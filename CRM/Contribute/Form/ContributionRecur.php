@@ -196,6 +196,15 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   }
 
   /**
+   * Get the recurring contribution ID.
+   *
+   * @return int
+   */
+  protected function getContributionRecurID(): int {
+    return $this->getSubscriptionDetails()->recur_id;
+  }
+
+  /**
    * Is this being used by a front end user to update their own recurring.
    *
    * @return bool

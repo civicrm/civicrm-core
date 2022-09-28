@@ -15,11 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
   public $_drilldownReport = ['pledge/summary' => 'Link to Detail Report'];
 
   protected $_customGroupExtends = [
@@ -159,6 +154,13 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
 
     // If we have a campaign, build out the relevant elements
     $this->addCampaignFields('civicrm_pledge');
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;

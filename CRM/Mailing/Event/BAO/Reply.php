@@ -23,13 +23,6 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Register a reply event.
    *
    * @param int $job_id
@@ -228,12 +221,12 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $component->find(TRUE);
 
     $domain = CRM_Core_BAO_Domain::getDomain();
-    list($domainEmailName, $_) = CRM_Core_BAO_Domain::getNameAndEmail();
+    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $params = [
       'subject' => $component->subject,
       'toEmail' => $to,
-      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     ];
@@ -263,7 +256,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $params['html'] = $html;
     $params['text'] = $text;
 
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'a', $eq->job_id, queue_id, $eq->hash);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'a', $eq->job_id, $queue_id, $eq->hash);
     if (CRM_Core_BAO_MailSettings::includeMessageId()) {
       $params['messageId'] = $params['Message-ID'];
     }

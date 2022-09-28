@@ -12,7 +12,7 @@
   {if $mode eq 'auto_renew'}
       {ts}Use this form to update the credit card and billing name and address used with the auto-renewal option for your {$membershipType} membership.{/ts}
   {else}
-    <strong>{ts 1=$amount|crmMoney 2=$frequency_interval 3=$frequency_unit}Recurring Contribution Details: %1 every %2 %3{/ts}
+    <strong>{ts 1=$amount|crmMoney 2=$recur_frequency_interval 3=$recur_frequency_unit}Recurring Contribution Details: %1 every %2 %3{/ts}
     {if $installments}
       {ts 1=$installments}for %1 installments{/ts}.
     {/if}</strong>

@@ -11,6 +11,9 @@
   <labelField>title</labelField>
   <paths>
     <add>civicrm/group/add?reset=1</add>
+    <view>civicrm/group/search?force=1&amp;context=smog&amp;gid=[id]&amp;component_mode=1</view>
+    <update>civicrm/group?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/group?reset=1&amp;action=delete&amp;id=[id]</delete>
   </paths>
   <field>
     <name>id</name>
@@ -87,6 +90,8 @@
   <field>
     <name>is_active</name>
     <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
     <title>Group Enabled</title>
     <comment>Is this entry active?</comment>
     <add>1.1</add>
@@ -190,6 +195,7 @@
     <type>boolean</type>
     <title>Group is Hidden</title>
     <default>0</default>
+    <required>true</required>
     <comment>Is this group hidden?</comment>
     <add>2.2</add>
   </field>
@@ -198,6 +204,7 @@
     <type>boolean</type>
     <title>Group is Reserved</title>
     <default>0</default>
+    <required>true</required>
     <add>4.2</add>
   </field>
   <index>

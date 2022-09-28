@@ -30,7 +30,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param CRM_Event_BAO_Event $event
    *
    * @return mixed
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function registerParticipant($params, &$participant, $event) {
     $participantParams = [
@@ -194,7 +194,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     ];
 
     if ($this->total) {
-      $this->add('text', 'billing_contact_email', 'Billing Email', '', TRUE);
+      $this->add('text', 'billing_contact_email', ts('Billing Email'), '', TRUE);
       $this->assign('collect_billing_email', TRUE);
     }
 
@@ -341,7 +341,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         'is_pay_later' => $this->is_pay_later,
         'pay_later_receipt' => $this->pay_later_receipt,
       ],
-      'valueName' => 'event_registration_receipt',
+      'workflow' => 'event_registration_receipt',
       'PDFFilename' => ts('confirmation') . '.pdf',
     ];
     $template_params_to_copy = [
@@ -558,8 +558,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $trxnDetails = [
       'trxn_id' => $result['trxn_id'],
-      'trxn_date' => $result['now'],
-      'currency' => $result['currencyID'] ?? NULL,
+      'trxn_date' => $params['receive_date'] ?? date('YmdHis'),
+      'currency' => $params['currencyID'],
     ];
     return $trxnDetails;
   }
@@ -694,7 +694,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @param int $event_id
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function apply_discount($discountCode, &$price_set_amount, &$cost, $event_id) {
     $extensions = civicrm_api3('Extension', 'get', [

@@ -43,6 +43,14 @@ class Permission extends Generic\AbstractEntity {
           'name' => 'group',
           'title' => 'Group',
           'data_type' => 'String',
+          'options' => [
+            'civicrm' => 'civicrm',
+            'cms' => 'cms',
+            'const' => 'const',
+            'afform' => 'afform',
+            'afformGeneric' => 'afformGeneric',
+            'unknown' => 'unknown',
+          ],
         ],
         [
           'name' => 'name',

@@ -43,6 +43,8 @@
     <name>is_active</name>
     <title>Enabled?</title>
     <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
     <comment>Is this property active?</comment>
     <add>2.0</add>
   </field>

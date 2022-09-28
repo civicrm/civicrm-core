@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -21,13 +23,6 @@ require_once 'Mail/mime.php';
  * Class CRM_Mailing_Event_BAO_Unsubscribe
  */
 class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscribe {
-
-  /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
 
   /**
    * Unsubscribe a contact from the domain.
@@ -111,7 +106,6 @@ WHERE  email = %2
    *   $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE): ?array {
     // First make sure there's a matching queue event.
@@ -132,10 +126,10 @@ WHERE  email = %2
     $relevant_mailing_id = $mailing_id;
 
     // Special case for AB Tests:
-    if (in_array($mailing_type, ['experiement', 'winner'])) {
+    if (in_array($mailing_type, ['experiment', 'winner'])) {
       // The mailing belongs to an AB test.
       // See if we can find an AB test where this is variant B.
-      $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', mailing_id, 'mailing_id_a', 'mailing_id_b');
+      $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_b');
       if (!empty($mailing_id_a)) {
         // OK, we were given mailing B and we looked up variant A which is the relevant one.
         $relevant_mailing_id = $mailing_id_a;
@@ -226,37 +220,76 @@ WHERE  email = %2
     $groupIdClause = '';
     if ($groupIds || $baseGroupIds) {
       $groupIdClause = "AND grp.id IN (" . implode(', ', array_merge($groupIds, $baseGroupIds)) . ")";
+      // Check that groupcontactcache is up to date so we can get smartgroups
+      CRM_Contact_BAO_GroupContactCache::check(array_merge($groupIds, $baseGroupIds));
     }
-    $do = CRM_Core_DAO::executeQuery("
+
+    /* https://lab.civicrm.org/dev/core/-/issues/3031
+     * When 2 separate tables are referenced in an OR clause the index will be used on one & not the other. At the sql
+     * level we usually deal with this by using UNION to join the 2 queries together - the patch is doing the same thing at
+     * the php level & probably as a result performs better than the original not-that-bad OR clause did & likely similarly to
+     * how a UNION would work.
+     */
+    $groupsCachedSQL = "
             SELECT      grp.id as group_id,
                         grp.title as title,
                         grp.frontend_title as frontend_title,
                         grp.frontend_description as frontend_description,
-                        grp.description as description
+                        grp.description as description,
+                        grp.saved_search_id as saved_search_id
+            FROM        civicrm_group grp
+            LEFT JOIN   civicrm_group_contact_cache gcc
+                ON      gcc.group_id = grp.id
+            WHERE       grp.is_hidden = 0
+                        $groupIdClause
+                AND     ((grp.saved_search_id is not null AND gcc.contact_id = %1)
+                            $baseGroupClause
+                        ) GROUP BY grp.id";
+
+    $groupsAddedSQL = "
+            SELECT      grp.id as group_id,
+                        grp.title as title,
+                        grp.frontend_title as frontend_title,
+                        grp.frontend_description as frontend_description,
+                        grp.description as description,
+                        grp.saved_search_id as saved_search_id
             FROM        civicrm_group grp
             LEFT JOIN   civicrm_group_contact gc
                 ON      gc.group_id = grp.id
             WHERE       grp.is_hidden = 0
                         $groupIdClause
-                AND     (grp.saved_search_id is not null
-                            OR  (gc.contact_id = $contact_id
+                AND     ((gc.contact_id = %1
                                 AND gc.status = 'Added')
                             $baseGroupClause
-                        )");
+                        ) GROUP BY grp.id";
+    $groupsParams = [
+      1 => [$contact_id, 'Positive'],
+    ];
+    $doCached = CRM_Core_DAO::executeQuery($groupsCachedSQL, $groupsParams);
+    $doAdded = CRM_Core_DAO::executeQuery($groupsAddedSQL, $groupsParams);
 
     if ($return) {
       $returnGroups = [];
-      while ($do->fetch()) {
-        $returnGroups[$do->group_id] = [
-          'title' => !empty($do->frontend_title) ? $do->frontend_title : $do->title,
-          'description' => !empty($do->frontend_description) ? $do->frontend_description : $do->description,
+      while ($doCached->fetch()) {
+        $returnGroups[$doCached->group_id] = [
+          'title' => !empty($doCached->frontend_title) ? $doCached->frontend_title : $doCached->title,
+          'description' => !empty($doCached->frontend_description) ? $doCached->frontend_description : $doCached->description,
+        ];
+      }
+      while ($doAdded->fetch()) {
+        $returnGroups[$doAdded->group_id] = [
+          'title' => !empty($doAdded->frontend_title) ? $doAdded->frontend_title : $doAdded->title,
+          'description' => !empty($doAdded->frontend_description) ? $doAdded->frontend_description : $doAdded->description,
         ];
       }
       return $returnGroups;
     }
     else {
-      while ($do->fetch()) {
-        $groups[$do->group_id] = !empty($do->frontend_title) ? $do->frontend_title : $do->title;
+      while ($doCached->fetch()) {
+        $groups[$doCached->group_id] = !empty($doCached->frontend_title) ? $doCached->frontend_title : $doCached->title;
+      }
+      while ($doAdded->fetch()) {
+        $groups[$doAdded->group_id] = !empty($doAdded->frontend_title) ? $doAdded->frontend_title : $doAdded->title;
       }
     }
     $transaction = new CRM_Core_Transaction();
@@ -290,9 +323,9 @@ WHERE  email = %2
    * Send a response email informing the contact of the groups from which he.
    * has been unsubscribed.
    *
-   * @param string $queue_id
+   * @param int $queue_id
    *   The queue event ID.
-   * @param array $groups
+   * @param array|null $groups
    *   List of group IDs.
    * @param bool $is_domain
    *   Is this domain-level?.
@@ -367,24 +400,35 @@ WHERE  email = %2
     $bao->body_text = $text;
     $bao->body_html = $html;
     $tokens = $bao->getTokens();
+    $templates = $bao->getTemplates();
+
     if ($eq->format == 'HTML' || $eq->format == 'Both') {
-      $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
-      $html = CRM_Utils_Token::replaceUnsubscribeTokens($html, $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
+      $html = CRM_Utils_Token::replaceUnsubscribeTokens($templates['html'], $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
       $html = CRM_Utils_Token::replaceActionTokens($html, $addresses, $urls, TRUE, $tokens['html']);
       $html = CRM_Utils_Token::replaceMailingTokens($html, $dao, NULL, $tokens['html']);
     }
     if (!$html || $eq->format == 'Text' || $eq->format == 'Both') {
-      $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
-      $text = CRM_Utils_Token::replaceUnsubscribeTokens($text, $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
+      $text = CRM_Utils_Token::replaceUnsubscribeTokens($templates['text'], $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
       $text = CRM_Utils_Token::replaceActionTokens($text, $addresses, $urls, FALSE, $tokens['text']);
       $text = CRM_Utils_Token::replaceMailingTokens($text, $dao, NULL, $tokens['text']);
     }
 
-    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['contactId'],
+    ]);
+
+    $tokenProcessor->addMessage('body_html', $html, 'text/html');
+    $tokenProcessor->addMessage('body_text', $text, 'text/plain');
+    $tokenProcessor->addRow(['contactId' => $eq->contact_id]);
+    $tokenProcessor->evaluate();
+    $html = $tokenProcessor->getRow(0)->render('body_html');
+    $text = $tokenProcessor->getRow(0)->render('body_text');
 
     $params = [
       'subject' => $component->subject,
-      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'toEmail' => $eq->email,
       'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),

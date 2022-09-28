@@ -28,6 +28,16 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   public $_contactId = NULL;
 
   /**
+   * @var bool
+   */
+  private $_isPaymentProcessor = FALSE;
+
+  /**
+   * @var bool
+   */
+  private $_accessContribution = FALSE;
+
+  /**
    * called when action is browse.
    */
   public function browse() {
@@ -45,6 +55,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $dao = new CRM_Member_DAO_Membership();
     $dao->contact_id = $this->_contactId;
     $dao->whereAdd($addWhere);
+    $dao->orderBy('end_date DESC');
     $dao->find();
 
     //CRM--4418, check for view, edit, delete
@@ -118,8 +129,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported(
           $membership[$dao->id]['membership_id']);
         $links = self::links('all',
-            NULL,
-            NULL,
+            FALSE,
+            FALSE,
             $isCancelSupported,
             $isUpdateBilling
         );
@@ -156,7 +167,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
       // Display Auto-renew status on page (0=disabled, 1=enabled, 2=enabled, but error
       if (!empty($membership[$dao->id]['contribution_recur_id'])) {
-        if (CRM_Member_BAO_Membership::isSubscriptionCancelled($membership[$dao->id]['membership_id'])) {
+        if (CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $membership[$dao->id]['membership_id'])) {
           $membership[$dao->id]['auto_renew'] = 2;
         }
         else {
@@ -240,7 +251,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is view.
    *
-   * @return null
+   * @return mixed
    */
   public function view() {
     $controller = new CRM_Core_Controller_Simple(
@@ -258,7 +269,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   /**
    * called when action is update or new.
    *
-   * @return null
+   * @return mixed
    */
   public function edit() {
     // We're trying to edit existing memberships or create a new one so we'll first check that a membership
@@ -287,8 +298,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
         //show associated soft credit when contribution payment is paid by different person in edit mode
         if ($this->_id && $this->_contactId) {
-          $filter = " AND cc.id IN (SELECT contribution_id FROM civicrm_membership_payment WHERE membership_id = {$this->_id})";
-          $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $filter);
+          $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $this->_id);
           if (!empty($softCreditList)) {
             $this->assign('softCredit', TRUE);
             $this->assign('softCreditRows', $softCreditList);
@@ -340,9 +350,11 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * the main function that is called when the page loads, it decides the which action has to be taken for the page.
+   * the main function that is called when the page loads, it decides the which
+   * action has to be taken for the page.
    *
    * @return null
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     $this->preProcess();
@@ -362,8 +374,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
       //show associated soft credit when contribution payment is paid by different person
       if ($this->_id && $this->_contactId) {
-        $filter = " AND cc.id IN (SELECT contribution_id FROM civicrm_membership_payment WHERE membership_id = {$this->_id})";
-        $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $filter);
+        $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $this->_id);
         if (!empty($softCreditList)) {
           $this->assign('softCredit', TRUE);
           $this->assign('softCreditRows', $softCreditList);
@@ -486,8 +497,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * Get action links.
    *
    * @param string $status
-   * @param null $isPaymentProcessor
-   * @param null $accessContribution
+   * @param bool $isPaymentProcessor
+   * @param bool $accessContribution
    * @param bool $isCancelSupported
    * @param bool $isUpdateBilling
    *
@@ -496,8 +507,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    */
   public static function &links(
     $status = 'all',
-    $isPaymentProcessor = NULL,
-    $accessContribution = NULL,
+    $isPaymentProcessor = FALSE,
+    $accessContribution = FALSE,
     $isCancelSupported = FALSE,
     $isUpdateBilling = FALSE
   ) {
@@ -640,8 +651,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    *
    * @param int $memTypeID
    *   membership type ID
-   * @param int $links
-   *   (reference ) action links
+   * @param array $links
+   *   (reference) action links
    */
   public static function getPermissionedLinks($memTypeID, &$links) {
     if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {

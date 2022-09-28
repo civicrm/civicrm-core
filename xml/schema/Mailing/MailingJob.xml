@@ -93,6 +93,7 @@
     <title>Mailing Job Is Test?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this job for a test mail?</comment>
     <add>1.9</add>
   </field>

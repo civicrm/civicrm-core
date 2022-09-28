@@ -7,9 +7,9 @@
  * @param $config
  */
 function _demoqueue_civix_civicrm_config(&$config) {
-  $template =& CRM_Core_Smarty::singleton();
+  $template = CRM_Core_Smarty::singleton();
 
-  $extRoot = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+  $extRoot = __DIR__ . DIRECTORY_SEPARATOR;
   $extDir = $extRoot . 'templates';
 
   if (is_array($template->template_dir)) {

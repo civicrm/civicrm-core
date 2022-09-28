@@ -152,8 +152,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     ]);
 
     //CiviPledge fields.
-    $config = CRM_Core_Config::singleton();
-    if (in_array('CiviPledge', $config->enableComponents)) {
+    if (CRM_Core_Component::isEnabled('CiviPledge')) {
       $this->assign('civiPledge', TRUE);
       $this->addElement('checkbox', 'is_pledge_active', ts('Pledges'),
         NULL, ['onclick' => "showHideAmountBlock( this, 'is_pledge_active' ); return showHideByValue('is_pledge_active',true,'pledgeFields','table-row','radio',false);"]
@@ -290,7 +289,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    *
    * @return bool|array

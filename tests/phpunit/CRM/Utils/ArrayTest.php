@@ -207,6 +207,30 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
   }
 
+  public function testGetSet_EmptyPath() {
+    $emptyPath = [];
+
+    $x = 'hello';
+    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals('hello', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals('hello', $x);
+
+    CRM_Utils_Array::pathSet($x, $emptyPath, 'bon jour');
+    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals('bon jour', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals('bon jour', $x);
+
+    CRM_Utils_Array::pathUnset($x, $emptyPath);
+    $this->assertEquals(FALSE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals(NULL, CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals(NULL, $x);
+
+    CRM_Utils_Array::pathSet($x, $emptyPath, 'buenos dias');
+    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals('buenos dias', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals('buenos dias', $x);
+  }
+
   public function getSortExamples() {
     $red = ['label' => 'Red', 'id' => 1, 'weight' => '90'];
     $orange = ['label' => 'Orange', 'id' => 2, 'weight' => '70'];
@@ -432,6 +456,53 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $flat = [];
     CRM_Utils_Array::flatten($data, $flat);
     $this->assertEquals($flat, $expected);
+  }
+
+  public function testSingle() {
+    $okExamples = [
+      ['abc'],
+      [123],
+      [TRUE],
+      [FALSE],
+      [''],
+      [[]],
+      [[1, 2, 3]],
+      ['a' => 'b'],
+      (function () {
+        yield 'abc';
+      })(),
+    ];
+    $badExamples = [
+      [],
+      [1, 2],
+      ['a' => 'b', 'c' => 'd'],
+      [[], []],
+      (function () {
+        yield from [];
+      })(),
+      (function () {
+        yield 1;
+        yield 2;
+      })(),
+    ];
+
+    $todoCount = count($okExamples) + count($badExamples);
+    foreach ($okExamples as $i => $okExample) {
+      $this->assertTrue(CRM_Utils_Array::single($okExample) !== NULL, "Expect to get a result from example ($i)");
+      $todoCount--;
+    }
+
+    foreach ($badExamples as $i => $badExample) {
+      try {
+        CRM_Utils_Array::single($badExample);
+        $this->fail("Expected exception for bad example ($i)");
+      }
+      catch (CRM_Core_Exception $e) {
+        $todoCount--;
+      }
+    }
+
+    $this->assertEquals(0, $todoCount);
   }
 
 }

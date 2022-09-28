@@ -1,6 +1,7 @@
 <?php
 
 require_once 'search_kit.civix.php';
+use CRM_Search_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
@@ -10,6 +11,7 @@ require_once 'search_kit.civix.php';
 function search_kit_civicrm_config(&$config) {
   _search_kit_civix_civicrm_config($config);
   Civi::dispatcher()->addListener('hook_civicrm_alterAngular', ['\Civi\Search\AfformSearchMetadataInjector', 'preprocess'], 1000);
+  Civi::dispatcher()->addSubscriber(new Civi\Api4\Event\Subscriber\SearchKitSubscriber());
 }
 
 /**
@@ -24,24 +26,30 @@ function search_kit_civicrm_container($container) {
 }
 
 /**
- * Implements hook_civicrm_xmlMenu().
+ * Implements hook_civicrm_permission().
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
+ * Define SearchKit permissions.
  */
-function search_kit_civicrm_xmlMenu(&$files) {
-  _search_kit_civix_civicrm_xmlMenu($files);
+function search_kit_civicrm_permission(&$permissions) {
+  $permissions['administer search_kit'] = [
+    E::ts('Search Kit: edit and delete searches'),
+    E::ts('Gives non-admin users access to the Search Kit UI to create, update and delete searches and displays'),
+  ];
 }
 
 /**
- * Implements hook_civicrm_managed().
+ * Implements hook_civicrm_alterApiRoutePermissions().
  *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
+ * Allow anonymous users to run a search display. Permissions are checked internally.
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
+ * @see CRM_Utils_Hook::alterApiRoutePermissions
  */
-function search_kit_civicrm_managed(&$entities) {
-  _search_kit_civix_civicrm_managed($entities);
+function search_kit_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action) {
+  if ($entity === 'SearchDisplay') {
+    if ($action === 'run' || $action === 'download' || $action === 'getSearchTasks') {
+      $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
+    }
+  }
 }
 
 /**
@@ -55,7 +63,6 @@ function search_kit_civicrm_managed(&$entities) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
  */
 function search_kit_civicrm_angularModules(&$angularModules) {
-  _search_kit_civix_civicrm_angularModules($angularModules);
   // Fetch all search tasks provided by extensions and add their Angular modules as crmSearchTasks dependencies
   $tasks = [];
   $null = NULL;
@@ -76,15 +83,6 @@ function search_kit_civicrm_angularModules(&$angularModules) {
 }
 
 /**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
- */
-function search_kit_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _search_kit_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
  * Implements hook_civicrm_entityTypes().
  *
  * Declare entity types provided by this module.
@@ -96,23 +94,26 @@ function search_kit_civicrm_entityTypes(&$entityTypes) {
 }
 
 /**
- * Implements hook_civicrm_themes().
- */
-function search_kit_civicrm_themes(&$themes) {
-  _search_kit_civix_civicrm_themes($themes);
-}
-
-/**
  * Implements hook_civicrm_pre().
  */
 function search_kit_civicrm_pre($op, $entity, $id, &$params) {
-  // Supply default name/label when creating new SearchDisplay
-  if ($entity === 'SearchDisplay' && $op === 'create') {
-    if (empty($params['label'])) {
-      $params['label'] = $params['name'];
-    }
-    elseif (empty($params['name'])) {
-      $params['name'] = \CRM_Utils_String::munge($params['label']);
-    }
+  // When deleting a saved search, also delete the displays
+  // This would happen anyway in sql because of the ON DELETE CASCADE foreign key,
+  // But this ensures that pre and post hooks are called
+  if ($entity === 'SavedSearch' && $op === 'delete') {
+    \Civi\Api4\SearchDisplay::delete(FALSE)
+      ->addWhere('saved_search_id', '=', $id)
+      ->execute();
+  }
+}
+
+/**
+ * Implements hook_civicrm_post().
+ */
+function search_kit_civicrm_post($op, $entity, $id, $object) {
+  // Flush fieldSpec cache when saving a SearchSegment
+  if ($entity === 'SearchSegment') {
+    \Civi::$statics['all_search_segments'] = NULL;
+    \Civi::cache('metadata')->clear();
   }
 }

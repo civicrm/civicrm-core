@@ -18,7 +18,7 @@
 /**
  * This class contains payment processor related functions.
  */
-class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProcessor {
+class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProcessor implements \Civi\Core\HookInterface {
   /**
    * Static holder for the default payment processor
    * @var object
@@ -34,7 +34,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return CRM_Financial_DAO_PaymentProcessor
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function create(array $params): CRM_Financial_DAO_PaymentProcessor {
     // If we are creating a new PaymentProcessor and have not specified the payment instrument to use, get the default from the Payment Processor Type.
@@ -92,7 +91,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
   /**
    * Retrieve array of allowed credit cards for this payment processor.
-   * @param integer|null $paymentProcessorID id of processor.
+   * @param int|null $paymentProcessorID
    * @return array
    */
   public static function getCreditCards($paymentProcessorID = NULL) {
@@ -100,7 +99,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $processor = new CRM_Financial_DAO_PaymentProcessor();
       $processor->id = $paymentProcessorID;
       $processor->find(TRUE);
-      $cards = json_decode($processor->accepted_credit_cards, TRUE);
+      $cards = json_decode(($processor->accepted_credit_cards ?? ''), TRUE);
       return $cards;
     }
     return [];
@@ -127,26 +126,20 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Financial_DAO_PaymentProcessor|null
-   *   object on success, null otherwise
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
-    $paymentProcessor->copyValues($params);
-    if ($paymentProcessor->find(TRUE)) {
-      CRM_Core_DAO::storeValues($paymentProcessor, $defaults);
-      return $paymentProcessor;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -184,27 +177,29 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * Delete payment processor.
    *
    * @param int $paymentProcessorID
-   *
-   * @return null
+   * @deprecated
    */
   public static function del($paymentProcessorID) {
     if (!$paymentProcessorID) {
       throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
     }
+    static::deleteRecord(['id' => $paymentProcessorID]);
+  }
 
-    $dao = new CRM_Financial_DAO_PaymentProcessor();
-    $dao->id = $paymentProcessorID;
-    if (!$dao->find(TRUE)) {
-      return NULL;
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'delete') {
+      // When a paymentProcessor is deleted, delete the associated test processor
+      $testDAO = new CRM_Financial_DAO_PaymentProcessor();
+      $testDAO->name = $event->object->name;
+      $testDAO->is_test = 1;
+      $testDAO->delete();
+
+      Civi\Payment\System::singleton()->flushProcessors();
     }
-
-    $testDAO = new CRM_Financial_DAO_PaymentProcessor();
-    $testDAO->name = $dao->name;
-    $testDAO->is_test = 1;
-    $testDAO->delete();
-
-    $dao->delete();
-    Civi\Payment\System::singleton()->flushProcessors();
   }
 
   /**
@@ -268,15 +263,15 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Get all payment processors as an array of objects.
    *
-   * @param string|NULL $mode
+   * @param string|null $mode
    * only return this mode - test|live or NULL for all
    * @param bool $reset
    * @param bool $isCurrentDomainOnly
    *   Do we only want to load payment processors associated with the current domain.
-   * @param bool|NULL $isActive
+   * @param bool|null $isActive
    *   Do we only want active processors, only inactive (FALSE) or all processors (NULL)
    *
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    * @return array
    */
   public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $isCurrentDomainOnly = TRUE, $isActive = TRUE) {
@@ -378,7 +373,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    *   available processors
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getPaymentProcessors($capabilities = [], $ids = FALSE) {
     if (is_array($ids)) {
@@ -549,7 +544,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
       try {
         $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $ppID]);
       }
-      catch (API_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         // Unable to load the processor because this function uses an unreliable method to derive it.
         // The function looks to load the payment processor ID from the contribution page, which
         // can support multiple processors.

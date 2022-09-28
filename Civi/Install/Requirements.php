@@ -121,7 +121,7 @@ class Requirements {
   /**
    * Generates a mysql connection
    *
-   * @param $db_config array
+   * @param array $db_config
    * @return object mysqli connection
    */
   protected function connect($db_config) {

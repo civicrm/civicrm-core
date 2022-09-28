@@ -47,20 +47,18 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
   public function buildForm(&$form) {
     $form->add('text',
       'postal_code_low',
-      ts('Postal Code Start'),
-      TRUE
+      ts('Postal Code Start')
     );
 
     $form->add('text',
       'postal_code_high',
-      ts('Postal Code End'),
-      TRUE
+      ts('Postal Code End')
     );
 
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle('Zip Code Range Search');
+    $this->setTitle(ts('Zip Code Range Search'));
 
     /**
      * if you are using the standard template, this array tells the template what elements
@@ -73,8 +71,7 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
    * @return array
    */
   public function summary() {
-    $summary = [];
-    return $summary;
+    return [];
   }
 
   /**
@@ -186,18 +183,6 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
    */
   public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
-  }
-
-  /**
-   * @param $title
-   */
-  public function setTitle($title) {
-    if ($title) {
-      CRM_Utils_System::setTitle($title);
-    }
-    else {
-      CRM_Utils_System::setTitle(ts('Search'));
-    }
   }
 
   /**

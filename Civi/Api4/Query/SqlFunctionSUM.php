@@ -21,7 +21,7 @@ class SqlFunctionSUM extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'flag_before' => ['DISTINCT' => ts('Distinct')],
+        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
         'must_be' => ['SqlField'],
       ],
     ];
@@ -32,6 +32,13 @@ class SqlFunctionSUM extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Sum');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The sum of all values in the grouping.');
   }
 
 }

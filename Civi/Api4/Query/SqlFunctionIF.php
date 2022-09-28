@@ -23,9 +23,19 @@ class SqlFunctionIF extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'min_expr' => 3,
-        'max_expr' => 3,
         'optional' => FALSE,
+        'must_be' => ['SqlEquation', 'SqlField'],
+        'label' => ts('If'),
+      ],
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull'],
+        'label' => ts('Then'),
+      ],
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull'],
+        'label' => ts('Else'),
       ],
     ];
   }
@@ -34,7 +44,14 @@ class SqlFunctionIF extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('If');
+    return ts('If/Else');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('If the field is empty, the first value, otherwise the second.');
   }
 
 }

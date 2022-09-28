@@ -18,13 +18,24 @@ class SqlFunctionREPLACE extends SqlFunction {
 
   protected static $category = self::CATEGORY_STRING;
 
+  protected static $dataType = 'String';
+
   protected static function params(): array {
     return [
       [
-        'min_expr' => 3,
-        'max_expr' => 3,
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlString'],
+        'label' => ts('Source'),
+      ],
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlString', 'SqlField'],
+        'label' => ts('Find'),
+      ],
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlString', 'SqlField'],
+        'label' => ts('Replace'),
       ],
     ];
   }
@@ -33,7 +44,14 @@ class SqlFunctionREPLACE extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Replace');
+    return ts('Replace text');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Substitutes one value for another in the text.');
   }
 
 }

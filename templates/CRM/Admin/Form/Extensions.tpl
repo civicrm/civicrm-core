@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for install /uninstall extensions  *}
-<h3>{$title}</h3>
+<h3>{$title|smarty:nodefaults}</h3>
 <div class="crm-block crm-form-block crm-admin-optionvalue-form-block">
    {if $action eq 8}
       <div class="messages status no-popup">
@@ -19,7 +19,7 @@
    {if $action eq 1}
      <div class="messages status no-popup">
         {icon icon="fa-info-circle"}{/icon}
-        {ts}Installing this extension will provide you with new functionality. Please make sure that the extension you're installing comes from a trusted source.{/ts} {ts}Do you want to continue?{/ts}
+        {ts}Installing this extension will provide you with new functionality.{/ts} {ts}Do you want to continue?{/ts}
       </div>
    {/if}
    {if $action eq 2}

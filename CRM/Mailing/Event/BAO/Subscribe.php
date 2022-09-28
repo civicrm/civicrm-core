@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -24,13 +26,6 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Register a subscription event.  Create a new contact if one does not
    * already exist.
    *
@@ -44,8 +39,8 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
    *   during event registration.
    * @param string $context
    *
-   * @return int|null
-   *   $se_id      The id of the subscription event, null on failure
+   * @return CRM_Mailing_Event_BAO_Subscribe|null
+   *   $se_id      The subscription event object, null on failure
    */
   public static function &subscribe($group_id, $email, $contactId = NULL, $context = NULL) {
     // CRM-1797 - allow subscription only to public groups
@@ -230,21 +225,26 @@ SELECT     civicrm_email.id as email_id
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
-    $tokens = $bao->getTokens();
+    $templates = $bao->getTemplates();
 
-    $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
-    $html = CRM_Utils_Token::replaceSubscribeTokens($html,
-      $group->title,
-      $url, TRUE
-    );
+    $html = CRM_Utils_Token::replaceSubscribeTokens($templates['html'], $group->title, $url, TRUE);
+    $text = CRM_Utils_Token::replaceSubscribeTokens($templates['text'], $group->title, $url, FALSE);
 
-    $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
-    $text = CRM_Utils_Token::replaceSubscribeTokens($text,
-      $group->title,
-      $url, FALSE
-    );
     // render the &amp; entities in text mode, so that the links work
     $text = str_replace('&amp;', '&', $text);
+
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['contactId'],
+    ]);
+
+    $tokenProcessor->addMessage('body_html', $html, 'text/html');
+    $tokenProcessor->addMessage('body_text', $text, 'text/plain');
+    $tokenProcessor->addRow(['contactId' => $this->contact_id]);
+    $tokenProcessor->evaluate();
+    $html = $tokenProcessor->getRow(0)->render('body_html');
+    $text = $tokenProcessor->getRow(0)->render('body_text');
 
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 's',
       $this->contact_id,
@@ -335,7 +335,7 @@ SELECT     civicrm_email.id as email_id
    *   during event registration.
    * @param string $context
    */
-  public static function commonSubscribe(&$groups, &$params, $contactId = NULL, $context = NULL) {
+  public static function commonSubscribe($groups, $params, $contactId = NULL, $context = NULL) {
     $contactGroups = CRM_Mailing_Event_BAO_Subscribe::getContactGroups($params['email'], $contactId);
     $group = [];
     $success = NULL;

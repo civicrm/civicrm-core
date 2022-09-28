@@ -27,7 +27,7 @@ CREATE TABLE `civicrm_relationship_cache` (
      CONSTRAINT FK_civicrm_relationship_cache_relationship_type_id FOREIGN KEY (`relationship_type_id`) REFERENCES `civicrm_relationship_type`(`id`) ON DELETE CASCADE,
      CONSTRAINT FK_civicrm_relationship_cache_near_contact_id FOREIGN KEY (`near_contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,
      CONSTRAINT FK_civicrm_relationship_cache_far_contact_id FOREIGN KEY (`far_contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
-)  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+)  ENGINE=InnoDB;
 
 -- Fix missing resubscribeUrl token. There doesn't seem to be any precedent
 -- for doing an upgrade for these, since the last update was in 2009 when

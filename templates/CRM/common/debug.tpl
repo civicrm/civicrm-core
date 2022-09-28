@@ -8,26 +8,26 @@
  +--------------------------------------------------------------------+
 *}
 <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
-{if !empty($smarty.get.smartyDebug)}
+{if isset($smarty.get.smartyDebug|smarty:nodefaults)}
 {debug}
 {/if}
 
-{if !empty($smarty.get.sessionReset)}
+{if isset($smarty.get.sessionReset|smarty:nodefaults)}
 {$session->reset($smarty.get.sessionReset)}
 {/if}
 
-{if !empty($smarty.get.sessionDebug)}
+{if isset($smarty.get.sessionDebug|smarty:nodefaults)}
 {$session->debug($smarty.get.sessionDebug)}
 {/if}
 
-{if !empty($smarty.get.directoryCleanup)}
+{if isset($smarty.get.directoryCleanup|smarty:nodefaults)}
 {$config->cleanup($smarty.get.directoryCleanup)}
 {/if}
 
-{if !empty($smarty.get.cacheCleanup)}
+{if isset($smarty.get.cacheCleanup|smarty:nodefaults)}
 {$config->clearDBCache()}
 {/if}
 
-{if !empty($smarty.get.configReset)}
+{if isset($smarty.get.configReset|smarty:nodefaults)}
 {$config->reset()}
 {/if}

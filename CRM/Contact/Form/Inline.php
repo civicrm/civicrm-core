@@ -162,6 +162,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
       'contact_view_options', TRUE
     );
     $smarty->assign('changeLog', $viewOptions['log']);
+    $smarty->ensureVariablesAreAssigned(['action']);
     $ret = ['markup' => $smarty->fetch('CRM/common/contactFooter.tpl')];
     if ($includeCount) {
       $ret['count'] = CRM_Contact_BAO_Contact::getCountComponent('log', $cid);

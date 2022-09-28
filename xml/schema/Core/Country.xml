@@ -108,6 +108,7 @@
     <title>Abbreviate Province?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Should state/province be displayed as abbreviation for contacts from this country?</comment>
     <add>3.1</add>
   </field>
@@ -116,6 +117,7 @@
     <title>Country Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this Country active?</comment>
     <add>5.35</add>
   </field>

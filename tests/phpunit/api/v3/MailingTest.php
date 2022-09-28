@@ -33,8 +33,6 @@
 class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_groupID;
   protected $_email;
-  protected $_apiversion = 3;
-  protected $_params = [];
   protected $_entity = 'Mailing';
   protected $_contactID;
 
@@ -55,7 +53,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_params = [
       'subject' => 'Hello {contact.display_name}',
       'body_text' => "This is {contact.display_name}.\nhttps://civicrm.org\n{domain.address}{action.optOutUrl}",
-      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
+      // 'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
+      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"{action.forward}\">Forward this email</a></p><p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
       'name' => 'mailing name',
       'created_id' => $this->_contactID,
       'header_id' => '',
@@ -78,15 +77,21 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_mailing_create.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testMailerCreateSuccess(): void {
+  public function testMailerCreateSuccess(int $version): void {
+    $this->_apiversion = $version;
+    $this->enableCiviCampaign();
     $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign'], __FUNCTION__, __FILE__);
-    $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $result['id']]);
+    $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals(1, $jobs['count']);
     // return isn't working on this in getAndCheck so lets not check it for now
     unset($this->_params['created_id']);
-    $this->getAndCheck($this->_params, $result['id'], 'mailing');
+    $this->getAndCheck($this->_params, $result['id'], 'Mailing');
   }
 
   /**
@@ -104,9 +109,12 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Create a completed mailing (e.g when importing from a provider).
    *
-   * @throws \CRM_Core_Exception
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testMailerCreateCompleted() {
+  public function testMailerCreateCompleted(int $version): void {
+    $this->_apiversion = $version;
     $this->_params['body_html'] = 'I am completed so it does not matter if there is an opt out link since I have already been sent by another system';
     $this->_params['is_completed'] = 1;
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
@@ -121,7 +129,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Per CRM-20316 the mailing should still create without created_id (not mandatory).
    */
-  public function testMailerCreateSuccessNoCreatedID() {
+  public function testMailerCreateSuccessNoCreatedID(): void {
     unset($this->_params['created_id']);
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
@@ -256,12 +264,15 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertEquals([$contactIDs['b']], $getRecipient3_ids);
   }
 
-  public function testMailerPreview() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailerPreview(): void {
     // BEGIN SAMPLE DATA
     $contactID = $this->individualCreate();
     $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
     $displayName = $displayName['values'][$contactID]['display_name'];
-    $this->assertTrue(!empty($displayName));
+    $this->assertNotEmpty($displayName);
 
     $params = $this->_params;
     $params['api.Mailing.preview'] = [
@@ -286,16 +297,16 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group');
     // 'Preview should not create any mailing_recipient records'
     $this->assertDBQuery($maxIDs['recipient'], 'SELECT MAX(id) FROM civicrm_mailing_recipients');
-    $baseurl = CRM_Utils_System::baseCMSURL();
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
     $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
     $this->assertStringContainsString("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
-    $this->assertStringContainsString('<a href="' . $baseurl . 'index.php?q=civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=">Forward this email with no protocol</a>', $previewResult['values']['body_html']);
+    $this->assertRegexp('!>Forward this email</a>!', $previewResult['values']['body_html']);
+    $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
-  public function testMailerPreviewUnknownContact() {
+  public function testMailerPreviewUnknownContact(): void {
     $params = $this->_params;
     $params['api.Mailing.preview'] = [
       'id' => '$value.id',
@@ -307,12 +318,12 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     // unknown-contact. However, changes should be purposeful, so we'll test
     // for the current behavior (i.e. returning blanks).
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-    $this->assertEquals("Hello ", $previewResult['values']['subject']);
-    $this->assertStringContainsString("This is .", $previewResult['values']['body_text']);
-    $this->assertStringContainsString("<p>This is .</p>", $previewResult['values']['body_html']);
+    $this->assertEquals('Hello ', $previewResult['values']['subject']);
+    $this->assertStringContainsString('This is .', $previewResult['values']['body_text']);
+    $this->assertStringContainsString('<p>This is .</p>', $previewResult['values']['body_html']);
   }
 
-  public function testMailerPreviewRecipients() {
+  public function testMailerPreviewRecipients(): void {
     // BEGIN SAMPLE DATA
     $groupIDs['inc'] = $this->groupCreate(['name' => 'Example include group', 'title' => 'Example include group']);
     $groupIDs['exc'] = $this->groupCreate(['name' => 'Example exclude group', 'title' => 'Example exclude group']);
@@ -547,7 +558,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       [],
       ['scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'],
       // expectedFailure
-      "/Failed to determine current user/",
+      '/Failed to determine current user/',
       // expectedJobCount
       0,
     ];
@@ -569,7 +580,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       [],
       [],
       // expectedFailure
-      "/Missing parameter scheduled_date and.or approval_date/",
+      '/Missing parameter scheduled_date and.or approval_date/',
       // expectedJobCount
       0,
     ];
@@ -591,7 +602,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       ['body_html' => '', 'body_text' => ''],
       ['scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'],
       // expectedFailure
-      "/Mailing cannot be sent. There are missing or invalid fields \\(body\\)./",
+      "/Mailing cannot be sent. There are missing or invalid fields \\(.*body.*\\)./",
       // expectedJobCount
       0,
     ];
@@ -652,7 +663,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * @dataProvider submitProvider
    * @throws \CRM_Core_Exception
    */
-  public function testMailerSubmit($useLogin, $createParams, $submitParams, $expectedFailure, $expectedJobCount) {
+  public function testMailerSubmit($useLogin, array $createParams, $submitParams, $expectedFailure, $expectedJobCount): void {
     if ($useLogin) {
       $this->createLoggedInUser();
     }
@@ -669,9 +680,9 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       $this->assertRegExp($expectedFailure, $submitResult['error_message']);
     }
     else {
-      $submitResult = $this->callAPIAndDocument('mailing', 'submit', $submitParams, __FUNCTION__, __FILE__);
-      $this->assertTrue(is_numeric($submitResult['id']));
-      $this->assertTrue(is_numeric($submitResult['values'][$id]['scheduled_id']));
+      $submitResult = $this->callAPIAndDocument('Mailing', 'submit', $submitParams, __FUNCTION__, __FILE__);
+      $this->assertIsNumeric($submitResult['id']);
+      $this->assertIsNumeric($submitResult['values'][$id]['scheduled_id']);
       $this->assertEquals($submitParams['scheduled_date'], $submitResult['values'][$id]['scheduled_date']);
     }
     $this->assertDBQuery($expectedJobCount, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', [
@@ -683,15 +694,18 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * Test unsubscribe list contains correct groups
    * when include = 'previous mailing'
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testUnsubscribeGroupList() {
     // Create set of groups and add a contact to both of them.
     $groupID2 = $this->groupCreate(['name' => 'Test group 2', 'title' => 'group title 2']);
     $groupID3 = $this->groupCreate(['name' => 'Test group 3', 'title' => 'group title 3']);
+    $smartGroupParams = ['form_values' => ['contact_type' => ['IN' => ['Household']]]];
+    $savedSearch = CRM_Contact_BAO_SavedSearch::create($smartGroupParams);
+    $groupID4 = $this->groupCreate(['name' => 'Test group 4', 'title' => 'group title 4', 'saved_search_id' => $savedSearch->id]);
+
     $contactId = $this->individualCreate();
-    foreach ([$groupID2, $groupID3] as $grp) {
+    foreach ([$groupID2, $groupID3, $groupID4] as $grp) {
       $params = [
         'contact_id' => $contactId,
         'group_id' => $grp,
@@ -710,7 +724,14 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'entity_id' => $groupID3,
       'group_type' => 'Include',
     ];
-    $mailingGroup = $this->callAPISuccess('MailingGroup', 'create', $mgParams);
+    $this->callAPISuccess('MailingGroup', 'create', $mgParams);
+    $mgParams = [
+      'mailing_id' => $mail['id'],
+      'entity_table' => 'civicrm_group',
+      'entity_id' => $groupID4,
+      'group_type' => 'Include',
+    ];
+    $this->callAPISuccess('MailingGroup', 'create', $mgParams);
     unset(Civi::$statics['CRM_Core_Permission_Base']);
 
     //Include previous mail in the mailing group.
@@ -730,10 +751,17 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $jobId = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingJob', $mail2['id'], 'id', 'mailing_id');
     $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_Queue', $jobId, 'hash', 'job_id');
     $queueId = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_Queue', $jobId, 'id', 'job_id');
-    $group = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
-    //Assert only one group returns in the unsubscribe list.
-    $this->assertCount(1, $group);
-    $this->assertEquals($groupID3, key($group));
+    // This gets the list of groups to unsubscribe but does NOT actually unsubcribe from groups (because return=TRUE)
+    $beforeUnsubscribeGroups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    // Assert that there are two groups in the unsubscribe list.
+    $this->assertCount(2, $beforeUnsubscribeGroups);
+    $this->assertArrayHasKey($groupID3, $beforeUnsubscribeGroups);
+    $this->assertArrayHasKey($groupID4, $beforeUnsubscribeGroups);
+    // Do the actual unsubscribe
+    CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, FALSE);
+    // Assert that there are now no groups in the unsubscribe list.
+    $afterUnsubscribeGroups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    $this->assertCount(0, $afterUnsubscribeGroups);
   }
 
   /**
@@ -776,6 +804,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $result = $this->callAPISuccess('mailing', 'stats', ['mailing_id' => $mail['id']]);
     $expectedResult = [
       //since among 100 mails 20 has been bounced
+      'Recipients' => 100,
       'Delivered' => 80,
       'Bounces' => 20,
       'Opened' => 20,

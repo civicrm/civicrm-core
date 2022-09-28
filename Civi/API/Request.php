@@ -45,17 +45,18 @@ class Request {
         ];
 
       case 4:
-        // For custom pseudo-entities
-        if (strpos($entity, 'Custom_') === 0) {
-          $apiRequest = \Civi\Api4\CustomValue::$action(substr($entity, 7));
+        $className = CoreUtil::getApiClass($entity);
+        $callable = [$className, $action];
+        if (!$className || !is_callable($callable)) {
+          throw new \Civi\API\Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
         }
-        else {
-          $callable = [CoreUtil::getApiClass($entity), $action];
-          if (!is_callable($callable)) {
-            throw new \Civi\API\Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
-          }
-          $apiRequest = call_user_func($callable);
+        // Check enabled components
+        $daoName = \CRM_Core_DAO_AllCoreTables::getFullName($entity);
+        if ($daoName && !$daoName::isComponentEnabled()) {
+          throw new \Civi\API\Exception\NotImplementedException("$entity API is not available because " . $daoName::COMPONENT . " component is disabled");
         }
+        $args = (array) CoreUtil::getInfoItem($entity, 'class_args');
+        $apiRequest = call_user_func_array($callable, $args);
         foreach ($params as $name => $param) {
           $setter = 'set' . ucfirst($name);
           $apiRequest->$setter($param);

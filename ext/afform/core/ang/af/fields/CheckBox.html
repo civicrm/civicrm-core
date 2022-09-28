@@ -4,4 +4,4 @@
     <label for="{{ fieldId + opt.id }}">{{:: opt.label }}</label>
   </li>
 </ul>
-<input type="checkbox" ng-if="!$ctrl.defn.options" id="{{:: fieldId }}" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]" />
+<input type="checkbox" ng-required="$ctrl.defn.required" ng-if="!$ctrl.defn.options" id="{{:: fieldId }}" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]" />

@@ -46,13 +46,13 @@
 {ts}Contribution Details{/ts}
 
 ===============================================================================
-{if isset($totalAmount)}
+{if $totalAmount}
 {ts}Total Fee{/ts}: {$totalAmount|crmMoney}
 {/if}
-{if isset($totalPaid)}
+{if $totalPaid}
 {ts}Total Paid{/ts}: {$totalPaid|crmMoney}
 {/if}
-{if isset($amountOwed)}
+{if $amountOwed}
 {ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
 {/if}
 
@@ -90,7 +90,7 @@
 ===============================================================================
 
 {$event.event_title}
-{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
 
 {if !empty($event.participant_role)}
 {ts}Participant Role{/ts}: {$event.participant_role}

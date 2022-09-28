@@ -23,8 +23,8 @@
  * Purpose:  formats array for output in DAO files and in APIv3 Examples
  * To find where this is used do a grep in Smarty templates for |@print_array
  * @param array|object $var
- * @param integer $depth
- * @param integer $length
+ * @param int $depth
+ * @param int $length
  * @return string
  */
 function smarty_modifier_print_array($var, $depth = 0, $length = 40) {

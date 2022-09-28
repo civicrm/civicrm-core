@@ -61,7 +61,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
       $params[str_replace('-5', '', str_replace('billing_', '', $key))] = $value;
     }
     $params['state_province'] = 'NSW';
-    $params['country'] = 'AUS';
+    $params['country'] = 'AU';
     $this->processor->doPayment($params);
     $this->assertEquals($this->getExpectedSinglePaymentRequests(), $this->getRequestBodies());
   }
@@ -85,7 +85,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
       $params[str_replace('-5', '', str_replace('billing_', '', $key))] = $value;
     }
     $params['state_province'] = 'NSW';
-    $params['country'] = 'AUS';
+    $params['country'] = 'AU';
     try {
       $this->processor->doPayment($params);
       $this->fail('Test was meant to throw an exception');
@@ -162,7 +162,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
    * @param int|null $id
    * @param bool $error
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setupMockHandler($id = NULL, $error = FALSE): void {
     if ($id) {
@@ -194,7 +194,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
    */
   public function getExpectedSinglePaymentRequests(): array {
     return [
-      '<ewaygateway><ewayCustomerID>87654321</ewayCustomerID><ewayTotalAmount>1000</ewayTotalAmount><ewayCardHoldersName>John O&apos;Connor</ewayCardHoldersName><ewayCardNumber>4444333322221111</ewayCardNumber><ewayCardExpiryMonth>10</ewayCardExpiryMonth><ewayCardExpiryYear>22</ewayCardExpiryYear><ewayTrxnNumber>xyz</ewayTrxnNumber><ewayCustomerInvoiceDescription>Test Contribution</ewayCustomerInvoiceDescription><ewayCustomerFirstName>John</ewayCustomerFirstName><ewayCustomerLastName>O&apos;Connor</ewayCustomerLastName><ewayCustomerEmail>unittesteway@civicrm.org</ewayCustomerEmail><ewayCustomerAddress>8 Hobbitton Road, The Shire, NSW.</ewayCustomerAddress><ewayCustomerPostcode>5010</ewayCustomerPostcode><ewayCustomerInvoiceRef>xyz</ewayCustomerInvoiceRef><ewayCVN>123</ewayCVN><ewayOption1></ewayOption1><ewayOption2></ewayOption2><ewayOption3></ewayOption3><ewayCustomerIPAddress>127.0.0.1</ewayCustomerIPAddress><ewayCustomerBillingCountry>AUS</ewayCustomerBillingCountry></ewaygateway>',
+      '<ewaygateway><ewayCustomerID>87654321</ewayCustomerID><ewayTotalAmount>1000</ewayTotalAmount><ewayCardHoldersName>John O&apos;Connor</ewayCardHoldersName><ewayCardNumber>4444333322221111</ewayCardNumber><ewayCardExpiryMonth>10</ewayCardExpiryMonth><ewayCardExpiryYear>22</ewayCardExpiryYear><ewayTrxnNumber>xyz</ewayTrxnNumber><ewayCustomerInvoiceDescription>Test Contribution</ewayCustomerInvoiceDescription><ewayCustomerFirstName>John</ewayCustomerFirstName><ewayCustomerLastName>O&apos;Connor</ewayCustomerLastName><ewayCustomerEmail>unittesteway@civicrm.org</ewayCustomerEmail><ewayCustomerAddress>8 Hobbitton Road, The Shire, NSW.</ewayCustomerAddress><ewayCustomerPostcode>5010</ewayCustomerPostcode><ewayCustomerInvoiceRef>xyz</ewayCustomerInvoiceRef><ewayCVN>123</ewayCVN><ewayOption1></ewayOption1><ewayOption2></ewayOption2><ewayOption3></ewayOption3><ewayCustomerIPAddress>127.0.0.1</ewayCustomerIPAddress><ewayCustomerBillingCountry>AU</ewayCustomerBillingCountry></ewaygateway>',
     ];
   }
 

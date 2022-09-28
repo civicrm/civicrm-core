@@ -51,7 +51,7 @@ class Joinable {
   protected $alias;
 
   /**
-   * @var array
+   * @var string[]
    */
   protected $conditions = [];
 
@@ -97,21 +97,33 @@ class Joinable {
   /**
    * Gets conditions required when joining to a base table
    *
-   * @param string|null $baseTableAlias
-   *   Name of the base table, if aliased.
+   * @param string $baseTableAlias
+   * @param string $targetTableAlias
    *
    * @return array
    */
-  public function getConditionsForJoin($baseTableAlias = NULL) {
-    $baseCondition = sprintf(
-      '%s.%s =  %s.%s',
-      $baseTableAlias ?: $this->baseTable,
+  public function getConditionsForJoin(string $baseTableAlias, string $targetTableAlias) {
+    $conditions = [];
+    $conditions[] = sprintf(
+      '`%s`.`%s` =  `%s`.`%s`',
+      $baseTableAlias,
       $this->baseColumn,
-      $this->getAlias(),
+      $targetTableAlias,
       $this->targetColumn
     );
+    $this->addExtraJoinConditions($conditions, $baseTableAlias, $targetTableAlias);
+    return $conditions;
+  }
 
-    return array_merge([$baseCondition], $this->conditions);
+  /**
+   * @param $conditions
+   * @param string $baseTableAlias
+   * @param string $targetTableAlias
+   */
+  protected function addExtraJoinConditions(&$conditions, string $baseTableAlias, string $targetTableAlias):void {
+    foreach ($this->conditions as $condition) {
+      $conditions[] = str_replace(['{base_table}', '{target_table}'], [$baseTableAlias, $targetTableAlias], $condition);
+    }
   }
 
   /**
@@ -190,25 +202,18 @@ class Joinable {
   }
 
   /**
-   * @param $condition
+   * @param string $condition
    *
    * @return $this
    */
-  public function addCondition($condition) {
+  public function addCondition(string $condition) {
     $this->conditions[] = $condition;
 
     return $this;
   }
 
   /**
-   * @return array
-   */
-  public function getExtraJoinConditions() {
-    return $this->conditions;
-  }
-
-  /**
-   * @param array $conditions
+   * @param string[] $conditions
    *
    * @return $this
    */
@@ -244,7 +249,7 @@ class Joinable {
   }
 
   /**
-   * @param int|NULL $serialize
+   * @param int|null $serialize
    *
    * @return $this
    */

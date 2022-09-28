@@ -27,6 +27,7 @@
     <title>Profile Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this form currently active? If false, hide all related fields for all sharing contexts.</comment>
     <add>1.1</add>
   </field>
@@ -150,6 +151,7 @@
     <title>Show Captcha On Profile</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Should a CAPTCHA widget be included this Profile form.</comment>
     <add>1.1</add>
   </field>
@@ -158,6 +160,7 @@
     <title>Map Profile</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Do we want to map results from this profile.</comment>
     <add>1.5</add>
   </field>
@@ -166,6 +169,7 @@
     <title>Show Edit Link?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Should edit link display in profile selector</comment>
     <add>1.6</add>
   </field>
@@ -174,6 +178,7 @@
     <title>Show Link to CMS User</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Should we display a link to the website profile in profile selector</comment>
     <add>1.7</add>
   </field>
@@ -182,6 +187,7 @@
     <title>Update on Duplicate</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Should we update the contact record if we find a duplicate</comment>
     <add>1.7</add>
   </field>
@@ -198,6 +204,7 @@
     <title>Create CMS User?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Should we create a cms user for this profile </comment>
     <add>1.8</add>
   </field>
@@ -211,6 +218,8 @@
     <name>is_reserved</name>
     <title>Profile Is Reserved</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>Is this group reserved for use by some other CiviCRM functionality?</comment>
     <add>3.0</add>
   </field>
@@ -257,6 +266,7 @@
     <title>Include Proximity Search?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Should we include proximity search feature in this profile search form?</comment>
     <add>3.2</add>
   </field>
@@ -291,6 +301,7 @@
     <title>Include Cancel Button</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Should a Cancel button be included in this Profile form.</comment>
     <add>5.0</add>
   </field>

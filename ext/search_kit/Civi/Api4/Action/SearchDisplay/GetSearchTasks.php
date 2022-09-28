@@ -21,9 +21,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * @param \Civi\Api4\Generic\Result $result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
+    // Adding checkPermissions filters out actions the user is not allowed to perform
     $entity = Entity::get($this->checkPermissions)->addWhere('name', '=', $this->entity)
       ->addSelect('name', 'title_plural')
       ->setChain(['actions' => ['$name', 'getActions', ['where' => [['name', 'IN', ['update', 'delete']]]], 'name']])
@@ -35,15 +36,26 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     $tasks = [$entity['name'] => []];
 
     if (array_key_exists($entity['name'], \CRM_Export_BAO_Export::getComponents())) {
+      $key = \CRM_Core_Key::get('CRM_Export_Controller_Standalone', TRUE);
       $tasks[$entity['name']]['export'] = [
         'title' => E::ts('Export %1', [1 => $entity['title_plural']]),
         'icon' => 'fa-file-excel-o',
         'crmPopup' => [
           'path' => "'civicrm/export/standalone'",
-          'query' => "{reset: 1, entity: '{$entity['name']}', id: ids.join(',')}",
+          'query' => "{reset: 1, entity: '{$entity['name']}'}",
+          'data' => "{id: ids.join(','), qfKey: '$key'}",
         ],
       ];
     }
+
+    $tasks[$entity['name']]['download'] = [
+      'module' => 'crmSearchTasks',
+      'title' => E::ts('Download Spreadsheet'),
+      'icon' => 'fa-download',
+      'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskDownload.html'],
+      // Does not require any rows to be selected
+      'number' => '>= 0',
+    ];
 
     if (array_key_exists('update', $entity['actions'])) {
       $tasks[$entity['name']]['update'] = [
@@ -52,6 +64,17 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'icon' => 'fa-save',
         'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskUpdate.html'],
       ];
+
+      $taggable = \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
+      if (in_array($entity['name'], $taggable, TRUE)) {
+        $tasks[$entity['name']]['tag'] = [
+          'module' => 'crmSearchTasks',
+          'title' => E::ts('Tag - Add/Remove Tags'),
+          'icon' => 'fa-tags',
+          'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskTag.html'],
+        ];
+      }
+
     }
 
     if (array_key_exists('delete', $entity['actions'])) {
@@ -66,26 +89,50 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     if ($entity['name'] === 'Contact') {
       // Add contact tasks which support standalone mode
       $contactTasks = $this->checkPermissions ? \CRM_Contact_Task::permissionedTaskTitles(\CRM_Core_Permission::getPermission()) : NULL;
+      // These tasks are redundant with the new api-based ones in SearchKit
+      $redundant = [\CRM_Core_Task::TAG_ADD, \CRM_Core_Task::TAG_REMOVE, \CRM_Core_Task::TASK_DELETE];
       foreach (\CRM_Contact_Task::tasks() as $id => $task) {
         if (
           (!$this->checkPermissions || isset($contactTasks[$id])) &&
           // Must support standalone mode (with a 'url' property)
           !empty($task['url']) &&
-          // The delete task is redundant with the new api-based one
-          $task['url'] !== 'civicrm/task/delete-contact'
+          !in_array($id, $redundant)
         ) {
           if ($task['url'] === 'civicrm/task/pick-profile') {
             $task['title'] = E::ts('Profile Update');
           }
+          $key = \CRM_Core_Key::get(\CRM_Utils_Array::first((array) $task['class']), TRUE);
           $tasks[$entity['name']]['contact.' . $id] = [
             'title' => $task['title'],
             'icon' => $task['icon'] ?? 'fa-gear',
             'crmPopup' => [
               'path' => "'{$task['url']}'",
-              'query' => "{reset: 1, cids: ids.join(',')}",
+              'query' => "{reset: 1}",
+              'data' => "{cids: ids.join(','), qfKey: '$key'}",
             ],
           ];
         }
+      }
+      if (!$this->checkPermissions || \CRM_Core_Permission::check(['merge duplicate contacts', 'delete contacts'])) {
+        $tasks[$entity['name']]['contact.merge'] = [
+          'title' => E::ts('Dedupe - Merge 2 Contacts'),
+          'number' => '=== 2',
+          'icon' => 'fa-compress',
+          'crmPopup' => [
+            'path' => "'civicrm/contact/merge'",
+            'query' => '{reset: 1, cid: ids[0], oid: ids[1], action: "update"}',
+          ],
+        ];
+      }
+      if (\CRM_Core_Component::isEnabled('CiviMail') && (
+        \CRM_Core_Permission::access('CiviMail') || !$this->checkPermissions ||
+        (\CRM_Mailing_Info::workflowEnabled() && \CRM_Core_Permission::check('create mailings'))
+      )) {
+        $tasks[$entity['name']]['contact.mailing'] = [
+          'title' => E::ts('Email - schedule/send via CiviMail'),
+          'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskMailing.html'],
+          'icon' => 'fa-paper-plane',
+        ];
       }
     }
 
@@ -93,12 +140,13 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       // FIXME: tasks() function always checks permissions, should respect `$this->checkPermissions`
       foreach (\CRM_Contribute_Task::tasks() as $id => $task) {
         if (!empty($task['url'])) {
+          $key = \CRM_Core_Key::get('CRM_Contribute_Controller_Task', TRUE);
           $tasks[$entity['name']]['contribution.' . $id] = [
             'title' => $task['title'],
             'icon' => $task['icon'] ?? 'fa-gear',
             'crmPopup' => [
               'path' => "'{$task['url']}'",
-              'query' => "{id: ids.join(',')}",
+              'data' => "{id: ids.join(','), qfKey: '$key'}",
             ],
           ];
         }
@@ -126,6 +174,8 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
 
     foreach ($tasks[$entity['name']] as $name => &$task) {
       $task['name'] = $name;
+      // Add default for number of rows action requires
+      $task += ['number' => '> 0'];
     }
 
     $result->exchangeArray(array_values($tasks[$entity['name']]));

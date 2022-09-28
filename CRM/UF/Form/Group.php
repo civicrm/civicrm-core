@@ -124,7 +124,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
 
     // setting title for html page
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_Utils_System::setTitle(ts('Profile Settings') . " - $title");
+      $this->setTitle(ts('Profile Settings') . " - $title");
     }
     elseif ($this->_action & (CRM_Core_Action::DISABLE | CRM_Core_Action::DELETE)) {
       $ufGroup['module'] = implode(' , ', CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id, TRUE));
@@ -149,7 +149,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $this->assign('message', $message);
     }
     else {
-      CRM_Utils_System::setTitle(ts('New CiviCRM Profile'));
+      $this->setTitle(ts('New CiviCRM Profile'));
     }
   }
 
@@ -199,9 +199,11 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     $this->addRule('weight', ts('is a numeric field'), 'numeric');
 
     // is this group active ?
-    $this->addElement('checkbox', 'is_active', ts('Is this CiviCRM Profile active?'));
+    $this->addElement('advcheckbox', 'is_active', ts('Is this CiviCRM Profile active?'));
 
-    $paneNames = ['Advanced Settings' => 'buildAdvanceSetting'];
+    $paneNames = [
+      ts('Advanced Settings') => 'buildAdvanceSetting',
+    ];
 
     foreach ($paneNames as $name => $type) {
       if ($this->_id) {
@@ -232,15 +234,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
         'name' => ts('Cancel'),
       ],
     ]);
-
-    // views are implemented as frozen form
-    if ($this->_action & CRM_Core_Action::VIEW) {
-      $this->freeze();
-      $this->addElement('xbutton', 'done', ts('Done'), [
-        'type' => 'button',
-        'onclick' => "location.href='civicrm/admin/uf/group?reset=1&action=browse'",
-      ]);
-    }
 
     $this->addFormRule(['CRM_UF_Form_Group', 'formRule'], $this);
   }
@@ -324,7 +317,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param array $self
+   * @param self $self
    *   Current form object.
    *
    * @return bool|array
@@ -369,11 +362,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     else {
       // get the submitted form values.
       $params = $this->controller->exportValues($this->_name);
-
-      if (!array_key_exists('is_active', $params)) {
-        $params['is_active'] = 0;
-      }
-
       if ($this->_action & (CRM_Core_Action::UPDATE)) {
         $params['id'] = $this->_id;
         // CRM-5284

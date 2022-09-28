@@ -253,7 +253,7 @@
               }
             },
             results: function(data) {
-              results = {
+              var results = {
                 children: $.map(data.values, function(obj) {
                   if('civicrm_mailing' === rcpAjaxState.entity) {
                     return obj["api.MailingRecipients.getcount"] > 0 ? {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
@@ -271,7 +271,7 @@
                   (rcpAjaxState.entity == 'civicrm_group'? 'Group' : 'Mailing'));
               }
 
-              more = data.more_results || !(rcpAjaxState.entity == 'civicrm_mailing' && rcpAjaxState.type == 'exclude');
+              var more = data.more_results || !(rcpAjaxState.entity == 'civicrm_mailing' && rcpAjaxState.type == 'exclude');
 
               if (more && !data.more_results) {
                 if (rcpAjaxState.type == 'include') {

@@ -22,7 +22,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @param int $param
    *   Year.
    *
-   * @return array
+   * @return array|null
    *   associated array
    */
   public static function contributionChartMonthly($param) {
@@ -61,7 +61,7 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
   /**
    * Get the contribution details by year.
    *
-   * @return array
+   * @return array|null
    *   associated array
    */
   public static function contributionChartYearly() {
@@ -207,21 +207,27 @@ LIMIT 1
   /**
    * Get contribution statuses by entity e.g. contribution, membership or 'participant'
    *
+   * @deprecated
+   *
+   * This is called from a couple of places outside of core so it has been made
+   * unused and deprecated rather than having the now-obsolete parameter change.
+   * It should work much the same for the places that call it with a notice. It is
+   * not an api function & not supported for use outside core. Extensions should write
+   * their own functions.
+   *
    * @param string $usedFor
-   * @param int $id
+   * @param string $name
    *   Contribution ID
    *
    * @return array
    *   Array of contribution statuses in array('status id' => 'label') format
    */
-  public static function getContributionStatuses($usedFor = 'contribution', $id = NULL) {
-    if ($usedFor === 'pledge') {
-      $statusNames = CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate');
+  public static function getContributionStatuses($usedFor = 'contribution', $name = NULL) {
+    $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    if ($usedFor !== 'contribution') {
+      return self::getPendingAndCompleteStatuses();
     }
-    else {
-      $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
-    }
-
     $statusNamesToUnset = [
       // For records which represent a data template for a recurring
       // contribution that may not yet have a payment. This status should not
@@ -232,42 +238,10 @@ LIMIT 1
       'Template',
     ];
     // on create fetch statuses on basis of component
-    if (!$id) {
-      $statusNamesToUnset = array_merge($statusNamesToUnset, [
-        'Refunded',
-        'Chargeback',
-        'Pending refund',
-      ]);
-
-      if ($usedFor === 'contribution') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, [
-          'In Progress',
-          'Overdue',
-          'Partially paid',
-        ]);
-      }
-      elseif ($usedFor === 'participant') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, [
-          'Cancelled',
-          'Failed',
-          'In Progress',
-          'Overdue',
-          'Partially paid',
-        ]);
-      }
-      elseif ($usedFor === 'membership') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, [
-          'In Progress',
-          'Cancelled',
-          'Failed',
-          'Overdue',
-          'Partially paid',
-        ]);
-      }
+    if (!$name) {
+      return self::getPendingCompleteFailedAndCancelledStatuses();
     }
     else {
-      $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'contribution_status_id');
-      $name = $statusNames[$contributionStatus] ?? NULL;
       switch ($name) {
         case 'Completed':
           // [CRM-17498] Removing unsupported status change options.
@@ -313,13 +287,8 @@ LIMIT 1
       unset($statusNames[CRM_Utils_Array::key($name, $statusNames)]);
     }
 
-    // based on filtered statuse names fetch the final list of statuses in array('id' => 'label') format
-    if ($usedFor == 'pledge') {
-      $statuses = CRM_Pledge_BAO_Pledge::buildOptions('status_id');
-    }
-    else {
-      $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
-    }
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+
     foreach ($statuses as $statusID => $label) {
       if (!array_key_exists($statusID, $statusNames)) {
         unset($statuses[$statusID]);
@@ -327,6 +296,34 @@ LIMIT 1
     }
 
     return $statuses;
+  }
+
+  /**
+   * Get the options for pending and completed as an array with labels as values.
+   *
+   * @return array
+   */
+  public static function getPendingAndCompleteStatuses(): array {
+    $statusIDS = [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+    ];
+    return array_intersect_key(CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id'), array_flip($statusIDS));
+  }
+
+  /**
+   * Get the options for pending and completed as an array with labels as values.
+   *
+   * @return array
+   */
+  public static function getPendingCompleteFailedAndCancelledStatuses(): array {
+    $statusIDS = [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Failed'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
+    ];
+    return array_intersect_key(CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id'), array_flip($statusIDS));
   }
 
   /**

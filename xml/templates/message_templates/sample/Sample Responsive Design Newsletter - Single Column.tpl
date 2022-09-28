@@ -188,7 +188,7 @@
   																	<!-- /Spacing --><!-- content -->
   																	<tr>
   																		<td style="padding:0 15px;">
-  																		<p style="font-family: Helvetica, arial, sans-serif; font-size: 16px; color: #7a6e67; text-align:left; line-height: 26px; padding-bottom:10px;">{contact.email_greeting},																		</p>
+  																		<p style="font-family: Helvetica, arial, sans-serif; font-size: 16px; color: #7a6e67; text-align:left; line-height: 26px; padding-bottom:10px;">{contact.email_greeting_display},																		</p>
   																		<p style="font-family: Helvetica, arial, sans-serif; font-size: 16px; color: #7a6e67; text-align:left; line-height: 26px; padding-bottom:10px;"><span class="padding-right15" style="font-family: Helvetica, arial, sans-serif; font-size: 14px; color: #7a6e67; text-align:left; line-height: 24px;">Replace with your text and images, and remember to link the facebook and twitter links in the footer to your pages. Have fun!</span></p>
   																		</td>
   																	</tr>

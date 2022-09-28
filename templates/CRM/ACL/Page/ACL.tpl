@@ -35,7 +35,7 @@
             </thead>
             <tbody>
             {foreach from=$rows item=row key=aclID}
-              <tr id="acl-{$aclID}" class="{cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if} crm-acl crm-entity {if NOT $row.is_active} disabled{/if}">
+              <tr id="acl-{$aclID}" class="{cycle values="odd-row,even-row"} {$row.class} crm-acl crm-entity {if NOT $row.is_active} disabled{/if}">
                 <td class="crm-acl-entity">{$row.entity}</td>
                 <td class="crm-acl-operation" >{$row.operation}</td>
                 <td class="crm-acl-object_name">{$row.object_name}</td>

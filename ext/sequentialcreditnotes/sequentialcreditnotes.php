@@ -4,15 +4,6 @@ require_once 'sequentialcreditnotes.civix.php';
 use Civi\Api4\Contribution;
 
 /**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
- */
-function sequentialcreditnotes_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _sequentialcreditnotes_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
  * Add a creditnote_id if appropriate.
  *
  * If the contribution is created with cancelled or refunded status, add credit note id
@@ -24,8 +15,7 @@ function sequentialcreditnotes_civicrm_alterSettingsFolders(&$metaDataFolders = 
  * @param int|null $id
  * @param array $params
  *
- * @throws \CiviCRM_API3_Exception
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function sequentialcreditnotes_civicrm_pre($op, $objectName, $id, &$params) {
   if ($objectName === 'Contribution' && !empty($params['contribution_status_id'])) {
@@ -50,7 +40,7 @@ function sequentialcreditnotes_civicrm_pre($op, $objectName, $id, &$params) {
  * @return string
  *   Credit Note Id.
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function sequentialcreditnotes_create_credit_note_id() {
 

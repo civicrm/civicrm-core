@@ -82,7 +82,7 @@ class CRM_Core_OptionValue {
     if ($optionGroupID) {
       $dao->option_group_id = $optionGroupID;
 
-      if (in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups)) {
+      if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
         $dao->domain_id = CRM_Core_Config::domainID();
       }
 
@@ -289,6 +289,8 @@ class CRM_Core_OptionValue {
 
       $nameTitle = [];
       if ($mode == 'contribute') {
+        // @todo - remove this - the only code place that calls
+        // this function in a way that would hit this is commented 'remove this'
         // This is part of a move towards standardising option values but we
         // should derive them from the fields array so am deprecating it again...
         // note that the reason this was needed was that payment_instrument_id was
@@ -336,7 +338,7 @@ class CRM_Core_OptionValue {
       if (is_array($nameTitle)) {
         foreach ($nameTitle as $name => $attribs) {
           self::$_fields[$key][$name] = $optionName;
-          list($tableName, $fieldName) = explode('.', $optionName['where']);
+          [$tableName, $fieldName] = explode('.', $optionName['where']);
           self::$_fields[$key][$name]['where'] = "{$name}.label";
           foreach ($attribs as $k => $val) {
             self::$_fields[$key][$name][$k] = $val;
@@ -351,7 +353,7 @@ class CRM_Core_OptionValue {
   /**
    * Build select query in case of option-values
    *
-   * @param $query
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function select(&$query) {
     if (!empty($query->_params) || !empty($query->_returnProperties)) {
@@ -360,7 +362,7 @@ class CRM_Core_OptionValue {
         if (!empty($values['pseudoconstant'])) {
           continue;
         }
-        list($tableName, $fieldName) = explode('.', $values['where']);
+        [$tableName, $fieldName] = explode('.', $values['where']);
         if (!empty($query->_returnProperties[$name])) {
           $query->_select["{$name}_id"] = "{$name}.value as {$name}_id";
           $query->_element["{$name}_id"] = 1;
@@ -438,7 +440,7 @@ FROM
       $params[2] = [$groupName, 'String'];
     }
 
-    if (in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups)) {
+    if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
       $where .= " AND option_value.domain_id = " . CRM_Core_Config::domainID();
     }
 

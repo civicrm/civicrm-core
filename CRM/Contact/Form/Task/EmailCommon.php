@@ -28,14 +28,9 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @param CRM_Core_Form $form
    * @param bool $bounce determine if we want to throw a status bounce.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function preProcessFromAddress(&$form, $bounce = TRUE) {
-    if (!isset($form->_single)) {
-      // @todo ensure this is already set.
-      $form->_single = FALSE;
-    }
-
     $form->_emails = [];
 
     // @TODO remove these line and to it somewhere more appropriate. Currently some classes (e.g Case
@@ -54,19 +49,12 @@ class CRM_Contact_Form_Task_EmailCommon {
     $form->_emails = $fromEmailValues;
     $defaults = [];
     $form->_fromEmails = $fromEmailValues;
-    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
-      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
-    }
     if (is_numeric(key($form->_fromEmails))) {
-      // Add signature
-      $defaultEmail = civicrm_api3('email', 'getsingle', ['id' => key($form->_fromEmails)]);
-      $defaults = [];
-      if (!empty($defaultEmail['signature_html'])) {
-        $defaults['html_message'] = '<br/><br/>--' . $defaultEmail['signature_html'];
-      }
-      if (!empty($defaultEmail['signature_text'])) {
-        $defaults['text_message'] = "\n\n--\n" . $defaultEmail['signature_text'];
-      }
+      $emailID = (int) key($form->_fromEmails);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
+    }
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
     }
     $form->setDefaults($defaults);
   }
@@ -76,28 +64,17 @@ class CRM_Contact_Form_Task_EmailCommon {
    *
    * @param array $fields
    *   The input form values.
-   * @param array $dontCare
-   * @param array $self
-   *   Additional values form 'this'.
    *
    * @return bool|array
    *   true if no errors, else array of errors
    */
-  public static function formRule($fields, $dontCare, $self) {
+  public static function formRule(array $fields) {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     $errors = [];
-    $template = CRM_Core_Smarty::singleton();
-
-    if (isset($fields['html_message'])) {
-      $htmlMessage = str_replace(["\n", "\r"], ' ', $fields['html_message']);
-      $htmlMessage = str_replace('"', '\"', $htmlMessage);
-      $template->assign('htmlContent', $htmlMessage);
-    }
-
     //Added for CRM-1393
     if (!empty($fields['saveTemplate']) && empty($fields['saveTemplateName'])) {
-      $errors['saveTemplateName'] = ts("Enter name to save message template");
+      $errors['saveTemplateName'] = ts('Enter name to save message template');
     }
-
     return empty($errors) ? TRUE : $errors;
   }
 

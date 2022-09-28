@@ -124,7 +124,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
     // form fields of Custom Option rows
     $defaultOptionValues = [];
-    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $_showHide = new CRM_Core_ShowHideBlocks();
 
     $optionAttributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue');
     $optionAttributes['label']['size'] = $optionAttributes['value']['size'] = 25;
@@ -214,7 +214,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     }
 
     $_flagOption = $_rowError = 0;
-    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $_showHide = new CRM_Core_ShowHideBlocks();
 
     //capture duplicate Custom option values
     if (!empty($fields['option_value'])) {

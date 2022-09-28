@@ -44,9 +44,9 @@
 }
 #civicrm-menu li li .sub-arrow:before {
   content: "\f0da";
-	font-family: 'FontAwesome';
-	float: right;
-	margin-right: -25px;
+  font-family: 'FontAwesome';
+  float: right;
+  margin-right: -25px;
 }
 /* x icon */
 #crm-menubar-state:checked ~ .crm-menubar-toggle-btn .crm-menubar-toggle-btn-icon {
@@ -205,13 +205,32 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
      collapsible to desktop (navbar + dropdowns)
   -----------------------------------------------*/
   /* start... (it's not recommended editing these rules) */
-  #civicrm-menu ul{position:absolute;width:12em;}
-  #civicrm-menu li{float:left;}
-  #civicrm-menu.sm-rtl li{float:right;}
-  #civicrm-menu ul li,#civicrm-menu.sm-rtl ul li,#civicrm-menu.sm-vertical li{float:none;}
-  #civicrm-menu a{white-space:nowrap;}
-  #civicrm-menu ul a,#civicrm-menu.sm-vertical a{white-space:normal;}
-  #civicrm-menu .sm-nowrap > li > a,#civicrm-menu .sm-nowrap > li > :not(ul) a{white-space:nowrap;}
+  #civicrm-menu ul {
+    position: absolute;
+    width: 12em;
+  }
+  #civicrm-menu li {
+    float: left;
+  }
+  #civicrm-menu.sm-rtl li {
+    float: right;
+  }
+  #civicrm-menu ul li,
+  #civicrm-menu.sm-rtl ul li,
+  #civicrm-menu.sm-vertical li {
+    float: none;
+  }
+  #civicrm-menu a {
+    white-space: nowrap;
+  }
+  #civicrm-menu ul a,
+  #civicrm-menu.sm-vertical a {
+    white-space: normal;
+  }
+  #civicrm-menu .sm-nowrap > li > a,
+  #civicrm-menu .sm-nowrap > li > :not(ul) a {
+    white-space: nowrap;
+  }
   /* ...end */
 
   /* hide the button in desktop view */
@@ -286,23 +305,23 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
     z-index: 100000;
     background-color: #1b1b1b;
   }
-	#civicrm-menu ul {
-		background-color: #444;
-	}
-	#civicrm-menu ul ul {
-		background-color: #555;
-	}
-	#civicrm-menu ul ul ul {
-		background-color: #666;
-	}
+  #civicrm-menu ul {
+    background-color: #444;
+  }
+  #civicrm-menu ul ul {
+    background-color: #555;
+  }
+  #civicrm-menu ul ul ul {
+    background-color: #666;
+  }
   #civicrm-menu li {
     padding: 5px;
   }
-	#civicrm-menu li a {
-		text-align: center;
-		font-size: 14px;
+  #civicrm-menu li a {
+    text-align: center;
+    font-size: 14px;
     color: #ddd;
-	}
+  }
   #civicrm-menu li a:focus,
   #civicrm-menu li a:hover,
   #civicrm-menu li a.highlighted {

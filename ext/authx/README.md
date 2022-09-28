@@ -124,3 +124,6 @@ $ cv ev 'Civi::settings()->set("authx_header_cred", ["pass","jwt"]);'
 $ curl 'https://demouser:demopass@example.org/civicrm/authx/id'
 {"contact_id":203,"user_id":"2"}
 ```
+
+The "AuthX: Authenticate to services with password" CiviCRM permission must
+also be granted for the role associated to the user.

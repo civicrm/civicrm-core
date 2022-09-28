@@ -19,12 +19,12 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class IndexTest extends UnitTestCase {
+class IndexTest extends Api4TestBase {
 
   public function testIndex() {
     // Results indexed by name
@@ -45,7 +45,7 @@ class IndexTest extends UnitTestCase {
     try {
       civicrm_api4('Activity', 'getActions', [], 99);
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $error = $e->getMessage();
     }
     $this->assertStringContainsString('not found', $error);
@@ -56,7 +56,7 @@ class IndexTest extends UnitTestCase {
     try {
       civicrm_api4('Activity', 'getActions', [], 'xyz');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $error = $e->getMessage();
     }
     $this->assertStringContainsString('not found', $error);

@@ -14,8 +14,8 @@
 #crm-status-list .crm-severity-emergency,
 #crm-status-list .crm-severity-alert,
 #crm-status-list .crm-severity-critical,
-#crm-status-list .crm-severity-error{
-  background-color: #E43D2B;
+#crm-status-list .crm-severity-error {
+  background-color: #e43d2b;
 }
 
 /* Warning Severity */
@@ -31,7 +31,7 @@
 /* All OK Severity */
 #crm-status-list .crm-severity-info,
 #crm-status-list .crm-severity-debug {
-  background-color: #00994D;
+  background-color: #00994d;
 }
 
 #crm-status-list .crm-status-message-body {

@@ -25,7 +25,7 @@
       <value>Work location</value>             <!--  description  -->
       <value>0</value>                         <!--  is_reserved  -->
       <value>1</value>                         <!--  is_active  -->
-      <null />                                 <!--  is_default  -->
+      <value>0</value>                         <!--  is_default  -->
     </row>
     <row>
       <value>3</value>                         <!--  id  -->
@@ -34,7 +34,7 @@
       <value>Main office location</value>      <!--  description  -->
       <value>0</value>                         <!--  is_reserved  -->
       <value>1</value>                         <!--  is_active  -->
-      <null />                                 <!--  is_default  -->
+      <value>0</value>                         <!--  is_default  -->
     </row>
     <row>
       <value>4</value>                         <!--  id  -->
@@ -43,7 +43,7 @@
       <value>Other location</value>            <!--  description  -->
       <value>0</value>                         <!--  is_reserved  -->
       <value>0</value>                         <!--  is_active  -->
-      <null />                                 <!--  is_default  -->
+      <value>0</value>                         <!--  is_default  -->
     </row>
     <row>
       <value>5</value>                         <!--  id  -->
@@ -52,7 +52,7 @@
       <value>Billing Address location</value>  <!--  description  -->
       <value>1</value>                         <!--  is_reserved  -->
       <value>1</value>                         <!--  is_active  -->
-      <null />                                 <!--  is_default  -->
+      <value>0</value>                         <!--  is_default  -->
     </row>
   </table>
 </dataset>

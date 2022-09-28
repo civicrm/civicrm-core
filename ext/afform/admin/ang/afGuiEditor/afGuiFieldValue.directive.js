@@ -5,34 +5,29 @@
   // Cribbed from the Api4 Explorer
   angular.module('afGuiEditor').directive('afGuiFieldValue', function(afGui) {
     return {
-      scope: {
-        field: '=afGuiFieldValue'
+      bindToController: {
+        field: '<afGuiFieldValue'
       },
       require: {
         ngModel: 'ngModel',
         editor: '^^afGuiEditor'
       },
-      link: function (scope, element, attrs, ctrl) {
-        var ts = scope.ts = CRM.ts('org.civicrm.afform_admin'),
+      controller: function ($element, $timeout) {
+        var ts = CRM.ts('org.civicrm.afform_admin'),
+          ctrl = this,
           multi;
-
-        function destroyWidget() {
-          var $el = $(element);
-          if ($el.is('.crm-form-date-wrapper .crm-hidden-date')) {
-            $el.crmDatepicker('destroy');
-          }
-          if ($el.is('.select2-container + input')) {
-            $el.crmEntityRef('destroy');
-          }
-          $(element).removeData().removeAttr('type').removeAttr('placeholder').show();
-        }
 
         function makeWidget(field) {
           var options,
-            $el = $(element),
+            $el = $($element),
             inputType = field.input_type,
             dataType = field.data_type;
           multi = field.serialize || dataType === 'Array';
+          // Allow input_type to override dataType
+          if (inputType) {
+            multi = (dataType !== 'Boolean' &&
+              (inputType === 'CheckBox' || (field.input_attrs && field.input_attrs.multiple)));
+          }
           if (inputType === 'Date') {
             $el.crmDatepicker({time: (field.input_attrs && field.input_attrs.time) || false});
           }
@@ -80,23 +75,22 @@
           return list;
         };
 
-        // Copied from ng-list
-        ctrl.ngModel.$parsers.push(parseList);
-        ctrl.ngModel.$formatters.push(function(value) {
-          return _.isArray(value) ? value.join(', ') : value;
-        });
+        this.$onInit = function() {
+          // Copied from ng-list
+          ctrl.ngModel.$parsers.push(parseList);
+          ctrl.ngModel.$formatters.push(function(value) {
+            return _.isArray(value) ? value.join(',') : value;
+          });
 
-        // Copied from ng-list
-        ctrl.ngModel.$isEmpty = function(value) {
-          return !value || !value.length;
+          // Copied from ng-list
+          ctrl.ngModel.$isEmpty = function(value) {
+            return !value || !value.length;
+          };
+
+          $timeout(function() {
+            makeWidget(ctrl.field);
+          });
         };
-
-        scope.$watchCollection('field', function(field) {
-          destroyWidget();
-          if (field) {
-            makeWidget(field);
-          }
-        });
       }
     };
   });

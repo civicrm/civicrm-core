@@ -138,7 +138,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $this->assertTrue($message->body instanceof ezcMailMultipartAlternative);
 
-      list($textPart, $htmlPart) = $message->body->getParts();
+      [$textPart, $htmlPart] = $message->body->getParts();
 
       $this->assertEquals('html', $htmlPart->subType);
       $this->assertRegExp(
@@ -163,6 +163,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         "Sample Header for TEXT formatted content.\n" .
         //  body_html, filtered
         "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
+        "\n" .
         "\n" .
         "Links:\n" .
         "------\n" .
@@ -194,7 +195,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $this->assertTrue($message->body instanceof ezcMailMultipartAlternative);
 
-      list($textPart, $htmlPart) = $message->body->getParts();
+      [$textPart, $htmlPart] = $message->body->getParts();
 
       $this->assertEquals('html', $htmlPart->subType);
       $this->assertRegExp(
@@ -216,6 +217,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         ";" .
         //  body_html, filtered
         "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
+        "\n" .
         "\n" .
         "Links:\n" .
         "------\n" .
@@ -337,7 +339,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $this->assertTrue($message->body instanceof ezcMailMultipartAlternative);
 
-      list($textPart, $htmlPart) = $message->body->getParts();
+      [$textPart, $htmlPart] = $message->body->getParts();
 
       if ($htmlUrlRegex) {
         $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'htmlUrlRegex' => $htmlUrlRegex, 'htmlPart' => $htmlPart->text], 1);

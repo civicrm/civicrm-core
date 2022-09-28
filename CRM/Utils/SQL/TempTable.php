@@ -187,7 +187,7 @@ class CRM_Utils_SQL_TempTable {
   /**
    * @param string $action
    *   Ex: 'CREATE', 'DROP'
-   * @param string|NULL $ifne
+   * @param string|null $ifne
    *   Ex: 'IF EXISTS', 'IF NOT EXISTS'.
    * @return string
    *   Ex: 'CREATE TEMPORARY TABLE `civicrm_tmp_e_foo_abcd1234`'
@@ -268,7 +268,7 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
-   * @param string|NULL $category
+   * @param string|null $category
    *
    * @return CRM_Utils_SQL_TempTable
    */

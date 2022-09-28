@@ -10,7 +10,8 @@
  */
 
 /**
- * Upgrade logic for FiveTwentySix */
+ * Upgrade logic for FiveTwentySix
+ */
 class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_Base {
 
   /**
@@ -54,12 +55,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
       ]);
     }
   }
-
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
 
   /**
    * Upgrade function.

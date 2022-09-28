@@ -7,9 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{capture assign=docUrlText}{ts}(Job parameters and command line syntax documentation...){/ts}{/capture}
 {capture assign=runAllURL}{crmURL p='civicrm/admin/runjobs' q="reset=1"}{/capture}
 <div class="help">
-    {ts 1=$runAllURL}You can configure scheduled jobs (cron tasks) for your CiviCRM installation. For most sites, your system administrator should set up one or more 'cron' tasks to run the enabled jobs. However, you can also <a href="%1">run all scheduled jobs manually</a>, or run specific jobs from this screen (click 'more' and then 'Execute Now').{/ts} {docURL page="sysadmin/setup/jobs" text="(Job parameters and command line syntax documentation...)"}
+    {ts 1=$runAllURL}You can configure scheduled jobs (cron tasks) for your CiviCRM installation. For most sites, your system administrator should set up one or more 'cron' tasks to run the enabled jobs. However, you can also <a href="%1">run all scheduled jobs manually</a>, or run specific jobs from this screen (click 'more' and then 'Execute Now').{/ts} {docURL page="sysadmin/setup/jobs" text=$docUrlText}
 </div>
 
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 4}
@@ -39,16 +40,16 @@
             <th ></th>
         </tr>
         {foreach from=$rows item=row}
-        <tr id="job-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {if !empty($row.class)}{$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
+        <tr id="job-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
             <td class="crm-job-name"><strong><span data-field="name">{$row.name}</span></strong> ({$row.run_frequency})<br/>
                 {$row.description}<br />
                 {ts}API Entity:{/ts} {$row.api_entity}<br/>
                 {ts}API Action:{/ts} <strong>{$row.api_action}</strong><br/>
             </td>
-            <td class="crm-job-name">{if isset($row.parameters)}{if $row.parameters eq null}<em>{ts}no parameters{/ts}</em>{else}<pre>{$row.parameters}</pre>{/if}{/if}</td>
-            <td class="crm-job-name">{if isset($row.last_run)}{if $row.last_run eq null}never{else}{$row.last_run|crmDate:$config->dateformatDatetime}{/if}{/if}</td>
+            <td class="crm-job-name">{if $row.parameters eq null}<em>{ts}no parameters{/ts}</em>{else}<pre>{$row.parameters}</pre>{/if}</td>
+            <td class="crm-job-name">{if $row.last_run eq null}never{else}{$row.last_run|crmDate:$config->dateformatDatetime}{/if}</td>
             <td id="row_{$row.id}_status" class="crm-job-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>

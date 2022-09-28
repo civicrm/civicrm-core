@@ -10,7 +10,9 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Api4\Membership;
 
 /**
  *  Test CRM_Member_Form_Membership functions.
@@ -72,8 +74,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file.
-   *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -81,7 +81,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     // NOTE: This will mock time for PHP. However, some values populated by MySQL ("modified_date") may leak through.
     CRM_Utils_Time::setTime('2020-08-01 01:00:00');
 
-    $this->_individualId = $this->individualCreate();
+    $this->ids['Contact']['individual'] = $this->_individualId = $this->individualCreate();
     $this->_paymentProcessorID = $this->processorCreate();
     $this->financialTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Member Dues');
     $this->ids['contact']['organization'] = $this->organizationCreate();
@@ -112,12 +112,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->validateAllPayments();
-    $this->validateAllContributions();
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(
       [
@@ -130,14 +126,17 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       $this->callAPISuccess('contact', 'delete', ['id' => $contactID, 'skip_undelete' => TRUE]);
     }
     CRM_Utils_Time::resetTime();
+    $this->revertTemplateToReservedTemplate('membership_offline_receipt');
+    if ($this->mut) {
+      $this->mut->stop();
+    }
+    parent::tearDown();
   }
 
   /**
    * Test the submit function of the membership form.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmit(): void {
     $loggedInUserID = $this->createLoggedInUser();
@@ -185,7 +184,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test submitting with tax enabled.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitWithTax(): void {
     $this->enableTaxAndInvoicing();
@@ -204,9 +202,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * https://lab.civicrm.org/dev/core/-/issues/2024
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSubmitWithTaxOfZero(): void {
@@ -227,7 +223,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitChangeType(): void {
     $form = $this->getForm();
@@ -254,9 +249,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRecur(): void {
+    $mut = new CiviMailUtils($this);
 
     $this->callAPISuccess('MembershipType', 'create', [
       'id' => $this->membershipTypeAnnualFixedID,
@@ -338,13 +333,15 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'street_address' => '10 Test St',
       'postal_code' => 90210,
     ]);
+    $mut->checkAllMailLog([
+      'Thank you text',
+    ]);
   }
 
   /**
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRecurCompleteInstant(): void {
     /** @var \CRM_Core_Payment_Dummy $processor */
@@ -423,58 +420,45 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider getThousandSeparators
    */
   public function testSubmitRecurCompleteInstantWithMail(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    // Visibility is 'Public Pages and Listings' in order to try to get to a specific line
-    // of code to ensure it's tested - it might not be a 'real' use case.
-    $this->createCustomGroupWithFieldOfType(['extends' => 'Membership'], 'multi_country', NULL, ['visibility' => 'Public Pages and Listings']);
     $this->mut = new CiviMailUtils($this, TRUE);
-    /** @var \CRM_Core_Payment_Dummy $processor */
-    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
-    $processor->setDoDirectPaymentResult([
-      'payment_status_id' => 1,
-      'trxn_id' => 'kettles boil water',
-      'fee_amount' => .29,
-    ]);
-
-    $this->callAPISuccess('MembershipType', 'create', [
-      'id' => $this->membershipTypeAnnualFixedID,
-      'duration_unit' => 'month',
-      'duration_interval' => 1,
-      'auto_renew' => 1,
-    ]);
-    $this->createLoggedInUser();
-    $form = $this->getForm(array_merge($this->getBaseSubmitParams(), [
-      'is_recur' => 1,
-      'send_receipt' => 1,
-      'auto_renew' => 1,
-      $this->getCustomFieldName('multi_country') => [1006, 1007],
-    ]));
-
-    $form->_contactID = $this->_individualId;
-    $form->_mode = 'live';
-
-    $form->testSubmit();
+    $form = $this->submitInstantCardRenewal();
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['contact_id' => $this->_individualId]);
     $this->assertEquals(1, $contributionRecur['is_email_receipt']);
     $this->mut->checkMailLog([
-      '$ ' . $this->formatMoneyInput(7800.90),
+      '$' . $this->formatMoneyInput(7800.90),
       'Country-multi : Angola, Anguilla',
     ]);
-    $this->mut->stop();
     $this->setCurrencySeparators(',');
+  }
+
+  /**
+   * Test message template output.
+   */
+  public function testMailOutput(): void {
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->swapMessageTemplateForTestTemplate('membership_offline_receipt');
+    $this->swapMessageTemplateForTestTemplate('membership_offline_receipt', 'text');
+    $this->submitInstantCardRenewal();
+    $this->mut->checkAllMailLog([
+      'thanks heaps',
+      'smarty:contributionID|' . $this->ids['Contribution']['live'],
+      'smarty:membershipID|' . $this->ids['Membership']['live'],
+      'smarty:contactID|' . $this->ids['Contact']['individual'],
+      'token:contact_id|' . $this->ids['Contact']['individual'],
+      'token:contribution_id|' . $this->ids['Contribution']['live'],
+      'token:membership_id|' . $this->ids['Membership']['live'],
+    ]);
   }
 
   /**
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPayLater(): void {
     $this->createLoggedInUser();
@@ -523,7 +507,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPayLaterWithBilling(): void {
     $this->createLoggedInUser();
@@ -583,7 +566,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitComplete(): void {
     $this->createLoggedInUser();
@@ -640,10 +622,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @return \CRM_Member_Form_MembershipRenewal
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function getForm($formValues = [], $mode = 'test'): CRM_Member_Form_MembershipRenewal {
-    /* @var CRM_Member_Form_MembershipRenewal $form */
+    /** @var CRM_Member_Form_MembershipRenewal $form */
     $form = $this->getFormObject('CRM_Member_Form_MembershipRenewal', $formValues);
 
     $form->_bltID = 5;
@@ -692,7 +673,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test renewing an expired membership.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRenewExpired(): void {
     $form = $this->getForm([], NULL);
@@ -732,6 +712,54 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Time::date('Y-12-31'), $log['end_date']);
     $this->assertEquals(CRM_Utils_Time::date('Y-m-d'), $log['modified_date']);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Current'), $log['status_id']);
+  }
+
+  /**
+   * Submit instant card renewal
+   */
+  protected function submitInstantCardRenewal(): void {
+    try {
+      // Visibility is 'Public Pages and Listings' in order to try to get to a specific line
+      // of code to ensure it's tested - it might not be a 'real' use case.
+      $this->createCustomGroupWithFieldOfType(['extends' => 'Membership'], 'multi_country', NULL, ['visibility' => 'Public Pages and Listings']);
+      /** @var \CRM_Core_Payment_Dummy $processor */
+      $processor = Civi\Payment\System::singleton()
+        ->getById($this->_paymentProcessorID);
+      $processor->setDoDirectPaymentResult([
+        'payment_status_id' => 1,
+        'trxn_id' => 'kettles boil water',
+        'fee_amount' => .29,
+      ]);
+
+      $this->callAPISuccess('MembershipType', 'create', [
+        'id' => $this->membershipTypeAnnualFixedID,
+        'duration_unit' => 'month',
+        'duration_interval' => 1,
+        'auto_renew' => 1,
+      ]);
+      $this->createLoggedInUser();
+      $form = $this->getForm(array_merge($this->getBaseSubmitParams(), [
+        'is_recur' => 1,
+        'send_receipt' => 1,
+        'auto_renew' => 1,
+        'receipt_text' => 'thanks heaps',
+        $this->getCustomFieldName('multi_country') => [1006, 1007],
+      ]));
+
+      $form->_contactID = $this->_individualId;
+      $form->_mode = 'live';
+
+      $form->testSubmit();
+      $this->ids['Contribution']['live'] = Contribution::get()
+        ->addWhere('trxn_id', '=', 'kettles boil water')
+        ->addSelect('id')->execute()->first()['id'];
+      $this->ids['Membership']['live'] = Membership::get()
+        ->addWhere('membership_type_id', '=', $this->membershipTypeAnnualFixedID)
+        ->addSelect('id')->execute()->first()['id'];
+    }
+    catch (CRM_Core_Exception | CRM_Core_Exception | CRM_Core_Exception $e) {
+      $this->fail($e->getMessage() . "\n" . $e->getTraceAsString());
+    }
   }
 
 }

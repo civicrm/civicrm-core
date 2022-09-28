@@ -21,7 +21,7 @@ class CRM_Group_Controller extends CRM_Core_Controller {
   /**
    * Class constructor.
    *
-   * @param null $title
+   * @param string $title
    * @param bool|int $action
    * @param bool $modal
    */

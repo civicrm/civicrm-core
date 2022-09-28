@@ -14,7 +14,7 @@ CRM.$(function($) {
   $.each(highlightedFields, function() {
     $('select[id^="mapper"][id$="_0"] option[value='+ this + ']').append(' *').css({"color":"#FF0000"});
   });
-  {/literal}{if $relationship}{literal}
+  {/literal}{if $highlightedRelFields}{literal}
   var highlightedRelFields = {/literal}{$highlightedRelFields|@json_encode}{literal};
   function highlight() {
     var select, fields = highlightedRelFields[$(this).val()];

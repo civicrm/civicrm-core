@@ -140,7 +140,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query['casContactIdField'] = 'e.contact_id';
     $query['casEntityIdField'] = 'e.id';
     $query['casContactTableAlias'] = NULL;
-    $query['casDateField'] = str_replace('event_', 'r.', $schedule->start_action_date);
+    $query['casDateField'] = str_replace('event_', 'r.', ($schedule->start_action_date ?? ''));
     if (empty($query['casDateField']) && $schedule->absolute_date) {
       $query['casDateField'] = "'" . CRM_Utils_Type::escape($schedule->absolute_date, 'String') . "'";
     }
@@ -149,8 +149,9 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     if ($schedule->recipient_listing && $schedule->limit_to) {
       switch ($schedule->recipient) {
         case 'participant_role':
-          $query->where("e.role_id IN (#recipList)")
-            ->param('recipList', \CRM_Utils_Array::explodePadded($schedule->recipient_listing));
+          $regex = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', \CRM_Utils_Array::explodePadded($schedule->recipient_listing)) . "([[:cntrl:]]|$)";
+          $query->where("e.role_id REGEXP (@regex)")
+            ->param('regex', $regex);
           break;
 
         default:

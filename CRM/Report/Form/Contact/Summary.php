@@ -128,7 +128,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

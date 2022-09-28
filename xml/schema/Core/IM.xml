@@ -100,6 +100,7 @@
     <title>Primary IM</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <html>
       <type>Radio</type>
     </html>
@@ -116,6 +117,7 @@
     <title>Is IM Billing?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this the billing?</comment>
     <add>2.0</add>
   </field>

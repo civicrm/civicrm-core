@@ -13,13 +13,13 @@
 
 <div class="crm-content-block crm-block">
 
-{if !empty($jobId)}
+{if $jobId}
     <h3>{ts}List of log entries for:{/ts} {$jobName}</h3>
 {/if}
 
   <div class="action-link">
     <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-top" class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
-    {if !empty($jobRunUrl)}
+    {if $jobRunUrl}
       <a href="{$jobRunUrl}" id="jobsList-run-top" class="button"><span><i class="crm-i fa-play" aria-hidden="true"></i> {ts}Execute Now{/ts}</span></a>
     {/if}
   </div>
@@ -41,8 +41,8 @@
             <td class="crm-joblog-name">{$row.name}</td>
             <td class="crm-joblog-details">
                 <div class="crm-joblog-command">{$row.command}</div>
-                {if $row.description}<div class="crm-joblog-description"><span class="bold">Summary</span><br/>{$row.description}</div>{/if}
-              {if $row.data}<div class="crm-joblog-data" style="border-top:1px solid #ccc; margin-top: 10px;"><span class="bold">Details</span><br/><pre>{$row.data}</pre></div>{/if}
+                {if $row.description}<div class="crm-joblog-description"><span class="bold">{ts}Summary{/ts}</span><br/>{$row.description}</div>{/if}
+                {if $row.data}<div class="crm-joblog-data" style="border-top:1px solid #ccc; margin-top: 10px;"><span class="bold">{ts}Details{/ts}</span><br/><pre>{$row.data}</pre></div>{/if}
             </td>
         </tr>
         {/foreach}
@@ -63,7 +63,7 @@
 
   <div class="action-link">
     <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-bottom" class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
-    {if !empty($jobRunUrl)}
+    {if $jobRunUrl}
       <a href="{$jobRunUrl}" id="jobsList-run-bottom" class="button"><span><i class="crm-i fa-play" aria-hidden="true"></i> {ts}Execute Now{/ts}</span></a>
     {/if}
   </div>

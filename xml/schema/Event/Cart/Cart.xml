@@ -37,6 +37,7 @@
     <title>Complete?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <add>4.1</add>
   </field>
   <foreignKey>

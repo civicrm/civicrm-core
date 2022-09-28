@@ -126,6 +126,7 @@
     <title>Repeat?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <add>3.4</add>
   </field>
   <field>
@@ -201,6 +202,7 @@
     <title>Schedule is Active?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this option active?</comment>
     <add>3.4</add>
   </field>
@@ -254,7 +256,8 @@
     <name>record_activity</name>
     <title>Record Activity for Reminder?</title>
     <type>boolean</type>
-    <default>NULL</default>
+    <default>0</default>
+    <required>true</required>
     <comment>Record Activity for this reminder?</comment>
     <add>3.4</add>
   </field>

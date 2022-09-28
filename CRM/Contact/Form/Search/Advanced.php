@@ -63,7 +63,8 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     ];
 
     //check if there are any custom data searchable fields
-    $extends = array_merge(['Contact', 'Individual', 'Household', 'Organization'],
+    $extends = array_merge(['Contact'],
+      CRM_Contact_BAO_ContactType::basicTypes(),
       CRM_Contact_BAO_ContactType::subTypes()
     );
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,
@@ -130,6 +131,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
           $this->_paneTemplatePath[$type] = $c->getAdvancedSearchPaneTemplatePath();
         }
         elseif (in_array($type, $hookPanes)) {
+          $this->add('hidden', "hidden_$type", 1);
           CRM_Contact_BAO_Query_Hook::singleton()->buildAdvancedSearchPaneForm($this, $type);
           CRM_Contact_BAO_Query_Hook::singleton()->setAdvancedSearchPaneTemplatePath($this->_paneTemplatePath, $type);
         }

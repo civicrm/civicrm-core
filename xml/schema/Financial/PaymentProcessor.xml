@@ -106,6 +106,7 @@
     <comment>Is this processor active?</comment>
     <add>1.8</add>
     <default>1</default>
+    <required>true</required>
   </field>
   <field>
     <name>is_default</name>
@@ -114,6 +115,7 @@
     <comment>Is this processor the default?</comment>
     <add>1.8</add>
     <default>0</default>
+    <required>true</required>
   </field>
   <field>
     <name>is_test</name>
@@ -122,6 +124,7 @@
     <comment>Is this processor for a test site?</comment>
     <add>1.8</add>
     <default>0</default>
+    <required>true</required>
   </field>
   <index>
     <name>UI_name_test_domain_id</name>
@@ -231,6 +234,8 @@
     <name>is_recur</name>
     <title>Processor Supports Recurring?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>Can process recurring contributions</comment>
     <add>1.8</add>
   </field>

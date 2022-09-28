@@ -488,17 +488,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $this->_component = $component;
     if ($this->isPayPalType($this::PAYPAL_EXPRESS) || ($this->isPayPalType($this::PAYPAL_PRO) && !empty($params['token']))) {
       return $this->doExpressCheckout($params);
-
     }
-
-    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+    $result = $this->setStatusPaymentPending([]);
 
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
     // have an example of that at the mome.
     if ($params['amount'] == 0) {
-      $result['payment_status_id'] = array_search('Completed', $statuses);
-      $result['payment_status'] = 'Completed';
+      $result = $this->setStatusPaymentCompleted($result);
       return $result;
     }
 
@@ -510,13 +507,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $result = $this->doPaymentPayPalButton($params, $component);
       if (is_array($result) && !isset($result['payment_status_id'])) {
         if (!empty($params['is_recur'])) {
-          // See comment block.
-          $result['payment_status_id'] = array_search('Pending', $statuses);
-          $result['payment_status'] = 'Pending';
+          $result = $this->setStatusPaymentPending($result);
         }
         else {
-          $result['payment_status_id'] = array_search('Completed', $statuses);
-          $result['payment_status'] = 'Completed';
+          $result = $this->setStatusPaymentCompleted($result);
         }
       }
     }
@@ -551,6 +545,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   public function doPaymentPayPalButton(&$params, $component = 'contribute') {
     $args = [];
 
+    $result = $this->setStatusPaymentPending([]);
+
     $this->initialize($args, 'DoDirectPayment');
 
     $args['paymentAction'] = 'Sale';
@@ -570,7 +566,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['state'] = $params['state_province'];
     $args['countryCode'] = $params['country'];
     $args['zip'] = $params['postal_code'];
-    $args['desc'] = substr(CRM_Utils_Array::value('description', $params), 0, 127);
+    $args['desc'] = substr(($params['description'] ?? ''), 0, 127);
     $args['custom'] = $params['accountingCode'] ?? NULL;
 
     // add CiviCRM BN code
@@ -602,20 +598,26 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     // Allow further manipulation of the arguments via custom hooks ..
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $args);
 
-    $result = $this->invokeAPI($args);
+    $apiResult = $this->invokeAPI($args);
 
     $params['recurr_profile_id'] = NULL;
 
     if (CRM_Utils_Array::value('is_recur', $params) == 1) {
-      $params['recurr_profile_id'] = $result['profileid'];
+      $params['recurr_profile_id'] = $apiResult['profileid'];
     }
 
     /* Success */
+    $result = $this->setStatusPaymentCompleted($result);
+    $doQueryParams = [
+      'gross_amount' => $apiResult['amt'] ?? NULL,
+      'trxn_id' => $apiResult['transactionid'] ?? NULL,
+      'is_recur' => $params['is_recur'] ?? FALSE,
+    ];
+    $params = array_merge($params, $this->doQuery($doQueryParams));
 
-    $params['trxn_id'] = $result['transactionid'] ?? NULL;
-    $params['gross_amount'] = $result['amt'] ?? NULL;
-    $params = array_merge($params, $this->doQuery($params));
-    return $params;
+    $result['fee_amount'] = $params['fee_amount'] ?? 0;
+    $result['trxn_id'] = $apiResult['transactionid'] ?? NULL;
+    return $result;
   }
 
   /**
@@ -695,7 +697,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * Get url for users to manage this recurring contribution for this processor.
    *
    * @param int $entityID
-   * @param null $entity
+   * @param string|null $entity
    * @param string $action
    *
    * @return string|null
@@ -771,7 +773,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * Process incoming notification.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function handlePaymentNotification() {
     $params = array_merge($_GET, $_REQUEST);
@@ -793,6 +794,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     switch ($paymentProcessorType) {
       case 'PayPal':
         // "PayPal - Website Payments Pro"
+        $paypalIPN = new CRM_Core_Payment_PayPalProIPN($params);
+        break;
+
+      case 'PayPal_Express':
+        // "PayPal - Express"
         $paypalIPN = new CRM_Core_Payment_PayPalProIPN($params);
         break;
 
@@ -1011,10 +1017,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         throw new CRM_Core_Exception(ts('Recurring contribution, but no database id'));
       }
 
+      // See https://developer.paypal.com/api/nvp-soap/paypal-payments-standard/integration-guide/Appx-websitestandard-htmlvariables/#link-recurringpaymentvariables
       $paypalParams += [
         'cmd' => '_xclick-subscriptions',
         'a3' => $this->getAmount($params),
-        'p3' => $params['frequency_interval'],
+        'p3' => $params['frequency_interval'] ?? 1,
         't3' => ucfirst(substr($params['frequency_unit'], 0, 1)),
         'src' => 1,
         'sra' => 1,
@@ -1089,7 +1096,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $p = [];
     foreach ($args as $n => $v) {
-      $p[] = "$n=" . urlencode($v);
+      $p[] = "$n=" . urlencode($v ?? '');
     }
 
     //NVPRequest for submitting to server

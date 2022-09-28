@@ -22,9 +22,10 @@
  */
 class api_v3_ExtensionTest extends CiviUnitTestCase {
 
+  use \Civi\Test\GuzzleTestTrait;
+
   public function setUp(): void {
-    $url = 'file://' . dirname(dirname(dirname(dirname(__FILE__)))) . '/mock/extension_browser_results';
-    Civi::settings()->set('ext_repo_url', $url);
+    Civi::settings()->set('ext_repo_url', 'http://localhost:9999/fake-repo');
   }
 
   public function tearDown(): void {
@@ -35,10 +36,18 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Test getremote.
    */
   public function testGetremote() {
+    $testsDir = dirname(dirname(dirname(dirname(__FILE__))));
+    $this->createMockHandler([file_get_contents($testsDir . '/mock/extension_browser_results/single')]);
+    $this->setUpClientWithHistoryContainer();
+    CRM_Extension_System::singleton()->getBrowser()->setGuzzleClient($this->getGuzzleClient());
+    CRM_Extension_System::singleton()->getBrowser()->refresh();
+
     $result = $this->callAPISuccess('extension', 'getremote', []);
     $this->assertEquals('org.civicrm.module.cividiscount', $result['values'][0]['key']);
     $this->assertEquals('module', $result['values'][0]['type']);
     $this->assertEquals('CiviDiscount', $result['values'][0]['name']);
+
+    $this->assertEquals(['http://localhost:9999/fake-repo/single'], $this->getRequestUrls());
   }
 
   /**

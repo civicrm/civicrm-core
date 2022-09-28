@@ -185,6 +185,24 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that auto renew = TRUE still works post schema change.
+   *
+   * https://lab.civicrm.org/dev/rc/-/issues/14
+   */
+  public function testCreateMembershipTypeAutoRenewBool(): void {
+    $this->callAPISuccess('MembershipType', 'create', [
+      'member_of_contact_id' => 1,
+      'financial_type_id' => 'Member Dues',
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'minimum_fee' => 1,
+      'name' => 'gen',
+      'auto_renew' => TRUE,
+    ]);
+  }
+
+  /**
    * Test update.
    *
    * @dataProvider versionThreeAndFour

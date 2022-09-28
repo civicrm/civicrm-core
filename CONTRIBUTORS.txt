@@ -6,7 +6,7 @@ Code Contributors for 5.x
 
 CiviCRM - Coleman Watts, Tim Otten
 a-n The Artists Information Company - William Mortada
-AGH Strategies - Alice Frumin, Andrew Hunt, Eli Lisseck, Tommy Bobo
+AGH Strategies - Alice Frumin, Andie Hunt, Eli Lisseck, Tommy Bobo
 Agileware - Alok Patel, Francis Whittle, Justin Freeman, Pengyi Zhang
 Alexy Mikhailichenko
 Andrei Mondoc
@@ -101,7 +101,7 @@ Systopia - Björn Endres, Thomas Leichtfuss
 Tadpole Collective - Kevin Cristiano
 Tanya Bouman
 Team Expansion - Greg Harris
-Third Sector Design - Michael McAndrew
+Third Sector Design - Michael McAndrew, Kurund Jalmi, William Mortada
 Thomas Mannell
 Timbsoft Technologies - Tunbola Ogunwande
 Tiotsop Gerest
@@ -122,7 +122,7 @@ CiviCRM - Coleman Watts, Josh Gowans, Tim Otten
 
 Aaron Jones
 Abhikalak Consultants - Amal Sharma
-AGH Strategies - Alice Frumin, Andrew Hunt, Eli Lisseck, Nikki Murray, Tommy
+AGH Strategies - Alice Frumin, Andie Hunt, Eli Lisseck, Nikki Murray, Tommy
     Bobo, Tyrell Cook
 Agileware - Alok Patel, Francis Whittle, Iris Abarquez, Justin Freeman, Vaibhav
     Sagar
@@ -297,7 +297,7 @@ CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Donald Lobo,
                Michael McAndrew, Monish Deb, Rohan Ramesh Katkar, Tim Otten,
                Yashodha Chaku
 ADG Communications - Steve Binkowski
-AGH Strategies - Andrew Hunt, Jane Hanley, Tommy Bobo, Tyrell Cook
+AGH Strategies - Andie Hunt, Jane Hanley, Tommy Bobo, Tyrell Cook
 Agileware - Justin Freeman, Francis Whittle, Iris Abarquez, Vaibhav Sagar
 Alex C
 Allan Chappell
@@ -380,7 +380,7 @@ Key Contributors and Sponsors for 4.5
 CiviCRM Team - Coleman Watts, David Greenberg, Donald Lobo,
                Kurund Jalmi, Michael McAndrew, Monish Deb, Pratik Joshi,
                Tim Otten, Yashodha Chaku, Eileen McNaughton
-AGH Strategies - Andrew Hunt, Maggie Epps, Tyrell Cook
+AGH Strategies - Andie Hunt, Maggie Epps, Tyrell Cook
 Allan Chappell
 Amnesty International Spain - Carlos Capote
 Andy Clark
@@ -438,7 +438,7 @@ Key Contributors and Sponsors for 4.4
 CiviCRM Team - Coleman Watts, David Greenberg, Donald Lobo,
                Kurund Jalmi, Michael McAndrew, Monish Deb,
                Tim Otten, Yashodha Chaku, Eileen McNaughton
-AGH Strategies - Andrew Hunt
+AGH Strategies - Andie Hunt
 Backoffice Thinking
 Chris Burgess
 Circle Interactive - Andrew Walker, Dave Jenkins
@@ -491,7 +491,7 @@ Key Contributors and Sponsors for 4.3
 CiviCRM Team - Coleman Watts, David Greenberg, Deepak Srivastava, Donald Lobo,
                Kurund Jalmi, Michael McAndrew, Pratik Joshi, Ravish Nair,
                Tim Otten, Yashodha Chaku, Eileen McNaughton
-AGH Strategies - Andrew Hunt
+AGH Strategies - Andie Hunt
 Backoffice Thinking
 Chris Burgess
 Circle Interactive - Andrew Walker, Dave Jenkins
@@ -539,7 +539,7 @@ Adam Wight
 Alice Aguilar
 Allen Shaw
 Andres Spagarino
-Andrew Hunt
+Andie Hunt
 Anthony Camilleri
 Ariel Gold
 Brian Shaughnessy

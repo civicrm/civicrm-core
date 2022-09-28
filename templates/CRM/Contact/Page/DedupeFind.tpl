@@ -18,56 +18,56 @@
         <tr>
           <td class="crm-contact-form-block-contact1">
             <label for="contact1">{ts}Contact 1{/ts}</label><br />
-            <input type="text" placeholder="Search Contact1" search-column="2" />
+            <input type="text" placeholder="{ts}Search Contact1{/ts}" search-column="2" id="contact1"/>
           </td>
           <td class="crm-contact-form-block-contact2">
             <label for="contact2">{ts}Contact 2{/ts}</label><br />
-            <input type="text" placeholder="Search Contact2" search-column="4" />
+            <input type="text" placeholder="{ts}Search Contact2{/ts}" search-column="4" id="contact2"/>
           </td>
           <td class="crm-contact-form-block-email1">
             <label for="email1">{ts}Email 1{/ts}</label><br />
-            <input type="text" placeholder="Search Email1" search-column="5" />
+            <input type="text" placeholder="{ts}Search Email1{/ts}" search-column="5" id="email1"/>
           </td>
           <td class="crm-contact-form-block-email2">
             <label for="email2">{ts}Email 2{/ts}</label><br />
-            <input type="text" placeholder="Search Email2" search-column="6" />
+            <input type="text" placeholder="{ts}Search Email2{/ts}" search-column="6" id="email2"/>
           </td>
         </tr>
         <tr>
           <td class="crm-contact-form-block-street-address1">
             <label for="street-adddress1">{ts}Street Address 1{/ts}</label><br />
-            <input type="text" placeholder="Search Street Address1" search-column="7" />
+            <input type="text" placeholder="{ts}Search Street Address1{/ts}" search-column="7" id="street-adddress1"/>
           </td>
           <td class="crm-contact-form-block-street-address2">
             <label for="street-adddress2">{ts}Street Address 2{/ts}</label><br />
-            <input type="text" placeholder="Search Street Address2" search-column="8" />
+            <input type="text" placeholder="{ts}Search Street Address2{/ts}" search-column="8" id="street-adddress2"/>
           </td>
           <td class="crm-contact-form-block-postcode1">
             <label for="postcode1">{ts}Postcode 1{/ts}</label><br />
-            <input type="text" placeholder="Search Postcode1" search-column="9" />
+            <input type="text" placeholder="{ts}Search Postcode1{/ts}" search-column="9" id="postcode1"/>
           </td>
           <td class="crm-contact-form-block-postcode2">
             <label for="postcode2">{ts}Postcode 2{/ts}</label><br />
-            <input type="text" placeholder="Search Postcode2" search-column="10" />
+            <input type="text" placeholder="{ts}Search Postcode2{/ts}" search-column="10" id="postcode2"/>
           </td>
         </tr>
       </table>
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
   <div>
-    Show / Hide columns:
-    <input type='checkbox' id ='steet-address' class='toggle-vis' data-column-main="7" data-column-dupe="8" >
+    {ts}Show / Hide columns:{/ts}
+    <input type='checkbox' id='steet-address' class='toggle-vis' data-column-main="7" data-column-dupe="8" >
         <label for="steet-address">{ts}Street Address{/ts}&nbsp;</label>
-    <input type='checkbox' id ='post-code' class='toggle-vis' data-column-main="9" data-column-dupe="10" >
+    <input type='checkbox' id='post-code' class='toggle-vis' data-column-main="9" data-column-dupe="10" >
         <label for="post-code">{ts}Post Code{/ts}&nbsp;</label>
-    <input type='checkbox' id ='conflicts' class='toggle-vis' data-column-main="11"  >
+    <input type='checkbox' id='conflicts' class='toggle-vis' data-column-main="11"  >
         <label for="conflicts">{ts}Conflicts{/ts}&nbsp; </label>
-    <input type='checkbox' id ='threshold' class='toggle-vis' data-column-main="12"  >
+    <input type='checkbox' id='threshold' class='toggle-vis' data-column-main="12"  >
         <label for="threshold">{ts}Threshold{/ts}&nbsp;</label>
   </div><br/>
   <span id="dupePairs_length_selection">
-    <input type='checkbox' id ='crm-dedupe-display-selection' name="display-selection">
-    <label for="display-selection">{ts}Within Selections{/ts}&nbsp;</label>
+    <input type='checkbox' id='crm-dedupe-display-selection' name="display-selection">
+    <label for="crm-dedupe-display-selection">{ts}Within Selections{/ts}&nbsp;</label>
   </span>
 
   <table id="dupePairs"

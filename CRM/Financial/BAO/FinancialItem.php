@@ -17,30 +17,20 @@
 class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Financial_DAO_FinancialItem
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    $financialItem = new CRM_Financial_DAO_FinancialItem();
-    $financialItem->copyValues($params);
-    if ($financialItem->find(TRUE)) {
-      CRM_Core_DAO::storeValues($financialItem, $defaults);
-      return $financialItem;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -51,26 +41,24 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param object $contribution
    *   Contribution object.
    * @param bool $taxTrxnID
-   *
-   * @param int $trxnId
+   * @param array|null $trxnId
    *
    * @return CRM_Financial_DAO_FinancialItem
    */
   public static function add($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $itemStatus = NULL;
-    if ($contribution->contribution_status_id == array_search('Completed', $contributionStatuses)
-      || $contribution->contribution_status_id == array_search('Pending refund', $contributionStatuses)
-    ) {
+    if ($contributionStatus === 'Completed' || $contributionStatus === 'Pending refund') {
       $itemStatus = array_search('Paid', $financialItemStatus);
     }
-    elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses)
-      || $contribution->contribution_status_id == array_search('In Progress', $contributionStatuses)
+    elseif ($contributionStatus === 'Pending'
+      // In progress is no longer present on new installs unless extensions add it.
+      || $contributionStatus === 'In Progress'
     ) {
       $itemStatus = array_search('Unpaid', $financialItemStatus);
     }
-    elseif ($contribution->contribution_status_id == array_search('Partially paid', $contributionStatuses)) {
+    elseif ($contributionStatus === 'Partially paid') {
       $itemStatus = array_search('Partially paid', $financialItemStatus);
     }
     $params = [
@@ -102,14 +90,12 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       );
     }
     if (empty($trxnId)) {
-      $trxnId['id'] = CRM_Contribute_BAO_Contribution::$_trxnIDs;
       if (empty($trxnId['id'])) {
         $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
         $trxnId['id'] = $trxn['financialTrxnId'];
       }
     }
-    $financialItem = self::create($params, NULL, $trxnId);
-    return $financialItem;
+    return self::create($params, NULL, $trxnId);
   }
 
   /**

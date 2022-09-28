@@ -17,11 +17,11 @@
       <tr>
         <td class="crm-contact-form-block-contact1">
           <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
-          <input class="crm-form-text" type="text" size="50" placeholder="Search Contacts" value="{$searchcontact1}" id="search-contact1" search-column="0" />
+          <input class="crm-form-text" type="text" size="50" placeholder="{ts}Search Contacts{/ts}" value="{$searchcontact1}" id="search-contact1" search-column="0" />
         </td>
         <td class="crm-contact-form-block-search">
           <label>&nbsp;</label><br />
-          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search" aria-hidden="true"></i> Find Contacts</span></button>
+          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Find Contacts{/ts}</span></button>
         </td>
       </tr>
     </table>

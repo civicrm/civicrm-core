@@ -10,9 +10,9 @@
 {* Configure Membership signup/renewal block for an Online Contribution page *}
 <div id="form" class="crm-block crm-form-block crm-member-membershipblock-form-block">
 <div class="help">
-    {ts}Use this form to enable and configure a Membership Signup and Renewal section for this Online Contribution Page. If you're not using this page for membership signup, leave the <strong>Enabled</strong> box un-checked..{/ts} {docURL page="user/membership/setup"}
+    {ts}Use this form to enable and configure a Membership Signup and Renewal section for this Online Contribution Page. If you're not using this page for membership signup, leave the <strong>Enabled</strong> box un-checked..{/ts} {docURL page="user/membership/online-membership-sign-up/"}
 </div>
-  {if $form.membership_type.html}
+  {if !empty($form.membership_type.html)}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
         <tr class="crm-member-membershipblock-form-block-member_is_active">

@@ -90,7 +90,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
       throw new CRM_Core_Exception('The profile id is missing');
     }
     $this->_title = ts('Update multiple activities') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
-    CRM_Utils_System::setTitle($this->_title);
+    $this->setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
     $this->_fields = [];

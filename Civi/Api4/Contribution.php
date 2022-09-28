@@ -19,4 +19,31 @@ namespace Civi\Api4;
  */
 class Contribution extends Generic\DAOEntity {
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Contribution\Create
+   */
+  public static function create($checkPermissions = TRUE) {
+    return (new Action\Contribution\Create(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Contribution\Save
+   */
+  public static function save($checkPermissions = TRUE) {
+    return (new Action\Contribution\Save(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Contribution\Update
+   */
+  public static function update($checkPermissions = TRUE) {
+    return (new Action\Contribution\Update(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }

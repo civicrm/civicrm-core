@@ -149,8 +149,6 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
    *
    * We need to do this to preserve the CiviCRM hook signatures for hooks that require
    * a return value, since the WordPress Plugin API seems to be incompatible with them.
-   *
-   * Copied and adapted from: CRM/Utils/Hook/Drupal6.php
    */
   public function buildModuleList() {
     if ($this->isBuilt === FALSE) {

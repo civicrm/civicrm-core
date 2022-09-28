@@ -1,0 +1,5 @@
+first_name,Last Name,Birth Date,Deceased Date,Custom Date One,Custom Date Two,Street Address,Type,expected
+Joe,8,09/01/2008,09/01/2008,09/01/2008,09/01/2008,17 Downing St,4,Valid
+Joe,9,09-01-2008,09-01-2008,09-01-2008,09-01-2008,18 Downing St,4,Valid
+Joe,10,09/01/2008,09/01/2008,09/01/2008,09/01/2008,19 Downing St,4,Valid
+Joe,11,09-01-2008,09-01-2008,09-01-2008,09-01-2008,20 Downing St,4,Valid

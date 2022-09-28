@@ -43,8 +43,7 @@ class CRM_Contact_BAO_Query_Hook {
   /**
    * Get or build the list of search objects (via hook).
    *
-   * @return array
-   *   Array of CRM_Contact_BAO_Query_Interface objects
+   * @return CRM_Contact_BAO_Query_Interface[]
    */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
@@ -62,6 +61,23 @@ class CRM_Contact_BAO_Query_Hook {
     foreach (self::getSearchQueryObjects() as $obj) {
       $flds = $obj->getFields();
       $extFields = array_merge($extFields, $flds);
+    }
+    return $extFields;
+  }
+
+  /**
+   * Get the fields that are available in the 'contact context'.
+   *
+   * For example exporting contacts should not include fields for grants etc.
+   *
+   * @return array
+   */
+  public function getContactFields(): array {
+    $extFields = [];
+    foreach ($this->getSearchQueryObjects() as $obj) {
+      // Get Fields is ambiguous about the
+      $fields = method_exists($obj, 'getContactFields') ? $obj->getContactFields() : $obj->getFields();
+      $extFields = array_merge($extFields, $fields);
     }
     return $extFields;
   }
@@ -148,6 +164,28 @@ class CRM_Contact_BAO_Query_Hook {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->setAdvancedSearchPaneTemplatePath($paneTemplatePathArray, $type);
     }
+  }
+
+  /**
+   * This gives the opportunity for a single hook to return default fields.
+   *
+   * It only runs if no core components have defaults for this $mode.
+   * The expectation is that only one hook will handle this mode, so just
+   * the first one to return a value is used.
+   *
+   * @param $mode
+   * @return array|null
+   */
+  public function getDefaultReturnProperties($mode) {
+    foreach ($this->getSearchQueryObjects() as $obj) {
+      if (method_exists($obj, 'defaultReturnProperties')) {
+        $properties = $obj::defaultReturnProperties($mode);
+        if ($properties) {
+          return $properties;
+        }
+      }
+    }
+    return NULL;
   }
 
 }

@@ -1,0 +1,9 @@
+<input id="{{:: fieldId }}"
+       class="form-control"
+       ng-disabled="$ctrl.afFieldset.getEntity().actions.update === false"
+       ng-model="getSetSelect"
+       ng-model-options="{getterSetter: true}"
+       crm-autocomplete="$ctrl.defn.entity"
+       crm-autocomplete-params="{formName: 'afform:' + $ctrl.afFieldset.getFormName(), fieldName: $ctrl.afFieldset.modelName + ':' + $ctrl.fieldName}"
+       placeholder="{{:: $ctrl.defn.input_attrs.placeholder }}"
+       ng-change="$ctrl.onSelectExisting()" >

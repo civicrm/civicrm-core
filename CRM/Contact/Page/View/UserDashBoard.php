@@ -132,6 +132,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       $contactRelationships = $selector = NULL;
       CRM_Utils_Hook::searchColumns('relationship.columns', $columnHeaders, $contactRelationships, $selector);
       $this->assign('columnHeaders', $columnHeaders);
+      $this->assign('entityInClassFormat', 'relationship');
       $dashboardElements[] = [
         'class' => 'crm-dashboard-permissionedOrgs',
         'templatePath' => 'CRM/Contact/Page/View/RelationshipSelector.tpl',
@@ -166,6 +167,12 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
 
     usort($dashboardElements, ['CRM_Utils_Sort', 'cmpFunc']);
+    foreach ($dashboardElements as $index => $dashboardElement) {
+      // Ensure property is set to avoid smarty notices
+      if (!array_key_exists('class', $dashboardElement)) {
+        $dashboardElements[$index]['class'] = NULL;
+      }
+    }
     $this->assign('dashboardElements', $dashboardElements);
 
     if (!empty($dashboardOptions['Groups'])) {

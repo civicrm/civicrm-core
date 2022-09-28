@@ -265,7 +265,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     parent::preProcess();
@@ -580,7 +579,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return void
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
 
@@ -786,7 +784,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param array $values
    *   Posted values of the form.
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -972,7 +970,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return string
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function submit($params) {
     if ($this->_mode && !$this->_isPaidEvent) {
@@ -999,7 +996,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $params['total_amount'] = CRM_Utils_Rule::cleanMoney($params['total_amount']);
     }
     if ($this->_isPaidEvent) {
-      list($contributionParams, $lineItem, $additionalParticipantDetails, $params) = $this->preparePaidEventProcessing($params);
+      [$contributionParams, $lineItem, $additionalParticipantDetails, $params] = $this->preparePaidEventProcessing($params);
     }
 
     $this->_params = $params;
@@ -1020,7 +1017,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $userName = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
 
     if ($this->_contactId) {
-      list($this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
+      [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
     }
 
     //modify params according to parameter used in create
@@ -1459,7 +1456,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       foreach ($this->_contactIds as $num => $contactID) {
         // Retrieve the name and email of the contact - this will be the TO for receipt email
-        list($this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($contactID);
+        [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
 
         $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
 
@@ -1499,7 +1496,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
                 }
               }
             }
-            $this->assign('totalTaxAmount', $totalTaxAmount);
             $this->assign('taxTerm', $this->getSalesTaxTerm());
             $this->assign('dataArray', $dataArray);
           }
@@ -1516,13 +1512,16 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $eventAmount = array_merge($eventAmount, $additionalParticipantDetails);
           $this->assign('amount', $eventAmount);
         }
-
+        $this->assign('totalTaxAmount', $totalTaxAmount ?? 0);
         $sendTemplateParams = [
-          'groupName' => 'msg_tpl_workflow_event',
-          'valueName' => 'event_offline_receipt',
+          'workflow' => 'event_offline_receipt',
           'contactId' => $contactID,
           'isTest' => !empty($this->_defaultValues['is_test']),
           'PDFFilename' => ts('confirmation') . '.pdf',
+          'modelProps' => [
+            'participantID' => $this->_id,
+            'eventID' => $params['event_id'],
+          ],
         ];
 
         // try to send emails only if email id is present
@@ -1544,13 +1543,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
           $this->_id, 'contribution_id', 'participant_id'
         );
-        $prefixValue = Civi::settings()->get('contribution_invoice_settings');
-        $invoicing = $prefixValue['invoicing'] ?? NULL;
-        if (!empty($taxAmt) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+        if (Civi::settings()->get('invoice_is_email_pdf')) {
           $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $contributionId;
         }
-        list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        [$mailSent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         if ($mailSent) {
           $sent[] = $contactID;
           foreach ($participants as $ids => $values) {
@@ -1656,11 +1653,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       //retrieve custom information
       $form->_values = [];
-      CRM_Event_Form_Registration::initEventFee($form, $event['id']);
+      CRM_Event_Form_Registration::initEventFee($form, $event['id'], FALSE);
       CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->_discountId);
       $lineItem = [];
-      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-      $invoicing = $invoiceSettings['invoicing'] ?? NULL;
       $totalTaxAmount = 0;
       if (!CRM_Utils_System::isNull(CRM_Utils_Array::value('line_items', $form->_values))) {
         $lineItem[] = $form->_values['line_items'];
@@ -1668,9 +1663,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $totalTaxAmount = $value['tax_amount'] + $totalTaxAmount;
         }
       }
-      if ($invoicing) {
-        $form->assign('totalTaxAmount', $totalTaxAmount);
-      }
+      $form->assign('totalTaxAmount', Civi::settings()->get('invoicing') ? ($totalTaxAmount ?? NULL) : NULL);
       $form->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
       $discounts = [];
       if (!empty($form->_values['discount'])) {
@@ -1733,7 +1726,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
 
         $form->add('select', 'contribution_status_id',
-          ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('participant')
+          ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getPendingAndCompleteStatuses()
         );
 
         $form->add('text', 'check_number', ts('Check Number'),
@@ -1765,9 +1758,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // Retrieve the name and email of the contact - form will be the TO for receipt email ( only if context is not standalone)
     if ($form->_context != 'standalone') {
       if ($form->_contactId) {
-        list($form->_contributorDisplayName,
-          $form->_contributorEmail
-          ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($form->_contactId);
+        [$form->_contributorDisplayName, $form->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($form->_contactId);
         $form->assign('email', $form->_contributorEmail);
       }
       else {
@@ -1788,7 +1779,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function preparePaidEventProcessing($params): array {
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
@@ -1944,7 +1935,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return \CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function processContribution(
     &$form, $params, $result, $contactID,
@@ -2046,7 +2036,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return \CRM_Event_BAO_Participant
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function addParticipant(&$form, $params, $contactID) {
     $transaction = new CRM_Core_Transaction();
@@ -2130,7 +2119,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param string $fieldName
    *
    * @return mixed
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getEventValue(string $fieldName) {
     if (!isset($this->_event)) {
@@ -2145,7 +2134,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param string $fieldName
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getParticipantValue($fieldName) {
     if (!$this->participantRecord) {
@@ -2168,7 +2157,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return string
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRevenueRecognitionDate() {
     if (Civi::settings()->get('deferred_revenue_enabled')) {
@@ -2181,7 +2170,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * Store the parameters to create a payment, if approprite, on the form.
+   * Store the parameters to create a payment, if appropriate, on the form.
    *
    * @param array $params
    *   Params as submitted.

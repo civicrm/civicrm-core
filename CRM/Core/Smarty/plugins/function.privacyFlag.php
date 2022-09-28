@@ -12,7 +12,7 @@
 /**
  *
  * @package CRM
- * @author Andrew Hunt, AGH Strategies
+ * @author Andie Hunt, AGH Strategies
  *
  */
 
@@ -36,7 +36,7 @@ function smarty_function_privacyFlag($params, &$smarty) {
     'do_not_phone' => 'fa-phone',
     'do_not_email' => 'fa-paper-plane',
     'do_not_mail' => 'fa-envelope',
-    'do_not_sms' => 'fa-mobile',
+    'do_not_sms' => 'fa-comments-o',
     'do_not_trade' => 'fa-exchange',
     'is_opt_out' => 'fa-paper-plane-o',
   ];

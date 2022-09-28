@@ -90,7 +90,7 @@ class CRM_Contact_BAO_SearchCustom {
    * @throws CRM_Core_Exception
    */
   public static function customClass($csID, $ssID) {
-    list($customSearchID, $customSearchClass, $formValues) = self::details($csID, $ssID);
+    [$customSearchID, $customSearchClass, $formValues] = self::details($csID, $ssID);
 
     if (!$customSearchID) {
       throw new CRM_Core_Exception('Could not resolve custom search ID');
@@ -114,7 +114,7 @@ class CRM_Contact_BAO_SearchCustom {
   }
 
   /**
-   * @param $args
+   * @param string $args
    *
    * @return array
    */
@@ -124,27 +124,12 @@ class CRM_Contact_BAO_SearchCustom {
     $values = explode("\n", $args);
     $formValues = [];
     foreach ($values as $value) {
-      list($n, $v) = CRM_Utils_System::explode('=', $value, 2);
+      [$n, $v] = CRM_Utils_System::explode('=', $value, 2);
       if (!empty($v)) {
         $formValues[$n] = $v;
       }
     }
     return $formValues;
-  }
-
-  /**
-   * @param int $csID
-   * @param int $ssID
-   *
-   * @return array
-   */
-  public static function fromWhereEmail($csID, $ssID) {
-    $customClass = self::customClass($csID, $ssID);
-
-    $from = $customClass->from();
-    $where = $customClass->where();
-
-    return [$from, $where];
   }
 
 }

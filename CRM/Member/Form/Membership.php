@@ -134,11 +134,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public function setDeleteMessage() {
     $this->deleteMessage = '<span class="font-red bold">'
-      . ts('WARNING: Deleting this membership will also delete any related payment (contribution) records.' . ts('This action cannot be undone.')
-        . '</span><p>'
-        . ts('Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.')
-          . '</p><p>'
-        . ts("Click 'Delete' if you want to continue.") . '</p>');
+      . ts('WARNING: Deleting this membership will also delete any related payment (contribution) records.')
+      . ' '
+      . ts('This action cannot be undone.')
+      . '</span><p>'
+      . ts('Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.')
+      . '</p><p>'
+      . ts("Click 'Delete' if you want to continue.") . '</p>';
   }
 
   /**
@@ -213,7 +215,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Form preProcess function.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
@@ -232,7 +233,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         CRM_Core_Error::statusBounce(ts("This Membership is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
       }
     }
-
+    $mems_by_org = [];
     if ($this->_action & CRM_Core_Action::ADD) {
       if ($this->_contactID) {
         //check whether contact has a current membership so we can alert user that they may want to do a renewal instead
@@ -247,7 +248,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           foreach ($cMemTypes as $memTypeID) {
             $memberorgs[$memTypeID] = CRM_Member_BAO_MembershipType::getMembershipType($memTypeID)['member_of_contact_id'];
           }
-          $mems_by_org = [];
           foreach ($contactMemberships as $mem) {
             $mem['member_of_contact_id'] = $memberorgs[$mem['membership_type_id']] ?? NULL;
             if (!empty($mem['membership_end_date'])) {
@@ -270,7 +270,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             );
             $mems_by_org[$mem['member_of_contact_id']] = $mem;
           }
-          $this->assign('existingContactMemberships', $mems_by_org);
         }
       }
       else {
@@ -285,6 +284,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $resources->addSetting(['existingMems' => $passthru]);
       }
     }
+    $this->assign('existingContactMemberships', $mems_by_org);
 
     if (!$this->_memType) {
       $params = CRM_Utils_Request::exportValues();
@@ -353,7 +353,7 @@ DESC limit 1");
 
     $subscriptionCancelled = FALSE;
     if (!empty($defaults['id'])) {
-      $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled($this->_id);
+      $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $this->_id);
     }
 
     $alreadyAutoRenew = FALSE;
@@ -375,10 +375,7 @@ DESC limit 1");
     if (empty($defaults['join_date'])) {
       $defaults['join_date'] = CRM_Utils_Time::date('Y-m-d');
     }
-
-    if (!empty($defaults['membership_end_date'])) {
-      $this->assign('endDate', $defaults['membership_end_date']);
-    }
+    $this->assign('endDate', $defaults['membership_end_date'] ?? NULL);
 
     return $defaults;
   }
@@ -476,7 +473,7 @@ DESC limit 1");
     // Throw status bounce when no Membership type or priceset is present
     if (empty($this->allMembershipTypeDetails) && empty($priceSets)
     ) {
-      CRM_Core_Error::statusBounce(ts('You do not have all the permissions needed for this page.'));
+      CRM_Core_Error::statusBounce(ts("You either do not have all the permissions needed for this page, or the membership types haven't been fully configured."));
     }
     // retrieve all memberships
     $allMembershipInfo = [];
@@ -596,7 +593,7 @@ DESC limit 1");
       );
 
       $this->add('select', 'contribution_status_id',
-        ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('membership')
+        ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getPendingAndCompleteStatuses()
       );
       $this->add('text', 'check_number', ts('Check Number'),
         CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'check_number')
@@ -629,10 +626,9 @@ DESC limit 1");
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     if ($this->_contactID) {
       [$this->_memberDisplayName, $this->_memberEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-
-      $this->assign('emailExists', $this->_memberEmail);
-      $this->assign('displayName', $this->_memberDisplayName);
     }
+    $this->assign('emailExists', $this->_memberEmail);
+    $this->assign('displayName', $this->_memberDisplayName);
 
     if ($isUpdateToExistingRecurringMembership && CRM_Member_BAO_Membership::isCancelSubscriptionSupported($this->_id)) {
       $this->assign('cancelAutoRenew',
@@ -662,7 +658,7 @@ DESC limit 1");
    *   mixed true or array of errors
    *
    * @throws \CRM_Core_Exception
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public static function formRule($params, $files, $self) {
     $errors = [];
@@ -867,7 +863,6 @@ DESC limit 1");
    * Process the form submission.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -920,7 +915,6 @@ DESC limit 1");
    * @return bool
    *   true if mail was sent successfully
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    *
    * @deprecated
    *   This function was shared with Batch_Entry which had limited overlap
@@ -939,12 +933,8 @@ DESC limit 1");
     }
 
     $form->assign('module', 'Membership');
-    $form->assign('contactID', $formValues['contact_id']);
-
-    $form->assign('membershipID', $this->getMembershipID());
 
     if (!empty($formValues['contribution_id'])) {
-      $form->assign('contributionID', $formValues['contribution_id']);
       $form->assign('currency', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $formValues['contribution_id'], 'currency'));
     }
     else {
@@ -986,16 +976,19 @@ DESC limit 1");
 
     CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'groupName' => 'msg_tpl_workflow_membership',
-        'valueName' => 'membership_offline_receipt',
-        'contactId' => $form->_receiptContactId,
+        'workflow' => 'membership_offline_receipt',
         'from' => $receiptFrom,
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
-        'isEmailPdf' => Civi::settings()->get('invoicing') && Civi::settings()->get('invoice_is_email_pdf'),
-        'contributionId' => $formValues['contribution_id'],
+        'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
+        'modelProps' => [
+          'receiptText' => $this->getSubmittedValue('receipt_text'),
+          'contributionId' => $formValues['contribution_id'],
+          'contactId' => $form->_receiptContactId,
+          'membershipId' => $this->getMembershipID(),
+        ],
       ]
     );
 
@@ -1008,8 +1001,6 @@ DESC limit 1");
    * This is also accessed by unit tests.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
    */
   public function submit(): void {
     $this->storeContactFields($this->_params);
@@ -1103,10 +1094,6 @@ DESC limit 1");
 
     if ($this->_mode) {
       $params['total_amount'] = $this->order->getTotalAmount();
-
-      //CRM-20264 : Store CC type and number (last 4 digit) during backoffice or online payment
-      $params['card_type_id'] = $this->_params['card_type_id'] ?? NULL;
-      $params['pan_truncation'] = $this->_params['pan_truncation'] ?? NULL;
       $params['financial_type_id'] = $this->getFinancialTypeID();
 
       //get the payment processor id as per mode. Try removing in favour of beginPostProcess.
@@ -1146,46 +1133,46 @@ DESC limit 1");
       // CRM-7137 -for recurring membership,
       // we do need contribution and recurring records.
       $result = NULL;
-      if ($this->isCreateRecurringContribution()) {
-        $this->_params = $formValues;
-        $contribution = civicrm_api3('Order', 'create',
-          [
-            'contact_id' => $this->_contributorContactID,
-            'line_items' => $this->getLineItemForOrderApi(),
-            'is_test' => $this->isTest(),
-            'campaign_id' => $this->getSubmittedValue('campaign_id'),
-            'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
-            'payment_instrument_id' => $this->getPaymentInstrumentID(),
-            'financial_type_id' => $this->getFinancialTypeID(),
-            'receive_date' => $this->getReceiveDate(),
-            'tax_amount' => $this->order->getTotalTaxAmount(),
-            'total_amount' => $this->order->getTotalAmount(),
-            'invoice_id' => $this->getInvoiceID(),
-            'currency' => $this->getCurrency(),
-            'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
-            'contribution_recur_id' => $this->getContributionRecurID(),
-            'skipCleanMoney' => TRUE,
-          ]
-        );
-        $this->ids['Contribution'] = $contribution['id'];
-        $this->setMembershipIDsFromOrder($contribution);
 
-        //create new soft-credit record, CRM-13981
-        if ($softParams) {
-          $softParams['contribution_id'] = $contribution['id'];
-          $softParams['currency'] = $this->getCurrency();
-          $softParams['amount'] = $this->order->getTotalAmount();
-          CRM_Contribute_BAO_ContributionSoft::add($softParams);
-        }
+      $this->_params = $formValues;
+      $contribution = civicrm_api3('Order', 'create',
+        [
+          'contact_id' => $this->_contributorContactID,
+          'line_items' => $this->getLineItemForOrderApi(),
+          'is_test' => $this->isTest(),
+          'campaign_id' => $this->getSubmittedValue('campaign_id'),
+          'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+          'payment_instrument_id' => $this->getPaymentInstrumentID(),
+          'financial_type_id' => $this->getFinancialTypeID(),
+          'receive_date' => $this->getReceiveDate(),
+          'tax_amount' => $this->order->getTotalTaxAmount(),
+          'total_amount' => $this->order->getTotalAmount(),
+          'invoice_id' => $this->getInvoiceID(),
+          'currency' => $this->getCurrency(),
+          'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
+          'contribution_recur_id' => $this->getContributionRecurID(),
+          'skipCleanMoney' => TRUE,
+        ]
+      );
+      $this->ids['Contribution'] = $contribution['id'];
+      $this->setMembershipIDsFromOrder($contribution);
 
-        $paymentParams['contactID'] = $this->_contactID;
-        $paymentParams['contributionID'] = $contribution['id'];
-
-        $paymentParams['contributionRecurID'] = $this->getContributionRecurID();
-        $paymentParams['is_recur'] = $this->isCreateRecurringContribution();
-        $params['contribution_id'] = $paymentParams['contributionID'];
-        $params['contribution_recur_id'] = $this->getContributionRecurID();
+      //create new soft-credit record, CRM-13981
+      if ($softParams) {
+        $softParams['contribution_id'] = $contribution['id'];
+        $softParams['currency'] = $this->getCurrency();
+        $softParams['amount'] = $this->order->getTotalAmount();
+        CRM_Contribute_BAO_ContributionSoft::add($softParams);
       }
+
+      $paymentParams['contactID'] = $this->_contactID;
+      $paymentParams['contributionID'] = $contribution['id'];
+
+      $paymentParams['contributionRecurID'] = $this->getContributionRecurID();
+      $paymentParams['is_recur'] = $this->isCreateRecurringContribution();
+      $params['contribution_id'] = $paymentParams['contributionID'];
+      $params['contribution_recur_id'] = $this->getContributionRecurID();
+
       $paymentStatus = NULL;
 
       if ($this->order->getTotalAmount() > 0.0) {
@@ -1202,6 +1189,8 @@ DESC limit 1");
               'trxn_id' => $result['trxn_id'],
               'contribution_id' => $params['contribution_id'],
               'is_send_contribution_notification' => FALSE,
+              'card_type_id' => $this->getCardTypeID(),
+              'pan_truncation' => $this->getPanTruncation(),
             ]);
           }
         }
@@ -1260,10 +1249,6 @@ DESC limit 1");
       $count = 0;
       foreach ($this->_memTypeSelected as $memType) {
         $membershipParams = array_merge($membershipTypeValues[$memType], $params);
-        //CRM-15366
-        if (!empty($softParams) && !$this->isCreateRecurringContribution()) {
-          $membershipParams['soft_credit'] = $softParams;
-        }
         if (isset($result['fee_amount'])) {
           $membershipParams['fee_amount'] = $result['fee_amount'];
         }
@@ -1274,19 +1259,11 @@ DESC limit 1");
         // process -
         // @see http://wiki.civicrm.org/confluence/pages/viewpage.action?pageId=261062657#Payments&AccountsRoadmap-Movetowardsalwaysusinga2-steppaymentprocess
         $membershipParams['contribution_status_id'] = $result['payment_status_id'] ?? NULL;
-        if ($this->isCreateRecurringContribution()) {
-          // The earlier process created the line items (although we want to get rid of the earlier one in favour
-          // of a single path!
-          unset($membershipParams['lineItems']);
-        }
+        // The earlier process created the line items (although we want to get rid of the earlier one in favour
+        // of a single path!
+        unset($membershipParams['lineItems']);
         $membershipParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
         // @todo stop passing $ids (membership and userId only are set above)
-        if (!$this->isCreateRecurringContribution()) {
-          // For recurring we already created it 'the right way' (order api).
-          // In time we will do that for all paths through this code but for now
-          // we have not migrated the other paths.
-          $this->setMembership((array) CRM_Member_BAO_Membership::create($membershipParams, $ids));
-        }
         $params['contribution'] = $membershipParams['contribution'] ?? NULL;
         unset($params['lineItems']);
       }
@@ -1377,9 +1354,9 @@ DESC limit 1");
     if ($this->getSubmittedValue('send_receipt') && $receiptSend) {
       $formValues['contact_id'] = $this->_contactID;
       $formValues['contribution_id'] = $contributionId;
-      // We really don't need a distinct receipt_text_signup vs receipt_text_renewal as they are
-      // handled in the receipt. But by setting one we avoid breaking templates for now
-      // although at some point we should switch in the templates.
+      // receipt_text_signup is no longer used in receipts from 5.47
+      // but may linger in some sites that have not updated their
+      // templates.
       $formValues['receipt_text_signup'] = $formValues['receipt_text'];
       // send email receipt
       $this->assignBillingName();
@@ -1408,7 +1385,6 @@ DESC limit 1");
    *      submitted form values
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function updateContributionOnMembershipTypeChange($inputParams) {
     if (Civi::settings()->get('update_contribution_on_membership_type_change') &&
@@ -1514,7 +1490,7 @@ DESC limit 1");
    * Get status message for updating membership.
    *
    * @return string
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getStatusMessageForUpdate(): string {
     foreach ($this->getCreatedMemberships() as $membership) {
@@ -1531,8 +1507,8 @@ DESC limit 1");
   /**
    * Get status message for create action.
    *
-   * @return array|string
-   * @throws \CiviCRM_API3_Exception
+   * @return string
+   * @throws \CRM_Core_Exception
    */
   protected function getStatusMessageForCreate(): string {
     foreach ($this->getCreatedMemberships() as $membership) {
@@ -1586,7 +1562,7 @@ DESC limit 1");
     if ($this->_action & CRM_Core_Action::UPDATE
       && CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getEntityId(),
         'contribution_recur_id')
-      && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->getEntityId())) {
+      && !CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $this->getEntityId())) {
 
       $isRecur = TRUE;
     }
@@ -1600,7 +1576,6 @@ DESC limit 1");
    *
    * @return bool
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function emailMembershipReceipt($formValues) {
     $customValues = $this->getCustomValuesForReceipt($formValues);
@@ -1683,8 +1658,7 @@ DESC limit 1");
    *
    * @return int|null
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getContributionRecurID():?int {
     if (!array_key_exists('ContributionRecur', $this->ids)) {
@@ -1698,8 +1672,7 @@ DESC limit 1");
    *
    * This function was copied from another form & needs cleanup.
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function createRecurringContribution(): void {
     if (!$this->isCreateRecurringContribution()) {
@@ -1754,7 +1727,7 @@ DESC limit 1");
    * Get the membership type, if any, to be recurred.
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRecurMembershipType(): array {
     foreach ($this->order->getRenewableMembershipTypes() as $type) {
@@ -1767,7 +1740,7 @@ DESC limit 1");
    * Get the frequency interval.
    *
    * @return int|null
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getFrequencyInterval(): ?int {
     $membershipType = $this->getRecurMembershipType();
@@ -1778,7 +1751,7 @@ DESC limit 1");
    * Get the frequency interval.
    *
    * @return string|null
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getFrequencyUnit(): ?string {
     $membershipType = $this->getRecurMembershipType();
@@ -1797,8 +1770,7 @@ DESC limit 1");
    * against breakage if code is moved around).
    *
    * @return array
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getFormMembershipParams(): array {
     $submittedValues = $this->controller->exportValues($this->_name);
@@ -1843,7 +1815,7 @@ DESC limit 1");
    * Get memberships submitted through the form submission.
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getCreatedMemberships(): array {
     return civicrm_api3('Membership', 'get', ['id' => ['IN' => $this->_membershipIDs]])['values'];
@@ -1853,7 +1825,7 @@ DESC limit 1");
    * Get parameters for membership create for all memberships to be created.
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getMembershipParameters(): array {
     $membershipTypeValues = [];
@@ -1935,7 +1907,7 @@ DESC limit 1");
    * Get the membership (or last membership) created or edited on this form.
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getMembership(): array {
     if (empty($this->membership)) {
@@ -1961,7 +1933,7 @@ DESC limit 1");
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getLineItemForOrderApi(): array {
     $lineItems = [];
@@ -1984,7 +1956,7 @@ DESC limit 1");
    * @param int $membershipTypeID
    *
    * @return mixed
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getMembershipParamsForType(int $membershipTypeID) {
     return array_merge($this->getFormMembershipParams(), $this->getMembershipParameters()[$membershipTypeID]);

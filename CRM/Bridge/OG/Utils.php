@@ -99,8 +99,8 @@ class CRM_Bridge_OG_Utils {
   }
 
   /**
-   * @param $source
-   * @param null $title
+   * @param string $source
+   * @param string|null $title
    * @param bool $abort
    *
    * @return null|string

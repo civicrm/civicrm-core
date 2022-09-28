@@ -44,7 +44,7 @@
              {$form.width_image_1.html}<br/>{$form.width_image_1.label}
             </td>
            <td>
-              {$form.height_image_1.html}</br>{$form.height_image_1.label}
+              {$form.height_image_1.html}<br/>{$form.height_image_1.label}
             </td>
            </tr>
          </table>
@@ -83,10 +83,10 @@
              {$form.width_participant_image.html}<br/>{$form.width_participant_image.label}
             </td>
            <td>
-              {$form.height_participant_image.html}</br>{$form.height_participant_image.label}
+              {$form.height_participant_image.html}<br/>{$form.height_participant_image.label}
             </td>
            <td>
-              {$form.alignment_participant_image.html}</br>{$form.alignment_participant_image.label}
+              {$form.alignment_participant_image.html}<br/>{$form.alignment_participant_image.label}
             </td>
            </tr>
          </table>

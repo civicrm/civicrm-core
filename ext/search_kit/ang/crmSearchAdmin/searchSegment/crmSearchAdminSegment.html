@@ -1,0 +1,78 @@
+<div id="bootstrap-theme">
+  <form name="searchSegmentForm">
+    <label for="search-segment-label">{{:: ts('Name') }} <span class="crm-marker">*</span></label>
+    <input id="search-segment-label" class="form-control" ng-model="$ctrl.segment.label" required>
+    <div class="help-block">{{:: ts('Name of the new computed search field.') }}</div>
+    <br>
+    <label for="search-segment-description">{{:: ts('Description') }}</label>
+    <textarea id="search-segment-description" class="form-control" ng-model="$ctrl.segment.description"></textarea>
+    <br>
+    <div class="form-inline">
+      <label for="search-segment-entity_name">{{:: ts('For') }} <span class="crm-marker">*</span></label>
+      <input id="search-segment-entity_name" class="form-control huge collapsible-optgroups" required ng-model="$ctrl.segment.entity_name" ng-change="$ctrl.onChangeEntity()" crm-ui-select="{allowClear: false, data: $ctrl.entitySelect, placeholder: ts('Entity')}">
+    </div>
+    <br>
+    <fieldset>
+      <legend>{{:: ts('Items') }}</legend>
+      <table class="table" ng-if="$ctrl.segment.entity_name">
+        <thead>
+          <tr>
+            <td></td>
+            <td>{{:: ts('Label') }}</td>
+            <td style="min-width: 60%">{{:: ts('Conditions') }}</td>
+            <td></td>
+          </tr>
+        </thead>
+        <tbody ui-sortable="$ctrl.sortableOptions" ng-model="$ctrl.segment.items">
+          <tr ng-repeat="item in $ctrl.segment.items">
+            <td class="crm-draggable">
+              <i class="crm-i fa-arrows crm-search-move-icon"></i>
+            </td>
+            <td>
+              <input class="form-control" ng-model="item.label" required>
+            </td>
+            <td>
+              <div ng-repeat="condition in item.when" class="form-inline">
+                <input class="form-control" ng-model="condition[0]" crm-ui-select="{data: $ctrl.selectFields, allowClear: false}" >
+                <crm-search-condition clause="condition" field="$ctrl.getField(condition[0])" offset="1" option-key="'name'" class="form-group"></crm-search-condition>
+                <a class="crm-hover-button" ng-if="$index" ng-click="item.when.splice($index, 1)">
+                  <i class="crm-i fa-times" aria-hidden="true"></i>
+                </a>
+              </div>
+              <div ng-if="item.when && item.when.length">
+                <button class="btn btn-xs btn-secondary" ng-click="$ctrl.addCondition(item)">
+                  <i class="crm-i fa-plus"></i>
+                  {{:: ts('Add Condition') }}
+                </button>
+              </div>
+              <div ng-if="!item.when || !item.when.length">
+                <em>{{:: ts('Default Item') }}</em>
+              </div>
+            </td>
+            <td class="text-right">
+              <button type="button" class="btn btn-xs btn-danger" ng-click="$ctrl.segment.items.splice($index, 1)">
+                <i class="crm-i fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4">
+              <button class="btn btn-sm btn-primary" ng-click="$ctrl.addItem(true)">
+                <i class="crm-i fa-plus"></i>
+                {{:: ts('Add Item') }}
+              </button>
+              <button class="btn btn-sm btn-primary" ng-click="$ctrl.addItem(false)" ng-if="!$ctrl.hasDefault()">
+                <i class="crm-i fa-plus"></i>
+                {{:: ts('Default Item') }}
+              </button>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </fieldset>
+
+    <crm-dialog-button text="ts('Save')" icons="{primary: $ctrl.saving ? 'fa-spinner fa-spin' : 'fa-save'}" on-click="$ctrl.save()" disabled="!searchSegmentForm.$valid || $ctrl.saving || !$ctrl.segment.items.length" />
+  </form>
+</div>

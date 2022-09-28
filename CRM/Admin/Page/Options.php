@@ -95,9 +95,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
       self::$_gLabel = ts('Option');
     }
 
-    $this->assign('gName', self::$_gName);
-    $this->assign('gLabel', self::$_gLabel);
-
     if (self::$_gName == 'acl_role') {
       CRM_Utils_System::setTitle(ts('Manage ACL Roles'));
       // set breadcrumb to append to admin/access
@@ -128,14 +125,12 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
       ]
     ));
 
-    if (self::$_gName == 'participant_role') {
-      $this->assign('showCounted', TRUE);
-    }
+    $this->assign('showCounted', self::$_gName === 'participant_role');
     $this->assign('isLocked', self::$_isLocked);
     $this->assign('allowLoggedIn', Civi::settings()->get('allow_mail_from_logged_in_contact'));
-    if (self::$_gName == 'activity_type') {
-      $this->assign('showComponent', TRUE);
-    }
+    $this->assign('showComponent', self::$_gName === 'activity_type');
+    $this->assign('gName', self::$_gName);
+    $this->assign('gLabel', self::$_gLabel);
   }
 
   /**
@@ -222,11 +217,20 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     CRM_Utils_Weight::addOrder($optionValue, 'CRM_Core_DAO_OptionValue',
       'id', $returnURL, $filter
     );
+    $this->assign('hasIcons', FALSE);
 
     // retrieve financial account name for the payment method page
-    if ($gName === "payment_instrument") {
-      foreach ($optionValue as $key => $option) {
+    foreach ($optionValue as $key => $option) {
+      if ($gName === 'payment_instrument') {
         $optionValue[$key]['financial_account'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($key, NULL, 'civicrm_option_value', 'financial_account_id.name');
+      }
+      foreach (['weight', 'description', 'value', 'color', 'label', 'is_default', 'icon'] as $expectedKey) {
+        if (!array_key_exists($expectedKey, $option)) {
+          $optionValue[$key][$expectedKey] = NULL;
+        }
+      }
+      if ($option['icon']) {
+        $this->assign('hasIcons', TRUE);
       }
     }
     $this->assign('rows', $optionValue);

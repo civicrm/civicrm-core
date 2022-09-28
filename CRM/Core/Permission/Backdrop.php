@@ -68,7 +68,7 @@ class CRM_Core_Permission_Backdrop extends CRM_Core_Permission_DrupalBase {
     }
     if (function_exists('user_access')) {
       $account = NULL;
-      if ($userId) {
+      if ($userId || $userId === 0) {
         $account = user_load($userId);
       }
       return user_access($str, $account);

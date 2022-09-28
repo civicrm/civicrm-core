@@ -37,7 +37,7 @@ class CRM_Activity_BAO_ActivityType {
   /**
    * Constructor
    *
-   * @param $activity_type_id int This matches up to the option_value 'value' column in the database.
+   * @param int $activity_type_id This matches up to the option_value 'value' column in the database.
    */
   public function __construct($activity_type_id) {
     $this->setActivityType($activity_type_id);
@@ -57,7 +57,7 @@ class CRM_Activity_BAO_ActivityType {
    * Look up the key/value pair representing this activity type from the id.
    * Generally called from constructor.
    *
-   * @param $activity_type_id int This matches up to the option_value 'value' column in the database.
+   * @param int $activity_type_id This matches up to the option_value 'value' column in the database.
    */
   public function setActivityType($activity_type_id) {
     if ($activity_type_id && is_numeric($activity_type_id)) {

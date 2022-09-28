@@ -24,7 +24,7 @@
 class CRM_Event_Badge_Simple extends CRM_Event_Badge {
 
   /**
-   * @param $participant
+   * @param array $participant
    */
   public function generateLabel($participant) {
     $date = CRM_Utils_Date::customFormat($participant['event_start_date'], "%e %b");

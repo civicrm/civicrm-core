@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-group-search-form-block">
-  <div class="crm-accordion-wrapper crm-search_builder-accordion {if $rows and empty($showSearchForm)}collapsed{/if}">
+  <div class="crm-accordion-wrapper crm-search_builder-accordion">
     <div class="crm-accordion-header crm-master-accordion-header">
       {ts}Find Groups{/ts}
     </div>
@@ -91,7 +91,7 @@
       <th data-data="description" data-orderable="false" cell-class="crm-group-description crmf-description {$editableClass}" class='crm-group-description'>{ts}Description{/ts}</th>
       <th data-data="group_type" cell-class="crm-group-group_type" class='crm-group-group_type'>{ts}Group Type{/ts}</th>
       <th data-data="visibility" cell-class="crm-group-visibility crmf-visibility {$editableClass}" cell-data-type="select" class='crm-group-visibility'>{ts}Visibility{/ts}</th>
-      {if !empty($showOrgInfo)}
+      {if $showOrgInfo}
         <th data-data="org_info" data-orderable="false" cell-class="crm-group-org_info" class='crm-group-org_info'>{ts}Organization{/ts}</th>
       {/if}
       <th data-data="links" data-orderable="false" cell-class="crm-group-group_links" class='crm-group-group_links'>&nbsp;</th>
@@ -111,6 +111,7 @@
     // also to handle search filtering for initial load of same page.
     var parentsOnly = 1
     var ZeroRecordText = {/literal}'{ts escape="js"}<div class="status messages">None found.{/ts}</div>'{literal};
+    var smartGroupText = {/literal}'<span>({ts escape="js"}Smart Group{/ts})</span>'{literal};
     $('table.crm-group-selector').data({
       "ajax": {
         "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
@@ -135,7 +136,7 @@
           d.status = groupStatus,
           d.savedSearch = $('.crm-group-search-form-block select#saved_search').val(),
           d.component_mode = $(".crm-group-search-form-block select#component_mode").val(),
-          d.showOrgInfo = {/literal}{if isset($showOrgInfo)}"{$showOrgInfo}"{else}"0"{/if}{literal},
+          d.showOrgInfo = {/literal}{if $showOrgInfo}"{$showOrgInfo}"{else}"0"{/if}{literal},
           d.parentsOnly = parentsOnly
         }
       },
@@ -157,15 +158,16 @@
         });
         //Reload table after draw
         $(settings.nTable).trigger('crmLoad');
-        if (parentsOnly) {
-          CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmEditable.js').done(function () {
+        CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmEditable.js').done(function () {
+          if (parentsOnly) {
             $('tbody tr.crm-group-parent', settings.nTable).each(function () {
               $(this).find('td:first')
                 .prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}')
                 .find('div').css({'display': 'inline'});
             });
-          });
-        }
+          }
+          $('tbody tr.crm-smart-group > td.crm-group-name', settings.nTable).append(smartGroupText);
+        });
       }
     });
     $(function($) {
@@ -184,7 +186,7 @@
     // show hide children
     var context = $('#crm-main-content-wrapper');
     $('table.crm-group-selector', context).on( 'click', 'span.show-children', function(){
-      var showOrgInfo = {/literal}{if isset($showOrgInfo)}"{$showOrgInfo}"{else}"0"{/if}{literal};
+      var showOrgInfo = {/literal}{if $showOrgInfo}true{else}false{/if}{literal};
       var rowID = $(this).parents('tr').prop('id');
       var parentRow = rowID.split('_');
       var parent_id = parentRow[1];
@@ -236,13 +238,16 @@
                 ];
                 if ('DT_RowClass' in val) {
                   val.row_classes = val.row_classes.concat(val.DT_RowClass.split(' ').filter((item) => val.row_classes.indexOf(item) < 0));
+                  if (val.DT_RowClass.indexOf('crm-smart-group') == -1) {
+                    smartGroupText = '';
+                  }
                 }
                 appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="' + val.row_classes.join(' ') + '">';
                 if ( val.is_parent ) {
-                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crmf-title {$editableClass}" style="display:inline">{literal}' + val.title + '</div></td>';
+                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crmf-title {$editableClass}" style="display:inline">{literal}' + val.title + '</div>' + smartGroupText + '</td>';
                 }
                 else {
-                  appendHTML += '<td class="crm-group-name  crmf-title {/literal}{$editableClass}{literal} ' + levelClass + '"><span class="crm-no-children"></span>' + val.title + '</td>';
+                  appendHTML += '<td class="crm-group-name' + levelClass + '"><div class="crmf-title {/literal}{$editableClass}{literal}"><span class="crm-no-children"></span>' + val.title + '</div>' + smartGroupText + '</td>';
                 }
                 appendHTML += '<td class="right">' + val.count + "</td>";
                 appendHTML += "<td>" + val.created_by + "</td>";

@@ -53,10 +53,19 @@ class CRM_Core_Permission {
   const AUTH_SRC_UNKNOWN = 0, AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4;
 
   /**
-   * Get the current permission of this user.
+   * Get the maximum permission of the current user with respect to _any_ contact records.
    *
-   * @return string
-   *   the permission of the user (edit or view or null)
+   * Note: This appears to be hydrated via `CRM_Core_Permission*::group()`, which appears to run in
+   * many page-views, but I'm not certain that it's guaranteed.
+   *
+   * @return int|string|null
+   *   Highest permission held by the current user.
+   *   If the user has "edit" rights to at least 1 contact (via permission or ACL),
+   *     then CRM_Core_Permission::EDIT.
+   *   If the user has "view" rights to at least 1 contact (via permission or ACL),
+   *     then CRM_Core_Permission::VIEW.
+   *   Otherwise, NULL.
+   * @see \CRM_Core_Permission_Base::group()
    */
   public static function getPermission() {
     $config = CRM_Core_Config::singleton();
@@ -255,7 +264,7 @@ class CRM_Core_Permission {
 
   /**
    * @param int $type
-   * @param null $prefix
+   * @param string|null $prefix
    * @param bool $reset
    *
    * @return string
@@ -335,7 +344,7 @@ class CRM_Core_Permission {
 
   /**
    * @param int $type
-   * @param null $prefix
+   * @param string $prefix
    * @param bool $returnUFGroupIds
    *
    * @return array|string
@@ -423,9 +432,7 @@ class CRM_Core_Permission {
    *   Access to specified $module is granted.
    */
   public static function access($module, $checkPermission = TRUE, $requireAllCasesPermOnCiviCase = FALSE) {
-    $config = CRM_Core_Config::singleton();
-
-    if (!in_array($module, $config->enableComponents)) {
+    if (!CRM_Core_Component::isEnabled($module)) {
       return FALSE;
     }
 
@@ -469,9 +476,7 @@ class CRM_Core_Permission {
         'CiviMember' => 'edit memberships',
         'CiviPledge' => 'edit pledges',
         'CiviContribute' => 'edit contributions',
-        'CiviGrant' => 'edit grants',
         'CiviMail' => 'access CiviMail',
-        'CiviAuction' => 'add auction items',
       ];
       $permissionName = $editPermissions[$module] ?? NULL;
     }
@@ -752,6 +757,14 @@ class CRM_Core_Permission {
       'administer reserved tags' => [
         $prefix . ts('administer reserved tags'),
       ],
+      'administer queues' => [
+        $prefix . ts('administer queues'),
+        ts('Initialize, browse, and cancel background processing queues'),
+        // At time of writing, we have specifically omitted the ability to edit fine-grained
+        // data about specific queue-tasks. Tasks are usually defined as PHP callables...
+        // and one should hesitate before allowing open-ended edits of PHP callables.
+        // However, it seems fine for web-admins to browse and cancel these things.
+      ],
       'administer dedupe rules' => [
         $prefix . ts('administer dedupe rules'),
         ts('Create and edit rules, change the supervised and unsupervised rules'),
@@ -840,6 +853,10 @@ class CRM_Core_Permission {
       'administer payment processors' => [
         $prefix . ts('administer payment processors'),
         ts('Add, Update, or Disable Payment Processors'),
+      ],
+      'render templates' => [
+        $prefix . ts('render templates'),
+        ts('Render open-ended template content. (Additional constraints may apply to autoloaded records and specific notations.)'),
       ],
       'edit message templates' => [
         $prefix . ts('edit message templates'),
@@ -1042,6 +1059,11 @@ class CRM_Core_Permission {
         'edit all contacts',
       ],
     ];
+    // Readonly relationship_cache table
+    $permissions['relationship_cache'] = [
+      // get is managed by BAO::addSelectWhereClause
+      'get' => [],
+    ];
 
     // CRM-17741 - Permissions for RelationshipType.
     $permissions['relationship_type'] = [
@@ -1135,8 +1157,14 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['line_item'] = $permissions['contribution'];
+    $permissions['product'] = $permissions['contribution'];
 
     $permissions['financial_item'] = $permissions['contribution'];
+    $permissions['financial_type']['get'] = $permissions['contribution']['get'];
+    $permissions['entity_financial_account']['get'] = $permissions['contribution']['get'];
+    $permissions['financial_account']['get'] = $permissions['contribution']['get'];
+    $permissions['financial_trxn']['get'] = $permissions['contribution']['get'];
+    $permissions['contribution_soft'] = $permissions['contribution'];
 
     // Payment permissions
     $permissions['payment'] = [
@@ -1207,6 +1235,7 @@ class CRM_Core_Permission {
     $permissions['job'] = [
       'process_batch_merge' => ['merge duplicate contacts'],
     ];
+    $permissions['job_log'] = ['default' => 'administer CiviCRM system'];
     $permissions['rule_group']['get'] = [['merge duplicate contacts', 'administer CiviCRM']];
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
@@ -1250,7 +1279,9 @@ class CRM_Core_Permission {
     $permissions['group_nesting'] = $permissions['group'];
     $permissions['group_organization'] = $permissions['group'];
 
-    //Group Contact permission
+    // Note: The v3 GroupContact API is nonstandard and not easy to fix, so these permissions
+    // are unnecessarily strict for v3. The v4 API overrides them.
+    // @see Civi\Api4\GroupContact::permissions
     $permissions['group_contact'] = [
       'get' => [
         'access CiviCRM',
@@ -1527,6 +1558,18 @@ class CRM_Core_Permission {
     ];
     $permissions['option_value'] = $permissions['uf_group'];
     $permissions['option_group'] = $permissions['option_value'];
+
+    // User Job permissions - we access these using acls on the get action.
+    // For create it probably makes sense (at least initially) to be stricter
+    // as the forms doing the work can set the permission check to FALSE.
+    $permissions['user_job'] = [
+      'get' => [
+        'access CiviCRM',
+      ],
+      'default' => [
+        'administer CiviCRM',
+      ],
+    ];
 
     $permissions['custom_value'] = [
       'gettree' => ['access CiviCRM'],

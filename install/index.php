@@ -254,7 +254,7 @@ else {
 
 if ($installType == 'drupal') {
   // Ensure that they have downloaded the correct version of CiviCRM
-  if ($civicrm_version['cms'] != 'Drupal' && $civicrm_version['cms'] != 'Drupal6') {
+  if ($civicrm_version['cms'] != 'Drupal') {
     $errorTitle = ts("Oops! Incorrect CiviCRM version");
     $errorMsg = ts("This installer can only be used for the Drupal version of CiviCRM.");
     errorDisplayPage($errorTitle, $errorMsg);
@@ -839,7 +839,7 @@ class InstallRequirements {
   }
 
   /**
-   * @param null $section
+   * @param string|null $section
    */
   public function showTable($section = NULL) {
     if ($section) {

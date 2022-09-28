@@ -62,6 +62,7 @@
     <title>Display Tag?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this tag selectable / displayed</comment>
     <add>2.1</add>
   </field>
@@ -82,6 +83,7 @@
     <title>Reserved</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <add>3.2</add>
   </field>
   <field>
@@ -89,6 +91,7 @@
     <title>Tagset</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <add>3.2</add>
   </field>
   <field>

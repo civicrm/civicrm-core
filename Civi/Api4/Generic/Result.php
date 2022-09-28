@@ -41,9 +41,20 @@ class Result extends \ArrayObject implements \JsonSerializable {
    */
   public $version = 4;
   /**
+   * Not for public use. Instead, please use countFetched(), countMatched() and count().
+   *
    * @var int
    */
   public $rowCount;
+
+  /**
+   * How many entities matched the query, regardless of LIMIT clauses.
+   *
+   * This requires that row_count is included in the SELECT.
+   *
+   * @var int
+   */
+  protected $matchedCount;
 
   private $indexedBy;
 
@@ -73,24 +84,10 @@ class Result extends \ArrayObject implements \JsonSerializable {
    * If there are too many or too few results, then throw an exception.
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function single() {
-    $result = NULL;
-    foreach ($this as $values) {
-      if ($result === NULL) {
-        $result = $values;
-      }
-      else {
-        throw new \API_Exception("Expected to find one {$this->entity} record, but there were multiple.");
-      }
-    }
-
-    if ($result === NULL) {
-      throw new \API_Exception("Expected to find one {$this->entity} record, but there were zero.");
-    }
-
-    return $result;
+    return \CRM_Utils_Array::single($this, "{$this->entity} record");
   }
 
   /**
@@ -112,7 +109,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
    *
    * @param string $key
    * @return $this
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function indexBy($key) {
     $this->indexedBy = $key;
@@ -124,7 +121,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
         }
       }
       if (!$newResults) {
-        throw new \API_Exception("Key $key not found in api results");
+        throw new \CRM_Core_Exception("Key $key not found in api results");
       }
       $this->exchangeArray($newResults);
     }
@@ -132,12 +129,59 @@ class Result extends \ArrayObject implements \JsonSerializable {
   }
 
   /**
+   * Returns the number of results.
+   *
+   * If row_count was included in the select fields, then this will be the
+   * number of matched entities, even if this differs from the number of
+   * entities fetched.
+   *
+   * If row_count was not included, then this returns the number of entities
+   * fetched, which may or may not be the number of matches.
+   *
+   * Your code might be easier to reason about if you use countFetched() or
+   * countMatched() instead.
+   *
+   * @return int
+   */
+  public function count(): int {
+    return $this->rowCount ?? parent::count();
+  }
+
+  /**
+   * Returns the number of results fetched.
+   *
+   * If a limit was used, this will be a number up to that limit.
+   *
+   * In the case that *only* the row_count was fetched, this will be zero, since no *entities* were fetched.
+   *
+   * @return int
+   */
+  public function countFetched() :int {
+    return parent::count();
+  }
+
+  /**
    * Returns the number of results
    *
    * @return int
    */
-  public function count() {
-    return $this->rowCount ?? parent::count();
+  public function countMatched() :int {
+    if (!isset($this->matchedCount)) {
+      throw new \CRM_Core_Exception("countMatched can only be used if there was no limit set or if row_count was included in the select fields.");
+    }
+    return $this->matchedCount;
+  }
+
+  /**
+   * Provides a way for API implementations to set the *matched* count.
+   *
+   * The matched count is the number of matching entities, regardless of any imposed limit clause.
+   */
+  public function setCountMatched(int $c) {
+    $this->matchedCount = $c;
+
+    // Set rowCount for backward compatibility.
+    $this->rowCount = $c;
   }
 
   /**
@@ -153,6 +197,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
   /**
    * @return array
    */
+  #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     return $this->getArrayCopy();
   }

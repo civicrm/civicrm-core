@@ -4,6 +4,7 @@
   <base>CRM/Core</base>
   <class>UFMatch</class>
   <name>civicrm_uf_match</name>
+  <title>User Account</title>
   <comment>The mapping from an user framework (UF) object to a CRM object.</comment>
   <add>1.1</add>
   <log>true</log>

@@ -32,7 +32,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    *   Classname of BAO.
    */
   public function getBAOName() {
-    return 'CRM_ACL_BAO_EntityRole';
+    return 'CRM_ACL_BAO_ACLEntityRole';
   }
 
   /**
@@ -124,7 +124,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
     $groups = CRM_Core_PseudoConstant::staticGroup();
 
     while ($dao->fetch()) {
-      $entityRoles[$dao->id] = [];
+      $entityRoles[$dao->id] = ['class' => ''];
       CRM_Core_DAO::storeValues($dao, $entityRoles[$dao->id]);
 
       $entityRoles[$dao->id]['acl_role'] = $aclRoles[$dao->acl_role_id] ?? NULL;

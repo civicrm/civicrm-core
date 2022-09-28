@@ -15,7 +15,7 @@
 </td>
 </tr>
 
-<tr id="option_group" {if !$form.option_group_id}class="hiddenElement"{/if}>
+<tr id="option_group" {if empty($form.option_group_id)}class="hiddenElement"{/if}>
   <td class="label">{$form.option_group_id.label}</td>
   <td class="html-adjust">{$form.option_group_id.html}</td>
 </tr>
@@ -86,7 +86,7 @@
     {* hide and display the appropriate blocks as directed by the php code *}
     on_load_init_blocks( showRows, hideBlocks, '' );
 
-{if $form.option_group_id}
+{if !empty($form.option_group_id)}
 {literal}
 function showOptionSelect( ) {
    if ( document.getElementsByName("option_type")[0].checked ) {

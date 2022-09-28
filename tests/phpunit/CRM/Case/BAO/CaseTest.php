@@ -11,6 +11,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $this->tablesToTruncate = [
       'civicrm_activity',
+      'civicrm_group_contact',
       'civicrm_contact',
       'civicrm_custom_group',
       'civicrm_custom_field',
@@ -18,6 +19,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'civicrm_case_contact',
       'civicrm_case_activity',
       'civicrm_case_type',
+      'civicrm_file',
+      'civicrm_entity_file',
       'civicrm_activity_contact',
       'civicrm_managed',
       'civicrm_relationship',
@@ -37,7 +40,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Make sure that the latest case activity works accurately.
    */
-  public function testCaseActivity() {
+  public function testCaseActivity(): void {
     $userID = $this->createLoggedInUser();
 
     $addTimeline = civicrm_api3('Case', 'addtimeline', [
@@ -57,8 +60,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   }
 
   protected function tearDown(): void {
-    parent::tearDown();
     $this->quickCleanup($this->tablesToTruncate, TRUE);
+    parent::tearDown();
   }
 
   public function testAddCaseToContact() {
@@ -326,6 +329,14 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     }
 
     $this->assertEquals(2, $totalEntityFiles, 'Two files should be attached with new case.');
+
+    // delete original files
+    unlink($fileA['values']['uri']);
+    unlink($fileB['values']['uri']);
+    // find out the hashed name of the attached file
+    foreach (CRM_Core_BAO_File::getEntityFile($customGroup['table_name'], $newCase[0]) as $file) {
+      unlink($file['fullPath']);
+    }
   }
 
   /**
@@ -355,25 +366,23 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $caseObj_2 = $this->createCase($client_id_2, $loggedInUser);
     $case_id_2 = $caseObj_2->id;
 
-    // Create link case activity. We could go thru the whole form processes
-    // but we really just want to test the BAO function so just need the
-    // activity to exist.
-    $result = $this->callAPISuccess('activity', 'create', [
-      'activity_type_id' => 'Link Cases',
-      'subject' => 'Test Link Cases',
-      'status_id' => 'Completed',
+    $form = $this->getFormObject('CRM_Case_Form_Activity', [
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Link Cases'),
+      'link_to_case_id' => $case_id_2,
+      'caseid' => $case_id_1,
       'source_contact_id' => $loggedInUser,
       'target_contact_id' => $client_id_1,
-      'case_id' => $case_id_1,
+      'cid' => $client_id_1,
+      'activity_date_time' => date('Y-m-d H:i:s'),
+      // note the subject gets set in javascript when you select the other case
+      // so it would be a little difficult here to test the subject is correct
+      'subject' => '',
     ]);
-
-    // Put it in the format needed for endPostProcess
-    $activity = new StdClass();
-    $activity->id = $result['id'];
-    $params = [
-      'link_to_case_id' => $case_id_2,
-    ];
-    CRM_Case_Form_Activity_LinkCases::endPostProcess(NULL, $params, $activity);
+    $form->set('caseid', $case_id_1);
+    $form->set('cid', $client_id_1);
+    $form->set('atype', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Link Cases'));
+    $form->buildForm();
+    $form->postProcess();
 
     // Get related cases for case 1
     $cases = CRM_Case_BAO_Case::getRelatedCases($case_id_1);
@@ -387,12 +396,6 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
   /**
    * Test various things after a case is closed.
-   *
-   * This annotation is not ideal, but without it there is some kind of
-   * messup that happens to quickform that persists between tests, e.g.
-   * it can't add maxfilesize validation rules.
-   * @runInSeparateProcess
-   * @preserveGlobalState disabled
    */
   public function testCaseClosure() {
     $loggedInUser = $this->createLoggedInUser();
@@ -746,19 +749,13 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $case1 = $this->createCase($clientId1, $loggedInUser);
     $case2 = $this->createCase($clientId2, $loggedInUser);
     $linkActivity = $this->callAPISuccess('Activity', 'create', [
-      'case_id' => $case1->id,
+      'case_id' => [$case1->id, $case2->id],
       'source_contact_id' => $loggedInUser,
       'target_contact' => $clientId1,
       'activity_type_id' => 'Link Cases',
       'subject' => 'Test Link Cases',
       'status_id' => 'Completed',
     ]);
-
-    // Put it in the format needed for endPostProcess
-    $activity = new StdClass();
-    $activity->id = $linkActivity['id'];
-    $params = ['link_to_case_id' => $case2->id];
-    CRM_Case_Form_Activity_LinkCases::endPostProcess(NULL, $params, $activity);
 
     // Get the option_value.value for case status Closed
     $closedStatusResult = $this->callAPISuccess('OptionValue', 'get', [
@@ -1230,6 +1227,154 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     // Note the stock case type adds a manager role for the logged in user so it's 31 not 30.
     $this->assertCount(31, CRM_Case_BAO_Case::getCaseRoles($individual, $caseId), 'Why not just make ten louder?');
+  }
+
+  /**
+   * Test that creating a regular activity with a subject including `[case #X]`
+   * gets filed on case X.
+   */
+  public function testFileOnCaseBySubject() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate();
+    $caseObj = $this->createCase($clientId, $loggedInUserId);
+    $subject = 'This should get filed on [case #' . $caseObj->id . ']';
+    $form = $this->getFormObject('CRM_Activity_Form_Activity', [
+      'source_contact_id' => $loggedInUserId,
+      // target is comma-separated string, by the way
+      'target_contact_id' => $clientId,
+      'subject' => $subject,
+      'activity_date_time' => date('Y-m-d H:i:s'),
+      'activity_type_id' => 1,
+    ]);
+    $form->postProcess();
+
+    $activity = $this->callAPISuccess('Activity', 'getsingle', [
+      'subject' => $subject,
+      'return' => ['case_id'],
+    ]);
+    // Note it's an array
+    $this->assertEquals([$caseObj->id], $activity['case_id']);
+
+    // Double-check
+    $queryParams = [1 => [$subject, 'String']];
+    $this->assertEquals(
+      $caseObj->id,
+      CRM_Core_DAO::singleValueQuery('SELECT ca.case_id
+        FROM civicrm_case_activity ca
+        INNER JOIN civicrm_activity a ON ca.activity_id = a.id
+        WHERE a.subject = %1
+        AND a.is_deleted = 0 AND a.is_current_revision = 1', $queryParams)
+    );
+  }
+
+  /**
+   * Same as testFileOnCaseBySubject but editing an existing non-case activity
+   */
+  public function testFileOnCaseByEditingSubject() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate();
+    $caseObj = $this->createCase($clientId, $loggedInUserId);
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $loggedInUserId,
+      'target_contact_id' => $clientId,
+      'activity_type_id' => 1,
+      'subject' => 'Starting as non-case activity',
+    ]);
+    $subject = 'Now should be a case activity [case #' . $caseObj->id . ']';
+    $form = $this->getFormObject('CRM_Activity_Form_Activity', [
+      'id' => $activity['id'],
+      'source_contact_id' => $loggedInUserId,
+      'target_contact_id' => $clientId,
+      'subject' => $subject,
+      'activity_date_time' => date('Y-m-d H:i:s'),
+      'activity_type_id' => 1,
+    ]);
+    $form->postProcess();
+
+    $activity = $this->callAPISuccess('Activity', 'getsingle', [
+      'id' => $activity['id'],
+      'return' => ['case_id'],
+    ]);
+    // Note it's an array
+    $this->assertEquals([$caseObj->id], $activity['case_id']);
+
+    // Double-check
+    $queryParams = [1 => [$activity['id'], 'Integer']];
+    $this->assertEquals(
+      $caseObj->id,
+      CRM_Core_DAO::singleValueQuery('SELECT ca.case_id
+        FROM civicrm_case_activity ca
+        INNER JOIN civicrm_activity a ON ca.activity_id = a.id
+        WHERE a.id = %1', $queryParams)
+    );
+  }
+
+  /**
+   * Basic case create test with an Org client
+   */
+  public function testOrgClient() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->organizationCreate();
+    $caseObj = $this->createCase($clientId, $loggedInUserId);
+    // Note explicitly saying check permissions, just as an extra little test.
+    $caseResult = \Civi\Api4\CiviCase::get(TRUE)
+      ->addWhere('id', '=', $caseObj->id)
+      ->execute()->first();
+    $this->assertEquals(1, $caseResult['case_type_id']);
+    $this->assertEquals('Case Subject', $caseResult['subject']);
+    $caseContact = \Civi\Api4\CaseContact::get(TRUE)
+      ->addWhere('case_id', '=', $caseObj->id)
+      ->execute()->first();
+    $this->assertEquals($clientId, $caseContact['contact_id']);
+  }
+
+  /**
+   * Test getRelatedAndGlobalContacts()
+   */
+  public function testGetRelatedAndGlobalContacts() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate(['first_name' => 'Cli', 'last_name' => 'Ent'], 0, TRUE);
+    $caseObj = $this->createCase($clientId, $loggedInUserId);
+
+    $gid = $this->callAPISuccess('Group', 'getsingle', ['name' => 'Case_Resources'])['id'];
+
+    // Create more than 25 contacts and add them to the group
+    $contacts = [];
+    for ($i = 1; $i <= 28; $i++) {
+      $contacts[$i] = [];
+      $contacts[$i]['id'] = $this->individualCreate([], 0, TRUE);
+      $contacts[$i]['sort_name'] = $this->callAPISuccess('Contact', 'getsingle', [
+        'id' => $contacts[$i]['id'],
+        'return' => ['sort_name'],
+      ])['sort_name'];
+      $this->callAPISuccess('GroupContact', 'create', [
+        'group_id' => $gid,
+        'contact_id' => $contacts[$i]['id'],
+      ]);
+    }
+    $retrievedContacts = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($caseObj->id);
+    // 29 because the case manager is also in the list
+    $this->assertCount(29, $retrievedContacts);
+
+    // There's probably an easier way to do this but what I'm trying to do
+    // is for each contact we created, verify the id is in the list and the
+    // associated sort_name also matches. But the list is just sequentially
+    // keyed.
+    for ($i = 1; $i <= 28; $i++) {
+      $found = FALSE;
+      foreach ($retrievedContacts as $retrievedContact) {
+        // Note the retrieved contact_id is a string, so loose comparison
+        if ($retrievedContact['contact_id'] == $contacts[$i]['id']) {
+          if ($retrievedContact['sort_name'] !== $contacts[$i]['sort_name']) {
+            $this->fail("Contact id {$contacts[$i]['id']} found but expected sort_name {$contacts[$i]['sort_name']} != {$retrievedContact['sort_name']}");
+          }
+          $found = TRUE;
+        }
+      }
+      if (!$found) {
+        $this->fail("Contact id {$contacts[$i]['id']} not found in list");
+      }
+    }
   }
 
 }

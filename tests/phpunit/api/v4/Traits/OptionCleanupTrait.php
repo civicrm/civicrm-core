@@ -31,6 +31,7 @@ trait OptionCleanupTrait {
   protected $optionValueMaxId;
 
   public function setUp(): void {
+    parent::setUp();
     $this->optionGroupMaxId = \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_option_group');
     $this->optionValueMaxId = \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_option_value');
   }
@@ -42,6 +43,7 @@ trait OptionCleanupTrait {
     if ($this->optionGroupMaxId) {
       \CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id > ' . $this->optionGroupMaxId);
     }
+    parent::tearDown();
   }
 
 }

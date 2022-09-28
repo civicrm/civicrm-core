@@ -15,7 +15,7 @@
       </td>
     </tr>
     <tr>
-      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="mailing" colspan='2'}
+      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="mailing" to='' from='' colspan='2' class='' hideRelativeLabel=0}
     </tr>
     <tr>
       <td colspan="1">{$form.sort_name.label} {help id="id-create_sort_name"}<br />
@@ -26,7 +26,7 @@
           {$form.is_archived.html}
         </div>
       </td>
-      {if $form.mailing_status}
+      {if !empty($form.mailing_status)}
          <td width="100%"><label>{if $sms eq 1}{ts}SMS Status{/ts}{else}{ts}Mailing Status{/ts}{/if}</label><br />
            <div class="listing-box" style="height: auto">
              {foreach from=$form.mailing_status item="mailing_status_val"}
@@ -43,7 +43,7 @@
     </tr>
 
     {* language *}
-    {if $form.language}
+    {if array_key_exists('language', $form)}
       <tr>
         <td>{$form.language.label} {help id="id-language"}<br />
           {$form.language.html|crmAddClass:big}
@@ -52,8 +52,8 @@
     {/if}
 
     {* campaign in mailing search *}
-    {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
-      campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
+    {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
+      campaignTrClass='' campaignTdClass=''}
 
     <tr>
       <td>{$form.buttons.html}</td><td colspan="2"></td>

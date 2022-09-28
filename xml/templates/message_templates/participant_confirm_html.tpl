@@ -10,7 +10,6 @@
 {capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
-<center>
   <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -20,7 +19,7 @@
 
   <tr>
    <td>
-    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+    {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
     <p>{ts}This is an invitation to complete your registration that was initially waitlisted.{/ts}</p>
    </td>
   </tr>
@@ -54,7 +53,7 @@
      <tr>
       <td colspan="2" {$valueStyle}>
        {$event.event_title}<br />
-       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
       </td>
      </tr>
      {if $conference_sessions}
@@ -67,9 +66,9 @@
        <td colspan="2" {$valueStyle}>
   {assign var='group_by_day' value='NA'}
   {foreach from=$conference_sessions item=session}
-   {if $session.start_date|date_format:"%Y/%m/%d" != $group_by_day|date_format:"%Y/%m/%d"}
+   {if $session.start_date|crmDate:"%Y/%m/%d" != $group_by_day|crmDate:"%Y/%m/%d"}
     {assign var='group_by_day' value=$session.start_date}
-          <em>{$group_by_day|date_format:"%m/%d/%Y"}</em><br />
+          <em>{$group_by_day|crmDate:"%m/%d/%Y"}</em><br />
    {/if}
    {$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}<br />
    {if $session.location}&nbsp;&nbsp;&nbsp;&nbsp;{$session.location}<br />{/if}
@@ -127,15 +126,21 @@
      {/if}
 
      {if $event.is_public}
-      <tr>
+     <tr>
        <td colspan="2" {$valueStyle}>
-        {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
-        <a href="{$icalFeed}">{ts}Download iCalendar File{/ts}</a>
+           {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+         <a href="{$icalFeed}">{ts}Download iCalendar entry for this event.{/ts}</a>
        </td>
-      </tr>
+     </tr>
+     <tr>
+       <td colspan="2" {$valueStyle}>
+           {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+         <a href="{$gCalendar}">{ts}Add event to Google Calendar{/ts}</a>
+       </td>
+     </tr>
      {/if}
 
-     {if $contact.email}
+     {if '{contact.email}'}
       <tr>
        <th {$headerStyle}>
         {ts}Registered Email{/ts}
@@ -143,7 +148,7 @@
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
-        {$contact.email}
+        {contact.email}
        </td>
       </tr>
      {/if}
@@ -173,12 +178,11 @@
   {/if}
   <tr>
    <td colspan="2" {$valueStyle}>
-    <p>{ts 1=$domain.phone 2=$domain.email}Please contact us at %1 or send email to %2 if you have questions.{/ts}</p>
+    <p>{ts 1='{domain.phone}' 2='{domain.email}'}Please contact us at %1 or send email to %2 if you have questions.{/ts}</p>
    </td>
   </tr>
 
  </table>
-</center>
 
 </body>
 </html>

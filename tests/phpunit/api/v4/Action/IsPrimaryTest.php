@@ -24,18 +24,19 @@ use Civi\Api4\IM;
 use Civi\Api4\Phone;
 use Civi\Api4\Address;
 use Civi\Api4\OpenID;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class IsPrimaryTest extends UnitTestCase {
+class IsPrimaryTest extends Api4TestBase implements TransactionalInterface {
 
   /**
    * Test that creating a location entity or deleting one re-assigns is_primary correctly.
    */
   public function testPrimaryHandling() {
-    $contactID = self::createEntity(['type' => 'Individual'])['id'];
+    $contactID = $this->createTestRecord('Contact')['id'];
     // Create an entity of each type.
     Email::create()->setValues(['email' => 'b@example.com', 'contact_id' => $contactID])->execute();
     Phone::create()->setValues(['phone' => '123', 'contact_id' => $contactID])->execute();

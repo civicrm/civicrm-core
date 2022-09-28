@@ -15,7 +15,7 @@
 </td>
 </tr>
 
-<tr id="option_group" {if !$form.option_group_id}class="hiddenElement"{/if}>
+<tr id="option_group" {if empty($form.option_group_id)}class="hiddenElement"{/if}>
   <td class="label">{$form.option_group_id.label}</td>
   <td class="html-adjust">{$form.option_group_id.html}</td>
 </tr>

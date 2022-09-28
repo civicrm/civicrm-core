@@ -48,7 +48,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm(): void {
     parent::buildQuickForm();
@@ -158,7 +157,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->_freqUnits = CRM_Core_SelectValues::getRecurringFrequencyUnits();
 
     //reminder_interval
-    $this->add('number', 'start_action_offset', ts('When'), ['class' => 'six', 'min' => 0]);
+    $this->add('number', 'start_action_offset', ts('When (trigger date)'), ['class' => 'six', 'min' => 0]);
     $this->addRule('start_action_offset', ts('Value should be a positive number'), 'positiveInteger');
 
     $isActive = ts('Scheduled Reminder Active');
@@ -302,7 +301,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * @return array|bool
    *   True if no errors, else array of errors
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function formRule(array $fields, $files, $self) {
@@ -390,6 +388,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $defaults['is_active'] = 1;
       $defaults['mode'] = 'Email';
       $defaults['record_activity'] = 1;
+      $defaults['start_action_unit'] = 'hour';
     }
     else {
       $defaults = $this->_values;
@@ -482,7 +481,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    *   The submitted form values.
    *
    * @return CRM_Core_DAO_ActionSchedule
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function parseActionSchedule($values) {
@@ -519,6 +518,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'end_frequency_interval',
       'end_action',
       'end_date',
+      'effective_end_date',
+      'effective_start_date',
     ];
 
     if (empty($params['absolute_date'])) {
@@ -693,8 +694,14 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * @return array
    */
   public function listTokens() {
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    $tokens = array_merge(CRM_Core_SelectValues::activityTokens(), $tokens);
+    $tokenProcessor = new \Civi\Token\TokenProcessor(\Civi::dispatcher(), [
+      'controller' => get_class(),
+      'smarty' => FALSE,
+      'schema' => ['activityId', 'participantId'],
+    ]);
+    $tokens = $tokenProcessor->listTokens();
+
+    $tokens = array_merge(CRM_Core_SelectValues::contactTokens(), $tokens);
     $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
     $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
     $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);

@@ -33,21 +33,27 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param CRM_Core_DAO_Domain $domain
    */
   public static function onPostSave($domain) {
+    // We want to clear out any cached tokens.
+    // Editing a domain is so rare we can risk being heavy handed.
+    Civi::cache('metadata')->clear();
     Civi::$statics[__CLASS__]['current'] = NULL;
   }
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return CRM_Core_DAO_Domain
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults) {
-    return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_Domain', $params, $defaults);
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -100,11 +106,22 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Checks that the current DB schema is at least $min version
    *
-   * @param string|number $min
+   * @param string|int $min
    * @return bool
    */
   public static function isDBVersionAtLeast($min) {
     return version_compare(self::version(), $min, '>=');
+  }
+
+  /**
+   * @return string
+   */
+  protected static function getMissingDomainFromEmailMessage(): string {
+    $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address',
+      'reset=1'
+    );
+    $status = ts("There is no valid default from email address configured for the domain. You can configure here <a href='%1'>Configure From Email Address.</a>", [1 => $url]);
+    return $status;
   }
 
   /**
@@ -132,9 +149,11 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param array $params
    * @param int $id
    *
+   * @deprecated
    * @return CRM_Core_DAO_Domain
+   * @throws \CRM_Core_Exception
    */
-  public static function edit($params, $id) {
+  public static function edit($params, $id): CRM_Core_DAO_Domain {
     $params['id'] = $id;
     return self::writeRecord($params);
   }
@@ -142,6 +161,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Create or update domain.
    *
+   * @deprecated
    * @param array $params
    * @return CRM_Core_DAO_Domain
    */
@@ -167,6 +187,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * @param bool $skipFatal
    * @param bool $returnString
+   *  If you are using this second parameter you probably are better
+   *  calling `getFromEmail()` which will return an actual string.
    *
    * @return array
    *   name & email for domain
@@ -193,12 +215,24 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       return [NULL, NULL];
     }
 
-    $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address',
-      'reset=1'
-    );
-    $status = ts("There is no valid default from email address configured for the domain. You can configure here <a href='%1'>Configure From Email Address.</a>", [1 => $url]);
+    $status = self::getMissingDomainFromEmailMessage();
 
     throw new CRM_Core_Exception($status);
+  }
+
+  /**
+   * Get the domain email in a format suitable for using as the from address.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public static function getFromEmail(): string {
+    $email = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
+    $email = current($email);
+    if (!$email) {
+      throw new CRM_Core_Exception(self::getMissingDomainFromEmailMessage());
+    }
+    return $email;
   }
 
   /**
@@ -307,7 +341,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Return domain information / user information for the usage in receipts
    * Try default from address then fall back to using logged in user details
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getDefaultReceiptFrom() {
     $domain = civicrm_api3('domain', 'getsingle', ['id' => CRM_Core_Config::domainID()]);
@@ -326,7 +360,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
     $userID = CRM_Core_Session::getLoggedInContactID();
     if (!empty($userID)) {
-      list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
+      [$userName, $userEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
     }
     // If still empty fall back to the logged in user details.
     // return empty values no matter what.

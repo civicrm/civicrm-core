@@ -1,5 +1,5 @@
-<div id="bootstrap-theme">
-  <form ng-controller="crmSearchTaskUpdate as $ctrl">
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form name="crmSearchTaskUpdateForm" ng-controller="crmSearchTaskUpdate as $ctrl">
     <p><strong>{{:: ts('Update the %1 selected %2 with the following values:', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
     <div class="form-inline" ng-repeat="clause in $ctrl.values" >
       <input class="form-control" ng-change="$ctrl.updateField($index)" ng-disabled="$ctrl.run" ng-model="clause[0]" crm-ui-select="{data: $ctrl.availableFields, allowClear: true, placeholder: 'Field'}" />
@@ -10,18 +10,10 @@
     </div>
     <div ng-if="$ctrl.run" class="crm-search-task-progress">
       <h5>{{:: ts('Updating %1 %2...', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</h5>
-      <crm-search-batch-runner entity="model.entity" action="Update" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess()" error="$ctrl.onError()" ></crm-search-batch-runner>
+      <crm-search-batch-runner entity="model.entity" action="update" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess()" error="$ctrl.onError()" ></crm-search-batch-runner>
     </div>
-    <hr />
-    <div class="buttons text-right">
-      <button type="button" ng-click="$ctrl.cancel()" class="btn btn-danger" ng-hide="$ctrl.run">
-        <i class="crm-i fa-times"></i>
-        {{:: ts('Cancel') }}
-      </button>
-      <button ng-click="$ctrl.save()" class="btn btn-primary" ng-disabled="!$ctrl.values.length || $ctrl.run">
-        <i class="crm-i fa-{{ $ctrl.run ? 'spin fa-spinner' : 'check' }}"></i>
-        {{:: ts('Update %1', {1: $ctrl.entityTitle}) }}
-      </button>
-    </div>
+
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>
+    <crm-dialog-button text="ts('Update %1', {1: $ctrl.entityTitle})" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-check'}" on-click="$ctrl.save()" disabled="!$ctrl.values.length || $ctrl.run || !crmSearchTaskUpdateForm.$valid" ></crm-dialog-button>
   </form>
 </div>

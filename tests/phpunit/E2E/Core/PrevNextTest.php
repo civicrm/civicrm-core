@@ -41,6 +41,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
   protected function tearDown(): void {
     \Civi::service('prevnext')->deleteItem(NULL, $this->cacheKey);
     \Civi::service('prevnext')->deleteItem(NULL, $this->cacheKeyB);
+    parent::tearDown();
   }
 
   public function testFillSql() {

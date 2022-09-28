@@ -397,7 +397,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    * @todo get rid of $recordType param. It's only because 3 separate contact tables
    * are mis-declared as one that we need it.
    *
-   * @param null $recordType deprecated
+   * @param string $recordType deprecated
    *   Parameter to hack around the bad decision made in construct to misrepresent
    *   different tables as the same table.
    */
@@ -619,7 +619,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   /**
    * Build ACL clause.
    *
-   * @param string $tableAlias
+   * @param array $tableAlias
    *
    * @throws \CRM_Core_Exception
    */
@@ -694,14 +694,13 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */
   public static function formRule($fields, $files, $self) {
     $errors = [];
-    $config = CRM_Core_Config::singleton();
-    if (in_array("CiviCase", $config->enableComponents)) {
+    if (CRM_Core_Component::isEnabled('CiviCase')) {
       $componentId = CRM_Core_Component::getComponentID('CiviCase');
       $caseActivityTypes = CRM_Core_OptionGroup::values('activity_type', TRUE, FALSE, FALSE, " AND v.component_id={$componentId}");
       if (!empty($fields['activity_type_id_value']) && is_array($fields['activity_type_id_value']) && empty($fields['include_case_activities_value'])) {

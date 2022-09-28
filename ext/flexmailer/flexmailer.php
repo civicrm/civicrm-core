@@ -24,15 +24,6 @@ function flexmailer_civicrm_config(&$config) {
 }
 
 /**
- * Implements hook_civicrm_xmlMenu().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
- */
-function flexmailer_civicrm_xmlMenu(&$files) {
-  _flexmailer_civix_civicrm_xmlMenu($files);
-}
-
-/**
  * Implements hook_civicrm_install().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
@@ -84,41 +75,6 @@ function flexmailer_civicrm_disable() {
  */
 function flexmailer_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
   return _flexmailer_civix_civicrm_upgrade($op, $queue);
-}
-
-/**
- * Implements hook_civicrm_managed().
- *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
- */
-function flexmailer_civicrm_managed(&$entities) {
-  _flexmailer_civix_civicrm_managed($entities);
-}
-
-/**
- * Implements hook_civicrm_angularModules().
- *
- * Generate a list of Angular modules.
- *
- * Note: This hook only runs in CiviCRM 4.5+. It may
- * use features only available in v4.6+.
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
- */
-function flexmailer_civicrm_angularModules(&$angularModules) {
-  _flexmailer_civix_civicrm_angularModules($angularModules);
-}
-
-/**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
- */
-function flexmailer_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _flexmailer_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
 /**

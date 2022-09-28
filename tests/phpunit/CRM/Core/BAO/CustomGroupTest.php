@@ -20,9 +20,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Clean up after test.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_contact'], TRUE);
@@ -446,7 +444,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test getActiveGroups() with Invalid Params()
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetActiveGroupsWithInvalidParams(): void {
     $contactId = $this->individualCreate();
@@ -517,7 +515,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * Test create() given a table_name
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function testCreateTableName(): void {
     $params = [
@@ -685,6 +682,27 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $expectedName = $isAllowed ? $name : $name . '0';
     CRM_Core_BAO_CustomGroup::validateCustomGroupName($group);
     $this->assertEquals($expectedName, $group->name);
+  }
+
+  public function testCustomGroupExtends() {
+    $extends = \CRM_Core_SelectValues::customGroupExtends();
+    $this->assertArrayHasKey('Contribution', $extends);
+    $this->assertArrayHasKey('Case', $extends);
+    $this->assertArrayHasKey('Contact', $extends);
+    $this->assertArrayHasKey('Individual', $extends);
+    $this->assertArrayHasKey('Household', $extends);
+    $this->assertArrayHasKey('Organization', $extends);
+    $this->assertArrayHasKey('Participant', $extends);
+    $this->assertArrayHasKey('ParticipantRole', $extends);
+    $this->assertArrayHasKey('ParticipantEventName', $extends);
+    $this->assertArrayHasKey('ParticipantEventType', $extends);
+  }
+
+  public function testMapTableName() {
+    $this->assertEquals('civicrm_case', CRM_Core_BAO_CustomGroup::mapTableName('Case'));
+    $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Contact'));
+    $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Individual'));
+    $this->assertEquals('civicrm_participant', CRM_Core_BAO_CustomGroup::mapTableName('Participant'));
   }
 
 }

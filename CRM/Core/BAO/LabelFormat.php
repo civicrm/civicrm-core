@@ -203,13 +203,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @return array
    *   array of measurement units
    */
-  public static function getUnits() {
-    return [
-      'in' => ts('Inches'),
-      'cm' => ts('Centimeters'),
-      'mm' => ts('Millimeters'),
-      'pt' => ts('Points'),
-    ];
+  public static function getUnits(): array {
+    return CRM_Core_SelectValues::getLayoutUnits();
   }
 
   /**

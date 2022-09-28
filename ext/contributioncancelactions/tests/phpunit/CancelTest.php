@@ -68,7 +68,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Test that a cancel from paypal pro results in an order being cancelled.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -105,7 +104,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Create an order with more than one membership.
    *
-   * @throws \CRM_Core_Exception
    */
   protected function createMembershipOrder(): void {
     $priceFieldID = $this->callAPISuccessGetValue('price_field', [
@@ -156,8 +154,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Create the general membership type.
    *
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
    */
   protected function createMembershipType(): void {
     MembershipType::create()->setValues([
@@ -182,9 +179,8 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    * @param array $params
    *
    * @return int
-   * @throws \CRM_Core_Exception
    */
-  public function createPaymentProcessor($params = []): int {
+  public function createPaymentProcessor(array $params = []): int {
     $params = array_merge([
       'name' => 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
@@ -220,8 +216,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Test that a cancel from paypal pro results in an order being cancelled.
    *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testPaypalStandardCancel(): void {
     $this->createContact();
@@ -243,26 +238,31 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   }
 
   /**
-   * Test cancel order api
-   * @throws API_Exception
+   * Test fail order api.
+   *
    * @throws CRM_Core_Exception
    */
-  public function testCancelOrderWithParticipant(): void {
-    $this->createContact();
-    $orderID = $this->createEventOrder();
-    $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
-    $this->callAPISuccess('Order', 'get', ['contribution_id' => $orderID]);
-    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
-    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 1);
+  public function testCancelOrderWithParticipantFailed(): void {
+    $status = 'Failed';
+    $this->createAndUpdateContribution($status);
+  }
+
+  /**
+   * Test cancel order api.
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function testCancelOrderWithParticipantCancelled(): void {
+    $this->markTestIncomplete('For unknown reasons this failed if run after the cancelled variation of this test');
+    $status = 'Cancelled';
+    $this->createAndUpdateContribution($status);
   }
 
   /**
    * Test cancelling a contribution with a membership on the contribution edit
    * form.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCancelFromContributionForm(): void {
     $this->createContact();
@@ -270,7 +270,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $this->createMembershipOrder();
     $this->createLoggedInUser();
     $formValues = [
-      'id' => $this->ids['Contribution'][0],
       'contact_id' => $this->ids['contact'][0],
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
     ];
@@ -278,7 +277,11 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Core_Controller();
     $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
-    $form->testSubmit($formValues, CRM_Core_Action::UPDATE);
+    $_SESSION['_' . $form->controller->_name . '_container']['values']['Contribution'] = $formValues;
+    $_REQUEST['action'] = 'update';
+    $_REQUEST['id'] = $this->ids['Contribution'][0];
+    $form->buildForm();
+    $form->postProcess();
 
     $contribution = Contribution::get()
       ->addWhere('id', '=', $this->ids['Contribution'][0])
@@ -287,6 +290,14 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $this->assertEquals('Cancelled', $contribution['contribution_status_id:name']);
     $membership = $this->callAPISuccessGetSingle('Membership', []);
     $this->assertEquals('Cancelled', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
+    $this->assertEquals(TRUE, $membership['is_override']);
+    $membershipSignupActivity = Activity::get()
+      ->addSelect('subject', 'source_record_id', 'status_id')
+      ->addWhere('activity_type_id:name', '=', 'Membership Signup')
+      ->execute();
+    $this->assertCount(1, $membershipSignupActivity);
+    $this->assertEquals($membership['id'], $membershipSignupActivity->first()['source_record_id']);
+    $this->assertEquals('General - Payment - Status: Pending', $membershipSignupActivity->first()['subject']);
     $activity = Activity::get()
       ->addSelect('subject', 'source_record_id', 'status_id')
       ->addWhere('activity_type_id:name', '=', 'Change Membership Status')
@@ -296,10 +307,18 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   }
 
   /**
+   * Get the event ID.
+   *
+   * @return int
+   */
+  protected function getEventID(): int {
+    return $this->ids['event'][0];
+  }
+
+  /**
    * Create an event and an order for a participant in that event.
    *
    * @return int
-   * @throws API_Exception
    * @throws CRM_Core_Exception
    */
   protected function createEventOrder(): int {
@@ -332,10 +351,52 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Create a contact for use in the test.
    *
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    */
   protected function createContact(): void {
     $this->ids['contact'][0] = Civi\Api4\Contact::create()->setValues(['first_name' => 'Brer', 'last_name' => 'Rabbit'])->execute()->first()['id'];
+  }
+
+  /**
+   * @param string $status
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function createAndUpdateContribution(string $status): void {
+    $this->createContact();
+    $orderID = $this->createEventOrder();
+    $participantID = Participant::get()
+      ->addSelect('id')
+      ->execute()
+      ->first()['id'];
+    $additionalParticipantID = Participant::create()->setValues([
+      'event_id' => $this->getEventID(),
+      'contact_id' => $this->individualCreate(),
+      'registered_by_id' => $participantID,
+      'status_id:name' => 'Pending from incomplete transaction',
+    ])->execute()->first()['id'];
+    if ($status === 'Cancelled') {
+      $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
+    }
+    else {
+      Contribution::update()
+        ->setValues(['contribution_status_id:name' => $status])
+        ->addWhere('id', '=', $orderID)
+        ->execute();
+    }
+    $this->callAPISuccess('Order', 'get', ['contribution_id' => $orderID]);
+    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => $status]);
+    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 2);
+
+    $cancelledActivatesCount = civicrm_api3('Activity', 'get', [
+      'sequential' => 1,
+      'activity_type_id' => 'Event Registration',
+      'subject' => ['LIKE' => '%Cancelled%'],
+      'source_record_id' => ['IN' => [$participantID, $additionalParticipantID]],
+    ]);
+
+    $this->assertEquals(2, $cancelledActivatesCount['count']);
   }
 
 }

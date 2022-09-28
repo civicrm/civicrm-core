@@ -43,10 +43,10 @@
         <tr id="payLaterFields" class="crm-contribution-form-block-payLaterFields"><td>&nbsp;</td>
             <td>
             <table class="form-layout">
-                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_text"><td scope="row" class="label">{$form.pay_later_text.label} <span class="crm-marker" title="This field is required.">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_text' id=$contributionPageID}{/if}</td>
+                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_text"><td scope="row" class="label">{$form.pay_later_text.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_text' id=$contributionPageID}{/if}</td>
                 <td>{$form.pay_later_text.html|crmAddClass:big}<br />
                     <span class="description">{ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form. You may include HTML formatting tags.{/ts}</span></td></tr>
-                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_receipt"><td scope="row" class="label">{$form.pay_later_receipt.label} <span class="crm-marker" title="This field is required.">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_receipt' id=$contributionPageID}{/if}</td>
+                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_receipt"><td scope="row" class="label">{$form.pay_later_receipt.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_receipt' id=$contributionPageID}{/if}</td>
                 <td>{$form.pay_later_receipt.html|crmAddClass:big}<br />
                   <span class="description">{ts}Instructions added to Confirmation and Thank-you pages, as well as the confirmation email, when the user selects the 'pay later' option (e.g. 'Mail your check to ... within 3 business days.').{/ts}</span></td></tr>
 
@@ -85,7 +85,7 @@
         <tr id="recurFields" class="crm-contribution-form-block-recurFields"><td>&nbsp;</td>
                <td>
                   <table class="form-layout-compressed">
-            <tr class="crm-contribution-form-block-recur_frequency_unit"><td scope="row" class="label">{$form.recur_frequency_unit.label}<span class="crm-marker" title="This field is required.">*</span></td>
+            <tr class="crm-contribution-form-block-recur_frequency_unit"><td scope="row" class="label">{$form.recur_frequency_unit.label}<span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></td>
                         <td>{$form.recur_frequency_unit.html}<br />
                         <span class="description">{ts}Select recurring units supported for recurring payments.{/ts}</span></td>
                     </tr>
@@ -291,7 +291,7 @@
      if ( !priceSetID ) {
        cj('#priceSet').hide();
        if (CRM.memberPriceset) {
-         cj(".crm-contribution-contributionpage-amount-form-block-amount_block_is_active td").html('<span class="description">{/literal}{ts}You cannot enable the Contribution Amounts section when a Membership Price Set is in use. (See the Memberships tab above.) Membership Price Sets may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription) or an additional voluntary contribution.</span>{/ts}{literal}');
+         cj(".crm-contribution-contributionpage-amount-form-block-amount_block_is_active td").html('<span class="description">{/literal}{ts escape="js"}You cannot enable the Contribution Amounts section when a Membership Price Set is in use. (See the Memberships tab above.) Membership Price Sets may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription) or an additional voluntary contribution.{/ts}{literal}</span>');
        }
      }
      cj('#amountFields').hide();
@@ -420,7 +420,7 @@
 
 </script>
 {/literal}
-{if $form.is_recur}
+{if !empty($form.is_recur)}
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="is_recur"
     trigger_value       ="true"
@@ -430,7 +430,7 @@
     invert              = "false"
 }
 {/if}
-{if $form.adjust_recur_start_date}
+{if !empty($form.adjust_recur_start_date)}
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="adjust_recur_start_date"
     trigger_value       ="true"

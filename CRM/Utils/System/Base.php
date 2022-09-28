@@ -357,7 +357,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Get the relative path to the sites base url.
    *
-   * @return bool
+   * @return string|false
    */
   public function getRelativeBaseURL() {
     $absoluteBaseURL = $this->getAbsoluteBaseURL();
@@ -729,7 +729,7 @@ abstract class CRM_Utils_System_Base {
       }
     }
     else {
-      $userFrameworkResourceURL = NULL;
+      $userFrameworkResourceURL = '';
     }
 
     return [
@@ -1020,6 +1020,15 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * This exists because of https://www.drupal.org/node/3006306 where
+   * they changed so that they don't start sessions for anonymous, but we
+   * want that.
+   */
+  public function getSessionId() {
+    return session_id();
+  }
+
+  /**
    * Get role names
    *
    * @return array|null
@@ -1052,6 +1061,23 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Get the CRM database as a 'prefix'.
+   *
+   * This returns a string that can be prepended to a query to include a CRM table.
+   *
+   * However, this string should contain backticks, or not, in accordance with the
+   * CMS's drupal views expectations, if any.
+   */
+  public function getCRMDatabasePrefix(): string {
+    $crmDatabase = DB::parseDSN(CRM_Core_Config::singleton()->dsn)['database'];
+    $cmsDatabase = DB::parseDSN(CRM_Core_Config::singleton()->userFrameworkDSN)['database'];
+    if ($crmDatabase === $cmsDatabase) {
+      return '';
+    }
+    return "`$crmDatabase`.";
+  }
+
+  /**
    * Invalidates the cache of dynamic routes and forces a rebuild.
    */
   public function invalidateRouteCache() {
@@ -1063,6 +1089,29 @@ abstract class CRM_Utils_System_Base {
    */
   public function showPasswordFieldWhenAdminCreatesUser() {
     return TRUE;
+  }
+
+  /**
+   * Return the CMS-specific UF Group Types for profiles.
+   * @return array
+   */
+  public function getUfGroupTypes() {
+    return [];
+  }
+
+  /**
+   * Should the current execution exit after a fatal error?
+   * This is the appropriate functionality in most cases.
+   *
+   * @internal
+   * @return bool
+   */
+  public function shouldExitAfterFatal() {
+    return TRUE;
+  }
+
+  public function checkCleanurls() {
+    return [];
   }
 
 }

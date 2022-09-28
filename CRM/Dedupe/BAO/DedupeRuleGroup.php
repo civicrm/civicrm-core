@@ -59,9 +59,8 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @return array
    *   a table-keyed array of field-keyed arrays holding supported fields' titles
    */
-  public static function supportedFields($requestedType) {
-    static $fields = NULL;
-    if (!$fields) {
+  public static function supportedFields($requestedType): array {
+    if (!isset(Civi::$statics[__CLASS__]['supportedFields'])) {
       // this is needed, as we're piggy-backing importableFields() below
       $replacements = [
         'civicrm_country.name' => 'civicrm_address.country_id',
@@ -84,9 +83,10 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         'civicrm_note',
         'civicrm_openid',
         'civicrm_phone',
+        'civicrm_website',
       ];
 
-      foreach (['Individual', 'Organization', 'Household'] as $ctype) {
+      foreach (CRM_Contact_BAO_ContactType::basicTypes() as $ctype) {
         // take the table.field pairs and their titles from importableFields() if the table is supported
         foreach (CRM_Contact_BAO_Contact::importableFields($ctype) as $iField) {
           if (isset($iField['where'])) {
@@ -94,7 +94,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
             if (isset($replacements[$where])) {
               $where = $replacements[$where];
             }
-            list($table, $field) = explode('.', $where);
+            [$table, $field] = explode('.', $where);
             if (!in_array($table, $supportedTables)) {
               continue;
             }
@@ -108,19 +108,24 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         // Justice League vs The Justice League but these could have the same sort_name if 'the the'
         // exension is installed (https://github.com/eileenmcnaughton/org.wikimedia.thethe)
         $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
-        // add custom data fields
-        foreach (CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1) as $key => $cg) {
+
+        // add all custom data fields including those only for sub_types.
+        foreach (CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, [], NULL, TRUE, NULL, TRUE) as $key => $cg) {
           if (!is_int($key)) {
             continue;
           }
           foreach ($cg['fields'] as $cf) {
-            $fields[$ctype][$cg['table_name']][$cf['column_name']] = $cf['label'];
+            $fields[$ctype][$cg['table_name']][$cf['column_name']] = $cg['title'] . ' : ' . $cf['label'];
           }
         }
       }
+      //Does this have to run outside of cache?
+      CRM_Utils_Hook::dupeQuery(CRM_Core_DAO::$_nullObject, 'supportedFields', $fields);
+      Civi::$statics[__CLASS__]['supportedFields'] = $fields;
     }
-    CRM_Utils_Hook::dupeQuery(CRM_Core_DAO::$_nullObject, 'supportedFields', $fields);
-    return !empty($fields[$requestedType]) ? $fields[$requestedType] : [];
+
+    return Civi::$statics[__CLASS__]['supportedFields'][$requestedType] ?? [];
+
   }
 
   /**
@@ -215,7 +220,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
 
     while (!empty($tableQueries)) {
-      list($isInclusive, $isDie) = self::isQuerySetInclusive($tableQueries, $this->threshold, $exclWeightSum);
+      [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $this->threshold, $exclWeightSum);
 
       if ($isInclusive) {
         // order queries by table count
@@ -374,7 +379,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
     if ($this->params && !$this->noRules) {
       if ($checkPermission) {
-        list($this->_aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
+        [$this->_aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
       }
       $query = "SELECT {$this->temporaryTables['dedupe']}.id1 as id
@@ -385,7 +390,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     else {
       $aclWhere = '';
       if ($checkPermission) {
-        list($this->_aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
+        [$this->_aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
       }
       $query = "SELECT IF({$this->temporaryTables['dedupe']}.id1 < {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id1, {$this->temporaryTables['dedupe']}.id2) as id1,

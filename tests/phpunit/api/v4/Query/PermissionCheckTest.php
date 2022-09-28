@@ -19,16 +19,17 @@
 
 namespace api\v4\Query;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Contact;
 use Civi\Api4\Event;
 use Civi\Api4\Participant;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class PermissionCheckTest extends UnitTestCase {
+class PermissionCheckTest extends Api4TestBase implements TransactionalInterface {
 
   /**
    * Clean up after test.

@@ -4,6 +4,7 @@
   var modelProps = {
     type: '@',
     data: '=',
+    actions: '=',
     modelName: '@name',
     label: '@',
     autofill: '@'
@@ -16,6 +17,7 @@
 
       this.$onInit = function() {
         var entity = _.pick(this, _.keys(modelProps));
+        entity.actions = entity.actions || {update: true, create: true};
         entity.id = null;
         this.afForm.registerEntity(entity);
       };

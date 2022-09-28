@@ -15,6 +15,8 @@ use Civi\API\Event\PrepareEvent;
 
 /**
  * Validate field inputs based on annotations in the action class
+ *
+ * @service civi.api4.validateFields
  */
 class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
 
@@ -32,10 +34,10 @@ class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
         $value = $apiRequest->$getParam();
         // Required fields
         if (!empty($info['required']) && (!$value && $value !== 0 && $value !== '0')) {
-          throw new \API_Exception('Parameter "' . $param . '" is required.');
+          throw new \CRM_Core_Exception('Parameter "' . $param . '" is required.');
         }
         if (!empty($info['type']) && !self::checkType($value, $info['type'])) {
-          throw new \API_Exception('Parameter "' . $param . '" is not of the correct type. Expecting ' . implode(' or ', $info['type']) . '.');
+          throw new \CRM_Core_Exception('Parameter "' . $param . '" is not of the correct type. Expecting ' . implode(' or ', $info['type']) . '.');
         }
         if (!empty($info['deprecated']) && isset($value)) {
           \CRM_Core_Error::deprecatedWarning('APIv4 ' . $apiRequest->getEntityName() . ".$param parameter is deprecated.");
@@ -50,7 +52,7 @@ class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
    * @param $value
    * @param $types
    * @return bool
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function checkType($value, $types) {
     if ($value === NULL) {
@@ -78,7 +80,7 @@ class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
           return TRUE;
 
         default:
-          throw new \API_Exception('Unknown parameter type: ' . $type);
+          throw new \CRM_Core_Exception('Unknown parameter type: ' . $type);
       }
     }
     return FALSE;

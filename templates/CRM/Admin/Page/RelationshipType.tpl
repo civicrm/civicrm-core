@@ -54,7 +54,7 @@
                 {if $row.contact_type_b_display} {$row.contact_type_b_display}
                 {if !empty($row.contact_sub_type_b)} - {$row.contact_sub_type_b}{/if} {else} {ts}All Contacts{/ts} {/if} </td>
             <td class="crm-relationship-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td>{$row.action|replace:'xx':$row.id}</td>
+            <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<extension key="shimmy" type="module">
+  <file>shimmy</file>
+  <name>FIXME</name>
+  <description>FIXME</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>CiviCRM LLC</author>
+    <email>info@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">http://FIXME</url>
+    <url desc="Documentation">http://FIXME</url>
+    <url desc="Support">http://FIXME</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2021-03-21</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
+  <compatibility>
+    <ver>5.0</ver>
+  </compatibility>
+  <comments>This is a new, undeveloped module</comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/Shimmy</namespace>
+  </civix>
+</extension>

@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
+class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implements Civi\Core\HookInterface {
 
   /**
    * Takes an associative array and creates an instance object.
@@ -219,41 +219,44 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    * Delete the instance of the Report.
    *
    * @param int $id
-   *
+   * @deprecated
    * @return mixed
-   *   $results no of deleted Instance on success, false otherwise
    */
   public static function del($id = NULL) {
-    $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $id, 'navigation_id', 'id');
-    $dao = new CRM_Report_DAO_ReportInstance();
-    $dao->id = $id;
-    $result = $dao->delete();
-
-    // Delete navigation if exists.
-    if ($navId) {
-      CRM_Core_BAO_Navigation::processDelete($navId);
-      CRM_Core_BAO_Navigation::resetNavigation();
-    }
-    return $result;
+    self::deleteRecord(['id' => $id]);
+    return 1;
   }
 
   /**
-   * Retrieve instance.
+   * Event fired prior to modifying a ReportInstance.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      // When deleting a report, also delete from navigation menu
+      $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $event->id, 'navigation_id');
+      if ($navId) {
+        CRM_Core_BAO_Navigation::processDelete($navId);
+        CRM_Core_BAO_Navigation::resetNavigation();
+      }
+    }
+  }
+
+  /**
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
+   *   Array of criteria values.
    * @param array $defaults
+   *   Array to be populated with found values.
    *
-   * @return CRM_Report_DAO_ReportInstance|null
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
   public static function retrieve($params, &$defaults) {
-    $instance = new CRM_Report_DAO_ReportInstance();
-    $instance->copyValues($params);
-
-    if ($instance->find(TRUE)) {
-      CRM_Core_DAO::storeValues($instance, $defaults);
-      return $instance;
-    }
-    return NULL;
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**

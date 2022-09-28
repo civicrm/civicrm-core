@@ -62,6 +62,7 @@ class CRM_Core_Page_AJAX_Attachment {
         );
       }
       elseif ($file['error']) {
+        require_once 'api/v3/utils.php';
         $results[$key] = civicrm_api3_create_error("Upload failed (code=" . $file['error'] . ")");
       }
       else {
@@ -136,6 +137,7 @@ class CRM_Core_Page_AJAX_Attachment {
   public static function angularSettings() {
     return [
       'token' => self::createToken(),
+      'maxFileSize' => Civi::settings()->get('maxFileSize'),
     ];
   }
 

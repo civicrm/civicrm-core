@@ -230,7 +230,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       $inUfField = $inputsByName[$outUfField['field_name']];
       foreach ($inUfField as $key => $inValue) {
         $this->assertEquals($inValue, $outUfField[$key],
-          sprintf("field_name=[%s] key=[%s] expected=[%s] actual=[%s]",
+          sprintf('field_name=[%s] key=[%s] expected=[%s] actual=[%s]',
             $outUfField['field_name'],
             $key,
             $inValue,

@@ -253,8 +253,10 @@
     initializeResponsive: function() {
       var $mainMenuState = $('#crm-menubar-state');
       // hide mobile menu beforeunload
-      $(window).on('beforeunload unload', function() {
-        CRM.menubar.spin(true);
+      $(window).on('beforeunload unload', function(e) {
+        if (!e.originalEvent.returnValue) {
+          CRM.menubar.spin(true);
+        }
         if ($mainMenuState[0].checked) {
           $mainMenuState[0].click();
         }
@@ -314,6 +316,12 @@
             });
           },
           focus: function (event, ui) {
+            // This is when an item is 'focussed' by keyboard up/down or mouse hover.
+            // It is not the same as actually having focus, i.e. it is not :focus
+            var lis = $(event.currentTarget).find('li[data-cid="' + ui.item.value + '"]');
+            lis.children('div').addClass('ui-state-active');
+            lis.siblings().children('div').removeClass('ui-state-active');
+            // Returning false leaves the user-entered text as it was.
             return false;
           },
           select: function (event, ui) {
@@ -340,6 +348,7 @@
         .autocomplete( "instance" )._renderItem = function( ul, item ) {
           var uiMenuItemWrapper = $("<div class='ui-menu-item-uiMenuItemWrapper'>");
           if (item.value == 0) {
+            // "No results"
             uiMenuItemWrapper.text(item.label);
           }
           else {
@@ -359,7 +368,7 @@
               }));
           }
 
-          return $( "<li class='ui-menu-item'>" )
+          return $( "<li class='ui-menu-item' data-cid=" + item.value + ">" )
             .append(uiMenuItemWrapper)
             .appendTo( ul );
         };

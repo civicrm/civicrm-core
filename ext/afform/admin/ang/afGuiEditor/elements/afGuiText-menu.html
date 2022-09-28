@@ -1,7 +1,7 @@
 <li ng-click="$event.stopPropagation()">
   <div class="af-gui-field-select-in-dropdown">
-    <label>{{:: ts('Style:') }}</label>
-    <select class="form-control" ng-model="node['#tag']" title="{{:: ts('Text style') }}">
+    <label>{{:: ts('Element:') }}</label>
+    <select class="form-control" ng-model="$ctrl.node['#tag']" title="{{:: ts('Text style') }}">
       <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
     </select>
   </div>

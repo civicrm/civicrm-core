@@ -7,19 +7,13 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-emailFormat-title"}
-  {ts}Email Format{/ts}
-{/htxt}
-{htxt id="id-emailFormat"}
-{ts}Select the email format preferred by this contact. Select 'Both' to send HTML and Text formats.{/ts}
-{/htxt}
 
 {htxt id="id-bulkmail-title"}
   {ts}Bulk Mailings{/ts}
 {/htxt}
 {htxt id="id-bulkmail"}
 {ts}If you are using the CiviMail component to send mailings to contacts, this field provides additional control over which email address is used. By default, CiviMail sends mail to each contact's preferred email address. If the contact has multiple locations, then the preferred email of the primary location is used. However, if the contact prefers to have CiviMail ('bulk') mailings set to an alternate email address - check the 'Use for Bulk Mailings' box next to that email address.{/ts}
-{/htxt} 
+{/htxt}
 
 {htxt id="id-optOut-title"}
   {ts}Opt Out{/ts}
@@ -151,7 +145,8 @@
   {ts}Geocoding{/ts}
 {/htxt}
 {htxt id="id-geo-code"}
-{capture assign=docLink}{docURL page="user/initial-set-up/installation-and-basic-set-up" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}{/capture}
+{capture assign=docUrlText}{ts}(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter){/ts}{/capture}
+{capture assign=docLink}{docURL page="user/initial-set-up/installation-and-basic-set-up/#mapping-and-geocoding" text=$docUrlText}{/capture}
 <p>{ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {$docLink}</p>
 {/htxt}
 

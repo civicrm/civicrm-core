@@ -37,7 +37,7 @@
                 <div id='help'>
                   {* Lifetime memberships have no end-date so current_membership array key exists but is NULL *}
                   {if $row.current_membership}
-                    {if $row.current_membership|date_format:"%Y%m%d" LT $smarty.now|date_format:"%Y%m%d"}
+                    {if $row.current_membership|crmDate:"%Y%m%d" LT $smarty.now|crmDate:"%Y%m%d"}
                       {ts 1=$row.current_membership|crmDate 2=$row.name}Your <strong>%2</strong> membership expired on %1.{/ts}<br />
                     {else}
                       {ts 1=$row.current_membership|crmDate 2=$row.name}Your <strong>%2</strong> membership expires on %1.{/ts}<br />
@@ -180,7 +180,7 @@
             {* Check if there is an existing membership of this type (current_membership NOT empty) and if the end-date is prior to today. *}
             {if array_key_exists( 'current_membership', $row ) AND $context EQ "makeContribution" }
               {if $row.current_membership}
-                {if $row.current_membership|date_format:"%Y%m%d" LT $smarty.now|date_format:"%Y%m%d"}
+                {if $row.current_membership|crmDate:"%Y%m%d" LT $smarty.now|crmDate:"%Y%m%d"}
                   <br /><em>{ts 1=$row.current_membership|crmDate 2=$row.name}Your <strong>%2</strong> membership expired on %1.{/ts}</em>
                 {else}
                   <br /><em>{ts 1=$row.current_membership|crmDate 2=$row.name}Your <strong>%2</strong> membership expires on %1.{/ts}</em>
@@ -195,7 +195,7 @@
         </tr>
 
       {/foreach}
-      {if isset($form.auto_renew) }
+      {if $form.auto_renew}
         <tr id="allow_auto_renew">
           <td style="width: auto;">{$form.auto_renew.html}</td>
           <td style="width: auto;">

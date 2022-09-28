@@ -14,7 +14,7 @@ class CRM_Event_Form_Task_RegisterTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testGet() {
-    /* @var CRM_Event_Form_Task_Register $form */
+    /** @var CRM_Event_Form_Task_Register $form */
     $form = $this->getFormObject('CRM_Event_Form_Task_Register');
     $this->assertEquals(FALSE, $form->_single);
   }

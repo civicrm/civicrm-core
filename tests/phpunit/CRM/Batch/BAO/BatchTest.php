@@ -34,11 +34,10 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
   /**
    * Cleanup after test.
    *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
+    $this->quickCleanup(['civicrm_batch', 'civicrm_file', 'civicrm_entity_file']);
     parent::tearDown();
-    $this->quickCleanup(['civicrm_batch']);
   }
 
   /**
@@ -55,7 +54,7 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetBatchFinancialItems() {
+  public function testGetBatchFinancialItems(): void {
 
     // create two contributions: one check and one credit card
 
@@ -118,8 +117,10 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
 
   /**
    * Test testExportFinancialBatch.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testExportFinancialBatch() {
+  public function testExportFinancialBatch(): void {
     $this->createLoggedInUser();
     $batchParams = ['title' => 'Test Batch'];
     $batchParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Exported');

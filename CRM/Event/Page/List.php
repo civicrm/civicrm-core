@@ -21,6 +21,7 @@ class CRM_Event_Page_List extends CRM_Core_Page {
     $end = CRM_Utils_Request::retrieveValue('end', 'Positive', 0);
 
     $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
+
     $this->assign('events', $info);
 
     // @todo Move this to eventcart extension

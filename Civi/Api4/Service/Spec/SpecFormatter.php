@@ -13,6 +13,7 @@
 namespace Civi\Api4\Service\Spec;
 
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Utils\FormattingUtil;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class SpecFormatter {
@@ -32,9 +33,12 @@ class SpecFormatter {
         $field->setName($data['custom_group_id.name'] . '.' . $data['name']);
       }
       else {
+        // Fields belonging to custom entities are treated as normal; type = Field instead of Custom
+        $field->setType('Field');
         $field->setTableName($data['custom_group_id.table_name']);
       }
       $field->setColumnName($data['column_name']);
+      $field->setNullable(empty($data['is_required']));
       $field->setCustomFieldId($data['id'] ?? NULL);
       $field->setCustomGroupName($data['custom_group_id.name']);
       $field->setTitle($data['label']);
@@ -43,6 +47,11 @@ class SpecFormatter {
       $field->setHelpPost($data['help_post'] ?? NULL);
       if (self::customFieldHasOptions($data)) {
         $field->setOptionsCallback([__CLASS__, 'getOptions']);
+        $suffixes = ['label'];
+        if (!empty($data['option_group_id'])) {
+          $suffixes = CoreUtil::getOptionValueFields($data['option_group_id'], 'id');
+        }
+        $field->setSuffixes($suffixes);
       }
       $field->setReadonly($data['is_view']);
     }
@@ -51,11 +60,27 @@ class SpecFormatter {
       $field = new FieldSpec($name, $entity, $dataTypeName);
       $field->setType('Field');
       $field->setColumnName($name);
-      $field->setRequired(!empty($data['required']));
+      $field->setNullable(empty($data['required']));
+      $field->setRequired(!empty($data['required']) && empty($data['default']));
       $field->setTitle($data['title'] ?? NULL);
       $field->setLabel($data['html']['label'] ?? NULL);
       if (!empty($data['pseudoconstant'])) {
-        $field->setOptionsCallback([__CLASS__, 'getOptions']);
+        // Do not load options if 'prefetch' is explicitly FALSE
+        if (!isset($data['pseudoconstant']['prefetch']) || $data['pseudoconstant']['prefetch'] === FALSE) {
+          $field->setOptionsCallback([__CLASS__, 'getOptions']);
+        }
+        // These suffixes are always supported if a field has options
+        $suffixes = ['name', 'label'];
+        // Add other columns specified in schema (e.g. 'abbrColumn')
+        foreach (array_diff(FormattingUtil::$pseudoConstantSuffixes, $suffixes) as $suffix) {
+          if (!empty($data['pseudoconstant'][$suffix . 'Column'])) {
+            $suffixes[] = $suffix;
+          }
+        }
+        if (!empty($data['pseudoconstant']['optionGroupName'])) {
+          $suffixes = CoreUtil::getOptionValueFields($data['pseudoconstant']['optionGroupName'], 'name');
+        }
+        $field->setSuffixes($suffixes);
       }
       $field->setReadonly(!empty($data['readonly']));
     }
@@ -172,7 +197,6 @@ class SpecFormatter {
     $returnFormat = array_diff($returnFormat, ['id', 'name', 'label']);
     // CRM_Core_Pseudoconstant doesn't know how to fetch extra stuff like icon, description, color, etc., so we have to invent that wheel here...
     if ($returnFormat) {
-      $optionIds = implode(',', array_column($options, 'id'));
       $optionIndex = array_flip(array_column($options, 'id'));
       if ($spec instanceof CustomFieldSpec) {
         $optionGroupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $spec->getCustomFieldId(), 'option_group_id');
@@ -204,16 +228,27 @@ class SpecFormatter {
           $returnFormat = array_diff($returnFormat, ['abbr']);
         }
         // Fetch anything else (color, icon, description)
-        if ($returnFormat && !empty($pseudoconstant['table']) && \CRM_Utils_Rule::commaSeparatedIntegers($optionIds)) {
-          $sql = "SELECT * FROM {$pseudoconstant['table']} WHERE id IN (%1)";
-          $query = \CRM_Core_DAO::executeQuery($sql, [1 => [$optionIds, 'CommaSeparatedIntegers']]);
+        if ($returnFormat && !empty($pseudoconstant['table'])) {
+          $idCol = $pseudoconstant['keyColumn'] ?? 'id';
+          $optionIds = \CRM_Core_DAO::escapeStrings(array_column($options, 'id'));
+          $sql = "SELECT * FROM {$pseudoconstant['table']} WHERE `$idCol` IN ($optionIds)";
+          $query = \CRM_Core_DAO::executeQuery($sql);
           while ($query->fetch()) {
             foreach ($returnFormat as $ret) {
-              if (property_exists($query, $ret)) {
+              $retCol = $pseudoconstant[$ret . 'Column'] ?? $ret;
+              if (property_exists($query, $retCol)) {
                 // Note: our schema is inconsistent about whether `description` fields allow html,
                 // but it's usually assumed to be plain text, so we strip_tags() to standardize it.
-                $options[$optionIndex[$query->id]][$ret] = $ret === 'description' ? strip_tags($query->$ret) : $query->$ret;
+                $options[$optionIndex[$query->$idCol]][$ret] = isset($query->$retCol) ? strip_tags($query->$retCol) : NULL;
               }
+            }
+          }
+        }
+        elseif ($returnFormat && !empty($pseudoconstant['callback'])) {
+          $callbackOptions = call_user_func(\Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), NULL, [], $values);
+          foreach ($callbackOptions as $callbackOption) {
+            if (is_array($callbackOption) && !empty($callbackOption['id']) && isset($optionIndex[$callbackOption['id']])) {
+              $options[$optionIndex[$callbackOption['id']]] += $callbackOption;
             }
           }
         }
@@ -252,12 +287,16 @@ class SpecFormatter {
     if ($inputType == 'Date' && !empty($inputAttrs['formatType'])) {
       self::setLegacyDateFormat($inputAttrs);
     }
+    // Number input for integer fields
+    if ($inputType === 'Text' && $dataTypeName === 'Int') {
+      $inputType = 'Number';
+    }
     // Date/time settings from custom fields
     if ($inputType == 'Date' && !empty($data['custom_group_id'])) {
       $inputAttrs['time'] = empty($data['time_format']) ? FALSE : ($data['time_format'] == 1 ? 12 : 24);
       $inputAttrs['date'] = $data['date_format'];
-      $inputAttrs['start_date_years'] = (int) $data['start_date_years'];
-      $inputAttrs['end_date_years'] = (int) $data['end_date_years'];
+      $inputAttrs['start_date_years'] = isset($data['start_date_years']) ? (int) $data['start_date_years'] : NULL;
+      $inputAttrs['end_date_years'] = isset($data['end_date_years']) ? (int) $data['end_date_years'] : NULL;
     }
     if ($inputType == 'Text' && !empty($data['maxlength'])) {
       $inputAttrs['maxlength'] = (int) $data['maxlength'];

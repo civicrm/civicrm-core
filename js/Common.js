@@ -368,6 +368,9 @@ if (!CRM.vars) CRM.vars = {};
         settings.width = '' + parseInt(percentage+gap-((screenWidth - 700)/7*(gap)/100), 10) + '%';
       }
     }
+    if (settings.dialogClass && !_.includes(settings.dialogClass, 'crm-container')) {
+      settings.dialogClass += ' crm-container';
+    }
     return settings;
   };
 
@@ -480,8 +483,8 @@ if (!CRM.vars) CRM.vars = {};
           $('.crm-select2-row-description', '#select2-drop').each(function() {
             $(this).closest('.select2-result-label').attr('title', $(this).text());
           });
-          // Collapsible optgroups should be expanded when searching
-          if ($('#select2-drop.collapsible-optgroups-enabled .select2-search input.select2-input').val()) {
+          // Collapsible optgroups should be expanded when searching (searching happens within select2-drop for single selects, but within the element for multiselects; this handles both)
+          if ($('#select2-drop.collapsible-optgroups-enabled .select2-search input.select2-input, .select2-dropdown-open.collapsible-optgroups .select2-search-field input.select2-input').val()) {
             $('#select2-drop.collapsible-optgroups-enabled li.select2-result-with-children')
               .addClass('optgroup-expanded');
           }
@@ -517,6 +520,47 @@ if (!CRM.vars) CRM.vars = {};
         $el.addClass('crm-ajax-select');
       }
       $el.select2(settings);
+    });
+  };
+
+  // Autocomplete based on APIv4 and Select2.
+  $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
+    select2Options = select2Options || {};
+    return $(this).each(function() {
+      $(this).crmSelect2({
+        ajax: {
+          quietMillis: 250,
+          url: CRM.url('civicrm/ajax/api4/' + entityName + '/autocomplete'),
+          data: function (input, pageNum) {
+            return {params: JSON.stringify(_.assign({
+              input: input,
+              page: pageNum || 1
+            }, apiParams))};
+          },
+          results: function(data) {
+            return {
+              results: data.values,
+              more: data.count > data.countFetched
+            };
+          },
+        },
+        minimumInputLength: 1,
+        formatResult: CRM.utils.formatSelect2Result,
+        formatSelection: formatEntityRefSelection,
+        escapeMarkup: _.identity,
+        initSelection: function($el, callback) {
+          var
+            multiple = !!select2Options.multiple,
+            val = $el.val();
+          if (val === '') {
+            return;
+          }
+          var params = $.extend({}, apiParams || {}, {ids: val.split(',')});
+          CRM.api4(entityName, 'autocomplete', params).then(function(result) {
+            callback(multiple ? result : result[0]);
+          });
+        }
+      });
     });
   };
 
@@ -806,7 +850,20 @@ if (!CRM.vars) CRM.vars = {};
       return '';
     }
     if (createLinks === true) {
-      createLinks = params.contact_type ? _.where(CRM.config.entityRef.links[entity], {type: params.contact_type}) : CRM.config.entityRef.links[entity];
+      if (!params.contact_type) {
+        createLinks = CRM.config.entityRef.links[entity];
+      }
+      else if (typeof params.contact_type === 'string') {
+        createLinks = _.where(CRM.config.entityRef.links[entity], {type: params.contact_type});
+      } else {
+        // lets assume it's an array with filters such as IN etc
+        createLinks = [];
+        _.each(params.contact_type, function(types) {
+          _.each(types, function(type) {
+            createLinks.push(_.findWhere(CRM.config.entityRef.links[entity], {type: type}));
+          });
+        });
+      }
     }
     _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
@@ -1145,10 +1202,11 @@ if (!CRM.vars) CRM.vars = {};
           $(this).addClass('crm-tooltip-down');
         }
         if (!$(this).children('.crm-tooltip-wrapper').length) {
+          var tooltipContents = $(this)[0].hasAttribute('data-tooltip-url') ? $(this).attr('data-tooltip-url') : this.href;
           $(this).append('<div class="crm-tooltip-wrapper"><div class="crm-tooltip"></div></div>');
           $(this).children().children('.crm-tooltip')
             .html('<div class="crm-loading-element"></div>')
-            .load(this.href);
+            .load(tooltipContents);
         }
       })
       .on('mouseleave', 'a.crm-summary-link', function () {

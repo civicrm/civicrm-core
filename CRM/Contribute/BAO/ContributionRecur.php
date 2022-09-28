@@ -9,15 +9,17 @@
  +--------------------------------------------------------------------+
  */
 
+use Brick\Money\Money;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
+use Civi\Api4\LineItem;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
+class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur implements Civi\Test\HookInterface {
 
   /**
    * Create recurring contribution.
@@ -92,6 +94,40 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     }
 
     return $recurring;
+  }
+
+  /**
+   * Event fired after modifying a recurring contribution.
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'edit') {
+      if (is_numeric($event->object->amount)) {
+        $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($event->object->id);
+        if (empty($templateContribution['id'])) {
+          return;
+        }
+        $lines = LineItem::get(FALSE)
+          ->addWhere('contribution_id', '=', $templateContribution['id'])
+          ->addWhere('contribution_id.is_template', '=', TRUE)
+          ->addSelect('contribution_id.total_amount')
+          ->execute();
+        if (count($lines) === 1) {
+          $contributionAmount = $lines->first()['contribution_id.total_amount'];
+          // USD here is just ensuring both are in the same format.
+          if (Money::of($contributionAmount, 'USD')->compareTo(Money::of($event->object->amount, 'USD'))) {
+            // If different then we need to update
+            // the contribution. Note that if this is being called
+            // as a result of the contribution having been updated then there will
+            // be no difference.
+            Contribution::update(FALSE)
+              ->addWhere('id', '=', $templateContribution['id'])
+              ->setValues(['total_amount' => $event->object->amount])
+              ->execute();
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -412,8 +448,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @param int $id
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @return int|NULL the ID of the newly created template contribution.
    */
@@ -435,6 +470,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
     // Retrieve the most recently added contribution
     $mostRecentContribution = Contribution::get(FALSE)
+      ->addSelect('custom.*', 'id', 'contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount', 'is_test')
       ->addWhere('contribution_recur_id', '=', $id)
       ->addWhere('is_template', '=', 0)
       // we need this line otherwise the is test contribution don't work.
@@ -461,26 +497,21 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     // relevant values to ensure the activity reflects that.
     $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($mostRecentContribution['id']);
 
-    $templateContributionParams = [];
-    $templateContributionParams['is_test'] = $mostRecentContribution['is_test'];
+    $templateContributionParams = $mostRecentContribution;
+    unset($templateContributionParams['id']);
     $templateContributionParams['is_template'] = '1';
+    $templateContributionParams['contribution_status_id:name'] = 'Template';
     $templateContributionParams['skipRecentView'] = TRUE;
     $templateContributionParams['contribution_recur_id'] = $id;
-    $templateContributionParams['line_item'] = $mostRecentContribution['line_item'];
-    $templateContributionParams['status_id'] = 'Template';
-    foreach (['contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount'] as $fieldName) {
-      if (isset($mostRecentContribution[$fieldName])) {
-        $templateContributionParams[$fieldName] = $mostRecentContribution[$fieldName];
-      }
-    }
     if (!empty($relatedContact['individual_id'])) {
       $templateContributionParams['on_behalf'] = TRUE;
       $templateContributionParams['source_contact_id'] = $relatedContact['individual_id'];
     }
     $templateContributionParams['source'] = $templateContributionParams['source'] ?? ts('Recurring contribution');
-    $templateContribution = civicrm_api3('Contribution', 'create', $templateContributionParams);
-    $temporaryObject = new CRM_Contribute_BAO_Contribution();
-    $temporaryObject->copyCustomFields($mostRecentContribution['id'], $templateContribution['id']);
+    $templateContribution = Contribution::create(FALSE)
+      ->setValues($templateContributionParams)
+      ->execute()
+      ->first();
     // Add new soft credit against current $contribution.
     CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($templateContributionParams['contribution_recur_id'], $templateContribution['id']);
     return $templateContribution['id'];
@@ -492,30 +523,29 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * Later we might merge in data stored against the contribution recur record rather than just return the contribution.
    *
    * @param int $id
-   * @param array $overrides
-   *   Parameters that should be overriden. Add unit tests if using parameters other than total_amount & financial_type_id.
+   * @param array $inputOverrides
+   *   Parameters that should be overridden. Add unit tests if using parameters other than total_amount & financial_type_id.
    *
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function getTemplateContribution(int $id, $overrides = []): array {
-    $recurFields = ['is_test', 'financial_type_id', 'total_amount', 'campaign_id'];
+  public static function getTemplateContribution(int $id, array $inputOverrides = []): array {
     $recurringContribution = ContributionRecur::get(FALSE)
       ->addWhere('id', '=', $id)
-      ->setSelect($recurFields)
+      ->setSelect(['is_test', 'financial_type_id', 'amount', 'campaign_id'])
       ->execute()
       ->first();
-    // If financial_type_id or total_amount are set on the
-    // recurring they are overrides, but of lower precedence
-    // than input parameters.
+
+    // Parameters passed into the function take precedences, falling back to those loaded from
+    // the recurring contribution.
     // we filter out null, '' and FALSE but not zero - I'm on the fence about zero.
-    $overrides = array_filter(array_merge(
-      // We filter recurringContribution as we only want the fields we asked for
-      // and specifically don't want 'id' added to overrides.
-      array_intersect_key($recurringContribution, array_fill_keys($recurFields, 1)),
-      $overrides
-    ), 'strlen');
+    $overrides = array_filter([
+      'is_test' => $inputOverrides['is_test'] ?? $recurringContribution['is_test'],
+      'financial_type_id' => $inputOverrides['financial_type_id'] ?? ($recurringContribution['financial_type_id'] ?? ''),
+      'campaign_id' => $inputOverrides['campaign_id'] ?? ($recurringContribution['campaign_id'] ?? ''),
+      'total_amount' => $inputOverrides['total_amount'] ?? $recurringContribution['amount'],
+    ], 'strlen');
 
     // First look for new-style template contribution with is_template=1
     $templateContributions = Contribution::get(FALSE)
@@ -550,11 +580,15 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       // The handling of the line items is managed in BAO_Order so this
       // is whether we should override on the contribution. Arguably the 2 should
       // be decoupled.
-      if (count($lineItems) > 1 && isset($overrides['financial_type_id'])) {
-        unset($overrides['financial_type_id']);
+      if (count($lineItems) > 1) {
+        unset($overrides['financial_type_id'], $overrides['total_amount']);
       }
       $result = array_merge($templateContribution, $overrides);
-      $result['line_item'][$order->getPriceSetID()] = $lineItems;
+      // Line items aren't always written to a contribution, for mystery reasons.
+      // Checking for their existence prevents $order->getPriceSetID returning NULL.
+      if ($lineItems) {
+        $result['line_item'][$order->getPriceSetID()] = $lineItems;
+      }
       // If the template contribution was made on-behalf then add the
       // relevant values to ensure the activity reflects that.
       $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($result['id']);
@@ -630,32 +664,6 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       if ($fields['frequency_unit'] == '0') {
         $errors['frequency_unit'] = ts('Please select a period (e.g. months, years ...) for how often you want to make this recurring contribution (EXAMPLE: Every 3 MONTHS).');
       }
-    }
-  }
-
-  /**
-   * Send start or end notification for recurring payments.
-   *
-   * @param array $ids
-   * @param CRM_Contribute_BAO_ContributionRecur $recur
-   * @param bool $isFirstOrLastRecurringPayment
-   */
-  public static function sendRecurringStartOrEndNotification($ids, $recur, $isFirstOrLastRecurringPayment) {
-    CRM_Core_Error::deprecatedFunctionWarning('use CRM_Contribute_BAO_ContributionPage::recurringNotify');
-    if ($isFirstOrLastRecurringPayment) {
-      $autoRenewMembership = FALSE;
-      if ($recur->id &&
-        isset($ids['membership']) && $ids['membership']
-      ) {
-        $autoRenewMembership = TRUE;
-      }
-
-      //send recurring Notification email for user
-      CRM_Contribute_BAO_ContributionPage::recurringNotify(
-        $ids['contribution'],
-        $isFirstOrLastRecurringPayment,
-        $recur
-      );
     }
   }
 
@@ -736,7 +744,6 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function addRecurLineItems($recurId, $contribution) {
     $foundLineItems = FALSE;
@@ -755,7 +762,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
                 'is_transactional' => FALSE,
               ]);
             }
-            catch (CiviCRM_API3_Exception $e) {
+            catch (CRM_Core_Exception $e) {
               // we are catching & ignoring errors as an extra precaution since lost IPNs may be more serious that lost membership_payment data
               // this fn is unit-tested so risk of changes elsewhere breaking it are otherwise mitigated
             }
@@ -788,76 +795,58 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @param int $contributionStatusID
    * @param float $contributionAmount
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function updateRecurLinkedPledge($contributionID, $contributionRecurID, $contributionStatusID, $contributionAmount) {
     $returnProperties = ['id', 'pledge_id'];
-    $paymentDetails = $paymentIDs = [];
+    $paymentDetails = [];
 
-    if (CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $contributionID,
-      $paymentDetails, $returnProperties
-    )
-    ) {
-      foreach ($paymentDetails as $key => $value) {
-        $paymentIDs[] = $value['id'];
-        $pledgeId = $value['pledge_id'];
-      }
-    }
-    else {
-      //payment is not already linked - if it is linked with a pledge we need to create a link.
-      // return if it is not recurring contribution
-      if (!$contributionRecurID) {
-        return;
-      }
+    $relatedContributions = new CRM_Contribute_DAO_Contribution();
+    $relatedContributions->contribution_recur_id = $contributionRecurID;
+    $relatedContributions->find();
 
-      $relatedContributions = new CRM_Contribute_DAO_Contribution();
-      $relatedContributions->contribution_recur_id = $contributionRecurID;
-      $relatedContributions->find();
-
-      while ($relatedContributions->fetch()) {
-        CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $relatedContributions->id,
-          $paymentDetails, $returnProperties
-        );
-      }
-
-      if (empty($paymentDetails)) {
-        // payment is not linked with a pledge and neither are any other contributions on this
-        return;
-      }
-
-      foreach ($paymentDetails as $key => $value) {
-        $pledgeId = $value['pledge_id'];
-      }
-
-      // we have a pledge now we need to get the oldest unpaid payment
-      $paymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeId);
-      if (empty($paymentDetails['id'])) {
-        // we can assume this pledge is now completed
-        // return now so we don't create a core error & roll back
-        return;
-      }
-      $paymentDetails['contribution_id'] = $contributionID;
-      $paymentDetails['status_id'] = $contributionStatusID;
-      $paymentDetails['actual_amount'] = $contributionAmount;
-
-      // put contribution against it
-      $payment = civicrm_api3('PledgePayment', 'create', $paymentDetails);
-      $paymentIDs[] = $payment['id'];
+    while ($relatedContributions->fetch()) {
+      CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $relatedContributions->id,
+        $paymentDetails, $returnProperties
+      );
     }
 
-    // update pledge and corresponding payment statuses
-    CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId, $paymentIDs, $contributionStatusID,
-      NULL, $contributionAmount
-    );
+    if (empty($paymentDetails)) {
+      // payment is not linked with a pledge and neither are any other contributions on this
+      return;
+    }
+
+    foreach ($paymentDetails as $value) {
+      $pledgeId = $value['pledge_id'];
+    }
+
+    // we have a pledge now we need to get the oldest unpaid payment
+    $paymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeId);
+    if (empty($paymentDetails['id'])) {
+      // we can assume this pledge is now completed
+      // return now so we don't create a core error & roll back
+      return;
+    }
+    $paymentDetails['contribution_id'] = $contributionID;
+    $paymentDetails['status_id'] = $contributionStatusID;
+    $paymentDetails['actual_amount'] = $contributionAmount;
+
+    // put contribution against it
+    civicrm_api3('PledgePayment', 'create', $paymentDetails);
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * Recurring contribution fields.
+   *
+   * @param CRM_Contribute_Form_Search $form
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function recurringContribution(&$form) {
-    // Recurring contribution fields
+  public static function recurringContribution($form): void {
+    // This assignment may be overwritten.
+    $form->assign('contribution_recur_pane_open', FALSE);
     foreach (self::getRecurringFields() as $key) {
-      if ($key == 'contribution_recur_payment_made' && !empty($form->_formValues) &&
+      if ($key === 'contribution_recur_payment_made' && !empty($form->_formValues) &&
         !CRM_Utils_System::isNull(CRM_Utils_Array::value($key, $form->_formValues))
       ) {
         $form->assign('contribution_recur_pane_open', TRUE);
@@ -903,7 +892,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   /**
    * Get the metadata for fields to be included on the search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getContributionRecurSearchFieldMetadata() {
     $fields = [
@@ -949,7 +938,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *   - Failed
    * @param string $effectiveDate
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function updateOnNewPayment($recurringContributionID, $paymentStatus, string $effectiveDate = 'now') {
 
@@ -1000,6 +989,38 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
+   * If a template contribution is updated we need to update the amount on the recurring contribution.
+   *
+   * @param \CRM_Contribute_DAO_Contribution $contribution
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function updateOnTemplateUpdated(CRM_Contribute_DAO_Contribution $contribution) {
+    if (empty($contribution->contribution_recur_id)) {
+      return;
+    }
+    $contributionRecur = ContributionRecur::get(FALSE)
+      ->addWhere('id', '=', $contribution->contribution_recur_id)
+      ->execute()
+      ->first();
+
+    if ($contribution->total_amount === NULL || $contribution->currency === NULL) {
+      // The contribution has not been fully loaded, so fetch a full copy now.
+      $contribution->find(TRUE);
+    }
+
+    if ($contribution->currency !== $contributionRecur['currency'] || !CRM_Utils_Money::equals($contributionRecur['amount'], $contribution->total_amount, $contribution->currency)) {
+      ContributionRecur::update(FALSE)
+        ->addValue('amount', $contribution->total_amount)
+        ->addValue('currency', $contribution->currency)
+        ->addValue('modified_date', 'now')
+        ->addWhere('id', '=', $contributionRecur['id'])
+        ->execute();
+    }
+  }
+
+  /**
    * Is this recurring contribution now complete.
    *
    * Have all the payments expected been received now.
@@ -1030,7 +1051,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @param int $financial_type_id
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
     $originalContribution = civicrm_api3('Contribution', 'getsingle', [
@@ -1059,8 +1080,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $params = [];
     switch ($fieldName) {
       case 'payment_processor_id':
-        if (isset(\Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'])) {
-          return \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'];
+        if (isset(\Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context])) {
+          return \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context];
         }
         $baoName = 'CRM_Contribute_BAO_ContributionRecur';
         $params['condition']['test'] = "is_test = 0";
@@ -1079,10 +1100,37 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         }
         $allProcessors = $liveProcessors + $testProcessors;
         ksort($allProcessors);
-        \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'] = $allProcessors;
+        \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context] = $allProcessors;
         return $allProcessors;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  }
+
+  /**
+   * Get the from address to use for the recurring contribution.
+   *
+   * This uses the contribution page id, if there is one, or the default domain one.
+   *
+   * @param int $id
+   *   Recurring contribution ID.
+   *
+   * @internal
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public static function getRecurFromAddress(int $id): string {
+    $details = Contribution::get(FALSE)
+      ->addWhere('contribution_recur_id', '=', $id)
+      ->addWhere('contribution_page_id', 'IS NOT NULL')
+      ->addSelect('contribution_page_id.receipt_from_name', 'contribution_page_id.receipt_from_email')
+      ->addOrderBy('receive_date', 'DESC')
+      ->execute()->first();
+    if (empty($details['contribution_page_id.receipt_from_email'])) {
+      $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
+      return "$domainValues[0] <$domainValues[1]>";
+    }
+    return '"' . $details['contribution_page_id.receipt_from_name'] . '" <' . $details['contribution_page_id.receipt_from_email'] . '>';
   }
 
 }

@@ -41,6 +41,7 @@
 
       this.preview = this.stale = false;
 
+      // Extra (non-field) colum types
       this.colTypes = {
         links: {
           label: ts('Links'),
@@ -68,16 +69,12 @@
             links: []
           }
         },
-      };
-
-      this.toggleLimit = function() {
-        if (ctrl.display.settings.limit) {
-          ctrl.display.settings.limit = 0;
-          if (ctrl.display.settings.pager) {
-            ctrl.display.settings.pager = false;
+        include: {
+          label: ts('Custom Code'),
+          icon: 'fa-code',
+          defaults: {
+            path: ''
           }
-        } else {
-          ctrl.display.settings.limit = CRM.crmSearchAdmin.defaultPagerSize;
         }
       };
 
@@ -129,10 +126,18 @@
       };
 
       this.getColLabel = function(col) {
-        if (col.type === 'field') {
+        if (col.type === 'field' || col.type === 'image' || col.type === 'html') {
           return ctrl.getFieldLabel(col.key);
         }
         return ctrl.colTypes[col.type].label;
+      };
+
+      this.toggleEmptyVal = function(col) {
+        if (col.empty_value) {
+          delete col.empty_value;
+        } else {
+          col.empty_value = ts('None');
+        }
       };
 
       this.toggleRewrite = function(col) {
@@ -144,166 +149,121 @@
         }
       };
 
+      this.toggleImage = function(col) {
+        if (col.type === 'image') {
+          delete col.image;
+          col.type = 'field';
+        } else {
+          col.image = {
+            alt: this.getColLabel(col)
+          };
+          delete col.editable;
+          col.type = 'image';
+        }
+      };
+
+      this.toggleHtml = function(col) {
+        if (col.type === 'html') {
+          col.type = 'field';
+        } else {
+          delete col.editable;
+          delete col.link;
+          delete col.icons;
+          col.type = 'html';
+        }
+      };
+
+      this.canBeImage = function(col) {
+        var expr = ctrl.getExprFromSelect(col.key),
+          info = searchMeta.parseExpr(expr);
+        return info.args[0] && info.args[0].field && info.args[0].field.input_type === 'File';
+      };
+
       this.toggleEditable = function(col) {
         if (col.editable) {
           delete col.editable;
-          return;
+        } else {
+          col.editable = true;
         }
-
-        var info = searchMeta.parseExpr(col.key),
-          value = col.key.split(':')[0];
-        // If field is an implicit join, use the original fk field
-        if (info.field.name !== info.field.fieldName) {
-          value = value.substr(0, value.lastIndexOf('.'));
-          info = searchMeta.parseExpr(value);
-        }
-        col.editable = {
-          entity: info.field.baseEntity,
-          options: !!info.field.options,
-          serialize: !!info.field.serialize,
-          fk_entity: info.field.fk_entity,
-          id: info.prefix + 'id',
-          name: info.field.name,
-          value: value
-        };
       };
 
-      this.isEditable = function(col) {
+      this.canBeEditable = function(col) {
         var expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
-        return !col.rewrite && !col.link && !info.fn && info.field && !info.field.readonly;
+        return !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
       };
 
-      function fieldToColumn(fieldExpr, defaults) {
-        var info = searchMeta.parseExpr(fieldExpr),
-          values = _.cloneDeep(defaults);
-        if (defaults.key) {
-          values.key = info.alias;
+      // Checks if a column contains a sortable value
+      // Must be a real sql expression (not a pseudo-field like `result_row_num`)
+      this.canBeSortable = function(col) {
+        // Column-header sorting is incompatible with draggable sorting
+        if (ctrl.display.settings.draggable) {
+          return false;
         }
-        if (defaults.label) {
-          values.label = searchMeta.getDefaultLabel(fieldExpr);
-        }
-        if (defaults.dataType) {
-          values.dataType = (info.fn && info.fn.dataType) || (info.field && info.field.data_type);
-        }
-        return values;
+        var expr = ctrl.getExprFromSelect(col.key),
+          info = searchMeta.parseExpr(expr),
+          arg = (info && info.args && _.findWhere(info.args, {type: 'field'})) || {};
+        return arg.field && arg.field.type !== 'Pseudo';
+      };
+
+      // Aggregate functions (COUNT, AVG, MAX) cannot autogenerate links, except for GROUP_CONCAT
+      // which gets special treatment in APIv4 to convert it to an array.
+      function canUseLinks(colKey) {
+        var expr = ctrl.getExprFromSelect(colKey),
+          info = searchMeta.parseExpr(expr);
+        return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
       }
+
+      var linkProps = ['path', 'entity', 'action', 'join', 'target'];
 
       this.toggleLink = function(column) {
         if (column.link) {
-          ctrl.onChangeLink(column, column.link.path, '');
+          ctrl.onChangeLink(column, {});
         } else {
+          delete column.editable;
           var defaultLink = ctrl.getLinks(column.key)[0];
-          column.link = {path: defaultLink ? defaultLink.path : 'civicrm/'};
-          ctrl.onChangeLink(column, null, column.link.path);
+          ctrl.onChangeLink(column, defaultLink || {path: 'civicrm/'});
         }
       };
 
-      this.onChangeLink = function(column, before, after) {
-        var beforeLink = before && _.findWhere(ctrl.getLinks(), {path: before}),
-          afterLink = after && _.findWhere(ctrl.getLinks(), {path: after});
-        if (!after) {
-          if (beforeLink && column.title === beforeLink.title) {
+      this.onChangeLink = function(column, afterLink) {
+        column.link = column.link || {};
+        var beforeLink = column.link.action && _.findWhere(ctrl.getLinks(column.key), {action: column.link.action});
+        if (!afterLink.action && !afterLink.path) {
+          if (beforeLink && beforeLink.text === column.title) {
             delete column.title;
           }
           delete column.link;
-        } else if (afterLink && ((!column.title && !before) || (beforeLink && beforeLink.title === column.title))) {
-          column.title = afterLink.title;
-        } else if (!afterLink && (beforeLink && beforeLink.title === column.title)) {
+          return;
+        }
+        if (afterLink.text && ((!column.title && !beforeLink) || (beforeLink && beforeLink.text === column.title))) {
+          column.title = afterLink.text;
+        } else if (!afterLink.text && (beforeLink && beforeLink.text === column.title)) {
           delete column.title;
         }
+        _.each(linkProps, function(prop) {
+          column.link[prop] = afterLink[prop] || '';
+        });
       };
 
       this.getLinks = function(columnKey) {
         if (!ctrl.links) {
-          ctrl.links = {'*': buildLinks()};
+          ctrl.links = {'*': ctrl.crmSearchAdmin.buildLinks(), '0': []};
         }
         if (!columnKey) {
           return ctrl.links['*'];
         }
+        if (!canUseLinks(columnKey)) {
+          return ctrl.links['0'];
+        }
         var expr = ctrl.getExprFromSelect(columnKey),
           info = searchMeta.parseExpr(expr),
-          joinEntity = '';
-        if (info.field.fk_entity || info.field.name !== info.field.fieldName) {
-          joinEntity = info.prefix + (info.field.fk_entity ? info.field.name : info.field.name.substr(0, info.field.name.lastIndexOf('.')));
-        } else if (info.prefix) {
-          joinEntity = info.prefix.replace('.', '');
-        }
+          joinEntity = searchMeta.getJoinEntity(info);
         if (!ctrl.links[joinEntity]) {
-          ctrl.links[joinEntity] = _.filter(ctrl.links['*'], function(link) {
-            return joinEntity === (link.join || '');
-          });
+          ctrl.links[joinEntity] = _.filter(ctrl.links['*'], {join: joinEntity});
         }
         return ctrl.links[joinEntity];
       };
-
-      // Build a list of all possible links to main entity or join entities
-      function buildLinks() {
-        function addTitle(link, entityName) {
-          switch (link.action) {
-            case 'view':
-              link.title = ts('View %1', {1: entityName});
-              break;
-
-            case 'update':
-              link.title = ts('Edit %1', {1: entityName});
-              break;
-
-            case 'delete':
-              link.title = ts('Delete %1', {1: entityName});
-              break;
-          }
-        }
-
-        // Links to main entity
-        var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
-          links = _.cloneDeep(mainEntity.paths || []);
-        _.each(links, function(link) {
-          addTitle(link, mainEntity.title);
-        });
-        // Links to explicitly joined entities
-        _.each(ctrl.savedSearch.api_params.join, function(joinClause) {
-          var join = searchMeta.getJoin(joinClause[0]),
-            joinEntity = searchMeta.getEntity(join.entity),
-            bridgeEntity = _.isString(joinClause[2]) ? searchMeta.getEntity(joinClause[2]) : null;
-          _.each(joinEntity.paths, function(path) {
-            var link = _.cloneDeep(path);
-            link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
-            link.join = join.alias;
-            addTitle(link, join.label);
-            links.push(link);
-          });
-          _.each(bridgeEntity && bridgeEntity.paths, function(path) {
-            var link = _.cloneDeep(path);
-            link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
-            link.join = join.alias;
-            addTitle(link, join.label + (bridgeEntity.bridge_title ? ' ' + bridgeEntity.bridge_title : ''));
-            links.push(link);
-          });
-        });
-        // Links to implicit joins
-        _.each(ctrl.savedSearch.api_params.select, function(fieldName) {
-          if (!_.includes(fieldName, ' AS ')) {
-            var info = searchMeta.parseExpr(fieldName);
-            if (info.field && !info.suffix && !info.fn && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
-              var idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
-                idField = searchMeta.parseExpr(idFieldName).field;
-              if (!ctrl.crmSearchAdmin.canAggregate(idFieldName)) {
-                var joinEntity = searchMeta.getEntity(idField.fk_entity),
-                  label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
-                _.each((joinEntity || {}).paths, function(path) {
-                  var link = _.cloneDeep(path);
-                  link.path = link.path.replace(/\[id/g, '[' + idFieldName);
-                  link.join = idFieldName;
-                  addTitle(link, label);
-                  links.push(link);
-                });
-              }
-            }
-          }
-        });
-        return _.uniq(links, 'path');
-      }
 
       this.pickIcon = function(model, key) {
         searchMeta.pickIcon().then(function(icon) {
@@ -311,11 +271,30 @@
         });
       };
 
+      this.toggleAddButton = function() {
+        if (ctrl.display.settings.addButton && ctrl.display.settings.addButton.path) {
+          delete ctrl.display.settings.addButton;
+        } else {
+          var entity = searchMeta.getBaseEntity();
+          ctrl.display.settings.addButton = {
+            path: entity.addPath || 'civicrm/',
+            text: ts('Add %1', {1: entity.title}),
+            icon: 'fa-plus'
+          };
+        }
+      };
+
+      this.onChangeAddButtonPath = function() {
+        if (!ctrl.display.settings.addButton.path) {
+          delete ctrl.display.settings.addButton;
+        }
+      };
+
       // Helper function to sort active from hidden columns and initialize each column with defaults
       this.initColumns = function(defaults) {
         if (!ctrl.display.settings.columns) {
           ctrl.display.settings.columns = _.transform(ctrl.savedSearch.api_params.select, function(columns, fieldExpr) {
-            columns.push(fieldToColumn(fieldExpr, defaults));
+            columns.push(searchMeta.fieldToColumn(fieldExpr, defaults));
           });
           ctrl.hiddenColumns = [];
         } else {
@@ -326,7 +305,7 @@
           ctrl.hiddenColumns = _.transform(ctrl.savedSearch.api_params.select, function(hiddenColumns, fieldExpr) {
             var key = _.last(fieldExpr.split(' AS '));
             if (!_.includes(activeColumns, key)) {
-              hiddenColumns.push(fieldToColumn(fieldExpr, defaults));
+              hiddenColumns.push(searchMeta.fieldToColumn(fieldExpr, defaults));
             }
           });
           _.eachRight(activeColumns, function(key, index) {
@@ -352,10 +331,18 @@
           return _.findIndex(ctrl.display.settings.sort, [key]) >= 0;
         }
         return {
-          results: [{
-            text: ts('Columns'),
-            children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
-          }].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom'], disabledIf))
+          results: [
+            {
+              text: ts('Random'),
+              icon: 'crm-i fa-random',
+              id: 'RAND()',
+              disabled: disabledIf('RAND()')
+            },
+            {
+              text: ts('Columns'),
+              children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
+            }
+          ].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra'], disabledIf))
         };
       };
 

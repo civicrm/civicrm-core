@@ -29,7 +29,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @return \CRM_Core_DAO_Phone
    *
-   * @throws API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function create($params) {
@@ -48,7 +47,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @return object
    *   CRM_Core_BAO_Phone object on success, null otherwise
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function add($params) {
@@ -76,9 +74,8 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @param int $id
    *   The contact id.
-   *
    * @param bool $updateBlankLocInfo
-   * @param null $type
+   * @param string|null $type
    * @param array $filters
    *
    * @return array
@@ -149,10 +146,8 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
    * This is called from CRM_Core_BAO_Block as a calculated function.
    *
    * @param array $entityElements
-   *   The array containing entity_id and.
-   *   entity_table name
-   *
-   * @param null $type
+   *   The array containing entity_id and entity_table name
+   * @param string|null $type
    *
    * @return array
    *   the array of phone ids which are potential numbers
@@ -205,7 +200,7 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
   /**
    * Set NULL to phone, mapping, uffield
    *
-   * @param $optionId
+   * @param int $optionId
    *   Value of option to be deleted.
    */
   public static function setOptionToNull($optionId) {
@@ -234,12 +229,14 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
   /**
    * Call common delete function.
    *
-   * @param int $id
+   * @see \CRM_Contact_BAO_Contact::on_hook_civicrm_post
    *
+   * @param int $id
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Phone', $id);
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
 }
