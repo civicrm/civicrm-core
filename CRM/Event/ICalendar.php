@@ -86,7 +86,7 @@ class CRM_Event_ICalendar {
       else {
         $template->assign('timezones', NULL);
       }
-      
+
       $calendar = $template->fetch('CRM/Core/Calendar/ICal.tpl');
       $calendar = preg_replace('/(?<!\r)\n/', "\r\n", $calendar);
     }
