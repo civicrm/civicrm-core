@@ -65,7 +65,7 @@
                   {$form.$element_name.html}
                   {if $element.html_type eq 'Text'}
                     {if $element.is_display_amounts}
-                    <span class="price-field-amount{if $form.$element_name.frozen EQ 1 || ($sold_out|is_array && $option.id|in_array:$sold_out)} sold-out-option{/if}">
+                    <span class="price-field-amount{if $form.$element_name.frozen EQ 1} sold-out-option{/if}">
                     {foreach item=option from=$element.options}
                       {if ($option.tax_amount || $option.tax_amount == "0") && $displayOpt && $invoicing}
                         {assign var="amount" value=`$option.amount+$option.tax_amount`}
@@ -81,12 +81,12 @@
                       {else}
                         {$option.amount|crmMoney:$currency} {$fieldHandle} {$form.$fieldHandle.frozen}
                       {/if}
-                      {if $form.$element_name.frozen EQ 1 || ($sold_out|is_array && $option.id|in_array:$sold_out)} ({ts}Sold out{/ts}){/if}
+                      {if $form.$element_name.frozen EQ 1} ({ts}Sold out{/ts}){/if}
                     {/foreach}
                     </span>
                     {else}
                       {* Not showing amount, but still need to conditionally show Sold out marker *}
-                      {if $form.$element_name.frozen EQ 1 || ($sold_out|is_array && $option.id|in_array:$sold_out)}
+                      {if $form.$element_name.frozen EQ 1}
                         <span class="sold-out-option">({ts}Sold out{/ts})<span>
                       {/if}
                     {/if}
