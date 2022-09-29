@@ -2423,20 +2423,23 @@ WHERE  ce.loc_block_id = $locBlockId";
     $query = [
       'reset' => 1,
     ];
+
     if ($eventId) {
       $query['id'] = $eventId;
-    }
-    $return[] = [
-      'url' => CRM_Utils_System::url('civicrm/event/ical', $query, TRUE, NULL, TRUE),
-      'text' => $eventId ? ts('Download iCalendar entry for this event.') : ts('Download iCalendar entry for current and future public events.'),
-      'icon' => 'fa-download',
-    ];
-    if ($eventId) {
-      $return[] = [
-        'url' => CRM_Utils_System::url('civicrm/event/ical', ['gCalendar' => 1] + $query, TRUE, NULL, TRUE),
-        'text' => ts('Add event to Google Calendar'),
-        'icon' => 'fa-share',
-      ];
+      $endDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'end_date');
+      if (empty($endDate) || strtotime($endDate) >= time()) {
+        $return[] = [
+          'url' => CRM_Utils_System::url('civicrm/event/ical', $query, TRUE, NULL, TRUE),
+          'text' => ts('Download iCalendar entry for this event.'),
+          'icon' => 'fa-download',
+        ];
+
+        $return[] = [
+          'url' => CRM_Utils_System::url('civicrm/event/ical', ['gCalendar' => 1] + $query, TRUE, NULL, TRUE),
+          'text' => ts('Add event to Google Calendar'),
+          'icon' => 'fa-share',
+        ];
+      }
     }
     else {
       $return[] = [
@@ -2445,6 +2448,7 @@ WHERE  ce.loc_block_id = $locBlockId";
         'icon' => 'fa-link',
       ];
     }
+
     return $return;
   }
 
