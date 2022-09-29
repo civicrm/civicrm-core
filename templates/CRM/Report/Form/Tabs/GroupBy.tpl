@@ -15,7 +15,7 @@
         {assign var="count" value=`$count+1`}
         <td width="25%">
           {$form.group_bys[$gbElem].html}
-          {if $form.group_bys_freq[$gbElem].html}:<br>
+          {if $form.group_bys_freq && array_key_exists($gbElem, $form.group_bys_freq)}:<br>
             &nbsp;&nbsp;{$form.group_bys_freq[$gbElem].label}&nbsp;{$form.group_bys_freq[$gbElem].html}
           {/if}
         </td>
