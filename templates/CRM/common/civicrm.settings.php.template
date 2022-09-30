@@ -99,8 +99,13 @@ if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
  *
  */
 if (!defined('CIVICRM_DSN')) {
-  if (CIVICRM_UF === 'UnitTests' && isset($GLOBALS['_CV']['TEST_DB_DSN'])) {
-    define('CIVICRM_DSN', $GLOBALS['_CV']['TEST_DB_DSN']);
+  if (CIVICRM_UF === 'UnitTests') {
+    if (isset($GLOBALS['_CV']['TEST_DB_DSN'])) {
+      define('CIVICRM_DSN', $GLOBALS['_CV']['TEST_DB_DSN']);
+    }
+    else {
+      throw new \Exception('$GLOBALS["_CV"]["TEST_DB_DSN"] is not set');
+    }
   }
   else {
     define('CIVICRM_DSN', 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true%%dbSSL%%');
