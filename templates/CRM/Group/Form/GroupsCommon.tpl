@@ -31,7 +31,7 @@
     </tr>
   </table>
 {/if}
-{if !empty($form.organization_id)}
+{if array_key_exists('organization_id', $form)}
   <h3>{ts}Associated Organization{/ts} {help id="id-group-organization" file="CRM/Group/Page/Group.hlp"}</h3>
   <table class="form-layout-compressed">
     <tr class="crm-group-form-block-organization">
