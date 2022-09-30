@@ -12,3 +12,8 @@ WHERE `option_group_id` = @og_recent_items_providers;
 UPDATE `civicrm_option_value`
 SET `value` = `name`
 WHERE `option_group_id` = @og_recent_items_providers AND `value` REGEXP '^[0-9]+$';
+
+{* Fix option values created with wrong name by the 5.53.0 installer *}
+UPDATE `civicrm_option_value`
+SET `name` = `value`
+WHERE `option_group_id` = @og_recent_items_providers;
