@@ -333,6 +333,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $errors['entity'] = ts('Please select entity value');
     }
 
+    if (!CRM_Utils_System::isNull($fields['absolute_date']) && !CRM_Utils_System::isNull($fields['start_action_offset'])) {
+      $errors['absolute_date'] = ts('Only an absolute date or a relative date or time can be entered, not both.');
+    }
     if (!CRM_Utils_System::isNull($fields['absolute_date'])) {
       if ($fields['absolute_date'] < date('Y-m-d')) {
         $errors['absolute_date'] = ts('Absolute date cannot be earlier than the current time.');
