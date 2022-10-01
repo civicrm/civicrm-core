@@ -405,6 +405,11 @@ class CRM_Contribute_Form_AdditionalInfo {
         if ($groupID == 'info') {
           continue;
         }
+
+        $is_public = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupID, 'is_public');
+        if (!$is_public) {
+          continue;
+        }
         foreach ($group['fields'] as $k => $field) {
           $field['title'] = $field['label'];
           $customFields["custom_{$k}"] = $field;
