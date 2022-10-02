@@ -159,9 +159,20 @@ class FormattingUtil {
       case 'LIKE':
       case 'NOT LIKE':
         $operator = ($operator === '=' || $operator === 'LIKE') ? 'BETWEEN' : 'NOT BETWEEN';
-        return [self::formatDateValue($format, $dateFrom), self::formatDateValue($format, $dateTo)];
 
-      // Less-than or greater-than-equal-to comparisons use the lower value
+        if (is_null($dateFrom) && !is_null($dateTo)) {
+          $operator = '<=';
+          return self::formatDateValue($format, $dateTo);
+        }
+        elseif (!is_null($dateFrom) && is_null($dateTo)) {
+          $operator = '>=';
+          return self::formatDateValue($format, $dateFrom);
+        }
+        else {
+          return [self::formatDateValue($format, $dateFrom), self::formatDateValue($format, $dateTo)];
+        }
+
+        // Less-than or greater-than-equal-to comparisons use the lower value
       case '<':
       case '>=':
         return self::formatDateValue($format, $dateFrom);
