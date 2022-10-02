@@ -161,11 +161,11 @@ class FormattingUtil {
         $operator = ($operator === '=' || $operator === 'LIKE') ? 'BETWEEN' : 'NOT BETWEEN';
 
         if (is_null($dateFrom) && !is_null($dateTo)) {
-          $operator = '<=';
+          $operator = ($operator === 'BETWEEN') ? '<=' : '>=';
           return self::formatDateValue($format, $dateTo);
         }
         elseif (!is_null($dateFrom) && is_null($dateTo)) {
-          $operator = '>=';
+          $operator = ($operator === 'BETWEEN') ? '>=' : '<=';
           return self::formatDateValue($format, $dateFrom);
         }
         else {
