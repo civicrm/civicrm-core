@@ -1,0 +1,357 @@
+/* The Bootstrap typically bundled has been re-structured in River Lea:	
+	- Some of it that wasn't being used (e.g. Glyphicons, Carousels) is deleted / commented out
+	- Some of it is taken out of the #bootstrap-theme namespace and added to /components/ typically marked, e.g. 'BS alerts'
+	- Some of it has been taken out and put below with as much integration with the rest of River Lea's CSS variables.
+	- The rest of it sits in _bootstrap3.css, an ever-shrinking version of the original Civi Bootstrap file.
+*/
+
+@import url(_bootstrap3.css);
+
+/* 
+	  TYPE 
+	  		*/
+
+#bootstrap-theme .help-block {
+	display: block;
+	color: var(--crm-c-text);
+	font-style: var(--crm-italic-style);
+	font-family: var(--crm-font-italic);
+	margin: var(--crm-s) 0 var(--crm-m);
+	font-size: var(--crm-font-small-size);
+}
+/* #bootstrap-theme h1, #bootstrap-theme .h1, #bootstrap-theme h2, #bootstrap-theme .h2, #bootstrap-theme h3, #bootstrap-theme .h3 {
+	margin-top: var(--crm-r2);
+	margin-bottom: var(--crm-m1);
+	font-weight: var(--crm-bold-weight);
+	font-family: var(--crm-font-bold);
+} */
+#bootstrap-theme h1 small, #bootstrap-theme h1 .small, #bootstrap-theme .h1 small, #bootstrap-theme .h1 .small, #bootstrap-theme h2 small, #bootstrap-theme h2 .small, #bootstrap-theme .h2 small, #bootstrap-theme .h2 .small, #bootstrap-theme h3 small, #bootstrap-theme h3 .small, #bootstrap-theme .h3 small, #bootstrap-theme .h3 .small {
+	font-size: 65%;
+}
+#bootstrap-theme h4, #bootstrap-theme .h4, #bootstrap-theme h5, #bootstrap-theme .h5, #bootstrap-theme h6, #bootstrap-theme .h6 {
+	margin-top: var(--crm-m1);
+	margin-bottom: var(--crm-m1);
+	font-weight: var(--crm-bold-weight);
+	font-family: var(--crm-font-bold);
+	color: var(--crm-c-text);
+}
+#bootstrap-theme h4 small, #bootstrap-theme h4 .small, #bootstrap-theme .h4 small, #bootstrap-theme .h4 .small, #bootstrap-theme h5 small, #bootstrap-theme h5 .small, #bootstrap-theme .h5 small, #bootstrap-theme .h5 .small, #bootstrap-theme h6 small, #bootstrap-theme h6 .small, #bootstrap-theme .h6 small, #bootstrap-theme .h6 .small {
+	font-size: 75%;
+}
+
+/* 
+      ALERTS
+            	*/
+
+#bootstrap-theme .alert h4 {
+    margin-top: 0;
+    color: inherit;
+}
+#bootstrap-theme .alert .alert-link {
+    font-weight: bold;
+}
+#bootstrap-theme .alert > p, #bootstrap-theme .alert > ul {
+    margin-bottom: 0;
+}
+#bootstrap-theme .alert > p + p {
+    margin-top: 5px;
+}
+#bootstrap-theme .alert-success hr {
+	border-top-color: #c9e2b3;
+}
+#bootstrap-theme .alert-success .alert-link {
+	color: var(--crm-alert-border-help);
+}
+#bootstrap-theme .alert-info hr {
+	border-top-color: #a6e1ec;
+}
+#bootstrap-theme .alert-info .alert-link {
+	color: var(--crm-alert-border-info);
+}
+#bootstrap-theme .alert-warning hr {
+	border-top-color: #f8e5be;
+}
+#bootstrap-theme .alert-warning .alert-link {
+	color: var(--crm-alert-border-warning);
+}
+#bootstrap-theme .alert-danger hr {
+	border-top-color: #e6c1c7;
+}
+#bootstrap-theme .alert-danger .alert-link {
+	color: var(--crm-alert-border-danger);
+}
+
+/*
+      BUTTONS
+                */
+
+/* Namespaced attributes */
+
+#bootstrap-theme .btn-link {
+	font-weight: 400;
+	color: var(--crm-c-link);
+	border-radius: 0;
+}
+#bootstrap-theme .btn-link, #bootstrap-theme .btn-link:active, #bootstrap-theme .btn-link.active, #bootstrap-theme .btn-link[disabled], fieldset[disabled] #bootstrap-theme .btn-link {
+	background-color: transparent;
+	box-shadow: none;
+}
+#bootstrap-theme .btn-link, #bootstrap-theme .btn-link:hover, #bootstrap-theme .btn-link:focus, #bootstrap-theme .btn-link:active {
+	border-color: transparent;
+}
+#bootstrap-theme .btn-link:hover, #bootstrap-theme .btn-link:focus {
+	color: var(--crm-c-link-hover);
+	text-decoration: var(--crm-link-decoration);
+	background-color: transparent;
+}
+#bootstrap-theme .btn-link[disabled]:hover, #bootstrap-theme .btn-link[disabled]:focus, fieldset[disabled] #bootstrap-theme .btn-link:hover, fieldset[disabled] #bootstrap-theme .btn-link:focus {
+	color: var(--crm-c-gray-800);
+	text-decoration: none;
+}
+#bootstrap-theme .input-group-addon {
+	padding: var(--crm-input-padding);
+	font-size: var(--crm-input-font-size);
+	font-weight: normal;
+	line-height: inherit;
+	color: var(--crm-input-color);
+	text-align: left;
+	background-color: var(--crm-input-background);
+	width: 100%;
+	border-radius: var(--crm-roundness);
+}
+#bootstrap-theme .has-success .form-control {
+	border-color: var(--crm-c-green-dark);
+}
+#bootstrap-theme .has-success .form-control:focus {
+	border-color: var(--crm-c-green-dark);
+}
+#bootstrap-theme .has-success .input-group-addon {
+	color: var(--crm-c-green-dark);
+	background-color: var(--crm-c-green-light);
+	border-color: var(--crm-c-green);
+}
+#bootstrap-theme .has-success .form-control-feedback {
+	color: var(--crm-c-green);
+}
+#bootstrap-theme .has-warning .form-control {
+	border-color: var(--crm-c-warning);
+}
+#bootstrap-theme .has-warning .form-control:focus {
+	border-color: var(--crm-c-warning);
+}
+#bootstrap-theme .has-warning .input-group-addon {
+	color: var(--crm-c-warning);
+	background-color: var(--crm-c-amber-light);
+	border-color: var(--crm-c-warning);
+}
+#bootstrap-theme .has-warning .form-control-feedback {
+	color: var(--crm-c-warning);
+}
+#bootstrap-theme .has-error .form-control,
+#bootstrap-theme .has-error .form-control a.select2-default {
+	border-color: var(--crm-c-alert);
+}
+#bootstrap-theme .has-error .form-control:focus {
+	border-color:  var(--crm-c-alert);
+}
+#bootstrap-theme .has-error .input-group-addon {
+	color:  var(--crm-c-alert);
+	background-color: # var(--crm-c-red-light);
+	border-color:  var(--crm-c-alert);
+}
+#bootstrap-theme .has-error .form-control-feedback {
+	color:  var(--crm-c-alert);
+}
+
+/* 
+    LABELS
+            */
+
+#bootstrap-theme .label-primary,
+#bootstrap-theme .label-warning,
+#bootstrap-theme .label-success,
+#bootstrap-theme .label-default,
+#bootstrap-theme .label-info,
+#bootstrap-theme .label-danger {
+	display: inline;
+	padding: var(--crm-btn-small-padding);
+	font-weight: var(--crm-bold-weight);
+	color: var(--crm-c-light-text);
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: baseline;
+	border-radius: var(--crm-roundness);
+}
+#bootstrap-theme .label:empty {
+	display: none;
+}
+.btn #bootstrap-theme .label {
+	position: relative;
+	top: -1px;
+}
+#bootstrap-theme a.label:hover, #bootstrap-theme a.label:focus {
+	color: var(--crm-c-light-text);
+	text-decoration: none;
+	cursor: pointer;
+}
+#bootstrap-theme .label-default {
+	background-color: var(--crm-c-text);
+    color: var(--crm-c-light-text);
+}
+#bootstrap-theme .label-default[href]:hover, #bootstrap-theme .label-default[href]:focus {
+	background-color: var(--crm-c-background4);
+}
+#bootstrap-theme .label-primary {
+	background: var(--crm-c-primary);
+    color: var(--crm-c-primary-text);
+}
+#bootstrap-theme .label-primary[href]:hover, #bootstrap-theme .label-primary[href]:focus {
+	background: var(--crm-c-primary-hover);
+}
+#bootstrap-theme .label-success {
+	background: var(--crm-c-success);
+    color: var(--crm-c-success-text);
+}
+#bootstrap-theme .label-success[href]:hover, #bootstrap-theme .label-success[href]:focus {
+	background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-success);
+}
+#bootstrap-theme .label-info {
+	background: var(--crm-c-info);
+    color: var(--crm-c-info-text);
+}
+#bootstrap-theme .label-info[href]:hover, #bootstrap-theme .label-info[href]:focus {
+	background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-info);
+}
+#bootstrap-theme .label-warning {
+	background: var(--crm-c-warning);
+    color: var(--crm-c-warning-text);
+}
+#bootstrap-theme .label-warning[href]:hover, #bootstrap-theme .label-warning[href]:focus {
+	background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-warning);
+}
+#bootstrap-theme .label-danger {
+	background: var(--crm-c-alert);
+    color: var(--crm-c-alert-text);
+}
+#bootstrap-theme .label-danger[href]:hover, #bootstrap-theme .label-danger[href]:focus {
+	background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
+}
+
+/* PANELS */
+
+/* With list groups - https://getbootstrap.com/docs/3.4/components/#panels-list-group */
+
+
+#bootstrap-theme .panel > .panel-heading + .panel-collapse > .list-group .list-group-item:first-child {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+#bootstrap-theme .panel-heading + .list-group .list-group-item:first-child {
+	border-top-width: 0;
+}
+#bootstrap-theme .list-group + .panel-footer {
+	border-top-width: 0;
+}
+#bootstrap-theme .panel > .list-group,
+#bootstrap-theme .panel > .panel-collapse > .list-group {
+	margin-bottom: 0;
+}
+#bootstrap-theme .panel > .list-group .list-group-item, #bootstrap-theme .panel > .panel-collapse > .list-group .list-group-item {
+	border-width: 1px 0;
+	border-radius: 0;
+}
+#bootstrap-theme .panel > .list-group:first-child .list-group-item:first-child, #bootstrap-theme .panel > .panel-collapse > .list-group:first-child .list-group-item:first-child {
+	border-top: 0;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+}
+#bootstrap-theme .panel > .list-group:last-child .list-group-item:last-child, #bootstrap-theme .panel > .panel-collapse > .list-group:last-child .list-group-item:last-child {
+	border-bottom: 0;
+	border-bottom-right-radius: 3px;
+	border-bottom-left-radius: 3px;
+}
+
+/* With tables - https://getbootstrap.com/docs/3.4/components/#panels-tables */
+
+#bootstrap-theme .panel > .table, #bootstrap-theme .panel > .table-responsive > .table, #bootstrap-theme .panel > .panel-collapse > .table {
+	margin-bottom: 0;
+}
+#bootstrap-theme .panel > .table caption, #bootstrap-theme .panel > .table-responsive > .table caption, #bootstrap-theme .panel > .panel-collapse > .table caption {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+#bootstrap-theme .panel > .table:first-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child {
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+}
+#bootstrap-theme .panel > .table:first-child > thead:first-child > tr:first-child, #bootstrap-theme .panel > .table:first-child > tbody:first-child > tr:first-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child {
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+}
+#bootstrap-theme .panel > .table:first-child > thead:first-child > tr:first-child td:first-child, #bootstrap-theme .panel > .table:first-child > thead:first-child > tr:first-child th:first-child, #bootstrap-theme .panel > .table:first-child > tbody:first-child > tr:first-child td:first-child, #bootstrap-theme .panel > .table:first-child > tbody:first-child > tr:first-child th:first-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:first-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:first-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:first-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:first-child {
+	border-top-left-radius: 3px;
+}
+#bootstrap-theme .panel > .table:first-child > thead:first-child > tr:first-child td:last-child, #bootstrap-theme .panel > .table:first-child > thead:first-child > tr:first-child th:last-child, #bootstrap-theme .panel > .table:first-child > tbody:first-child > tr:first-child td:last-child, #bootstrap-theme .panel > .table:first-child > tbody:first-child > tr:first-child th:last-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child td:last-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child > thead:first-child > tr:first-child th:last-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child td:last-child, #bootstrap-theme .panel > .table-responsive:first-child > .table:first-child > tbody:first-child > tr:first-child th:last-child {
+	border-top-right-radius: 3px;
+}
+#bootstrap-theme .panel > .table:last-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child {
+	border-bottom-right-radius: 3px;
+	border-bottom-left-radius: 3px;
+}
+#bootstrap-theme .panel > .table:last-child > tbody:last-child > tr:last-child, #bootstrap-theme .panel > .table:last-child > tfoot:last-child > tr:last-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child {
+	border-bottom-right-radius: 3px;
+	border-bottom-left-radius: 3px;
+}
+#bootstrap-theme .panel > .table:last-child > tbody:last-child > tr:last-child td:first-child, #bootstrap-theme .panel > .table:last-child > tbody:last-child > tr:last-child th:first-child, #bootstrap-theme .panel > .table:last-child > tfoot:last-child > tr:last-child td:first-child, #bootstrap-theme .panel > .table:last-child > tfoot:last-child > tr:last-child th:first-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:first-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:first-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:first-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:first-child {
+	border-bottom-left-radius: 3px;
+}
+#bootstrap-theme .panel > .table:last-child > tbody:last-child > tr:last-child td:last-child, #bootstrap-theme .panel > .table:last-child > tbody:last-child > tr:last-child th:last-child, #bootstrap-theme .panel > .table:last-child > tfoot:last-child > tr:last-child td:last-child, #bootstrap-theme .panel > .table:last-child > tfoot:last-child > tr:last-child th:last-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child td:last-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child > tbody:last-child > tr:last-child th:last-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child td:last-child, #bootstrap-theme .panel > .table-responsive:last-child > .table:last-child > tfoot:last-child > tr:last-child th:last-child {
+	border-bottom-right-radius: 3px;
+}
+#bootstrap-theme .panel > .panel-body + .table, #bootstrap-theme .panel > .panel-body + .table-responsive, #bootstrap-theme .panel > .table + .panel-body, #bootstrap-theme .panel > .table-responsive + .panel-body {
+	border-top: 1px solid #ddd;
+}
+#bootstrap-theme .panel > .table > tbody:first-child > tr:first-child th, #bootstrap-theme .panel > .table > tbody:first-child > tr:first-child td {
+	border-top: 0;
+}
+
+#bootstrap-theme .panel > .table-bordered, #bootstrap-theme .panel > .table-responsive > .table-bordered {
+	border: 0;
+}
+
+#bootstrap-theme .panel > .table-bordered > thead > tr > th:first-child, #bootstrap-theme .panel > .table-bordered > thead > tr > td:first-child, #bootstrap-theme .panel > .table-bordered > tbody > tr > th:first-child, #bootstrap-theme .panel > .table-bordered > tbody > tr > td:first-child, #bootstrap-theme .panel > .table-bordered > tfoot > tr > th:first-child, #bootstrap-theme .panel > .table-bordered > tfoot > tr > td:first-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr > th:first-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr > td:first-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr > th:first-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr > td:first-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr > th:first-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr > td:first-child {
+	border-left: 0;
+}
+
+#bootstrap-theme .panel > .table-bordered > thead > tr > th:last-child, #bootstrap-theme .panel > .table-bordered > thead > tr > td:last-child, #bootstrap-theme .panel > .table-bordered > tbody > tr > th:last-child, #bootstrap-theme .panel > .table-bordered > tbody > tr > td:last-child, #bootstrap-theme .panel > .table-bordered > tfoot > tr > th:last-child, #bootstrap-theme .panel > .table-bordered > tfoot > tr > td:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr > th:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr > td:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr > th:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr > td:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr > th:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr > td:last-child {
+	border-right: 0;
+}
+#bootstrap-theme .panel > .table-bordered > thead > tr:first-child > td, #bootstrap-theme .panel > .table-bordered > thead > tr:first-child > th, 
+#bootstrap-theme .panel > .table-bordered > tbody > tr:first-child > td, #bootstrap-theme .panel > .table-bordered > tbody > tr:first-child > th, 
+#bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr:first-child > td, 
+#bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr:first-child > th, 
+#bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:first-child > td, 
+#bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:first-child > th,
+#bootstrap-theme .panel > .table-bordered > tbody > tr:last-child > td, 
+#bootstrap-theme .panel > .table-bordered > tbody > tr:last-child > th, 
+#bootstrap-theme .panel > .table-bordered > tfoot > tr:last-child > td, 
+#bootstrap-theme .panel > .table-bordered > tfoot > tr:last-child > th, 
+#bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:last-child > td, 
+#bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:last-child > th, 
+#bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr:last-child > td, 
+#bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr:last-child > th {
+	border-bottom: 0;
+}
+#bootstrap-theme .panel > .table-responsive {
+	margin-bottom: 0;
+	border: 0;
+}
+
+/*
+	NAV
+			*/
+#bootstrap-theme .navbar-default {
+	background-color: var(--crm-c-darkest);
+	border-color: var(--crm-c-darkest);
+	color: var(--crm-c-light-text);
+}

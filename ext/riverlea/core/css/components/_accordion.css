@@ -1,0 +1,135 @@
+.crm-container details {
+	background-color: unset;
+}
+.crm-container details ~ details {
+	margin: var(--crm-expand-gap);
+}
+.crm-container details details {
+	padding: 0 var(--crm-expand-gap);
+}
+.crm-container summary { /* default summary setting*/
+	display: list-item;
+	list-style: none;
+	cursor: var(--crm-hover-clickable);
+	font-size: var(--crm-font-size);
+	padding: var(--crm-m2) var(--crm-m3);
+	font-family: var(--crm-font-bold);
+	font-weight: var(--crm-bold-weight);
+	color: var(--crm-c-text);
+}
+.crm-container table summary { /* Makes summary match the size of the rest of the table it's in */
+	font-size: inherit;
+}
+.crm-container summary::-webkit-details-marker { /* Safari fix to remove summary icon */
+	display: none;
+}
+.crm-container .crm-accordion-bold {
+	background-color: var(--crm-expand-body-bg);
+	border-radius: var(--crm-roundness);
+	margin: var(--crm-expand-gap);
+}
+.crm-container .crm-accordion-bold > summary {
+	background-color: var(--crm-expand-header-bg);
+	color: var(--crm-expand-header-color);
+	border-radius: var(--crm-roundness);	
+	border: var(--crm-expand-header-border);
+	border-width: var(--crm-expand-header-border-width);
+	font-weight: var(--crm-expand-header-weight);
+	padding: var(--crm-expand-header-padding);
+}
+.crm-container .crm-accordion-bold > summary a {
+	color: var(--crm-expand-header-color);
+}
+.crm-container .crm-accordion-bold[open] > summary { /* open version of that */
+	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0; 
+}
+.crm-container .crm-accordion-bold > summary.active,
+.crm-container .crm-accordion-bold > summary:hover,
+.crm-container .crm-accordion-bold > summary:focus { /* hover version of that */
+	background-color: var(--crm-expand-header-bg-active);
+}
+.crm-container details.crm-accordion-bold > .crm-accordion-body {
+	padding: var(--crm-expand-body-padding);
+	border: var(--crm-expand-body-border);
+	border-width: var(--crm-expand-border-width);
+	border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
+	box-shadow: var(--crm-expand-body-box-shadow);
+	animation: crm-details-show .3s ease-in-out;
+}
+/* Simple fix for details without a summary element */
+.crm-container details.crm-accordion-bold:not( > summary) {
+	border: var(--crm-expand-body-border);
+	padding: var(--crm-expand-body-padding);
+}
+.crm-container details.crm-accordion-bold:not( > summary) {
+	border: 0;
+	padding: 0;
+}
+.crm-container details.crm-accordion-light > .crm-accordion-body {
+	padding: var(--crm-expand-body-padding);
+}
+.crm-container .CRM_Contact_Form_Search_Advanced details.crm-accordion-light > .crm-accordion-body {
+	padding: var(--crm-expand-2-body-padding)
+}
+.crm-container .crm-accordion-light {
+	border: var(--crm-expand-2-border);
+	border-radius: var(--crm-roundness);
+}
+.crm-container .crm-accordion-light > summary {
+	font-family: var(--crm-font);
+	font-weight: var(--crm-expand-header2-weight);
+	background-color: var(--crm-expand-header2-bg);
+	color: var(--crm-expand-header2-color);
+}
+.crm-container .crm-accordion-light > summary.active { /* active version of that */
+	font-family: var(--crm-font-bold);
+	font-weight: var(--crm-bold-weight);
+}
+.crm-container .crm-accordion-light > summary a {
+	color: var(--crm-expand-header2-color);
+}
+/* Contact dashboard */
+
+#contact-summary details,
+#contact-summary .crm-accordion-light > summary,
+#contact-summary .crm-accordion-light > summary.active,
+#contact-summary .crm-accordion-light > summary:hover,
+#contact-summary .crm-accordion-light > summary:focus,
+#Contact .crm-accordion-light > summary,
+#Contact .crm-accordion-light > summary:hover,
+#Contact .crm-accordion-light > summary:focus {
+	box-shadow: none;
+	border: 0 solid transparent;
+	background-color: transparent;
+	color: var(--crm-c-text);
+}
+#contact-summary details .crm-summary-block {
+	box-shadow: var(--crm-block-shadow);
+	margin-bottom: 0;
+}
+#contact-summary summary {
+	padding: var(--crm-m) !important;
+} 
+#contact-summary details .crm-accordion-body {
+	box-shadow: none;
+}
+/* Expand/collapse icons */
+
+.crm-container details > summary::before {
+	font-size: var(--crm-font-size);
+	content: var(--crm-expand-icon);
+	color: var(--crm-expand-icon-color);
+	font-style: normal;
+	line-height: 1.35;
+	font-family: FontAwesome;
+	text-rendering: auto;
+	text-indent: inherit;
+	margin-right: var(--crm-expand-icon-spacing);
+	display: inline-block;
+	transform-origin: center center;
+	transition: var(--crm-expand-transition);
+}
+.crm-container details[open] > summary::before {
+	transform: var(--crm-expand-transform);
+	transition: var(--crm-expand-transition);
+}

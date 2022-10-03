@@ -1,0 +1,770 @@
+/* Form parts */
+
+.crm-container div.crm-field-wrapper {
+    margin-bottom: var(--crm-r);
+}
+.crm-container table.form-layout td, 
+.crm-container table.form-layout-compressed td,
+.crm-form-block .crm-section {
+    padding: var(--crm-m) var(--crm-s);
+    border: none !important /* vs contactSummary.css */;
+    height: auto;
+}
+.crm-container div.form-layout-compressed {
+    display: flex;
+    gap: var(--crm-s);
+    padding: var(--crm-r) 0;
+    align-items: center;
+}
+.crm-container .crm-results-block-empty {
+    margin: var(--crm-padding-reg) 0;
+}
+
+/* Labels */
+.crm-container .form-layout td.label, 
+.crm-container .form-layout-compressed td.label, 
+.crm-container .selector td.label, 
+.crm-container .form-layout-compressed th.label {
+    width: var(--crm-input-label-width);
+    text-align: var(--crm-input-label-align);
+    padding: var(--crm-m2) var(--crm-m2) 0 0;
+    font-family: var(--crm-input-label-font);
+    font-weight: var(--crm-input-label-weight);
+}
+.crm-container .crm-summary-group .crm-section .label,
+.crm-container label {
+    text-align: left;
+    font-family: var(--crm-input-label-font);
+    font-weight: var(--crm-input-label-weight);
+    padding-right: var(--crm-m2);
+}
+.crm-container .label > label { /* Fix for dble label specification */
+    padding-right: 0;
+    text-align: unset;
+}
+.crm-container .crm-summary-group .crm-section .label {
+    width: 40%;
+}
+.crm-container .radio-inline label, 
+.crm-container .checkbox-inline label {
+    font-family: inherit;
+    font-weight: inherit;
+}
+.crm-container .advanced-search-fields {
+    column-gap: var(--crm-r);
+    row-gap: var(--crm-s);
+}
+.crm-container .form-layout label,
+.crm-container .form-layout-compressed label, 
+.crm-container .form-item label, 
+.crm-container .crm-accordion-body label, 
+.crm-container .crm-form-block label, 
+.crm-container #task-section label {
+    color: var(--crm-c-text);
+    font-family: var(--crm-input-label-font);
+    font-weight: var(--crm-input-label-weight);
+    font-size: var(--crm-input-label-size) !important; /* vs civiMail/ang/crmMailing.css */
+    display: inline-block;
+    margin-bottom: var(--crm-s);
+}
+.crm-container .form-layout td.label label {
+    margin-bottom: 0;
+}
+.crm-container .form-layout label {
+    width: var(--crm-input-label-width);
+}
+.crm-container .description:not(#help),
+.crm-container td.description {
+    color: var(--crm-input-description);
+    font-size: var(--crm-input-label-size);
+}
+.crm-container .crm-marker {
+    color: var(--crm-c-alert);
+}
+.crm-container .form-inline {
+    padding: var(--crm-s) 0;
+}
+.crm-search-display .form-inline {
+    padding: var(--crm-padding-reg) 0;
+}
+.crm-container td.label:has(.helpicon) {
+    display: flex;
+    gap: var(--crm-m);
+    align-items: center;
+    padding-right: 0;
+    justify-content: var(--crm-input-label-align);
+}
+/* Fieldset */
+.crm-container fieldset:not(.collapsed, .crm-inactive-dashlet-fieldset) {
+    padding: var(--crm-fieldset-padding);
+    margin: var(--crm-padding-reg) 0;
+    border: 1px solid var(--crm-fieldset-border-color);
+    border-width: var(--crm-fieldset-border);
+}
+.crm-container fieldset legend {
+    font-weight: var(--crm-bold-weight);
+    font-family: var(--crm-font-bold);
+    padding-inline: var(--crm-m);
+    color: var(--crm-c-text);
+}
+/* Required Mark */
+.crm-container .required-mark::after {
+    color: var(--crm-c-alert);
+    content: "*";
+    margin-left: var(--crm-s);
+}
+/* Input */
+
+.crm-container input.form-control,
+input.crm-form-text, 
+.crm-icon-picker-button, 
+.crm-container input.dateplugin, 
+input.crm-form-password,
+.crm-container .replace-plain, 
+.crm-container textarea, 
+select.crm-form-multiselect,
+select.crm-form-select, 
+.crm-container .ui-widget input,
+.crm-container select[aria-controls],
+.ui-datepicker .ui-datepicker-header select {
+    transition: var(--crm-input-active-ani);
+    font-size: var(--crm-input-font-size);
+    background-color: var(--crm-input-background);
+    border-radius: var(--crm-input-border-radius);
+    box-shadow: var(--crm-input-box-shadow);
+    color: var(--crm-input-color);
+    border: 1px solid var(--crm-input-border-color);
+    padding: var(--crm-input-padding);
+    background-image: var(--crm-background-image);
+    height: var(--crm-input-height);
+    width: var(--crm-big-input);
+    font-family: inherit; /* for extra JQuery UI protection */
+}
+.crm-container .replace-plain, 
+.crm-container textarea, 
+select.crm-form-multiselect {
+    padding: var(--crm-input-padding-large);
+    height: auto;
+    min-height: var(--crm-input-height);
+}
+.crm-container input.crm-form-color {
+    width: var(--crm-input-height);
+    padding: 0;
+    border: 1px solid var(--crm-c-darkest);
+}
+.crm-container .replace-plain {
+    background-color: var(--crm-c-background3);
+    min-width: var(--crm-huge-input);
+}
+.crm-container input.form-control:focus,
+input.crm-form-text:focus, 
+.crm-icon-picker-button:focus, 
+.crm-container input.dateplugin:focus, 
+input.crm-form-password:focus,
+.crm-container .replace-plain:focus,
+.crm-container textarea:focus,
+select.crm-form-multiselect:focus,
+select.crm-form-select:focus, 
+.crm-container select[aria-controls]:focus,
+.crm-container .select2-container-active *:focus {
+    border-color: var(--crm-c-focus);
+    outline: 0;
+}
+.crm-container input.error,
+input.crm-error,
+select.crm-error {
+    border-color: var(--crm-c-alert);
+}
+.crm-container :focus, 
+.crm-container .ui-dialog :focus {
+    box-shadow: none;
+    border: 1px solid var(--crm-c-focus);
+}
+.crm-container .big {
+    width: var(--crm-big-input);
+}
+.crm-container .huge, 
+input.crm-form-autocomplete, 
+input.crm-form-entityref {
+    width: var(--crm-huge-input);
+}
+.crm-container input.crm-placeholder-icon::placeholder {
+    font-family: "FontAwesome";
+    text-align: right;
+}
+.crm-icon-picker-button {
+    margin: 0 0 var(--crm-s);
+}
+.crm-container .crm-form-number {
+    width: 8ch;
+}
+
+/* Inline edit */
+
+.crm-edit-ready .crm-inline-edit:hover {
+    cursor: var(--crm-hover-clickable);
+    border: var(--crm-dash-edit-border);
+}
+.crm-inline-edit {
+    border: var(--crm-dash-edit-border);
+    border-color: transparent;
+    background: none;
+}
+.crm-container .crm-editable-form {
+    display: flex;
+}
+.crm-container .crm-editable-form input {
+    height: var(--crm-input-height);
+    box-shadow: var(--crm-input-box-shadow);
+    padding: var(--crm-input-padding);
+    font-size: var(--crm-input-font-size);
+}
+.crm-container .crm-editable-form button {
+    background: transparent;
+    padding: var(--crm-padding-small);
+}
+.crm-container .crm-editable-form [type="submit"] {
+    color: var(--crm-c-success) !important;
+}
+.crm-container .crm-editable-form [type="cancel"] {
+    color: var(--crm-c-alert) !important;
+}
+
+/* Contact Summary (.contactSummary.css) */
+
+#contact-summary .crm-summary-block {
+    background: var(--crm-dash-block-bg);
+    border-radius: var(--crm-roundness);
+    box-shadow: var(--crm-block-shadow);
+    margin-bottom: var(--crm-dash-panel-padding);
+}
+#contact-summary .crm-summary-block .crm-summary-block {
+    box-shadow: none;
+}
+#contact-summary div.crm-clear {
+    padding: var(--crm-dash-block-padding);
+}
+.crm-container div.crm-summary-row {
+    background-color: var(--crm-dash-summary-row-bg) !important; /* vs contactSummary.css */
+    border-top: 1px solid var(--crm-dash-summary-row-bg) !important; /* vs contactSummary.css */
+    display: flex;
+}
+#contact-summary div.crm-summary-row div.crm-label {
+    background-color: var(--crm-dash-label-bg) !important; /* vs contactSummary.css */
+    color: var(--crm-c-text) !important; /* vs contactSummary.css */
+    padding: var(--crm-m) !important; /* vs contactSummary.css */
+    font-weight: var(--crm-bold-weight);
+    font-family:  var(--crm-font-bold);
+    font-size: var(--crm-font-size);
+    width: var(--crm-input-label-width) !important; /* vs contactSummary.css */
+}
+#crm-container div.crm-summary-row div.crm-content{
+    padding: var(--crm-m) !important; /* vs contactSummary.css */
+    margin-left: unset !important; /* vs contactSummary.css */
+}
+.crm-container div.contact_panel table {
+    width: auto;
+}
+#crm-container div.crm-summary-block .crm-edit-help {
+    display: block !important; /* vs contactSummary.css */
+    background-color: transparent !important;
+    border-radius: 0 !important;
+}
+#contact-summary .crm-edit-help {
+    float: right;
+    color: transparent;
+}
+#contact-summary .crm-edit-help .crm-i.fa-pencil {
+    float: right;
+    color: var(--crm-c-text);
+    margin: var(--crm-xs) 0 0 var(--crm-m);
+}
+#contact-summary .crm-inline-edit {
+    border: 2px dashed transparent !important /*vs contactSummary.css*/;
+}
+#contact-summary .crm-inline-edit:hover .crm-edit-help {
+    color: var(--crm-c-text);
+    background-color: var(--crm-c-background3) !important;
+    border-radius: 0;
+}
+#contact-summary #tags {
+    display: flex;
+    gap: var(--crm-s);
+    align-items: center;
+}
+#contact-summary .crm-tag-item {
+    border-radius: var(--crm-roundness);
+    padding: 0 var(--crm-s);
+    background-color: var(--crm-c-background2);
+}
+/* Inline edit - contact */
+
+#contactname-block .crm-inline-edit {
+    border: 0 solid transparent;
+}
+div.crm-inline-edit.form {
+    border: 1px solid var(--crm-c-focus);
+    border-radius: var(--crm-roundness);
+    width: fit-content;
+    float: none;    
+    padding: var(--crm-r);
+    background: var(--crm-inline-edit-bg);
+}
+#crm-contactname-content.crm-inline-edit.form {
+    background: var(--crm-inline-edit-bg) !important /* vs contactSummary */;
+}
+.crm-inline-edit.form td {
+    background: transparent;
+    padding: var(--crm-m);
+    border-bottom: 0 solid transparent;
+}
+.CRM_Contact_Form_Inline_ContactName div.crm-inline-edit-form {
+    white-space: nowrap;
+    padding: var(--crm-dash-block-padding);
+    display: flex;
+    color: var(--crm-c-text);
+    background-color: var(--crm-inline-edit-bg) !important /* vs contactSummary */;
+}
+table.crm-inline-edit-form td, 
+div.crm-inline-edit-form,
+#crm-container div.crm-inline-edit.form {
+    background-color: transparent !important /*vs contactSummary.css*/;
+}
+div.crm-inline-edit-form div.crm-clear {
+    padding: var(--crm-m) 0 0;
+}
+.crm-inline-edit-form div.crm-summary-row {
+    border: 0 solid transparent;
+}
+.crm-inline-edit-form div.crm-summary-row div.crm-label,
+.crm-inline-edit-form div.crm-summary-row .label {
+    float: none;
+    width: auto;
+    padding: var(--crm-m) 0 var(--crm-s);
+    background: transparent;
+}
+.crm-inline-edit-form div.crm-summary-row div.crm-content {
+    display: table-cell;
+    padding: 0;
+}
+#contact-summary .crm-inline-button, 
+#contact-summary .crm-submit-buttons {
+    margin-bottom: 0;
+    padding-bottom: var(--crm-m2);
+}
+.CRM_Contact_Form_Inline_ContactName .crm-inline-button {
+    margin-left: auto;
+    order: 2;
+    align-self: end;
+}
+
+/* Checkboxes & radios */
+
+input.crm-form-radio + label, 
+input.crm-form-checkbox + label,
+.crm-container input[type="checkbox"] + label[for], 
+.crm-container input[type="radio"] + label[for] {
+    margin: 0 var(--crm-m) 0 var(--crm-s);
+    cursor: var(--crm-hover-clickable);
+    width: unset;
+}
+.crm-container input[type="checkbox"], 
+.crm-container input[type="radio"] {
+    accent-color: var(--crm-input-radio-color);
+    margin: -2px 4px 0 0;
+    width: inherit;
+}
+/* Checkbox/radio fields with n-per-line. See https://lab.civicrm.org/dev/core/-/issues/4985 */
+.crm-container .crm-multiple-checkbox-radio-options {
+    --gap: 1em;
+    --checkbox-width: 2em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+}
+/* Override more general styling */
+.crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
+input.crm-form-checkbox) + label {
+    margin-left: 0;
+}
+.crm-container .crm-multiple-checkbox-radio-options .crm-option-label-pair {
+    display: grid;
+    grid-template-columns: var(--checkbox-width) 1fr;
+    align-items: baseline;
+}
+.crm-container .crm-multiple-checkbox-radio-options.crm-options-per-line .crm-option-label-pair {
+    flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--gap)) / var(--crm-opts-per-line));
+}
+/* Slider */
+.crm-container .ui-slider {
+    background: var(--crm-c-background4);
+}
+.crm-container .ui-slider .ui-slider-handle {
+    border: 0;
+    background: var(--crm-c-background5);
+}
+
+/* Select2 */
+
+.crm-container .select2-container:not(.select2-container-multi,.collapsible-optgroups) {
+    width: auto;
+    max-width: 100%;
+}
+.crm-container .select2-container-multi {
+    min-width: 96px;
+    max-width: 100%;
+}
+.crm-container select.form-control,
+.crm-container .select2-container-multi .select2-choices,
+.crm-container .select2-container .select2-choice {
+    background: var(--crm-input-background);
+    border: 1px solid var(--crm-input-border-color);   
+    border-radius: var(--crm-input-border-radius);
+    box-shadow: var(--crm-input-box-shadow);
+    height: var(--crm-input-height) !important /* vs select2.min.css */;
+    padding: var(--crm-xs1) var(--crm-r2) var(--crm-xs1) var(--crm-m);
+    font-size: var(--crm-input-font-size);
+    color: var(--crm-input-color);
+}
+.crm-container .select2-container .select2-choice .select2-arrow {
+    background: var(--crm-input-background);
+    border-left-color: var(--crm-input-border-color);  
+    border-radius: 0 var(--crm-input-border-radius) var(--crm-input-border-radius) 0;
+    text-align: center;
+    width: var(--crm-r3);
+}
+.crm-container .select2-container .select2-choice .select2-arrow b {
+    display: none;
+}
+.crm-container .select2-container-multi .select2-choices::before,
+.crm-container .select2-container .select2-choice .select2-arrow::before {
+    font-family: "FontAwesome";
+    font-style: normal;
+    text-rendering: auto;
+    color: var(--crm-c-text);
+    background: none;
+    content: var(--crm-input-dropdown-icon);
+    right: 0;
+    top: var(--crm-s);
+    display: block;
+    height: var(--crm-r);
+    position: absolute;
+    width: var(--crm-r2);
+}
+.crm-container .select2-container .select2-choice .select2-arrow::before {
+    top: var(--crm-xs);
+}
+.crm-container .select2-dropdown-open .select2-choice, 
+.crm-container .select2-dropdown-open .select2-choices {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-color: var(--crm-c-focus);
+    box-shadow: none;
+}
+.crm-container .select2-container-multi .select2-choices .select2-search-field input {
+    font-family: var(--crm-font);
+    line-height: normal;
+    margin: 0;
+    padding: 0;
+    min-height: unset;
+    color: var(--crm-input-color);
+}
+.crm-container .select2-container-multi .select2-choices .select2-search-field input.select2-default {
+    color: var(--crm-input-color);
+}
+.select2-container-disabled a {
+    box-shadow: none;
+    background: var(--crm-c-page-background);
+}
+.select2-container-disabled .select2-arrow {
+    background: transparent;
+}
+.crm-container .select2-container.select2-container-disabled .select2-choice {
+    background-color: var(--crm-c-background);
+    border: 1px solid var(--crm-c-inactive);
+    cursor: default;
+}
+.select2-container.select2-container-disabled .select2-choice .select2-arrow {
+    border-left: 0;
+    background: var(--crm-c-background);
+}
+.crm-container .select2-container-multi .select2-choices {
+    display: flex;
+    flex-flow: wrap;
+    gap: var(--crm-s);
+    padding: 2px var(--crm-s);
+    align-items: center;
+}
+.select2-container-multi .select2-choices .select2-search-choice {
+    padding: 1px var(--crm-m) 1px var(--crm-r1);
+    margin: 0;
+    position: relative;
+    line-height: unset;
+    color: var(--crm-c-text);
+    cursor: default;
+    border: 1px solid var(--crm-c-divider);
+    border-radius: var(--crm-roundness);
+    background-clip: padding-box;
+    user-select: none;
+    background-color: var(--crm-form-select-bg);
+    background-image: none;
+    box-shadow: none;
+}
+/* .select2-container-multi .select2-search-choice-close {
+    top: var(--crm-m);
+} */
+.select2-container-multi .select2-choices .select2-search-choice p {
+    margin: 0;
+}
+.select2-container .crm-select2-row-description {
+    display: none;
+}
+
+/* Select dropdwon */
+
+.select2-drop.select2-drop-active.crm-container {
+    background: var(--crm-input-background);
+    border-bottom-left-radius: var(--crm-roundness);
+    border-bottom-right-radius: var(--crm-roundness);
+    border-color: var(--crm-c-focus);
+    right: -1px;
+}
+.select2-drop.select2-drop-active.crm-container.select2-drop-above {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.select2-search::after {
+    font-family: "FontAwesome";
+    font-style: normal;
+    text-rendering: auto;
+    font-size: .8em;
+    color: #4d4d69;
+    color: #464354;
+    content: "";
+    font-size: 14px;
+    position: relative;
+    right: 20px;
+}
+.select2-search input {
+    background-image: none !important;
+    border-color: #66afe9;
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height: 20px;
+}
+.crm-container .select2-results {
+    font-size: var(--crm-m2);
+    padding: 0;
+    margin: 0;
+}
+.select2-drop.select2-drop-active.crm-container .select2-results li {
+    color: var(--crm-c-text);
+    padding: var(--crm-s);
+    margin: 0;
+}
+.select2-results .select2-ajax-error, 
+.select2-results .select2-no-results,
+.select2-results .select2-searching,
+.select2-results .select2-selection-limit {
+    background: var(--crm-input-background);
+  }
+.select2-drop.select2-drop-active.crm-container .select2-results .select2-highlighted {
+    background: var(--crm-c-background3);
+}
+.select2-drop.select2-drop-active.crm-container .crm-entityref-filters select,
+.select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {
+    background: var(--crm-c-background);
+    border: 1px solid var(--crm-input-border-color);
+    border-radius: var(--crm-roundness);
+    box-sizing: border-box;
+    height: var(--crm-l);
+    margin-top: var(--crm-s);
+}
+.select2-drop.select2-drop-active.crm-container .select2-results li {
+    color: var(--crm-c-text);
+    padding: var(--crm-s);
+}
+.select2-drop .crm-entityref-links {
+    border-top: 1px solid var(--crm-input-border-color);
+    margin-top: var(--crm-m);
+}
+.crm-container .select2-results .select2-result-label {
+    font-size: var(--crm-input-font-size);
+    padding: var(--crm-s) var(--crm-m);
+    font-weight: var(--crm-bold-weight);
+    font-family: var(--crm-font-bold);
+}
+.crm-container .crm-select2-row-description p {
+    font-weight: normal;
+    font-family: var(--crm-font);
+    font-size: var(--crm-input-font-size);
+    margin: 0;
+    padding: 0;
+  }
+
+/* Dates */
+
+.form-inline:has(.crm-form-date-wrapper) {
+    display: flex;
+    align-items: center;
+    gap: var(--crm-xs);
+}
+.crm-form-date-wrapper {
+    display: grid;
+    grid-template-columns: 13ch 9ch;
+}
+.crm-container input.crm-form-time:not(.form-control) {
+    width: 9ch;
+    margin-left: 1em;
+}
+.crm-container input.dateplugin, 
+.crm-container input.crm-form-date {
+    width: 14ch;
+}
+.crm-container input.crm-placeholder-icon {
+    padding-right: var(--crm-m);
+}
+.ui-datepicker, .ui-datepicker * {
+    border-radius: 0;
+    font-family: var(--crm-font);
+    height: unset;
+}
+.ui-datepicker {
+    background: var(--crm-input-background) !important;
+    border-radius: 0;
+    box-shadow: var(--crm-popup-shadow);
+    min-width: 30ch;
+    padding: var(--crm-m1);
+    width: auto;
+    z-index: 100001 !important; /* vs menubar for datepickers in modals */ 
+}
+.ui-datepicker .ui-datepicker-header {
+    border: 0;
+    margin-bottom: var(--crm-s);
+}
+.ui-datepicker :not(b) {
+    background: none !important;
+    border: 0 solid transparent !important;
+}
+.ui-datepicker .ui-datepicker-header .ui-datepicker-prev, 
+.ui-datepicker .ui-datepicker-header .ui-datepicker-next {
+    border-radius: var(--crm-roundness);
+    box-shadow: none !important;
+    cursor: var(--crm-hover-clickable);
+    text-align: center;
+    top: var(--crm-s3);
+    border: 0 solid transparent;
+}
+.ui-datepicker-next.ui-corner-all:hover,
+.ui-datepicker-prev.ui-corner-all:hover {
+    background: var(--crm-c-gray-100) !important;
+    border: 0 solid transparent;
+  }
+.ui-datepicker .ui-datepicker-header .ui-datepicker-prev::before, 
+.ui-datepicker .ui-datepicker-header .ui-datepicker-next::before {
+    font-family: "FontAwesome";
+    color: var(--crm-c-text);
+    font-size: var(--crm-small-font-size);
+    line-height: var(--crm-l);
+    padding: 0;
+}
+.ui-datepicker .ui-datepicker-prev::before {
+    content: "";
+}
+.ui-datepicker .ui-datepicker-next::before {
+    content: "";
+}
+.ui-datepicker .ui-datepicker-header select {
+    font-family: var(--crm-font);
+    margin: 0 var(--crm-m1);
+    padding-left: 5px !important;
+    font-size: var(--crm-m3);
+    width: 7ch;
+}
+.ui-datepicker-calendar thead tr {
+    border-top: 1px solid var(--crm-c-gray-300);
+}
+.ui-datepicker-calendar thead th {
+    color: var(--crm-c-text);
+    font-size: var(--crm-small-font-size);
+}
+.ui-datepicker-calendar tr {
+    border-bottom: none;
+}
+.ui-datepicker-calendar [data-handler], 
+.ui-datepicker-calendar .ui-state-disabled {
+    background-color: var(--crm-gray-50) !important;
+    border: 0;
+    font-size: var(--crm-small-font-size);
+    opacity: 1;
+    padding: var(--crm-s);
+}
+.ui-datepicker-calendar .ui-state-disabled {
+    opacity: 0.35;
+}
+.ui-datepicker-calendar [data-handler] .ui-state-active, 
+.ui-datepicker-calendar .ui-state-disabled .ui-state-active {
+    background-color: var(--crm-c-primary) !important; 
+    color: var(--crm-c-primary-text) !important;
+}
+.ui-datepicker-calendar [data-handler] a, 
+.ui-datepicker-calendar .ui-state-disabled a {
+    border: 0;
+    border-radius: 20px;
+    cursor: var(--crm-hover-clickable);
+    padding: var(--crm-s);
+    text-align: center;
+}
+
+/* BS3 radio/checklbox */
+
+#bootstrap-theme .radio, #bootstrap-theme .checkbox {
+	position: relative;
+	display: block;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+#bootstrap-theme .radio.disabled label, 
+#bootstrap-theme fieldset[disabled].radio label, 
+#bootstrap-theme .checkbox.disabled label, 
+#bootstrap-theme fieldset[disabled] .checkbox label {
+	cursor: not-allowed;
+}
+#bootstrap-theme .radio label, 
+#bootstrap-theme .checkbox label {
+	min-height: 20px;
+	padding-left: 20px;
+	margin-bottom: 0;
+	font-weight: 400;
+	cursor: pointer;
+}
+/* #bootstrap-theme .radio input[type="radio"], 
+#bootstrap-theme .radio-inline input[type="radio"], 
+#bootstrap-theme .checkbox input[type="checkbox"], 
+#bootstrap-theme .checkbox-inline input[type="checkbox"] {
+	/* position: absolute;
+	margin-top: 4px; */
+	/* margin-left: -20px; */
+} */
+#bootstrap-theme .radio + .radio, #bootstrap-theme .checkbox + .checkbox {
+	margin-top: -5px;
+}
+#bootstrap-theme .radio-inline, 
+#bootstrap-theme .checkbox-inline {
+	position: relative;
+	display: inline-block;
+	margin-bottom: 0;
+	font-weight: 400;
+	vertical-align: middle;
+	cursor: pointer;
+}
+#bootstrap-theme .radio-inline.disabled, 
+fieldset[disabled] #bootstrap-theme .radio-inline, 
+#bootstrap-theme .checkbox-inline.disabled, 
+fieldset[disabled] #bootstrap-theme .checkbox-inline {
+	cursor: not-allowed;
+}
+#bootstrap-theme .radio-inline + .radio-inline, 
+#bootstrap-theme .checkbox-inline + .checkbox-inline {
+	margin-top: 0;
+	margin-left: var(--crm-m);
+}

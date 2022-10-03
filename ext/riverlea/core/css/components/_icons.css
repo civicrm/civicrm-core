@@ -1,0 +1,252 @@
+.crm-container .ui-icon[class*=" fa-"],
+.crm-container a.helpicon,
+.crm-container .replace-plain::before,
+.crm-container .crm-i {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.crm-container .ui-icon[class*=" fa-"] {
+    margin: 0;
+}
+.crm-container .messages .crm-i {
+    padding: var(--crm-s) var(--crm-m) var(--crm-s) 0;
+    float: left;
+}
+.crm-container button.btn-xs:has(.fa-times),
+.crm-container .crm-hover-button:has(.crm-i),
+.crm-container .crm-hover-button:has(.crm-i):hover,
+.crm-container .crm-hover-button:has(.crm-i):focus {
+    background: transparent;
+    color: var(--crm-c-link) !important;
+    padding: var(--crm-padding-small);
+}
+.crm-container .select2-container[class*=" fa-"]::before,
+.crm-container .messages.crm-empty-table > img /* removes inform.gif icon */ {
+    display: none;
+}
+
+/* Notification icons */
+.crm-container #crm-notification-container div.ui-notify-message.error .notify-content .crm-i.fa-exclamation-triangle,
+.crm-container #crm-notification-container div.ui-notify-message div.icon {
+    display: none;
+}
+#crm-notification-container .ui-notify-message a.ui-notify-cross::before,
+.crm-container #crm-notification-container div.ui-notify-message h1::before,
+div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
+.crm-container .delete-icon,
+.crm-container span.batch-valid,
+.crm-container span.batch-invalid,
+.crm-container .messages.crm-empty-table::before {
+    font-family: "FontAwesome";
+    font-style: normal;
+    text-rendering: auto;
+    font-size: var(--crm-font-size);
+    margin: 0 var(--crm-m) 0 0;
+}
+.crm-container #crm-notification-container div.ui-notify-message.error h1::before,
+.crm-container span.batch-invalid::before {
+    content: var(--crm-icon-alert);
+    color: var(--crm-c-alert);
+}
+.crm-container #crm-notification-container div.ui-notify-message.success h1::before,
+.crm-container span.batch-valid::before {
+    content: var(--crm-icon-success);
+    color: var(--crm-c-success);
+}
+.crm-container #crm-notification-container div.ui-notify-message.info h1::before,
+.crm-container .messages.crm-empty-table::before {
+    content: var(--crm-icon-info);
+    color: var(--crm-c-info);
+}
+
+/* Help icon */
+.crm-container a.helpicon::before {
+    content: "\f059";
+}
+.crm-container a.helpicon:hover,
+.crm-container a.helpicon:focus {
+    text-decoration: none;
+}
+
+/* Check icon */
+
+.crm-container .crm-button .crm-i.fa-check::before,
+.crm-container .btn .crm-i.fa-check::before,
+.crm-container .crm-button .crm-i.fa-check-circle::before,
+.crm-container .btn .crm-i.fa-check-circle::before,
+.crm-container .btn-success .crm-i::before {
+    color: var(--crm-icon-success-color);
+}
+
+/* Close icon */
+#crm-notification-container .ui-notify-message a.ui-notify-cross,
+div.civicrm-community-messages a.civicrm-community-message-dismiss,
+.crm-container .ui-icon-circle-close {
+    font-size: 0;
+    float: right;
+    text-decoration: none;
+    padding: 0 0 0 0.5rem;
+    opacity: 0.25; /* matches Bootstrap */
+    background-image: none;
+    position: relative !important;
+    text-indent: 0;
+    height: auto;
+    width: auto;
+}
+#crm-notification-container .ui-notify-message a.ui-notify-cross::before,
+div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
+.crm-container .ui-icon-circle-close::before {
+    content: var(--crm-icon-close);
+    color: var(--crm-notify-col);
+}
+.crm-container .ui-icon-circle-close:hover,
+.crm-container .ui-icon-circle-close:focus,
+#crm-notification-container .ui-notify-message a.ui-notify-cross:hover,
+#crm-notification-container .ui-notify-message a.ui-notify-cross:focus {
+    opacity: 1;
+    transition: 0.2s;
+}
+.crm-container .crm-button .crm-i.fa-times::before,
+.crm-container .btn-danger .crm-i::before {
+    color: var(--crm-icon-alert-color);
+}
+
+/* Info icon */
+
+.crm-container .crm-button .crm-i.fa-info::before,
+.crm-container .btn-info .crm-i::before {
+    color: var(--crm-icon-info-color);
+}
+
+/* Warning icon */  
+
+.crm-container .btn-warning .crm-i::before {
+    color: var(--crm-icon-warning-color);
+}
+
+/* Table sorting icons */
+.crm-container tr a.sorting, 
+.crm-container tr a.sorting_asc, 
+.crm-container tr a.sorting_desc,
+.crm-container table.dataTable thead th.sorting,
+.crm-container table.dataTable thead th.sorting_asc,
+.crm-container table.dataTable thead th.sorting_desc  {
+    background-image: none;
+    color: var(--crm-c-text);
+}
+.crm-container th a:hover,
+.crm-container th a:focus {
+    text-decoration: none;
+}
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon { 
+    /* Bootstrap & SearchKit sort resets */
+    position: initial;
+    float: var(--crm-table-sort-float);
+    opacity: 1;
+    color: inherit;
+    line-height: inherit;
+    font-style: normal;
+    text-rendering: auto;
+    font: normal normal normal var(--crm-dash-icon-size)/inherit FontAwesome;
+}
+.crm-container a.sorting::after,
+.crm-container a.sorting_asc::after, 
+.crm-container a.sorting_desc::after,
+.crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon::before,
+.crm-container table.dataTable thead th.sorting::before,
+.crm-container table.dataTable thead th.sorting_asc::before,
+.crm-container table.dataTable thead th.sorting_desc::before,
+.jstree-default .jstree-icon {
+    font-family: "FontAwesome";
+    font-style: normal;
+    text-rendering: auto;
+    font-size: var(--crm-dash-icon-size);
+    content:  var(--crm-icon-sort);
+    color: var(--crm-table-sort-col);
+    float: var(--crm-table-sort-float);
+    margin: var(--crm-xs1) var(--crm-m) 0 0;
+    position: relative;
+}
+.crm-container a.sorting_asc::after,
+.crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-asc::before,
+.crm-container table.dataTable thead th.sorting_asc::before {
+    content: var(--crm-icon-sort-asc);
+    color: var(--crm-c-link);
+}
+.crm-container a.sorting_desc::after,
+.crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-desc::before,
+.crm-container table.dataTable thead th.sorting_desc::before {  
+    content: var(--crm-icon-sort-desc);
+    color: var(--crm-c-link);
+}
+
+/* Trash icons */
+
+.crm-container .delete-icon {
+    background-image: none;
+}
+.crm-container .delete-icon::before,
+.crm-container .crm-i.fa-trash::before {
+    content: "\f1f8";
+    color: var(--crm-icon-alert-color);
+}
+.crm-container .delete-icon:hover::before,
+.crm-container .delete-icon:focus::before {
+    color: var(--crm-icon-alert-color);
+}
+
+/* Jqueery UI icons (tags) */
+
+.crm-container .jstree-wholerow-ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--crm-xs);
+}
+.jstree-default > .jstree-wholerow-ul > li.jstree-node {
+    margin-inline: 0;
+}
+.jstree-default .jstree-wholerow-clicked,
+.jstree-default .jstree-wholerow-hovered {
+    background: transparent !important;
+}
+.crm-container .jstree-default .jstree-icon {
+    background-image: none;
+    font-size: var(--crm-r1);
+    margin-right: var(--btn-icon-spacing)
+}
+.crm-container .jstree-default .jstree-checkbox::before {
+    content: '\f096';
+}
+.crm-container .jstree-default.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox::before, 
+.crm-container .jstree-default .jstree-checked > .jstree-checkbox::before {
+    content: '\f046';
+    color: var(--crm-c-success);
+}
+.jstree-default > .jstree-no-dots .jstree-closed > .jstree-ocl::before,
+.jstree .jstree-closed > .jstree-ocl::before {
+    display: block;
+    content: '\f105';
+    color: var(--crm-c-text);
+}
+.jstree-default > .jstree-no-dots .jstree-open > .jstree-ocl::before,
+.jstree .jstree-open > .jstree-ocl::before {
+    display: block;
+    content: '\f107';
+    color: var(--crm-c-text);
+}
+.crm-container .jstree-default .jstree-search {
+    color: var(--crm-c-alert);
+    font-weight: normal;
+}
+.crm-container #navigation-tree li.jstree-node {
+    background-image: none;
+}
+/* Resets icons with unwanted backgrounds */
+.crm-container a.crm-hover-button:has(span.icon) {
+    background-color: transparent;
+    padding: 0;
+}
