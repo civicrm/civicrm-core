@@ -67,21 +67,6 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Process the mailbox for all the settings from civicrm_mail_settings.
-   *
-   * @param bool|string $civiMail if true, processing is done in CiviMail context, or Activities otherwise.
-   */
-  public static function process($civiMail = TRUE) {
-    $dao = new CRM_Core_DAO_MailSettings();
-    $dao->domain_id = CRM_Core_Config::domainID();
-    $dao->find();
-
-    while ($dao->fetch()) {
-      self::_process($civiMail, $dao);
-    }
-  }
-
-  /**
    * @param $civiMail
    * @param CRM_Core_DAO_MailSettings $dao
    * @param bool $is_create_activities
