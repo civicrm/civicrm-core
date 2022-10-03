@@ -531,6 +531,11 @@ class CRM_Utils_File {
     if (!empty($dir) && is_dir($dir)) {
       $htaccess = <<<HTACCESS
 <Files "*">
+# OpenLiteSpeed 1.4.38+
+  <IfModule !authz_core_module>
+    RewriteRule .* - [F,L]
+  </IfModule>
+
 # Apache 2.2
   <IfModule !authz_core_module>
     Order allow,deny
