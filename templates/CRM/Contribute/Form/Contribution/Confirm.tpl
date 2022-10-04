@@ -225,7 +225,7 @@
         </div>
       {/if}
     {/if}
-    {if $email}
+    {if !$emailExists}
       <div class="crm-group contributor_email-group">
         <div class="header-dark">
           {ts}Your Email{/ts}
