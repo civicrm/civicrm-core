@@ -30,19 +30,16 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    * View details of a note.
    */
   public function view() {
-    $note = new CRM_Core_DAO_Note();
-    $note->id = $this->_id;
-    if ($note->find(TRUE)) {
+    $note = \Civi\Api4\Note::get()
+      ->addSelect('*', 'privacy:label')
+      ->addWhere('id', '=', $this->_id)
+      ->execute()
+      ->single();
+    $note['privacy'] = $note['privacy:label'];
+    $this->assign('note', $note);
 
-      CRM_Core_DAO::storeValues($note, $this->values);
-      $this->values['privacy'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Note', 'privacy', $this->values['privacy']);
-      $this->assign('note', $this->values);
-    }
-
-    $comments = CRM_Core_BAO_Note::getNoteTree($this->values['id'], 1);
-    if (!empty($comments)) {
-      $this->assign('comments', $comments);
-    }
+    $comments = CRM_Core_BAO_Note::getNoteTree($this->_id, 1);
+    $this->assign('comments', $comments);
 
     // add attachments part
     $currentAttachmentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_note', $this->_id);
