@@ -36,9 +36,10 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
    *
    * @return bool
    *   True on success
+   * @throws \CRM_Core_Exception
    */
-  public static function confirm($contact_id, $subscribe_id, $hash) {
-    $se = &CRM_Mailing_Event_BAO_Subscribe::verify(
+  public static function confirm(int $contact_id, int $subscribe_id, string $hash) {
+    $se = CRM_Mailing_Event_BAO_Subscribe::verify(
       $contact_id,
       $subscribe_id,
       $hash
@@ -52,7 +53,7 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     // if so, we should ignore this request and hence avoid sending multiple
     // emails - CRM-11157
     $details = CRM_Contact_BAO_GroupContact::getMembershipDetail($contact_id, $se->group_id);
-    if ($details && $details->status == 'Added') {
+    if ($details && $details->status === 'Added') {
       // This contact is already subscribed
       // lets return the group title
       return CRM_Core_DAO::getFieldValue(
@@ -79,9 +80,9 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
 
     $transaction->commit();
 
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    list($display_name, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($se->contact_id);
+    [$display_name, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($se->contact_id);
 
     $group = new CRM_Contact_DAO_Group();
     $group->id = $se->group_id;
@@ -118,12 +119,12 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,
-      'schema' => ['contactId'],
+      'schema' => ['contactId', 'groupId'],
     ]);
 
     $tokenProcessor->addMessage('body_html', $html, 'text/html');
     $tokenProcessor->addMessage('body_text', $text, 'text/plain');
-    $tokenProcessor->addRow(['contactId' => $contact_id]);
+    $tokenProcessor->addRow(['contactId' => $contact_id, 'groupId' => $group->id]);
     $tokenProcessor->evaluate();
     $html = $tokenProcessor->getRow(0)->render('body_html');
     $text = $tokenProcessor->getRow(0)->render('body_text');
@@ -140,7 +141,7 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
       'text' => $text,
     ];
     // send - ignore errors because the desired status change has already been successful
-    $unused_result = CRM_Utils_Mail::send($mailParams);
+    CRM_Utils_Mail::send($mailParams);
 
     return $group->title;
   }

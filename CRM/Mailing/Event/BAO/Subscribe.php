@@ -151,7 +151,7 @@ SELECT     civicrm_email.id as email_id
    * @return object|null
    *   The subscribe event object, or null on failure
    */
-  public static function &verify($contact_id, $subscribe_id, $hash) {
+  public static function verify(int $contact_id, int $subscribe_id, $hash) {
     $success = NULL;
     $se = new CRM_Mailing_Event_BAO_Subscribe();
     $se->contact_id = $contact_id;
@@ -175,7 +175,7 @@ SELECT     civicrm_email.id as email_id
     $domain = CRM_Core_BAO_Domain::getDomain();
 
     //get the default domain email address.
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();

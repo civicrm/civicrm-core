@@ -191,7 +191,7 @@ trait ContactTestTrait {
    * @return int
    *   groupId of created group
    */
-  public function groupCreate($params = []) {
+  public function groupCreate(array $params = []): int {
     $params = array_merge([
       'name' => 'Test Group 1',
       'domain_id' => 1,

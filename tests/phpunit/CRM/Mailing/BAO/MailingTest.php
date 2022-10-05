@@ -55,9 +55,10 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * @param $mailingID
    * @param $groupID
    * @param string $type
+   *
    * @return array|int
    */
-  private function createMailingGroup($mailingID, $groupID, $type = 'Include') {
+  private function createMailingGroup($mailingID, $groupID, string $type = 'Include') {
     return $this->callAPISuccess('MailingGroup', 'create', [
       'mailing_id' => $mailingID,
       'group_type' => $type,
@@ -69,7 +70,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   /**
    * Test to ensure that using ACL permitted contacts are correctly fetched for bulk mailing
    */
-  public function testgetRecipientsUsingACL() {
+  public function testgetRecipientsUsingACL(): void {
     $this->prepareForACLs();
     $this->createLoggedInUser();
     // create hook to build ACL where clause which choses $this->allowedContactId as the only contact to be considered as mail recipient
@@ -77,7 +78,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view my contact'];
 
     // Create dummy group and assign 2 contacts
-    $name = 'Test static group ' . substr(sha1(rand()), 0, 7);
+    $name = 'Test static group 1';
     $groupID = $this->groupCreate([
       'name' => $name,
       'title' => $name,
@@ -111,20 +112,16 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test mailing receipients when using previous mailing as include and contact is in exclude as well
+   * Test mailing recipients when using previous mailing as include and contact is in exclude as well
    */
-  public function testMailingIncludePreviousMailingExcludeGroup() {
-    $groupName = 'Test static group ' . substr(sha1(rand()), 0, 7);
-    $groupName2 = 'Test static group 2' . substr(sha1(rand()), 0, 7);
+  public function testMailingIncludePreviousMailingExcludeGroup(): void {
     $groupID = $this->groupCreate([
-      'name' => $groupName,
-      'title' => $groupName,
-      'is_active' => 1,
+      'name' => 'Test static group 1',
+      'title' => 'Test static group 1',
     ]);
     $groupID2 = $this->groupCreate([
-      'name' => $groupName2,
-      'title' => $groupName2,
-      'is_active' => 1,
+      'name' => 'Test static group 2',
+      'title' => 'Test static group 2',
     ]);
     $contactID = $this->individualCreate([], 0);
     $contactID2 = $this->individualCreate([], 2);
