@@ -32,6 +32,7 @@
       <af-gui-text ng-switch-when="text" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-text" ></af-gui-text>
       <af-gui-markup ng-switch-when="markup" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-markup" ></af-gui-markup>
       <af-gui-button ng-switch-when="button" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-button" ></af-gui-button>
+      <af-gui-recaptcha ng-switch-when="recaptcha" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-recaptcha" ></af-gui-recaptcha>
       <af-gui-container ng-switch-when="searchFieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] + ' ' + item['class'] }}" ng-class="{'af-entity-selected': isSelectedSearchFieldset(item)}" data-entity="{{ getSearchKey(item) }}" ></af-gui-container>
       <af-gui-search-display ng-switch-when="searchDisplay" node="item" class="af-gui-element"></af-gui-search-display>
     </div>

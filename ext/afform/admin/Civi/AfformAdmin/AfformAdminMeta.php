@@ -216,6 +216,12 @@ class AfformAdminMeta {
             '#markup' => FALSE,
           ],
         ],
+        'recaptcha' => [
+          'title' => E::ts('ReCaptcha'),
+          'element' => [
+            '#tag' => 'af-recaptcha',
+          ],
+        ],
         'submit' => [
           'title' => E::ts('Submit Button'),
           'afform_type' => ['form'],

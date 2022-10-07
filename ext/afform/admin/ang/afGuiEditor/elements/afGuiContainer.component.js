@@ -337,6 +337,9 @@
         if (node['#tag'] && (node['#tag'].slice(0, 19) === 'crm-search-display-')) {
           return 'searchDisplay';
         }
+        if (node['#tag'] === 'af-recaptcha') {
+          return 'recaptcha';
+        }
         var classes = afGui.splitClass(node['class']),
           types = ['af-container', 'af-text', 'af-button', 'af-markup'],
           type = _.intersection(types, classes);
