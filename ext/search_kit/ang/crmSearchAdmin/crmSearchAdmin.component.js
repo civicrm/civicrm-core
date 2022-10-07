@@ -471,7 +471,7 @@
       };
 
       function getFieldsForJoin(joinEntity) {
-        return {results: ctrl.getAllFields(':name', ['Field'], null, joinEntity)};
+        return {results: ctrl.getAllFields(':name', ['Field', 'Extra'], null, joinEntity)};
       }
 
       // @return {function}
