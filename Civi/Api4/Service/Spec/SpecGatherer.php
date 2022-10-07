@@ -125,7 +125,8 @@ class SpecGatherer extends AutoService {
     $query = CustomField::get(FALSE)
       ->setSelect(['custom_group_id.name', 'custom_group_id.title', '*'])
       ->addWhere('is_active', '=', TRUE)
-      ->addWhere('custom_group_id.is_multiple', '=', '0');
+      ->addWhere('custom_group_id.is_active', '=', TRUE)
+      ->addWhere('custom_group_id.is_multiple', '=', FALSE);
 
     // Contact custom groups are extra complicated because contact_type can be a value for extends
     if ($entity === 'Contact') {
