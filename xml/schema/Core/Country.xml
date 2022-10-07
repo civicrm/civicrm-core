@@ -6,6 +6,8 @@
   <name>civicrm_country</name>
   <add>1.1</add>
   <labelField>name</labelField>
+  <icon>fa-globe</icon>
+  <description>Countries of the world</description>
   <field>
     <name>id</name>
     <title>Country ID</title>
