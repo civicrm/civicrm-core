@@ -966,6 +966,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $submittedValues['contribution_status_id'] = $this->_values['contribution_status_id'];
     }
 
+    if (isset($submittedValues['is_email_receipt']) && isset($submittedValues['contribution_page_id'])) {
+      $contributionPage = \Civi\Api4\ContributionPage::get()
+        ->addSelect('is_email_receipt', 'receipt_text')
+        ->addWhere('id', '=', $submittedValues['contribution_page_id'])
+        ->execute()->first();
+      if ($contributionPage['is_email_receipt']) {
+        $submittedValues['receipt_text'] = $contributionPage['receipt_text'];
+      }
+    }
+
     try {
       $contribution = $this->submit($submittedValues, $this->_action, $this->_ppID);
     }
