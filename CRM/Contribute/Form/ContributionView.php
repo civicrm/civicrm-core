@@ -118,6 +118,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         ->addJoin('Contact AS contact', 'LEFT', ['contact.id', '=', 'participant.contact_id'])
         ->addWhere('entity_table', '=', 'civicrm_participant')
         ->addWhere('contribution_id', '=', $id)
+        ->addGroupBy('entity_id')
         ->execute();
     }
     catch (CRM_Core_Exception $e) {
