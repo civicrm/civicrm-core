@@ -247,6 +247,7 @@
 
       function setDateOptions() {
         if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
+          ctrl.node.defn = ctrl.node.defn || {};
           ctrl.node.defn.options = $scope.getProp('search_range') ? CRM.afGuiEditor.dateRanges : CRM.afGuiEditor.dateRanges.slice(1);
           setFieldDefn();
         }
