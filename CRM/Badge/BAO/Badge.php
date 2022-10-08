@@ -78,7 +78,7 @@ class CRM_Badge_BAO_Badge {
    * @return array
    *   row with meta data
    */
-  public static function formatLabel(&$row, &$layout) {
+  public static function formatLabel(array $row, array $layout): array {
     $formattedRow = ['labelFormat' => $layout['label_format_name']];
     $formattedRow['labelTitle'] = $layout['title'];
     $formattedRow['labelId'] = $layout['id'];
@@ -149,16 +149,16 @@ class CRM_Badge_BAO_Badge {
   /**
    * @param array $formattedRow
    */
-  public function generateLabel($formattedRow) {
+  public function generateLabel(array $formattedRow): void {
     switch ($formattedRow['labelFormat']) {
       case 'A6 Badge Portrait 150x106':
       case 'Hanging Badge 3-3/4" x 4-3"/4':
-        self::labelCreator($formattedRow, 5);
+        $this->labelCreator($formattedRow, 5);
         break;
 
       case 'Avery 5395':
       default:
-        self::labelCreator($formattedRow);
+        $this->labelCreator($formattedRow);
         break;
     }
   }
@@ -167,7 +167,7 @@ class CRM_Badge_BAO_Badge {
    * @param array $formattedRow
    * @param int $cellspacing
    */
-  public function labelCreator(&$formattedRow, $cellspacing = 0) {
+  public function labelCreator($formattedRow, $cellspacing = 0) {
     $this->lMarginLogo = 18;
     $this->tMarginName = 20;
 
@@ -229,7 +229,7 @@ class CRM_Badge_BAO_Badge {
     for ($i = 1; $i <= $rowCount; $i++) {
       if (!empty($formattedRow['token'][$i]['token'])) {
         $value = '';
-        if ($formattedRow['token'][$i]['token'] != 'spacer') {
+        if ($formattedRow['token'][$i]['token'] !== 'spacer') {
           $value = $formattedRow['token'][$i]['value'];
         }
 
@@ -256,7 +256,7 @@ class CRM_Badge_BAO_Badge {
     if (!empty($formattedRow['barcode'])) {
       $data = $formattedRow['values'];
 
-      if ($formattedRow['barcode']['type'] == 'barcode') {
+      if ($formattedRow['barcode']['type'] === 'barcode') {
         $data['current_value'] = $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
       }
       else {
@@ -457,6 +457,8 @@ class CRM_Badge_BAO_Badge {
     }
     $tokenProcessor->evaluate();
     foreach ($tokenProcessor->getRows() as $row) {
+      $rows[$row->context['participantId']]['contact_id'] = $row->context['contactId'];
+      $rows[$row->context['participantId']]['participant_id'] = $row->context['participantId'];
       foreach ($processorTokens as $processorToken) {
         $rows[$row->context['participantId']][$processorToken] = $row->render($processorToken);
       }
