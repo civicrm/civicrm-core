@@ -106,6 +106,36 @@
         }
       });
 
+      // Handle the logic for conditional fields
+      this.checkConditions = function(conditions, op) {
+        op = op || 'AND';
+        // OR and AND have the opposite behavior so the logic is inverted
+        // NOT works identically to OR but gets flipped at the end
+        var ret = op === 'AND',
+          flip = !ret;
+        _.each(conditions, function(clause) {
+          // Recurse into nested group
+          if (_.isArray(clause[1])) {
+            if (ctrl.checkConditions(clause[1], clause[0]) === flip) {
+              ret = flip;
+            }
+          } else {
+            // Angular can't handle expressions with quotes inside brackets, so they are omitted
+            // Here we add them back to make valid js
+            _.each(clause, function(expr, idx) {
+              if (_.isString(expr) && expr.charAt(0) !== '"') {
+                clause[idx] = expr.replace(/\[/g, "['").replace(/]/g, "']");
+              }
+            });
+            var parser = $parse(clause.join(' '));
+            if (parser(data) === flip) {
+              ret = flip;
+            }
+          }
+        });
+        return op === 'NOT' ? !ret : ret;
+      };
+
       // Called after form is submitted and files are uploaded
       function postProcess() {
         var metaData = ctrl.getFormMeta(),

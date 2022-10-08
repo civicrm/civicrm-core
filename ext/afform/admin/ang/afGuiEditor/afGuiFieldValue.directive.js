@@ -10,7 +10,7 @@
       },
       require: {
         ngModel: 'ngModel',
-        editor: '^^afGuiEditor'
+        editor: '?^^afGuiEditor'
       },
       controller: function ($element, $timeout) {
         var ts = CRM.ts('org.civicrm.afform_admin'),
