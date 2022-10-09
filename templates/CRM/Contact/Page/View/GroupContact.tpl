@@ -141,22 +141,25 @@
             <td data-order="{$row.out_date}">{$row.out_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
-              {if $row.saved_search_id}
-              <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 manually into %2, overriding smart group critera?{/ts}">
-                {ts}Manual Add{/ts}
-              {else}
-              <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
-                {ts}Rejoin Group{/ts}
-              {/if}
-              </td><td>
-              </a>
-              {if $row.saved_search_id}
-              <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2?{/ts} {ts}They will be in the smart group or not based on the smart group criteria.{/ts}">
-              {else}
-              <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2?{/ts} {ts}This group will no longer be listed under Removed Groups.{/ts}">
-              {/if}
-                {ts}Delete{/ts}
-              </a>
+                {if $row.saved_search_id}
+                <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 manually into %2, overriding smart group critera?{/ts}">
+                  {ts}Manual Add{/ts}
+                {else}
+                <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
+                  {ts}Rejoin Group{/ts}
+                {/if}
+            </td>
+            <td>
+                </a>
+                {if $row.saved_search_id}
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2?{/ts} {ts}They will be in the smart group or not based on the smart group criteria.{/ts}">
+                  {ts}Delete{/ts}
+                </a>
+                {else}
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2?{/ts} {ts}This group will no longer be listed under Removed Groups.{/ts}">
+                  {ts}Delete{/ts}
+                </a>
+                {/if}
               {/if}
             </td>
           </tr>
