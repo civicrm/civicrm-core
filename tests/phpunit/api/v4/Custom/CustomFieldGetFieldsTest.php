@@ -19,6 +19,7 @@
 
 namespace api\v4\Custom;
 
+use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
 use Civi\Api4\CustomField;
@@ -47,6 +48,37 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     ContactType::delete(FALSE)
       ->addWhere('name', '=', $this->subTypeName)
       ->execute();
+  }
+
+  public function testDisabledFields() {
+    // Create a custom group with one enabled and one disabled field
+    CustomGroup::create(FALSE)
+      ->addValue('extends', 'Activity')
+      ->addValue('title', 'act_test_grp')
+      ->execute();
+    $this->saveTestRecords('CustomField', [
+      'records' => [
+        ['label' => 'enabled_field'],
+        ['label' => 'disabled_field', 'is_active' => FALSE],
+      ],
+      'defaults' => ['custom_group_id.name' => 'act_test_grp'],
+    ]);
+
+    // Only the enabled field shows up
+    $getFields = Activity::getFields(FALSE)->execute()->column('name');
+    $this->assertContains('act_test_grp.enabled_field', $getFields);
+    $this->assertNotContains('act_test_grp.disabled_field', $getFields);
+
+    // Disable the entire custom group
+    CustomGroup::update(FALSE)
+      ->addWhere('name', '=', 'act_test_grp')
+      ->addValue('is_active', FALSE)
+      ->execute();
+
+    // Neither field shows up as the whole group is disabled
+    $getFields = Activity::getFields(FALSE)->execute()->column('name');
+    $this->assertNotContains('act_test_grp.enabled_field', $getFields);
+    $this->assertNotContains('act_test_grp.disabled_field', $getFields);
   }
 
   public function testCustomGetFieldsWithContactSubType() {

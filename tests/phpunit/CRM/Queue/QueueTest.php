@@ -97,7 +97,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertTrue($q1 instanceof CRM_Queue_Queue_Sql);
     $this->assertDBQuery('active', "SELECT status FROM civicrm_queue WHERE name = 'test/valid/default'");
 
-    foreach (['draft', 'active', 'complete', 'aborted'] as $n => $exampleStatus) {
+    foreach (['draft', 'active', 'completed', 'aborted'] as $n => $exampleStatus) {
       $q1 = Civi::queue("test/valid/$n", [
         'type' => 'Sql',
         'runner' => 'task',

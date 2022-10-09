@@ -577,6 +577,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
     $this->assignPaymentFields();
     $this->assignEmailField();
+    $this->assign('emailExists', $this->_emailExists);
 
     // also assign the receipt_text
     if (isset($this->_values['receipt_text'])) {

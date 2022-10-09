@@ -90,6 +90,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
   /**
    * Set up variables to build the form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     $this->addOptionalQuickFormElement('parents');
@@ -130,12 +132,12 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         $this->setTitle(ts('Confirm Group Delete'));
       }
       if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
-        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved group."));
+        CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to delete this reserved group.'));
       }
     }
     else {
       if ($this->_id && $this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
-        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to change settings for this reserved group."));
+        CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to change settings for this reserved group.'));
       }
       if (isset($this->_id)) {
         $groupValues = array(
@@ -143,18 +145,11 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
           'title' => $this->_title,
           'saved_search_id' => $this->_groupValues['saved_search_id'] ?? '',
         );
-        if (isset($this->_groupValues['saved_search_id'])) {
-          $this->assign('editSmartGroupURL', CRM_Contact_BAO_SavedSearch::getEditSearchUrl($this->_groupValues['saved_search_id']));
-        }
-        if (!empty($this->_groupValues['created_id'])) {
-          $groupValues['created_by'] = CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['created_id'], 'sort_name', 'id');
-        }
+        $this->assign('editSmartGroupURL', isset($this->_groupValues['saved_search_id']) ? CRM_Contact_BAO_SavedSearch::getEditSearchUrl($this->_groupValues['saved_search_id']) : NULL);
+        $groupValues['created_by'] = empty($this->_groupValues['created_id']) ? NULL : CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_groupValues['created_id'], 'sort_name', 'id');
+        $groupValues['modified_by'] = empty($this->_groupValues['modified_id']) ? NULL : CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_groupValues['modified_id'], 'sort_name', 'id');
 
-        if (!empty($this->_groupValues['modified_id'])) {
-          $groupValues['modified_by'] = CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['modified_id'], 'sort_name', 'id');
-        }
-
-        $this->assign_by_ref('group', $groupValues);
+        $this->assign('group', $groupValues);
 
         $this->setTitle(ts('Group Settings: %1', array(1 => $this->_title)));
       }

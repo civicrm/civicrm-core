@@ -534,10 +534,20 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         else {
           $visibility_id = self::getVisibilityOptionID('public');
         }
+
+        $class = '';
+        $maxlen = max(array_map('strlen', $selectOption));
+        if ($maxlen > 25) {
+          $class = ' huge';
+        }
+        if ($maxlen > 40) {
+          $class = ' huge40';
+        }
+
         $element = &$qf->add('select', $elementName, $label, $selectOption, $useRequired && $field->is_required, [
           'placeholder' => ts('- select %1 -', [1 => $label]),
           'price' => json_encode($priceVal),
-          'class' => 'crm-select2',
+          'class' => 'crm-select2' . $class,
           'data-price-field-values' => json_encode($customOption),
         ]);
 
