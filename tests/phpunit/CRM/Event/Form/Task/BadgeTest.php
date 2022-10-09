@@ -19,6 +19,8 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
 
   /**
    * Test the the submit function on the event participant submit function.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmit(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Participant']);
@@ -30,7 +32,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
 
     $badgeLayout = PrintLabel::get()->addSelect('data')->execute()->first();
     $values = [
-      'data' => array_merge((array) $badgeLayout['data'], ['token' => [], 'font_name' => [''], 'font_size' => [], 'text_alignment' => []]),
+      'data' => array_merge((array) $badgeLayout['data'], ['token' => [], 'font_name' => [''], 'font_size' => [], 'text_alignment' => [], 'add_barcode' => 1]),
     ];
     foreach (array_keys($this->getAvailableTokens()) as $id => $token) {
       $index = $id + 1;
