@@ -115,8 +115,8 @@
 
   {if $groupOut}
     <div class="ht-one"></div>
-    <h3 class="status-removed">{ts}Past Groups{/ts}</h3>
-    <div class="description">{ts 1=$displayName}%1 is no longer part of these group(s).{/ts}</div>
+    <h3 class="status-removed">{ts}Removed Groups{/ts}</h3>
+    <div class="description">{ts 1=$displayName}%1 has been removed from these group(s).{/ts}</div>
     {strip}
       <table id="past_group" class="display">
         <thead>
@@ -125,24 +125,30 @@
           <th>{ts}Status{/ts}</th>
           <th>{ts}Date Added{/ts}</th>
           <th>{ts}Date Removed{/ts}</th>
-          <th></th>
+          <th colspan="2">{ts}Actions{/ts} {help id='actions' file='CRM/Contact/Page/View/GroupContact.hlp'}</th>
         </tr>
         </thead>
         {foreach from=$groupOut item=row}
           <tr id="group_contact-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}">
             <td class="bold">
               <a href="{crmURL p='civicrm/group/search' q="reset=1&force=1&context=smog&gid=`$row.group_id`"}">
-                {$row.title}
+                {if $row.saved_search_id}* {/if}{$row.title}
               </a>
             </td>
             <td class="status-removed">{ts 1=$row.out_method}Removed (by %1){/ts}</td>
             <td data-order="{$row.date_added}">{$row.date_added|crmDate}</td>
             <td data-order="{$row.out_date}">{$row.out_date|crmDate}</td>
-            <td>{if $permission EQ 'edit'}
-                <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
-                  {ts}Rejoin Group{/ts}</a>
+            <td>
+              {if $permission EQ 'edit'}
+              <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
+                {if $row.saved_search_id}{ts}Manual Add{/ts}{else}{ts}Rejoin Group{/ts}{/if}
+              </a>
+            </td>
+            <td>
               <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Past Groups).{/ts}">
-                {ts}Delete{/ts}</a>{/if}
+                {ts}Delete{/ts}
+              </a>
+              {/if}
             </td>
           </tr>
         {/foreach}

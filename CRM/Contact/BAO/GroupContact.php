@@ -335,7 +335,9 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
                     civicrm_group.id as group_id,
                     civicrm_group.is_hidden as is_hidden,
                     civicrm_subscription_history.date as date,
-                    civicrm_subscription_history.method as method';
+                    civicrm_subscription_history.method as method,
+                    civicrm_group.saved_search_id as saved_search_id';
+
     }
 
     $where = " WHERE contact_a.id = %1 AND civicrm_group.is_active = 1";
@@ -400,6 +402,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         $values[$id]['title'] = ($public && !empty($group->group_public_title) ? $group->group_public_title : $dao->group_title);
         $values[$id]['visibility'] = $dao->visibility;
         $values[$id]['is_hidden'] = $dao->is_hidden;
+        $values[$id]['saved_search_id'] = $dao->saved_search_id;
         switch ($dao->status) {
           case 'Added':
             $prefix = 'in_';
