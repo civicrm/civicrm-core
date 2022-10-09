@@ -251,7 +251,10 @@ class CRM_Extension_System {
   }
 
   /**
+   * Get the cache object.
+   *
    * @return CRM_Utils_Cache_Interface
+   * @throws \CRM_Core_Exception
    */
   public function getCache() {
     if ($this->cache === NULL) {
@@ -261,6 +264,7 @@ class CRM_Extension_System {
         'name' => $cacheGroup,
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
         'prefetch' => TRUE,
+        'withArray' => 'fast',
       ]);
     }
     return $this->cache;
