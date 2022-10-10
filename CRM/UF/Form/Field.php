@@ -411,7 +411,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       ts('Visibility'),
       CRM_Core_SelectValues::ufVisibility(),
       TRUE,
-      ['onChange' => "showHideSeletorSearch(this.value);"]
+      ['onChange' => "showHideSelectorSearch(this.value);"]
     );
 
     //CRM-4363
