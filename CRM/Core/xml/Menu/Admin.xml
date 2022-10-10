@@ -163,6 +163,11 @@
      <weight>60</weight>
   </item>
   <item>
+     <path>civicrm/admin/locationType/edit</path>
+     <title>Edit Location Type</title>
+     <page_callback>CRM_Admin_Form_LocationType</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/website_type</path>
      <title>Website Types</title>
      <desc>Options for assigning website types to contacts.</desc>
