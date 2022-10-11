@@ -154,9 +154,9 @@ function showLabel( ) {
 }
 
 {/literal}{if $action neq 8}{literal}
-showHideSeletorSearch();
+showHideSelectorSearch();
 
-function showHideSeletorSearch() {
+function showHideSelectorSearch() {
   var is_search = cj('#is_search_label, #is_search_html');
   var in_selector = cj('#in_selector_label, #in_selector_html');
   if (cj("#visibility").val() == "User and User Admin Only") {
@@ -179,7 +179,7 @@ function showHideSeletorSearch() {
 }
 
 cj("#field_name_1").bind( 'change blur', function( ) {
-  showHideSeletorSearch( );
+  showHideSelectorSearch( );
 });
 
 CRM.$(function($) {
