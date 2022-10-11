@@ -24,6 +24,7 @@
   </civix>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
+    <psr0 prefix="CRM_" path="."/>
   </classloader>
   <requires>
     <ext>authx</ext>
