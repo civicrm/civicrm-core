@@ -167,9 +167,9 @@ foreach ($importEntities as $importEntity) {
             ],
             [
               'type' => 'field',
-              'key' => 'COUNT__id',
+              'key' => 'COUNT_id',
               'dataType' => 'Integer',
-              'label' => '',
+              'label' => E::ts('Number of rows'),
               'sortable' => TRUE,
             ],
           ],
