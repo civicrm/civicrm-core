@@ -47,41 +47,40 @@
                   </a>
                 </div>
               {/if}
-              {foreach from=$cd_edit.fields item=element key=field_id}
+              {if !empty($cd_edit.fields)}
                 <table class="crm-info-panel">
-                  <tr>
-                    {if $element.options_per_line != 0}
+                  {foreach from=$cd_edit.fields item=element key=field_id}
+                    <tr>
                       <td class="label">{$element.field_title}</td>
                       <td class="html-adjust">
-                        {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                        {foreach from=$element.field_value item=val}
-                          {$val}
-                          <br/>
-                        {/foreach}
-                      </td>
-                    {else}
-                      <td class="label">{$element.field_title}</td>
-                      {if $element.field_data_type == 'Money'}
-                        {if $element.field_type == 'Text'}
-                          <td class="html-adjust">{$element.data|crmMoney}</td>
+                        {if $element.options_per_line != 0}
+                          {* sort by fails for option per line. Added a variable to iterate through the element array*}
+                          {foreach from=$element.field_value item=val}
+                            {$val}
+                            <br/>
+                          {/foreach}
                         {else}
-                          <td class="html-adjust">{$element.field_value}</td>
-                        {/if}
-                      {else}
-                        <td class="html-adjust">
-                          {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                            {', '|implode:$element.contact_ref_links}
-                          {elseif $element.field_data_type == 'Memo'}
-                            {$element.field_value|nl2br}
+                          {if $element.field_data_type == 'Money'}
+                            {if $element.field_type == 'Text'}
+                              {$element.data|crmMoney}
+                            {else}
+                              {$element.field_value}
+                            {/if}
                           {else}
-                            {$element.field_value}
+                            {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
+                              {', '|implode:$element.contact_ref_links}
+                            {elseif $element.field_data_type == 'Memo'}
+                              {$element.field_value|nl2br}
+                            {else}
+                              {$element.field_value}
+                            {/if}
                           {/if}
-                        </td>
-                      {/if}
-                    {/if}
-                  </tr>
+                        {/if}
+                      </td>
+                    </tr>
+                  {/foreach}
                 </table>
-              {/foreach}
+              {/if}
               {assign var="rowCount" value=$rowCount+1}
             </div>
             <!-- end of body -->
