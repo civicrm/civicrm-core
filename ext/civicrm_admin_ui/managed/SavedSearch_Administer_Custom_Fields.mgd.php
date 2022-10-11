@@ -193,6 +193,11 @@ return [
               FALSE,
             ],
           ],
+          'addButton' => [
+            'path' => 'civicrm/admin/custom/group/field/add?reset=1&action=add&gid=[custom_group_id]',
+            'text' => E::ts('Add Custom Field'),
+            'icon' => 'fa-plus',
+          ],
         ],
         'acl_bypass' => FALSE,
       ],
