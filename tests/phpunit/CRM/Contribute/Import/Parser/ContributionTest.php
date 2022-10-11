@@ -9,6 +9,7 @@ use Civi\Api4\ContributionSoft;
 use Civi\Api4\DedupeRule;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Email;
+use Civi\Api4\Import;
 use Civi\Api4\Note;
 use Civi\Api4\OptionValue;
 use Civi\Api4\UserJob;
@@ -43,6 +44,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     DedupeRule::delete()
       ->addWhere('rule_table', '!=', 'civicrm_email')
       ->addWhere('dedupe_rule_group_id.name', '=', 'IndividualUnsupervised')->execute();
+    $this->callAPISuccess('Extension', 'disable', ['key' => 'civiimport']);
     parent::tearDown();
   }
 
@@ -815,6 +817,16 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'rule_table' => 'civicrm_contact',
       'rule_field' => 'last_name',
     ]);
+  }
+
+  /**
+   * Test the Import api works from the extension when the extension is enabled after the import.
+   */
+  public function testEnableExtension(): void {
+    $this->importContributionsDotCSV();
+    $this->callAPISuccess('Extension', 'enable', ['key' => 'civiimport']);
+    $result = Import::get($this->userJobID)->execute();
+    $this->assertEquals('ERROR', $result->first()['_status']);
   }
 
 }
