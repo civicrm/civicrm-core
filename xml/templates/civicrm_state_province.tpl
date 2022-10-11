@@ -114,8 +114,6 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1226, 1101, "UP", "Uttar Pradesh"),
 (1227, 1101, "WB", "West Bengal"),
 (1228, 1101, "AN", "Andaman and Nicobar Islands"),
-(1229, 1101, "DN", "Dadra and Nagar Haveli"),
-(1230, 1101, "DD", "Daman and Diu"),
 (1231, 1101, "DL", "Delhi"),
 (1232, 1101, "LD", "Lakshadweep"),
 (1233, 1101, "PY", "Pondicherry"),
@@ -4160,7 +4158,12 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
  (NULL, 1023, 'SAN', 'Sandys'),
  (NULL, 1023, 'SMI', 'Smiths'),
  (NULL, 1023, 'SOU', 'Southampton'),
- (NULL, 1023, 'WAR', 'Warwick')
- 
+ (NULL, 1023, 'WAR', 'Warwick'),
+
+-- Add in missing Indian State provinces
+
+(NULL, 1101, "DH", "Dādra and Nagar Haveli and Damān and Diu"),
+(NULL, 1101, "LA", "Ladākh")
+
  -- end of statement:
  ;
