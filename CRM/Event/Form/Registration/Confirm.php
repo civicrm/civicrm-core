@@ -1061,11 +1061,26 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     // get the add to groups
     $addToGroups = [];
-
-    if (!empty($form->_fields)) {
-      foreach ($form->_fields as $key => $value) {
-        if (!empty($value['add_to_group_id'])) {
-          $addToGroups[$value['add_to_group_id']] = $value['add_to_group_id'];
+    if (empty($params['registered_by_id'])) {
+      $topProfile = 'custom_pre_id';
+      $additionalProfiles = 'custom_post_id';
+    }
+    else {
+      $topProfile = 'additional_custom_pre_id';
+      $additionalProfiles = 'additional_custom_post_id';
+    }
+    $profiles = $form->_values[$additionalProfiles] ?? [];
+    if (!empty($form->_values[$topProfile])) {
+      $profiles[] = $form->_values[$topProfile];
+    }
+    if (!empty($profiles)) {
+      $uFGroups = \Civi\Api4\UFGroup::get()
+        ->addSelect('add_to_group_id')
+        ->addWhere('id', 'IN', $profiles)
+        ->execute();
+      foreach ($uFGroups as $uFGroup) {
+        if (!empty($uFGroup['add_to_group_id'])) {
+          $addToGroups[$uFGroup['add_to_group_id']] = $uFGroup['add_to_group_id'];
         }
       }
     }
