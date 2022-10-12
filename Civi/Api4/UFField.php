@@ -14,7 +14,6 @@ namespace Civi\Api4;
  * UFField entity - aka profile fields.
  *
  * @see \Civi\Api4\UFGroup
- * @searchable none
  * @orderBy weight
  * @groupWeightsBy uf_group_id
  * @since 5.19
