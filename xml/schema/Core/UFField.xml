@@ -7,6 +7,9 @@
   <comment>User Framework fields and their properties.</comment>
   <add>1.1</add>
   <log>true</log>
+  <paths>
+    <add>civicrm/admin/uf/group/field/add?reset=1&amp;action=add&amp;gid=[custom_group_id]</add>
+  </paths>
   <field>
     <name>id</name>
     <title>Profile Field ID</title>
