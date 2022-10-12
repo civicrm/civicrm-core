@@ -5,7 +5,7 @@ ALTER TABLE civicrm_job_log MODIFY COLUMN data LONGTEXT COMMENT 'Potential exten
 
 -- Add in missing indian states as per iso-3166-2
 SELECT @indianCountryID := id FROM civicrm_country WHERE name = 'India' AND iso_code = 'IN';
-INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES
+INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name) VALUES
  (@indianCountryID, "LA", "Ladākh"),
  (@indianCountryID, "DH", "Dādra and Nagar Haveli and Damān and Diu");
 
