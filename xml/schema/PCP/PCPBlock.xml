@@ -8,6 +8,7 @@
   <add>2.2</add>
   <log>true</log>
   <component>CiviContribute</component>
+  <title>Personal Campaign Block</title>
   <field>
     <name>id</name>
     <title>PCP Block ID</title>
