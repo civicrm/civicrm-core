@@ -402,4 +402,26 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNull($results[2]['address_primary.city']);
   }
 
+  public function testBasicContactACLs() {
+    $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+    ];
+
+    $this->createTestRecord('Contact');
+
+    $result = Contact::get()->execute();
+    $this->assertGreaterThan(0, $result->count());
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+    ];
+
+    $this->createTestRecord('Contact');
+
+    $result = Contact::get()->execute();
+    $this->assertCount(0, $result);
+  }
+
 }
