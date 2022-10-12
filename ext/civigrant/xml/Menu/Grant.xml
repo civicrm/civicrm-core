@@ -35,4 +35,26 @@
      <page_callback>CRM_Grant_Page_Tab</page_callback>
      <access_arguments>access CiviGrant</access_arguments>
   </item>
+  <item>
+     <path>civicrm/admin/options/grant_type</path>
+     <title>Grant Types</title>
+     <desc>List of types which can be assigned to Grants. (Enable CiviGrant from Administer > System Settings > Enable Components if you want to track grants.)</desc>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <adminGroup>Option Lists</adminGroup>
+     <weight>385</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/grant_status/edit</path>
+     <title>Edit Grant Types</title>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <adminGroup>Option Lists</adminGroup>
+     <weight>385</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/grant_type/edit</path>
+     <title>Edit Grant Status</title>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <adminGroup>Option Lists</adminGroup>
+     <weight>385</weight>
+  </item>
 </menu>

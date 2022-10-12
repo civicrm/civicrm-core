@@ -50,6 +50,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    */
   public function preProcess() {
     parent::preProcess();
+    CRM_Utils_Request::retrieve('action', 'String', $this);
+    CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
+    $this->set('BAOName', 'CRM_Core_BAO_OptionValue');
     $session = CRM_Core_Session::singleton();
     if (!$this->_gName && !empty($this->urlPath[3])) {
       $this->_gName = $this->urlPath[3];
