@@ -85,7 +85,7 @@
   <field>
     <name>data</name>
     <title>Extended Data</title>
-    <type>text</type>
+    <type>longtext</type>
     <comment>Potential extended data for specific job run (e.g. tracebacks).</comment>
     <add>4.1</add>
   </field>

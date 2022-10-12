@@ -1,5 +1,8 @@
 {* file to handle db changes in 5.56.alpha1 during upgrade *}
 
+-- dev/core#3905 Update data type for data to LONGTEXT
+ALTER TABLE civicrm_job_log MODIFY COLUMN data LONGTEXT COMMENT 'Potential extended data for specific job run (e.g. tracebacks).';
+
 -- Add in missing indian states as per iso-3166-2
 SELECT @indianCountryID := id FROM civicrm_country WHERE name = 'India' AND iso_code = 'IN';
 INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES
