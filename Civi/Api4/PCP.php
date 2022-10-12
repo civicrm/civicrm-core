@@ -11,8 +11,11 @@
 namespace Civi\Api4;
 
 /**
- * PCP entity.
+ * Personal Campaign Pages.
  *
+ * Personalized contribution pages for individuals to fundraise toward a common goal.
+ *
+ * @see https://docs.civicrm.org/user/en/latest/contributions/personal-campaign-pages/
  * @searchable secondary
  * @since 5.42
  * @package Civi\Api4
