@@ -62,4 +62,39 @@ class SubscriptionHistoryTest extends Api4TestBase {
     $this->assertLessThanOrEqual(time(), strtotime($historyRemoved->single()['date']));
   }
 
+  public function testGetPermissions() {
+    $this->createLoggedInUser();
+
+    $contact = $this->createTestRecord('Contact');
+    $group = $this->createTestRecord('Group');
+    $groupContact = $this->createTestRecord('GroupContact', [
+      'group_id' => $group['id'],
+      'contact_id' => $contact['id'],
+    ]);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+    ];
+
+    $historyAdded = SubscriptionHistory::get()
+      ->addSelect('*')
+      ->addWhere('group_id', '=', $group['id'])
+      ->addWhere('status', '=', 'Added')
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(1, $historyAdded);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $historyAdded = SubscriptionHistory::get()
+      ->addSelect('*')
+      ->addWhere('group_id', '=', $group['id'])
+      ->addWhere('status', '=', 'Added')
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(0, $historyAdded);
+
+  }
+
 }
