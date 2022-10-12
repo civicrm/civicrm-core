@@ -3949,8 +3949,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-15443 - ensure getlist api does not return deleted contacts.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetlistExcludeConditions(): void {
     $name = 'Scarabée';
@@ -3967,6 +3965,16 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals($contact, $result['values'][0]['id']);
+  }
+
+  /**
+   * Test getlist gets an organization with a number that is not a valid organization ID.
+   */
+  public function testGetlistInvalidID(): void {
+    $individualID = $this->individualCreate();
+    $contact = $this->organizationCreate(['organization_name' => 'Org ' . $individualID]);
+    $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $individualID, 'params' => ['contact_type' => 'Organization']]);
+    $this->assertEquals(1, $result['count']);
   }
 
   /**
