@@ -3,14 +3,14 @@ use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
   [
-    'name' => 'SavedSearch_Financial_Types',
+    'name' => 'SavedSearch_Administer_Financial_Types',
     'entity' => 'SavedSearch',
     'cleanup' => 'unused',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'Financial_Types',
+        'name' => 'Administer_Financial_Types',
         'label' => E::ts('Financial Types'),
         'form_values' => NULL,
         'mapping_id' => NULL,
@@ -65,8 +65,8 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Financial_Types_Table_1',
-        'label' => E::ts('Financial Types Table 1'),
-        'saved_search_id.name' => 'Financial_Types',
+        'label' => E::ts('Administer Financial Types'),
+        'saved_search_id.name' => 'Administer_Financial_Types',
         'type' => 'table',
         'settings' => [
           'actions' => FALSE,
@@ -77,7 +77,12 @@ return [
           ],
           'pager' => [],
           'placeholder' => 5,
-          'sort' => [],
+          'sort' => [
+            [
+              'name',
+              'ASC',
+            ],
+          ],
           'columns' => [
             [
               'type' => 'field',
@@ -93,13 +98,6 @@ return [
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
-              'icons' => [
-                [
-                  'icon' => 'fa-pencil',
-                  'side' => 'left',
-                  'if' => [],
-                ],
-              ],
             ],
             [
               'type' => 'field',
@@ -136,7 +134,7 @@ return [
               'size' => 'btn-xs',
               'links' => [
                 [
-                  'path' => '/civicrm/admin/financial/financialType/accounts?reset=1&action=browse&aid=[id]',
+                  'path' => 'civicrm/admin/financial/financialType/accounts?reset=1&action=browse&aid=[id]',
                   'icon' => '',
                   'text' => E::ts('Accounts'),
                   'style' => 'default',
@@ -146,41 +144,25 @@ return [
                   'join' => '',
                   'target' => '',
                 ],
-              ],
-              'type' => 'buttons',
-              'alignment' => 'text-right',
-            ],
-            [
-              'size' => 'btn-sm',
-              'links' => [
                 [
-                  'path' => '/civicrm/admin/financial/financialType?action=update&id=[id]&reset=1',
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
                   'condition' => [],
-                  'entity' => '',
-                  'action' => '',
+                  'entity' => 'FinancialType',
+                  'action' => 'update',
                   'join' => '',
-                  'target' => '',
+                  'target' => 'crm-popup',
                 ],
-              ],
-              'type' => 'buttons',
-              'alignment' => 'text-right',
-            ],
-            [
-              'size' => 'btn-sm',
-              'links' => [
                 [
-                  'path' => '/civicrm/admin/financial/financialType?action=delete&id=[id]',
-                  'icon' => 'fa-trash-o',
+                  'icon' => 'fa-trash',
                   'text' => E::ts('Delete'),
                   'style' => 'danger',
                   'condition' => [],
-                  'entity' => '',
-                  'action' => '',
+                  'entity' => 'FinancialType',
+                  'action' => 'delete',
                   'join' => '',
-                  'target' => '',
+                  'target' => 'crm-popup',
                 ],
               ],
               'type' => 'buttons',
@@ -188,9 +170,17 @@ return [
             ],
           ],
           'addButton' => [
-            'path' => 'civicrm/admin/financial/financialType/accounts?reset=1&action=add',
+            'path' => 'civicrm/admin/financial/financialType/edit?reset=1&action=add',
             'text' => E::ts('Add Financial Type'),
             'icon' => 'fa-plus',
+          ],
+          'cssRules' => [
+            [
+              'disabled',
+              'is_active',
+              '=',
+              FALSE,
+            ],
           ],
         ],
         'acl_bypass' => FALSE,
