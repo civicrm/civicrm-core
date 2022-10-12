@@ -18,7 +18,7 @@ class CRM_Search_Page_Admin extends CRM_Core_Page {
 
   public function run() {
     $breadCrumb = [
-      'title' => E::ts('Search Kit'),
+      'title' => E::ts('SearchKit'),
       'url' => CRM_Utils_System::url('civicrm/admin/search', NULL, FALSE, '/list'),
     ];
     CRM_Utils_System::appendBreadCrumb([$breadCrumb]);

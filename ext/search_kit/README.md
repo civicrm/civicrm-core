@@ -1,10 +1,10 @@
-# CiviCRM Search Kit
+# CiviCRM SearchKit
 
 A core extension to create complex searches, reports & smart groups.
 
 ## Usage
 
-Once enabled, navigate to **Search > Search Kit** in the menu.
+Once enabled, navigate to **Search > SearchKit** in the menu.
 
 ## Development
 

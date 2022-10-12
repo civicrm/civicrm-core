@@ -31,7 +31,7 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
         if ($afform['type'] !== 'system' &&
           \CRM_Extension_System::singleton()->getMapper()->isActiveModule('afform_admin')
         ) {
-          CRM_Utils_System::appendBreadCrumb([['title' => E::ts('Form Builder'), 'url' => CRM_Utils_System::url('civicrm/admin/afform')]]);
+          CRM_Utils_System::appendBreadCrumb([['title' => E::ts('FormBuilder'), 'url' => CRM_Utils_System::url('civicrm/admin/afform')]]);
           CRM_Utils_System::appendBreadCrumb([['title' => E::ts('Edit Form'), 'url' => CRM_Utils_System::url('civicrm/admin/afform', NULL, FALSE, '/edit/' . $pageArgs['afform'])]]);
         }
       }

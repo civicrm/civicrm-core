@@ -15,7 +15,7 @@ foreach ($domains as $domain) {
       'version' => 4,
       'values' => [
         'name' => 'afform_admin',
-        'label' => E::ts('Form Builder'),
+        'label' => E::ts('FormBuilder'),
         'permission' => [
           'administer CiviCRM',
           'administer afform',

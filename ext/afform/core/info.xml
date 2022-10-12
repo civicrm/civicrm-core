@@ -18,7 +18,7 @@
   <compatibility>
     <ver>5.56</ver>
   </compatibility>
-  <comments>The Form Core extension is required to use any dynamic form. To administer and edit forms, also install the Form Builder extension.</comments>
+  <comments>The Form Core extension is required to use any dynamic form. To administer and edit forms, also install the FormBuilder extension.</comments>
   <civix>
     <namespace>CRM/Afform</namespace>
   </civix>

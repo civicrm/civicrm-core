@@ -14,7 +14,7 @@ foreach ($domains as $domain) {
     'params' => [
       'version' => 4,
       'values' => [
-        'label' => E::ts('Search Kit'),
+        'label' => E::ts('SearchKit'),
         'name' => 'search_kit',
         'url' => 'civicrm/admin/search',
         'icon' => 'crm-i fa-search-plus',
