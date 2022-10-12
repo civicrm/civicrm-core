@@ -142,6 +142,11 @@
     <weight>370</weight>
   </item>
   <item>
+    <path>civicrm/admin/financial/financialAccount/edit</path>
+    <title>Edit Financial Accounts</title>
+    <page_callback>CRM_Financial_Form_FinancialAccount</page_callback>
+  </item>
+  <item>
     <path>civicrm/admin/options/payment_instrument</path>
     <title>Payment Methods</title>
     <page_callback>CRM_Admin_Page_Options</page_callback>
