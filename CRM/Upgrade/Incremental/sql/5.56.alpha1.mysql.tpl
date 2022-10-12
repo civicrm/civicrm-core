@@ -14,3 +14,9 @@ SET ca.state_province_id = @DHStateID
 WHERE csp.country_id = @indianCountryID AND csp.abbreviation IN ("DN", "DD");
 
 UPDATE civicrm_state_province SET is_active = 0 WHERE country_id = @indianCountryID AND abbreviation IN ("DN", "DD");
+
+-- Fix incorrect civicrm_preferences_date description for activityDate and searchDate
+
+UPDATE civicrm_preferences_date SET description = '{ts escape="sql"}Date for relationships. activities. contributions: receive, receipt, cancel. membership: join, start, renew. case: start, end.{/ts}' WHERE civicrm_preferences_date.name = 'activityDate';
+
+UPDATE civicrm_preferences_date SET description = '{ts escape="sql"}Used in search forms.{/ts}' WHERE civicrm_preferences_date.name = 'searchDate';

@@ -1137,13 +1137,13 @@ VALUES
 INSERT INTO `civicrm_preferences_date`
   (name, start, end, date_format, time_format, description)
 VALUES
-  ( 'activityDate'    ,  20, 10, '',    '',  '{ts escape="sql"}Date for activities including contributions: receive, receipt, cancel. membership: join, start, renew. case: start, end.{/ts}'         ),
+  ( 'activityDate'    ,  20, 10, '',    '',  '{ts escape="sql"}Date for relationships. activities. contributions: receive, receipt, cancel. membership: join, start, renew. case: start, end.{/ts}'         ),
   ( 'activityDateTime',  20, 10, '',     1,  '{ts escape="sql"}Date and time for activity: scheduled. participant: registered.{/ts}'                                                                  ),
   ( 'birth'           , 100,  0, '',    '',  '{ts escape="sql"}Birth and deceased dates. Only year, month and day fields are supported.{/ts}'                                                         ),
   ( 'creditCard'      ,   0, 10, 'M Y', '',  '{ts escape="sql"}Month and year only for credit card expiration.{/ts}'                                                                                  ),
   ( 'custom'          ,  20, 20, '',    '',  '{ts escape="sql"}Uses date range passed in by form field. Can pass in a posix date part parameter. Start and end offsets defined here are ignored.{/ts}'),
   ( 'mailing'         ,   0,  1, '',    '',  '{ts escape="sql"}Date and time. Used for scheduling mailings.{/ts}'                                                                                     ),
-  ( 'searchDate'      ,  20, 20, '',    '',  '{ts escape="sql"}Used in search forms and for relationships.{/ts}'                                                                                      );
+  ( 'searchDate'      ,  20, 20, '',    '',  '{ts escape="sql"}Used in search forms.{/ts}'                                                                                      );
 
 
 -- various processor options
