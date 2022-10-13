@@ -53,7 +53,7 @@ class LegacySpecScanner implements AutoServiceInterface {
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
     foreach ($locations as $location) {
-      $path = \CRM_Utils_File::addTrailingSlash(dirname($location)) . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
+      $path = \CRM_Utils_File::addTrailingSlash(dirname($location ?? '')) . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
       if (!file_exists($path) || !is_dir($path)) {
         $resource = new \Symfony\Component\Config\Resource\FileExistenceResource($path);
         $container->addResource($resource);
