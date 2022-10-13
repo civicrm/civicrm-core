@@ -54,7 +54,7 @@
       {if $mem_end_date}
        <tr>
         <td {$labelStyle}>
-         {ts}Membership End Date{/ts}
+         {ts}Membership Expiration Date{/ts}
         </td>
         <td {$valueStyle}>
           {$mem_end_date|crmDate}

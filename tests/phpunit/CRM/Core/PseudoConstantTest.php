@@ -800,11 +800,11 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Member_DAO_MembershipStatus' => [
         [
           'fieldName' => 'start_event',
-          'sample' => 'start date',
+          'sample' => 'Membership Start Date',
         ],
         [
           'fieldName' => 'end_event',
-          'sample' => 'member since',
+          'sample' => 'Member Since',
         ],
         [
           'fieldName' => 'start_event_adjust_unit',

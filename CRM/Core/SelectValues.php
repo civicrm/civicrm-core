@@ -156,9 +156,9 @@ class CRM_Core_SelectValues {
    */
   public static function eventDate() {
     return [
-      'start_date' => ts('start date'),
-      'end_date' => ts('end date'),
-      'join_date' => ts('member since'),
+      'start_date' => ts('Membership Start Date'),
+      'end_date' => ts('Membership Expiration Date'),
+      'join_date' => ts('Member Since'),
     ];
   }
 

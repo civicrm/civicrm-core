@@ -320,7 +320,7 @@
           <th>{ts}Membership Type{/ts}</th>
           <th class="currency">{ts}Membership Fee{/ts}</th>
           <th class="start_date">{ts}Membership Start Date{/ts}</th>
-          <th class="end_date">{ts}Membership End Date{/ts}</th>
+          <th class="end_date">{ts}Membership Expiration Date{/ts}</th>
           <th>{ts}Source{/ts}</th>
           <th>{ts}Status{/ts}</th>
           {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
