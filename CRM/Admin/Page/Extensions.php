@@ -155,6 +155,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $keys = array_keys($manager->getStatuses());
     sort($keys);
     $hiddenExtensions = $mapper->getKeysByTag('mgmt:hidden');
+    $requiredExtensions = $mapper->getKeysByTag('mgmt:required');
     foreach ($keys as $key) {
       if (in_array($key, $hiddenExtensions)) {
         continue;
@@ -202,7 +203,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       }
       // TODO if extbrowser is enabled and extbrowser has newer version than extcontainer,
       // then $action += CRM_Core_Action::UPDATE
-      if ($action) {
+      if ($action && !in_array($key, $requiredExtensions)) {
         $row['action'] = CRM_Core_Action::formLink(self::links(),
           $action,
           ['id' => $row['id'], 'key' => $obj->key],
