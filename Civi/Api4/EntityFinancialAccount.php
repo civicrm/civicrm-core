@@ -17,7 +17,7 @@ namespace Civi\Api4;
  *
  * @ui_join_filters account_relationship
  *
- * @searchable bridge
+ * @searchable secondary
  * @since 5.37
  * @package Civi\Api4
  */

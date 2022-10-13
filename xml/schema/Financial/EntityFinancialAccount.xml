@@ -31,6 +31,10 @@
     <required>true</required>
     <import>true</import>
     <add>4.3</add>
+    <html>
+      <label>Entity Type</label>
+      <type>Select</type>
+    </html>
     <comment>Links to an entity_table like civicrm_financial_type</comment>
     <pseudoconstant>
       <callback>CRM_Financial_BAO_EntityFinancialAccount::entityTables</callback>
@@ -42,6 +46,10 @@
     <type>int unsigned</type>
     <required>true</required>
     <add>4.3</add>
+    <html>
+      <label>Entity</label>
+      <type>EntityRef</type>
+    </html>
     <comment>Links to an id in the entity_table, such as vid in civicrm_financial_type</comment>
   </field>
       <dynamicForeignKey>

@@ -134,8 +134,8 @@ return [
               'size' => 'btn-xs',
               'links' => [
                 [
-                  'path' => 'civicrm/admin/financial/financialType/accounts?reset=1&action=browse&aid=[id]',
-                  'icon' => '',
+                  'path' => 'civicrm/admin/financial/financialType/accounts/list#/?entity_id=[id]',
+                  'icon' => 'fa-external-link',
                   'text' => E::ts('Accounts'),
                   'style' => 'default',
                   'condition' => [],
