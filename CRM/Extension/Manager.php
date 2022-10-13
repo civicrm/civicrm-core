@@ -315,6 +315,8 @@ class CRM_Extension_Manager {
     $this->mapper->refresh();
     if (!CRM_Core_Config::isUpgradeMode()) {
       \Civi::reset();
+      // Class-index needs to be cleared before we restart the container
+      \Civi\Core\ClassScanner::cache('index')->flush();
       \CRM_Core_Config::singleton(TRUE, TRUE);
       CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
 
