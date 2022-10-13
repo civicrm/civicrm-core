@@ -24,6 +24,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\EntityTag;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -120,6 +121,22 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['name', 'label', 'description', 'icon'], $actFields['activity_type_id']['suffixes']);
     $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['status_id']['suffixes']);
     $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['tags']['suffixes']);
+  }
+
+  public function testDynamicFks() {
+    $tagFields = EntityTag::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertEmpty($tagFields['entity_id']['fk_entity']);
+
+    $tagFields = EntityTag::getFields(FALSE)
+      ->addValue('entity_table', 'civicrm_activity')
+      ->execute()->indexBy('name');
+    $this->assertEquals('Activity', $tagFields['entity_id']['fk_entity']);
+
+    $tagFields = EntityTag::getFields(FALSE)
+      ->addValue('entity_table:name', 'Contact')
+      ->execute()->indexBy('name');
+    $this->assertEquals('Contact', $tagFields['entity_id']['fk_entity']);
   }
 
 }

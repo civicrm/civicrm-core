@@ -46,7 +46,7 @@ class SpecGatherer extends AutoService {
 
     // Real entities
     if (strpos($entity, 'Custom_') !== 0) {
-      $this->addDAOFields($entity, $action, $specification);
+      $this->addDAOFields($entity, $action, $specification, $values);
       if ($includeCustom) {
         $this->addCustomFields($entity, $specification);
       }
@@ -83,8 +83,9 @@ class SpecGatherer extends AutoService {
    * @param string $entity
    * @param string $action
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
+   * @param array $values
    */
-  private function addDAOFields($entity, $action, RequestSpec $spec) {
+  private function addDAOFields($entity, $action, RequestSpec $spec, array $values) {
     $DAOFields = $this->getDAOFields($entity);
 
     foreach ($DAOFields as $DAOField) {
@@ -100,8 +101,35 @@ class SpecGatherer extends AutoService {
       if ($DAOField['name'] == 'is_active' && empty($DAOField['default'])) {
         $DAOField['default'] = '1';
       }
+      $this->setDynamicFk($DAOField, $entity, $values);
       $field = SpecFormatter::arrayToField($DAOField, $entity);
       $spec->addFieldSpec($field);
+    }
+  }
+
+  /**
+   * Cleverly enables getFields to report dynamic FKs if a value is supplied for the entity type.
+   *
+   * E.g. many tables have a DFK with a pair of `entity_table` and `entity_id` columns.
+   * If you supply a value for `entity_table`, then getFields will output the correct `fk_entity` for the `entity_id` field.
+   *
+   * @param array $DAOField
+   * @param string $entityName
+   * @param array $values
+   */
+  private function setDynamicFk(array &$DAOField, string $entityName, array $values): void {
+    if (empty($field['FKClassName']) && $values) {
+      $bao = CoreUtil::getBAOFromApiName($entityName);
+      // Check all dynamic FKs for entity for a match with this field and a supplied value
+      foreach ($bao::getReferenceColumns() ?? [] as $reference) {
+        if ($reference instanceof \CRM_Core_Reference_Dynamic
+          && $reference->getReferenceKey() === $DAOField['name']
+          && array_key_exists($reference->getTypeColumn(), $values)
+        ) {
+          $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($values[$reference->getTypeColumn()]);
+          break;
+        }
+      }
     }
   }
 
