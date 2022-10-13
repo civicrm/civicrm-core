@@ -7143,13 +7143,13 @@ UNLOCK TABLES;
 LOCK TABLES `civicrm_preferences_date` WRITE;
 /*!40000 ALTER TABLE `civicrm_preferences_date` DISABLE KEYS */;
 INSERT INTO `civicrm_preferences_date` (`id`, `name`, `description`, `start`, `end`, `date_format`, `time_format`) VALUES
- (1,'activityDate','Date for activities including contributions: receive, receipt, cancel. membership: join, start, renew. case: start, end.',20,10,'',''),
+ (1,'activityDate','Date for relationships. activities. contributions: receive, receipt, cancel. membership: join, start, renew. case: start, end.',20,10,'',''),
  (2,'activityDateTime','Date and time for activity: scheduled. participant: registered.',20,10,'','1'),
  (3,'birth','Birth and deceased dates. Only year, month and day fields are supported.',100,0,'',''),
  (4,'creditCard','Month and year only for credit card expiration.',0,10,'M Y',''),
  (5,'custom','Uses date range passed in by form field. Can pass in a posix date part parameter. Start and end offsets defined here are ignored.',20,20,'',''),
  (6,'mailing','Date and time. Used for scheduling mailings.',0,1,'',''),
- (7,'searchDate','Used in search forms and for relationships.',20,20,'','');
+ (7,'searchDate','Used in search forms.',20,20,'','');
 /*!40000 ALTER TABLE `civicrm_preferences_date` ENABLE KEYS */;
 UNLOCK TABLES;
 
