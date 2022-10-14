@@ -1467,7 +1467,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         $params['start_date'] = $membership->start_date;
         $params['end_date'] = $membership->end_date;
 
-        // we should not created contribution record for related contacts, CRM-3371
+        // we should not create contribution record for related contacts, CRM-3371
         unset($params['contribution_status_id']);
 
         //CRM-16857: Do not create multiple line-items for inherited membership through priceset.
