@@ -214,7 +214,7 @@ class CRM_Core_ManagedEntities {
     $doUpdate = ($policy === 'always');
 
     if ($policy === 'unmodified') {
-      // If this is not an APIv4 managed entity, the entity_modidfied_date will always be null
+      // If this is not an APIv4 managed entity, the entity_modified_date will always be null
       if (!CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
         Civi::log()->warning('ManagedEntity update policy "unmodified" specified for entity type ' . $item['entity_type'] . ' which is not an APIv4 ManagedEntity. Falling back to policy "always".');
       }
