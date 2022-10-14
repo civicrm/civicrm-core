@@ -26,6 +26,7 @@
   </requires>
   <comments>Replaces legacy pages with configurable Search Display Forms.</comments>
   <classloader>
+    <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <civix>
