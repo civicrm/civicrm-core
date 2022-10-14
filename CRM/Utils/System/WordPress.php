@@ -1283,6 +1283,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       session_start();
     }
   }
+  
+  /**
+   * Get role names
+   *
+   * @return array
+   */
+  public function getRoleNames() {
+    return wp_roles()->role_names;
+  }
 
   /**
    * Perform any necessary actions prior to redirecting via POST.
