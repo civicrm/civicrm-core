@@ -6,6 +6,11 @@
   <name>civicrm_location_type</name>
   <add>1.1</add>
   <log>true</log>
+  <paths>
+    <add>civicrm/admin/locationType/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/locationType/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/locationType/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Location Type ID</title>

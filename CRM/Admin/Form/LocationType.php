@@ -25,6 +25,13 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
    */
   public $submitOnce = TRUE;
 
+  public function preProcess(): void {
+    CRM_Utils_Request::retrieve('action', 'String', $this);
+    CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
+    $this->set('BAOName', 'CRM_Core_BAO_LocationType');
+    parent::preProcess();
+  }
+
   /**
    * Build the form object.
    */

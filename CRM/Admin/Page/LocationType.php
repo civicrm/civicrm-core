@@ -50,7 +50,7 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
       self::$_links = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/locationType',
+          'url' => 'civicrm/admin/locationType/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Location Type'),
         ],
@@ -66,7 +66,7 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/locationType',
+          'url' => 'civicrm/admin/locationType/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Location Type'),
         ],
