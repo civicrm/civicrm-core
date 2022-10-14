@@ -119,6 +119,11 @@
      <weight>35</weight>
   </item>
   <item>
+     <path>civicrm/admin/reltype/edit</path>
+     <title>Edit Relationship Type</title>
+     <page_callback>CRM_Admin_Form_RelationshipType</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/subtype</path>
      <title>Contact Types</title>
      <page_callback>CRM_Admin_Page_ContactType</page_callback>
@@ -580,7 +585,7 @@
   <item>
      <path>civicrm/admin/options/grant_type</path>
      <title>Grant Types</title>
-     <desc>List of types which can be assigned to Grants. (Enable CiviGrant from Administer > Systme Settings > Enable Components if you want to track grants.)</desc>
+     <desc>List of types which can be assigned to Grants. (Enable CiviGrant from Administer > System Settings > Enable Components if you want to track grants.)</desc>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Option Lists</adminGroup>
      <weight>385</weight>

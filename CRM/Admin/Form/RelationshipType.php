@@ -41,6 +41,13 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
    */
   protected $entityFields = [];
 
+  public function preProcess(): void {
+    CRM_Utils_Request::retrieve('action', 'String', $this);
+    CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
+    $this->set('BAOName', 'CRM_Contact_BAO_RelationshipType');
+    parent::preProcess();
+  }
+
   /**
    * Set entity fields to be assigned to the form.
    */
