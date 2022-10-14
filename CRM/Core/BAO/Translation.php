@@ -223,6 +223,10 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
       // and prefer, for example, French French over US English for French Canadians.
       // Sites that genuinely want to cater to both will add translations for both
       // and we work through preferences below.
+      // @todo: Some scripts/unit tests don't set a language so nominal is null,
+      // so this then ends up retrieving all languages and then just picking
+      // one. Should it treat null in a better way? Should it be an explicit
+      // error not to have a language set?
       $translations->addWhere('language', 'LIKE', substr($userLocale->nominal ?? '', 0, 2) . '%');
     }
     else {
