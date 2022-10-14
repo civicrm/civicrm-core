@@ -25,6 +25,7 @@
   </tags>
   <comments>Financial acls - working towards moving this code to the extension from core</comments>
   <classloader>
+    <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <mixins>

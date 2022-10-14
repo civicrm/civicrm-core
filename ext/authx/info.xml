@@ -22,6 +22,7 @@
   </compatibility>
   <comments>AuthX enables remote applications to connect to CiviCRM. Use it to enable and disable different forms of authentication (such as username-password, API key, and/or JWT).</comments>
   <classloader>
+    <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <mixins>
