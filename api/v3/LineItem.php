@@ -27,7 +27,7 @@
  * @return array
  *   api result array
  *
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_line_item_create($params) {
@@ -73,8 +73,8 @@ function civicrm_api3_line_item_get($params) {
  *   Array containing id of the group to be deleted.
  *
  * @return array API result array
- * @throws API_Exception
- * @throws \CiviCRM_API3_Exception
+ * @throws CRM_Core_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_line_item_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

@@ -489,7 +489,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the grant search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -515,7 +515,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
    *
    * @param CRM_Core_Form $form
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildSearchForm(&$form) {
     $form->addSearchFieldMetadata(['Membership' => self::getSearchFieldMetadata()]);

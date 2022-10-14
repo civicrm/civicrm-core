@@ -208,7 +208,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testDeleteWithPending(int $version): void {
     $this->_apiversion = $version;

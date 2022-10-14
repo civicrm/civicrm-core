@@ -694,7 +694,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * Test unsubscribe list contains correct groups
    * when include = 'previous mailing'
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testUnsubscribeGroupList() {

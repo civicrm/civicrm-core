@@ -18,7 +18,11 @@ use Civi\Api4\UserJob;
 use Civi\BAO\Import;
 use CRM_Core_BAO_UserJob;
 
-class ImportSpecProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class ImportSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc
@@ -41,6 +45,7 @@ class ImportSpecProvider implements Generic\SpecProviderInterface {
       $field = new FieldSpec($column['name'], $spec->getEntity(), 'String');
       $field->setTitle(ts('Import field') . ':' . $column['label']);
       $field->setLabel($column['label']);
+      $field->setType('Field');
       $field->setReadonly($isInternalField);
       $field->setDescription(ts('Data being imported into the field.'));
       $field->setColumnName($column['name']);

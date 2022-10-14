@@ -41,7 +41,7 @@ class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\Hook
     return [
       'active' => ts('Active'),
       // ^^ The queue is active. It will execute tasks at the nearest convenience.
-      'complete' => ts('Complete'),
+      'completed' => ts('Complete'),
       // ^^ The queue will no longer execute tasks - because no new tasks are expected. Everything is complete.
       'draft' => ts('Draft'),
       // ^^ The queue is not ready to execute tasks - because we are still curating a list of tasks.
@@ -97,7 +97,7 @@ class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\Hook
    * @param \CRM_Queue_Queue $queue
    * @param array $items
    * @param array $outcomes
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @see CRM_Utils_Hook::queueRun()
    */
   public static function hook_civicrm_queueRun_task(CRM_Queue_Queue $queue, array $items, array &$outcomes) {

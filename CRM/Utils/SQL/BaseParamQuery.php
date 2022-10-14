@@ -125,7 +125,7 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
                 $values[$valueKey] = 'NULL';
               }
               elseif (!is_numeric($value)) {
-                //throw new API_Exception("Failed encoding non-numeric value" . var_export(array($m[0] => $values), TRUE));
+                //throw new CRM_Core_Exception("Failed encoding non-numeric value" . var_export(array($m[0] => $values), TRUE));
                 throw new CRM_Core_Exception("Failed encoding non-numeric value (" . $m[0] . ")");
               }
             }

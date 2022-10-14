@@ -204,7 +204,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    * @throws \League\Csv\Exception
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testExportComponentsMembership(): void {
     $this->setUpMembershipExportData();
@@ -325,7 +325,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Basic test to ensure the exportComponents function can export selected fields for activity
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportComponentsActivity(): void {
@@ -408,7 +407,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up some data for us to do testing on.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUpContributionExportData(): void {
     $this->setUpContactExportData();
@@ -420,7 +418,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up some data for us to do testing on.
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function setUpMembershipExportData(): void {
     $this->setUpContactExportData();
@@ -442,7 +439,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up data to test case export.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setupCaseExportData(): void {
     $contactID1 = $this->individualCreate();
@@ -463,7 +459,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up some data for us to do testing on.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUpActivityExportData(): void {
     $this->setUpContactExportData();
@@ -516,7 +511,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param int $isPrimaryOnly
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    * @dataProvider getBooleanDataProvider
    */
@@ -554,7 +548,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * does NOT retain the gender of the former.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportPseudoField(): void {
@@ -599,7 +592,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test exporting relationships.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportRelationships(): void {
@@ -725,9 +717,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * Test custom data exporting.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \League\Csv\Exception
    */
@@ -774,7 +764,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Attempt to do a fairly full export of location data.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportIMData(): void {
@@ -860,9 +849,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * Less over the top complete than the im test.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \League\Csv\Exception
    */
@@ -939,7 +926,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Export City against multiple location types.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportAddressData(): void {
@@ -1052,7 +1038,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test master_address_id field when no merge is in play.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportMasterAddress(): void {
@@ -1074,7 +1059,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test merging same address when specifying fields.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testMergeSameAddressSpecifyFields(): void {
@@ -1086,7 +1070,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test the merge same address option.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testMergeSameAddress(): void {
@@ -1190,7 +1173,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Tests the options for greeting templates when choosing to merge same address.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testMergeSameAddressGreetingOptions(): void {
@@ -1258,7 +1240,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * So C take preference over A and thus C is exported as result.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testMergeSameAddressOnExport(): void {
@@ -1385,7 +1366,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @return array
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function setUpHousehold(): array {
     $this->setUpContactExportData();
@@ -1889,7 +1869,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * https://lab.civicrm.org/dev/core/issues/819
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \League\Csv\Exception
    */
   public function testExportIncompleteSubmission(): void {
@@ -2168,7 +2147,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param string $exportMode
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setupBaseExportData($exportMode): void {
     $this->createLoggedInUser();
@@ -2985,7 +2963,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test get preview function on export processor.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testExportGetPreview(): void {
     $this->setUpContactExportData();
@@ -3025,7 +3002,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up contacts which will be merged with the same address option.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function setUpContactSameAddressExportData(): void {
     $this->setUpContactExportData();

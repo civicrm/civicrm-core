@@ -42,7 +42,6 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    *   or NULL if params is present and doesn't have and for a field.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function sql() {
     if ($this->params &&
@@ -228,7 +227,7 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    * @param string $fieldName
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getFieldType($fieldName) {
     $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($this->rule_table);

@@ -46,7 +46,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
    * Fire ValidateValuesEvent several times - and ensure it conveys the
    * expected data.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testHookData() {
@@ -160,7 +160,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
       ])->execute();
       $this->fail('Expected an exception due to validation error');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertEquals(1, $hookCount);
       $this->assertRegExp(';not sufficiently namey;', $e->getMessage());
       $this->assertRegExp(';tongue twister;', $e->getMessage());

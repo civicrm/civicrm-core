@@ -26,7 +26,6 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function preProcess() {
     $id = $this->getID();
@@ -119,9 +118,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         ->addJoin('Contact AS contact', 'LEFT', ['contact.id', '=', 'participant.contact_id'])
         ->addWhere('entity_table', '=', 'civicrm_participant')
         ->addWhere('contribution_id', '=', $id)
+        ->addGroupBy('entity_id')
         ->execute();
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // likely don't have permission for events/participants
       $participantLineItems = [];
     }
@@ -380,7 +380,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         ->addValue('id', $this->getID())
         ->execute()->first()['access'];
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       return FALSE;
     }
   }

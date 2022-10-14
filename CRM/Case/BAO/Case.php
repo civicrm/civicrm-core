@@ -30,11 +30,12 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
 
   /**
    * Is CiviCase enabled?
-   *
+   * @deprecated
    * @return bool
    */
   public static function enabled() {
-    return CRM_Core_Component::isEnabled('CiviCase');
+    CRM_Core_Error::deprecatedFunctionWarning('isComponentEnabled');
+    return self::isComponentEnabled();
   }
 
   /**
@@ -63,7 +64,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
    */
   public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
     // FIXME: The EventScanner ought to skip over disabled components when registering HookInterface
-    if (!CRM_Core_Component::isEnabled('CiviCase')) {
+    if (!self::isComponentEnabled()) {
       return;
     }
     if ($e->entity === 'Activity' && in_array($e->action, ['create', 'edit'])) {
@@ -1876,7 +1877,7 @@ HERESQL;
     try {
       return civicrm_api3('Case', 'getcount', $params);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // Lack of permissions will throw an exception
       return 0;
     }
@@ -2467,7 +2468,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     }
 
     //do check for civicase component enabled.
-    if ($checkComponent && !self::enabled()) {
+    if ($checkComponent && !self::isComponentEnabled()) {
       return $allow;
     }
 
@@ -2490,7 +2491,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
             'end_date' => ['IS NULL' => 1],
           ]);
         }
-        catch (CiviCRM_API3_Exception $e) {
+        catch (CRM_Core_Exception $e) {
           // Lack of permissions will throw an exception
           $caseCount = 0;
         }
@@ -2709,7 +2710,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * or 'access all cases and activities'
    */
   public static function accessCiviCase() {
-    if (!self::enabled()) {
+    if (!self::isComponentEnabled()) {
       return FALSE;
     }
 
@@ -2732,7 +2733,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @return bool
    */
   public static function accessCase($caseId, $denyClosed = TRUE) {
-    if (!$caseId || !self::enabled()) {
+    if (!$caseId || !self::isComponentEnabled()) {
       return FALSE;
     }
 
@@ -2743,7 +2744,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     try {
       return (bool) civicrm_api3('Case', 'getcount', $params);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // Lack of permissions will throw an exception
       return FALSE;
     }
@@ -2954,7 +2955,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @param int $relTypeId
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function endCaseRole($caseId, $direction, $cid, $relTypeId) {
     // Validate inputs
@@ -2987,7 +2987,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *   Whatever is known about this dao object.
    *
    * @return array|bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    *
    * @see CRM_Core_DAO::buildOptionsContext
    * @see CRM_Core_DAO::buildOptions
@@ -3058,7 +3058,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *
    * @return mixed $emailFromContactId
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @see https://issues.civicrm.org/jira/browse/CRM-20308
    */
   public static function getReceiptFrom($activityID) {
@@ -3117,7 +3117,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     try {
       $case = civicrm_api3('Case', 'getsingle', ['id' => $caseId]);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // Lack of permissions will throw an exception
       return 0;
     }
@@ -3125,7 +3125,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       try {
         $caseType = civicrm_api3('CaseType', 'getsingle', ['id' => $case['case_type_id'], 'return' => ['definition']]);
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         // Lack of permissions will throw an exception
         return 'no case type found';
       }
@@ -3136,7 +3136,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
           try {
             $relType = civicrm_api3('RelationshipType', 'getsingle', ['label_a_b' => $roleDetails['name']]);
           }
-          catch (CiviCRM_API3_Exception $e) {
+          catch (CRM_Core_Exception $e) {
           }
           if (!empty($relType['id'])) {
             $roleDetails['id'] = $relType['id'];
@@ -3146,7 +3146,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
           try {
             $relTypeBa = civicrm_api3('RelationshipType', 'getsingle', ['label_b_a' => $roleDetails['name']]);
           }
-          catch (CiviCRM_API3_Exception $e) {
+          catch (CRM_Core_Exception $e) {
           }
           if (!empty($relTypeBa['id'])) {
             if (!empty($roleDetails['direction'])) {

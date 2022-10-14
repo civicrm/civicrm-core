@@ -23,7 +23,7 @@ class SqlFunctionMIN extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'flag_before' => ['DISTINCT' => ts('Distinct')],
+        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
         'must_be' => ['SqlField'],
       ],
     ];

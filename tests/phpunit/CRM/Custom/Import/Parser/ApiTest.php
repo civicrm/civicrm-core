@@ -18,6 +18,8 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
 
   /**
    * Test the full form-flow import.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testImport(): void {
     $this->individualCreate();
@@ -50,7 +52,7 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
    * @noinspection PhpUnnecessaryLocalVariableInspection
    */
   protected function getDataSourceForm(array $submittedValues): CRM_Custom_Import_Form_DataSource {
-    /* @var \CRM_Custom_Import_Form_DataSource $form */
+    /** @var \CRM_Custom_Import_Form_DataSource $form */
     $form = $this->getFormObject('CRM_Custom_Import_Form_DataSource', $submittedValues);
     return $form;
   }
@@ -66,7 +68,7 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
    * @noinspection PhpUnnecessaryLocalVariableInspection
    */
   protected function getMapFieldForm(array $submittedValues): CRM_Custom_Import_Form_MapField {
-    /* @var \CRM_Custom_Import_Form_MapField $form */
+    /** @var \CRM_Custom_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Custom_Import_Form_MapField', $submittedValues);
     return $form;
   }
@@ -82,7 +84,7 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
    * @noinspection PhpUnnecessaryLocalVariableInspection
    */
   protected function getPreviewForm(array $submittedValues): CRM_Custom_Import_Form_Preview {
-    /* @var CRM_Custom_Import_Form_Preview $form */
+    /** @var CRM_Custom_Import_Form_Preview $form */
     $form = $this->getFormObject('CRM_Custom_Import_Form_Preview', $submittedValues);
     return $form;
   }

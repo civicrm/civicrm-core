@@ -518,7 +518,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         'label' => '"FIXME" <info@EXAMPLE.ORG>',
       ])->setRecords([['domain_id' => 1], ['domain_id' => 2]])->execute();
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->fail('failed to re-instate domain contacts ' . $e->getMessage());
     }
   }
@@ -567,7 +567,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * CHeck that all tests that have created payments have created them with the right financial entities.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function assertPostConditions(): void {
@@ -920,7 +919,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return \CRM_Core_Payment_Dummy
    *   Instance of Dummy Payment Processor
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function dummyProcessorCreate($processorParams = []) {
     $paymentProcessorID = $this->processorCreate($processorParams);
@@ -1505,7 +1504,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return array|int
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function activityCreate($params = []) {
     $params = array_merge([
@@ -1946,7 +1944,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         [['name', 'LIKE', 'Financial-Type -%'], ['name', 'LIKE', 'Sales tax %']]
       )->execute();
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->fail('failed to cleanup financial types ' . $e->getMessage());
     }
     CRM_Core_PseudoConstant::flush('taxRates');
@@ -1969,7 +1967,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Recreate default membership types.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function restoreMembershipTypes(): void {
     MembershipType::delete(FALSE)->addWhere('id', '>', 0)->execute();
@@ -2485,7 +2483,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $params Optionally modify params for membership/recur (duration_unit/frequency_unit)
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setupMembershipRecurringPaymentProcessorTransaction($params = []): void {
     $membershipParams = $recurParams = [];
@@ -2943,7 +2941,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       try {
         civicrm_api3($entity, 'delete', ['id' => $id, 'skip_undelete' => 1]);
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         // This is a best-effort cleanup function, ignore.
       }
     }
@@ -3230,7 +3228,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public function getFormObject($class, $formValues = [], $pageName = '', $searchFormValues = []) {
     $_POST = $formValues;
-    /* @var CRM_Core_Form $form */
+    /** @var CRM_Core_Form $form */
     $form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     switch ($class) {
@@ -3432,7 +3430,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param bool $teardown
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setupForSmsTests($teardown = FALSE) {
     require_once 'CiviTest/CiviTestSMSProvider.php';
@@ -3608,7 +3606,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Validate all created contributions.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function validateAllContributions(): void {
     $contributions = Contribution::get(FALSE)->setSelect(['total_amount', 'tax_amount'])->execute();
@@ -3847,7 +3845,7 @@ WHERE a1.is_primary = 0
   /**
    * Delete any extraneous relationship types.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function deleteNonDefaultRelationshipTypes(): void {
@@ -3880,7 +3878,7 @@ WHERE a1.is_primary = 0
 
       CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->fail('failed to cleanup custom groups ' . $e->getMessage());
     }
   }

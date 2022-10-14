@@ -84,7 +84,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -176,7 +175,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    *
@@ -256,7 +254,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   /**
    * CRM-18000 - Test start_date, end_date after renewal
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -307,7 +304,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * Data provider for test process membership.
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getMembershipData(): array {
@@ -424,7 +421,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * Create a campaign.
    *
    * @return mixed
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function createCampaign(): int {

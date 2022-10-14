@@ -59,9 +59,7 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
   /**
    * Test email uses signature.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testPostProcessWithSignature(): void {
@@ -95,7 +93,7 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     }
     $deceasedContactID = $this->individualCreate(['is_deceased' => 1, 'email' => 'dead@example.com']);
     $to[] = $deceasedContactID . '::' . 'dead@example.com';
-    /* @var CRM_Contact_Form_Task_Email $form*/
+    /** @var CRM_Contact_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
       'to' => implode(',', $to),
       'subject' => 'Really interesting stuff',

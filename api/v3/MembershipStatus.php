@@ -106,14 +106,14 @@ function civicrm_api3_membership_status_update($params) {
  *
  * @param array $params
  * @return array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @throws CRM_Core_Exception
  */
 function civicrm_api3_membership_status_delete($params) {
 
   $memberStatusDelete = CRM_Member_BAO_MembershipStatus::del($params['id'], TRUE);
   if ($memberStatusDelete) {
-    throw new API_Exception($memberStatusDelete['error_message']);
+    throw new CRM_Core_Exception($memberStatusDelete['error_message']);
   }
   return civicrm_api3_create_success();
 }
@@ -126,14 +126,14 @@ function civicrm_api3_membership_status_delete($params) {
  *
  * @param array $membershipParams
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  *
  * @return array
  *   Array of status id and status name
  */
 function civicrm_api3_membership_status_calc($membershipParams) {
   if (!($membershipID = CRM_Utils_Array::value('membership_id', $membershipParams))) {
-    throw new API_Exception('membershipParams do not contain membership_id');
+    throw new CRM_Core_Exception('membershipParams do not contain membership_id');
   }
 
   if (empty($membershipParams['id'])) {
@@ -157,7 +157,7 @@ SELECT start_date, end_date, join_date, membership_type_id
     }
   }
   else {
-    throw new API_Exception('did not find a membership record');
+    throw new CRM_Core_Exception('did not find a membership record');
   }
   return $result;
 }

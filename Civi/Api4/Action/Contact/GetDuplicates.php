@@ -19,7 +19,7 @@ use Civi\Api4\Utils\FormattingUtil;
 
 /**
  * Get matching contacts based on a dedupe rule
- * @method setDedupeRule(string $dedupeRule)
+ * @method $this setDedupeRule(string $dedupeRule)
  * @method string getDedupeRule()
  */
 class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
@@ -66,7 +66,7 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
     if (strpos($this->dedupeRule, '.Unsupervised') || strpos($this->dedupeRule, '.Supervised')) {
       [$contactType, $ruleType] = explode('.', $this->dedupeRule);
       if (!empty($item['contact_type']) && $contactType !== $item['contact_type']) {
-        throw new \API_Exception('Mismatched contact type.');
+        throw new \CRM_Core_Exception('Mismatched contact type.');
       }
       $item['contact_type'] = $contactType;
       $dedupeParams['rule'] = $ruleType;
@@ -77,7 +77,7 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
         ->addSelect('id', 'contact_type')
         ->execute()->single();
       if (!empty($item['contact_type']) && $ruleGroup['contact_type'] !== $item['contact_type']) {
-        throw new \API_Exception('Mismatched contact type.');
+        throw new \CRM_Core_Exception('Mismatched contact type.');
       }
       $item['contact_type'] = $ruleGroup['contact_type'];
       $dedupeParams['rule_group_id'] = $ruleGroup['id'];
@@ -116,7 +116,7 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
    *
    * @param array $entityValues
    * @param array $dedupeParams
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function transformCustomParams(array &$entityValues, array &$dedupeParams) {
     foreach ($entityValues as $name => $value) {

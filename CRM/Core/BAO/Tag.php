@@ -89,6 +89,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $thisref['name'] = $dao->name;
       $thisref['description'] = $dao->description;
       $thisref['is_selectable'] = $dao->is_selectable;
+      $thisref['children'] = [];
 
       if (!$dao->parent_id) {
         $this->tree[$dao->id] = &$thisref;
@@ -301,7 +302,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param bool $allowSelectingNonSelectable
    * @param null $exclude
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getColorTags($usedFor = NULL, $allowSelectingNonSelectable = FALSE, $exclude = NULL) {
     $params = [

@@ -231,7 +231,7 @@ function civicrm_api3_generic_getfield($apiRequest) {
  * @param array $params
  * @param array $apiRequest
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Exception
  */
 function _civicrm_api3_generic_getfield_spec(&$params, $apiRequest) {
@@ -272,7 +272,7 @@ function _civicrm_api3_generic_getfield_spec(&$params, $apiRequest) {
  * @param array $apiRequest
  *   Api request as an array. Keys are.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return int
  *   count of results
  */
@@ -283,7 +283,7 @@ function civicrm_api3_generic_getcount($apiRequest) {
     return (int) $result['values'];
   }
   if (!isset($result['count'])) {
-    throw new API_Exception(ts('Unexpected result from getcount') . print_r($result, TRUE));
+    throw new CRM_Core_Exception(ts('Unexpected result from getcount') . print_r($result, TRUE));
   }
   return $result['count'];
 }
@@ -363,18 +363,18 @@ function _civicrm_api3_generic_getrefcount_spec(&$params, $apiRequest) {
  * @param array $apiRequest
  *   Api request as an array.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  *   API result (int 0 or 1)
  */
 function civicrm_api3_generic_getrefcount($apiRequest) {
   $entityToClassMap = CRM_Core_DAO_AllCoreTables::daoToClass();
   if (!isset($entityToClassMap[$apiRequest['entity']])) {
-    throw new API_Exception("The entity '{$apiRequest['entity']}' is unknown or unsupported by 'getrefcount'. Consider implementing this API.", 'getrefcount_unsupported');
+    throw new CRM_Core_Exception("The entity '{$apiRequest['entity']}' is unknown or unsupported by 'getrefcount'. Consider implementing this API.", 'getrefcount_unsupported');
   }
   $daoClass = $entityToClassMap[$apiRequest['entity']];
 
-  /* @var $dao CRM_Core_DAO */
+  /** @var CRM_Core_DAO $dao */
   $dao = new $daoClass();
   $dao->id = $apiRequest['params']['id'];
   if ($dao->find(TRUE)) {
@@ -406,7 +406,7 @@ function civicrm_api3_generic_replace($apiRequest) {
  *
  * @return array
  *   Array of results
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_generic_getoptions($apiRequest) {
   // Resolve aliases.

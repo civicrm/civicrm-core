@@ -156,7 +156,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    * @param array $values
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getMappedRow(array $values): array {
     $params = [];

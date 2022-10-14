@@ -19,7 +19,7 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccessGetSingle('Participant', ['id' => $participantID]);
     $this->assertEquals(2, $participant['participant_status_id']);
 
-    /* @var CRM_Event_Form_Task_Batch $form */
+    /** @var CRM_Event_Form_Task_Batch $form */
     $form = $this->getFormObject('CRM_Event_Form_Task_Batch');
     $form->submit(['field' => [$participantID => ['participant_status_id' => 1, 'custom_' . $field['id'] => ['two' => 1, 'four' => 1]]]]);
 
@@ -36,13 +36,12 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
    * Registration'.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCancel(): void {
     $this->createEventOrder(['source' => 'Online Event Registration', 'is_pay_later' => 1]);
     $participantCancelledStatusID = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Cancelled');
 
-    /* @var CRM_Event_Form_Task_Batch $form */
+    /** @var CRM_Event_Form_Task_Batch $form */
     $form = $this->getFormObject('CRM_Event_Form_Task_Batch');
     $form->submit(['field' => [$this->ids['Participant'][0] => ['participant_status' => $participantCancelledStatusID]]]);
 

@@ -52,7 +52,7 @@ class Kernel {
    *   Array to be passed to API function.
    *
    * @return array|int
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @see runSafe
    * @deprecated
    */
@@ -72,7 +72,7 @@ class Kernel {
    *   Array to be passed to API function.
    *
    * @return array|int
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function runSafe($entity, $action, $params) {
     $apiRequest = [];
@@ -86,7 +86,7 @@ class Kernel {
         $this->dispatcher->dispatch('civi.api.exception', new ExceptionEvent($e, NULL, $apiRequest, $this));
       }
 
-      if ($e instanceof \API_Exception) {
+      if ($e instanceof \CRM_Core_Exception) {
         $err = $this->formatApiException($e, $apiRequest);
       }
       elseif ($e instanceof \PEAR_Exception) {
@@ -136,7 +136,7 @@ class Kernel {
    *
    * @param array|\Civi\Api4\Generic\AbstractAction $apiRequest
    * @return array|\Civi\Api4\Generic\Result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -155,7 +155,7 @@ class Kernel {
    * Bootstrap - Load basic dependencies and sanity-check inputs.
    *
    * @param \Civi\Api4\Generic\AbstractAction|array $apiRequest
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function boot($apiRequest) {
     require_once 'api/Exception.php';
@@ -166,7 +166,7 @@ class Kernel {
     switch ($apiRequest['version']) {
       case 3:
         if (!is_array($apiRequest['params'])) {
-          throw new \API_Exception('Input variable `params` is not an array', 2000);
+          throw new \CRM_Core_Exception('Input variable `params` is not an array', 2000);
         }
         _civicrm_api3_initialize();
         break;
@@ -176,13 +176,13 @@ class Kernel {
         break;
 
       default:
-        throw new \API_Exception('Unknown api version', 2000);
+        throw new \CRM_Core_Exception('Unknown api version', 2000);
     }
   }
 
   /**
    * @param array $apiRequest
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function validate($apiRequest) {
   }
@@ -305,7 +305,7 @@ class Kernel {
    *
    * @return array
    *   API response.
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function formatException($e, $apiRequest) {
     $data = [];
@@ -316,14 +316,14 @@ class Kernel {
   }
 
   /**
-   * @param \API_Exception $e
+   * @param \CRM_Core_Exception $e
    *   An unhandled exception.
    * @param array $apiRequest
    *   The full description of the API request.
    *
    * @return array
    *   (API response)
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function formatApiException($e, $apiRequest) {
     $data = $e->getExtraParams();
@@ -349,7 +349,7 @@ class Kernel {
    * @return array
    *   API response.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function formatPearException($e, $apiRequest) {
     $data = [];
@@ -384,7 +384,7 @@ class Kernel {
    * @param mixed $code
    *   Doesn't appear to be used.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @return array
    *   Array<type>.
    */
@@ -404,7 +404,7 @@ class Kernel {
 
     if (isset($apiRequest['params']) && is_array($apiRequest['params']) && !empty($apiRequest['params']['api.has_parent'])) {
       $errorCode = empty($data['error_code']) ? 'chained_api_failed' : $data['error_code'];
-      throw new \API_Exception('Error in call to ' . $apiRequest['entity'] . '_' . $apiRequest['action'] . ' : ' . $msg, $errorCode, $data);
+      throw new \CRM_Core_Exception('Error in call to ' . $apiRequest['entity'] . '_' . $apiRequest['action'] . ' : ' . $msg, $errorCode, $data);
     }
 
     return $data;

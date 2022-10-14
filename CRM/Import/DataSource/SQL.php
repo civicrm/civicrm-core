@@ -76,7 +76,6 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   /**
    * Initialize the datasource, based on the submitted values stored in the user job.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function initialize(): void {

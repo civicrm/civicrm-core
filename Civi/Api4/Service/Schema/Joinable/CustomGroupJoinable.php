@@ -97,7 +97,7 @@ class CustomGroupJoinable extends Joinable {
    *
    * @param $extends
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function getEntityFromExtends($extends) {

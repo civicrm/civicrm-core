@@ -337,7 +337,7 @@ function afform_civicrm_angularModules(&$angularModules) {
  *   The module definition.
  * @return array
  *   Array(string $filename => string $html).
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function _afform_get_partials($moduleName, $module) {
   $afform = civicrm_api4('Afform', 'get', [
@@ -500,14 +500,10 @@ function _afform_clear() {
 function _afform_angular_module_name($fileBaseName, $format = 'camel') {
   switch ($format) {
     case 'camel':
-      $camelCase = '';
-      foreach (preg_split('/[-_ ]/', $fileBaseName, -1, PREG_SPLIT_NO_EMPTY) as $shortNamePart) {
-        $camelCase .= ucfirst($shortNamePart);
-      }
-      return strtolower($camelCase[0]) . substr($camelCase, 1);
+      return \CRM_Utils_String::convertStringToCamel($fileBaseName, FALSE);
 
     case 'dash':
-      return strtolower(implode('-', preg_split('/[-_ ]|(?=[A-Z])/', $fileBaseName, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
+      return \CRM_Utils_String::convertStringToDash($fileBaseName);
 
     default:
       throw new \Exception("Unrecognized format");

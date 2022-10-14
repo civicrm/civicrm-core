@@ -32,7 +32,7 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
   /**
    * Basic get test.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGet(): void {
     $result = WorkflowMessage::get(FALSE)
@@ -110,7 +110,7 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
    * Only examples tagged phpunit will be checked.
    *
    * @param string $name
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @dataProvider getRenderExamples
    */

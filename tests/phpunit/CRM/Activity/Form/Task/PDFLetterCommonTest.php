@@ -20,7 +20,6 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * Test create a document with basic tokens.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateDocumentBasicTokens(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
@@ -121,7 +120,6 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * Unknown tokens are removed at the very end.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateDocumentUnknownTokens(): void {
     $activity = $this->activityCreate();

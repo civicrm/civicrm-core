@@ -18,6 +18,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Core\DAO\Event\PostUpdate;
+use Civi\Core\DAO\Event\PreUpdate;
+
 if (!defined('DB_DSN_MODE')) {
   define('DB_DSN_MODE', 'auto');
 }
@@ -44,6 +47,18 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   protected function getPrimaryKey(): array {
     return static::$_primaryKey;
+  }
+
+  /**
+   * @return string
+   */
+  protected function getFirstPrimaryKey(): string {
+    // Historically it was always 'id'. It is now the case that some entities (import entities)
+    // have a single key that is NOT 'id'. However, for entities that have multiple
+    // keys (which we support in codegen if not many other places) we return 'id'
+    // simply because that is what we historically did & we don't want to 'just change'
+    // it & break those extensions without doing the work to create an alternative.
+    return count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
   }
 
   /**
@@ -543,7 +558,7 @@ class CRM_Core_DAO extends DB_DataObject {
   public function sequenceKey() {
     static $sequenceKeys;
     if (!isset($sequenceKeys)) {
-      $sequenceKeys = [CRM_Utils_Array::single($this->getPrimaryKey()), TRUE];
+      $sequenceKeys = [$this->getFirstPrimaryKey(), TRUE];
     }
     return $sequenceKeys;
   }
@@ -641,13 +656,10 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function save($hook = TRUE) {
     $eventID = uniqid();
-    // In practice the 'Import' entities are probably the only ones with a single
-    // primary key that is not import. Should we check all if more than one?
-    // Can do that when it comes up...
-    $primaryField = CRM_Utils_Array::single($this->getPrimaryKey());
+    $primaryField = $this->getFirstPrimaryKey();
     if (!empty($this->$primaryField)) {
       if ($hook) {
-        $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
+        $preEvent = new PreUpdate($this);
         $preEvent->eventID = $eventID;
         \Civi::dispatcher()->dispatch('civi.dao.preUpdate', $preEvent);
       }
@@ -655,7 +667,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $result = $this->update();
 
       if ($hook) {
-        $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
+        $event = new PostUpdate($this, $result);
         $event->eventID = $eventID;
         \Civi::dispatcher()->dispatch('civi.dao.postUpdate', $event);
       }
@@ -663,7 +675,7 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     else {
       if ($hook) {
-        $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
+        $preEvent = new PreUpdate($this);
         $preEvent->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.preInsert", $preEvent);
       }
@@ -671,7 +683,7 @@ class CRM_Core_DAO extends DB_DataObject {
       $result = $this->insert();
 
       if ($hook) {
-        $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
+        $event = new PostUpdate($this, $result);
         $event->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.postInsert", $event);
       }
@@ -766,6 +778,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function copyValues($params) {
     $allNull = TRUE;
+    $primaryKey = $this->getFirstPrimaryKey();
     foreach ($this->fields() as $uniqueName => $field) {
       $dbName = $field['name'];
       if (array_key_exists($dbName, $params)) {
@@ -783,7 +796,19 @@ class CRM_Core_DAO extends DB_DataObject {
       // if there is no value then make the variable NULL
       if ($exists) {
         if ($value === '') {
-          $this->$dbName = 'null';
+          if ($dbName === $primaryKey && $field['type'] === CRM_Utils_Type::T_INT) {
+            // See also \Civi\Api4\Utils\FormattingUtil::formatWriteParams().
+            // The string 'null' is used in pear::db to "unset" values, whereas
+            // it skips over fields where the param is real null. However
+            // "unsetting" a primary key doesn't make sense - you can't convert
+            // an existing record to a "new" one. And then having string 'null'
+            // in the dao object can confuse later code, in particular save()
+            // which then calls the update hook instead of the create hook.
+            $this->$dbName = NULL;
+          }
+          else {
+            $this->$dbName = 'null';
+          }
         }
         elseif (is_array($value) && !empty($field['serialize'])) {
           $this->$dbName = CRM_Core_DAO::serializeField($value, $field['serialize']);
@@ -1079,16 +1104,16 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @return array
    */
-  public static function getTableNames() {
+  public static function getTableNames(): array {
     $dao = CRM_Core_DAO::executeQuery(
       "SELECT TABLE_NAME
        FROM information_schema.TABLES
        WHERE TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
          AND TABLE_NAME LIKE 'civicrm_%'
-         AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
-         AND TABLE_NAME NOT LIKE '%_temp%'
+         AND TABLE_NAME NOT LIKE '%_tmp%'
       ");
 
+    $values = [];
     while ($dao->fetch()) {
       $values[] = $dao->TABLE_NAME;
     }
@@ -1107,8 +1132,6 @@ class CRM_Core_DAO extends DB_DataObject {
        WHERE ENGINE = 'MyISAM'
          AND TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
          AND TABLE_NAME LIKE 'civicrm_%'
-         AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
-         AND TABLE_NAME NOT LIKE '%_temp%'
          AND TABLE_NAME NOT LIKE 'civicrm_tmp_%'
       ");
   }
@@ -2554,7 +2577,6 @@ SELECT contact_id
 
     $occurrences = [];
     foreach ($links as $refSpec) {
-      /** @var $refSpec CRM_Core_Reference_Interface */
       $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
       $result = $refSpec->findReferences($this);
       if ($result) {
@@ -2583,7 +2605,6 @@ SELECT contact_id
 
     $counts = [];
     foreach ($links as $refSpec) {
-      /** @var $refSpec CRM_Core_Reference_Interface */
       $count = $refSpec->getReferenceCount($this);
       if (!empty($count['count'])) {
         $counts[] = $count;
@@ -2591,7 +2612,6 @@ SELECT contact_id
     }
 
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
-      /** @var $component CRM_Core_Component_Info */
       $counts = array_merge($counts, $component->getReferenceCounts($this));
     }
     CRM_Utils_Hook::referenceCounts($this, $counts);
@@ -2621,7 +2641,7 @@ SELECT contact_id
       $links = $daoClassName::getReferenceColumns();
 
       foreach ($links as $refSpec) {
-        /** @var $refSpec CRM_Core_Reference_Interface */
+        /** @var CRM_Core_Reference_Interface $refSpec */
         if ($refSpec->matchesTargetTable($tableName)) {
           $refsFound[] = $refSpec;
         }
@@ -2639,7 +2659,7 @@ SELECT contact_id
    * Refer to CRM-17454 for information on the danger of querying the information
    * schema to derive this.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getReferencesToContactTable() {
     if (isset(\Civi::$statics[__CLASS__]) && isset(\Civi::$statics[__CLASS__]['contact_references'])) {
@@ -2710,7 +2730,7 @@ SELECT contact_id
    *
    * @param array $cidRefs
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function appendCustomContactReferenceFields(&$cidRefs) {
     $fields = civicrm_api3('CustomField', 'get', [
@@ -3367,6 +3387,16 @@ SELECT contact_id
       $suffix = '_' . ++$dupes;
     }
     $this->name = $name . $suffix;
+  }
+
+  /**
+   * Check if component is enabled for this DAO class
+   *
+   * @return bool
+   */
+  public static function isComponentEnabled(): bool {
+    $daoName = static::class;
+    return !defined("$daoName::COMPONENT") || CRM_Core_Component::isEnabled($daoName::COMPONENT);
   }
 
 }

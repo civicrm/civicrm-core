@@ -44,7 +44,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   /**
    * Test that a string replacement in a message template can be done.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMessageTemplateStringReplace(): void {
     MessageTemplate::update()->setValues(['msg_html' => '{$display_name}'])->addWhere(
@@ -70,7 +70,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   /**
    * Test that a $this->string replacement in a message template can be done.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testActionScheduleStringReplace(): void {
     ActionSchedule::create(FALSE)->setValues([

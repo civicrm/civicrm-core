@@ -488,7 +488,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   /**
    * @param array $params
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
@@ -545,7 +544,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param $primaryContactId
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function createRelationship($key, $relContactId, $primaryContactId): void {
     //if more than one duplicate contact
@@ -1056,7 +1054,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   IDs of a possible.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function getPossibleContactMatch(array $params, ?int $extIDMatch, $dedupeRuleID): ?int {
     $possibleMatches = $this->getPossibleMatchesByDedupeRule($params, $dedupeRuleID, FALSE);
@@ -1156,7 +1153,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $values
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function formatLocationBlock(&$values) {
     // @todo - remove this function.
@@ -1233,7 +1230,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *  - address, email, phone
    * @param int|null $contactID
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function fillPrimary(&$params, $values, $entity, $contactID) {
     if ($values['location_type_id'] === 'Primary') {
@@ -1270,7 +1267,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $columnNumber
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getMappingFieldFromMapperInput(array $fieldMapping, int $mappingID, int $columnNumber): array {
     $isRelationshipField = preg_match('/\d*_a_b|b_a$/', $fieldMapping[0]);
@@ -1302,7 +1299,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   or as returned from getMappingFieldFromMapperInput
    *
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getMappedFieldLabel(array $mappedField): string {
     $this->setFieldMetadata();
@@ -1333,7 +1330,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param string $direction
    *
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRelationshipLabel(int $id, string $direction): string {
     if (empty($this->relationshipLabels[$id . $direction])) {
@@ -1364,7 +1361,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *     '5_a_b' => ['contact_type' => 'Organization', 'url' => ['url' => 'https://example.org', 'website_type_id' => 1]]
    *     'im' => ['im' => 'my-handle', 'location_type_id' => 1, 'provider_id' => 1],
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getMappedRow(array $values): array {
     $params = ['relationship' => []];
@@ -1414,7 +1411,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param string $prefixString
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
   protected function getInvalidValuesForContact($value, string $prefixString): array {
@@ -1438,7 +1435,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * Also 'im_provider_id' is mapped to the 'real' field name 'provider_id'
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getFieldMappings(): array {
     $mappedFields = [];
@@ -1466,7 +1463,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @return null|string
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRelatedContactType($relationshipTypeID, $relationshipDirection): ?string {
     if (!$relationshipTypeID) {
@@ -1484,7 +1481,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @return null|string
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRelatedContactSubType(int $relationshipTypeID, $relationshipDirection): ?string {
     if (!$relationshipTypeID) {
@@ -1502,7 +1499,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @return null|string
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRelatedContactLabel($relationshipTypeID, $relationshipDirection): ?string {
     $relationshipField = 'label_' . $relationshipDirection;
@@ -1515,7 +1512,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $relationshipTypeID
    *
    * @return string[]
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRelationshipType(int $relationshipTypeID): array {
     $cacheKey = 'relationship_type' . $relationshipTypeID;
@@ -1536,7 +1533,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param mixed $importedValue
    *
    * @return void
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function addFieldToParams(array &$contactArray, array $locationValues, string $fieldName, $importedValue): void {
     if (!empty($locationValues)) {
@@ -1585,7 +1582,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @return array
    *   e.g ['5_a_b' => ['contact_type' => 'Organization', 'organization_name' => 'The Firm']]
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRelatedContactsParams(array $params): array {
     $relatedContacts = [];
@@ -1612,9 +1609,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *
    * @return int|null
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function lookupContactID(array $params, bool $isMainContact): ?int {
@@ -1648,9 +1643,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param bool $isMainContact
    *
    * @return array[]
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function processContact(array $params, array $formatted, bool $isMainContact): array {
     $params['id'] = $formatted['id'] = $this->lookupContactID($params, $isMainContact);
@@ -1677,7 +1670,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int|null|string $countryID
    *
    * @return int|string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function tryToResolveStateProvince(string $stateProvince, $countryID) {
@@ -1715,7 +1708,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $params
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function fillStateProvince(array &$params): array {
     foreach ($params as $key => $value) {
@@ -1748,7 +1741,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param array $possibleStates
    *
    * @return int|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function checkStatesForCountry(int $countryID, array $possibleStates) {
     foreach ($possibleStates as $index => $state) {
@@ -1778,7 +1771,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * @param $outcome
+   * @param int|null|string $outcome
    *
    * @return string
    */

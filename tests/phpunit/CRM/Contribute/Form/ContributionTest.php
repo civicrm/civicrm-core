@@ -76,7 +76,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Setup function.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     $this->_apiversion = 3;
@@ -182,7 +182,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCreditCardPayPal(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -480,7 +479,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *  - 1 civicrm_financial_item. This is linked to the line item and has a status of 3
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCreditCardInvalid(): void {
     $form = new CRM_Contribute_Form_Contribution();
@@ -521,7 +519,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function creates a billing address if provided.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCreditCardWithBillingAddress(): void {
     $this->submitContributionForm([
@@ -642,7 +639,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *
    * @param bool $isTaxed
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -1033,7 +1029,6 @@ Paid By: Check',
    * Test the submit function that completes the partially paid payment using Credit Card
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testPartialPaymentWithCreditCard(): void {
     // create a partially paid contribution by using back-office form
@@ -1472,7 +1467,6 @@ Paid By: Check',
    * updating multiple memberships
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testCustomFieldsOnMembershipGetUpdated(): void {
@@ -2186,7 +2180,7 @@ Paid By: Check',
    * @return \CRM_Contribute_Form_Contribution
    */
   protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
-    /* @var CRM_Contribute_Form_Contribution $form */
+    /** @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
     $form->buildForm();
     return $form;

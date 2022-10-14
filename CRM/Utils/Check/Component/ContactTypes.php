@@ -41,7 +41,7 @@ class CRM_Utils_Check_Component_ContactTypes extends CRM_Utils_Check_Component {
         'fa-picture-o'
       );
       foreach ($contactTypesWithImages as $contactType) {
-        $message->addAction($contactType['label'], FALSE, 'href', ['path' => 'civicrm/admin/options/subtype', 'query' => ['action' => 'update', 'id' => $contactType['id'], 'reset' => 1]], 'fa-pencil');
+        $message->addAction($contactType['label'], FALSE, 'href', ['path' => 'civicrm/admin/options/subtype/edit', 'query' => ['action' => 'update', 'id' => $contactType['id'], 'reset' => 1]], 'fa-pencil');
       }
       $messages[] = $message;
     }

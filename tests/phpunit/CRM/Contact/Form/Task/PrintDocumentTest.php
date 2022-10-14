@@ -51,7 +51,7 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
    */
   public function _testDocumentContent($formValues, $type) {
     $html = [];
-    /* @var CRM_Contact_Form_Task_PDF $form */
+    /** @var CRM_Contact_Form_Task_PDF $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_PDF', [], NULL, [
       'radio_ts' => 'ts_sel',
       'task' => CRM_Member_Task::PDF_LETTER,

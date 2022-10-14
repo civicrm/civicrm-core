@@ -31,7 +31,7 @@
         <legend>{ts}Comments{/ts}</legend>
             <table class="display">
                 <thead>
-                    <tr><th>{ts}Comment{/ts}</th><th>{ts}Created By{/ts}</th><th>{ts}Date{/ts}</th></tr>
+                    <tr><th>{ts}Comment{/ts}</th><th>{ts}Created By{/ts}</th><th>{ts}Date{/ts}</th><th>{ts}Modified Date{/ts}</th></tr>
                 </thead>
                 {foreach from=$comments item=comment}
                   <tr class="{cycle values='odd-row,even-row'}"><td>{$comment.note}</td><td>{$comment.createdBy}</td><td>{$comment.note_date}</td><td>{$comment.modified_date}</td></tr>

@@ -36,6 +36,8 @@
                 <td class="html-adjust">
                   {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
                     {', '|implode:$element.contact_ref_links}
+                  {elseif $element.field_data_type == 'Money'}
+                    {$element.field_value|crmMoney}
                   {else}
                     {$element.field_value}
                   {/if}

@@ -47,7 +47,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    *   the values of the posted saved search used as default values in various Search Form
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function getFormValues($id) {
     $specialDateFields = [
@@ -176,7 +175,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @return array
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchParams($id) {
     $savedSearch = \Civi\Api4\SavedSearch::get(FALSE)
@@ -339,7 +337,7 @@ WHERE  $where";
    * @param string $op
    * @param array|string|int $value
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function decodeRelativeFields(&$formValues, $fieldName, $op, $value) {
     // check if its a custom date field, if yes then 'searchDate' format the value

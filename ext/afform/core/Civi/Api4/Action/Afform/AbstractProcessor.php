@@ -52,7 +52,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Each key in the array corresponds to the name of an entity,
    * and the value is an array of arrays
    * (because of `<af-repeat>` all entities are treated as if they may be multi)
-   * E.g. $entityIds['Individual1'] = [['id' => 1, 'joins' => ['Email' => [1,2,3]]];
+   * E.g. $entityIds['Individual1'] = [['id' => 1, '_joins' => ['Email' => [['id' => 1], ['id' => 2]]];
    *
    * @var array
    */
@@ -62,7 +62,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * @param \Civi\Api4\Generic\Result $result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function _run(Result $result) {
     // This will throw an exception if the form doesn't exist or user lacks permission
@@ -106,7 +106,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
     $idField = CoreUtil::getIdFieldName($entity['type']);
     if (!empty($entity['fields'][$idField]['saved_search'])) {
-      $ids = $this->validateBySavedSearch($entity, $idField, $ids);
+      $ids = $this->validateBySavedSearch($entity, $ids);
     }
     if (!$ids) {
       return;
@@ -117,19 +117,20 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     ])->indexBy($idField);
     foreach ($ids as $index => $id) {
       $this->_entityIds[$entity['name']][$index] = [
-        'id' => isset($result[$id]) ? $id : NULL,
-        'joins' => [],
+        $idField => isset($result[$id]) ? $id : NULL,
+        '_joins' => [],
       ];
       if (isset($result[$id])) {
         $data = ['fields' => $result[$id]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
+          $joinIdField = CoreUtil::getIdFieldName($joinEntity);
           $data['joins'][$joinEntity] = (array) $api4($joinEntity, 'get', [
             'where' => self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $id),
             'limit' => !empty($join['af-repeat']) ? $join['max'] ?? 0 : 1,
-            'select' => array_keys($join['fields']),
+            'select' => array_unique(array_merge([$joinIdField], array_keys($join['fields']))),
             'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
           ]);
-          $this->_entityIds[$entity['name']][$index]['joins'][$joinEntity] = array_column($data['joins'][$joinEntity], 'id');
+          $this->_entityIds[$entity['name']][$index]['_joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($data['joins'][$joinEntity], [$joinIdField]);
         }
         $this->_entityValues[$entity['name']][$index] = $data;
       }
@@ -182,7 +183,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param string $joinEntityType
    * @param int|string $mainEntityId
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function getJoinWhereClause(FormDataModel $formDataModel, string $mainEntityName, string $joinEntityType, $mainEntityId) {
     $entity = $formDataModel->getEntity($mainEntityName);
@@ -214,7 +215,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param $entityName
    * @param $fieldName
    * @return array|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getEntityField($entityName, $fieldName) {
     if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$entityName])) {

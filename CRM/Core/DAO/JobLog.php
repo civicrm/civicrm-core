@@ -97,7 +97,7 @@ class CRM_Core_DAO_JobLog extends CRM_Core_DAO {
    * Potential extended data for specific job run (e.g. tracebacks).
    *
    * @var string|null
-   *   (SQL type: text)
+   *   (SQL type: longtext)
    *   Note that values will be retrieved from the database as a string.
    */
   public $data;
@@ -250,7 +250,7 @@ class CRM_Core_DAO_JobLog extends CRM_Core_DAO {
         ],
         'data' => [
           'name' => 'data',
-          'type' => CRM_Utils_Type::T_TEXT,
+          'type' => CRM_Utils_Type::T_LONGTEXT,
           'title' => ts('Extended Data'),
           'description' => ts('Potential extended data for specific job run (e.g. tracebacks).'),
           'where' => 'civicrm_job_log.data',

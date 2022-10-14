@@ -187,7 +187,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @param int|null $savedMappingID
    *
    * @deprecated - working to remove this in favour of `addSavedMappingFields`
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function buildSavedMappingFields($savedMappingID) {
     //to save the current mappings
@@ -266,7 +266,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @param int $columnNumber
    * @param bool $isUpdate
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function saveMappingField(int $mappingID, int $columnNumber, bool $isUpdate = FALSE): void {
@@ -293,7 +292,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   /**
    * Save the Field Mapping.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function saveMapping(): void {
@@ -321,7 +319,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -479,11 +476,14 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         'text' => $field['title'],
         'id' => $fieldName,
         'has_location' => !empty($field['hasLocationType']),
+        'default_value' => $field['default_value'] ?? '',
+        'contact_type' => $field['contact_type'] ?? NULL,
+        'match_rule' => $field['match_rule'] ?? NULL,
       ];
       if (in_array($fieldName, $highlightedFields, TRUE)) {
         $childField['text'] .= '*';
       }
-      $category = ($childField['has_location'] || $field['name'] === 'contact_id') ? 'Contact' : ($field['entity'] ?? $entity);
+      $category = ($childField['has_location'] || $field['name'] === 'contact_id') ? 'Contact' : $field['entity_instance'] ?? ($field['entity'] ?? $entity);
       if (empty($categories[$category])) {
         $category = $entity;
       }
@@ -511,7 +511,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   protected function guessMappingBasedOnColumns(string $columnHeader): string {
     $headerPatterns = $this->getHeaderPatterns();
     // do array search first to see if has mapped key
-    $columnKey = array_search($columnHeader, $this->_mapperFields, TRUE);
+    $columnKey = array_search($columnHeader, $this->getAvailableFields(), TRUE);
     if ($columnKey && empty($this->_fieldUsed[$columnKey])) {
       $this->_fieldUsed[$columnKey] = TRUE;
       return $columnKey;

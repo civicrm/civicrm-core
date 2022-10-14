@@ -47,8 +47,8 @@
 
       {counter start=0 skip=1 print=false}
       {foreach from=$rows item=row}
-      <tr id="crm-mailing_{$row.id}" class="{cycle values="odd-row,even-row"} crm-mailing crm-mailing_status-{$row.status}">
-        <td class="crm-mailing-name">{$row.name}</td>
+      <tr id="mailing-{$row.id}" class="{cycle values="odd-row,even-row"} crm-mailing crm-mailing_status-{$row.status} crm-entity" data-action="create">
+        <td class="crm-mailing-name crm-editable crmf-name">{$row.name}</td>
         {if $multilingual}
           <td class="crm-mailing-language">{$row.language}</td>
         {/if}
@@ -67,8 +67,8 @@
         <td class="crm-mailing-scheduled">{$row.scheduled}</td>
         <td class="crm-mailing-start">{$row.start}</td>
         <td class="crm-mailing-end">{$row.end}</td>
-       {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}
-          <td class="crm-mailing-campaign">{$row.campaign}</td>
+       {if call_user_func(array('CRM_Campaign_BAO_Campaign','isComponentEnabled'))}
+          <td class="crm-mailing-campaign crm-editable crmf-campaign_id" data-type="select" data-empty-option="{ts}- none -{/ts}">{$row.campaign}</td>
       {/if}
         <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
       </tr>

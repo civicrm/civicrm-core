@@ -39,7 +39,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       ts('Settings - %1 Integration', [1 => $this->_uf])
     );
 
-    if ($this->_uf == 'WordPress') {
+    if ($this->_uf === 'WordPress') {
       $this->_settings['wpBasePage'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
       $this->assign('wpBasePageEnabled', TRUE);
     }
@@ -50,7 +50,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     }
 
     // find out if drupal has its database prefixed
-    if ($this->_uf == 'Drupal8') {
+    if ($this->_uf === 'Drupal8') {
       $databases['default'] = Drupal\Core\Database\Database::getConnectionInfo('default');
     }
     else {

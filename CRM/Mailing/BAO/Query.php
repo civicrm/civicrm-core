@@ -116,7 +116,7 @@ class CRM_Mailing_BAO_Query {
   /**
    * Get the metadata for fields to be included on the mailing search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    *
    * @todo ideally this would be a trait included on the mailing search & advanced search
    * rather than a static function.
@@ -391,7 +391,7 @@ class CRM_Mailing_BAO_Query {
    *
    * @param \CRM_Mailing_Form_Search $form
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildSearchForm(&$form) {
     $form->addSearchFieldMetadata(['Mailing' => self::getSearchFieldMetadata()]);

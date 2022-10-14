@@ -36,12 +36,12 @@ class DAOCreateAction extends AbstractCreateAction {
   }
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function validateValues() {
     $idField = CoreUtil::getIdFieldName($this->getEntityName());
     if (!empty($this->values[$idField])) {
-      throw new \API_Exception("Cannot pass $idField to Create action. Use Update action instead.");
+      throw new \CRM_Core_Exception("Cannot pass $idField to Create action. Use Update action instead.");
     }
     parent::validateValues();
   }

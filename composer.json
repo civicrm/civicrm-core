@@ -53,7 +53,7 @@
     "php": "~7.2.5 || ~7.3 || ~8",
     "composer-runtime-api": "~2.0",
     "cache/integration-tests": "~0.17.0",
-    "dompdf/dompdf" : "~2",
+    "dompdf/dompdf" : "~2.0.1",
     "firebase/php-jwt": ">=3 <6",
     "rubobaquero/phpquery": "^0.9.15",
     "symfony/config": "~4.4",
@@ -69,7 +69,7 @@
     "tecnickcom/tcpdf" : "6.4.*",
     "totten/ca-config": "~22.05",
     "zetacomponents/base": "1.9.*",
-    "zetacomponents/mail": "~1.9.3",
+    "zetacomponents/mail": "~1.9.4",
     "marcj/topsort": "~1.1",
     "phpoffice/phpword": "^0.18.0",
     "pear/validate_finance_creditcard": "0.7.0",
@@ -87,7 +87,7 @@
     "league/csv": "~9.6.2",
     "league/oauth2-client": "^2.4",
     "league/oauth2-google": "^3.0",
-    "tplaner/when": "~3.0.0",
+    "tplaner/when": "~3.1",
     "xkerman/restricted-unserialize": "~1.1",
     "typo3/phar-stream-wrapper": "^2 || ^3.0",
     "brick/money": "~0.5",
@@ -125,25 +125,6 @@
       "bash tools/scripts/composer/phpword-jquery.sh",
       "bash tools/scripts/composer/guzzle-mockhandler-fix.sh"
     ]
-  },
-  "repositories": {
-    "tplaner-when-1ec099f421bff354cc5c929f83b94031423fc80": {
-      "type": "package",
-      "package": {
-        "version": "3.0.0+php53",
-        "dist": {"url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip", "type": "zip"},
-        "name": "tplaner/when",
-        "type": "library",
-        "description": "Date/Calendar recursion library.",
-        "keywords": ["recurrence", "date", "time", "DateTime"],
-        "homepage": "https://github.com/tplaner/When",
-        "license": "MIT",
-        "authors": [{"name": "Tom Planer", "email": "tplaner@gmail.com"}],
-        "require": {"php": ">=5.3.0"},
-        "require-dev": {"phpunit/phpunit": "~4.0"},
-        "autoload": {"psr-4": {"When\\": "src/"}}
-      }
-    }
   },
   "extra": {
     "downloads": {
@@ -246,7 +227,7 @@
         "url": "https://github.com/civicrm/jquery/archive/1.12.4-civicrm-1.2.zip"
       },
       "jquery-ui": {
-        "url": "https://github.com/civicrm/jqueryui/archive/1.13.1-civicrm.zip"
+        "url": "https://github.com/civicrm/jqueryui/archive/1.13.2-civicrm.zip"
       },
       "jquery-validation": {
         "url": "https://github.com/jquery-validation/jquery-validation/archive/1.19.3.zip",

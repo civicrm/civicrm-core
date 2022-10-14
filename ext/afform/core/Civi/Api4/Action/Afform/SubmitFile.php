@@ -62,21 +62,22 @@ class SubmitFile extends AbstractProcessor {
 
   protected function processForm() {
     if (empty($_FILES['file'])) {
-      throw new \API_Exception('File upload required');
+      throw new \CRM_Core_Exception('File upload required');
     }
     $afformEntity = $this->_formDataModel->getEntity($this->modelName);
     $apiEntity = $this->joinEntity ?: $afformEntity['type'];
     $entityIndex = (int) $this->entityIndex;
     $joinIndex = (int) $this->joinIndex;
+    $idField = CoreUtil::getIdFieldName($apiEntity);
     if ($this->joinEntity) {
-      $entityId = $this->_entityIds[$this->modelName][$entityIndex]['joins'][$this->joinEntity][$joinIndex] ?? NULL;
+      $entityId = $this->_entityIds[$this->modelName][$entityIndex]['_joins'][$this->joinEntity][$joinIndex][$idField] ?? NULL;
     }
     else {
-      $entityId = $this->_entityIds[$this->modelName][$entityIndex]['id'] ?? NULL;
+      $entityId = $this->_entityIds[$this->modelName][$entityIndex][$idField] ?? NULL;
     }
 
     if (!$entityId) {
-      throw new \API_Exception('Entity not found');
+      throw new \CRM_Core_Exception('Entity not found');
     }
 
     $attachmentParams = [
@@ -101,7 +102,7 @@ class SubmitFile extends AbstractProcessor {
     if (strpos($apiEntity, 'Custom_') === 0) {
       civicrm_api4($apiEntity, 'update', [
         'values' => [
-          'id' => $entityId,
+          $idField => $entityId,
           $this->fieldName => $file['id'],
         ],
       ]);

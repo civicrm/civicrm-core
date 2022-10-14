@@ -95,7 +95,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     try {
       $limit2->single();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $msg = $e->getMessage();
     }
     $this->assertRegExp(';Expected to find one Contact record;', $msg);
@@ -111,7 +111,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
    * By default our DBs are not 🦉 compliant. This test will age
    * out when we are.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testEmoji(): void {
     $schemaNeedsAlter = \CRM_Core_BAO_SchemaHandler::databaseSupportsUTF8MB4();
@@ -315,7 +315,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testOrClause(): void {
     Contact::get()
@@ -400,6 +400,28 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNull($results[2]['phone_primary.phone']);
     $this->assertNull($results[2]['im_primary.name']);
     $this->assertNull($results[2]['address_primary.city']);
+  }
+
+  public function testBasicContactACLs() {
+    $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+    ];
+
+    $this->createTestRecord('Contact');
+
+    $result = Contact::get()->execute();
+    $this->assertGreaterThan(0, $result->count());
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+    ];
+
+    $this->createTestRecord('Contact');
+
+    $result = Contact::get()->execute();
+    $this->assertCount(0, $result);
   }
 
 }

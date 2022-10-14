@@ -295,7 +295,7 @@ class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
   /**
    * Get the metadata for fields to be included on the grant search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [

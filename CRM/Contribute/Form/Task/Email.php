@@ -39,7 +39,6 @@ class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
    *
    * @return array
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function getRows(): array {

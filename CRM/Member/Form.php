@@ -399,7 +399,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @param int $membershipTypeID
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function processRecurringContribution($contributionRecurParams, $membershipTypeID) {
 
@@ -489,7 +489,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @param array $formValues
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setPriceSetParameters(array $formValues): array {
     // process price set and get total amount and line items.
@@ -532,7 +532,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getOrderParams(): array {
     return [

@@ -122,7 +122,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Preprocess form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
 
@@ -456,7 +455,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Process the renewal form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess(): void {
     // get the submitted form values.
@@ -481,7 +479,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * This function is also accessed by a unit test.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function submit() {
     $this->storeContactFields($this->_params);
@@ -728,7 +725,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    *
    * @return CRM_Member_BAO_Membership
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function processMembership($memParams, $changeToday, $numRenewTerms, $pending) {
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();

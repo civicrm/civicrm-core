@@ -75,15 +75,15 @@ class CRM_Logging_Schema {
    * @param array $fieldSpec
    *
    * @return bool
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    */
   public static function checkLoggingSupport(&$value, $fieldSpec) {
     if (!(CRM_Core_DAO::checkTriggerViewPermission(FALSE)) && $value) {
-      throw new API_Exception(ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled."));
+      throw new CRM_Core_Exception(ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled."));
     }
     // dev/core#1812 Disable logging in a multilingual environment.
     if (CRM_Core_I18n::isMultilingual() && $value) {
-      throw new API_Exception(ts("Logging is not supported in a multilingual environment!"));
+      throw new CRM_Core_Exception(ts("Logging is not supported in a multilingual environment!"));
     }
     return TRUE;
   }
@@ -142,12 +142,13 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     }
 
     // do not log temp import, cache, menu and log tables
-    $this->tables = preg_grep('/^civicrm_import_job_/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/_cache$/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/_log/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/^civicrm_queue_/', $this->tables, PREG_GREP_INVERT);
     //CRM-14672
     $this->tables = preg_grep('/^civicrm_menu/', $this->tables, PREG_GREP_INVERT);
+    // CiviCRM no longer creates temp tables with `_temp` - they are `tmp` - but this is being left in
+    // in case extensions do - since we don't want to suddenly start logging them.
     $this->tables = preg_grep('/_temp_/', $this->tables, PREG_GREP_INVERT);
     // CRM-18178
     $this->tables = preg_grep('/_bak$/', $this->tables, PREG_GREP_INVERT);
@@ -318,7 +319,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    *     'forceEngineMigration' - force engine upgrade from ARCHIVE to InnoDB?
    *
    * @return int $updateTablesCount
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function updateLogTableSchema($params) {
     $updateLogConn = FALSE;

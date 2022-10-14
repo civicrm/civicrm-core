@@ -21,7 +21,7 @@
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_message_template_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MessageTemplate');
@@ -84,7 +84,7 @@ function civicrm_api3_message_template_get($params) {
  *
  * @param array $params
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_message_template_send($params) {
@@ -110,7 +110,7 @@ function civicrm_api3_message_template_send($params) {
   if (empty($params['messageTemplateID'])) {
     if (empty($params['workflow'])) {
       // Can't use civicrm_api3_verify_mandatory for this because it would give the wrong field names
-      throw new API_Exception(
+      throw new CRM_Core_Exception(
         'Mandatory key(s) missing from params array: requires id or workflow',
         'mandatory_missing',
         ['fields' => ['id', 'workflow']]

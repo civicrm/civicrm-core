@@ -834,6 +834,10 @@ input.crm-form-entityref {
   margin: 0;
 }
 
+.crm-container .price-set-option-content .description {
+  font-size: 1em;
+}
+
 .crm-container .form-layout-compressed td.description,
 .crm-container .form-layout td.description {
   padding: 0 5px 5px 5px;
@@ -3781,7 +3785,6 @@ span.crm-status-icon {
 
 #crm-container.crm-public .price-set-row .crm-price-amount-label {
   color: #444444;
-  font-weight: bold;
 }
 
 #crm-container.crm-public .price-set-row .highlight label {

@@ -53,7 +53,6 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * @return array
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setDefaultValues() {
     $defaults = [];

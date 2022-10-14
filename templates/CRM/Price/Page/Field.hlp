@@ -89,5 +89,12 @@
   {ts}Membership Type{/ts}
 {/htxt}
 {htxt id="id-membership-type"}
-    {ts}If you select a membership type, a membership will be created or renewed when users select this option. Leave this column blank for non-membership options (e.g. magazine subscription).{/ts} 
+    {ts}If you select a membership type, a membership will be created or renewed when users select this option. Leave this column blank for non-membership options (e.g. magazine subscription).{/ts}
+{/htxt}
+
+{htxt id="description-title"}
+  {ts}Description{/ts}
+{/htxt}
+{htxt id="description"}
+    {ts}Description is not shown publicly.{/ts}
 {/htxt}

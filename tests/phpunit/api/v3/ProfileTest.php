@@ -27,7 +27,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Set up for test.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -42,9 +42,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Cleanup after test.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -101,9 +99,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    *
    * We are checking that there is no error.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testProfileGetWithAddressCustomData(): void {
     $this->_createIndividualContact();
@@ -192,7 +188,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Test getting multiple profiles, including billing.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testProfileGetMultipleHasBillingLocation(): void {
     $individual = $this->_createIndividualContact();
@@ -420,7 +415,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Check with missing required field in profile.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testProfileSubmitCheckProfileRequired(): void {
     $profileFieldValues = $this->_createIndividualContact();
@@ -449,7 +444,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check with success.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testProfileSubmit(): void {
     $profileFieldValues = $this->_createIndividualContact();
@@ -539,7 +533,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check we can submit membership batch profiles (create mode)
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testProfileSubmitMembershipBatch(): void {
     // @todo - figure out why this doesn't pass validate financials
@@ -561,7 +554,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Set is deprecated but we need to ensure it still works.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testLegacySet(): void {
     $profileFieldValues = $this->_createIndividualContact();
@@ -833,7 +825,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check handling a custom greeting.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitGreetingFields() {
     $profileFieldValues = $this->_createIndividualContact();
@@ -872,7 +863,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * @param array $params
    *
    * @return mixed
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function _createIndividualContact($params = []) {
     $contactParams = array_merge([

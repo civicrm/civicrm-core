@@ -218,12 +218,16 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
       ->addWhere('entity_table', '=', CRM_Core_DAO_AllCoreTables::getTableForEntityName($apiRequest['entity']))
       ->setCheckPermissions(FALSE)
       ->setSelect(['entity_field', 'entity_id', 'string', 'language']);
-    if ((substr($userLocale->nominal, '-3', '3') !== '_NO')) {
+    if ((substr($userLocale->nominal ?? '', '-3', '3') !== '_NO')) {
       // Generally we want to check for any translations of the base language
       // and prefer, for example, French French over US English for French Canadians.
       // Sites that genuinely want to cater to both will add translations for both
       // and we work through preferences below.
-      $translations->addWhere('language', 'LIKE', substr($userLocale->nominal, 0, 2) . '%');
+      // @todo: Some scripts/unit tests don't set a language so nominal is null,
+      // so this then ends up retrieving all languages and then just picking
+      // one. Should it treat null in a better way? Should it be an explicit
+      // error not to have a language set?
+      $translations->addWhere('language', 'LIKE', substr($userLocale->nominal ?? '', 0, 2) . '%');
     }
     else {
       // And here we have ... the Norwegians. They have three main variants which

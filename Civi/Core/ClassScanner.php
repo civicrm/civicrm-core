@@ -16,11 +16,11 @@ namespace Civi\Core;
  *
  * The implementation of scanning+caching are generally built on these assumptions:
  *
- * - Scanning the filesystem can be expensive. One scan should serve many consumers.
+ * - Scanning the filesystem is expensive. One scan should serve many consumers.
  * - Consumers want to know about specific interfaces (`get(['interface' => 'CRM_Foo_BarInterface'])`.
  *
- * We reconcile these goals by performing a single scan and then storing separate cache-items for each
- * known interface (eg `$cache->get(md5('CRM_Foo_BarInterface'))`).
+ * We reconcile these goals by performing a single scan and then storing an index.
+ * (Indexes are stored per-interface. So `$cache->get(md5('CRM_Foo_BarInterface'))` is a list of matching classes.)
  */
 class ClassScanner {
 
@@ -42,6 +42,8 @@ class ClassScanner {
   private static $caches;
 
   /**
+   * Get a list of classes which match the $criteria.
+   *
    * @param array $criteria
    *   Ex: ['interface' => 'Civi\Core\HookInterface']
    * @return string[]
@@ -84,9 +86,11 @@ class ClassScanner {
    *
    * Example:
    *   assert $cache->get(md5(HookInterface::class)) == ['CRM_Foo_Bar', 'Civi\Whiz\Bang']
+   *   assert $cache->get(md5(UserJob::class)) == ['CRM_Foo_Job1', 'Civi\Whiz\Job2']
    *
    * @return string[]
-   *   List of PHP interfaces that were detected
+   *   List of PHP interfaces that were detected.
+   *   Ex: ['\Civi\Core\HookInterface', '\Civi\UserJob\UserJobInterface']
    */
   private static function buildIndex(\CRM_Utils_Cache_Interface $cache): array {
     $allClasses = static::scanClasses();
@@ -106,6 +110,8 @@ class ClassScanner {
   }
 
   /**
+   * Build a list of Civi-related classes (including core and extensions).
+   *
    * @return array
    *   Ex: ['CRM_Foo_Bar', 'Civi\Whiz\Bang']
    */
@@ -116,6 +122,8 @@ class ClassScanner {
   }
 
   /**
+   * Build a list of Civi-related classes (core-only).
+   *
    * @return array
    *   Ex: ['CRM_Foo_Bar', 'Civi\Whiz\Bang']
    */
@@ -133,9 +141,8 @@ class ClassScanner {
     $classes = [];
     static::scanFolders($classes, $civicrmRoot, 'Civi/Test/ExampleData', '\\');
     static::scanFolders($classes, $civicrmRoot, 'CRM/*/WorkflowMessage', '_');
-    static::scanFolders($classes, $civicrmRoot, 'Civi/*/WorkflowMessage', '\\');
-    static::scanFolders($classes, $civicrmRoot, 'Civi/WorkflowMessage', '\\');
     static::scanFolders($classes, $civicrmRoot, 'CRM/*/Import', '_');
+    static::scanFolders($classes, $civicrmRoot, 'Civi', '\\', ';\\\(Security|Test)\\\;');
     if (\CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests') {
       if (strpos(get_include_path(), $civicrmRoot . 'tests/phpunit') !== FALSE) {
         static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'CRM/*/WorkflowMessage', '_');
@@ -157,6 +164,17 @@ class ClassScanner {
     });
   }
 
+  /**
+   * Does `$class` have any interfaces that we care about?
+   *
+   * @param string $class
+   *   Concrete class that we are examining.
+   *   Ex: 'Civi\Myextension\Foo'
+   * @return array
+   *   List of implemented interfaces that we care about.
+   *   Ex: ['Civi\Core\HookInterface', 'Civi\Core\Service\AutoServiceInterface']
+   * @throws \ReflectionException
+   */
   private static function getRelevantInterfaces(string $class): array {
     $rawInterfaceNames = (new \ReflectionClass($class))->getInterfaceNames();
     return preg_grep(static::CIVI_INTERFACE_REGEX, $rawInterfaceNames);
@@ -166,12 +184,13 @@ class ClassScanner {
    * Search some $classRoot folder for a list of classes.
    *
    * Return any classes that implement a Civi-related interface, such as ExampleDataInterface
-   * or HookInterface. (Specifically, interfaces matchinv CIVI_INTERFACE_REGEX.)
+   * or HookInterface. (Specifically, interfaces matching CIVI_INTERFACE_REGEX.)
    *
    * @internal
    *   Currently reserved for use within civicrm-core. Signature may change.
    * @param string[] $classes
-   *   List of known/found classes.
+   *   Alterable list of extant classes.
+   *   `scanFolders()` will add new classes to this list.
    * @param string $classRoot
    *   The base folder in which to search.
    *   Ex: The $civicrm_root or some extension's basedir.
@@ -180,9 +199,13 @@ class ClassScanner {
    *   May use wildcards.
    *   Ex: "CRM" or "Civi"
    * @param string $classDelim
-   *   Namespace separator, eg underscore or backslash.
+   *   Namespace separator, eg "_" (PEAR namespacing) or "\" (PHP namespacing).
+   * @param string|null $excludeRegex
+   *   A regular expression describing class-files that should be excluded.
+   *   For example, if you have two versions of a class that are loaded in mutually-incompatible environments,
+   *   then you may need to skip scanning.
    */
-  public static function scanFolders(array &$classes, string $classRoot, string $classDir, string $classDelim): void {
+  public static function scanFolders(array &$classes, string $classRoot, string $classDir, string $classDelim, ?string $excludeRegex = NULL): void {
     $classRoot = \CRM_Utils_File::addTrailingSlash($classRoot, '/');
 
     $baseDirs = (array) glob($classRoot . $classDir);
@@ -194,6 +217,9 @@ class ClassScanner {
         $absFile = str_replace(DIRECTORY_SEPARATOR, '/', $absFile);
         $relFile = \CRM_Utils_File::relativize($absFile, $classRoot);
         $class = str_replace('/', $classDelim, substr($relFile, 0, -4));
+        if ($excludeRegex !== NULL && preg_match($excludeRegex, $class)) {
+          continue;
+        }
         if (class_exists($class)) {
           $interfaces = static::getRelevantInterfaces($class);
           if ($interfaces) {
@@ -202,13 +228,18 @@ class ClassScanner {
         }
         elseif (!interface_exists($class) && !trait_exists($class)) {
           // If you get this error, then perhaps (a) you need to fix the name of file/class/namespace or (b) you should disable class-scanning.
-          throw new \RuntimeException("Scanned file {$relFile} for class {$class}, but it was not found.");
+          // throw new \RuntimeException("Scanned file {$relFile} for class {$class}, but it was not found.");
+          // We can't throw an exception since it breaks some test environments. We can't log because this happens too early and it leads to an infinite loop. error_log() works but is debatable if anyone will look there.
         }
       }
     }
   }
 
   /**
+   * Lookup a cache-service used by ClassScanner.
+   *
+   * There are a couple of cache services (eg "index" and "structure") with different lifecycles.
+   *
    * @param string $name
    *   - The 'index' cache describes the list of live classes that match an interface. It persists for the
    *     duration of the system-configuration (eg cleared by system-flush or enable/disable extension).
@@ -221,16 +252,20 @@ class ClassScanner {
    * @internal
    */
   public static function cache(string $name): \CRM_Utils_Cache_Interface {
-    // Class-scanner runs before container is available. Manage our own cache. (Similar to extension-cache.)
-    // However, unlike extension-cache, we do not want to prefetch all interface lists on all pageloads.
+    // The class-scanner runs early (before the container is available), so we need to manage our own caches.
 
     if (!isset(static::$caches[$name])) {
       switch ($name) {
         case 'index':
+          global $_DB_DATAOBJECT;
           if (empty($_DB_DATAOBJECT['CONFIG'])) {
-            // Atypical example: You have a test with a @dataProvider that relies on ClassScanner. Runs before bot.
+            // Atypical example: You have a PHPUnit test with a @dataProvider that relies on ClassScanner. It runs before boot.
             return new \CRM_Utils_Cache_ArrayCache([]);
           }
+
+          // The index-cache is similar to the extension-cache, except in the prefetch policy.
+          // (We need the full list of extensions on every page-load, but we don't need the full list
+          // of interfaces on every page-load.)
           static::$caches[$name] = \CRM_Utils_Cache::create([
             'name' => 'classes',
             'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],

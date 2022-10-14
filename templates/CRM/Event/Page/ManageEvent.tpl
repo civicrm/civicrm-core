@@ -41,7 +41,7 @@
         <th>{ts}Public?{/ts}</th>
         <th>{ts}Starts{/ts}</th>
         <th>{ts}Ends{/ts}</th>
-        {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}
+        {if call_user_func(array('CRM_Campaign_BAO_Campaign','isComponentEnabled'))}
           <th>{ts}Campaign{/ts}</th>
         {/if}
         <th>{ts}Active?{/ts}</th>
@@ -64,7 +64,7 @@
           <td class="crm-event-is_public">{if $row.is_public eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="crm-event-start_date" data-order="{$row.start_date|crmDate:'%Y-%m-%d'}">{$row.start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
           <td class="crm-event-end_date" data-order="{$row.end_date|crmDate:'%Y-%m-%d'}">{$row.end_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
-          {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}
+          {if call_user_func(array('CRM_Campaign_BAO_Campaign','isComponentEnabled'))}
             <td class="crm-event-campaign">{$row.campaign}</td>
           {/if}
           <td class="crm-event_status" id="row_{$row.id}_status">

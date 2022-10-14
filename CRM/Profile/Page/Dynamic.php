@@ -442,7 +442,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * @param string $email
    *
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function getLinkedEmail($email): string {

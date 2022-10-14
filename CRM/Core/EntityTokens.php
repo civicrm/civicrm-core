@@ -261,7 +261,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         // Tests fail without checkPermissions = FALSE
         $this->fieldMetadata = (array) civicrm_api4($this->getApiEntityName(), 'getfields', ['checkPermissions' => FALSE], 'name');
       }
-      catch (API_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         $this->fieldMetadata = [];
       }
     }
@@ -368,7 +368,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @todo remove this function & use the metadata that is loaded.
    *
    * @return string[]
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getBasicTokens(): array {
     $return = [];
@@ -409,7 +409,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     // 'not a real field' offered up by case - seems like an oddity
     // we should skip at the top level for now.
     $fields = ['tags'];
-    if (!CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
+    if (!CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
       $fields[] = 'campaign_id';
     }
     return $fields;
@@ -465,7 +465,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param \Civi\Token\Event\TokenValueEvent $e
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getPrefetchFields(TokenValueEvent $e): array {
     $allTokens = array_keys($this->getTokenMetadata());

@@ -51,4 +51,27 @@ class CustomGroupTest extends CustomTestBase {
     $this->assertEquals('Contribution', $groups[1]['extends']);
   }
 
+  public function testGetExtendsEntityColumnValuePseudoconstant() {
+    $activityTypeName = uniqid();
+    $activityType = $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'activity_type',
+      'name' => $activityTypeName,
+    ]);
+    $customGroup1 = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'extends_entity_column_value:name' => [$activityTypeName],
+    ]);
+    $customGroup2 = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+    ]);
+    $this->assertEquals([$activityType['value']], $customGroup1['extends_entity_column_value']);
+
+    $result = CustomGroup::get(FALSE)
+      ->addWhere('extends_entity_column_value:name', 'CONTAINS', $activityTypeName)
+      ->addWhere('extends:name', '=', 'Activities')
+      ->execute()->single();
+
+    $this->assertEquals([$activityType['value']], $result['extends_entity_column_value']);
+  }
+
 }

@@ -49,7 +49,7 @@ class TranslationModeTest extends Api4TestBase {
    * Test that translated strings are rendered for templates where they exist.
    *
    * @dataProvider getTranslationSettings
-   * @throws \API_Exception|\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    * @group locale
    */
   public function testGetTranslatedTemplate($translationSettings): void {
@@ -86,7 +86,7 @@ class TranslationModeTest extends Api4TestBase {
 
   /**
    * @return mixed
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function addTranslation() {

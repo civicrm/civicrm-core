@@ -40,7 +40,7 @@ trait CRM_Core_DynamicFKAccessTrait {
     if ($eid && $table) {
       $targetEntity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
       if ($targetEntity === NULL) {
-        throw new \API_Exception(sprintf('Cannot resolve permissions for dynamic foreign key in "%s". Invalid table reference "%s".',
+        throw new \CRM_Core_Exception(sprintf('Cannot resolve permissions for dynamic foreign key in "%s". Invalid table reference "%s".',
           static::getTableName(), $table));
       }
       return \Civi\Api4\Utils\CoreUtil::checkAccessDelegated($targetEntity, 'update', ['id' => $eid], $userID);

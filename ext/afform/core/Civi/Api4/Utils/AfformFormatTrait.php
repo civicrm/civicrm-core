@@ -38,7 +38,7 @@ trait AfformFormatTrait {
   /**
    * @param string $html
    * @return mixed
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function convertHtmlToOutput($html) {
     if ($this->layoutFormat === 'html') {
@@ -51,7 +51,7 @@ trait AfformFormatTrait {
   /**
    * @param mixed $mixed
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function convertInputToHtml($mixed) {
     if (is_string($mixed)) {

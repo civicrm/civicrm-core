@@ -430,7 +430,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     try {
       MockBasicEntity::create()->addValue('fruit:color', 'yellow')->execute();
     }
-    catch (\API_Exception $createError) {
+    catch (\CRM_Core_Exception $createError) {
     }
     $this->assertStringContainsString('Illegal expression', $createError->getMessage());
   }

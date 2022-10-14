@@ -1088,7 +1088,6 @@ class CRM_Export_BAO_ExportProcessor {
    *
    * @return string
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $paymentDetails) {
 
@@ -1875,7 +1874,6 @@ class CRM_Export_BAO_ExportProcessor {
    * @param int $contactID
    *
    * @return array
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function replaceMergeTokens(int $contactID): array {

@@ -638,7 +638,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * Process the form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     // store the submitted values in an array

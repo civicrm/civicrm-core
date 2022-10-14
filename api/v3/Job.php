@@ -65,12 +65,11 @@ function _civicrm_api3_job_clone_spec(&$spec) {
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_job_clone($params) {
   if (empty($params['id'])) {
-    throw new API_Exception("Mandatory key(s) missing from params array: id field is required");
+    throw new CRM_Core_Exception("Mandatory key(s) missing from params array: id field is required");
   }
   $id = $params['id'];
   unset($params['id']);
@@ -189,9 +188,7 @@ function _civicrm_api3_job_geocode_spec(&$params) {
  *  - makes testing a bit simpler since we can simulate past/future time
  *
  * @return array
- * @throws \API_Exception
  * @throws \CRM_Core_Exception
- * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_job_send_reminder($params) {
   //note that $params['rowCount' can be overridden by one of the preferred syntaxes ($options['limit'] = x
@@ -201,7 +198,7 @@ function civicrm_api3_job_send_reminder($params) {
   $params['rowCount'] = 0;
   $lock = Civi::lockManager()->acquire('worker.core.ActionSchedule');
   if (!$lock->isAcquired()) {
-    throw new API_Exception('Could not acquire lock, another ActionSchedule process is running');
+    throw new CRM_Core_Exception('Could not acquire lock, another ActionSchedule process is running');
   }
 
   CRM_Core_BAO_ActionSchedule::processQueue($params['now'] ?? NULL, $params);
@@ -526,7 +523,7 @@ function civicrm_api3_job_process_respondent($params) {
  *
  * @return array
  *   API Result Array
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_job_process_batch_merge($params) {
   $rule_group_id = $params['rule_group_id'] ?? NULL;
@@ -622,6 +619,7 @@ function civicrm_api3_job_run_payment_cron($params) {
  *
  * @param array $params
  *   Sends in various config parameters to decide what needs to be cleaned.
+ * @return array
  */
 function civicrm_api3_job_cleanup($params) {
   $session   = CRM_Utils_Array::value('session', $params, TRUE);
@@ -658,6 +656,8 @@ function civicrm_api3_job_cleanup($params) {
   if ($wordRplc) {
     CRM_Core_BAO_WordReplacement::rebuild();
   }
+
+  return civicrm_api3_create_success();
 }
 
 /**
@@ -666,12 +666,12 @@ function civicrm_api3_job_cleanup($params) {
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_job_disable_expired_relationships($params) {
   $result = CRM_Contact_BAO_Relationship::disableExpiredRelationships();
   if (!$result) {
-    throw new API_Exception('Failed to disable all expired relationships.');
+    throw new CRM_Core_Exception('Failed to disable all expired relationships.');
   }
   return civicrm_api3_create_success(1, $params, 'Job', 'disable_expired_relationships');
 }
@@ -687,12 +687,12 @@ function civicrm_api3_job_disable_expired_relationships($params) {
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_job_group_rebuild($params) {
   $lock = Civi::lockManager()->acquire('worker.core.GroupRebuild');
   if (!$lock->isAcquired()) {
-    throw new API_Exception('Could not acquire lock, another GroupRebuild process is running');
+    throw new CRM_Core_Exception('Could not acquire lock, another GroupRebuild process is running');
   }
 
   $limit = $params['limit'] ?? 0;
@@ -716,7 +716,7 @@ function civicrm_api3_job_group_rebuild($params) {
  * @param array $params
  *
  * @return array
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_job_group_cache_flush(array $params): array {
   CRM_Contact_BAO_GroupContactCache::deterministicCacheFlush();
@@ -734,7 +734,7 @@ function civicrm_api3_job_group_cache_flush(array $params): array {
  *
  * @return array
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_job_acl_cache_flush(array $params): array {
   CRM_ACL_BAO_Cache::resetCache();

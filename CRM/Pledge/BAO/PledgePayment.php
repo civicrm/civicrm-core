@@ -558,7 +558,7 @@ WHERE  civicrm_pledge.id = %2
    *
    * @return int
    *   $statusId calculated status id of pledge
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function calculatePledgeStatus(int $pledgeId): int {
     if (count(Pledge::get(FALSE)
@@ -853,7 +853,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
    *
    * @param \Civi\Core\Event\GenericHookEvent $event
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function on_hook_civicrm_post(GenericHookEvent $event): void {
     if (!CRM_Core_Component::isEnabled('CiviPledge')) {

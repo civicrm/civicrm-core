@@ -92,7 +92,6 @@ class DAOGetAction extends AbstractGetAction {
   protected $translationMode;
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function _run(Result $result) {
@@ -100,7 +99,7 @@ class DAOGetAction extends AbstractGetAction {
     $baoName = $this->getBaoName();
     if (!$baoName) {
       // In some cases (eg. site spin-up) the code may attempt to call the api before the entity name is registered.
-      throw new \API_Exception("BAO for {$this->getEntityName()} is not available. This could be a load-order issue");
+      throw new \CRM_Core_Exception("BAO for {$this->getEntityName()} is not available. This could be a load-order issue");
     }
     if (!$baoName::tableHasBeenAdded()) {
       \Civi::log()->warning("Could not read from {$this->getEntityName()} before table has been added. Upgrade required.", ['civi.tag' => 'upgrade_needed']);
@@ -151,11 +150,11 @@ class DAOGetAction extends AbstractGetAction {
    * @param mixed $value
    * @param bool $isExpression
    * @return $this
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function addWhere(string $fieldName, string $op, $value = NULL, bool $isExpression = FALSE) {
     if (!in_array($op, CoreUtil::getOperators())) {
-      throw new \API_Exception('Unsupported operator');
+      throw new \CRM_Core_Exception('Unsupported operator');
     }
     $this->where[] = [$fieldName, $op, $value, $isExpression];
     return $this;
@@ -191,11 +190,11 @@ class DAOGetAction extends AbstractGetAction {
    * @param string $op
    * @param mixed $value
    * @return $this
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function addHaving(string $expr, string $op, $value = NULL) {
     if (!in_array($op, CoreUtil::getOperators())) {
-      throw new \API_Exception('Unsupported operator');
+      throw new \CRM_Core_Exception('Unsupported operator');
     }
     $this->having[] = [$expr, $op, $value];
     return $this;

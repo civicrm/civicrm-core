@@ -577,6 +577,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
     $this->assignPaymentFields();
     $this->assignEmailField();
+    $this->assign('emailExists', $this->_emailExists);
 
     // also assign the receipt_text
     if (isset($this->_values['receipt_text'])) {
@@ -752,7 +753,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Assign payment field information to the template.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function assignPaymentFields() {
     //fix for CRM-3767
@@ -812,9 +812,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @param int $id
    * @param CRM_Core_Form $form
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildComponentForm($id, $form): void {
     if (empty($id)) {
@@ -1193,7 +1191,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @return float
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getMainContributionAmount($params) {
     if (!empty($params['selectMembership'])) {

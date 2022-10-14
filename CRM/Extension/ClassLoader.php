@@ -164,6 +164,11 @@ class CRM_Extension_ClassLoader {
 
           case 'psr4':
             $loader->addPsr4($mapping['prefix'], $path . '/' . $mapping['path']);
+            if (defined('CIVICRM_TEST')) {
+              if (is_dir($path . '/tests/phpunit/' . $mapping['path'])) {
+                $loader->addPsr4($mapping['prefix'], $path . '/tests/phpunit/' . $mapping['path']);
+              }
+            }
             break;
         }
       }

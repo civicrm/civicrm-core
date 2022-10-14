@@ -385,7 +385,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
   }
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testExportOptionGroupWithDomain(): void {
     $result = OptionGroup::get(FALSE)

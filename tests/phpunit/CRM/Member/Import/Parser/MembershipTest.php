@@ -59,7 +59,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * Set up for test.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -367,8 +366,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
    * Test importing to a custom field.
    *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testImportCustomData(): void {
     $donaldDuckID = $this->individualCreate(['first_name' => 'Donald', 'last_name' => 'Duck']);
@@ -488,7 +486,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $form->postProcess();
-    /* @var CRM_Member_Import_Form_MapField $form */
+    /** @var CRM_Member_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Member_Import_Form_Preview', $submittedValues);
     $form->setUserJobID($this->userJobID);
     $form->buildForm();

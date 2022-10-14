@@ -12,7 +12,6 @@ class CRM_Event_Form_SelfSvcUpdateTest extends CiviUnitTestCase {
    * Test cancellation.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testForm(): void {
     $_REQUEST['pid'] = $this->participantCreate(['status_id' => 'Registered']);
@@ -20,7 +19,7 @@ class CRM_Event_Form_SelfSvcUpdateTest extends CiviUnitTestCase {
     $this->addLocationBlockToDomain();
     $this->individualCreate(['email' => 'new@example.org']);
     $mut = new CiviMailUtils($this);
-    /* @var CRM_Event_Form_SelfSvcUpdate $form*/
+    /** @var CRM_Event_Form_SelfSvcUpdate $form */
     $form = $this->getFormObject('CRM_Event_Form_SelfSvcUpdate', [
       'email' => 'new@example.org',
       'action' => 2,

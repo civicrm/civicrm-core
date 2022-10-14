@@ -63,7 +63,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
           ],
         ])->execute();
       }
-      catch (API_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         // A failure to create the history might be a deadlock or similar
         // This record is not important enough to trigger a larger fail.
         Civi::log()->warning('Failed to add civicrm_subscription_history record with error :error', ['error' => $e->getMessage()]);

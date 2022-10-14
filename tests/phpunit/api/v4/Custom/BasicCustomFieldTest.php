@@ -32,7 +32,7 @@ use Civi\Api4\RelationshipCache;
 class BasicCustomFieldTest extends CustomTestBase {
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testWithSingleField(): void {
     $customGroup = CustomGroup::create(FALSE)
@@ -387,7 +387,7 @@ class BasicCustomFieldTest extends CustomTestBase {
   /**
    * Some types are creating a dummy option group even if we don't have
    * any option values.
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testUndesiredOptionGroupCreation(): void {
     $optionGroupCount = OptionGroup::get(FALSE)->selectRowCount()->execute()->count();

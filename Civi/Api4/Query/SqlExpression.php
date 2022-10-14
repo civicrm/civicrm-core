@@ -74,7 +74,7 @@ abstract class SqlExpression {
    * @param bool $parseAlias
    * @param array $mustBe
    * @return SqlExpression
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function convert(string $expression, $parseAlias = FALSE, $mustBe = []) {
     $as = $parseAlias ? strrpos($expression, ' AS ') : FALSE;
@@ -91,7 +91,7 @@ abstract class SqlExpression {
     elseif ($bracketPos && $lastChar === ')') {
       $fnName = substr($expr, 0, $bracketPos);
       if ($fnName !== strtoupper($fnName)) {
-        throw new \API_Exception('Sql function must be uppercase.');
+        throw new \CRM_Core_Exception('Sql function must be uppercase.');
       }
       $className = 'SqlFunction' . $fnName;
     }
@@ -114,7 +114,7 @@ abstract class SqlExpression {
     }
     $className = __NAMESPACE__ . '\\' . $className;
     if (!class_exists($className)) {
-      throw new \API_Exception('Unable to parse sql expression: ' . $expression);
+      throw new \CRM_Core_Exception('Unable to parse sql expression: ' . $expression);
     }
     $sqlExpression = new $className($expr, $alias);
     if ($mustBe) {
@@ -123,7 +123,7 @@ abstract class SqlExpression {
           return $sqlExpression;
         }
       }
-      throw new \API_Exception('Illegal sql expression.');
+      throw new \CRM_Core_Exception('Illegal sql expression.');
     }
     return $sqlExpression;
   }
@@ -172,6 +172,16 @@ abstract class SqlExpression {
   }
 
   /**
+   * Checks the name of this sql expression class.
+   *
+   * @param $type
+   * @return bool
+   */
+  public function isType($type): bool {
+    return $this->getType() === $type;
+  }
+
+  /**
    * @return string
    */
   abstract public static function getTitle(): string;
@@ -192,7 +202,7 @@ abstract class SqlExpression {
    * @return mixed|null
    */
   protected function captureKeyword($keywords, &$arg) {
-    foreach ($keywords as $key) {
+    foreach (array_filter($keywords, 'strlen') as $key) {
       // Match keyword followed by a space or eol
       if (strpos($arg, $key . ' ') === 0 || rtrim($arg) === $key) {
         $arg = ltrim(substr($arg, strlen($key)));
@@ -209,7 +219,7 @@ abstract class SqlExpression {
    * @param array $mustBe
    * @param int $max
    * @return SqlExpression[]
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function captureExpressions(string &$arg, array $mustBe, int $max) {
     $captured = [];

@@ -158,7 +158,11 @@ EOHTML;
 
     $this->assertEquals($this->formName, $submission['afform_name']);
     $this->assertIsInt($submission['data']['Activity1'][0]['id']);
+    $this->assertEquals('Individual1', $submission['data']['Activity1'][0]['subject']);
     $this->assertIsInt($submission['data']['Individual1'][0]['id']);
+    $this->assertEquals($firstName, $submission['data']['Individual1'][0]['first_name']);
+    $this->assertEquals('site', $submission['data']['Individual1'][0]['last_name']);
+    $this->assertEquals('This field is set in the data array', $submission['data']['Individual1'][0]['source']);
 
     // Check that Activity was submitted correctly.
     $activity = \Civi\Api4\Activity::get(FALSE)
@@ -170,7 +174,7 @@ EOHTML;
       ->execute()->first();
     $this->assertEquals($firstName, $contact['first_name']);
     $this->assertEquals('site', $contact['last_name']);
-    // Check that the data overrides form submsision
+    // Check that the data overrides form submission
     $this->assertEquals('Register A site', $contact['source']);
     // Check that the contact and the activity were correctly linked up as per the form.
     $this->callAPISuccessGetSingle('ActivityContact', ['contact_id' => $contact['id'], 'activity_id' => $activity['id']]);
@@ -193,7 +197,7 @@ EOHTML;
         ->indexBy('name');
       $this->fail('Expected authorization exception from Afform.prefill');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       // Should fail permission check
     }
 
@@ -207,7 +211,7 @@ EOHTML;
         ->execute();
       $this->fail('Expected authorization exception from Afform.submit');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       // Should fail permission check
     }
   }
@@ -294,6 +298,7 @@ EOHTML;
   public function testCreatingContactsWithOnlyEmail(): void {
     $this->useValues([
       'layout' => self::$layouts['employer'],
+      'create_submission' => TRUE,
       'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
@@ -331,9 +336,22 @@ EOHTML;
     $contact = \Civi\Api4\Contact::get()
       ->addWhere('display_name', '=', $individualEmail)
       ->addJoin('Contact AS org', 'LEFT', ['employer_id', '=', 'org.id'])
-      ->addSelect('display_name', 'org.display_name')
+      ->addSelect('display_name', 'org.display_name', 'org.id', 'email_primary')
       ->execute()->first();
     $this->assertEquals($orgEmail, $contact['org.display_name']);
+
+    $submission = \Civi\Api4\AfformSubmission::get(FALSE)
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()->single();
+    $this->assertEquals($contact['id'], $submission['data']['Individual1'][0]['id']);
+    $this->assertEquals($contact['org.id'], $submission['data']['Organization1'][0]['id']);
+    $this->assertEquals('Organization1', $submission['data']['Individual1'][0]['employer_id']);
+    $this->assertEquals($contact['email_primary'], $submission['data']['Individual1'][0]['_joins']['Email'][0]['id']);
+    $this->assertEquals($individualEmail, $submission['data']['Individual1'][0]['_joins']['Email'][0]['email']);
+    $this->assertEquals($locationType, $submission['data']['Individual1'][0]['_joins']['Email'][0]['location_type_id']);
+    $this->assertEquals($orgEmail, $submission['data']['Organization1'][0]['_joins']['Email'][0]['email']);
+    $this->assertEquals($locationType, $submission['data']['Organization1'][0]['_joins']['Email'][0]['location_type_id']);
   }
 
 }

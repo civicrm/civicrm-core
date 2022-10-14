@@ -167,7 +167,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
       // Display Auto-renew status on page (0=disabled, 1=enabled, 2=enabled, but error
       if (!empty($membership[$dao->id]['contribution_recur_id'])) {
-        if (CRM_Member_BAO_Membership::isSubscriptionCancelled($membership[$dao->id]['membership_id'])) {
+        if (CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $membership[$dao->id]['membership_id'])) {
           $membership[$dao->id]['auto_renew'] = 2;
         }
         else {
@@ -354,7 +354,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * action has to be taken for the page.
    *
    * @return null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     $this->preProcess();

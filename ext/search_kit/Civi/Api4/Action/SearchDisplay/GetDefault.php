@@ -40,7 +40,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
   /**
    * @param \Civi\Api4\Generic\Result $result
    * @throws UnauthorizedException
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
     // Only SearchKit admins can use this in unsecured "preview mode"

@@ -60,7 +60,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
    *
    * @param array $example
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function build(array &$example): void {
     $workFlow = WorkflowMessage::get(TRUE)->addWhere('name', '=', $example['workflow'])->execute()->first();
@@ -107,9 +107,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
    * @param \CRM_Contribute_WorkflowMessage_ContributionOfflineReceipt|\CRM_Contribute_WorkflowMessage_ContributionOnlineReceipt|\CRM_Contribute_WorkflowMessage_ContributionInvoiceReceipt $messageTemplate
    * @param array $example
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function addExampleData(GenericWorkflowMessage $messageTemplate, $example): void {
@@ -156,7 +154,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
    * Get a non-quick-config price set.
    *
    * @return array|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function getNonQuickConfigPriceSet(): ?array {
     // Permission check defaults to true - likely implicitly OK but may need to be false.
@@ -172,7 +170,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
    * @param array|null $priceFieldValue
    * @param $index
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function setLineItem(CRM_Financial_BAO_Order $mockOrder, $priceField, ?array $priceFieldValue, $index): void {
     $mockOrder->setLineItem([

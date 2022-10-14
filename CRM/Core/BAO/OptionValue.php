@@ -132,7 +132,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @return \CRM_Core_DAO_OptionValue
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function add(&$params, $ids = []) {
     if (!empty($ids['optionValue']) && empty($params['id'])) {

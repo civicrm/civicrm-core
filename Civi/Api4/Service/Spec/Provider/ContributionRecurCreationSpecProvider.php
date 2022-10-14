@@ -19,8 +19,10 @@ use Civi\Api4\Service\Spec\RequestSpec;
  * Class ContributionRecurCreationSpecProvider
  *
  * @package Civi\Api4\Service\Spec\Provider
+ * @service
+ * @internal
  */
-class ContributionRecurCreationSpecProvider implements Generic\SpecProviderInterface {
+class ContributionRecurCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc

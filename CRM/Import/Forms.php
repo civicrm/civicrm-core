@@ -75,7 +75,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    *
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getUserJob(): array {
     if (!$this->userJob) {
@@ -91,7 +91,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * Get submitted values stored in the user job.
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getUserJobSubmittedValues(): array {
     return $this->getUserJob()['metadata']['submitted_values'];
@@ -264,7 +264,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * - however, the sql class, for example, might realise the fields it cares
    * about are unchanged and not flush the table.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function flushDataSource(): void {
@@ -288,7 +287,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected function getDataSourceObject(): ?CRM_Import_DataSource {
     $className = $this->getDataSourceClassName();
     if ($className) {
-      /* @var CRM_Import_DataSource $dataSource */
       return new $className($this->getUserJobID());
     }
     return NULL;
@@ -304,7 +302,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected function getDataSourceFields(): array {
     $className = $this->getDataSourceClassName();
     if ($className) {
-      /* @var CRM_Import_DataSource $dataSourceClass */
+      /** @var CRM_Import_DataSource $dataSourceClass */
       $dataSourceClass = new $className();
       return $dataSourceClass->getSubmittableFields();
     }
@@ -342,12 +340,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getContactType(): string {
-    $contactTypeMapping = [
-      'Individual' => 'Individual',
-      'Household' => 'Household',
-      'Organization' => 'Organization',
-    ];
-    return $contactTypeMapping[$this->getSubmittedValue('contactType')];
+    return $this->getSubmittedValue('contactType') ?? $this->getUserJob()['metadata']['entity_configuration']['Contact']['contact_type'];
   }
 
   /**
@@ -367,7 +360,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    *
    * @return int
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function createUserJob(): int {
     $id = UserJob::create(FALSE)
@@ -391,7 +384,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @param string $key
    * @param array $data
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function updateUserJobMetadata(string $key, array $data): void {
@@ -415,7 +408,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    *
    * @return array
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function getColumnHeaders(): array {
@@ -427,7 +419,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    *
    * @return int
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function getNumberOfColumns(): int {
@@ -449,7 +440,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    *   or [CRM_Import_Parser::ERROR, CRM_Import_Parser::VALID]
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   protected function getDataRows($statuses = [], int $limit = 0): array {
     $statuses = (array) $statuses;
@@ -463,7 +453,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @param int $limit
    *
    * @return array
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function getOutputRows($statuses = [], int $limit = 0) {
@@ -492,7 +481,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    *
    * @return int
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function getRowCount($statuses = []) {
@@ -506,7 +494,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * This gets the rows from the temp table that match the relevant status
    * and output them as a csv.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \League\Csv\CannotInsertRecord
    * @throws \CRM_Core_Exception
    */
@@ -576,7 +564,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @return array
    *   e.g ['first_name' => 'First Name', 'last_name' => 'Last Name'....
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getAvailableFields(): array {
     $return = [];
@@ -590,6 +578,9 @@ class CRM_Import_Forms extends CRM_Core_Form {
         // but is now loaded in the Parser for the LexIM variant.
         continue;
       }
+      // Swap out dots for double underscores so as not to break the quick form js.
+      // We swap this back on postProcess.
+      $name = str_replace('.', '__', $name);
       $return[$name] = $field['html']['label'] ?? $field['title'];
     }
     return $return;
@@ -653,13 +644,19 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * ['First Name', 'Employee Of - First Name', 'Home - Street Address']
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getMappedFieldLabels(): array {
     $mapper = [];
     $parser = $this->getParser();
-    foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mappedField) {
-      $mapper[$columnNumber] = $parser->getMappedFieldLabel($parser->getMappingFieldFromMapperInput((array) $mappedField, 0, $columnNumber));
+    $importMappings = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    if (empty($importMappings)) {
+      foreach ($this->getSubmittedValue('mapper') as $columnNumber => $mapping) {
+        $importMappings[] = $parser->getMappingFieldFromMapperInput((array) $mapping, 0, $columnNumber);
+      }
+    }
+    foreach ($importMappings as $columnNumber => $importMapping) {
+      $mapper[$columnNumber] = $parser->getMappedFieldLabel($importMapping);
     }
     return $mapper;
   }
@@ -667,7 +664,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
   /**
    * Assign variables required for the MapField form.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function assignMapFieldVariables(): void {
@@ -702,7 +698,17 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @return array
    */
   public function getHeaderPatterns(): array {
-    return $this->getParser()->getHeaderPatterns();
+    $headerPatterns = [];
+    foreach ($this->getFields() as $name => $field) {
+      if (empty($field['headerPattern']) || $field['headerPattern'] === '//') {
+        continue;
+      }
+      // Swap out dots for double underscores so as not to break the quick form js.
+      // We swap this back on postProcess.
+      $name = str_replace('.', '__', $name);
+      $headerPatterns[$name] = $field['headerPattern'];
+    }
+    return $headerPatterns;
   }
 
   /**
@@ -749,6 +755,30 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected function getBaseEntity(): string {
     $info = $this->getParser()->getUserJobInfo();
     return reset($info)['entity'];
+  }
+
+  /**
+   * Assign values for civiimport.
+   *
+   * I wanted to put this in the extension - but there are a lot of protected functions
+   * we would need to revisit and make public - do we want to?
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function assignCiviimportVariables(): void {
+    $contactTypes = [];
+    foreach (CRM_Contact_BAO_ContactType::basicTypeInfo() as $contactType) {
+      $contactTypes[] = ['id' => $contactType['name'], 'text' => $contactType['label']];
+    }
+    $parser = $this->getParser();
+    Civi::resources()->addVars('crmImportUi', [
+      'defaults' => $this->getDefaults(),
+      'rows' => $this->getDataRows([], 2),
+      'contactTypes' => $contactTypes,
+      'entityMetadata' => $this->getFieldOptions(),
+      'dedupeRules' => $parser->getAllDedupeRules(),
+      'userJob' => $this->getUserJob(),
+    ]);
   }
 
 }

@@ -15,8 +15,7 @@ use Civi\Api4\Contribution;
  * @param int|null $id
  * @param array $params
  *
- * @throws \CiviCRM_API3_Exception
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function sequentialcreditnotes_civicrm_pre($op, $objectName, $id, &$params) {
   if ($objectName === 'Contribution' && !empty($params['contribution_status_id'])) {
@@ -41,7 +40,7 @@ function sequentialcreditnotes_civicrm_pre($op, $objectName, $id, &$params) {
  * @return string
  *   Credit Note Id.
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function sequentialcreditnotes_create_credit_note_id() {
 

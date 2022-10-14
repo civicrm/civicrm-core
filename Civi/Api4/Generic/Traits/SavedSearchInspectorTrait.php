@@ -45,7 +45,7 @@ trait SavedSearchInspectorTrait {
 
   /**
    * If SavedSearch is supplied as a string, this will load it as an array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function loadSavedSearch() {
@@ -132,14 +132,14 @@ trait SavedSearchInspectorTrait {
           'expr' => $expr,
           'dataType' => $expr->getDataType(),
         ];
-        foreach ($expr->getFields() as $fieldName) {
-          $fieldMeta = $this->getField($fieldName);
+        foreach ($expr->getFields() as $fieldAlias) {
+          $fieldMeta = $this->getField($fieldAlias);
           if ($fieldMeta) {
-            $item['fields'][] = $fieldMeta;
+            $item['fields'][$fieldAlias] = $fieldMeta;
           }
         }
         if (!isset($item['dataType']) && $item['fields']) {
-          $item['dataType'] = $item['fields'][0]['data_type'];
+          $item['dataType'] = \CRM_Utils_Array::first($item['fields'])['data_type'];
         }
         $this->_selectClause[$expr->getAlias()] = $item;
       }
@@ -152,6 +152,7 @@ trait SavedSearchInspectorTrait {
    * @return array{fields: array, expr: SqlExpression, dataType: string}|NULL
    */
   protected function getSelectExpression($key) {
+    $key = explode(' AS ', $key)[1] ?? $key;
     return $this->getSelectClause()[$key] ?? NULL;
   }
 

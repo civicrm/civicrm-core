@@ -19,12 +19,12 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
   /**
    * Test the mail sent on update.
    *
-   * @throws \CRM_Core_Exception|\API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMail(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->addContribution();
-    /* @var CRM_Contribute_Form_UpdateSubscription $form */
+    /** @var CRM_Contribute_Form_UpdateSubscription $form */
     $form = $this->getFormObject('CRM_Contribute_Form_UpdateSubscription', ['is_notify' => TRUE]);
     $form->set('crid', $this->getContributionRecurID());
     $form->buildForm();

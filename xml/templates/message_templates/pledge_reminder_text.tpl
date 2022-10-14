@@ -30,4 +30,4 @@ Click this link to go to a web page where you can make your payment online:
 or need to modify your payment schedule.{/ts}
 
 
-{ts}Thank your for your generous support.{/ts}
+{ts}Thank you for your generous support.{/ts}

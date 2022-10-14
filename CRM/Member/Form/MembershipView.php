@@ -92,7 +92,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    *   Primary membership info (membership_id, contact_id, membership_type ...).
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function relAction($action, $owner) {
     switch ($action) {
@@ -400,7 +399,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       $values['membership_type'] = CRM_Core_TestEntity::appendTestText($values['membership_type']);
     }
 
-    $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled($this->membershipID);
+    $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $this->membershipID);
     $values['auto_renew'] = ($autoRenew && !$subscriptionCancelled) ? 'Yes' : 'No';
 
     //do check for campaigns

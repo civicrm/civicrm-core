@@ -33,6 +33,7 @@ class CRM_Contact_Form_Edit_Email {
   public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
     if (!$blockCount) {
+      CRM_Core_Error::deprecatedWarning('pass in blockCount');
       $blockId = ($form->get('Email_Block_Count')) ? $form->get('Email_Block_Count') : 1;
     }
     else {
@@ -83,21 +84,6 @@ class CRM_Contact_Form_Edit_Email {
       }
 
       $form->addElement('radio', "email[$blockId][is_primary]", '', '', '1', $js);
-      // Only display the signature fields if this contact has a CMS account
-      // because they can only send email if they have access to the CRM
-      $isAddSignatureFields = $form instanceof \CRM_Contact_Form_Contact && !empty($form->_contactId);
-      $form->assign('isAddSignatureFields', $isAddSignatureFields);
-      if ($isAddSignatureFields) {
-        $ufID = CRM_Core_BAO_UFMatch::getUFId($form->_contactId);
-        if ($ufID) {
-          $form->add('textarea', "email[$blockId][signature_text]", ts('Signature (Text)'),
-            ['rows' => 2, 'cols' => 40]
-          );
-          $form->add('wysiwyg', "email[$blockId][signature_html]", ts('Signature (HTML)'),
-            ['rows' => 2, 'cols' => 40]
-          );
-        }
-      }
     }
   }
 

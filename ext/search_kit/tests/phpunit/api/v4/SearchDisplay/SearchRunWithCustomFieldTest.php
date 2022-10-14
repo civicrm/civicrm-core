@@ -25,7 +25,7 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
   /**
    * Delete all created custom groups.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     // Core bug: `civicrm_entity_file` doesn't get cleaned up when a contact is deleted,

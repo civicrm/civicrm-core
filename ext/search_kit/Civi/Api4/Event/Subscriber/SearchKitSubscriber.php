@@ -15,8 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Event subscriber to check extra permission for SavedSearches
+ * @service civi.api4.searchKit
  */
-class SearchKitSubscriber implements EventSubscriberInterface {
+class SearchKitSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   /**
    * @return array
@@ -36,7 +37,7 @@ class SearchKitSubscriber implements EventSubscriberInterface {
    *   API authorization event.
    */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
-    /* @var \Civi\Api4\Generic\AbstractAction $apiRequest */
+    /** @var \Civi\Api4\Generic\AbstractAction $apiRequest */
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] == 4 && $apiRequest->getEntityName() === 'SavedSearch') {
       if (\CRM_Core_Permission::check('administer search_kit')) {

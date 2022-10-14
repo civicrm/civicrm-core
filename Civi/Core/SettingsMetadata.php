@@ -61,7 +61,7 @@ class SettingsMetadata {
 
     if (!is_array($settingsMetadata)) {
       global $civicrm_root;
-      $metaDataFolders = [$civicrm_root . '/settings'];
+      $metaDataFolders = [\CRM_Utils_File::addTrailingSlash($civicrm_root) . 'settings'];
       \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
       $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
       \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);

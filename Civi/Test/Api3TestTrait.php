@@ -130,7 +130,7 @@ trait Api3TestTrait {
     try {
       $result = $this->civicrm_api($entity, $action, $params);
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       // api v4 call failed and threw an exception.
       return [];
     }
@@ -299,8 +299,7 @@ trait Api3TestTrait {
    * @param $v3Action
    * @param array $v3Params
    * @return array|int
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Exception
    */
   public function runApi4Legacy($v3Entity, $v3Action, $v3Params = []) {
@@ -467,6 +466,12 @@ trait Api3TestTrait {
         }
         break;
 
+      case 'merge':
+        $v4Action = 'mergeDuplicates';
+        $v3Params['contact_id'] = $v3Params['to_keep_id'];
+        $v3Params['duplicate_id'] = $v3Params['to_remove_id'];
+        break;
+
       case 'getoptions':
         $indexBy = 0;
         $v4Action = 'getFields';
@@ -626,7 +631,7 @@ trait Api3TestTrait {
    * @param array $result
    * @param bool $sequential
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function runApi4LegacyChain($key, $params, $mainEntity, $result, $sequential) {
     // Handle an array of multiple calls using recursion

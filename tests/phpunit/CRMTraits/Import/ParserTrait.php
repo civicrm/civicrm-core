@@ -49,10 +49,20 @@ trait CRMTraits_Import_ParserTrait {
     $form->buildForm();
     $this->assertTrue($form->validate());
     $form->postProcess();
+    $this->submitPreviewForm($submittedValues);
+  }
+
+  /**
+   * Submit the preview form, triggering the import.
+   *
+   * @param array $submittedValues
+   */
+  protected function submitPreviewForm(array $submittedValues): void {
     $form = $this->getPreviewForm($submittedValues);
     $form->setUserJobID($this->userJobID);
     $form->buildForm();
     $this->assertTrue($form->validate());
+
     try {
       $form->postProcess();
       $this->fail('Expected a redirect');
@@ -77,10 +87,9 @@ trait CRMTraits_Import_ParserTrait {
   protected function getMapperFromFieldMappings(array $mappings): array {
     $mapper = [];
     foreach ($mappings as $mapping) {
-      $fieldInput = [$mapping['name']];
+      $fieldInput = [$mapping['name'] ?? ''];
       if (!empty($mapping['soft_credit_type_id'])) {
-        $fieldInput[1] = $mapping['soft_credit_match_field'];
-        $fieldInput[2] = $mapping['soft_credit_type_id'];
+        $fieldInput[1] = $mapping['soft_credit_type_id'];
       }
       $mapper[] = $fieldInput;
     }

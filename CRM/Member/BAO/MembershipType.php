@@ -65,7 +65,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    *   Array contains the id (deprecated).
    *
    * @return \CRM_Member_DAO_MembershipType
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function add(&$params, $ids = []) {
     // DEPRECATED Check if membershipType ID was passed in via $ids
@@ -116,7 +116,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   /**
    * Flush anywhere that membership types might be cached.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function flush() {
     CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
@@ -822,7 +822,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    *
    * @return array
    *   List of membershipType details keyed by membershipTypeID
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getAllMembershipTypes(): array {
     $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
@@ -863,7 +863,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    * @param int $id
    *
    * @return mixed
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getMembershipType($id) {
     return self::getAllMembershipTypes()[$id];

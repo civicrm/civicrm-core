@@ -377,7 +377,6 @@ class CRM_Dedupe_MergeHandler {
    * The use of the new hook is tested, including the fact it is called before contributions are merged, as this
    * is likely to be significant data in merge hooks.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function mergeLocations(): void {

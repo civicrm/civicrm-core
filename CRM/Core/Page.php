@@ -452,7 +452,7 @@ class CRM_Core_Page {
    * @param string $entity
    *   The entity being queried.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function assignFieldMetadataToTemplate($entity) {
     $fields = civicrm_api3($entity, 'getfields', ['action' => 'get']);

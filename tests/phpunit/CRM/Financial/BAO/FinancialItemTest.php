@@ -39,7 +39,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   /**
    * Check method add()
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testAdd(): void {
     $price = 100;
@@ -80,7 +80,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   /**
    * Check method retrieve()
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testRetrieve(): void {
     $price = 100.00;
@@ -119,8 +119,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   /**
    * Check method create()
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testCreate(): void {
     $contactID = $this->individualCreate();

@@ -36,7 +36,8 @@
       // Gets the first arg of type "field"
       function getFirstArgFromExpr(expr) {
         if (!(expr in meta)) {
-          meta[expr] = _.findWhere(searchMeta.parseExpr(expr).args, {type: 'field'});
+          var args = searchMeta.parseExpr(expr).args;
+          meta[expr] = _.findWhere(args, {type: 'field'});
         }
         return meta[expr] || {};
       }

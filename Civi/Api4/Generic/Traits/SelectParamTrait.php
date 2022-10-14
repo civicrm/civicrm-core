@@ -50,7 +50,7 @@ trait SelectParamTrait {
    * It ignores those containing special characters like dots or parentheses,
    * they are handled separately in Api4SelectQuery.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function expandSelectClauseWildcards() {
     if (!$this->select) {

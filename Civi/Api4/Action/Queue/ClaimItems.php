@@ -41,7 +41,7 @@ class ClaimItems extends \Civi\Api4\Generic\AbstractAction {
     $isBatch = $queue instanceof \CRM_Queue_Queue_BatchQueueInterface;
     $limit = $queue->getSpec('batch_limit') ?: 1;
     if ($limit > 1 && !$isBatch) {
-      throw new \API_Exception(sprintf('Queue "%s" (%s) does not support batching.', $queue->getName(), get_class($queue)));
+      throw new \CRM_Core_Exception(sprintf('Queue "%s" (%s) does not support batching.', $queue->getName(), get_class($queue)));
       // Note 1: Simply looping over `claimItem()` is unlikley to help the consumer b/c
       // drivers like Sql+Memory are linear+blocking.
       // Note 2: The default is batch_limit=1. So someone has specifically chosen an invalid configuration...
@@ -82,7 +82,7 @@ class ClaimItems extends \Civi\Api4\Generic\AbstractAction {
 
   protected function queue(): \CRM_Queue_Queue {
     if (empty($this->queue)) {
-      throw new \API_Exception('Missing required parameter: $queue');
+      throw new \CRM_Core_Exception('Missing required parameter: $queue');
     }
     return \Civi::queue($this->queue);
   }

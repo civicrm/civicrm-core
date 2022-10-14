@@ -32,7 +32,6 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    *
    * @dataProvider getCsvFiles
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testToCsv(array $fileData): void {
@@ -134,7 +133,6 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * skipped because of some checking for column-count matches in the import,
    * and so you don't hit the current fail.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testBlankLineAtEnd(): void {
@@ -153,12 +151,11 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    *
    * @return \CRM_Contact_Import_Form_DataSource
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function submitDatasourceForm(string $csvFileName): CRM_Contact_Import_Form_DataSource {
     $_GET['dataSource'] = 'CRM_Import_DataSource_CSV';
-    /* @var CRM_Contact_Import_Form_DataSource $form */
+    /** @var CRM_Contact_Import_Form_DataSource $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', [
       'uploadFile' => [
         'name' => __DIR__ . '/' . $csvFileName,

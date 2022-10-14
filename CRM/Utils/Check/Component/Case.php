@@ -40,7 +40,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
    * @inheritDoc
    */
   public function isEnabled() {
-    return CRM_Case_BAO_Case::enabled();
+    return CRM_Case_BAO_Case::isComponentEnabled();
   }
 
   /**

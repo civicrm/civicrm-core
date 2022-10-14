@@ -319,7 +319,6 @@ FROM civicrm_action_schedule cas
    * @param string $now
    * @param array $params
    *
-   * @throws API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function buildRecipientContacts(string $mappingID, $now, $params = []) {
@@ -348,7 +347,6 @@ FROM civicrm_action_schedule cas
    * @param string $now
    * @param array $params
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function processQueue($now = NULL, $params = []): void {

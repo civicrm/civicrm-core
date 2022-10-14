@@ -163,7 +163,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param array $defaults
    *  Default parameters to be be merged into each of the params.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function bulkSave($bulkParams, $defaults = []) {
     CRM_Core_Error::deprecatedFunctionWarning(__CLASS__ . '::writeRecords');
@@ -723,7 +723,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if (empty($fieldValues)) {
       $field->id = $fieldID;
       if (!$field->find(TRUE)) {
-        throw new CRM_Core_Exception('Cannot find Custom Field');
+        throw new CRM_Core_Exception('Cannot find Custom Field ' . $fieldID);
       }
 
       $fieldValues = [];
@@ -753,7 +753,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param string $label
    *   Label for custom field.
    * @return \HTML_QuickForm_Element|null
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function addQuickFormElement(
     $qf, $elementName, $fieldId, $useRequired = TRUE, $search = FALSE, $label = NULL
@@ -1246,7 +1246,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
               try {
                 $file_description = civicrm_api3('File', 'getvalue', ['return' => "description", 'id' => $value]);
               }
-              catch (CiviCRM_API3_Exception $dontcare) {
+              catch (CRM_Core_Exception $dontcare) {
                 // don't care
               }
 
@@ -2196,7 +2196,7 @@ WHERE  id IN ( %1, %2 )
    * @param int[] $fieldIDs
    *   Optional list field ids to move.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Exception
    */
   public function move($oldContactID, $newContactID, $fieldIDs) {
@@ -2473,7 +2473,7 @@ AND      default_value IS NOT NULL";
    * @param bool $fullString Whether to return "custom_123" or "123"
    *
    * @return string|int|null
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getCustomFieldID($fieldName, $groupName = NULL, $fullString = FALSE) {
     $cacheKey = $groupName . '.' . $fieldName;

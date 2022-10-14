@@ -32,7 +32,7 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
     }
 
     \Civi\Api4\UserJob::create()->setValues([
-      'type_id:label' => 'Contact Import',
+      'job_type' => 'contact_import',
       'status_id:name' => 'in_progress',
       'queue_id.name' => $queue->getName(),
     ])->execute();

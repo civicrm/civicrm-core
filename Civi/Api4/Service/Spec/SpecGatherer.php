@@ -15,12 +15,14 @@ namespace Civi\Api4\Service\Spec;
 use Civi\Api4\CustomField;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Service\AutoService;
 
 /**
  * Class SpecGatherer
  * @package Civi\Api4\Service\Spec
+ * @service spec_gatherer
  */
-class SpecGatherer {
+class SpecGatherer extends AutoService {
 
   /**
    * @var \Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface[]
@@ -108,7 +110,7 @@ class SpecGatherer {
    *
    * @param string $entity
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @see \CRM_Core_SelectValues::customGroupExtends
    */
   private function addCustomFields($entity, RequestSpec $spec) {
@@ -123,7 +125,8 @@ class SpecGatherer {
     $query = CustomField::get(FALSE)
       ->setSelect(['custom_group_id.name', 'custom_group_id.title', '*'])
       ->addWhere('is_active', '=', TRUE)
-      ->addWhere('custom_group_id.is_multiple', '=', '0');
+      ->addWhere('custom_group_id.is_active', '=', TRUE)
+      ->addWhere('custom_group_id.is_multiple', '=', FALSE);
 
     // Contact custom groups are extra complicated because contact_type can be a value for extends
     if ($entity === 'Contact') {
@@ -220,12 +223,12 @@ class SpecGatherer {
    * @param string $entityName
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function getDAOFields(string $entityName): array {
     $bao = CoreUtil::getBAOFromApiName($entityName);
     if (!$bao) {
-      throw new \API_Exception('Entity not loaded: ' . $entityName);
+      throw new \CRM_Core_Exception('Entity not loaded: ' . $entityName);
     }
     return $bao::getSupportedFields();
   }

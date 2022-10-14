@@ -21,7 +21,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
   public function setUp(): void {
@@ -35,9 +34,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->_membershipStatusID = $this->_membershipTypeID = NULL;
@@ -91,7 +88,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Test to delete related membership when type of parent membership is changed which does not have relation type associated.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDeleteRelatedMembershipsOnParentTypeChanged(): void {
 
@@ -139,7 +135,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreate(): void {
 
@@ -171,7 +166,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetValues(): void {
     //        $this->markTestSkipped( 'causes mysterious exit, needs fixing!' );
@@ -232,7 +226,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testRetrieve(): void {
     [$contactId, $membershipId] = $this->setupMembership();
@@ -247,7 +240,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testActiveMembers(): void {
     $contactId = $this->individualCreate();
@@ -311,7 +303,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDeleteMembership(): void {
     [$contactId, $membershipId] = $this->setupMembership();
@@ -328,7 +319,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetContactMembership(): void {
     [$contactId, $membershipId] = $this->setupMembership();
@@ -390,7 +380,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * page id from the membership record
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetContributionPageId(): void {
     [$contactId, $membershipId] = $this->setupMembership();
@@ -406,7 +395,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * type.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetMembershipStarts(): void {
     [$contactId, $membershipId] = $this->setupMembership();
@@ -423,7 +411,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * optionally for a specified date.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetMembershipCount(): void {
     [$contactId, $membershipId] = $this->setupMembership();
@@ -439,7 +426,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Checkup sort name function.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSortName(): void {
     $contactId = $this->individualCreate();
@@ -467,7 +453,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Delete related memberships.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDeleteRelatedMemberships(): void {
     [$contactId, $membershipId] = $this->setupMembership();
@@ -486,7 +471,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    *   renewal Failed asserting that two strings are equal.
    *   Expected-'2021-03-01' Actual+'2021-02-28'
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testRenewMembership(): void {
     $contactId = $this->individualCreate();
@@ -541,7 +525,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Renew stale membership.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testStaleMembership(): void {
     $statusId = 3;
@@ -596,7 +579,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testUpdateAllMembershipStatusConvertExpiredOverriddenStatusToNormal(): void {
     $params = [
@@ -627,7 +609,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testUpdateAllMembershipStatusHandleOverriddenWithEndOverrideDateEqualTodayAsExpired(): void {
     $params = [
@@ -658,7 +639,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testUpdateAllMembershipStatusDoesNotConvertOverriddenMembershipWithoutEndOverrideDateToNormal(): void {
     $params = [
@@ -688,7 +668,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMembershipPaymentForSingleContributionMultipleMembership(): void {
     $membershipTypeID1 = $this->membershipTypeCreate(['name' => 'Parent']);
@@ -826,7 +805,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * Test the buildMembershipTypeValues function.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testBuildMembershipTypeValues(): void {
     $this->restoreMembershipTypes();
@@ -858,7 +837,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function setupMembership(): array {
     $contactId = $this->individualCreate();
@@ -1005,7 +983,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * @param int $count
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private function createContacts(int $count): array {
     $contacts = [];

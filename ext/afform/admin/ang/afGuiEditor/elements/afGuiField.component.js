@@ -89,6 +89,11 @@
       // Returns the original field definition from metadata
       this.getDefn = function() {
         var defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name);
+        // Calc fields are specific to a search display, not part of the schema
+        if (!defn && ctrl.container.getSearchDisplay(ctrl.container.node)) {
+          var searchDisplay = ctrl.container.getSearchDisplay(ctrl.container.node);
+          defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.node.name});
+        }
         defn = defn || {
           label: ts('Untitled'),
           required: false
@@ -171,6 +176,9 @@
           case 'Number':
             return !(defn.options || defn.data_type === 'Boolean');
 
+          case 'DisplayOnly':
+            return true;
+
           default:
             return false;
         }
@@ -239,6 +247,7 @@
 
       function setDateOptions() {
         if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
+          ctrl.node.defn = ctrl.node.defn || {};
           ctrl.node.defn.options = $scope.getProp('search_range') ? CRM.afGuiEditor.dateRanges : CRM.afGuiEditor.dateRanges.slice(1);
           setFieldDefn();
         }

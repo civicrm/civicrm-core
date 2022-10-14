@@ -128,7 +128,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * (dev/core#310) : Test to ensure payments are correctly allocated, when a event fee is changed for a mult-line item event registration
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testPaymentAllocationOnMultiLineItemEvent(): void {
     // USE-CASE :
@@ -380,7 +379,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * Financial Type:  'Event Fee' and 'Event Fee 2' respectively.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function createParticipantRecordsFromTwoFieldPriceSet() {
     // Create financial type - Event Fee 2
@@ -516,7 +514,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   /**
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitWithDeferredRecognition() {
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
@@ -552,7 +549,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @param bool $isQuickConfig
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPartialPayment($isQuickConfig) {
     $mut = new CiviMailUtils($this, TRUE);
@@ -602,7 +598,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @param bool $isQuickConfig
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPendingPartiallyPaidAddPayment($isQuickConfig) {
     $mut = new CiviMailUtils($this, TRUE);
@@ -826,7 +821,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * Check if participant is transferred correctly.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testTransferParticipantRegistration(): void {
     //Register a contact to a sample event.
@@ -836,7 +830,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
     $this->assertCount(2, $lineItems);
     $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $contribution['id'], 'participant_id', 'contribution_id');
-    /* @var CRM_Event_Form_SelfSvcTransfer $form */
+    /** @var CRM_Event_Form_SelfSvcTransfer $form */
     $form = $this->getFormObject('CRM_Event_Form_SelfSvcTransfer');
     $toContactId = $this->individualCreate();
     $mut = new CiviMailUtils($this);

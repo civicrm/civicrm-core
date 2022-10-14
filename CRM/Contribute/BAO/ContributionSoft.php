@@ -52,7 +52,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param CRM_Contribute_BAO_Contribution $contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function processSoftContribution($params, $contribution) {
     if (array_key_exists('pcp', $params)) {
@@ -351,7 +350,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @return array
    *   Associated array of soft contributions
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function getSoftContributionSelector($params): array {
@@ -387,7 +385,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getSoftContributionList($contact_id, ?int $membershipID = NULL, $isTest = 0, &$dTParams = NULL): array {
     // This is necessary for dataTables sorting.
@@ -552,8 +550,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param \CRM_Contribute_BAO_Contribution $contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
    */
   protected static function processPCP($pcp, $contribution) {
     $pcpId = self::getSoftCreditIds($contribution->id, TRUE);
@@ -593,7 +589,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param array $contributionSoft
    *   Contribution object.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function pcpNotifyOwner(int $contributionID, array $contributionSoft): void {

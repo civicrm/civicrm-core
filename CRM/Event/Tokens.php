@@ -88,7 +88,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
 
   /**
    * @inheritDoc
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     $eventID = $this->getFieldValue($row, 'id');
@@ -108,7 +108,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
    *
    * @return array
    *
-   * @throws \API_Exception|\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    *
    * @internal
    */

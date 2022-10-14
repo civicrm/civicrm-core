@@ -425,7 +425,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test get custom field id function.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetCustomFieldID() {
     $this->createCustomField();

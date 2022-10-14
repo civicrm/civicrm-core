@@ -68,7 +68,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Test that a cancel from paypal pro results in an order being cancelled.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -155,7 +154,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Create the general membership type.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function createMembershipType(): void {
     MembershipType::create()->setValues([
@@ -217,8 +216,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Test that a cancel from paypal pro results in an order being cancelled.
    *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testPaypalStandardCancel(): void {
     $this->createContact();
@@ -242,7 +240,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Test fail order api.
    *
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    */
   public function testCancelOrderWithParticipantFailed(): void {
     $status = 'Failed';
@@ -252,7 +250,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Test cancel order api.
    *
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    */
   public function testCancelOrderWithParticipantCancelled(): void {
     $this->markTestIncomplete('For unknown reasons this failed if run after the cancelled variation of this test');
@@ -264,7 +262,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    * Test cancelling a contribution with a membership on the contribution edit
    * form.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testCancelFromContributionForm(): void {
     $this->createContact();
@@ -321,7 +319,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    * Create an event and an order for a participant in that event.
    *
    * @return int
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    */
   protected function createEventOrder(): int {
     $this->ids['event'][0] = (int) Event::create()->setValues(['title' => 'Event', 'start_date' => 'tomorrow', 'event_type_id:name' => 'Workshop'])->execute()->first()['id'];
@@ -353,7 +351,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Create a contact for use in the test.
    *
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    */
   protected function createContact(): void {
     $this->ids['contact'][0] = Civi\Api4\Contact::create()->setValues(['first_name' => 'Brer', 'last_name' => 'Rabbit'])->execute()->first()['id'];
@@ -362,8 +360,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * @param string $status
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function createAndUpdateContribution(string $status): void {

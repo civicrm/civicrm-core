@@ -499,7 +499,7 @@ abstract class CRM_Utils_Hook {
    *   The name of the form.
    * @param array &$fields the POST parameters as filtered by QF
    * @param array &$files the FILES parameters as sent in by POST
-   * @param array &$form the form object
+   * @param CRM_Core_Form &$form the form object
    * @param array &$errors the array of errors.
    *
    * @return mixed

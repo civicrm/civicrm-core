@@ -31,7 +31,7 @@ class SaveTest extends Api4TestBase implements TransactionalInterface {
   /**
    * @dataProvider getMatchingCriteriaDataProvider
    * @return void
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSaveWithMatchingCriteria($matchCriteria, $records, $changes, $expected) {

@@ -64,6 +64,8 @@
   name        : Alain Benbassat
   organization: Business & Code
 
+- github      : alarmingcod
+    
 - github      : albionbrown
   name        : Josh Brown
   organization: CEPR
@@ -184,6 +186,10 @@
 - github      : bastienho
   name        : Bastien Ho
 
+- github      : bdpfreizeiten 
+  name        : David Geisel
+  organization: Bund Deutscher PfadfinderInnen BaWue
+  
 - github      : bhahumanists
   name        : Andrew West
   organization: British Humanist Association
@@ -802,6 +808,10 @@
 - github      : KarinG
   name        : Karin Gerritsen
   organization: Semper IT
+  
+- github      : kaspernowak
+  name        : Kasper Nowak
+  organization: NowaTech
 
 - github      : kcristiano
   name        : Kevin Cristiano
@@ -1280,7 +1290,7 @@
 
 - github      : savionlee
   name        : Savion Lee
-  
+
 - github      : scoobird
   name        : Morgan Robinson
   organization: Palante Technology Cooperative
@@ -1584,3 +1594,11 @@
 - github      : vitius1
   name        : Vít Maňásek
   organization: KAM z.s.
+  
+- github      : wikimediaWfan 
+  name        : Wenjun Fan
+  organization: Wikimedia Foundation
+
+- github      : damilare1 
+  name        : Damilare Adedoyin
+  organization: Wikimedia Foundation

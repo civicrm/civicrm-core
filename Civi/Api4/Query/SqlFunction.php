@@ -59,7 +59,7 @@ abstract class SqlFunction extends SqlExpression {
           continue;
         }
         if (!$prefix && !$param['optional']) {
-          throw new \API_Exception("Missing param $name for SQL function " . static::getName());
+          throw new \CRM_Core_Exception("Missing param $name for SQL function " . static::getName());
         }
       }
       elseif ($param['flag_before']) {
@@ -76,7 +76,7 @@ abstract class SqlFunction extends SqlExpression {
           count($exprs) < $param['min_expr'] &&
           !(!$exprs && $param['optional'])
         ) {
-          throw new \API_Exception("Too few arguments to param $name for SQL function " . static::getName());
+          throw new \CRM_Core_Exception("Too few arguments to param $name for SQL function " . static::getName());
         }
         $this->args[$idx]['expr'] = $exprs;
 
@@ -84,7 +84,7 @@ abstract class SqlFunction extends SqlExpression {
       }
     }
     if (trim($arg)) {
-      throw new \API_Exception("Too many arguments given for SQL function " . static::getName());
+      throw new \CRM_Core_Exception("Too many arguments given for SQL function " . static::getName());
     }
   }
 
@@ -163,7 +163,7 @@ abstract class SqlFunction extends SqlExpression {
     $params = [];
     foreach (static::params() as $param) {
       // Merge in defaults to ensure each param has these properties
-      $params[] = $param + [
+      $param += [
         'name' => NULL,
         'label' => ts('Select'),
         'min_expr' => 1,
@@ -174,6 +174,10 @@ abstract class SqlFunction extends SqlExpression {
         'must_be' => ['SqlField', 'SqlFunction', 'SqlString', 'SqlNumber', 'SqlNull'],
         'api_default' => NULL,
       ];
+      if (!$param['max_expr']) {
+        $param['must_be'] = [];
+      }
+      $params[] = $param;
     }
     return $params;
   }

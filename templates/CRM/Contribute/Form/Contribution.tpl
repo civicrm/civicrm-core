@@ -33,7 +33,7 @@
   {/if}
 
   <div class="crm-block crm-form-block crm-contribution-form-block">
-    {if !$email and $action neq 8 and $context neq 'standalone'}
+    {if $context neq 'standalone' && !$email and $action neq 8}
       <div class="messages status no-popup">
         {icon icon="fa-info-circle"}{/icon}{ts}You will not be able to send an automatic email receipt for this contribution because there is no email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
       </div>
@@ -119,9 +119,12 @@
             </tr>
           {/if}
 
-          <tr id="adjust-option-type" class="crm-contribution-form-block-option_type">
-            <td class="label"></td><td {$valueStyle}>{$form.option_type.html}</td>
-          </tr>
+          {if array_key_exists('option_type', $form)}
+            <tr id="adjust-option-type" class="crm-contribution-form-block-option_type">
+              <td class="label"></td><td {$valueStyle}>{$form.option_type.html}</td>
+            </tr>
+          {/if}
+
         {/if}
         {if $contributionMode && $processorSupportsFutureStartDate}
           <tr id='start_date' class="crm-contribution-form-block-receive_date">
@@ -148,7 +151,7 @@
               {if $contribution_status_id eq 2}{if $is_pay_later }: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
             </td>
             <td>
-              {if !$isUsePaymentBlock && $contactId && $contribID && $contributionMode EQ null && $contribution_status_id eq 2}
+              {if !$isUsePaymentBlock && $contactId && $contribution_status_id eq 2 && $contribID && $contributionMode EQ null}
                 {capture assign=payNowLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=update&id=`$contribID`&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
                 <a class="open-inline action-item crm-hover-button" href="{$payNowLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Pay with Credit Card{/ts}</a>
               {/if}
@@ -176,10 +179,12 @@
                     <td class="label" style="vertical-align: top;">{$form.cancel_reason.label}</td>
                     <td>{$form.cancel_reason.html}</td>
                   </tr>
-                  <tr id="refundTrxnID">
-                    <td class="label" style="vertical-align: top;">{$form.refund_trxn_id.label}</td>
-                    <td>{$form.refund_trxn_id.html}</td>
-                  </tr>
+                  {if array_key_exists('refund_trxn_id', $form)}
+                    <tr id="refundTrxnID">
+                      <td class="label" style="vertical-align: top;">{$form.refund_trxn_id.label}</td>
+                      <td>{$form.refund_trxn_id.html}</td>
+                    </tr>
+                  {/if}
                 </table>
               </fieldset>
             </td>
@@ -193,7 +198,7 @@
           </tr>
           {/if}
         {/if}
-        {if $form.revenue_recognition_date && !$payNow}
+        {if array_key_exists('revenue_recognition_date', $form) && !$payNow}
           <tr class="crm-contribution-form-block-revenue_recognition_date">
             <td class="label">{$form.revenue_recognition_date.label}</td>
             <td>{$form.revenue_recognition_date.html}</td>
@@ -407,6 +412,14 @@
           </div><!-- /.crm-accordion-wrapper -->
         {/foreach}
       </div>
+    {/if}
+    {if $billing_address}
+      <fieldset>
+        <legend>{ts}Billing Address{/ts}</legend>
+        <div class="form-item">
+          {$billing_address|nl2br}
+        </div>
+      </fieldset>
     {/if}
     <br />
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

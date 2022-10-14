@@ -99,7 +99,6 @@ class BasicGetAction extends AbstractGetAction {
    * Evaluate :pseudoconstant suffix expressions and replace raw values with option values
    *
    * @param $records
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function formatRawValues(&$records) {

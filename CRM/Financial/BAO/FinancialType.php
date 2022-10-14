@@ -172,7 +172,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @return array
    *   all financial type with income account is relationship
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getIncomeFinancialType($checkPermissions = TRUE): array {
     // Realistically tests are the only place where logged in contact can

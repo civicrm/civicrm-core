@@ -25,9 +25,9 @@
   </a>
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type !== 'Existing' && $ctrl.hasDefaultValue">
-  <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
+  <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
     <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('afform_default')" ng-model-options="{getterSetter: true}" >
-  </div>
+  </form>
 </li>
 <li>
   <a href ng-click="toggleLabel(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show field label') }}">

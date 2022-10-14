@@ -19,6 +19,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\UserJob;
+
 require_once 'Log.php';
 require_once 'Mail.php';
 
@@ -266,7 +268,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   public function cleanupCaches($sessionReset = TRUE) {
     // cleanup templates_c directory
     $this->cleanup(1, FALSE);
-
+    UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
     // clear all caches
     self::clearDBCache();
     Civi::cache('session')->clear();
@@ -323,7 +325,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   /**
    * Clear db cache.
    */
-  public static function clearDBCache() {
+  public static function clearDBCache(): void {
     $queries = [
       'TRUNCATE TABLE civicrm_acl_cache',
       'TRUNCATE TABLE civicrm_acl_contact_cache',
@@ -356,20 +358,15 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *   Optional time interval for mysql date function.g '2 day'. This can be used to prevent
    *   tables created recently from being deleted.
    */
-  public static function clearTempTables($timeInterval = FALSE) {
+  public static function clearTempTables($timeInterval = FALSE): void {
 
     $dao = new CRM_Core_DAO();
     $query = "
       SELECT TABLE_NAME as tableName
       FROM   INFORMATION_SCHEMA.TABLES
       WHERE  TABLE_SCHEMA = %1
-      AND (
-        TABLE_NAME LIKE 'civicrm_import_job_%'
-        OR TABLE_NAME LIKE 'civicrm_report_temp%'
-        OR TABLE_NAME LIKE 'civicrm_tmp_d%'
-        )
+      AND TABLE_NAME LIKE 'civicrm_tmp_d%'
     ";
-    // NOTE: Cannot find use-cases where "civicrm_report_temp" would be durable. Could probably remove.
 
     if ($timeInterval) {
       $query .= " AND CREATE_TIME < DATE_SUB(NOW(), INTERVAL {$timeInterval})";
@@ -382,8 +379,17 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     }
     if (!empty($tables)) {
       $table = implode(',', $tables);
-      // drop leftover temporary tables
-      CRM_Core_DAO::executeQuery("DROP TABLE $table");
+      // If a User Job references the table do not drop it. This is a bit quick & dirty, but we don't want to
+      // get into calling more sophisticated functions in a cache clear, and the table names are pretty unique
+      // (ex: "civicrm_tmp_d_dflt_1234abcd5678efgh"), and the "metadata" may continue to evolve for the next
+      // couple months.
+      // TODO: Circa v5.60+, consider a more precise cleanup. Discussion: https://github.com/civicrm/civicrm-core/pull/24538
+      // A separate process will reap the UserJobs but here the goal is just not to delete them during cache clearing
+      // if they are still referenced.
+      if (!CRM_Core_DAO::executeQuery("SELECT count(*) FROM civicrm_user_job WHERE metadata LIKE '%" . $tableDAO->tableName . "%'")) {
+        // drop leftover temporary tables
+        CRM_Core_DAO::executeQuery("DROP TABLE $table");
+      }
     }
   }
 

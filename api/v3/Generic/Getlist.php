@@ -19,7 +19,7 @@
  * @param array $apiRequest
  *
  * @return mixed
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_generic_getList($apiRequest) {
   $entity = CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($apiRequest['entity']);

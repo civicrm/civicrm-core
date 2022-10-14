@@ -214,7 +214,7 @@ class CRM_Core_ManagedEntities {
     $doUpdate = ($policy === 'always');
 
     if ($policy === 'unmodified') {
-      // If this is not an APIv4 managed entity, the entity_modidfied_date will always be null
+      // If this is not an APIv4 managed entity, the entity_modified_date will always be null
       if (!CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
         Civi::log()->warning('ManagedEntity update policy "unmodified" specified for entity type ' . $item['entity_type'] . ' which is not an APIv4 ManagedEntity. Falling back to policy "always".');
       }
@@ -274,7 +274,7 @@ class CRM_Core_ManagedEntities {
    *
    * @param array $item
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function disableEntity(array $item): void {
     $entity_type = $item['entity_type'];
@@ -489,7 +489,7 @@ class CRM_Core_ManagedEntities {
    * @param string $entity_type
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private function isActivationSupported(string $entity_type): bool {
     if (!isset(Civi::$statics[__CLASS__][__FUNCTION__][$entity_type])) {

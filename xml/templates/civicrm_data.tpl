@@ -431,8 +431,6 @@ VALUES
   (@option_group_id_cs, '{ts escape="sql"}Pending{/ts}'    , 2, 'Pending'    , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Cancelled{/ts}'  , 3, 'Cancelled'  , NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Failed{/ts}'     , 4, 'Failed'     , NULL, 0, 0, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}In Progress{/ts}', 5, 'In Progress', NULL, 0, 0, 5, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}Overdue{/ts}'    , 6, 'Overdue'    , NULL, 0, 0, 6, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Refunded{/ts}'   , 7, 'Refunded'   , NULL, 0, 0, 7, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Partially paid{/ts}', 8, 'Partially paid', NULL, 0, 0, 8, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Pending refund{/ts}', 9, 'Pending refund', NULL, 0, 0, 9, NULL, 0, 1, 1, NULL, NULL, NULL),
@@ -1139,13 +1137,13 @@ VALUES
 INSERT INTO `civicrm_preferences_date`
   (name, start, end, date_format, time_format, description)
 VALUES
-  ( 'activityDate'    ,  20, 10, '',    '',  '{ts escape="sql"}Date for activities including contributions: receive, receipt, cancel. membership: join, start, renew. case: start, end.{/ts}'         ),
+  ( 'activityDate'    ,  20, 10, '',    '',  '{ts escape="sql"}Date for relationships. activities. contributions: receive, receipt, cancel. membership: join, start, renew. case: start, end.{/ts}'         ),
   ( 'activityDateTime',  20, 10, '',     1,  '{ts escape="sql"}Date and time for activity: scheduled. participant: registered.{/ts}'                                                                  ),
   ( 'birth'           , 100,  0, '',    '',  '{ts escape="sql"}Birth and deceased dates. Only year, month and day fields are supported.{/ts}'                                                         ),
   ( 'creditCard'      ,   0, 10, 'M Y', '',  '{ts escape="sql"}Month and year only for credit card expiration.{/ts}'                                                                                  ),
   ( 'custom'          ,  20, 20, '',    '',  '{ts escape="sql"}Uses date range passed in by form field. Can pass in a posix date part parameter. Start and end offsets defined here are ignored.{/ts}'),
   ( 'mailing'         ,   0,  1, '',    '',  '{ts escape="sql"}Date and time. Used for scheduling mailings.{/ts}'                                                                                     ),
-  ( 'searchDate'      ,  20, 20, '',    '',  '{ts escape="sql"}Used in search forms and for relationships.{/ts}'                                                                                      );
+  ( 'searchDate'      ,  20, 20, '',    '',  '{ts escape="sql"}Used in search forms.{/ts}'                                                                                      );
 
 
 -- various processor options
@@ -1783,7 +1781,6 @@ INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_act
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'greenwich', 'Theme: Greenwich', 'Theme: Greenwich', 'greenwich', 1);
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'eventcart', 'Event cart', 'Event cart', 'eventcart', 1);
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'financialacls', 'Financial ACLs', 'Financial ACLs', 'financialacls', 1);
-INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'contributioncancelactions', 'Contribution cancel actions', 'Contribution cancel actions', 'contributioncancelactions', 1);
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'recaptcha', 'reCAPTCHA', 'reCAPTCHA', 'recaptcha', 1);
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'ckeditor4', 'CKEditor4', 'CKEditor4', 'ckeditor4', 1);
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'legacycustomsearches', 'Custom search framework', 'Custom search framework', 'legacycustomsearches', 1);
@@ -1796,15 +1793,15 @@ SELECT @option_group_id_recent := max(id) from civicrm_option_group where name =
 
 INSERT INTO civicrm_option_value (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}description{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
  VALUES
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Contacts{/ts}'{/localize}, 'Contact', 'Contacts', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Relationships{/ts}'{/localize}, 'Relationship', 'Relationships', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Activities{/ts}'{/localize}, 'Activity', 'Activities', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Notes{/ts}'{/localize}, 'Note', 'Notes', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Groups{/ts}'{/localize}, 'Group', 'Groups', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Cases{/ts}'{/localize}, 'Case', 'Cases', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Contributions{/ts}'{/localize}, 'Contribution', 'Contributions', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Participants{/ts}'{/localize}, 'Participant', 'Participants', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Memberships{/ts}'{/localize}, 'Membership', 'Memberships', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Pledges{/ts}'{/localize}, 'Pledge', 'Pledges', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Events{/ts}'{/localize}, 'Event', 'Events', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Campaigns{/ts}'{/localize}, 'Campaign', 'Campaigns', NULL, NULL, 0, 1, '', 0, 0, 1, NULL, NULL);
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Contacts{/ts}'{/localize}, 'Contact', 'Contact', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Relationships{/ts}'{/localize}, 'Relationship', 'Relationship', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Activities{/ts}'{/localize}, 'Activity', 'Activity', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Notes{/ts}'{/localize}, 'Note', 'Note', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Groups{/ts}'{/localize}, 'Group', 'Group', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Cases{/ts}'{/localize}, 'Case', 'Case', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Contributions{/ts}'{/localize}, 'Contribution', 'Contribution', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Participants{/ts}'{/localize}, 'Participant', 'Participant', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Memberships{/ts}'{/localize}, 'Membership', 'Membership', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Pledges{/ts}'{/localize}, 'Pledge', 'Pledge', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Events{/ts}'{/localize}, 'Event', 'Event', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, {localize}'{ts escape="sql"}Campaigns{/ts}'{/localize}, 'Campaign', 'Campaign', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL);

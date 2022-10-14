@@ -111,7 +111,7 @@ class Api3SelectQuery extends SelectQuery {
         $orClause = [];
         foreach ($orGroup as $key) {
           if (!isset($filters[$key])) {
-            throw new \CiviCRM_API3_Exception("'$key' specified in OR group but not added to params");
+            throw new \CRM_Core_Exception("'$key' specified in OR group but not added to params");
           }
           $orClause[] = $filters[$key];
           unset($filters[$key]);

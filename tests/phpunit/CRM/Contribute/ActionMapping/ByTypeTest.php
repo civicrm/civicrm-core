@@ -282,8 +282,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * legacy processor function. Once this is true we can expose the listener on the
    * token processor for contribution and call it internally from the legacy code.
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testTokenRendering(): void {
     $this->targetDate = '20150201000107';

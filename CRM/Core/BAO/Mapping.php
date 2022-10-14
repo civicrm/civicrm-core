@@ -112,13 +112,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    * @return array
    *   Array of mapping names, keyed by id.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getCreateMappingValues($mappingType) {
     try {
       return CRM_Core_BAO_Mapping::getMappings($mappingType);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // Having a valid mapping_type_id is now enforced. However, rather than error let's
       // add it. This is required for Multi value which could be done by upgrade script, but
       // it feels like there could be other instances so this is safer.
@@ -227,7 +227,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    * @param string $fieldName
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getMappingFieldValues($mappingID, $fieldName) {
     return array_merge(CRM_Utils_Array::collect($fieldName, civicrm_api3('MappingField', 'get', ['mapping_id' => $mappingID, 'return' => $fieldName])['values']));

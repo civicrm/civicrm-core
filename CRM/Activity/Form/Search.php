@@ -70,7 +70,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess(): void {
     $this->set('searchFormName', 'Search');
@@ -121,7 +120,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm(): void {
     parent::buildQuickForm();
@@ -153,7 +151,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
    *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess(): void {
     if ($this->_done) {
@@ -316,7 +314,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getEntityMetadata() {
     return CRM_Activity_BAO_Query::getSearchFieldMetadata();

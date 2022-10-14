@@ -39,7 +39,7 @@ function _civicrm_api3_membership_delete_spec(&$params) {
  * @param array $params
  *   Array array holding id - Id of the contact membership to be deleted.
  * @return array API result array.
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_membership_delete($params) {
   if (isset($params['preserve_contribution'])) {
@@ -47,7 +47,7 @@ function civicrm_api3_membership_delete($params) {
       return civicrm_api3_create_success(TRUE, $params);
     }
     else {
-      throw new API_Exception(ts('Could not delete membership'));
+      throw new CRM_Core_Exception(ts('Could not delete membership'));
     }
   }
   else {
@@ -68,7 +68,6 @@ function civicrm_api3_membership_delete($params) {
  *   API result array.
  *
  * @throws \CRM_Core_Exception
- * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_membership_create($params) {
   // check params for membership id during update

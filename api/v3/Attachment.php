@@ -85,7 +85,7 @@ function _civicrm_api3_attachment_create_spec(&$spec) {
  * @param array $params
  *
  * @return array
- * @throws API_Exception validation errors
+ * @throws CRM_Core_Exception validation errors
  * @see Civi\API\Subscriber\DynamicFKAuthorization
  */
 function civicrm_api3_attachment_create($params) {
@@ -104,29 +104,29 @@ function civicrm_api3_attachment_create($params) {
     $file['id'] = $fileDao->id = $id;
 
     if (!$fileDao->find(TRUE)) {
-      throw new API_Exception("Invalid ID");
+      throw new CRM_Core_Exception("Invalid ID");
     }
 
     $entityFileDao->file_id = $id;
     if (!$entityFileDao->find(TRUE)) {
-      throw new API_Exception("Cannot modify orphaned file");
+      throw new CRM_Core_Exception("Cannot modify orphaned file");
     }
   }
 
   if (!$id && !is_string($content) && !is_string($moveFile)) {
-    throw new API_Exception("Mandatory key(s) missing from params array: 'id' or 'content' or 'options.move-file'");
+    throw new CRM_Core_Exception("Mandatory key(s) missing from params array: 'id' or 'content' or 'options.move-file'");
   }
   if (!$isTrusted && $moveFile) {
-    throw new API_Exception("options.move-file is only supported on secure calls");
+    throw new CRM_Core_Exception("options.move-file is only supported on secure calls");
   }
   if (is_string($content) && is_string($moveFile)) {
-    throw new API_Exception("'content' and 'options.move-file' are mutually exclusive");
+    throw new CRM_Core_Exception("'content' and 'options.move-file' are mutually exclusive");
   }
   if ($id && !$isTrusted && isset($file['upload_date']) && $file['upload_date'] != CRM_Utils_Date::isoToMysql($fileDao->upload_date)) {
-    throw new API_Exception("Cannot modify upload_date" . var_export([$file['upload_date'], $fileDao->upload_date, CRM_Utils_Date::isoToMysql($fileDao->upload_date)], TRUE));
+    throw new CRM_Core_Exception("Cannot modify upload_date" . var_export([$file['upload_date'], $fileDao->upload_date, CRM_Utils_Date::isoToMysql($fileDao->upload_date)], TRUE));
   }
   if ($id && $name && $name != CRM_Utils_File::cleanFileName($fileDao->uri)) {
-    throw new API_Exception("Cannot modify name");
+    throw new CRM_Core_Exception("Cannot modify name");
   }
 
   if (!$id) {
@@ -147,7 +147,7 @@ function civicrm_api3_attachment_create($params) {
     // CRM-17432 Do not use rename() since it will break file permissions.
     // Also avoid move_uploaded_file() because the API can use options.move-file.
     if (!copy($moveFile, $path)) {
-      throw new API_Exception("Cannot copy uploaded file $moveFile to $path");
+      throw new CRM_Core_Exception("Cannot copy uploaded file $moveFile to $path");
     }
     unlink($moveFile);
   }
@@ -183,7 +183,7 @@ function _civicrm_api3_attachment_get_spec(&$spec) {
  *
  * @return array
  *   per APIv3
- * @throws API_Exception validation errors
+ * @throws CRM_Core_Exception validation errors
  */
 function civicrm_api3_attachment_get($params) {
   list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = _civicrm_api3_attachment_parse_params($params);
@@ -216,7 +216,7 @@ function _civicrm_api3_attachment_delete_spec(&$spec) {
  * @param array $params
  *
  * @return array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_attachment_delete($params) {
   if (!empty($params['id'])) {
@@ -226,7 +226,7 @@ function civicrm_api3_attachment_delete($params) {
     // ok
   }
   else {
-    throw new API_Exception("Mandatory key(s) missing from params array: id or entity_table+entity_table");
+    throw new CRM_Core_Exception("Mandatory key(s) missing from params array: id or entity_table+entity_table");
   }
 
   $config = CRM_Core_Config::singleton();
@@ -269,12 +269,12 @@ function civicrm_api3_attachment_delete($params) {
  * @param bool $isTrusted
  *
  * @return CRM_Core_DAO
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTrusted) {
   foreach (['name', 'content', 'path', 'url'] as $unsupportedFilter) {
     if (!empty($params[$unsupportedFilter])) {
-      throw new API_Exception("Get by $unsupportedFilter is not currently supported");
+      throw new CRM_Core_Exception("Get by $unsupportedFilter is not currently supported");
     }
   }
 
@@ -335,12 +335,12 @@ function __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTru
  *    - string $moveFile: the full path to a local file whose content should be loaded
  *    - bool $isTrusted: whether we trust the requester to do sketchy things (like moving files or reassigning entities)
  *    - bool $returnContent: whether we are expected to return the full content of the file
- * @throws API_Exception validation errors
+ * @throws CRM_Core_Exception validation errors
  */
 function _civicrm_api3_attachment_parse_params($params) {
   $id = $params['id'] ?? NULL;
   if ($id && !is_numeric($id)) {
-    throw new API_Exception("Malformed id");
+    throw new CRM_Core_Exception("Malformed id");
   }
 
   $file = [];
@@ -365,7 +365,7 @@ function _civicrm_api3_attachment_parse_params($params) {
   $name = NULL;
   if (array_key_exists('name', $params)) {
     if ($params['name'] != basename($params['name']) || preg_match(':[/\\\\]:', $params['name'])) {
-      throw new API_Exception('Malformed name');
+      throw new CRM_Core_Exception('Malformed name');
     }
     $name = $params['name'];
   }

@@ -37,7 +37,7 @@ class FormattingUtil {
    *
    * @param array $params
    * @param array $fields
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function formatWriteParams(&$params, $fields) {
     foreach ($fields as $name => $field) {
@@ -82,23 +82,23 @@ class FormattingUtil {
    * @param $value
    * @param string|null $fieldName
    * @param array $fieldSpec
+   * @param array $params
    * @param string|null $operator (only for 'get' actions)
    * @param null $index (for recursive loops)
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, &$operator = NULL, $index = NULL) {
+  public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, array $params = [], &$operator = NULL, $index = NULL) {
     // Evaluate pseudoconstant suffix
     $suffix = strpos(($fieldName ?? ''), ':');
     if ($suffix) {
-      $options = self::getPseudoconstantList($fieldSpec, $fieldName, [], $operator ? 'get' : 'create');
+      $options = self::getPseudoconstantList($fieldSpec, $fieldName, $params, $operator ? 'get' : 'create');
       $value = self::replacePseudoconstant($options, $value, TRUE);
       return;
     }
     elseif (is_array($value)) {
       $i = 0;
       foreach ($value as &$val) {
-        self::formatInputValue($val, $fieldName, $fieldSpec, $operator, $i++);
+        self::formatInputValue($val, $fieldName, $fieldSpec, $params, $operator, $i++);
       }
       return;
     }
@@ -111,7 +111,7 @@ class FormattingUtil {
     if ($fk === 'Contact' && !is_numeric($value)) {
       $value = \_civicrm_api3_resolve_contactID($value);
       if ('unknown-user' === $value) {
-        throw new \API_Exception("\"{$fieldSpec['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $fieldSpec['name'], "type" => "integer"]);
+        throw new \CRM_Core_Exception("\"{$fieldSpec['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $fieldSpec['name'], "type" => "integer"]);
       }
     }
 
@@ -148,7 +148,7 @@ class FormattingUtil {
       return date($format, strtotime($value ?? ''));
     }
     if (isset($index) && !strstr($operator, 'BETWEEN')) {
-      throw new \API_Exception("Relative dates cannot be in an array using the $operator operator.");
+      throw new \CRM_Core_Exception("Relative dates cannot be in an array using the $operator operator.");
     }
     [$dateFrom, $dateTo] = \CRM_Utils_Date::getFromTo($value);
     switch ($operator) {
@@ -159,9 +159,20 @@ class FormattingUtil {
       case 'LIKE':
       case 'NOT LIKE':
         $operator = ($operator === '=' || $operator === 'LIKE') ? 'BETWEEN' : 'NOT BETWEEN';
-        return [self::formatDateValue($format, $dateFrom), self::formatDateValue($format, $dateTo)];
 
-      // Less-than or greater-than-equal-to comparisons use the lower value
+        if (is_null($dateFrom) && !is_null($dateTo)) {
+          $operator = ($operator === 'BETWEEN') ? '<=' : '>=';
+          return self::formatDateValue($format, $dateTo);
+        }
+        elseif (!is_null($dateFrom) && is_null($dateTo)) {
+          $operator = ($operator === 'BETWEEN') ? '>=' : '<=';
+          return self::formatDateValue($format, $dateFrom);
+        }
+        else {
+          return [self::formatDateValue($format, $dateFrom), self::formatDateValue($format, $dateTo)];
+        }
+
+        // Less-than or greater-than-equal-to comparisons use the lower value
       case '<':
       case '>=':
         return self::formatDateValue($format, $dateFrom);
@@ -177,7 +188,7 @@ class FormattingUtil {
         return self::formatDateValue($format, $index ? $dateTo : $dateFrom);
 
       default:
-        throw new \API_Exception("Relative dates cannot be used with the $operator operator.");
+        throw new \CRM_Core_Exception("Relative dates cannot be used with the $operator operator.");
     }
   }
 
@@ -188,7 +199,6 @@ class FormattingUtil {
    * @param array $fields
    * @param string $action
    * @param array $selectAliases
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function formatOutputValues(&$results, $fields, $action = 'get', $selectAliases = []) {
@@ -247,7 +257,7 @@ class FormattingUtil {
    *   Other values for this object
    * @param string $action
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getPseudoconstantList(array $field, string $fieldAlias, $params = [], $action = 'get') {
     [$fieldPath, $valueType] = explode(':', $fieldAlias);
@@ -255,7 +265,7 @@ class FormattingUtil {
     // For create actions, only unique identifiers can be used.
     // For get actions any valid suffix is ok.
     if (($action === 'create' && !$context) || !in_array($valueType, self::$pseudoConstantSuffixes, TRUE)) {
-      throw new \API_Exception('Illegal expression');
+      throw new \CRM_Core_Exception('Illegal expression');
     }
     $baoName = $context ? CoreUtil::getBAOFromApiName($field['entity']) : NULL;
     // Use BAO::buildOptions if possible
@@ -271,7 +281,7 @@ class FormattingUtil {
     if (is_array($options)) {
       return $options;
     }
-    throw new \API_Exception("No option list found for '{$field['name']}'");
+    throw new \CRM_Core_Exception("No option list found for '{$field['name']}'");
   }
 
   /**

@@ -52,7 +52,6 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
    * This test mimics a scenario where the form is submitted more than once
    * and the user_job is updated to reflect the new data source.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testDataSources(): void {
@@ -122,7 +121,6 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
    * @param array $sqlFormValues
    *
    * @return CRM_Contact_Import_Form_DataSource
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   private function submitDataSourceForm(array $sqlFormValues): CRM_Contact_Import_Form_DataSource {

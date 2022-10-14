@@ -18,8 +18,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * For any API requests that correspond to a Doctrine entity
  * ($apiRequest['doctrineClass']), check permissions specified in
  * Civi\API\Annotation\Permission.
+ *
+ * @service civi.api4.permissionCheck
  */
-class PermissionCheckSubscriber implements EventSubscriberInterface {
+class PermissionCheckSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   /**
    * @return array
@@ -37,7 +39,7 @@ class PermissionCheckSubscriber implements EventSubscriberInterface {
    *   API authorization event.
    */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
-    /* @var \Civi\Api4\Generic\AbstractAction $apiRequest */
+    /** @var \Civi\Api4\Generic\AbstractAction $apiRequest */
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] == 4) {
       if (!$apiRequest->getCheckPermissions() || $apiRequest->isAuthorized(\CRM_Core_Session::singleton()->getLoggedInContactID())) {

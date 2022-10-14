@@ -271,6 +271,25 @@
         });
       };
 
+      this.toggleAddButton = function() {
+        if (ctrl.display.settings.addButton && ctrl.display.settings.addButton.path) {
+          delete ctrl.display.settings.addButton;
+        } else {
+          var entity = searchMeta.getBaseEntity();
+          ctrl.display.settings.addButton = {
+            path: entity.addPath || 'civicrm/',
+            text: ts('Add %1', {1: entity.title}),
+            icon: 'fa-plus'
+          };
+        }
+      };
+
+      this.onChangeAddButtonPath = function() {
+        if (!ctrl.display.settings.addButton.path) {
+          delete ctrl.display.settings.addButton;
+        }
+      };
+
       // Helper function to sort active from hidden columns and initialize each column with defaults
       this.initColumns = function(defaults) {
         if (!ctrl.display.settings.columns) {

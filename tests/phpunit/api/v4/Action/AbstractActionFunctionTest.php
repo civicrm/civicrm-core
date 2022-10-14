@@ -26,7 +26,7 @@ use api\v4\Api4TestBase;
 class AbstractActionFunctionTest extends Api4TestBase {
 
   public function testUndefinedParamException(): void {
-    $this->expectException('API_Exception');
+    $this->expectException('CRM_Core_Exception');
     $this->expectExceptionMessage('Unknown api parameter: getTranslationMode');
     \Civi\Api4\System::flush(FALSE)->getTranslationMode();
   }

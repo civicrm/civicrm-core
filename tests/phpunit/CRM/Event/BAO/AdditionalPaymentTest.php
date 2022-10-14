@@ -140,7 +140,6 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   /**
    * See https://lab.civicrm.org/dev/core/issues/153
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testPaymentWithCustomPaymentInstrument() {
@@ -218,7 +217,6 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   /**
    * Test owed/refund info is listed on view payments.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testTransactionInfo() {

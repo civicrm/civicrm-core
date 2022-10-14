@@ -29,7 +29,7 @@ class CRM_Queue_TaskRunner {
    *    - 'retry': Task encountered an error. Will try again later.
    *    - 'delete': Task encountered an error. Will not try again later. Removed from queue.
    *    - 'abort': Task encountered an error. Will not try again later. Stopped the queue.
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function run(CRM_Queue_Queue $queue, $item): string {
     $this->assertType($item->data, ['CRM_Queue_Task'], 'Cannot run. Invalid task given.');
@@ -42,14 +42,14 @@ class CRM_Queue_TaskRunner {
     if (is_numeric($queue->getSpec('retry_limit')) && $item->run_count > 1 + $queue->getSpec('retry_limit')) {
       \Civi::log()->debug("Skipping exhausted task: " . $task->title);
       $outcome = $queue->getSpec('error');
-      $exception = new \API_Exception(sprintf('Skipping exhausted task after %d tries: %s', $item->run_count, print_r($task, 1)), 'queue_retry_exhausted');
+      $exception = new \CRM_Core_Exception(sprintf('Skipping exhausted task after %d tries: %s', $item->run_count, print_r($task, 1)), 'queue_retry_exhausted');
     }
     else {
       \Civi::log()->debug("Running task: " . $task->title);
       try {
         $runResult = $task->run($this->createContext($queue));
         $outcome = $runResult ? 'ok' : $queue->getSpec('error');
-        $exception = ($outcome === 'ok') ? NULL : new \API_Exception('Queue task returned false', 'queue_false');
+        $exception = ($outcome === 'ok') ? NULL : new \CRM_Core_Exception('Queue task returned false', 'queue_false');
       }
       catch (\Exception $e) {
         $outcome = $queue->getSpec('error');

@@ -197,6 +197,48 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', '=', $c1)
       ->execute();
     $this->assertCount(2, $contact);
+
+    // Find contributions To end of previous calendar year
+    $contact = \Civi\Api4\Contact::get()
+      ->addSelect('id', 'contribution.total_amount')
+      ->setJoin([
+        ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '=', '"earlier.year"']],
+      ])
+      ->addWhere('id', '=', $c1)
+      ->execute();
+    $this->assertCount(2, $contact);
+
+    // Find contributions not To end of previous calendar year
+    $contact = \Civi\Api4\Contact::get()
+      ->addSelect('id', 'contribution.total_amount')
+      ->setJoin([
+        ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '!=', '"earlier.year"']],
+      ])
+      ->addWhere('id', '=', $c1)
+      ->execute();
+    $this->assertCount(1, $contact);
+    $this->assertEquals(6, $contact[0]['contribution.total_amount']);
+
+    // Find contributions From start of current calendar year
+    $contact = \Civi\Api4\Contact::get()
+      ->addSelect('id', 'contribution.total_amount')
+      ->setJoin([
+        ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '=', '"greater.year"']],
+      ])
+      ->addWhere('id', '=', $c1)
+      ->execute();
+    $this->assertCount(1, $contact);
+    $this->assertEquals(6, $contact[0]['contribution.total_amount']);
+
+    // Find contributions not From start of current calendar year
+    $contact = \Civi\Api4\Contact::get()
+      ->addSelect('id', 'contribution.total_amount')
+      ->setJoin([
+        ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '!=', '"greater.year"']],
+      ])
+      ->addWhere('id', '=', $c1)
+      ->execute();
+    $this->assertCount(2, $contact);
   }
 
 }

@@ -57,9 +57,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    *   {@see \CRM_Contact_Import_Parser_Contact::getMappingFieldFromMapperInput}
    * @param array $expecteds
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmit(array $params, array $mapper, array $expecteds = []): void {
     $form = $this->getMapFieldFormObject(array_merge($params, ['mapper' => $mapper]));
@@ -140,7 +138,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    *   Some defaults are provided.
    *
    * @return \CRM_Contact_Import_Form_MapField
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function getMapFieldFormObject(array $submittedValues = []): CRM_Contact_Import_Form_MapField {
@@ -163,7 +160,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
 
     $dataSource = new CRM_Import_DataSource_SQL($userJobID);
     $null = NULL;
-    /* @var CRM_Contact_Import_Form_MapField $form */
+    /** @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
     $form->set('user_job_id', $userJobID);
     $dataSource->initialize();
@@ -187,7 +184,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @param string $expectedJS
    * @param array $expectedDefaults
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testLoadSavedMapping(array $fieldSpec, string $expectedJS, array $expectedDefaults): void {
@@ -207,9 +203,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * In conjunction with testing our existing  function this  tests the methods we want to migrate to
    * to  clean it up.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testLoadSavedMappingDirect(): void {
     $mapping = $this->storeComplexMapping();
@@ -226,9 +220,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $this->assertEquals('street_address', $processor->getFieldName(3));
     $this->assertEquals($this->getCustomFieldName('text'), $processor->getFieldName(4));
     $this->assertEquals('url', $processor->getFieldName(8));
-
-    $processor->setContactTypeByConstant('Household');
-    $this->assertEquals('Household', $processor->getContactType());
   }
 
   /**
@@ -283,7 +274,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @param $columnHeader
    * @param $mapsTo
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testDefaultFromColumnNames($columnHeader, $mapsTo): void {
@@ -339,14 +329,14 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function loadSavedMapping(int $mappingID, int $columnNumber): array {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
     $processor->setMetadata($this->getContactImportMetadata());
-    $processor->setContactTypeByConstant('Individual');
+    $processor->setContactType('Individual');
 
     $defaults = [];
     $defaults["mapper[$columnNumber]"] = $processor->getSavedQuickformDefaultsForColumn($columnNumber);
@@ -357,7 +347,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   /**
    * Set up the mapping form.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   private function setUpMapFieldForm(): void {
@@ -368,8 +357,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   /**
    * Tests the routing used in the 5.50 upgrade script to stop using labels...
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testConvertFields(): void {
     $mapping = $this->storeComplexMapping(TRUE);

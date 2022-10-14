@@ -425,7 +425,6 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * ParseStreetAddress if enabled, otherwise, don't.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testParseStreetAddressIfEnabled() {
     // Turn off address standardization. Parsing should work without it.

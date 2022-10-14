@@ -44,7 +44,7 @@ class GetOptions extends AbstractProcessor {
 
   /**
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function processForm() {
     $formEntity = $this->_formDataModel->getEntity($this->modelName);
@@ -55,16 +55,16 @@ class GetOptions extends AbstractProcessor {
     if ($formEntity) {
       $entity = $this->joinEntity ?: $formEntity['type'];
       if ($this->joinEntity && !isset($formEntity['joins'][$this->joinEntity]['fields'][$this->fieldName])) {
-        throw new \API_Exception('Cannot get options for field not present on form');
+        throw new \CRM_Core_Exception('Cannot get options for field not present on form');
       }
       elseif (!$this->joinEntity && !isset($formEntity['fields'][$this->fieldName])) {
-        throw new \API_Exception('Cannot get options for field not present on form');
+        throw new \CRM_Core_Exception('Cannot get options for field not present on form');
       }
     }
     // For search forms, get entity from savedSearch api params
     elseif ($searchDisplay) {
       if (!isset($searchDisplay['fields'][$this->fieldName])) {
-        throw new \API_Exception('Cannot get options for field not present on form');
+        throw new \CRM_Core_Exception('Cannot get options for field not present on form');
       }
       $savedSearch = SavedSearch::get(FALSE)
         ->addWhere('name', '=', $searchDisplay['searchName'])

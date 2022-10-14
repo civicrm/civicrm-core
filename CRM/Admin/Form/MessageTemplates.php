@@ -44,7 +44,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   /**
    * PreProcess form - load existing values.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -268,7 +267,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   /**
    * Process the form submission.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */

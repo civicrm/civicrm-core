@@ -98,7 +98,6 @@ trait DAOActionTrait {
    *
    * @return array
    *   The records after being written to the DB (e.g. including newly assigned "id").
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function writeObjects($items) {
@@ -135,7 +134,7 @@ trait DAOActionTrait {
     foreach ($this->write($items) as $index => $dao) {
       if (!$dao) {
         $errMessage = sprintf('%s write operation failed', $this->getEntityName());
-        throw new \API_Exception($errMessage);
+        throw new \CRM_Core_Exception($errMessage);
       }
       $result[] = $this->baoToArray($dao, $items[$index]);
     }
@@ -230,7 +229,6 @@ trait DAOActionTrait {
    * @param array $params
    * @param int $entityId
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function formatCustomParams(&$params, $entityId) {
@@ -264,7 +262,7 @@ trait DAOActionTrait {
         require_once 'api/v3/utils.php';
         $value = \_civicrm_api3_resolve_contactID($value);
         if ('unknown-user' === $value) {
-          throw new \API_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
+          throw new \CRM_Core_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
         }
       }
 

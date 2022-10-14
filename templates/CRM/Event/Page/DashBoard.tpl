@@ -17,8 +17,10 @@
     <div class="clear">&nbsp;</div>
     <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts}
       {help id="id-event-intro"}
-      {include file="CRM/Event/Page/iCalLinks.tpl"}
     </h3>
+    <div class="crm-clearfix">
+      {include file="CRM/Event/Page/iCalLinks.tpl"}
+    </div>
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>

@@ -18,7 +18,7 @@ function contribution_recur_delete_example() {
   try {
     $result = civicrm_api3('ContributionRecur', 'delete', $params);
   }
-  catch (CiviCRM_API3_Exception $e) {
+  catch (CRM_Core_Exception $e) {
     // Handle error here.
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();

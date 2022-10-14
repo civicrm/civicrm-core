@@ -6,6 +6,11 @@
   <name>civicrm_contact_type</name>
   <comment>Provide type information for contacts</comment>
   <add>3.1</add>
+  <paths>
+    <add>civicrm/admin/options/subtype/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/options/subtype/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/options/subtype/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Contact Type ID</title>

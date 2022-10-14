@@ -29,7 +29,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @return \CRM_Core_DAO_Phone
    *
-   * @throws API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function create($params) {
@@ -48,7 +47,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @return object
    *   CRM_Core_BAO_Phone object on success, null otherwise
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function add($params) {

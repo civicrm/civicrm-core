@@ -50,7 +50,7 @@ function _civicrm_api3_contribution_soft_create_spec(&$params) {
  * @return array
  *   Api formatted result.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_contribution_soft_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

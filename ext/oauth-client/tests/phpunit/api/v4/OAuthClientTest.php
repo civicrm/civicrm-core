@@ -78,7 +78,7 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
       ])->execute();
       $this->fail("Expected exception: invalid provider");
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->assertRegExp(';Invalid provider;', $e->getMessage());
     }
   }
@@ -104,7 +104,7 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
         ->execute();
       $this->fail("Expected exception: invalid provider");
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->assertRegExp(';Invalid provider;', $e->getMessage());
     }
 
