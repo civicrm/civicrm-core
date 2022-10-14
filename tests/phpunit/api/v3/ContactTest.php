@@ -3972,9 +3972,18 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testGetlistInvalidID(): void {
     $individualID = $this->individualCreate();
-    $contact = $this->organizationCreate(['organization_name' => 'Org ' . $individualID]);
+    $organizationID = $this->organizationCreate(['organization_name' => 'Org ' . $individualID]);
+    $organizationID2 = $this->organizationCreate(['organization_name' => 'Org ' . $organizationID]);
     $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $individualID, 'params' => ['contact_type' => 'Organization']]);
     $this->assertEquals(1, $result['count']);
+    $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $organizationID, 'params' => ['contact_type' => 'Organization']]);
+    $this->assertEquals(2, $result['count']);
+    $this->assertEquals($organizationID, $result['values'][0]['id']);
+    $this->assertEquals($organizationID2, $result['values'][1]['id']);
+
+    $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $organizationID2, 'params' => ['contact_type' => 'Organization']]);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals($organizationID2, $result['values'][0]['id']);
   }
 
   /**

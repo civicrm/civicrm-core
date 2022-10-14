@@ -31,12 +31,74 @@ function civicrm_api3_generic_getList($apiRequest) {
   // Add an extra page of results for the record with an exact id match
   if ($forceIdSearch) {
     $request['page_num'] = ($request['page_num'] ?? 1) - 1;
-    if (empty($request['page_num'])) {
-      $request['id'] = $request['input'];
-      unset($request['input']);
+    $idRequest = $request;
+    if (empty($idRequest['page_num'])) {
+      $idRequest['id'] = $idRequest['input'];
+      unset($idRequest['input']);
     }
+    $result = _civicrm_api3_generic_getlist_get_result($idRequest, $entity, $meta, $apiRequest);
   }
 
+  $searchResult = _civicrm_api3_generic_getlist_get_result($request, $entity, $meta, $apiRequest);
+  $foundIDCount = 0;
+  if ($forceIdSearch && !empty($result['values'])) {
+    $contactSearchID = $idRequest['id'];
+    $foundIDCount = 1;
+    // Merge id fetch into search result.
+    foreach ($searchResult['values'] as $searchResultItem) {
+      if ($searchResultItem['id'] !== $contactSearchID) {
+        $result['values'][] = $searchResultItem;
+      }
+      else {
+        // If the id search found the same contact as the string search then
+        // set foundIDCount to 0 - ie no additional row should be added for the id.
+        $foundIDCount = 0;
+      }
+    }
+  }
+  else {
+    $result = $searchResult;
+  }
+  // Hey api, would you like to format the output?
+  $fnName = "_civicrm_api3_{$entity}_getlist_output";
+  $fnName = function_exists($fnName) ? $fnName : '_civicrm_api3_generic_getlist_output';
+  $values = $fnName($result, $request, $entity, $meta);
+
+  _civicrm_api3_generic_getlist_postprocess($result, $request, $values);
+
+  $output = ['page_num' => $request['page_num']];
+
+  if ($forceIdSearch) {
+    $output['page_num']++;
+    // When returning the single record matching id
+    if (empty($request['page_num'])) {
+      foreach ($values as $i => $value) {
+        $description = ts('ID: %1', [1 => $value['id']]);
+        $values[$i]['description'] = array_merge([$description], $value['description'] ?? []);
+      }
+    }
+  }
+  // Limit is set for searching but not fetching by id
+  if (!empty($request['params']['options']['limit'])) {
+    // If we have an extra result then this is not the last page
+    $last = ($request['params']['options']['limit'] - 1) + $foundIDCount;
+    $output['more_results'] = isset($values[$last]);
+    unset($values[$last]);
+  }
+
+  return civicrm_api3_create_success($values, $request['params'], $entity, 'getlist', CRM_Core_DAO::$_nullObject, $output);
+}
+
+/**
+ * @param string $entity
+ * @param $request
+ * @param $meta
+ * @param array $apiRequest
+ *
+ * @return array
+ * @throws \CRM_Core_Exception
+ */
+function _civicrm_api3_generic_getlist_get_result(array &$request, string $entity, $meta, array $apiRequest): array {
   // Hey api, would you like to provide default values?
   $fnName = "_civicrm_api3_{$entity}_getlist_defaults";
   $defaults = function_exists($fnName) ? $fnName($request) : [];
@@ -74,36 +136,7 @@ function civicrm_api3_generic_getList($apiRequest) {
     // Re-index to sequential = 0.
     $result['values'] = array_merge($result['values']);
   }
-
-  // Hey api, would you like to format the output?
-  $fnName = "_civicrm_api3_{$entity}_getlist_output";
-  $fnName = function_exists($fnName) ? $fnName : '_civicrm_api3_generic_getlist_output';
-  $values = $fnName($result, $request, $entity, $meta);
-
-  _civicrm_api3_generic_getlist_postprocess($result, $request, $values);
-
-  $output = ['page_num' => $request['page_num']];
-
-  if ($forceIdSearch) {
-    $output['page_num']++;
-    // When returning the single record matching id
-    if (empty($request['page_num'])) {
-      $output['more_results'] = TRUE;
-      foreach ($values as $i => $value) {
-        $description = ts('ID: %1', [1 => $value['id']]);
-        $values[$i]['description'] = array_merge([$description], $value['description'] ?? []);
-      }
-    }
-  }
-  // Limit is set for searching but not fetching by id
-  elseif (!empty($request['params']['options']['limit'])) {
-    // If we have an extra result then this is not the last page
-    $last = $request['params']['options']['limit'] - 1;
-    $output['more_results'] = isset($values[$last]);
-    unset($values[$last]);
-  }
-
-  return civicrm_api3_create_success($values, $request['params'], $entity, 'getlist', CRM_Core_DAO::$_nullObject, $output);
+  return $result;
 }
 
 /**
@@ -114,13 +147,13 @@ function civicrm_api3_generic_getList($apiRequest) {
  * @param array $apiDefaults
  * @param array $fields
  */
-function _civicrm_api3_generic_getList_defaults($entity, &$request, $apiDefaults, $fields) {
+function _civicrm_api3_generic_getList_defaults(string $entity, array &$request, array $apiDefaults, array $fields): void {
   $defaults = [
     'page_num' => 1,
     'input' => '',
     'image_field' => NULL,
     'color_field' => isset($fields['color']) ? 'color' : NULL,
-    'id_field' => $entity == 'option_value' ? 'value' : 'id',
+    'id_field' => $entity === 'option_value' ? 'value' : 'id',
     'description_field' => [],
     'add_wildcard' => Civi::settings()->get('includeWildCardInName'),
     'params' => [],
