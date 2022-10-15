@@ -9,6 +9,12 @@
   <log>true</log>
   <component>CiviContribute</component>
   <labelField>name</labelField>
+  <paths>
+    <view>civicrm/admin/financial/financialType?reset=1</view>
+    <add>civicrm/admin/financial/financialType?action=add&amp;reset=1</add>
+    <update>civicrm/admin/financial/financialType?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/financial/financialType?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Financial Type ID</title>

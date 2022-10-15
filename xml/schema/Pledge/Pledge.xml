@@ -8,6 +8,12 @@
   <log>true</log>
   <icon>fa-paper-plane</icon>
   <component>CiviPledge</component>
+  <paths>
+    <add>civicrm/pledge/add?action=add&amp;context=standalone&amp;reset=1</add>
+    <view>civicrm/contact/view/pledge?id=[id]&amp;cid=[contact_id]&amp;action=view&amp;reset=1</view>
+    <update>civicrm/contact/view/pledge?id=[id]&amp;cid=[contact_id]&amp;action=update&amp;reset=1</update>
+    <delete>civicrm/contact/view/pledge?id=[id]&amp;cid=[contact_id]&amp;action=delete&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <uniqueName>pledge_id</uniqueName>
