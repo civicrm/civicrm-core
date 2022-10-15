@@ -72,7 +72,7 @@
         // Customize the noResultsText
         $scope.$watch('$ctrl.filters', function() {
           ctrl.settings.noResultsText = (angular.equals(['has_base'], getActiveFilters())) ?
-            ts('Welcome to Search Kit. Click the New Search button above to start composing your first search.') :
+            ts('Welcome to SearchKit. Click the New Search button above to start composing your first search.') :
             ts('No Saved Searches match filter criteria.');
         }, true);
       };

@@ -21,7 +21,7 @@ class CRM_Search_Page_Search extends CRM_Core_Page {
     Civi::service('angularjs.loader')->useApp();
 
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      CRM_Utils_System::appendBreadCrumb([['title' => E::ts('Search Kit'), 'url' => CRM_Utils_System::url('civicrm/admin/search')]]);
+      CRM_Utils_System::appendBreadCrumb([['title' => E::ts('SearchKit'), 'url' => CRM_Utils_System::url('civicrm/admin/search')]]);
     }
 
     parent::run();

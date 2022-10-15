@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.afform_admin" type="module">
   <file>afform_admin</file>
-  <name>Form Builder</name>
+  <name>FormBuilder</name>
   <description>Administer, edit and compose dynamic forms</description>
   <license>AGPL-3.0</license>
   <maintainer>
@@ -18,7 +18,7 @@
   <compatibility>
     <ver>5.56</ver>
   </compatibility>
-  <comments>Form Builder provides a UI to administer and edit forms. It is an optional admin tool and not required for the forms to function.</comments>
+  <comments>FormBuilder provides a UI to administer and edit forms. It is an optional admin tool and not required for the forms to function.</comments>
   <requires>
     <ext>org.civicrm.afform</ext>
     <ext>org.civicrm.search_kit</ext>

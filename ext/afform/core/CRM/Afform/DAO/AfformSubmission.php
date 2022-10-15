@@ -87,7 +87,7 @@ class CRM_Afform_DAO_AfformSubmission extends CRM_Core_DAO {
    *   Whether to return the plural version of the title.
    */
   public static function getEntityTitle($plural = FALSE) {
-    return $plural ? E::ts('Form Builder Submissions') : E::ts('Form Builder Submission');
+    return $plural ? E::ts('FormBuilder Submissions') : E::ts('FormBuilder Submission');
   }
 
   /**

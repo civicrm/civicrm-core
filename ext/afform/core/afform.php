@@ -424,7 +424,7 @@ function afform_civicrm_alterMenu(&$items) {
  */
 function afform_civicrm_permission(&$permissions) {
   $permissions['administer afform'] = [
-    E::ts('Form Builder: edit and delete forms'),
+    E::ts('FormBuilder: edit and delete forms'),
     E::ts('Allows non-admin users to create, update and delete forms'),
   ];
 }
@@ -538,7 +538,7 @@ function afform_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action
 function afform_civicrm_preProcess($formName, &$form) {
   if ($formName === 'CRM_Core_Form_ShortCode') {
     $form->components['afform'] = [
-      'label' => E::ts('Form Builder'),
+      'label' => E::ts('FormBuilder'),
       'select' => [
         'key' => 'name',
         'entity' => 'Afform',
