@@ -19,4 +19,15 @@ namespace Civi\Api4;
  */
 class SubscriptionHistory extends Generic\DAOEntity {
 
+  /**
+   * @see \Civi\Api4\Generic\AbstractEntity::permissions()
+   * @return array
+   */
+  public static function permissions() {
+    // get permission is managed by ACLs
+    return [
+      'get' => [],
+    ];
+  }
+
 }
