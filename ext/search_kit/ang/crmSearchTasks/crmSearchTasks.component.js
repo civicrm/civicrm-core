@@ -30,7 +30,7 @@
         }
         initialized = true;
         crmApi4({
-          entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural'], where: [['name', '=', ctrl.entity]]}, 0],
+          entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural', 'primary_key'], where: [['name', '=', ctrl.entity]]}, 0],
           tasks: ['SearchDisplay', 'getSearchTasks', {entity: ctrl.entity}]
         }).then(function(result) {
           ctrl.entityInfo = result.entityInfo;
@@ -61,7 +61,9 @@
           search: ctrl.search,
           display: ctrl.display,
           displayController: ctrl.displayController,
-          entityInfo: ctrl.entityInfo
+          entityInfo: ctrl.entityInfo,
+          taskTitle: action.title,
+          apiBatch: _.cloneDeep(action.apiBatch)
         };
         // If action uses a crmPopup form
         if (action.crmPopup) {
@@ -71,13 +73,13 @@
             .on('crmFormSuccess', ctrl.refresh);
         }
         // If action uses dialogService
-        else if (action.uiDialog) {
+        else {
           var options = CRM.utils.adjustDialogDefaults({
             autoOpen: false,
             dialogClass: 'crm-search-task-dialog',
             title: action.title
           });
-          dialogService.open('crmSearchTask', action.uiDialog.templateUrl, data, options)
+          dialogService.open('crmSearchTask', (action.uiDialog && action.uiDialog.templateUrl) || '~/crmSearchTasks/crmSearchTaskApiBatch.html', data, options)
             // Reload results on success, do nothing on cancel
             .then(ctrl.refresh, _.noop);
         }
