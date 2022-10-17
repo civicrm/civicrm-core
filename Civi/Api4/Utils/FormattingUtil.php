@@ -89,7 +89,29 @@ class FormattingUtil {
    */
   public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, array $params = [], &$operator = NULL, $index = NULL) {
     // Evaluate pseudoconstant suffix
-    $suffix = strpos(($fieldName ?? ''), ':');
+    $suffix = str_replace(':', '', strstr(($fieldName ?? ''), ':'));
+    $fk = $fieldSpec['name'] == 'id' ? $fieldSpec['entity'] : $fieldSpec['fk_entity'] ?? NULL;
+
+    // Handle special 'current_domain' option. See SpecFormatter::getOptions
+    $currentDomain = ($fk === 'Domain' && in_array('current_domain', (array) $value, TRUE));
+    if ($currentDomain) {
+      // If the fieldName uses a suffix, convert
+      $domainKey = $suffix ?: 'id';
+      $domainValue = \CRM_Core_BAO_Domain::getDomain()->$domainKey;
+      // If the value is an array, only convert the current_domain item
+      if (is_array($value)) {
+        foreach ($value as $idx => $val) {
+          if ($val === 'current_domain') {
+            $value[$idx] = $domainValue;
+          }
+        }
+      }
+      else {
+        $value = $domainValue;
+      }
+    }
+
+    // Convert option list suffix to value
     if ($suffix) {
       $options = self::getPseudoconstantList($fieldSpec, $fieldName, $params, $operator ? 'get' : 'create');
       $value = self::replacePseudoconstant($options, $value, TRUE);
@@ -102,12 +124,8 @@ class FormattingUtil {
       }
       return;
     }
-    $fk = $fieldSpec['name'] == 'id' ? $fieldSpec['entity'] : $fieldSpec['fk_entity'] ?? NULL;
 
-    if ($fk === 'Domain' && $value === 'current_domain') {
-      $value = \CRM_Core_Config::domainID();
-    }
-
+    // Special handling for 'current_user' and user lookups
     if ($fk === 'Contact' && !is_numeric($value)) {
       $value = \_civicrm_api3_resolve_contactID($value);
       if ('unknown-user' === $value) {
