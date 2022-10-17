@@ -52,7 +52,7 @@
 
         {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          {crmButton q="action=add&reset=1&pp=$defaultPaymentProcessorType" id="newPaymentProcessor"  icon="plus-circle"}{ts}Add Payment Processor{/ts}{/crmButton}
+          {crmButton p='civicrm/admin/paymentProcessor/edit' q="action=add&reset=1" id="newPaymentProcessor"  icon="plus-circle"}{ts}Add Payment Processor{/ts}{/crmButton}
         </div>
         {/if}
 </div>
@@ -62,7 +62,7 @@
         {ts}There are no Payment Processors entered.{/ts}
      </div>
      <div class="action-link">
-       {crmButton p='civicrm/admin/paymentProcessor' q="action=add&reset=1&pp=$defaultPaymentProcessorType" id="newPaymentProcessor"  icon="plus-circle"}{ts}Add Payment Processor{/ts}{/crmButton}
+       {crmButton p='civicrm/admin/paymentProcessor/edit' q="action=add&reset=1" id="newPaymentProcessor"  icon="plus-circle"}{ts}Add Payment Processor{/ts}{/crmButton}
      </div>
 {/if}
 </div>

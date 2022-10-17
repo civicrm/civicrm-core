@@ -456,6 +456,10 @@
      <access_arguments>administer payment processors</access_arguments>
   </item>
   <item>
+     <path>civicrm/admin/paymentProcessor/edit</path>
+     <page_callback>CRM_Admin_Form_PaymentProcessor</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/setting/mapping</path>
      <title>Mapping and Geocoding</title>
      <page_callback>CRM_Admin_Form_Setting_Mapping</page_callback>

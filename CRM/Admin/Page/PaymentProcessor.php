@@ -47,30 +47,30 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/paymentProcessor',
+          'url' => 'civicrm/admin/paymentProcessor/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Payment Processor'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Payment Processor'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Payment Processor'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/paymentProcessor',
+          'url' => 'civicrm/admin/paymentProcessor/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Payment Processor'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -85,20 +85,14 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
   public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
-    //CRM-15546
-    $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', array(
-      'labelColumn' => 'name',
-      'flip' => 1,
-    ));
-    $this->assign('defaultPaymentProcessorType', $paymentProcessorTypes['PayPal']);
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Administration'),
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     return parent::run();
   }
