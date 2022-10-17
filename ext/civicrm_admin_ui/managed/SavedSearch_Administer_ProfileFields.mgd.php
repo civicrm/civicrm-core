@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_Profile_Fields',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -42,7 +42,7 @@ return [
   [
     'name' => 'SavedSearch_Profile_Fields_SearchDisplay_Profile_Fields',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
