@@ -33,11 +33,10 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
    */
   public function preProcess() {
     $flag = FALSE;
-    $gid = $this->get('id');
-    $this->set('gid', $gid);
-    $field = CRM_Utils_Request::retrieve('field', 'Boolean', $this, TRUE, 0);
+    $gid = CRM_Utils_Request::retrieve('gid', 'Integer', $this, TRUE);
+    $fieldId = CRM_Utils_Request::retrieve('fieldId', 'Integer', $this, FALSE, 0);
 
-    if ($field) {
+    if ($fieldId) {
       $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, NULL, NULL, NULL, TRUE);
       $fieldDAO = new CRM_Core_DAO_UFField();
       $fieldDAO->id = $this->get('fieldId');

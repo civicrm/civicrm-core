@@ -57,8 +57,8 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
-          'url' => 'civicrm/admin/uf/group/field',
-          'qs' => 'action=preview&id=%%id%%&field=1',
+          'url' => 'civicrm/admin/uf/group/preview',
+          'qs' => 'action=preview&gid=%%gid%%&fieldId=%%id%%',
           'title' => ts('Preview CiviCRM Profile Field'),
         ],
         CRM_Core_Action::DISABLE => [
@@ -259,6 +259,9 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   /**
    * Preview custom field.
    *
+   * @deprecated
+   *   Links should point directly to civicrm/admin/uf/group/preview
+   *
    * @param int $fieldId
    *   Custom field id.
    * @param int $groupId
@@ -272,7 +275,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
       'reset=1&action=browse&gid=' . $this->_gid
     ));
     $controller->set('fieldId', $fieldId);
-    $controller->set('id', $groupId);
+    $controller->set('gid', $groupId);
     $controller->setEmbedded(TRUE);
     $controller->process();
     $controller->run();

@@ -59,8 +59,8 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
-          'url' => 'civicrm/admin/uf/group',
-          'qs' => 'action=preview&id=%%id%%&field=0&context=group',
+          'url' => 'civicrm/admin/uf/group/preview',
+          'qs' => 'action=preview&gid=%%id%%&context=group',
           'title' => ts('Edit CiviCRM Profile Group'),
         ],
         CRM_Core_Action::ADD => [
@@ -372,6 +372,9 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   /**
    * for preview mode for ufoup.
    *
+   * @deprecated
+   *   Links should point directly to civicrm/admin/uf/group/preview
+   *
    * @param int $id
    *   Uf group id.
    *
@@ -379,7 +382,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    */
   public function preview($id, $action) {
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Preview', ts('CiviCRM Profile Group Preview'), NULL);
-    $controller->set('id', $id);
+    $controller->set('gid', $id);
     $controller->setEmbedded(TRUE);
     $controller->process();
     $controller->run();
