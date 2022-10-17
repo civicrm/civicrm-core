@@ -108,7 +108,7 @@ return [
               'editable' => TRUE,
             ],
             [
-              'size' => 'btn-sm',
+              'size' => 'btn-xs',
               'links' => [
                 [
                   'entity' => 'ContactType',

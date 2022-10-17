@@ -54,7 +54,7 @@
           label: ts('Buttons'),
           icon: 'fa-square-o',
           defaults: {
-            size: 'btn-sm',
+            size: 'btn-xs',
             links: []
           }
         },
