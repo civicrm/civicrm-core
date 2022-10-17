@@ -120,6 +120,11 @@
     <weight>580</weight>
   </item>
   <item>
+    <path>civicrm/admin/financial/financialType/edit</path>
+    <title>Edit Financial Type</title>
+    <page_callback>CRM_Financial_Form_FinancialType</page_callback>
+  </item>
+  <item>
     <path>civicrm/payment</path>
     <title>New Payment</title>
     <page_callback>CRM_Contribute_Form_AdditionalPayment</page_callback>
