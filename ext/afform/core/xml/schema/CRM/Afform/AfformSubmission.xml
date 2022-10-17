@@ -10,6 +10,7 @@
 
   <field>
     <name>id</name>
+    <title>Form Submission ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique Submission ID</comment>
