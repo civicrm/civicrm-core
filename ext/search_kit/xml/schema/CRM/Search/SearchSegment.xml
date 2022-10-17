@@ -11,6 +11,7 @@
 
   <field>
     <name>id</name>
+    <title>Search Segment ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique SearchSegment ID</comment>
