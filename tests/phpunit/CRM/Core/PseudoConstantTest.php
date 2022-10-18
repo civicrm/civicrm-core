@@ -310,7 +310,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ],
         [
           'fieldName' => 'extends',
-          'sample' => 'CiviEvent',
+          'sample' => 'Event',
         ],
         [
           'fieldName' => 'financial_type_id',

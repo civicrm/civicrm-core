@@ -1705,4 +1705,27 @@ WHERE     ct.id = cp.financial_type_id AND
     $form->assign('ispricelifetime', $checklifetime);
   }
 
+  /**
+   * Pseudoconstant options for the `extends` field
+   *
+   * @return array
+   */
+  public static function getExtendsOptions(): array {
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    $allowedComponents = [
+      'CiviEvent' => ts('Event'),
+      'CiviContribute' => ts('Contribution'),
+      'CiviMember' => ts('Membership'),
+    ];
+    $result = [];
+    foreach (array_intersect_key($enabledComponents, $allowedComponents) as $component) {
+      $result[] = [
+        'id' => $component->componentID,
+        'name' => $component->name,
+        'label' => $allowedComponents[$component->name],
+      ];
+    }
+    return $result;
+  }
+
 }

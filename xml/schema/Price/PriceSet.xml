@@ -134,10 +134,9 @@
     <required>true</required>
     <comment>What components are using this price set?</comment>
     <pseudoconstant>
-      <table>civicrm_component</table>
-      <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <callback>CRM_Price_BAO_PriceSet::getExtendsOptions</callback>
     </pseudoconstant>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>3.1</add>
     <html>
       <type>Text</type>
