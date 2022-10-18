@@ -68,7 +68,9 @@ class Cors {
 
     foreach ($this->loadRules() as $rule) {
 
+      // phpcs:disable
       if (fnmatch($rule->pattern, $match)) {
+        // phpcs:enable
         return $rule;
       }
     }
