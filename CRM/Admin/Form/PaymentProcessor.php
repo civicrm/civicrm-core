@@ -106,6 +106,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
+    CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
+    $this->set('BAOName', 'CRM_Financial_BAO_PaymentProcessor');
+
     parent::preProcess();
 
     $this->setPaymentProcessorTypeID();
@@ -507,7 +510,11 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $this->set('pp', $this->_paymentProcessorType);
     }
     else {
-      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, TRUE, NULL);
+      $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', array(
+        'labelColumn' => 'name',
+        'flip' => 1,
+      ));
+      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, $paymentProcessorTypes['PayPal']);
     }
   }
 

@@ -172,6 +172,15 @@ class SpecFormatter {
         self::addOptionProps($options, $spec, $bao, $fieldName, $values, $returnFormat);
       }
     }
+    // Special 'current_domain' option
+    if ($spec->getFkEntity() === 'Domain') {
+      array_unshift($options, [
+        'id' => 'current_domain',
+        'name' => 'current_domain',
+        'label' => ts('Current Domain'),
+        'icon' => 'fa-sign-in',
+      ]);
+    }
     return $options;
   }
 
