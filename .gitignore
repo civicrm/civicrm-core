@@ -6,6 +6,7 @@
 !/ext/authx
 !/ext/civigrant
 !/ext/civicrm_admin_ui
+!/ext/cors
 !/ext/sequentialcreditnotes
 !/ext/flexmailer
 !/ext/eventcart

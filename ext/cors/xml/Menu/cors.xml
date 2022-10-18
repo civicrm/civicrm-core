@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/setting/cors</path>
+    <title>CORS</title>
+    <page_callback>CRM_Admin_Form_Generic</page_callback>
+    <adminGroup>System Settings</adminGroup>
+    <desc>Configure CORS headers</desc>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+</menu>
