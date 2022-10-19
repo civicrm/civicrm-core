@@ -106,9 +106,6 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
-    $this->set('BAOName', 'CRM_Financial_BAO_PaymentProcessor');
-
     parent::preProcess();
 
     $this->setPaymentProcessorTypeID();
