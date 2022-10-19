@@ -1316,11 +1316,12 @@ class CRM_Utils_Date {
             }
             else {
               $from['Y'] = $fYear - $relativeTermSuffix;
-              $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
+              $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + $relativeTermSuffix);
               $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
               $to['d'] = $fiscalEnd['2'];
               $to['M'] = $fiscalEnd['1'];
-              $to['Y'] = $fYear;
+              // We need the year from FiscalEnd, instead of just fYear, because these differ if the FY starts on Jan 1
+              $to['Y'] = $fiscalEnd['0'];
               $to['H'] = 23;
               $to['i'] = $to['s'] = 59;
             }
