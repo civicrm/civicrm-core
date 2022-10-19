@@ -428,7 +428,15 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   public function testMultipleStateless(): void {
     \Civi::settings()->set("authx_header_cred", ['api_key']);
     $cookieJar = new CookieJar();
-    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
+    $http = $this->createGuzzle([
+      'http_errors' => FALSE,
+      'cookies' => $cookieJar,
+      'headers' => [
+        // This header should be set in real REST-style flows. It takes on extra significance in Drupal,
+        // where session-based logging is toggled based on XMLHttpRequest.
+        'X-Requested-With' => 'XMLHttpRequest',
+      ],
+    ]);
 
     /** @var \Psr\Http\Message\RequestInterface $request */
 
