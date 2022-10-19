@@ -783,6 +783,13 @@ class CRM_Core_DAO extends DB_DataObject {
           $this->$dbName = CRM_Core_DAO::serializeField($value, $field['serialize']);
           $allNull = FALSE;
         }
+        // When a single value was entered for a serialized field, it's probably due to sloppy coding.
+        // Folks, always use an array to pass in values for fields containing array data.
+        // Meanwhile, I'll convert it for you. You're welcome.
+        elseif (is_numeric($value) && !empty($field['serialize'])) {
+          $this->$dbName = CRM_Core_DAO::serializeField((array) $value, $field['serialize']);
+          $allNull = FALSE;
+        }
         else {
           $maxLength = $field['maxlength'] ?? NULL;
           if (!is_array($value) && $maxLength && mb_strlen($value ?? '') > $maxLength && empty($field['pseudoconstant'])) {

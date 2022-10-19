@@ -19,7 +19,7 @@
  * Business object for managing price sets.
  *
  */
-class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
+class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet implements \Civi\Core\HookInterface {
 
   /**
    * Static field for default price set details.
@@ -31,41 +31,28 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   /**
    * Takes an associative array and creates a price set object.
    *
-   * @param array $params
-   *   (reference) an assoc array of name/value pairs.
+   * @deprecated
+   *   Use writeRecord
    *
-   * @return CRM_Price_DAO_PriceSet
+   * @param array $params
+   *
+   * @return CRM_Price_BAO_PriceSet
    */
-  public static function create(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'PriceSet', CRM_Utils_Array::value('id', $params), $params);
+  public static function create($params) {
+    return self::writeRecord($params);
+  }
 
-    if (empty($params['id']) && empty($params['name'])) {
-      $params['name'] = CRM_Utils_String::munge($params['title'], '_', 242);
-    }
-    $priceSetID = NULL;
-    $validatePriceSet = TRUE;
-    if (!empty($params['extends']) && is_array($params['extends'])) {
-      if (!array_key_exists(CRM_Core_Component::getComponentID('CiviEvent'), $params['extends'])
-        || !array_key_exists(CRM_Core_Component::getComponentID('CiviMember'), $params['extends'])
-      ) {
-        $validatePriceSet = FALSE;
+  /**
+   * Event fired before an action is taken on an ACL record.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'create' || $event->action === 'edit') {
+      if (self::eventPriceSetDomainID()) {
+        $event->params['domain_id'] = CRM_Core_Config::domainID();
       }
-      $params['extends'] = CRM_Utils_Array::implodePadded($params['extends']);
     }
-    else {
-      $priceSetID = $params['id'] ?? NULL;
-    }
-    $priceSetBAO = new CRM_Price_BAO_PriceSet();
-    $priceSetBAO->copyValues($params);
-    if (self::eventPriceSetDomainID()) {
-      $priceSetBAO->domain_id = CRM_Core_Config::domainID();
-    }
-    $priceSetBAO->save();
-
-    CRM_Utils_Hook::post($hook, 'PriceSet', $priceSetBAO->id, $priceSetBAO);
     unset(\Civi::$statics['CRM_Core_PseudoConstant']);
-    return $priceSetBAO;
   }
 
   /**
