@@ -44,3 +44,6 @@ UPDATE civicrm_state_province SET is_active = 0 WHERE country_id = @indianCountr
 UPDATE civicrm_preferences_date SET description = '{ts escape="sql"}Date for relationships. activities. contributions: receive, receipt, cancel. membership: join, start, renew. case: start, end.{/ts}' WHERE civicrm_preferences_date.name = 'activityDate';
 
 UPDATE civicrm_preferences_date SET description = '{ts escape="sql"}Used in search forms.{/ts}' WHERE civicrm_preferences_date.name = 'searchDate';
+
+-- dev/core#3926 Need to increase data size for 'url' column on 'civicrm_website' table
+ALTER TABLE civicrm_website CHANGE url url VARCHAR( 255 );
