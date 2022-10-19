@@ -742,6 +742,14 @@ function civicrm_api3_case_getList($params) {
     $params['params']['case_id'] = ['IN' => $params['id']];
     unset($params['id']);
   }
+  if (empty($params['params']['case_id']) || is_array($params['params']['case_id'])) {
+    // Default to hiding deleted cases & deleted contacts
+    $params += ['params' => []];
+    $params['params'] += [
+      'case_id.is_deleted' => 0,
+      'contact_id.is_deleted' => 0,
+    ];
+  }
   $params['id_field'] = 'case_id';
   $params['label_field'] = $params['search_field'] = 'contact_id.sort_name';
   $params['description_field'] = [
