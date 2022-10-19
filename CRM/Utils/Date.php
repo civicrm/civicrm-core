@@ -1140,7 +1140,7 @@ class CRM_Utils_Date {
    *   start date and end date for the relative time frame
    */
   public static function relativeToAbsolute($relativeTerm, $unit) {
-    $now = getdate();
+    $now = getdate(CRM_Utils_Time::time());
     $from = $to = $dateRange = [];
     $from['H'] = $from['i'] = $from['s'] = 0;
     $relativeTermParts = explode('_', $relativeTerm);
@@ -1927,8 +1927,8 @@ class CRM_Utils_Date {
    *   $fy       Current Fiscal Year
    */
   public static function calculateFiscalYear($fyDate, $fyMonth) {
-    $date = date("Y-m-d");
-    $currentYear = date("Y");
+    $date = date("Y-m-d", CRM_Utils_Time::time());
+    $currentYear = date("Y", CRM_Utils_Time::time());
 
     // recalculate the date because month 4::04 make the difference
     $fiscalYear = explode('-', date("Y-m-d", mktime(0, 0, 0, $fyMonth, $fyDate, $currentYear)));
