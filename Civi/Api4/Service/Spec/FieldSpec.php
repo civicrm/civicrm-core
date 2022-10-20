@@ -245,4 +245,14 @@ class FieldSpec {
     return $this;
   }
 
+  /**
+   * @param string $filter
+   * @return $this
+   */
+  public function setFilter($filter) {
+    $this->filter = $filter;
+
+    return $this;
+  }
+
 }

@@ -596,9 +596,15 @@ if (!CRM.vars) CRM.vars = {};
       if (entity.charAt(0).toUpperCase() !== entity.charAt(0)) {
         entity = _.capitalize(_.camelCase(entity));
       }
+
+      var apiParams = $.extend(true, {}, $el.data('api-params') || {}, options.api);
+      if (options.filter) {
+        apiParams = $.extend(true, {}, apiParams, {'params': Object.fromEntries(new URLSearchParams(options.filter))});
+      }
+
       $el.data('api-entity', entity);
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
-      $el.data('api-params', $.extend(true, {}, $el.data('api-params') || {}, options.api));
+      $el.data('api-params', apiParams);
       $el.data('create-links', options.create || $el.data('create-links'));
       var staticItems = options.static || $el.data('static') || [];
       _.each(staticItems, function(option, i) {

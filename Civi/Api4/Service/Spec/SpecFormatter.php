@@ -96,6 +96,8 @@ class SpecFormatter {
       $field->setFkEntity($fkAPIName ?: AllCoreTables::getBriefName($fkClassName));
     }
 
+    $field->setFilter($data['filter'] ?? NULL);
+
     return $field;
   }
 
