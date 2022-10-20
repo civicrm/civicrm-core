@@ -30,6 +30,6 @@
     <angularModule>crmPrimaryKeys</angularModule>
   </civix>
   <tags>
-    <tag>hidden</tag>
+    <tag>mgmt:hidden</tag>
   </tags>
 </extension>
