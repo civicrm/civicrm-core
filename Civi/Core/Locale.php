@@ -169,11 +169,12 @@ class Locale {
    *   Ex: `en_US`, `es_ES`, `fr_CA`
    * @return \Civi\Core\Locale
    *   The effective locale specification.
+   * @throws \CRM_Core_Exception
    */
   public static function negotiate(string $preferred): Locale {
     // Create a locale for the requested language
     if (!preg_match(';^[a-z][a-z]_[A-Z][A-Z]$;', $preferred)) {
-      throw new \RuntimeException("Cannot instantiate malformed locale: $preferred");
+      throw new \CRM_Core_Exception("Cannot instantiate malformed locale: $preferred");
     }
 
     $systemDefault = \Civi::settings()->get('lcMessages');
