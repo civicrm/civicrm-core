@@ -79,6 +79,24 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
         ],
       ],
     ];
+    $exs[] = [
+      '<div class="af-container af-layout-inline">
+        <af-field name="street_address" />
+        <af-field name="location_type_id" />
+        <af-field name="is_primary" />
+      </div>
+      <div class="af-container af-layout-inline">
+        <af-field name="city" />
+        <af-field name="state_province_id" />
+        <af-field name="country_id" />
+        <af-field name="postal_code" />
+      </div>',
+      [
+        'e' => ['div' => 2, 'af-field' => 7, 'body' => 1],
+        'a' => ['class' => 2, 'name' => 7],
+        'c' => ['af-container' => 2, 'af-layout-inline' => 2],
+      ],
+    ];
 
     return $exs;
   }
@@ -91,9 +109,14 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
    * @dataProvider getExamples
    */
   public function testSymbols($html, $expect): void {
+    // yes, 2
+    \phpQuery::$debug = 2;
     $expectDefaults = ['e' => [], 'a' => [], 'c' => []];
     $expect = array_merge($expectDefaults, $expect);
+    ob_start();
     $actual = Symbols::scan($html);
+    ob_end_clean();
+    \phpQuery::$debug = FALSE;
 
     $this->assertEquals($expect['e'], $actual->elements);
     $this->assertEquals($expect['a'], $actual->attributes);
