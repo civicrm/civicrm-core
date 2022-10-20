@@ -46,6 +46,26 @@
         </div>
     {/if}
 
+    {if $showPaymentOnConfirm}
+    <div class="crm-group event_info-group">
+      <div class="header-dark">
+          {ts}Payment details{/ts}
+      </div>
+    {if !empty($form.payment_processor_id.label)}
+      <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
+        <legend>{ts}Payment Options{/ts}</legend>
+        <div class="crm-section payment_processor-section">
+          <div class="label">{$form.payment_processor_id.label}</div>
+          <div class="content">{$form.payment_processor_id.html}</div>
+          <div class="clear"></div>
+        </div>
+      </fieldset>
+    {/if}
+        {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    {literal}<script>function calculateTotalFee() { return {/literal}{$totalAmount}{literal} }</script>{/literal}
+    </div>
+    {/if}
+
     <div class="crm-group event_info-group">
         <div class="header-dark">
             {ts}Event Information{/ts}

@@ -253,6 +253,18 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('amounts', $this->_amount);
       $this->assign('totalAmount', $this->_totalAmount);
       $this->set('totalAmount', $this->_totalAmount);
+      $this->assign('showPaymentOnConfirm', FALSE);
+
+      //if (!empty($this->_values['event']['is_multiple_registrations'])) {
+        $isPayLater = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'is_pay_later');
+        $this->setPayLaterLabel($isPayLater ? $this->_values['event']['pay_later_text'] : '');
+        $this->_paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_values['event']['payment_processor'] ?? NULL);
+        $this->assignPaymentProcessor($isPayLater);
+
+        $this->assign('showPaymentOnConfirm', TRUE);
+        $this->addPaymentProcessorFieldsToForm();
+        CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+     // }
     }
 
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
@@ -317,7 +329,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     $this->setDefaults($defaults);
-    $this->freeze();
+    //$this->freeze();
 
     //lets give meaningful status message, CRM-4320.
     $this->assign('isOnWaitlist', $this->_allowWaitlist);
