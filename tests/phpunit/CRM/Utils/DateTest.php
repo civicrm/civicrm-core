@@ -251,6 +251,2290 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Extendable test of relative dates.
+   * This is similar to the existing tests but can quickly add a variation
+   * by adding an array to the dataprovider.
+   * @dataProvider relativeDateProvider
+   * @param array $input
+   * @param array $expected
+   */
+  public function testRelativeToAbsoluteGeneral(array $input, array $expected) {
+    if (isset($input['fiscalYearStart'])) {
+      Civi::settings()->set('fiscalYearStart', $input['fiscalYearStart']);
+    }
+    putenv('TIME_FUNC=frozen');
+    CRM_Utils_Time::setTime($input['now']);
+    // The data is in a more human-readable form to make it easier for people,
+    // but we need it "squashed" so take out punctuation.
+    $expected = [
+      'from' => preg_replace('/[^0-9]/', '', $expected['from']),
+      'to' => preg_replace('/[^0-9]/', '', $expected['to']),
+    ];
+    $this->assertEquals($expected, CRM_Utils_Date::relativeToAbsolute($input['term'], $input['unit']));
+    putenv('TIME_FUNC=');
+    CRM_Utils_Time::resetTime();
+  }
+
+  /**
+   * dataProvider for testRelativeToAbsoluteGeneral()
+   * @return array
+   */
+  public function relativeDateProvider(): array {
+    return [
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          // previous_1 should be equivalent to previous
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-02-01',
+          'to' => '2021-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-02-01',
+          'to' => '2021-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-02-01',
+          'to' => '2021-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-02-01',
+          'to' => '2021-01-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-03-01',
+          'to' => '2021-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-03-01',
+          'to' => '2021-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2021-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          'to' => '2021-02-28 23:59:59',
+        ],
+      ],
+
+      // leap year
+      [
+        'input' => [
+          'now' => '2021-01-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2021-01-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2021-01-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2021-01-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2017-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+
+      /////////////////
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          // previous_1 should be equivalent to previous
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-03-01',
+          'to' => '2021-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-03-01',
+          'to' => '2021-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2021-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          'to' => '2021-02-28 23:59:59',
+        ],
+      ],
+
+      // leap year
+      [
+        'input' => [
+          'now' => '2021-02-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2021-02-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2021-02-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2021-02-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2017-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+
+      /////////////////
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          // previous_1 should be equivalent to previous
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+
+      // leap year
+      [
+        'input' => [
+          'now' => '2020-03-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-03-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-03-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-03-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2017-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-04-01',
+          'to' => '2021-03-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+
+      /////////////////
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          // previous_1 should be equivalent to previous
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+
+      // leap year
+      [
+        'input' => [
+          'now' => '2020-04-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-04-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-04-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-04-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2017-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-11-01',
+          'to' => '2021-10-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-04-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+
+      /////////////////
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          // previous_1 should be equivalent to previous
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+
+      // leap year
+      [
+        'input' => [
+          'now' => '2020-11-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-11-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-11-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-11-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2017-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-11-01',
+          'to' => '2022-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-11-01',
+          'to' => '2022-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-11-01',
+          'to' => '2022-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-11-01',
+          'to' => '2022-10-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-11-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-12-01',
+          'to' => '2021-11-30 23:59:59',
+        ],
+      ],
+
+      /////////////////
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          // previous_1 should be equivalent to previous
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-01-01',
+          'to' => '2021-12-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-02-01',
+          'to' => '2022-01-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2022-02-28 23:59:59',
+        ],
+      ],
+
+      // leap year
+      [
+        'input' => [
+          'now' => '2020-12-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-12-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-12-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-12-02',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2017-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 4, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-04-01',
+          'to' => '2022-03-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-11-01',
+          'to' => '2022-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-11-01',
+          'to' => '2022-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-11-01',
+          'to' => '2022-10-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 11, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-11-01',
+          'to' => '2022-10-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-12-01',
+          'to' => '2022-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_1',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2021-12-01',
+          'to' => '2022-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-12-01',
+          'to' => '2022-11-30 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-02',
+          'fiscalYearStart' => ['M' => 12, 'd' => 1],
+          'term' => 'previous_3',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-12-01',
+          'to' => '2022-11-30 23:59:59',
+        ],
+      ],
+
+      // additional leap year cases
+      [
+        'input' => [
+          'now' => '2020-02-29',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          'to' => '2019-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-03-01',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-02-29',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2017-03-01',
+          'to' => '2019-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2020-03-01',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_2',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+
+      // ************ previous_before.fiscal_year **********
+      [
+        'input' => [
+          'now' => '2022-01-01',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_before',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-01-01',
+          'to' => '2020-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_before',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-01-01',
+          'to' => '2020-12-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-31',
+          'fiscalYearStart' => ['M' => 1, 'd' => 1],
+          'term' => 'previous_before',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-01-01',
+          'to' => '2020-12-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-01-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_before',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-02-01',
+          'to' => '2020-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-02-02',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_before',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-02-01',
+          'to' => '2021-01-31 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-31',
+          'fiscalYearStart' => ['M' => 2, 'd' => 1],
+          'term' => 'previous_before',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-02-01',
+          'to' => '2021-01-31 23:59:59',
+        ],
+      ],
+
+      [
+        'input' => [
+          'now' => '2022-02-28',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_before',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2019-03-01',
+          // leap year
+          'to' => '2020-02-29 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2021-02-28',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_before',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2018-03-01',
+          // not leap year
+          'to' => '2019-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-03-01',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_before',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-03-01',
+          'to' => '2021-02-28 23:59:59',
+        ],
+      ],
+      [
+        'input' => [
+          'now' => '2022-12-31',
+          'fiscalYearStart' => ['M' => 3, 'd' => 1],
+          'term' => 'previous_before',
+          'unit' => 'fiscal_year',
+        ],
+        'expected' => [
+          'from' => '2020-03-01',
+          'to' => '2021-02-28 23:59:59',
+        ],
+      ],
+    ];
+  }
+
+  /**
    * Test customFormat() function
    */
   public function testCustomFormat() {
