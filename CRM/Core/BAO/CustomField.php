@@ -1344,7 +1344,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     //set defaults if mode is registration
-    if (!trim($value) &&
+    if (!trim($value ?? '') &&
       ($value !== 0) &&
       (!in_array($mode, [CRM_Profile_Form::MODE_EDIT, CRM_Profile_Form::MODE_SEARCH]))
     ) {
