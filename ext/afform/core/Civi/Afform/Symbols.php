@@ -35,7 +35,19 @@ class Symbols {
    */
   public static function scan($html) {
     $symbols = new static();
+    $oldErrorStatus = libxml_use_internal_errors(TRUE);
     $doc = new \DOMDocumentWrapper($html, 'text/html');
+    foreach (libxml_get_errors() as $error) {
+      if (substr($error->message, 0, 3) === 'Tag' && substr(trim($error->message), -7, 7) === 'invalid') {
+        // ignore? libxml treats e.g. af-field tags as invalid html
+      }
+      else {
+        // This is similar to when use_internal_errors is false.
+        trigger_error($error->message, E_USER_WARNING);
+      }
+    }
+    libxml_clear_errors();
+    libxml_use_internal_errors($oldErrorStatus);
     $symbols->scanNode($doc->root);
     return $symbols;
   }
