@@ -172,6 +172,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
 
     $extraParams = ($key) ? "&key={$key}" : NULL;
 
+    $closeExtra = ts('Writing off this pledge will also cancel any scheduled (and not completed) pledge payments.') . ' ' . ts('This action cannot be undone.') . ' ' . ts('Do you want to continue?');
     $cancelExtra = ts('Cancelling this pledge will also cancel any scheduled (and not completed) pledge payments.') . ' ' . ts('This action cannot be undone.') . ' ' . ts('Do you want to continue?');
     self::$_links = [
       CRM_Core_Action::VIEW => [
@@ -185,6 +186,13 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
         'url' => 'civicrm/contact/view/pledge',
         'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
         'title' => ts('Edit Pledge'),
+      ],
+      CRM_Core_Action::CLOSE => [
+        'name' => ts('Write Off'),
+        'url' => 'civicrm/contact/view/pledge',
+        'qs' => 'reset=1&action=close&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
+        'extra' => 'onclick = "return confirm(\'' . $closeExtra . '\');"',
+        'title' => ts('Write Off Pledge'),
       ],
       CRM_Core_Action::DETACH => [
         'name' => ts('Cancel'),
@@ -201,7 +209,17 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
       ],
     ];
 
+    $status = CRM_Utils_Array::value(2, $args);
     if (in_array('Cancel', $hideOption)) {
+      unset(self::$_links[CRM_Core_Action::DETACH]);
+      unset(self::$_links[CRM_Core_Action::CLOSE]);
+    }
+
+    if (in_array($status, [2,6])) {
+      unset(self::$_links[CRM_Core_Action::CLOSE]);
+    }
+
+    if (in_array($status, [5])) {
       unset(self::$_links[CRM_Core_Action::DETACH]);
     }
 
@@ -322,7 +340,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
 
       $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->pledge_id;
 
-      $row['action'] = CRM_Core_Action::formLink(self::links($hideOption, $this->_key),
+      $row['action'] = CRM_Core_Action::formLink(self::links($hideOption, $this->_key, $row['pledge_status_id']),
         $mask,
         [
           'id' => $result->pledge_id,
