@@ -251,4 +251,24 @@ class Import extends CRM_Core_DAO {
     return array_merge(self::getFieldsForTable($tableName), self::getSupportedFields());
   }
 
+  /**
+   * Defines the default key as 'id'.
+   *
+   * @return array
+   */
+  public function keys() {
+    return ['_id'];
+  }
+
+  /**
+   * Tells DB_DataObject which keys use autoincrement.
+   * 'id' is autoincrementing by default.
+   *
+   *
+   * @return array
+   */
+  public function sequenceKey() {
+    return ['_id', TRUE];
+  }
+
 }
