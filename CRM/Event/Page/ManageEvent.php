@@ -282,7 +282,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       $this
     );
     $createdId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
-    if (strtolower($this->_sortByCharacter) == 'all' ||
+    if ((!empty($this->_sortByCharacter) && strtolower($this->_sortByCharacter) == 'all') ||
       !empty($_POST)
     ) {
       $this->_sortByCharacter = '';
