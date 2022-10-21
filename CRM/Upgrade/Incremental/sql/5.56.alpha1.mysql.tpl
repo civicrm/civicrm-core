@@ -8,6 +8,8 @@ INSERT INTO
   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 SELECT
   @option_group_id_date_filter, {localize}'{ts escape="sql"}Previous 2 fiscal years{/ts}'{/localize}, 'previous_2.fiscal_year', 'previous_2.fiscal_year', NULL, NULL, 0, (SELECT @max_wt := @max_wt+1), {localize}NULL{/localize}, 0, 0, 1, NULL, NULL, NULL
+-- needed for mariadb
+FROM DUAL
 WHERE NOT EXISTS (SELECT * FROM civicrm_option_value WHERE `value`='previous_2.fiscal_year' AND `option_group_id` = @option_group_id_date_filter);
 
 SELECT @max_wt := max(weight) from civicrm_option_value where option_group_id = @option_group_id_date_filter;
@@ -15,6 +17,8 @@ INSERT INTO
   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 SELECT
   @option_group_id_date_filter, {localize}'{ts escape="sql"}Fiscal year prior to previous fiscal year{/ts}'{/localize}, 'previous_before.fiscal_year', 'previous_before.fiscal_year', NULL, NULL, 0, (SELECT @max_wt := @max_wt+1), {localize}NULL{/localize}, 0, 0, 1, NULL, NULL, NULL
+-- needed for mariadb
+FROM DUAL
 WHERE NOT EXISTS (SELECT * FROM civicrm_option_value WHERE `value`='previous_before.fiscal_year' AND `option_group_id` = @option_group_id_date_filter);
 
 -- dev/core#3905 Update data type for data to LONGTEXT
