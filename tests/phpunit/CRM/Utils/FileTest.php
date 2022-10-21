@@ -318,10 +318,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * @param bool $expected
    */
   public function testIsDirWithOpenBasedir(?string $input, bool $expected) {
-    $originalOpenBasedir = ini_get('open_basedir');
-
     // This might not always be under cms root, but let's see how it goes.
     $a_dir = \Civi::paths()->getPath('[civicrm.compile]/');
+
     if (file_exists("{$a_dir}/isDirTest/ok/ok.txt")) {
       unlink("{$a_dir}/isDirTest/ok/ok.txt");
     }
@@ -339,36 +338,109 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     // For now let's try this, assuming a drupal 7 structure where we know
     // where this file is:
     $cms_root = realpath(__DIR__ . '/../../../../../../../..');
+
+    // This test requires tightening `open_basedir` settings, which is a one-way change.
+    // Therefore, we have to do that part of the test in a sub-process.
+    // If you run directly in the same-process, then (eg) `phpunit` will have trouble writing error-data to JUnit XML files.
+    [$exitCode, $stdout, $stderr] = $this->runStaticMethodAsScript(__CLASS__, 'doIsDirWithOpenBasedir', [$a_dir, $cms_root, $input, $expected]);
+    $this->assertEquals('"OK"', trim($stdout), 'doIsDirWithOpenBasedir() should return OK');
+    $this->assertEquals('', trim($stderr), 'doIsDirWithOpenBasedir() should not generate warnings');
+    $this->assertEquals(0, $exitCode, 'doIsDirWithOpenBasedir() should exit normally');
+
+    unlink("{$a_dir}/isDirTest/ok/ok.txt");
+    rmdir("{$a_dir}/isDirTest/ok");
+    rmdir("{$a_dir}/isDirTest");
+  }
+
+  /**
+   * @param string $a_dir
+   * @param string $cms_root
+   * @param string|null $input
+   * @param bool $expected
+   * @return string
+   * @throws \ErrorException
+   */
+  public static function doIsDirWithOpenBasedir(string $a_dir, string $cms_root, ?string $input, bool $expected): string {
     // We also need temp dir because phpunit creates files in there as it does stuff before we can reset basedir.
     ini_set('open_basedir', $cms_root . PATH_SEPARATOR . sys_get_temp_dir());
 
-    $this->assertTrue(mkdir("{$a_dir}/isDirTest"));
-    $this->assertTrue(mkdir("{$a_dir}/isDirTest/ok"));
+    if (!mkdir("{$a_dir}/isDirTest")) {
+      return 'Failed to make isDirTest';
+    }
+
+    if (!mkdir("{$a_dir}/isDirTest/ok")) {
+      return 'Failed to make isDirTest/ok';
+    }
+
     file_put_contents("{$a_dir}/isDirTest/ok/ok.txt", 'Hello World!');
     // hmm the "bad" isn't going to work the same way php's own tests work. We
     // need to find a directory outside both cms_root and the sys temp dir.
     // Let's just use some known unix files that always exist instead.
     // mkdir("{$a_dir}/isDirTest/bad");
 
-    $old_cwd = getcwd();
-    $this->assertTrue(chdir("{$a_dir}/isDirTest/ok"));
+    if (!chdir("{$a_dir}/isDirTest/ok")) {
+      return 'Failed to chdir to isDirTest/ok';
+    }
 
     clearstatcache();
-    if ($expected) {
-      $this->assertTrue(CRM_Utils_File::isDir($input));
-    }
-    else {
+    $actual = CRM_Utils_File::isDir($input); /* Should pass */
+    // $actual = is_dir($input); /* Should fail */
+    if ($expected !== $actual) {
+      return sprintf("isDir returned incorrect result. Expected=%s Actual=%s", json_encode($expected), json_encode($actual));
       // Note that except for 'ok.txt', the real is_dir() would give an
       // error for these. For 'ok.txt' it would return false, but no error.
       // So this is what we are changing about the real function.
-      $this->assertFalse(CRM_Utils_File::isDir($input));
     }
 
-    ini_set('open_basedir', $originalOpenBasedir);
-    $this->assertTrue(chdir($old_cwd));
-    unlink("{$a_dir}/isDirTest/ok/ok.txt");
-    rmdir("{$a_dir}/isDirTest/ok");
-    rmdir("{$a_dir}/isDirTest");
+    return 'OK';
+  }
+
+  protected function runStaticMethodAsScript(string $class, string $method, $args = []) {
+    $func = new ReflectionMethod($class, $method);
+    $outClass = 'Wrapper' . time();
+    $ignoreStdErr = ';^Xdebug:;';
+
+    $inFile = $func->getFileName();
+    $inFileLines = explode("\n", file_get_contents($inFile));
+
+    $lines = array_merge(
+      [
+        '<' . '?php',
+        "class $outClass {",
+      ],
+      array_slice($inFileLines, $func->getStartLine() - 1, $func->getEndLine() - $func->getStartLine() + 1),
+      [
+        '}',
+        sprintf('$args = %s;', var_export($args, 1)),
+        sprintf('return %s::%s(...$args);', $outClass, $method),
+      ]
+    );
+    $tmpSrc = implode("\n", $lines);
+
+    $outFile = tempnam(sys_get_temp_dir(), 'test-script-') . '.php';
+    file_put_contents($outFile, $tmpSrc);
+
+    try {
+      $cmd = 'cv ev -v ' . escapeshellarg("return require \"$outFile\";");
+      $descriptorSpec = array(0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']);
+      $oldOutput = getenv('CV_OUTPUT');
+      putenv("CV_OUTPUT=json");
+      $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__);
+      putenv("CV_OUTPUT=$oldOutput");
+      fclose($pipes[0]);
+      $stdout = stream_get_contents($pipes[1]);
+      $stderr = stream_get_contents($pipes[2]);
+      fclose($pipes[1]);
+      fclose($pipes[2]);
+
+      $stderr = implode("\n", preg_grep($ignoreStdErr, explode("\n", $stderr), PREG_GREP_INVERT));
+      $exitCode = proc_close($process);
+
+      return [$exitCode, $stdout, $stderr];
+    }
+    finally {
+      unlink($outFile);
+    }
   }
 
   /**
