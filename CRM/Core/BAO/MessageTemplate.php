@@ -202,19 +202,18 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    * @return array
    */
   public static function getMessageTemplates($all = TRUE, $isSMS = FALSE) {
-    $msgTpls = [];
 
-    $messageTemplates = new CRM_Core_DAO_MessageTemplate();
-    $messageTemplates->is_active = 1;
-    $messageTemplates->is_sms = $isSMS;
+    $messageTemplates = \Civi\Api4\MessageTemplate::get()
+      ->addSelect('id', 'msg_title')
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('is_sms', '=', $isSMS);
 
     if (!$all) {
-      $messageTemplates->workflow_id = 'NULL';
+      $messageTemplates->addWhere('workflow_id', 'IS NULL');
     }
-    $messageTemplates->find();
-    while ($messageTemplates->fetch()) {
-      $msgTpls[$messageTemplates->id] = $messageTemplates->msg_title;
-    }
+
+    $msgTpls = array_column((array) $messageTemplates->execute(), 'msg_title', 'id');
+
     asort($msgTpls);
     return $msgTpls;
   }
