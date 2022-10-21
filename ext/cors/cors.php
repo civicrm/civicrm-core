@@ -5,11 +5,6 @@ require_once 'cors.civix.php';
 use CRM_Cors_ExtensionUtil as E;
 // phpcs:enable
 
-Civi::dispatcher()->addListener('civi.invoke.auth', function ($e) {
-  $cors = new \Civi\Cors\Cors();
-  $cors->addHeaders($e->args);
-}, 10);
-
 /**
  * Implements hook_civicrm_config().
  *

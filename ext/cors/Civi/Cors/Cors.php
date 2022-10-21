@@ -11,13 +11,23 @@
 
 namespace Civi\Cors;
 
+use Civi\Core\Service\AutoService;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 /**
  * Provides CORS (Cross-Origin Resource Sharing) support for CiviCRM URLs.
  *
  * @see https://docs.civicrm.org/dev/en/latest/framework/cors/
  * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/
+ * @service cors
  */
-class Cors {
+class Cors extends AutoService implements EventSubscriberInterface {
+
+  public static function getSubscribedEvents() {
+    return [
+      'civi.invoke.auth' => ['addHeaders', 10],
+    ];
+  }
 
   /**
    * Add headers to responses for configured URLs.
@@ -29,12 +39,11 @@ class Cors {
    *
    * Feel free to create an issue or submit a PR if you think we should be.
    *
-   * @param  Array $args A list of URL path arguments
+   * @param \Civi\Core\Event\GenericHookEvent $e
    * @return void
    */
-  public function addHeaders($args) {
-
-    $rule = $this->matchRule($args);
+  public function addHeaders($e) {
+    $rule = $this->matchRule($e->args);
 
     // If a rule matches, set appropriate headers.
     if ($rule) {
