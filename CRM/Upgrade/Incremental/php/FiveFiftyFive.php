@@ -29,7 +29,6 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFive extends CRM_Upgrade_Incremental_
    */
   public function upgrade_5_55_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-    $this->addTask('Remove Index for custom field label', 'dropIndex', 'civicrm_custom_field', 'UI_label_custom_group_id');
   }
 
 }
