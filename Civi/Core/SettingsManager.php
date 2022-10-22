@@ -351,6 +351,7 @@ class SettingsManager {
           'imageUploadURL' => '[civicrm.files]/persist/contribute/',
           'extensionsDir' => '[civicrm.files]/ext/',
           'extensionsURL' => '[civicrm.files]/ext/',
+          'ext_max_depth' => \CRM_Extension_System::DEFAULT_MAX_DEPTH,
           'resourceBase' => '[civicrm.root]/',
           'userFrameworkResourceURL' => '[civicrm.root]/',
         ];
