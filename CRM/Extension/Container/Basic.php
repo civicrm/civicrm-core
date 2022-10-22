@@ -78,6 +78,12 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   protected $filters = [];
 
   /**
+   * @var int|null
+   *   Maximum number of subdirectories to search.
+   */
+  protected $maxDepth;
+
+  /**
    * @param string $baseDir
    *   Local path to the container.
    * @param string $baseUrl
@@ -86,12 +92,15 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
    *   Cache in which to store extension metadata.
    * @param string $cacheKey
    *   Unique name for this container.
+   * @param int|null $maxDepth
+   *   Maximum number of subdirectories to search.
    */
-  public function __construct($baseDir, $baseUrl, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
+  public function __construct($baseDir, $baseUrl, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, ?int $maxDepth = NULL) {
     $this->cache = $cache;
     $this->cacheKey = $cacheKey;
     $this->baseDir = rtrim($baseDir, '/');
     $this->baseUrl = rtrim($baseUrl, '/');
+    $this->maxDepth = $maxDepth;
   }
 
   /**
@@ -198,7 +207,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
       }
       if (!is_array($this->relPaths)) {
         $this->relPaths = [];
-        $infoPaths = CRM_Utils_File::findFiles($this->baseDir, 'info.xml');
+        $infoPaths = CRM_Utils_File::findFiles($this->baseDir, 'info.xml', FALSE, $this->maxDepth);
         foreach ($infoPaths as $infoPath) {
           $relPath = CRM_Utils_File::relativize(dirname($infoPath), $this->baseDir);
           try {

@@ -744,9 +744,13 @@ HTACCESS;
    *   glob pattern, eg "*.txt".
    * @param bool $relative
    *   TRUE if paths should be made relative to $dir
+   * @param int|null $maxDepth
+   *   Maximum depth of subdirs to check.
+   *   For no limit, use NULL.
+   *
    * @return array(string)
    */
-  public static function findFiles($dir, $pattern, $relative = FALSE) {
+  public static function findFiles($dir, $pattern, $relative = FALSE, ?int $maxDepth = NULL) {
     if (!is_dir($dir) || !is_readable($dir)) {
       return [];
     }
@@ -757,7 +761,8 @@ HTACCESS;
       ? constant('CIVICRM_EXCLUDE_DIRS_PATTERN')
       : '@' . preg_quote(DIRECTORY_SEPARATOR) . '\.@';
 
-    $dir = rtrim($dir, '/');
+    $dir = rtrim($dir, '/' . DIRECTORY_SEPARATOR);
+    $baseDepth = static::findPathDepth($dir);
     $todos = [$dir];
     $result = [];
     while (!empty($todos)) {
@@ -771,13 +776,34 @@ HTACCESS;
         }
       }
       // Find subdirs to recurse into.
-      $subdirs = glob("$subdir/*", GLOB_ONLYDIR);
-      if (!empty($excludeDirsPattern)) {
-        $subdirs = preg_grep($excludeDirsPattern, $subdirs, PREG_GREP_INVERT);
+      $depth = static::findPathDepth($subdir) - $baseDepth + 1;
+      if ($maxDepth === NULL || $depth <= $maxDepth) {
+        $subdirs = glob("$subdir/*", GLOB_ONLYDIR);
+        if (!empty($excludeDirsPattern)) {
+          $subdirs = preg_grep($excludeDirsPattern, $subdirs, PREG_GREP_INVERT);
+        }
+        $todos = array_merge($todos, $subdirs);
       }
-      $todos = array_merge($todos, $subdirs);
     }
     return $result;
+  }
+
+  /**
+   * Determine the absolute depth of a path expression.
+   *
+   * @param string $path
+   *   Ex: '/var/www/foo'
+   * @return int
+   *   Ex: 3
+   */
+  private static function findPathDepth(string $path): int {
+    // Both PHP-Unix and PHP-Windows support '/'s. Additionally, PHP-Windows also supports '\'s.
+    // They are roughly equivalent. (The differences are described by a secret book hidden in the tower of Mordor.)
+    $depth = substr_count($path, '/');
+    if (DIRECTORY_SEPARATOR !== '/') {
+      $depth += substr_count($path, DIRECTORY_SEPARATOR);
+    }
+    return $depth;
   }
 
   /**
