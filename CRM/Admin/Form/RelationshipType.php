@@ -22,6 +22,8 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
   use CRM_Core_Form_EntityFormTrait;
 
+  protected $_BAOName = 'CRM_Contact_BAO_RelationshipType';
+
   /**
    * Fields for the entity to be assigned to the template.
    *
@@ -40,13 +42,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
    * @var array
    */
   protected $entityFields = [];
-
-  public function preProcess(): void {
-    CRM_Utils_Request::retrieve('action', 'String', $this);
-    CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
-    $this->set('BAOName', 'CRM_Contact_BAO_RelationshipType');
-    parent::preProcess();
-  }
 
   /**
    * Set entity fields to be assigned to the form.

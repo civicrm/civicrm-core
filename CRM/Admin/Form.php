@@ -49,14 +49,24 @@ class CRM_Admin_Form extends CRM_Core_Form {
   }
 
   /**
-   * Basic setup.
+   * Note: This type of form was traditionally embedded in a page, with values like _id and _action
+   * being `set()` by the page controller.
+   * Nowadays the preferred approach is to place these forms at their own url, so this function
+   * handles both scenarios. It will retrieve id either from a value stored by the page controller
+   * if embedded, or from the url if standalone.
    */
   public function preProcess() {
     Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
     Civi::resources()->addScriptFile('civicrm', 'js/jquery/jquery.crmIconPicker.js');
 
-    $this->_id = $this->get('id');
+    // Lookup id from URL or stored value in controller
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+
     $this->_BAOName = $this->get('BAOName');
+    // If BAOName not explicitly set, look it up from the api entity name
+    if (!$this->_BAOName) {
+      $this->_BAOName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getFullName($this->getDefaultEntity()));
+    }
     $this->_values = [];
     if (isset($this->_id)) {
       $params = ['id' => $this->_id];

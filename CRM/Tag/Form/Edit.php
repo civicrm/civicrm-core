@@ -28,12 +28,6 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
     return 'Tag';
   }
 
-  public function preProcess() {
-    CRM_Utils_Request::retrieve('id', 'Integer', $this, FALSE);
-    $this->set('BAOName', 'CRM_Core_BAO_Tag');
-    parent::preProcess();
-  }
-
   /**
    * Build the form object.
    */
