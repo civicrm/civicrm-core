@@ -11,6 +11,8 @@
 
 namespace Civi\Afform;
 
+use Civi\Core\Service\AutoService;
+
 /**
  * Base class for Afform Behaviors
  *
@@ -30,7 +32,7 @@ namespace Civi\Afform;
  * Note: Behavior classes can be in any namespace, but if you want the convenience of the
  * `afform-behavior-php` autoloader, they must be in `\Civi\Afform\Behavior`.
  */
-abstract class AbstractBehavior implements BehaviorInterface {
+abstract class AbstractBehavior extends AutoService implements BehaviorInterface {
 
   /**
    * Optional description of the behavior
