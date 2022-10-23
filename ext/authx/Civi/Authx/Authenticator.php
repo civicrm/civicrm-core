@@ -11,6 +11,9 @@
 
 namespace Civi\Authx;
 
+use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\HookInterface;
+use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
 use GuzzleHttp\Psr7\Response;
 
@@ -19,8 +22,49 @@ use GuzzleHttp\Psr7\Response;
  * checks if current policy accepts this credential, and logs in as the target person.
  *
  * @package Civi\Authx
+ * @service authx.authenticator
  */
-class Authenticator {
+class Authenticator extends AutoService implements HookInterface {
+
+  /**
+   * When 'CRM_Core_Invoke' fires 'civi.invoke.auth', we should check for credentials.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   * @return bool|void
+   * @throws \Exception
+   */
+  public function on_civi_invoke_auth(GenericHookEvent $e) {
+    $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
+    $siteKey = $_SERVER['HTTP_X_CIVI_KEY'] ?? $params['_authxSiteKey'] ?? NULL;
+
+    if (!empty($_SERVER['HTTP_X_CIVI_AUTH'])) {
+      return $this->auth($e, ['flow' => 'xheader', 'cred' => $_SERVER['HTTP_X_CIVI_AUTH'], 'siteKey' => $siteKey]);
+    }
+
+    if (!empty($_SERVER['HTTP_AUTHORIZATION']) && !empty(\Civi::settings()->get('authx_header_cred'))) {
+      return $this->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION'], 'siteKey' => $siteKey]);
+    }
+
+    if (!empty($params['_authx'])) {
+      if ((implode('/', $e->args) === 'civicrm/authx/login')) {
+        $this->auth($e, ['flow' => 'login', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
+        _authx_redact(['_authx']);
+      }
+      elseif (!empty($params['_authxSes'])) {
+        $this->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+          _authx_reload(implode('/', $e->args), $_SERVER['QUERY_STRING']);
+        }
+        else {
+          _authx_redact(['_authx', '_authxSes']);
+        }
+      }
+      else {
+        $this->auth($e, ['flow' => 'param', 'cred' => $params['_authx'], 'siteKey' => $siteKey]);
+        _authx_redact(['_authx']);
+      }
+    }
+  }
 
   /**
    * @var \Civi\Authx\AuthxInterface

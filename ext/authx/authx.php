@@ -5,47 +5,6 @@ require_once 'authx.civix.php';
 use CRM_Authx_ExtensionUtil as E;
 // phpcs:enable
 
-Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
-  $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
-  $siteKey = $_SERVER['HTTP_X_CIVI_KEY'] ?? $params['_authxSiteKey'] ?? NULL;
-
-  if (!empty($_SERVER['HTTP_X_CIVI_AUTH'])) {
-    return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'xheader', 'cred' => $_SERVER['HTTP_X_CIVI_AUTH'], 'siteKey' => $siteKey]);
-  }
-
-  if (!empty($_SERVER['HTTP_AUTHORIZATION']) && !empty(Civi::settings()->get('authx_header_cred'))) {
-    return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION'], 'siteKey' => $siteKey]);
-  }
-
-  if (!empty($params['_authx'])) {
-    if ((implode('/', $e->args) === 'civicrm/authx/login')) {
-      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'login', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
-      _authx_redact(['_authx']);
-    }
-    elseif (!empty($params['_authxSes'])) {
-      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
-      if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        _authx_reload(implode('/', $e->args), $_SERVER['QUERY_STRING']);
-      }
-      else {
-        _authx_redact(['_authx', '_authxSes']);
-      }
-    }
-    else {
-      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'param', 'cred' => $params['_authx'], 'siteKey' => $siteKey]);
-      _authx_redact(['_authx']);
-    }
-  }
-
-  // Accept legacy auth (?key=...&api_key=...) for 'civicrm/ajax/rest' and 'civicrm/ajax/api4/*'.
-  // The use of `?key=` could clash on some endpoints. Only accept on a small list of endpoints that are compatible with it.
-  if (count($e->args) > 2 && $e->args[1] === 'ajax' && in_array($e->args[2], ['rest', 'api4'])) {
-    if ((!empty($_REQUEST['api_key']) || !empty($_REQUEST['key']))) {
-      return (new \Civi\Authx\LegacyRestAuthenticator())->auth($e, ['flow' => 'legacyrest', 'cred' => 'Bearer ' . $_REQUEST['api_key'] ?? '', 'siteKey' => $_REQUEST['key'] ?? NULL]);
-    }
-  }
-});
-
 /**
  * Perform a system login.
  *
