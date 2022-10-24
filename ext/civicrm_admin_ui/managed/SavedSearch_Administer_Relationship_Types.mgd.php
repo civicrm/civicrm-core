@@ -19,8 +19,8 @@ return [
         'api_params' => [
           'version' => 4,
           'select' => [
-            'name_a_b',
-            'name_b_a',
+            'label_a_b',
+            'label_b_a',
             'contact_type_a:label',
             'contact_type_b:label',
             'is_active',
@@ -61,7 +61,7 @@ return [
           'columns' => [
             [
               'type' => 'field',
-              'key' => 'name_a_b',
+              'key' => 'label_a_b',
               'dataType' => 'String',
               'label' => E::ts('Relationship A to B'),
               'sortable' => TRUE,
@@ -69,7 +69,7 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'name_b_a',
+              'key' => 'label_b_a',
               'dataType' => 'String',
               'label' => E::ts('Relationship B to A'),
               'sortable' => TRUE,
