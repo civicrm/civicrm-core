@@ -60,6 +60,20 @@ class SubscriptionHistoryTest extends Api4TestBase {
     $this->assertCount(1, $historyRemoved);
     $this->assertGreaterThanOrEqual($timeRemoved, strtotime($historyRemoved->single()['date']));
     $this->assertLessThanOrEqual(time(), strtotime($historyRemoved->single()['date']));
+
+    $timeDeleted = time();
+    GroupContact::delete()
+      ->addWhere('id', '=', $groupContact['id'])
+      ->execute();
+    $historyDeleted = SubscriptionHistory::get()
+      ->addSelect('*')
+      ->addWhere('group_id', '=', $group['id'])
+      ->addWhere('status', '=', 'Deleted')
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(1, $historyDeleted);
+    $this->assertGreaterThanOrEqual($timeDeleted, strtotime($historyDeleted->single()['date']));
+    $this->assertLessThanOrEqual(time(), strtotime($historyDeleted->single()['date']));
   }
 
   public function testGetPermissions() {
