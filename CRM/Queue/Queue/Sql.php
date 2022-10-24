@@ -47,31 +47,27 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     $lease_time = $lease_time ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
 
     $result = NULL;
-    $dao = CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
-    $sql = "
+    CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
+    $sql = '
         SELECT first_in_queue.* FROM (
           SELECT id, queue_name, submit_time, release_time, run_count, data
           FROM civicrm_queue_item
           WHERE queue_name = %1
-          ORDER BY weight ASC, id ASC
+          ORDER BY weight, id
           LIMIT 1
         ) first_in_queue
         WHERE release_time IS NULL OR release_time < %2
-      ";
+      ';
     $params = [
       1 => [$this->getName(), 'String'],
       2 => [CRM_Utils_Time::getTime(), 'Timestamp'],
     ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
-    if (is_a($dao, 'DB_Error')) {
-      // FIXME - Adding code to allow tests to pass
-      throw new CRM_Core_Exception('Unable to claim queue item');
-    }
 
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       $dao->run_count++;
-      $sql = "UPDATE civicrm_queue_item SET release_time = %1, run_count = %3 WHERE id = %2";
+      $sql = 'UPDATE civicrm_queue_item SET release_time = %1, run_count = %3 WHERE id = %2';
       $sqlParams = [
         '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
         '2' => [$dao->id, 'Integer'],
@@ -87,7 +83,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
       $result = $dao;
     }
 
-    $dao = CRM_Core_DAO::executeQuery('UNLOCK TABLES;');
+    CRM_Core_DAO::executeQuery('UNLOCK TABLES;');
 
     return $result;
   }
