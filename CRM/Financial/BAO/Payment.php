@@ -397,6 +397,7 @@ class CRM_Financial_BAO_Payment {
       'contactDisplayName' => $entities['contact']['display_name'],
       'emailGreeting' => $entities['contact']['email_greeting'],
       'totalAmount' => $entities['payment']['total'],
+      'currency' => $entities['payment']['currency'],
       'amountOwed' => $entities['payment']['balance'],
       'totalPaid' => $entities['payment']['paid'],
       'paymentAmount' => $entities['payment']['total_amount'],
@@ -431,6 +432,7 @@ class CRM_Financial_BAO_Payment {
     $testedTemplateVariables = [
       'contactDisplayName',
       'totalAmount',
+      'currency',
       'amountOwed',
       'paymentAmount',
       'event',

@@ -44,7 +44,7 @@
         {ts}This Refund Amount{/ts}
         </td>
         <td {$valueStyle}>
-        {$refundAmount|crmMoney}
+        {$refundAmount|crmMoney:$currency}
         </td>
       </tr>
     {else}
@@ -56,7 +56,7 @@
         {ts}This Payment Amount{/ts}
         </td>
         <td {$valueStyle}>
-        {$paymentAmount|crmMoney}
+        {$paymentAmount|crmMoney:$currency}
         </td>
       </tr>
     {/if}
@@ -110,7 +110,7 @@
       {ts}Total Fee{/ts}
     </td>
     <td {$valueStyle}>
-      {$totalAmount|crmMoney}
+      {$totalAmount|crmMoney:$currency}
     </td>
   </tr>
   {/if}
@@ -120,7 +120,7 @@
       {ts}Total Paid{/ts}
     </td>
     <td {$valueStyle}>
-      {$totalPaid|crmMoney}
+      {$totalPaid|crmMoney:$currency}
     </td>
   </tr>
   {/if}
@@ -130,7 +130,7 @@
       {ts}Balance Owed{/ts}
     </td>
     <td {$valueStyle}>
-      {$amountOwed|crmMoney}
+      {$amountOwed|crmMoney:$currency}
     </td> {* This will be zero after final payment. *}
   </tr>
   {/if}
