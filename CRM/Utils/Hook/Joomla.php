@@ -74,7 +74,7 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
           $app = JCli::getInstance();
         }
         else {
-          $app = JApplicationCli::getInstance();
+          $app = \Joomla\CMS\Factory::getApplication();
         }
       }
 
