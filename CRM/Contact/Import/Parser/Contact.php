@@ -12,6 +12,7 @@
 use Civi\Api4\Contact;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\StateProvince;
+use Civi\Api4\DedupeRuleGroup;
 
 require_once 'api/v3/utils.php';
 
@@ -1633,7 +1634,19 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (isset($params['relationship'])) {
         unset($params['relationship']);
       }
-      $id = $this->getPossibleContactMatch($params, $extIDMatch, $this->getSubmittedValue('dedupe_rule_id') ?: NULL);
+      $ruleId = $this->getSubmittedValue('dedupe_rule_id') ?: NULL;
+      // if this is not the main contact and the contact types are not the same
+      $mainContactType = $this->getSubmittedValue('contactType');
+      if (!$isMainContact && $params['contact_type'] !== $mainContactType) {
+        // use the unsupervised dedupe rule for this contact type
+        $ruleId = DedupeRuleGroup::get(FALSE)
+          ->addSelect('id')
+          ->addWhere('contact_type', '=', $params['contact_type'])
+          ->addWhere('used', '=', 'Unsupervised')
+          ->execute()
+          ->first()['id'];
+      }
+      $id = $this->getPossibleContactMatch($params, $extIDMatch, $ruleId);
       if ($id && $isMainContact && $this->isSkipDuplicates()) {
         throw new CRM_Core_Exception(ts('Contact matched by dedupe rule already exists in the database.'), CRM_Import_Parser::DUPLICATE);
       }
