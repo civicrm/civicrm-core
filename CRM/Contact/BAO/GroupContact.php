@@ -45,10 +45,13 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
    * @noinspection UnknownInspectionInspection
    */
   public static function self_hook_civicrm_post(PostEvent $event): void {
-    if (is_object($event->object) && in_array($event->action, ['create', 'edit'], TRUE)) {
+    if (is_object($event->object) && in_array($event->action, ['create', 'edit', 'delete'], TRUE)) {
       // Lookup existing info for the sake of subscription history
       if ($event->action === 'edit') {
         $event->object->find(TRUE);
+      }
+      if ($event->action === 'delete') {
+        $event->object->status = 'Deleted';
       }
 
       try {
