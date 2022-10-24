@@ -203,6 +203,23 @@ class QueueTest extends Api4TestBase {
     $this->assertTrue(is_numeric($first['id']));
     $this->assertEquals($queueName, $first['queue']);
     $this->assertFalse(isset($first['data']));
+    $this->assertFalse(isset($first['run_as']));
+  }
+
+  public function testSelectRunAs() {
+    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_select';
+    $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
+    $this->assertQueueStats(0, 0, 0, $queue);
+
+    $task = new \CRM_Queue_Task([QueueTest::class, 'doSomething'], ['first']);
+    $task->runAs = ['contactId' => 99, 'domainId' => 1];
+    \Civi::queue($queueName)->createItem($task);
+
+    $first = Queue::claimItems()->setQueue($queueName)->setSelect(['id', 'queue', 'run_as'])->execute()->single();
+    $this->assertTrue(is_numeric($first['id']));
+    $this->assertEquals($queueName, $first['queue']);
+    $this->assertFalse(isset($first['data']));
+    $this->assertEquals(['contactId' => 99, 'domainId' => 1], $first['run_as']);
   }
 
   public function testEmptyPoll() {
