@@ -236,6 +236,10 @@ class CRM_Afform_ArrayHtml {
           $arr['#children'] = $this->convertNodesToArray($node->childNodes);
         }
       }
+      // Empty containers should still get a #children attribute
+      elseif (in_array($node->tagName, ['div', 'fieldset'], TRUE)) {
+        $arr['#children'] = [];
+      }
       return $arr;
     }
     elseif ($node instanceof DOMText) {
