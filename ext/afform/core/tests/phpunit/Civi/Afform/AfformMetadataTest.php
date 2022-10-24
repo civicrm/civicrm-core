@@ -29,7 +29,7 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
 
     // Ensure the "Existing" contact field exists
     $this->assertEquals('Existing Contact', $individualFields['id']['label']);
-    $this->assertEquals('Existing', $individualFields['id']['input_type']);
+    $this->assertEquals('EntityRef', $individualFields['id']['input_type']);
   }
 
 }

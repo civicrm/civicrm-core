@@ -14,6 +14,7 @@ namespace Civi\Api4\Subscriber;
 use Civi\Afform\FormDataModel;
 use Civi\API\Events;
 use Civi\Api4\Afform;
+use Civi\Api4\Utils\CoreUtil;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -52,20 +53,25 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
       }
       $formDataModel = new FormDataModel($afform['layout']);
       $entity = $formDataModel->getEntity($entityName);
+      $isId = $fieldName === CoreUtil::getIdFieldName($entity['type']);
 
+      // For the "Existing Entity" selector,
       // Look up the "type" fields (e.g. contact_type, activity_type_id, case_type_id, etc)
-      $typeFields = [];
-      if ($entity['type'] === 'Contact') {
-        $typeFields = ['contact_type', 'contact_sub_type'];
-      }
-      else {
-        $extends = array_column(\CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), 'grouping', 'id');
-        $typeFields = (array) ($extends[$entity['type']] ?? NULL);
-      }
-      // If entity has a type set in the values, auto-apply that to filters
-      foreach ($typeFields as $typeField) {
-        if (!empty($entity['data'][$typeField])) {
-          $apiRequest->addFilter($typeField, $entity['data'][$typeField]);
+      // And apply it as a filter if specified on the form.
+      if ($isId) {
+        $typeFields = [];
+        if ($entity['type'] === 'Contact') {
+          $typeFields = ['contact_type', 'contact_sub_type'];
+        }
+        else {
+          $extends = array_column(\CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), 'grouping', 'id');
+          $typeFields = (array) ($extends[$entity['type']] ?? NULL);
+        }
+        // If entity has a type set in the values, auto-apply that to filters
+        foreach ($typeFields as $typeField) {
+          if (!empty($entity['data'][$typeField])) {
+            $apiRequest->addFilter($typeField, $entity['data'][$typeField]);
+          }
         }
       }
 

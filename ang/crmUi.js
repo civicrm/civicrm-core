@@ -720,12 +720,15 @@
         },
         bindToController: {
           crmAutocomplete: '<',
-          crmAutocompleteParams: '<'
+          crmAutocompleteParams: '<',
+          multiple: '<'
         },
         controller: function($element, $timeout) {
           var ctrl = this;
           $timeout(function() {
-            $element.crmAutocomplete(ctrl.crmAutocomplete, ctrl.crmAutocompleteParams);
+            $element.crmAutocomplete(ctrl.crmAutocomplete, ctrl.crmAutocompleteParams, {
+              multiple: ctrl.multiple
+            });
             // Ensure widget is updated when model changes
             if (ctrl.ngModel) {
               ctrl.ngModel.$render = function() {
