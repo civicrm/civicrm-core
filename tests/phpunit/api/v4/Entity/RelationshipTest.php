@@ -77,4 +77,61 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($relationship['modified_date'], $cacheRecords[$c2]['relationship_modified_date']);
   }
 
+  public function testRelationshipDisableCreate(): void {
+    $today = new \DateTime('today');
+    $future = new \DateTime('today');
+    $future->add(new \DateInterval('P1Y'));
+
+    $c1 = Contact::create(FALSE)->addValue('first_name', '1')->execute()->first()['id'];
+    $c2 = Contact::create(FALSE)->addValue('first_name', '2')->execute()->first()['id'];
+    $relationship = Relationship::create(FALSE)
+      ->setValues([
+        'contact_id_a' => $c1,
+        'contact_id_b' => $c2,
+        'start_date' => $today->format('Y-m-d'),
+        'end_date' => $future->format('Y-m-d'),
+        'relationship_type_id' => 1,
+        'description' => "Wow, we're related!",
+        'is_permission_a_b' => 1,
+        'is_permission_b_a:name' => 'View only',
+      ])->execute()->first();
+    $relationship = Relationship::get(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->execute()->first();
+    $relationshipDisable = Relationship::update(FALSE)
+      ->addWHere('id','=', $relationship['id'])
+      ->addValue('is_active', FALSE)
+      ->execute()->first();
+    $relationship2 = Relationship::create(FALSE)
+      ->setValues([
+        'contact_id_a' => $c1,
+        'contact_id_b' => $c2,
+        'start_date' => $today->format('Y-m-d'),
+        'end_date' => $future->format('Y-m-d'),
+        'relationship_type_id' => 1,
+        'description' => "Wow, we're related!",
+        'is_permission_a_b' => 1,
+        'is_permission_b_a:name' => 'View only',
+      ])->execute()->first();
+
+    $cacheRecords = RelationshipCache::get(FALSE)
+      ->addWhere('near_contact_id', 'IN', [$c1])
+      ->addWhere('is_active', '=', FALSE)
+      ->addSelect('near_contact_id', 'orientation', 'description', 'start_date', 'end_date')
+      ->execute()->indexBy('near_contact_id');
+    $this->assertCount(1, $cacheRecords);
+    $this->assertEquals(FALSE, $cacheRecords[$c1]['is_active']);
+    $this->assertEquals($today, $cachedRecords[$c1]['start_date']);
+    $this->assertEquals($future, $cachedRecords[$c1]['end_date']);
+
+    $cacheRecords = RelationshipCache::get(FALSE)
+      ->addWhere('near_contact_id', 'IN', [$c1])
+      ->addWhere('is_active', '=', TRUE)
+      ->addSelect('near_contact_id', 'orientation', 'description', 'start_date', 'end_date')
+      ->execute()->indexBy('near_contact_id');
+    $this->assertCount(1, $cacheRecords);
+    $this->assertEquals(TRUE, $cacheRecords[$c1]['is_active']);
+    $this->assertEquals($today, $cachedRecords[$c1]['start_date']);
+    $this->assertEquals($future, $cachedRecords[$c1]['end_date']);
+  }
 }
