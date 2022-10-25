@@ -7,6 +7,10 @@ use Civi\Api4\Contact;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
+/**
+ * @service
+ * @internal
+ */
 class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface {
 
   /**

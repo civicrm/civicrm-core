@@ -6,6 +6,10 @@ use Civi\Afform\Event\AfformPrefillEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
+/**
+ * @service
+ * @internal
+ */
 class ContactAutofill extends AbstractBehavior implements EventSubscriberInterface {
 
   /**
