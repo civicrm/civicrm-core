@@ -6,11 +6,12 @@
       savedSearch: '<'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdmin.html',
-    controller: function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta) {
+    controller: function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta, crmUiHelp) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
         afformLoad,
         fieldsForJoinGetters = {};
+      $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Compose'});
 
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
       this.afformAdminEnabled = (CRM.checkPerm('administer CiviCRM') || CRM.checkPerm('administer afform')) &&

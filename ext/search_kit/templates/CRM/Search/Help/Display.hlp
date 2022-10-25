@@ -1,0 +1,3 @@
+{htxt id="rewrite"}
+  <p>{ts}Both search tokens and smarty tags are supported when rewriting fields.{/ts}</p>
+{/htxt}

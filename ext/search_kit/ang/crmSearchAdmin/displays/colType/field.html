@@ -44,6 +44,7 @@
     <input type="checkbox" ng-checked="col.rewrite" ng-click="$ctrl.parent.toggleRewrite(col)" >
     {{:: ts('Rewrite Text') }}
   </label>
+  <a crm-ui-help="hs({id: 'rewrite', title: ts('Rewrite Text')})"></a>
   <textarea rows="2" class="form-control crm-flex-1" ng-if="col.rewrite" ng-model="col.rewrite" ng-model-options="{updateOn: 'blur'}"></textarea>
   <crm-search-admin-token-select ng-if="col.rewrite" model="col" field="rewrite" suffix=":label"></crm-search-admin-token-select>
 </div>
