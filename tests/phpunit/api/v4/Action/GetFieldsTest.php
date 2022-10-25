@@ -139,4 +139,11 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('Contact', $tagFields['entity_id']['fk_entity']);
   }
 
+  public function testFiltersAreReturned(): void {
+    $field = Contact::getFields(FALSE)
+      ->addWhere('name', '=', 'employer_id')
+      ->execute()->single();
+    $this->assertEquals(['contact_type' => 'Organization'], $field['input_attrs']['filter']);
+  }
+
 }

@@ -54,12 +54,15 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
       $formDataModel = new FormDataModel($afform['layout']);
       $entity = $formDataModel->getEntity($entityName);
       $isId = $fieldName === CoreUtil::getIdFieldName($entity['type']);
+      $field = civicrm_api4($entity['type'], 'getFields', [
+        'checkPermissions' => FALSE,
+        'where' => [['name', '=', $fieldName]],
+      ])->single();
 
       // For the "Existing Entity" selector,
       // Look up the "type" fields (e.g. contact_type, activity_type_id, case_type_id, etc)
       // And apply it as a filter if specified on the form.
       if ($isId) {
-        $typeFields = [];
         if ($entity['type'] === 'Contact') {
           $typeFields = ['contact_type', 'contact_sub_type'];
         }
@@ -73,6 +76,9 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
             $apiRequest->addFilter($typeField, $entity['data'][$typeField]);
           }
         }
+      }
+      foreach ($field['input_attrs']['filter'] ?? [] as $key => $value) {
+        $apiRequest->addFilter($key, $value);
       }
 
       $apiRequest->setCheckPermissions($entity['security'] !== 'FBAC');

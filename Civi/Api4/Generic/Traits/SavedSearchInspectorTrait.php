@@ -218,6 +218,7 @@ trait SavedSearchInspectorTrait {
     foreach ($fieldNames as $fieldName) {
       $field = $this->getField($fieldName);
       $dataType = $field['data_type'] ?? NULL;
+      $operators = ($field['operators'] ?? []) ?: CoreUtil::getOperators();
       // Array is either associative `OP => VAL` or sequential `IN (...)`
       if (is_array($value)) {
         $value = array_filter($value, [$this, 'hasValue']);
@@ -245,17 +246,23 @@ trait SavedSearchInspectorTrait {
           $filterClauses[] = ['AND', $andGroup];
         }
       }
-      elseif (!empty($field['serialize'])) {
+      elseif (!empty($field['serialize']) && in_array('CONTAINS', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, 'CONTAINS', $value];
       }
-      elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
+      elseif ((!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) && in_array('=', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, '=', $value];
       }
-      elseif ($prefixWithWildcard) {
+      elseif ($prefixWithWildcard && in_array('CONTAINS', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, 'CONTAINS', $value];
       }
-      else {
+      elseif (in_array('LIKE', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, 'LIKE', $value . '%'];
+      }
+      elseif (in_array('IN', $operators, TRUE)) {
+        $filterClauses[] = [$fieldName, 'IN', (array) $value];
+      }
+      else {
+        $filterClauses[] = [$fieldName, '=', $value];
       }
     }
     // Single field

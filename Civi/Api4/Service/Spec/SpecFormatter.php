@@ -281,6 +281,11 @@ class SpecFormatter {
     $inputType = $data['html']['type'] ?? $data['html_type'] ?? NULL;
     $inputAttrs = $data['html'] ?? [];
     unset($inputAttrs['type']);
+    // Custom field contact ref filters
+    if (is_string($data['filter'] ?? NULL) && strpos($data['filter'], '=')) {
+      $filters = explode('&', $data['filter']);
+      $inputAttrs['filter'] = $filters;
+    }
 
     $map = [
       'Select Date' => 'Date',
@@ -321,8 +326,24 @@ class SpecFormatter {
     foreach ($inputAttrs as $key => $val) {
       if ($key !== strtolower($key)) {
         unset($inputAttrs[$key]);
-        $key = strtolower(preg_replace('/(?=[A-Z])/', '_$0', $key));
+        $key = \CRM_Utils_String::convertStringToSnakeCase($key);
         $inputAttrs[$key] = $val;
+      }
+      // Format EntityRef filter property (core and custom fields)
+      if ($key === 'filter' && is_array($val)) {
+        $filters = [];
+        foreach ($val as $filter) {
+          [$k, $v] = explode('=', $filter);
+          $filters[$k] = $v;
+        }
+        // Legacy APIv3 custom field stuff
+        if ($dataTypeName === 'ContactReference') {
+          if (!empty($filters['group'])) {
+            $filters['groups'] = $filters['group'];
+          }
+          unset($filters['action'], $filters['group']);
+        }
+        $inputAttrs['filter'] = $filters;
       }
     }
     $fieldSpec
