@@ -298,13 +298,7 @@ class CRM_Utils_Address {
   ) {
     static $config = NULL;
 
-    if (!$format) {
-      $format = Civi::settings()->get('address_format');
-    }
-
-    if ($mailing) {
-      $format = Civi::settings()->get('mailing_format');
-    }
+    $format = Civi::settings()->get('mailing_format');
 
     $formatted = $format;
 
@@ -328,7 +322,7 @@ class CRM_Utils_Address {
     }
 
     //CRM-16876 Display countries in all caps when in mailing mode.
-    if ($mailing && !empty($fields['country'])) {
+    if (!empty($fields['country'])) {
       if (Civi::settings()->get('hideCountryMailingLabels')) {
         $domain = CRM_Core_BAO_Domain::getDomain();
         $domainLocation = CRM_Core_BAO_Location::getValues(['contact_id' => $domain->contact_id]);
