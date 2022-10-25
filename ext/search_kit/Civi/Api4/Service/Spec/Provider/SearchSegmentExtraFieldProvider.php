@@ -30,6 +30,7 @@ class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
       $field->setOptions(array_column($set['items'], 'label'));
       $field->setSuffixes(['label']);
       $field->setSqlRenderer([__CLASS__, 'renderSql']);
+      $field->setInputType('Select');
       $spec->addFieldSpec($field);
     }
   }
