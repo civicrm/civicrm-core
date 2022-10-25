@@ -65,7 +65,7 @@
   organization: Business & Code
 
 - github      : alarmingcod
-    
+
 - github      : albionbrown
   name        : Josh Brown
   organization: CEPR
@@ -186,10 +186,10 @@
 - github      : bastienho
   name        : Bastien Ho
 
-- github      : bdpfreizeiten 
+- github      : bdpfreizeiten
   name        : David Geisel
   organization: Bund Deutscher PfadfinderInnen BaWue
-  
+
 - github      : bhahumanists
   name        : Andrew West
   organization: British Humanist Association
@@ -513,6 +513,8 @@
   name        : Greg Rundlett
   organization: eQuality Technology
 
+- github      : Freewindrider
+
 - github      : gah242s
   name        : Greg Harris
   organization: Team Expansion
@@ -808,7 +810,7 @@
 - github      : KarinG
   name        : Karin Gerritsen
   organization: Semper IT
-  
+
 - github      : kaspernowak
   name        : Kasper Nowak
   organization: NowaTech
@@ -1238,6 +1240,10 @@
   name        : René Olivo
   organization: CompuCorp
 
+- github      : rennieh
+  name        : Rennie Harrison
+  organization: AGH Strategies
+
 - github      : revati90
   name        : Revati Gawas
   organization: OSSeed Technologies LLP
@@ -1594,7 +1600,9 @@
 - github      : vitius1
   name        : Vít Maňásek
   organization: KAM z.s.
-  
-- github      : wikimediaWfan 
+
+- github      : wikimediaWfan
   name        : Wenjun Fan
   organization: Wikimedia Foundation
+
+- github      : YesusHDS
