@@ -1285,6 +1285,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * Get role names
+   *
+   * @return array
+   */
+  public function getRoleNames() {
+    return wp_roles()->role_names;
+  }
+
+  /**
    * Perform any necessary actions prior to redirecting via POST.
    *
    * Redirecting via POST means that cookies need to be sent with SameSite=None.
