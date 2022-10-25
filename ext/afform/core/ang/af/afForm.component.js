@@ -138,6 +138,15 @@
       }
 
       this.submit = function() {
+        // check if the recaptcha exits and add it to the response
+        if (document.getElementById('g-recaptcha-response')) {
+          data.recaptcha = document.getElementById('g-recaptcha-response').value;
+          if (!data.recaptcha) {
+            CRM.alert(ts('Please verify the recaptcha.'), ts('Form Error'));
+            return;
+          }
+        }
+
         if (!ctrl.ngForm.$valid) {
           CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
           return;
@@ -164,6 +173,12 @@
           } else {
             postProcess();
           }
+        })
+        .catch(function(error) {
+          status.resolve();
+          status = CRM.status(error.error_message, 'error');
+          $element.unblock();
+          CRM.alert(error.error_message, ts('Form Error'));
         });
       };
     }

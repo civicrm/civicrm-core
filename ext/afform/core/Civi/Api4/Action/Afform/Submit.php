@@ -26,6 +26,18 @@ class Submit extends AbstractProcessor {
   protected $values;
 
   protected function processForm() {
+    // let's validate the recaptcha
+    if (isset($this->values['recaptcha'])) {
+      // set recaptcha in POST as expected by the extension
+      $_POST['g-recaptcha-response'] = $this->values['recaptcha'];
+
+      // validate recaptcha before processing form
+      if (!\CRM_Utils_ReCAPTCHA::validate(NULL, NULL)) {
+        // throw error
+        throw new \Exception("Enable to verify your identity.");
+      }
+    }
+
     // Save submission record
     if (!empty($this->_afform['create_submission'])) {
       $submission = AfformSubmission::create(FALSE)
