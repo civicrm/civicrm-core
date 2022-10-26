@@ -33,6 +33,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected $entity = 'Contribution';
 
   /**
+   * Original value for background processing.
+   *
+   * @var bool
+   */
+  protected $enableBackgroundQueueOriginalValue;
+
+  /**
    * These extensions are inactive at the start. They may be activated during the test. They should be deactivated at the end.
    *
    * For the moment, the test is simply hard-coded to cleanup in a specific order. It's tempting to auto-detect and auto-uninstall these.
@@ -48,8 +55,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   protected function setUp(): void {
     parent::setUp();
-    $origExtensions = array_column(CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'fullName');
-    $this->assertEquals([], array_intersect($origExtensions, $this->toggleExts), 'These extensions may be enabled and disabled during the test. The start-state and end-state should be the same. It appears that we have an unexpected start-state. Perhaps another test left us with a weird start-state?');
+    $originalExtensions = array_column(CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'fullName');
+    $this->assertEquals([], array_intersect($originalExtensions, $this->toggleExts), 'These extensions may be enabled and disabled during the test. The start-state and end-state should be the same. It appears that we have an unexpected start-state. Perhaps another test left us with a weird start-state?');
+    $this->enableBackgroundQueueOriginalValue = Civi::settings()->get('enableBackgroundQueue');
   }
 
   /**
@@ -68,6 +76,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       CRM_Extension_System::singleton()->getManager()->disable([$ext]);
       CRM_Extension_System::singleton()->getManager()->uninstall([$ext]);
     }
+    Civi::settings()->set('enableBackgroundQueue', $this->enableBackgroundQueueOriginalValue);
     parent::tearDown();
   }
 
@@ -223,9 +232,15 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * These features are
    *  - default_value for each field.
    *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isBackGroundProcessing
+   *
    * @throws \CRM_Core_Exception
    */
-  public function testImportFromUserJobConfiguration(): void {
+  public function testImportFromUserJobConfiguration(bool $isBackGroundProcessing): void {
+    Civi::settings()->set('enableBackgroundQueue', $isBackGroundProcessing);
+    $this->createLoggedInUser();
     $importMappings = [
       ['name' => 'organization_name'],
       ['name' => 'legal_name'],

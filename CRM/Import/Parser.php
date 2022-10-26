@@ -667,7 +667,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   public function queue(): void {
     $dataSource = $this->getDataSourceObject();
     $totalRowCount = $totalRows = $dataSource->getRowCount(['new']);
-    $queue = Civi::queue('user_job_' . $this->getUserJobID(), ['type' => 'Sql', 'error' => 'abort', 'runner' => 'task', 'user_job_id' => $this->getUserJobID()]);
+    // The retry limit for the queue is set to 5 - allowing for a few deadlocks but we might consider
+    // making this configurable at some point.
+    $queue = Civi::queue('user_job_' . $this->getUserJobID(), ['type' => 'Sql', 'error' => 'abort', 'runner' => 'task', 'user_job_id' => $this->getUserJobID(), 'retry_limit' => 5]);
     UserJob::update(FALSE)->setValues(['queue_id.name' => 'user_job_' . $this->getUserJobID()])->addWhere('id', '=', $this->getUserJobID())->execute();
     $offset = 0;
     $batchSize = 50;
@@ -681,6 +683,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         ['userJobID' => $this->getUserJobID(), 'limit' => $batchSize, 'offset' => 0],
         ts('Processed %1 rows out of %2', [1 => $offset + $batchSize, 2 => $totalRowCount])
       );
+      $task->runAs = ['contactId' => CRM_Core_Session::getLoggedInContactID(), 'domainId' => CRM_Core_Config::domainID()];
       $queue->createItem($task);
       $totalRows -= $batchSize;
       $offset += $batchSize;
