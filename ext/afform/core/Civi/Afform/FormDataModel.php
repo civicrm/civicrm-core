@@ -168,6 +168,13 @@ class FormDataModel {
       elseif (!empty($node['#children'])) {
         $this->parseFields($node['#children'], $entity, $join, $searchDisplay);
       }
+      elseif ($entity && $node['#tag'] === 'af-recaptcha') {
+        $recaptchaPublicKey = \Civi\Api4\Setting::get(FALSE)
+          ->addSelect('recaptchaPublicKey')
+          ->execute()->first()['value'];
+
+        $this->entities[$entity]['recaptchaKey'] = $recaptchaPublicKey;
+      }
       // Recurse into embedded blocks
       if (isset($this->blocks[$node['#tag']])) {
         if (!isset($this->blocks[$node['#tag']]['layout'])) {
