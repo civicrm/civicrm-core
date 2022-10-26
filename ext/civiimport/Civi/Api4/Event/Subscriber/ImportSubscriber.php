@@ -80,7 +80,8 @@ class ImportSubscriber extends \Civi\Core\Service\AutoService implements EventSu
         $exists = Entity::get(FALSE)->addWhere('name', '=', 'Import_' . $event->id)->selectRowCount()->execute()->count();
         if (!$exists || $event->action === 'delete') {
           // Flush entities cache key so our new Import will load as an entity.
-          Civi::cache('metadata')->set('api4.entities.info', NULL);
+          Civi::cache('metadata')->delete('api4.entities.info');
+          Civi::cache('metadata')->delete('civiimport_tables');
           CRM_Core_DAO_AllCoreTables::flush();
           Managed::reconcile(FALSE)->setModules(['civiimport'])->execute();
         }

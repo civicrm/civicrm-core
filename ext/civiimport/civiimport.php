@@ -14,6 +14,8 @@ use CRM_Civiimport_ExtensionUtil as E;
  * Implements hook_civicrm_config().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
+ *
+ * @noinspection PhpUnused
  */
 function civiimport_civicrm_config(&$config) {
   _civiimport_civix_civicrm_config($config);
@@ -100,6 +102,9 @@ function civiimport_civicrm_entityTypes(array &$entityTypes): void {
  * Note this lives here as `entityTypes` hook calls it - which may not fully
  * have class loading set up by the time it runs.
  *
+ * Where the database is fully booted already it is better to call
+ * `Civi\BAO\Import::getImportTables()` which has caching.
+ *
  * @return array
  */
 function _civiimport_civicrm_get_import_tables(): array {
@@ -156,6 +161,43 @@ function _civiimport_civicrm_get_import_tables(): array {
 function civiimport_civicrm_alterTemplateFile($formName, $form, $type, &$templateFile) {
   if ($formName === 'CRM_Contribute_Import_Form_MapField') {
     $templateFile = 'CRM/Import/MapField.tpl';
+  }
+}
+
+/**
+ * Implements search tasks hook to add the `validate` and `import` actions.
+ *
+ * @param array $tasks
+ * @param bool $checkPermissions
+ * @param int|null $userId
+ *
+ * @noinspection PhpUnused
+ */
+function civiimport_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userId) {
+  foreach (_civiimport_civicrm_get_import_tables() as $import) {
+    $tasks['Import_' . $import['user_job_id']]['validate'] = [
+      'title' => E::ts('Validate'),
+      'icon' => 'fa-check',
+      'apiBatch' => [
+        'action' => 'validate',
+        'params' => NULL,
+        'runMsg' => E::ts('Validating %1 row/s...'),
+        'successMsg' => E::ts('Ran validation on %1 row/s.'),
+        'errorMsg' => E::ts('An error occurred while attempting to validate %1 row/s.'),
+      ],
+    ];
+    $tasks['Import_' . $import['user_job_id']]['import'] = [
+      'title' => E::ts('Import'),
+      'icon' => 'fa-arrow-right',
+      'apiBatch' => [
+        'action' => 'import',
+        'params' => NULL,
+        'runMsg' => E::ts('Importing %1 row/s...'),
+        'confirmMsg' => E::ts('Are you sure you want to import %1 row/s?'),
+        'successMsg' => E::ts('Ran import on %1 row/s.'),
+        'errorMsg' => E::ts('An error occurred while attempting to import %1 row/s.'),
+      ],
+    ];
   }
 }
 
