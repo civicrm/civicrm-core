@@ -297,7 +297,6 @@ class CRM_Utils_Address {
     $tokenFields = NULL
   ) {
     static $config = NULL;
-    $microformat = FALSE;
 
     if (!$format) {
       $format = Civi::settings()->get('address_format');
@@ -348,88 +347,57 @@ class CRM_Utils_Address {
       }
     }
 
-    if (!$microformat) {
-      // replacements in case of Individual Name Format
-      $replacements = [
-        'contact.display_name' => $fields['display_name'] ?? NULL,
-        'contact.individual_prefix' => $fields['individual_prefix'] ?? NULL,
-        'contact.formal_title' => $fields['formal_title'] ?? NULL,
-        'contact.first_name' => $fields['first_name'] ?? NULL,
-        'contact.middle_name' => $fields['middle_name'] ?? NULL,
-        'contact.last_name' => $fields['last_name'] ?? NULL,
-        'contact.individual_suffix' => $fields['individual_suffix'] ?? NULL,
-        'contact.address_name' => $fields['address_name'] ?? NULL,
-        'contact.street_address' => $fields['street_address'] ?? NULL,
-        'contact.supplemental_address_1' => $fields['supplemental_address_1'] ?? NULL,
-        'contact.supplemental_address_2' => $fields['supplemental_address_2'] ?? NULL,
-        'contact.supplemental_address_3' => $fields['supplemental_address_3'] ?? NULL,
-        'contact.city' => $fields['city'] ?? NULL,
-        'contact.state_province_name' => $fields['state_province_name'] ?? NULL,
-        'contact.county' => $fields['county'] ?? NULL,
-        'contact.state_province' => $fields['state_province'] ?? NULL,
-        'contact.postal_code' => $fullPostalCode,
-        'contact.country' => $fields['country'] ?? NULL,
-        'contact.world_region' => $fields['world_region'] ?? NULL,
-        'contact.geo_code_1' => $fields['geo_code_1'] ?? NULL,
-        'contact.geo_code_2' => $fields['geo_code_2'] ?? NULL,
-        'contact.current_employer' => $fields['current_employer'] ?? NULL,
-        'contact.nick_name' => $fields['nick_name'] ?? NULL,
-        'contact.email' => $fields['email'] ?? NULL,
-        'contact.im' => $fields['im'] ?? NULL,
-        'contact.do_not_email' => $fields['do_not_email'] ?? NULL,
-        'contact.do_not_phone' => $fields['do_not_phone'] ?? NULL,
-        'contact.do_not_mail' => $fields['do_not_mail'] ?? NULL,
-        'contact.do_not_sms' => $fields['do_not_sms'] ?? NULL,
-        'contact.do_not_trade' => $fields['do_not_trade'] ?? NULL,
-        'contact.job_title' => $fields['job_title'] ?? NULL,
-        'contact.birth_date' => $fields['birth_date'] ?? NULL,
-        'contact.gender' => $fields['gender'] ?? NULL,
-        'contact.is_opt_out' => $fields['is_opt_out'] ?? NULL,
-        'contact.preferred_mail_format' => $fields['preferred_mail_format'] ?? NULL,
-        'contact.phone' => $fields['phone'] ?? NULL,
-        'contact.home_URL' => $fields['home_URL'] ?? NULL,
-        'contact.contact_source' => $fields['contact_source'] ?? NULL,
-        'contact.external_identifier' => $fields['external_identifier'] ?? NULL,
-        'contact.contact_id' => $fields['id'] ?? NULL,
-        'contact.household_name' => $fields['household_name'] ?? NULL,
-        'contact.organization_name' => $fields['organization_name'] ?? NULL,
-        'contact.legal_name' => $fields['legal_name'] ?? NULL,
-        'contact.preferred_communication_method' => $fields['preferred_communication_method'] ?? NULL,
-        'contact.communication_style' => $fields['communication_style'] ?? NULL,
-        'contact.addressee' => $fields['addressee_display'] ?? NULL,
-        'contact.email_greeting' => $fields['email_greeting_display'] ?? NULL,
-        'contact.postal_greeting' => $fields['postal_greeting_display'] ?? NULL,
-      ];
-    }
-    else {
-      $replacements = [
-        'contact.address_name' => "<span class=\"address-name\">" . $fields['address_name'] . "</span>",
-        'contact.street_address' => "<span class=\"street-address\">" . $fields['street_address'] . "</span>",
-        'contact.supplemental_address_1' => "<span class=\"extended-address\">" . $fields['supplemental_address_1'] . "</span>",
-        'contact.supplemental_address_2' => $fields['supplemental_address_2'],
-        'contact.supplemental_address_3' => $fields['supplemental_address_3'],
-        'contact.city' => "<span class=\"locality\">" . $fields['city'] . "</span>",
-        'contact.state_province_name' => "<span class=\"region\">" . $fields['state_province_name'] . "</span>",
-        'contact.county' => "<span class=\"region\">" . $fields['county'],
-        'contact.state_province' => "<span class=\"region\">" . $fields['state_province'] . "</span>",
-        'contact.postal_code' => "<span class=\"postal-code\">" . $fullPostalCode . "</span>",
-        'contact.country' => "<span class=\"country-name\">" . $fields['country'] . "</span>",
-        'contact.world_region' => "<span class=\"region\">" . $fields['world_region'] . "</span>",
-      ];
-
-      // erase all empty ones, so we dont get blank lines
-      foreach (array_keys($replacements) as $key) {
-        $exactKey = substr($key, 0, 8) == 'contact.' ? substr($key, 8) : $key;
-        if ($key != 'contact.postal_code' &&
-          CRM_Utils_Array::value($exactKey, $fields) == NULL
-        ) {
-          $replacements[$key] = '';
-        }
-      }
-      if (empty($fullPostalCode)) {
-        $replacements['contact.postal_code'] = '';
-      }
-    }
+    // replacements in case of Individual Name Format
+    $replacements = [
+      'contact.display_name' => $fields['display_name'] ?? NULL,
+      'contact.individual_prefix' => $fields['individual_prefix'] ?? NULL,
+      'contact.formal_title' => $fields['formal_title'] ?? NULL,
+      'contact.first_name' => $fields['first_name'] ?? NULL,
+      'contact.middle_name' => $fields['middle_name'] ?? NULL,
+      'contact.last_name' => $fields['last_name'] ?? NULL,
+      'contact.individual_suffix' => $fields['individual_suffix'] ?? NULL,
+      'contact.address_name' => $fields['address_name'] ?? NULL,
+      'contact.street_address' => $fields['street_address'] ?? NULL,
+      'contact.supplemental_address_1' => $fields['supplemental_address_1'] ?? NULL,
+      'contact.supplemental_address_2' => $fields['supplemental_address_2'] ?? NULL,
+      'contact.supplemental_address_3' => $fields['supplemental_address_3'] ?? NULL,
+      'contact.city' => $fields['city'] ?? NULL,
+      'contact.state_province_name' => $fields['state_province_name'] ?? NULL,
+      'contact.county' => $fields['county'] ?? NULL,
+      'contact.state_province' => $fields['state_province'] ?? NULL,
+      'contact.postal_code' => $fullPostalCode,
+      'contact.country' => $fields['country'] ?? NULL,
+      'contact.world_region' => $fields['world_region'] ?? NULL,
+      'contact.geo_code_1' => $fields['geo_code_1'] ?? NULL,
+      'contact.geo_code_2' => $fields['geo_code_2'] ?? NULL,
+      'contact.current_employer' => $fields['current_employer'] ?? NULL,
+      'contact.nick_name' => $fields['nick_name'] ?? NULL,
+      'contact.email' => $fields['email'] ?? NULL,
+      'contact.im' => $fields['im'] ?? NULL,
+      'contact.do_not_email' => $fields['do_not_email'] ?? NULL,
+      'contact.do_not_phone' => $fields['do_not_phone'] ?? NULL,
+      'contact.do_not_mail' => $fields['do_not_mail'] ?? NULL,
+      'contact.do_not_sms' => $fields['do_not_sms'] ?? NULL,
+      'contact.do_not_trade' => $fields['do_not_trade'] ?? NULL,
+      'contact.job_title' => $fields['job_title'] ?? NULL,
+      'contact.birth_date' => $fields['birth_date'] ?? NULL,
+      'contact.gender' => $fields['gender'] ?? NULL,
+      'contact.is_opt_out' => $fields['is_opt_out'] ?? NULL,
+      'contact.preferred_mail_format' => $fields['preferred_mail_format'] ?? NULL,
+      'contact.phone' => $fields['phone'] ?? NULL,
+      'contact.home_URL' => $fields['home_URL'] ?? NULL,
+      'contact.contact_source' => $fields['contact_source'] ?? NULL,
+      'contact.external_identifier' => $fields['external_identifier'] ?? NULL,
+      'contact.contact_id' => $fields['id'] ?? NULL,
+      'contact.household_name' => $fields['household_name'] ?? NULL,
+      'contact.organization_name' => $fields['organization_name'] ?? NULL,
+      'contact.legal_name' => $fields['legal_name'] ?? NULL,
+      'contact.preferred_communication_method' => $fields['preferred_communication_method'] ?? NULL,
+      'contact.communication_style' => $fields['communication_style'] ?? NULL,
+      'contact.addressee' => $fields['addressee_display'] ?? NULL,
+      'contact.email_greeting' => $fields['email_greeting_display'] ?? NULL,
+      'contact.postal_greeting' => $fields['postal_greeting_display'] ?? NULL,
+    ];
 
     // replacements in case of Custom Token
     if (stristr($formatted, 'custom_')) {
@@ -460,17 +428,7 @@ class CRM_Utils_Address {
     }
 
     // drop any {...} constructs from lines' ends
-    if (!$microformat) {
-      $formatted = "\n$formatted\n";
-    }
-    else {
-      if ($microformat == 1) {
-        $formatted = "\n<div class=\"location vcard\"><span class=\"adr\">\n$formatted</span></div>\n";
-      }
-      else {
-        $formatted = "\n<div class=\"vcard\"><span class=\"adr\">$formatted</span></div>\n";
-      }
-    }
+    $formatted = "\n$formatted\n";
 
     $formatted = preg_replace('/\n{[^{}]*}/u', "\n", $formatted);
     $formatted = preg_replace('/{[^{}]*}\n/u', "\n", $formatted);
@@ -488,29 +446,7 @@ class CRM_Utils_Address {
     // drop any empty lines left after the replacements
     $formatted = preg_replace('/^[ \t]*[\r\n]+/m', '', $formatted);
 
-    if (!$microformat) {
-      $finalFormatted = $formatted;
-    }
-    else {
-      // remove \n from each line and only add at the end
-      // this hack solves formatting issue, when we convert nl2br
-      $lines = [];
-      $count = 1;
-      $finalFormatted = NULL;
-      $formattedArray = explode("\n", $formatted);
-      $formattedArray = array_filter($formattedArray);
-
-      foreach ($formattedArray as $line) {
-        $line = trim($line);
-        if ($line) {
-          if ($count > 1 && $count < count($formattedArray)) {
-            $line = "$line\n";
-          }
-          $finalFormatted .= $line;
-          $count++;
-        }
-      }
-    }
+    $finalFormatted = $formatted;
     return $finalFormatted;
   }
 
