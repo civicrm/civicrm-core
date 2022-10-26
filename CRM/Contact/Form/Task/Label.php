@@ -97,18 +97,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   public function postProcess($params = NULL) {
     $fv = $params ?: $this->controller->exportValues($this->_name);
     $locName = NULL;
-    //get the address format sequence from the config file
-    $mailingFormat = Civi::settings()->get('mailing_format');
 
-    $sequence = CRM_Utils_Address::sequence($mailingFormat);
-
-    foreach ($sequence as $v) {
-      $address[$v] = 1;
-    }
-
-    if (array_key_exists('postal_code', $address)) {
-      $address['postal_code_suffix'] = 1;
-    }
+    $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
 
     //build the returnproperties
     $returnProperties = ['display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1];
@@ -158,13 +148,13 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     if (!empty($fv['location_type_id'])) {
       $locType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $locName = $locType[$fv['location_type_id']];
-      $location = ['location' => ["{$locName}" => $address]];
+      $location = ['location' => ["{$locName}" => $addressReturnProperties]];
       $returnProperties = array_merge($returnProperties, $location);
       $params[] = ['location_type', '=', [1 => $fv['location_type_id']], 0, 0];
       $primaryLocationOnly = FALSE;
     }
     else {
-      $returnProperties = array_merge($returnProperties, $address);
+      $returnProperties = array_merge($returnProperties, $addressReturnProperties);
       $primaryLocationOnly = TRUE;
     }
 
