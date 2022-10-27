@@ -149,7 +149,9 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
     if ($expr instanceof SqlEquation) {
       $args = [];
       foreach ($expr->getArgs() as $arg) {
-        $args[] = $this->getColumnLabel($arg['expr']);
+        if (is_array($arg) && !empty($arg['expr'])) {
+          $args[] = $this->getColumnLabel(SqlExpression::convert($arg['expr']));
+        }
       }
       return '(' . implode(',', array_filter($args)) . ')';
     }
