@@ -45,12 +45,20 @@
       });
 
       this.addArg = function(exprType) {
-        var param = ctrl.getParam(ctrl.args.length);
+        var param = ctrl.getParam(ctrl.args.length),
+          val = '';
+        if (exprType === 'SqlNumber') {
+          // Number: default to 0
+          val = 0;
+        } else if (exprType === 'SqlField') {
+          // Field: Default to first available field, making it easier to delete the value
+          val = ctrl.getFields().results[0].children[0].id;
+        }
         ctrl.args.push({
           type: ctrl.exprTypes[exprType].type,
           flag_before: _.filter(_.keys(param.flag_before))[0],
           name: param.name,
-          value: exprType === 'SqlNumber' ? 0 : ''
+          value: val
         });
       };
 
