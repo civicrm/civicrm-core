@@ -235,7 +235,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
           $params[$entity] = [];
           $params[$entity]['contact_type'] = $this->getContactTypeForEntity($entity) ?: $this->getContactType();
         }
-        $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
+        $params[$entity][$mappedField['name'] === 'contribution_campaign_id' ? $mappedField['name'] : $this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
       }
     }
     return $params;

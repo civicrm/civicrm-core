@@ -601,6 +601,62 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that campaign_id is properly validated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportFieldsValidateCampaignId(): void {
+    $this->individualCreate(['email' => 'mum@example.com']);
+    $this->campaignCreate();
+    $this->callAPISuccess('System', 'flush', []);
+    $fieldMappings = [
+      ['name' => 'first_name'],
+      ['name' => ''],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => 'email_primary.email'],
+      ['name' => ''],
+      ['name' => ''],
+      ['name' => 'trxn_id'],
+      ['name' => 'contribution_campaign_id'],
+    ];
+    // First we try to create without total_amount mapped.
+    // It will fail in create mode as total_amount is required for create.
+    $this->submitDataSourceForm('contributions_bad_campaign.csv', $fieldMappings);
+    $form = $this->getMapFieldForm([
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
+      'contactType' => 'Individual',
+    ]);
+    $form->setUserJobID($this->userJobID);
+    $form->buildForm();
+    $this->assertFalse($form->validate());
+
+    // Now we add in total amount - it works in create mode.
+    $fieldMappings[1]['name'] = 'total_amount';
+    $submittedValues = [
+      'skipColumnHeader' => TRUE,
+      'fieldSeparator' => ',',
+      'contactType' => 'Individual',
+      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'file' => ['name' => 'contributions_bad_campaign.csv'],
+      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
+      'groups' => [],
+    ];
+    $this->submitDataSourceForm('contributions_bad_campaign.csv', $submittedValues);
+    $form = $this->getMapFieldForm($submittedValues);
+    $form->setUserJobID($this->userJobID);
+    $form->buildForm();
+    $this->assertTrue($form->validate());
+    $form->postProcess();
+    $row = $this->getDataSource()->getRows()[0];
+    $this->assertEquals('ERROR', $row[10]);
+    $this->assertEquals('Invalid value for field(s) : Campaign', $row[11]);
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function testImportWithMatchByExternalIdentifier() :void {
