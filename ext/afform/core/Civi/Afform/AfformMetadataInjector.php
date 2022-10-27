@@ -75,6 +75,13 @@ class AfformMetadataInjector {
           }
           self::fillFieldMetadata($entityType, $action, $afField);
         }
+
+        foreach (pq('af-recaptcha') as $captcha) {
+          $recaptchaPublicKey = \Civi\Api4\Setting::get(FALSE)
+            ->addSelect('recaptchaPublicKey')
+            ->execute()->first()['value'];
+          pq($captcha)->attr('recaptchakey', $recaptchaPublicKey);
+        }
       });
     $e->angular->add($changeSet);
   }
