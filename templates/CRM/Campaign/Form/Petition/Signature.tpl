@@ -11,10 +11,15 @@
 
 <script>
 {literal}
-
   if (typeof(cj) === 'undefined') cj = jQuery;
 {/literal}
 </script>
+
+{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCampaign') }
+  {capture assign="buttonTitle"}{ts}Edit Petition{/ts}{/capture}
+  {crmButton target="_blank" p="civicrm/petition/add" q="reset=1&action=update&id=`$petition.id`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
+  <div class='clear'></div>
+{/if}
 
 <div id="intro" class="crm-section">{$petition.instructions}</div>
 <div class="crm-block crm-petition-form-block">
