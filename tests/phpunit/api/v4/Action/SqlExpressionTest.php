@@ -113,6 +113,7 @@ class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
         '(illegal * stuff) AS illegal_stuff',
         // This field will be null
         '(hold_date + 5) AS null_plus_five',
+        '(1 % 2) AS one_is_odd',
       ])
       ->addWhere('(contact_id + 1)', '=', 1 + $contact['id'])
       ->setLimit(1)
@@ -126,6 +127,7 @@ class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($result['is_between']);
     $this->assertArrayNotHasKey('illegal_stuff', $result);
     $this->assertEquals('5', $result['null_plus_five']);
+    $this->assertEquals('1', $result['one_is_odd']);
   }
 
 }
