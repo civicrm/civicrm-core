@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Utils\CoreUtil;
@@ -89,10 +90,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           $ids = array_slice($ids, 0, !empty($entity['af-repeat']) ? $entity['max'] ?? NULL : 1);
           $this->loadEntity($entity, $ids);
         }
-        elseif (!empty($entity['autofill']) && $this->fillMode !== 'entity') {
-          $this->autofillEntity($entity, $entity['autofill']);
-        }
       }
+      $event = new AfformPrefillEvent($this->_afform, $this->_formDataModel, $this, $entity['type'], $entityName, $this->_entityIds);
+      \Civi::dispatcher()->dispatch('civi.afform.prefill', $event);
     }
   }
 
@@ -102,7 +102,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param array $entity
    * @param array $ids
    */
-  private function loadEntity(array $entity, array $ids) {
+  public function loadEntity(array $entity, array $ids) {
     $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
     $idField = CoreUtil::getIdFieldName($entity['type']);
     if (!empty($entity['fields'][$idField]['saved_search'])) {
@@ -134,24 +134,6 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         }
         $this->_entityValues[$entity['name']][$index] = $data;
       }
-    }
-  }
-
-  /**
-   * Fetch an entity based on its autofill settings
-   *
-   * @param $entity
-   * @param $mode
-   */
-  private function autoFillEntity($entity, $mode) {
-    $id = NULL;
-    if ($entity['type'] == 'Contact') {
-      if ($mode == 'user') {
-        $id = \CRM_Core_Session::getLoggedInContactID();
-      }
-    }
-    if ($id) {
-      $this->loadEntity($entity, [$id]);
     }
   }
 

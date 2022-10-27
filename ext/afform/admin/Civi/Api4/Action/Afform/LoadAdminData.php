@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\Afform;
 
 use Civi\AfformAdmin\AfformAdminMeta;
 use Civi\Api4\Afform;
+use Civi\Api4\AfformBehavior;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -221,6 +222,13 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     foreach (array_diff($entities, $this->skipEntities) as $entity) {
       $info['entities'][$entity] = AfformAdminMeta::getApiEntity($entity);
       $info['fields'][$entity] = AfformAdminMeta::getFields($entity, ['action' => $getFieldsMode]);
+      $behaviors = AfformBehavior::get(FALSE)
+        ->addWhere('entities', 'CONTAINS', $entity)
+        ->execute();
+      foreach ($behaviors as $behavior) {
+        $behavior['modes'] = $behavior['modes'][$entity];
+        $info['behaviors'][$entity][] = $behavior;
+      }
     }
     $info['blocks'] = array_values($info['blocks']);
 

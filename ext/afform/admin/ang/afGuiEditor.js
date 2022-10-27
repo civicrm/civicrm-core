@@ -112,11 +112,16 @@
               CRM.afGuiEditor.blocks[block.directive_name] = block;
             }
           });
+          // Add behavior data
+          CRM.afGuiEditor.behaviors = CRM.afGuiEditor.behaviors || {};
+          _.extend(CRM.afGuiEditor.behaviors, data.behaviors);
+          // Add entities
           _.each(data.entities, function(entity, entityName) {
             if (!CRM.afGuiEditor.entities[entityName]) {
               CRM.afGuiEditor.entities[entityName] = entity;
             }
           });
+          // Combine entities with fields
           _.each(data.fields, function(fields, entityName) {
             if (CRM.afGuiEditor.entities[entityName]) {
               CRM.afGuiEditor.entities[entityName].fields = fields;
