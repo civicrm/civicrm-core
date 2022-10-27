@@ -308,10 +308,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $rows[$id] = [$formatted];
     }
 
-    if (!empty($fv['is_unit_testing'])) {
-      return $rows;
-    }
-
     //call function to create labels
     $this->createLabel($rows, $fv['label_name']);
     CRM_Utils_System::civiExit();
@@ -343,10 +339,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    *   Associated array of contact data.
    * @param string $format
    *   Format in which labels needs to be printed.
-   * @param string $fileName
-   *   The name of the file to save the label in.
    */
-  private function createLabel($contactRows, $format, $fileName = 'MailingLabels_CiviCRM.pdf') {
+  private function createLabel(array $contactRows, $format) {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
     $pdf->Open();
     $pdf->AddPage();
@@ -361,7 +355,10 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $pdf->AddPdfLabel($val);
       $val = '';
     }
-    $pdf->Output($fileName, 'D');
+    if (CIVICRM_UF === 'UnitTests') {
+      throw new CRM_Core_Exception_PrematureExitException('pdf output called', ['contactRows' => $contactRows, 'format' => $format, 'pdf' => $pdf]);
+    }
+    $pdf->Output('MailingLabels_CiviCRM.pdf', 'D');
   }
 
 }
