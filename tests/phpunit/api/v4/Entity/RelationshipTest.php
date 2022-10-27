@@ -99,7 +99,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', '=', $relationship['id'])
       ->execute()->first();
     $relationshipDisable = Relationship::update(FALSE)
-      ->addWHere('id','=', $relationship['id'])
+      ->addWhere('id', '=', $relationship['id'])
       ->addValue('is_active', FALSE)
       ->execute()->first();
     $relationship2 = Relationship::create(FALSE)
@@ -134,4 +134,5 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($today, $cachedRecords[$c1]['start_date']);
     $this->assertEquals($future, $cachedRecords[$c1]['end_date']);
   }
+
 }
