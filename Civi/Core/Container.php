@@ -363,6 +363,10 @@ class Container {
       'CRM_Contribute_RecurTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    $container->setDefinition('crm_group_tokens', new Definition(
+      'CRM_Core_GroupTokens',
+      []
+    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     $container->setDefinition('crm_domain_tokens', new Definition(
       'CRM_Core_DomainTokens',
       []
