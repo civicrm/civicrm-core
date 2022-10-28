@@ -35,6 +35,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
     $this->addTask(ts('Create index %1', [1 => 'civicrm_action_schedule.UI_name']), 'addIndex', 'civicrm_action_schedule', 'name', 'UI');
     $this->addTask('Add fields to civicrm_mail_settings to allow more flexibility for email to activity', 'addMailSettingsFields');
     $this->addTask('Update afform tab names', 'updateAfformTabs');
+    $this->addTask('Add in Client Removed Activity Type', 'addCaseClientRemovedActivity');
   }
 
   /**
@@ -126,6 +127,19 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
         }
       }
     }
+    return TRUE;
+  }
+
+  public static function addCaseClientRemovedActivity() {
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'activity_type',
+      'name' => 'Case Client Removed',
+      'label' => ts('Case Client was removed from Case'),
+      'description' => ts('Case client was removed from a case'),
+      'is_active' => TRUE,
+      'component_id' => CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_component WHERE name = 'CiviCase'"),
+      'icon' => 'fa-trash',
+    ]);
     return TRUE;
   }
 
