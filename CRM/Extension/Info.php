@@ -104,7 +104,7 @@ class CRM_Extension_Info {
    * @return CRM_Extension_Info
    */
   public static function loadFromFile($file) {
-    list ($xml, $error) = CRM_Utils_XML::parseFile($file);
+    [$xml, $error] = CRM_Utils_XML::parseFile($file);
     if ($xml === FALSE) {
       throw new CRM_Extension_Exception_ParseException("Failed to parse info XML: $error");
     }
@@ -124,7 +124,7 @@ class CRM_Extension_Info {
    * @return CRM_Extension_Info
    */
   public static function loadFromString($string) {
-    list ($xml, $error) = CRM_Utils_XML::parseString($string);
+    [$xml, $error] = CRM_Utils_XML::parseString($string);
     if ($xml === FALSE) {
       throw new CRM_Extension_Exception_ParseException("Failed to parse info XML: $string");
     }
