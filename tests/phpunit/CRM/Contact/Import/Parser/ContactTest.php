@@ -17,6 +17,7 @@
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
+use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Email;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
@@ -79,13 +80,21 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contactImportValues = [
       'first_name' => 'Alok',
       'last_name' => 'Patel',
+      'email' => 'alok@email.com',
       'Employee of' => 'Agileware',
     ];
 
     $values = array_values($contactImportValues);
+    $ruleGroupId = DedupeRuleGroup::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('contact_type', '=', 'Individual')
+      ->addWhere('used', '=', 'Unsupervised')
+      ->execute()
+      ->first()['id'];
     $userJobID = $this->getUserJobID([
-      'mapper' => [['first_name'], ['last_name'], ['5_a_b', 'organization_name']],
+      'mapper' => [['first_name'], ['last_name'], ['email'], ['5_a_b', 'organization_name']],
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
+      'dedupe_rule_id' => $ruleGroupId,
     ]);
 
     $this->importValues($userJobID, $values, 'IMPORTED');
