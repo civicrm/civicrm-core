@@ -1636,7 +1636,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       if ($fieldMetadata['name'] === 'campaign_id') {
         if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
           $campaign = Campaign::get()->addClause('OR', ['title', '=', $importedValue], ['name', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
-          Civi::$statics[__CLASS__][$fieldName][$importedValue] = $campaign['id'] ?? FALSE;
+          Civi::$statics[__CLASS__][$fieldName][$importedValue] = $campaign['id'] ?? NULL;
         }
         return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?? 'invalid_import_value';
       }
