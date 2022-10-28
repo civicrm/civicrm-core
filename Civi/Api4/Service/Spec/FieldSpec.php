@@ -15,6 +15,7 @@ namespace Civi\Api4\Service\Spec;
 /**
  * Contains APIv4 field metadata
  */
+#[\AllowDynamicProperties]
 class FieldSpec {
 
   // BasicSpecTrait: name, title, description

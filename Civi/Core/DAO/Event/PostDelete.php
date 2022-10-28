@@ -28,6 +28,11 @@ class PostDelete extends \Symfony\Component\EventDispatcher\Event {
   public $result;
 
   /**
+   * @var string
+   */
+  public $eventID;
+
+  /**
    * @param \CRM_Core_DAO $object
    * @param int|false $result
    */

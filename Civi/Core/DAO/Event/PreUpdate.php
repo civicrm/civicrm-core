@@ -23,6 +23,11 @@ class PreUpdate extends \Symfony\Component\EventDispatcher\Event {
   public $object;
 
   /**
+   * @var string
+   */
+  public $eventID;
+
+  /**
    * @param $object
    */
   public function __construct($object) {

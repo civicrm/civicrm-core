@@ -16,6 +16,7 @@ use Civi\Schema\Traits\BasicSpecTrait;
 use Civi\Schema\Traits\PhpDataTypeSpecTrait;
 use Civi\Schema\Traits\OptionsSpecTrait;
 
+#[\AllowDynamicProperties]
 class FieldSpec {
 
   // BasicSpecTrait: name, title, description
