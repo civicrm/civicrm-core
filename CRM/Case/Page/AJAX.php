@@ -104,7 +104,7 @@ class CRM_Case_Page_AJAX {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function addClient() {
+  public static function addClient() {
     $caseId = CRM_Utils_Type::escape($_POST['caseID'], 'Positive');
     $contactId = CRM_Utils_Type::escape($_POST['contactID'], 'Positive');
 
