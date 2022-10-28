@@ -43,6 +43,11 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
   protected $_id;
 
   /**
+   * @var int
+   */
+  protected $_timeout;
+
+  /**
    * Use MySQL's GET_LOCK(). Locks are shared across all Civi instances
    * on the same MySQL server.
    *
@@ -158,7 +163,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    *
    * @todo document naming convention for CiviMail locks as this is key to ensuring they work properly.
    *
-   * @param int $timeout
+   * @param int|null $timeout
    *
    * @return bool
    * @throws \CRM_Core_Exception

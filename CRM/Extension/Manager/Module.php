@@ -18,6 +18,11 @@
 class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
 
   /**
+   * @var \CRM_Extension_Mapper
+   */
+  protected $mapper;
+
+  /**
    * @param CRM_Extension_Mapper $mapper
    */
   public function __construct(CRM_Extension_Mapper $mapper) {
