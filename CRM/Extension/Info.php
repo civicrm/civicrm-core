@@ -96,6 +96,66 @@ class CRM_Extension_Info {
   public $upgrader = NULL;
 
   /**
+   * @var array|null
+   */
+  public $civix;
+
+  /**
+   * @var string|null
+   */
+  public $comments;
+
+  /**
+   * @var array
+   *   Ex: ['ver' => '5.50']
+   */
+  public $compatibility;
+
+  /**
+   * @var string|null
+   */
+  public $description;
+
+  /**
+   * @var string|null
+   *   Ex: 'stable', 'alpha', 'beta'
+   */
+  public $develStage;
+
+  /**
+   * Full URL of the zipball for this extension/version.
+   *
+   * This property is (usually) only provided on the feed of new/available extensions.
+   *
+   * @var string|null
+   */
+  public $downloadUrl;
+
+  /**
+   * @var string|null
+   *   Ex: 'GPL-3.0'
+   */
+  public $license;
+
+  /**
+   * @var string|null
+   *   Ex: '2025-01-02'
+   */
+  public $releaseDate;
+
+  /**
+   * @var array|null
+   *   Ex: ['Documentation' => 'https://example.org/my-extension/docs']
+   */
+  public $urls;
+
+  /**
+   * @var string|null
+   *   Ex: '1.2.3'
+   */
+  public $version;
+
+  /**
    * Load extension info an XML file.
    *
    * @param string $file
