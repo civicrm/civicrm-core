@@ -141,4 +141,9 @@
     <title>Email</title>
     <page_callback>CRM_Case_Form_Task_Email</page_callback>
   </item>
+  <item>
+     <path>civicrm/contact/view/case/deleteClient</path>
+     <title>Remove Client</title>
+     <page_callback>CRM_Case_Form_DeleteClient</page_callback>
+  </item>
 </menu>

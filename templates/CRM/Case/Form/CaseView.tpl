@@ -24,7 +24,7 @@
         <td colspan="5" class="label">
           {ts}Clients:{/ts}
           {foreach from=$caseRoles.client item=client name=clients}
-            <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if not $smarty.foreach.clients.last}, &nbsp; {/if}
+            <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if count($caseRoles.client) gt 1}<a class="crm-popup crm-hover-button" href="{crmURL p='civicrm/contact/view/case/deleteClient' q="action=delete&reset=1&cid=`$client.contact_id`&id=`$caseId`&rcid=`$contactID`"}" title="{ts}Remove Client{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>{/if}{if not $smarty.foreach.clients.last}, &nbsp; {/if}
           {/foreach}
           <a href="#addClientDialog" class="crm-hover-button case-miniform" title="{ts}Add Client{/ts}" data-key="{crmKey name='civicrm/case/ajax/addclient'}">
             <i class="crm-i fa-user-plus" aria-hidden="true"></i>

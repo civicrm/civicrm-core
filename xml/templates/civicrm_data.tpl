@@ -384,6 +384,9 @@ VALUES
   -- Activity Type for failed payment
    (@option_group_id_act, 'Failed Payment', 54, 'Failed Payment', NULL, 1, 0, 54, 'Failed Payment', 0, 1, 1, @contributeCompId, NULL, NULL),
 
+  -- Activity Type for Case Client being removed
+   (@option_group_id_act, '{ts escape="sql"}Case Client was removed from Case{/ts}',                 55, 'Case Client Removed', NULL,0, 0, 55, '', 0, 1, 1, @caseCompId, NULL, 'fa-trash'),
+
    (@option_group_id_gender, '{ts escape="sql"}Female{/ts}', 1, 'Female', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Male{/ts}',   2, 'Male',   NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Other{/ts}',  3, 'Other',  NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
