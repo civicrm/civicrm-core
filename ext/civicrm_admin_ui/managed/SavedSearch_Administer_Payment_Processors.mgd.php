@@ -82,7 +82,10 @@ return [
             'table',
             'table-striped',
           ],
-          'pager' => [],
+          'pager' => [
+            'show_count' => TRUE,
+            'expose_limit' => TRUE,
+          ],
           'placeholder' => 5,
           'sort' => [],
           'columns' => [
