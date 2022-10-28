@@ -158,7 +158,7 @@
           if (!ctrl.rowCount || editedRow) {
             if (!ctrl.limit || ctrl.results.length < ctrl.limit) {
               ctrl.rowCount = ctrl.results.length;
-            } else if (ctrl.settings.pager) {
+            } else if (ctrl.settings.pager || ctrl.settings.headerCount) {
               var params = ctrl.getApiParams('row_count');
               crmApi4('SearchDisplay', 'run', params).then(function(result) {
                 ctrl.rowCount = result.count;
