@@ -24,13 +24,9 @@ use Civi\Core\Service\AutoService;
  * behaviors by selecting a mode.
  *
  * To enact its functionality, a behavior class can listen to any Civi hook or event.
- * (the simplist way is by implementing `HookInterface`,
- * or for finer control of the order of events, try the `EventSubscriberInterface`).
+ * (e.g. by using `EventSubscriberInterface`).
  *
- * Notable events often used by Behaviors include `civi.afform.prefill` and `civi.afform.submit`.
- *
- * Note: Behavior classes can be in any namespace, but if you want the convenience of the
- * `afform-behavior-php` autoloader, they must be in `\Civi\Afform\Behavior`.
+ * Notable events used by Behaviors include `civi.afform.validate`, `civi.afform.prefill` and `civi.afform.submit`.
  */
 abstract class AbstractBehavior extends AutoService implements BehaviorInterface {
 
