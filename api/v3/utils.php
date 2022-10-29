@@ -2288,8 +2288,8 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
     }
   }
   // Check our field length
-  elseif (is_string($fieldValue) && !empty($fieldInfo['maxlength']) && strlen(utf8_decode($fieldValue)) > $fieldInfo['maxlength']) {
-    throw new CRM_Core_Exception("Value for $fieldName is " . strlen(utf8_decode($value)) . " characters  - This field has a maxlength of {$fieldInfo['maxlength']} characters.",
+  elseif (is_string($fieldValue) && !empty($fieldInfo['maxlength']) && mb_strlen($fieldValue ?? '') > $fieldInfo['maxlength']) {
+    throw new CRM_Core_Exception("Value for $fieldName is " . mb_strlen($value ?? '') . " characters  - This field has a maxlength of {$fieldInfo['maxlength']} characters.",
       2100, ['field' => $fieldName]
     );
   }
