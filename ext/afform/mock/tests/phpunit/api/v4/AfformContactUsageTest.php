@@ -63,10 +63,11 @@ EOHTML;
   <af-entity data="{contact_type: 'Individual', source: 'Update Info'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1">
       <af-field name="first_name" defn="{required: true, input_attrs: {}}" />
-      <af-field name="last_name" defn="{required: true, input_attrs: {}}"/>
+      <af-field name="middle_name" />
+      <af-field name="last_name" defn="{required: false, input_attrs: {}}"/>
       <div af-join="Email">
         <div class="af-container af-layout-inline">
-          <af-field name="email" defn="{required: true, input_attrs: {}}" />
+          <af-field name="email" />
         </div>
       </div>
   </fieldset>
@@ -328,7 +329,7 @@ EOHTML;
           ],
           'joins' => [
             'Email' => [
-              ['email' => $individualEmail, 'location_type_id' => $locationType],
+              ['email' => $individualEmail, 'location_type_id' => $locationType, 'is_primary' => TRUE],
             ],
           ],
         ],
@@ -338,7 +339,7 @@ EOHTML;
           'fields' => [],
           'joins' => [
             'Email' => [
-              ['email' => $orgEmail, 'location_type_id' => $locationType],
+              ['email' => $orgEmail, 'location_type_id' => $locationType, 'is_primary' => TRUE],
             ],
           ],
         ],
@@ -406,7 +407,7 @@ EOHTML;
           ],
           'joins' => [
             'Email' => [
-              ['email' => '123@example.com', 'location_type_id' => $locationType],
+              ['email' => '123@example.com', 'location_type_id' => $locationType, 'is_primary' => TRUE],
             ],
           ],
         ],
@@ -437,22 +438,25 @@ EOHTML;
           'joins' => [
             'Email' => [
               ['email' => 'test@example.org'],
+              [],
             ],
           ],
         ],
       ],
     ];
 
-    $this->expectException(\Exception::class);
-
     try {
       Civi\Api4\Afform::submit()
         ->setName($this->formName)
         ->setValues($values)
         ->execute();
+      $this->fail('Should have thrown exception');
     }
     catch (\CRM_Core_Exception $e) {
       // Should fail required fields missing
+      $this->assertCount(2, $e->getErrorData()['validation']);
+      $this->assertEquals('First Name is a required field.', $e->getErrorData()['validation'][0]);
+      $this->assertEquals('Email is a required field.', $e->getErrorData()['validation'][1]);
     }
 
   }
@@ -477,16 +481,17 @@ EOHTML;
       ],
     ];
 
-    $this->expectException(\Exception::class);
-
     try {
       Civi\Api4\Afform::submit()
         ->setName($this->formName)
         ->setValues($values)
         ->execute();
+      $this->fail('Should have thrown exception');
     }
     catch (\CRM_Core_Exception $e) {
       // Should fail required fields missing
+      $this->assertCount(1, $e->getErrorData()['validation']);
+      $this->assertEquals('Email is a required field.', $e->getErrorData()['validation'][0]);
     }
 
   }
