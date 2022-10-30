@@ -9,7 +9,7 @@ class AfformPrefillEvent extends AfformBaseEvent {
   use AfformEventEntityTrait;
 
   /**
-   * AfformSubmitEvent constructor.
+   * AfformPrefillEvent constructor.
    *
    * @param array $afform
    * @param \Civi\Afform\FormDataModel $formDataModel

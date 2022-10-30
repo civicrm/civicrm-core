@@ -2,7 +2,10 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use CRM_Afform_ExtensionUtil as E;
 use Civi\Afform\Event\AfformSubmitEvent;
+use Civi\Afform\Event\AfformValidateEvent;
+use Civi\Afform\FormDataModel;
 use Civi\Api4\AfformSubmission;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\Utils\CoreUtil;
@@ -26,15 +29,7 @@ class Submit extends AbstractProcessor {
   protected $values;
 
   protected function processForm() {
-    // Save submission record
-    if (!empty($this->_afform['create_submission'])) {
-      $submission = AfformSubmission::create(FALSE)
-        ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
-        ->addValue('afform_name', $this->name)
-        ->addValue('data', $this->getValues())
-        ->execute()->first();
-    }
-
+    // Preprocess submitted values
     $entityValues = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       $entityValues[$entityName] = [];
@@ -67,6 +62,25 @@ class Submit extends AbstractProcessor {
         }
       }
     }
+
+    // Call validation handlers
+    $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this, $entityValues);
+    \Civi::dispatcher()->dispatch('civi.afform.validate', $event);
+    $errors = $event->getErrors();
+    if ($errors) {
+      throw new \CRM_Core_Exception(ts('Validation Error', ['plural' => '%1 Validation Errors', 'count' => count($errors)]), 0, ['validation' => $errors]);
+    }
+
+    // Save submission record
+    if (!empty($this->_afform['create_submission'])) {
+      $submission = AfformSubmission::create(FALSE)
+        ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
+        ->addValue('afform_name', $this->name)
+        ->addValue('data', $this->getValues())
+        ->execute()->first();
+    }
+
+    // Call submit handlers
     $entityWeights = \Civi\Afform\Utils::getEntityWeights($this->_formDataModel->getEntities(), $entityValues);
     foreach ($entityWeights as $entityName) {
       $entityType = $this->_formDataModel->getEntity($entityName)['type'];
@@ -111,6 +125,62 @@ class Submit extends AbstractProcessor {
   }
 
   /**
+   * Validate required field values
+   *
+   * @param \Civi\Afform\Event\AfformValidateEvent $event
+   */
+  public static function validateRequiredFields(AfformValidateEvent $event): void {
+    foreach ($event->getFormDataModel()->getEntities() as $entityName => $entity) {
+      $entityValues = $event->getEntityValues()[$entityName] ?? [];
+      foreach ($entityValues as $values) {
+        foreach ($entity['fields'] as $fieldName => $attributes) {
+          $error = self::getRequiredFieldError($entity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
+          if ($error) {
+            $event->setError($error);
+          }
+        }
+        foreach ($entity['joins'] as $joinEntity => $join) {
+          foreach ($values['joins'][$joinEntity] ?? [] as $joinIndex => $joinValues) {
+            foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
+              $error = self::getRequiredFieldError($joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL);
+              if ($error) {
+                $event->setError($error);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * If a required field is missing a value, return an error message
+   *
+   * @param string $apiEntity
+   * @param string $fieldName
+   * @param array $attributes
+   * @param mixed $value
+   * @return string|null
+   */
+  private static function getRequiredFieldError(string $apiEntity, string $fieldName, $attributes, $value) {
+    // If we have a value, no need to check if required
+    if ($value || is_numeric($value) || is_bool($value)) {
+      return NULL;
+    }
+    // Required set to false, no need to validate
+    if (isset($attributes['defn']['required']) && !$attributes['defn']['required']) {
+      return NULL;
+    }
+    $fullDefn = FormDataModel::getField($apiEntity, $fieldName, 'create');
+    $isRequired = $attributes['defn']['required'] ?? $fullDefn['required'] ?? FALSE;
+    if ($isRequired) {
+      $label = $attributes['defn']['label'] ?? $fullDefn['label'];
+      return E::ts('%1 is a required field.', [1 => $label]);
+    }
+    return NULL;
+  }
+
+  /**
    * Replace Entity reference fields with the id of the referenced entity.
    * @param string $entityName
    * @param $records
@@ -139,7 +209,7 @@ class Submit extends AbstractProcessor {
   }
 
   /**
-   * Validate contact(s) meet the minimum requirements to be created (name and/or email).
+   * Check if contact(s) meet the minimum requirements to be created (name and/or email).
    *
    * This requires a function because simple required fields validation won't work
    * across multiple entities (contact + n email addresses).

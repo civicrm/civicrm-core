@@ -164,6 +164,12 @@
           } else {
             postProcess();
           }
+        })
+        .catch(function(error) {
+          status.resolve();
+          status = CRM.status(error.error_message, 'error');
+          $element.unblock();
+          CRM.alert(error.error_message, ts('Form Error'));
         });
       };
     }
