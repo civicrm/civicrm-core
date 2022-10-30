@@ -62,6 +62,17 @@ class SqlEquation extends SqlExpression {
   }
 
   /**
+   * Get the arguments and operators passed to this sql expression.
+   *
+   * For each item in the returned array, if it's an array, it's a value; if it's a string, it's an operator.
+   *
+   * @return array
+   */
+  public function getArgs(): array {
+    return $this->args;
+  }
+
+  /**
    * Render the expression for insertion into the sql query
    *
    * @param Civi\Api4\Query\Api4SelectQuery $query

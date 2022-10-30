@@ -1421,4 +1421,35 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('¥500', $result[2]['columns'][0]['val']);
   }
 
+  public function testSelectEquations() {
+    $activities = $this->saveTestRecords('Activity', [
+      'records' => [
+        ['duration' => 60],
+        ['duration' => 120],
+        ['duration' => 180],
+      ],
+    ]);
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Activity',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', '(duration / 60)'],
+          'where' => [['id', 'IN', $activities->column('id')]],
+        ],
+      ],
+      'display' => NULL,
+      'sort' => [['id', 'ASC']],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(3, $result);
+
+    $this->assertEquals(1, $result[0]['columns'][1]['val']);
+    $this->assertEquals(2, $result[1]['columns'][1]['val']);
+    $this->assertEquals(3, $result[2]['columns'][1]['val']);
+  }
+
 }
