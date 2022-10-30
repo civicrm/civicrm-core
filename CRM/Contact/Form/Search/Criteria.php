@@ -77,9 +77,8 @@ class CRM_Contact_Form_Search_Criteria {
       foreach ($used_for as $key => $value) {
         //check tags for every type and find if there are any defined
         $tags = CRM_Core_BAO_Tag::getTagsUsedFor($key, FALSE, TRUE, NULL);
-        // check if there are tags other than contact type, if no - keep checkbox hidden on adv search
-        // we will hide searching contact by attachments tags until it will be implemented in core
-        if (count($tags) && $key != 'civicrm_file' && $key != 'civicrm_contact') {
+        // check if there are tags for cases or activities, if no - keep checkbox hidden on adv search
+        if (count($tags) && ($key == 'civicrm_case' || $key == 'civicrm_activity')) {
           //if tags exists then add type to display in adv search form help text
           $tagsTypes[] = $value;
           $showAllTagTypes = TRUE;
