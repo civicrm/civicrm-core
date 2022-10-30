@@ -103,6 +103,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'financial_type_id'],
       ['name' => 'external_identifier'],
       ['name' => 'soft_credit.contact.external_identifier', 'soft_credit_type_id' => 1],
+      ['name' => ''],
     ];
     $this->importCSV('contributions_amount_validate.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
@@ -119,6 +120,27 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+
+    // Now try the import with the dots swapped to double underscores. The parser
+    // layer and api understand the dots - but QuickForm has to play switcheroo as the dots
+    // break the hierarchical multiselect js. QuickForm uses a double underscore as a stand in.;
+    $this->validateSoftCreditImport([
+      ['name' => 'total_amount'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => 'external_identifier'],
+      ['name' => 'soft_credit__contact__external_identifier', 'soft_credit_type_id' => 1],
+    ]);
+    $this->validateSoftCreditImport([
+      ['name' => 'total_amount'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => 'external_identifier'],
+      [],
+      [],
+      [],
+      ['name' => 'soft_credit__contact__id', 'soft_credit_type_id' => 1],
+    ]);
   }
 
   /**
@@ -872,6 +894,22 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('Extension', 'enable', ['key' => 'civiimport']);
     $result = Import::get($this->userJobID)->execute();
     $this->assertEquals('ERROR', $result->first()['_status']);
+  }
+
+  /**
+   * @param array $mapping
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function validateSoftCreditImport(array $mapping): void {
+    Contribution::delete()->addWhere('id', '>', 0)->execute();
+    $this->callAPISuccessGetCount('ContributionSoft', [], 0);
+    $this->importCSV('contributions_amount_validate.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    // Check a row imported.
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+    $this->callAPISuccessGetCount('ContributionSoft', [], 1);
   }
 
 }
