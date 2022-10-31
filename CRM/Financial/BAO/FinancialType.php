@@ -183,6 +183,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
           '=',
           'financial_type.id',
         ])
+        ->addWhere('financial_type.is_active', '=', '1')
         ->execute()->indexBy('entity_id');
       Civi::$statics[__CLASS__][$key] = [];
       foreach ($types as $type) {
