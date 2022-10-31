@@ -347,9 +347,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     $this->assign('ufGroupName', $name);
     CRM_Utils_Hook::viewProfile($name);
 
-    if (strtolower($name) == 'summary_overlay') {
-      $template->assign('overlayProfile', TRUE);
-    }
+    $template->assign('overlayProfile', (strtolower($name) === 'summary_overlay'));
 
     if (($this->_multiRecord & CRM_Core_Action::VIEW) && $this->_recordId && !$this->_allFields) {
       $fieldDetail = reset($fields);
