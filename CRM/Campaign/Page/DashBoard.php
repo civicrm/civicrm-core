@@ -490,7 +490,8 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting([
         'tabSettings' => [
-          'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
+          // Tabs should use selectedChild, but Campaign has many legacy links
+          'active' => strtolower($_GET['subPage'] ?? $_GET['selectedChild'] ?? 'campaign'),
         ],
       ]);
   }
