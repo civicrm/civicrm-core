@@ -29,6 +29,7 @@ class SqlEquation extends SqlExpression {
     '-',
     '*',
     '/',
+    '%',
   ];
 
   /**
