@@ -247,13 +247,17 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $ruleFields = $rule['fields'];
     $weightSum = 0;
     foreach ($mapper as $mapping) {
-      if ($mapping[0] === 'external_identifier' || $mapping[0] === 'contribution_contact_id' || $mapping[0] === 'contact__id') {
+      // Because api v4 style fields have a . and QuickForm multiselect js does
+      // not cope with a . the quick form layer will use a double underscore
+      // as a stand in (the angular layer will not)
+      $fieldName = str_replace('__', '.', $mapping[0]);
+      if ($fieldName === 'external_identifier' || $fieldName === 'contribution_contact_id' || $fieldName === 'contact__id') {
         // It is enough to have external identifier mapped.
         $weightSum = $threshold;
         break;
       }
-      if (array_key_exists($mapping[0], $ruleFields)) {
-        $weightSum += $ruleFields[$mapping[0]];
+      if (array_key_exists($fieldName, $ruleFields)) {
+        $weightSum += $ruleFields[$fieldName];
       }
     }
     if ($weightSum < $threshold) {

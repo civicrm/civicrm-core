@@ -472,6 +472,24 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Tests the form flow copes with QuickForm style dots.
+   *
+   * Because the QuickForm hierarchical select won't cope with dots
+   * we are using a double underscore on that form. The test checks that works.
+   */
+  public function testImportQuickFormEmailMatch() :void {
+    $this->individualCreate(['email' => 'jenny@example.com']);
+    $this->importCSV('checkboxes.csv', [
+      ['name' => 'total_amount'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => ''],
+      ['name' => 'email_primary__email'],
+      ['name' => ''],
+    ]);
+  }
+
+  /**
    * Test whether importing a contribution using email match will match a non-primary.
    *
    * @throws \CRM_Core_Exception
