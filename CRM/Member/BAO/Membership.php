@@ -1775,7 +1775,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @throws \CRM_Core_Exception
    */
   protected static function hasExistingInheritedMembership($params) {
-    foreach (civicrm_api3('Membership', 'get', ['contact_id' => $params['contact_id']])['values'] as $membership) {
+    $currentMemberships = \Civi\Api4\Membership::get(FALSE)
+      ->addJoin('MembershipStatus AS membership_status', 'LEFT')
+      ->addWhere('membership_status.is_current_member', '=', TRUE)
+      ->addWhere('contact_id', '=', $params['contact_id'])
+      ->execute();
+    foreach ($currentMemberships as $membership) {
       if (!empty($membership['owner_membership_id'])
         && $membership['membership_type_id'] === $params['membership_type_id']
         && (int) $params['owner_membership_id'] !== (int) $membership['owner_membership_id']
