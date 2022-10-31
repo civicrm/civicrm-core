@@ -17,6 +17,7 @@
     controller: function($scope, $element, crmApi4, dialogService, afGui) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
+      var genericElements = [];
 
       this.$onInit = function() {
         if (ctrl.node['#tag'] && ((ctrl.node['#tag'] in afGui.meta.blocks) || ctrl.join)) {
@@ -39,6 +40,11 @@
           }
           initializeBlockContainer();
         }
+        _.each(afGui.meta.elements, function(element) {
+          if (element.directive) {
+            genericElements.push(element.directive);
+          }
+        });
       };
 
       this.sortableOptions = {
@@ -336,6 +342,9 @@
         }
         if (node['#tag'] && (node['#tag'].slice(0, 19) === 'crm-search-display-')) {
           return 'searchDisplay';
+        }
+        if (node['#tag'] && _.includes(genericElements, node['#tag'])) {
+          return 'generic';
         }
         var classes = afGui.splitClass(node['class']),
           types = ['af-container', 'af-text', 'af-button', 'af-markup'],

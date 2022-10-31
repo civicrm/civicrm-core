@@ -194,6 +194,7 @@ body.af-gui-dragging {
   position: relative;
   padding: 0 3px 3px;
   display: block;
+  min-height: 21px;
 }
 
 #afGuiEditor .af-gui-container {

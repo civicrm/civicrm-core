@@ -9,7 +9,7 @@
     },
     controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
       var schema = {},
-        data = {},
+        data = {extra: {}},
         status,
         args,
         submissionResponse,
