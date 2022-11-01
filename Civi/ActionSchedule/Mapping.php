@@ -278,7 +278,12 @@ abstract class Mapping implements MappingInterface {
       $valueLabelMap['event_type'] = \CRM_Event_PseudoConstant::eventType();
       $valueLabelMap['civicrm_event'] = \CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
       $valueLabelMap['civicrm_participant_status_type'] = \CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-      $valueLabelMap['event_template'] = \CRM_Event_PseudoConstant::eventTemplates();
+      $valueLabelMap['event_template'] = \Civi\Api4\Event::get(FALSE)
+        ->addWhere('is_template', '=', TRUE)
+        ->addWhere('is_active', '=', TRUE)
+        ->execute()
+        ->indexBy('id')
+        ->column('template_title');
       $valueLabelMap['auto_renew_options'] = \CRM_Core_OptionGroup::values('auto_renew_options');
       $valueLabelMap['contact_date_reminder_options'] = \CRM_Core_OptionGroup::values('contact_date_reminder_options');
       $valueLabelMap['civicrm_membership_type'] = \CRM_Member_PseudoConstant::membershipType();

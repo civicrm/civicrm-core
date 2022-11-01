@@ -254,8 +254,11 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   Array of event id → template title pairs
+   *
+   * @deprecated Use the API instead
    */
   public static function &eventTemplates($id = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use the api');
     if (!self::$eventTemplates) {
       CRM_Core_PseudoConstant::populate(self::$eventTemplates,
         'CRM_Event_DAO_Event',

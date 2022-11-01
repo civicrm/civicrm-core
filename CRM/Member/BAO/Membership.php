@@ -1129,7 +1129,7 @@ AND civicrm_membership.is_test = %2";
    * @param \CRM_Contribute_BAO_Contribution|\CRM_Contribute_DAO_Contribution $contribution
    */
   public static function updateRecurMembership(CRM_Member_DAO_Membership $membership, CRM_Contribute_BAO_Contribution $contribution) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use the API instead');
+    CRM_Core_Error::deprecatedFunctionWarning('Use the api');
 
     if (empty($contribution->contribution_recur_id)) {
       return;
