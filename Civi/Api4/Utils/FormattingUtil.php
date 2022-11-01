@@ -243,6 +243,12 @@ class FormattingUtil {
           $fieldOptions = self::getPseudoconstantList($field, $fieldName, $result, $action);
           $dataType = NULL;
         }
+        // Store contact_type value before replacing pseudoconstant (e.g. transforming it to contact_type:label)
+        // Used by self::contactFieldsToRemove below
+        if ($value && isset($field['entity']) && $field['entity'] === 'Contact' && $field['name'] === 'contact_type') {
+          $prefix = strrpos($fieldName, '.');
+          $contactTypePaths[$prefix ? substr($fieldName, 0, $prefix + 1) : ''] = $value;
+        }
         if ($fieldExpr->supportsExpansion) {
           if (!empty($field['serialize']) && is_string($value)) {
             $value = \CRM_Core_DAO::unSerializeField($value, $field['serialize']);
@@ -250,11 +256,6 @@ class FormattingUtil {
           if (isset($fieldOptions)) {
             $value = self::replacePseudoconstant($fieldOptions, $value);
           }
-        }
-        // Keep track of contact types for self::contactFieldsToRemove
-        if ($value && isset($field['entity']) && $field['entity'] === 'Contact' && $field['name'] === 'contact_type') {
-          $prefix = strrpos($fieldName, '.');
-          $contactTypePaths[$prefix ? substr($fieldName, 0, $prefix + 1) : ''] = $value;
         }
         $result[$key] = self::convertDataType($value, $dataType);
       }
