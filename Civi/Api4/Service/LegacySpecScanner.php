@@ -26,6 +26,9 @@ class LegacySpecScanner implements AutoServiceInterface {
   public static function buildContainer(ContainerBuilder $container): void {
     $classNames = static::findClasses('Civi\Api4\Service\Spec\Provider', $container);
     foreach ($classNames as $className) {
+      if (!class_exists($className)) {
+        continue;
+      }
       $class = new \ReflectionClass($className);
       if ($class->implementsInterface(AutoServiceInterface::class)) {
         // This is already handled by the main scanner.
