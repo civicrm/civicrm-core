@@ -11,7 +11,6 @@ use CRM_Search_ExtensionUtil as E;
 function search_kit_civicrm_config(&$config) {
   _search_kit_civix_civicrm_config($config);
   Civi::dispatcher()->addListener('hook_civicrm_alterAngular', ['\Civi\Search\AfformSearchMetadataInjector', 'preprocess'], 1000);
-  Civi::dispatcher()->addSubscriber(new Civi\Api4\Event\Subscriber\SearchKitSubscriber());
 }
 
 /**
