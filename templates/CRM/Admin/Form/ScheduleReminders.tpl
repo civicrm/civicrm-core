@@ -33,7 +33,10 @@
 
     <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">
         <td class="right"></td>
-        <td colspan="3">{$form.start_action_offset.html}&nbsp;&nbsp;&nbsp;{$form.start_action_unit.html}&nbsp;&nbsp;&nbsp;{$form.start_action_condition.html}&nbsp;&nbsp;&nbsp;{$form.start_action_date.html}</td>
+        <td colspan="3">
+          {$form.start_action_offset.html}&nbsp;&nbsp;&nbsp;{$form.start_action_unit.html}&nbsp;&nbsp;&nbsp;{$form.start_action_condition.html}&nbsp;&nbsp;&nbsp;{$form.start_action_date.html}
+          {if $context === "event"}&nbsp;{help id="relative_absolute_schedule_dates"}{/if}
+        </td>
     </tr>
     <tr id="recordActivity" class="crm-scheduleReminder-form-block-record_activity"><td class="label" width="20%">{$form.record_activity.label}</td>
         <td>{$form.record_activity.html}</td>
