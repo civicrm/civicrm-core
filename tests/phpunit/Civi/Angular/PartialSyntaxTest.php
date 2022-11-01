@@ -94,7 +94,7 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
         $count++;
         if (!$coder->checkConsistentHtml($html)) {
           $recodedHtml = $coder->recode($html);
-          $this->assertEquals($html, $recodedHtml, "File $path has inconsistent HTML. Use tools/scripts/check-angular.php to debug. ");
+          $this->assertEquals($recodedHtml, $html, "File $path has inconsistent HTML. Use tools/scripts/check-angular.php to debug. ");
         }
       }
     }
