@@ -69,6 +69,16 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected $parser;
 
   /**
+   * Is the code being accessed in QuickForm mode.
+   *
+   * If false, ie functions being called to support the angular form, then we
+   * 'quick-form-ify' the fields with dots over to double underscores.
+   *
+   * @var bool
+   */
+  protected $isQuickFormMode = TRUE;
+
+  /**
    * Get User Job.
    *
    * API call to retrieve the userJob row.
@@ -778,6 +788,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
       $contactTypes[] = ['id' => $contactType['name'], 'text' => $contactType['label']];
     }
     $parser = $this->getParser();
+    $this->isQuickFormMode = FALSE;
     Civi::resources()->addVars('crmImportUi', [
       'defaults' => $this->getDefaults(),
       'rows' => $this->getDataRows([], 2),
