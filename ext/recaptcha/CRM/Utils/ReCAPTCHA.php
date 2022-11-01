@@ -196,17 +196,27 @@ class CRM_Utils_ReCAPTCHA {
   }
 
   /**
+   * QuickForm validate callback
+   *
    * @param $value
    * @param CRM_Core_Form $form
    *
    * @return mixed
    */
   public static function validate($value, $form) {
+    return self::checkResponse($_POST['g-recaptcha-response']);
+  }
+
+  /**
+   * @param string $response
+   * @return bool
+   */
+  public static function checkResponse($response) {
     require_once E::path('lib/recaptcha/recaptchalib.php');
 
     $resp = recaptcha_check_answer(CRM_Core_Config::singleton()->recaptchaPrivateKey,
       $_SERVER['REMOTE_ADDR'],
-      $_POST['g-recaptcha-response']
+      $response
     );
     return $resp->is_valid;
   }
