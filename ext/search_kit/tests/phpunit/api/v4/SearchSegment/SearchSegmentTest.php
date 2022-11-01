@@ -85,6 +85,7 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
 
     $this->assertEquals('Giving Tier', $getField['label']);
     $this->assertEquals('Extra', $getField['type']);
+    $this->assertEquals('Select', $getField['input_type']);
     $this->assertEquals(['Low ball', 'Minor league', 'Major league', 'Heavy hitter'], $getField['options']);
 
     $params = [
