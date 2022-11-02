@@ -199,7 +199,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
    */
   private function getColumnLink(&$col, $clause) {
     if ($clause['expr'] instanceof SqlField || $clause['expr'] instanceof SqlFunctionGROUP_CONCAT) {
-      $field = $clause['fields'][0] ?? NULL;
+      $field = \CRM_Utils_Array::first($clause['fields'] ?? []);
       if ($field &&
         CoreUtil::getInfoItem($field['entity'], 'label_field') === $field['name'] &&
         !empty(CoreUtil::getInfoItem($field['entity'], 'paths')['view'])
