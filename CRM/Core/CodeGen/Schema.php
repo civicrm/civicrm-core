@@ -6,6 +6,12 @@
 class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
 
   /**
+   * @var array
+   *   array of locaes to generate
+   */
+  public $locales;
+
+  /**
    * CRM_Core_CodeGen_Schema constructor.
    *
    * @param \CRM_Core_CodeGen_Main $config

@@ -107,6 +107,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   protected $membership = [];
 
+  public $_quickConfig;
+
   /**
    * Set entity fields to be assigned to the form.
    */

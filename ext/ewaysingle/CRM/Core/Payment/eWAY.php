@@ -94,13 +94,19 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   protected $guzzleClient;
 
   /**
+   * Are we in live or test mode
+   * @var string
+   */
+  protected $_mode;
+
+  /**
    * *******************************************************
    * Constructor
    *
    * @param string $mode
    *   The mode of operation: live or test.
    *
-   * @param int $paymentProcessor
+   * @param array $paymentProcessor
    *
    * *******************************************************
    */

@@ -16,6 +16,12 @@ namespace Civi\Test;
 trait ContactTestTrait {
 
   /**
+   * Ids of records created
+   * @var array
+   */
+  protected $ids = [];
+
+  /**
    * Emulate a logged in user since certain functions use that.
    * value to store a record in the DB (like activity)
    *

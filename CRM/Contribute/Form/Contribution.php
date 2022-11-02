@@ -208,6 +208,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   protected $previousContributionStatus;
 
+
+  /**
+   * Payment Instrument ID
+   *
+   * @var int
+   */
+  protected $payment_instrument_id;
+
   /**
    * Explicitly declare the form context.
    */

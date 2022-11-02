@@ -28,6 +28,8 @@ class CiviCaseTestCase extends CiviUnitTestCase {
 
   protected $_loggedInUser;
 
+  protected $tablesToTruncate;
+
   public function setUp(): void {
     parent::setUp();
 

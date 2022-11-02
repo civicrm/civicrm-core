@@ -21,6 +21,13 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    */
   protected $guzzleClient;
 
+
+  /**
+   * Are we in live or test mode
+   * @var string
+   */
+  protected $_mode;
+
   /**
    * Constructor
    *

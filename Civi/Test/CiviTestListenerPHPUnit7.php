@@ -30,6 +30,8 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
    */
   private $tx;
 
+  public $errorScope;
+
   public function startTestSuite(\PHPUnit\Framework\TestSuite $suite): void {
     $byInterface = $this->indexTestsByInterface($suite->tests());
     $this->validateGroups($byInterface);

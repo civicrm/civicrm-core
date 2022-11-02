@@ -138,6 +138,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_customGroupFilters = TRUE;
   protected $_customGroupGroupBy = FALSE;
   protected $_customGroupJoin = 'LEFT JOIN';
+  protected $_customGroupExtended = [];
 
   /**
    * Build tags filter
@@ -524,8 +525,9 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @var string
    */
-
   protected $sqlArray;
+
+  protected $sqlFormattedArray;
 
   /**
    * Tables created for the report that need removal afterwards.

@@ -26,6 +26,18 @@ class CRM_Core_Payment_ElavonTest extends \PHPUnit\Framework\TestCase implements
   use \Civi\Test\Api3TestTrait;
 
   /**
+   * Payment Processor
+   * @var \CRM_Core_Payment_Elavon
+   */
+  protected $processor;
+
+  /**
+   * Ids of objects created
+   * @var array
+   */
+  protected $ids;
+
+  /**
    * Setup used when HeadlessInterface is implemented.
    *
    * Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
