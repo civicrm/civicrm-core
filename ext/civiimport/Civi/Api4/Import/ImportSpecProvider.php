@@ -10,19 +10,21 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Service\Spec\Provider;
+namespace Civi\Api4\Import;
 
 use Civi\Api4\Service\Spec\FieldSpec;
+use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\UserJob;
 use Civi\BAO\Import;
+use Civi\Core\Service\AutoService;
 use CRM_Core_BAO_UserJob;
 
 /**
  * @service
  * @internal
  */
-class ImportSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class ImportSpecProvider extends AutoService implements SpecProviderInterface {
 
   /**
    * @inheritDoc
