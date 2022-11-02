@@ -22,7 +22,7 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       'api_entity' => 'Contact',
       'api_params' => [
         'version' => 4,
-        'select' => ['first_name', 'last_name', 'contact_sub_type:label', 'gender_id'],
+        'select' => ['first_name', 'display_name', 'contact_sub_type:label', 'gender_id'],
         'where' => [],
       ],
     ];
@@ -37,6 +37,17 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertEquals('fa-table', $display['type:icon']);
     $this->assertEquals('Contact', $display['saved_search_id.api_entity']);
     $this->assertEquals('Contacts', $display['saved_search_id.api_entity:label']);
+
+    // Default sort order should have been added
+    $this->assertEquals([['sort_name', 'ASC']], $display['settings']['sort']);
+
+    // `display_name` column should have a link
+    $this->assertEquals('Contact', $display['settings']['columns'][1]['link']['entity']);
+    $this->assertEquals('view', $display['settings']['columns'][1]['link']['action']);
+    $this->assertEmpty($display['settings']['columns'][1]['link']['join']);
+
+    // `first_name` column should not have a link
+    $this->assertArrayNotHasKey('link', $display['settings']['columns'][0]);
   }
 
   public function testGetDefaultNoEntity() {
