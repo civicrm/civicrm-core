@@ -31,7 +31,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFive extends CRM_Upgrade_Incremental_
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
-  public function upgrade_5_55_beta1($rev): void {
+  public function upgrade_5_55_beta2($rev): void {
     $this->addTask(ts('Fix Event Badge Upgrade'), 'fix_event_badge_upgrade');
   }
 
