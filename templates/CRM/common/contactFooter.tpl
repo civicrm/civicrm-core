@@ -13,6 +13,7 @@
   <span class="col1">
     {if $external_identifier}{ts}External ID{/ts}:&nbsp;{$external_identifier}{/if}
     {if $action !== 2}&nbsp; &nbsp;{ts}Contact ID{/ts}:&nbsp;{$contactId}{/if}
+    {if $userRecordUrl}&nbsp; &nbsp;{ts}User ID{/ts}:&nbsp;<a title="{ts}View user record{/ts}" class="user-record-link" href="{$userRecordUrl}">{$userRecordId}</a>{/if}
   </span>
   {if $lastModified}
     {ts}Last Change by{/ts}: <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$lastModified.id`"}">{$lastModified.name}</a> ({$lastModified.date|crmDate}) &nbsp;
