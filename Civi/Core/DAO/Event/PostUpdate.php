@@ -28,6 +28,11 @@ class PostUpdate extends \Symfony\Component\EventDispatcher\Event {
   public $result;
 
   /**
+   * @var string
+   */
+  public $eventID;
+
+  /**
    * @param $object
    * @param $result
    */

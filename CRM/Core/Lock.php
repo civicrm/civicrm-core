@@ -43,6 +43,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
   protected $_id;
 
   /**
+   * Lock Timeout
    * @var int
    */
   protected $_timeout;
