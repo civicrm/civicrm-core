@@ -871,6 +871,49 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test values import correctly when they are numbers.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/3850
+   * @throws \CRM_Core_Exception
+   */
+  public function testCustomCheckboxNumericValues(): void {
+    $this->createCustomGroupWithFieldOfType([], 'checkbox', '', [
+      'option_values' => [
+        [
+          'label' => 'Red',
+          'value' => '1',
+          'weight' => 1,
+          'is_active' => 1,
+        ],
+        [
+          'label' => 'Yellow',
+          'value' => '2',
+          'weight' => 2,
+          'is_active' => 1,
+        ],
+        [
+          'label' => 'Blue',
+          'value' => '3',
+          'weight' => 3,
+          'is_active' => 1,
+        ],
+      ],
+    ]);
+    $this->importCSV('individual_with_custom_checkbox_field.csv', [
+      [0 => 'first_name'],
+      [0 => 'last_name'],
+      [0 => $this->getCustomFieldName('checkbox')],
+    ]);
+    $contacts = Contact::get()->addWhere('last_name', '=', 'Smith')
+      ->addSelect($this->getCustomFieldName('checkbox', 4))
+      ->execute();
+    $this->assertCount(2, $contacts);
+    foreach ($contacts as $contact) {
+      $this->assertEquals([1, 2, 3], $contact[$this->getCustomFieldName('checkbox', 4)]);
+    }
+  }
+
+  /**
    * Test importing in the Preferred Language Field
    *
    * @throws \CRM_Core_Exception
@@ -2123,6 +2166,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *   e.g [['first_name']['email', 1]].
    *   {@see \CRM_Contact_Import_Parser_Contact::getMappingFieldFromMapperInput}
    * @param array $submittedValues
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function importCSV(string $csv, array $mapper, array $submittedValues = []): void {
     $submittedValues = array_merge([
