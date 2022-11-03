@@ -62,6 +62,9 @@ class CRM_Api4_Services {
           $matches = [];
           preg_match('/(\w*)\.php$/', $file, $matches);
           $serviceName = $namespace . array_pop($matches);
+          if (!class_exists($serviceName)) {
+            continue;
+          }
           $serviceClass = new \ReflectionClass($serviceName);
           if ($serviceClass->isInstantiable()) {
             $definition = $container->register(str_replace('\\', '_', $serviceName), $serviceName);
