@@ -4,7 +4,6 @@ namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Query\SqlField;
-use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 
@@ -90,13 +89,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @throws \CRM_Core_Exception
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
-    // Only SearchKit admins can use this in unsecured "preview mode"
-    if (
-      (is_array($this->savedSearch) || is_array($this->display)) && $this->checkPermissions &&
-      !\CRM_Core_Permission::check([['administer CiviCRM data', 'administer search_kit']])
-    ) {
-      throw new UnauthorizedException('Access denied');
-    }
+    $this->checkPermissionToLoadSearch();
     $this->loadSavedSearch();
     $this->loadSearchDisplay();
 
@@ -119,10 +112,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Transforms each row into an array of raw data and an array of formatted columns
    *
-   * @param \Civi\Api4\Generic\Result $result
+   * @param iterable $result
    * @return array{data: array, columns: array}[]
    */
-  protected function formatResult(\Civi\Api4\Generic\Result $result): array {
+  protected function formatResult(iterable $result): array {
     $rows = [];
     $keyName = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
     foreach ($result as $index => $record) {
@@ -1021,15 +1014,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * @param string $str
-   */
-  private function getTokens($str) {
-    $tokens = [];
-    preg_match_all('/\\[([^]]+)\\]/', $str, $tokens);
-    return array_unique($tokens[1]);
-  }
-
-  /**
    * Given an alias like Contact_Email_01_location_type_id
    * this will return Contact_Email_01.location_type_id
    * @param string $alias
@@ -1254,27 +1238,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $values;
-  }
-
-  /**
-   * Loads display if not already an array
-   */
-  private function loadSearchDisplay(): void {
-    // Display name given
-    if (is_string($this->display)) {
-      $this->display = SearchDisplay::get(FALSE)
-        ->setSelect(['*', 'type:name'])
-        ->addWhere('name', '=', $this->display)
-        ->addWhere('saved_search_id', '=', $this->savedSearch['id'])
-        ->execute()->single();
-    }
-    // Null given - use default display
-    elseif (is_null($this->display)) {
-      $this->display = SearchDisplay::getDefault(FALSE)
-        ->addSelect('*', 'type:name')
-        ->setSavedSearch($this->savedSearch)
-        ->execute()->first();
-    }
   }
 
 }

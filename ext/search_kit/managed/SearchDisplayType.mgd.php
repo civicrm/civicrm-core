@@ -85,4 +85,24 @@ return [
       'match' => ['option_group_id', 'name'],
     ],
   ],
+  [
+    'name' => 'SearchDisplayType:autocomplete',
+    'entity' => 'OptionValue',
+    'cleanup' => 'always',
+    'update' => 'always',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'search_display_type',
+        'value' => 'autocomplete',
+        'name' => 'crm-search-display-autocomplete',
+        'label' => E::ts('Autocomplete'),
+        'icon' => 'fa-keyboard-o',
+        'is_reserved' => TRUE,
+        'is_active' => TRUE,
+        'domain_id' => NULL,
+      ],
+      'match' => ['option_group_id', 'name'],
+    ],
+  ],
 ];

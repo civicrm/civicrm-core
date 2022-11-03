@@ -20,8 +20,10 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Contact;
 use Civi\Api4\MockBasicEntity;
+use Civi\Api4\SavedSearch;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
@@ -35,6 +37,10 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
    * @var callable
    */
   private $hookCallback;
+
+  public function setUpHeadless(): void {
+    \Civi\Test::headless()->install('org.civicrm.search_kit')->apply();
+  }
 
   /**
    * Listens for civi.api4.entityTypes event to manually add this nonstandard entity
@@ -77,6 +83,8 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertCount(2, $result);
     $this->assertEquals('Black', $result[0]['label']);
     $this->assertEquals('777777', $result[1]['color']);
+    $this->assertEquals($entities[1]['identifier'], $result[1]['id']);
+    $this->assertEquals($entities[2]['identifier'], $result[0]['id']);
 
     $result = MockBasicEntity::autocomplete()
       ->setInput('ite')
@@ -158,51 +166,25 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->createLoggedInUser();
 
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
-      'administer CiviCRM',
       'view all contacts',
     ];
-
-    // Admin can apply the api_key filter
-    $result = Contact::autocomplete()
-      ->setInput($lastName)
-      ->setClientFilters(['api_key' => 'secret789'])
-      ->execute();
-    $this->assertCount(1, $result);
-
-    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
-      'access CiviCRM',
-      'view all contacts',
-    ];
-
-    // Non-admin cannot apply filter
-    $result = Contact::autocomplete()
-      ->setInput($lastName)
-      ->setClientFilters(['api_key' => 'secret789'])
-      ->execute();
-    $this->assertCount(3, $result);
-
-    // Cannot apply filter even with permissions disabled
-    $result = Contact::autocomplete(FALSE)
-      ->setInput($lastName)
-      ->setClientFilters(['api_key' => 'secret789'])
-      ->execute();
-    $this->assertCount(3, $result);
 
     // Assert that the end-user is not allowed to inject arbitrary savedSearch params
     $msg = '';
     try {
-      $result = Contact::autocomplete()
+      Contact::autocomplete()
         ->setInput($lastName)
         ->setSavedSearch([
           'api_entity' => 'Contact',
           'api_params' => [],
         ])
         ->execute();
+      $this->fail();
     }
-    catch (\CRM_Core_Exception $e) {
+    catch (UnauthorizedException $e) {
       $msg = $e->getMessage();
     }
-    $this->assertEquals('Parameter "savedSearch" is not of the correct type. Expecting string.', $msg);
+    $this->assertEquals('Access denied', $msg);
 
     // With hook callback, permissions can be overridden by injecting a trusted filter
     $this->hookCallback = function(\Civi\Api4\Generic\AutocompleteAction $action) {
@@ -214,6 +196,71 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->setInput($lastName)
       ->execute();
     $this->assertCount(1, $result);
+  }
+
+  public function testAutocompletePager() {
+    MockBasicEntity::delete()->addWhere('identifier', '>', 0)->execute();
+    $sampleData = [];
+    foreach (range(1, 21) as $num) {
+      $sampleData[] = ['foo' => 'Test ' . $num];
+    }
+    MockBasicEntity::save()
+      ->setRecords($sampleData)
+      ->execute();
+
+    $result1 = MockBasicEntity::autocomplete()
+      ->setInput('est')
+      ->execute();
+    $this->assertEquals('Test 1', $result1[0]['label']);
+    $this->assertEquals(10, $result1->countFetched());
+    $this->assertEquals(11, $result1->countMatched());
+
+    $result2 = MockBasicEntity::autocomplete()
+      ->setInput('est')
+      ->setPage(2)
+      ->execute();
+    $this->assertEquals('Test 11', $result2[0]['label']);
+    $this->assertEquals(10, $result2->countFetched());
+    $this->assertEquals(11, $result2->countMatched());
+
+    $result3 = MockBasicEntity::autocomplete()
+      ->setInput('est')
+      ->setPage(3)
+      ->execute();
+    $this->assertEquals('Test 21', $result3[0]['label']);
+    $this->assertEquals(1, $result3->countFetched());
+    $this->assertEquals(1, $result3->countMatched());
+  }
+
+  public function testAutocompleteIdField() {
+    $label = uniqid();
+    $sample = $this->saveTestRecords('SavedSearch', [
+      'records' => [
+        ['name' => 'c', 'label' => "C $label"],
+        ['name' => 'a', 'label' => "A $label"],
+        ['name' => 'b', 'label' => "B $label"],
+      ],
+      'defaults' => ['api_entity' => 'Contact'],
+    ]);
+
+    $result1 = SavedSearch::autocomplete()
+      ->setInput($label)
+      ->setKey('name')
+      ->execute();
+
+    $this->assertEquals('a', $result1[0]['id']);
+    $this->assertEquals('b', $result1[1]['id']);
+    $this->assertEquals('c', $result1[2]['id']);
+
+    // This key won't be used since api_entity is not a unique index
+    $result2 = SavedSearch::autocomplete()
+      ->setInput($label)
+      ->setKey('api_entity')
+      ->execute();
+    // Expect id to be returned as key instead of api_entity
+    $this->assertEquals($sample[1]['id'], $result2[0]['id']);
+    $this->assertEquals($sample[2]['id'], $result2[1]['id']);
+    $this->assertEquals($sample[0]['id'], $result2[2]['id']);
   }
 
 }
