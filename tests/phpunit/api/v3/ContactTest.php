@@ -3949,8 +3949,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-15443 - ensure getlist api does not return deleted contacts.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetlistExcludeConditions(): void {
     $name = 'Scarabée';
@@ -3967,6 +3965,25 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals($contact, $result['values'][0]['id']);
+  }
+
+  /**
+   * Test getlist gets an organization with a number that is not a valid organization ID.
+   */
+  public function testGetlistInvalidID(): void {
+    $individualID = $this->individualCreate();
+    $organizationID = $this->organizationCreate(['organization_name' => 'Org ' . $individualID]);
+    $organizationID2 = $this->organizationCreate(['organization_name' => 'Org ' . $organizationID]);
+    $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $individualID, 'params' => ['contact_type' => 'Organization']]);
+    $this->assertEquals(1, $result['count']);
+    $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $organizationID, 'params' => ['contact_type' => 'Organization']]);
+    $this->assertEquals(2, $result['count']);
+    $this->assertEquals($organizationID, $result['values'][0]['id']);
+    $this->assertEquals($organizationID2, $result['values'][1]['id']);
+
+    $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $organizationID2, 'params' => ['contact_type' => 'Organization']]);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals($organizationID2, $result['values'][0]['id']);
   }
 
   /**
