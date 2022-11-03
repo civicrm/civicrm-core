@@ -1066,7 +1066,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // Icon based on activity type
     $this->assertEquals([['class' => 'fa-slideshare', 'side' => 'left']], $result[0]['columns'][0]['icons']);
     // Activity type icon + conditional icon based on status
-    $this->assertEquals([['class' => 'fa-phone', 'side' => 'left'], ['class' => 'fa-star', 'side' => 'right']], $result[1]['columns'][0]['icons']);
+    $this->assertEquals([['class' => 'fa-star', 'side' => 'right'], ['class' => 'fa-phone', 'side' => 'left']], $result[1]['columns'][0]['icons']);
   }
 
   /**
@@ -1450,6 +1450,88 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(1, $result[0]['columns'][1]['val']);
     $this->assertEquals(2, $result[1]['columns'][1]['val']);
     $this->assertEquals(3, $result[2]['columns'][1]['val']);
+  }
+
+  public function testContactTypeIcons(): void {
+    $this->createTestRecord('ContactType', [
+      'label' => 'Star',
+      'name' => 'Star',
+      'parent_id:name' => 'Individual',
+      'icon' => 'fa-star',
+    ]);
+    $this->createTestRecord('ContactType', [
+      'label' => 'None',
+      'name' => 'None',
+      'parent_id:name' => 'Individual',
+      'icon' => NULL,
+    ]);
+
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      [
+        'first_name' => 'Starry',
+        'contact_sub_type' => ['Star'],
+      ],
+      [
+        'first_name' => 'No icon',
+        'contact_sub_type' => ['None'],
+      ],
+      [
+        'first_name' => 'Both',
+        'contact_sub_type' => ['None', 'Star'],
+      ],
+    ];
+    $records = $this->saveTestRecords('Contact', [
+      'records' => $sampleData,
+      'defaults' => ['last_name' => $lastName],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'last_name'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First',
+              'dataType' => 'String',
+              'type' => 'field',
+              'icons' => [
+                ['field' => 'contact_sub_type:icon'],
+                ['field' => 'contact_type:icon'],
+              ],
+            ],
+          ],
+          'sort' => [
+            ['sort_name', 'ASC'],
+          ],
+        ],
+      ],
+      'filters' => ['last_name' => $lastName],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(3, $result);
+
+    // Contacts will be returned in order by sort_name
+    $this->assertEquals('Both', $result[0]['columns'][0]['val']);
+    $this->assertEquals('fa-star', $result[0]['columns'][0]['icons'][0]['class']);
+    $this->assertEquals('No icon', $result[1]['columns'][0]['val']);
+    $this->assertEquals('fa-user', $result[1]['columns'][0]['icons'][0]['class']);
+    $this->assertEquals('Starry', $result[2]['columns'][0]['val']);
+    $this->assertEquals('fa-star', $result[2]['columns'][0]['icons'][0]['class']);
   }
 
 }
