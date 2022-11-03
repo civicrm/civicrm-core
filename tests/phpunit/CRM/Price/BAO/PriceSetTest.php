@@ -30,7 +30,7 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
     $params = ['priceSetId' => $priceSetID, 'price_' . $field['id'] => 1];
     $amountLevel = CRM_Price_BAO_PriceSet::getAmountLevelText($params);
     $this->assertEquals(CRM_Core_DAO::VALUE_SEPARATOR . 'Price Field - 1' . CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel);
-    $priceFieldValue = $this->callAPISuccess('pricefieldvalue', 'getsingle', ['price_field_id' => $field['id']]);
+    $priceFieldValue = $this->callAPISuccess('PriceFieldValue', 'getsingle', ['price_field_id' => $field['id']]);
     $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $priceFieldValue['id']]);
     $this->callAPISuccess('PriceField', 'delete', ['id' => $field['id']]);
     $this->callAPISuccess('PriceSet', 'delete', ['id' => $priceSetID]);
