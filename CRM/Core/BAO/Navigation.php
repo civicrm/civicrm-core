@@ -320,7 +320,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       if (!isset($b['attributes']['weight'])) {
         $b['attributes']['weight'] = 1000;
       }
-      return $a['attributes']['weight'] - $b['attributes']['weight'];
+      return (int) $a['attributes']['weight'] - (int) $b['attributes']['weight'];
     });
 
     // If any of the $navigations have children, recurse
