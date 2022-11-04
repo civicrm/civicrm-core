@@ -647,10 +647,12 @@ class PropertyBag implements \ArrayAccess {
    */
   public function setBillingCountry($input, $label = 'default') {
     if (!is_string($input) || strlen($input) !== 2) {
-      throw new \InvalidArgumentException("setBillingCountry expects ISO 3166-1 alpha-2 country code.");
+      \Civi::log()->error('setBillingCountry expects ISO 3166-1 alpha-2 country code. Attempted to use "' . $input . '"');
+      // @fixme We should be calling throw new \InvalidArgumentException() here but see https://lab.civicrm.org/dev/core/-/issues/3918
     }
     if (!CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'country_id', $input)) {
-      throw new \InvalidArgumentException("setBillingCountry expects ISO 3166-1 alpha-2 country code.");
+      \Civi::log()->error('setBillingCountry expects ISO 3166-1 alpha-2 country code. "' . $input . '" not found in database.');
+      // @fixme We should be calling throw new \InvalidArgumentException() here but see https://lab.civicrm.org/dev/core/-/issues/3918
     }
     return $this->set('billingCountry', $label, (string) $input);
   }
