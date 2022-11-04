@@ -145,6 +145,11 @@ class AfformAdminMeta {
         }
       }
     }
+    foreach ($fields as $name => $field) {
+      if ($field['input_type'] === 'EntityRef') {
+        $fields[$name]['security'] = 'RBAC';
+      }
+    }
     return $fields;
   }
 

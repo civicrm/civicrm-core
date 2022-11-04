@@ -12,6 +12,11 @@
     <input class="form-control" crm-entityref="{entity: 'SavedSearch', api: {id_field: 'name', params: {api_entity: $ctrl.getEntity().name}}}" ng-model="getSet('saved_search')" ng-model-options="{getterSetter: true}">
   </div>
 </li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'" title="{{:: ts('Should permissions be checked when autocompleting existing entities') }}">
+  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <input crm-ui-select="{data: $ctrl.editor.securityModes}" ng-model="getSet('security')" ng-model-options="{getterSetter: true}" class="form-control">
+  </div>
+</li>
 <li>
   <a href ng-click="toggleRequired(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Require this field') }}">
     <i class="crm-i fa-{{ getProp('required') ? 'check-' : '' }}square-o"></i>

@@ -54,10 +54,16 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
       $formDataModel = new FormDataModel($afform['layout']);
       $entity = $formDataModel->getEntity($entityName);
       $isId = $fieldName === CoreUtil::getIdFieldName($entity['type']);
-      $field = civicrm_api4($entity['type'], 'getFields', [
+      $fieldSpec = civicrm_api4($entity['type'], 'getFields', [
         'checkPermissions' => FALSE,
         'where' => [['name', '=', $fieldName]],
       ])->single();
+      $formField = $entity['fields'][$fieldName]['defn'] ?? [];
+
+      // Auto-add filters defined in schema
+      foreach ($fieldSpec['input_attrs']['filter'] ?? [] as $key => $value) {
+        $apiRequest->addFilter($key, $value);
+      }
 
       // For the "Existing Entity" selector,
       // Look up the "type" fields (e.g. contact_type, activity_type_id, case_type_id, etc)
@@ -77,12 +83,9 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
           }
         }
       }
-      foreach ($field['input_attrs']['filter'] ?? [] as $key => $value) {
-        $apiRequest->addFilter($key, $value);
-      }
 
-      $apiRequest->setCheckPermissions($entity['security'] !== 'FBAC');
-      $apiRequest->setSavedSearch($entity['fields'][$fieldName]['defn']['saved_search'] ?? NULL);
+      $apiRequest->setCheckPermissions($formField['security'] !== 'FBAC');
+      $apiRequest->setSavedSearch($formField['saved_search'] ?? NULL);
     }
   }
 
