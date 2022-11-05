@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<table>
+  <base>CRM/Cors</base>
+  <class>CorsRule</class>
+  <name>civicrm_cors_rule</name>
+  <comment>Defines CORS rules for requests</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>path</name>
+    <title>Path</title>
+    <type>varchar</type>
+    <length>256</length>
+    <comment>Path to match against (using the MySQL like operator)</comment>
+  </field>
+
+  <field>
+    <name>priority</name>
+    <title>Priority</title>
+    <type>int unsigned</type>
+    <comment>Higher priority rules are matched first</comment>
+  </field>
+
+  <field>
+    <name>origins</name>
+    <title>Origins</title>
+    <type>varchar</type>
+    <length>512</length>
+    <required>true</required>
+    <comment>The Access-Control-Allow-Origin response header</comment>
+  </field>
+
+  <field>
+    <name>headers</name>
+    <title>Headers</title>
+    <type>varchar</type>
+    <length>512</length>
+    <comment>The Access-Control-Allow-Headers response header</comment>
+  </field>
+
+  <field>
+    <name>methods</name>
+    <title>Methods</title>
+    <type>varchar</type>
+    <length>256</length>
+    <comment>The Access-Control-Allow-Methods response header</comment>
+  </field>
+
+  <field>
+    <name>max_age</name>
+    <title>Max age</title>
+    <type>int unsigned</type>
+    <comment>The Access-Control-Max-Age response header</comment>
+  </field>
+
+</table>

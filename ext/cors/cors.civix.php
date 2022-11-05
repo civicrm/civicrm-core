@@ -79,13 +79,6 @@ class CRM_Cors_ExtensionUtil {
 
 use CRM_Cors_ExtensionUtil as E;
 
-function _cors_civix_mixin_polyfill() {
-  if (!class_exists('CRM_Extension_MixInfo')) {
-    $polyfill = __DIR__ . '/mixin/polyfill.php';
-    (require $polyfill)(E::LONG_NAME, E::SHORT_NAME, E::path());
-  }
-}
-
 /**
  * (Delegated) Implements hook_civicrm_config().
  *
@@ -112,7 +105,6 @@ function _cors_civix_civicrm_config(&$config = NULL) {
 
   $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
-  _cors_civix_mixin_polyfill();
 }
 
 /**
@@ -125,7 +117,6 @@ function _cors_civix_civicrm_install() {
   if ($upgrader = _cors_civix_upgrader()) {
     $upgrader->onInstall();
   }
-  _cors_civix_mixin_polyfill();
 }
 
 /**
@@ -166,7 +157,6 @@ function _cors_civix_civicrm_enable() {
       $upgrader->onEnable();
     }
   }
-  _cors_civix_mixin_polyfill();
 }
 
 /**
@@ -304,5 +294,11 @@ function _cors_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parentID) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function _cors_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, []);
+  $entityTypes = array_merge($entityTypes, [
+    'CRM_Cors_DAO_CorsRule' => [
+      'name' => 'CorsRule',
+      'class' => 'CRM_Cors_DAO_CorsRule',
+      'table' => 'civicrm_cors_rule',
+    ],
+  ]);
 }
