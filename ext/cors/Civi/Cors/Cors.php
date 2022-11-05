@@ -56,10 +56,16 @@ class Cors extends AutoService implements EventSubscriberInterface {
 
     // If a rule matches, set appropriate headers.
     if ($rule) {
-      $this->setAllowOrigin($rule->origins);
-      $this->setAllowHeaders($rule->headers);
-      $this->setAllowMethods($rule->methods);
-      $this->setMaxAge();
+      $this->setAllowOrigin($rule['origins']);
+      if ($rule['headers']) {
+        $this->setAllowHeaders($rule['headers']);
+      }
+      if ($rule['methods']) {
+        $this->setAllowMethods($rule['methods']);
+      }
+      if ($rule['max_age']) {
+        $this->setMaxAge($rule['max_age']);
+      }
 
       // Respond to all OPTIONS requests with a 204.
       if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -73,65 +79,17 @@ class Cors extends AutoService implements EventSubscriberInterface {
   /**
    * See if we can match path arguments against a CORS rule.
    *
-   * Note: fnmatch() is 'not available on non-POSIX compliant systems except
-   * Windows'. This doesn't seem like a big deal to me, but I thought it was
-   * worth nothing. @see https://www.php.net/manual/en/function.fnmatch.php
-   * for more details.
-   *
-   * @param  Array $args path arguments
-   * @return Object a rule that can be used to construct CORS headers
+   * @param  array $args path arguments
+   * @return array|null a rule that can be used to construct CORS headers
    */
   public function matchRule($args) {
-    $match = implode('/', $args);
-
-    foreach ($this->loadRules() as $rule) {
-
-      // phpcs:disable
-      if (fnmatch($rule->pattern, $match)) {
-        // phpcs:enable
-        return $rule;
-      }
-    }
-
-    return FALSE;
-  }
-
-  /**
-   * Load CORS rules. Each rule is an array with the following keys
-   * - pattern A URL pattern to match against (using fnmatch())
-   * - origins Comma separated list of allowed origins or '*'.
-   * - headers Comma separated list of allowed headers
-   * - methods Comma separated list of allowed methods
-   *
-   * @return Array of CORS rules
-   */
-  public function loadRules() {
-    $rulesJson = \Civi::settings()->get('cors_rules');
-    $rules = json_decode($rulesJson);
-    return $rules;
-  }
-
-  public function validateRules($rules) {
-    $rules = json_decode($rules);
-    if ($rules === NULL) {
-      return FALSE;
-    }
-    if (!is_array($rules)) {
-      return FALSE;
-    }
-    foreach ($rules as $rule) {
-      if (!isset($rule->pattern)) {
-        return FALSE;
-      }
-      if (!isset($rule->origins)) {
-        return FALSE;
-      }
-    }
-    return TRUE;
-  }
-
-  public function validateMaxAge($maxAge) {
-    return $maxAge === '' || is_numeric($maxAge);
+    $path = implode('/', $args);
+    $result = \Civi\Api4\CorsRule::get()
+      ->addWhere('path', 'REVERSE LIKE', $path)
+      ->setLimit(1)
+      ->execute()
+      ->first();
+    return $result;
   }
 
   /**
@@ -224,20 +182,11 @@ class Cors extends AutoService implements EventSubscriberInterface {
 
   /**
    * Add an 'Access-Control-Max-Age' header.
-   *
+   * @param  Int $maxAge Maximum number of seconds the results can be cached.
    * @return void
    */
-  public function setMaxAge() {
-
-    $maxAge = \Civi::settings()->get('cors_max_age');
-
-    if (!is_numeric($maxAge)) {
-      return;
-    }
-
-    if ($maxAge) {
-      header('Access-Control-Max-Age: ' . (int) $maxAge);
-    }
+  public function setMaxAge($maxAge) {
+    header('Access-Control-Max-Age: ' . $maxAge);
   }
 
 }
