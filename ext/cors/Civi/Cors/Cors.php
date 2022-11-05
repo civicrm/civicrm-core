@@ -43,6 +43,15 @@ class Cors extends AutoService implements EventSubscriberInterface {
    * @return void
    */
   public function addHeaders($e) {
+
+    // Try and exit early if we are not in a CORS context
+    if ($_SERVER["HTTP_SEC_FETCH_SITE"] == 'same-origin') {
+      return;
+    }
+    if (!isset($_SERVER["HTTP_ORIGIN"])) {
+      return;
+    }
+
     $rule = $this->matchRule($e->args);
 
     // If a rule matches, set appropriate headers.
