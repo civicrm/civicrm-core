@@ -141,15 +141,12 @@ class Cors extends AutoService implements EventSubscriberInterface {
   /**
    * Add an 'Access-Control-Allow-Methods' header.
    *
-   * @param  String $methods '*' or a comma separated list of allowed methods.
+   * @param  String $methods Comma separated list of allowed methods or '*'.
    * @return void
    */
   public function setAllowMethods($methods) {
-    if (!$methods) {
-      return;
-    }
 
-    // Wildcard origin
+    // Wildcard methods.
     if ($methods === '*') {
       header('Access-Control-Allow-Methods: *');
       return;
