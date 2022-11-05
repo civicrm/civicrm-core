@@ -84,8 +84,9 @@ class Cors extends AutoService implements EventSubscriberInterface {
    */
   public function matchRule($args) {
     $path = implode('/', $args);
-    $result = \Civi\Api4\CorsRule::get()
+    $result = \Civi\Api4\CorsRule::get(FALSE)
       ->addWhere('path', 'REVERSE LIKE', $path)
+      ->addOrderBy('priority', 'DESC')
       ->setLimit(1)
       ->execute()
       ->first();
