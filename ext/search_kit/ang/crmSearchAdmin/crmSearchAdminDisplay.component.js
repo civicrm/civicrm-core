@@ -16,6 +16,7 @@
       _.each(CRM.crmSearchAdmin.displayTypes, function(type) {
         html +=
           '<div ng-switch-when="' + type.id + '">\n' +
+          '  <div class="help-block"><i class="crm-i ' + type.icon + '"></i> ' + _.escape(type.description) + '</div>' +
           '  <search-admin-display-' + type.id + ' api-entity="$ctrl.savedSearch.api_entity" api-params="$ctrl.savedSearch.api_params" display="$ctrl.display"></search-admin-display-' + type.id + '>\n' +
           '  <hr>\n' +
           '  <button type="button" class="btn btn-{{ !$ctrl.stale ? \'success\' : $ctrl.preview ? \'warning\' : \'primary\' }}" ng-click="$ctrl.previewDisplay()" ng-disabled="!$ctrl.stale">\n' +
