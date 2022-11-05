@@ -107,36 +107,34 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    */
   public function browse() {
     // get all custom groups sorted by weight
-    $premiums = [];
-    $dao = new CRM_Contribute_DAO_Product();
-    $dao->orderBy('name');
-    $dao->find();
+    $premiums = \Civi\Api4\Product::get()
+      ->addOrderBy('name', 'ASC')
+      ->execute()
+      ->getArrayCopy();
 
-    while ($dao->fetch()) {
-      $premiums[$dao->id] = [];
-      CRM_Core_DAO::storeValues($dao, $premiums[$dao->id]);
-      // form all action links
-      $action = array_sum(array_keys($this->links()));
+    $action = array_sum(array_keys($this->links()));
 
-      if ($dao->is_active) {
+    foreach ($premiums as &$premium) {
+      if ($premium['is_active']) {
         $action -= CRM_Core_Action::ENABLE;
       }
       else {
         $action -= CRM_Core_Action::DISABLE;
       }
 
-      $premiums[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
+      $premium['action'] = CRM_Core_Action::formLink(self::links(),
         $action,
-        ['id' => $dao->id],
+        ['id' => $premium['id']],
         ts('more'),
         FALSE,
         'premium.manage.row',
         'Premium',
-        $dao->id
+        $premium['id']
       );
       // Financial Type
-      if (!empty($dao->financial_type_id)) {
-        $premiums[$dao->id]['financial_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Product', 'financial_type_id', $dao->financial_type_id);
+      $premium['financial_type'] = NULL;
+      if (!empty($premium['financial_type_id'])) {
+        $premium['financial_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Product', 'financial_type_id', $premium['financial_type_id']);
       }
     }
     $this->assign('rows', $premiums);
