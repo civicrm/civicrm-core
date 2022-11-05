@@ -25,13 +25,14 @@
     <title>Path</title>
     <type>varchar</type>
     <length>256</length>
-    <comment>Path to match against (using the MySQL like operator)</comment>
+    <comment>Path to match against (using MySQL's LIKE operator)</comment>
   </field>
 
   <field>
     <name>priority</name>
     <title>Priority</title>
     <type>int unsigned</type>
+    <default>0</default>
     <comment>Higher priority rules are matched first</comment>
   </field>
 
@@ -41,7 +42,7 @@
     <type>varchar</type>
     <length>512</length>
     <required>true</required>
-    <comment>The Access-Control-Allow-Origin response header</comment>
+    <comment>A comma separated list of allowed origins or '*'. Used to create the 'Access-Control-Allow-Origin' response header </comment>
   </field>
 
   <field>
@@ -49,7 +50,7 @@
     <title>Headers</title>
     <type>varchar</type>
     <length>512</length>
-    <comment>The Access-Control-Allow-Headers response header</comment>
+    <comment>A comma separated list of allowed headers or '*'. Used to create the 'Access-Control-Allow-Headers' response header</comment>
   </field>
 
   <field>
@@ -57,14 +58,14 @@
     <title>Methods</title>
     <type>varchar</type>
     <length>256</length>
-    <comment>The Access-Control-Allow-Methods response header</comment>
+    <comment>A comma separated list of allowed methods or '*'. Used to create the 'Access-Control-Allow-Methods' response header</comment>
   </field>
 
   <field>
     <name>max_age</name>
     <title>Max age</title>
     <type>int unsigned</type>
-    <comment>The Access-Control-Max-Age response header</comment>
+    <comment>Maximum number of seconds the results can be cached. Use to create the 'Access-Control-Max-Age' response header</comment>
   </field>
 
 </table>
