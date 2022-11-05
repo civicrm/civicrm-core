@@ -52,7 +52,7 @@ class Cors extends AutoService implements EventSubscriberInterface {
       $this->setAllowMethods($rule->methods);
       $this->setMaxAge();
 
-      // Respond to all OPTIONS requests with an 204.
+      // Respond to all OPTIONS requests with a 204.
       if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         http_response_code(204);
         // There is no need for any further processing.
