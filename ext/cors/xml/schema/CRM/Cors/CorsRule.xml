@@ -32,7 +32,7 @@
     <name>priority</name>
     <title>Priority</title>
     <type>int unsigned</type>
-    <default>0</default>
+    <default>1</default>
     <comment>Higher priority rules are matched first</comment>
   </field>
 
