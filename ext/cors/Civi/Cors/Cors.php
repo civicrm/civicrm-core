@@ -130,14 +130,11 @@ class Cors extends AutoService implements EventSubscriberInterface {
   /**
    * Set the allowed headers for this request (typically authorisation headers).
    *
-   * @param String $headers '*' or a comma separated list of allowed headers
+   * @param String $headers Comma separated list of allowed headers or '*'
    * @return void
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
    */
   public function setAllowHeaders($headers) {
-    if (!$headers) {
-      return;
-    }
     header('Access-Control-Allow-Headers: ' . $headers);
   }
 
