@@ -95,17 +95,12 @@ class Cors extends AutoService implements EventSubscriberInterface {
   /**
    * Set the allowed origin(s) for this request.
    *
-   * @param String $origins '*' or a comma separated list of allowed origins.
+   * @param String $origins Comma separated list of allowed origins or '*'.
    * @return void
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
    */
   public function setAllowOrigin($origins) {
-
-    // No origin specified.
-    if (!$origins) {
-      return;
-    }
 
     // Wildcard origin.
     if ($origins === '*') {
