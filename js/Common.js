@@ -527,7 +527,7 @@ if (!CRM.vars) CRM.vars = {};
   $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
     select2Options = select2Options || {};
     return $(this).each(function() {
-      $(this).crmSelect2({
+      $(this).crmSelect2(_.extend({
         ajax: {
           quietMillis: 250,
           url: CRM.url('civicrm/ajax/api4/' + entityName + '/autocomplete'),
@@ -560,7 +560,7 @@ if (!CRM.vars) CRM.vars = {};
             callback(multiple ? result : result[0]);
           });
         }
-      });
+      }, select2Options));
     });
   };
 

@@ -227,8 +227,8 @@
         setDateOptions();
       };
 
-      $scope.toggleRequired = function() {
-        getSet('required', !getSet('required'));
+      $scope.toggleAttr = function(attr) {
+        getSet(attr, !getSet(attr));
       };
 
       $scope.toggleHelp = function(position) {

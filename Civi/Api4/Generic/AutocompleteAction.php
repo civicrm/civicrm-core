@@ -28,6 +28,8 @@ use Civi\Api4\Utils\CoreUtil;
  * @method string getFormName()
  * @method $this setFieldName(string $fieldName) Set fieldName.
  * @method string getFieldName()
+ * @method $this setFilters(array $filters)
+ * @method array getFilters()
  */
 class AutocompleteAction extends AbstractAction {
   use Traits\SavedSearchInspectorTrait;
@@ -84,6 +86,14 @@ class AutocompleteAction extends AbstractAction {
   protected $key;
 
   /**
+   * Search conditions that will be automatically added to the WHERE or HAVING clauses
+   *
+   * Format: [fieldName => value][]
+   * @var array
+   */
+  public $filters = [];
+
+  /**
    * Filters set programmatically by `civi.api.prepare` listener. Automatically trusted.
    *
    * Format: [fieldName => value][]
@@ -138,7 +148,7 @@ class AutocompleteAction extends AbstractAction {
       $this->addFilter($labelField, $this->input);
     }
 
-    // Ensure SELECT param includes all fields & filters
+    // Ensure SELECT param includes all fields & trusted filters
     $select = [$idField];
     foreach ($this->display['settings']['columns'] as $column) {
       if ($column['type'] === 'field') {
@@ -159,7 +169,7 @@ class AutocompleteAction extends AbstractAction {
     $apiResult = \Civi\Api4\SearchDisplay::run(FALSE)
       ->setSavedSearch($this->savedSearch)
       ->setDisplay($this->display)
-      ->setFilters($this->trustedFilters)
+      ->setFilters($this->filters)
       ->setReturn($return)
       ->execute();
 
@@ -188,6 +198,7 @@ class AutocompleteAction extends AbstractAction {
    * @param mixed $value
    */
   public function addFilter(string $fieldName, $value) {
+    $this->filters[$fieldName] = $value;
     $this->trustedFilters[$fieldName] = $value;
   }
 
