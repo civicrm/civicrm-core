@@ -104,6 +104,7 @@ class CoreUtil {
     $operators[] = 'IS NOT EMPTY';
     $operators[] = 'REGEXP';
     $operators[] = 'NOT REGEXP';
+    $operators[] = 'REVERSE LIKE';
     return $operators;
   }
 

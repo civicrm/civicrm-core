@@ -633,6 +633,10 @@ class Api4SelectQuery {
       return sprintf('%s %s "%s"', $fieldAlias, $operator, \CRM_Core_DAO::escapeString($value));
     }
 
+    if ($operator == 'REVERSE LIKE') {
+      return sprintf('"%s" LIKE %s', \CRM_Core_DAO::escapeString($value), $fieldAlias);
+    }
+
     if (is_bool($value)) {
       $value = (int) $value;
     }
