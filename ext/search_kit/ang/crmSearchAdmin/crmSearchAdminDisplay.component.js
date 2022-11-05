@@ -12,7 +12,6 @@
     template: function() {
       // Dynamic template generates switch condition for each display type
       var html =
-        '<div ng-include="\'~/crmSearchAdmin/crmSearchAdminDisplay.html\'"></div>\n' +
         '<div ng-switch="$ctrl.display.type">\n';
       _.each(CRM.crmSearchAdmin.displayTypes, function(type) {
         html +=
@@ -324,6 +323,19 @@
             ctrl.preview = true;
           }, 100);
         }
+      };
+
+      this.getDefaultLimit = function() {
+        return CRM.crmSearchAdmin.defaultPagerSize;
+      };
+
+      this.getDefaultSort = function() {
+        var apiEntity = ctrl.savedSearch.api_entity,
+          sort = [];
+        if (searchMeta.getEntity(apiEntity).order_by) {
+          sort.push([searchMeta.getEntity(apiEntity).order_by, 'ASC']);
+        }
+        return sort;
       };
 
       this.fieldsForSort = function() {

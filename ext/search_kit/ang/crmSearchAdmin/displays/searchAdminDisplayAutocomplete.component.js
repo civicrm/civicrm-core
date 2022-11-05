@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchAdmin').component('searchAdminDisplayGrid', {
+  angular.module('crmSearchAdmin').component('searchAdminDisplayAutocomplete', {
     bindings: {
       display: '<',
       apiEntity: '<',
@@ -10,23 +10,28 @@
     require: {
       parent: '^crmSearchAdminDisplay'
     },
-    templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayGrid.html',
+    templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayAutocomplete.html',
     controller: function($scope, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
+        ctrl = this,
+        colTypes = [];
 
       this.getColTypes = function() {
-        return ctrl.parent.colTypes;
+        return colTypes;
       };
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {
           ctrl.display.settings = {
-            colno: '3',
-            limit: ctrl.parent.getDefaultLimit(),
             sort: ctrl.parent.getDefaultSort(),
-            pager: {}
+            columns: []
           };
+          var labelField = searchMeta.getEntity(ctrl.apiEntity).label_field;
+          _.each([labelField, 'description'], function(field) {
+            if (_.includes(ctrl.parent.savedSearch.api_params.select, field)) {
+              ctrl.display.settings.columns.push(searchMeta.fieldToColumn(field, {}));
+            }
+          });
         }
         ctrl.parent.initColumns({});
       };
