@@ -2,7 +2,7 @@
 <extension key="cors" type="module">
   <file>cors</file>
   <name>CORS</name>
-  <description>Adds CORS headers to responses sent to requests for CiviCRM URLs.</description>
+  <description>Add CORS headers to responses sent to requests for CiviCRM URLs.</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Michael McAndrew</author>
@@ -13,11 +13,11 @@
     <url desc="Support">https://chat.civicrm.org/civicrm/channels/dev</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2022-10-18</releaseDate>
+  <releaseDate>2022-12-07</releaseDate>
   <version>1.0</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>5.55</ver>
+    <ver>5.57</ver>
   </compatibility>
   <classloader>
     <psr0 prefix="CRM_" path="." />
