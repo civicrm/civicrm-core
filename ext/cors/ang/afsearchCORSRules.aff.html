@@ -1,0 +1,20 @@
+<div af-fieldset="">
+  <div class="af-markup">
+    <div class="help">
+<p>
+  {{:: ts('This extension adds CORS headers to responses sent to requests for CiviCRM URLs.') }}
+</p>
+<p>
+  {{:: ts('Paths are checked in order of priority (higher priority first) and matched using MySQL like wildcards, e.g. \'civicrm/ajax/api4/%\'.  You can specify allowed origins, allowed headers, allowed methods and also set a max age to cache the header.') }}
+</p>
+      <a href="https://docs.civicrm.org/sysadmin/en/latest/setup/cors/" target="_blank" class="crm-doc-link no-popup">{{:: ts('For documentation, see the sysadmin guide.') }}</a>
+    </div>
+  </div>
+  <crm-search-display-table search-name="CORS_rules" display-name="CORS_rules_table"></crm-search-display-table>
+</div>
+
+
+
+<div af-fieldset="">
+  <crm-search-display-table search-name="Administer_Contact_Types" display-name="Contact_Types_Table"></crm-search-display-table>
+</div>

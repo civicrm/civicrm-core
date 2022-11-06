@@ -1,0 +1,13 @@
+{
+  "type": "search",
+  "title": "CORS rules",
+  "description": "Add CORS headers to responses sent to requests for CiviCRM URLs.",
+  "icon": "",
+  "server_route": "civicrm/admin/cors",
+  "permission": "administer CiviCRM",
+  "navigation": {
+    "parent": "System Settings",
+    "label": "CORS rules",
+    "weight": 20
+  }
+}
