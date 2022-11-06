@@ -25,6 +25,7 @@
     <title>Path</title>
     <type>varchar</type>
     <length>256</length>
+    <required>true</required>
     <comment>Path to match against (using MySQL's LIKE operator)</comment>
   </field>
 
@@ -33,6 +34,7 @@
     <title>Priority</title>
     <type>int unsigned</type>
     <default>1</default>
+    <required>true</required>
     <comment>Higher priority rules are matched first</comment>
   </field>
 

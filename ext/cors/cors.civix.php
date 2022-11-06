@@ -24,7 +24,7 @@ class CRM_Cors_ExtensionUtil {
    *   Translated text.
    * @see ts
    */
-  public static function ts($text, $params = []): string {
+  public static function ts($text, $params = []) {
     if (!array_key_exists('domain', $params)) {
       $params['domain'] = [self::LONG_NAME, NULL];
     }
@@ -41,7 +41,7 @@ class CRM_Cors_ExtensionUtil {
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo'.
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo/css/foo.css'.
    */
-  public static function url($file = NULL): string {
+  public static function url($file = NULL) {
     if ($file === NULL) {
       return rtrim(CRM_Core_Resources::singleton()->getUrl(self::LONG_NAME), '/');
     }

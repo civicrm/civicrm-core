@@ -35,12 +35,12 @@ SET FOREIGN_KEY_CHECKS=1;
 -- *******************************************************/
 CREATE TABLE `civicrm_cors_rule` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique ID',
-  `path` varchar(256) COMMENT 'Path to match against (using the MySQL like operator)',
-  `priority` int unsigned COMMENT 'Higher priority rules are matched first',
-  `origins` varchar(512) NOT NULL COMMENT 'The Access-Control-Allow-Origin response header',
-  `headers` varchar(512) COMMENT 'The Access-Control-Allow-Headers response header',
-  `methods` varchar(256) COMMENT 'The Access-Control-Allow-Methods response header',
-  `max_age` int unsigned COMMENT 'The Access-Control-Max-Age response header',
+  `path` varchar(256) NOT NULL COMMENT 'Path to match against (using MySQL\'s LIKE operator)',
+  `priority` int unsigned NOT NULL DEFAULT 1 COMMENT 'Higher priority rules are matched first',
+  `origins` varchar(512) NOT NULL COMMENT 'A comma separated list of allowed origins or \'*\'. Used to create the \'Access-Control-Allow-Origin\' response header ',
+  `headers` varchar(512) COMMENT 'A comma separated list of allowed headers or \'*\'. Used to create the \'Access-Control-Allow-Headers\' response header',
+  `methods` varchar(256) COMMENT 'A comma separated list of allowed methods or \'*\'. Used to create the \'Access-Control-Allow-Methods\' response header',
+  `max_age` int unsigned COMMENT 'Maximum number of seconds the results can be cached. Use to create the \'Access-Control-Max-Age\' response header',
   PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB;
