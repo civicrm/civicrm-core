@@ -178,8 +178,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('action', CRM_Core_Action::VIEW);
     //To show the event location on maps directly on event info page
     $locations = CRM_Event_BAO_Event::getMapInfo($this->_id);
+    $this->assign('locations', $locations);
     if (!empty($locations) && !empty($values['event']['is_map'])) {
-      $this->assign('locations', $locations);
       $this->assign('mapProvider', $config->mapProvider);
       $this->assign('mapKey', $config->mapAPIKey);
       $sumLat = $sumLng = 0;
