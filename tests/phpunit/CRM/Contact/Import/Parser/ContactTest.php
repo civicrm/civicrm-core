@@ -1292,6 +1292,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testImportCountryStateCounty(): void {
+    $sql = "INSERT INTO civicrm_county SET id = 999, name = 'Farnell', abbreviation = '', state_province_id = 1640, is_active = 1";
+    \CRM_Core_DAO::executeQuery($sql);
     $childKey = $this->getRelationships()['Child of']['id'] . '_a_b';
     $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
     $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
@@ -1338,6 +1340,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->importCSV($csv, $mapper);
     $contacts = $this->getImportedContacts();
     foreach ($contacts as $contact) {
+      $this->assertEquals(999, $contact['address'][0]['county_id']);
       $this->assertEquals(1013, $contact['address'][0]['country_id']);
       $this->assertEquals(1640, $contact['address'][0]['state_province_id']);
     }
