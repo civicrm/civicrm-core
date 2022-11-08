@@ -429,7 +429,6 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       ['billingPostalCode', ['billing_postal_code', 'postal_code', 'billing_postal_code-5'], $valid_strings_inc_null, []],
       ['billingCounty', [], $valid_strings_inc_null, []],
       ['billingStateProvince', ['billing_state_province', 'state_province', 'billing_state_province-5'], $valid_strings_inc_null, []],
-      ['billingCountry', [], [['GB', 'GB'], ['NZ', 'NZ']], ['XX', '', NULL, 0]],
       ['contributionID', ['contribution_id'], $valid_ints, $invalid_ints],
       ['contributionRecurID', ['contribution_recur_id'], $valid_ints, $invalid_ints],
       ['description', [], [['foo' , 'foo'], ['', '']], []],
@@ -446,6 +445,70 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       ['transactionID', ['transaction_id'], $valid_strings, []],
       ['trxnResultCode', [], $valid_strings, []],
     ];
+  }
+
+  /**
+   * Billing country is a mess.
+   */
+  public function testBillingCountry() {
+
+    // Test designed use
+    foreach (['NZ', 'GB'] as $valid) {
+      $propertyBag = new PropertyBag();
+      $propertyBag->setBillingCountry($valid);
+      $this->assertEquals($valid, $propertyBag->getBillingCountry());
+      $this->assertCount(0, $propertyBag->logs);
+    }
+
+    // Many sorts of nothingness
+    foreach ([NULL, 0, FALSE] as $bad) {
+      $propertyBag = new PropertyBag();
+      $propertyBag->setBillingCountry($bad);
+      $this->assertCount(1, $propertyBag->logs);
+      $latestLog = end($propertyBag->logs);
+      $this->assertRegExp("/setBillingCountry input warnings.*Expected string.*munged to: \"\"/s", $latestLog);
+      $this->assertEquals('', $propertyBag->getBillingCountry());
+    }
+
+    // '' special case
+    $propertyBag = new PropertyBag();
+    $propertyBag->setBillingCountry('');
+    $this->assertCount(1, $propertyBag->logs);
+    $latestLog = end($propertyBag->logs);
+    $this->assertRegExp('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\n.*munged to: ""/', $latestLog);
+    $this->assertEquals('', $propertyBag->getBillingCountry());
+
+    // Invalid country name
+    $propertyBag = new PropertyBag();
+    $propertyBag->setBillingCountry('UnitedKing');
+    $this->assertCount(1, $propertyBag->logs);
+    $latestLog = end($propertyBag->logs);
+    $this->assertRegExp('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\nGiven input did not match a country name\.\n.*munged to: ""/', $latestLog);
+    $this->assertEquals('', $propertyBag->getBillingCountry());
+
+    // Valid country name
+    $propertyBag = new PropertyBag();
+    $propertyBag->setBillingCountry('United Kingdom');
+    $this->assertCount(1, $propertyBag->logs);
+    $latestLog = end($propertyBag->logs);
+    $this->assertRegExp('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\nGiven input matched a country name.*?\n.*munged to: "GB"/', $latestLog);
+    $this->assertEquals('GB', $propertyBag->getBillingCountry());
+
+    // Invalid country ID
+    $propertyBag = new PropertyBag();
+    $propertyBag->setBillingCountry(-1);
+    $this->assertCount(1, $propertyBag->logs);
+    $latestLog = end($propertyBag->logs);
+    $this->assertRegExp('/setBillingCountry input warnings.+\nExpected string\nGiven input looked like it could be a country ID but did not.*?\n.*munged to: ""/', $latestLog);
+    $this->assertEquals('', $propertyBag->getBillingCountry());
+
+    // Valid country ID
+    $propertyBag = new PropertyBag();
+    $propertyBag->setBillingCountry(1154); /* should be New Zealand */
+    $this->assertCount(1, $propertyBag->logs);
+    $latestLog = end($propertyBag->logs);
+    $this->assertRegExp('/setBillingCountry input warnings.+\nExpected string\nGiven input matched a country ID.*?\n.*munged to: "NZ"/', $latestLog);
+    $this->assertEquals('NZ', $propertyBag->getBillingCountry());
   }
 
   /**

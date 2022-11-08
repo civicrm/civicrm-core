@@ -4,6 +4,7 @@ namespace Civi\Payment;
 use InvalidArgumentException;
 use CRM_Core_Error;
 use CRM_Core_PseudoConstant;
+use Civi\Api4\Country;
 
 /**
  * @class
@@ -83,6 +84,12 @@ class PropertyBag implements \ArrayAccess {
     'isNotifyProcessorOnCancelRecur' => TRUE,
   ];
 
+  /**
+   * For unit tests only.
+   *
+   * @var array
+   */
+  public $logs = [];
 
   /**
    * @var bool
@@ -646,13 +653,55 @@ class PropertyBag implements \ArrayAccess {
    * @param string $label e.g. 'default'
    */
   public function setBillingCountry($input, $label = 'default') {
-    if (!is_string($input) || strlen($input) !== 2) {
-      throw new \InvalidArgumentException("setBillingCountry expects ISO 3166-1 alpha-2 country code.");
+    $warnings = [];
+    $munged = $input;
+    if (!is_string($input)) {
+      $warnings[] = 'Expected string';
     }
-    if (!CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'country_id', $input)) {
-      throw new \InvalidArgumentException("setBillingCountry expects ISO 3166-1 alpha-2 country code.");
+    else {
+      if (!(strlen($input) === 2 && CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'country_id', $input))) {
+        $warnings[] = 'Not ISO 3166-1 alpha-2 code.';
+      }
     }
-    return $this->set('billingCountry', $label, (string) $input);
+
+    if ($warnings) {
+      // Try to munge.
+      if (empty($input)) {
+        $munged = '';
+      }
+      else {
+        if ((is_int($input) || preg_match('/^\d+$/', $input))) {
+          // Got a number. Maybe it's an ID?
+          $munged = Country::get(FALSE)->addSelect('iso_code')->addWhere('id', '=', $input)->execute()->first()['iso_code'] ?? '';
+          if ($munged) {
+            $warnings[] = "Given input matched a country ID, assuming it was that.";
+          }
+          else {
+            $warnings[] = "Given input looked like it could be a country ID but did not match a country.";
+          }
+        }
+        elseif (is_string($input)) {
+          $munged = Country::get(FALSE)->addSelect('iso_code')->addWhere('name', '=', $input)->execute()->first()['iso_code'] ?? '';
+          if ($munged) {
+            $warnings[] = "Given input matched a country name, assuming it was that.";
+          }
+          else {
+            $warnings[] = "Given input did not match a country name.";
+          }
+        }
+        else {
+          $munged = '';
+          $warnings[] = "Given input is plain weird.";
+        }
+      }
+    }
+
+    if ($warnings) {
+      $warnings[] = "Input: " . json_encode($input) . " was munged to: " . json_encode($munged);
+      $this->logWarning(__FUNCTION__ . " input warnings (may be errors in future):\n" . implode("\n", $warnings));
+    }
+
+    return $this->set('billingCountry', $label, $munged);
   }
 
   /**
@@ -1206,6 +1255,14 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("Attempted to set '$prop' via setCustomProperty - must use using its setter.");
     }
     $this->props[$label][$prop] = $value;
+  }
+
+  /**
+   * For unit tests only.
+   */
+  protected function logWarning($message) {
+    $this->logs[] = $message;
+    \Civi::log()->warning($message);
   }
 
 }
