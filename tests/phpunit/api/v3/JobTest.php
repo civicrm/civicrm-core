@@ -27,33 +27,11 @@ use Civi\Api4\Contact;
  */
 class api_v3_JobTest extends CiviUnitTestCase {
 
-  public $DBResetRequired = FALSE;
-
-  public $_entity = 'Job';
-
-  /**
-   * Created membership type.
-   *
-   * Must be created outside the transaction due to it breaking the transaction.
-   *
-   * @var int
-   */
-  public $membershipTypeID;
-
-  /**
-   * Report instance used in mail_report tests.
-   *
-   * @var array
-   */
-  private $report_instance;
-
   /**
    * Set up for tests.
    */
   public function setUp(): void {
     parent::setUp();
-    $this->membershipTypeID = $this->membershipTypeCreate(['name' => 'General']);
-    $this->useTransaction();
     $this->_params = [
       'sequential' => 1,
       'name' => 'API_Test_Job',
@@ -64,36 +42,22 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     ];
-    $this->report_instance = $this->createReportInstance();
   }
 
   /**
    * Cleanup after test.
    */
   public function tearDown(): void {
-    parent::tearDown();
-    // The membershipType create breaks transactions so this extra cleanup is needed.
-    $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
-    $this->cleanUpSetUpIDs();
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone', 'civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule', 'civicrm_group', 'civicrm_group_contact'], TRUE);
     parent::tearDown();
-  }
-
-  /**
-   * Check with no name.
-   */
-  public function testCreateWithoutName(): void {
-    $this->callAPIFailure('job', 'create', ['is_active' => 1],
-      'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
-    );
   }
 
   /**
    * Create job with an invalid "run_frequency" value.
    */
   public function testCreateWithInvalidFrequency(): void {
-    $params = [
+    $this->callAPIFailure('job', 'create', [
       'sequential' => 1,
       'name' => 'API_Test_Job',
       'description' => 'A long description written by hand in cursive',
@@ -102,30 +66,24 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'api_action' => 'api_test_action',
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
-    ];
-    $this->callAPIFailure('job', 'create', $params);
+    ]);
   }
 
   /**
    * Create job.
    */
   public function testCreate(): void {
-    $result = $this->callAPIAndDocument('job', 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['values'][0]['id']);
-
-    // mutate $params to match expected return value
-    unset($this->_params['sequential']);
-    //assertDBState compares expected values in $result to actual values in the DB
-    $this->assertDBState('CRM_Core_DAO_Job', $result['id'], $this->_params);
+    $result = $this->callAPIAndDocument('Job', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $this->getAndCheck($this->_params, $result['id'], 'Job');
   }
 
   /**
    * Clone job.
    */
   public function testClone(): void {
-    $createResult = $this->callAPISuccess('job', 'create', $this->_params);
+    $createResult = $this->callAPISuccess('Job', 'create', $this->_params);
     $params = ['id' => $createResult['id']];
-    $cloneResult = $this->callAPIAndDocument('job', 'clone', $params, __FUNCTION__, __FILE__);
+    $cloneResult = $this->callAPIAndDocument('Job', 'clone', $params, __FUNCTION__, __FILE__);
     $clonedJob = $cloneResult['values'][$cloneResult['id']];
     $this->assertEquals($this->_params['name'] . ' - Copy', $clonedJob['name']);
     $this->assertEquals($this->_params['description'], $clonedJob['description']);
@@ -136,37 +94,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check if required fields are not passed.
-   */
-  public function testDeleteWithoutRequired(): void {
-    $params = [
-      'name' => 'API_Test_PP',
-      'title' => 'API Test Payment Processor',
-      'class_name' => 'CRM_Core_Payment_APITest',
-    ];
-
-    $result = $this->callAPIFailure('job', 'delete', $params);
-    $this->assertEquals('Mandatory key(s) missing from params array: id', $result['error_message']);
-  }
-
-  /**
-   * Check with incorrect required fields.
-   */
-  public function testDeleteWithIncorrectData(): void {
-    $params = [
-      'id' => 'abcd',
-    ];
-    $this->callAPIFailure('job', 'delete', $params);
-  }
-
-  /**
    * Check job delete.
    */
   public function testDelete(): void {
-    $createResult = $this->callAPISuccess('job', 'create', $this->_params);
+    $createResult = $this->callAPISuccess('Job', 'create', $this->_params);
     $params = ['id' => $createResult['id']];
-    $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
-    $this->assertAPIDeleted($this->_entity, $createResult['id']);
+    $this->callAPIAndDocument('Job', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->assertAPIDeleted('Job', $createResult['id']);
   }
 
   /**
@@ -181,7 +115,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     // Clear out the postal greeting
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET postal_greeting_display = NULL WHERE id = ' . $contactID);
-    $this->callAPISuccess($this->_entity, 'update_greeting', [
+    $this->callAPISuccess('Job', 'update_greeting', [
       'gt' => 'postal_greeting',
       'ct' => 'Individual',
     ]);
@@ -198,7 +132,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess(): void {
     $gt = 'postal_greeting,email_greeting,addressee';
     $ct = 'Individual,Household';
-    $this->callAPISuccess($this->_entity, 'update_greeting', ['gt' => $gt, 'ct' => $ct]);
+    $this->callAPISuccess('Job', 'update_greeting', ['gt' => $gt, 'ct' => $ct]);
   }
 
   /**
@@ -297,7 +231,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     ]);
     $relationshipID = $result['id'];
     $this->assertEquals('Hooked', $result['values'][$relationshipID]['description']);
-    $this->callAPISuccess($this->_entity, 'disable_expired_relationships', []);
+    $this->callAPISuccess('Job', 'disable_expired_relationships', []);
     $result = $this->callAPISuccess('relationship', 'get', []);
     $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
     $this->contactDelete($individualID);
@@ -2241,14 +2175,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testMailReportForPrint(): void {
     $mut = new CiviMailUtils($this, TRUE);
-
+    $reportInstance = $this->createReportInstance();
     // avoid warnings
     if (empty($_SERVER['QUERY_STRING'])) {
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
     ob_start();
-    $this->callAPISuccess('job', 'mail_report', [
-      'instanceId' => $this->report_instance['id'],
+    $this->callAPISuccess('Job', 'mail_report', [
+      'instanceId' => $reportInstance['id'],
       'format' => 'print',
     ]);
     ob_end_clean();
@@ -2275,15 +2209,15 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testMailReportForPdf(): void {
     $mut = new CiviMailUtils($this, TRUE);
-
+    $reportInstance = $this->createReportInstance();
     // avoid warnings
     if (empty($_SERVER['QUERY_STRING'])) {
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
 
     ob_start();
-    $this->callAPISuccess('job', 'mail_report', [
-      'instanceId' => $this->report_instance['id'],
+    $this->callAPISuccess('Job', 'mail_report', [
+      'instanceId' => $reportInstance['id'],
       'format' => 'pdf',
     ]);
     ob_end_clean();
@@ -2313,6 +2247,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * but since it's csv we can easily check the output.
    */
   public function testMailReportForCsv(): void {
+    $reportInstance = $this->createReportInstance();
     // Create many contacts, in particular so that the report would be more
     // than a one-pager.
     for ($i = 0; $i < 110; $i++) {
@@ -2326,8 +2261,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
     ob_start();
-    $this->callAPISuccess('job', 'mail_report', [
-      'instanceId' => $this->report_instance['id'],
+    $this->callAPISuccess('Job', 'mail_report', [
+      'instanceId' => $reportInstance['id'],
       'format' => 'csv',
     ]);
     ob_end_clean();
@@ -2374,8 +2309,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Helper to create a report instance of the contact summary report.
+   *
+   * @return array
    */
-  private function createReportInstance() {
+  private function createReportInstance(): array {
     return $this->callAPISuccess('ReportInstance', 'create', [
       'report_id' => 'contact/summary',
       'title' => 'test report',
