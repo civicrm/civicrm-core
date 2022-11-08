@@ -13,6 +13,7 @@
 namespace Civi\Api4\Generic;
 
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Retrieve $ENTITIES for an autocomplete form field.
@@ -119,6 +120,10 @@ class AutocompleteAction extends AbstractAction {
 
     if (!$this->savedSearch) {
       $this->savedSearch = ['api_entity' => $entityName];
+      // Allow the default search to be modified
+      \Civi::dispatcher()->dispatch('civi.search.autocompleteDefault', GenericHookEvent::create([
+        'savedSearch' => &$this->savedSearch,
+      ]));
     }
     $this->loadSavedSearch();
     $this->loadSearchDisplay();
@@ -133,10 +138,9 @@ class AutocompleteAction extends AbstractAction {
       $labelField = implode(',', array_unique(array_merge([$labelField], $this->getTokens($this->display['settings']['columns'][0]['rewrite']))));
     }
 
-    $apiParams =& $this->savedSearch['api_params'];
     // Render mode: fetch by id
     if ($this->ids) {
-      $apiParams['where'][] = [$idField, 'IN', $this->ids];
+      $this->savedSearch['api_params']['where'][] = [$idField, 'IN', $this->ids];
       unset($this->display['settings']['pager']);
       $return = NULL;
     }
@@ -148,23 +152,7 @@ class AutocompleteAction extends AbstractAction {
       $this->addFilter($labelField, $this->input);
     }
 
-    // Ensure SELECT param includes all fields & trusted filters
-    $select = [$idField];
-    foreach ($this->display['settings']['columns'] as $column) {
-      if ($column['type'] === 'field') {
-        $select[] = $column['key'];
-      }
-      if (!empty($column['rewrite'])) {
-        $select = array_merge($select, $this->getTokens($column['rewrite']));
-      }
-    }
-    foreach ($this->trustedFilters as $fields => $val) {
-      $select = array_merge($select, explode(',', $fields));
-    }
-    if (!empty($this->display['settings']['color'])) {
-      $select[] = $this->display['settings']['color'];
-    }
-    $apiParams['select'] = array_unique(array_merge($apiParams['select'], $select));
+    $this->augmentSelectClause($idField);
 
     $apiResult = \Civi\Api4\SearchDisplay::run(FALSE)
       ->setSavedSearch($this->savedSearch)
@@ -200,6 +188,32 @@ class AutocompleteAction extends AbstractAction {
   public function addFilter(string $fieldName, $value) {
     $this->filters[$fieldName] = $value;
     $this->trustedFilters[$fieldName] = $value;
+  }
+
+  /**
+   * Ensure SELECT param includes all display fields & trusted filters
+   *
+   * @param string $idField
+   */
+  private function augmentSelectClause(string $idField) {
+    $select = [$idField];
+    foreach ($this->display['settings']['columns'] as $column) {
+      if ($column['type'] === 'field') {
+        $select[] = $column['key'];
+      }
+      if (!empty($column['rewrite'])) {
+        $select = array_merge($select, $this->getTokens($column['rewrite']));
+      }
+    }
+    // Add trustedFilters to the SELECT clause so that SearchDisplay::run will trust them
+    foreach ($this->trustedFilters as $fields => $val) {
+      $select = array_merge($select, explode(',', $fields));
+    }
+    if (!empty($this->display['settings']['color'])) {
+      $select[] = $this->display['settings']['color'];
+    }
+    $select = array_merge($select, array_column($this->display['settings']['sort'] ?? [], 0));
+    $this->savedSearch['api_params']['select'] = array_unique(array_merge($this->savedSearch['api_params']['select'], $select));
   }
 
   /**

@@ -78,7 +78,7 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
     $fieldSpec = civicrm_api4($entity['type'], 'getFields', [
       'checkPermissions' => FALSE,
       'where' => [['name', '=', $fieldName]],
-    ])->single();
+    ])->first();
     $formField = $entity['fields'][$fieldName]['defn'] ?? [];
 
     // Auto-add filters defined in schema
