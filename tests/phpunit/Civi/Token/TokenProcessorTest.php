@@ -187,9 +187,12 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   /**
    * @group locale
    * @dataProvider getPartialNonPartial
+   *
    * @param array $settings
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRenderLocalizedSmarty(array $settings) {
+  public function testRenderLocalizedSmarty(array $settings): void {
     $cleanup = \CRM_Utils_AutoClean::swapSettings($settings);
     \CRM_Utils_Time::setTime('2022-04-08 16:32:04');
     $resetTime = \CRM_Utils_AutoClean::with(['CRM_Utils_Time', 'resetTime']);
@@ -265,7 +268,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(3, $rowCount);
   }
 
-  public function testGetMessageTokens() {
+  public function testGetMessageTokens(): void {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
     ]);
@@ -290,7 +293,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
    * Perform a full mail-merge, substituting multiple tokens for multiple
    * contacts in multiple messages.
    */
-  public function testFull() {
+  public function testFull(): void {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
     ]);
@@ -357,7 +360,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
         $p->addMessage('example', $inputMessage, 'text/plain');
         $p->addRow()
           ->format('text/plain')->tokens($exampleTokens);
-        foreach ($p->evaluate()->getRows() as $key => $row) {
+        foreach ($p->evaluate()->getRows() as $row) {
           $this->assertEquals($expectOutput, $row->render('example'));
           $actualExampleCount++;
         }
@@ -367,14 +370,14 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals($expectExampleCount, $actualExampleCount);
   }
 
-  public function onListTokens(TokenRegisterEvent $e) {
+  public function onListTokens(TokenRegisterEvent $e): void {
     $this->counts[__FUNCTION__]++;
     $e->register('custom', [
       'foobar' => 'A special message about foobar',
     ]);
   }
 
-  public function onEvalTokens(TokenValueEvent $e) {
+  public function onEvalTokens(TokenValueEvent $e): void {
     $this->counts[__FUNCTION__]++;
     foreach ($e->getRows() as $row) {
       /** @var TokenRow $row */
@@ -396,7 +399,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
    *
    * @link https://lab.civicrm.org/dev/core/-/issues/2673
    */
-  public function testHookTokenDiagonal() {
+  public function testHookTokenDiagonal(): void {
     $cid = $this->individualCreate();
 
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
