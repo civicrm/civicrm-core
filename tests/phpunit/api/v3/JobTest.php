@@ -42,14 +42,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Report instance used in mail_report tests.
+   *
    * @var array
    */
   private $report_instance;
 
   /**
    * Set up for tests.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -70,8 +69,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Cleanup after test.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     parent::tearDown();
@@ -87,10 +84,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Check with no name.
    */
   public function testCreateWithoutName(): void {
-    $params = [
-      'is_active' => 1,
-    ];
-    $this->callAPIFailure('job', 'create', $params,
+    $this->callAPIFailure('job', 'create', ['is_active' => 1],
       'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
     );
   }
@@ -126,9 +120,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Clone job
-   *
-   * @throws \CRM_Core_Exception
+   * Clone job.
    */
   public function testClone(): void {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
@@ -169,8 +161,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Check job delete.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testDelete(): void {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
@@ -204,8 +194,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test greeting update handles comma separated params.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess(): void {
     $gt = 'postal_greeting,email_greeting,addressee';
@@ -225,8 +213,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * of scheduled reminder testing functions. However, it seems that the api
    * itself would need to be moved to the scheduled_reminder fn to do that
    * with the job wrapper being respected for legacy functions
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCallSendReminderSuccessMoreThanDefaultLimit(): void {
     $membershipTypeID = $this->membershipTypeCreate();
@@ -254,7 +240,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       ]);
     }
     $this->callAPISuccess('job', 'send_reminder', []);
-    $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
     $this->assertEquals($successfulCronCount, $createTotal);
   }
 
@@ -283,18 +269,16 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'mode' => 'User_Preference',
     ]);
     $this->callAPISuccess('job', 'send_reminder', []);
-    $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
     $this->assertEquals(1, $successfulCronCount);
-    $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
+    $sentToID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_action_log');
     $this->assertEquals($sentToID, $theChosenOneID);
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery("SELECT is_error FROM civicrm_action_log"));
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT is_error FROM civicrm_action_log'));
     $this->setupForSmsTests(TRUE);
   }
 
   /**
    * Test disabling expired relationships.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCallDisableExpiredRelationships(): void {
     $individualID = $this->individualCreate();
@@ -322,8 +306,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Event templates should not send reminders to additional contacts.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testTemplateRemindAdditionalContacts(): void {
     $contactId = $this->individualCreate();
@@ -356,8 +338,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Deleted events should not send reminders to additional contacts.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testDeletedEventRemindAdditionalContacts(): void {
     $contactId = $this->individualCreate();
@@ -417,11 +397,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccess('SmsProvider', 'delete', ['id' => $provider['id']]);
     $this->callAPISuccess('job', 'send_reminder', []);
-    $cronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $cronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
     $this->assertEquals(1, $cronCount);
-    $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
+    $sentToID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_action_log');
     $this->assertEquals($sentToID, $theChosenOneID);
-    $cronLog = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_action_log")->fetchAll()[0];
+    $cronLog = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_action_log')->fetchAll()[0];
     $this->assertEquals(1, $cronLog['is_error']);
     $this->assertEquals('SMS reminder cannot be sent because the SMS provider has been deleted.', $cronLog['message']);
     $this->setupForSmsTests(TRUE);
@@ -431,8 +411,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test the batch merge function.
    *
    * We are just checking it returns without error here.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMerge(): void {
     $this->callAPISuccess('Job', 'process_batch_merge', []);
@@ -443,11 +421,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @dataProvider getMergeSets
    *
-   * @param $dataSet
-   *
-   * @throws \CRM_Core_Exception
+   * @param array $dataSet
    */
-  public function testBatchMergeWorks($dataSet): void {
+  public function testBatchMergeWorks(array $dataSet): void {
     foreach ($dataSet['contacts'] as $params) {
       $this->callAPISuccess('Contact', 'create', $params);
     }
@@ -514,8 +490,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test that non-contact entity tags are untouched in merge.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testContributionEntityTag(): void {
     $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'tag_used_for', 'value' => 'civicrm_contribution', 'label' => 'Contribution']);
@@ -548,8 +522,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Group 7  null  Removed  **** null
    *
    * The ones with **** are the ones where I think a case could be made to change the behaviour.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeMergesGroups(): void {
     $contactID = $this->individualCreate();
@@ -638,8 +610,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test that we handle cache entries without clashes.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testMergeCaches(): void {
     $contactID = $this->individualCreate();
@@ -695,8 +665,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *    - result primary kept with the lowest ID. Other address retained too (to preserve location type info).
    *
    * @param array $dataSet
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergesAddresses(array $dataSet): void {
     $contactID1 = $this->individualCreate();
@@ -731,8 +699,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @dataProvider getMergeLocationData
    *
    * @param array $dataSet
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergesAddressesHook(array $dataSet): void {
     $contactID1 = $this->individualCreate();
@@ -766,8 +732,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test the organization will not be matched to an individual.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeWillNotMergeOrganizationToIndividual(): void {
     $individual = $this->callAPISuccess('Contact', 'create', [
@@ -808,8 +772,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *   Contact_id of the contact that will be absorbed and deleted.
    * @param array $migrationInfo
    *   Calculated migration info, informational only.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function hookMostRecentDonor(array &$blocksDAO, int $mainId, int $otherId, array $migrationInfo): void {
 
@@ -874,20 +836,17 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $data = $this->getMergeLocations($address1, $address2, 'Address');
     $data = array_merge($data, $this->getMergeLocations(['phone' => '12345', 'phone_type_id' => 1], ['phone' => '678910', 'phone_type_id' => 1], 'Phone'));
     $data = array_merge($data, $this->getMergeLocations(['phone' => '12345'], ['phone' => '678910'], 'Phone'));
-    $data = array_merge($data, $this->getMergeLocations(['email' => 'mini@me.com'], ['email' => 'mini@me.org'], 'Email', [
+    return array_merge($data, $this->getMergeLocations(['email' => 'mini@me.com'], ['email' => 'mini@me.org'], 'Email', [
       [
         'email' => 'anthony_anderson@civicrm.org',
         'location_type_id' => 'Home',
       ],
     ]));
-    return $data;
 
   }
 
   /**
    * Test weird characters don't mess with merge & cause a fatal.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testNoErrorOnOdd(): void {
     $this->individualCreate();
@@ -905,8 +864,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate
    * emails.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeEmailHandling(): void {
     for ($x = 0; $x <= 4; $x++) {
@@ -938,16 +895,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param bool $onHold2
    * @param bool $merge
    * @param string|null $conflictText
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testBatchMergeEmailOnHold($onHold1, $onHold2, bool $merge, ?string $conflictText): void {
+  public function testBatchMergeEmailOnHold(bool $onHold1, bool $onHold2, bool $merge, ?string $conflictText): void {
     $this->individualCreate([
       'api.email.create' => [
         'email' => 'batman@gotham.met',
         'location_type_id' => 'Work',
         'is_primary' => 1,
-        'on_hold' => $onHold1,
+        'on_hold' => (int) $onHold1,
       ],
     ]);
     $this->individualCreate([
@@ -955,7 +910,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'email' => 'batman@gotham.met',
         'location_type_id' => 'Work',
         'is_primary' => 1,
-        'on_hold' => $onHold2,
+        'on_hold' => (int) $onHold2,
       ],
     ]);
     $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
@@ -979,10 +934,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function getOnHoldSets(): array {
     // Each row specifies: contact 1 on_hold, contact 2 on_hold, merge? (0 or 1),
     return [
-      [0, 0, TRUE, NULL],
-      [0, 1, FALSE, "Email 2 (Work): 'batman@gotham.met' vs. 'batman@gotham.met\n(On Hold)'"],
-      [1, 0, FALSE, "Email 2 (Work): 'batman@gotham.met\n(On Hold)' vs. 'batman@gotham.met'"],
-      [1, 1, TRUE, NULL],
+      [FALSE, FALSE, TRUE, NULL],
+      [FALSE, TRUE, FALSE, "Email 2 (Work): 'batman@gotham.met' vs. 'batman@gotham.met\n(On Hold)'"],
+      [TRUE, FALSE, FALSE, "Email 2 (Work): 'batman@gotham.met\n(On Hold)' vs. 'batman@gotham.met'"],
+      [TRUE, TRUE, TRUE, NULL],
     ];
   }
 
@@ -996,8 +951,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param string $name
    * @param bool $isReserved
    * @param int $threshold
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeEmptyRule(string $contactType, string $used, string $name, bool $isReserved, int $threshold): void {
     $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
@@ -1035,8 +988,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate
    * emails.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeMatchingAddress(): void {
     for ($x = 0; $x <= 2; $x++) {
@@ -1089,8 +1040,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test the batch merge by id range.
    *
    * We have 2 sets of 5 matches & set the merge only to merge the lower set.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeIDRange(): void {
     for ($x = 0; $x <= 4; $x++) {
@@ -1122,8 +1071,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test the batch merge copes with view only custom data field.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeCustomDataViewOnlyField(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
@@ -1146,8 +1093,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * Note that we set 0 on 2 fields with one on each contact to ensure that
    * both merged & mergee fields are respected.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeCustomDataZeroValueField(): void {
     $customGroup = $this->customGroupCreate();
@@ -1173,8 +1118,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test the batch merge treats 0 vs 1 as a conflict.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeCustomDataZeroValueFieldWithConflict(): void {
     $customGroup = $this->customGroupCreate();
@@ -1200,8 +1143,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @dataProvider getMergeSets
    *
    * @param array $dataSet
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeWorksCheckPermissionsTrue(array $dataSet): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM', 'merge duplicate contacts', 'force merge duplicate contacts'];
@@ -1220,8 +1161,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @dataProvider getMergeSets
    *
    * @param array $dataSet
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeWorksCheckPermissionsFalse(array $dataSet): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
@@ -1584,12 +1523,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @param string $op
    * @param string $objectName
-   * @param int $id
+   * @param int|null $id
    * @param array $params
    *
    * @noinspection PhpUnusedParameterInspection
    */
-  public function hookPreRelationship(string $op, string $objectName, $id, array &$params): void {
+  public function hookPreRelationship(string $op, string $objectName, ?int $id, array &$params): void {
     if ($op === 'delete') {
       return;
     }
@@ -1611,7 +1550,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getMergeLocations(array $locationParams1, array $locationParams2, string $entity, $additionalExpected = []): array {
+  public function getMergeLocations(array $locationParams1, array $locationParams2, string $entity, array $additionalExpected = []): array {
     return [
       [
         'matching_primary' => [
@@ -2002,8 +1941,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test processing membership for deceased contacts.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testProcessMembershipDeceased(): void {
     $this->callAPISuccess('Job', 'process_membership', []);
@@ -2018,8 +1955,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test we get an error is deceased status is disabled.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testProcessMembershipNoDeceasedStatus(): void {
     $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
@@ -2037,8 +1972,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Test processing membership: check that status is updated when it should be
    * and left alone when it shouldn't.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testProcessMembershipUpdateStatus(): void {
     $this->ids['MembershipType'] = $this->membershipTypeCreate();
@@ -2169,9 +2102,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test processing membership where is_override is set to 0 rather than NULL
-   *
-   * @throws \CRM_Core_Exception
+   * Test processing membership where is_override is set to 0 rather than NULL.
    */
   public function testProcessMembershipIsOverrideNotNullNot1either(): void {
     $membershipTypeId = $this->membershipTypeCreate();
@@ -2198,7 +2129,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params['status_id'] = 'New';
     $resultCurrent = $this->callAPISuccess('Membership', 'create', $params);
     // Ensure that is_override is set to 0 by doing through DB given API not seem to accept id
-    CRM_Core_DAO::executeQuery("Update civicrm_membership SET is_override = 0 WHERE id = %1", [1 => [$resultCurrent['id'], 'Positive']]);
+    CRM_Core_DAO::executeQuery('Update civicrm_membership SET is_override = 0 WHERE id = %1', [1 => [$resultCurrent['id'], 'Positive']]);
     $this->assertEquals(array_search('New', $memStatus, TRUE), $resultCurrent['values'][0]['status_id']);
     $jobResult = $this->callAPISuccess('Job', 'process_membership', []);
     $this->assertEquals('Processed 1 membership records. Updated 1 records.', $jobResult['values']);
@@ -2224,8 +2155,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *   Is administratively overridden (if so the status is fixed).
    *
    * @return int
-   *
-   * @throws \CRM_Core_Exception
    */
   protected function createMembershipNeedingStatusProcessing(string $startDate, string $endDate, string $status, bool $isAdminOverride = FALSE): int {
     $params = [
@@ -2259,6 +2188,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $membershipTypeID = $this->membershipTypeCreate();
     $this->membershipStatusCreate();
     $createTotal = 3;
+    $theChosenOneID = NULL;
     $groupID = $this->groupCreate(['name' => 'Texan drawlers', 'title' => 'a...']);
     for ($i = 1; $i <= $createTotal; $i++) {
       $contactID = $this->individualCreate();
@@ -2308,8 +2238,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * We're not testing that the report itself is correct since in 'print'
    * format it's a little difficult to parse out, so we're just testing that
    * the email was sent and it more or less looks like an email we'd expect.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testMailReportForPrint(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -2344,8 +2272,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * We're not testing that the report itself is correct since in 'pdf'
    * format it's a little difficult to parse out, so we're just testing that
    * the email was sent and it more or less looks like an email we'd expect.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testMailReportForPdf(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -2385,8 +2311,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * As with the print and pdf we're not super-concerned about report
    * functionality itself - we're more concerned with the mailing part,
    * but since it's csv we can easily check the output.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testMailReportForCsv(): void {
     // Create many contacts, in particular so that the report would be more
