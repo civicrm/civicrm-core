@@ -28,6 +28,15 @@ use Civi\Api4\Contact;
 class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
+   * Entities to return to their original values during tearDown.
+   *
+   * The array is keyed by EntityName.
+   *
+   * @var array
+   */
+  private $originalValues = [];
+
+  /**
    * Set up for tests.
    */
   public function setUp(): void {
@@ -50,6 +59,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone', 'civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule', 'civicrm_group', 'civicrm_group_contact'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone'], TRUE);
+    foreach ($this->originalValues as $entity => $entities) {
+      foreach ($entities as $values) {
+        $this->callAPISuccess($entity, 'create', $values);
+      }
+    }
     parent::tearDown();
   }
 
@@ -101,6 +116,56 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params = ['id' => $createResult['id']];
     $this->callAPIAndDocument('Job', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertAPIDeleted('Job', $createResult['id']);
+  }
+
+  /**
+   * Test processing strings with boolean's in them.
+   *
+   * e.g {if {contact.first_name|boolean}
+   *
+   * @dataProvider dataProviderNamesAndGreetings
+   */
+  public function testUpdateGreetingBooleanToken($params, $expectedEmailGreeting): void {
+    $this->setEmailGreetingTemplateToConditional();
+    $contactID = $this->individualCreate($params);
+    $this->assertEquals($expectedEmailGreeting, Contact::get()->addSelect('email_greeting_display')->addWhere('id', '=', $contactID)->execute()->first()['email_greeting_display']);
+  }
+
+  /**
+   * Data provider for testing email greeting template.
+   */
+  public function dataProviderNamesAndGreetings(): array {
+    return [
+      [
+        'params' => ['first_name' => 'Anthony'],
+        'expected' => 'Dear Anthony',
+      ],
+      [
+        'params' => ['first_name' => ''],
+        'expected' => 'Dear Friend',
+      ],
+      [
+        // This isn't really an issue with the |boolean provider
+        // but it would be without it - https://lab.civicrm.org/dev/core/-/issues/3962
+        'params' => ['first_name' => "O'Shea"],
+        'expected' => "Dear O'Shea",
+      ],
+    ];
+  }
+
+  /**
+   * Set the Individual email template to use {if {contact.first_name|boolean}.
+   */
+  protected function setEmailGreetingTemplateToConditional(): void {
+    $this->originalValues['OptionValue']['email'] = reset($this->callAPISuccess('OptionValue', 'get', [
+      'option_group_id' => 'email_greeting',
+      'is_default' => TRUE,
+      'filter' => 1,
+    ])['values']);
+    $this->callAPISuccess('OptionValue', 'create', [
+      'id' => $this->originalValues['OptionValue']['email']['id'],
+      'label' => '{if {contact.first_name|boolean}}Dear {contact.first_name}{else}Dear Friend{/if}',
+    ]);
   }
 
   /**
