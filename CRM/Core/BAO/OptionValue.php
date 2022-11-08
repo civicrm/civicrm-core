@@ -167,36 +167,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $optionValue->domain_id = CRM_Core_Config::domainID();
     }
 
-    // When setting a default option, unset other options in this group as default
-    // FIXME: The extra CRM_Utils_System::isNull is because the API will pass the string 'null'
-    // FIXME: It would help to make this column NOT NULL DEFAULT 0
-    if (!empty($params['is_default']) && !CRM_Utils_System::isNull($params['is_default'])) {
-      $query = 'UPDATE civicrm_option_value SET is_default = 0 WHERE  option_group_id = %1';
-
-      // tweak default reset, and allow multiple default within group.
-      if ($resetDefaultFor = CRM_Utils_Array::value('reset_default_for', $params)) {
-        if (is_array($resetDefaultFor)) {
-          $colName = key($resetDefaultFor);
-          $colVal = $resetDefaultFor[$colName];
-          $query .= " AND ( $colName IN (  $colVal ) )";
-        }
-      }
-
-      $p = [1 => [$params['option_group_id'], 'Integer']];
-
-      // Limit update by domain of option
-      $domain = CRM_Utils_System::isNull($optionValue->domain_id) ? NULL : $optionValue->domain_id;
-      if (!$domain && $id && $isDomainOptionGroup) {
-        $domain = CRM_Core_DAO::getFieldValue(__CLASS__, $id, 'domain_id');
-      }
-      if ($domain) {
-        $query .= ' AND domain_id = %2';
-        $p[2] = [$domain, 'Integer'];
-      }
-
-      CRM_Core_DAO::executeQuery($query, $p);
-    }
-
     $groupsSupportingDuplicateValues = ['languages'];
     if (!$id && !empty($params['value'])) {
       $dao = new CRM_Core_DAO_OptionValue();
@@ -218,6 +188,14 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
     $optionValue->id = $id;
     $optionValue->save();
+    $id = $optionValue->id;
+    // When setting a default option, unset other options in this group as default
+    // FIXME: The extra CRM_Utils_System::isNull is because the API will pass the string 'null'
+    // FIXME: It would help to make this column NOT NULL DEFAULT 0
+    if (!CRM_Utils_System::isNull($params['is_default'] ?? NULL)) {
+      $optionValue->find(TRUE);
+      self::updateOptionDefaults($params['option_group_id'], $optionValue->id, $optionValue, $groupName);
+    }
     Civi::cache('metadata')->flush();
     CRM_Core_PseudoConstant::flush();
 
@@ -569,6 +547,32 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     }
 
     return CRM_Utils_Array::first($result['values']);
+  }
+
+  /**
+   * Update the default values of other options in the group when the new value is set to is_default.
+   *
+   * @param int $optionGroupID
+   * @param int $id
+   * @param \CRM_Core_DAO_OptionValue $optionValue
+   * @param string $groupName
+   */
+  private static function updateOptionDefaults(int $optionGroupID, int $id, CRM_Core_DAO_OptionValue $optionValue, string $groupName): void {
+    $query = 'UPDATE civicrm_option_value SET is_default = 0 WHERE option_group_id = %1 AND id <> %2';
+    $queryParams = [1 => [$optionGroupID, 'Integer'], 2 => [$id, 'Integer']];
+
+    // Limit update by domain of option. This is loaded if it is a domain option group.
+    if (!empty($optionValue->domain_id)) {
+      $query .= ' AND domain_id = %3';
+      $queryParams[3] = [(int) $optionValue->domain_id, 'Integer'];
+    }
+    if (in_array($groupName, ['email_greeting', 'postal_greeting', 'addressee'], TRUE)) {
+      $variableNumber = count($queryParams) + 1;
+      $query .= ' AND filter = %' . $variableNumber;
+      $queryParams[$variableNumber] = [(int) $optionValue->filter, 'Integer'];
+    }
+
+    CRM_Core_DAO::executeQuery($query, $queryParams);
   }
 
 }
