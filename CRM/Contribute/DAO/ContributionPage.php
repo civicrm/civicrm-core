@@ -39,6 +39,17 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
   public static $_log = TRUE;
 
   /**
+   * Paths for accessing this entity in the UI.
+   *
+   * @var string[]
+   */
+  protected static $_paths = [
+    'add' => 'civicrm/admin/contribute/add?reset=1&action=add',
+    'update' => 'civicrm/admin/contribute/settings?reset=1&action=update&id=[id]',
+    'delete' => 'civicrm/admin/contribute?reset=1&action=delete&id=[id]',
+  ];
+
+  /**
    * Contribution ID
    *
    * @var int|string|null
@@ -536,6 +547,9 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
           'localizable' => 1,
+          'html' => [
+            'type' => 'Text',
+          ],
           'add' => '1.3',
         ],
         'intro_text' => [
