@@ -142,7 +142,7 @@ function saveRecord(recordID, op, recordBAO, entityID) {
   }
   var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=assignRemove'}"{literal};
   //post request and get response
-  CRM.$.post( postUrl, { records: [recordID], recordBAO: recordBAO, op:op, entityID:entityID, key: {/literal}"{crmKey name='civicrm/ajax/ar'}"{literal}  }, function( html ){
+  CRM.$.post( postUrl, { records: [recordID], recordBAO: recordBAO, op:op, entityID:entityID }, function( html ){
     //this is custom status set when record update success.
     if (html.status == 'record-updated-success') {
        if (op == 'close') {
