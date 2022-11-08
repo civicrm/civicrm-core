@@ -1367,58 +1367,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * At this point, $contactDetails has loaded the contact from the DAO. Any
-   * (non-custom) missing fields are null.  By removing them, we can avoid
-   * expensive calls to CRM_Contact_BAO_Query.
-   *
-   * @deprecated unused in core
-   *
-   * @param string $tokenString
-   * @param array $contactDetails
-   * @param array $greetingTokens
-   */
-  private static function removeNullContactTokens(&$tokenString, $contactDetails, &$greetingTokens) {
-
-    // Only applies to contact tokens
-    if (!array_key_exists('contact', $greetingTokens)) {
-      return;
-    }
-
-    $greetingTokensOriginal = $greetingTokens;
-    $contactFieldList = CRM_Contact_DAO_Contact::fields();
-    // Sometimes contactDetails are in a multidemensional array, sometimes a
-    // single-dimension array.
-    if (array_key_exists(0, $contactDetails) && is_array($contactDetails[0])) {
-      $contactDetails = current($contactDetails[0]);
-    }
-    $nullFields = array_keys(array_diff_key($contactFieldList, $contactDetails));
-
-    // Handle legacy tokens
-    foreach (self::legacyContactTokens() as $oldToken => $newToken) {
-      if (CRM_Utils_Array::key($newToken, $nullFields)) {
-        $nullFields[] = $oldToken;
-      }
-    }
-
-    // Remove null contact fields from $greetingTokens
-    $greetingTokens['contact'] = array_diff($greetingTokens['contact'], $nullFields);
-
-    // Also remove them from $tokenString
-    $removedTokens = array_diff($greetingTokensOriginal['contact'], $greetingTokens['contact']);
-    // Handle legacy tokens again, sigh
-    if (!empty($removedTokens)) {
-      foreach ($removedTokens as $token) {
-        if (CRM_Utils_Array::value($token, self::legacyContactTokens()) !== NULL) {
-          $removedTokens[] = CRM_Utils_Array::value($token, self::legacyContactTokens());
-        }
-      }
-      foreach ($removedTokens as $token) {
-        $tokenString = str_replace("{contact.$token}", '', $tokenString);
-      }
-    }
-  }
-
-  /**
    * @param $tokens
    *
    * @return array
