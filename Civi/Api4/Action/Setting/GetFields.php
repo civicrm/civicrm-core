@@ -80,6 +80,10 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
         'data_type' => 'String',
       ],
       [
+        'name' => 'html_attributes',
+        'data_type' => 'Array',
+      ],
+      [
         'name' => 'add',
         'data_type' => 'String',
       ],
