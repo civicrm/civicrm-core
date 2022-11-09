@@ -17,6 +17,7 @@
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
+use Civi\Api4\County;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Email;
 use Civi\Api4\Group;
@@ -1292,6 +1293,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testImportCountryStateCounty(): void {
+    $countyID = County::create()->setValues([
+      'name' => 'Farnell',
+      'abbreviation' => '',
+      'state_province_id' => 1640,
+    ])->execute()->first()['id'];
     $childKey = $this->getRelationships()['Child of']['id'] . '_a_b';
     $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
     $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
@@ -1338,6 +1344,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->importCSV($csv, $mapper);
     $contacts = $this->getImportedContacts();
     foreach ($contacts as $contact) {
+      $this->assertEquals($countyID, $contact['address'][0]['county_id']);
       $this->assertEquals(1013, $contact['address'][0]['country_id']);
       $this->assertEquals(1640, $contact['address'][0]['state_province_id']);
     }
