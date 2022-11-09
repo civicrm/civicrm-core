@@ -383,4 +383,73 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     $this->assertEquals($activityTypes['Email'], $result[2]['data']['activity_type_id']);
   }
 
+  public function testMultiValuedFields():void {
+    CustomGroup::create(FALSE)
+      ->addValue('extends', 'Contact')
+      ->addValue('title', 'my_test')
+      ->addChain('field', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('label', 'my_field')
+        ->addValue('html_type', 'Select')
+        ->addValue('serialize', 1)
+        ->addValue('option_values', ['zero', 'one', 'two', 'three'])
+      )
+      ->execute();
+
+    $lastName = uniqid(__FUNCTION__);
+
+    $sampleContacts = [
+      ['first_name' => 'A', 'my_test.my_field' => [0, 2, 3]],
+      ['first_name' => 'B', 'my_test.my_field' => [0]],
+    ];
+    Contact::save(FALSE)
+      ->setRecords($sampleContacts)
+      ->addDefault('last_name', $lastName)
+      ->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'last_name'],
+          'where' => [['last_name', '=', $lastName]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
+            [
+              'key' => 'last_name',
+              'label' => 'Last',
+              'dataType' => 'String',
+              'type' => 'field',
+              'rewrite' => '[last_name] [my_test.my_field:label]',
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+
+    $this->assertEquals(['zero', 'two', 'three'], $result[0]['data']['my_test.my_field:label']);
+    $this->assertEquals("$lastName zero, two, three", $result[0]['columns'][1]['val']);
+    $this->assertEquals(['zero'], $result[1]['data']['my_test.my_field:label']);
+    $this->assertEquals("$lastName zero", $result[1]['columns'][1]['val']);
+  }
+
 }
