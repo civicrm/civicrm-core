@@ -205,6 +205,10 @@
         };
       };
 
+      ctrl.getAutocompleteFieldName = function() {
+        return ctrl.afFieldset.modelName + (ctrl.afJoin ? ('+' + ctrl.afJoin.entity) : '') + ':' + ctrl.fieldName;
+      };
+
       $scope.getOptions = function () {
         return chainSelectOptions || ctrl.defn.options || (ctrl.fieldName === 'is_primary' && ctrl.defn.input_type === 'Radio' ? noOptions : boolOptions);
       };

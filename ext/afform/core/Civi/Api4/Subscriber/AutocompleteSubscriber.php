@@ -73,13 +73,24 @@ class AutocompleteSubscriber implements EventSubscriberInterface {
       return;
     }
     $formDataModel = new FormDataModel($afform['layout']);
+    [$entityName, $joinEntity] = array_pad(explode('+', $entityName), 2, NULL);
     $entity = $formDataModel->getEntity($entityName);
-    $isId = $fieldName === CoreUtil::getIdFieldName($entity['type']);
-    $fieldSpec = civicrm_api4($entity['type'], 'getFields', [
+
+    // If using a join (e.g. Contact -> Email)
+    if ($joinEntity) {
+      $apiEntity = $joinEntity;
+      $isId = FALSE;
+      $formField = $entity['joins'][$joinEntity]['fields'][$fieldName]['defn'] ?? [];
+    }
+    else {
+      $apiEntity = $entity['type'];
+      $isId = $fieldName === CoreUtil::getIdFieldName($apiEntity);
+      $formField = $entity['fields'][$fieldName]['defn'] ?? [];
+    }
+    $fieldSpec = civicrm_api4($apiEntity, 'getFields', [
       'checkPermissions' => FALSE,
       'where' => [['name', '=', $fieldName]],
     ])->first();
-    $formField = $entity['fields'][$fieldName]['defn'] ?? [];
 
     // Auto-add filters defined in schema
     foreach ($fieldSpec['input_attrs']['filter'] ?? [] as $key => $value) {
