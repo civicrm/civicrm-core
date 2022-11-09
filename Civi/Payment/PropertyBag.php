@@ -92,6 +92,15 @@ class PropertyBag implements \ArrayAccess {
   public $logs = [];
 
   /**
+   * For unit tests only. Set to the name of a function, e.g. setBillingCountry
+   * to suppress calling CRM_Core_Error::deprecatedWarning which will break tests.
+   * Useful when a test is testing THAT a deprecatedWarning is thrown.
+   *
+   * @var string
+   */
+  public string $ignoreDeprecatedWarningsInFunction = '';
+
+  /**
    * @var bool
    * Temporary, internal variable to help ease transition to PropertyBag.
    * Used by cast() to suppress legacy warnings.
@@ -698,7 +707,12 @@ class PropertyBag implements \ArrayAccess {
 
     if ($warnings) {
       $warnings[] = "Input: " . json_encode($input) . " was munged to: " . json_encode($munged);
-      $this->logWarning(__FUNCTION__ . " input warnings (may be errors in future):\n" . implode("\n", $warnings));
+      $warnings = "PropertyBag::setBillingCountry input warnings (may be errors in future):\n" . implode("\n", $warnings);
+      $this->logs[] = $warnings;
+      // Emit a deprecatedWarning except in the case that we're testing this function.
+      if (__FUNCTION__ !== $this->ignoreDeprecatedWarningsInFunction) {
+        CRM_Core_Error::deprecatedWarning($warnings);
+      }
     }
 
     return $this->set('billingCountry', $label, $munged);
@@ -1255,14 +1269,6 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("Attempted to set '$prop' via setCustomProperty - must use using its setter.");
     }
     $this->props[$label][$prop] = $value;
-  }
-
-  /**
-   * For unit tests only.
-   */
-  protected function logWarning($message) {
-    $this->logs[] = $message;
-    \Civi::log()->warning($message);
   }
 
 }

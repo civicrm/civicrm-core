@@ -463,6 +463,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     // Many sorts of nothingness
     foreach ([NULL, 0, FALSE] as $bad) {
       $propertyBag = new PropertyBag();
+      $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
       $propertyBag->setBillingCountry($bad);
       $this->assertCount(1, $propertyBag->logs);
       $latestLog = end($propertyBag->logs);
@@ -472,6 +473,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // '' special case
     $propertyBag = new PropertyBag();
+    $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
     $propertyBag->setBillingCountry('');
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
@@ -480,6 +482,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Invalid country name
     $propertyBag = new PropertyBag();
+    $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
     $propertyBag->setBillingCountry('UnitedKing');
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
@@ -488,6 +491,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Valid country name
     $propertyBag = new PropertyBag();
+    $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
     $propertyBag->setBillingCountry('United Kingdom');
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
@@ -496,6 +500,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Invalid country ID
     $propertyBag = new PropertyBag();
+    $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
     $propertyBag->setBillingCountry(-1);
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
@@ -504,6 +509,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Valid country ID
     $propertyBag = new PropertyBag();
+    $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
     $propertyBag->setBillingCountry(1154); /* should be New Zealand */
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
