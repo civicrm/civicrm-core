@@ -27,7 +27,7 @@ return function ($mixInfo, $bootCache) {
     foreach ($files as $file) {
       $themeMeta = include $file;
       if (empty($themeMeta['name'])) {
-        $themeMeta['name'] = preg_replace(':\.theme\.php$:', '', basename($file));
+        $themeMeta['name'] = basename($file, '.theme.php');
       }
       if (empty($themeMeta['ext'])) {
         $themeMeta['ext'] = $mixInfo->longName;

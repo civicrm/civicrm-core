@@ -28,7 +28,7 @@ class E2E_Shimmy_LifecycleTest extends \PHPUnit\Framework\TestCase implements \C
     $mixinTestFiles = (array) glob($this->getPath('/tests/mixin/*Test.php'));
     foreach ($mixinTestFiles as $file) {
       require_once $file;
-      $class = '\\Civi\Shimmy\\Mixins\\' . preg_replace(';\.php$;', '', basename($file));
+      $class = '\\Civi\Shimmy\\Mixins\\' . basename($file, '.php');
       $this->mixinTests[] = new $class();
     }
   }

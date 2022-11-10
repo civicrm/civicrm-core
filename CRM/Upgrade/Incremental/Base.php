@@ -52,7 +52,7 @@ class CRM_Upgrade_Incremental_Base {
     $sqlGlob = implode(DIRECTORY_SEPARATOR, [dirname(__FILE__), 'sql', $this->getMajorMinor() . '.*.mysql.tpl']);
     $sqlFiles = glob($sqlGlob);;
     foreach ($sqlFiles as $file) {
-      $revList[] = str_replace('.mysql.tpl', '', basename($file));
+      $revList[] = basename($file, '.mysql.tpl');
     }
 
     $c = new ReflectionClass(static::class);
