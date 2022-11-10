@@ -58,8 +58,6 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
 
   /**
    * Test that case tokens are consistently rendered.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCaseTokenConsistency(): void {
     $this->createLoggedInUser();
@@ -67,17 +65,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Case']);
     $tokens = CRM_Core_SelectValues::caseTokens();
     $this->assertEquals($this->getCaseTokens(), $tokens);
-    $caseID = $this->getCaseID();
     $tokenString = $this->getTokenString(array_keys($this->getCaseTokens()));
-    $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseID, $tokenString, ['case' => $this->getCaseTokenKeys()]);
-    $this->assertEquals($this->getExpectedCaseTokenOutput(), $tokenHtml);
-    // Now do the same without passing in 'knownTokens'
-    $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseID, $tokenString);
-    $this->assertEquals($this->getExpectedCaseTokenOutput(), $tokenHtml);
-
-    // And check our deprecated tokens still work.
-    $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseID, '{case.case_type_id} {case.status_id}');
-    $this->assertEquals('Housing Support Ongoing', $tokenHtml);
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,

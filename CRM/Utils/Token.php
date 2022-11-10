@@ -619,6 +619,7 @@ class CRM_Utils_Token {
     $returnBlankToken = FALSE,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     // Refresh contact tokens in case they have changed. There is heavy caching
     // in exportable fields so there is no benefit in doing this conditionally.
     self::$_tokens['contact'] = array_merge(
@@ -1546,6 +1547,7 @@ class CRM_Utils_Token {
    * @throws \CRM_Core_Exception
    */
   public static function replaceCaseTokens($caseId, $str, $knownTokens = NULL, $escapeSmarty = FALSE): string {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (strpos($str, '{case.') === FALSE) {
       return $str;
     }

@@ -1565,29 +1565,6 @@ $text
     }
   }
 
-  public function testCaseTokens() {
-    $caseTest = new CiviCaseTestCase();
-    $caseTest->setUp();
-    // Create a contact and contactDetails array.
-    $contactId = $this->individualCreate();
-
-    // create a case for this user
-    $result = $this->callAPISuccess('Case', 'create', [
-      'contact_id' => $contactId,
-      'case_type_id' => '1',
-      'subject' => "my case",
-      'status_id' => "Open",
-    ]);
-
-    $caseId = $result['id'];
-    $html_message = "<p>This is a test case with id: {case.id} and subject: {case.subject}</p>";
-    $html_message = CRM_Utils_Token::replaceCaseTokens($caseId, $html_message);
-
-    $this->assertTrue(strpos($html_message, 'id: ' . $caseId) !== 0);
-    $this->assertTrue(strpos($html_message, 'subject: my case') !== 0);
-    $caseTest->tearDown();
-  }
-
   public function testSendEmailWithCaseId() {
     $caseTest = new CiviCaseTestCase();
     $caseTest->setUp();
