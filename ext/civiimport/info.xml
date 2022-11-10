@@ -31,7 +31,7 @@
   </classloader>
   <civix>
     <namespace>CRM/Civiimport</namespace>
-    <format>22.05.2</format>
+    <format>22.10.0</format>
     <angularModule>crmCiviimport</angularModule>
   </civix>
   <mixins>

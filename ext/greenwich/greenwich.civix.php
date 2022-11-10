@@ -7,9 +7,9 @@
  * extension.
  */
 class CRM_Greenwich_ExtensionUtil {
-  const SHORT_NAME = "greenwich";
-  const LONG_NAME = "greenwich";
-  const CLASS_PREFIX = "CRM_Greenwich";
+  const SHORT_NAME = 'greenwich';
+  const LONG_NAME = 'greenwich';
+  const CLASS_PREFIX = 'CRM_Greenwich';
 
   /**
    * Translate a string using the extension's domain.
@@ -24,7 +24,7 @@ class CRM_Greenwich_ExtensionUtil {
    *   Translated text.
    * @see ts
    */
-  public static function ts($text, $params = []) {
+  public static function ts($text, $params = []): string {
     if (!array_key_exists('domain', $params)) {
       $params['domain'] = [self::LONG_NAME, NULL];
     }
@@ -41,7 +41,7 @@ class CRM_Greenwich_ExtensionUtil {
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo'.
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo/css/foo.css'.
    */
-  public static function url($file = NULL) {
+  public static function url($file = NULL): string {
     if ($file === NULL) {
       return rtrim(CRM_Core_Resources::singleton()->getUrl(self::LONG_NAME), '/');
     }
@@ -138,7 +138,7 @@ function _greenwich_civix_civicrm_postInstall() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
  */
-function _greenwich_civix_civicrm_uninstall() {
+function _greenwich_civix_civicrm_uninstall(): void {
   _greenwich_civix_civicrm_config();
   if ($upgrader = _greenwich_civix_upgrader()) {
     $upgrader->onUninstall();
@@ -150,7 +150,7 @@ function _greenwich_civix_civicrm_uninstall() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
  */
-function _greenwich_civix_civicrm_enable() {
+function _greenwich_civix_civicrm_enable(): void {
   _greenwich_civix_civicrm_config();
   if ($upgrader = _greenwich_civix_upgrader()) {
     if (is_callable([$upgrader, 'onEnable'])) {
@@ -165,7 +165,7 @@ function _greenwich_civix_civicrm_enable() {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
  * @return mixed
  */
-function _greenwich_civix_civicrm_disable() {
+function _greenwich_civix_civicrm_disable(): void {
   _greenwich_civix_civicrm_config();
   if ($upgrader = _greenwich_civix_upgrader()) {
     if (is_callable([$upgrader, 'onDisable'])) {

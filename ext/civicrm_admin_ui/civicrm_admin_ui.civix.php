@@ -24,7 +24,7 @@ class CRM_CivicrmAdminUi_ExtensionUtil {
    *   Translated text.
    * @see ts
    */
-  public static function ts($text, $params = []) {
+  public static function ts($text, $params = []): string {
     if (!array_key_exists('domain', $params)) {
       $params['domain'] = [self::LONG_NAME, NULL];
     }
@@ -41,7 +41,7 @@ class CRM_CivicrmAdminUi_ExtensionUtil {
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo'.
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo/css/foo.css'.
    */
-  public static function url($file = NULL) {
+  public static function url($file = NULL): string {
     if ($file === NULL) {
       return rtrim(CRM_Core_Resources::singleton()->getUrl(self::LONG_NAME), '/');
     }
@@ -91,9 +91,9 @@ function _civicrm_admin_ui_civix_civicrm_config(&$config = NULL) {
   }
   $configured = TRUE;
 
-  $template =& CRM_Core_Smarty::singleton();
+  $template = CRM_Core_Smarty::singleton();
 
-  $extRoot = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+  $extRoot = __DIR__ . DIRECTORY_SEPARATOR;
   $extDir = $extRoot . 'templates';
 
   if (is_array($template->template_dir)) {
@@ -105,6 +105,185 @@ function _civicrm_admin_ui_civix_civicrm_config(&$config = NULL) {
 
   $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
+}
+
+/**
+ * Implements hook_civicrm_install().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
+ */
+function _civicrm_admin_ui_civix_civicrm_install() {
+  _civicrm_admin_ui_civix_civicrm_config();
+  if ($upgrader = _civicrm_admin_ui_civix_upgrader()) {
+    $upgrader->onInstall();
+  }
+}
+
+/**
+ * Implements hook_civicrm_postInstall().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
+ */
+function _civicrm_admin_ui_civix_civicrm_postInstall() {
+  _civicrm_admin_ui_civix_civicrm_config();
+  if ($upgrader = _civicrm_admin_ui_civix_upgrader()) {
+    if (is_callable([$upgrader, 'onPostInstall'])) {
+      $upgrader->onPostInstall();
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_uninstall().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
+ */
+function _civicrm_admin_ui_civix_civicrm_uninstall(): void {
+  _civicrm_admin_ui_civix_civicrm_config();
+  if ($upgrader = _civicrm_admin_ui_civix_upgrader()) {
+    $upgrader->onUninstall();
+  }
+}
+
+/**
+ * (Delegated) Implements hook_civicrm_enable().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
+ */
+function _civicrm_admin_ui_civix_civicrm_enable(): void {
+  _civicrm_admin_ui_civix_civicrm_config();
+  if ($upgrader = _civicrm_admin_ui_civix_upgrader()) {
+    if (is_callable([$upgrader, 'onEnable'])) {
+      $upgrader->onEnable();
+    }
+  }
+}
+
+/**
+ * (Delegated) Implements hook_civicrm_disable().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
+ * @return mixed
+ */
+function _civicrm_admin_ui_civix_civicrm_disable(): void {
+  _civicrm_admin_ui_civix_civicrm_config();
+  if ($upgrader = _civicrm_admin_ui_civix_upgrader()) {
+    if (is_callable([$upgrader, 'onDisable'])) {
+      $upgrader->onDisable();
+    }
+  }
+}
+
+/**
+ * (Delegated) Implements hook_civicrm_upgrade().
+ *
+ * @param $op string, the type of operation being performed; 'check' or 'enqueue'
+ * @param $queue CRM_Queue_Queue, (for 'enqueue') the modifiable list of pending up upgrade tasks
+ *
+ * @return mixed
+ *   based on op. for 'check', returns array(boolean) (TRUE if upgrades are pending)
+ *   for 'enqueue', returns void
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
+ */
+function _civicrm_admin_ui_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+  if ($upgrader = _civicrm_admin_ui_civix_upgrader()) {
+    return $upgrader->onUpgrade($op, $queue);
+  }
+}
+
+/**
+ * @return CRM_CivicrmAdminUi_Upgrader
+ */
+function _civicrm_admin_ui_civix_upgrader() {
+  if (!file_exists(__DIR__ . '/CRM/CivicrmAdminUi/Upgrader.php')) {
+    return NULL;
+  }
+  else {
+    return CRM_CivicrmAdminUi_Upgrader_Base::instance();
+  }
+}
+
+/**
+ * Inserts a navigation menu item at a given place in the hierarchy.
+ *
+ * @param array $menu - menu hierarchy
+ * @param string $path - path to parent of this item, e.g. 'my_extension/submenu'
+ *    'Mailing', or 'Administer/System Settings'
+ * @param array $item - the item to insert (parent/child attributes will be
+ *    filled for you)
+ *
+ * @return bool
+ */
+function _civicrm_admin_ui_civix_insert_navigation_menu(&$menu, $path, $item) {
+  // If we are done going down the path, insert menu
+  if (empty($path)) {
+    $menu[] = [
+      'attributes' => array_merge([
+        'label'      => CRM_Utils_Array::value('name', $item),
+        'active'     => 1,
+      ], $item),
+    ];
+    return TRUE;
+  }
+  else {
+    // Find an recurse into the next level down
+    $found = FALSE;
+    $path = explode('/', $path);
+    $first = array_shift($path);
+    foreach ($menu as $key => &$entry) {
+      if ($entry['attributes']['name'] == $first) {
+        if (!isset($entry['child'])) {
+          $entry['child'] = [];
+        }
+        $found = _civicrm_admin_ui_civix_insert_navigation_menu($entry['child'], implode('/', $path), $item);
+      }
+    }
+    return $found;
+  }
+}
+
+/**
+ * (Delegated) Implements hook_civicrm_navigationMenu().
+ */
+function _civicrm_admin_ui_civix_navigationMenu(&$nodes) {
+  if (!is_callable(['CRM_Core_BAO_Navigation', 'fixNavigationMenu'])) {
+    _civicrm_admin_ui_civix_fixNavigationMenu($nodes);
+  }
+}
+
+/**
+ * Given a navigation menu, generate navIDs for any items which are
+ * missing them.
+ */
+function _civicrm_admin_ui_civix_fixNavigationMenu(&$nodes) {
+  $maxNavID = 1;
+  array_walk_recursive($nodes, function($item, $key) use (&$maxNavID) {
+    if ($key === 'navID') {
+      $maxNavID = max($maxNavID, $item);
+    }
+  });
+  _civicrm_admin_ui_civix_fixNavigationMenuItems($nodes, $maxNavID, NULL);
+}
+
+function _civicrm_admin_ui_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parentID) {
+  $origKeys = array_keys($nodes);
+  foreach ($origKeys as $origKey) {
+    if (!isset($nodes[$origKey]['attributes']['parentID']) && $parentID !== NULL) {
+      $nodes[$origKey]['attributes']['parentID'] = $parentID;
+    }
+    // If no navID, then assign navID and fix key.
+    if (!isset($nodes[$origKey]['attributes']['navID'])) {
+      $newKey = ++$maxNavID;
+      $nodes[$origKey]['attributes']['navID'] = $newKey;
+      $nodes[$newKey] = $nodes[$origKey];
+      unset($nodes[$origKey]);
+      $origKey = $newKey;
+    }
+    if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
+      _civicrm_admin_ui_civix_fixNavigationMenuItems($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
+    }
+  }
 }
 
 /**

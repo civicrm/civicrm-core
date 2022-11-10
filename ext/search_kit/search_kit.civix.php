@@ -24,7 +24,7 @@ class CRM_Search_ExtensionUtil {
    *   Translated text.
    * @see ts
    */
-  public static function ts($text, $params = []) {
+  public static function ts($text, $params = []): string {
     if (!array_key_exists('domain', $params)) {
       $params['domain'] = [self::LONG_NAME, NULL];
     }
@@ -41,7 +41,7 @@ class CRM_Search_ExtensionUtil {
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo'.
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo/css/foo.css'.
    */
-  public static function url($file = NULL) {
+  public static function url($file = NULL): string {
     if ($file === NULL) {
       return rtrim(CRM_Core_Resources::singleton()->getUrl(self::LONG_NAME), '/');
     }
@@ -138,7 +138,7 @@ function _search_kit_civix_civicrm_postInstall() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
  */
-function _search_kit_civix_civicrm_uninstall() {
+function _search_kit_civix_civicrm_uninstall(): void {
   _search_kit_civix_civicrm_config();
   if ($upgrader = _search_kit_civix_upgrader()) {
     $upgrader->onUninstall();
@@ -150,7 +150,7 @@ function _search_kit_civix_civicrm_uninstall() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
  */
-function _search_kit_civix_civicrm_enable() {
+function _search_kit_civix_civicrm_enable(): void {
   _search_kit_civix_civicrm_config();
   if ($upgrader = _search_kit_civix_upgrader()) {
     if (is_callable([$upgrader, 'onEnable'])) {
@@ -165,7 +165,7 @@ function _search_kit_civix_civicrm_enable() {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
  * @return mixed
  */
-function _search_kit_civix_civicrm_disable() {
+function _search_kit_civix_civicrm_disable(): void {
   _search_kit_civix_civicrm_config();
   if ($upgrader = _search_kit_civix_upgrader()) {
     if (is_callable([$upgrader, 'onDisable'])) {

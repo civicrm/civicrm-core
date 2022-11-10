@@ -33,5 +33,6 @@
   </mixins>
   <civix>
     <namespace>CRM/Financialacls</namespace>
+    <format>22.10.0</format>
   </civix>
 </extension>

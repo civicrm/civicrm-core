@@ -34,5 +34,6 @@
   </mixins>
   <civix>
     <namespace>CRM/Flexmailer</namespace>
+    <format>22.10.0</format>
   </civix>
 </extension>
