@@ -121,7 +121,7 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
    */
   public function upgrade_1005(): bool {
     $this->ctx->log->info('Applying update 1005 - add acl_bypass column.');
-    $this->addTask('Add Cancel Button Setting to the Profile', 'addColumn',
+    $this->addTask('Add acl_bypass column', 'addColumn',
       'civicrm_search_display', 'acl_bypass', "tinyint DEFAULT 0 COMMENT 'Skip permission checks and ACLs when running this display.'");
     return TRUE;
   }
@@ -173,6 +173,17 @@ CREATE TABLE `civicrm_search_segment` (
 ENGINE=InnoDB ROW_FORMAT=DYNAMIC";
       CRM_Core_DAO::executeQuery($createTable, [], TRUE, NULL, FALSE, FALSE);
     }
+    return TRUE;
+  }
+
+  /**
+   * Upgrade 1008 - add description column.
+   * @return bool
+   */
+  public function upgrade_1008(): bool {
+    $this->ctx->log->info('Applying update 1005 - add description column.');
+    $this->addTask('Add description column', 'addColumn',
+      'civicrm_search_display', 'description', "text COMMENT 'Backend-only description for admin users.'");
     return TRUE;
   }
 

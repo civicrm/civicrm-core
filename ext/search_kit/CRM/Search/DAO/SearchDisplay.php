@@ -66,6 +66,13 @@ class CRM_Search_DAO_SearchDisplay extends CRM_Core_DAO {
   public $label;
 
   /**
+   * @var string|null
+   *   (SQL type: text)
+   *   Note that values will be retrieved from the database as a string.
+   */
+  public $description;
+
+  /**
    * FK to saved search table.
    *
    * @var int|string
@@ -153,6 +160,10 @@ class CRM_Search_DAO_SearchDisplay extends CRM_Core_DAO {
           'entity' => 'SearchDisplay',
           'bao' => 'CRM_Search_DAO_SearchDisplay',
           'localizable' => 0,
+          'html' => [
+            'type' => 'Number',
+            'label' => E::ts("ID"),
+          ],
           'readonly' => TRUE,
           'add' => '1.0',
         ],
@@ -171,6 +182,7 @@ class CRM_Search_DAO_SearchDisplay extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Text',
+            'label' => E::ts("Name"),
           ],
           'add' => '1.0',
         ],
@@ -189,8 +201,26 @@ class CRM_Search_DAO_SearchDisplay extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Text',
+            'label' => E::ts("Label"),
           ],
           'add' => '1.0',
+        ],
+        'description' => [
+          'name' => 'description',
+          'type' => CRM_Utils_Type::T_TEXT,
+          'title' => E::ts('Search Display Description'),
+          'rows' => 2,
+          'cols' => 60,
+          'where' => 'civicrm_search_display.description',
+          'table_name' => 'civicrm_search_display',
+          'entity' => 'SearchDisplay',
+          'bao' => 'CRM_Search_DAO_SearchDisplay',
+          'localizable' => 0,
+          'html' => [
+            'type' => 'TextArea',
+            'label' => E::ts("Description"),
+          ],
+          'add' => '5.36',
         ],
         'saved_search_id' => [
           'name' => 'saved_search_id',
@@ -204,6 +234,9 @@ class CRM_Search_DAO_SearchDisplay extends CRM_Core_DAO {
           'bao' => 'CRM_Search_DAO_SearchDisplay',
           'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_SavedSearch',
+          'html' => [
+            'label' => E::ts("Saved Search"),
+          ],
           'add' => '1.0',
         ],
         'type' => [
@@ -221,6 +254,7 @@ class CRM_Search_DAO_SearchDisplay extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Select',
+            'label' => E::ts("Type"),
           ],
           'pseudoconstant' => [
             'optionGroupName' => 'search_display_type',

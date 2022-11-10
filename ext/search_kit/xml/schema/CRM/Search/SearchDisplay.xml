@@ -15,6 +15,10 @@
     <required>true</required>
     <comment>Unique SearchDisplay ID</comment>
     <add>1.0</add>
+    <html>
+      <label>ID</label>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -30,6 +34,7 @@
     <type>varchar</type>
     <length>255</length>
     <html>
+      <label>Name</label>
       <type>Text</type>
     </html>
     <add>1.0</add>
@@ -43,9 +48,24 @@
     <type>varchar</type>
     <length>255</length>
     <html>
+      <label>Label</label>
       <type>Text</type>
     </html>
     <add>1.0</add>
+  </field>
+
+  <field>
+    <name>description</name>
+    <type>text</type>
+    <title>Search Display Description</title>
+    <comment>Backend-only description for admin users.</comment>
+    <html>
+      <label>Description</label>
+      <type>TextArea</type>
+      <rows>2</rows>
+      <cols>60</cols>
+    </html>
+    <add>5.36</add>
   </field>
 
   <field>
@@ -55,6 +75,9 @@
     <comment>FK to saved search table.</comment>
     <required>true</required>
     <add>1.0</add>
+    <html>
+      <label>Saved Search</label>
+    </html>
   </field>
   <foreignKey>
     <name>saved_search_id</name>
@@ -84,6 +107,7 @@
     </pseudoconstant>
     <add>1.0</add>
     <html>
+      <label>Type</label>
       <type>Select</type>
     </html>
   </field>

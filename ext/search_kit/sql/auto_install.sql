@@ -31,13 +31,14 @@ SET FOREIGN_KEY_CHECKS=1;
 -- *
 -- * civicrm_search_display
 -- *
--- * Search Kit - saved search displays
+-- * SearchKit - saved search displays
 -- *
 -- *******************************************************/
 CREATE TABLE `civicrm_search_display` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique SearchDisplay ID',
   `name` varchar(255) NOT NULL COMMENT 'Unique name for identifying search display',
   `label` varchar(255) NOT NULL COMMENT 'Label for identifying search display to administrators',
+  `description` text COMMENT 'Backend-only description for admin users.',
   `saved_search_id` int unsigned NOT NULL COMMENT 'FK to saved search table.',
   `type` varchar(128) NOT NULL COMMENT 'Type of display',
   `settings` text DEFAULT NULL COMMENT 'Configuration data for the search display',
