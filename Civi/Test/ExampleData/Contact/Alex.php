@@ -2,7 +2,9 @@
 
 namespace Civi\Test\ExampleData\Contact;
 
-class Alex extends \Civi\Test\EntityExample {
+use Civi\Test\EntityExample;
+
+class Alex extends EntityExample {
 
   public function getExamples(): iterable {
     yield [
@@ -12,7 +14,7 @@ class Alex extends \Civi\Test\EntityExample {
 
   public function build(array &$example): void {
     $example['data'] = [
-      'id' => '100',
+      'id' => 0,
       'first_name' => 'Alex',
       'middle_name' => '',
       'last_name' => 'D\u00edaz',

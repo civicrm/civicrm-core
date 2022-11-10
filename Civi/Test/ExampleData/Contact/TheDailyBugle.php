@@ -14,7 +14,7 @@ class TheDailyBugle extends EntityExample {
 
   public function build(array &$example): void {
     $example['data'] = [
-      'contact_id' => 102,
+      'contact_id' => 0,
       'contact_type' => 'Organization',
       'organization_name' => 'The Daily Bugle',
       'sort_name' => 'Daily Bugle',
