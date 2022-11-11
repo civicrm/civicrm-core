@@ -7,9 +7,9 @@
  * extension.
  */
 class CRM_Sequentialcreditnotes_ExtensionUtil {
-  const SHORT_NAME = "sequentialcreditnotes";
-  const LONG_NAME = "sequentialcreditnotes";
-  const CLASS_PREFIX = "CRM_Sequentialcreditnotes";
+  const SHORT_NAME = 'sequentialcreditnotes';
+  const LONG_NAME = 'sequentialcreditnotes';
+  const CLASS_PREFIX = 'CRM_Sequentialcreditnotes';
 
   /**
    * Translate a string using the extension's domain.
@@ -24,7 +24,7 @@ class CRM_Sequentialcreditnotes_ExtensionUtil {
    *   Translated text.
    * @see ts
    */
-  public static function ts($text, $params = []) {
+  public static function ts($text, $params = []): string {
     if (!array_key_exists('domain', $params)) {
       $params['domain'] = [self::LONG_NAME, NULL];
     }
@@ -41,7 +41,7 @@ class CRM_Sequentialcreditnotes_ExtensionUtil {
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo'.
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo/css/foo.css'.
    */
-  public static function url($file = NULL) {
+  public static function url($file = NULL): string {
     if ($file === NULL) {
       return rtrim(CRM_Core_Resources::singleton()->getUrl(self::LONG_NAME), '/');
     }
@@ -138,7 +138,7 @@ function _sequentialcreditnotes_civix_civicrm_postInstall() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
  */
-function _sequentialcreditnotes_civix_civicrm_uninstall() {
+function _sequentialcreditnotes_civix_civicrm_uninstall(): void {
   _sequentialcreditnotes_civix_civicrm_config();
   if ($upgrader = _sequentialcreditnotes_civix_upgrader()) {
     $upgrader->onUninstall();
@@ -150,7 +150,7 @@ function _sequentialcreditnotes_civix_civicrm_uninstall() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
  */
-function _sequentialcreditnotes_civix_civicrm_enable() {
+function _sequentialcreditnotes_civix_civicrm_enable(): void {
   _sequentialcreditnotes_civix_civicrm_config();
   if ($upgrader = _sequentialcreditnotes_civix_upgrader()) {
     if (is_callable([$upgrader, 'onEnable'])) {
@@ -165,7 +165,7 @@ function _sequentialcreditnotes_civix_civicrm_enable() {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
  * @return mixed
  */
-function _sequentialcreditnotes_civix_civicrm_disable() {
+function _sequentialcreditnotes_civix_civicrm_disable(): void {
   _sequentialcreditnotes_civix_civicrm_config();
   if ($upgrader = _sequentialcreditnotes_civix_upgrader()) {
     if (is_callable([$upgrader, 'onDisable'])) {
@@ -181,7 +181,8 @@ function _sequentialcreditnotes_civix_civicrm_disable() {
  * @param $queue CRM_Queue_Queue, (for 'enqueue') the modifiable list of pending up upgrade tasks
  *
  * @return mixed
- *   based on op. for 'check', returns array(boolean) (TRUE if upgrades are pending) for 'enqueue', returns void
+ *   based on op. for 'check', returns array(boolean) (TRUE if upgrades are pending)
+ *   for 'enqueue', returns void
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
  */
@@ -219,7 +220,7 @@ function _sequentialcreditnotes_civix_insert_navigation_menu(&$menu, $path, $ite
   if (empty($path)) {
     $menu[] = [
       'attributes' => array_merge([
-        'label'      => $item['name'] ?? NULL,
+        'label'      => CRM_Utils_Array::value('name', $item),
         'active'     => 1,
       ], $item),
     ];

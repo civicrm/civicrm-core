@@ -29,5 +29,6 @@
   </classloader>
   <civix>
     <namespace>CRM/Greenwich</namespace>
+    <format>22.10.0</format>
   </civix>
 </extension>

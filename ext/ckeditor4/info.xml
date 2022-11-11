@@ -30,5 +30,6 @@
   </mixins>
   <civix>
     <namespace>CRM/Ckeditor4</namespace>
+    <format>22.10.0</format>
   </civix>
 </extension>
