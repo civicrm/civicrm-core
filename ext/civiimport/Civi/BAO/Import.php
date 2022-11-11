@@ -42,12 +42,23 @@ class Import extends CRM_Core_DAO {
   public static $_primaryKey = ['_id'];
 
   /**
+   * Get the array of import tables in the database.
+   *
+   * Note that this can be required early (e.g EntityTypes, even
+   * before caching & class loading is fully available (the latter could be resolved now).
+   * Where that is the case `_civiimport_civicrm_get_import_tables` should be called directly.
+   *
    * @return array
    */
   public static function getImportTables(): array {
     // This calls a function on the extension file as it is called from `entityTypes`
     // which can be called very early, before this class is available to that hook.
-    return _civiimport_civicrm_get_import_tables();
+    if (!\Civi::cache('metadata')->has('civiimport_tables')) {
+      $tables = _civiimport_civicrm_get_import_tables();
+      \Civi::cache('metadata')->set('civiimport_tables', $tables);
+      return $tables;
+    }
+    return \Civi::cache('metadata')->get('civiimport_tables');
   }
 
   /**
