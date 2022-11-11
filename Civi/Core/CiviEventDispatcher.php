@@ -2,9 +2,9 @@
 
 namespace Civi\Core;
 
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\HookStyleListener;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class CiviEventDispatcher
@@ -16,9 +16,14 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * @see \CRM_Utils_Hook
  */
-class CiviEventDispatcher extends EventDispatcher {
+class CiviEventDispatcher implements CiviEventDispatcherInterface {
 
   const DEFAULT_HOOK_PRIORITY = -100;
+
+  /**
+   * @var Symfony\Component\EventDispatcher\EventDispatcher
+   */
+  private $dispatcher;
 
   /**
    * Track the list of hook-events for which we have autoregistered
@@ -50,6 +55,20 @@ class CiviEventDispatcher extends EventDispatcher {
    *   Array(string $eventRegex => string $action)
    */
   private $dispatchPolicyRegex = NULL;
+
+  /**
+   * Constructor
+   */
+  public function __construct() {
+    $this->dispatcher = new UnoptimizedEventDispatcher();
+  }
+
+  /**
+   * Get Event Dispatcher
+   */
+  public function getDispatcher() {
+    return $this->dispatcher;
+  }
 
   /**
    * Determine whether $eventName should delegate to the CMS hook system.
@@ -91,6 +110,27 @@ class CiviEventDispatcher extends EventDispatcher {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function addSubscriber(EventSubscriberInterface $subscriber) {
+    return $this->dispatcher->addSubscriber($subscriber);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeSubscriber(EventSubscriberInterface $subscriber) {
+    return $this->dispatcher->removeSubscriber($subscriber);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getListenerPriority($eventName, $listener) {
+    return $this->dispatcher->getListenerPriority($eventName, $listener);
+  }
+
+  /**
    * Add a test listener.
    *
    * @param string $eventName
@@ -106,7 +146,7 @@ class CiviEventDispatcher extends EventDispatcher {
       $eventName = substr($eventName, 1);
       $listener = new HookStyleListener($listener);
     }
-    parent::addListener($eventName, $listener, $priority);
+    $this->dispatcher->addListener($eventName, $listener, $priority);
   }
 
   /**
@@ -169,7 +209,7 @@ class CiviEventDispatcher extends EventDispatcher {
   /**
    * @inheritDoc
    */
-  public function dispatch($eventName, Event $event = NULL) {
+  public function dispatch($eventName, $event = NULL) {
     // Dispatch policies add systemic overhead and (normally) should not be evaluated. JNZ.
     if ($this->dispatchPolicyRegex !== NULL) {
       switch ($mode = $this->checkDispatchPolicy($eventName)) {
@@ -214,7 +254,10 @@ class CiviEventDispatcher extends EventDispatcher {
       }
     }
     $this->bindPatterns($eventName);
-    return parent::dispatch($eventName, $event);
+    if ($event === NULL) {
+      $event = GenericHookEvent::create([]);
+    }
+    return $this->dispatcher->dispatch($event, $eventName);
   }
 
   /**
@@ -222,7 +265,14 @@ class CiviEventDispatcher extends EventDispatcher {
    */
   public function getListeners($eventName = NULL) {
     $this->bindPatterns($eventName);
-    return parent::getListeners($eventName);
+    return $this->dispatcher->getListeners($eventName);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeListener($eventName, $listener) {
+    return $this->dispatcher->removeListener($eventName, $listener);
   }
 
   /**
@@ -231,7 +281,7 @@ class CiviEventDispatcher extends EventDispatcher {
   public function hasListeners($eventName = NULL) {
     // All hook_* events have default listeners, so hasListeners(NULL) is a truism.
     return ($eventName === NULL || $this->isHookEvent($eventName))
-      ? TRUE : parent::hasListeners($eventName);
+      ? TRUE : $this->dispatcher->hasListeners($eventName);
   }
 
   /**

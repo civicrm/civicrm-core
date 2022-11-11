@@ -3,7 +3,7 @@ namespace Civi\API\Subscriber;
 
 use Civi\API\Kernel;
 use Civi\API\Provider\StaticProvider;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Civi\Core\CiviEventDispatcher;
 
 /**
  */
@@ -19,7 +19,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
   const FORBIDDEN_ID = 30;
 
   /**
-   * @var \Symfony\Component\EventDispatcher\EventDispatcher
+   * @var \Civi\Core\CiviEventDispatcher
    */
   public $dispatcher;
 
@@ -67,7 +67,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       ]
     );
 
-    $this->dispatcher = new EventDispatcher();
+    $this->dispatcher = new CiviEventDispatcher();
     $this->kernel = new Kernel($this->dispatcher);
     $this->kernel
       ->registerApiProvider($fileProvider)

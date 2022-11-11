@@ -1,7 +1,7 @@
 <?php
 namespace Civi\ActionSchedule\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Class MailingQueryEvent
@@ -49,7 +49,7 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * Event name: 'civi.actionSchedule.prepareMailingQuery'
  */
-class MailingQueryEvent extends Event {
+class MailingQueryEvent extends GenericHookEvent {
 
   /**
    * The schedule record which produced this mailing.

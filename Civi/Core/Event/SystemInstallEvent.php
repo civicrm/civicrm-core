@@ -15,7 +15,7 @@ namespace Civi\Core\Event;
  * Class SystemInstallEvent
  * @package Civi\API\Event
  */
-class SystemInstallEvent extends \Symfony\Component\EventDispatcher\Event {
+class SystemInstallEvent extends GenericHookEvent {
 
   /**
    * The SystemInstallEvent fires once after installation - during the first page-view.

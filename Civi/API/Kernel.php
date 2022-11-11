@@ -23,7 +23,7 @@ use Civi\API\Event\RespondEvent;
 class Kernel {
 
   /**
-   * @var \Symfony\Component\EventDispatcher\EventDispatcher
+   * @var \Civi\Core\CiviEventDispatcherInterface
    */
   protected $dispatcher;
 
@@ -33,7 +33,7 @@ class Kernel {
   protected $apiProviders;
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @param \Civi\Core\CiviEventDispatcherInterface $dispatcher
    *   The event dispatcher which receives kernel events.
    * @param array $apiProviders
    *   Array of ProviderInterface.
@@ -462,14 +462,14 @@ class Kernel {
   }
 
   /**
-   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   * @return \Civi\Core\CiviEventDispatcherInterface
    */
   public function getDispatcher() {
     return $this->dispatcher;
   }
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @param \Civi\Core\CiviEventDispatcherInterface $dispatcher
    *   The event dispatcher which receives kernel events.
    * @return Kernel
    */

@@ -17,7 +17,7 @@ namespace Civi\FlexMailer;
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Core\Event\GenericHookEvent;
 
 // For compat w/v4.6 phpunit
 require_once 'tests/phpunit/CRM/Mailing/BaseMailingSystemTest.php';
@@ -60,7 +60,7 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
     $this->counts = array();
   }
 
-  public function handleEvent(Event $e) {
+  public function handleEvent(GenericHookEvent $e) {
     // We keep track of the events that fire during mail delivery.
     // At the end, we'll ensure that the correct events fired.
     $clazz = get_class($e);
