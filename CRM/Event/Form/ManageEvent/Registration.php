@@ -253,7 +253,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $this->addElement('checkbox',
       'allow_same_participant_emails',
-      ts('Same email address?')
+      ts('Allow same email and multiple registrations?')
     );
     $this->assign('ruleFields', json_encode($ruleFields));
 
