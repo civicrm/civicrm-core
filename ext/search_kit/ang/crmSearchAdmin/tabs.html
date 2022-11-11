@@ -1,4 +1,7 @@
 <li>
+  <textarea placeholder="{{:: ts('Enter description (only shown to admins)') }}" ng-model="$ctrl.savedSearch.description"></textarea>
+</li>
+<li>
   <crm-search-admin-tags tag-ids="$ctrl.savedSearch.tag_id" class="btn-group btn-group-sm"></crm-search-admin-tags>
 </li>
 <li role="presentation" ng-class="{active: controls.tab === 'compose'}">

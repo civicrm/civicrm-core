@@ -29,6 +29,7 @@
             'id',
             'name',
             'label',
+            'description',
             'api_entity',
             'api_entity:label',
             'api_params',
@@ -193,8 +194,13 @@
                 title: ts('Edit Label'),
                 editable: true
               }),
+              searchMeta.fieldToColumn('description', {
+                label: true,
+                title: ts('Edit Description'),
+                editable: true
+              }),
               searchMeta.fieldToColumn('api_entity:label', {
-                label: ts('For'),
+                label: true,
                 empty_value: ts('Missing'),
                 cssRules: [
                   ['font-italic', 'api_entity:label', 'IS EMPTY']
