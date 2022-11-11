@@ -231,7 +231,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     $this->add('text', 'subject', ts('Subject'), ['size' => 50, 'maxlength' => 254], TRUE);
 
-    $this->add('select', 'from_email_address', ts('From'), $this->getFromEmails(), TRUE);
+    $this->add('select', 'from_email_address', ts('From'), $this->getFromEmails(), TRUE, ['class' => 'crm-select2 huge']);
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);
 
