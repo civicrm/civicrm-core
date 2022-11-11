@@ -97,7 +97,7 @@ class PropertyBag implements \ArrayAccess {
    *
    * @var string
    */
-  public string $ignoreDeprecatedWarningsInFunction = '';
+  public $ignoreDeprecatedWarningsInFunction = '';
 
   /**
    * @var bool
