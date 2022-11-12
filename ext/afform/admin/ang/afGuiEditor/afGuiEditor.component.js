@@ -43,6 +43,11 @@
         }
       };
 
+      this.securityModes = [
+        {id: 'RBAC', icon: 'fa-lock', text: ts('Enforce Permissions')},
+        {id: 'FBAC', icon: 'fa-unlock', text: ts('Open Access')},
+      ];
+
       // Above mode for use with getterSetter
       this.debounceWithGetterSetter = _.assign({getterSetter: true}, this.debounceMode);
 

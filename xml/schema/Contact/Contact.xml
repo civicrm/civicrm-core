@@ -838,6 +838,7 @@
     <html>
       <type>EntityRef</type>
       <label>Current Employer</label>
+      <filter>contact_type=Organization</filter>
     </html>
     <contactType>Individual</contactType>
   </field>

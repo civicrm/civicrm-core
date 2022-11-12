@@ -231,8 +231,9 @@ class FormDataModel {
     // Id field for selecting existing entity
     if ($action === 'create' && $field['name'] === CoreUtil::getIdFieldName($entityName)) {
       $entityTitle = CoreUtil::getInfoItem($entityName, 'title');
-      $field['input_type'] = 'Existing';
-      $field['entity'] = $entityName;
+      $field['input_type'] = 'EntityRef';
+      $field['fk_entity'] = $entityName;
+      $field['is_id'] = TRUE;
       $field['label'] = E::ts('Existing %1', [1 => $entityTitle]);
       $field['input_attrs']['placeholder'] = E::ts('Select %1', [1 => $entityTitle]);
     }

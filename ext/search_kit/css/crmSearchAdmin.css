@@ -100,6 +100,7 @@
   min-height: 3.5em;
 }
 
+#bootstrap-theme.crm-search .form-control label,
 #bootstrap-theme.crm-search legend[ng-click] {
   cursor: pointer;
 }

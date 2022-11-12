@@ -15,6 +15,10 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
+      this.getColTypes = function() {
+        return ctrl.parent.colTypes;
+      };
+
       this.symbols = {
         ul: [
           {char: '', label: ts('Default')},
@@ -34,13 +38,10 @@
         if (!ctrl.display.settings) {
           ctrl.display.settings = {
             style: 'ul',
-            limit: CRM.crmSearchAdmin.defaultPagerSize,
-            sort: [],
+            limit: ctrl.parent.getDefaultLimit(),
+            sort: ctrl.parent.getDefaultSort(),
             pager: {}
           };
-          if (searchMeta.getEntity(ctrl.apiEntity).order_by) {
-            ctrl.display.settings.sort.push([searchMeta.getEntity(ctrl.apiEntity).order_by, 'ASC']);
-          }
         }
         ctrl.parent.initColumns({});
       };

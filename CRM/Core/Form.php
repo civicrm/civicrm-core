@@ -1788,7 +1788,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['data-api-field'] = $props['name'];
       }
     }
-    $props += CRM_Utils_Array::value('html', $fieldSpec, []);
+    $htmlProps = (array) ($fieldSpec['html'] ?? []);
+    CRM_Utils_Array::remove($htmlProps, 'label', 'filter');
+    $props += $htmlProps;
     if (in_array($widget, ['Select', 'Select2'])
       && !array_key_exists('placeholder', $props)
       && $placeholder = self::selectOrAnyPlaceholder($props, $required, $label)) {
@@ -1889,6 +1891,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->add('wysiwyg', $name, $label, $props, $required);
 
       case 'EntityRef':
+        // Auto-apply filters from field metadata
+        foreach ($fieldSpec['html']['filter'] ?? [] as $filter) {
+          [$k, $v] = explode('=', $filter);
+          $props['api']['params'][$k] = $v;
+        }
         return $this->addEntityRef($name, $label, $props, $required);
 
       case 'Password':

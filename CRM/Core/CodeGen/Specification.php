@@ -413,6 +413,9 @@ class CRM_Core_CodeGen_Specification {
           $field['html'][$htmlOption] = $this->value($htmlOption, $fieldXML->html);
         }
       }
+      if (isset($fieldXML->html->filter)) {
+        $field['html']['filter'] = (array) $fieldXML->html->filter;
+      }
     }
 
     // in multilingual context popup, we need extra information to create appropriate widget

@@ -42,12 +42,14 @@
         }
       };
 
+      this.getColTypes = function() {
+        return ctrl.parent.colTypes;
+      };
+
       this.$onInit = function () {
         if (!ctrl.display.settings) {
           ctrl.display.settings = _.extend({}, _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null, pager: {}});
-          if (searchMeta.getEntity(ctrl.apiEntity).order_by) {
-            ctrl.display.settings.sort.push([searchMeta.getEntity(ctrl.apiEntity).order_by, 'ASC']);
-          }
+          ctrl.display.settings.sort = ctrl.parent.getDefaultSort();
         }
         // Displays created prior to 5.43 may not have this property
         ctrl.display.settings.classes = ctrl.display.settings.classes || [];

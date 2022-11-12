@@ -154,6 +154,36 @@ class Submit extends AbstractProcessor {
   }
 
   /**
+   * Validate all fields of type "EntityRef" contain values that are allowed by filters
+   *
+   * @param \Civi\Afform\Event\AfformValidateEvent $event
+   */
+  public static function validateEntityRefFields(AfformValidateEvent $event): void {
+    $formName = $event->getAfform()['name'];
+    foreach ($event->getFormDataModel()->getEntities() as $entityName => $entity) {
+      $entityValues = $event->getEntityValues()[$entityName] ?? [];
+      foreach ($entityValues as $values) {
+        foreach ($entity['fields'] as $fieldName => $attributes) {
+          $error = self::getEntityRefError($formName, $entityName, $entity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
+          if ($error) {
+            $event->setError($error);
+          }
+        }
+        foreach ($entity['joins'] as $joinEntity => $join) {
+          foreach ($values['joins'][$joinEntity] ?? [] as $joinIndex => $joinValues) {
+            foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
+              $error = self::getEntityRefError($formName, $entityName . '+' . $joinEntity, $joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL);
+              if ($error) {
+                $event->setError($error);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * If a required field is missing a value, return an error message
    *
    * @param string $apiEntity
@@ -176,6 +206,40 @@ class Submit extends AbstractProcessor {
     if ($isRequired) {
       $label = $attributes['defn']['label'] ?? $fullDefn['label'];
       return E::ts('%1 is a required field.', [1 => $label]);
+    }
+    return NULL;
+  }
+
+  /**
+   * Return an error if an EntityRef field is submitted with a value outside the range of its savedSearch filters
+   *
+   * @param string $formName
+   * @param string $entityName
+   * @param string $apiEntity
+   * @param string $fieldName
+   * @param array $attributes
+   * @param mixed $value
+   * @return string|null
+   */
+  private static function getEntityRefError(string $formName, string $entityName, string $apiEntity, string $fieldName, $attributes, $value) {
+    $values = array_filter((array) $value);
+    // If we have no values, continue
+    if (!$values) {
+      return NULL;
+    }
+    $fullDefn = FormDataModel::getField($apiEntity, $fieldName, 'create');
+    $fieldType = $attributes['defn']['input_type'] ?? $fullDefn['input_type'];
+    $fkEntity = $attributes['defn']['fk_entity'] ?? $fullDefn['fk_entity'] ?? $apiEntity;
+    if ($fieldType === 'EntityRef') {
+      $result = (array) civicrm_api4($fkEntity, 'autocomplete', [
+        'ids' => $values,
+        'formName' => "afform:$formName",
+        'fieldName' => "$entityName:$fieldName",
+      ]);
+      if (count($result) < count($values) || array_diff($values, array_column($result, 'id'))) {
+        $label = $attributes['defn']['label'] ?? FormDataModel::getField($apiEntity, $fieldName, 'create')['label'];
+        return E::ts('Illegal value for %1.', [1 => $label]);
+      }
     }
     return NULL;
   }
