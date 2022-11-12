@@ -56,7 +56,6 @@ function afform_civicrm_config(&$config) {
   $dispatcher->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
   $dispatcher->addListener('hook_civicrm_check', ['\Civi\Afform\StatusChecks', 'hook_civicrm_check']);
   $dispatcher->addListener('civi.afform.get', ['\Civi\Api4\Action\Afform\Get', 'getCustomGroupBlocks']);
-  $dispatcher->addSubscriber(new \Civi\Api4\Subscriber\AutocompleteSubscriber());
 
   // Register support for email tokens
   if (CRM_Extension_System::singleton()->getMapper()->isActiveModule('authx')) {
