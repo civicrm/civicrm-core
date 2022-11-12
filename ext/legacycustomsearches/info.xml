@@ -25,7 +25,7 @@
   </compatibility>
   <comments>This is hidden on install to give extensions that require it time to add it to their requires and to allow us to get it out of GroupContact load</comments>
   <classloader>
-    <psr0 prefix="CRM_" path=""/>
+    <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <mixins>
