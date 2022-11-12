@@ -38,7 +38,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       $count = 1;
       // Query only works in 4.3+
       if (version_compare($currentVer, "4.3.0") > 0) {
-        $count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_payment_processor WHERE payment_processor_type_id IN (SELECT id FROM civicrm_payment_processor_type WHERE name = 'Moneris')");
+        // Disable i18nRewrite for multilingual because the view might not yet exist (added in 5.13.0)
+        $i18nRewrite = FALSE;
+        $count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_payment_processor WHERE payment_processor_type_id IN (SELECT id FROM civicrm_payment_processor_type WHERE name = 'Moneris')", TRUE, NULL, FALSE, $i18nRewrite);
       }
       if ($count && !function_exists('moneris_civicrm_managed')) {
         $preUpgradeMessage .= '<p>' . ts('The %1 payment processor is no longer bundled with CiviCRM. After upgrading you will need to install the extension to continue using it.', [1 => 'Moneris']) . '</p>';
