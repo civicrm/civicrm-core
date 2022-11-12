@@ -777,7 +777,8 @@
             $timeout(function() {
               $element.crmAutocomplete(ctrl.entity, ctrl.crmAutocompleteParams, {
                 multiple: ctrl.multi,
-                minimumInputLength: ctrl.autoOpen && !ctrl.staticOptions ? 0 : 1,
+                // Only auto-open if there are no static options
+                minimumInputLength: ctrl.autoOpen && _.isEmpty(ctrl.staticOptions) ? 0 : 1,
                 static: ctrl.staticOptions || [],
               });
             });

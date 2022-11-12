@@ -398,7 +398,10 @@
               entity.optionsLoaded = false;
               entitiesToLoad[entityName] = [entityName, 'getFields', {
                 loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
-                where: [['options', '!=', false]],
+                // For fields with both an FK and an option list, prefer the FK
+                // because it's more efficient to render an autocomplete than to
+                // pre-load potentially thousands of options into a select dropdown.
+                where: [['options', '!=', false], ['fk_entity', 'IS NULL']],
                 select: ['options']
               }, {name: 'options'}];
             }
