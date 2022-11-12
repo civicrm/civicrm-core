@@ -27,6 +27,12 @@ use CRM_Search_ExtensionUtil as E;
 class Admin {
 
   /**
+   * SELECT clause for GetFields
+   * @var string[]
+   */
+  private static $getFieldProps = ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'];
+
+  /**
    * Returns clientside data needed for the `crmSearchAdmin` Angular module.
    *
    * @return array
@@ -47,6 +53,7 @@ class Admin {
       'defaultPagerSize' => \Civi::settings()->get('default_pager_size'),
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
       'modules' => $extensions,
+      'loadOptionsSetting' => ['id', 'name', 'label', 'description', 'color', 'icon'],
       'defaultContactType' => \CRM_Contact_BAO_ContactType::basicTypeInfo()['Individual']['name'] ?? NULL,
       'defaultDistanceUnit' => \CRM_Utils_Address::getDefaultDistanceUnit(),
       'tags' => Tag::get()
@@ -142,7 +149,7 @@ class Admin {
           $entity['addPath'] = $paths['add'];
         }
         $getFields = civicrm_api4($entity['name'], 'getFields', [
-          'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
+          'select' => self::$getFieldProps,
           'where' => [['name', 'NOT IN', ['api_key', 'hash']]],
           'orderBy' => ['label'],
         ]);

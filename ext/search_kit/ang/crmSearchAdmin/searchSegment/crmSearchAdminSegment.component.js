@@ -107,7 +107,7 @@
           records: [ctrl.segment],
           chain: {
             fields: [ctrl.segment.entity_name, 'getFields', {
-              loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+              loadOptions: CRM.crmSearchAdmin.loadOptionsSetting,
               where: [['type', '=', 'Extra'], ['name', 'LIKE', 'segment_%']]
             }]
           }

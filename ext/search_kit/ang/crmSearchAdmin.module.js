@@ -392,12 +392,16 @@
         // Ensure option lists are loaded for all fields with options
         // Sets an optionsLoaded property on each entity to avoid duplicate requests
         loadFieldOptions: function(entities) {
+          // Special case - Contact entity contains Address fields
+          if (_.includes(entities, 'Contact') && !_.includes(entities, 'Address')) {
+            entities.push('Address');
+          }
           var entitiesToLoad = _.transform(entities, function(entitiesToLoad, entityName) {
             var entity = getEntity(entityName);
             if (!('optionsLoaded' in entity)) {
               entity.optionsLoaded = false;
               entitiesToLoad[entityName] = [entityName, 'getFields', {
-                loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+                loadOptions: CRM.crmSearchAdmin.loadOptionsSetting,
                 where: [['options', '!=', false]],
                 select: ['options']
               }, {name: 'options'}];
@@ -412,6 +416,16 @@
                 });
                 entity.optionsLoaded = true;
               });
+              // Special case - Contact entity contains Address fields
+              if (results.Contact) {
+                var addressFields = getEntity('Address').fields;
+                _.each(getEntity('Contact').fields, function(field) {
+                  if (field.entity === 'Address') {
+                    var fieldName = field.name.replace(/^\w+\./, '');
+                    field.options = _.find(addressFields, {name: fieldName}).options;
+                  }
+                });
+              }
             });
           }
         },
