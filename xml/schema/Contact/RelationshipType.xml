@@ -169,6 +169,7 @@
     <comment>Is this relationship type currently active (i.e. can be used when creating or editing relationships)?</comment>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
     <add>1.1</add>
   </field>
