@@ -126,6 +126,10 @@
     <type>boolean</type>
     <comment>Is this navigation item active?</comment>
     <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <required>true</required>
     <add>3.0</add>
   </field>
