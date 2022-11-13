@@ -72,6 +72,10 @@
     <type>boolean</type>
     <comment>whether this status type is active</comment>
     <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <required>true</required>
     <add>3.0</add>
   </field>

@@ -83,6 +83,10 @@
     <type>boolean</type>
     <required>true</required>
     <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is this property active?</comment>
   </field>
 </table>
