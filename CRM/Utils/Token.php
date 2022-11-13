@@ -1041,48 +1041,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Find and replace tokens for each component.
-   *
-   * @param string $str
-   *   The string to search.
-   * @param array $contact
-   *   Associative array of contact properties.
-   * @param array $components
-   *   A list of tokens that are known to exist in the email body.
-   *
-   * @param bool $escapeSmarty
-   * @param bool $returnEmptyToken
-   *
-   * @return string
-   *   The processed string
-   *
-   * @deprecated
-   */
-  public static function replaceComponentTokens(&$str, $contact, $components, $escapeSmarty = FALSE, $returnEmptyToken = TRUE) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
-    if (!is_array($components) || empty($contact)) {
-      return $str;
-    }
-
-    foreach ($components as $name => $tokens) {
-      if (!is_array($tokens) || empty($tokens)) {
-        continue;
-      }
-
-      foreach ($tokens as $token) {
-        if (self::token_match($name, $token, $str) && isset($contact[$name . '.' . $token])) {
-          self::token_replace($name, $token, $contact[$name . '.' . $token], $str, $escapeSmarty);
-        }
-        elseif (!$returnEmptyToken) {
-          //replacing empty token
-          self::token_replace($name, $token, "", $str, $escapeSmarty);
-        }
-      }
-    }
-    return $str;
-  }
-
-  /**
    * Get array of string tokens.
    *
    * @param string $string
