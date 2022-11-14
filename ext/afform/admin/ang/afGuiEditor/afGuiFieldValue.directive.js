@@ -38,7 +38,11 @@
               _.each(ctrl.editor.getEntities({type: field.fk_entity}), function(entity) {
                  options.push({id: entity.name, label: entity.label, icon: afGui.meta.entities[entity.type].icon});
               });
-              $el.crmEntityRef({entity: field.fk_entity, select: {multiple: multi}, static: options});
+              $el.crmAutocomplete(field.fk_entity, {fieldName: field.entity + '.' + field.name}, {
+                multiple: multi,
+                "static": options,
+                minimumInputLength: options.length ? 1 : 0
+              });
             } else if (field.options) {
               options = _.transform(field.options, function(options, val) {
                 options.push({id: val.id, text: val.label});
