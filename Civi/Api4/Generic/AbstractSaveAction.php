@@ -127,6 +127,7 @@ abstract class AbstractSaveAction extends AbstractAction {
     $primaryKey = CoreUtil::getIdFieldName($this->getEntityName());
     if (empty($record[$primaryKey]) && !empty($this->match)) {
       $where = [];
+      $hasNonEmptyMatchValue = FALSE;
       foreach ($record as $key => $val) {
         if (in_array($key, $this->match, TRUE)) {
           if ($val === '' || is_null($val)) {
@@ -135,10 +136,11 @@ abstract class AbstractSaveAction extends AbstractAction {
           }
           else {
             $where[] = [$key, '=', $val];
+            $hasNonEmptyMatchValue = TRUE;
           }
         }
       }
-      if (count($where) === count($this->match)) {
+      if ((count($where) === count($this->match)) && $hasNonEmptyMatchValue) {
         $existing = civicrm_api4($this->getEntityName(), 'get', [
           'select' => [$primaryKey],
           'where' => $where,
