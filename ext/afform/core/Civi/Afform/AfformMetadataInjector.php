@@ -62,7 +62,8 @@ class AfformMetadataInjector {
           // If this fieldset is standalone (not linked to an af-entity) it is for get rather than create
           if ($apiEntities) {
             $action = 'get';
-            $entityType = self::getFieldEntityType($afField->getAttribute('name'), \CRM_Utils_JS::decode($apiEntities));
+            $entityList = \CRM_Utils_JS::decode(htmlspecialchars_decode($apiEntities));
+            $entityType = self::getFieldEntityType($afField->getAttribute('name'), $entityList);
           }
           else {
             $entityName = pq($fieldset)->attr('af-fieldset');
@@ -156,7 +157,7 @@ class AfformMetadataInjector {
         $fieldDefn[$name] = \CRM_Utils_JS::encode($prop);
       }
     }
-    pq($afField)->attr('defn', htmlspecialchars(\CRM_Utils_JS::writeObject($fieldDefn)));
+    pq($afField)->attr('defn', htmlspecialchars(\CRM_Utils_JS::writeObject($fieldDefn), ENT_COMPAT));
   }
 
   /**
