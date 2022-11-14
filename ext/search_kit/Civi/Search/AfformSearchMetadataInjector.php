@@ -49,10 +49,10 @@ class AfformSearchMetadataInjector {
                 ->addSelect('settings', 'saved_search_id.api_entity', 'saved_search_id.api_params')
                 ->execute()->first();
               if ($display) {
-                pq($component)->attr('settings', htmlspecialchars(\CRM_Utils_JS::encode($display['settings'] ?? [])));
-                pq($component)->attr('api-entity', htmlspecialchars($display['saved_search_id.api_entity']));
-                pq($component)->attr('search', htmlspecialchars(\CRM_Utils_JS::encode($searchName)));
-                pq($component)->attr('display', htmlspecialchars(\CRM_Utils_JS::encode($displayName)));
+                pq($component)->attr('settings', htmlspecialchars(\CRM_Utils_JS::encode($display['settings'] ?? []), ENT_COMPAT));
+                pq($component)->attr('api-entity', htmlspecialchars($display['saved_search_id.api_entity'], ENT_COMPAT));
+                pq($component)->attr('search', htmlspecialchars(\CRM_Utils_JS::encode($searchName), ENT_COMPAT));
+                pq($component)->attr('display', htmlspecialchars(\CRM_Utils_JS::encode($displayName), ENT_COMPAT));
 
                 // Add entity names to the fieldset so that afform can populate field metadata
                 $fieldset = pq($component)->parents('[af-fieldset]');
@@ -64,7 +64,7 @@ class AfformSearchMetadataInjector {
                       $entityList[] = $join[2] . ' AS ' . (explode(' AS ', $join[0])[1]);
                     }
                   }
-                  $fieldset->attr('api-entities', htmlspecialchars(\CRM_Utils_JS::encode($entityList)));
+                  $fieldset->attr('api-entities', htmlspecialchars(\CRM_Utils_JS::encode($entityList), ENT_COMPAT));
                   // Add field metadata for aggregate fields because they are not in the schema.
                   // Normal entity fields will be handled by AfformMetadataInjector
                   foreach (Meta::getCalcFields($display['saved_search_id.api_entity'], $display['saved_search_id.api_params']) as $fieldInfo) {
