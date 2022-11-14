@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_Administer_Financial_Types',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -59,7 +59,7 @@ return [
   [
     'name' => 'SavedSearch_Financial_Types_SearchDisplay_Financial_Types_Table_1',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,

@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_Administer_Assigned_Financial_Accounts',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -51,7 +51,7 @@ return [
   [
     'name' => 'SavedSearch_Administer_Assigned_Financial_Accounts_SearchDisplay_Entity_Financial_Accounts_Table',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,

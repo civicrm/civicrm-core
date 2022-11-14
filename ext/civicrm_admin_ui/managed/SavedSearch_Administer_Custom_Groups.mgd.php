@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_Administer_Custom_Groups',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -53,7 +53,7 @@ return [
   [
     'name' => 'SavedSearch_Administer_Custom_Groups_SearchDisplay_Table',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,

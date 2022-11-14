@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_Administer_Contact_Types',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
