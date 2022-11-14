@@ -236,16 +236,9 @@
           else if (ctrl.defn.search_range) {
             return ($scope.dataProvider.getFieldData()[ctrl.fieldName]['>='] = val);
           }
-          // A multi-select needs to split string value into an array
-          if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.multiple) {
-            val = val ? val.split(',') : [];
-          }
           return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val);
         }
         // Getter
-        if (_.isArray(currentVal)) {
-          return currentVal.join(',');
-        }
         if (ctrl.defn.is_date) {
           return _.isPlainObject(currentVal) ? '{}' : currentVal;
         }

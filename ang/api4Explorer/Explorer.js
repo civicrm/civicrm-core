@@ -1259,8 +1259,11 @@
                 $el.removeClass('loading').crmSelect2({data: options, multiple: multi});
               });
             } else if (field.fk_entity) {
-              var apiParams = field.id_field ? {id_field: field.id_field} : {};
-              $el.crmEntityRef({entity: field.fk_entity, api: apiParams, select: {multiple: multi}, static: field.fk_entity === 'Contact' ? ['user_contact_id'] : []});
+              $el.crmAutocomplete(field.fk_entity, {fieldName: field.entity + '.' + field.name, key: field.id_field || null}, {
+                multiple: multi,
+                static: field.fk_entity === 'Contact' ? ['user_contact_id'] : [],
+                minimumInputLength: field.fk_entity === 'Contact' ? 1 : 0
+              });
             } else if (dataType === 'Boolean') {
               $el.attr('placeholder', ts('- select -')).crmSelect2({allowClear: false, multiple: multi, placeholder: ts('- select -'), data: [
                 {id: 'true', text: ts('Yes')},

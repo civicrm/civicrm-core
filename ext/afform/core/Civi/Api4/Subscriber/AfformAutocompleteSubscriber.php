@@ -13,7 +13,6 @@ namespace Civi\Api4\Subscriber;
 
 use Civi\Core\Service\AutoService;
 use Civi\Afform\FormDataModel;
-use Civi\API\Events;
 use Civi\Api4\Afform;
 use Civi\Api4\Generic\AutocompleteAction;
 use Civi\Api4\Utils\CoreUtil;
@@ -31,7 +30,7 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
    */
   public static function getSubscribedEvents() {
     return [
-      'civi.api.prepare' => ['onApiPrepare', Events::W_MIDDLE],
+      'civi.api.prepare' => ['onApiPrepare', -20],
     ];
   }
 
@@ -90,15 +89,10 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
       $isId = $fieldName === CoreUtil::getIdFieldName($apiEntity);
       $formField = $entity['fields'][$fieldName]['defn'] ?? [];
     }
-    $fieldSpec = civicrm_api4($apiEntity, 'getFields', [
-      'checkPermissions' => FALSE,
-      'where' => [['name', '=', $fieldName]],
-    ])->first();
 
-    // Auto-add filters defined in schema
-    foreach ($fieldSpec['input_attrs']['filter'] ?? [] as $key => $value) {
-      $apiRequest->addFilter($key, $value);
-    }
+    // Set standard fieldName so core AutocompleteFieldSubscriber can handle filters from the schema
+    // @see \Civi\Api4\Event\Subscriber\AutocompleteFieldSubscriber::onApiPrepare
+    $apiRequest->setFieldName("$apiEntity.$fieldName");
 
     // For the "Existing Entity" selector,
     // Look up the "type" fields (e.g. contact_type, activity_type_id, case_type_id, etc)
