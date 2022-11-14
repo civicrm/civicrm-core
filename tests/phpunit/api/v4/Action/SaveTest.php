@@ -55,7 +55,7 @@ class SaveTest extends Api4TestBase implements TransactionalInterface {
         ->execute()->single()['id'];
 
       // This modified version of Zak will match with the existing Zak
-      // (external id and first name both match)
+      // (nickname and first name both match)
 
       $sameZakWithChangedLastName = [
         'nick_name' => $zakOriginal['nick_name'],
@@ -71,7 +71,7 @@ class SaveTest extends Api4TestBase implements TransactionalInterface {
       self::assertEquals($zakOriginal['id'], $sameZakWithChangedLastName['id']);
 
       // This new Bob will not match the existing Bob
-      // (first name matches, but external id is different)
+      // (first name matches, but nickname is different)
 
       self::assertNotEquals($bobOriginal['nick_name'], $testValue);
 
