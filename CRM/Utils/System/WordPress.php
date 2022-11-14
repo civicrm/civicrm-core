@@ -1522,7 +1522,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
     if ($clean == 1) {
       //cleanURLs are enabled in CiviCRM, let's make sure the wordpress permalink settings and cache are actually correct by checking the first active contribution page
-      $contributionPages = \Civi\Api4\ContributionPage::get(FALSE)
+      $contributionPages = !CRM_Core_Component::isEnabled('CiviContribute') ? [] : \Civi\Api4\ContributionPage::get(FALSE)
         ->addSelect('id')
         ->addWhere('is_active', '=', TRUE)
         ->setLimit(1)
@@ -1535,7 +1535,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
       else {
         //no active contribution pages, we can check an event page. This probably won't ever happen.
-        $eventPages = \Civi\Api4\Event::get(FALSE)
+        $eventPages = !CRM_Core_Component::isEnabled('CiviEvent') ? [] : \Civi\Api4\Event::get(FALSE)
           ->addSelect('id')
           ->addWhere('is_active', '=', TRUE)
           ->setLimit(1)
