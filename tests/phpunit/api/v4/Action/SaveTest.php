@@ -16,7 +16,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
@@ -29,99 +28,93 @@ use Civi\Test\TransactionalInterface;
 class SaveTest extends Api4TestBase implements TransactionalInterface {
 
   /**
-   * @dataProvider getMatchingCriteriaDataProvider
    * @return void
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testSaveWithMatchingCriteria($matchCriteria, $records, $changes, $expected) {
-    $contacts = Contact::save(FALSE)
-      ->setRecords($records)
-      ->execute();
+  public function testSaveWithMatchingCriteria() {
+    foreach (['Kiddo', '', NULL] as $testValue) {
+      $zakOriginal = [
+        'nick_name' => $testValue,
+        'first_name' => 'Zak',
+        'last_name' => 'Original',
+      ];
 
-    $modified = Contact::save(FALSE)
-      ->setRecords($changes)
-      ->setMatch($matchCriteria)
-      ->execute();
+      $zakOriginal['id'] = Contact::create(FALSE)
+        ->setValues($zakOriginal)
+        ->execute()->single()['id'];
 
-    $this->assertGreaterThan($contacts[0]['id'], $modified[0]['id']);
-    $this->assertEquals($contacts[1]['id'], $modified[1]['id']);
+      $bobOriginal = [
+        'nick_name' => 'bob',
+        'first_name' => 'Bob',
+        'last_name' => 'Original',
+      ];
 
-    $ids = [$contacts[0]['id'], $modified[0]['id'], $contacts[1]['id']];
-    $get = Contact::get(FALSE)
-      ->setSelect(['id', 'first_name', 'last_name', 'external_identifier'])
-      ->addWhere('id', 'IN', $ids)
-      ->addOrderBy('id')
-      ->execute();
+      $bobOriginal['id'] = Contact::create(FALSE)
+        ->setValues($bobOriginal)
+        ->execute()->single()['id'];
 
-    for ($index = 0; $index < count($expected); $index++) {
-      $expected[$index]['id'] = $contacts[0]['id'] + $index;
+      // This modified version of Zak will match with the existing Zak
+      // (external id and first name both match)
+
+      $sameZakWithChangedLastName = [
+        'nick_name' => $zakOriginal['nick_name'],
+        'first_name' => $zakOriginal['first_name'],
+        'last_name' => 'Changed',
+      ];
+
+      $sameZakWithChangedLastName['id'] = Contact::save(FALSE)
+        ->setMatch(['first_name', 'nick_name'])
+        ->setRecords([$sameZakWithChangedLastName])
+        ->execute()->single()['id'];
+
+      self::assertEquals($zakOriginal['id'], $sameZakWithChangedLastName['id']);
+
+      // This new Bob will not match the existing Bob
+      // (first name matches, but external id is different)
+
+      self::assertNotEquals($bobOriginal['nick_name'], $testValue);
+
+      $anotherBob = [
+        'nick_name' => $testValue,
+        'first_name' => $bobOriginal['first_name'],
+        'last_name' => 'Changed',
+      ];
+
+      $anotherBob['id'] = Contact::save(FALSE)
+        ->setMatch(['first_name', 'nick_name'])
+        ->setRecords([$anotherBob])
+        ->execute()->single()['id'];
+
+      self::assertGreaterThan($bobOriginal['id'], $anotherBob['id']);
+
+      $allContactIds = [
+        $zakOriginal['id'],
+        $sameZakWithChangedLastName['id'],
+        $bobOriginal['id'],
+        $anotherBob['id'],
+      ];
+
+      $allCreatedAndSavedContacts = Contact::get(FALSE)
+        ->setSelect(['id', 'first_name', 'last_name', 'nick_name'])
+        ->addWhere('id', 'IN', $allContactIds)
+        ->execute()->indexBy('id');
+
+      self::assertCount(3, $allCreatedAndSavedContacts);
+
+      $expected = [
+        $zakOriginal['id'] => $sameZakWithChangedLastName,
+        $bobOriginal['id'] => $bobOriginal,
+        $anotherBob['id'] => $anotherBob,
+      ];
+
+      self::assertEquals($expected, $allCreatedAndSavedContacts->getArrayCopy());
+
+      Contact::delete(FALSE)
+        ->setUseTrash(FALSE)
+        ->addWhere('id', 'IN', $allContactIds)
+        ->execute();
     }
-    $this->assertEquals($expected, (array) $get);
-  }
-
-  public function getMatchingCriteriaDataProvider() {
-    // data = [ match criteria, records, modifiedRecords, expected results ]
-    $data[] = [
-      ['first_name', 'external_identifier'],
-      [
-        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
-        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => 'def'],
-      ],
-      [
-        ['first_name' => 'One', 'last_name' => 'Changed', 'external_identifier' => 'ghi'],
-        ['first_name' => 'Two', 'last_name' => 'Changed', 'external_identifier' => 'def'],
-      ],
-      [
-        // Original insert
-        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
-        // Match+update
-        ['first_name' => 'Two', 'last_name' => 'Changed', 'external_identifier' => 'def'],
-        // Subsequent insert
-        ['first_name' => 'One', 'last_name' => 'Changed', 'external_identifier' => 'ghi'],
-      ],
-    ];
-    // Test that we get a match on an empty string (eg. external_identifier => '')
-    $data[] = [
-      ['first_name', 'last_name', 'external_identifier'],
-      [
-        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
-        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => ''],
-      ],
-      [
-        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'ghi'],
-        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => ''],
-      ],
-      [
-        // Original insert
-        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
-        // Match+update
-        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => ''],
-        // Subsequent insert
-        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'ghi'],
-      ],
-    ];
-    // Test that we get a match on NULL (eg. external_identifier => NULL)
-    $data[] = [
-      ['first_name', 'last_name', 'external_identifier'],
-      [
-        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
-        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => NULL],
-      ],
-      [
-        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'ghi'],
-        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => NULL],
-      ],
-      [
-        // Original insert
-        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
-        // Match+update
-        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => NULL],
-        // Subsequent insert
-        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'ghi'],
-      ],
-    ];
-    return $data;
   }
 
 }
