@@ -101,6 +101,26 @@ class SaveTest extends Api4TestBase implements TransactionalInterface {
         ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'ghi'],
       ],
     ];
+    // Test that we get a match on NULL (eg. external_identifier => NULL)
+    $data[] = [
+      ['first_name', 'last_name', 'external_identifier'],
+      [
+        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
+        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => NULL],
+      ],
+      [
+        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'ghi'],
+        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => NULL],
+      ],
+      [
+        // Original insert
+        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'abc'],
+        // Match+update
+        ['first_name' => 'Two', 'last_name' => 'Test', 'external_identifier' => NULL],
+        // Subsequent insert
+        ['first_name' => 'One', 'last_name' => 'Test', 'external_identifier' => 'ghi'],
+      ],
+    ];
     return $data;
   }
 
