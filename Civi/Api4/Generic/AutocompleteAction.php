@@ -131,28 +131,45 @@ class AutocompleteAction extends AbstractAction {
     // Pass-through this parameter
     $this->display['acl_bypass'] = !$this->getCheckPermissions();
 
-    $idField = $this->getIdFieldName();
-    $labelField = $this->display['settings']['columns'][0]['key'];
-    // If label column uses a rewrite, search on those fields too
-    if (!empty($this->display['settings']['columns'][0]['rewrite'])) {
-      $labelField = implode(',', array_unique(array_merge([$labelField], $this->getTokens($this->display['settings']['columns'][0]['rewrite']))));
-    }
+    $keyField = $this->getKeyField();
+    $displayFields = $this->getDisplayFields();
+    $this->augmentSelectClause($keyField, $displayFields);
 
     // Render mode: fetch by id
     if ($this->ids) {
-      $this->savedSearch['api_params']['where'][] = [$idField, 'IN', $this->ids];
+      $this->savedSearch['api_params']['where'][] = [$keyField, 'IN', $this->ids];
       unset($this->display['settings']['pager']);
       $return = NULL;
     }
     // Search mode: fetch a page of results based on input
     else {
+      // Default search and sort field
+      $labelField = $this->display['settings']['columns'][0]['key'];
+      $idField = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+      $this->display['settings'] += [
+        'sort' => [$labelField, 'ASC'],
+      ];
+      // Always search on the first line of the display
+      $searchFields = [$labelField];
+      // If input is an integer, search by id
+      if (\CRM_Utils_Rule::positiveInteger($this->input)) {
+        $searchFields[] = $idField;
+        // Add a sort clause to place exact ID match at the top
+        array_unshift($this->display['settings']['sort'], [
+          "($idField = $this->input)",
+          'DESC',
+        ]);
+      }
+      // If first line uses a rewrite, search on those fields too
+      if (!empty($this->display['settings']['columns'][0]['rewrite'])) {
+        $searchFields = array_merge($searchFields, $this->getTokens($this->display['settings']['columns'][0]['rewrite']));
+      }
       $this->display['settings']['limit'] = $this->display['settings']['limit'] ?? \Civi::settings()->get('search_autocomplete_count') ?: 10;
       $this->display['settings']['pager'] = [];
       $return = 'scroll:' . $this->page;
-      $this->addFilter($labelField, $this->input);
+      // SearchKit treats comma-separated fieldnames as OR clauses
+      $this->addFilter(implode(',', array_unique($searchFields)), $this->input);
     }
-
-    $this->augmentSelectClause($idField);
 
     $apiResult = \Civi\Api4\SearchDisplay::run(FALSE)
       ->setSavedSearch($this->savedSearch)
@@ -163,7 +180,7 @@ class AutocompleteAction extends AbstractAction {
 
     foreach ($apiResult as $row) {
       $item = [
-        'id' => $row['data'][$idField],
+        'id' => $row['data'][$keyField],
         'label' => $row['columns'][0]['val'],
         'icon' => $row['columns'][0]['icons'][0]['class'] ?? NULL,
         'description' => [],
@@ -191,20 +208,31 @@ class AutocompleteAction extends AbstractAction {
   }
 
   /**
+   * Gather all fields used by the display
+   *
+   * @return array
+   */
+  private function getDisplayFields() {
+    $fields = [];
+    foreach ($this->display['settings']['columns'] as $column) {
+      if ($column['type'] === 'field') {
+        $fields[] = $column['key'];
+      }
+      if (!empty($column['rewrite'])) {
+        $fields = array_merge($fields, $this->getTokens($column['rewrite']));
+      }
+    }
+    return array_unique($fields);
+  }
+
+  /**
    * Ensure SELECT param includes all display fields & trusted filters
    *
    * @param string $idField
+   * @param array $displayFields
    */
-  private function augmentSelectClause(string $idField) {
-    $select = [$idField];
-    foreach ($this->display['settings']['columns'] as $column) {
-      if ($column['type'] === 'field') {
-        $select[] = $column['key'];
-      }
-      if (!empty($column['rewrite'])) {
-        $select = array_merge($select, $this->getTokens($column['rewrite']));
-      }
-    }
+  private function augmentSelectClause(string $idField, array $displayFields) {
+    $select = array_merge([$idField], $displayFields);
     // Add trustedFilters to the SELECT clause so that SearchDisplay::run will trust them
     foreach ($this->trustedFilters as $fields => $val) {
       $select = array_merge($select, explode(',', $fields));
@@ -217,37 +245,14 @@ class AutocompleteAction extends AbstractAction {
   }
 
   /**
-   * @param $fieldNameWithSuffix
-   * @return bool
-   */
-  private function checkFieldAccess($fieldNameWithSuffix) {
-    [$fieldName] = explode(':', $fieldNameWithSuffix);
-    if (
-      in_array($fieldName, $this->_apiParams['select'], TRUE) ||
-      in_array($fieldNameWithSuffix, $this->_apiParams['select'], TRUE) ||
-      in_array($fieldName, $this->savedSearch['api_params']['select'], TRUE) ||
-      in_array($fieldNameWithSuffix, $this->savedSearch['api_params']['select'], TRUE)
-    ) {
-      return TRUE;
-    }
-    // Proceed only if permissions are being enforced.'
-    // Anonymous users in permission-bypass mode should not be allowed to set arbitrary filters.
-    if ($this->getCheckPermissions()) {
-      // This function checks field permissions
-      return (bool) $this->getField($fieldName);
-    }
-    return FALSE;
-  }
-
-  /**
-   * By default, returns the primary key of the entity (typically `id`).
+   * Get the field by which results will be keyed (typically `id` unless $this->key is set).
    *
    * If $this->key param is set, it will allow it ONLY if the field is a unique index on the entity.
-   * This is a security measure. Allowing any value could give access to potentially sentitive data.
+   * This is a security measure. Allowing any value could give access to potentially sensitive data.
    *
    * @return string
    */
-  private function getIdFieldName() {
+  private function getKeyField() {
     $entityName = $this->savedSearch['api_entity'];
     if ($this->key) {
       /** @var \CRM_Core_DAO $dao */
