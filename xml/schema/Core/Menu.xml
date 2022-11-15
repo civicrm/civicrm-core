@@ -155,6 +155,10 @@
     <title>Enabled?</title>
     <type>boolean</type>
     <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <required>true</required>
     <comment>Is this menu item active?</comment>
     <add>2.1</add>

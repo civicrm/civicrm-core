@@ -193,6 +193,10 @@
     <type>boolean</type>
     <title>Custom Field Is Active?</title>
     <comment>Is this property active?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <default>1</default>
     <add>1.1</add>
   </field>

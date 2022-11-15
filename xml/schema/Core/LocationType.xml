@@ -73,6 +73,10 @@
     <title>Location Type is Active?</title>
     <type>boolean</type>
     <comment>Is this property active?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>1.1</add>
   </field>
   <field>
