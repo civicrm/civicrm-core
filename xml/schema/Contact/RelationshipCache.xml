@@ -201,6 +201,7 @@
     <add>5.29</add>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
     <readonly>true</readonly>
   </field>

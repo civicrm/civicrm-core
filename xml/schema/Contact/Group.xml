@@ -93,7 +93,11 @@
     <default>1</default>
     <required>true</required>
     <title>Group Enabled</title>
-    <comment>Is this entry active?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <comment>Is this group active?</comment>
     <add>1.1</add>
   </field>
   <field>

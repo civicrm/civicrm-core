@@ -363,7 +363,11 @@
     <type>boolean</type>
     <default>1</default>
     <required>true</required>
-    <comment>Is this property active?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <comment>Is this page active?</comment>
     <add>1.3</add>
   </field>
   <field>
