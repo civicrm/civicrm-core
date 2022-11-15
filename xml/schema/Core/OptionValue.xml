@@ -144,6 +144,10 @@
     <title>Option Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is this option active?</comment>
     <add>1.5</add>
   </field>
