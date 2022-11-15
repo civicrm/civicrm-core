@@ -232,8 +232,8 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals(1, $result3->countMatched());
   }
 
-  public function testAutocompleteIdField() {
-    $label = uniqid();
+  public function testAutocompleteWithDifferentKey() {
+    $label = $this->randomLetters();
     $sample = $this->saveTestRecords('SavedSearch', [
       'records' => [
         ['name' => 'c', 'label' => "C $label"],
@@ -241,7 +241,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
         ['name' => 'b', 'label' => "B $label"],
       ],
       'defaults' => ['api_entity' => 'Contact'],
-    ]);
+    ])->indexBy('name');
 
     $result1 = SavedSearch::autocomplete()
       ->setInput($label)
@@ -252,15 +252,69 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('b', $result1[1]['id']);
     $this->assertEquals('c', $result1[2]['id']);
 
+    // Try searching by ID - should only get one result
+    $result1 = SavedSearch::autocomplete()
+      ->setInput((string) $sample['b']['id'])
+      ->setKey('name')
+      ->execute();
+    $this->assertCount(1, $result1);
+    $this->assertEquals('b', $result1[0]['id']);
+
     // This key won't be used since api_entity is not a unique index
     $result2 = SavedSearch::autocomplete()
       ->setInput($label)
       ->setKey('api_entity')
       ->execute();
     // Expect id to be returned as key instead of api_entity
-    $this->assertEquals($sample[1]['id'], $result2[0]['id']);
-    $this->assertEquals($sample[2]['id'], $result2[1]['id']);
-    $this->assertEquals($sample[0]['id'], $result2[2]['id']);
+    $this->assertEquals($sample['a']['id'], $result2[0]['id']);
+    $this->assertEquals($sample['b']['id'], $result2[1]['id']);
+    $this->assertEquals($sample['c']['id'], $result2[2]['id']);
+  }
+
+  public function testContactAutocompleteById() {
+    $firstName = $this->randomLetters();
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => array_fill(0, 15, ['first_name' => $firstName]),
+    ]);
+
+    $cid = $contacts[11]['id'];
+
+    Contact::save(FALSE)
+      ->addRecord(['id' => $contacts[0]['id'], 'last_name' => "Aaaac$cid"])
+      ->addRecord(['id' => $contacts[14]['id'], 'last_name' => "Aaaab$cid"])
+      ->addRecord(['id' => $contacts[6]['id'], 'last_name' => "Aaaaa$cid"])
+      ->execute();
+
+    $result = Contact::autocomplete()
+      ->setInput((string) $cid)
+      ->execute();
+
+    // Exact match should be at beginning of the list
+    $this->assertContains($cid, $result->column('id'));
+    $this->assertEquals($cid, $result[0]['id']);
+    // If by chance there are other matching contacts in the db, skip over them
+    foreach ($result as $i => $row) {
+      if ($row['id'] == $contacts[6]['id']) {
+        break;
+      }
+    }
+    // The other 3 matches should be in order
+    $this->assertEquals($contacts[6]['id'], $result[$i]['id']);
+    $this->assertEquals($contacts[14]['id'], $result[$i + 1]['id']);
+    $this->assertEquals($contacts[0]['id'], $result[$i + 2]['id']);
+
+    // Ensure partial match doesn't work (end of id)
+    $result = Contact::autocomplete()
+      ->setInput(substr((string) $cid, -1))
+      ->execute();
+    $this->assertNotContains($cid, $result->column('id'));
+
+    // Ensure partial match doesn't work (beginning of id)
+    $result = Contact::autocomplete()
+      ->setInput(substr((string) $cid, 0, 1))
+      ->execute();
+    $this->assertNotContains($cid, $result->column('id'));
   }
 
 }

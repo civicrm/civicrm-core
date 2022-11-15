@@ -159,6 +159,15 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   }
 
   /**
+   * Generate some random lowercase letters
+   * @param int $len
+   * @return string
+   */
+  public function randomLetters(int $len = 10) {
+    return \CRM_Utils_String::createRandom($len, implode('', range('a', 'z')));
+  }
+
+  /**
    * Get the required fields for the api entity + action.
    *
    * @param string $entity
@@ -352,10 +361,10 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
         return random_int(1, 2000);
 
       case 'String':
-        return \CRM_Utils_String::createRandom(10, implode('', range('a', 'z')));
+        return $this->randomLetters();
 
       case 'Text':
-        return \CRM_Utils_String::createRandom(100, implode('', range('a', 'z')));
+        return $this->randomLetters(100);
 
       case 'Money':
         return sprintf('%d.%2d', rand(0, 2000), rand(10, 99));

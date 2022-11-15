@@ -57,6 +57,7 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
     if (!$entityName) {
       throw new \CRM_Core_Exception("Entity name is required to get autocomplete default display.");
     }
+    $idField = CoreUtil::getIdFieldName($entityName);
     $labelField = CoreUtil::getInfoItem($entityName, 'label_field');
     if (!$labelField) {
       throw new \CRM_Core_Exception("Entity $entityName has no default label field.");
@@ -67,6 +68,11 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
 
     $fields = CoreUtil::getApiClass($entityName)::get()->entityFields();
     $columns = [$labelField];
+    // Add grouping fields like "event_type_id" in the description
+    $grouping = (array) (CoreUtil::getCustomGroupExtends($entityName)['grouping'] ?? []);
+    foreach ($grouping as $fieldName) {
+      $columns[] = "$fieldName:label";
+    }
     if (isset($fields['description'])) {
       $columns[] = 'description';
     }
@@ -78,6 +84,12 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
         'key' => $columnField,
       ];
     }
+    // Include entity id on the second line
+    $e->display['settings']['columns'][1] = [
+      'type' => 'field',
+      'key' => $idField,
+      'rewrite' => "#[$idField]" . (isset($columns[1]) ? " [$columns[1]]" : ''),
+    ];
 
     // Default icons
     $iconFields = CoreUtil::getInfoItem($entityName, 'icon_field') ?? [];

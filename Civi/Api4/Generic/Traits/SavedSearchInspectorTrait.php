@@ -315,8 +315,9 @@ trait SavedSearchInspectorTrait {
    * Search a string for all square bracket tokens and return their contents (without the brackets)
    *
    * @param string $str
+   * @return array
    */
-  protected function getTokens($str) {
+  protected function getTokens(string $str): array {
     $tokens = [];
     preg_match_all('/\\[([^]]+)\\]/', $str, $tokens);
     return array_unique($tokens[1]);
