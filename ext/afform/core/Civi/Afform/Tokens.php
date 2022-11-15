@@ -32,7 +32,9 @@ class Tokens {
    */
   public static function applyCkeditorWorkaround(GenericHookEvent $e) {
     foreach (array_keys($e->content) as $field) {
-      $e->content[$field] = preg_replace(';https?://(\{afform.*Url\});', '$1', $e->content[$field]);
+      if (is_string($e->content[$field])) {
+        $e->content[$field] = preg_replace(';https?://(\{afform.*Url\});', '$1', $e->content[$field]);
+      }
     }
   }
 
