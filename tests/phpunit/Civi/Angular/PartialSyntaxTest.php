@@ -85,6 +85,8 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
   /**
    */
   public function testAllPartials() {
+    $this->markTestIncomplete('checkConsistentHtml gives too many false-positive errors to be useful in a unit test.');
+
     $coder = new \Civi\Angular\Coder();
     $errors = [];
     $count = 0;
