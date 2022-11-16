@@ -56,6 +56,10 @@
     <type>boolean</type>
     <default>0</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <comment>whether this is the default set of settings for this domain</comment>
     <add>2.2</add>
   </field>
