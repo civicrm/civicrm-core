@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
+class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_MailingEventQueue {
 
   /**
    * Queue a new recipient.

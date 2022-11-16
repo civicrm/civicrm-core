@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
+class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_MailingEventOpened {
 
   /**
    * Register an open event.

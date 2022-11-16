@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
+class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_MailingEventDelivered {
 
   /**
    * Create a new delivery event.

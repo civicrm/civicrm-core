@@ -749,8 +749,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     //CRM-20431 - Delete group id that matches first mailing id.
     $this->callAPISuccess('Group', 'delete', ['id' => $this->_groupID]);
     $jobId = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingJob', $mail2['id'], 'id', 'mailing_id');
-    $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_Queue', $jobId, 'hash', 'job_id');
-    $queueId = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_Queue', $jobId, 'id', 'job_id');
+    $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_MailingEventQueue', $jobId, 'hash', 'job_id');
+    $queueId = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_MailingEventQueue', $jobId, 'id', 'job_id');
     // This gets the list of groups to unsubscribe but does NOT actually unsubcribe from groups (because return=TRUE)
     $beforeUnsubscribeGroups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
     // Assert that there are two groups in the unsubscribe list.

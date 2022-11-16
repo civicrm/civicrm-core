@@ -471,7 +471,7 @@ function _civicrm_api3_mailing_event_forward_spec(&$params) {
  */
 function civicrm_api3_mailing_event_click($params) {
   civicrm_api3_verify_mandatory($params,
-    'CRM_Mailing_Event_DAO_TrackableURLOpen',
+    'CRM_Mailing_Event_DAO_MailingEventClickThrough',
     ['event_queue_id', 'url_id'],
     FALSE
   );
@@ -498,7 +498,7 @@ function civicrm_api3_mailing_event_click($params) {
 function civicrm_api3_mailing_event_open($params) {
 
   civicrm_api3_verify_mandatory($params,
-    'CRM_Mailing_Event_DAO_Opened',
+    'CRM_Mailing_Event_DAO_MailingEventOpened',
     ['event_queue_id'],
     FALSE
   );

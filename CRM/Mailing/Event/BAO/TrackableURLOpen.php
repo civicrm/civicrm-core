@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_TrackableURLOpen {
+class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_MailingEventClickThrough {
 
   /**
    * Track a click-through and return the URL to redirect.

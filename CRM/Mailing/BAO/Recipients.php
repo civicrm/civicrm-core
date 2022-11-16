@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
+class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_MailingRecipients {
 
   /**
    * @param int $mailingID

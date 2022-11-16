@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
+class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_MailingEventForward {
 
   /**
    * Create a new forward event, create a new contact if necessary

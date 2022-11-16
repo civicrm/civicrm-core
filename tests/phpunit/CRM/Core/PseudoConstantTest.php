@@ -869,13 +869,13 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Scheduled',
         ],
       ],
-      'CRM_Mailing_Event_DAO_Bounce' => [
+      'CRM_Mailing_Event_DAO_MailingEventBounce' => [
         [
           'fieldName' => 'bounce_type_id',
           'sample' => 'Invalid',
         ],
       ],
-      'CRM_Mailing_Event_DAO_Subscribe' => [
+      'CRM_Mailing_Event_DAO_MailingEventSubscribe' => [
         [
           'fieldName' => 'group_id',
           'sample' => $group_name,

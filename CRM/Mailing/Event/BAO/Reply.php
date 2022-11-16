@@ -20,7 +20,7 @@ require_once 'Mail/mime.php';
 /**
  * Class CRM_Mailing_Event_BAO_Reply
  */
-class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
+class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_MailingEventReply {
 
   /**
    * Register a reply event.
@@ -199,7 +199,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
     $contacts = CRM_Contact_DAO_Contact::getTableName();
     $email = CRM_Core_DAO_Email::getTableName();
-    $queue = CRM_Mailing_Event_DAO_Queue::getTableName();
+    $queue = CRM_Mailing_Event_DAO_MailingEventQueue::getTableName();
 
     $eq = new CRM_Core_DAO();
     $eq->query(

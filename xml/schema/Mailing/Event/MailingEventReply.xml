@@ -2,14 +2,14 @@
 
 <table>
   <base>CRM/Mailing/Event</base>
-  <class>Unsubscribe</class>
-  <name>civicrm_mailing_event_unsubscribe</name>
-  <comment>Tracks when a recipient unsubscribes from a group/domain</comment>
+  <class>MailingEventReply</class>
+  <name>civicrm_mailing_event_reply</name>
+  <comment>Tracks when a contact replies to a mailing</comment>
   <archive>true</archive>
   <component>CiviMail</component>
   <field>
     <name>id</name>
-    <title>Unsubscribe ID</title>
+    <title>Reply ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <html>
@@ -37,18 +37,11 @@
     <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
-    <name>org_unsubscribe</name>
-    <title>Unsubscribe is for Organization?</title>
-    <type>boolean</type>
-    <required>true</required>
-    <comment>Unsubscribe at org- or group-level</comment>
-  </field>
-  <field>
     <name>time_stamp</name>
-    <title>Unsubscribe Timestamp</title>
+    <title>Reply Timestamp</title>
     <type>timestamp</type>
     <default>CURRENT_TIMESTAMP</default>
     <required>true</required>
-    <comment>When this delivery event occurred.</comment>
+    <comment>When this reply event occurred.</comment>
   </field>
 </table>

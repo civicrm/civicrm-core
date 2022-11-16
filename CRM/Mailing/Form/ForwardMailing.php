@@ -38,7 +38,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     $mailing = &$q->getMailing();
 
     if ($hash) {
-      $emailId = CRM_Core_DAO::getfieldValue('CRM_Mailing_Event_DAO_Queue', $hash, 'email_id', 'hash');
+      $emailId = CRM_Core_DAO::getfieldValue('CRM_Mailing_Event_DAO_MailingEventQueue', $hash, 'email_id', 'hash');
       $this->_fromEmail = $fromEmail = CRM_Core_DAO::getfieldValue('CRM_Core_DAO_Email', $emailId, 'email');
       $this->assign('fromEmail', $fromEmail);
     }
