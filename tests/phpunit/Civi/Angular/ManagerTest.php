@@ -57,14 +57,14 @@ class ManagerTest extends \CiviUnitTestCase {
       if (isset($module['js'])) {
         $this->assertTrue(is_array($module['js']));
         foreach ($module['js'] as $file) {
-          $this->assertTrue(file_exists($this->res->getPath($module['ext'], $file)));
+          $this->assertTrue(file_exists($this->res->getPath($module['ext'], $file)), "File '$file' not found for " . $module['ext']);
           $counts['js']++;
         }
       }
       if (isset($module['css'])) {
         $this->assertTrue(is_array($module['css']));
         foreach ($module['css'] as $file) {
-          $this->assertTrue(file_exists($this->res->getPath($module['ext'], $file)));
+          $this->assertTrue(file_exists($this->res->getPath($module['ext'], $file)), "File '$file' not found for " . $module['ext']);
           $counts['css']++;
         }
       }
