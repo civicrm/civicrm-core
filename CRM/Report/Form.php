@@ -4948,6 +4948,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'employer_id' => [
         'title' => ts('Current Employer'),
       ],
+      'created_date' => [
+        'title' => ts('Created Date'),
+      ],
     ];
   }
 
@@ -4985,6 +4988,11 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       'contact_sub_type' => [
         'title' => ts('Contact Subtype'),
+      ],
+      'created_date' => [
+        'title' => ts('Contact Created'),
+        'operatorType' => CRM_Report_Form::OP_DATE,
+        'type' => CRM_Utils_Type::T_DATE,
       ],
       'modified_date' => [
         'title' => ts('Contact Modified'),
