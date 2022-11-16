@@ -14,11 +14,11 @@
   <form>
     <div class="crm-flex-box">
       <div class="nav-stacked">
-        <input id="crm-saved-search-label" class="form-control" ng-model="$ctrl.savedSearch.label" type="text" required placeholder="{{:: ts('Untitled Search') }}" />
+        <input id="crm-saved-search-label" class="form-control" ng-model="$ctrl.savedSearch.label" type="text" required placeholder="{{:: ts('Untitled Search') }}">
       </div>
       <div class="crm-flex-4 form-inline">
         <label for="crm-search-main-entity">{{:: ts('Search for') }}</label>
-        <input id="crm-search-main-entity" class="form-control huge collapsible-optgroups" ng-model="$ctrl.savedSearch.api_entity" crm-ui-select="::{allowClear: false, data: mainEntitySelect}" ng-disabled="$ctrl.savedSearch.id" />
+        <input id="crm-search-main-entity" class="form-control huge collapsible-optgroups" ng-model="$ctrl.savedSearch.api_entity" crm-ui-select="::{allowClear: false, data: mainEntitySelect}" ng-disabled="$ctrl.savedSearch.id">
 
         <div class="form-group pull-right">
 
@@ -30,16 +30,17 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-right" ng-if=":: $ctrl.openAfformMenu">
               <li ng-if=":: $ctrl.afformAdminEnabled">
-                <a target="_blank" href="{{:: $ctrl.afformPath + '#/create/search/' + $ctrl.savedSearch.name }}">
+                <a target="_blank" ng-href="{{:: $ctrl.afformPath + '#/create/search/' + $ctrl.savedSearch.name }}">
                   <i class="fa fa-plus"></i> {{:: ts('Create form for search results table') }}
                 </a>
               </li>
               <li ng-repeat="display in $ctrl.savedSearch.displays" ng-if="$ctrl.afformAdminEnabled && display.id">
-                <a target="_blank" href="{{:: $ctrl.afformPath + '#/create/search/' + $ctrl.savedSearch.name + '.' + display.name }}">
+                <a target="_blank" ng-href="{{:: $ctrl.afformPath + '#/create/search/' + $ctrl.savedSearch.name + '.' + display.name }}">
                   <i class="fa fa-plus"></i> {{:: ts('Create form for %1', {1: display.label}) }}
                 </a>
               </li>
-              <li class="divider" role="separator" ng-if="$ctrl.afformAdminEnabled && $ctrl.afforms.length"></li>
+              <li class="divider" role="separator" ng-if="$ctrl.afformAdminEnabled && $ctrl.afforms.length">
+              </li>
               <li ng-if="!$ctrl.afforms" class="disabled">
                 <a href>
                   <i class="crm-i fa-spinner fa-spin"></i>
