@@ -51,7 +51,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @var string[]
    */
-  protected $toggleExts = ['civiimport', 'org.civicrm.search_kit', 'org.civicrm.afform', 'authx'];
+  protected $toggleExts = ['civiimport', 'org.civicrm.afform', 'authx'];
 
   protected function setUp(): void {
     parent::setUp();

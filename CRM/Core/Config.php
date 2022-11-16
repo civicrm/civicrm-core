@@ -293,7 +293,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
         CRM_Core_Permission::basicPermissions()
       );
     }
-    else {
+    elseif (get_class($this->userPermissionClass) !== 'CRM_Core_Permission_UnitTests') {
       // Cannot store permissions -- warn if any modules require them
       $modules_with_perms = [];
       foreach ($module_files as $module_file) {
@@ -302,6 +302,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
           $modules_with_perms[] = $module_file['prefix'];
         }
       }
+      // FIXME: Setting a session status message here is probably wrong.
+      // For starters we are not necessarily in the context of a user-facing form
+      // for another thing this message will show indiscriminately to non-admin users
+      // and finally, this message contains nothing actionable for the person reading it to do.
       if (!empty($modules_with_perms)) {
         CRM_Core_Session::setStatus(
           ts('Some modules define permissions, but the CMS cannot store them: %1', [1 => implode(', ', $modules_with_perms)]),

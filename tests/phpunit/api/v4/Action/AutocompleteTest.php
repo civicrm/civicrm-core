@@ -38,10 +38,6 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
    */
   private $hookCallback;
 
-  public function setUpHeadless(): void {
-    \Civi\Test::headless()->install('org.civicrm.search_kit')->apply();
-  }
-
   /**
    * Listens for civi.api4.entityTypes event to manually add this nonstandard entity
    *
