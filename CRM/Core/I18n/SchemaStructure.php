@@ -624,14 +624,17 @@ class CRM_Core_I18n_SchemaStructure {
         ],
         'civicrm_event' => [
           'title' => [
+            'label' => "Title",
             'type' => "Text",
           ],
           'summary' => [
+            'label' => "Summary",
             'type' => "TextArea",
             'rows' => "4",
             'cols' => "60",
           ],
           'description' => [
+            'label' => "Description",
             'type' => "RichTextEditor",
             'rows' => "8",
             'cols' => "60",
@@ -640,6 +643,7 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "Text",
           ],
           'event_full_text' => [
+            'label' => "Event Full Message",
             'type' => "TextArea",
             'rows' => "4",
             'cols' => "60",

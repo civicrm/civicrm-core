@@ -903,7 +903,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{event.title}' => 'Event Title',
       '{event.start_date}' => 'Event Start Date',
       '{event.end_date}' => 'Event End Date',
-      '{event.event_type_id:label}' => 'Event Type',
+      '{event.event_type_id:label}' => 'Type',
       '{event.summary}' => 'Event Summary',
       '{event.contact_email}' => 'Event Contact Email',
       '{event.contact_phone}' => 'Event Contact Phone',
