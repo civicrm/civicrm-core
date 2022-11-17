@@ -42,7 +42,7 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
     throw new CRM_Core_Exception('Group is not Public. Contact cannot be subscribed to this Group.');
   }
 
-  $subscribe = CRM_Mailing_Event_BAO_Subscribe::subscribe($group_id, $email, $contact_id);
+  $subscribe = CRM_Mailing_Event_BAO_MailingEventSubscribe::subscribe($group_id, $email, $contact_id);
 
   if ($subscribe !== NULL) {
     /* Ask the contact for confirmation */

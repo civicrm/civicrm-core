@@ -264,7 +264,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     // also compute the recipients and store them in the mailing recipients table
     CRM_Mailing_BAO_Mailing::getRecipients($mailing->id);
 
-    $count = CRM_Mailing_BAO_Recipients::mailingSize($mailing->id);
+    $count = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing->id);
     $this->set('count', $count);
     $this->assign('count', $count);
     $this->set('groups', $groups);

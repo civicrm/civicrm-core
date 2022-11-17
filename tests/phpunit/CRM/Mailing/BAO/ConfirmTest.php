@@ -68,7 +68,7 @@ class CRM_Mailing_BAO_ConfirmTest extends CiviUnitTestCase {
       INSERT INTO civicrm_mailing_event_subscribe (group_id, contact_id, hash) VALUES ($groupID, $contactID, $hash)
     ");
 
-    CRM_Mailing_Event_BAO_Confirm::confirm($contactID, 1, $hash);
+    CRM_Mailing_Event_BAO_MailingEventConfirm::confirm($contactID, 1, $hash);
     $mailUtil->checkAllMailLog([
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'To: "Mr. Anthony Anderson II" <anthony_anderson@civicrm.org>',

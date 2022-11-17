@@ -32,7 +32,7 @@ function civicrm_api3_mailing_event_confirm_create($params) {
   $subscribe_id = $params['subscribe_id'];
   $hash         = $params['hash'];
 
-  $confirm = CRM_Mailing_Event_BAO_Confirm::confirm($contact_id, $subscribe_id, $hash) !== FALSE;
+  $confirm = CRM_Mailing_Event_BAO_MailingEventConfirm::confirm($contact_id, $subscribe_id, $hash) !== FALSE;
 
   if (!$confirm) {
     throw new Exception('Confirmation failed');

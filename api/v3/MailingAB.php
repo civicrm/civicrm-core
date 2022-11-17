@@ -274,7 +274,7 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
   foreach ($ABFormat as $name => $column) {
     switch (strtolower($params['criteria'])) {
       case 'open':
-        $result = CRM_Mailing_Event_BAO_Opened::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_opened.time_stamp ASC");
+        $result = CRM_Mailing_Event_BAO_MailingEventOpened::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_opened.time_stamp ASC");
         $startDate = CRM_Utils_Date::processDate($result[0]['date']);
         $targetDate = CRM_Utils_Date::processDate($params['target_date']);
         $dateDuration = round(round(strtotime($targetDate) - strtotime($startDate)) / $params['split_count']);
@@ -282,14 +282,14 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $toDate = date('YmdHis', $toDate);
         $graphStats[$name] = [
           $params['split_count_select'] => [
-            'count' => CRM_Mailing_Event_BAO_Opened::getTotalCount($mailingAB[$column], NULL, TRUE, $toDate),
+            'count' => CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($mailingAB[$column], NULL, TRUE, $toDate),
             'time' => CRM_Utils_Date::customFormat($toDate),
           ],
         ];
         break;
 
       case 'total unique clicks':
-        $result = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
+        $result = CRM_Mailing_Event_BAO_MailingEventClickThrough::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
         $startDate = CRM_Utils_Date::processDate($result[0]['date']);
         $targetDate = CRM_Utils_Date::processDate($params['target_date']);
         $dateDuration = round(abs(strtotime($targetDate) - strtotime($startDate)) / $params['split_count']);
@@ -297,7 +297,7 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $toDate = date('YmdHis', $toDate);
         $graphStats[$name] = [
           $params['split_count_select'] => [
-            'count' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, NULL, $toDate),
+            'count' => CRM_Mailing_Event_BAO_MailingEventClickThrough::getTotalCount($params['mailing_id'], NULL, FALSE, NULL, $toDate),
             'time' => CRM_Utils_Date::customFormat($toDate),
           ],
         ];
@@ -309,7 +309,7 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         }
         // FIXME: doesn't make sense to get url_id mailing_id_(a|b) while getting start date in mailing_id_a
         $url_id = CRM_Mailing_BAO_TrackableURL::getTrackerURLId($mailingAB[$column], $params['target_url']);
-        $result = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($mailingAB['mailing_id_a'], NULL, FALSE, $url_id, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
+        $result = CRM_Mailing_Event_BAO_MailingEventClickThrough::getRows($mailingAB['mailing_id_a'], NULL, FALSE, $url_id, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
         $startDate = CRM_Utils_Date::processDate($result[0]['date']);
         $targetDate = CRM_Utils_Date::processDate($params['target_date']);
         $dateDuration = round(abs(strtotime($targetDate) - strtotime($startDate)) / $params['split_count']);
@@ -317,7 +317,7 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $toDate = CRM_Utils_Date::processDate($toDate);
         $graphStats[$name] = [
           $params['split_count_select'] => [
-            'count' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, $url_id, $toDate),
+            'count' => CRM_Mailing_Event_BAO_MailingEventClickThrough::getTotalCount($params['mailing_id'], NULL, FALSE, $url_id, $toDate),
             'time' => CRM_Utils_Date::customFormat($toDate),
           ],
         ];

@@ -90,7 +90,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
    *   True on success
    */
   public static function confirm($contact_id, $subscribe_id, $hash, $activity_id, $petition_id) {
-    $se = CRM_Mailing_Event_BAO_Subscribe::verify($contact_id, $subscribe_id, $hash);
+    $se = CRM_Mailing_Event_BAO_MailingEventSubscribe::verify($contact_id, $subscribe_id, $hash);
 
     if (!$se) {
       return FALSE;
@@ -98,7 +98,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
 
     $transaction = new CRM_Core_Transaction();
 
-    $ce = new CRM_Mailing_Event_BAO_Confirm();
+    $ce = new CRM_Mailing_Event_BAO_MailingEventConfirm();
     $ce->event_subscribe_id = $se->id;
     $ce->time_stamp = date('YmdHis');
     $ce->save();

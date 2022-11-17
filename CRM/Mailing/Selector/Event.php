@@ -161,15 +161,15 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
               'direction' => CRM_Utils_Sort::ASCENDING,
             ],
           ] + $this->_columnHeaders;
-          $dateSort = CRM_Mailing_Event_BAO_Delivered::getTableName() . '.time_stamp';
+          $dateSort = CRM_Mailing_Event_BAO_MailingEventDelivered::getTableName() . '.time_stamp';
           break;
 
         case 'opened':
-          $dateSort = CRM_Mailing_Event_BAO_Opened::getTableName() . '.time_stamp';
+          $dateSort = CRM_Mailing_Event_BAO_MailingEventOpened::getTableName() . '.time_stamp';
           break;
 
         case 'bounce':
-          $dateSort = CRM_Mailing_Event_BAO_Bounce::getTableName() . '.time_stamp';
+          $dateSort = CRM_Mailing_Event_BAO_MailingEventBounce::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders,
             [
               [
@@ -183,7 +183,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           break;
 
         case 'forward':
-          $dateSort = CRM_Mailing_Event_BAO_Forward::getTableName() . '.time_stamp';
+          $dateSort = CRM_Mailing_Event_BAO_MailingEventForward::getTableName() . '.time_stamp';
 
           $this->_columnHeaders = array_merge($this->_columnHeaders,
             [
@@ -195,11 +195,11 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           break;
 
         case 'reply':
-          $dateSort = CRM_Mailing_Event_BAO_Reply::getTableName() . '.time_stamp';
+          $dateSort = CRM_Mailing_Event_BAO_MailingEventReply::getTableName() . '.time_stamp';
           break;
 
         case 'unsubscribe':
-          $dateSort = CRM_Mailing_Event_BAO_Unsubscribe::getTableName() . '.time_stamp';
+          $dateSort = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders, [
             [
               'name' => ts('Unsubscribe'),
@@ -208,7 +208,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           break;
 
         case 'optout':
-          $dateSort = CRM_Mailing_Event_BAO_Unsubscribe::getTableName() . '.time_stamp';
+          $dateSort = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders, [
             [
               'name' => ts('Opt-Out'),
@@ -217,7 +217,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           break;
 
         case 'click':
-          $dateSort = CRM_Mailing_Event_BAO_TrackableURLOpen::getTableName() . '.time_stamp';
+          $dateSort = CRM_Mailing_Event_BAO_MailingEventClickThrough::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders, [
             [
               'name' => ts('URL'),
@@ -251,14 +251,14 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   public function getTotalCount($action) {
     switch ($this->_event_type) {
       case 'queue':
-        $event = new CRM_Mailing_Event_BAO_Queue();
+        $event = new CRM_Mailing_Event_BAO_MailingEventQueue();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id
         );
         return $result;
 
       case 'delivered':
-        $event = new CRM_Mailing_Event_BAO_Delivered();
+        $event = new CRM_Mailing_Event_BAO_MailingEventDelivered();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
@@ -266,7 +266,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return $result;
 
       case 'opened':
-        $event = new CRM_Mailing_Event_BAO_Opened();
+        $event = new CRM_Mailing_Event_BAO_MailingEventOpened();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
@@ -274,7 +274,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return $result;
 
       case 'bounce':
-        $event = new CRM_Mailing_Event_BAO_Bounce();
+        $event = new CRM_Mailing_Event_BAO_MailingEventBounce();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
@@ -282,7 +282,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return $result;
 
       case 'forward':
-        $event = new CRM_Mailing_Event_BAO_Forward();
+        $event = new CRM_Mailing_Event_BAO_MailingEventForward();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
@@ -290,7 +290,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return $result;
 
       case 'reply':
-        $event = new CRM_Mailing_Event_BAO_Reply();
+        $event = new CRM_Mailing_Event_BAO_MailingEventReply();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
@@ -298,7 +298,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return $result;
 
       case 'unsubscribe':
-        $event = new CRM_Mailing_Event_BAO_Unsubscribe();
+        $event = new CRM_Mailing_Event_BAO_MailingEventUnsubscribe();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
@@ -306,7 +306,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return $result;
 
       case 'optout':
-        $event = new CRM_Mailing_Event_BAO_Unsubscribe();
+        $event = new CRM_Mailing_Event_BAO_MailingEventUnsubscribe();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct,
@@ -315,7 +315,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return $result;
 
       case 'click':
-        $event = new CRM_Mailing_Event_BAO_TrackableURLOpen();
+        $event = new CRM_Mailing_Event_BAO_MailingEventClickThrough();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct,
@@ -348,62 +348,62 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     switch ($this->_event_type) {
       case 'queue':
-        $rows = CRM_Mailing_Event_BAO_Queue::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_MailingEventQueue::getRows($this->_mailing_id,
           $this->_job_id, $offset, $rowCount, $sort
         );
         return $rows;
 
       case 'delivered':
-        $rows = CRM_Mailing_Event_BAO_Delivered::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_MailingEventDelivered::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
         return $rows;
 
       case 'opened':
-        $rows = CRM_Mailing_Event_BAO_Opened::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_MailingEventOpened::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
         return $rows;
 
       case 'bounce':
-        $rows = CRM_Mailing_Event_BAO_Bounce::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_MailingEventBounce::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
         return $rows;
 
       case 'forward':
-        $rows = CRM_Mailing_Event_BAO_Forward::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_MailingEventForward::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
         return $rows;
 
       case 'reply':
-        $rows = CRM_Mailing_Event_BAO_Reply::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_MailingEventReply::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
         return $rows;
 
       case 'unsubscribe':
-        $rows = CRM_Mailing_Event_BAO_Unsubscribe::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort, TRUE
         );
         return $rows;
 
       case 'optout':
-        $rows = CRM_Mailing_Event_BAO_Unsubscribe::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort, FALSE
         );
         return $rows;
 
       case 'click':
-        $rows = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows(
+        $rows = CRM_Mailing_Event_BAO_MailingEventClickThrough::getRows(
           $this->_mailing_id, $this->_job_id,
           $this->_is_distinct, $this->_url_id,
           $offset, $rowCount, $sort

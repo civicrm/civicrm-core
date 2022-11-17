@@ -206,7 +206,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     $this->checkMailParamsContext = FALSE;
 
-    CRM_Mailing_Event_BAO_Reply::reply(
+    CRM_Mailing_Event_BAO_MailingEventReply::reply(
       $matches[1],
       $matches[2],
       $matches[3]
@@ -382,7 +382,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
       });
 
     // Now test unsubscribe groups.
-    $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing(
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(
       $matches[1],
       $matches[2],
       $matches[3],
@@ -404,7 +404,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
       global $dbLocale;
       $dbLocale = '_fr_FR';
       // Now test unsubscribe groups.
-      $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing(
+      $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(
         $matches[1],
         $matches[2],
         $matches[3],

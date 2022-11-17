@@ -1283,7 +1283,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     if (!empty($mailingType)) {
       // we send in the contactID so we match the same groups and are exact, rather than relying on email
       // CRM-8710
-      CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($mailingType, $result, $this->_id, 'profile');
+      CRM_Mailing_Event_BAO_MailingEventSubscribe::commonSubscribe($mailingType, $result, $this->_id, 'profile');
     }
 
     $ufGroups = [];
