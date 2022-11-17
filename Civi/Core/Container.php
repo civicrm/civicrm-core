@@ -181,6 +181,8 @@ class Container {
       'fields' => 'contact fields',
       'contactTypes' => 'contactTypes',
       'metadata' => 'metadata',
+      'mixinBoot' => 'mixinBoot',
+      'mixinScan' => 'mixinScan',
     ];
     $verSuffixCaches = ['metadata'];
     $verSuffix = '_' . preg_replace(';[^0-9a-z_];', '_', \CRM_Utils_System::version());
@@ -192,7 +194,7 @@ class Container {
       // For Caches that we don't really care about the ttl for and/or maybe accessed
       // fairly often we use the fastArrayDecorator which improves reads and writes, these
       // caches should also not have concurrency risk.
-      $fastArrayCaches = ['groups', 'navigation', 'customData', 'fields', 'contactTypes', 'metadata', 'js_strings'];
+      $fastArrayCaches = ['groups', 'navigation', 'customData', 'fields', 'contactTypes', 'metadata', 'js_strings', 'mixinBoot', 'mixinScan'];
       if (in_array($cacheSvc, $fastArrayCaches)) {
         $definitionParams['withArray'] = 'fast';
       }
