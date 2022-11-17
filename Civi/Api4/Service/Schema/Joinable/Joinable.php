@@ -104,13 +104,15 @@ class Joinable {
    */
   public function getConditionsForJoin(string $baseTableAlias, string $targetTableAlias) {
     $conditions = [];
-    $conditions[] = sprintf(
-      '`%s`.`%s` =  `%s`.`%s`',
-      $baseTableAlias,
-      $this->baseColumn,
-      $targetTableAlias,
-      $this->targetColumn
-    );
+    if ($this->baseColumn && $this->targetColumn) {
+      $conditions[] = sprintf(
+        '`%s`.`%s` =  `%s`.`%s`',
+        $baseTableAlias,
+        $this->baseColumn,
+        $targetTableAlias,
+        $this->targetColumn
+      );
+    }
     $this->addExtraJoinConditions($conditions, $baseTableAlias, $targetTableAlias);
     return $conditions;
   }
