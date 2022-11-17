@@ -52,7 +52,7 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
       ->execute()
       ->single();
     $result = $ex['render'][0];
-    $this->assertRegExp('/Case ID : 1234/', $result['text']);
+    $this->assertMatchesRegularExpression('/Case ID : 1234/', $result['text']);
   }
 
   public function testRenderCustomTemplate() {
@@ -69,7 +69,7 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
       ])
       ->execute()
       ->single();
-    $this->assertRegExp('/The role is myrole./', $result['text']);
+    $this->assertMatchesRegularExpression('/The role is myrole./', $result['text']);
   }
 
   public function testRenderExamplesBaseline() {
@@ -131,7 +131,7 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     foreach ($example['asserts']['default'] as $num => $assert) {
       $msg = sprintf('Check assertion(%s) on example (%s)', $num, $example['name']);
       if (isset($assert['regex'])) {
-        $this->assertRegExp($assert['regex'], $result[$assert['for']], $msg);
+        $this->assertMatchesRegularExpression($assert['regex'], $result[$assert['for']], $msg);
       }
       else {
         $this->fail('Unrecognized assertion: ' . json_encode($assert));

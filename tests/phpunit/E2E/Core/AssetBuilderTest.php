@@ -133,7 +133,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     \Civi::service('asset_builder')->setCacheEnabled(TRUE);
     $url = \Civi::service('asset_builder')->getUrl($asset, $params);
     $this->assertEquals(1, $this->fired['hook_civicrm_buildAsset']);
-    $this->assertRegExp(';^https?:.*dyn/square.[0-9a-f]+.(txt|js)$;', $url);
+    $this->assertMatchesRegularExpression(';^https?:.*dyn/square.[0-9a-f]+.(txt|js)$;', $url);
     $this->assertEquals($expectedContent, file_get_contents($url));
     // Note: This actually relies on httpd to determine MIME type.
     // That could be ambiguous for javascript.
@@ -157,7 +157,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     $url = \Civi::service('asset_builder')->getUrl($asset, $params);
     $this->assertEquals(0, $this->fired['hook_civicrm_buildAsset']);
     // Ex: Traditional URLs on D7 have "/". Traditional URLs on WP have "%2F".
-    $this->assertRegExp(';^https?:.*civicrm(/|%2F)asset(/|%2F)builder.*square.(txt|js);', $url);
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)asset(/|%2F)builder.*square.(txt|js);', $url);
 
     // Simulate a request. Our fake hook won't fire in a real request.
     parse_str(parse_url($url, PHP_URL_QUERY), $get);

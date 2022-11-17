@@ -91,7 +91,7 @@ class ValidatorTest extends \CiviUnitTestCase {
       array_keys($expectedErrors)
     );
     foreach ($expectedErrors as $key => $pat) {
-      $this->assertRegExp($pat, $actualErrors[$key], "Error for \"$key\" should match pattern");
+      $this->assertMatchesRegularExpression($pat, $actualErrors[$key], "Error for \"$key\" should match pattern");
     }
   }
 

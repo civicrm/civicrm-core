@@ -5,6 +5,8 @@ namespace Civi\Test;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
+// phpcs:ignore
+use Yoast\PHPUnitPolyfills\Polyfills\AssertionRenames;
 
 /**
  * Class HttpTestTrait
@@ -156,7 +158,7 @@ trait HttpTestTrait {
     }
 
     $response = $this->resolveResponse($response);
-    $this->assertRegexp($regexp, (string) $response->getBody(),
+    $this->assertMatchesRegularExpression($regexp, (string) $response->getBody(),
       $message . 'Response body does not match pattern' . $this->formatFailure($response));
     return $this;
   }

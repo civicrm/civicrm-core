@@ -34,7 +34,7 @@ class CRM_Core_ComposerConfigTest extends \PHPUnit\Framework\TestCase {
 
     foreach ($lock['packages'] as $package) {
       if (isset($hardLocks[$package['name']])) {
-        $this->assertRegExp($hardLocks[$package['name']], $package['version'],
+        $this->assertMatchesRegularExpression($hardLocks[$package['name']], $package['version'],
           "Check hardlock for " . $package['name']);
         unset($hardLocks[$package['name']]);
       }

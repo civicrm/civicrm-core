@@ -9,6 +9,10 @@
  * Note: If you need to work as a different user, try using `cv()` or
  * a web-service.
  */
+
+// phpcs:ignore
+use Yoast\PHPUnitPolyfills\Polyfills\AssertionRenames;
+
 class CiviEndToEndTestCase extends PHPUnit\Framework\TestCase implements \Civi\Test\EndToEndInterface {
 
   public static function setUpBeforeClass(): void {

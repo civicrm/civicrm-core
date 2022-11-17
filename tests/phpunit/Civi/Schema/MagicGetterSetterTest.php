@@ -102,7 +102,7 @@ class MagicGetterSetterTest extends \CiviUnitTestCase {
       }
       catch (\CRM_Core_Exception $e) {
         $message = $e->getMessage();
-        $this->assertRegExp('/Unknown method.*::' . $nonMethod . '()/', $message);
+        $this->assertMatchesRegularExpression('/Unknown method.*::' . $nonMethod . '()/', $message);
       }
     }
   }

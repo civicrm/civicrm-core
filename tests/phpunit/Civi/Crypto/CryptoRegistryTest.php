@@ -102,7 +102,7 @@ class CryptoRegistryTest extends \CiviUnitTestCase {
       $this->fail("Expected crypto exception");
     }
     catch (CryptoException $e) {
-      $this->assertRegExp(';Malformed key ID;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Malformed key ID;', $e->getMessage());
     }
   }
 

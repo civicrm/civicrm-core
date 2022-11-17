@@ -467,7 +467,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       $propertyBag->setBillingCountry($bad);
       $this->assertCount(1, $propertyBag->logs);
       $latestLog = end($propertyBag->logs);
-      $this->assertRegExp("/setBillingCountry input warnings.*Expected string.*munged to: \"\"/s", $latestLog);
+      $this->assertMatchesRegularExpression("/setBillingCountry input warnings.*Expected string.*munged to: \"\"/s", $latestLog);
       $this->assertEquals('', $propertyBag->getBillingCountry());
     }
 
@@ -477,7 +477,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $propertyBag->setBillingCountry('');
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
-    $this->assertRegExp('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\n.*munged to: ""/', $latestLog);
+    $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\n.*munged to: ""/', $latestLog);
     $this->assertEquals('', $propertyBag->getBillingCountry());
 
     // Invalid country name
@@ -486,7 +486,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $propertyBag->setBillingCountry('UnitedKing');
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
-    $this->assertRegExp('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\nGiven input did not match a country name\.\n.*munged to: ""/', $latestLog);
+    $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\nGiven input did not match a country name\.\n.*munged to: ""/', $latestLog);
     $this->assertEquals('', $propertyBag->getBillingCountry());
 
     // Valid country name
@@ -495,7 +495,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $propertyBag->setBillingCountry('United Kingdom');
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
-    $this->assertRegExp('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\nGiven input matched a country name.*?\n.*munged to: "GB"/', $latestLog);
+    $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\nGiven input matched a country name.*?\n.*munged to: "GB"/', $latestLog);
     $this->assertEquals('GB', $propertyBag->getBillingCountry());
 
     // Invalid country ID
@@ -504,7 +504,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $propertyBag->setBillingCountry(-1);
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
-    $this->assertRegExp('/setBillingCountry input warnings.+\nExpected string\nGiven input looked like it could be a country ID but did not.*?\n.*munged to: ""/', $latestLog);
+    $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nExpected string\nGiven input looked like it could be a country ID but did not.*?\n.*munged to: ""/', $latestLog);
     $this->assertEquals('', $propertyBag->getBillingCountry());
 
     // Valid country ID
@@ -513,7 +513,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $propertyBag->setBillingCountry(1154); /* should be New Zealand */
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
-    $this->assertRegExp('/setBillingCountry input warnings.+\nExpected string\nGiven input matched a country ID.*?\n.*munged to: "NZ"/', $latestLog);
+    $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nExpected string\nGiven input matched a country ID.*?\n.*munged to: "NZ"/', $latestLog);
     $this->assertEquals('NZ', $propertyBag->getBillingCountry());
   }
 

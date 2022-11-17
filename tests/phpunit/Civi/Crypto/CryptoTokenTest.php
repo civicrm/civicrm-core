@@ -44,7 +44,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
       $this->fail("Expected CryptoException");
     }
     catch (CryptoException $e) {
-      $this->assertRegExp(';Cannot decrypt token. Invalid format.;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Cannot decrypt token. Invalid format.;', $e->getMessage());
     }
 
     $goodExample = $cryptoToken->encrypt('mess with me', 'UNIT-TEST');
@@ -57,7 +57,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
       $this->fail("Expected CryptoException");
     }
     catch (CryptoException $e) {
-      $this->assertRegExp(';Cannot decrypt token. Invalid format.;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Cannot decrypt token. Invalid format.;', $e->getMessage());
     }
   }
 
@@ -84,7 +84,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
    */
   public function testRoundtrip($inputText, $inputKeyIdOrTag, $expectTokenRegex, $expectTokenLen, $expectPlain) {
     $token = \Civi::service('crypto.token')->encrypt($inputText, $inputKeyIdOrTag);
-    $this->assertRegExp($expectTokenRegex, $token);
+    $this->assertMatchesRegularExpression($expectTokenRegex, $token);
     $this->assertEquals($expectTokenLen, strlen($token));
     $this->assertEquals($expectPlain, \Civi::service('crypto.token')->isPlainText($token));
 
@@ -99,7 +99,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $cryptoToken = \Civi::service('crypto.token');
 
     $first = $cryptoToken->encrypt("hello world", 'UNIT-TEST');
-    $this->assertRegExp(';k=asdf-key-1;', $first);
+    $this->assertMatchesRegularExpression(';k=asdf-key-1;', $first);
     $this->assertEquals('hello world', $cryptoToken->decrypt($first));
 
     // If the keys haven't changed yet, then rekey() is a null-op.
@@ -113,8 +113,8 @@ class CryptoTokenTest extends \CiviUnitTestCase {
       'id' => 'new-key',
     ]);
     $third = $cryptoToken->rekey($first, 'UNIT-TEST');
-    $this->assertNotRegExp(';k=asdf-key-1;', $third);
-    $this->assertRegExp(';k=new-key;', $third);
+    $this->assertDoesNotMatchRegularExpression(';k=asdf-key-1;', $third);
+    $this->assertMatchesRegularExpression(';k=new-key;', $third);
     $this->assertEquals('hello world', $cryptoToken->decrypt($third));
   }
 
@@ -141,7 +141,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
       'id' => 'interim-key',
     ]);
     $third = $cryptoToken->rekey($first, 'APPLE');
-    $this->assertRegExp(';k=interim-key;', $third);
+    $this->assertMatchesRegularExpression(';k=interim-key;', $third);
     $this->assertEquals('hello world', $cryptoToken->decrypt($third));
 
     // But if we add another key with earlier priority,

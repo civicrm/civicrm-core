@@ -123,7 +123,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responses[1], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad1', $decode['id']);
-    $this->assertRegexp(';API.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
+    $this->assertMatchesRegularExpression(';API.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
 
     $decode = json_decode($responses[2], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
@@ -134,7 +134,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad2', $decode['id']);
     $this->assertEquals(1, $decode['result']['is_error']);
-    $this->assertRegexp(';API.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
+    $this->assertMatchesRegularExpression(';API.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
   }
 
   public function testApi4() {
@@ -168,7 +168,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     };
     $apiFail = function($line, $caseId) {
       $decode = json_decode($line, TRUE);
-      $this->assertRegExp(';Authorization failed;', $decode['error']['message'], "($caseId) Should have authorization error. Got: $line");
+      $this->assertMatchesRegularExpression(';Authorization failed;', $decode['error']['message'], "($caseId) Should have authorization error. Got: $line");
     };
 
     $cases = []; /* [ ActivePerms?, Trusted?, CheckPerms?, ExpectResult */
@@ -193,7 +193,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
       [$inActivePerms, $inTrusted, $inApiCall, $expect] = $case;
       $this->setPermissions($inActivePerms);
       $responses = $this->runLines([$useException, $inApiCall], $inTrusted);
-      $this->assertRegExp($inTrusted === 'u' ? ';"untrusted";' : ';"trusted";', $responses[0], "($caseId) Header should indicate trust level");
+      $this->assertMatchesRegularExpression($inTrusted === 'u' ? ';"untrusted";' : ';"trusted";', $responses[0], "($caseId) Header should indicate trust level");
       $expect($responses[2], $caseId);
     }
   }
@@ -212,7 +212,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responses[1], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad1', $decode['id']);
-    $this->assertRegexp(';Api.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
+    $this->assertMatchesRegularExpression(';Api.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
 
     $decode = json_decode($responses[2], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
@@ -223,7 +223,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad2', $decode['id']);
     $this->assertEquals(1, $decode['result']['is_error']);
-    $this->assertRegexp(';Api.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
+    $this->assertMatchesRegularExpression(';Api.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
   }
 
   /**

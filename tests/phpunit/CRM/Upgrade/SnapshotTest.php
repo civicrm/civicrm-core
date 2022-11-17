@@ -25,14 +25,14 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
       $this->fail('Accepted invalid name');
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertRegExp('/Malformed snapshot name/', $e->getMessage());
+      $this->assertMatchesRegularExpression('/Malformed snapshot name/', $e->getMessage());
     }
     try {
       CRM_Upgrade_Snapshot::createTableName('civicrm', '5.45', 'loremipsumdolorsitametconsecteturadipiscingelitseddoeiusmod');
       $this->fail('Accepted excessive name');
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertRegExp('/Snapshot name is too long/', $e->getMessage());
+      $this->assertMatchesRegularExpression('/Snapshot name is too long/', $e->getMessage());
     }
   }
 

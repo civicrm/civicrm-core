@@ -90,7 +90,7 @@ class ExampleHookTest extends TestCase implements HeadlessInterface, HookInterfa
     $p = new Main();
     $p->run();
     $content = ob_get_clean();
-    $this->assertRegExp('; hook_civicrm_alterContent on_hook_civicrm_alterContent;', $content);
+    $this->assertMatchesRegularExpression('; hook_civicrm_alterContent on_hook_civicrm_alterContent;', $content);
   }
 
   /**

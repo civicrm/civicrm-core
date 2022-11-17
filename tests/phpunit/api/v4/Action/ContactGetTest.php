@@ -98,7 +98,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     catch (\CRM_Core_Exception $e) {
       $msg = $e->getMessage();
     }
-    $this->assertRegExp(';Expected to find one Contact record;', $msg);
+    $this->assertMatchesRegularExpression(';Expected to find one Contact record;', $msg);
     $limit1 = Contact::get(FALSE)->addWhere('last_name', '=', $last_name)->setLimit(1)->execute();
     $this->assertCount(1, (array) $limit1);
     $this->assertCount(1, $limit1);

@@ -388,7 +388,7 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
     }
     else {
       $this->assertAPIFailure($result);
-      $this->assertRegExp('/The request does not match any active API authorizations./', $result['error_message']);
+      $this->assertMatchesRegularExpression('/The request does not match any active API authorizations./', $result['error_message']);
     }
   }
 

@@ -154,7 +154,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       $this->fail('In output mode, we should reject requests to interpolate inputs.');
     }
     catch (Exception $e) {
-      $this->assertRegExp("/Cannot mix interpolation modes/", $e->getMessage());
+      $this->assertMatchesRegularExpression("/Cannot mix interpolation modes/", $e->getMessage());
     }
 
     $outputModeFragment = CRM_Utils_SQL_Select::fragment()
@@ -166,7 +166,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       $this->fail('In output-mode, we should reject requests to merge from input-mode.');
     }
     catch (Exception $e) {
-      $this->assertRegExp("/Cannot merge queries that use different interpolation modes/", $e->getMessage());
+      $this->assertMatchesRegularExpression("/Cannot merge queries that use different interpolation modes/", $e->getMessage());
     }
   }
 
@@ -253,7 +253,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       $this->fail('Unknown variables should throw errors in strict mode.');
     }
     catch (Exception $e) {
-      $this->assertRegExp('/Cannot build query. Variable "@johnMcClane" is unknown./', $e->getMessage());
+      $this->assertMatchesRegularExpression('/Cannot build query. Variable "@johnMcClane" is unknown./', $e->getMessage());
     }
   }
 

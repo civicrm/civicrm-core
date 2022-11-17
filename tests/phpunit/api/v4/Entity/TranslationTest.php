@@ -191,7 +191,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
       $this->fail('Create should have failed');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertRegExp($errorRegex, $e->getMessage());
+      $this->assertMatchesRegularExpression($errorRegex, $e->getMessage());
     }
   }
 
@@ -221,7 +221,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
         $this->fail('Update should fail');
       }
       catch (\CRM_Core_Exception $e) {
-        $this->assertRegExp($errorRegex, $e->getMessage());
+        $this->assertMatchesRegularExpression($errorRegex, $e->getMessage());
       }
     }
   }

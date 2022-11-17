@@ -47,7 +47,7 @@ class CiviEventDispatcherTest extends \CiviUnitTestCase {
       $this->fail('Expected exception');
     }
     catch (\Exception $e) {
-      $this->assertRegExp(';The dispatch policy prohibits event;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';The dispatch policy prohibits event;', $e->getMessage());
     }
   }
 

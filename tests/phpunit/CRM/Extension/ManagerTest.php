@@ -204,7 +204,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       $this->fail('Expected disable to fail due to dependency');
     }
     catch (CRM_Extension_Exception $e) {
-      $this->assertRegExp('/test.foo.downstream/', $e->getMessage());
+      $this->assertMatchesRegularExpression('/test.foo.downstream/', $e->getMessage());
     }
 
     // Status unchanged

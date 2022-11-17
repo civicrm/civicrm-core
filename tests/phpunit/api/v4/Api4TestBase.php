@@ -25,6 +25,8 @@ use Civi\Test\Api4TestTrait;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
 use PHPUnit\Framework\TestCase;
+// phpcs:ignore
+use Yoast\PHPUnitPolyfills\Polyfills\AssertionRenames;
 
 /**
  * @group headless

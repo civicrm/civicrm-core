@@ -43,6 +43,8 @@ use Civi\Payment\System;
 use Civi\Api4\OptionValue;
 use Civi\Test\Api3DocTrait;
 use League\Csv\Reader;
+// phpcs:ignore
+use Yoast\PHPUnitPolyfills\Polyfills\AssertionRenames;
 
 /**
  *  Include class definitions
