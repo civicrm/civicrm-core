@@ -19,6 +19,7 @@
 
         function makeWidget(field) {
           var options,
+            filters,
             $el = $($element),
             inputType = field.input_type,
             dataType = field.data_type;
@@ -34,9 +35,22 @@
           else if (field.fk_entity || field.options || dataType === 'Boolean') {
             if (field.fk_entity) {
               // Static options for choosing current user or other entities on the form
-              options = field.fk_entity === 'Contact' ? ['user_contact_id'] : [];
+              options = [];
+              filters = (field.input_attrs && field.input_attrs.filter) || {};
+              if (field.fk_entity === 'Contact' && (!filters.contact_type || filters.contact_type === 'Individual')) {
+                options.push('user_contact_id');
+              }
               _.each(ctrl.editor.getEntities({type: field.fk_entity}), function(entity) {
-                 options.push({id: entity.name, label: entity.label, icon: afGui.meta.entities[entity.type].icon});
+                // Check if field filters match entity data (e.g. contact_type)
+                var filtersMatch = true;
+                _.each(filters, function(value, key) {
+                  if (entity.data && entity.data[key] && entity.data[key] != value) {
+                    filtersMatch = false;
+                  }
+                })
+                if (filtersMatch) {
+                  options.push({id: entity.name, label: entity.label, icon: afGui.meta.entities[entity.type].icon});
+                }
               });
               $el.crmAutocomplete(field.fk_entity, {fieldName: field.entity + '.' + field.name}, {
                 multiple: multi,
