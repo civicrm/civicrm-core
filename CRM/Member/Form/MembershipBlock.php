@@ -126,14 +126,12 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         }
       }
 
-      $membership = $membershipDefault = $params = [];
+      $membership = $membershipDefault = $autoRenewMembershipTypes = [];
       foreach ($membershipTypes as $k => $v) {
         $membership[] = $this->createElement('advcheckbox', $k, NULL, $v);
         $membershipDefault[$k] = NULL;
-        $membershipRequired[$k] = NULL;
         if ($isRecur) {
           $autoRenew = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $k, 'auto_renew');
-          $membershipRequired[$k] = $autoRenew;
           $autoRenewOptions = [];
           if ($autoRenew) {
             $autoRenewOptions = [ts('Not offered'), ts('Give option'), ts('Required')];
@@ -141,7 +139,8 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             //CRM-15573
             if ($autoRenew == 2) {
               $this->freeze("auto_renew_$k");
-              $params['id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipBlock', $this->_id, 'id', 'entity_id');
+              $this->setDefaults(["auto_renew_$k" => 2]);
+              $autoRenewMembershipTypes[$k] = $autoRenew;
             }
             $this->_renewOption[$k] = $autoRenew;
           }
@@ -149,9 +148,37 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       }
 
       //CRM-15573
-      if (!empty($params['id'])) {
-        $params['membership_types'] = serialize($membershipRequired);
-        CRM_Member_BAO_MembershipBlock::writeRecord($params);
+      // check if we have any auto-renew membership types and determine if the settings needs to be
+      // auto updated
+      if (!empty($autoRenewMembershipTypes)) {
+        // get the existing membership types for this page
+        $membershipBlocks = \Civi\Api4\MembershipBlock::get()
+          ->addSelect('id', 'membership_types')
+          ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+          ->addWhere('entity_id', '=', $this->_id)
+          ->execute()
+          ->first();
+
+        if (!empty($membershipBlocks['membership_types'])) {
+          $updatedMembershipTypes = [];
+          foreach ($membershipBlocks['membership_types'] as $mtype => $value) {
+            if (!empty($autoRenewMembershipTypes[$mtype])) {
+              $updatedMembershipTypes[$mtype] = $autoRenewMembershipTypes[$mtype];
+            }
+            else {
+              $updatedMembershipTypes[$mtype] = $value;
+            }
+          }
+
+          // let's update only if need to which is only when membership type auto renew
+          // option changes in the membership type configuration
+          if ($membershipBlocks['membership_types'] != $updatedMembershipTypes) {
+            \Civi\Api4\MembershipBlock::update()
+              ->addValue('membership_types', serialize($updatedMembershipTypes))
+              ->addWhere('id', '=', $membershipBlocks['id'])
+              ->execute();
+          }
+        }
       }
       $this->add('hidden', "mem_price_field_id", '', ['id' => "mem_price_field_id"]);
       $this->assign('is_recur', $isRecur);
