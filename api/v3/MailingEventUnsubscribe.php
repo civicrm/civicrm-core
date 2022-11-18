@@ -17,6 +17,17 @@
  */
 
 /**
+ * Get mailing event unsubscribe record.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_mailing_event_unsubscribe_get($params) {
+  return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_MailingEventUnsubscribe', $params);
+}
+
+/**
  * Unsubscribe from mailing group.
  *
  * @param array $params

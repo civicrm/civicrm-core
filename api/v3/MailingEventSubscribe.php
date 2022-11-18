@@ -17,6 +17,17 @@
  */
 
 /**
+ * Get mailing event subscribe record.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_mailing_event_subscribe_get($params) {
+  return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_MailingEventSubscribe', $params);
+}
+
+/**
  * Subscribe from mailing group.
  *
  * @param array $params

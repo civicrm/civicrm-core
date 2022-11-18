@@ -17,6 +17,17 @@
  */
 
 /**
+ * Get mailing event confirm record.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_mailing_event_confirm_get($params) {
+  return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_MailingEventConfirm', $params);
+}
+
+/**
  * Handle a confirm event.
  *
  * @param array $params
