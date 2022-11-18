@@ -494,6 +494,10 @@ class TokenProcessor {
       case 'lower':
         return mb_strtolower($value);
 
+      case 'boolean':
+        // Cast to 0 or 1 for use in text.
+        return (int) ((bool) $value);
+
       case 'crmDate':
         if ($value instanceof \DateTime) {
           // @todo cludgey.
@@ -505,7 +509,7 @@ class TokenProcessor {
         }
 
       default:
-        throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
+        throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
     }
   }
 

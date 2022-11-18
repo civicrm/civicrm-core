@@ -341,14 +341,18 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $this->counts['onEvalTokens']);
   }
 
-  public function testFilter() {
+  public function testFilter(): void {
     $exampleTokens['foo_bar']['whiz_bang'] = 'Some Text';
+    $exampleTokens['foo_bar']['whiz_bop'] = '';
     $exampleMessages = [
       'This is {foo_bar.whiz_bang}.' => 'This is Some Text.',
       'This is {foo_bar.whiz_bang|lower}...' => 'This is some text...',
       'This is {foo_bar.whiz_bang|upper}!' => 'This is SOME TEXT!',
+      'This is {foo_bar.whiz_bang|boolean}!' => 'This is 1!',
+      'This is {foo_bar.whiz_bop|boolean}!' => 'This is 0!',
     ];
-    $expectExampleCount = /* {#msgs} x {smarty:on,off} */ 6;
+    // We expect 5 messages to be parsed 2 times each - ie 10 times.
+    $expectExampleCount = 10;
     $actualExampleCount = 0;
 
     foreach ($exampleMessages as $inputMessage => $expectOutput) {
