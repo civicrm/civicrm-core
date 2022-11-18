@@ -831,7 +831,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $result = [];
     $selectAliases = array_map(function($select) {
       return array_slice(explode(' AS ', $select), -1)[0];
-    }, $this->savedSearch['api_params']['select']);
+    }, $this->_apiParams['select']);
     foreach ($selectAliases as $alias) {
       [$alias] = explode(':', $alias);
       $result[] = $alias;
@@ -886,9 +886,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $apiParams
    */
   protected function augmentSelectClause(&$apiParams): void {
-    $existing = array_map(function($item) {
-      return explode(' AS ', $item)[1] ?? $item;
-    }, $apiParams['select']);
     // Add primary key field if actions are enabled
     // (only needed for non-dao entities, as Api4SelectQuery will auto-add the id)
     if (!in_array('DAOEntity', CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'type')) &&

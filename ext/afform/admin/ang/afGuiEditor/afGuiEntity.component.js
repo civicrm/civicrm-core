@@ -8,7 +8,7 @@
       entity: '<'
     },
     require: {editor: '^^afGuiEditor'},
-    controller: function ($scope, $timeout, afGui) {
+    controller: function ($scope, $timeout, afGui, formatForSelect2) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
       var ctrl = this;
       $scope.controls = {};
@@ -24,10 +24,6 @@
 
       $scope.getMeta = function() {
         return afGui.meta.entities[ctrl.getEntityType()];
-      };
-
-      this.getBehaviors = function() {
-        return CRM.afGuiEditor.behaviors[ctrl.getEntityType()];
       };
 
       $scope.getField = afGui.getField;
@@ -212,6 +208,12 @@
           $scope.controls.fieldSearch = '';
           ctrl.buildPaletteLists();
         });
+
+        ctrl.behaviors = _.transform(CRM.afGuiEditor.behaviors[ctrl.getEntityType()], function(behaviors, behavior) {
+          var item = _.cloneDeep(behavior);
+          item.options = formatForSelect2(item.modes, 'name', 'label', ['description', 'icon']);
+          behaviors.push(item);
+        }, []);
       };
     }
   });

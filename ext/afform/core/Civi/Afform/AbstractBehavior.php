@@ -40,6 +40,15 @@ abstract class AbstractBehavior extends AutoService implements BehaviorInterface
   }
 
   /**
+   * Optional template for configuring the behavior in the AfformGuiEditor
+   *
+   * @return string|null
+   */
+  public static function getTemplate(): ?string {
+    return NULL;
+  }
+
+  /**
    * Dashed name, name of entity attribute for selected mode
    * @return string
    */

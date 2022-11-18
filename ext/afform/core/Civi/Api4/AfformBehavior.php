@@ -53,6 +53,11 @@ class AfformBehavior extends Generic\AbstractEntity {
           'description' => 'Optional localized description displayed on admin screen',
         ],
         [
+          'name' => 'template',
+          'data_type' => 'String',
+          'description' => 'Optional template for configuring the behavior in the AfformGuiEditor',
+        ],
+        [
           'name' => 'entities',
           'data_type' => 'Array',
           'description' => 'Afform entities this behavior supports',

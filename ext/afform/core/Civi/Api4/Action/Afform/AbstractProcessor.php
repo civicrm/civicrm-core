@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Generic\Result;
@@ -77,7 +78,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Load all entities
    */
   protected function loadEntities() {
-    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
+    $sorter = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
+    \Civi::dispatcher()->dispatch('civi.afform.sort.prefill', $sorter);
+    $sortedEntities = $sorter->getSortedEnties();
+    foreach ($sortedEntities as $entityName) {
+      $entity = $this->_formDataModel->getEntity($entityName);
       $this->_entityIds[$entityName] = [];
       $idField = CoreUtil::getIdFieldName($entity['type']);
       if (!empty($entity['actions']['update'])) {
@@ -86,8 +91,6 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           (!empty($entity['url-autofill']) || isset($entity['fields'][$idField]))
         ) {
           $ids = (array) $this->args[$entityName];
-          // Limit number of records to 1 unless using af-repeat
-          $ids = array_slice($ids, 0, !empty($entity['af-repeat']) ? $entity['max'] ?? NULL : 1);
           $this->loadEntity($entity, $ids);
         }
       }
@@ -103,9 +106,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param array $ids
    */
   public function loadEntity(array $entity, array $ids) {
+    // Limit number of records based on af-repeat settings
+    // If 'min' is set then it is repeatable, and max will either be a number or NULL for unlimited.
+    $ids = array_slice($ids, 0, isset($entity['min']) ? $entity['max'] : 1);
+
     $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
     $idField = CoreUtil::getIdFieldName($entity['type']);
-    if (!empty($entity['fields'][$idField]['saved_search'])) {
+    if ($ids && !empty($entity['fields'][$idField]['saved_search'])) {
       $ids = $this->validateBySavedSearch($entity, $ids);
     }
     if (!$ids) {

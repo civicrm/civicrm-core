@@ -74,13 +74,27 @@ trait AfformEventEntityTrait {
   }
 
   /**
-   * Get the id of a saved record
+   * Get the id of an instance of the current entity
    * @param int $index
    * @return mixed
    */
   public function getEntityId(int $index = 0) {
-    $idField = CoreUtil::getIdFieldName($this->entityName);
+    $apiEntity = $this->getFormDataModel()->getEntity($this->entityName)['type'];
+    $idField = CoreUtil::getIdFieldName($apiEntity);
     return $this->entityIds[$this->entityName][$index][$idField] ?? NULL;
+  }
+
+  /**
+   * Get the id(s) of an entity
+   *
+   * @param string|null $entityName
+   * @return array
+   */
+  public function getEntityIds(string $entityName = NULL): array {
+    $entityName = $entityName ?: $this->entityName;
+    $apiEntity = $this->getFormDataModel()->getEntity($this->entityName)['type'];
+    $idField = CoreUtil::getIdFieldName($apiEntity);
+    return array_column($this->entityIds[$entityName] ?? [], $idField);
   }
 
   /**

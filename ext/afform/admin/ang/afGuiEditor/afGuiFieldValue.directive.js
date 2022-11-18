@@ -24,6 +24,7 @@
             inputType = field.input_type,
             dataType = field.data_type;
           multi = field.serialize || dataType === 'Array';
+          $el.crmSelect2('destroy').crmDatepicker('destroy');
           // Allow input_type to override dataType
           if (inputType) {
             multi = (dataType !== 'Boolean' &&
@@ -47,12 +48,13 @@
                   if (entity.data && entity.data[key] && entity.data[key] != value) {
                     filtersMatch = false;
                   }
-                })
+                });
                 if (filtersMatch) {
                   options.push({id: entity.name, label: entity.label, icon: afGui.meta.entities[entity.type].icon});
                 }
               });
-              $el.crmAutocomplete(field.fk_entity, {fieldName: field.entity + '.' + field.name}, {
+              var params = field.entity && field.name ? {fieldName: field.entity + '.' + field.name} : {filters: filters};
+              $el.crmAutocomplete(field.fk_entity, params, {
                 multiple: multi,
                 "static": options,
                 minimumInputLength: options.length ? 1 : 0
@@ -104,7 +106,9 @@
           ctrl.ngModel.$isEmpty = function(value) {
             return !value || !value.length;
           };
+        };
 
+        this.$onChanges = function() {
           $timeout(function() {
             makeWidget(ctrl.field);
           });
