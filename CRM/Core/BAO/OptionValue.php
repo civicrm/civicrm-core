@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
+class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi\Core\HookInterface {
 
   /**
    * Create option value.
@@ -232,24 +232,24 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param int $optionValueId
    *
    * @return bool
-   *
+   * @deprecated
    */
   public static function del($optionValueId) {
-    $optionValue = new CRM_Core_DAO_OptionValue();
-    $optionValue->id = $optionValueId;
-    if (!$optionValue->find()) {
-      return FALSE;
+    return (bool) static::deleteRecord(['id' => $optionValueId]);
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      if (self::updateRecords($event->id, CRM_Core_Action::DELETE)) {
+        Civi::cache('metadata')->flush();
+        CRM_Core_PseudoConstant::flush();
+      }
     }
-    $hookParams = ['id' => $optionValueId];
-    CRM_Utils_Hook::pre('delete', 'OptionValue', $optionValueId, $hookParams);
-    if (self::updateRecords($optionValueId, CRM_Core_Action::DELETE)) {
-      Civi::cache('metadata')->flush();
-      CRM_Core_PseudoConstant::flush();
-      $optionValue->delete();
-      CRM_Utils_Hook::post('delete', 'OptionValue', $optionValueId, $optionValue);
-      return TRUE;
-    }
-    return FALSE;
   }
 
   /**
