@@ -898,7 +898,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
         $item['child'] = [
           [
             'attributes' => [
-              'label' => 'CiviCRM Home',
+              'label' => ts('CiviCRM Home'),
               'name' => 'CiviCRM Home',
               'url' => 'civicrm/dashboard?reset=1',
               'weight' => 1,
@@ -906,7 +906,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
           ],
           [
             'attributes' => [
-              'label' => 'Hide Menu',
+              'label' => ts('Hide Menu'),
               'name' => 'Hide Menu',
               'url' => '#hidemenu',
               'weight' => 2,
@@ -914,7 +914,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
           ],
           [
             'attributes' => [
-              'label' => 'Log out',
+              'label' => ts('Log out'),
               'name' => 'Log out',
               'url' => 'civicrm/logout?reset=1',
               'weight' => 3,
