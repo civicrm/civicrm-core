@@ -2,7 +2,7 @@
 return [
   'type' => 'primary',
   'defaults' => "{
-    actions: {create: true, update: false}
+    actions: {create: true, update: true}
   }",
   'boilerplate' => [],
 ];
