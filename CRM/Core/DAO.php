@@ -2219,6 +2219,9 @@ SELECT contact_id
    * @return string
    */
   public static function escapeString($string) {
+    if ($string === NULL) {
+      return '';
+    }
     static $_dao = NULL;
     if (!$_dao) {
       // If this is an atypical case (e.g. preparing .sql file before CiviCRM
