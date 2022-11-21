@@ -34,6 +34,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Configure how many events should be shown on the dashboard. This overrides the default value of 10 entries.'),
     'help_text' => NULL,
+    'html_attributes' => ['class' => 'crm-select2', 'required' => FALSE, 'placeholder' => ts('Show All')],
     'pseudoconstant' => ['callback' => 'CRM_Core_SelectValues::getDashboardEntriesCount'],
   ],
 ];

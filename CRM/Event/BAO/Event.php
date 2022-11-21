@@ -394,7 +394,7 @@ WHERE      civicrm_event.is_active = 1 AND
       $event_summary_limit = "LIMIT      0, $show_max_events";
     }
     else {
-      $event_summary_limit = "";
+      $event_summary_limit = '';
     }
 
     $query = "

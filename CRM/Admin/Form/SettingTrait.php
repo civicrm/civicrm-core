@@ -176,14 +176,15 @@ trait CRM_Admin_Form_SettingTrait {
    */
   protected function addFieldsDefinedInSettingsMetadata() {
     $this->addSettingsToFormFromMetadata();
-    $settingMetaData = $this->getSettingsMetaData();
+    $settingsMetaData = $this->getSettingsMetaData();
     $descriptions = [];
-    foreach ($settingMetaData as $setting => $props) {
+    foreach ($settingsMetaData as $setting => $props) {
       $quickFormType = $this->getQuickFormType($props);
+      $isSelect2 = ($props['html_attributes']['class'] ?? NULL) === 'crm-select2';
       if (isset($quickFormType)) {
         $options = $props['options'] ?? NULL;
         if ($options) {
-          if ($quickFormType === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
+          if ($quickFormType === 'Select' && !$isSelect2 && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
             // If the spec specifies the field is not required add a null option.
             // Why not if empty($props['is_required']) - basically this has been added to the spec & might not be set to TRUE
             // when it is true.
@@ -210,8 +211,11 @@ trait CRM_Admin_Form_SettingTrait {
             ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, []) : NULL
           );
         }
+        elseif ($isSelect2) {
+          $this->add('select2', $setting, $props['title'], $options, $props['is_required'] ?? FALSE, ['multiple' => $props['html_attributes']['multiple'] ?? FALSE, 'placeholder' => $props['html_attributes']['placeholder'] ?? ts('None')]);
+        }
         elseif ($add === 'addSelect') {
-          $this->addElement('select', $setting, $props['title'], $options, CRM_Utils_Array::value('html_attributes', $props));
+          $this->addElement('select', $setting, $props['title'], $options, $props['html_attributes'] ?? NULL);
         }
         elseif ($add === 'addCheckBox') {
           $this->addCheckBox($setting, '', $options, NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
@@ -223,7 +227,7 @@ trait CRM_Admin_Form_SettingTrait {
             $classes .= ' crm-sortable-list';
             $newOptions = array_flip(self::reorderSortableOptions($setting, $options));
           }
-          $settingMetaData[$setting]['wrapper_element'] = ['<ul class="' . $classes . '"><li>', '</li></ul>'];
+          $settingsMetaData[$setting]['wrapper_element'] = ['<ul class="' . $classes . '"><li>', '</li></ul>'];
           $this->addCheckBox($setting,
             $props['title'],
             $newOptions,
@@ -270,7 +274,7 @@ trait CRM_Admin_Form_SettingTrait {
     }
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
-    $this->assign('settings_fields', $settingMetaData);
+    $this->assign('settings_fields', $settingsMetaData);
     $this->assign('fields', $this->getSettingsOrderedByWeight());
     // @todo look at sharing the code below in the settings trait.
     if ($this->hasReadOnlyFields()) {

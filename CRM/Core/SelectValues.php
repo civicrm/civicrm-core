@@ -1081,11 +1081,9 @@ class CRM_Core_SelectValues {
    * @return array
    *   Dashboard entries options - in practice [-1 => 'Show All', 10 => 10, 20 => 20, ... 100 => 100].
    */
-  public static function getDashboardEntriesCount() {
-    $optionValues = [];
-    $optionValues[-1] = ts('show all');
+  public static function getDashboardEntriesCount(): array {
     for ($i = 10; $i <= 100; $i += 10) {
-      $optionValues[$i] = $i;
+      $optionValues[] = ['id' => $i, 'name' => $i, 'label' => $i];
     }
     return $optionValues;
   }
