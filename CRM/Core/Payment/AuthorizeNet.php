@@ -143,7 +143,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       $this->_setParam($field, $value);
     }
 
-    if (!empty($params['is_recur']) && !empty($params['contributionRecurID'])) {
+    if (!empty($propertyBag->getIsRecur()) && !empty($propertyBag->getContributionRecurID())) {
       $this->doRecurPayment();
       $params['payment_status_id'] = array_search('Pending', $statuses);
       $params['payment_status'] = 'Pending';
@@ -167,7 +167,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     // Authorize.Net will not refuse duplicates, so we should check if the user already submitted this transaction
-    if ($this->checkDupe($authorizeNetFields['x_invoice_num'], $params['contributionID'] ?? NULL)) {
+    $contributionId = $propertyBag->has('contributionID') ? $propertyBag->getContributionID() : NULL;
+    if ($this->checkDupe($authorizeNetFields['x_invoice_num'], $contributionId)) {
       throw new PaymentProcessorException('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.', 9004);
     }
 
