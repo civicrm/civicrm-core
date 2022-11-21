@@ -15,21 +15,37 @@ class LocaleTest extends \CiviEndToEndTestCase {
   public function getLanguageExamples(): array {
     $results = [];
     switch (CIVICRM_UF) {
-      case 'Drupal':
-      case 'Drupal8':
       case 'Backdrop':
-        $results[] = ['de_DE', 'de_CH', 't', 'Yes', 'Ja'];
-        // That's weird -- you install Drupal's "de", and you do `setUFLocale('de_DE')`, and
-        // the result is... to report back as 'de_DE'. Weird. But the actual string is OK...
+        // FIXME: In buildkit.git:app/config/backdrop-*, it downloads the *.po files, but it lacks drush support for activating them.
+        $results[] = ['*SKIP*', NULL, NULL, NULL, NULL];
         break;
 
-      case 'WordPress':
-        $results[] = ['de_DE', 'de_DE', '__', 'Yes', 'Ja'];
+      case 'Drupal':
+        $results[] = ['de_DE', 'de_CH', 't', 'Yes', 'Ja'];
+        // That's weird... If you install Drupal's "de", and if you do `setUFLocale('de_DE')`, if
+        // you lookup `getUFLocale()`... then it reports back as 'de_CH'. Feels arbitrary.
+        // OTOH, D7 doesn't appear to distinguish national dialects, so `de_DE` and `de_CH` are the same thing...
+        break;
+
+      case 'Drupal8':
+        // FIXME: In buildkit.git:app/config/drupal8-*, it downloads the *.po files, but it lacks drush support for activating them.
+        $results[] = ['*SKIP*', NULL, NULL, NULL, NULL];
         break;
 
       case 'Joomla':
+        // FIXME: In CRM_Utils_System_Joomla, the setUFLocale and getUFLocale are not fully implemented.
+        // FIXME: In buildkit.git:app/config/joomla-*, it does not enable any languages.
+        $results[] = ['*SKIP*', NULL, NULL, NULL, NULL];
+        break;
+
+      case 'WordPress':
+        // FIXME: In CRM_Utils_System_WordPress, the setUFLocale and getUFLocale are not fully implemented.
+        // FIXME: In buildkit.git:app/config/wp-*, it does not enable any languages.
+        $results[] = ['*SKIP*', NULL, NULL, NULL, NULL];
+        // $results[] = ['de_DE', 'de_DE', '__', 'Yes', 'Ja'];
+        break;
+
       default:
-        $this->fail('Test not implemented for ' . CIVICRM_UF);
     }
     return $results;
   }
@@ -56,6 +72,10 @@ class LocaleTest extends \CiviEndToEndTestCase {
    * @dataProvider getLanguageExamples
    */
   public function testSetLanguage($civiLocale, $expectUfLocale, $translator, $inputString, $expectString) {
+    if ($civiLocale === '*SKIP*') {
+      $this->markTestIncomplete('Current environment does not support testing of UF locale.');
+    }
+
     $actualStrings = [];
     $actualLocales = [];
     \Civi::dispatcher()->addListener('civi.api.respond', function (RespondEvent $e) use (&$actualStrings, &$actualLocales, $translator, $inputString, $civiLocale) {
