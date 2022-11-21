@@ -509,6 +509,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   private function deleteAction($id) {
     CRM_Contact_BAO_Relationship::del($id);
+    CRM_Core_Session::setStatus(ts('Selected relationship has been deleted successfully.'), ts('Record Deleted'), 'success');
 
     // reload all blocks to reflect this change on the user interface.
     $this->ajaxResponse['reloadBlocks'] = ['#crm-contactinfo-content'];
