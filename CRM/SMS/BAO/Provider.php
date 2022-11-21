@@ -117,6 +117,8 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
    *
    * @return null
    * @throws CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function del($providerID) {
     if (!$providerID) {
@@ -129,7 +131,9 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
     if (!$dao->find(TRUE)) {
       return NULL;
     }
-    $dao->delete();
+    // The above just filters out attempts to delete for other domains
+    // Not sure it's needed, but preserves old behaviour and is deprecated.
+    static::deleteRecord(['id' => $providerID]);
   }
 
   /**
