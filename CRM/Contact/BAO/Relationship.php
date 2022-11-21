@@ -12,7 +12,7 @@
 /**
  * Class CRM_Contact_BAO_Relationship.
  */
-class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
+class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implements \Civi\Core\HookInterface {
 
   /**
    * Various constants to indicate different type of relationships.
@@ -623,37 +623,50 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @return CRM_Contact_DAO_Relationship
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function del($id) {
-    // delete from relationship table
-    CRM_Utils_Hook::pre('delete', 'Relationship', $id);
+    return static::deleteRecord(['id' => $id]);
+  }
 
-    $relationship = self::clearCurrentEmployer($id, CRM_Core_Action::DELETE);
-    $relationship->delete();
-    if (CRM_Core_Permission::access('CiviMember')) {
-      // create $params array which isrequired to delete memberships
-      // of the related contacts.
-      $params = [
-        'relationship_type_id' => "{$relationship->relationship_type_id}_a_b",
-        'contact_check' => [$relationship->contact_id_b => 1],
-      ];
-
-      $ids = [];
-      // calling relatedMemberships to delete the memberships of
-      // related contacts.
-      self::relatedMemberships($relationship->contact_id_a,
-        $params,
-        $ids,
-        CRM_Core_Action::DELETE,
-        FALSE
-      );
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      self::clearCurrentEmployer($event->id, CRM_Core_Action::DELETE);
     }
+  }
 
-    CRM_Core_Session::setStatus(ts('Selected relationship has been deleted successfully.'), ts('Record Deleted'), 'success');
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      if (CRM_Core_Permission::access('CiviMember')) {
+        // create $params array which isrequired to delete memberships
+        // of the related contacts.
+        $params = [
+          'relationship_type_id' => "{$event->object->relationship_type_id}_a_b",
+          'contact_check' => [$event->object->contact_id_b => 1],
+        ];
 
-    CRM_Utils_Hook::post('delete', 'Relationship', $id, $relationship);
-
-    return $relationship;
+        $ids = [];
+        // calling relatedMemberships to delete the memberships of
+        // related contacts.
+        self::relatedMemberships($event->object->contact_id_a,
+          $params,
+          $ids,
+          CRM_Core_Action::DELETE,
+          FALSE
+        );
+      }
+    }
   }
 
   /**
