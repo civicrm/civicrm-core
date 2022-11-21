@@ -51,9 +51,12 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    *
    * @param int $id
    * @throws CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function del($id) {
     throw new CRM_Core_Exception('Cannot call del function');
+    // Stop this showing up when we're looking for undeprecated del's by keeping this: static::deleteRecord(
   }
 
   /**

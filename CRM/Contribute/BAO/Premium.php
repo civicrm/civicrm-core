@@ -55,11 +55,11 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * Delete financial Types.
    *
    * @param int $premiumID
+   *
+   * @deprecated
    */
   public static function del($premiumID) {
-    $premium = new CRM_Contribute_DAO_Premium();
-    $premium->id = $premiumID;
-    $premium->delete();
+    return static::deleteRecord(['id' => $premiumID]);
   }
 
   /**
