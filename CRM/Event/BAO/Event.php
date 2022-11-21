@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
+class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\HookInterface {
 
   /**
    * Retrieve DB object and copy to defaults array.
@@ -171,57 +171,58 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *   Event id.
    *
    * @return mixed|null
+   *
+   * @deprecated
    */
   public static function del($id) {
-    if (!$id) {
-      return NULL;
-    }
+    return (bool) static::deleteRecord(['id' => $id]);
+  }
 
-    CRM_Utils_Hook::pre('delete', 'Event', $id);
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
 
-    $extends = ['event'];
-    $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
-    foreach ($groupTree as $values) {
-      $query = "DELETE FROM %1 WHERE entity_id = %2";
-      CRM_Core_DAO::executeQuery($query, [
-        1 => [$values['table_name'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
-        2 => [$id, 'Integer'],
-      ]);
-    }
-
-    // Clean up references to profiles used by the event (CRM-20935)
-    $ufJoinParams = [
-      'module' => 'CiviEvent',
-      'entity_table' => 'civicrm_event',
-      'entity_id' => $id,
-    ];
-    CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
-    $ufJoinParams = [
-      'module' => 'CiviEvent_Additional',
-      'entity_table' => 'civicrm_event',
-      'entity_id' => $id,
-    ];
-    CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
-
-    // price set cleanup, CRM-5527
-    CRM_Price_BAO_PriceSet::removeFrom('civicrm_event', $id);
-
-    $event = new CRM_Event_DAO_Event();
-    $event->id = $id;
-
-    if ($event->find(TRUE)) {
-      $locBlockId = $event->loc_block_id;
-      $result = $event->delete();
-
-      if (!is_null($locBlockId)) {
-        self::deleteEventLocBlock($locBlockId, $id);
+      $extends = ['event'];
+      $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+      foreach ($groupTree as $values) {
+        $query = "DELETE FROM %1 WHERE entity_id = %2";
+        CRM_Core_DAO::executeQuery($query, [
+          1 => [$values['table_name'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
+          2 => [$event->id, 'Integer'],
+        ]);
       }
 
-      CRM_Utils_Hook::post('delete', 'Event', $id, $event);
-      return $result;
-    }
+      // Clean up references to profiles used by the event (CRM-20935)
+      $ufJoinParams = [
+        'module' => 'CiviEvent',
+        'entity_table' => 'civicrm_event',
+        'entity_id' => $event->id,
+      ];
+      CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
+      $ufJoinParams = [
+        'module' => 'CiviEvent_Additional',
+        'entity_table' => 'civicrm_event',
+        'entity_id' => $event->id,
+      ];
+      CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
 
-    return NULL;
+      // price set cleanup, CRM-5527
+      CRM_Price_BAO_PriceSet::removeFrom('civicrm_event', $event->id);
+
+      $eventDAO = new CRM_Event_DAO_Event();
+      $eventDAO->id = $event->id;
+
+      if ($eventDAO->find(TRUE)) {
+        $locBlockId = $eventDAO->loc_block_id;
+        if (!is_null($locBlockId)) {
+          self::deleteEventLocBlock($locBlockId, $event->id);
+        }
+      }
+    }
   }
 
   /**
