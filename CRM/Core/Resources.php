@@ -33,9 +33,9 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   /**
    * We don't have a container or dependency-injection, so use singleton instead
    *
-   * @var object
+   * @var CRM_Core_Resources
    */
-  private static $_singleton = NULL;
+  private static $_singleton;
 
   /**
    * @var CRM_Extension_Mapper
