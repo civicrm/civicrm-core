@@ -28,18 +28,14 @@
 
       // Wait for crm-container present on the page as it's faster than document.ready
       function insert(markup) {
-        if ($('#crm-container').length) {
+        if (document.getElementById('crm-container')) {
           render(markup);
         } else {
           new MutationObserver(function(mutations, observer) {
-            _.each(mutations, function(mutant) {
-              _.each(mutant.addedNodes, function(node) {
-                if ($(node).is('#crm-container')) {
-                  render(markup);
-                  observer.disconnect();
-                }
-              });
-            });
+            if (document.getElementById('crm-container')) {
+              observer.disconnect();
+              render(markup);
+            }
           }).observe(document, {childList: true, subtree: true});
         }
       }
