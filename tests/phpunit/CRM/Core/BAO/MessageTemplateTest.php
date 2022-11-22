@@ -4,7 +4,9 @@ use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\MessageTemplate;
 use Civi\Api4\Translation;
+use Civi\Test\Invasive;
 use Civi\Token\TokenProcessor;
+use Civi\WorkflowMessage\WorkflowMessage;
 
 /**
  * Class CRM_Core_BAO_MessageTemplateTest
@@ -24,10 +26,15 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     unset($GLOBALS['tsLocale'], $GLOBALS['dbLocale'], $GLOBALS['civicrmLocale']);
   }
 
+  /**
+   * Test rendering the template.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testRenderTemplate(): void {
     $contactId = $this->individualCreate([
       'first_name' => 'Abba',
-      'last_name' => 'Baab',
+      'last_name' => 'Baa',
       'prefix_id' => NULL,
       'suffix_id' => NULL,
     ]);
@@ -42,29 +49,30 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         'msg_html' => '<p>Hello testRenderTemplate {contact.display_name}!</p>',
       ],
     ]);
-    $this->assertEquals('Hello testRenderTemplate Abba Baab!', $rendered['subject']);
-    $this->assertEquals('Hello testRenderTemplate Abba Baab!', $rendered['text']);
-    $this->assertStringContainsString('<p>Hello testRenderTemplate Abba Baab!</p>', $rendered['html']);
+    $this->assertEquals('Hello testRenderTemplate Abba Baa!', $rendered['subject']);
+    $this->assertEquals('Hello testRenderTemplate Abba Baa!', $rendered['text']);
+    $this->assertStringContainsString('<p>Hello testRenderTemplate Abba Baa!</p>', $rendered['html']);
   }
 
+  /**
+   * Data provider for locale configurations to test.
+   *
+   * @return array
+   */
   public function getLocaleConfigurations(): array {
     $yesPartials = ['partial_locales' => TRUE, 'uiLanguages' => ['en_US']];
     $noPartials = ['partial_locales' => FALSE, 'uiLanguages' => ['en_US'], 'format_locale' => 'en_US'];
 
     $allTemplates = [];
-    $allTemplates['*'] = ['subject' => 'Hello', 'html' => 'Looky there!', 'text' => '{contribution.total_amount}'];
+    $allTemplates['*'] = ['subject' => 'Hello', 'html' => 'Look there!', 'text' => '{contribution.total_amount}'];
     $allTemplates['fr_FR'] = ['subject' => 'Bonjour', 'html' => 'Voila!', 'text' => '{contribution.total_amount}'];
     $allTemplates['fr_CA'] = ['subject' => 'Bonjour Canada', 'html' => 'Voila! Canada', 'text' => '{contribution.total_amount}'];
     $allTemplates['es_PR'] = ['subject' => 'Buenos dias', 'html' => 'Listo', 'text' => '{contribution.total_amount}'];
     $allTemplates['th_TH'] = ['subject' => 'สวัสดี', 'html' => 'ดังนั้น', 'text' => '{contribution.total_amount}'];
 
-    $onlyTemplates = function(array $locales) use ($allTemplates) {
-      return CRM_Utils_Array::subset($allTemplates, $locales);
-    };
-
     $rendered = [];
-    // $rendered['*'] = ['subject' => 'Hello', 'html' => 'Looky there!', 'text' => '$ 100.00'];
-    $rendered['*'] = ['subject' => 'Hello', 'html' => 'Looky there!', 'text' => '$100.00'];
+    // $rendered['*'] = ['subject' => 'Hello', 'html' => 'Look there!', 'text' => '$ 100.00'];
+    $rendered['*'] = ['subject' => 'Hello', 'html' => 'Look there!', 'text' => '$100.00'];
     $rendered['fr_FR'] = ['subject' => 'Bonjour', 'html' => 'Voila!', 'text' => '100,00 $US'];
     $rendered['fr_CA'] = ['subject' => 'Bonjour Canada', 'html' => 'Voila! Canada', 'text' => '100,00 $ US'];
     $rendered['es_PR'] = ['subject' => 'Buenos dias', 'html' => 'Listo', 'text' => '100.00 $US'];
@@ -74,21 +82,33 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
     $result['fr_FR matches fr_FR (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'fr_FR', $rendered['fr_FR']];
     $result['fr_FR matches fr_FR (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'fr_FR', $rendered['fr_FR']];
-    $result['fr_FR falls back to fr_CA (ltd-tpls; yes-partials)'] = [$yesPartials, $onlyTemplates(['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
-    $result['fr_FR falls back to fr_CA (ltd-tpls; no-partials)'] = [$noPartials, $onlyTemplates(['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
+    $result['fr_FR falls back to fr_CA (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
+    $result['fr_FR falls back to fr_CA (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
 
     $result['fr_CA matches fr_CA (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'fr_CA', $rendered['fr_CA']];
     $result['fr_CA matches fr_CA (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'fr_CA', $rendered['fr_CA']];
-    $result['fr_CA falls back to fr_FR (ltd-tpls; yes-partials)'] = [$yesPartials, $onlyTemplates(['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
-    $result['fr_CA falls back to fr_FR (ltd-tpls; no-partials)'] = [$noPartials, $onlyTemplates(['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
+    $result['fr_CA falls back to fr_FR (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
+    $result['fr_CA falls back to fr_FR (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
 
     $result['th_TH matches th_TH (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'th_TH', $rendered['th_TH']];
     $result['th_TH falls back to system default (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'th_TH', $rendered['*']];
     // ^^ The essence of the `partial_locales` setting -- whether partially-supported locales (th_TH) use mixed-mode or fallback to completely diff locale.
-    $result['th_TH falls back to system default (ltd-tpls; yes-partials)'] = [$yesPartials, $onlyTemplates(['*']), 'th_TH', $rendered['*']];
-    $result['th_TH falls back to system default (ltd-tpls; no-partials)'] = [$noPartials, $onlyTemplates(['*']), 'th_TH', $rendered['*']];
+    $result['th_TH falls back to system default (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
+    $result['th_TH falls back to system default (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
 
     return $result;
+  }
+
+  /**
+   * Filter allTemplates to get the subset for the locales required.
+   *
+   * @param array $allTemplates
+   * @param array $locales
+   *
+   * @return array
+   */
+  public function getLocaleTemplates(array $allTemplates, array $locales): array {
+    return CRM_Utils_Array::subset($allTemplates, $locales);
   }
 
   /**
@@ -165,6 +185,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       CRM_Utils_Array::subset($expectRendered, ['subject', 'html', 'text']),
       CRM_Utils_Array::subset($rendered, ['subject', 'html', 'text'])
     );
+    // Explicitly unset & initiate __destruct so it is clear there is a reason to set it.
+    unset($cleanup);
   }
 
   /**
@@ -173,7 +195,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   public function testSendTemplate_RenderMode_OpenTemplate(): void {
     $contactId = $this->individualCreate([
       'first_name' => 'Abba',
-      'last_name' => 'Baab',
+      'last_name' => 'Baa',
       'prefix_id' => NULL,
       'suffix_id' => NULL,
     ]);
@@ -192,9 +214,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ]
     );
     $this->assertEquals(FALSE, $sent);
-    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!', $subject);
-    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!', $messageText);
-    $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!</p>', $messageHtml);
+    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!', $subject);
+    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!', $messageText);
+    $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!</p>', $messageHtml);
   }
 
   public function testSendTemplate_RenderMode_DefaultTpl(): void {
@@ -213,7 +235,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
       $contactId = $this->individualCreate([
         'first_name' => 'Abba',
-        'last_name' => 'Baab',
+        'last_name' => 'Baa',
         'prefix_id' => NULL,
         'suffix_id' => NULL,
       ]);
@@ -228,9 +250,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         ]
       );
       $this->assertEquals(FALSE, $sent);
-      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baab!', $subject);
-      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baab!', $messageText);
-      $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_Default Abba Baab!</p>', $messageHtml);
+      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baa!', $subject);
+      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baa!', $messageText);
+      $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_Default Abba Baa!</p>', $messageHtml);
     });
   }
 
@@ -250,7 +272,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
       $contactId = $this->individualCreate([
         'first_name' => 'Abba',
-        'last_name' => 'Baab',
+        'last_name' => 'Baa',
         'prefix_id' => NULL,
         'suffix_id' => NULL,
       ]);
@@ -269,9 +291,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         ]
       );
       $this->assertEquals(FALSE, $sent);
-      $this->assertEquals('Hello Abba Baab about Something Something!', $subject);
-      $this->assertEquals('Hello Abba Baab about Something Something!', $messageText);
-      $this->assertStringContainsString('<p>Hello Abba Baab about Something Something!</p>', $messageHtml);
+      $this->assertEquals('Hello Abba Baa about Something Something!', $subject);
+      $this->assertEquals('Hello Abba Baa about Something Something!', $messageText);
+      $this->assertStringContainsString('<p>Hello Abba Baa about Something Something!</p>', $messageHtml);
     });
   }
 
@@ -284,7 +306,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $client_id = $this->individualCreate();
     $contact_id = $this->individualCreate();
 
-    $msg = \Civi\WorkflowMessage\WorkflowMessage::create('case_activity', [
+    $msg = WorkflowMessage::create('case_activity', [
       'modelProps' => [
         'contactId' => $contact_id,
         'contact' => ['role' => 'Sand grain counter'],
@@ -304,7 +326,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals([], \Civi\Test\Invasive::get([$msg, '_extras']));
+    $this->assertEquals([], Invasive::get([$msg, '_extras']));
 
     [, $subject, $message] = $msg->sendTemplate([
       'workflow' => 'case_activity',
@@ -376,6 +398,7 @@ London, 90210
   /**
    * Test rendering of smarty tokens.
    *
+   * @throws \CRM_Core_Exception
    */
   public function testRenderTemplateIgnoreSmarty(): void {
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
@@ -413,7 +436,7 @@ London, 90210
     $advertisedTokens = CRM_Core_SelectValues::contactTokens();
     $this->assertEquals($this->getAdvertisedTokens(), $advertisedTokens);
 
-    CRM_Core_Smarty::singleton()->assign('pre_assigned_smarty', 'wee');
+    CRM_Core_Smarty::singleton()->assign('pre_assigned_smarty', 'woo');
     // This string contains the 4 types of possible replaces just to be sure they
     // work in combination.
     $tokenString = '{$pre_assigned_smarty}{$passed_smarty}
@@ -421,7 +444,7 @@ London, 90210
 {important_stuff.favourite_emoticon}
 ';
     foreach (array_keys($tokenData) as $key) {
-      $tokenString .= "{$key}:{contact.{$key}}\n";
+      $tokenString .= "$key:{contact.$key}\n";
     }
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
       'workflow' => 'dummy',
@@ -432,9 +455,9 @@ London, 90210
         'msg_text' => $tokenString,
       ],
       'tokenContext' => ['contactId' => $tokenData['contact_id']],
-      'tplParams' => ['passed_smarty' => 'whoa'],
+      'tplParams' => ['passed_smarty' => 'hoo'],
     ]);
-    $expected = 'weewhoa
+    $expected = 'woohoo
 Default Domain Name
 emo
 ';
@@ -443,7 +466,7 @@ emo
     $textDifferences = [
       '<p>',
       '</p>',
-      '<a href="http://civicrm.org" ',
+      '<a href="https://civicrm.org" ',
       'target="_blank">',
       '</a>',
     ];
@@ -452,7 +475,7 @@ emo
     }
     $this->assertEquals($expected, $messageContent['text']);
     $checksum_position = strpos($messageContent['subject'], 'cs=');
-    $this->assertTrue($checksum_position !== FALSE);
+    $this->assertNotFalse($checksum_position);
     $fixedExpected = rtrim(str_replace("\n", ' ', $expected));
     $this->assertEquals(substr($fixedExpected, 0, $checksum_position), substr($messageContent['subject'], 0, $checksum_position));
     $returned_parts = explode('_', substr($messageContent['subject'], $checksum_position));
@@ -468,6 +491,8 @@ emo
 
   /**
    * Test that old contact tokens still work, as we add new-style support.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testLegacyTokens(): void {
     $contactID = $this->individualCreate(['gender_id' => 'Female', 'communication_style' => 1, 'preferred_communication_method' => 'Phone']);
@@ -543,7 +568,7 @@ emo
     $address = $this->setupContactFromTokeData($tokenData);
     $tokenString = '';
     foreach (array_keys($tokenData) as $key) {
-      $tokenString .= "{$key}:{contact.{$key}}\n";
+      $tokenString .= "$key:{contact.$key}\n";
     }
     $newStyleTokenString = '';
     foreach (array_keys($this->getAdvertisedTokens()) as $key) {
@@ -555,9 +580,9 @@ emo
 
     $tokenProcessor->addRow(['contactId' => $tokenData['contact_id']]);
     $tokenProcessor->evaluate();
-    $rendered = '';
+    $rendered = $newStyleRendered = '';
     foreach ($tokenProcessor->getRows() as $row) {
-      $rendered = (string) $row->render('html');
+      $rendered = $row->render('html');
       $newStyleRendered = $row->render('new');
     }
     $expected = $this->getExpectedContactOutput($address['id'], $tokenData, $rendered);
@@ -783,12 +808,12 @@ emo
       'im' => 'IM Screen Name',
       'openid' => 'OpenID',
       'world_region' => 'World Region',
-      'url' => 'http://civicrm.org',
-      $this->getCustomFieldName('text') => 'Bobsled',
+      'url' => 'https://civicrm.org',
+      $this->getCustomFieldName() => 'Bobsled',
       $this->getCustomFieldName('select_string') => 'R',
       $this->getCustomFieldName('select_date') => '2021-01-20',
       $this->getCustomFieldName('int') => 999,
-      $this->getCustomFieldName('link') => 'http://civicrm.org',
+      $this->getCustomFieldName('link') => 'https://civicrm.org',
       $this->getCustomFieldName('file') => '',
       $this->getCustomFieldName('country') => 'New Zealand',
       $this->getCustomFieldName('multi_country') => ['France', 'Canada'],
@@ -807,7 +832,6 @@ emo
    * @param array $tokenData
    *
    * @return array|int
-   * @throws \CRM_Core_Exception
    */
   protected function setupContactFromTokeData(array $tokenData) {
     $this->callAPISuccess('Contact', 'create', $tokenData);
@@ -839,10 +863,10 @@ emo
    * @return string
    * @throws \CRM_Core_Exception
    */
-  protected function getExpectedContactOutput($id, array $tokenData, string $actualOutput): string {
+  protected function getExpectedContactOutput(int $id, array $tokenData, string $actualOutput): string {
     $checksum = substr($actualOutput, (strpos($actualOutput, 'cs=') + 3), 47);
     $contact = Contact::get(FALSE)->addWhere('id', '=', $tokenData['contact_id'])->setSelect(['modified_date', 'employer_id'])->execute()->first();
-    $expected = 'contact_type:Individual
+    return 'contact_type:Individual
 do_not_email:1
 do_not_phone:
 do_not_mail:1
@@ -910,12 +934,12 @@ im_provider:1
 im:IM Screen Name
 openid:OpenID
 world_region:America South, Central, North and Caribbean
-url:http://civicrm.org
+url:https://civicrm.org
 custom_1:Bobsled
 custom_2:Red
 custom_3:01/20/2021 12:00AM
 custom_4:999
-custom_5:<a href="http://civicrm.org" target="_blank">http://civicrm.org</a>
+custom_5:<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
 custom_6:
 custom_7:New Zealand
 custom_8:France, Canada
@@ -927,7 +951,6 @@ custom_13:Purple
 checksum:cs=' . $checksum . '
 contact_id:' . $tokenData['contact_id'] . '
 ';
-    return $expected;
   }
 
   /**
@@ -940,10 +963,10 @@ contact_id:' . $tokenData['contact_id'] . '
    * @return string
    * @throws \CRM_Core_Exception
    */
-  protected function getExpectedContactOutputNewStyle($id, array $tokenData, string $actualOutput): string {
+  protected function getExpectedContactOutputNewStyle(int $id, array $tokenData, string $actualOutput): string {
     $checksum = substr($actualOutput, (strpos($actualOutput, 'cs=') + 3), 47);
     $contact = Contact::get(FALSE)->addWhere('id', '=', $tokenData['contact_id'])->setSelect(['modified_date', 'employer_id'])->execute()->first();
-    $expected = 'contact_type:label |Individual
+    return 'contact_type:label |Individual
 do_not_email:label |Yes
 do_not_phone:label |No
 do_not_mail:label |Yes
@@ -1009,7 +1032,7 @@ provider_id:label |Yahoo
 im |IM Screen Name
 openid |OpenID
 world_region |America South, Central, North and Caribbean
-url |http://civicrm.org
+url |https://civicrm.org
 custom_9 |Mr. Spider Man II
 custom_7 |New Zealand
 custom_8 |France, Canada
@@ -1020,14 +1043,13 @@ custom_2 |Red
 custom_13 |Purple
 custom_10 |Queensland
 custom_11 |Victoria, New South Wales
-custom_5 |<a href="http://civicrm.org" target="_blank">http://civicrm.org</a>
+custom_5 |<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
 custom_12 |Yes
 custom_3 |01/20/2021 12:00AM
 checksum |cs=' . $checksum . '
 id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
 ';
-    return $expected;
   }
 
 }
