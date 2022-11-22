@@ -64,7 +64,12 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB implements \Ci
     if ($event->action === 'delete') {
       foreach (['mailing_id_a', 'mailing_id_b', 'mailing_id_c'] as $part) {
         if ($event->object->$part) {
-          CRM_Mailing_BAO_Mailing::deleteRecord(['id' => $event->object->$part]);
+          // Don't let missing mailing parts throw exceptions
+          try {
+            CRM_Mailing_BAO_Mailing::deleteRecord(['id' => $event->object->$part]);
+          }
+          catch (Exception $e) {
+          }
         }
       }
     }
