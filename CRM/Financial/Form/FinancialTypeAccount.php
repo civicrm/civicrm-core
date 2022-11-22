@@ -272,7 +272,14 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Financial_BAO_EntityFinancialAccount::del($this->_id, $this->_aid);
+      try {
+        CRM_Financial_BAO_FinancialTypeAccount::del($this->_id);
+        CRM_Financial_BAO_EntityFinancialAccount::del($this->_id);
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Core_Session::setStatus($e->message);
+        return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', "reset=1&action=browse&aid={$this->_aid}"));
+      }
       CRM_Core_Session::setStatus(ts('Selected financial type account has been deleted.'));
     }
     else {
