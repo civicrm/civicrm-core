@@ -508,6 +508,14 @@ class TokenProcessor {
           return $value;
         }
 
+      case 'default':
+        if (!$value) {
+          return $filter[1];
+        }
+        else {
+          return $value;
+        }
+
       default:
         throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
     }
