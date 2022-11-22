@@ -17,6 +17,7 @@ use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\PaymentProcessor;
+use Civi\Core\Event\PostEvent;
 
 /**
  *
@@ -604,9 +605,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
   /**
    * Event fired after modifying a contribution.
+   *
    * @param \Civi\Core\Event\PostEvent $event
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+  public static function self_hook_civicrm_post(PostEvent $event): void {
     if ($event->action === 'edit') {
       CRM_Contribute_BAO_ContributionRecur::updateOnTemplateUpdated($event->object);
     }

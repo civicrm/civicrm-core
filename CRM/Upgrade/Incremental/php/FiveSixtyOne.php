@@ -21,6 +21,23 @@
  */
 class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
+    if ($rev === '5.61.alpha1' && CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contribution_recur LIMIT 1')) {
+      $documentationUrl = 'https://docs.civicrm.org/dev/en/latest/financial/recurring-contributions/';
+      $documentationAnchor = 'target="_blank" href="' . htmlentities($documentationUrl) . '"';
+      $extensionUrl = 'https://docs.civicrm.org/dev/en/latest/financial/recurring-contributions/';
+      $extensionAnchor = 'target="_blank" href="' . htmlentities($extensionUrl) . '"';
+
+      $preUpgradeMessage .= '<p>' .
+        ts('This release contains a change to the behaviour of recurring contributions under some edge-case circumstances.')
+        . ' ' . ts('Since 5.49 the amount and currency on the recurring contribution record changed when the amount of any contribution against it was changed, indicating a change in future intent.')
+        . ' ' . ts('It is generally not possible to edit the amount for contributions linked to recurring contributions so for most sites this would never occur anyway.')
+        . ' ' . ts('If you still want this behaviour you should install the <a %1>Recur future amounts extension</a>', [1 => $extensionAnchor])
+        . ' ' . ts('Please <a %1>read about recurring contribution templates</a> for more information', [1 => $documentationAnchor])
+        . '</p>';
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
