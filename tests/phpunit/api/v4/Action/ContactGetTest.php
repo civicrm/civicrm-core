@@ -424,4 +424,17 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(0, $result);
   }
 
+  public function testInvalidPseudoConstantWithIN(): void {
+    $this->createTestRecord('Contact', [
+      'first_name' => uniqid(),
+      'last_name' => uniqid(),
+      'prefix_id:name' => 'Ms.',
+    ]);
+    $resultCount = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('prefix_id:name', 'IN', ['Msssss.'])
+      ->execute();
+    $this->assertCount(0, $resultCount);
+  }
+
 }
