@@ -117,23 +117,46 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test we don't change unintended fields on API edit
+   * Test we don't change unintended fields on the recurring contribution.
+   *
+   * This tests two scenarios
+   *  - editing a contribution and changing unrelated fields should leave the
+   *    currency unchanged
+   *  - Adding (or editing) contributions on the recurring should only alter
+   *    it if the contribbution is a template contribution.
    *
    * @throws \CRM_Core_Exception
    */
   public function testUpdateRecur(): void {
     $createParams = $this->_params;
     $createParams['currency'] = 'XAU';
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $createParams);
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
     $editParams = [
       'id' => $contributionRecur['id'],
       'end_date' => '+ 4 weeks',
     ];
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $editParams);
-    $dao = new CRM_Contribute_BAO_ContributionRecur();
-    $dao->id = $contributionRecur['id'];
-    $dao->find(TRUE);
-    $this->assertEquals('XAU', $dao->currency, 'Edit clobbered recur currency');
+    $contributionRecurID = $this->callAPISuccess('ContributionRecur', 'create', $editParams)['id'];
+    $contributionRecur = ContributionRecur::get()->setSelect(['amount', 'currency'])->addWhere('id', '=', $contributionRecurID)->execute()->first();
+    $this->assertEquals('XAU', $contributionRecur['currency'], 'Contribution recur update should not have changed the recur currency');
+    $this->assertEquals(3, $contributionRecur['amount'], 'Contribution recur update should not have changed the recur amount');
+
+    $contributionID = Contribution::create()->setValues([
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => 5,
+      'currency' => 'USD',
+      'contact_id' => $this->_params['contact_id'],
+      'financial_type_id:name' => 'Donation',
+    ])->execute()->first()['id'];
+    Contribution::update()->setValues(['receive_date' => 'yesterday'])->addWhere('id', '=', $contributionID)->execute();
+    $contributionRecur = ContributionRecur::get()->setSelect(['amount', 'currency'])->addWhere('id', '=', $contributionRecur['id'])->execute()->first();
+    $this->assertEquals('XAU', $contributionRecur['currency'], 'New contribution should not have changed the recur as it is not a template');
+    $this->assertEquals(3, $contributionRecur['amount'], 'New contribution should have not changed the recur amount as it not is a template');
+
+    Contribution::update()->setValues(['is_template' => TRUE])->addWhere('id', '=', $contributionID)->execute();
+
+    $contributionRecur = ContributionRecur::get()->setSelect(['amount', 'currency'])->addWhere('id', '=', $contributionRecur['id'])->execute()->first();
+    $this->assertEquals('USD', $contributionRecur['currency'], 'Editing contribution should have changed the recur currency as it is a template');
+    $this->assertEquals(5, $contributionRecur['amount'], 'Editing contribution should have changed the recur amount as it is a template');
   }
 
   /**
