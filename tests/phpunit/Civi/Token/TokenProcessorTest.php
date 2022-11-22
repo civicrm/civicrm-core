@@ -350,9 +350,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'This is {foo_bar.whiz_bang|upper}!' => 'This is SOME TEXT!',
       'This is {foo_bar.whiz_bang|boolean}!' => 'This is 1!',
       'This is {foo_bar.whiz_bop|boolean}!' => 'This is 0!',
+      'This is {foo_bar.whiz_bang|default:"bang"}.' => 'This is Some Text.',
+      'This is {foo_bar.whiz_bop|default:"bop"}.' => 'This is bop.',
     ];
-    // We expect 5 messages to be parsed 2 times each - ie 10 times.
-    $expectExampleCount = 10;
+    // We expect 7 messages to be parsed 2 times each - ie 14 times.
+    $expectExampleCount = 14;
     $actualExampleCount = 0;
 
     foreach ($exampleMessages as $inputMessage => $expectOutput) {
