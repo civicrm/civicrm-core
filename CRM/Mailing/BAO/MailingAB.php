@@ -18,7 +18,7 @@
 /**
  * Class CRM_Mailing_BAO_MailingAB
  */
-class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
+class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB implements \Civi\Core\HookInterface {
 
   /**
    * Construct a new mailingab object.
@@ -48,30 +48,26 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    *
    * @param int $id
    *   Id of the mail to delete.
+   *
+   * @deprecated
    */
   public static function del($id) {
-    if (empty($id)) {
-      throw new CRM_Core_Exception(ts('No id passed to MailingAB del function'));
-    }
-    CRM_Core_Transaction::create()->run(function () use ($id) {
-      CRM_Utils_Hook::pre('delete', 'MailingAB', $id);
+    static::deleteRecord(['id' => $id]);
+  }
 
-      $dao = new CRM_Mailing_DAO_MailingAB();
-      $dao->id = $id;
-      if ($dao->find(TRUE)) {
-        $mailing_ids = [$dao->mailing_id_a, $dao->mailing_id_b, $dao->mailing_id_c];
-        $dao->delete();
-        foreach ($mailing_ids as $mailing_id) {
-          if ($mailing_id) {
-            CRM_Mailing_BAO_Mailing::del($mailing_id);
-          }
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'delete') {
+      foreach (['mailing_id_a', 'mailing_id_b', 'mailing_id_c'] as $part) {
+        if ($event->object->$part) {
+          CRM_Mailing_BAO_Mailing::deleteRecord(['id' => $event->object->$part]);
         }
       }
-
-      CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
-
-      CRM_Utils_Hook::post('delete', 'MailingAB', $id, $dao);
-    });
+    }
   }
 
   /**
