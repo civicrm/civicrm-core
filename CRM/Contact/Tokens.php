@@ -57,15 +57,12 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     if (!$this->checkActive($e->getTokenProcessor())) {
       return;
     }
-    $relatedTokens = array_flip($this->getTokenMappingsForRelatedEntities());
     foreach ($this->getTokenMetadata() as $tokenName => $field) {
       if ($field['audience'] === 'user') {
         $e->register([
           'entity' => $this->entity,
-          // Preserve legacy token names. It generally feels like
-          // it would be good to switch to the more specific token names
-          // but other code paths are still in use which can't handle them.
-          'field' => $relatedTokens[$tokenName] ?? $tokenName,
+          // We advertise the new-style token names - but support legacy ones.
+          'field' => $tokenName,
           'label' => $field['title'],
         ]);
       }
@@ -398,19 +395,31 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       }
       $metadata = (array) civicrm_api4($apiEntity, 'getfields', ['checkPermissions' => FALSE], 'name');
       foreach ($metadata as $field) {
-        $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, 'primary_' . $entity);
+        if ($entity === 'website') {
+          // It's not the primary - it's 'just one of them' - so the name is _first not _primary
+          $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, 'website_first');
+        }
+        else {
+          $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, $entity . '_primary');
+          $field['label'] .= ' (' . ts('Billing') . ')';
+          // Set audience to sysadmin in case adding them to UI annoys people. If people ask to see this
+          // in the UI we could set to 'user'.
+          $field['audience'] = 'sysadmin';
+          $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, $entity . '_billing');
+        }
       }
     }
     // Manually add in the abbreviated state province as that maps to
     // what has traditionally been delivered.
-    $tokensMetadata['primary_address.state_province_id:abbr'] = $tokensMetadata['primary_address.state_province_id:label'];
-    $tokensMetadata['primary_address.state_province_id:abbr']['name'] = 'state_province_id:abbr';
-    $tokensMetadata['primary_address.state_province_id:abbr']['audience'] = 'user';
+    $tokensMetadata['address_primary.state_province_id:abbr'] = $tokensMetadata['address_primary.state_province_id:label'];
+    $tokensMetadata['address_primary.state_province_id:abbr']['name'] = 'state_province_id:abbr';
+    $tokensMetadata['address_primary.state_province_id:abbr']['audience'] = 'user';
     // Hide the label for now because we are not sure if there are paths
     // where legacy token resolution is in play where this could not be resolved.
-    $tokensMetadata['primary_address.state_province_id:label']['audience'] = 'sysadmin';
+    $tokensMetadata['address_primary.state_province_id:label']['audience'] = 'sysadmin';
     // Hide this really obscure one. Just cos it annoys me.
-    $tokensMetadata['primary_address.manual_geo_code:label']['audience'] = 'sysadmin';
+    $tokensMetadata['address_primary.manual_geo_code:label']['audience'] = 'sysadmin';
+    $tokensMetadata['openid_primary.openid']['audience'] = 'sysadmin';
     Civi::cache('metadata')->set($this->getCacheKey(), $tokensMetadata);
     return $tokensMetadata;
   }
@@ -441,13 +450,20 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       $fieldSpec = $this->getMetadataForField($field);
       $prefix = '';
       if (isset($fieldSpec['table_name']) && $fieldSpec['table_name'] !== 'civicrm_contact') {
-        $tableAlias = str_replace('civicrm_', 'primary_', $fieldSpec['table_name']);
-        $joins[$tableAlias] = $fieldSpec['entity'];
-
-        $prefix = $tableAlias . '.';
-      }
-      if ($fieldSpec['type'] === 'Custom') {
-        $customFields['custom_' . $fieldSpec['custom_field_id']] = $fieldSpec['name'];
+        if ($fieldSpec['table_name'] === 'civicrm_website') {
+          $tableAlias = 'website_first';
+          $joins[$tableAlias] = $fieldSpec['entity'];
+          $prefix = $tableAlias . '.';
+        }
+        if ($fieldSpec['table_name'] === 'civicrm_openid') {
+          // We could start to deprecate this one maybe..... I've made it un-advertised.
+          $tableAlias = 'openid_primary';
+          $joins[$tableAlias] = $fieldSpec['entity'];
+          $prefix = $tableAlias . '.';
+        }
+        if ($fieldSpec['type'] === 'Custom') {
+          $customFields['custom_' . $fieldSpec['custom_field_id']] = $fieldSpec['name'];
+        }
       }
       $returnProperties[] = $prefix . $this->getMetadataForField($field)['name'];
     }
@@ -534,65 +550,81 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   /**
    * Get the tokens that are accessed by joining onto a related entity.
    *
-   * Note the original thinking was to migrate to advertising the tokens
-   * that more accurately reflect the schema & also add support for e.g
-   * billing_address.street_address - which would be hugely useful for workflow
-   * message templates.
+   * This is an array of legacy style tokens mapped to the new style - so that
+   * discontinued tokens still work (although they are no longer advertised).
    *
-   * However that feels like a bridge too far for this round
-   * since we haven't quite hit the goal of all token processing going through
-   * the token processor & we risk advertising tokens that don't work if we get
-   * ahead of that process.
+   * There are three types of legacy tokens
+   * - apiv3 style - e.g {contact.email}
+   * - ad hoc - hey cos it's CiviCRM
+   * - 'wrong' apiv4 style - ie I thought we would do 'primary_address' but we did
+   *   'address_primary' - these were added as the 'real token names' but not
+   *   advertised & likely never adopted so handling them for a while is a
+   *   conservative approach.
+   *
+   * The new type maps to the v4 api.
    *
    * @return string[]
    */
   protected function getTokenMappingsForRelatedEntities(): array {
-    return [
-      'on_hold' => 'primary_email.on_hold',
-      'on_hold:label' => 'primary_email.on_hold:label',
-      'phone_type_id' => 'primary_phone.phone_type_id',
-      'phone_type_id:label' => 'primary_phone.phone_type_id:label',
+    $legacyFieldMapping = [
+      'on_hold' => 'email_primary.on_hold:label',
+      'phone_type_id' => 'phone_primary.phone_type_id',
+      'phone_type_id:label' => 'phone_primary.phone_type_id:label',
+      'phone_type' => 'phone_primary.phone_type_id:label',
+      'phone' => 'phone_primary.phone',
+      'primary_phone.phone' => 'phone_primary.phone',
+      'phone_ext' => 'phone_primary.phone_ext',
+      'primary_phone.phone_ext' => 'phone_primary.phone_ext',
       'current_employer' => 'employer_id.display_name',
-      'location_type_id' => 'primary_address.location_type_id',
-      'location_type' => 'primary_address.location_type_id:label',
-      'location_type_id:label' => 'primary_address.location_type_id:label',
-      'street_address' => 'primary_address.street_address',
-      'address_id' => 'primary_address.id',
-      'address_name' => 'primary_address.name',
-      'street_number' => 'primary_address.street_number',
-      'street_number_suffix' => 'primary_address.street_number_suffix',
-      'street_name' => 'primary_address.street_name',
-      'street_unit' => 'primary_address.street_unit',
-      'supplemental_address_1' => 'primary_address.supplemental_address_1',
-      'supplemental_address_2' => 'primary_address.supplemental_address_2',
-      'supplemental_address_3' => 'primary_address.supplemental_address_3',
-      'city' => 'primary_address.city',
-      'postal_code' => 'primary_address.postal_code',
-      'postal_code_suffix' => 'primary_address.postal_code_suffix',
-      'geo_code_1' => 'primary_address.geo_code_1',
-      'geo_code_2' => 'primary_address.geo_code_2',
-      'manual_geo_code' => 'primary_address.manual_geo_code',
-      'master_id' => 'primary_address.master_id',
-      'county' => 'primary_address.county_id:label',
-      'county_id' => 'primary_address.county_id',
-      'state_province' => 'primary_address.state_province_id:abbr',
-      'state_province_id' => 'primary_address.state_province_id',
-      'country' => 'primary_address.country_id:label',
-      'country_id' => 'primary_address.country_id',
-      'world_region' => 'primary_address.country_id.region_id:name',
-      'phone_type' => 'primary_phone.phone_type_id:label',
-      'phone' => 'primary_phone.phone',
-      'phone_ext' => 'primary_phone.phone_ext',
-      'email' => 'primary_email.email',
-      'signature_text' => 'primary_email.signature_text',
-      'signature_html' => 'primary_email.signature_html',
-      'im' => 'primary_im.name',
-      'im_provider' => 'primary_im.provider_id',
-      'provider_id:label' => 'primary_im.provider_id:label',
-      'provider_id' => 'primary_im.provider_id',
-      'openid' => 'primary_openid.openid',
-      'url' => 'primary_website.url',
+      'location_type_id' => 'address_primary.location_type_id',
+      'location_type' => 'address_primary.location_type_id:label',
+      'location_type_id:label' => 'address_primary.location_type_id:label',
+      'street_address' => 'address_primary.street_address',
+      'address_id' => 'address_primary.id',
+      'address_name' => 'address_primary.name',
+      'street_number' => 'address_primary.street_number',
+      'street_number_suffix' => 'address_primary.street_number_suffix',
+      'street_name' => 'address_primary.street_name',
+      'street_unit' => 'address_primary.street_unit',
+      'supplemental_address_1' => 'address_primary.supplemental_address_1',
+      'supplemental_address_2' => 'address_primary.supplemental_address_2',
+      'supplemental_address_3' => 'address_primary.supplemental_address_3',
+      'city' => 'address_primary.city',
+      'postal_code' => 'address_primary.postal_code',
+      'postal_code_suffix' => 'address_primary.postal_code_suffix',
+      'geo_code_1' => 'address_primary.geo_code_1',
+      'geo_code_2' => 'address_primary.geo_code_2',
+      'manual_geo_code' => 'address_primary.manual_geo_code',
+      'master_id' => 'address_primary.master_id',
+      'county' => 'address_primary.county_id:label',
+      'county_id' => 'address_primary.county_id',
+      'state_province' => 'address_primary.state_province_id:abbr',
+      'state_province_id' => 'address_primary.state_province_id',
+      'country' => 'address_primary.country_id:label',
+      'country_id' => 'address_primary.country_id',
+      'world_region' => 'address_primary.country_id.region_id:name',
+      'email' => 'email_primary.email',
+      'signature_text' => 'email_primary.signature_text',
+      'signature_html' => 'email_primary.signature_html',
+      'im' => 'im_primary.name',
+      'im_provider' => 'im_primary.provider_id:label',
+      'openid' => 'openid_primary.openid',
+      'url' => 'website_first.url',
     ];
+    foreach ($legacyFieldMapping as $fieldName) {
+      // Add in our briefly-used 'primary_address' variants.
+      // ie add 'primary_email.email' => 'email_primary.email'
+      // so allow the former to be mapped to the latter.
+      // We can deprecate these out later as they were likely never adopted.
+      $oldPrimaryName = str_replace(
+        ['email_primary', 'im_primary', 'phone_primary', 'address_primary', 'openid_primary', 'website_first'],
+        ['primary_email', 'primary_im', 'primary_phone', 'primary_address', 'primary_openid', 'primary_website'],
+        $fieldName);
+      if ($oldPrimaryName !== $fieldName) {
+        $legacyFieldMapping[$oldPrimaryName] = $fieldName;
+      }
+    }
+    return $legacyFieldMapping;
   }
 
   /**
@@ -619,7 +651,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'data_type' => 'String',
         'audience' => 'user',
       ],
-      'primary_address.country_id.region_id:name' => [
+      'address_primary.country_id.region_id:name' => [
         'title' => ts('World Region'),
         'name' => 'country_id.region_id.name',
         'type' => 'mapped',

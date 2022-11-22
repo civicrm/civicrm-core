@@ -123,7 +123,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    * @dataProvider getLocaleConfigurations
    */
   public function testRenderTranslatedTemplate($settings, $templates, $preferredLanguage, $expectRendered): void {
-    if (empty($settings['partial_locales']) && count(\CRM_Core_I18n::languages(FALSE)) <= 1) {
+    if (empty($settings['partial_locales']) && count(CRM_Core_I18n::languages(FALSE)) <= 1) {
       $this->markTestIncomplete('Full testing of localization requires l10n data.');
     }
     $cleanup = \CRM_Utils_AutoClean::swapSettings($settings);
@@ -658,39 +658,38 @@ emo
       '{contact.addressee_display}' => 'Addressee',
       '{contact.email_greeting_display}' => 'Email Greeting',
       '{contact.postal_greeting_display}' => 'Postal Greeting',
-      '{contact.current_employer}' => 'Current Employer',
-      '{contact.location_type_id:label}' => 'Address Location Type',
-      '{contact.address_id}' => 'Address ID',
-      '{contact.street_address}' => 'Street Address',
-      '{contact.street_number}' => 'Street Number',
-      '{contact.street_number_suffix}' => 'Street Number Suffix',
-      '{contact.street_name}' => 'Street Name',
-      '{contact.street_unit}' => 'Street Unit',
-      '{contact.supplemental_address_1}' => 'Supplemental Address 1',
-      '{contact.supplemental_address_2}' => 'Supplemental Address 2',
-      '{contact.supplemental_address_3}' => 'Supplemental Address 3',
-      '{contact.city}' => 'City',
-      '{contact.postal_code_suffix}' => 'Postal Code Suffix',
-      '{contact.postal_code}' => 'Postal Code',
-      '{contact.geo_code_1}' => 'Latitude',
-      '{contact.geo_code_2}' => 'Longitude',
-      '{contact.address_name}' => 'Address Name',
-      '{contact.master_id}' => 'Master Address ID',
-      '{contact.county}' => 'County',
-      '{contact.state_province}' => 'State/Province',
-      '{contact.country}' => 'Country',
-      '{contact.phone}' => 'Phone',
-      '{contact.phone_ext}' => 'Phone Extension',
-      '{contact.phone_type}' => 'Phone Type',
-      '{contact.email}' => 'Email',
-      '{contact.on_hold:label}' => 'On Hold',
-      '{contact.signature_text}' => 'Signature Text',
-      '{contact.signature_html}' => 'Signature Html',
-      '{contact.provider_id:label}' => 'IM Provider',
-      '{contact.im}' => 'IM Screen Name',
-      '{contact.openid}' => 'OpenID',
-      '{contact.world_region}' => 'World Region',
-      '{contact.url}' => 'Website',
+      '{contact.employer_id.display_name}' => 'Current Employer',
+      '{contact.address_primary.location_type_id:label}' => 'Address Location Type',
+      '{contact.address_primary.id}' => 'Address ID',
+      '{contact.address_primary.street_address}' => 'Street Address',
+      '{contact.address_primary.street_number}' => 'Street Number',
+      '{contact.address_primary.street_number_suffix}' => 'Street Number Suffix',
+      '{contact.address_primary.street_name}' => 'Street Name',
+      '{contact.address_primary.street_unit}' => 'Street Unit',
+      '{contact.address_primary.supplemental_address_1}' => 'Supplemental Address 1',
+      '{contact.address_primary.supplemental_address_2}' => 'Supplemental Address 2',
+      '{contact.address_primary.supplemental_address_3}' => 'Supplemental Address 3',
+      '{contact.address_primary.city}' => 'City',
+      '{contact.address_primary.postal_code_suffix}' => 'Postal Code Suffix',
+      '{contact.address_primary.postal_code}' => 'Postal Code',
+      '{contact.address_primary.geo_code_1}' => 'Latitude',
+      '{contact.address_primary.geo_code_2}' => 'Longitude',
+      '{contact.address_primary.name}' => 'Address Name',
+      '{contact.address_primary.master_id}' => 'Master Address ID',
+      '{contact.address_primary.county_id:label}' => 'County',
+      '{contact.address_primary.state_province_id:abbr}' => 'State/Province',
+      '{contact.address_primary.country_id:label}' => 'Country',
+      '{contact.phone_primary.phone}' => 'Phone',
+      '{contact.phone_primary.phone_ext}' => 'Phone Extension',
+      '{contact.phone_primary.phone_type_id:label}' => 'Phone Type',
+      '{contact.email_primary.email}' => 'Email',
+      '{contact.email_primary.on_hold:label}' => 'On Hold',
+      '{contact.email_primary.signature_text}' => 'Signature Text',
+      '{contact.email_primary.signature_html}' => 'Signature Html',
+      '{contact.im_primary.provider_id:label}' => 'IM Provider',
+      '{contact.im_primary.name}' => 'IM Screen Name',
+      '{contact.address_primary.country_id.region_id:name}' => 'World Region',
+      '{contact.website_first.url}' => 'Website',
       '{contact.custom_9}' => 'Contact reference field :: Custom Group',
       '{contact.custom_7}' => 'Country :: Custom Group',
       '{contact.custom_8}' => 'Country-multi :: Custom Group',
@@ -722,6 +721,7 @@ emo
    * Note it will render additional custom fields if they exist.
    *
    * @return array
+   *
    * @throws \CRM_Core_Exception
    */
   public function getOldContactTokens(): array {
@@ -829,6 +829,46 @@ emo
   }
 
   /**
+   * Test tokens that we briefly introduced before changing our minds....
+   *
+   * The style I thought we were going to go with looked like
+   *
+   * {contact.primary_address.street_address} but.... we went with
+   * {contact.address_primary.street_address} at the apiv4 level - which is what
+   * we are trying to mirror. It's likely no-one ever used these as we didn't
+   * advertise them and the old 'random' v3 style tokens continued to work.
+   *
+   * But, we should support them for a bit - which means testing them...
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testBrieflyPopularTokens(): void {
+    $this->createCustomGroupWithFieldsOfAllTypes([]);
+    $tokenData = $this->getOldContactTokens();
+    $this->setupContactFromTokeData($tokenData);
+    // One token from each entity....
+    $tokenString = "primary_email:{contact.primary_email.email}\n"
+      . "primary_address:{contact.primary_address.street_address}\n"
+      . "primary_im:{contact.primary_im.name}\n"
+      . "primary_website:{contact.primary_website.url}\n"
+      . "primary_openid:{contact.primary_openid.openid}\n"
+      . "primary_phone:{contact.primary_phone.phone}\n";
+
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), []);
+    $tokenProcessor->addMessage('html', $tokenString, 'text/html');
+    $tokenProcessor->addRow(['contactId' => $tokenData['contact_id']]);
+    $tokenProcessor->evaluate();
+    $messageHtml = $tokenProcessor->getRow(0)->render('html');
+    $this->assertEquals('primary_email:anthony_anderson@civicrm.org
+primary_address:Street Address
+primary_im:IM Screen Name
+primary_website:https://civicrm.org
+primary_openid:OpenID
+primary_phone:123-456
+', $messageHtml);
+  }
+
+  /**
    * @param array $tokenData
    *
    * @return array|int
@@ -927,10 +967,10 @@ phone_ext:77
 phone_type_id:2
 phone_type:Mobile
 email:anthony_anderson@civicrm.org
-on_hold:0
+on_hold:No
 signature_text:Yours sincerely
 signature_html:<p>Yours</p>
-im_provider:1
+im_provider:Yahoo
 im:IM Screen Name
 openid:OpenID
 world_region:America South, Central, North and Caribbean
@@ -1000,39 +1040,38 @@ modified_date |' . CRM_Utils_Date::customFormat($contact['modified_date']) . '
 addressee_display |Mr. Robert Frank Smith II
 email_greeting_display |Dear Robert
 postal_greeting_display |Dear Robert
-current_employer |Unit Test Organization
-location_type_id:label |Home
-address_id |' . $id . '
-street_address |Street Address
-street_number |123
-street_number_suffix |S
-street_name |Main St
-street_unit |45B
-supplemental_address_1 |Round the corner
-supplemental_address_2 |Up the road
-supplemental_address_3 |By the big tree
-city |New York
-postal_code_suffix |4578
-postal_code |90210
-geo_code_1 |48.858093
-geo_code_2 |2.294694
-address_name |The white house
-master_id |' . $tokenData['master_id'] . '
-county |
-state_province |TX
-country |United States
-phone |123-456
-phone_ext |77
-phone_type |Mobile
-email |anthony_anderson@civicrm.org
-on_hold:label |No
-signature_text |Yours sincerely
-signature_html |<p>Yours</p>
-provider_id:label |Yahoo
-im |IM Screen Name
-openid |OpenID
-world_region |America South, Central, North and Caribbean
-url |https://civicrm.org
+employer_id.display_name |Unit Test Organization
+address_primary.location_type_id:label |Home
+address_primary.id |' . $id . '
+address_primary.street_address |Street Address
+address_primary.street_number |123
+address_primary.street_number_suffix |S
+address_primary.street_name |Main St
+address_primary.street_unit |45B
+address_primary.supplemental_address_1 |Round the corner
+address_primary.supplemental_address_2 |Up the road
+address_primary.supplemental_address_3 |By the big tree
+address_primary.city |New York
+address_primary.postal_code_suffix |4578
+address_primary.postal_code |90210
+address_primary.geo_code_1 |48.858093
+address_primary.geo_code_2 |2.294694
+address_primary.name |The white house
+address_primary.master_id |' . $tokenData['master_id'] . '
+address_primary.county_id:label |
+address_primary.state_province_id:abbr |TX
+address_primary.country_id:label |United States
+phone_primary.phone |123-456
+phone_primary.phone_ext |77
+phone_primary.phone_type_id:label |Mobile
+email_primary.email |anthony_anderson@civicrm.org
+email_primary.on_hold:label |No
+email_primary.signature_text |Yours sincerely
+email_primary.signature_html |&lt;p&gt;Yours&lt;/p&gt;
+im_primary.provider_id:label |Yahoo
+im_primary.name |IM Screen Name
+address_primary.country_id.region_id:name |America South, Central, North and Caribbean
+website_first.url |https://civicrm.org
 custom_9 |Mr. Spider Man II
 custom_7 |New Zealand
 custom_8 |France, Canada
