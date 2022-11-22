@@ -996,21 +996,24 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @param \CRM_Contribute_DAO_Contribution $contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function updateOnTemplateUpdated(CRM_Contribute_DAO_Contribution $contribution) {
-    if (empty($contribution->contribution_recur_id)) {
+  public static function updateOnTemplateUpdated(CRM_Contribute_DAO_Contribution $contribution): void {
+    if ($contribution->is_template === '0' || empty($contribution->contribution_recur_id)) {
       return;
     }
+
+    if ($contribution->total_amount === NULL || $contribution->currency === NULL || $contribution->is_template === NULL) {
+      // The contribution has not been fully loaded, so fetch a full copy now.
+      $contribution->find(TRUE);
+    }
+    if (!$contribution->is_template) {
+      return;
+    }
+
     $contributionRecur = ContributionRecur::get(FALSE)
       ->addWhere('id', '=', $contribution->contribution_recur_id)
       ->execute()
       ->first();
-
-    if ($contribution->total_amount === NULL || $contribution->currency === NULL) {
-      // The contribution has not been fully loaded, so fetch a full copy now.
-      $contribution->find(TRUE);
-    }
 
     if ($contribution->currency !== $contributionRecur['currency'] || !CRM_Utils_Money::equals($contributionRecur['amount'], $contribution->total_amount, $contribution->currency)) {
       ContributionRecur::update(FALSE)
