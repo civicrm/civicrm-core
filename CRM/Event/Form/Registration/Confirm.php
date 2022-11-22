@@ -1074,7 +1074,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $profiles[] = $form->_values[$topProfile];
     }
     if (!empty($profiles)) {
-      $uFGroups = \Civi\Api4\UFGroup::get()
+      $uFGroups = \Civi\Api4\UFGroup::get(FALSE)
         ->addSelect('add_to_group_id')
         ->addWhere('id', 'IN', $profiles)
         ->execute();
