@@ -22,7 +22,7 @@ require_once 'Mail/mime.php';
 /**
  * Class CRM_Mailing_BAO_Mailing
  */
-class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
+class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\Core\HookInterface {
 
   /**
    * An array that holds the complete templates
@@ -2403,26 +2403,23 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    *   Id of the mail to delete.
    *
    * @return void
+   *
+   * @deprecated
    */
   public static function del($id) {
-    if (empty($id)) {
-      throw new CRM_Core_Exception(ts('No id passed to mailing del function'));
+    static::deleteRecord(['id' => $id]);
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      // Delete all file attachments
+      CRM_Core_BAO_File::deleteEntityFile('civicrm_mailing', $event->id);
     }
-
-    CRM_Utils_Hook::pre('delete', 'Mailing', $id);
-
-    // delete all file attachments
-    CRM_Core_BAO_File::deleteEntityFile('civicrm_mailing',
-      $id
-    );
-
-    $dao = new CRM_Mailing_DAO_Mailing();
-    $dao->id = $id;
-    $dao->delete();
-
-    CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
-
-    CRM_Utils_Hook::post('delete', 'Mailing', $id, $dao);
   }
 
   /**
