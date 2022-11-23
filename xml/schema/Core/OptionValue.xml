@@ -17,6 +17,9 @@
     <required>true</required>
     <comment>Option ID</comment>
     <add>1.5</add>
+    <html>
+      <label>ID</label>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -54,6 +57,10 @@
     <required>true</required>
     <length>512</length>
     <localizable>true</localizable>
+    <html>
+      <type>Text</type>
+      <label>Label</label>
+    </html>
     <comment>Option string as displayed to users - e.g. the label in an HTML OPTION tag.</comment>
     <add>1.5</add>
   </field>
@@ -63,7 +70,10 @@
     <type>varchar</type>
     <length>512</length>
     <required>true</required>
-    <comment>The actual value stored (as a foreign key) in the data record. Functions which need lookup option_value.title should use civicrm_option_value.option_group_id plus civicrm_option_value.value as the key.</comment>
+    <html>
+      <label>Value</label>
+    </html>
+    <comment>The value that is saved to the database to represent this option.</comment>
     <add>1.5</add>
     <change>3.3</change>
   </field>
@@ -73,6 +83,10 @@
     <type>varchar</type>
     <length>255</length>
     <import>true</import>
+    <readonly>true</readonly>
+    <html>
+      <label>Name</label>
+    </html>
     <comment>Stores a fixed (non-translated) name for this option value. Lookup functions should use the name as the key for the option value row.</comment>
     <add>1.5</add>
   </field>
@@ -122,6 +136,7 @@
       <type>TextArea</type>
       <rows>8</rows>
       <cols>60</cols>
+      <label>Description</label>
     </html>
     <localizable>true</localizable>
     <comment>Optional description.</comment>
@@ -214,6 +229,9 @@
     <type>varchar</type>
     <length>255</length>
     <default>NULL</default>
+    <html>
+      <label>Icon</label>
+    </html>
     <comment>crm-i icon class</comment>
     <add>4.7</add>
   </field>
@@ -221,6 +239,9 @@
     <name>color</name>
     <title>Color</title>
     <type>varchar</type>
+    <html>
+      <label>Color</label>
+    </html>
     <length>255</length>
     <comment>Hex color value e.g. #ffffff</comment>
     <default>NULL</default>

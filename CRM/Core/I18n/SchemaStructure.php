@@ -404,12 +404,14 @@ class CRM_Core_I18n_SchemaStructure {
         'civicrm_option_value' => [
           'label' => [
             'type' => "Text",
+            'label' => "Label",
             'required' => "true",
           ],
           'description' => [
             'type' => "TextArea",
             'rows' => "8",
             'cols' => "60",
+            'label' => "Description",
           ],
         ],
         'civicrm_group' => [
