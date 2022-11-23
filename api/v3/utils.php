@@ -1395,7 +1395,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, $params) {
 function _civicrm_api3_basic_delete($bao_name, &$params) {
   civicrm_api3_verify_mandatory($params, NULL, ['id']);
   _civicrm_api3_check_edit_permissions($bao_name, ['id' => $params['id']]);
-  if (method_exists($bao_name, 'del')) {
+  if (method_exists($bao_name, 'del') && !\Civi\Api4\Utils\ReflectionUtils::isMethodDeprecated($bao_name, 'del')) {
     $args = [&$params['id']];
     $dao = new $bao_name();
     $dao->id = $params['id'];
