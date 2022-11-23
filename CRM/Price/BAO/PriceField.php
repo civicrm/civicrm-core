@@ -382,7 +382,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         foreach ($customOption as $opId => $opt) {
           $preHelpText = $postHelpText = '';
-          $opt['label'] = '<span class="crm-price-amount-label">' . $opt['label'] . '</span>';
+          $opt['label'] = !empty($opt['label']) ? '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' : '';
           if (!empty($opt['help_pre'])) {
             $preHelpText = '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span><span class="crm-price-amount-help-pre-separator">:&nbsp;</span>';
           }
@@ -567,7 +567,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
 
           $preHelpText = $postHelpText = '';
-          $opt['label'] = '<span class="crm-price-amount-label">' . $opt['label'] . '</span>';
+          $opt['label'] = !empty($opt['label']) ? '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' : '';
           if (!empty($opt['help_pre'])) {
             $preHelpText = '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span><span class="crm-price-amount-help-pre-separator">:&nbsp;</span>';
           }
