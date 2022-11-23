@@ -342,6 +342,45 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test APIv4 calculated field master_id
+   */
+  public function testMessageTemplateMasterID() {
+    CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
+      $tx->rollback();
+
+      $messageTemplateID = MessageTemplate::get()
+        ->addWhere('is_default', '=', 1)
+        ->addWhere('workflow_name', '=', 'contribution_offline_receipt')
+        ->addSelect('id')
+        ->execute()->first()['id'];
+      $messageTemplateIDReserved = MessageTemplate::get()
+        ->addWhere('is_reserved', '=', 1)
+        ->addWhere('workflow_name', '=', 'contribution_offline_receipt')
+        ->addSelect('id')
+        ->execute()->first()['id'];
+      $master_id = MessageTemplate::get()
+        ->addSelect('master_id')
+        ->addWhere('id', '=', $messageTemplateID)
+        ->execute()->first()['master_id'];
+      $this->assertNull($master_id);
+
+      MessageTemplate::update()
+        ->addWhere('id', '=', $messageTemplateID)
+        ->setValues([
+          'msg_subject' => 'Hello world',
+          'msg_text' => 'Hello world',
+          'msg_html' => '<p>Hello world</p>',
+        ])
+        ->execute();
+      $master_id = MessageTemplate::get()
+        ->addSelect('master_id')
+        ->addWhere('id', '=', $messageTemplateID)
+        ->execute()->first()['master_id'];
+      $this->assertEquals($master_id, $messageTemplateIDReserved);
+    });
+  }
+
+  /**
    * Test rendering of domain tokens.
    *
    * @throws \CRM_Core_Exception
