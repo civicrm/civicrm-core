@@ -203,6 +203,14 @@ class Locale {
       $validDbLocales = \Civi::settings()->get('languageLimit');
       $locale->db = static::pickFirstLocale(array_keys($validDbLocales), $fallbacks) ?: $systemDefault;
     }
+
+    // Determine locale for UF APIs: This next bit is a little bit wrong.
+    // We should have something like `$validUfLanguages` and pick the closest match.
+    // Or perhaps each `CRM_Utils_System_{$UF}` should have a `negotiate()` helper.
+    // But it's a academic... D7/D8/BD are the only UF's which implement `setUFLocale`/`getUFLocale`,
+    // and they drop the country-code - which basically addresses the goal (falling back to a more generic locale).
+    $locale->uf = $locale->ts;
+
     return $locale;
   }
 
