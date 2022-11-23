@@ -201,7 +201,7 @@ class CRM_Utils_VersionCheck {
       'CRM_Member_DAO_MembershipBlock' => 'is_active = 1',
       'CRM_Pledge_DAO_Pledge' => 'is_test = 0',
       'CRM_Pledge_DAO_PledgeBlock' => NULL,
-      'CRM_Mailing_Event_DAO_Delivered' => NULL,
+      'CRM_Mailing_Event_DAO_MailingEventDelivered' => NULL,
     ];
     foreach ($tables as $daoName => $where) {
       if (class_exists($daoName)) {

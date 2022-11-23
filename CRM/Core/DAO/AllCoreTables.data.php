@@ -432,14 +432,14 @@ return [
     'class' => 'CRM_Contact_DAO_GroupOrganization',
     'table' => 'civicrm_group_organization',
   ],
-  'CRM_Mailing_Event_DAO_Subscribe' => [
-    'name' => 'Subscribe',
-    'class' => 'CRM_Mailing_Event_DAO_Subscribe',
+  'CRM_Mailing_Event_DAO_MailingEventSubscribe' => [
+    'name' => 'MailingEventSubscribe',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventSubscribe',
     'table' => 'civicrm_mailing_event_subscribe',
   ],
-  'CRM_Mailing_Event_DAO_Confirm' => [
-    'name' => 'Confirm',
-    'class' => 'CRM_Mailing_Event_DAO_Confirm',
+  'CRM_Mailing_Event_DAO_MailingEventConfirm' => [
+    'name' => 'MailingEventConfirm',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventConfirm',
     'table' => 'civicrm_mailing_event_confirm',
   ],
   'CRM_Contribute_DAO_ContributionPage' => [
@@ -602,9 +602,9 @@ return [
     'class' => 'CRM_Mailing_DAO_MailingJob',
     'table' => 'civicrm_mailing_job',
   ],
-  'CRM_Mailing_DAO_Recipients' => [
-    'name' => 'Recipients',
-    'class' => 'CRM_Mailing_DAO_Recipients',
+  'CRM_Mailing_DAO_MailingRecipients' => [
+    'name' => 'MailingRecipients',
+    'class' => 'CRM_Mailing_DAO_MailingRecipients',
     'table' => 'civicrm_mailing_recipients',
   ],
   'CRM_Mailing_DAO_Spool' => [
@@ -612,44 +612,44 @@ return [
     'class' => 'CRM_Mailing_DAO_Spool',
     'table' => 'civicrm_mailing_spool',
   ],
-  'CRM_Mailing_Event_DAO_Queue' => [
+  'CRM_Mailing_Event_DAO_MailingEventQueue' => [
     'name' => 'MailingEventQueue',
-    'class' => 'CRM_Mailing_Event_DAO_Queue',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventQueue',
     'table' => 'civicrm_mailing_event_queue',
   ],
-  'CRM_Mailing_Event_DAO_Bounce' => [
-    'name' => 'Bounce',
-    'class' => 'CRM_Mailing_Event_DAO_Bounce',
+  'CRM_Mailing_Event_DAO_MailingEventBounce' => [
+    'name' => 'MailingEventBounce',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventBounce',
     'table' => 'civicrm_mailing_event_bounce',
   ],
-  'CRM_Mailing_Event_DAO_Delivered' => [
-    'name' => 'Delivered',
-    'class' => 'CRM_Mailing_Event_DAO_Delivered',
+  'CRM_Mailing_Event_DAO_MailingEventDelivered' => [
+    'name' => 'MailingEventDelivered',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventDelivered',
     'table' => 'civicrm_mailing_event_delivered',
   ],
-  'CRM_Mailing_Event_DAO_Forward' => [
-    'name' => 'Forward',
-    'class' => 'CRM_Mailing_Event_DAO_Forward',
+  'CRM_Mailing_Event_DAO_MailingEventForward' => [
+    'name' => 'MailingEventForward',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventForward',
     'table' => 'civicrm_mailing_event_forward',
   ],
-  'CRM_Mailing_Event_DAO_Opened' => [
-    'name' => 'Opened',
-    'class' => 'CRM_Mailing_Event_DAO_Opened',
+  'CRM_Mailing_Event_DAO_MailingEventOpened' => [
+    'name' => 'MailingEventOpened',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventOpened',
     'table' => 'civicrm_mailing_event_opened',
   ],
-  'CRM_Mailing_Event_DAO_Reply' => [
-    'name' => 'Reply',
-    'class' => 'CRM_Mailing_Event_DAO_Reply',
+  'CRM_Mailing_Event_DAO_MailingEventReply' => [
+    'name' => 'MailingEventReply',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventReply',
     'table' => 'civicrm_mailing_event_reply',
   ],
-  'CRM_Mailing_Event_DAO_TrackableURLOpen' => [
-    'name' => 'TrackableURLOpen',
-    'class' => 'CRM_Mailing_Event_DAO_TrackableURLOpen',
+  'CRM_Mailing_Event_DAO_MailingEventClickThrough' => [
+    'name' => 'MailingEventClickThrough',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventClickThrough',
     'table' => 'civicrm_mailing_event_trackable_url_open',
   ],
-  'CRM_Mailing_Event_DAO_Unsubscribe' => [
-    'name' => 'Unsubscribe',
-    'class' => 'CRM_Mailing_Event_DAO_Unsubscribe',
+  'CRM_Mailing_Event_DAO_MailingEventUnsubscribe' => [
+    'name' => 'MailingEventUnsubscribe',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventUnsubscribe',
     'table' => 'civicrm_mailing_event_unsubscribe',
   ],
   'CRM_Contribute_DAO_ContributionRecur' => [

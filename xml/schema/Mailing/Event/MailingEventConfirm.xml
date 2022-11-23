@@ -2,7 +2,7 @@
 
 <table>
   <base>CRM/Mailing/Event</base>
-  <class>Confirm</class>
+  <class>MailingEventConfirm</class>
   <name>civicrm_mailing_event_confirm</name>
   <comment>Tracks when a subscription event is confirmed by email</comment>
   <archive>true</archive>

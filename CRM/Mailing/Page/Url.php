@@ -32,7 +32,7 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
   public function run() {
     $queue_id = CRM_Utils_Request::retrieveValue('qid', 'Integer');
     $url_id = CRM_Utils_Request::retrieveValue('u', 'Integer', NULL, TRUE);
-    $url = trim(CRM_Mailing_Event_BAO_TrackableURLOpen::track($queue_id, $url_id));
+    $url = trim(CRM_Mailing_Event_BAO_MailingEventClickThrough::track($queue_id, $url_id));
     $query_string = $this->extractPassthroughParameters();
 
     if (strlen($query_string) > 0) {

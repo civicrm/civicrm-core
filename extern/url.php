@@ -18,7 +18,7 @@ if (!$url_id) {
 }
 
 require_once 'CRM/Mailing/Event/BAO/TrackableURLOpen.php';
-$url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($queue_id, $url_id);
+$url = CRM_Mailing_Event_BAO_MailingEventClickThrough::track($queue_id, $url_id);
 
 // CRM-7103
 // Looking for additional query variables and append them when redirecting.

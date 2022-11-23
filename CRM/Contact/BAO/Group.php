@@ -52,7 +52,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     // added for CRM-1631 and CRM-1794
     // delete all subscribed mails with the selected group id
-    $subscribe = new CRM_Mailing_Event_DAO_Subscribe();
+    $subscribe = new CRM_Mailing_Event_DAO_MailingEventSubscribe();
     $subscribe->group_id = $id;
     $subscribe->delete();
 

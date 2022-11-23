@@ -644,7 +644,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           $entryFound = TRUE;
         }
         if (array_key_exists('civicrm_mailing_event_opened_open_count', $row)) {
-          $rows[$rowNum]['civicrm_mailing_event_opened_open_count'] = CRM_Mailing_Event_BAO_Opened::getTotalCount($row['civicrm_mailing_id']);
+          $rows[$rowNum]['civicrm_mailing_event_opened_open_count'] = CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($row['civicrm_mailing_id']);
           $entryFound = TRUE;
         }
       }

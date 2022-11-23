@@ -285,10 +285,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public static function toBeSkipped_get($sequential = FALSE) {
     $entitiesWithoutGet = [
-      'MailingEventSubscribe',
-      'MailingEventConfirm',
       'MailingEventResubscribe',
-      'MailingEventUnsubscribe',
       'Location',
     ];
     if ($sequential === TRUE) {

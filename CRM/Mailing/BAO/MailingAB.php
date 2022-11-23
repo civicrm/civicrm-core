@@ -84,10 +84,10 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB implements \Ci
     CRM_Mailing_BAO_Mailing::getRecipients($dao->mailing_id_a);
 
     //calculate total number of random recipients for mail C from group_percentage selected
-    $totalCount = CRM_Mailing_BAO_Recipients::mailingSize($dao->mailing_id_a);
+    $totalCount = CRM_Mailing_BAO_MailingRecipients::mailingSize($dao->mailing_id_a);
     $totalSelected = max(1, round(($totalCount * $dao->group_percentage) / 100));
 
-    CRM_Mailing_BAO_Recipients::reassign($dao->mailing_id_a, [
+    CRM_Mailing_BAO_MailingRecipients::reassign($dao->mailing_id_a, [
       $dao->mailing_id_b => (2 * $totalSelected <= $totalCount) ? $totalSelected : $totalCount - $totalSelected,
       $dao->mailing_id_c => max(0, $totalCount - $totalSelected - $totalSelected),
     ]);

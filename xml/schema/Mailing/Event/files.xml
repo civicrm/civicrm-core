@@ -2,15 +2,15 @@
 
 <tables xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<xi:include href="Queue.xml"            parse="xml" />
-<xi:include href="Bounce.xml"           parse="xml" />
-<xi:include href="Delivered.xml"        parse="xml" />
-<xi:include href="Forward.xml"          parse="xml" />
-<xi:include href="Opened.xml"           parse="xml" />
-<xi:include href="Reply.xml"            parse="xml" />
-<xi:include href="Subscribe.xml"        parse="xml" />
-<xi:include href="Confirm.xml"          parse="xml" />
-<xi:include href="TrackableURLOpen.xml" parse="xml" />
-<xi:include href="Unsubscribe.xml"      parse="xml" />
+<xi:include href="MailingEventQueue.xml"            parse="xml" />
+<xi:include href="MailingEventBounce.xml"           parse="xml" />
+<xi:include href="MailingEventDelivered.xml"        parse="xml" />
+<xi:include href="MailingEventForward.xml"          parse="xml" />
+<xi:include href="MailingEventOpened.xml"           parse="xml" />
+<xi:include href="MailingEventReply.xml"            parse="xml" />
+<xi:include href="MailingEventSubscribe.xml"        parse="xml" />
+<xi:include href="MailingEventConfirm.xml"          parse="xml" />
+<xi:include href="MailingEventClickThrough.xml" parse="xml" />
+<xi:include href="MailingEventUnsubscribe.xml"      parse="xml" />
 
 </tables>

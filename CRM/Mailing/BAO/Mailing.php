@@ -834,7 +834,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
             'email_id' => $dao->email_id,
             'contact_id' => $groupContact,
           ];
-          CRM_Mailing_Event_BAO_Queue::create($params);
+          CRM_Mailing_Event_BAO_MailingEventQueue::create($params);
         }
       }
     }
@@ -1747,15 +1747,15 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'mailing_group' => CRM_Mailing_DAO_MailingGroup::getTableName(),
       'group' => CRM_Contact_BAO_Group::getTableName(),
       'job' => CRM_Mailing_BAO_MailingJob::getTableName(),
-      'queue' => CRM_Mailing_Event_BAO_Queue::getTableName(),
-      'delivered' => CRM_Mailing_Event_BAO_Delivered::getTableName(),
-      'opened' => CRM_Mailing_Event_BAO_Opened::getTableName(),
-      'reply' => CRM_Mailing_Event_BAO_Reply::getTableName(),
-      'unsubscribe' => CRM_Mailing_Event_BAO_Unsubscribe::getTableName(),
-      'bounce' => CRM_Mailing_Event_BAO_Bounce::getTableName(),
-      'forward' => CRM_Mailing_Event_BAO_Forward::getTableName(),
+      'queue' => CRM_Mailing_Event_BAO_MailingEventQueue::getTableName(),
+      'delivered' => CRM_Mailing_Event_BAO_MailingEventDelivered::getTableName(),
+      'opened' => CRM_Mailing_Event_BAO_MailingEventOpened::getTableName(),
+      'reply' => CRM_Mailing_Event_BAO_MailingEventReply::getTableName(),
+      'unsubscribe' => CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName(),
+      'bounce' => CRM_Mailing_Event_BAO_MailingEventBounce::getTableName(),
+      'forward' => CRM_Mailing_Event_BAO_MailingEventForward::getTableName(),
       'url' => CRM_Mailing_BAO_TrackableURL::getTableName(),
-      'urlopen' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTableName(),
+      'urlopen' => CRM_Mailing_Event_BAO_MailingEventClickThrough::getTableName(),
       'component' => CRM_Mailing_BAO_MailingComponent::getTableName(),
       'spool' => CRM_Mailing_BAO_Spool::getTableName(),
     ];
@@ -1953,17 +1953,17 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
       // compute open total separately to discount duplicates
       // CRM-1258
-      $row['opened'] = CRM_Mailing_Event_BAO_Opened::getTotalCount($mailing_id, $mailing->id, TRUE);
+      $row['opened'] = CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($mailing_id, $mailing->id, TRUE);
       $report['event_totals']['opened'] += $row['opened'];
-      $row['total_opened'] = CRM_Mailing_Event_BAO_Opened::getTotalCount($mailing_id, $mailing->id);
+      $row['total_opened'] = CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($mailing_id, $mailing->id);
       $report['event_totals']['total_opened'] += $row['total_opened'];
 
       // compute unsub total separately to discount duplicates
       // CRM-1783
-      $row['unsubscribe'] = CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($mailing_id, $mailing->id, TRUE, TRUE);
+      $row['unsubscribe'] = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTotalCount($mailing_id, $mailing->id, TRUE, TRUE);
       $report['event_totals']['unsubscribe'] += $row['unsubscribe'];
 
-      $row['optout'] = CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($mailing_id, $mailing->id, TRUE, FALSE);
+      $row['optout'] = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTotalCount($mailing_id, $mailing->id, TRUE, FALSE);
       $report['event_totals']['optout'] += $row['optout'];
 
       foreach (array_keys(CRM_Mailing_BAO_MailingJob::fields()) as $field) {
@@ -2008,7 +2008,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['jobs'][] = $row;
     }
 
-    $report['event_totals']['queue'] = CRM_Mailing_BAO_Recipients::mailingSize($mailing_id);
+    $report['event_totals']['queue'] = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing_id);
 
     if (!empty($report['event_totals']['queue'])) {
       $report['event_totals']['delivered_rate'] = (100.0 * $report['event_totals']['delivered']) / $report['event_totals']['queue'];
@@ -2821,8 +2821,8 @@ ORDER BY civicrm_mailing.name";
 
     //CRM-12814
     if (!empty($mailings)) {
-      $openCounts = CRM_Mailing_Event_BAO_Opened::getMailingContactCount(array_keys($mailings), $params['contact_id']);
-      $clickCounts = CRM_Mailing_Event_BAO_TrackableURLOpen::getMailingContactCount(array_keys($mailings), $params['contact_id']);
+      $openCounts = CRM_Mailing_Event_BAO_MailingEventOpened::getMailingContactCount(array_keys($mailings), $params['contact_id']);
+      $clickCounts = CRM_Mailing_Event_BAO_MailingEventClickThrough::getMailingContactCount(array_keys($mailings), $params['contact_id']);
     }
 
     // format params and add links

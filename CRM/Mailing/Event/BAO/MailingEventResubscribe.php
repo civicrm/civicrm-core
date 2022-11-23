@@ -40,14 +40,14 @@ class CRM_Mailing_Event_BAO_Resubscribe {
   public static function &resub_to_mailing($job_id, $queue_id, $hash) {
     // First make sure there's a matching queue event.
 
-    $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
     $success = NULL;
     if (!$q) {
       return $success;
     }
 
     // check if this queue_id was actually unsubscribed
-    $ue = new CRM_Mailing_Event_BAO_Unsubscribe();
+    $ue = new CRM_Mailing_Event_BAO_MailingEventUnsubscribe();
     $ue->event_queue_id = $queue_id;
     $ue->org_unsubscribe = 0;
     if (!$ue->find(TRUE)) {
@@ -155,7 +155,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     }
 
     // remove entry from Unsubscribe table.
-    $ue = new CRM_Mailing_Event_BAO_Unsubscribe();
+    $ue = new CRM_Mailing_Event_BAO_MailingEventUnsubscribe();
     $ue->event_queue_id = $queue_id;
     $ue->org_resubscribe = 0;
     if ($ue->find(TRUE)) {
@@ -187,7 +187,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
     $contacts = CRM_Contact_DAO_Contact::getTableName();
     $email = CRM_Core_DAO_Email::getTableName();
-    $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $queue = CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
 
     //get the default domain email address.
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();

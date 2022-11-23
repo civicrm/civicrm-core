@@ -2,13 +2,13 @@
 
 <table>
   <base>CRM/Mailing</base>
-  <class>Recipients</class>
+  <class>MailingRecipients</class>
   <name>civicrm_mailing_recipients</name>
   <comment>Stores information about the recipients of a mailing.</comment>
   <archive>true</archive>
   <component>CiviMail</component>
-  <title>Recipient</title>
-  <titlePlural>Recipients</titlePlural>
+  <title>Mailing Recipient</title>
+  <titlePlural>Mailing Recipients</titlePlural>
   <field>
     <name>id</name>
     <title>Mailing Recipients ID</title>

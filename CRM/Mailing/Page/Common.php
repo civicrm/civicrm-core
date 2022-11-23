@@ -38,7 +38,7 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
     }
 
     // verify that the three numbers above match
-    $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
     if (!$q) {
       throw new CRM_Core_Exception(ts("There was an error in your request"));
     }
@@ -51,12 +51,12 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
 
     $confirm = CRM_Utils_Request::retrieve('confirm', 'Boolean');
 
-    list($displayName, $email) = CRM_Mailing_Event_BAO_Queue::getContactInfo($queue_id);
+    list($displayName, $email) = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);
     $this->assign('display_name', $displayName);
     $this->assign('email', $email);
     $this->assign('confirm', $confirm);
 
-    $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($job_id, $queue_id, $hash, TRUE);
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job_id, $queue_id, $hash, TRUE);
     $this->assign('groups', $groups);
     $groupExist = NULL;
     foreach ($groups as $key => $value) {
@@ -68,9 +68,9 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
 
     if ($confirm) {
       if ($this->_type == 'unsubscribe') {
-        $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($job_id, $queue_id, $hash);
+        $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job_id, $queue_id, $hash);
         if (count($groups)) {
-          CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($queue_id, $groups, FALSE, $job_id);
+          CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($queue_id, $groups, FALSE, $job_id);
         }
         else {
           // should we indicate an error, or just ignore?
@@ -86,8 +86,8 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
         }
       }
       else {
-        if (CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_domain($job_id, $queue_id, $hash)) {
-          CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($queue_id, NULL, TRUE, $job_id);
+        if (CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_domain($job_id, $queue_id, $hash)) {
+          CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($queue_id, NULL, TRUE, $job_id);
         }
         else {
           // should we indicate an error, or just ignore?

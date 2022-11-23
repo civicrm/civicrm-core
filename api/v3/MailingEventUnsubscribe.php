@@ -17,6 +17,17 @@
  */
 
 /**
+ * Get mailing event unsubscribe record.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_mailing_event_unsubscribe_get($params) {
+  return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_MailingEventUnsubscribe', $params);
+}
+
+/**
  * Unsubscribe from mailing group.
  *
  * @param array $params
@@ -31,19 +42,19 @@ function civicrm_api3_mailing_event_unsubscribe_create($params) {
   $queue = $params['event_queue_id'];
   $hash = $params['hash'];
   if (empty($params['org_unsubscribe'])) {
-    $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($job, $queue, $hash);
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job, $queue, $hash);
     if (count($groups)) {
-      CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($queue, $groups, FALSE, $job);
+      CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($queue, $groups, FALSE, $job);
       return civicrm_api3_create_success($params);
     }
   }
   else {
-    $unsubs = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_domain($job, $queue, $hash);
+    $unsubs = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_domain($job, $queue, $hash);
     if (!$unsubs) {
       return civicrm_api3_create_error('Domain Queue event could not be found');
     }
 
-    CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($queue, NULL, TRUE, $job);
+    CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($queue, NULL, TRUE, $job);
     return civicrm_api3_create_success($params);
   }
 
