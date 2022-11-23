@@ -614,7 +614,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if ($field['type'] !== 'Custom' && !in_array($field['name'], $exposedFields, TRUE)) {
       return;
     }
-    $field['audience'] = 'user';
+    $field['audience'] = $field['audience'] ?? 'user';
     if ($field['name'] === 'contact_id') {
       // Since {contact.id} is almost always present don't confuse users
       // by also adding (e.g {participant.contact_id)
@@ -627,7 +627,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       // Convert to apiv3 style for now. Later we can add v4 with
       // portable naming & support for labels/ dates etc so let's leave
       // the space open for that.
-      // Not the existing quickform widget has handling for the custom field
+      // Not the existing QuickForm widget has handling for the custom field
       // format based on the title using this syntax.
       $parts = explode(': ', $field['label']);
       $field['title'] = "{$parts[1]} :: {$parts[0]}";
