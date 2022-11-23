@@ -63,7 +63,7 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
     $paymentInstruments = $this->callAPISuccess('Contribution', 'getoptions', ['field' => 'payment_instrument_id'])['values'];
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', [])['values'];
     foreach ($paymentInstruments as $paymentInstrumentID => $paymentInstrumentName) {
-      $financialAccountID = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($paymentInstrumentID);
+      $financialAccountID = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($paymentInstrumentID);
       if (in_array($paymentInstrumentName, ['Credit Card', 'Debit Card'])) {
         $this->assertEquals('Payment Processor Account', $financialAccounts[$financialAccountID]['name']);
       }

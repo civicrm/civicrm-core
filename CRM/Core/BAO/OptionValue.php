@@ -220,7 +220,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
           'account_relationship' => $relationTypeId,
           'financial_account_id' => $params['financial_account_id'],
         ];
-        CRM_Financial_BAO_FinancialTypeAccount::add($params);
+        CRM_Financial_BAO_EntityFinancialAccount::add($params);
       }
     }
     return $optionValue;

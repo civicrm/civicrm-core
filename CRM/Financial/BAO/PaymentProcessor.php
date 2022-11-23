@@ -71,7 +71,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
         'account_relationship' => $relationTypeId,
         'financial_account_id' => $params['financial_account_id'],
       ];
-      CRM_Financial_BAO_FinancialTypeAccount::add($values);
+      CRM_Financial_BAO_EntityFinancialAccount::add($values);
     }
 
     if (isset($params['id']) && isset($params['is_active']) && !isset($params['is_test'])) {

@@ -94,7 +94,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'account_relationship' => 10,
       'financial_account_id' => $this->financialAccountId,
     ];
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialRelationParams);
+    CRM_Financial_BAO_EntityFinancialAccount::add($financialRelationParams);
 
     // Financial type with 5% tax rate
     $financialAccountHalfTax = [
@@ -124,7 +124,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'financial_account_id' => $this->halfFinancialAccId,
     ];
 
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialRelationHalftax);
+    CRM_Financial_BAO_EntityFinancialAccount::add($financialRelationHalftax);
 
     // Enable component contribute setting
     $this->enableTaxAndInvoicing();
@@ -493,7 +493,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ];
 
     $result = [];
-    CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
+    CRM_Financial_BAO_EntityFinancialAccount::retrieve($searchParams, $result);
     return $result['financial_account_id'] ?? NULL;
   }
 
