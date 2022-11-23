@@ -4126,21 +4126,21 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $entityFinancialTrxns = $this->getFinancialTransactionsForContribution($contributionID);
 
     $originalTrxnParams = [
-      'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($originalInstrumentID),
+      'to_financial_account_id' => CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($originalInstrumentID),
       'payment_instrument_id' => $originalInstrumentID,
       'amount' => $amount,
       'status_id' => 1,
     ];
 
     $reversalTrxnParams = [
-      'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($originalInstrumentID),
+      'to_financial_account_id' => CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($originalInstrumentID),
       'payment_instrument_id' => $originalInstrumentID,
       'amount' => -$amount,
       'status_id' => 1,
     ];
 
     $newTrxnParams = [
-      'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($newInstrumentID),
+      'to_financial_account_id' => CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($newInstrumentID),
       'payment_instrument_id' => $newInstrumentID,
       'amount' => $amount,
       'status_id' => 1,
@@ -4233,7 +4233,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         ];
       }
       if ($context === 'paymentInstrument') {
-        $compareParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($instrumentId);
+        $compareParams['to_financial_account_id'] = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($instrumentId);
         $compareParams['payment_instrument_id'] = $instrumentId;
       }
       else {
@@ -4273,7 +4273,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'account_relationship' => $relationTypeId,
       'financial_account_id' => 7,
     ];
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialParams);
+    CRM_Financial_BAO_EntityFinancialAccount::add($financialParams);
     $this->assertNotEmpty($optionValue['values'][$optionValue['id']]['value']);
     return $optionValue['values'][$optionValue['id']]['value'];
   }

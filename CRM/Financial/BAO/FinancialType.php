@@ -144,7 +144,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     if ($event->action === 'create') {
-      $titles = CRM_Financial_BAO_FinancialTypeAccount::createDefaultFinancialAccounts($event->object);
+      $titles = CRM_Financial_BAO_EntityFinancialAccount::createDefaultFinancialAccounts($event->object);
       $event->object->titles = $titles;
     }
     if ($event->action === 'delete') {

@@ -2988,7 +2988,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'account_relationship' => $relationTypeID,
       'financial_account_id' => $this->callAPISuccess('FinancialAccount', 'getValue', ['name' => $financialAccountName, 'return' => 'id']),
     ];
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+    CRM_Financial_BAO_EntityFinancialAccount::add($financialAccountParams);
 
     return CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $params['label']);
   }
@@ -3074,7 +3074,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     }
     $entityParams['financial_account_id'] = $financialAccountID;
 
-    return CRM_Financial_BAO_FinancialTypeAccount::add($entityParams);
+    return CRM_Financial_BAO_EntityFinancialAccount::add($entityParams);
   }
 
   /**

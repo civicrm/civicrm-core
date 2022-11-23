@@ -1028,7 +1028,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'account_relationship' => 10,
       'financial_account_id' => $financialAccountId,
     ];
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+    CRM_Financial_BAO_EntityFinancialAccount::add($financialAccountParams);
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     $this->assertEquals('5.00', round($taxRates[$financialType['id']], 2));
   }
