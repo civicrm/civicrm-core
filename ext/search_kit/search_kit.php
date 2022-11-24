@@ -82,17 +82,6 @@ function search_kit_civicrm_angularModules(&$angularModules) {
 }
 
 /**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function search_kit_civicrm_entityTypes(&$entityTypes) {
-  _search_kit_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
  * Implements hook_civicrm_pre().
  */
 function search_kit_civicrm_pre($op, $entity, $id, &$params) {
