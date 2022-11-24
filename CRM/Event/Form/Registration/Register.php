@@ -428,8 +428,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // https://github.com/civicrm/civicrm-core/pull/19151
       $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56));
       self::buildAmount($this);
-      //CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-      //$this->addPaymentProcessorFieldsToForm();
+      if (!$this->showPaymentOnConfirm) {
+        CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+        $this->addPaymentProcessorFieldsToForm();
+      }
     }
 
     if ($contactID === 0 && !$this->_values['event']['is_multiple_registrations']) {
@@ -905,7 +907,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($form->_values['event']['is_monetary']) {
       if (empty($form->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 &&
         !isset($fields['payment_processor_id'])) {
-        // $errors['payment_processor_id'] = ts('Please select a Payment Method');
+        if (!$form->showPaymentOnConfirm) {
+          $errors['payment_processor_id'] = ts('Please select a Payment Method');
+        }
       }
 
       if (self::isZeroAmount($fields, $form)) {

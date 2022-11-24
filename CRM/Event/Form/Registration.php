@@ -179,6 +179,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $paymentInstrumentID;
 
   /**
+   * Should the payment element be shown on the confirm page instead of the first page?
+   *
+   * @var bool
+   */
+  protected $showPaymentOnConfirm = FALSE;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -217,6 +224,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     //get the additional participant ids.
     $this->_additionalParticipantIds = $this->get('additionalParticipantIds');
+
+    $this->showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
 
     if (!$this->_values) {
       // this is the first time we are hitting this, so check for permissions here
