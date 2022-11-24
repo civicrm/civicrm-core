@@ -1,5 +1,6 @@
 <?php
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Mapping;
 use Civi\Api4\UserJob;
 use Civi\BAO\Import;
@@ -157,10 +158,35 @@ function _civiimport_civicrm_get_import_tables(): array {
  * @param string $templateFile
  *
  * @noinspection PhpUnusedParameterInspection
+ * @throws \CRM_Core_Exception
  */
-function civiimport_civicrm_alterTemplateFile($formName, $form, $type, &$templateFile) {
+function civiimport_civicrm_alterTemplateFile($formName, $form, $type, &$templateFile): void {
   if ($formName === 'CRM_Contribute_Import_Form_MapField') {
     $templateFile = 'CRM/Import/MapField.tpl';
+  }
+  if ($formName === 'CRM_Queue_Page_Monitor') {
+    $jobName = CRM_Utils_Request::retrieveValue('name', 'String');
+    if (strpos($jobName, 'user_job_') === 0) {
+      try {
+        $userJobID = (int) str_replace('user_job_', '', $jobName);
+        $jobType = UserJob::get()->addWhere('id', '=', $userJobID)
+          ->execute()->first()['job_type'];
+        foreach (CRM_Core_BAO_UserJob::getTypes() as $userJobType) {
+          if ($userJobType['id'] === $jobType
+            && is_subclass_of($userJobType['class'], 'CRM_Import_Parser')
+          ) {
+
+            $templateFile = 'CRM/Import/Monitor.tpl';
+            Civi::resources()
+              ->addVars('civiimport', ['url' => CRM_Utils_System::url('civicrm/import/contact/summary', ['reset' => 1, 'user_job_id' => $userJobID])]);
+            break;
+          }
+        }
+      }
+      catch (UnauthorizedException $e) {
+        // We will not do anything here if not permissioned - leave it for the core page.
+      }
+    }
   }
 }
 
