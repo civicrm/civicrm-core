@@ -236,6 +236,9 @@ function civiimport_civicrm_buildForm(string $formName, $form) {
   }
 
   if ($formName === 'CRM_Contact_Import_Form_Summary') {
+    Civi::service('angularjs.loader')->addModules('crmSearchDisplay');
+    Civi::service('angularjs.loader')->addModules('afCore');
+    Civi::service('angularjs.loader')->addModules('af');
     $form->assign('downloadErrorRecordsUrl', '/civicrm/search#/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=ERROR');
   }
 }

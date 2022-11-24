@@ -34,10 +34,21 @@
         {ts count=$invalidRowCount plural='CiviCRM has detected invalid data and/or formatting errors in %count records. These records have not been imported.'}CiviCRM has detected invalid data and/or formatting errors in one record. This record has not been imported.{/ts}
         </p>
         <p class="error">
-        {ts 1=$downloadErrorRecordsUrl|smarty:nodefaults}You can <a href='%1'>See the errors</a>. You may then correct them, and re-import with the corrected data.{/ts}
+        {ts 1=$downloadErrorRecordsUrl|smarty:nodefaults}You can <a href='%1'>see the errors</a>. You may then correct them, and re-import with the corrected data.{/ts}
         </p>
     {/if}
+  I'm here-ere
+  I'm here
+  <crm-angular-js modules="crmSearchDisplay">
+    <af-gui-search display="display"></af-gui-search>
+    <crm-search-display-table search-name="Import_Summary_1" display-name="Import_Summary_1"">
+    </crm-search-display-table>
+    <div af-fieldset="">
+      <crm-search-display-table search-name="Import_Summary_1" display-name="Import_Summary_1"">
+      </crm-search-display-table>
+    </div>
 
+  </crm-angular-js>
     {if $duplicateRowCount}
         <p {if $dupeError}class="error"{/if}>
         {ts count=$duplicateRowCount plural='CiviCRM has detected %count records which are duplicates of existing CiviCRM contact records.'}CiviCRM has detected one record which is a duplicate of existing CiviCRM contact record.{/ts} {$dupeActionString}
