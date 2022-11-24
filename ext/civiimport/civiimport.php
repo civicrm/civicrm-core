@@ -234,4 +234,8 @@ function civiimport_civicrm_buildForm(string $formName, $form) {
       }
     }
   }
+
+  if ($formName === 'CRM_Contact_Import_Form_Summary') {
+    $form->assign('downloadErrorRecordsUrl', '/civicrm/search#/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=ERROR');
+  }
 }
