@@ -333,33 +333,33 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    *
    * @param array $fields
    * @param array $files
-   * @param CRM_Core_Form $self
+   * @param \CRM_Event_Form_Registration_Confirm $form
    *
    * @return array|bool
    */
-  public static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $form) {
     $errors = [];
-    $eventFull = CRM_Event_BAO_Participant::eventFull($self->_eventId, FALSE, $self->_values['event']['has_waitlist'] ?? FALSE);
-    if ($eventFull && empty($self->_allowConfirmation)) {
-      if (empty($self->_allowWaitlist)) {
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "reset=1&id={$self->_eventId}", FALSE, NULL, FALSE, TRUE));
+    $eventFull = CRM_Event_BAO_Participant::eventFull($form->_eventId, FALSE, $form->_values['event']['has_waitlist'] ?? FALSE);
+    if ($eventFull && empty($form->_allowConfirmation)) {
+      if (empty($form->_allowWaitlist)) {
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "reset=1&id={$form->_eventId}", FALSE, NULL, FALSE, TRUE));
       }
     }
-    $self->_feeBlock = $self->_values['fee'];
-    CRM_Event_Form_Registration_Register::formatFieldsForOptionFull($self);
+    $form->_feeBlock = $form->_values['fee'];
+    CRM_Event_Form_Registration_Register::formatFieldsForOptionFull($form);
 
-    if (!empty($self->_priceSetId) &&
-      !$self->_requireApproval && !$self->_allowWaitlist
+    if (!empty($form->_priceSetId) &&
+      !$form->_requireApproval && !$form->_allowWaitlist
       ) {
-      $priceSetErrors = self::validatePriceSet($self, $self->_params);
-      if (!empty($priceSetErrors)) {
+      $errors = self::validatePriceSet($form, $form->_params);
+      if (!empty($errors)) {
         CRM_Core_Session::setStatus(ts('You have been returned to the start of the registration process and any sold out events have been removed from your selections. You will not be able to continue until you review your booking and select different events if you wish.'), ts('Unfortunately some of your options have now sold out for one or more participants.'), 'error');
         CRM_Core_Session::setStatus(ts('Please note that the options which are marked or selected are sold out for participant being viewed.'), ts('Sold out:'), 'error');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "_qf_Register_display=true&qfKey={$fields['qfKey']}"));
       }
     }
 
-    return empty($priceSetErrors) ? TRUE : $priceSetErrors;
+    return empty($errors) ? TRUE : $errors;
   }
 
   /**
