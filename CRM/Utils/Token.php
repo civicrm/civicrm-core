@@ -1593,37 +1593,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * We have a situation where we are rendering more than one token in each field because we are combining
-   * tokens from more than one contribution when pdf thank you letters are grouped (CRM-14367)
-   *
-   * The replaceContributionToken doesn't handle receive_date correctly in this scenario because of the formatting
-   * it applies (other tokens are OK including date fields)
-   *
-   * So we sort this out & then call the main function. Note that we are not escaping smarty on this fields like the main function
-   * does - but the fields is already being formatted through a date function
-   *
-   * @param string $separator
-   * @param string $str
-   * @param array $contributions
-   * @param array $knownTokens
-   *
-   * @deprecated
-   *
-   * @return string
-   */
-  public static function replaceMultipleContributionTokens(string $separator, string $str, array $contributions, array $knownTokens): string {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
-    foreach ($knownTokens['contribution'] ?? [] as $token) {
-      $resolvedTokens = [];
-      foreach ($contributions as $contribution) {
-        $resolvedTokens[] = self::replaceContributionTokens('{contribution.' . $token . '}', $contribution, FALSE, $knownTokens);
-      }
-      $str = self::token_replace('contribution', $token, implode($separator, $resolvedTokens), $str);
-    }
-    return $str;
-  }
-
-  /**
    * Get replacement strings for any membership tokens (only a small number of tokens are implemnted in the first instance
    * - this is used by the pdfLetter task from membership search
    *
