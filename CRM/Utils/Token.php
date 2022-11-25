@@ -1419,6 +1419,7 @@ class CRM_Utils_Token {
    * in CRM_Contribute_Form_Task_PDFLetter.
    */
   protected static function _buildContributionTokens() {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     $key = 'contribution';
 
     if (!isset(Civi::$statics[__CLASS__][__FUNCTION__][$key])) {
@@ -1569,6 +1570,7 @@ class CRM_Utils_Token {
    * @return mixed
    */
   public static function replaceContributionTokens($str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     $key = 'contribution';
     if (!$knownTokens || empty($knownTokens[$key])) {
       //early return
@@ -1685,6 +1687,7 @@ class CRM_Utils_Token {
    * @throws \CRM_Core_Exception
    */
   public static function getContributionTokenReplacement($token, $contribution, $html = FALSE, $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     self::_buildContributionTokens();
 
     switch ($token) {

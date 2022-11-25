@@ -366,42 +366,6 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       }
     }
 
-    $messageToken = CRM_Utils_Token::getTokens($this->schedule->body_text);
-
-    $contributionDetails = CRM_Contribute_BAO_Contribution::replaceContributionTokens(
-      [$this->ids['Contribution']['alice']],
-      $this->schedule->body_text,
-      $messageToken,
-      $this->schedule->body_text,
-      $this->schedule->body_text,
-      $messageToken,
-      TRUE
-    );
-    $expected = [
-      'receive_date = February 1st, 2015',
-      'new style status = Completed',
-      'contribution status id = 1',
-      'id ' . $this->ids['Contribution']['alice'],
-      'contribution_id ' . $this->ids['Contribution']['alice'],
-      'financial type id = 1',
-      'financial type name = Donation',
-      'financial type label = Donation',
-      'payment instrument id = 4',
-      'payment instrument name = Check',
-      'payment instrument label = Check',
-      'legacy source SSF',
-      'source SSF',
-      'non_deductible_amount = € 10.00',
-      'total_amount = € 100.00',
-      'net_amount = € 95.00',
-      'fee_amount = € 5.00',
-      'campaign_id = 1',
-      'campaign name = big_campaign',
-      'campaign label = Campaign',
-    ];
-    foreach ($expected as $string) {
-      $this->assertStringContainsString($string, $contributionDetails[$this->contacts['alice']['id']]['html']);
-    }
     $tokens = [
       'id',
       'payment_instrument_id:label',
