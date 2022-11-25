@@ -2290,11 +2290,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test repeat contribution successfully creates line item.
    *
-   * @throws \CRM_Core_Exception
+   * This is just testing a contribution which matches the recurring.
    */
   public function testRepeatTransaction(): void {
-    $originalContribution = $this->setUpRepeatTransaction([], 'single');
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $originalContribution = $this->setUpRepeatTransaction([], 'single', ['total_amount' => 500, 'net_amount' => 495]);
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
       'contribution_status_id' => 'Completed',
       'trxn_id' => 4567,
@@ -2314,7 +2314,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'price_field_id',
       ],
     ];
-    $lineItem1 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, [
+    $lineItem1 = $this->callAPISuccess('LineItem', 'get', array_merge($lineItemParams, [
       'entity_id' => $originalContribution['id'],
     ]));
     $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, [
@@ -2329,6 +2329,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'id' => $originalContribution['payment_processor_id'],
         'return' => 'payment_instrument_id',
       ]),
+      'total_amount' => 500,
     ], 'online');
   }
 
@@ -4420,7 +4421,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   protected function setUpRepeatTransaction(array $recurParams, $flag, array $contributionParams = []) {
     $paymentProcessorID = $this->paymentProcessorCreate();
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', array_merge([
       'contact_id' => $this->_individualId,
       'installments' => '12',
       'frequency_interval' => '1',
