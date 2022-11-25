@@ -306,19 +306,21 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
   public static function updateUserJobTable($context): bool {
     self::addColumn($context, 'civicrm_user_job', 'job_type', 'varchar(64) NOT NULL');
     // This is really only for rc-upgraders. There has been no stable with type_id.
-    CRM_Core_DAO::executeQuery(
-      "UPDATE civicrm_user_job SET job_type =
-      CASE
-        WHEN type_id = 1 THEN 'contact_import'
-        WHEN type_id = 2 THEN 'contribution_import'
-        WHEN type_id = 3 THEN 'membership_import'
-        WHEN type_id = 4 THEN 'activity_import'
-        WHEN type_id = 5 THEN 'participant_import'
-        WHEN type_id = 6 THEN 'custom_field_import'
-      END
-      "
-    );
-    self::dropColumn($context, 'civicrm_user_job', 'type_id');
+    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_user_job', 'type_id')) {
+      CRM_Core_DAO::executeQuery(
+        "UPDATE civicrm_user_job SET job_type =
+        CASE
+          WHEN type_id = 1 THEN 'contact_import'
+          WHEN type_id = 2 THEN 'contribution_import'
+          WHEN type_id = 3 THEN 'membership_import'
+          WHEN type_id = 4 THEN 'activity_import'
+          WHEN type_id = 5 THEN 'participant_import'
+          WHEN type_id = 6 THEN 'custom_field_import'
+        END
+        "
+      );
+      self::dropColumn($context, 'civicrm_user_job', 'type_id');
+    }
     return TRUE;
   }
 
