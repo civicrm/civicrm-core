@@ -1233,79 +1233,9 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * Test for replaceContributionTokens.
-   *
-   * This function tests whether the contribution tokens are replaced with
-   * values from contribution.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testReplaceContributionTokens(): void {
-    $customGroup = $this->customGroupCreate(['extends' => 'Contribution', 'title' => 'contribution stuff']);
-    $customField = $this->customFieldOptionValueCreate($customGroup, 'myCustomField');
-    $contactId1 = $this->individualCreate();
-    $params = [
-      'contact_id' => $contactId1,
-      'receive_date' => '20120511',
-      'total_amount' => 100.00,
-      'financial_type_id' => 1,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
-      'source' => 'SSF',
-      'contribution_status_id' => 2,
-      "custom_{$customField['id']}" => 'value1',
-      'currency' => 'EUR',
-    ];
-    $contribution1 = $this->contributionCreate($params);
-    $contactId2 = $this->individualCreate();
-    $params = [
-      'contact_id' => $contactId2,
-      'receive_date' => '20150511',
-      'total_amount' => 200.00,
-      'financial_type_id' => 1,
-      'trxn_id' => 6789,
-      'invoice_id' => 12345,
-      'source' => 'ABC',
-      'contribution_status_id' => 1,
-      "custom_{$customField['id']}" => 'value2',
-    ];
-    $contribution2 = $this->contributionCreate($params);
-    $ids = [$contribution1, $contribution2];
-
-    $subject = 'This is a test for contribution ID: {contribution.contribution_id}';
-    $text = 'Contribution Amount: {contribution.total_amount}';
-    $html = "<p>Contribution Source: {contribution.contribution_source}</p></br>
-      <p>Contribution Invoice ID: {contribution.invoice_id}</p></br>
-      <p>Contribution Receive Date: {contribution.receive_date}</p></br>
-      <p>Contribution Custom Field: {contribution.custom_{$customField['id']}}</p></br>
-      {contribution.contribution_status_id:name}";
-
-    $subjectToken = CRM_Utils_Token::getTokens($subject);
-    $messageToken = CRM_Utils_Token::getTokens($text);
-    $messageToken = array_merge($messageToken, CRM_Utils_Token::getTokens($html));
-
-    $contributionDetails = CRM_Contribute_BAO_Contribution::replaceContributionTokens(
-      $ids,
-      $subject,
-      $subjectToken,
-      $text,
-      $html,
-      $messageToken,
-      TRUE
-    );
-
-    $this->assertEquals('Contribution Amount: € 100.00', $contributionDetails[$contactId1]['text'], 'The text does not match');
-    $this->assertEquals('<p>Contribution Source: ABC</p></br>
-      <p>Contribution Invoice ID: 12345</p></br>
-      <p>Contribution Receive Date: May 11th, 2015 12:00 AM</p></br>
-      <p>Contribution Custom Field: Label2</p></br>
-      Completed', $contributionDetails[$contactId2]['html'], 'The html does not match');
-  }
-
-  /**
    * Test for contribution with deferred revenue.
    */
-  public function testContributionWithDeferredRevenue() {
+  public function testContributionWithDeferredRevenue(): void {
     $contactId = $this->individualCreate();
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $params = [
