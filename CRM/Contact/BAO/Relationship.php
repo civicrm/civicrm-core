@@ -51,7 +51,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
     $extendedParams = self::loadExistingRelationshipDetails($params);
     // When id is specified we always wan't to update, so we don't need to
     // check for duplicate relations.
-    if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, $extendedParams['contact_id_a'], $extendedParams['contact_id_b'], CRM_Utils_Array::value('id', $extendedParams, 0))) {
+    if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, (int) $extendedParams['contact_id_a'], (int) $extendedParams['contact_id_b'], CRM_Utils_Array::value('id', $extendedParams, 0))) {
       throw new CRM_Core_Exception('Duplicate Relationship');
     }
     $params = $extendedParams;
@@ -201,9 +201,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
     if (
     self::checkDuplicateRelationship(
       $contactFields,
-      $contactID,
+      (int) $contactID,
       // step 2
-      $relatedContactID
+      (int) $relatedContactID
     )
     ) {
       return [0, 1];
@@ -842,14 +842,14 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
    * @return bool
    *   true if record exists else false
    */
-  public static function checkDuplicateRelationship($params, $id, $contactId = 0, $relationshipId = 0) {
+  public static function checkDuplicateRelationship(array $params, int $id, int $contactId = 0, int $relationshipId = 0): bool {
     $relationshipTypeId = $params['relationship_type_id'] ?? NULL;
     [$type] = explode('_', $relationshipTypeId);
 
-    $queryString = "
+    $queryString = '
 SELECT id
 FROM   civicrm_relationship
-WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
+WHERE  is_active = 1 AND relationship_type_id = ' . CRM_Utils_Type::escape($type, 'Integer');
 
     /*
      * CRM-11792 - date fields from API are in ISO format, but this function

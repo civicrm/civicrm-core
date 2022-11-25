@@ -266,9 +266,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if (
       CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
         $contactFields,
-        $contactID,
+        (int) $contactID,
         // step 2
-        $relatedContactID
+        (int) $relatedContactID
       )
     ) {
       return [0, 1];
