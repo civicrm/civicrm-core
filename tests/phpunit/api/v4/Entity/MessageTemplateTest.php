@@ -22,6 +22,7 @@ use api\v4\Api4TestBase;
 use Civi\Test\DbTestTrait;
 use Civi\Test\GenericAssertionsTrait;
 use Civi\Test\TransactionalInterface;
+use Civi\Api4\MessageTemplate;
 
 /**
  * @group headless
@@ -132,6 +133,56 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
     $saved = civicrm_api4('MessageTemplate', 'save', ['records' => [array_merge(['id' => NULL, 'is_reserved' => 0], $this->baseTpl)]])->first();
     $this->assertDBQuery('My Template', 'SELECT msg_title FROM civicrm_msg_template WHERE id = %1', [1 => [$saved['id'], 'Int']]);
     $this->assertDBQuery('<p>My body as HTML</p>', 'SELECT msg_html FROM civicrm_msg_template WHERE id = %1', [1 => [$saved['id'], 'Int']]);
+  }
+
+  /**
+   * Test APIv4 calculated field master_id
+   */
+  public function testMessageTemplateMasterID() {
+    \CRM_Core_Transaction::create(TRUE)->run(function(\CRM_Core_Transaction $tx) {
+      $tx->rollback();
+
+      $messageTemplateID = MessageTemplate::get()
+        ->addWhere('is_default', '=', 1)
+        ->addWhere('workflow_name', '=', 'contribution_offline_receipt')
+        ->addSelect('id')
+        ->execute()->first()['id'];
+      $messageTemplateIDReserved = MessageTemplate::get()
+        ->addWhere('is_reserved', '=', 1)
+        ->addWhere('workflow_name', '=', 'contribution_offline_receipt')
+        ->addSelect('id')
+        ->execute()->first()['id'];
+      $msgTpl = MessageTemplate::get()
+        ->addSelect('msg_subject', 'master_id', 'master_id.msg_subject')
+        ->addWhere('id', '=', $messageTemplateID)
+        ->execute()->first();
+      // confirm subject is set
+      $this->assertNotNull($msgTpl['msg_subject']);
+      // message is unchanged from original so both of these should be null
+      $this->assertNull($msgTpl['master_id']);
+      $this->assertNull($msgTpl['master_id.msg_subject']);
+
+      MessageTemplate::update()
+        ->addWhere('id', '=', $messageTemplateID)
+        ->setValues([
+          'msg_subject' => 'Hello world',
+          'msg_text' => 'Hello world',
+          'msg_html' => '<p>Hello world</p>',
+        ])
+        ->execute();
+      $msgTpl = MessageTemplate::get()
+        ->addSelect('msg_subject', 'master_id', 'master_id.msg_subject')
+        ->addWhere('id', '=', $messageTemplateID)
+        ->execute()->first();
+      // confirm subject is set
+      $this->assertNotNull($msgTpl['msg_subject']);
+      // message is changed so both of these should be set
+      $this->assertEquals($msgTpl['master_id'], $messageTemplateIDReserved);
+      $this->assertNotNull($msgTpl['master_id.msg_subject']);
+      // these should be different
+      $this->assertNotEquals($msgTpl['msg_subject'], $msgTpl['master_id.msg_subject']);
+
+    });
   }
 
 }
