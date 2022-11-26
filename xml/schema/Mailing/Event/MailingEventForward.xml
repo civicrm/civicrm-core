@@ -7,14 +7,15 @@
   <comment>Tracks when a contact forwards a mailing to a (new) contact</comment>
   <archive>true</archive>
   <component>CiviMail</component>
-  <title>Mailing Forwarded Event</title>
-  <titlePlural>Mailing Forwarded Events</titlePlural>
+  <title>Mailing Forward</title>
+  <titlePlural>Mailing Forwards</titlePlural>
   <field>
     <name>id</name>
     <title>Forward ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <html>
+      <label>ID</label>
       <type>Number</type>
     </html>
   </field>
@@ -29,7 +30,7 @@
     <required>true</required>
     <comment>FK to EventQueue</comment>
     <html>
-      <label>Event Queue</label>
+      <label>Recipient</label>
     </html>
   </field>
   <foreignKey>

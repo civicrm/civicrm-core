@@ -11,15 +11,13 @@
 namespace Civi\Api4;
 
 /**
- * Mailing job.
+ * Handles double-opt-in confirmations to mailing group subscriptions.
  *
- * Mailing job tracks the batching of CiviMails.
- *
- * @see https://docs.civicrm.org/user/en/latest/email/what-is-civimail/
- * @since 5.48
+ * @see \Civi\Api4\Mailing
+ * @since 5.57
  * @package Civi\Api4
  */
-class MailingJob extends Generic\DAOEntity {
-  use Generic\Traits\ReadOnlyEntity;
+class MailingEventConfirm extends Generic\DAOEntity {
+  use \Civi\Api4\Generic\Traits\ReadOnlyEntity;
 
 }

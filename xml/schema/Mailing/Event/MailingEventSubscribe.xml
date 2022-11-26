@@ -7,12 +7,14 @@
   <comment>Tracks when a (new) contact subscribes to a group by email</comment>
   <archive>true</archive>
   <component>CiviMail</component>
+  <title>Mailing Opt-In</title>
   <field>
     <name>id</name>
     <title>Mailing Subscribe ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <html>
+      <label>ID</label>
       <type>Number</type>
     </html>
   </field>
