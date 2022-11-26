@@ -120,7 +120,7 @@
                 <div><label>{ts}Recurring Contribution(s){/ts}</label></div>
                 <table class="selector">
                     <tr class="columnheader">
-                        <th>{ts}Terms:{/ts}</th>
+                        <th>{ts}Terms{/ts}</th>
                         <th>{ts}Status{/ts}</th>
                         <th>{ts}Installments{/ts}</th>
                         <th>{ts}Created{/ts}</th>
@@ -129,13 +129,18 @@
                     {foreach from=$recurRows item=row key=id}
                         <tr class="{cycle values="odd-row,even-row"}">
                             <td><label>{$recurRows.$id.amount|crmMoney}</label>
-                                every {$recurRows.$id.frequency_interval} {$recurRows.$id.frequency_unit}
-                                for {$recurRows.$id.installments} installments
+                                {ts 1=$recurRows.$id.frequency_interval 2=$recurRows.$id.frequency_unit} every %1 %2{/ts}
+                                {if !empty($recurRows.$id.installments)}
+                                    {ts 1=$recurRows.$id.installments} for %1 installments{/ts}
+                                {/if}
                             </td>
                             <td>{$recurRows.$id.recur_status}</td>
                             <td>{if $recurRows.$id.completed}<a href="{$recurRows.$id.link}">{$recurRows.$id.completed}
-                                    /{$recurRows.$id.installments}</a>
-                                {else}0/{$recurRows.$id.installments} {/if}</td>
+                                    {if !empty($recurRows.$id.installments)}/{$recurRows.$id.installments}{/if}</a>
+                                {else}0
+                                    {if !empty($recurRows.$id.installments)}/{$recurRows.$id.installments}{/if}
+                                {/if}
+                            </td>
                             <td>{$recurRows.$id.create_date|crmDate}</td>
                             <td>{$recurRows.$id.action|replace:'xx':$recurRows.id}</td>
                         </tr>
