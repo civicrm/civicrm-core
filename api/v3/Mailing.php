@@ -321,7 +321,7 @@ function civicrm_api3_mailing_event_bounce($params) {
 
   $params += CRM_Mailing_BAO_BouncePattern::match($body);
 
-  if (CRM_Mailing_Event_BAO_MailingEventBounce::create($params)) {
+  if (CRM_Mailing_Event_BAO_MailingEventBounce::recordBounce($params)) {
     return civicrm_api3_create_success($params);
   }
   else {

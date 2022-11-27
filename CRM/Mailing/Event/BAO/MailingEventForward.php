@@ -177,7 +177,7 @@ class CRM_Mailing_Event_BAO_MailingEventForward extends CRM_Mailing_Event_DAO_Ma
       $params = array_merge($params,
         CRM_Mailing_BAO_BouncePattern::match($result->getMessage())
       );
-      CRM_Mailing_Event_BAO_MailingEventBounce::create($params);
+      CRM_Mailing_Event_BAO_MailingEventBounce::recordBounce($params);
     }
     else {
       $successfulForward = TRUE;
