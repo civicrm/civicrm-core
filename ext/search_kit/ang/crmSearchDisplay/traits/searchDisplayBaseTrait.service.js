@@ -100,7 +100,7 @@
 
       getAfformFilters: function() {
         return _.pick(this.afFieldset ? this.afFieldset.getFieldData() : {}, function(val) {
-          return val !== null && (_.includes(['boolean', 'number', 'object'], typeof val) || val.length);
+          return typeof val !== 'undefined' && val !== null && (_.includes(['boolean', 'number', 'object'], typeof val) || val.length);
         });
       },
 
