@@ -195,11 +195,15 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $title
    * @param string[] $keys
    *   List of extensions to enable.
+   * @param int $weight
+   *   A weight > 1500 will install after extension upgrades run. Do this for brand-new extensions.
+   *   A weight < 1500 will install before extension upgrades. Do this if the extension may
+   *   have previously been enabled.
    */
-  protected function addExtensionTask(string $title, array $keys): void {
+  protected function addExtensionTask(string $title, array $keys, int $weight = 2000): void {
     Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
       new CRM_Queue_Task([static::CLASS, 'enableExtension'], [$keys], $title),
-      ['weight' => 2000]
+      ['weight' => $weight]
     );
   }
 

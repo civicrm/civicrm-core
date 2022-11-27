@@ -29,7 +29,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_57_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-    $this->addExtensionTask('Enable SearchKit extension', ['org.civicrm.search_kit']);
+    $this->addExtensionTask('Enable SearchKit extension', ['org.civicrm.search_kit'], 1100);
   }
 
 }
