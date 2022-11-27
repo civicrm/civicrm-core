@@ -1280,6 +1280,19 @@
       };
     })
 
+    // Reformat an array of objects for compatibility with select2
+    .factory('formatForSelect2', function() {
+      return function(input, key, label, extra) {
+        return _.transform(input, function(result, item) {
+          var formatted = {id: item[key], text: item[label]};
+          if (extra) {
+            _.merge(formatted, _.pick(item, extra));
+          }
+          result.push(formatted);
+        }, []);
+      };
+    })
+
     .run(function($rootScope, $location) {
       /// Example: <button ng-click="goto('home')">Go home!</button>
       $rootScope.goto = function(path) {

@@ -43,6 +43,9 @@ class Run extends AbstractRunAction {
     // Pager can operate in "page" mode for traditional pager, or "scroll" mode for infinite scrolling
     $pagerMode = NULL;
 
+    $this->augmentSelectClause($apiParams);
+    $this->applyFilters();
+
     switch ($this->return) {
       case 'id':
         $key = CoreUtil::getIdFieldName($entityName);
@@ -58,7 +61,6 @@ class Run extends AbstractRunAction {
         break;
 
       case 'tally':
-        $this->applyFilters();
         unset($apiParams['orderBy'], $apiParams['limit']);
         $api = Request::create($entityName, 'get', $apiParams);
         $query = new Api4SelectQuery($api);
@@ -100,10 +102,7 @@ class Run extends AbstractRunAction {
           $apiParams['limit']++;
         }
         $apiParams['orderBy'] = $this->getOrderByFromSort();
-        $this->augmentSelectClause($apiParams);
     }
-
-    $this->applyFilters();
 
     $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
     // Copy over meta properties to this result
