@@ -156,7 +156,8 @@
           ctrl.editing = ctrl.loading = false;
           // Update rowCount if running for the first time or during an update op
           if (!ctrl.rowCount || editedRow) {
-            if (!ctrl.limit || ctrl.results.length < ctrl.limit) {
+            // No need to fetch count if on page 1 and result count is under the limit
+            if (!ctrl.limit || (ctrl.results.length < ctrl.limit && ctrl.page === 1)) {
               ctrl.rowCount = ctrl.results.length;
             } else if (ctrl.settings.pager || ctrl.settings.headerCount) {
               var params = ctrl.getApiParams('row_count');
