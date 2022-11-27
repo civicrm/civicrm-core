@@ -23,7 +23,7 @@ class MessageTemplateGetSpecProvider extends \Civi\Core\Service\AutoService impl
       ->setInputType('Select')
       ->setReadonly(TRUE)
       ->setFkEntity('MessageTemplate')
-      ->setSqlRenderer([__CLASS__, 'revertible']);
+      ->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
     $spec->addFieldSpec($field);
   }
 
@@ -35,21 +35,6 @@ class MessageTemplateGetSpecProvider extends \Civi\Core\Service\AutoService impl
    */
   public function applies($entity, $action) {
     return $entity === 'MessageTemplate' && $action === 'get';
-  }
-
-  /**
-   * Callback for finding id of template to revert to
-   * Based on CRM_Admin_Page_MessageTemplates::__construct()
-   *
-   * @return string
-   */
-  public static function revertible(): string {
-    return "(SELECT `id` FROM `civicrm_msg_template` `orig`
-      WHERE `a`.`workflow_name` = `orig`.`workflow_name` AND `orig`.`is_reserved` = 1 AND
-        ( `a`.`msg_subject` != `orig`.`msg_subject` OR
-          `a`.`msg_text`    != `orig`.`msg_text`    OR
-          `a`.`msg_html`    != `orig`.`msg_html`
-        ))";
   }
 
 }
