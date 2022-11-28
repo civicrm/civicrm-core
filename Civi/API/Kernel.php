@@ -144,7 +144,16 @@ class Kernel {
     $this->boot($apiRequest);
 
     [$apiProvider, $apiRequest] = $this->resolve($apiRequest);
-    $this->authorize($apiProvider, $apiRequest);
+
+    try {
+      $this->authorize($apiProvider, $apiRequest);
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      // We catch and re-throw to log for visibility
+      \CRM_Core_Error::backtrace('API Request Authorization failed', TRUE);
+      throw $e;
+    }
+
     [$apiProvider, $apiRequest] = $this->prepare($apiProvider, $apiRequest);
     $result = $apiProvider->invoke($apiRequest);
 
