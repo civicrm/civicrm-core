@@ -214,25 +214,29 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   if ($tabsetName !== 'civicrm/contact/view') {
     return;
   }
+  $contactTypes = array_merge([$context['contact_type']], $context['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get(FALSE)
+    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
     ->addWhere('contact_summary', '=', 'tab')
-    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name')
+    ->addOrderBy('title')
     ->execute();
   $weight = 111;
   foreach ($afforms as $afform) {
-    $tabs[] = [
-      'id' => $afform['name'],
-      'title' => $afform['title'],
-      'weight' => $weight++,
-      'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
-      'is_active' => TRUE,
-      'template' => 'afform/contactSummary/AfformTab.tpl',
-      'module' => $afform['module_name'],
-      'directive' => $afform['directive_name'],
-    ];
-    // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module.
-    if (empty($context['caller'])) {
-      Civi::service('angularjs.loader')->addModules($afform['module_name']);
+    if (empty($afform['summary_contact_type']) || array_intersect($afform['summary_contact_type'], $contactTypes)) {
+      $tabs[] = [
+        'id' => $afform['name'],
+        'title' => $afform['title'],
+        'weight' => $weight++,
+        'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
+        'is_active' => TRUE,
+        'template' => 'afform/contactSummary/AfformTab.tpl',
+        'module' => $afform['module_name'],
+        'directive' => $afform['directive_name'],
+      ];
+      // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module.
+      if (empty($context['caller'])) {
+        Civi::service('angularjs.loader')->addModules($afform['module_name']);
+      }
     }
   }
 }
@@ -246,24 +250,40 @@ function afform_civicrm_pageRun(&$page) {
   if (!in_array(get_class($page), ['CRM_Contact_Page_View_Summary', 'CRM_Contact_Page_View_Print'])) {
     return;
   }
-  $scanner = \Civi::service('afform_scanner');
+  $afforms = Civi\Api4\Afform::get(FALSE)
+    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
+    ->addWhere('contact_summary', '=', 'block')
+    ->addOrderBy('title')
+    ->execute();
   $cid = $page->get('cid');
+  $contact = NULL;
   $side = 'left';
-  foreach ($scanner->getMetas() as $afform) {
-    if (!empty($afform['contact_summary']) && $afform['contact_summary'] === 'block') {
-      $module = _afform_angular_module_name($afform['name']);
-      $block = [
-        'module' => $module,
-        'directive' => _afform_angular_module_name($afform['name'], 'dash'),
-      ];
-      $content = CRM_Core_Smarty::singleton()->fetchWith('afform/contactSummary/AfformBlock.tpl', ['contactId' => $cid, 'block' => $block]);
-      CRM_Core_Region::instance("contact-basic-info-$side")->add([
-        'markup' => '<div class="crm-summary-block">' . $content . '</div>',
-        'weight' => 1,
-      ]);
-      Civi::service('angularjs.loader')->addModules($module);
-      $side = $side === 'left' ? 'right' : 'left';
+  $weight = ['left' => 1, 'right' => 1];
+  foreach ($afforms as $afform) {
+    // If Afform specifies a contact type, lookup the contact and compare
+    if (!empty($afform['summary_contact_type'])) {
+      // Contact.get only needs to happen once
+      $contact = $contact ?? civicrm_api4('Contact', 'get', [
+        'select' => ['contact_type', 'contact_sub_type'],
+        'where' => [['id', '=', $cid]],
+      ])->first();
+      $contactTypes = array_merge([$contact['contact_type']], $contact['contact_sub_type'] ?? []);
+      if (!array_intersect($afform['summary_contact_type'], $contactTypes)) {
+        continue;
+      }
     }
+    $block = [
+      'module' => $afform['module_name'],
+      'directive' => _afform_angular_module_name($afform['name'], 'dash'),
+    ];
+    $content = CRM_Core_Smarty::singleton()->fetchWith('afform/contactSummary/AfformBlock.tpl', ['contactId' => $cid, 'block' => $block]);
+    CRM_Core_Region::instance("contact-basic-info-$side")->add([
+      'markup' => '<div class="crm-summary-block">' . $content . '</div>',
+      'name' => 'afform:' . $afform['name'],
+      'weight' => $weight[$side]++,
+    ]);
+    Civi::service('angularjs.loader')->addModules($afform['module_name']);
+    $side = $side === 'left' ? 'right' : 'left';
   }
 }
 
@@ -274,9 +294,11 @@ function afform_civicrm_pageRun(&$page) {
  */
 function afform_civicrm_contactSummaryBlocks(&$blocks) {
   $afforms = \Civi\Api4\Afform::get(FALSE)
-    ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label'])
+    ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label', 'summary_contact_type'])
     ->addWhere('contact_summary', '=', 'block')
+    ->addOrderBy('title')
     ->execute();
+  $allContactTypes = \CRM_Contact_BAO_ContactType::getAllContactTypes();
   foreach ($afforms as $index => $afform) {
     // Create a group per afform type
     $blocks += [
@@ -286,8 +308,17 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
         'blocks' => [],
       ],
     ];
+    $contactType = [];
+    // If the form specifies contact types, resolve them to just the parent types (Individual, Organization, Household)
+    // because ContactLayout doesn't care about sub-types
+    foreach ($afform['summary_contact_type'] ?? [] as $name) {
+      $parent = $allContactTypes[$name]['parent'] ?? $name;
+      $contactType[$parent] = $parent;
+    }
     $blocks["afform_{$afform['type']}"]['blocks'][$afform['name']] = [
       'title' => $afform['title'],
+      // ContactLayout only supports a single contact type
+      'contact_type' => count($contactType) === 1 ? CRM_Utils_Array::first($contactType) : NULL,
       'tpl_file' => 'afform/contactSummary/AfformBlock.tpl',
       'module' => $afform['module_name'],
       'directive' => $afform['directive_name'],

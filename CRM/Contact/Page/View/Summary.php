@@ -250,7 +250,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $changeLog = $this->_viewOptions['log'];
     $this->assign_by_ref('changeLog', $changeLog);
 
-    $this->assign('allTabs', $this->getTabs());
+    $this->assign('allTabs', $this->getTabs($defaults));
 
     // hook for contact summary
     // ignored but needed to prevent warnings
@@ -342,7 +342,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function getTabs() {
+  public function getTabs(array $contact) {
     $allTabs = [];
     $getCountParams = [];
     $weight = 10;
@@ -418,7 +418,11 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     // Allow other modules to add or remove tabs
-    $context = ['contact_id' => $this->_contactId];
+    $context = [
+      'contact_id' => $contact['id'],
+      'contact_type' => $contact['contact_type'],
+      'contact_sub_type' => CRM_Utils_Array::explodePadded($contact['contact_sub_type'] ?? NULL),
+    ];
     CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
 
     $expectedKeys = ['count', 'class', 'template', 'hideCount', 'icon'];
