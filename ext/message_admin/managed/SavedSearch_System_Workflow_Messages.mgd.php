@@ -79,6 +79,14 @@ return [
               'sortable' => TRUE,
             ],
             [
+              'type' => 'field',
+              'key' => 'master_id',
+              'dataType' => 'Integer',
+              'label' => 'Changed from default?',
+              'sortable' => TRUE,
+              'rewrite' => "{if '[master_id]' == ''}No{else}Yes{/if}",
+            ],
+            [
               'size' => 'btn-xs',
               'links' => [
                 [
@@ -91,34 +99,6 @@ return [
                   'style' => 'default',
                   'path' => 'civicrm/admin/messageTemplates/#/edit?id=[id]',
                   'condition' => [],
-                ],
-                [
-                  'path' => 'civicrm/admin/messageTemplates?action=view&id=[master_id]&reset=1',
-                  'icon' => 'fa-external-link',
-                  'text' => 'View Default',
-                  'style' => 'default',
-                  'condition' => [
-                    'master_id',
-                    'IS NOT EMPTY',
-                  ],
-                  'entity' => '',
-                  'action' => '',
-                  'join' => '',
-                  'target' => '',
-                ],
-                [
-                  'path' => 'civicrm/admin/messageTemplates&action=revert&id=[id]&selectedChild=workflow',
-                  'icon' => 'fa-external-link',
-                  'text' => 'Revert to Default',
-                  'style' => 'danger',
-                  'condition' => [
-                    'master_id',
-                    'IS NOT EMPTY',
-                  ],
-                  'entity' => '',
-                  'action' => '',
-                  'join' => '',
-                  'target' => '',
                 ],
               ],
               'type' => 'buttons',
