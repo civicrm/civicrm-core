@@ -114,7 +114,7 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
     $e->display['settings'] += [
       'description' => $e->savedSearch['description'] ?? NULL,
       'sort' => [],
-      'limit' => \Civi::settings()->get('default_pager_size'),
+      'limit' => (int) \Civi::settings()->get('default_pager_size'),
       'pager' => [
         'show_count' => TRUE,
         'expose_limit' => TRUE,
