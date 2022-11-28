@@ -870,16 +870,15 @@ WHERE ($subtypeClause)";
       $query = CRM_Utils_SQL_Select::from('civicrm_contact_type');
       $dao = CRM_Core_DAO::executeQuery($query->toSQL());
       $contactTypes = array_column($dao->fetchAll(), NULL, 'name');
-      $name_options = self::buildOptions('parent_id', 'validate');
-      $label_options = self::buildOptions('parent_id', 'get');
-      foreach ($contactTypes as $id => $contactType) {
-        $contactTypes[$id]['parent'] = $contactType['parent_id'] ? $name_options[$contactType['parent_id']] : NULL;
-        $contactTypes[$id]['parent_label'] = $contactType['parent_id'] ? $label_options[$contactType['parent_id']] : NULL;
+      $parents = array_column($contactTypes, NULL, 'id');
+      foreach ($contactTypes as $name => $contactType) {
+        $contactTypes[$name]['parent'] = $contactType['parent_id'] ? $parents[$contactType['parent_id']]['name'] : NULL;
+        $contactTypes[$name]['parent_label'] = $contactType['parent_id'] ? $parents[$contactType['parent_id']]['label'] : NULL;
         // Cast int/bool types.
-        $contactTypes[$id]['id'] = (int) $contactType['id'];
-        $contactTypes[$id]['parent_id'] = $contactType['parent_id'] ? (int) $contactType['parent_id'] : NULL;
-        $contactTypes[$id]['is_active'] = (bool) $contactType['is_active'];
-        $contactTypes[$id]['is_reserved'] = (bool) $contactType['is_reserved'];
+        $contactTypes[$name]['id'] = (int) $contactType['id'];
+        $contactTypes[$name]['parent_id'] = $contactType['parent_id'] ? (int) $contactType['parent_id'] : NULL;
+        $contactTypes[$name]['is_active'] = (bool) $contactType['is_active'];
+        $contactTypes[$name]['is_reserved'] = (bool) $contactType['is_reserved'];
       }
       $cache->set($cacheKey, $contactTypes);
     }
