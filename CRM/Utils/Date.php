@@ -232,20 +232,19 @@ class CRM_Utils_Date {
   public static function &getAbbrMonthNames($month = FALSE) {
     $key = 'abbrMonthNames_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
-      $intl_formatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, NULL, IntlDateFormatter::GREGORIAN, 'MMM');
       \Civi::$statics[__CLASS__][$key] = [
-        1 => $intl_formatter->format(strtotime('1 January')),
-        2 => $intl_formatter->format(strtotime('1 February')),
-        3 => $intl_formatter->format(strtotime('1 March')),
-        4 => $intl_formatter->format(strtotime('1 April')),
-        5 => $intl_formatter->format(strtotime('1 May')),
-        6 => $intl_formatter->format(strtotime('1 June')),
-        7 => $intl_formatter->format(strtotime('1 July')),
-        8 => $intl_formatter->format(strtotime('1 August')),
-        9 => $intl_formatter->format(strtotime('1 September')),
-        10 => $intl_formatter->format(strtotime('1 October')),
-        11 => $intl_formatter->format(strtotime('1 November')),
-        12 => $intl_formatter->format(strtotime('1 December')),
+        1 => ts('Jan', ['context' => 'Abbreviated month name']),
+        2 => ts('Feb', ['context' => 'Abbreviated month name']),
+        3 => ts('Mar', ['context' => 'Abbreviated month name']),
+        4 => ts('Apr', ['context' => 'Abbreviated month name']),
+        5 => ts('May', ['context' => 'Abbreviated month name']),
+        6 => ts('Jun', ['context' => 'Abbreviated month name']),
+        7 => ts('Jul', ['context' => 'Abbreviated month name']),
+        8 => ts('Aug', ['context' => 'Abbreviated month name']),
+        9 => ts('Sep', ['context' => 'Abbreviated month name']),
+        10 => ts('Oct', ['context' => 'Abbreviated month name']),
+        11 => ts('Nov', ['context' => 'Abbreviated month name']),
+        12 => ts('Dec', ['context' => 'Abbreviated month name']),
       ];
     }
     if ($month) {
