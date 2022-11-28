@@ -14,11 +14,14 @@
 
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
-<div class="help">
-    <p>
-      <strong>{ts}Import has completed successfully.{/ts}</strong>
-    {if $outputUnavailable}{ts}Detailed information is no longer available.{/ts}{else}{ts}The information below summarizes the results.{/ts}{/if}
-    </p>
+ <div class="help">
+   <p>
+     {if $unprocessedRowCount}
+       <strong>{ts}The import is still processing.{/ts}</strong>
+     {else}
+       <strong>{ts}Import has completed successfully.{/ts}</strong>
+     {/if}
+   </p>
 
    {if $unMatchCount}
         <p class="error">
@@ -61,6 +64,12 @@
       <td class="data">{$totalRowCount}</td>
       <td class="explanation">{ts}Total number of rows in the imported data.{/ts}</td>
     </tr>
+    {if $unprocessedRowCount}
+      <tr><td class="label crm-grid-cell">{ts}Rows Still processing{/ts}</td>
+        <td class="data">{$unprocessedRowCount}</td>
+        <td class="explanation">{ts}Rows still being processed.{/ts}</td>
+      </tr>
+    {/if}
 
     {if $invalidRowCount}
       <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
@@ -91,7 +100,7 @@
 
     <tr>
       <td class="label crm-grid-cell">{ts}Total Rows Imported{/ts}</td>
-      <td class="data">{$validRowCount}</td>
+      <td class="data">{$importedRowCount}</td>
       <td class="explanation">{ts}Total number of primary records created or modified during the import.{/ts}</td>
     </tr>
     {foreach from=$trackingSummary item="summaryRow"}

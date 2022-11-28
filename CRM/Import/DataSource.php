@@ -639,6 +639,7 @@ abstract class CRM_Import_DataSource {
       CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT_ERROR => ['pledge_payment_error'],
       'new' => ['new', 'valid'],
       'valid' => ['valid'],
+      'imported' => ['imported', 'soft_credit_imported', 'pledge_payment_imported', 'warning_unparsed_address'],
     ];
   }
 

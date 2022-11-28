@@ -63,7 +63,8 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Forms {
     $this->assign('outputUnavailable', FALSE);
     try {
       $this->assign('totalRowCount', $this->getRowCount());
-      $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID) + $this->getRowCount(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
+      $this->assign('unprocessedRowCount', $this->getRowCount() - $this->getRowCount('imported') - $this->getRowCount(CRM_Import_Parser::ERROR) - $this->getRowCount(CRM_Import_Parser::DUPLICATE));
+      $this->assign('importedRowCount', $this->getRowCount('imported'));
       $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
       $this->assign('duplicateRowCount', $this->getRowCount(CRM_Import_Parser::DUPLICATE));
       $this->assign('unMatchCount', $this->getRowCount(CRM_Import_Parser::NO_MATCH));
@@ -100,6 +101,7 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Forms {
       }
       $this->assign('dupeActionString', $dupeActionString);
     }
+    // @todo - remove this - it is never thrown.
     catch (CRM_Import_Exception_ImportTableUnavailable $e) {
       $this->assign('outputUnavailable', TRUE);
     }
