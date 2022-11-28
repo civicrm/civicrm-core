@@ -4,7 +4,7 @@ return [
   [
     'name' => 'SavedSearch_System_Workflow_Messages',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -46,7 +46,7 @@ return [
   [
     'name' => 'SavedSearch_System_Workflow_Messages_SearchDisplay_System_Workflow_Messages_Table_1',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -82,14 +82,14 @@ return [
               'size' => 'btn-xs',
               'links' => [
                 [
-                  'entity' => 'MessageTemplate',
-                  'action' => 'update',
+                  'entity' => '',
+                  'action' => '',
                   'join' => '',
                   'target' => '',
                   'icon' => 'fa-pencil',
                   'text' => 'Edit',
                   'style' => 'default',
-                  'path' => '',
+                  'path' => 'civicrm/admin/messageTemplates/#/edit?id=[id]',
                   'condition' => [],
                 ],
                 [
