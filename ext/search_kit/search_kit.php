@@ -49,6 +49,10 @@ function search_kit_civicrm_alterApiRoutePermissions(&$permissions, $entity, $ac
       $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
     }
   }
+  // An autocomplete is a type of search dislay and should always be allowed
+  if ($action === 'autocomplete') {
+    $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
+  }
 }
 
 /**
