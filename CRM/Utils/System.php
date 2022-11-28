@@ -1272,7 +1272,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Get logged in user's IP address.
+   * Get the client's IP address.
    *
    * Get IP address from HTTP REMOTE_ADDR header. If the CMS is Drupal then use
    * the Drupal function as this also handles reverse proxies (based on proper
