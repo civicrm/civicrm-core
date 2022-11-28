@@ -7,14 +7,15 @@
   <comment>Tracks when and why an email bounced.</comment>
   <archive>true</archive>
   <component>CiviMail</component>
-  <title>Mailing Bounce Event</title>
-  <titlePlural>Mailing Bounce Events</titlePlural>
+  <title>Mailing Bounce</title>
+  <description>Mailings that failed to reach the inbox of the recipient.</description>
   <field>
     <name>id</name>
     <title>Bounce ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <html>
+      <label>ID</label>
       <type>Number</type>
     </html>
   </field>
@@ -29,7 +30,7 @@
     <required>true</required>
     <comment>FK to EventQueue</comment>
     <html>
-      <label>Event Queue</label>
+      <label>Recipient</label>
     </html>
   </field>
   <foreignKey>
@@ -40,7 +41,7 @@
   </foreignKey>
   <field>
     <name>bounce_type_id</name>
-    <title>Bounce Type</title>
+    <title>Bounce Type ID</title>
     <type>int unsigned</type>
     <comment>What type of bounce was it?</comment>
     <pseudoconstant>
@@ -49,6 +50,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
+      <label>Bounce Type</label>
       <type>Select</type>
     </html>
   </field>

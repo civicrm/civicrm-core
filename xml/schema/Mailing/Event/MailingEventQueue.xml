@@ -8,14 +8,15 @@
   <comment>A collection of all intended recipients of a job</comment>
   <archive>true</archive>
   <component>CiviMail</component>
-  <title>Mailing Queue Event</title>
-  <titlePlural>Mailing Queue Events</titlePlural>
+  <title>Mailing Recipient</title>
+  <description>Intended recipients of a mailing.</description>
   <field>
     <name>id</name>
     <type>int unsigned</type>
     <title>Mailing Event Queue ID</title>
     <required>true</required>
     <html>
+      <label>ID</label>
       <type>Number</type>
     </html>
   </field>
@@ -28,9 +29,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <title>Job ID</title>
-    <comment>FK to Job</comment>
+    <comment>Mailing Job</comment>
     <html>
-      <label>Job</label>
+      <label>Outbound Mailing</label>
     </html>
   </field>
   <foreignKey>

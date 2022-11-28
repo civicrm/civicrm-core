@@ -17,16 +17,16 @@
 class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_MailingEventBounce {
 
   /**
-   * Create a new bounce event, update the email address if necessary
+   * Record a new bounce event, update the email address if necessary
    *
    * @param array $params
    *
    * @return bool|null
    */
-  public static function create(&$params) {
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($params['job_id'],
-      $params['event_queue_id'],
-      $params['hash']
+  public static function recordBounce(&$params) {
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($params['job_id'] ?? NULL,
+      $params['event_queue_id'] ?? NULL,
+      $params['hash'] ?? NULL
     );
     $success = NULL;
 
@@ -35,11 +35,8 @@ class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_Mai
     }
 
     $transaction = new CRM_Core_Transaction();
-    $bounce = new CRM_Mailing_Event_BAO_MailingEventBounce();
-    $bounce->time_stamp = date('YmdHis');
 
-    $action = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($action, 'MailingEventBounce', CRM_Utils_Array::value('id', $params), $params);
+    $params['time_stamp'] = date('YmdHis');
 
     // if we dont have a valid bounce type, we should set it
     // to bounce_type_id 11 which is Syntax error. this allows such email
@@ -64,10 +61,7 @@ class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_Mai
     // CRM-11989
     $params['bounce_reason'] = mb_strcut($params['bounce_reason'], 0, 254);
 
-    $bounce->copyValues($params);
-    $bounce->save();
-
-    CRM_Utils_Hook::post($action, 'MailingEventBounce', $bounce->id, $bounce);
+    self::writeRecord($params);
 
     if ($q->email_id) {
       self::putEmailOnHold($q->email_id);
@@ -75,6 +69,19 @@ class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_Mai
     $transaction->commit();
 
     return TRUE;
+  }
+
+  /**
+   * Create function was renamed `recordBounce` because it's not a standard CRUD create function
+   *
+   * @param array $params
+   * @deprecated
+   *
+   * @return bool|null
+   */
+  public static function create(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning('recordBounce');
+    return self::recordBounce($params);
   }
 
   /**

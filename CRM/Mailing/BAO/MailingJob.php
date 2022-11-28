@@ -679,7 +679,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         $params = array_merge($params,
           CRM_Mailing_BAO_BouncePattern::match($result->getMessage())
         );
-        CRM_Mailing_Event_BAO_MailingEventBounce::create($params);
+        CRM_Mailing_Event_BAO_MailingEventBounce::recordBounce($params);
       }
       elseif (is_a($result, 'PEAR_Error') && $mailing->sms_provider_id) {
         // Handle SMS errors: CRM-15426

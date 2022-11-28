@@ -11,15 +11,13 @@
 namespace Civi\Api4;
 
 /**
- * Mailing job.
+ * Mailings that failed to reach the inbox of the recipient
  *
- * Mailing job tracks the batching of CiviMails.
- *
- * @see https://docs.civicrm.org/user/en/latest/email/what-is-civimail/
- * @since 5.48
+ * @see \Civi\Api4\Mailing
+ * @since 5.57
  * @package Civi\Api4
  */
-class MailingJob extends Generic\DAOEntity {
+class MailingEventBounce extends Generic\DAOEntity {
   use Generic\Traits\ReadOnlyEntity;
 
 }

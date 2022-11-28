@@ -13,6 +13,7 @@
     <type>int unsigned</type>
     <required>true</required>
     <html>
+      <label>ID</label>
       <type>Number</type>
     </html>
   </field>
@@ -27,7 +28,7 @@
     <required>true</required>
     <comment>FK to EventQueue</comment>
     <html>
-      <label>Event Queue</label>
+      <label>Recipient</label>
     </html>
   </field>
   <foreignKey>
