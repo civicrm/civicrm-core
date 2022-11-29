@@ -288,6 +288,7 @@ class CRM_Core_I18n_SchemaStructure {
         ],
         'civicrm_contact_type' => [
           'label' => [
+            'label' => "Label",
             'type' => "Text",
           ],
           'description' => [
