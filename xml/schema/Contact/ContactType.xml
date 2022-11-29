@@ -113,7 +113,7 @@
   </foreignKey>
   <field>
     <name>is_active</name>
-    <title>Contact Type Is Active?</title>
+    <title>Contact Type Enabled</title>
     <type>boolean</type>
     <default>1</default>
     <required>true</required>
@@ -126,7 +126,7 @@
   </field>
   <field>
     <name>is_reserved</name>
-    <title>Contact Type is Reserved?</title>
+    <title>Contact Type is Reserved</title>
     <type>boolean</type>
     <default>0</default>
     <required>true</required>
