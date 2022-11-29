@@ -586,6 +586,7 @@ class CRM_Utils_Token {
     $returnBlankToken = FALSE,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (self::$_tokens['contact'] == NULL) {
       /* This should come from UF */
 
