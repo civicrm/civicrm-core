@@ -253,7 +253,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'entity_id' => $params['id'],
       'entity_table' => 'civicrm_contribution',
     ];
-    $trxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+    $trxn = current($this->retrieveEntityFinancialTrxn($entityParams));
     $trxnParams = [
       'id' => $trxn['financial_trxn_id'],
     ];
@@ -289,11 +289,11 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'financial_trxn_id' => $trxn['financial_trxn_id'],
       'entity_table' => 'civicrm_financial_item',
     ];
-    $entityTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+    $entityTrxn = current($this->retrieveEntityFinancialTrxn($entityParams));
     $fitemParams = [
       'id' => $entityTrxn['entity_id'],
     ];
-    if ($context == 'offline' || $context == 'online') {
+    if ($context === 'offline' || $context === 'online') {
       $compareParams = [
         'amount' => 100,
         'status_id' => 1,

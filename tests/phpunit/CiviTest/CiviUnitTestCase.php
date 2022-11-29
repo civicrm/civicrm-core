@@ -2827,11 +2827,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ]);
     $this->assertEquals($contribution['total_amount'] - $contribution['fee_amount'], $contribution['net_amount']);
     if ($context === 'pending') {
-      $trxn = CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams);
+      $trxn = $this->retrieveEntityFinancialTrxn($entityParams);
       $this->assertNull($trxn, 'No Trxn to be created until IPN callback');
       return;
     }
-    $trxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+    $trxn = current($this->retrieveEntityFinancialTrxn($entityParams));
     $trxnParams = [
       'id' => $trxn['financial_trxn_id'],
     ];
@@ -2865,7 +2865,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'financial_trxn_id' => $trxn['financial_trxn_id'],
       'entity_table' => 'civicrm_financial_item',
     ];
-    $entityTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+    $entityTrxn = current($this->retrieveEntityFinancialTrxn($entityParams));
     $fitemParams = [
       'id' => $entityTrxn['entity_id'],
     ];
@@ -2887,7 +2887,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         'entity_id' => $params['id'],
         'entity_table' => 'civicrm_contribution',
       ];
-      $maxTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($maxParams, TRUE));
+      $maxTrxn = current($this->retrieveEntityFinancialTrxn($maxParams, TRUE));
       $trxnParams = [
         'id' => $maxTrxn['financial_trxn_id'],
       ];
@@ -3943,6 +3943,51 @@ WHERE table_schema = '$dataObject->_database'");
       }
     }
     return $data;
+  }
+
+  /**
+   * Retrieve entity financial trxn details.
+   *
+   * @deprecated - only called by tests - to be replaced with
+   * $trxn = (array) EntityFinancialTrxn::get()
+   *  ->addWhere('id', '=', $contributionID)
+   *  ->addWhere('entity_table', '=', 'civicrm_contribution')
+   *  ->addSelect('*')->execute();
+   *
+   * @param array $params
+   *   an assoc array of name/value pairs.
+   * @param bool $maxId
+   *   To retrieve max id.
+   *
+   * @deprecated - this was used so much in tests I copied it over - but
+   * it should go.... the tests just need to use the api.
+   *
+   * @return array
+   */
+  public function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
+    $financialItem = new CRM_Financial_DAO_EntityFinancialTrxn();
+    $financialItem->copyValues($params);
+    // retrieve last entry from civicrm_entity_financial_trxn
+    if ($maxId) {
+      $financialItem->orderBy('id DESC');
+      $financialItem->limit(1);
+    }
+    $financialItem->find();
+    while ($financialItem->fetch()) {
+      $financialItems[$financialItem->id] = [
+        'id' => $financialItem->id,
+        'entity_table' => $financialItem->entity_table,
+        'entity_id' => $financialItem->entity_id,
+        'financial_trxn_id' => $financialItem->financial_trxn_id,
+        'amount' => $financialItem->amount,
+      ];
+    }
+    if (!empty($financialItems)) {
+      return $financialItems;
+    }
+    else {
+      return NULL;
+    }
   }
 
 }

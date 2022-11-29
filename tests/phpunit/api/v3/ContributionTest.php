@@ -4058,12 +4058,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'entity_id' => $contId,
         'entity_table' => 'civicrm_contribution',
       ];
-      $trxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($params, TRUE));
+      $trxn = current($this->retrieveEntityFinancialTrxn($params, TRUE));
       $entityParams = [
         'financial_trxn_id' => $trxn['financial_trxn_id'],
         'entity_table' => 'civicrm_financial_item',
       ];
-      $entityTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+      $entityTrxn = current($this->retrieveEntityFinancialTrxn($entityParams));
       $params = [
         'id' => $entityTrxn['entity_id'],
       ];
@@ -4219,7 +4219,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'entity_table' => 'civicrm_contribution',
         'amount' => -100,
       ];
-      $trxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+      $trxn = current($this->retrieveEntityFinancialTrxn($entityParams));
       $trxnParams1 = [
         'id' => $trxn['financial_trxn_id'],
       ];
@@ -4770,10 +4770,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'entity_id' => $contributionID,
       'entity_table' => 'civicrm_contribution',
     ];
-    // @todo the following function has naming errors & has a weird signature & appears to
-    // only be called from test classes. Move into test suite & maybe just use api
-    // from this function.
-    return array_merge(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($trxnParams));
+    return array_merge($this->retrieveEntityFinancialTrxn($trxnParams));
   }
 
   /**
