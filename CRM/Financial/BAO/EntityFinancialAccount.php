@@ -75,59 +75,65 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
    * Delete financial Types.
    *
    * @param int $financialTypeAccountId
-   * @param int $accountId
-   * @deprecated
+   * @param int $accountId  (not used)
+   *
    * @throws \CRM_Core_Exception
+   * @deprecated
    */
   public static function del($financialTypeAccountId, $accountId = NULL) {
-    // check if financial type is present
-    $check = FALSE;
-    $relationValues = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+    static::deleteRecord(['id' => $financialTypeAccountId]);
+  }
 
-    $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id');
-    // check dependencies
-    // FIXME hardcoded list = bad
-    $dependency = [
-      ['Contribute', 'Contribution'],
-      ['Contribute', 'ContributionPage'],
-      ['Member', 'MembershipType'],
-      ['Price', 'PriceFieldValue'],
-      ['Grant', 'Grant'],
-      ['Contribute', 'PremiumsProduct'],
-      ['Contribute', 'Product'],
-      ['Price', 'LineItem'],
-    ];
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      $financialTypeAccountId = $event->id;
 
-    foreach ($dependency as $name) {
-      $daoString = 'CRM_' . $name[0] . '_DAO_' . $name[1];
-      if (class_exists($daoString)) {
-        /** @var \CRM_Core_DAO $dao */
-        $dao = new $daoString();
-        $dao->financial_type_id = $financialTypeId;
-        if ($dao->find(TRUE)) {
-          $check = TRUE;
-          break;
+      // check if financial type is present
+      $check = FALSE;
+      $relationValues = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+
+      $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id');
+      // check dependencies
+      // FIXME hardcoded list = bad
+      $dependency = [
+        ['Contribute', 'Contribution'],
+        ['Contribute', 'ContributionPage'],
+        ['Member', 'MembershipType'],
+        ['Price', 'PriceFieldValue'],
+        ['Grant', 'Grant'],
+        ['Contribute', 'PremiumsProduct'],
+        ['Contribute', 'Product'],
+        ['Price', 'LineItem'],
+      ];
+
+      foreach ($dependency as $name) {
+        $daoString = 'CRM_' . $name[0] . '_DAO_' . $name[1];
+        if (class_exists($daoString)) {
+          /** @var \CRM_Core_DAO $dao */
+          $dao = new $daoString();
+          $dao->financial_type_id = $financialTypeId;
+          if ($dao->find(TRUE)) {
+            $check = TRUE;
+            break;
+          }
+        }
+      }
+
+      if ($check) {
+        if ($name[1] === 'PremiumsProduct' || $name[1] === 'Product') {
+          throw new \CRM_Core_Exception(ts('You cannot remove an account with a %1 relationship while the Financial Type is used for a Premium.', [1 => $relationValues[$financialTypeAccountId]]));
+        }
+        else {
+          $accountRelationShipId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'account_relationship');
+          throw new \CRM_Core_Exception(ts('You cannot remove an account with a %1 relationship because it is being referenced by one or more of the following types of records: Contributions, Contribution Pages, or Membership Types. Consider disabling this type instead if you no longer want it used.', [1 => $relationValues[$accountRelationShipId]]), NULL, 'error');
         }
       }
     }
-
-    if ($check) {
-      if ($name[1] === 'PremiumsProduct' || $name[1] === 'Product') {
-        CRM_Core_Session::setStatus(ts('You cannot remove an account with a %1 relationship while the Financial Type is used for a Premium.', [1 => $relationValues[$financialTypeAccountId]]));
-      }
-      else {
-        $accountRelationShipId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'account_relationship');
-        CRM_Core_Session::setStatus(ts('You cannot remove an account with a %1 relationship because it is being referenced by one or more of the following types of records: Contributions, Contribution Pages, or Membership Types. Consider disabling this type instead if you no longer want it used.', [1 => $relationValues[$accountRelationShipId]]), NULL, 'error');
-      }
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', "reset=1&action=browse&aid={$accountId}"));
-    }
-
-    // delete from financial Type table
-    $financialType = new CRM_Financial_DAO_EntityFinancialAccount();
-    $financialType->id = $financialTypeAccountId;
-    $financialType->find(TRUE);
-    $financialType->delete();
-    CRM_Core_Session::setStatus(ts('Unbalanced transactions may be created if you delete the account of type: %1.', [1 => $relationValues[$financialType->account_relationship]]));
   }
 
   /**
