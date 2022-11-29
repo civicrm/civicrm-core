@@ -116,7 +116,7 @@ class TokenProcessor {
   protected $next = 0;
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param \Civi\Core\CiviEventDispatcher $dispatcher
    * @param array $context
    */
   public function __construct($dispatcher, $context) {
