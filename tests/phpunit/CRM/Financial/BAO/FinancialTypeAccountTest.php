@@ -39,21 +39,6 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method del()
-   */
-  public function testDel() {
-    list($financialAccount, $financialType, $financialAccountType) = $this->createFinancialAccount(
-      'Expenses',
-      'Expense Account is'
-    );
-
-    CRM_Financial_BAO_EntityFinancialAccount::del($financialAccountType->id);
-    $params = ['id' => $financialAccountType->id];
-    $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
-  }
-
-  /**
    * Check method retrieve()
    */
   public function testRetrieve() {
