@@ -195,22 +195,15 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    *   Optional reply-to from the reply.
    */
   private static function autoRespond(&$mailing, $queue_id, $replyto) {
-    $config = CRM_Core_Config::singleton();
-
-    $contacts = CRM_Contact_DAO_Contact::getTableName();
-    $email = CRM_Core_DAO_Email::getTableName();
-    $queue = CRM_Mailing_Event_DAO_MailingEventQueue::getTableName();
-
-    $eq = new CRM_Core_DAO();
-    $eq->query(
-      "SELECT     $contacts.preferred_mail_format as format,
-                  $email.email as email,
-                  $queue.job_id as job_id,
-                  $queue.hash as hash
-        FROM        $contacts
-        INNER JOIN  $queue ON $queue.contact_id = $contacts.id
-        INNER JOIN  $email ON $queue.email_id = $email.id
-        WHERE       $queue.id = " . CRM_Utils_Type::escape($queue_id, 'Integer')
+    $eq = CRM_Core_DAO::executeQuery(
+      'SELECT contact.preferred_mail_format as format,
+                  email.email as email,
+                  queue.job_id as job_id,
+                  queue.hash as hash
+        FROM civicrm_contact contact
+        INNER JOIN  civicrm_mailing_event_queue queue ON queue.contact_id = contact.id
+        INNER JOIN  civicrm_email email ON queue.email_id = email.id
+        WHERE       queue.id = ' . CRM_Utils_Type::escape($queue_id, 'Integer')
     );
     $eq->fetch();
 
