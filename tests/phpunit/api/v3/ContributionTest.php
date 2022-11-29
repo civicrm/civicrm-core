@@ -1365,7 +1365,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Function tests that line items, financial records are updated when pay later contribution is received.
    */
   public function testCreateUpdateContributionPayLater() {
-    $contribParams = [
+    $contributionParams = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
@@ -1375,9 +1375,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_pay_later' => 1,
 
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
 
-    $newParams = array_merge($contribParams, [
+    $newParams = array_merge($contributionParams, [
       'id' => $contribution['id'],
       'contribution_status_id' => 1,
     ]);
@@ -1393,7 +1393,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCreateUpdateContributionPaymentInstrument(): void {
     $instrumentId = $this->_addPaymentInstrument();
-    $contribParams = [
+    $contributionParams = [
       'contact_id' => $this->_individualId,
       'total_amount' => 100.00,
       'financial_type_id' => $this->_financialTypeId,
@@ -1401,9 +1401,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
 
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
 
-    $newParams = array_merge($contribParams, [
+    $newParams = array_merge($contributionParams, [
       'id' => $contribution['id'],
       'payment_instrument_id' => $instrumentId,
     ]);
@@ -1420,7 +1420,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCreateUpdateNegativeContributionPaymentInstrument() {
     $instrumentId = $this->_addPaymentInstrument();
-    $contribParams = [
+    $contributionParams = [
       'contact_id' => $this->_individualId,
       'total_amount' => -100.00,
       'financial_type_id' => $this->_financialTypeId,
@@ -1428,9 +1428,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
 
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
 
-    $newParams = array_merge($contribParams, [
+    $newParams = array_merge($contributionParams, [
       'id' => $contribution['id'],
       'payment_instrument_id' => $instrumentId,
     ]);
@@ -1686,8 +1686,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Function tests invalid contribution status change.
    */
-  public function testCreateUpdateContributionInValidStatusChange() {
-    $contribParams = [
+  public function testCreateUpdateContributionInValidStatusChange(): void {
+    $contributionParams = [
       'contact_id' => 1,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
@@ -1695,8 +1695,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'payment_instrument_id' => 1,
       'contribution_status_id' => 1,
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
-    $newParams = array_merge($contribParams, [
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $newParams = array_merge($contributionParams, [
       'id' => $contribution['id'],
       'contribution_status_id' => 2,
     ]);
@@ -1710,7 +1710,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionCancelPending() {
-    $contribParams = [
+    $contributionParams = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
@@ -1720,8 +1720,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_pay_later' => 1,
 
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
-    $newParams = array_merge($contribParams, [
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $newParams = array_merge($contributionParams, [
       'id' => $contribution['id'],
       'contribution_status_id' => 3,
       'cancel_date' => '2012-02-02 09:00',
@@ -1741,7 +1741,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionChangeFinancialType() {
-    $contribParams = [
+    $contributionParams = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
@@ -1750,8 +1750,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
 
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
-    $newParams = array_merge($contribParams, [
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $newParams = array_merge($contributionParams, [
       'id' => $contribution['id'],
       'financial_type_id' => 3,
     ]);
@@ -1766,7 +1766,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionWithFeeAmountChangeFinancialType() {
-    $contribParams = [
+    $contributionParams = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
@@ -1776,8 +1776,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
 
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
-    $newParams = array_merge($contribParams, [
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $newParams = array_merge($contributionParams, [
       'id' => $contribution['id'],
       'financial_type_id' => 3,
     ]);
@@ -2640,9 +2640,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @dataProvider contributionStatusProvider
    *
+   * @param array $contributionStatus
+   *
    * @throws \CRM_Core_Exception
    */
-  public function testRepeatTransactionMembershipRenewContributionNotCompleted($contributionStatus): void {
+  public function testRepeatTransactionMembershipRenewContributionNotCompleted(array $contributionStatus): void {
     // Completed status should renew so we don't test that here
     // In Progress status was never actually intended to be available for contributions.
     // Partially paid is not valid.

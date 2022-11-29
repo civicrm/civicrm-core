@@ -901,7 +901,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       && $self->_values['contribution_status_id'] != $fields['contribution_status_id']
       && $self->_values['is_template'] != 1
     ) {
-      CRM_Contribute_BAO_Contribution::checkStatusValidation($self->_values, $fields, $errors);
+      try {
+        CRM_Contribute_BAO_Contribution::checkStatusValidation($self->_values, $fields);
+      }
+      catch (CRM_Core_Exception $e) {
+        $errors['contribution_status_id'] = $e->getMessage();
+      }
     }
     // CRM-16015, add form-rule to restrict change of financial type if using price field of different financial type
     if (($self->_action & CRM_Core_Action::UPDATE)

@@ -54,13 +54,12 @@ function civicrm_api3_contribution_create($params) {
     }
   }
   if (!empty($params['id']) && !empty($params['contribution_status_id'])) {
-    $error = [];
     //throw error for invalid status change such as setting completed back to pending
     //@todo this sort of validation belongs in the BAO not the API - if it is not an OK
     // action it needs to be blocked there. If it is Ok through a form it needs to be OK through the api
-    CRM_Contribute_BAO_Contribution::checkStatusValidation(NULL, $params, $error);
-    if (array_key_exists('contribution_status_id', $error)) {
-      throw new CRM_Core_Exception($error['contribution_status_id']);
+    $values = ['contribution_status_id' => (int) CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['id'], 'contribution_status_id')];
+    if ($values['contribution_status_id'] !== (int) $params['contribution_status_id']) {
+      CRM_Contribute_BAO_Contribution::checkStatusValidation($values, $params);
     }
   }
   if (!empty($params['id']) && !empty($params['financial_type_id'])) {
