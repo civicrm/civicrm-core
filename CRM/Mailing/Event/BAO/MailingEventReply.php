@@ -196,7 +196,7 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    */
   private static function autoRespond(&$mailing, $queue_id, $replyto) {
     $eq = CRM_Core_DAO::executeQuery(
-      'SELECT contact.preferred_mail_format as format,
+      'SELECT
                   email.email as email,
                   queue.job_id as job_id,
                   queue.hash as hash
@@ -238,14 +238,10 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
     $bao->body_html = $html;
     $tokens = $bao->getTokens();
 
-    if ($eq->format == 'HTML' || $eq->format == 'Both') {
-      $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
-      $html = CRM_Utils_Token::replaceMailingTokens($html, $mailing, NULL, $tokens['html']);
-    }
-    if (!$html || $eq->format == 'Text' || $eq->format == 'Both') {
-      $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
-      $text = CRM_Utils_Token::replaceMailingTokens($text, $mailing, NULL, $tokens['text']);
-    }
+    $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
+    $html = CRM_Utils_Token::replaceMailingTokens($html, $mailing, NULL, $tokens['html']);
+    $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
+    $text = CRM_Utils_Token::replaceMailingTokens($text, $mailing, NULL, $tokens['text']);
     $params['html'] = $html;
     $params['text'] = $text;
 
