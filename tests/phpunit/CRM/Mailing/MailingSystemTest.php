@@ -158,6 +158,9 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     ], 1);
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function testMailingReplyAutoRespond(): void {
     // Because our parent class marks the _groupID as private, we can't use that :-(
     $group_1 = $this->groupCreate([
@@ -165,14 +168,15 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
       'title' => 'Test Group Mailing Reply',
     ]);
     $this->createContactsInGroup(1, $group_1);
+    $this->callAPISuccess('Address', 'create', ['street_address' => 'Sesame Street', 'contact_id' => 1]);
 
     // Also _mut is private to the parent, so we have to make our own:
     $mut = new CiviMailUtils($this, TRUE);
 
-    $replyComponent = civicrm_api3('MailingComponent', 'get', ['id' => CRM_Mailing_PseudoConstant::defaultComponent('Reply', ''), 'sequential' => 1])['values'][0];
-    $replyComponent['body_html'] = $replyComponent['body_html'] . ' {domain.address} ';
-    $replyComponent['body_txt'] = $replyComponent['body_txt'] . ' {domain.address} ';
-    civicrm_api3('MailingComponent', 'create', $replyComponent);
+    $replyComponent = $this->callAPISuccess('MailingComponent', 'get', ['id' => CRM_Mailing_PseudoConstant::defaultComponent('Reply', ''), 'sequential' => 1])['values'][0];
+    $replyComponent['body_html'] .= ' {domain.address} ';
+    $replyComponent['body_txt'] .= ' {domain.address} ';
+    $this->callAPISuccess('MailingComponent', 'create', $replyComponent);
 
     // Create initial mailing to the group.
     $mailingParams = [
@@ -187,16 +191,16 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     ];
 
     // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
-    $mailing_1 = $this->callAPISuccess('mailing', 'create', $mailingParams);
+    $mailing_1 = $this->callAPISuccess('Mailing', 'create', $mailingParams);
     $mut->assertRecipients(array());
     $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
 
     $allMessages = $mut->getAllMessages('ezc');
-    $this->assertEquals(1, count($allMessages));
+    $this->assertCount(1, $allMessages);
 
     // So far so good.
     $message = end($allMessages);
-    $this->assertTrue($message->body instanceof ezcMailText);
+    $this->assertInstanceOf(ezcMailText::class, $message->body);
     $this->assertEquals('plain', $message->body->subType);
     $this->assertEquals(1, preg_match(
       '@mailing/unsubscribe.*jid=(\d+)&qid=(\d+)&h=([0-9a-z]+)@',
@@ -213,7 +217,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     );
     $mut->checkMailLog([
       'Please Send Inquiries to Our Contact Email Address',
-      CRM_Core_DomainTokens::getDomainTokenValues(NULL, FALSE)['address'],
+      'Sesame Street',
       'do-not-reply@chaos.org',
       'info@EXAMPLE.ORG',
       'mail1@nul.example.com',
