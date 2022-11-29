@@ -1,21 +1,7 @@
 <?php
 
-use Civi\Api4\Entity;
 use Civi\BAO\Import;
 use CRM_Civiimport_ExtensionUtil as E;
-
-// Check if SearchKit is enabled before adding SavedSearches.
-try {
-  if (!Entity::get(FALSE)
-    ->addWhere('name', '=', 'SearchDisplay')
-    ->selectRowCount()
-    ->execute()->count()) {
-    return [];
-  }
-}
-catch (CRM_Core_Exception $e) {
-  return [];
-}
 
 $managedEntities = [];
 $importEntities = Import::getImportTables();
