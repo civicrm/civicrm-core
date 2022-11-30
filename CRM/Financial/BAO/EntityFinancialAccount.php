@@ -81,6 +81,7 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
    * @deprecated
    */
   public static function del($financialTypeAccountId, $accountId = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     static::deleteRecord(['id' => $financialTypeAccountId]);
   }
 
