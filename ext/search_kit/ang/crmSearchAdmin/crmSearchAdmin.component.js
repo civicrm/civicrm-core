@@ -532,8 +532,8 @@
           prefix = typeof prefix === 'undefined' ? '' : prefix;
           _.each(fields, function(field) {
             var item = {
-              // Use suffix only if the field is not an FK. EntityRef fields look-up by id.
-              id: prefix + field.name + (!field.fk_entity && _.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
+              // Use options suffix if available.
+              id: prefix + field.name + (field.options && _.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
               text: field.label,
               description: field.description
             };

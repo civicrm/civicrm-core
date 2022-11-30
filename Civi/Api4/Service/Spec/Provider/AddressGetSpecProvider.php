@@ -27,7 +27,12 @@ class AddressGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
-    // Groups field
+    // These fields do not have any sensible "name" pseudoconstant so should just use the ID
+    foreach (['state_province_id', 'country_id', 'county_id'] as $name) {
+      $spec->getFieldByName($name)->setSuffixes(['label', 'abbr']);
+    }
+
+    // Proximity search field
     $field = new FieldSpec('proximity', 'Address', 'Boolean');
     $field->setLabel(ts('Address Proximity'))
       ->setTitle(ts('Address Proximity'))

@@ -143,14 +143,12 @@
         }
 
         if (!_.includes(['>', '<', '>=', '<='], ctrl.op)) {
-          // For fields with both an FK and an option list, prefer the FK
-          // because it's more efficient to render an autocomplete than to
-          // pre-load potentially thousands of options into a select dropdown.
-          if ((field.fk_entity || field.name === 'id')) {
-            return '~/crmSearchTasks/crmSearchInput/entityRef.html';
-          }
-          if (field.options) {
+          // Only use option list if the field has a "name" suffix
+          if (field.options && field.suffixes && field.suffixes.includes('name')) {
             return '~/crmSearchTasks/crmSearchInput/select.html';
+          }
+          if (field.fk_entity || field.name === 'id') {
+            return '~/crmSearchTasks/crmSearchInput/entityRef.html';
           }
         }
 
