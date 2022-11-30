@@ -275,6 +275,14 @@ function civiimport_civicrm_buildForm(string $formName, $form) {
   }
 
   if ($formName === 'CRM_Contact_Import_Form_Summary') {
+    $userJobID = $form->getUserJobID();
+    Civi::service('angularjs.loader')
+      ->addModules('importSummary' . $userJobID);
+    CRM_Core_Resources::singleton()->addMarkup('<crm-angular-js modules=\'importSummary' . $userJobID . '\'>
+  <form id="bootstrap-theme">
+    <import-summary-' . $userJobID . '></import-summary-' . $userJobID . '>
+  </form>
+</crm-angular-js>');
     $form->assign('downloadErrorRecordsUrl', '/civicrm/search#/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=ERROR');
   }
 }
