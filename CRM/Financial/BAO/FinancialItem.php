@@ -182,9 +182,12 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param bool $maxId
    *   To retrieve max id.
    *
+   * @deprecated
+   *
    * @return array
    */
   public static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     $financialItem = new CRM_Financial_DAO_EntityFinancialTrxn();
     $financialItem->copyValues($params);
     // retrieve last entry from civicrm_entity_financial_trxn
