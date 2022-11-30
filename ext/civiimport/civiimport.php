@@ -86,6 +86,10 @@ function civiimport_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function civiimport_civicrm_entityTypes(array &$entityTypes): void {
+  // This is the uncached function :-( Because we can't tell if it is being
+  // called pre-boot. Currently both this and the cached functions rely on the
+  // static cache - but since it keeps changing practice is to call this
+  // function when we know caching is likely to be scary.
   $importEntities = _civiimport_civicrm_get_import_tables();
 
   foreach ($importEntities as $userJobID => $table) {
@@ -104,11 +108,19 @@ function civiimport_civicrm_entityTypes(array &$entityTypes): void {
  * have class loading set up by the time it runs.
  *
  * Where the database is fully booted already it is better to call
- * `Civi\BAO\Import::getImportTables()` which has caching.
+ * `Civi\BAO\Import::getImportTables()` which is expected to have caching.
+ *
+ * Currently both functions share the Civi::statics caching in this function -
+ * but we have had lots of back & forth so the principle is - call this if
+ * we know caching could be scary - call the other for 'whatever caching is
+ * most performant'.
  *
  * @return array
  */
 function _civiimport_civicrm_get_import_tables(): array {
+  if (isset(Civi::$statics['civiimport_tables'])) {
+    return Civi::$statics['civiimport_tables'];
+  }
   // We need to avoid the api here as it is called early & could cause loops.
   $tables = CRM_Core_DAO::executeQuery('
      SELECT `user_job`.`id` AS id, `metadata`, `name`, `job_type`, `user_job`.`created_id`, `created_id`.`display_name`, `user_job`.`created_date`, `user_job`.`expires_date`
@@ -146,6 +158,7 @@ function _civiimport_civicrm_get_import_tables(): array {
       'description' => $tables->created_date . $createdBy,
     ];
   }
+  Civi::$statics['civiimport_tables'] = $importEntities;
   return $importEntities;
 }
 
@@ -200,7 +213,7 @@ function civiimport_civicrm_alterTemplateFile($formName, $form, $type, &$templat
  * @noinspection PhpUnused
  */
 function civiimport_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userId) {
-  foreach (_civiimport_civicrm_get_import_tables() as $import) {
+  foreach (Import::getImportTables() as $import) {
     $tasks['Import_' . $import['user_job_id']]['validate'] = [
       'title' => E::ts('Validate'),
       'icon' => 'fa-check',

@@ -12,19 +12,23 @@ use Civi\API\Event\AuthorizeEvent;
 use Civi\API\Events;
 use Civi\Api4\Entity;
 use Civi\Api4\Managed;
+use Civi\Api4\SearchDisplay;
 use Civi\Api4\UserJob;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Service\AutoService;
 use CRM_Core_DAO_AllCoreTables;
 use Civi\Api4\Import;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Civi\API\Exception\UnauthorizedException;
+use CRM_Civiimport_ExtensionUtil as E;
 
 /**
  * Listening class that registers each Import table as an entity.
+ *
  * @service civi.api4.importSubscriber
  */
-class ImportSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
+class ImportSubscriber extends AutoService implements EventSubscriberInterface {
 
   /**
    * Get the events this class listens to.
@@ -36,6 +40,7 @@ class ImportSubscriber extends \Civi\Core\Service\AutoService implements EventSu
       'hook_civicrm_post' => 'on_hook_civicrm_post',
       'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
       'civi.api.authorize' => [['onApiAuthorize', Events::W_EARLY]],
+      'civi.afform.get' => 'on_civi_afform_get',
     ];
   }
 
@@ -59,12 +64,6 @@ class ImportSubscriber extends \Civi\Core\Service\AutoService implements EventSu
         'class_args' => [$userJobID],
         'label_field' => '_id',
         'searchable' => 'secondary',
-        'paths' => [
-          //  'browse' => "civicrm/eck/entity/list/{$entity_type['name']}",
-          //  'view' => "civicrm/eck/entity?reset=1&action=view&type={$entity_type['name']}&id=[id]",
-          //  'update' => "civicrm/eck/entity/edit/{$entity_type['name']}/[subtype:name]#?{$entity_type['entity_name']}=[id]",
-          //  'add' => "civicrm/eck/entity/edit/{$entity_type['name']}/[subtype:name]",
-        ],
         'class' => Import::class,
         'icon' => 'fa-upload',
       ];
@@ -80,6 +79,7 @@ class ImportSubscriber extends \Civi\Core\Service\AutoService implements EventSu
         $exists = Entity::get(FALSE)->addWhere('name', '=', 'Import_' . $event->id)->selectRowCount()->execute()->count();
         if (!$exists || $event->action === 'delete') {
           // Flush entities cache key so our new Import will load as an entity.
+          unset(Civi::$statics['civiimport_tables']);
           Civi::cache('metadata')->delete('api4.entities.info');
           Civi::cache('metadata')->delete('civiimport_tables');
           CRM_Core_DAO_AllCoreTables::flush();
@@ -110,6 +110,71 @@ class ImportSubscriber extends \Civi\Core\Service\AutoService implements EventSu
         throw new UnauthorizedException('Import access not permitted');
       }
     }
+  }
+
+  /**
+   * Get an array of FormBuilder forms for viewing imports.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @noinspection PhpUnused
+   */
+  public static function on_civi_afform_get(GenericHookEvent $event): void {
+    // We're only providing afforms of type 'search'
+    if ($event->getTypes && !in_array('search', $event->getTypes, TRUE)) {
+      return;
+    }
+
+    $importForms = self::getImportForms();
+    if (!empty($importForms) && $importForms !== $event->afforms) {
+      $event->afforms = array_merge($event->afforms ?? [], $importForms);
+    }
+  }
+
+  /**
+   * Get an array of FormBuilder forms for viewing imports.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function getImportForms(): array {
+    $cacheKey = 'civiimport_forms_' . \CRM_Core_Config::domainID() . '_' . (int) \CRM_Core_Session::getLoggedInContactID();
+    if (\Civi::cache('metadata')->has($cacheKey)) {
+      return \Civi::cache('metadata')->get($cacheKey);
+    }
+    $forms = [];
+    try {
+      $importSearches = SearchDisplay::get()
+        ->addWhere('saved_search_id.name', 'LIKE', 'Import\_Summary\_%')
+        ->addWhere('saved_search_id.expires_date', '>', 'now')
+        ->addSelect('name', 'label')
+        ->execute();
+      foreach ($importSearches as $importSearch) {
+        $userJobID = str_replace('Import_Summary_', '', $importSearch['name']);
+        $forms[$importSearch['name']] = [
+          'name' => $importSearch['name'],
+          'type' => 'search',
+          'title' => $importSearch['label'],
+          'base_module' => E::LONG_NAME,
+          'is_dashlet' => FALSE,
+          'is_public' => FALSE,
+          'is_token' => FALSE,
+          'permission' => 'access CiviCRM',
+          'requires' => ['crmSearchDisplayTable'],
+          'layout' => '<div af-fieldset="">
+  <crm-search-display-table search-name="Import_Summary_' . $userJobID . '" display-name="Import_Summary_' . $userJobID . '">
+</crm-search-display-table></div>',
+        ];
+      }
+    }
+    catch (UnauthorizedException $e) {
+      // No access - return the empty array.
+    }
+    \Civi::cache('metadata')->set($cacheKey, $forms);
+    return $forms;
   }
 
 }
