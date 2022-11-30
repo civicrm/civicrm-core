@@ -120,10 +120,23 @@
           {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
-              {if $frequency_interval > 1}
-                <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
+              {if $installments > 1}
+                {if $frequency_interval > 1}
+                  <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
+                {else}
+                  <strong>{ts 1=$frequency_unit}This membership will be renewed automatically every %1.{/ts}</strong>
+                {/if}
               {else}
-                <strong>{ts 1=$frequency_unit}This membership will be renewed automatically every %1.{/ts}</strong>
+                  {* dev/translation#80 All 'every %1' strings are incorrectly using ts, but focusing on the most important one until we find a better fix. *}
+                  {if $frequency_unit eq 'day'}
+                    <strong>{ts}This membership will be renewed automatically every day.{/ts}</strong>
+                  {elseif $frequency_unit eq 'week'}
+                    <strong>{ts}This membership will be renewed automatically every week.{/ts}</strong>
+                  {elseif $frequency_unit eq 'month'}
+                    <strong>{ts}This membership will be renewed automatically every month.{/ts}</strong>
+                  {elseif $frequency_unit eq 'year'}
+                    <strong>{ts}This membership will be renewed automatically every year.{/ts}</strong>
+                  {/if}
               {/if}
               <div class="description crm-auto-renew-cancel-info">({ts}You will receive an email receipt which includes information about how to cancel the auto-renewal option.{/ts})</div>
             {/crmRegion}
