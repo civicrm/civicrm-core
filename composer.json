@@ -77,7 +77,7 @@
     "pear/auth_sasl": "1.1.0",
     "pear/net_smtp": "1.10.*",
     "pear/net_socket": "1.0.*",
-    "pear/mail": "^1.4",
+    "pear/mail": "^1.5",
     "guzzlehttp/guzzle": "^6.3 || ^7.3",
     "psr/simple-cache": "~1.0.1",
     "cweagans/composer-patches": "~1.0",
