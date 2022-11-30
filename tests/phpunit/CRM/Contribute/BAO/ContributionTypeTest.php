@@ -46,24 +46,6 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method retrive()
-   */
-  public function testRetrieve() {
-    $params = [
-      'name' => 'Donations',
-      'is_deductible' => 0,
-      'is_active' => 1,
-    ];
-    $ids = [];
-    $contributionType = CRM_Financial_BAO_FinancialType::add($params, $ids);
-
-    $defaults = [];
-    $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-
-    $this->assertEquals($result->name, 'Donations', 'Verify financial type name.');
-  }
-
-  /**
    * Check method setIsActive()
    */
   public function testSetIsActive() {
@@ -82,24 +64,6 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
       'Database check on updated for financial type is_active.'
     );
     $this->assertEquals($isActive, 0, 'Verify financial types is_active.');
-  }
-
-  /**
-   * Check method del()
-   */
-  public function testdel() {
-    $params = [
-      'name' => 'Donations',
-      'is_deductible' => 0,
-      'is_active' => 1,
-    ];
-    $ids = [];
-    $contributionType = CRM_Financial_BAO_FinancialType::add($params, $ids);
-
-    CRM_Financial_BAO_FinancialType::del($contributionType->id);
-    $params = ['id' => $contributionType->id];
-    $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
   }
 
 }
