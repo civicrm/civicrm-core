@@ -27,7 +27,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     // Adding checkPermissions filters out actions the user is not allowed to perform
     $entity = Entity::get($this->checkPermissions)->addWhere('name', '=', $this->entity)
       ->addSelect('name', 'title_plural')
-      ->setChain(['actions' => ['$name', 'getActions', ['where' => [['name', 'IN', ['update', 'delete']]]], 'name']])
+      ->setChain([
+        'actions' => ['$name', 'getActions', ['where' => [['name', 'IN', ['update', 'delete']]]], 'name'],
+        'fields' => ['$name', 'getFields', ['where' => [['type', '=', 'Field']]], 'name'],
+      ])
       ->execute()->first();
 
     if (!$entity) {
@@ -64,6 +67,33 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'icon' => 'fa-save',
         'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskUpdate.html'],
       ];
+
+      // Enable/disable are basically shortcut update actions
+      if (isset($entity['fields']['is_active'])) {
+        $tasks[$entity['name']]['enable'] = [
+          'title' => E::ts('Enable %1', [1 => $entity['title_plural']]),
+          'icon' => 'fa-toggle-on',
+          'apiBatch' => [
+            'action' => 'update',
+            'params' => ['values' => ['is_active' => TRUE]],
+            'runMsg' => E::ts('Enabling %1 %2...'),
+            'successMsg' => E::ts('Successfully enabled %1 %2.'),
+            'errorMsg' => E::ts('An error occurred while attempting to enable %1 %2.'),
+          ],
+        ];
+        $tasks[$entity['name']]['disable'] = [
+          'title' => E::ts('Disable %1', [1 => $entity['title_plural']]),
+          'icon' => 'fa-toggle-off',
+          'apiBatch' => [
+            'action' => 'update',
+            'params' => ['values' => ['is_active' => FALSE]],
+            'confirmMsg' => E::ts('Are you sure you want to disable %1 %2?'),
+            'runMsg' => E::ts('Disabling %1 %2...'),
+            'successMsg' => E::ts('Successfully disabled %1 %2.'),
+            'errorMsg' => E::ts('An error occurred while attempting to disable %1 %2.'),
+          ],
+        ];
+      }
 
       $taggable = \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
       if (in_array($entity['name'], $taggable, TRUE)) {
