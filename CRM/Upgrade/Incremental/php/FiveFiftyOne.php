@@ -188,7 +188,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
 
     $activityContact = CRM_Activity_BAO_ActivityContact::import();
     $activityTarget['target_contact_id'] = $activityContact['contact_id'];
-    $fields = array_merge(CRM_Activity_BAO_Activity::importableFields(),
+    $fields = array_merge(self::getImportableActivityFields(),
       $activityTarget
     );
 
@@ -322,6 +322,54 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
       self::dropColumn($context, 'civicrm_user_job', 'type_id');
     }
     return TRUE;
+  }
+
+  /**
+   * Combine all the importable fields from the lower levels object.
+   *
+   * The ordering is important, since currently we do not have a weight
+   * scheme. Adding weight is super important and should be done in the
+   * next week or so, before this can be called complete.
+   *
+   * @return array
+   *   array of importable Fields
+   */
+  private static function getImportableActivityFields(): array {
+    if (empty(Civi::$statics[__CLASS__][__FUNCTION__])) {
+      Civi::$statics[__CLASS__][__FUNCTION__] = [];
+      $fields = ['' => ['title' => ts('- do not import -')]];
+
+      $tmpFields = CRM_Activity_DAO_Activity::import();
+      $contactFields = CRM_Contact_BAO_Contact::importableFields('Individual', NULL);
+
+      // Using new Dedupe rule.
+      $ruleParams = [
+        'contact_type' => 'Individual',
+        'used' => 'Unsupervised',
+      ];
+      $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
+
+      $tmpConatctField = [];
+      if (is_array($fieldsArray)) {
+        foreach ($fieldsArray as $value) {
+          $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
+            $value,
+            'id',
+            'column_name'
+          );
+          $value = $customFieldId ? 'custom_' . $customFieldId : $value;
+          $tmpConatctField[trim($value)] = $contactFields[trim($value)];
+          $tmpConatctField[trim($value)]['title'] = $tmpConatctField[trim($value)]['title'] . " (match to contact)";
+        }
+      }
+      $tmpConatctField['external_identifier'] = $contactFields['external_identifier'];
+      $tmpConatctField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . " (match to contact)";
+      $fields = array_merge($fields, $tmpConatctField);
+      $fields = array_merge($fields, $tmpFields);
+      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Activity'));
+      Civi::$statics[__CLASS__][__FUNCTION__] = $fields;
+    }
+    return Civi::$statics[__CLASS__][__FUNCTION__];
   }
 
   /**
