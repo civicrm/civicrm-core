@@ -195,23 +195,34 @@ class Import extends CRM_Core_DAO {
    * @throws \CRM_Core_Exception
    */
   public static function getFieldsForTable(string $tableName): array {
+    $cacheKey = 'civiimport_table_fields' . $tableName;
+    if (\Civi::cache('metadata')->has($cacheKey)) {
+      return \Civi::cache('metadata')->get($cacheKey);
+    }
     if (!CRM_Utils_Rule::alphanumeric($tableName)) {
       // This is purely precautionary so does not need to be a translated string.
       throw new CRM_Core_Exception('Invalid import table');
     }
     $columns = [];
-    $headers = UserJob::get(FALSE)
+    $userJob = UserJob::get(FALSE)
       ->addWhere('metadata', 'LIKE', '%' . $tableName . '%')
-      ->addSelect('metadata')->execute()->first()['metadata']['DataSource']['column_headers'] ?? [];
+      ->addSelect('metadata', 'job_type')->execute()->first();
+    $headers = $userJob['metadata']['DataSource']['column_headers'] ?? [];
+    $entity = \CRM_Core_BAO_UserJob::getType($userJob['job_type'])['entity'];
     $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
     $userFieldIndex = 0;
     while ($result->fetch()) {
       $columns[$result->Field] = ['name' => $result->Field, 'table_name' => $tableName];
-      if (substr($result->Field, 1) !== '_') {
-        $columns[$result->Field]['label'] = $headers[$userFieldIndex] ?? $result->Field;
+      if (strpos($result->Field, '_') !== 0) {
+        $columns[$result->Field]['label'] = ts('Import field') . ':' . ($headers[$userFieldIndex] ?? $result->Field);
         $userFieldIndex++;
       }
+      else {
+        $columns[$result->Field]['label'] = $result->Field === '_entity_id' ? E::ts('%1 ID', [1 => $entity]) : $result->Field;
+        $columns[$result->Field]['type'] = strpos($result->Type, 'int') === 0 ? 'Integer' : 'String';
+      }
     }
+    \Civi::cache('metadata')->set($cacheKey, $columns);
     return $columns;
   }
 

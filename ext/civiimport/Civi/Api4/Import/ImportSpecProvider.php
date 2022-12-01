@@ -19,6 +19,7 @@ use Civi\Api4\UserJob;
 use Civi\BAO\Import;
 use Civi\Core\Service\AutoService;
 use CRM_Core_BAO_UserJob;
+use CRM_Civiimport_ExtensionUtil as E;
 
 /**
  * @service
@@ -33,11 +34,10 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
   public function modifySpec(RequestSpec $spec): void {
     $tableName = $spec->getEntityTableName();
     $columns = Import::getFieldsForTable($tableName);
-    $action = $spec->getAction();
     // CheckPermissions does not reach us here - so we will have to rely on earlier permission filters.
     $userJobID = substr($spec->getEntity(), (strpos($spec->getEntity(), '_') + 1));
     $userJob = UserJob::get(FALSE)->addWhere('id', '=', $userJobID)->addSelect('metadata', 'job_type', 'created_id')->execute()->first();
-
+    $entity = CRM_Core_BAO_UserJob::getType($userJob['job_type'])['entity'];
     foreach ($columns as $column) {
       $isInternalField = strpos($column['name'], '_') === 0;
       $exists = $isInternalField && $spec->getFieldByName($column['name']);
@@ -57,6 +57,7 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
           if ($userJob['job_type'] === $jobType['id'] && $jobType['entity']) {
             $field->setFkEntity($jobType['entity']);
             $field->setInputType('EntityRef');
+            $field->setInputAttrs(['label' => $entity]);
           }
         }
       }
