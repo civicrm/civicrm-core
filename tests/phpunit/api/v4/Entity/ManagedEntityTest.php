@@ -517,6 +517,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       // managed entities & the test will fail if we pretend it doesn't exist
       // here but still let it declare entities.
       new CRM_Core_Module('legacycustomsearches', TRUE),
+      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     (new CRM_Core_ManagedEntities($allModules))->reconcile();
 
@@ -565,6 +566,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       // managed entities & the test will fail if we pretend it doesn't exist
       // here but still let it declare entities.
       new CRM_Core_Module('legacycustomsearches', TRUE),
+      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     // If module is disabled it will not run hook_civicrm_managed.
     $this->_managedEntities = [];
@@ -592,6 +594,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       // managed entities & the test will fail if we pretend it doesn't exist
       // here but still let it declare entities.
       new CRM_Core_Module('legacycustomsearches', TRUE),
+      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     $this->_managedEntities = $managedEntities;
     (new CRM_Core_ManagedEntities($allModules))->reconcile();

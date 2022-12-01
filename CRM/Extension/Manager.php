@@ -378,6 +378,9 @@ class CRM_Extension_Manager {
 
     sort($keys);
     $disableRequirements = $this->findDisableRequirements($keys);
+
+    $requiredExtensions = $this->mapper->getKeysByTag('mgmt:required');
+
     // This munges order, but makes it comparable.
     sort($disableRequirements);
     if ($keys !== $disableRequirements) {
@@ -388,6 +391,10 @@ class CRM_Extension_Manager {
 
     foreach ($keys as $key) {
       if (isset($origStatuses[$key])) {
+        if (in_array($key, $requiredExtensions)) {
+          throw new CRM_Extension_Exception("Cannot disable required extension: $key");
+        }
+
         switch ($origStatuses[$key]) {
           case self::STATUS_INSTALLED:
             $this->addProcess([$key], 'disabling');
