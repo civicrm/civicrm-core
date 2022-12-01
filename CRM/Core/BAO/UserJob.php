@@ -146,7 +146,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
    * @return array
    */
   public static function getTypes(): array {
-    $types = Civi::cache()->get('UserJobTypes');
+    $types = Civi::cache('metadata')->get('UserJobTypes');
     if ($types === NULL) {
       $types = [];
       $classes = ClassScanner::get(['interface' => UserJobInterface::class]);
@@ -158,7 +158,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
         }
         $types = array_merge($types, $declaredTypes);
       }
-      Civi::cache()->set('UserJobTypes', $types);
+      Civi::cache('metadata')->set('UserJobTypes', $types);
     }
     // Rekey to numeric to prevent https://lab.civicrm.org/dev/core/-/issues/3719
     return array_values($types);
