@@ -371,6 +371,10 @@ class Container {
       'CRM_Core_DomainTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    $container->setDefinition('crm_token_tidy', new Definition(
+      '\Civi\Token\TidySubscriber',
+      []
+    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
     $dispatcherDefn = $container->getDefinition('dispatcher');
     foreach (\CRM_Core_DAO_AllCoreTables::getBaoClasses() as $baoEntity => $baoClass) {

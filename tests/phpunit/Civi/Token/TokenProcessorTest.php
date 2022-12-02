@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Token;
 
+use Civi\Api4\Website;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Civi\Core\CiviEventDispatcher;
@@ -261,32 +262,74 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $rowCount = 0;
     foreach ($tokenProcessor->evaluate()->getRows() as $key => $row) {
       /** @var TokenRow */
-      $this->assertTrue($row instanceof TokenRow);
+      $this->assertInstanceOf(TokenRow::class, $row);
       $this->assertEquals($expectText[$key], $row->render('text'));
       $rowCount++;
     }
     $this->assertEquals(3, $rowCount);
   }
 
-  public function testGetMessageTokens(): void {
-    $p = new TokenProcessor($this->dispatcher, [
-      'controller' => __CLASS__,
-    ]);
-    $p->addMessage('greeting_html', 'Good morning, <p>{contact.display_name}</p>. {custom.foobar}!', 'text/html');
-    $p->addMessage('greeting_text', 'Good morning, {contact.display_name}. {custom.whizbang}, {contact.first_name}!', 'text/plain');
-    $expected = [
-      'contact' => ['display_name', 'first_name'],
-      'custom' => ['foobar', 'whizbang'],
-    ];
-    $this->assertEquals($expected, $p->getMessageTokens());
+  /**
+   * Test that double urls created by https:// followed by a token are cleaned up.
+   *
+   * The ckeditor UI makes it easy to put https:// in the html when adding links,
+   * but they in the website url already.
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @noinspection HttpUrlsUsage
+   */
+  public function testRenderDoubleUrl(): void {
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
+    $this->dispatcher->addSubscriber(new TidySubscriber());
+    $contactID = $this->individualCreate();
+    $websiteID = Website::create()->setValues(['contact_id' => $contactID, 'url' => 'https://example.com'])->execute()->first()['id'];
+    $row = $this->renderUrlMessage($contactID);
+    $this->assertEquals('<a href="https://example.com">blah</a>', $row->render('one'));
+    $this->assertEquals('<a href="https://example.com">blah</a>', $row->render('two'));
+
+    Website::update()->setValues(['url' => 'http://example.com'])->addWhere('id', '=', $websiteID)->execute();
+    $row = $this->renderUrlMessage($contactID);
+    $this->assertEquals('<a href="http://example.com">blah</a>', $row->render('one'));
+    $this->assertEquals('<a href="http://example.com">blah</a>', $row->render('two'));
   }
 
+  /**
+   * Render a message with double url potential.
+   *
+   * @param int $contactID
+   *
+   * @return \Civi\Token\TokenRow
+   *
+   * @noinspection HttpUrlsUsage
+   */
+  protected function renderUrlMessage(int $contactID): TokenRow {
+    $tokenProcessor = $this->getTokenProcessor(['schema' => ['contactId']]);
+    $tokenProcessor->addRow(['contactId' => $contactID]);
+    $tokenProcessor->addMessage('one', '<a href="https://{contact.website_first.url}">blah</a>', 'text/html');
+    $tokenProcessor->addMessage('two', '<a href="http://{contact.website_first.url}">blah</a>', 'text/html');
+    return $tokenProcessor->evaluate()->getRow(0);
+  }
+
+  public function testGetMessageTokens(): void {
+    $tokenProcessor = $this->getTokenProcessor();
+    $tokenProcessor->addMessage('greeting_html', 'Good morning, <p>{contact.display_name}</p>. {custom.foobar}!', 'text/html');
+    $tokenProcessor->addMessage('greeting_text', 'Good morning, {contact.display_name}. {custom.whiz_bang}, {contact.first_name}!', 'text/plain');
+
+    $expected = [
+      'contact' => ['display_name', 'first_name'],
+      'custom' => ['foobar', 'whiz_bang'],
+    ];
+    $this->assertEquals($expected, $tokenProcessor->getMessageTokens());
+  }
+
+  /**
+   * Test getting available tokens.
+   */
   public function testListTokens(): void {
-    $p = new TokenProcessor($this->dispatcher, [
-      'controller' => __CLASS__,
-    ]);
-    $p->addToken(['entity' => 'MyEntity', 'field' => 'myField', 'label' => 'My Label']);
-    $this->assertEquals(['{MyEntity.myField}' => 'My Label'], $p->listTokens());
+    $tokenProcessor = $this->getTokenProcessor();
+    $tokenProcessor->addToken(['entity' => 'MyEntity', 'field' => 'myField', 'label' => 'My Label']);
+    $this->assertEquals(['{MyEntity.myField}' => 'My Label'], $tokenProcessor->listTokens());
   }
 
   /**
@@ -636,6 +679,19 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     }
     $this->assertEquals('Invoice #100!', $outputs[0]);
     $this->assertEquals('Invoice #200!', $outputs[1]);
+  }
+
+  /**
+   * Get a token processor instance.
+   *
+   * @param array $context
+   *
+   * @return \Civi\Token\TokenProcessor
+   */
+  protected function getTokenProcessor(array $context = []): TokenProcessor {
+    return new TokenProcessor($this->dispatcher, array_merge([
+      'controller' => __CLASS__,
+    ], $context));
   }
 
   ///**
