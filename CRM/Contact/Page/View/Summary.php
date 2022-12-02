@@ -425,6 +425,14 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     ];
     CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
 
+    // Remove any tabs that don't apply to this contact type
+    foreach (array_keys($allTabs) as $key) {
+      $tabContactType = (array) ($allTabs[$key]['contact_type'] ?? []);
+      if ($tabContactType && !in_array($contact['contact_type'], $tabContactType, TRUE)) {
+        unset($allTabs[$key]);
+      }
+    }
+
     $expectedKeys = ['count', 'class', 'template', 'hideCount', 'icon'];
 
     foreach ($allTabs as &$tab) {

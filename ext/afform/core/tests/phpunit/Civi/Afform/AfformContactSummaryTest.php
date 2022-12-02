@@ -15,6 +15,8 @@ class AfformContactSummaryTest extends \api\v4\Api4TestBase {
     'contact_summary_test1',
     'contact_summary_test2',
     'contact_summary_test3',
+    'contact_summary_test4',
+    'contact_summary_test5',
   ];
 
   public function setUpHeadless() {
@@ -52,6 +54,16 @@ class AfformContactSummaryTest extends \api\v4\Api4TestBase {
       ->addValue('title', 'Test A')
       ->addValue('contact_summary', 'tab')
       ->execute();
+    Afform::create()
+      ->addValue('name', $this->formNames[3])
+      ->addValue('title', 'Test D')
+      ->addValue('contact_summary', 'tab')
+      ->addValue('summary_contact_type', ['Individual'])
+      ->execute();
+    Afform::create()
+      ->addValue('name', $this->formNames[4])
+      ->addValue('title', 'Test E')
+      ->execute();
 
     $tabs = [];
     $context = [
@@ -67,7 +79,11 @@ class AfformContactSummaryTest extends \api\v4\Api4TestBase {
     $this->assertArrayHasKey($this->formNames[1], $tabs);
     $this->assertArrayHasKey($this->formNames[2], $tabs);
     $this->assertArrayNotHasKey($this->formNames[0], $tabs);
+    $this->assertArrayHasKey($this->formNames[3], $tabs);
+    $this->assertArrayNotHasKey($this->formNames[4], $tabs);
     $this->assertEquals('Test C', $tabs[$this->formNames[1]]['title']);
+    $this->assertEquals(['Individual'], $tabs[$this->formNames[1]]['contact_type']);
+    $this->assertEquals(['Individual'], $tabs[$this->formNames[3]]['contact_type']);
     $this->assertEquals('Test A', $tabs[$this->formNames[2]]['title']);
     $this->assertEquals('crm-i smiley-face', $tabs[$this->formNames[1]]['icon']);
     // Fallback icon
@@ -132,10 +148,9 @@ class AfformContactSummaryTest extends \api\v4\Api4TestBase {
     $blocks = [];
     afform_civicrm_contactSummaryBlocks($blocks);
 
-    // ContactLayout doesn't support > 1 contact type, so this ought to be null
-    $this->assertNull($blocks['afform_search']['blocks'][$this->formNames[0]]['contact_type']);
+    $this->assertEquals(['Individual', 'Household'], $blocks['afform_search']['blocks'][$this->formNames[0]]['contact_type']);
     // Sub-type should have been converted to parent type
-    $this->assertEquals('Organization', $blocks['afform_form']['blocks'][$this->formNames[1]]['contact_type']);
+    $this->assertEquals(['Organization'], $blocks['afform_form']['blocks'][$this->formNames[1]]['contact_type']);
     $this->assertNull($blocks['afform_form']['blocks'][$this->formNames[2]]['contact_type']);
     // Forms should be sorted by title
     $order = array_flip(array_keys($blocks['afform_form']['blocks']));
