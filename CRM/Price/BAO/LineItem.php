@@ -302,9 +302,10 @@ WHERE li.contribution_id = %1";
     }
 
     foreach ($params["price_{$fid}"] as $oid => $qty) {
-      $price = $amount_override === NULL ? $options[$oid]['amount'] : $amount_override;
+      $qty = (int) $qty;
+      $price = (float) ($amount_override === NULL ? $options[$oid]['amount'] : $amount_override);
 
-      $participantsPerField = CRM_Utils_Array::value('count', $options[$oid], 0);
+      $participantsPerField = (int) CRM_Utils_Array::value('count', $options[$oid], 0);
 
       $values[$oid] = [
         'price_field_id' => $fid,
