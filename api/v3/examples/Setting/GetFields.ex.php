@@ -3349,30 +3349,6 @@ function setting_getfields_expectedresult() {
           ],
         ],
       ],
-      'recaptchaOptions' => [
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'recaptchaOptions',
-        'type' => 'String',
-        'quick_form_type' => 'Element',
-        'html_attributes' => [
-          'size' => 64,
-          'maxlength' => 64,
-        ],
-        'html_type' => 'text',
-        'default' => '',
-        'add' => '4.3',
-        'title' => 'reCAPTCHA Options',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:\'blackglass\', lang : \'fr\' ). Check the available options at <a href=\"https://developers.google.com/recaptcha/docs/display#config\">Customizing the Look and Feel of reCAPTCHA</a>.',
-        'help_text' => '',
-        'settings_pages' => [
-          'recaptcha' => [
-            'weight' => 10,
-          ],
-        ],
-      ],
       'credit_notes_prefix' => [
         'group_name' => 'Contribute Preferences',
         'group' => 'contribute',
