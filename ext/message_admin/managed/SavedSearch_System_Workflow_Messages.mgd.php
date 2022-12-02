@@ -1,5 +1,11 @@
 <?php
 
+require_once 'message_admin.civix.php';
+// phpcs:disable
+use CRM_MessageAdmin_ExtensionUtil as E;
+// phpcs:enable
+
+
 return [
   [
     'name' => 'SavedSearch_System_Workflow_Messages',
