@@ -376,7 +376,7 @@ WHERE  email = %2
 
     $eq = new CRM_Core_DAO();
     $eq->query(
-      "SELECT     $contacts.preferred_mail_format as format,
+      "SELECT
                     $contacts.id as contact_id,
                     $email.email as email,
                     $queue.hash as hash
@@ -402,16 +402,13 @@ WHERE  email = %2
     $tokens = $bao->getTokens();
     $templates = $bao->getTemplates();
 
-    if ($eq->format == 'HTML' || $eq->format == 'Both') {
-      $html = CRM_Utils_Token::replaceUnsubscribeTokens($templates['html'], $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
-      $html = CRM_Utils_Token::replaceActionTokens($html, $addresses, $urls, TRUE, $tokens['html']);
-      $html = CRM_Utils_Token::replaceMailingTokens($html, $dao, NULL, $tokens['html']);
-    }
-    if (!$html || $eq->format == 'Text' || $eq->format == 'Both') {
-      $text = CRM_Utils_Token::replaceUnsubscribeTokens($templates['text'], $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
-      $text = CRM_Utils_Token::replaceActionTokens($text, $addresses, $urls, FALSE, $tokens['text']);
-      $text = CRM_Utils_Token::replaceMailingTokens($text, $dao, NULL, $tokens['text']);
-    }
+    $html = CRM_Utils_Token::replaceUnsubscribeTokens($templates['html'], $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
+    $html = CRM_Utils_Token::replaceActionTokens($html, $addresses, $urls, TRUE, $tokens['html']);
+    $html = CRM_Utils_Token::replaceMailingTokens($html, $dao, NULL, $tokens['html']);
+
+    $text = CRM_Utils_Token::replaceUnsubscribeTokens($templates['text'], $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
+    $text = CRM_Utils_Token::replaceActionTokens($text, $addresses, $urls, FALSE, $tokens['text']);
+    $text = CRM_Utils_Token::replaceMailingTokens($text, $dao, NULL, $tokens['text']);
 
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
