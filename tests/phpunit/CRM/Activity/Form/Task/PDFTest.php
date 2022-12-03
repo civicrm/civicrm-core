@@ -6,7 +6,7 @@ use Civi\Token\TokenProcessor;
  * Class CRM_Activity_Form_Task_PDFLetterCommonTest
  * @group headless
  */
-class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
+class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
 
   /**
    * Set up for tests.
