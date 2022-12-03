@@ -1434,6 +1434,7 @@ WHERE entity_id =%1 AND entity_table = %2";
    *   array of importable Fields
    */
   public static function &importableFields($status = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     if (empty(Civi::$statics[__CLASS__][__FUNCTION__])) {
       Civi::$statics[__CLASS__][__FUNCTION__] = [];
       if (!$status) {
