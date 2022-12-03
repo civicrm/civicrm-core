@@ -48,24 +48,16 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
    */
   public function setUp(): void {
     parent::setUp();
-    // If we happen to execute with flexmailer active, use BAO mode.
-    // There is a parallel FlexMailerSystemTest which runs in flexmailer mode.
-    Civi::settings()->add(['flexmailer_traditional' => 'bao']);
-
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
       [$this, 'hook_alterMailParams']);
-    error_reporting(E_ALL && !E_USER_DEPRECATED);
   }
 
   /**
    * @see CRM_Utils_Hook::alterMailParams
    */
-  public function hook_alterMailParams(&$params, $context = NULL): void {
+  public function hook_alterMailParams(): void {
     $this->counts['hook_alterMailParams'] = 1;
-    if ($this->checkMailParamsContext) {
-      $this->assertEquals('civimail', $context);
-    }
   }
 
   /**
@@ -90,6 +82,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     $this->assertNotEmpty($displayName);
 
     $params = $this->_params;
+    /** @noinspection HttpUrlsUsage */
     $params['body_html'] = '<a href="http://{action.forward}">Forward this email written in ckeditor</a>';
     $params['api.Mailing.preview'] = [
       'id' => '$value.id',
@@ -113,13 +106,15 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
    * Generate a fully-formatted mailing (with body_html content).
    *
    * @dataProvider urlTrackingExamples
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testUrlTracking(
     $inputHtml,
     $htmlUrlRegex,
     $textUrlRegex,
     $params
-  ) {
+  ): void {
     parent::testUrlTracking($inputHtml, $htmlUrlRegex, $textUrlRegex, $params);
   }
 
@@ -175,7 +170,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     $replyComponent = $this->callAPISuccess('MailingComponent', 'get', ['id' => CRM_Mailing_PseudoConstant::defaultComponent('Reply', ''), 'sequential' => 1])['values'][0];
     $replyComponent['body_html'] .= ' {domain.address} ';
-    $replyComponent['body_txt'] .= ' {domain.address} ';
+    $replyComponent['body_txt'] = $replyComponent['body_txt'] ?? '' . ' {domain.address} ';
     $this->callAPISuccess('MailingComponent', 'create', $replyComponent);
 
     // Create initial mailing to the group.
@@ -258,7 +253,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
    * @dataProvider multiLingual
    *
    */
-  public function testGitLabIssue1108($isMultiLingual) {
+  public function testGitLabIssue1108($isMultiLingual): void {
 
     // We need to make sure the mailing IDs are higher than the groupIDs.
     // We do this by adding mailings until the mailing.id value is at least 10

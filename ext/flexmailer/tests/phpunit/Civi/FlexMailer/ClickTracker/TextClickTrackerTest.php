@@ -27,7 +27,6 @@ class TextClickTrackerTest extends \CiviUnitTestCase {
     }
 
     parent::setUp();
-    \Civi::settings()->set('flexmailer_traditional', 'flexmailer');
   }
 
   public function getHrefExamples() {
