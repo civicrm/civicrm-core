@@ -24,7 +24,7 @@
             inputType = field.input_type,
             dataType = field.data_type;
           multi = field.serialize || dataType === 'Array';
-          $el.crmSelect2('destroy').crmDatepicker('destroy');
+          $el.crmAutocomplete('destroy').crmDatepicker('destroy');
           // Allow input_type to override dataType
           if (inputType) {
             multi = (dataType !== 'Boolean' &&
