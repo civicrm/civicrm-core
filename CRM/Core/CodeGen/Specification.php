@@ -245,6 +245,12 @@ class CRM_Core_CodeGen_Specification {
 
     $table['fields'] = &$fields;
 
+    // Default label field
+    if (!$table['labelField']) {
+      $possibleLabels = ['label', 'title'];
+      $table['labelField'] = CRM_Utils_Array::first(array_intersect($possibleLabels, array_keys($fields)));
+    }
+
     if ($this->value('primaryKey', $tableXML)) {
       $this->getPrimaryKey($tableXML->primaryKey, $fields, $table);
     }
