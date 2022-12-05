@@ -226,145 +226,152 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addYesNo('is_monetary',
-      ts('Paid Event'),
-      NULL,
-      NULL,
-      ['onclick' => "return showHideByValue('is_monetary','0','event-fees','block','radio',false);"]
-    );
+    // Check to see if CiviContribute is an enabled component
+    $components = \Civi\Api4\Setting::get()
+      ->addSelect('enable_components')
+      ->execute()['value'];
+    // if Contribute component is active, do below, else run a check to say that this component must be active to use the Fees tab
+    if (in_array('CiviContribute', $components)) {
+      $this->addYesNo('is_monetary',
+        ts('Paid Event'),
+        NULL,
+        NULL,
+        ['onclick' => "return showHideByValue('is_monetary','0','event-fees','block','radio',false);"]
+      );
 
-    //add currency element.
-    $this->addCurrency('currency', ts('Currency'), FALSE);
+      //add currency element.
+      $this->addCurrency('currency', ts('Currency'), FALSE);
 
-    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor();
+      $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor();
 
-    $this->assign('paymentProcessor', $paymentProcessor);
-    $this->addCheckBox('payment_processor', ts('Payment Processor'),
-      array_flip($paymentProcessor),
-      NULL, NULL, NULL, NULL,
-      ['&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>']
-    );
+      $this->assign('paymentProcessor', $paymentProcessor);
+      $this->addCheckBox('payment_processor', ts('Payment Processor'),
+        array_flip($paymentProcessor),
+        NULL, NULL, NULL, NULL,
+        ['&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>']
+      );
 
-    // financial type
-    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() ||
-        (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && CRM_Core_Permission::check('administer CiviCRM Financial Types'))) {
-      $this->addSelect('financial_type_id');
-    }
-    else {
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
-      $this->addSelect('financial_type_id', ['context' => 'search', 'options' => $financialTypes]);
-    }
-    // add pay later options
-    $this->addElement('checkbox', 'is_pay_later', ts('Enable Pay Later option?'), NULL,
-      ['onclick' => "return showHideByValue('is_pay_later','','payLaterOptions','block','radio',false);"]
-    );
-    $this->addElement('textarea', 'pay_later_text', ts('Pay Later Label'),
-      CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_text'),
-      FALSE
-    );
-    $this->add('wysiwyg', 'pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_receipt'));
-
-    $this->addElement('checkbox', 'is_billing_required', ts('Billing address required'));
-    $this->add('text', 'fee_label', ts('Fee Label'));
-
-    $price = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviEvent');
-    if (CRM_Utils_System::isNull($price)) {
-      $this->assign('price', FALSE);
-    }
-    else {
-      $this->assign('price', TRUE);
-    }
-    $this->addField('price_set_id', [
-      'entity' => 'PriceField',
-      'options' => $price,
-      'onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);",
-    ]);
-
-    $default = [0 => NULL];
-    $this->add('hidden', 'price_field_id', '', ['id' => 'price_field_id']);
-    for ($i = 1; $i <= self::NUM_OPTION; $i++) {
-      // label
-      $this->add('text', "label[$i]", ts('Label'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'label'));
-      $this->add('hidden', "price_field_value[$i]", '', ['id' => "price_field_value[$i]"]);
-
-      // value
-      $this->add('text', "value[$i]", ts('Value'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'));
-      $this->addRule("value[$i]", ts('Please enter a valid money value for this field (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
-
-      // default
-      $default[$i] = NULL;
-    }
-
-    $this->addRadio('default', '', $default);
-
-    $this->addElement('checkbox', 'is_discount', ts('Discounts by Signup Date?'), NULL,
-      ['onclick' => "warnDiscountDel(); return showHideByValue('is_discount','','discount','block','radio',false);"]
-    );
-    $discountSection = $this->get('discountSection');
-
-    $this->assign('discountSection', $discountSection);
-
-    // form fields of Discount sets
-    $defaultOption = [];
-    $_showHide = new CRM_Core_ShowHideBlocks();
-
-    for ($i = 1; $i <= self::NUM_DISCOUNT; $i++) {
-      //the show hide blocks
-      $showBlocks = 'discount_' . $i;
-      if ($i > 2) {
-        $_showHide->addHide($showBlocks);
+      // financial type
+      if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() ||
+          (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && CRM_Core_Permission::check('administer CiviCRM Financial Types'))) {
+        $this->addSelect('financial_type_id');
       }
       else {
-        $_showHide->addShow($showBlocks);
+        CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
+        $this->addSelect('financial_type_id', ['context' => 'search', 'options' => $financialTypes]);
       }
-
-      //Increment by 1 of start date of previous end date.
-      if (is_array($this->_submitValues) &&
-        !empty($this->_submitValues['discount_name'][$i]) &&
-        !empty($this->_submitValues['discount_name'][$i + 1]) &&
-        isset($this->_submitValues['discount_end_date']) &&
-        isset($this->_submitValues['discount_end_date'][$i]) &&
-        $i < self::NUM_DISCOUNT - 1
-      ) {
-        if (!empty($this->_submitValues['discount_end_date'][$i + 1])
-          && empty($this->_submitValues['discount_start_date'][$i + 1])
-        ) {
-          $this->_submitValues['discount_start_date'][$i + 1] = date('Y-m-d', strtotime("+1 days " . $this->_submitValues['discount_end_date'][$i]));
-        }
-      }
-      //Decrement by 1 of end date from next start date.
-      if ($i > 1 &&
-        is_array($this->_submitValues) &&
-        !empty($this->_submitValues['discount_name'][$i]) &&
-        !empty($this->_submitValues['discount_name'][$i - 1]) &&
-        isset($this->_submitValues['discount_start_date']) &&
-        isset($this->_submitValues['discount_start_date'][$i])
-      ) {
-        if (!empty($this->_submitValues['discount_start_date'][$i])
-          && empty($this->_submitValues['discount_end_date'][$i - 1])
-        ) {
-          list($this->_submitValues['discount_end_date'][$i - 1]) = date('Y-m-d', strtotime("-1 days " . $this->_submitValues['discount_start_date'][$i]));
-        }
-      }
-
-      $this->add('text', 'discount_name[' . $i . ']', ts('Discount Name'),
-        CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceSet', 'title')
+      // add pay later options
+      $this->addElement('checkbox', 'is_pay_later', ts('Enable Pay Later option?'), NULL,
+        ['onclick' => "return showHideByValue('is_pay_later','','payLaterOptions','block','radio',false);"]
       );
-      $this->add('hidden', "discount_price_set[$i]", '', ['id' => "discount_price_set[$i]"]);
-      $this->add('datepicker', 'discount_start_date[' . $i . ']', ts('Discount Start Date'), [], FALSE, ['time' => FALSE]);
-      $this->add('datepicker', 'discount_end_date[' . $i . ']', ts('Discount End Date'), [], FALSE, ['time' => FALSE]);
+      $this->addElement('textarea', 'pay_later_text', ts('Pay Later Label'),
+        CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_text'),
+        FALSE
+      );
+      $this->add('wysiwyg', 'pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_receipt'));
+
+      $this->addElement('checkbox', 'is_billing_required', ts('Billing address required'));
+      $this->add('text', 'fee_label', ts('Fee Label'));
+
+      $price = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviEvent');
+      if (CRM_Utils_System::isNull($price)) {
+        $this->assign('price', FALSE);
+      }
+      else {
+        $this->assign('price', TRUE);
+      }
+      $this->addField('price_set_id', [
+        'entity' => 'PriceField',
+        'options' => $price,
+        'onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);",
+      ]);
+
+      $default = [0 => NULL];
+      $this->add('hidden', 'price_field_id', '', ['id' => 'price_field_id']);
+      for ($i = 1; $i <= self::NUM_OPTION; $i++) {
+        // label
+        $this->add('text', "label[$i]", ts('Label'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'label'));
+        $this->add('hidden', "price_field_value[$i]", '', ['id' => "price_field_value[$i]"]);
+
+        // value
+        $this->add('text', "value[$i]", ts('Value'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'));
+        $this->addRule("value[$i]", ts('Please enter a valid money value for this field (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
+
+        // default
+        $default[$i] = NULL;
+      }
+
+      $this->addRadio('default', '', $default);
+
+      $this->addElement('checkbox', 'is_discount', ts('Discounts by Signup Date?'), NULL,
+        ['onclick' => "warnDiscountDel(); return showHideByValue('is_discount','','discount','block','radio',false);"]
+      );
+      $discountSection = $this->get('discountSection');
+
+      $this->assign('discountSection', $discountSection);
+
+      // form fields of Discount sets
+      $defaultOption = [];
+      $_showHide = new CRM_Core_ShowHideBlocks();
+
+      for ($i = 1; $i <= self::NUM_DISCOUNT; $i++) {
+        //the show hide blocks
+        $showBlocks = 'discount_' . $i;
+        if ($i > 2) {
+          $_showHide->addHide($showBlocks);
+        }
+        else {
+          $_showHide->addShow($showBlocks);
+        }
+
+        //Increment by 1 of start date of previous end date.
+        if (is_array($this->_submitValues) &&
+          !empty($this->_submitValues['discount_name'][$i]) &&
+          !empty($this->_submitValues['discount_name'][$i + 1]) &&
+          isset($this->_submitValues['discount_end_date']) &&
+          isset($this->_submitValues['discount_end_date'][$i]) &&
+          $i < self::NUM_DISCOUNT - 1
+        ) {
+          if (!empty($this->_submitValues['discount_end_date'][$i + 1])
+            && empty($this->_submitValues['discount_start_date'][$i + 1])
+          ) {
+            $this->_submitValues['discount_start_date'][$i + 1] = date('Y-m-d', strtotime("+1 days " . $this->_submitValues['discount_end_date'][$i]));
+          }
+        }
+        //Decrement by 1 of end date from next start date.
+        if ($i > 1 &&
+          is_array($this->_submitValues) &&
+          !empty($this->_submitValues['discount_name'][$i]) &&
+          !empty($this->_submitValues['discount_name'][$i - 1]) &&
+          isset($this->_submitValues['discount_start_date']) &&
+          isset($this->_submitValues['discount_start_date'][$i])
+        ) {
+          if (!empty($this->_submitValues['discount_start_date'][$i])
+            && empty($this->_submitValues['discount_end_date'][$i - 1])
+          ) {
+            list($this->_submitValues['discount_end_date'][$i - 1]) = date('Y-m-d', strtotime("-1 days " . $this->_submitValues['discount_start_date'][$i]));
+          }
+        }
+
+        $this->add('text', 'discount_name[' . $i . ']', ts('Discount Name'),
+          CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceSet', 'title')
+        );
+        $this->add('hidden', "discount_price_set[$i]", '', ['id' => "discount_price_set[$i]"]);
+        $this->add('datepicker', 'discount_start_date[' . $i . ']', ts('Discount Start Date'), [], FALSE, ['time' => FALSE]);
+        $this->add('datepicker', 'discount_end_date[' . $i . ']', ts('Discount End Date'), [], FALSE, ['time' => FALSE]);
+      }
+      $_showHide->addToTemplate();
+      $this->addElement('xbutton', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
+        [
+          'type' => 'submit',
+          'class' => 'crm-form-submit cancel',
+          'value' => 1,
+        ]
+      );
+      $this->assign('deferredFinancialType', Civi::settings()->get('deferred_revenue_enabled') ? array_keys(CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType()) : NULL);
+      $this->buildAmountLabel();
+      parent::buildQuickForm(); 
     }
-    $_showHide->addToTemplate();
-    $this->addElement('xbutton', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
-      [
-        'type' => 'submit',
-        'class' => 'crm-form-submit cancel',
-        'value' => 1,
-      ]
-    );
-    $this->assign('deferredFinancialType', Civi::settings()->get('deferred_revenue_enabled') ? array_keys(CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType()) : NULL);
-    $this->buildAmountLabel();
-    parent::buildQuickForm();
   }
 
   /**
