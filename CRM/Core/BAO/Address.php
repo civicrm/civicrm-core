@@ -204,12 +204,17 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
     // add county id if county is set
     // CRM-7837
-    if ((!isset($params['county_id']) || !is_numeric($params['county_id']))
-      && isset($params['county']) && !empty($params['county'])
+    if (
+      (isset($params['county_id']) && !is_numeric($params['county_id'])) ||
+      (!isset($params['county_id']) && isset($params['county']) && !empty($params['county']))
     ) {
       $county = new CRM_Core_DAO_County();
-      $county->name = $params['county'];
 
+      $search = $params['county'] ?? NULL;
+      if (empty($search)) {
+        $search = $params['county_id'];
+      }
+      $county->name = $search;
       if (isset($params['state_province_id'])) {
         $county->state_province_id = $params['state_province_id'];
       }

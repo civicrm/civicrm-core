@@ -1298,6 +1298,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'abbreviation' => '',
       'state_province_id' => 1640,
     ])->execute()->first()['id'];
+    // What if there are two counties with the same name?
+    $dupeCountyID = County::create()->setValues([
+      'name' => 'Farnell',
+      'abbreviation' => '',
+      'state_province_id' => 1641,
+    ])->execute()->first()['id'];
+
     $childKey = $this->getRelationships()['Child of']['id'] . '_a_b';
     $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
     $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
