@@ -214,7 +214,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   if ($tabsetName !== 'civicrm/contact/view') {
     return;
   }
-  $contactTypes = array_merge([$context['contact_type']], $context['contact_sub_type'] ?? []);
+  $contactTypes = array_merge([$context['contact_type']] ?? [], $context['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get(FALSE)
     ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
     ->addWhere('contact_summary', '=', 'tab')
@@ -222,13 +222,15 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
     ->execute();
   $weight = 111;
   foreach ($afforms as $afform) {
-    if (empty($afform['summary_contact_type']) || array_intersect($afform['summary_contact_type'], $contactTypes)) {
+    $summaryContactType = $afform['summary_contact_type'] ?? [];
+    if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
       $tabs[] = [
         'id' => $afform['name'],
         'title' => $afform['title'],
         'weight' => $weight++,
         'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
         'is_active' => TRUE,
+        'contact_type' => _afform_get_contact_types($summaryContactType) ?: NULL,
         'template' => 'afform/contactSummary/AfformTab.tpl',
         'module' => $afform['module_name'],
         'directive' => $afform['directive_name'],
@@ -298,7 +300,6 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
     ->addWhere('contact_summary', '=', 'block')
     ->addOrderBy('title')
     ->execute();
-  $allContactTypes = \CRM_Contact_BAO_ContactType::getAllContactTypes();
   foreach ($afforms as $index => $afform) {
     // Create a group per afform type
     $blocks += [
@@ -308,17 +309,12 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
         'blocks' => [],
       ],
     ];
-    $contactType = [];
     // If the form specifies contact types, resolve them to just the parent types (Individual, Organization, Household)
     // because ContactLayout doesn't care about sub-types
-    foreach ($afform['summary_contact_type'] ?? [] as $name) {
-      $parent = $allContactTypes[$name]['parent'] ?? $name;
-      $contactType[$parent] = $parent;
-    }
+    $contactType = _afform_get_contact_types($afform['summary_contact_type'] ?? []);
     $blocks["afform_{$afform['type']}"]['blocks'][$afform['name']] = [
       'title' => $afform['title'],
-      // ContactLayout only supports a single contact type
-      'contact_type' => count($contactType) === 1 ? CRM_Utils_Array::first($contactType) : NULL,
+      'contact_type' => $contactType ?: NULL,
       'tpl_file' => 'afform/contactSummary/AfformBlock.tpl',
       'module' => $afform['module_name'],
       'directive' => $afform['directive_name'],
@@ -329,6 +325,23 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
       'system_default' => [0, $index % 2],
     ];
   }
+}
+
+/**
+ * Resolve a mixed list of contact types and sub-types into just top-level contact types (Individual, Organization, Household)
+ *
+ * @param array $mixedTypes
+ * @return array
+ * @throws CRM_Core_Exception
+ */
+function _afform_get_contact_types(array $mixedTypes): array {
+  $allContactTypes = \CRM_Contact_BAO_ContactType::getAllContactTypes();
+  $contactTypes = [];
+  foreach ($mixedTypes as $name) {
+    $parent = $allContactTypes[$name]['parent'] ?? $name;
+    $contactTypes[$parent] = $parent;
+  }
+  return array_values($contactTypes);
 }
 
 /**
