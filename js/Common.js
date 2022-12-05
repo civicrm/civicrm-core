@@ -554,6 +554,9 @@ if (!CRM.vars) CRM.vars = {};
 
   // Autocomplete based on APIv4 and Select2.
   $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
+    if (entityName === 'destroy') {
+      return $(this).off('.crmEntity').crmSelect2('destroy');
+    }
     select2Options = select2Options || {};
     return $(this).each(function() {
       var $el = $(this).off('.crmEntity'),

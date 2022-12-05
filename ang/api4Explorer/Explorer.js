@@ -1226,7 +1226,7 @@
             $el.crmDatepicker('destroy');
           }
           if ($el.is('.select2-container + input')) {
-            $el.crmEntityRef('destroy');
+            $el.crmAutocomplete('destroy');
           }
           $(element).removeData().removeAttr('type').removeAttr('placeholder').show();
         }
@@ -1447,7 +1447,7 @@
     if (field && suffix) {
       field.pseudoconstant = suffix;
     }
-    // When joining to a 'name' field, value fields should render an appropriate entityRef
+    // When joining to a 'name' field, value fields should render an appropriate autocomplete
     if (field && field.type === 'Field' && field.name === 'name' && _.includes(fieldName, '.')) {
       field.fk_entity = field.entity;
       field.id_field = 'name';
