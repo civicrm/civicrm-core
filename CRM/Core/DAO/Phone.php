@@ -271,6 +271,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
           'localizable' => 0,
+          'deprecated' => TRUE,
           'add' => '1.1',
         ],
         'phone' => [

@@ -973,6 +973,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
           'localizable' => 0,
+          'deprecated' => TRUE,
           'html' => [
             'type' => 'Select',
             'label' => ts("Preferred Mail Format"),
@@ -1582,6 +1583,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
           'localizable' => 0,
+          'deprecated' => TRUE,
           'html' => [
             'type' => 'Text',
           ],

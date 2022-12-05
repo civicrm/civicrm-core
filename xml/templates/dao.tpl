@@ -226,6 +226,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.uniqueTitle}
   'unique_title' => {$tsFunctionName}('{$field.uniqueTitle}'),
 {/if}
+{if $field.deprecated}
+  'deprecated' => TRUE,
+{/if}
 {if $field.html}
   'html' => array(
   {foreach from=$field.html item=val key=key}
