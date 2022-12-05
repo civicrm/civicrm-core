@@ -13,7 +13,6 @@
 namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Query\Api4SelectQuery;
-use Civi\Api4\SearchSegment;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 
@@ -50,9 +49,14 @@ class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
     if (!isset(\Civi::$statics['all_search_segments'])) {
       \Civi::$statics['all_search_segments'] = [];
       try {
-        $searchSegments = SearchSegment::get(FALSE)->addOrderBy('label')->execute();
+        // Use api wrapper instead of calling SearchSegment class directly to avoid "class not found"
+        // errors that may occur during installs and upgrades
+        $searchSegments = civicrm_api4('SearchSegment', 'get', [
+          'checkPermissions' => FALSE,
+          'orderBy' => ['label' => 'ASC'],
+        ]);
       }
-      // Suppress SearchSegment BAO/table not found error e.g. during upgrade mode
+      // Suppress SearchSegment class/table not found error e.g. during upgrade mode
       catch (\Exception $e) {
         return [];
       }
