@@ -664,6 +664,10 @@
   name        : Jack Aponte
   organization: Palante Technology Cooperative
 
+- github      : jackgleeson
+  name        : Jack Gleeson
+  organization: Wikimedia Foundation
+
 - github      : jackrabbithanna
   name        : Mark Hanna
   organization: Skvare
@@ -1103,6 +1107,10 @@
   name        : Nicolas Ganivet
   organization: CiviDesk
 
+- github      : NicolasdRa
+  name        : Nicolás di Rago
+  organization: Supertemplates UG
+
 - github      : nielosz
   name        : Niels Heinemann
   organization: Kompetenzzentrum Technik-Diversity-Chancengleichheit
@@ -1318,6 +1326,8 @@
 - github      : samuelsov
   name        : Samuel Vanhove
   organization: Coop SymbioTIC
+
+- github      : sebalis
 
 - github      : simonjohnparker
   name        : Simon John Parker
@@ -1614,12 +1624,12 @@
   name        : Wenjun Fan
   organization: Wikimedia Foundation
 
-- github      : damilare1 
+- github      : damilare1
   name        : Damilare Adedoyin
   organization: Wikimedia Foundation
 
 - github      : YesusHDS
-  
-- github      : Toby-fz 
+
+- github      : Toby-fz
   name        : Toby Messerli
   organization: Fuzion
