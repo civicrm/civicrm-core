@@ -159,7 +159,6 @@ class CRM_Core_Config_MagicMerge {
       'moneyformat' => ['setting'],
       'moneyvalueformat' => ['setting'],
       'provinceLimit' => ['setting'],
-      'recaptchaOptions' => ['setting'],
       'recaptchaPublicKey' => ['setting'],
       'recaptchaPrivateKey' => ['setting'],
       'forceRecaptcha' => ['setting'],

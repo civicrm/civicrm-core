@@ -76,7 +76,6 @@ class CRM_Utils_ReCAPTCHA {
     $html = recaptcha_get_html(\Civi::settings()->get('recaptchaPublicKey'), $error, $useHTTPS);
 
     $form->assign('recaptchaHTML', $html);
-    $form->assign('recaptchaOptions', \Civi::settings()->get('recaptchaOptions'));
     $form->add(
       'text',
       'g-recaptcha-response',
