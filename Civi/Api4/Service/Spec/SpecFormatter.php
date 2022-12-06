@@ -87,6 +87,7 @@ class SpecFormatter {
     $field->setSerialize($data['serialize'] ?? NULL);
     $field->setDefaultValue($data['default'] ?? NULL);
     $field->setDescription($data['description'] ?? NULL);
+    $field->setDeprecated($data['deprecated'] ?? FALSE);
     self::setInputTypeAndAttrs($field, $data, $dataTypeName);
 
     $field->setPermission($data['permission'] ?? NULL);

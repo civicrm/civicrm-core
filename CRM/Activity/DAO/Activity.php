@@ -497,6 +497,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'bao' => 'CRM_Activity_BAO_Activity',
           'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Phone',
+          'deprecated' => TRUE,
           'html' => [
             'type' => 'EntityRef',
             'label' => ts("Phone (called)"),
@@ -515,6 +516,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
           'localizable' => 0,
+          'deprecated' => TRUE,
           'html' => [
             'type' => 'Text',
           ],
@@ -662,6 +664,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'bao' => 'CRM_Activity_BAO_Activity',
           'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Relationship',
+          'deprecated' => TRUE,
           'html' => [
             'label' => ts("Relationship"),
           ],
@@ -679,6 +682,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
           'localizable' => 0,
+          'deprecated' => TRUE,
           'add' => '2.2',
         ],
         'original_id' => [
@@ -692,6 +696,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'bao' => 'CRM_Activity_BAO_Activity',
           'localizable' => 0,
           'FKClassName' => 'CRM_Activity_DAO_Activity',
+          'deprecated' => TRUE,
           'html' => [
             'label' => ts("Original Activity"),
           ],

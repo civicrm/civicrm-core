@@ -763,6 +763,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
           'localizable' => 0,
+          'deprecated' => TRUE,
           'add' => '1.1',
         ],
         'country_id' => [

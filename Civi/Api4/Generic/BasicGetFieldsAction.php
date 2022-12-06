@@ -392,6 +392,11 @@ class BasicGetFieldsAction extends BasicGetAction {
         'default_value' => FALSE,
       ],
       [
+        'name' => 'deprecated',
+        'data_type' => 'Boolean',
+        'default_value' => FALSE,
+      ],
+      [
         'name' => 'output_formatters',
         'data_type' => 'Array',
         '@internal' => TRUE,

@@ -29,7 +29,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ->addSelect('name', 'title_plural')
       ->setChain([
         'actions' => ['$name', 'getActions', ['where' => [['name', 'IN', ['update', 'delete']]]], 'name'],
-        'fields' => ['$name', 'getFields', ['where' => [['type', '=', 'Field']]], 'name'],
+        'fields' => ['$name', 'getFields', ['where' => [['deprecated', '=', FALSE], ['type', '=', 'Field']]], 'name'],
       ])
       ->execute()->first();
 

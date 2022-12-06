@@ -101,7 +101,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['name', 'label'], $fields['campaign_id']['suffixes']);
   }
 
-  public function testRequiredAndNullable() {
+  public function testRequiredAndNullableAndDeprecated() {
     $actFields = Activity::getFields(FALSE)
       ->setAction('create')
       ->execute()->indexBy('name');
@@ -111,6 +111,8 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertFalse($actFields['activity_type_id']['nullable']);
     $this->assertFalse($actFields['subject']['required']);
     $this->assertTrue($actFields['subject']['nullable']);
+    $this->assertFalse($actFields['subject']['deprecated']);
+    $this->assertTrue($actFields['phone_id']['deprecated']);
   }
 
   public function testGetSuffixes() {
