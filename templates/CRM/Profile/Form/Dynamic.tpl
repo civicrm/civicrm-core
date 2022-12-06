@@ -220,32 +220,11 @@
 
 </div> {* end crm-container div *}
 
-<script type="text/javascript">
-  {if $drupalCms}
-    {literal}
-    if ( document.getElementsByName("cms_create_account")[0].checked ) {
-      cj('#details').show();
-    }
-    else {
-      cj('#details').hide();
-    }
-    {/literal}
-  {/if}
-</script>
 {/if} {* fields array is not empty *}
 {if $multiRecordFieldListing and empty($fields)}
   {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl" showListing=true}
 {/if}
-{if $drupalCms}
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="create_account"
-trigger_value       =""
-target_element_id   ="details"
-target_element_type ="block"
-field_type          ="radio"
-invert              = 0
-}
-{elseif $statusMessage}
+{if $statusMessage}
 <div class="messages status no-popup">
   {icon icon="fa-info-circle"}{/icon}
   {$statusMessage}
