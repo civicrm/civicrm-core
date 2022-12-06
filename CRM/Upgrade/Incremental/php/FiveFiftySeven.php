@@ -37,7 +37,14 @@ class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_57_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Fix dangerous delete cascade', 'fixDeleteCascade');
     $this->addExtensionTask('Enable SearchKit extension', ['org.civicrm.search_kit'], 1100);
+  }
+
+  public static function fixDeleteCascade($ctx): bool {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_activity', 'FK_civicrm_activity_original_id');
+    CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_activity` ADD CONSTRAINT `FK_civicrm_activity_original_id` FOREIGN KEY (`original_id`) REFERENCES `civicrm_activity` (`id`) ON DELETE SET NULL');
+    return TRUE;
   }
 
 }
