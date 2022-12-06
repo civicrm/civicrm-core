@@ -326,7 +326,7 @@
     <table>civicrm_activity</table>
     <key>id</key>
     <add>2.2</add>
-    <onDelete>CASCADE</onDelete>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
     <name>result</name>
