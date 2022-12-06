@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\Api4\Generic\Traits\SavedSearchInspectorTrait;
 use CRM_Search_ExtensionUtil as E;
 use Civi\Api4\Entity;
 
@@ -11,6 +12,14 @@ use Civi\Api4\Entity;
  * @package Civi\Api4\Action\SearchDisplay
  */
 class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
+
+  use SavedSearchInspectorTrait;
+
+  /**
+   * An array containing the searchDisplay definition
+   * @var array
+   */
+  protected $display;
 
   /**
    * Name of entity
@@ -36,6 +45,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     if (!$entity) {
       return;
     }
+
+    $this->loadSavedSearch();
+    $this->loadSearchDisplay();
+
     $tasks = [$entity['name'] => []];
 
     if (array_key_exists($entity['name'], \CRM_Export_BAO_Export::getComponents())) {
@@ -199,9 +212,9 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     $null = NULL;
     $checkPermissions = $this->checkPermissions;
     $userId = $this->checkPermissions ? \CRM_Core_Session::getLoggedInContactID() : NULL;
-    \CRM_Utils_Hook::singleton()->invoke(['tasks', 'checkPermissions', 'userId'],
+    \CRM_Utils_Hook::singleton()->invoke(['tasks', 'checkPermissions', 'userId', 'search', 'display'],
       $tasks, $checkPermissions, $userId,
-      $null, $null, $null, 'civicrm_searchKitTasks'
+      $this->savedSearch, $this->display, $null, 'civicrm_searchKitTasks'
     );
 
     foreach ($tasks[$entity['name']] as $name => &$task) {
