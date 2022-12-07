@@ -7,7 +7,7 @@
         {{ts('Configure the "Redirect URL":')}}
       </p>
       <pre>{{redirectUrl}}</pre>
-      <div ng-if="redirectUrl.startsWith('http:/') && !redirectUrl.match('//(localhost|127\.0\.0\.1)')">
+      <div ng-if="redirectUrl.startsWith('http:/') &amp;&amp; !redirectUrl.match('//(localhost|127\.0\.0\.1)')">
         <p>
           {{ts('WARNING: Most web-service providers require "https://" URLs. Alternatively, "http://" may be accepted for strictly local URLs ("localhost" or "127.0.0.1").')}}
         </p>
@@ -17,7 +17,7 @@
       </div>
     </li>
 
-    <li ng-if="options.provider.options.scopes.length > 0">
+    <li ng-if="options.provider.options.scopes.length">
       <p>
         {{ts('Configure the scopes:')}}
       </p>
