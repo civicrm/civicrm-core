@@ -21,6 +21,14 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    if ($rev === '5.57.alpha1') {
+      if (CRM_Core_DAO::singleValueQuery('SELECT COUNT(id) FROM civicrm_activity WHERE is_current_revision = 0')) {
+        $preUpgradeMessage .= '<p>' . ts('Your database contains CiviCase activity revisions which are deprecated and will begin to appear as duplicates in SearchKit/api4/etc.<ul><li>For further instructions see this <a %1>Lab Snippet</a>.</li></ul>', [1 => 'target="_blank" href="https://lab.civicrm.org/-/snippets/85"']) . '</p>';
+      }
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
@@ -29,7 +37,14 @@ class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_57_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Fix dangerous delete cascade', 'fixDeleteCascade');
     $this->addExtensionTask('Enable SearchKit extension', ['org.civicrm.search_kit'], 1100);
+  }
+
+  public static function fixDeleteCascade($ctx): bool {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_activity', 'FK_civicrm_activity_original_id');
+    CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_activity` ADD CONSTRAINT `FK_civicrm_activity_original_id` FOREIGN KEY (`original_id`) REFERENCES `civicrm_activity` (`id`) ON DELETE SET NULL');
+    return TRUE;
   }
 
 }
