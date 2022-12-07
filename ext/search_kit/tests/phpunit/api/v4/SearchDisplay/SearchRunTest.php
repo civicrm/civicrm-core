@@ -1376,33 +1376,33 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
         'api_entity' => 'Contribution',
         'api_params' => [
           'version' => 4,
-          'select' => ['total_amount'],
+          'select' => ['total_amount', 'id'],
           'where' => [['id', 'IN', $contributions->column('id')]],
         ],
       ],
       'display' => NULL,
-      'sort' => [['id', 'ASC']],
+      'sort' => [['id', 'DESC']],
     ];
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(3, $result);
 
     // Currency should have been fetched automatically and used to format the value
-    $this->assertEquals('GBP', $result[0]['data']['currency']);
-    $this->assertEquals('£100.00', $result[0]['columns'][0]['val']);
+    $this->assertEquals('GBP', $result[2]['data']['currency']);
+    $this->assertEquals('£100.00', $result[2]['columns'][0]['val']);
 
     $this->assertEquals('USD', $result[1]['data']['currency']);
     $this->assertEquals('$200.00', $result[1]['columns'][0]['val']);
 
-    $this->assertEquals('JPY', $result[2]['data']['currency']);
-    $this->assertEquals('¥500', $result[2]['columns'][0]['val']);
+    $this->assertEquals('JPY', $result[0]['data']['currency']);
+    $this->assertEquals('¥500', $result[0]['columns'][0]['val']);
 
     // Now do a search for the contribution line-items
     $params['savedSearch'] = [
       'api_entity' => 'LineItem',
       'api_params' => [
         'version' => 4,
-        'select' => ['line_total'],
+        'select' => ['line_total', 'id'],
         'where' => [['contribution_id', 'IN', $contributions->column('id')]],
       ],
     ];
@@ -1411,14 +1411,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(3, $result);
 
     // An automatic join should have been added to fetch the contribution currency
-    $this->assertEquals('GBP', $result[0]['data']['contribution_id.currency']);
-    $this->assertEquals('£100.00', $result[0]['columns'][0]['val']);
+    $this->assertEquals('GBP', $result[2]['data']['contribution_id.currency']);
+    $this->assertEquals('£100.00', $result[2]['columns'][0]['val']);
 
     $this->assertEquals('USD', $result[1]['data']['contribution_id.currency']);
     $this->assertEquals('$200.00', $result[1]['columns'][0]['val']);
 
-    $this->assertEquals('JPY', $result[2]['data']['contribution_id.currency']);
-    $this->assertEquals('¥500', $result[2]['columns'][0]['val']);
+    $this->assertEquals('JPY', $result[0]['data']['contribution_id.currency']);
+    $this->assertEquals('¥500', $result[0]['columns'][0]['val']);
   }
 
   public function testSelectEquations() {
