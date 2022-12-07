@@ -44,9 +44,6 @@
     {include file="CRM/Form/body.tpl"}
   {/if}
   {strip}
-    {if $help_pre && $action neq 4}
-      <div class="messages help">{$help_pre}</div>
-    {/if}
 
     {include file="CRM/common/CMSUser.tpl"}
 
@@ -215,7 +212,6 @@
         {/if}
       </div>
     {/if}
-    {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}
   {/strip}
 
 </div> {* end crm-container div *}
