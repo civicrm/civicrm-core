@@ -1,6 +1,7 @@
 <?php
 namespace api\v4\SearchDisplay;
 
+use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
@@ -22,23 +23,27 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
    * Test downloading array format.
    */
   public function testDownloadArray() {
-    $lastName = uniqid(__FUNCTION__);
+    $cid = Contact::create(FALSE)->execute()->single()['id'];
+    $subject = uniqid(__FUNCTION__);
     $sampleData = [
-      ['first_name' => 'One', 'last_name' => $lastName],
-      ['first_name' => 'Two', 'last_name' => $lastName],
-      ['first_name' => 'Three', 'last_name' => $lastName],
-      ['first_name' => 'Four', 'last_name' => $lastName],
+      ['duration' => 1, 'subject' => $subject, 'details' => '<p>Markup</p>'],
+      ['duration' => 3, 'subject' => $subject, 'details' => 'Plain &amp; simple'],
+      ['duration' => 3, 'subject' => $subject],
+      ['duration' => 4, 'subject' => $subject],
     ];
-    Contact::save(FALSE)->setRecords($sampleData)->execute();
+    Activity::save(FALSE)
+      ->setRecords($sampleData)
+      ->setDefaults(['activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid])
+      ->execute();
 
     $params = [
       'checkPermissions' => FALSE,
       'format' => 'array',
       'savedSearch' => [
-        'api_entity' => 'Contact',
+        'api_entity' => 'Activity',
         'api_params' => [
           'version' => 4,
-          'select' => ['last_name'],
+          'select' => ['subject', 'details'],
           'where' => [],
         ],
       ],
@@ -51,11 +56,17 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
           'pager' => [],
           'columns' => [
             [
-              'key' => 'last_name',
-              'label' => 'First Last',
+              'key' => 'subject',
+              'label' => 'Duration Subject',
               'dataType' => 'String',
               'type' => 'field',
-              'rewrite' => '[first_name] [last_name]',
+              'rewrite' => '[duration] [subject]',
+            ],
+            [
+              'key' => 'details',
+              'label' => 'Details',
+              'dataType' => 'String',
+              'type' => 'html',
             ],
           ],
           'sort' => [
@@ -63,18 +74,21 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
           ],
         ],
       ],
-      'filters' => ['last_name' => $lastName],
+      'filters' => ['subject' => $subject],
       'afform' => NULL,
     ];
 
     $download = (array) civicrm_api4('SearchDisplay', 'download', $params);
     $header = array_shift($download);
 
-    $this->assertEquals('First Last', $header[0]);
+    $this->assertEquals('Duration Subject', $header[0]);
 
     foreach ($download as $rowNum => $data) {
-      $this->assertEquals($sampleData[$rowNum]['first_name'] . ' ' . $lastName, $data[0]);
+      $this->assertEquals($sampleData[$rowNum]['duration'] . ' ' . $subject, $data[0]);
     }
+    // Markup should be formatted as plain text
+    $this->assertEquals('Markup', $download[0][1]);
+    $this->assertEquals('Plain & simple', $download[1][1]);
   }
 
   /**
