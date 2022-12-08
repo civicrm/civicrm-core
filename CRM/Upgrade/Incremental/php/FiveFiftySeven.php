@@ -39,6 +39,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Fix dangerous delete cascade', 'fixDeleteCascade');
     $this->addExtensionTask('Enable SearchKit extension', ['org.civicrm.search_kit'], 1100);
+    $this->addExtensionTask('Enable Flexmailer extension', ['org.civicrm.flexmailer']);
   }
 
   public static function fixDeleteCascade($ctx): bool {

@@ -25,6 +25,9 @@
   <compatibility>
     <ver>5.57</ver>
   </compatibility>
+  <tags>
+    <tag>mgmt:required</tag>
+  </tags>
   <classloader>
     <psr4 prefix="Civi\FlexMailer\" path="src"/>
   </classloader>

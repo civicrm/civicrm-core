@@ -3256,31 +3256,6 @@ function setting_getfields_expectedresult() {
           '0' => 'financialacls_toggle',
         ],
       ],
-      'flexmailer_traditional' => [
-        'group_name' => 'Flexmailer Preferences',
-        'group' => 'flexmailer',
-        'name' => 'flexmailer_traditional',
-        'type' => 'String',
-        'html_type' => 'select',
-        'html_attributes' => [
-          'class' => 'crm-select2',
-        ],
-        'pseudoconstant' => [
-          'callback' => '_flexmailer_traditional_options',
-        ],
-        'default' => 'auto',
-        'add' => '5.13',
-        'title' => 'Traditional Mailing Handler',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'For greater backward-compatibility, process \"<code>traditional</code>\" mailings with the CiviMail\'s hard-coded BAO.<br/>For greater forward-compatibility, process \"<code>traditional</code>\" mailings with Flexmailer\'s extensible pipeline.',
-        'help_text' => '',
-        'settings_pages' => [
-          'flexmailer' => [
-            'weight' => 5,
-          ],
-        ],
-      ],
       'recaptchaPublicKey' => [
         'group_name' => 'CiviCRM Preferences',
         'group' => 'core',
