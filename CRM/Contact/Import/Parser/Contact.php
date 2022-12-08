@@ -812,59 +812,56 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $data[$blockName][$loc]['is_primary'] = 1;
         }
 
-        if (1) {
-          if ($fieldName === 'state_province') {
-            // CRM-3393
-            if (is_numeric($value) && ((int ) $value) >= 1000) {
-              $data['address'][$loc]['state_province_id'] = $value;
-            }
-            elseif (empty($value)) {
-              $data['address'][$loc]['state_province_id'] = '';
-            }
-            else {
-              $data['address'][$loc]['state_province'] = $value;
-            }
+        if ($fieldName === 'state_province') {
+          // CRM-3393
+          if (is_numeric($value) && ((int ) $value) >= 1000) {
+            $data['address'][$loc]['state_province_id'] = $value;
           }
-          elseif ($fieldName === 'country_id') {
-            $data['address'][$loc]['country_id'] = $value;
-          }
-          elseif ($fieldName === 'county') {
-            $data['address'][$loc]['county_id'] = $value;
-          }
-          elseif ($fieldName == 'address_name') {
-            $data['address'][$loc]['name'] = $value;
-          }
-          elseif (substr($fieldName, 0, 14) === 'address_custom') {
-            $data['address'][$loc][substr($fieldName, 8)] = $value;
+          elseif (empty($value)) {
+            $data['address'][$loc]['state_province_id'] = '';
           }
           else {
-            $data[$blockName][$loc][$fieldName] = $value;
+            $data['address'][$loc]['state_province'] = $value;
           }
         }
+        elseif ($fieldName === 'country_id') {
+          $data['address'][$loc]['country_id'] = $value;
+        }
+        elseif ($fieldName === 'county') {
+          $data['address'][$loc]['county_id'] = $value;
+        }
+        elseif ($fieldName == 'address_name') {
+          $data['address'][$loc]['name'] = $value;
+        }
+        elseif (substr($fieldName, 0, 14) === 'address_custom') {
+          $data['address'][$loc][substr($fieldName, 8)] = $value;
+        }
+        else {
+          $data[$blockName][$loc][$fieldName] = $value;
+        }
       }
-      if (TRUE) {
-        // @todo - meaningless IF - left to keep whitespace clean in PR.
-        if ($key === 'location') {
-          foreach ($value as $locationTypeId => $field) {
-            foreach ($field as $block => $val) {
-              if ($block === 'address' && array_key_exists('address_name', $val)) {
-                $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
-              }
+
+      if ($key === 'location') {
+        foreach ($value as $locationTypeId => $field) {
+          foreach ($field as $block => $val) {
+            if ($block === 'address' && array_key_exists('address_name', $val)) {
+              $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
             }
           }
         }
-        if (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
-          && ($value == '' || !isset($value)) &&
-          ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
-          ($key === 'current_employer' && empty($params['current_employer']))) {
-          // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
-          // to avoid update with empty values
-          continue;
-        }
-        else {
-          $data[$key] = $value;
-        }
       }
+      if (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
+        && ($value == '' || !isset($value)) &&
+        ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
+        ($key === 'current_employer' && empty($params['current_employer']))) {
+        // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
+        // to avoid update with empty values
+        continue;
+      }
+      else {
+        $data[$key] = $value;
+      }
+
     }
 
     if (!isset($data['contact_type'])) {
