@@ -897,7 +897,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $cid
    *   contact id.
    */
-  public function formatParams(&$params, $cid) {
+  private function formatParams(&$params, $cid) {
     if ($this->isSkipDuplicates()) {
       return;
     }
@@ -914,18 +914,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($params['contact_type'], NULL, $cid, 0, NULL);
     CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults, FALSE, FALSE);
 
-    $locationFields = [
-      'address' => 'address',
-    ];
-
     $contact = get_object_vars($contactObj);
 
     foreach ($params as $key => $value) {
-      if ($key == 'id' || $key == 'contact_type') {
-        continue;
-      }
-
-      if (array_key_exists($key, $locationFields)) {
+      if ($key === 'id' || $key === 'contact_type' || $key === 'address') {
         continue;
       }
 
@@ -950,24 +942,22 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
 
-    foreach ($locationFields as $locKeys) {
-      if (isset($params[$locKeys]) && is_array($params[$locKeys])) {
-        foreach ($params[$locKeys] as $key => $value) {
-          if ($modeFill) {
-            $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $locKeys);
+    if (isset($params['address']) && is_array($params['address'])) {
+      foreach ($params['address'] as $key => $value) {
+        if ($modeFill) {
+          $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, 'address');
 
-            if (isset($getValue)) {
-              foreach ($getValue as $cnt => $values) {
-                if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$locKeys][$key]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$locKeys][$key]['location_type_id']) {
-                  unset($params[$locKeys][$key]);
-                }
+          if (isset($getValue)) {
+            foreach ($getValue as $cnt => $values) {
+              if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params['address'][$key]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params['address'][$key]['location_type_id']) {
+                unset($params['address'][$key]);
               }
             }
           }
         }
-        if (count($params[$locKeys]) == 0) {
-          unset($params[$locKeys]);
-        }
+      }
+      if (count($params['address']) == 0) {
+        unset($params['address']);
       }
     }
   }
