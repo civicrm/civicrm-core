@@ -16,7 +16,7 @@
 {ts}Refund Details{/ts}
 
 ===============================================================================
-{ts}This Refund Amount{/ts}: {$refundAmount|crmMoney}
+{ts}This Refund Amount{/ts}: {$refundAmount|crmMoney:$currency}
 ------------------------------------------------------------------------------------
 
 {else}
@@ -25,7 +25,7 @@
 {ts}Payment Details{/ts}
 
 ===============================================================================
-{ts}This Payment Amount{/ts}: {$paymentAmount|crmMoney}
+{ts}This Payment Amount{/ts}: {$paymentAmount|crmMoney:$currency}
 ------------------------------------------------------------------------------------
 {/if}
 {if $receive_date}
@@ -47,13 +47,13 @@
 
 ===============================================================================
 {if $totalAmount}
-{ts}Total Fee{/ts}: {$totalAmount|crmMoney}
+{ts}Total Fee{/ts}: {$totalAmount|crmMoney:$currency}
 {/if}
 {if $totalPaid}
-{ts}Total Paid{/ts}: {$totalPaid|crmMoney}
+{ts}Total Paid{/ts}: {$totalPaid|crmMoney:$currency}
 {/if}
 {if $amountOwed}
-{ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
+{ts}Balance Owed{/ts}: {$amountOwed|crmMoney:$currency} {* This will be zero after final payment. *}
 {/if}
 
 
