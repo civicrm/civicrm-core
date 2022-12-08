@@ -2647,7 +2647,7 @@ WHERE {$whereClause}";
             'now',
             FALSE,
             $newMembershipId,
-            $newMembership
+            (array) $newMembership
           );
 
           if (!empty($status['id']) and $status['id'] != $newMembership->status_id) {
