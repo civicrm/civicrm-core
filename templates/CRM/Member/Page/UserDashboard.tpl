@@ -24,7 +24,7 @@
             <th></th>
         </tr>
         {foreach from=$activeMembers item=activeMember}
-        <tr id="row_{$activeMember.id}" class="{cycle values="odd-row,even-row"} {$activeMember.class}">
+        <tr id="row_{$activeMember.id}" class="{cycle values="odd-row,even-row"}">
           <td class="crm-active-membership-membership_type">{$activeMember.membership_type}</td>
           <td class="crm-active-membership-join_date">{$activeMember.join_date|crmDate}</td>
           <td class="crm-active-membership-start_date">{$activeMember.start_date|crmDate}</td>
