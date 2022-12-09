@@ -164,4 +164,34 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
     return array_values($types);
   }
 
+  /**
+   * Get user job type.
+   *
+   * @param string $type
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public static function getType(string $type): array {
+    foreach (self::getTypes() as $importType) {
+      if ($importType['id'] === $type) {
+        return $importType;
+      }
+    }
+    throw new CRM_Core_Exception($type . 'not found');
+  }
+
+  /**
+   * Get the specified value for the import job type.
+   *
+   * @param string $type
+   * @param string $key
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  public static function getTypeValue(string $type, string $key) {
+    return self::getType($type)[$key];
+  }
+
 }

@@ -761,10 +761,15 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * Get the base entity for the import.
    *
    * @return string
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function getBaseEntity(): string {
-    $info = $this->getParser()->getUserJobInfo();
-    return reset($info)['entity'];
+    if ($this->getUserJobID()) {
+      $info = $this->getParser()->getUserJobInfo();
+      return reset($info)['entity'];
+    }
+    return CRM_Core_BAO_UserJob::getTypeValue($this->getUserJobType(), 'entity');
   }
 
   /**
