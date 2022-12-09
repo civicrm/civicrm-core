@@ -76,12 +76,12 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
         $db = Drupal\Core\Database\Database::getConnectionInfo('default')['default'];
         $tablePrefixes = "# Drupal 9 : Per-table prefixes are no longer supported\n";
         $tablePrefixes .= '$databases[\'civicrm\'][\'default\'] = [' . "\n";
-        $tablePrefixes .= "\t" . '\'database\' => \'' . $db['database'] .'\',' . "\n";
-        $tablePrefixes .= "\t" . '\'username\' => \'' . $db['username'] .'\',' . "\n";
-        $tablePrefixes .= "\t" . '\'password\' => \'' . 'set your db password' .'\',' . "\n";
-        $tablePrefixes .= "\t" . '\'host\' => \'' . $db['host'] .'\',' . "\n";
-        $tablePrefixes .= "\t" . '\'port\' => \'' . $db['port'] .'\',' . "\n";
-        $tablePrefixes .= "\t" . '\'driver\' => \'' . $db['driver'] .'\',' . "\n";
+        $tablePrefixes .= "\t" . '\'database\' => \'' . $db['database'] . '\',' . "\n";
+        $tablePrefixes .= "\t" . '\'username\' => \'' . $db['username'] . '\',' . "\n";
+        $tablePrefixes .= "\t" . '\'password\' => \'' . 'set your db password' . '\',' . "\n";
+        $tablePrefixes .= "\t" . '\'host\' => \'' . $db['host'] . '\',' . "\n";
+        $tablePrefixes .= "\t" . '\'port\' => \'' . $db['port'] . '\',' . "\n";
+        $tablePrefixes .= "\t" . '\'driver\' => \'' . $db['driver'] . '\',' . "\n";
         $tablePrefixes .= "\t" . '\'prefix\' => \'\',' . "\n";
         $tablePrefixes .= "\t" . '\'namespace\' => \'Drupal\\Core\\Database\\Driver\\mysql\',' . "\n";
         $tablePrefixes .= "\t" . '\'collation\' => \'utf8mb4_general_ci\',' . "\n";
