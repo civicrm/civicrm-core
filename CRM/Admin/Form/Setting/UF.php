@@ -71,7 +71,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
 
     if ($config->userSystem->viewsExists() &&
       ($config->dsn != $config->userFrameworkDSN || !empty($drupal_prefix))) {
-      if (($config->userSystem->is_drupal) && (explode('.', \DRUPAL::VERSION) >=9)) {
+      if (($config->userSystem->is_drupal) && (explode('.', \DRUPAL::VERSION) >= 9)) {
         # Per-table prefixes are no longer supported
         $db = Drupal\Core\Database\Database::getConnectionInfo('default')['default'];
         $tablePrefixes = "# Drupal 9 : Per-table prefixes are no longer supported\n";
