@@ -85,8 +85,6 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
     $this->add('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2], TRUE);
     $this->setDefaults(['fieldSeparator' => $config->fieldSeparator]);
     $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . static::IMPORT_ENTITY);
-
-    $this->assign('savedMapping', $mappingArray);
     $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
     if ($loadedMapping = $this->get('loadedMapping')) {

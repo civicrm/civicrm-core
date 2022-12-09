@@ -98,8 +98,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     ]);
 
     $mappingArray = CRM_Core_BAO_Mapping::getMappings('Import Contact');
-
-    $this->assign('savedMapping', $mappingArray);
     $this->addElement('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
     $js = ['onClick' => "buildSubTypes();buildDedupeRules();"];
@@ -124,12 +122,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
 
-    $geoCode = FALSE;
     if (CRM_Utils_GeocodeProvider::getUsableClassName()) {
-      $geoCode = TRUE;
       $this->addElement('checkbox', 'doGeocodeAddress', ts('Geocode addresses during import?'));
     }
-    $this->assign('geoCode', $geoCode);
 
     $this->addElement('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2]);
 

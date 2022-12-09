@@ -33,20 +33,26 @@
   <div id="common-form-controls" class="form-item">
     <h3>{ts}Import Options{/ts}</h3>
     <table class="form-layout-compressed">
-      <tr class="crm-import-datasource-form-block-contactType">
-        <td class="label">{$form.contactType.label}</td>
-        <td>{$form.contactType.html} {help id='contact-type'}&nbsp;&nbsp;&nbsp;
-          <span id="contact-subtype">{$form.contactSubType.label}&nbsp;&nbsp;&nbsp;{$form.contactSubType.html} {help id='contact-sub-type'}</span>
-        </td>
-      </tr>
-      <tr class="crm-import-datasource-form-block-onDuplicate">
-        <td class="label">{$form.onDuplicate.label}</td>
-        <td>{$form.onDuplicate.html} {help id='dupes'}</td>
-      </tr>
-      <tr class="crm-import-datasource-form-block-dedupe">
-        <td class="label">{$form.dedupe_rule_id.label}</td>
-        <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='id-dedupe_rule'}</td>
-      </tr>
+      {if array_key_exists('contactType', $form)}
+        <tr class="crm-import-datasource-form-block-contactType">
+          <td class="label">{$form.contactType.label}</td>
+          <td>{$form.contactType.html} {help id='contact-type'}{if array_key_exists('contactSubType', $form)}&nbsp;&nbsp;&nbsp;
+            <span id="contact-subtype">{$form.contactSubType.label}&nbsp;&nbsp;&nbsp;{$form.contactSubType.html} {help id='contact-sub-type'}{/if}</span>
+          </td>
+        </tr>
+      {/if}
+      {if array_key_exists('onDuplicate', $form)}
+        <tr class="crm-import-datasource-form-block-onDuplicate">
+          <td class="label">{$form.onDuplicate.label}</td>
+          <td>{$form.onDuplicate.html} {help id='dupes'}</td>
+        </tr>
+      {/if}
+      {if array_key_exists('dedupe_rule_id', $form)}
+        <tr class="crm-import-datasource-form-block-dedupe">
+          <td class="label">{$form.dedupe_rule_id.label}</td>
+          <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='id-dedupe_rule'}</td>
+        </tr>
+      {/if}
       <tr class="crm-import-datasource-form-block-fieldSeparator">
         <td class="label">{$form.fieldSeparator.label}</td>
         <td>{$form.fieldSeparator.html} {help id='id-fieldSeparator'}</td>
@@ -56,7 +62,7 @@
         <td></td><td class="description">{ts}Select the format that is used for date fields in your import data.{/ts}</td>
       </tr>
 
-      {if $geoCode}
+      {if array_key_exists('doGeocodeAddress', $form)}
         <tr class="crm-import-datasource-form-block-doGeocodeAddress">
           <td class="label"></td>
           <td>{$form.doGeocodeAddress.html} {$form.doGeocodeAddress.label}<br />
@@ -68,7 +74,7 @@
         </tr>
       {/if}
 
-      {if $savedMapping}
+      {if array_key_exists('savedMapping', $form)}
         <tr class="crm-import-datasource-form-block-savedMapping">
           <td class="label"><label for="savedMapping">{$form.savedMapping.label}</label></td>
           <td>{$form.savedMapping.html}<br />
@@ -77,7 +83,7 @@
         </tr>
       {/if}
 
-      {if $form.disableUSPS}
+      {if array_key_exists('disableUSPS', $form)}
         <tr class="crm-import-datasource-form-block-disableUSPS">
           <td class="label"></td>
           <td>{$form.disableUSPS.html} <label for="disableUSPS">{$form.disableUSPS.label}</label><br />
