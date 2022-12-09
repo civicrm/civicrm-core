@@ -70,26 +70,41 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     $this->assign('tablePrefixes', FALSE);
 
     if ($config->userSystem->viewsExists() &&
-      (
-        $config->dsn != $config->userFrameworkDSN || !empty($drupal_prefix)
-      )
-    ) {
-
-      $dsnArray = DB::parseDSN(CRM_Utils_SQL::autoSwitchDSN($config->dsn));
-      $tableNames = CRM_Core_DAO::getTableNames();
-      asort($tableNames);
-      $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= [';
-      if ($config->userFramework === 'Backdrop') {
-        $tablePrefixes = '$database_prefix = [';
+      ($config->dsn != $config->userFrameworkDSN || !empty($drupal_prefix))) {
+      if (($config->userSystem->is_drupal) && (explode('.', \DRUPAL::VERSION) >=9)) {
+        # Per-table prefixes are no longer supported
+        $db = Drupal\Core\Database\Database::getConnectionInfo('default')['default'];
+        $tablePrefixes = "# Drupal 9 : Per-table prefixes are no longer supported\n";
+        $tablePrefixes .= '$databases[\'civicrm\'][\'default\'] = [' . "\n";
+        $tablePrefixes .= "\t" . '\'database\' => \'' . $db['database'] .'\',' . "\n";
+        $tablePrefixes .= "\t" . '\'username\' => \'' . $db['username'] .'\',' . "\n";
+        $tablePrefixes .= "\t" . '\'password\' => \'' . 'set your db password' .'\',' . "\n";
+        $tablePrefixes .= "\t" . '\'host\' => \'' . $db['host'] .'\',' . "\n";
+        $tablePrefixes .= "\t" . '\'port\' => \'' . $db['port'] .'\',' . "\n";
+        $tablePrefixes .= "\t" . '\'driver\' => \'' . $db['driver'] .'\',' . "\n";
+        $tablePrefixes .= "\t" . '\'prefix\' => \'\',' . "\n";
+        $tablePrefixes .= "\t" . '\'namespace\' => \'Drupal\\Core\\Database\\Driver\\mysql\',' . "\n";
+        $tablePrefixes .= "\t" . '\'collation\' => \'utf8mb4_general_ci\',' . "\n";
+        $tablePrefixes .= '];';
+        $this->assign('tablePrefixes', $tablePrefixes);
       }
-      // add default prefix: the drupal database prefix
-      $tablePrefixes .= "\n  'default' => '$drupal_prefix',";
-      $prefix = $config->userSystem->getCRMDatabasePrefix();
-      foreach ($tableNames as $tableName) {
-        $tablePrefixes .= "\n  '" . str_pad($tableName . "'", 41) . " => '{$prefix}',";
+      else {
+        $dsnArray = DB::parseDSN(CRM_Utils_SQL::autoSwitchDSN($config->dsn));
+        $tableNames = CRM_Core_DAO::getTableNames();
+        asort($tableNames);
+        $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= [';
+        if ($config->userFramework === 'Backdrop') {
+          $tablePrefixes = '$database_prefix = [';
+        }
+        // add default prefix: the drupal database prefix
+        $tablePrefixes .= "\n  'default' => '$drupal_prefix',";
+        $prefix = $config->userSystem->getCRMDatabasePrefix();
+        foreach ($tableNames as $tableName) {
+          $tablePrefixes .= "\n  '" . str_pad($tableName . "'", 41) . " => '{$prefix}',";
+        }
+        $tablePrefixes .= "\n];";
+        $this->assign('tablePrefixes', $tablePrefixes);
       }
-      $tablePrefixes .= "\n];";
-      $this->assign('tablePrefixes', $tablePrefixes);
     }
 
     parent::buildQuickForm();
