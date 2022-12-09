@@ -34,7 +34,7 @@ class CRM_Core_I18n_SchemaStructure {
         ],
         'civicrm_option_group' => [
           'title' => "varchar(255) COMMENT 'Option Group title.'",
-          'description' => "varchar(255) COMMENT 'Option group description.'",
+          'description' => "text COMMENT 'Option group description.'",
         ],
         'civicrm_relationship_type' => [
           'label_a_b' => "varchar(64) COMMENT 'label for relationship of contact_a to contact_b.'",
