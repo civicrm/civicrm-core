@@ -216,7 +216,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
         'MembershipBlock',
         'Pledge',
         'PledgeBlock',
-        'Delivered',
+        'MailingEventDelivered',
       ];
       sort($entity_names);
       sort($expected_entity_names);
