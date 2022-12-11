@@ -8,14 +8,14 @@
  +--------------------------------------------------------------------+
 *}
 {* Displays search criteria assigned to $qill variable, for all search forms - basic, advanced, search builder, and component searches. *}
-{foreach from=$qill name=sets key=setKey item=orClauses}
+{foreach from=$qill|smarty:nodefaults name=sets key=setKey item=orClauses}
     {if $smarty.foreach.sets.total > 2}
         {* We have multiple criteria sets, so display AND'd items in each set on the same line. *}
         {if count($orClauses) gt 0}
         <ul>
         <li>
-        {foreach from=$orClauses name=criteria item=item}
-            {$item|escape}
+        {foreach from=$orClauses|smarty:nodefaults name=criteria item=item}
+            {$item|smarty:nodefaults|escape}
             {if !$smarty.foreach.criteria.last}
                 <span class="font-italic">...{ts}AND{/ts}...</span>
             {/if}
@@ -36,10 +36,10 @@
     {else}
         {foreach from=$orClauses name=criteria item=item}
             <div class="qill">
-            {$item|escape}
+            {$item|smarty:nodefaults|escape}
             {if !$smarty.foreach.criteria.last}
                 {if !empty($operator)}
-                  <span class="font-italic">...{$operator|escape}...</span>
+                  <span class="font-italic">...{$operator|smarty:nodefaults|escape:html}...</span>
                 {else}
                   <span class="font-italic">...{ts}AND{/ts}...</span>
                 {/if}

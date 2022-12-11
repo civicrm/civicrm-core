@@ -6271,7 +6271,7 @@ AND   displayRelType.is_active = 1
       $fieldValue = CRM_Utils_Date::customFormat($fieldValue);
     }
 
-    return [CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue];
+    return [$qillOperators[$op] ?? $op, $fieldValue];
   }
 
   /**
