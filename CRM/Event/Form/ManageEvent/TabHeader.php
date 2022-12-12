@@ -66,12 +66,8 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs = [];
     $tabs['settings'] = ['title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage'] + $default;
     $tabs['location'] = ['title' => ts('Event Location')] + $default;
-    // Check to see if CiviContribute is an enabled component.
-    $components = \Civi\Api4\Setting::get()
-      ->addSelect('enable_components')
-      ->execute()[0]['value'];
     // If CiviContribute is active, create the Fees tab.
-    if (in_array('CiviContribute', $components)) {
+    if (CRM_Core_Component::isEnabled('CiviContribute')) {
       $tabs['fee'] = ['title' => ts('Fees')] + $default;
     }
     $tabs['registration'] = ['title' => ts('Online Registration')] + $default;

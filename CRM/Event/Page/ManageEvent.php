@@ -147,12 +147,8 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'url' => 'civicrm/event/manage/location',
           'field' => 'loc_block_id',
         ];
-      // Check to see if CiviContribute is an enabled component.
-      $components = \Civi\Api4\Setting::get()
-        ->addSelect('enable_components')
-        ->execute()[0]['value'];
       // If CiviContribute is active, create the Fees dropdown menu item.
-      if (in_array('CiviContribute', $components)) {
+      if (CRM_Core_Component::isEnabled('CiviContribute')) {
         self::$_tabLinks[$cacheKey]['fee']
           = [
             'title' => ts('Fees'),
