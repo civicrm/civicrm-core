@@ -106,7 +106,7 @@
     </tr>
     <tr class="crm-custom-field-form-block-default_value" id="hideDefault" {if $action eq 2 && ($form.data_type.value.0.0 < 4 && $form.data_type.value.1.0 NEQ 'Text')}class="hiddenElement"{/if}>
       <td class="label">{$form.default_value.label}</td>
-      <td class="html-adjust">{$form.default_value.html}</td>
+      <td class="html-adjust">{$form.default_value.html|crmAddClass:oneline}</td>
     </tr>
     <tr class="crm-custom-field-form-block-description"  id="hideDesc" {if $action neq 4 && $action eq 2 && ($form.data_type.value.0.0 < 4 && $form.data_type.value.1.0 NEQ 'Text')}class="hiddenElement"{/if}>
       <td class="label">&nbsp;</td>

@@ -106,9 +106,8 @@
   </field>
   <field>
     <name>default_value</name>
-    <type>varchar</type>
+    <type>text</type>
     <title>Custom Field Default</title>
-    <length>255</length>
     <comment>Use form_options.is_default for field_types which use options.</comment>
     <add>1.1</add>
   </field>

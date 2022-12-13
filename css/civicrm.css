@@ -228,6 +228,10 @@ input.crm-form-entityref {
   white-space: nowrap;
   overflow: auto;
 }
+.crm-container textarea.oneline {
+  width: 25em;
+  height: 1.8em;
+}
 .crm-container .bigSelect {
   width: 15em;
   height: 12em;

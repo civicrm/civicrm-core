@@ -418,7 +418,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->addRule('options_per_line', ts('must be a numeric value'), 'numeric');
 
     // default value, help pre, help post, mask, attributes, javascript ?
-    $this->add('text', 'default_value', ts('Default Value'),
+    $this->add('textarea', 'default_value', ts('Default Value'),
       $attributes['default_value']
     );
     $this->add('textarea', 'help_pre', ts('Field Pre Help'),
