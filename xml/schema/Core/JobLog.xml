@@ -58,6 +58,10 @@
     <comment>Pointer to job id - not a FK though, just for logging purposes</comment>
     <add>4.1</add>
   </field>
+  <index>
+    <name>index_job_id</name>
+    <fieldName>job_id</fieldName>
+  </index>
   <field>
     <name>name</name>
     <title>Job Name</title>
