@@ -168,8 +168,8 @@ class CRM_Case_Form_Activity_OpenCase {
 
     if ($form->_currentlyViewedContactId) {
       list($displayName) = CRM_Contact_BAO_Contact::getDisplayAndImage($form->_currentlyViewedContactId);
-      $form->assign('clientName', $displayName);
     }
+    $form->assign('clientName', $displayName ?? NULL);
 
     $form->add('datepicker', 'start_date', ts('Case Start Date'), [], TRUE);
 

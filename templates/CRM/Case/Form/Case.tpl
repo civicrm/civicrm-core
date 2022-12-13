@@ -34,12 +34,12 @@
             <div class="help">{$activityTypeDescription}</div>
         </tr>
     {/if}
-{if !empty($clientName)}
+{if $clientName}
     <tr class="crm-case-form-block-clientName">
       <td class="label">{ts}Client{/ts}</td>
       <td class="bold view-value">{$clientName}</td>
     </tr>
-{elseif empty($clientName) and $action eq 1}
+{elseif $action eq 1}
     {if $context eq 'standalone'}
       <td class="label">{$form.client_id.label}</td>
       <td class="view-value">{$form.client_id.html}</td>
