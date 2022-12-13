@@ -99,13 +99,10 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    * @throws \CRM_Core_Exception
    */
   public function setDefaultValues(): array {
-    $config = CRM_Core_Config::singleton();
-    $defaults = [
-      'contactType' => 'Individual',
-      'fieldSeparator' => $config->fieldSeparator,
-      // Perhaps never used, but permits url passing of the group.
-      'multipleCustomData' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
-    ];
+    parent::setDefaultValues();
+    $defaults['contactType'] = 'Individual';
+    // Perhaps never used, but permits url passing of the group.
+    $defaults['multipleCustomData'] = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     $loadedMapping = $this->get('loadedMapping');
     if ($loadedMapping) {

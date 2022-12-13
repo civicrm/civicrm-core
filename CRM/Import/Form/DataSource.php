@@ -59,33 +59,14 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   public function buildQuickForm() {
     $this->assign('errorMessage', $this->getErrorMessage());
     $config = CRM_Core_Config::singleton();
-    // When we switch to using the DataSource.tpl used by Contact we can remove this in
-    // favour of the one used by Contact - I was trying to consolidate
-    // first & got stuck on https://github.com/civicrm/civicrm-core/pull/23458
-    $this->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
-    $uploadFileSize = CRM_Utils_Number::formatUnitSize($config->maxFileSize . 'm', TRUE);
 
-    //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
-    if (empty($uploadFileSize)) {
-      $uploadFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
-    }
-    $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
+    $this->assign('urlPath', 'civicrm/import/datasource');
+    $this->assign('urlPathVar', 'snippet=4&user_job_id=' . $this->get('user_job_id'));
 
-    $this->assign('uploadSize', $uploadSize);
+    $this->add('select', 'dataSource', ts('Data Source'), $this->getDataSources(), TRUE,
+      ['onchange' => 'buildDataSourceFormBlock(this.value);']
+    );
 
-    $this->add('File', 'uploadFile', ts('Import Data File'), NULL, TRUE);
-    $this->setMaxFileSize($uploadFileSize);
-    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
-      1 => $uploadSize,
-      2 => $uploadFileSize,
-    ]), 'maxfilesize', $uploadFileSize);
-    $this->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
-    $this->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
-
-    $this->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
-
-    $this->add('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2], TRUE);
-    $this->setDefaults(['fieldSeparator' => $config->fieldSeparator]);
     $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . static::IMPORT_ENTITY);
     $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
@@ -95,6 +76,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
     //build date formats
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
+
+    $this->buildDataSourceFields();
 
     $this->addButtons([
         [
@@ -108,6 +91,15 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
           'name' => ts('Cancel'),
         ],
     ]);
+  }
+
+  public function setDefaultValues() {
+    return [
+      'dataSource' => $this->getDefaultDataSource(),
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+      'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
+    ];
+
   }
 
   /**

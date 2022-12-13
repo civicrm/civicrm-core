@@ -121,13 +121,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    *   reference to the array of default values
    */
   public function setDefaultValues() {
-    $defaults = [
-      'dataSource' => $this->getDefaultDataSource(),
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
-      'contactType' => 'Individual',
-      'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
-      'disableUSPS' => TRUE,
-    ];
+    $defaults = parent::setDefaultValues();
+    $defaults['contactType'] = 'Individual';
+    $defaults['disableUSPS'] = TRUE;
 
     if ($this->get('loadedMapping')) {
       $defaults['savedMapping'] = $this->get('loadedMapping');
