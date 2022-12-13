@@ -216,7 +216,6 @@ return [
     'type' => 'String',
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'html_type' => 'checkboxes',
-    'sortable' => TRUE,
     'pseudoconstant' => [
       'callback' => 'CRM_Core_SelectValues::quicksearchOptions',
     ],
