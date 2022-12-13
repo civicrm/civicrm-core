@@ -212,7 +212,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $expectText = [
       'Yes No April',
       'Oui Non avril',
-      'Sí No Abril',
+      'Sí No abril',
     ];
 
     $rowCount = 0;
