@@ -73,9 +73,9 @@
             .on('crmFormSuccess', ctrl.refresh);
         }
         else if (action.redirect) {
-          var path = $scope.$eval(action.redirect.path, data),
-            query = action.redirect.query && $scope.$eval(action.redirect.query, data) && $scope.$eval(action.redirect.data, data);
-          $window.open(CRM.url(path, query), '_blank');
+          var redirectPath = $scope.$eval(action.redirect.path, data),
+            redirectQuery = action.redirect.query && $scope.$eval(action.redirect.query, data) && $scope.$eval(action.redirect.data, data);
+          $window.open(CRM.url(redirectPath, redirectQuery), '_blank');
         }
         // If action uses dialogService
         else {
