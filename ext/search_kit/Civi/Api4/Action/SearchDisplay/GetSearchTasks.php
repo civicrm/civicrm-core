@@ -138,15 +138,32 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
             $task['title'] = E::ts('Profile Update');
           }
           $key = \CRM_Core_Key::get(\CRM_Utils_Array::first((array) $task['class']), TRUE);
-          $tasks[$entity['name']]['contact.' . $id] = [
-            'title' => $task['title'],
-            'icon' => $task['icon'] ?? 'fa-gear',
-            'crmPopup' => [
-              'path' => "'{$task['url']}'",
-              'query' => "{reset: 1}",
-              'data' => "{cids: ids.join(','), qfKey: '$key'}",
-            ],
-          ];
+
+          //break out mailing labels (and/or others) for redirect instead of crmPopup
+          if ($task['title'] == 'Mailing labels - print') {
+            //this is questionable see below
+            // $url = $task['url'] . '?qfKey=' . $key;
+            $tasks[$entity['name']]['contact.' . $id] = [
+              'title' => $task['title'],
+              'icon' => $task['icon'] ?? 'fa-gear',
+              'redirect' => [
+                'path' => "'{$task['url']}'",
+                'query' => "{reset: 1}",
+                'data' => "{cids: ids.join(','), qfKey: '$key'}",
+              ]
+            ];
+          }
+          else {
+            $tasks[$entity['name']]['contact.' . $id] = [
+              'title' => $task['title'],
+              'icon' => $task['icon'] ?? 'fa-gear',
+              'crmPopup' => [
+                'path' => "'{$task['url']}'",
+                'query' => "{reset: 1}",
+                'data' => "{cids: ids.join(','), qfKey: '$key'}",
+              ],
+            ];
+          }
         }
       }
       if (!$this->checkPermissions || \CRM_Core_Permission::check(['merge duplicate contacts', 'delete contacts'])) {
