@@ -139,10 +139,8 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           }
           $key = \CRM_Core_Key::get(\CRM_Utils_Array::first((array) $task['class']), TRUE);
 
-          //break out mailing labels (and/or others) for redirect instead of crmPopup
+          //break out mailing labels for redirect instead of crmPopup
           if ($task['title'] == 'Mailing labels - print') {
-            //this is questionable see below
-            // $url = $task['url'] . '?qfKey=' . $key;
             $tasks[$entity['name']]['contact.' . $id] = [
               'title' => $task['title'],
               'icon' => $task['icon'] ?? 'fa-gear',
