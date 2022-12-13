@@ -73,6 +73,9 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
       'modified_date' => $activityMoreInfo['modified_date'],
       'activity_modified_date' => $activityMoreInfo['modified_date'],
       'attachment' => NULL,
+      'mailingId' => NULL,
+      'campaign' => NULL,
+      'engagement_level' => NULL,
     ];
 
     $this->assertEquals($expected, $templateVar);
