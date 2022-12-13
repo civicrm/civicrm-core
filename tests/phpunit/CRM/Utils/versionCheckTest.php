@@ -216,7 +216,8 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
         'MembershipBlock',
         'Pledge',
         'PledgeBlock',
-        'MailingEventDelivered',
+        'Delivered',
+        // TIP: If an entity is renamed, then update VersionCheck's $compat list.
       ];
       sort($entity_names);
       sort($expected_entity_names);

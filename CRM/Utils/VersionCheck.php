@@ -203,6 +203,8 @@ class CRM_Utils_VersionCheck {
       'CRM_Pledge_DAO_PledgeBlock' => NULL,
       'CRM_Mailing_Event_DAO_MailingEventDelivered' => NULL,
     ];
+    // Provide continuity in wire format.
+    $compat = ['MailingEventDelivered' => 'Delivered'];
     foreach ($tables as $daoName => $where) {
       if (class_exists($daoName)) {
         /** @var \CRM_Core_DAO $dao */
@@ -212,7 +214,7 @@ class CRM_Utils_VersionCheck {
         }
         $short_name = substr($daoName, strrpos($daoName, '_') + 1);
         $this->stats['entities'][] = [
-          'name' => $short_name,
+          'name' => $compat[$short_name] ?? $short_name,
           'size' => $dao->count(),
         ];
       }
