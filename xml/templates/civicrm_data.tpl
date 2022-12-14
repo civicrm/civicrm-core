@@ -612,24 +612,24 @@ VALUES
   (@option_group_id_report , '{ts escape="sql"}Database Log Report{/ts}',                     'contact/log',                    'CRM_Report_Form_Contact_Log',                    NULL, 0, 0, 27, '{ts escape="sql"}Log of contact and activity records created or updated in a given date range.{/ts}', 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_report , '{ts escape="sql"}Activity Summary Report{/ts}',                 'activitySummary',                'CRM_Report_Form_ActivitySummary',                NULL, 0, 0, 28, '{ts escape="sql"}Shows activity statistics by type / date{/ts}', 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_report, '{ts escape="sql"}Bookkeeping Transactions Report{/ts}',          'contribute/bookkeeping',         'CRM_Report_Form_Contribute_Bookkeeping',         NULL, 0, 0, 29,    '{ts escape="sql"}Shows Bookkeeping Transactions Report{/ts}', 0, 0, 1, 2, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Participant list Count Report{/ts}'{/localize}, 'event/participantlist', 'CRM_Report_Form_Event_ParticipantListCount', NULL, 0, 0, 31, {localize}'{ts escape="sql"}Shows the Participant list with Participant Count.{/ts}'{/localize}, 0, 0, 1, @eventCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Income Count Summary Report{/ts}'{/localize}, 'event/incomesummary', 'CRM_Report_Form_Event_IncomeCountSummary', NULL, 0, 0, 32, {localize}'{ts escape="sql"}Shows the Income Summary of events with Count.{/ts}'{/localize}, 0, 0, 1, @eventCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Case Detail Report{/ts}'{/localize}, 'case/detail', 'CRM_Report_Form_Case_Detail', NULL, 0, 0, 33, {localize}'{ts escape="sql"}Case Details{/ts}'{/localize}, 0, 0, 1, @caseCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Mail Bounce Report{/ts}'{/localize}, 'Mailing/bounce', 'CRM_Report_Form_Mailing_Bounce', NULL, 0, 0, 34, {localize}'{ts escape="sql"}Bounce Report for mailings{/ts}'{/localize}, 0, 0, 1, @mailCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Mail Summary Report{/ts}'{/localize}, 'Mailing/summary', 'CRM_Report_Form_Mailing_Summary', NULL, 0, 0, 35, {localize}'{ts escape="sql"}Summary statistics for mailings{/ts}'{/localize}, 0, 0, 1, @mailCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Mail Opened Report{/ts}'{/localize}, 'Mailing/opened', 'CRM_Report_Form_Mailing_Opened', NULL, 0, 0, 36, {localize}'{ts escape="sql"}Display contacts who opened emails from a mailing{/ts}'{/localize}, 0, 0, 1, @mailCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Mail Click-Through Report{/ts}'{/localize}, 'Mailing/clicks', 'CRM_Report_Form_Mailing_Clicks', NULL, 0, 0, 37, {localize}'{ts escape="sql"}Display clicks from each mailing{/ts}'{/localize}, 0, 0, 1, @mailCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Contact Logging Report (Summary){/ts}'{/localize}, 'logging/contact/summary', 'CRM_Report_Form_Contact_LoggingSummary', NULL, 0, 0, 38, {localize}'{ts escape="sql"}Contact modification report for the logging infrastructure (summary).{/ts}'{/localize}, 0, 0, 0, NULL, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Contact Logging Report (Detail){/ts}'{/localize}, 'logging/contact/detail', 'CRM_Report_Form_Contact_LoggingDetail', NULL, 0, 0, 39, {localize}'{ts escape="sql"}Contact modification report for the logging infrastructure (detail).{/ts}'{/localize}, 0, 0, 0, NULL, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Survey Report (Detail){/ts}'{/localize},    'survey/detail', 'CRM_Report_Form_Campaign_SurveyDetails',  NULL, 0, 0, 43, {localize}'{ts escape="sql"}Detailed report for canvassing, phone-banking, walk lists or other surveys.{/ts}'{/localize}, 0, 0, 1, @campaignCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Personal Campaign Page Report{/ts}'{/localize}, 'contribute/pcp', 'CRM_Report_Form_Contribute_PCP', NULL, 0, 0, 44, {localize}'{ts escape="sql"}Summarizes amount raised and number of contributors for each Personal Campaign Page.{/ts}'{/localize}, 0, 0, 1, @contributeCompId, NULL, NULL),
-  (@option_group_id_report , {localize}'{ts escape="sql"}Pledge Summary Report{/ts}'{/localize}, 'pledge/summary', 'CRM_Report_Form_Pledge_Summary', NULL, 0, 0, 45, {localize}'{ts escape="sql"}Groups and totals pledges by criteria including contact, time period, pledge status, location, etc.{/ts}'{/localize}, 0, 0, 1, @pledgeCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Participant list Count Report{/ts}', 'event/participantlist', 'CRM_Report_Form_Event_ParticipantListCount', NULL, 0, 0, 31, '{ts escape="sql"}Shows the Participant list with Participant Count.{/ts}', 0, 0, 1, @eventCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Income Count Summary Report{/ts}', 'event/incomesummary', 'CRM_Report_Form_Event_IncomeCountSummary', NULL, 0, 0, 32, '{ts escape="sql"}Shows the Income Summary of events with Count.{/ts}', 0, 0, 1, @eventCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Case Detail Report{/ts}', 'case/detail', 'CRM_Report_Form_Case_Detail', NULL, 0, 0, 33, '{ts escape="sql"}Case Details{/ts}', 0, 0, 1, @caseCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Mail Bounce Report{/ts}', 'Mailing/bounce', 'CRM_Report_Form_Mailing_Bounce', NULL, 0, 0, 34, '{ts escape="sql"}Bounce Report for mailings{/ts}', 0, 0, 1, @mailCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Mail Summary Report{/ts}', 'Mailing/summary', 'CRM_Report_Form_Mailing_Summary', NULL, 0, 0, 35, '{ts escape="sql"}Summary statistics for mailings{/ts}', 0, 0, 1, @mailCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Mail Opened Report{/ts}', 'Mailing/opened', 'CRM_Report_Form_Mailing_Opened', NULL, 0, 0, 36, '{ts escape="sql"}Display contacts who opened emails from a mailing{/ts}', 0, 0, 1, @mailCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Mail Click-Through Report{/ts}', 'Mailing/clicks', 'CRM_Report_Form_Mailing_Clicks', NULL, 0, 0, 37, '{ts escape="sql"}Display clicks from each mailing{/ts}', 0, 0, 1, @mailCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Contact Logging Report (Summary){/ts}', 'logging/contact/summary', 'CRM_Report_Form_Contact_LoggingSummary', NULL, 0, 0, 38, '{ts escape="sql"}Contact modification report for the logging infrastructure (summary).{/ts}', 0, 0, 0, NULL, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Contact Logging Report (Detail){/ts}', 'logging/contact/detail', 'CRM_Report_Form_Contact_LoggingDetail', NULL, 0, 0, 39, '{ts escape="sql"}Contact modification report for the logging infrastructure (detail).{/ts}', 0, 0, 0, NULL, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Survey Report (Detail){/ts}',    'survey/detail', 'CRM_Report_Form_Campaign_SurveyDetails',  NULL, 0, 0, 43, '{ts escape="sql"}Detailed report for canvassing, phone-banking, walk lists or other surveys.{/ts}', 0, 0, 1, @campaignCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Personal Campaign Page Report{/ts}', 'contribute/pcp', 'CRM_Report_Form_Contribute_PCP', NULL, 0, 0, 44, '{ts escape="sql"}Summarizes amount raised and number of contributors for each Personal Campaign Page.{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
+  (@option_group_id_report , '{ts escape="sql"}Pledge Summary Report{/ts}', 'pledge/summary', 'CRM_Report_Form_Pledge_Summary', NULL, 0, 0, 45, '{ts escape="sql"}Groups and totals pledges by criteria including contact, time period, pledge status, location, etc.{/ts}', 0, 0, 1, @pledgeCompId, NULL, NULL),
   (@option_group_id_report , '{ts escape="sql"}Contribution Aggregate by Relationship{/ts}',                   'contribute/history',              'CRM_Report_Form_Contribute_History',              NULL, 0, 0, 46,  '{ts escape="sql"}List contact's donation history, grouped by year, along with contributions attributed to any of the contact's related contacts.{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
-  (@option_group_id_report,  {localize}'{ts escape="sql"}Mail Detail Report{/ts}'{/localize},                                            'mailing/detail',     'CRM_Report_Form_Mailing_Detail',          NULL, 0, 0, 47,  {localize}'{ts escape="sql"}Provides reporting on Intended and Successful Deliveries, Unsubscribes and Opt-outs, Replies and Forwards.{/ts}'{/localize},   0, 0, 1, @mailCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Contribution and Membership Details{/ts}'{/localize}, 'member/contributionDetail', 'CRM_Report_Form_Member_ContributionDetail', NULL, 0, 0, 48, {localize}'{ts escape="sql"}Contribution details for any type of contribution, plus associated membership information for contributions which are in payment for memberships.{/ts}'{/localize}, 0, 0, 1, @memberCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Recurring Contributions Report{/ts}'{/localize}, 'contribute/recur', 'CRM_Report_Form_Contribute_Recur',               NULL, 0, 0, 49, {localize}'{ts escape="sql"}Provides information about the status of recurring contributions{/ts}'{/localize}, 0, 0, 1, @contributeCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Recurring Contributions Summary{/ts}'{/localize}, 'contribute/recursummary', 'CRM_Report_Form_Contribute_RecurSummary',               NULL, 0, 0, 49, {localize}'{ts escape="sql"}Provides simple summary for each payment instrument for which there are recurring contributions (e.g. Credit Card, Standing Order, Direct Debit, etc., NULL), showing within a given date range.{/ts}'{/localize}, 0, 0, 1, @contributeCompId, NULL, NULL),
-  (@option_group_id_report, {localize}'{ts escape="sql"}Deferred Revenue Details{/ts}'{/localize}, 'contribute/deferredrevenue', 'CRM_Report_Form_Contribute_DeferredRevenue', NULL, 0, 0, 50, {localize}'{ts escape="sql"}Deferred Revenue Details Report{/ts}'{/localize}, 0, 0, 1, @contributeCompId, NULL, NULL),
+  (@option_group_id_report,  '{ts escape="sql"}Mail Detail Report{/ts}',                                            'mailing/detail',     'CRM_Report_Form_Mailing_Detail',          NULL, 0, 0, 47,  '{ts escape="sql"}Provides reporting on Intended and Successful Deliveries, Unsubscribes and Opt-outs, Replies and Forwards.{/ts}',   0, 0, 1, @mailCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Contribution and Membership Details{/ts}', 'member/contributionDetail', 'CRM_Report_Form_Member_ContributionDetail', NULL, 0, 0, 48, '{ts escape="sql"}Contribution details for any type of contribution, plus associated membership information for contributions which are in payment for memberships.{/ts}', 0, 0, 1, @memberCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Recurring Contributions Report{/ts}', 'contribute/recur', 'CRM_Report_Form_Contribute_Recur',               NULL, 0, 0, 49, '{ts escape="sql"}Provides information about the status of recurring contributions{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Recurring Contributions Summary{/ts}', 'contribute/recursummary', 'CRM_Report_Form_Contribute_RecurSummary',               NULL, 0, 0, 49, '{ts escape="sql"}Provides simple summary for each payment instrument for which there are recurring contributions (e.g. Credit Card, Standing Order, Direct Debit, etc., NULL), showing within a given date range.{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
+  (@option_group_id_report, '{ts escape="sql"}Deferred Revenue Details{/ts}', 'contribute/deferredrevenue', 'CRM_Report_Form_Contribute_DeferredRevenue', NULL, 0, 0, 50, '{ts escape="sql"}Deferred Revenue Details Report{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
 
   (@option_group_id_acs, '{ts escape="sql"}Scheduled{/ts}',    1, 'Scheduled',    NULL, 0, 1,    1, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_acs, '{ts escape="sql"}Completed{/ts}',    2, 'Completed',    NULL, 1, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
@@ -1768,23 +1768,23 @@ INSERT INTO `civicrm_price_field_value` (  `price_field_id`, `name`, `label`, `a
 VALUES ( @fieldID, 'contribution_amount', 'Contribution Amount', '1', '1', '0', '1', 1);
 
 -- CRM-13833
-INSERT INTO civicrm_option_group (`name`, `title`, `is_reserved`, `is_active`) VALUES ('soft_credit_type', {localize}'{ts escape="sql"}Soft Credit Types{/ts}'{/localize}, 1, 1);
+INSERT INTO civicrm_option_group (`name`, `title`, `is_reserved`, `is_active`) VALUES ('soft_credit_type', '{ts escape="sql"}Soft Credit Types{/ts}', 1, 1);
 
 SELECT @option_group_id_soft_credit_type := max(id) from civicrm_option_group where name = 'soft_credit_type';
 
 INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `weight`, `is_default`, `is_active`, `is_reserved`)
 VALUES
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}In Honor of{/ts}'{/localize}, 1, 'in_honor_of', 1, 0, 1, 1),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}In Memory of{/ts}'{/localize}, 2, 'in_memory_of', 2, 0, 1, 1),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Solicited{/ts}'{/localize}, 3, 'solicited', 3, 1, 1, 1),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Household{/ts}'{/localize}, 4, 'household', 4, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Workplace Giving{/ts}'{/localize}, 5, 'workplace', 5, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Foundation Affiliate{/ts}'{/localize}, 6, 'foundation_affiliate', 6, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}3rd-party Service{/ts}'{/localize}, 7, '3rd-party_service', 7, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Donor-advised Fund{/ts}'{/localize}, 8, 'donor-advised_fund', 8, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Matched Gift{/ts}'{/localize}, 9, 'matched_gift', 9, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Personal Campaign Page{/ts}'{/localize}, 10, 'pcp', 10, 0, 1, 1),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Gift{/ts}'{/localize}, 11, 'gift', 11, 0, 1, 1);
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}In Honor of{/ts}', 1, 'in_honor_of', 1, 0, 1, 1),
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}In Memory of{/ts}', 2, 'in_memory_of', 2, 0, 1, 1),
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Solicited{/ts}', 3, 'solicited', 3, 1, 1, 1),
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Household{/ts}', 4, 'household', 4, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Workplace Giving{/ts}', 5, 'workplace', 5, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Foundation Affiliate{/ts}', 6, 'foundation_affiliate', 6, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}3rd-party Service{/ts}', 7, '3rd-party_service', 7, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Donor-advised Fund{/ts}', 8, 'donor-advised_fund', 8, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Matched Gift{/ts}', 9, 'matched_gift', 9, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Personal Campaign Page{/ts}', 10, 'pcp', 10, 0, 1, 1),
+  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Gift{/ts}', 11, 'gift', 11, 0, 1, 1);
 
 -- Auto-install core extension.
 -- Note this is a limited interim technique for installing core extensions -  the goal is that core extensions would be installed
@@ -1800,21 +1800,21 @@ INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_act
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'org.civicrm.flexmailer', 'FlexMailer', 'FlexMailer', 'flexmailer', 1);
 
 -- dev/core#3783 Recent Items providers
-INSERT INTO civicrm_option_group (`name`, `title`, `is_reserved`, `is_active`) VALUES ('recent_items_providers', {localize}'{ts escape="sql"}Recent Items Providers{/ts}'{/localize}, 1, 1);
+INSERT INTO civicrm_option_group (`name`, `title`, `is_reserved`, `is_active`) VALUES ('recent_items_providers', '{ts escape="sql"}Recent Items Providers{/ts}', 1, 1);
 
 SELECT @option_group_id_recent := max(id) from civicrm_option_group where name = 'recent_items_providers';
 
-INSERT INTO civicrm_option_value (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}description{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+INSERT INTO civicrm_option_value (`option_group_id`, label, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, description, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
  VALUES
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Contacts{/ts}'{/localize}, 'Contact', 'Contact', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Relationships{/ts}'{/localize}, 'Relationship', 'Relationship', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Activities{/ts}'{/localize}, 'Activity', 'Activity', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Notes{/ts}'{/localize}, 'Note', 'Note', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Groups{/ts}'{/localize}, 'Group', 'Group', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Cases{/ts}'{/localize}, 'Case', 'Case', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Contributions{/ts}'{/localize}, 'Contribution', 'Contribution', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Participants{/ts}'{/localize}, 'Participant', 'Participant', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Memberships{/ts}'{/localize}, 'Membership', 'Membership', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Pledges{/ts}'{/localize}, 'Pledge', 'Pledge', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Events{/ts}'{/localize}, 'Event', 'Event', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, {localize}'{ts escape="sql"}Campaigns{/ts}'{/localize}, 'Campaign', 'Campaign', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL);
+    (@option_group_id_recent, '{ts escape="sql"}Contacts{/ts}', 'Contact', 'Contact', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Relationships{/ts}', 'Relationship', 'Relationship', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Activities{/ts}', 'Activity', 'Activity', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Notes{/ts}', 'Note', 'Note', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Groups{/ts}', 'Group', 'Group', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Cases{/ts}', 'Case', 'Case', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Contributions{/ts}', 'Contribution', 'Contribution', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Participants{/ts}', 'Participant', 'Participant', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Memberships{/ts}', 'Membership', 'Membership', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Pledges{/ts}', 'Pledge', 'Pledge', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Events{/ts}', 'Event', 'Event', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
+    (@option_group_id_recent, '{ts escape="sql"}Campaigns{/ts}', 'Campaign', 'Campaign', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL);
