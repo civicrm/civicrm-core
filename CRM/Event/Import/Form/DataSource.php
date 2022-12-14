@@ -20,7 +20,11 @@
  */
 class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/event/import';
+  /**
+   * Variable to store redirect path.
+   * @var string
+   */
+  protected $_userContext = 'civicrm/event/import';
 
   const IMPORT_ENTITY = 'Participant';
 

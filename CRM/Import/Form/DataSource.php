@@ -22,9 +22,17 @@ use Civi\Api4\Utils\CoreUtil;
 abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
   /**
+   * Variable to store redirect path.
+   * @var string
+   */
+  protected $_userContext = '';
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess(): void {
+    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url($this->_userContext, 'reset=1'));
+
     // check for post max size
     CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
     $this->assign('importEntity', $this->getTranslatedEntity());
@@ -183,7 +191,12 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       $this->flushDataSource();
       $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     }
-    $this->instantiateDataSource();
+    try {
+      $this->instantiateDataSource();
+    }
+    catch (Exception $e) {
+      CRM_Core_Error::statusBounce('Could not process datasource: ' . $e->getMessage());
+    }
   }
 
   /**

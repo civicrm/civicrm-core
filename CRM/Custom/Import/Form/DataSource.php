@@ -22,7 +22,11 @@ use Civi\Api4\CustomGroup;
  */
 class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/import/custom';
+  /**
+   * Variable to store redirect path.
+   * @var string
+   */
+  protected $_userContext = 'civicrm/import/custom';
 
   const IMPORT_ENTITY = 'Multi value custom data';
 

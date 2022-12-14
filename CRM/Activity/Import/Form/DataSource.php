@@ -20,7 +20,11 @@
  */
 class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/import/activity';
+  /**
+   * Variable to store redirect path.
+   * @var string
+   */
+  protected $_userContext = 'civicrm/import/activity';
 
   const IMPORT_ENTITY = 'Activity';
 
