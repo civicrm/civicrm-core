@@ -585,4 +585,21 @@ class CRM_Upgrade_Incremental_Base {
     return TRUE;
   }
 
+  public static function alterColumn($ctx, $table, $column, $properties, $localizable = FALSE): bool {
+    $locales = CRM_Core_I18n::getMultilingual();
+    $queries = [];
+    if ($localizable && $locales) {
+      foreach ($locales as $locale) {
+        $queries[] = "ALTER TABLE `$table` CHANGE `{$column}_{$locale}` `{$column}_{$locale}` $properties";
+      }
+    }
+    else {
+      $queries[] = "ALTER TABLE `$table` CHANGE `$column` `$column` $properties";
+    }
+    foreach ($queries as $query) {
+      CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
 }
