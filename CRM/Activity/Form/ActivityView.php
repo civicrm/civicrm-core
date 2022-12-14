@@ -83,6 +83,11 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
       }
     }
 
+    // ensure these are set so that they get assigned to the template
+    $values['mailingId'] = $values['mailingId'] ?? NULL;
+    $values['campaign'] = $values['campaign'] ?? NULL;
+    $values['engagement_level'] = $values['engagement_level'] ?? NULL;
+
     // Get the campaign.
     if ($campaignId = CRM_Utils_Array::value('campaign_id', $defaults)) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
