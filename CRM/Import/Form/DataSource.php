@@ -55,6 +55,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
   /**
    * Common form elements.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     $this->assign('errorMessage', $this->getErrorMessage());
@@ -67,7 +69,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       ['onchange' => 'buildDataSourceFormBlock(this.value);']
     );
 
-    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . static::IMPORT_ENTITY);
+    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . $this->getBaseEntity());
     $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
     if ($loadedMapping = $this->get('loadedMapping')) {
