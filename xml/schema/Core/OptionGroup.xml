@@ -42,8 +42,7 @@
   <field>
     <name>description</name>
     <title>Option Group Description</title>
-    <type>varchar</type>
-    <length>255</length>
+    <type>text</type>
     <localizable>true</localizable>
     <comment>Option group description.</comment>
     <add>1.5</add>
