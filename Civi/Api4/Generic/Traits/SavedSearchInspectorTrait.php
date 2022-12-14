@@ -56,7 +56,12 @@ trait SavedSearchInspectorTrait {
         ->execute()->single();
     }
     if (is_array($this->savedSearch)) {
-      $this->savedSearch += ['api_params' => []];
+      // Ensure array keys are always defined even for unsaved "preview" mode
+      $this->savedSearch += [
+        'id' => NULL,
+        'name' => NULL,
+        'api_params' => [],
+      ];
       $this->savedSearch['api_params'] += ['version' => 4, 'select' => [], 'where' => []];
     }
     $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
@@ -82,6 +87,13 @@ trait SavedSearchInspectorTrait {
         // Set by AutocompleteAction
         ->setType($this->_displayType ?? 'table')
         ->execute()->first();
+    }
+    if (is_array($this->display)) {
+      // Ensure array keys are always defined even for unsaved "preview" mode
+      $this->display += [
+        'id' => NULL,
+        'name' => NULL,
+      ];
     }
   }
 
