@@ -31,7 +31,7 @@
         initialized = true;
         crmApi4({
           entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural', 'primary_key'], where: [['name', '=', ctrl.entity]]}, 0],
-          tasks: ['SearchDisplay', 'getSearchTasks', {entity: ctrl.entity}]
+          tasks: ['SearchDisplay', 'getSearchTasks', {entity: ctrl.entity, savedSearch: ctrl.search, display: ctrl.display}]
         }).then(function(result) {
           ctrl.entityInfo = result.entityInfo;
           ctrl.tasks = result.tasks;

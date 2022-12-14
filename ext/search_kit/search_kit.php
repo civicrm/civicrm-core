@@ -70,7 +70,7 @@ function search_kit_civicrm_angularModules(&$angularModules) {
   $tasks = [];
   $null = NULL;
   $checkPermissions = FALSE;
-  \CRM_Utils_Hook::singleton()->invoke(['tasks', 'checkPermissions', 'userId'],
+  \CRM_Utils_Hook::singleton()->invoke(['tasks', 'checkPermissions', 'userId', 'search', 'display'],
     $tasks, $checkPermissions, $null,
     $null, $null, $null, 'civicrm_searchKitTasks'
   );
