@@ -218,7 +218,7 @@ CRM.$(function($) {
   function saveRecords(records, op) {
     var postUrl = CRM.url('civicrm/ajax/rest', 'className=CRM_Financial_Page_AJAX&fnName=assignRemove');
     //post request and get response
-    $.post(postUrl, {records: records, recordBAO: 'CRM_Batch_BAO_Batch', op: op, key: {/literal}"{crmKey name='civicrm/ajax/ar'}"{literal}},
+    $.post(postUrl, {records: records, recordBAO: 'CRM_Batch_BAO_Batch', op: op},
       function(response) {
         //this is custom status set when record update success.
         if (response.status == 'record-updated-success') {
