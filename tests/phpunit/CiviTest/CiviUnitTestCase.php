@@ -255,29 +255,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * @param bool $perClass
-   * @param null $object
-   *
-   * @return bool
-   *   TRUE if the populate logic runs; FALSE if it is skipped
-   */
-  protected static function _populateDB($perClass = FALSE, &$object = NULL) {
-    if ($perClass || $object == NULL) {
-      $dbreset = TRUE;
-    }
-    else {
-      $dbreset = $object->DBResetRequired;
-    }
-
-    if (!$dbreset) {
-      return FALSE;
-    }
-
-    \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
-    return TRUE;
-  }
-
-  /**
    * Declare the environment that we wish to run in.
    *
    * TODO: The hope is to get this to align with `Civi\Test::headless()` and perhaps
@@ -299,7 +276,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       throw new \RuntimeException("CiviUnitTestCase requires CIVICRM_UF=UnitTests");
     }
 
-    static::_populateDB(TRUE);
+    \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
 
     // also set this global hack
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = [];
@@ -327,7 +304,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $dbName = self::getDBName();
       // install test database
       echo PHP_EOL . "Installing {$dbName} database" . PHP_EOL;
-      static::_populateDB(FALSE, $this);
+      \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
       self::$dbInit = TRUE;
     }
 
