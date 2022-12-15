@@ -526,7 +526,22 @@
   </item>
   <item>
      <path>civicrm/admin/options/edit</path>
-     <title>Edit Option Group</title>>
+     <title>Edit Option Group/Value</title>>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+  </item>
+  <item>
+     <path>civicrm/admin/options/add</path>
+     <title>Add Option Group/Value</title>    
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+  </item>
+  <item>
+     <path>civicrm/admin/options/update</path>
+     <title>Update Option Group/Value</title>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+  </item>
+  <item>
+     <path>civicrm/admin/options/delete</path>
+     <title>Delete Option Group/Value</title>
      <page_callback>CRM_Admin_Page_Options</page_callback>
   </item>
   <item>

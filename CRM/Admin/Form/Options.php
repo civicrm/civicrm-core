@@ -54,8 +54,17 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   public function preProcess() {
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
-    if (!$this->_gName && !empty($this->urlPath[3])) {
-      $this->_gName = $this->urlPath[3];
+    // Handle new civicrm/admin/options/edit and civicrm/admin/options/add links
+    if (!empty($this->urlPath[3])) {
+      if ($this->urlPath[3] == 'edit' || $this->urlPath[3] == 'add' || $this->urlPath[3] == 'update' || $this->urlPath[3] == 'delete') {
+        $urlGroup = $this->urlPath[4] ?? '';
+      }
+      else {
+        $urlGroup = $this->urlPath[3];
+      }
+    }
+    if (!$this->_gName && !empty($urlGroup)) {
+      $this->_gName = $urlGroup;
     }
     if (!$this->_gName && !empty($_GET['gid'])) {
       $this->_gName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', (int) $_GET['gid'], 'name');

@@ -63,13 +63,13 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * Sets the title.
    */
   public function preProcess() {
-    // Handle new civicrm/admin/options/edit link
+    // Handle new civicrm/admin/options/edit and civicrm/admin/options/add links
     if (!empty($this->urlPath[3])) {
-      if ($this->urlPath[3] == 'edit') {
+      if ($this->urlPath[3] == 'edit' || $this->urlPath[3] == 'add' || $this->urlPath[3] == 'update' || $this->urlPath[3] == 'delete') {
         $urlGroup = $this->urlPath[4] ?? '';
       }
       else {
-       $urlGroup = $this->urlPath[3];
+        $urlGroup = $this->urlPath[3];
       }
     }
     if (!self::$_gName && !empty($urlGroup)) {

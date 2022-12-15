@@ -7,8 +7,8 @@
   <add>1.5</add>
   <log>true</log>
   <paths>
-    <add>civicrm/admin/options/edit?action=add&amp;reset=1</add>
-    <update>civicrm/admin/options/edit?action=update&amp;reset=1&amp;id=[id]</update>
+    <add>civicrm/admin/options/add?action=add&amp;reset=1</add>
+    <update>civicrm/admin/options/update?action=update&amp;reset=1&amp;id=[id]</update>
   </paths>
   <field>
     <name>id</name>
