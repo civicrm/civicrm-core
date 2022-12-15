@@ -262,13 +262,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * @return bool
-   */
-  public function requireDBReset() {
-    return $this->DBResetRequired;
-  }
-
-  /**
    * @return string
    */
   public static function getDBName() {
@@ -318,7 +311,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $dbreset = TRUE;
     }
     else {
-      $dbreset = $object->requireDBReset();
+      $dbreset = $object->DBResetRequired;
     }
 
     if (self::$populateOnce || !$dbreset) {
