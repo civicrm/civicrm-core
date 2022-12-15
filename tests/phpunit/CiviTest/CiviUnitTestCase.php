@@ -241,20 +241,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * @return string
-   */
-  public static function getDBName() {
-    static $dbName = NULL;
-    if ($dbName === NULL) {
-      require_once "DB.php";
-      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
-      $dsninfo = DB::parseDSN($dsn);
-      $dbName = $dsninfo['database'];
-    }
-    return $dbName;
-  }
-
-  /**
    * Declare the environment that we wish to run in.
    *
    * TODO: The hope is to get this to align with `Civi\Test::headless()` and perhaps
@@ -301,9 +287,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     }
 
     if (!self::$dbInit) {
-      $dbName = self::getDBName();
-      // install test database
-      echo PHP_EOL . "Installing {$dbName} database" . PHP_EOL;
+      fprintf(STDERR, "\nInstalling %s database\n", \Civi\Test::dsn('database'));
       \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
       self::$dbInit = TRUE;
     }
