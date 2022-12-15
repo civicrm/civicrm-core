@@ -525,6 +525,11 @@
      <weight>105</weight>
   </item>
   <item>
+     <path>civicrm/admin/options/edit</path>
+     <title>Edit Option Group</title>>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/mapping</path>
      <title>Import/Export Mappings</title>
      <desc>Import and Export mappings allow you to easily run the same job multiple times. This option allows you to rename or delete existing mappings.</desc>

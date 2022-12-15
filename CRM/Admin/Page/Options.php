@@ -63,8 +63,17 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * Sets the title.
    */
   public function preProcess() {
-    if (!self::$_gName && !empty($this->urlPath[3])) {
-      self::$_gName = $this->urlPath[3];
+    // Handle new civicrm/admin/options/edit link
+    if (!empty($this->urlPath[3])) {
+      if ($this->urlPath[3] == 'edit') {
+        $urlGroup = $this->urlPath[4] ?? '';
+      }
+      else {
+       $urlGroup = $this->urlPath[3];
+      }
+    }
+    if (!self::$_gName && !empty($urlGroup)) {
+      self::$_gName = $urlGroup;
       self::$_isLocked = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gName, 'is_locked', 'name');
     }
     // If an id arg is passed instead of a group name in the path
