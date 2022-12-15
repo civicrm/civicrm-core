@@ -312,12 +312,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   *  Required implementation of abstract method.
-   */
-  protected function getDataSet() {
-  }
-
-  /**
    * @param bool $perClass
    * @param null $object
    *
