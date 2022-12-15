@@ -255,26 +255,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   *  Create database connection for this instance.
-   *
-   *  Initialize the test database if it hasn't been initialized
-   *
-   */
-  protected function getConnection() {
-    if (!self::$dbInit) {
-      $dbName = self::getDBName();
-
-      //  install test database
-      echo PHP_EOL . "Installing {$dbName} database" . PHP_EOL;
-
-      static::_populateDB(FALSE, $this);
-
-      self::$dbInit = TRUE;
-    }
-
-  }
-
-  /**
    * @param bool $perClass
    * @param null $object
    *
@@ -331,11 +311,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       exit(1);
     }
 
-    //  Get and save a connection to the database
-    $this->getConnection(); /* NOTE: Side-effects! */
-
-    // reload database before each test
-    //        $this->_populateDB();
+    if (!self::$dbInit) {
+      $dbName = self::getDBName();
+      // install test database
+      echo PHP_EOL . "Installing {$dbName} database" . PHP_EOL;
+      static::_populateDB(FALSE, $this);
+      self::$dbInit = TRUE;
+    }
 
     // "initialize" CiviCRM to avoid problems when running single tests
     // FIXME: look at it closer in second stage
