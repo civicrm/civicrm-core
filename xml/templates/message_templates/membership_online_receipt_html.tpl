@@ -78,7 +78,7 @@
        </th>
       </tr>
 
-      {if !$useForMember and isset($membership_amount) and !empty($is_quick_config)}
+      {if !$useForMember and $membership_amount and !empty($is_quick_config)}
 
        <tr>
         <td {$labelStyle}>
@@ -242,14 +242,14 @@
          {ts}Amount{/ts}
         </td>
         <td {$valueStyle}>
-         {$amount|crmMoney} {if isset($amount_level)} - {$amount_level}{/if}
+         {$amount|crmMoney} {if $amount_level} - {$amount_level}{/if}
         </td>
        </tr>
 
       {/if}
 
 
-     {elseif isset($membership_amount)}
+     {elseif $membership_amount}
 
 
       <tr>

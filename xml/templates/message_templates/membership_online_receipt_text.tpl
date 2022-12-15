@@ -26,7 +26,7 @@
 {ts}Membership Fee{/ts}
 
 ===========================================================
-{if !$useForMember && isset($membership_amount) && !empty($is_quick_config)}
+{if !$useForMember && $membership_amount && !empty($is_quick_config)}
 {ts 1=$membership_name}%1 Membership{/ts}: {$membership_amount|crmMoney}
 {if $amount && !$is_separate_payment }
 {ts}Contribution Amount{/ts}: {$amount|crmMoney}
@@ -87,9 +87,9 @@
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
 
-{ts}Amount{/ts}: {$amount|crmMoney} {if isset($amount_level) } - {$amount_level} {/if}
+{ts}Amount{/ts}: {$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}
 {/if}
-{elseif isset($membership_amount)}
+{elseif $membership_amount}
 ===========================================================
 {ts}Membership Fee{/ts}
 
