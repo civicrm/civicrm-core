@@ -84,13 +84,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   private static $dbInit = FALSE;
 
   /**
-   *  Database connection.
-   *
-   * @var PHPUnit_Extensions_Database_DB_IDatabaseConnection
-   */
-  protected $_dbconn;
-
-  /**
    * API version in use.
    *
    * @var int
@@ -339,7 +332,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     }
 
     //  Get and save a connection to the database
-    $this->_dbconn = $this->getConnection();
+    $this->getConnection(); /* NOTE: Side-effects! */
 
     // reload database before each test
     //        $this->_populateDB();
