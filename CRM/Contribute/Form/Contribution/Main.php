@@ -362,10 +362,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (empty($this->_values['pledge_id']) && empty($this->_ccid)) {
       $this->_separateMembershipPayment = FALSE;
       if (CRM_Core_Component::isEnabled('CiviMember')) {
-        $isTest = 0;
-        if ($this->_action & CRM_Core_Action::PREVIEW) {
-          $isTest = 1;
-        }
 
         if ($this->_priceSetId &&
           (CRM_Core_Component::getComponentID('CiviMember') == CRM_Utils_Array::value('extends', $this->_priceSet))
@@ -374,11 +370,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $this->set('useForMember', $this->_useForMember);
         }
 
-        $this->_separateMembershipPayment = $this->buildMembershipBlock(
-          $this->_membershipContactID,
-          NULL,
-          $isTest
-        );
+        $this->_separateMembershipPayment = $this->buildMembershipBlock();
       }
       $this->set('separateMembershipPayment', $this->_separateMembershipPayment);
     }
@@ -523,18 +515,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @todo this was shared on CRM_Contribute_Form_ContributionBase but we are refactoring and simplifying for each
    *   step (main/confirm/thankyou)
    *
-   * @param int $cid
-   *   Contact checked for having a current membership for a particular membership.
-   * @param int|array $selectedMembershipTypeID
-   *   Selected membership id.
-   * @param null $isTest
-   *
    * @return bool
    *   Is this a separate membership payment
    *
    * @throws \CRM_Core_Exception
    */
-  private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL, $isTest = NULL) {
+  private function buildMembershipBlock() {
+    $cid = $this->_membershipContactID;
+    $isTest = (bool) ($this->_action & CRM_Core_Action::PREVIEW);
+    $selectedMembershipTypeID = NULL;
     $separateMembershipPayment = FALSE;
     $this->addOptionalQuickFormElement('auto_renew');
     if ($this->_membershipBlock) {
