@@ -273,13 +273,25 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       return FALSE;
     }
 
-    Civi\Test::data()->populate();
-
-    // `CiviUnitTestCase` has replaced the baseline DB configuration. To coexist with other
-    // tests based on `CiviEnvBuilder`, we need to store a signature marking the current DB configuration.
-    (new \Civi\Test\CiviEnvBuilder())->callback(function(){}, 'CiviUnitTestCase')->apply(TRUE);
-
+    \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
     return TRUE;
+  }
+
+  /**
+   * Declare the environment that we wish to run in.
+   *
+   * TODO: The hope is to get this to align with `Civi\Test::headless()` and perhaps
+   * assimilate other steps from 'setUp()'. The method is reserved while we look
+   * for the right split. However, when we're a little further along on that, this
+   * should be made overrideable.
+   *
+   * @return \Civi\Test\CiviEnvBuilder
+   */
+  final public static function buildEnvironment(): \Civi\Test\CiviEnvBuilder {
+    // Ideally: return Civi\Test::headless();
+    $b = new \Civi\Test\CiviEnvBuilder();
+    $b->callback([\Civi\Test::data(), 'populate']);
+    return $b;
   }
 
   public static function setUpBeforeClass(): void {
