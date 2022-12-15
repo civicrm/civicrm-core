@@ -262,10 +262,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *   TRUE if the populate logic runs; FALSE if it is skipped
    */
   protected static function _populateDB($perClass = FALSE, &$object = NULL) {
-    if (CIVICRM_UF !== 'UnitTests') {
-      throw new \RuntimeException("_populateDB requires CIVICRM_UF=UnitTests");
-    }
-
     if ($perClass || $object == NULL) {
       $dbreset = TRUE;
     }
@@ -287,6 +283,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   public static function setUpBeforeClass(): void {
+    if (CIVICRM_UF !== 'UnitTests') {
+      throw new \RuntimeException("CiviUnitTestCase requires CIVICRM_UF=UnitTests");
+    }
+
     static::_populateDB(TRUE);
 
     // also set this global hack
