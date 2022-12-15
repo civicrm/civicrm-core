@@ -744,7 +744,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
       // https://lab.civicrm.org/dev/core/-/issues/4317#note_91322
       $name = str_replace('_.', '~~', $name);
       $name = str_replace('.', '__', $name);
-      $return[$name] = $field['html']['label'] ?? $field['title'];
+      $return[$name] = $field['title'];
     }
     return $return;
   }
