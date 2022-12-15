@@ -91,13 +91,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected $_dbconn;
 
   /**
-   * The database name.
-   *
-   * @var string
-   */
-  static protected $_dbName;
-
-  /**
    * API version in use.
    *
    * @var int
@@ -240,8 +233,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
     // we need full error reporting
     error_reporting(E_ALL & ~E_NOTICE);
-
-    self::$_dbName = self::getDBName();
 
     // also load the class loader
     require_once 'CRM/Core/ClassLoader.php';
