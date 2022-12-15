@@ -111,20 +111,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected $tempDirs;
 
   /**
-   * @var bool
-   * populateOnce allows to skip db resets in setUp
-   *
-   *  WARNING! USE WITH CAUTION - IT'LL RENDER DATA DEPENDENCIES
-   *  BETWEEN TESTS WHEN RUN IN SUITE. SUITABLE FOR LOCAL, LIMITED
-   *  "CHECK RUNS" ONLY!
-   *
-   *  IF POSSIBLE, USE $this->DBResetRequired = FALSE IN YOUR TEST CASE!
-   *
-   * @see http://forum.civicrm.org/index.php/topic,18065.0.html
-   */
-  public static $populateOnce = FALSE;
-
-  /**
    * DBResetRequired allows skipping DB reset
    * in specific test case. If you still need
    * to reset single test (method) of such case, call
@@ -314,10 +300,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $dbreset = $object->DBResetRequired;
     }
 
-    if (self::$populateOnce || !$dbreset) {
+    if (!$dbreset) {
       return FALSE;
     }
-    self::$populateOnce = NULL;
 
     Civi\Test::data()->populate();
 
