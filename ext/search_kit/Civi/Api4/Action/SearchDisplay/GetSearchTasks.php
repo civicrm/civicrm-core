@@ -139,29 +139,18 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
           }
           $key = \CRM_Core_Key::get(\CRM_Utils_Array::first((array) $task['class']), TRUE);
 
-          //break out mailing labels for redirect instead of crmPopup
-          if ($id == CRM_Core_Task::LABEL_CONTACTS) {
-            $tasks[$entity['name']]['contact.' . $id] = [
-              'title' => $task['title'],
-              'icon' => $task['icon'] ?? 'fa-gear',
-              'redirect' => [
-                'path' => "'{$task['url']}'",
-                'query' => "{reset: 1}",
-                'data' => "{cids: ids.join(','), qfKey: '$key'}",
-              ],
-            ];
-          }
-          else {
-            $tasks[$entity['name']]['contact.' . $id] = [
-              'title' => $task['title'],
-              'icon' => $task['icon'] ?? 'fa-gear',
-              'crmPopup' => [
-                'path' => "'{$task['url']}'",
-                'query' => "{reset: 1}",
-                'data' => "{cids: ids.join(','), qfKey: '$key'}",
-              ],
-            ];
-          }
+          // Print Labels action does not support popups, open full-screen
+          $actionType = $id == \CRM_Core_Task::LABEL_CONTACTS ? 'redirect' : 'crmPopup';
+
+          $tasks[$entity['name']]['contact.' . $id] = [
+            'title' => $task['title'],
+            'icon' => $task['icon'] ?? 'fa-gear',
+            $actionType => [
+              'path' => "'{$task['url']}'",
+              'query' => "{reset: 1}",
+              'data' => "{cids: ids.join(','), qfKey: '$key'}",
+            ],
+          ];
         }
       }
       if (!$this->checkPermissions || \CRM_Core_Permission::check(['merge duplicate contacts', 'delete contacts'])) {
