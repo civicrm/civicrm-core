@@ -810,7 +810,7 @@ emo
       'created_date' => '2020-01-01',
       'modified_date' => '2020-01-01',
       'addressee' => '{contact.prefix_id:label}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.suffix_id:label}',
-      'email_greeting' => 'Dear {contact.first_name}',
+      'email_greeting' => 'Dear {if {contact.first_name|boolean} && {contact.last_name|boolean}}{contact.first_name}{else}friend{/if}',
       'postal_greeting' => 'Dear {contact.first_name}',
       'current_employer' => 'Unit Test Organization',
       'location_type' => 'Main',

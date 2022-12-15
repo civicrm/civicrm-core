@@ -719,7 +719,7 @@ VALUES
   (@option_group_id_rr, '{literal}/(19|20)(\\d{2})-(\\d{1,2})-(\\d{1,2})/{/literal}', 'date_', 'date_', NULL, 1, 0, 2, NULL, 0, 0, 0, NULL, NULL, NULL),
 
 -- email greeting.
-  (@option_group_id_emailGreeting, '{literal}Dear {contact.first_name}{/literal}',                                                 1, '{literal}Dear {contact.first_name}{/literal}',                                                 NULL,    1, 1, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
+  (@option_group_id_emailGreeting, '{literal}Dear {if {contact.first_name|boolean} && {contact.last_name|boolean}}{contact.first_name}{else}friend{/if}{/literal}',                                                 1, '{literal}Dear {contact.first_name}{/literal}',                                                 NULL,    1, 1, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_emailGreeting, '{literal}Dear {contact.prefix_id:label} {contact.first_name} {contact.last_name}{/literal}', 2, '{literal}Dear {contact.prefix_id:label} {contact.first_name} {contact.last_name}{/literal}', NULL,    1, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_emailGreeting, '{literal}Dear {contact.prefix_id:label} {contact.last_name}{/literal}',                      3, '{literal}Dear {contact.prefix_id:label} {contact.last_name}{/literal}',                      NULL,    1, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_emailGreeting, '{literal}Customized{/literal}',                                                                4, '{literal}Customized{/literal}',                                                                NULL, 0, 0, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
