@@ -79,13 +79,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   use \Civi\Test\LocaleTestTrait;
 
   /**
-   *  Database has been initialized.
-   *
-   * @var bool
-   */
-  private static $dbInit = FALSE;
-
-  /**
    * API version in use.
    *
    * @var int
@@ -287,11 +280,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if ($GLOBALS['stdin'] === FALSE) {
       echo "Couldn't open temporary file\n";
       exit(1);
-    }
-
-    if (!self::$dbInit) {
-      \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
-      self::$dbInit = TRUE;
     }
 
     // "initialize" CiviCRM to avoid problems when running single tests
