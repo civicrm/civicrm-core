@@ -52,7 +52,7 @@ VALUES
   (@option_group_id_languages, 0, 0, 'kw_GB', 'kw', {localize}'{ts escape="sql"}Cornish{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'co_FR', 'co', {localize}'{ts escape="sql"}Corsican{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'cr_CA', 'cr', {localize}'{ts escape="sql"}Cree{/ts}'{/localize}, @counter := @counter + 1),
-  (@option_group_id_languages, 0, 0, 'hr_HR', 'hr', {localize}'{ts escape="sql"}Croatian{/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 1, 'hr_HR', 'hr', {localize}'{ts escape="sql"}Croatian{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'cs_CZ', 'cs', {localize}'{ts escape="sql"}Czech{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'da_DK', 'da', {localize}'{ts escape="sql"}Danish{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'dv_MV', 'dv', {localize}'{ts escape="sql"}Divehi; Dhivehi; Maldivian;{/ts}'{/localize}, @counter := @counter + 1),
