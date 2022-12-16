@@ -54,6 +54,11 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     }
   }
 
+  public function setUpHeadless() {
+    // TODO: search_kit should probably be part of the 'headless()' baseline.
+    return \Civi\Test::headless()->install(['org.civicrm.search_kit'])->apply();
+  }
+
   public function setUp(): void {
     $this->hookCallback = NULL;
     // Ensure MockBasicEntity gets added via above listener

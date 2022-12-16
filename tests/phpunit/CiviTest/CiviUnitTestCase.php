@@ -343,6 +343,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
     Civi\Test::data()->populate();
 
+    // `CiviUnitTestCase` has replaced the baseline DB configuration. To coexist with other
+    // tests based on `CiviEnvBuilder`, we need to store a signature marking the current DB configuration.
+    (new \Civi\Test\CiviEnvBuilder())->callback(function(){}, 'CiviUnitTestCase')->apply(TRUE);
+
     return TRUE;
   }
 
