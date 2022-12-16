@@ -33,15 +33,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyEight extends CRM_Upgrade_Incremental
   }
 
   public static function addOptionGroupDescriptions($ctx): bool {
-    $locales = CRM_Core_I18n::getMultilingual();
-    if ($locales) {
-      foreach ($locales as $locale) {
-        CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_option_group` CHANGE `description_{$locale}` `description_{$locale}` TEXT COMMENT 'Option group description.'", [], TRUE, NULL, FALSE, FALSE);
-      }
-    }
-    else {
-      CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_option_group` MODIFY COLUMN `description` TEXT', [], TRUE, NULL, FALSE, FALSE);
-    }
+    CRM_Upgrade_Incremental_Base::alterColumn($ctx, 'civicrm_option_group', 'description', "TEXT COMMENT 'Option group description.'", TRUE);
     $values = [
       [
         'group' => 'gender',
