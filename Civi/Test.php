@@ -110,7 +110,7 @@ class Test {
    */
   public static function headless() {
     $civiRoot = dirname(__DIR__);
-    $builder = new \Civi\Test\CiviEnvBuilder('CiviEnvBuilder');
+    $builder = new \Civi\Test\CiviEnvBuilder();
     $builder
       ->callback(function ($ctx) {
         if (CIVICRM_UF !== 'UnitTests') {
@@ -139,7 +139,7 @@ class Test {
    * @return \Civi\Test\CiviEnvBuilder
    */
   public static function e2e() {
-    $builder = new \Civi\Test\CiviEnvBuilder('CiviEnvBuilder');
+    $builder = new \Civi\Test\CiviEnvBuilder();
     $builder
       ->callback(function ($ctx) {
         if (CIVICRM_UF === 'UnitTests') {
