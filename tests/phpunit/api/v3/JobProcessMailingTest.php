@@ -27,7 +27,6 @@
 class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-  public $DBResetRequired = FALSE;
   public $_entity = 'Job';
   public $_params = [];
   private $_groupID;

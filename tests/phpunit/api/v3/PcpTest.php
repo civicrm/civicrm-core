@@ -31,7 +31,6 @@
 class api_v3_PcpTest extends CiviUnitTestCase {
   protected $params;
   protected $entity = 'Pcp';
-  public $DBResetRequired = TRUE;
 
   public function setUp(): void {
     $this->params = [

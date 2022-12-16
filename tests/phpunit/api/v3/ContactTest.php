@@ -42,8 +42,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
-  public $DBResetRequired = FALSE;
-
   protected $_entity;
 
   protected $_params;

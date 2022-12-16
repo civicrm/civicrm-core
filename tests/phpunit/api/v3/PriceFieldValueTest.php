@@ -20,8 +20,6 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
   protected $priceSetID = 0;
   protected $_entity = 'price_field_value';
 
-  public $DBResetRequired = TRUE;
-
   /**
    * @var int
    */

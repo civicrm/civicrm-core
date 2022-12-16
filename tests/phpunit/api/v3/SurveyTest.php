@@ -31,7 +31,6 @@
 class api_v3_SurveyTest extends CiviUnitTestCase {
   protected $params;
   protected $entity = 'survey';
-  public $DBResetRequired = FALSE;
 
   public function setUp(): void {
     $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', [

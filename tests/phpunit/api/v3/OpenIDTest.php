@@ -29,8 +29,6 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
   protected $id;
   protected $_entity;
 
-  public $DBResetRequired = FALSE;
-
   public function setUp(): void {
     parent::setUp();
     $this->useTransaction();

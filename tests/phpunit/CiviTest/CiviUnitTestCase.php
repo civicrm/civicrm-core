@@ -106,16 +106,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected $tempDirs;
 
   /**
-   * DBResetRequired allows skipping DB reset
-   * in specific test case. If you still need
-   * to reset single test (method) of such case, call
-   * $this->cleanDB() in the first line of this
-   * test (method).
-   * @var bool
-   */
-  public $DBResetRequired = TRUE;
-
-  /**
    * @var CRM_Core_Transaction|null
    */
   private $tx = NULL;

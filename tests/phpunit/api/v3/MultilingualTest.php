@@ -18,7 +18,6 @@
  */
 class api_v3_MultilingualTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  public $DBResetRequired = FALSE;
 
   /**
    * Sets up the fixture, for example, opens a network connection.

@@ -16,7 +16,6 @@
  * @group headless
  */
 class api_v3_APITest extends CiviUnitTestCase {
-  public $DBResetRequired = FALSE;
 
   protected $_apiversion = 3;
 

@@ -19,8 +19,6 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   protected $optionGroup;
 
-  public $DBResetRequired = FALSE;
-
   /**
    * @throws \CRM_Core_Exception
    */
