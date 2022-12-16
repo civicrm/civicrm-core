@@ -264,6 +264,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   final public static function buildEnvironment(): \Civi\Test\CiviEnvBuilder {
     // Ideally: return Civi\Test::headless();
     $b = new \Civi\Test\CiviEnvBuilder();
+    $b->callback(function () {
+      fprintf(STDERR, "\nInstalling %s database\n", \Civi\Test::dsn('database'));
+    });
     $b->callback([\Civi\Test::data(), 'populate']);
     return $b;
   }
@@ -297,7 +300,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     }
 
     if (!self::$dbInit) {
-      fprintf(STDERR, "\nInstalling %s database\n", \Civi\Test::dsn('database'));
       \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
       self::$dbInit = TRUE;
     }
