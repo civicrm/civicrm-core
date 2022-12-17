@@ -67,7 +67,8 @@ div.crm-container fieldset label {
 }
 
 input.crm-form-radio + label,
-input.crm-form-checkbox + label {
+input.crm-form-checkbox + label,
+.crm-frozen-field .sold-out-option {
   margin-left: 7px;
 }
 
@@ -832,6 +833,14 @@ input.crm-form-entityref {
   line-height: inherit;
   padding: 0;
   margin: 0;
+}
+
+.crm-container .description.help_post {
+  margin-top: 0.45em;
+}
+
+.crm-container .description.help_pre {
+  margin-bottom: 0.45em;
 }
 
 .crm-container .price-set-option-content .description {
@@ -3800,12 +3809,8 @@ span.crm-status-icon {
   display: none;
 }
 
-#crm-container .sold-out-option,
-#crm-container .price-set-row span.sold-out-option .crm-price-amount-label,
-#crm-container .price-set-row span.sold-out-option .crm-price-amount-amount {
-  font-style: italic !important;
-  font-weight: normal !important;
-  font-size: 15px;
+.crm-container span.sold-out-option,
+.crm-container span.sold-out-option span {
   color: #666 !important;
 }
 

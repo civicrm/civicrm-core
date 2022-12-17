@@ -795,11 +795,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $option['total_option_count'] = $dbTotalCount + $currentTotalCount;
       }
 
-      //ignore option full for offline registration.
-      if ($className == 'CRM_Event_Form_Participant' || $className === 'CRM_Event_Form_Task_Register') {
-        $optionFullIds = [];
-      }
-
       //finally get option ids in.
       $field['option_full_ids'] = $optionFullIds;
     }
