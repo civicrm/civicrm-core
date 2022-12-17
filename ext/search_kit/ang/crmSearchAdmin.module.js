@@ -408,7 +408,10 @@
               _.each(results, function(fields, entityName) {
                 var entity = getEntity(entityName);
                 _.each(fields, function(options, fieldName) {
-                  _.find(entity.fields, {name: fieldName}).options = options;
+                  var field = _.find(entity.fields, {name: fieldName});
+                  if (field) {
+                    field.options = options;
+                  }
                 });
                 entity.optionsLoaded = true;
               });
