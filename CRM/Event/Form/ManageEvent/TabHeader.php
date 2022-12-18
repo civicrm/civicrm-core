@@ -66,7 +66,10 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs = [];
     $tabs['settings'] = ['title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage'] + $default;
     $tabs['location'] = ['title' => ts('Event Location')] + $default;
-    $tabs['fee'] = ['title' => ts('Fees')] + $default;
+    // If CiviContribute is active, create the Fees tab.
+    if (CRM_Core_Component::isEnabled('CiviContribute')) {
+      $tabs['fee'] = ['title' => ts('Fees')] + $default;
+    }
     $tabs['registration'] = ['title' => ts('Online Registration')] + $default;
     // @fixme I don't understand the event permissions check here - can we just get rid of it?
     $permissions = CRM_Event_BAO_Event::getAllPermissions();
