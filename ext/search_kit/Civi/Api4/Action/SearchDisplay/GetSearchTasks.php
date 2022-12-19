@@ -151,10 +151,14 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
             $task['title'] = E::ts('Profile Update');
           }
           $key = \CRM_Core_Key::get(\CRM_Utils_Array::first((array) $task['class']), TRUE);
+
+          // Print Labels action does not support popups, open full-screen
+          $actionType = $id == \CRM_Core_Task::LABEL_CONTACTS ? 'redirect' : 'crmPopup';
+
           $tasks[$entity['name']]['contact.' . $id] = [
             'title' => $task['title'],
             'icon' => $task['icon'] ?? 'fa-gear',
-            'crmPopup' => [
+            $actionType => [
               'path' => "'{$task['url']}'",
               'query' => "{reset: 1}",
               'data' => "{cids: ids.join(','), qfKey: '$key'}",
