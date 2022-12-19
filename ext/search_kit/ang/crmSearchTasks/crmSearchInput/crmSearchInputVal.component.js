@@ -144,7 +144,7 @@
 
         if (!_.includes(['>', '<', '>=', '<='], ctrl.op)) {
           // Only use option list if the field has a "name" suffix
-          if (field.options && field.suffixes && field.suffixes.includes('name')) {
+          if (field.options && (!field.suffixes || field.suffixes.includes('name'))) {
             return '~/crmSearchTasks/crmSearchInput/select.html';
           }
           if (field.fk_entity || field.name === 'id') {
