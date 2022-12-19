@@ -84,20 +84,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   private static $dbInit = FALSE;
 
   /**
-   *  Database connection.
-   *
-   * @var PHPUnit_Extensions_Database_DB_IDatabaseConnection
-   */
-  protected $_dbconn;
-
-  /**
-   * The database name.
-   *
-   * @var string
-   */
-  static protected $_dbName;
-
-  /**
    * API version in use.
    *
    * @var int
@@ -116,20 +102,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Array of temporary directory names
    */
   protected $tempDirs;
-
-  /**
-   * @var bool
-   * populateOnce allows to skip db resets in setUp
-   *
-   *  WARNING! USE WITH CAUTION - IT'LL RENDER DATA DEPENDENCIES
-   *  BETWEEN TESTS WHEN RUN IN SUITE. SUITABLE FOR LOCAL, LIMITED
-   *  "CHECK RUNS" ONLY!
-   *
-   *  IF POSSIBLE, USE $this->DBResetRequired = FALSE IN YOUR TEST CASE!
-   *
-   * @see http://forum.civicrm.org/index.php/topic,18065.0.html
-   */
-  public static $populateOnce = FALSE;
 
   /**
    * DBResetRequired allows skipping DB reset
@@ -241,8 +213,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     // we need full error reporting
     error_reporting(E_ALL & ~E_NOTICE);
 
-    self::$_dbName = self::getDBName();
-
     // also load the class loader
     require_once 'CRM/Core/ClassLoader.php';
     CRM_Core_ClassLoader::singleton()->register();
@@ -271,87 +241,28 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * @return bool
-   */
-  public function requireDBReset() {
-    return $this->DBResetRequired;
-  }
-
-  /**
-   * @return string
-   */
-  public static function getDBName() {
-    static $dbName = NULL;
-    if ($dbName === NULL) {
-      require_once "DB.php";
-      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
-      $dsninfo = DB::parseDSN($dsn);
-      $dbName = $dsninfo['database'];
-    }
-    return $dbName;
-  }
-
-  /**
-   *  Create database connection for this instance.
+   * Declare the environment that we wish to run in.
    *
-   *  Initialize the test database if it hasn't been initialized
+   * TODO: The hope is to get this to align with `Civi\Test::headless()` and perhaps
+   * assimilate other steps from 'setUp()'. The method is reserved while we look
+   * for the right split. However, when we're a little further along on that, this
+   * should be made overrideable.
    *
+   * @return \Civi\Test\CiviEnvBuilder
    */
-  protected function getConnection() {
-    if (!self::$dbInit) {
-      $dbName = self::getDBName();
-
-      //  install test database
-      echo PHP_EOL . "Installing {$dbName} database" . PHP_EOL;
-
-      static::_populateDB(FALSE, $this);
-
-      self::$dbInit = TRUE;
-    }
-
-  }
-
-  /**
-   *  Required implementation of abstract method.
-   */
-  protected function getDataSet() {
-  }
-
-  /**
-   * @param bool $perClass
-   * @param null $object
-   *
-   * @return bool
-   *   TRUE if the populate logic runs; FALSE if it is skipped
-   */
-  protected static function _populateDB($perClass = FALSE, &$object = NULL) {
-    if (CIVICRM_UF !== 'UnitTests') {
-      throw new \RuntimeException("_populateDB requires CIVICRM_UF=UnitTests");
-    }
-
-    if ($perClass || $object == NULL) {
-      $dbreset = TRUE;
-    }
-    else {
-      $dbreset = $object->requireDBReset();
-    }
-
-    if (self::$populateOnce || !$dbreset) {
-      return FALSE;
-    }
-    self::$populateOnce = NULL;
-
-    Civi\Test::data()->populate();
-
-    // `CiviUnitTestCase` has replaced the baseline DB configuration. To coexist with other
-    // tests based on `CiviEnvBuilder`, we need to store a signature marking the current DB configuration.
-    (new \Civi\Test\CiviEnvBuilder())->callback(function(){}, 'CiviUnitTestCase')->apply(TRUE);
-
-    return TRUE;
+  final public static function buildEnvironment(): \Civi\Test\CiviEnvBuilder {
+    // Ideally: return Civi\Test::headless();
+    $b = new \Civi\Test\CiviEnvBuilder();
+    $b->callback([\Civi\Test::data(), 'populate']);
+    return $b;
   }
 
   public static function setUpBeforeClass(): void {
-    static::_populateDB(TRUE);
+    if (CIVICRM_UF !== 'UnitTests') {
+      throw new \RuntimeException("CiviUnitTestCase requires CIVICRM_UF=UnitTests");
+    }
+
+    \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
 
     // also set this global hack
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = [];
@@ -375,11 +286,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       exit(1);
     }
 
-    //  Get and save a connection to the database
-    $this->_dbconn = $this->getConnection();
-
-    // reload database before each test
-    //        $this->_populateDB();
+    if (!self::$dbInit) {
+      fprintf(STDERR, "\nInstalling %s database\n", \Civi\Test::dsn('database'));
+      \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
+      self::$dbInit = TRUE;
+    }
 
     // "initialize" CiviCRM to avoid problems when running single tests
     // FIXME: look at it closer in second stage
