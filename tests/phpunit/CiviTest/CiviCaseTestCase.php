@@ -28,6 +28,12 @@ class CiviCaseTestCase extends CiviUnitTestCase {
 
   protected $_loggedInUser;
 
+  /**
+   * Tables to truncate as part of cleanup
+   * @var array
+   */
+  protected $tablesToTruncate;
+
   public function setUp(): void {
     parent::setUp();
 

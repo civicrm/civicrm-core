@@ -21,6 +21,8 @@
  */
 class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
 
+  protected $_newActivity;
+
   /**
    * Get information about the provided job.
    *  - name

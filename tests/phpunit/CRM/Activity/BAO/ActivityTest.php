@@ -15,6 +15,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   private $someContacts = [];
 
+  protected $allowedContacts = [];
+
   /**
    * Set up for test.
    *

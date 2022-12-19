@@ -25,6 +25,8 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
    */
   private $cache = [];
 
+  public $errorScope;
+
   /**
    * @var \CRM_Core_Transaction|null
    */

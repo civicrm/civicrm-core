@@ -128,6 +128,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   public $submitOnce = TRUE;
 
   /**
+   * @var array
+   */
+  public $_groupTree;
+
+  public $_entityTagValues;
+
+  /**
    * Explicitly declare the entity api name.
    *
    * @return string

@@ -80,6 +80,14 @@ trait CRM_Contact_Form_Task_EmailTrait {
    */
   protected $suppressedEmails = [];
 
+  public $_contactDetails = [];
+
+  public $_entityTagValues;
+
+  public $_caseId;
+
+  public $_context;
+
   /**
    * Getter for isSearchContext.
    *

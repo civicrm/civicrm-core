@@ -5,6 +5,8 @@ class SettingsBagTest extends \CiviUnitTestCase {
 
   protected $origSetting;
 
+  public $mandates;
+
   protected function setUp(): void {
     $this->origSetting = $GLOBALS['civicrm_setting'];
 

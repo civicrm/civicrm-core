@@ -135,6 +135,13 @@ class CRM_Core_Page {
   ];
 
   /**
+   * The permission we have on this contact
+   *
+   * @var string
+   */
+  public $_permission;
+
+  /**
    * Class constructor.
    *
    * @param string $title
