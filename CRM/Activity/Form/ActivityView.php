@@ -87,6 +87,8 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     $values['mailingId'] = $values['mailingId'] ?? NULL;
     $values['campaign'] = $values['campaign'] ?? NULL;
     $values['engagement_level'] = $values['engagement_level'] ?? NULL;
+    // also this which doesn't get set for bulk emails
+    $values['target_contact_value'] = $values['target_contact_value'] ?? NULL;
 
     // Get the campaign.
     if ($campaignId = CRM_Utils_Array::value('campaign_id', $defaults)) {
