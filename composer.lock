@@ -335,23 +335,23 @@
         },
         {
             "name": "civicrm/composer-compile-lib",
-            "version": "v0.6",
+            "version": "v0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/composer-compile-lib.git",
-                "reference": "8bd52f0d2ba97eaa83853c3cfc37841376f5b903"
+                "reference": "658230901ee3fc2830e9f93239a635a086b6816d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/composer-compile-lib/zipball/8bd52f0d2ba97eaa83853c3cfc37841376f5b903",
-                "reference": "8bd52f0d2ba97eaa83853c3cfc37841376f5b903",
+                "url": "https://api.github.com/repos/civicrm/composer-compile-lib/zipball/658230901ee3fc2830e9f93239a635a086b6816d",
+                "reference": "658230901ee3fc2830e9f93239a635a086b6816d",
                 "shasum": ""
             },
             "require": {
                 "civicrm/composer-compile-plugin": "~0.19 || ~1.0",
                 "padaliyajay/php-autoprefixer": "~1.2",
                 "scssphp/scssphp": "^1.8.1",
-                "symfony/filesystem": "~2.8 || ~3.4 || ~4.0 || ~5.0",
+                "symfony/filesystem": "~2.8 || ~3.4 || ~4.0 || ~5.0 || ~6.0",
                 "tubalmartin/cssmin": "^4.1"
             },
             "type": "library",
@@ -396,9 +396,9 @@
             "description": "Small library of compilation helpers",
             "support": {
                 "issues": "https://github.com/civicrm/composer-compile-lib/issues",
-                "source": "https://github.com/civicrm/composer-compile-lib/tree/v0.6"
+                "source": "https://github.com/civicrm/composer-compile-lib/tree/v0.7"
             },
-            "time": "2022-07-22T09:41:59+00:00"
+            "time": "2022-12-19T21:16:16+00:00"
         },
         {
             "name": "civicrm/composer-compile-plugin",
