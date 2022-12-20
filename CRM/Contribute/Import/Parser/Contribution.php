@@ -185,7 +185,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @return array
    */
   public function getRequiredFieldsForMatch(): array {
-    return [['id'], ['invoice_id'], ['trxn_id']];
+    return [['contribution_id'], ['invoice_id'], ['trxn_id']];
   }
 
   /**
