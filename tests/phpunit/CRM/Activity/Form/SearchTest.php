@@ -6,6 +6,11 @@
  */
 class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
 
+  /**
+   * @var int
+   */
+  protected $individualID;
+
   public function setUp(): void {
     parent::setUp();
     $this->individualID = $this->individualCreate();

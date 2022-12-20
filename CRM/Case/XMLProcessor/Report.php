@@ -24,6 +24,13 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   protected $_isRedact;
 
   /**
+   * Redaction Rules.
+   *
+   * @var array
+   */
+  protected $_redactionStringRules = [];
+
+  /**
    */
   public function __construct() {
   }

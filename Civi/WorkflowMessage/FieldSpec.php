@@ -43,6 +43,8 @@ class FieldSpec {
    */
   public $scope;
 
+  public $comment;
+
   /**
    * @return bool
    */

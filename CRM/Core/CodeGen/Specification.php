@@ -9,6 +9,8 @@ class CRM_Core_CodeGen_Specification {
 
   protected $classNames;
 
+  public $buildVersion;
+
   /**
    * Read and parse.
    *

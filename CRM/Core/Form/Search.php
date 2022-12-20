@@ -94,6 +94,8 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    */
   protected $searchFieldMetadata = ['Contact' => []];
 
+  protected $_reset;
+
   /**
    * @return array
    */

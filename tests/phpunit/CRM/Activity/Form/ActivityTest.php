@@ -8,6 +8,11 @@ use Civi\Test\Invasive;
  */
 class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
+  protected $assignee1;
+  protected $assignee2;
+  protected $target;
+  protected $source;
+
   public function setUp():void {
     parent::setUp();
     $this->assignee1 = $this->individualCreate([
