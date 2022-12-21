@@ -719,6 +719,49 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create contact with custom checkbox with empty array
+   */
+  public function testCreateWithEmptyCustomCheckbox(): void {
+    $this->callAPISuccess('OptionGroup', 'create', [
+      'name' => 'checkbox_opts',
+      'title' => 'Checkbox Options',
+      'data_type' => 'String',
+      'is_active' => 1,
+    ]);
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'checkbox_opts',
+      'name' => 'checkbox_option_one',
+      'label' => 'Checkbox Option One',
+      'is_active' => 1,
+      'value' => 1,
+    ]);
+    $custom_group_id = $this->createCustomGroup([
+      'name' => 'checkbox_custom_group',
+      'title' => 'Checkbox Group',
+      'extends' => 'Contact',
+    ]);
+    $custom_field_id = $this->callAPISuccess('CustomField', 'create', [
+      'name' => 'a_checkbox_field',
+      'label' => 'A Checkbox Field',
+      'custom_group_id' => $custom_group_id,
+      'option_group_id' => 'checkbox_opts',
+      'html_type' => 'CheckBox',
+      'data_type' => 'String',
+      'is_active' => 1,
+    ])['id'];
+
+    $params = $this->_params;
+    $params['custom_' . $custom_field_id] = [];
+    $contact_id = $this->callAPISuccess('Contact', 'create', $params)['id'];
+
+    $result = $this->callAPISuccessGetSingle('Contact', ['id' => $contact_id, 'return' => ['custom_' . $custom_field_id]]);
+    $this->assertSame('', $result['custom_' . $custom_field_id]);
+
+    $this->customFieldDelete($custom_field_id);
+    $this->customGroupDelete($custom_group_id);
+  }
+
+  /**
    * CRM-14232 test preferred language set to site default if not passed.
    *
    * @param int $version
