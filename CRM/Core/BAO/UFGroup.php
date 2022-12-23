@@ -1894,6 +1894,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     elseif (substr($fieldName, 0, 9) === 'image_URL') {
+      if (!isset($attributes['accept'])) {
+        $attributes['accept'] = 'image/png, image/jpeg, image/gif';
+      }
       $form->add('file', $name, $title, $attributes, $required);
       $form->addUploadElement($name);
     }
