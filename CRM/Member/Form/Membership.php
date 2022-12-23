@@ -286,15 +286,18 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
     $this->assign('existingContactMemberships', $mems_by_org);
 
-    if (!$this->_memType) {
-      $params = CRM_Utils_Request::exportValues();
-      if (!empty($params['membership_type_id'][1])) {
-        $this->_memType = $params['membership_type_id'][1];
-      }
+    $customFieldMemType = $this->_memType;
+    $params = CRM_Utils_Request::exportValues();
+
+    if (!$this->_memType && !empty($params['membership_type_id'][1])) {
+      $this->_memType = $params['membership_type_id'][1];
     }
 
-    // Add custom data to form
-    CRM_Custom_Form_CustomData::addToForm($this, $this->_memType);
+    if (($this->_action & CRM_Core_Action::UPDATE) && !empty($params['membership_type_id'][1])) {
+      $customFieldMemType = $params['membership_type_id'][1];
+    }
+
+    CRM_Custom_Form_CustomData::addToForm($this, $customFieldMemType);
     $this->setPageTitle(ts('Membership'));
   }
 
