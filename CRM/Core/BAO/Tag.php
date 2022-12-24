@@ -89,12 +89,18 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $thisref['name'] = $dao->name;
       $thisref['description'] = $dao->description;
       $thisref['is_selectable'] = $dao->is_selectable;
-      $thisref['children'] = [];
-
+      if (!isset($thisref['children'])) {
+        $thisref['children'] = [];
+      }
       if (!$dao->parent_id) {
         $this->tree[$dao->id] = &$thisref;
       }
       else {
+        if (!isset($refs[$dao->parent_id])) {
+          $refs[$dao->parent_id] = array(
+            'children' => [],
+          );
+        }
         $refs[$dao->parent_id]['children'][$dao->id] = &$thisref;
       }
     }
