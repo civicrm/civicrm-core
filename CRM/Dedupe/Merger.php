@@ -1608,11 +1608,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // handle custom fields
     $mainTree = self::getTree($main['contact_type'], NULL, $mainId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE, NULL, TRUE,
+      CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE, TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
     $otherTree = self::getTree($main['contact_type'], NULL, $otherId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE, NULL, TRUE,
+      CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE, TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
 
@@ -1692,8 +1692,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $subTypes
    * @param string $subName
    * @param bool $fromCache
-   * @param bool $onlySubType
-   *   Only return specified subtype or return specified subtype + unrestricted fields.
    * @param bool $returnAll
    *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
    *   api - through which it is properly tested - so can be refactored with some comfort.)
@@ -1722,7 +1720,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $subTypes = [],
     $subName = NULL,
     $fromCache = TRUE,
-    $onlySubType = NULL,
     $returnAll = FALSE,
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
@@ -1845,9 +1842,7 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
         $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", CRM_Core_BAO_CustomGroup::validateSubTypeByEntity($entityType, $subType));
       }
       $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
-      if (!$onlySubType) {
-        $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
-      }
+      $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
 
       $strWhere = "
 WHERE civicrm_custom_group.is_active = 1
