@@ -1607,11 +1607,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // handle custom fields
-    $mainTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], NULL, $mainId, -1,
+    $mainTree = self::getTree($main['contact_type'], NULL, $mainId, -1,
       CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE, NULL, TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
-    $otherTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], NULL, $otherId, -1,
+    $otherTree = self::getTree($main['contact_type'], NULL, $otherId, -1,
       CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE, NULL, TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
@@ -1671,6 +1671,335 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $result['other_details']['location_blocks'] = $locations['other'];
 
     return $result;
+  }
+
+  /**
+   * Function is separated from shared function & can likely be distilled to an api call.
+   *
+   * @todo clean up post split.
+   *
+   * Get custom groups/fields data for type of entity in a tree structure representing group->field hierarchy
+   * This may also include entity specific data values.
+   *
+   * An array containing all custom groups and their custom fields is returned.
+   *
+   * @param string $entityType
+   *   Of the contact whose contact type is needed.
+   * @param array $toReturn
+   *   What data should be returned. ['custom_group' => ['id', 'name', etc.], 'custom_field' => ['id', 'label', etc.]]
+   * @param int $entityID
+   * @param int $groupID
+   * @param array $subTypes
+   * @param string $subName
+   * @param bool $fromCache
+   * @param bool $onlySubType
+   *   Only return specified subtype or return specified subtype + unrestricted fields.
+   * @param bool $returnAll
+   *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
+   *   api - through which it is properly tested - so can be refactored with some comfort.)
+   * @param bool|int $checkPermission
+   *   Either a CRM_Core_Permission constant or FALSE to disable checks
+   * @param string|int $singleRecord
+   *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
+   * @param bool $showPublicOnly
+   *
+   * @return array
+   *   Custom field 'tree'.
+   *
+   *   The returned array is keyed by group id and has the custom group table fields
+   *   and a subkey 'fields' holding the specific custom fields.
+   *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
+   *   if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
+   *
+   * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
+   *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
+   *   With caching the performance impact would be small & the function would be cleaner
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function getTree(
+    $entityType,
+    $toReturn = [],
+    $entityID = NULL,
+    $groupID = NULL,
+    $subTypes = [],
+    $subName = NULL,
+    $fromCache = TRUE,
+    $onlySubType = NULL,
+    $returnAll = FALSE,
+    $checkPermission = CRM_Core_Permission::EDIT,
+    $singleRecord = NULL,
+    $showPublicOnly = FALSE
+  ) {
+    if ($checkPermission === TRUE) {
+      CRM_Core_Error::deprecatedWarning('Unexpected TRUE passed to CustomGroup::getTree $checkPermission param.');
+      $checkPermission = CRM_Core_Permission::EDIT;
+    }
+    if ($entityID) {
+      $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
+    }
+    if (!is_array($subTypes)) {
+      if (empty($subTypes)) {
+        $subTypes = [];
+      }
+      else {
+        if (stristr($subTypes, ',')) {
+          $subTypes = explode(',', $subTypes);
+        }
+        else {
+          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
+        }
+      }
+    }
+
+    // create a new tree
+
+    // legacy hardcoded list of data to return
+    $tableData = [
+      'custom_field' => [
+        'id',
+        'name',
+        'label',
+        'column_name',
+        'data_type',
+        'html_type',
+        'default_value',
+        'attributes',
+        'is_required',
+        'is_view',
+        'help_pre',
+        'help_post',
+        'options_per_line',
+        'start_date_years',
+        'end_date_years',
+        'date_format',
+        'time_format',
+        'option_group_id',
+        'in_selector',
+      ],
+      'custom_group' => [
+        'id',
+        'name',
+        'table_name',
+        'title',
+        'help_pre',
+        'help_post',
+        'collapse_display',
+        'style',
+        'is_multiple',
+        'extends',
+        'extends_entity_column_id',
+        'extends_entity_column_value',
+        'max_multiple',
+      ],
+    ];
+    $current_db_version = CRM_Core_BAO_Domain::version();
+    $is_public_version = version_compare($current_db_version, '4.7.19', '>=');
+    $serialize_version = version_compare($current_db_version, '5.27.alpha1', '>=');
+    if ($is_public_version) {
+      $tableData['custom_group'][] = 'is_public';
+    }
+    if ($serialize_version) {
+      $tableData['custom_field'][] = 'serialize';
+    }
+    if (!$toReturn || !is_array($toReturn)) {
+      $toReturn = $tableData;
+    }
+    else {
+      // Supply defaults and remove unknown array keys
+      $toReturn = array_intersect_key(array_filter($toReturn) + $tableData, $tableData);
+      // Merge in required fields that we must have
+      $toReturn['custom_field'] = array_unique(array_merge($toReturn['custom_field'], ['id', 'column_name', 'data_type']));
+      $toReturn['custom_group'] = array_unique(array_merge($toReturn['custom_group'], ['id', 'is_multiple', 'table_name', 'name']));
+      // Validate return fields
+      $toReturn['custom_field'] = array_intersect($toReturn['custom_field'], array_keys(CRM_Core_DAO_CustomField::fieldKeys()));
+      $toReturn['custom_group'] = array_intersect($toReturn['custom_group'], array_keys(CRM_Core_DAO_CustomGroup::fieldKeys()));
+    }
+
+    // create select
+    $select = [];
+    foreach ($toReturn as $tableName => $tableColumn) {
+      foreach ($tableColumn as $columnName) {
+        $select[] = "civicrm_{$tableName}.{$columnName} as civicrm_{$tableName}_{$columnName}";
+      }
+    }
+    $strSelect = "SELECT " . implode(', ', $select);
+
+    // from, where, order by
+    $strFrom = "
+FROM     civicrm_custom_group
+LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicrm_custom_group.id)
+";
+
+    // if entity is either individual, organization or household pls get custom groups for 'contact' too.
+    if ($entityType == "Individual" || $entityType == 'Organization' ||
+      $entityType == 'Household'
+    ) {
+      $in = "'$entityType', 'Contact'";
+    }
+    elseif (strpos($entityType, "'") !== FALSE) {
+      // this allows the calling function to send in multiple entity types
+      $in = $entityType;
+    }
+    else {
+      // quote it
+      $in = "'$entityType'";
+    }
+
+    $params = [];
+    $sqlParamKey = 1;
+    $subType = '';
+    if (!empty($subTypes)) {
+      foreach ($subTypes as $key => $subType) {
+        $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", CRM_Core_BAO_CustomGroup::validateSubTypeByEntity($entityType, $subType));
+      }
+      $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
+      if (!$onlySubType) {
+        $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
+      }
+
+      $strWhere = "
+WHERE civicrm_custom_group.is_active = 1
+  AND civicrm_custom_field.is_active = 1
+  AND civicrm_custom_group.extends IN ($in)
+  AND $subTypeClause
+";
+      if ($subName) {
+        $strWhere .= " AND civicrm_custom_group.extends_entity_column_id = %{$sqlParamKey}";
+        $params[$sqlParamKey] = [$subName, 'String'];
+        $sqlParamKey = $sqlParamKey + 1;
+      }
+    }
+    else {
+      $strWhere = "
+WHERE civicrm_custom_group.is_active = 1
+  AND civicrm_custom_field.is_active = 1
+  AND civicrm_custom_group.extends IN ($in)
+";
+      if (!$returnAll) {
+        $strWhere .= "AND civicrm_custom_group.extends_entity_column_value IS NULL";
+      }
+    }
+
+    if ($groupID > 0) {
+      // since we want a specific group id we add it to the where clause
+      $strWhere .= " AND civicrm_custom_group.id = %{$sqlParamKey}";
+      $params[$sqlParamKey] = [$groupID, 'Integer'];
+    }
+    elseif (!$groupID) {
+      // since groupID is false we need to show all Inline groups
+      $strWhere .= " AND civicrm_custom_group.style = 'Inline'";
+    }
+    if ($checkPermission) {
+      // ensure that the user has access to these custom groups
+      $strWhere .= " AND " .
+        CRM_Core_Permission::customGroupClause($checkPermission,
+          'civicrm_custom_group.'
+        );
+    }
+
+    if ($showPublicOnly && $is_public_version) {
+      $strWhere .= "AND civicrm_custom_group.is_public = 1";
+    }
+
+    $orderBy = "
+ORDER BY civicrm_custom_group.weight,
+         civicrm_custom_group.title,
+         civicrm_custom_field.weight,
+         civicrm_custom_field.label
+";
+
+    // final query string
+    $queryString = "$strSelect $strFrom $strWhere $orderBy";
+
+    // lets see if we can retrieve the groupTree from cache
+    $cacheString = $queryString;
+    if ($groupID > 0) {
+      $cacheString .= "_{$groupID}";
+    }
+    else {
+      $cacheString .= "_Inline";
+    }
+
+    $cacheKey = "CRM_Core_DAO_CustomGroup_Query " . md5($cacheString);
+    $multipleFieldGroupCacheKey = "CRM_Core_DAO_CustomGroup_QueryMultipleFields " . md5($cacheString);
+    $cache = CRM_Utils_Cache::singleton();
+    if ($fromCache) {
+      $groupTree = $cache->get($cacheKey);
+      $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
+    }
+
+    if (empty($groupTree)) {
+      [$multipleFieldGroups, $groupTree] = CRM_Core_BAO_CustomGroup::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
+
+      $cache->set($cacheKey, $groupTree);
+      $cache->set($multipleFieldGroupCacheKey, $multipleFieldGroups);
+    }
+    // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
+    // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
+    $entitySingleSelectClauses = $entityMultipleSelectClauses = $groupTree['info']['select'] = [];
+    $singleFieldTables = [];
+    // now that we have all the groups and fields, lets get the values
+    // since we need to know the table and field names
+    // add info to groupTree
+
+    if (isset($groupTree['info']) && !empty($groupTree['info']) &&
+      !empty($groupTree['info']['tables']) && $singleRecord != 'new'
+    ) {
+      $select = $from = $where = [];
+      $groupTree['info']['where'] = NULL;
+
+      foreach ($groupTree['info']['tables'] as $table => $fields) {
+        $groupTree['info']['from'][] = $table;
+        $select = [
+          "{$table}.id as {$table}_id",
+          "{$table}.entity_id as {$table}_entity_id",
+        ];
+        foreach ($fields as $column => $dontCare) {
+          $select[] = "{$table}.{$column} as {$table}_{$column}";
+        }
+        $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
+        if ($entityID) {
+          $groupTree['info']['where'][] = "{$table}.entity_id = $entityID";
+          if (in_array($table, $multipleFieldGroups) &&
+            CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($entityID, $table)
+          ) {
+            $entityMultipleSelectClauses[$table] = $select;
+          }
+          else {
+            $singleFieldTables[] = $table;
+            $entitySingleSelectClauses = array_merge($entitySingleSelectClauses, $select);
+          }
+
+        }
+      }
+      if ($entityID && !empty($singleFieldTables)) {
+        CRM_Core_BAO_CustomGroup::buildEntityTreeSingleFields($groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTables);
+      }
+      $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
+      if (!empty($multipleFieldTablesWithEntityData)) {
+        CRM_Core_BAO_CustomGroup::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData, $singleRecord);
+      }
+
+    }
+    return $groupTree;
+  }
+
+  /**
+   * Suppose you have a SQL column, $column, which includes a delimited list, and you want
+   * a WHERE condition for rows that include $value. Use whereListHas().
+   *
+   * @param string $column
+   * @param string $value
+   * @param string $delimiter
+   * @return string
+   *   SQL condition.
+   */
+  private static function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
+    // ?
+    $bareValue = trim($value, $delimiter);
+    $escapedValue = CRM_Utils_Type::escape("%{$delimiter}{$bareValue}{$delimiter}%", 'String', FALSE);
+    return "($column LIKE \"$escapedValue\")";
   }
 
   /**

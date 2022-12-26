@@ -635,13 +635,15 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * Clean and validate the filter before it is used in a db query.
    *
+   * @internal this will be private again soon.
+   *
    * @param string $entityType
    * @param string $subType
    *
    * @return string
    * @throws \CRM_Core_Exception
    */
-  protected static function validateSubTypeByEntity($entityType, $subType) {
+  public static function validateSubTypeByEntity($entityType, $subType) {
     $subType = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
     if (is_numeric($subType)) {
       return $subType;
@@ -2273,6 +2275,9 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   /**
    * Build the metadata tree for the custom group.
    *
+   * @internal - function is temporarily public but will be private again
+   * once separated function disentangled.
+   *
    * @param string $entityType
    * @param array $toReturn
    * @param array $subTypes
@@ -2283,7 +2288,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @return array
    * @throws \CRM_Core_Exception
    */
-  private static function buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType) {
+  public static function buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType) {
     $groupTree = $multipleFieldGroups = [];
     $crmDAO = CRM_Core_DAO::executeQuery($queryString, $params);
     $customValueTables = [];
