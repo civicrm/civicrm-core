@@ -1608,11 +1608,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // handle custom fields
     $mainTree = self::getTree($main['contact_type'], $mainId,
-      CRM_Utils_Array::value('contact_sub_type', $main), TRUE,
+      CRM_Utils_Array::value('contact_sub_type', $main),
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
     $otherTree = self::getTree($main['contact_type'], $otherId,
-      CRM_Utils_Array::value('contact_sub_type', $other), TRUE,
+      CRM_Utils_Array::value('contact_sub_type', $other),
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
 
@@ -1687,9 +1687,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Of the contact whose contact type is needed.
    * @param int $entityID
    * @param array $subTypes
-   * @param bool $returnAll
-   *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
-   *   api - through which it is properly tested - so can be refactored with some comfort.)
    * @param bool|int $checkPermission
    *   Either a CRM_Core_Permission constant or FALSE to disable checks
    *
@@ -1711,9 +1708,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $entityType,
     $entityID = NULL,
     $subTypes = [],
-    $returnAll = FALSE,
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
+
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
     }
@@ -1836,9 +1833,6 @@ WHERE civicrm_custom_group.is_active = 1
   AND civicrm_custom_field.is_active = 1
   AND civicrm_custom_group.extends IN ($in)
 ";
-      if (!$returnAll) {
-        $strWhere .= "AND civicrm_custom_group.extends_entity_column_value IS NULL";
-      }
     }
 
     if ($checkPermission) {
