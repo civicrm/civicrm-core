@@ -1608,11 +1608,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // handle custom fields
     $mainTree = self::getTree($main['contact_type'], NULL, $mainId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE,
+      CRM_Utils_Array::value('contact_sub_type', $main), TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
     $otherTree = self::getTree($main['contact_type'], NULL, $otherId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE,
+      CRM_Utils_Array::value('contact_sub_type', $other), TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
 
@@ -1690,7 +1690,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $entityID
    * @param int $groupID
    * @param array $subTypes
-   * @param string $subName
    * @param bool $returnAll
    *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
    *   api - through which it is properly tested - so can be refactored with some comfort.)
@@ -1717,7 +1716,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $entityID = NULL,
     $groupID = NULL,
     $subTypes = [],
-    $subName = NULL,
     $returnAll = FALSE,
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
@@ -1848,11 +1846,6 @@ WHERE civicrm_custom_group.is_active = 1
   AND civicrm_custom_group.extends IN ($in)
   AND $subTypeClause
 ";
-      if ($subName) {
-        $strWhere .= " AND civicrm_custom_group.extends_entity_column_id = %{$sqlParamKey}";
-        $params[$sqlParamKey] = [$subName, 'String'];
-        $sqlParamKey = $sqlParamKey + 1;
-      }
     }
     else {
       $strWhere = "
