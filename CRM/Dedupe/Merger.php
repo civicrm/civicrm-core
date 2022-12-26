@@ -1607,11 +1607,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // handle custom fields
-    $mainTree = self::getTree($main['contact_type'], NULL, $mainId, -1,
+    $mainTree = self::getTree($main['contact_type'], NULL, $mainId,
       CRM_Utils_Array::value('contact_sub_type', $main), TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
-    $otherTree = self::getTree($main['contact_type'], NULL, $otherId, -1,
+    $otherTree = self::getTree($main['contact_type'], NULL, $otherId,
       CRM_Utils_Array::value('contact_sub_type', $other), TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
@@ -1688,7 +1688,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $toReturn
    *   What data should be returned. ['custom_group' => ['id', 'name', etc.], 'custom_field' => ['id', 'label', etc.]]
    * @param int $entityID
-   * @param int $groupID
    * @param array $subTypes
    * @param bool $returnAll
    *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
@@ -1714,7 +1713,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $entityType,
     $toReturn = [],
     $entityID = NULL,
-    $groupID = NULL,
     $subTypes = [],
     $returnAll = FALSE,
     $checkPermission = CRM_Core_Permission::EDIT
@@ -1858,15 +1856,6 @@ WHERE civicrm_custom_group.is_active = 1
       }
     }
 
-    if ($groupID > 0) {
-      // since we want a specific group id we add it to the where clause
-      $strWhere .= " AND civicrm_custom_group.id = %{$sqlParamKey}";
-      $params[$sqlParamKey] = [$groupID, 'Integer'];
-    }
-    elseif (!$groupID) {
-      // since groupID is false we need to show all Inline groups
-      $strWhere .= " AND civicrm_custom_group.style = 'Inline'";
-    }
     if ($checkPermission) {
       // ensure that the user has access to these custom groups
       $strWhere .= " AND " .
@@ -1887,12 +1876,7 @@ ORDER BY civicrm_custom_group.weight,
 
     // lets see if we can retrieve the groupTree from cache
     $cacheString = $queryString;
-    if ($groupID > 0) {
-      $cacheString .= "_{$groupID}";
-    }
-    else {
-      $cacheString .= "_Inline";
-    }
+    $cacheString .= "_Inline";
 
     $cacheKey = "CRM_Core_DAO_CustomGroup_Query " . md5($cacheString);
     $multipleFieldGroupCacheKey = "CRM_Core_DAO_CustomGroup_QueryMultipleFields " . md5($cacheString);
