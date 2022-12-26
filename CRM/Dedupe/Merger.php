@@ -1607,11 +1607,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // handle custom fields
-    $mainTree = self::getTree($main['contact_type'], NULL, $mainId,
+    $mainTree = self::getTree($main['contact_type'], $mainId,
       CRM_Utils_Array::value('contact_sub_type', $main), TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
-    $otherTree = self::getTree($main['contact_type'], NULL, $otherId,
+    $otherTree = self::getTree($main['contact_type'], $otherId,
       CRM_Utils_Array::value('contact_sub_type', $other), TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
@@ -1685,8 +1685,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param string $entityType
    *   Of the contact whose contact type is needed.
-   * @param array $toReturn
-   *   What data should be returned. ['custom_group' => ['id', 'name', etc.], 'custom_field' => ['id', 'label', etc.]]
    * @param int $entityID
    * @param array $subTypes
    * @param bool $returnAll
@@ -1711,7 +1709,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   private static function getTree(
     $entityType,
-    $toReturn = [],
     $entityID = NULL,
     $subTypes = [],
     $returnAll = FALSE,
@@ -1784,19 +1781,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     if ($serialize_version) {
       $tableData['custom_field'][] = 'serialize';
     }
-    if (!$toReturn || !is_array($toReturn)) {
-      $toReturn = $tableData;
-    }
-    else {
-      // Supply defaults and remove unknown array keys
-      $toReturn = array_intersect_key(array_filter($toReturn) + $tableData, $tableData);
-      // Merge in required fields that we must have
-      $toReturn['custom_field'] = array_unique(array_merge($toReturn['custom_field'], ['id', 'column_name', 'data_type']));
-      $toReturn['custom_group'] = array_unique(array_merge($toReturn['custom_group'], ['id', 'is_multiple', 'table_name', 'name']));
-      // Validate return fields
-      $toReturn['custom_field'] = array_intersect($toReturn['custom_field'], array_keys(CRM_Core_DAO_CustomField::fieldKeys()));
-      $toReturn['custom_group'] = array_intersect($toReturn['custom_group'], array_keys(CRM_Core_DAO_CustomGroup::fieldKeys()));
-    }
+    $toReturn = $tableData;
 
     // create select
     $select = [];
