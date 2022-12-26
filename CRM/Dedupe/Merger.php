@@ -1783,7 +1783,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $submitted = [];
     }
     foreach ($submitted as $key => $value) {
-      [$cFields, $submitted] = self::processCustomFields($mainId, $key, $cFields, $submitted, $value);
+      $submitted = self::processCustomFields($mainId, $key, $cFields, $submitted, $value);
     }
 
     // move view only custom fields CRM-5362
@@ -2206,7 +2206,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     if (substr($key, 0, 7) === 'custom_') {
       $fid = (int) substr($key, 7);
       if (empty($cFields[$fid])) {
-        return [$cFields, $submitted];
+        return $submitted;
       }
       $htmlType = $cFields[$fid]['attributes']['html_type'];
       $isSerialized = CRM_Core_BAO_CustomField::isSerialized($cFields[$fid]['attributes']);
@@ -2277,7 +2277,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         }
       }
     }
-    return [$cFields, $submitted];
+    return $submitted;
   }
 
   /**
