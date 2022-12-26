@@ -1608,11 +1608,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // handle custom fields
     $mainTree = self::getTree($main['contact_type'], NULL, $mainId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE, TRUE,
+      CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
     $otherTree = self::getTree($main['contact_type'], NULL, $otherId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE, TRUE,
+      CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
 
@@ -1691,7 +1691,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $groupID
    * @param array $subTypes
    * @param string $subName
-   * @param bool $fromCache
    * @param bool $returnAll
    *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
    *   api - through which it is properly tested - so can be refactored with some comfort.)
@@ -1719,7 +1718,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $groupID = NULL,
     $subTypes = [],
     $subName = NULL,
-    $fromCache = TRUE,
     $returnAll = FALSE,
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
@@ -1906,10 +1904,8 @@ ORDER BY civicrm_custom_group.weight,
     $cacheKey = "CRM_Core_DAO_CustomGroup_Query " . md5($cacheString);
     $multipleFieldGroupCacheKey = "CRM_Core_DAO_CustomGroup_QueryMultipleFields " . md5($cacheString);
     $cache = CRM_Utils_Cache::singleton();
-    if ($fromCache) {
-      $groupTree = $cache->get($cacheKey);
-      $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
-    }
+    $groupTree = $cache->get($cacheKey);
+    $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
 
     if (empty($groupTree)) {
       [$multipleFieldGroups, $groupTree] = CRM_Core_BAO_CustomGroup::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
