@@ -1608,11 +1608,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // handle custom fields
     $mainTree = self::getTree($main['contact_type'], (int) $mainId,
-      CRM_Utils_Array::value('contact_sub_type', $main),
+      empty($main['contact_sub_type']) ? [] : $main['contact_sub_type'],
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
     $otherTree = self::getTree($main['contact_type'], (int) $otherId,
-      CRM_Utils_Array::value('contact_sub_type', $other),
+      empty($other['contact_sub_type']) ? [] : $other['contact_sub_type'],
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
 
@@ -1711,11 +1711,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
     if (!is_array($subTypes)) {
-      if (empty($subTypes)) {
-        $subTypes = [];
-      }
-      else {
-        if (stristr($subTypes, ',')) {
+      if (!empty($subTypes)) {
+        if (stripos($subTypes, ',') !== FALSE) {
           $subTypes = explode(',', $subTypes);
         }
         else {
