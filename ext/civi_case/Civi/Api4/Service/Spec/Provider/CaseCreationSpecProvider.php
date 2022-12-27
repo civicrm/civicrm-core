@@ -14,6 +14,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @service
@@ -51,6 +52,9 @@ class CaseCreationSpecProvider extends \Civi\Core\Service\AutoService implements
     $medium_id = new FieldSpec('medium_id', $spec->getEntity(), 'Integer');
     $medium_id->setTitle(ts('Activity Medium'));
     $medium_id->setDescription('Open Case activity medium.');
+    $medium_id->setOptionsCallback(['Civi\Api4\Service\Spec\SpecFormatter', 'getOptions']);
+    $suffixes = CoreUtil::getOptionValueFields('encounter_medium', 'name');
+    $medium_id->setSuffixes($suffixes);
     $spec->addFieldSpec($medium_id);
 
     $duration = new FieldSpec('duration', $spec->getEntity(), 'Integer');
