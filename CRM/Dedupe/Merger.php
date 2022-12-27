@@ -1781,21 +1781,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 FROM     civicrm_custom_group
 LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicrm_custom_group.id)
 ";
-
-    // if entity is either individual, organization or household pls get custom groups for 'contact' too.
-    if ($entityType == "Individual" || $entityType == 'Organization' ||
-      $entityType == 'Household'
-    ) {
-      $in = "'$entityType', 'Contact'";
-    }
-    elseif (strpos($entityType, "'") !== FALSE) {
-      // this allows the calling function to send in multiple entity types
-      $in = $entityType;
-    }
-    else {
-      // quote it
-      $in = "'$entityType'";
-    }
+    $in = "'$entityType', 'Contact'";
 
     $params = [];
     $sqlParamKey = 1;
