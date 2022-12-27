@@ -1816,12 +1816,8 @@ ORDER BY civicrm_custom_group.weight,
     // final query string
     $queryString = "$strSelect $strFrom $strWhere $orderBy";
 
-    // lets see if we can retrieve the groupTree from cache
-    $cacheString = $queryString;
-    $cacheString .= "_Inline";
-
-    $cacheKey = "CRM_Core_DAO_CustomGroup_Query " . md5($cacheString);
-    $multipleFieldGroupCacheKey = "CRM_Core_DAO_CustomGroup_QueryMultipleFields " . md5($cacheString);
+    $cacheKey = __CLASS__ . __FUNCTION__ . $entityType . md5(implode('.', $subTypes));
+    $multipleFieldGroupCacheKey = $cacheKey . 'multi';
     $cache = CRM_Utils_Cache::singleton();
     $groupTree = $cache->get($cacheKey);
     $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
