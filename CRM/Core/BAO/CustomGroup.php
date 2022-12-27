@@ -2276,8 +2276,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   /**
    * Build the metadata tree for the custom group.
    *
-   * @internal - function is temporarily public but will be private again
-   * once separated function disentangled.
+   * @internal
    *
    * @param string $entityType
    * @param array $toReturn
@@ -2289,7 +2288,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType) {
+  private static function buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType) {
     $groupTree = $multipleFieldGroups = [];
     $crmDAO = CRM_Core_DAO::executeQuery($queryString, $params);
     $customValueTables = [];
