@@ -1711,6 +1711,82 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
 
+    $cacheKey = __CLASS__ . __FUNCTION__ . $entityType . md5(implode('.', $subTypes));
+    $multipleFieldGroupCacheKey = $cacheKey . 'multi';
+    $cache = CRM_Utils_Cache::singleton();
+    $groupTree = $cache->get($cacheKey);
+    $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
+
+    if (empty($groupTree)) {
+      [$multipleFieldGroups, $groupTree] = self::buildGroupTree($entityType, $checkPermission, $subTypes);
+
+      $cache->set($cacheKey, $groupTree);
+      $cache->set($multipleFieldGroupCacheKey, $multipleFieldGroups);
+    }
+    // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
+    // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
+    $entitySingleSelectClauses = $entityMultipleSelectClauses = $groupTree['info']['select'] = [];
+    $singleFieldTables = [];
+    // now that we have all the groups and fields, lets get the values
+    // since we need to know the table and field names
+    // add info to groupTree
+
+    if (isset($groupTree['info']) && !empty($groupTree['info']) &&
+      !empty($groupTree['info']['tables'])
+    ) {
+      $select = $from = $where = [];
+      $groupTree['info']['where'] = NULL;
+
+      foreach ($groupTree['info']['tables'] as $table => $fields) {
+        $groupTree['info']['from'][] = $table;
+        $select = [
+          "{$table}.id as {$table}_id",
+          "{$table}.entity_id as {$table}_entity_id",
+        ];
+        foreach ($fields as $column => $dontCare) {
+          $select[] = "{$table}.{$column} as {$table}_{$column}";
+        }
+        $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
+        if ($entityID) {
+          $groupTree['info']['where'][] = "{$table}.entity_id = $entityID";
+          if (in_array($table, $multipleFieldGroups) &&
+            CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($entityID, $table)
+          ) {
+            $entityMultipleSelectClauses[$table] = $select;
+          }
+          else {
+            $singleFieldTables[] = $table;
+            $entitySingleSelectClauses = array_merge($entitySingleSelectClauses, $select);
+          }
+
+        }
+      }
+      if ($entityID && !empty($singleFieldTables)) {
+        CRM_Core_BAO_CustomGroup::buildEntityTreeSingleFields($groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTables);
+      }
+      $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
+      if (!empty($multipleFieldTablesWithEntityData)) {
+        CRM_Core_BAO_CustomGroup::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData, NULL);
+      }
+
+    }
+    return $groupTree;
+  }
+
+  /**
+   * Build the metadata tree for the custom group.
+   *
+   * @param string $entityType
+   * @param bool $checkPermission
+   * @param array $subTypes
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @internal
+   *
+   */
+  private static function buildGroupTree($entityType, $checkPermission, $subTypes) {
+
     // create a new tree
 
     // legacy hardcoded list of data to return
@@ -1815,85 +1891,6 @@ ORDER BY civicrm_custom_group.weight,
 
     // final query string
     $queryString = "$strSelect $strFrom $strWhere $orderBy";
-
-    $cacheKey = __CLASS__ . __FUNCTION__ . $entityType . md5(implode('.', $subTypes));
-    $multipleFieldGroupCacheKey = $cacheKey . 'multi';
-    $cache = CRM_Utils_Cache::singleton();
-    $groupTree = $cache->get($cacheKey);
-    $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
-
-    if (empty($groupTree)) {
-      [$multipleFieldGroups, $groupTree] = self::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
-
-      $cache->set($cacheKey, $groupTree);
-      $cache->set($multipleFieldGroupCacheKey, $multipleFieldGroups);
-    }
-    // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
-    // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
-    $entitySingleSelectClauses = $entityMultipleSelectClauses = $groupTree['info']['select'] = [];
-    $singleFieldTables = [];
-    // now that we have all the groups and fields, lets get the values
-    // since we need to know the table and field names
-    // add info to groupTree
-
-    if (isset($groupTree['info']) && !empty($groupTree['info']) &&
-      !empty($groupTree['info']['tables'])
-    ) {
-      $select = $from = $where = [];
-      $groupTree['info']['where'] = NULL;
-
-      foreach ($groupTree['info']['tables'] as $table => $fields) {
-        $groupTree['info']['from'][] = $table;
-        $select = [
-          "{$table}.id as {$table}_id",
-          "{$table}.entity_id as {$table}_entity_id",
-        ];
-        foreach ($fields as $column => $dontCare) {
-          $select[] = "{$table}.{$column} as {$table}_{$column}";
-        }
-        $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
-        if ($entityID) {
-          $groupTree['info']['where'][] = "{$table}.entity_id = $entityID";
-          if (in_array($table, $multipleFieldGroups) &&
-            CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($entityID, $table)
-          ) {
-            $entityMultipleSelectClauses[$table] = $select;
-          }
-          else {
-            $singleFieldTables[] = $table;
-            $entitySingleSelectClauses = array_merge($entitySingleSelectClauses, $select);
-          }
-
-        }
-      }
-      if ($entityID && !empty($singleFieldTables)) {
-        CRM_Core_BAO_CustomGroup::buildEntityTreeSingleFields($groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTables);
-      }
-      $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
-      if (!empty($multipleFieldTablesWithEntityData)) {
-        CRM_Core_BAO_CustomGroup::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData);
-      }
-
-    }
-    return $groupTree;
-  }
-
-  /**
-   * Build the metadata tree for the custom group.
-   *
-   * @internal
-   *
-   * @param string $entityType
-   * @param array $toReturn
-   * @param array $subTypes
-   * @param string $queryString
-   * @param array $params
-   * @param string $subType
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  private static function buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType) {
     $groupTree = $multipleFieldGroups = [];
     $crmDAO = CRM_Core_DAO::executeQuery($queryString, $params);
     $customValueTables = [];
