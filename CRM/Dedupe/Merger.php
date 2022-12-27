@@ -1846,7 +1846,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
         // populate the group information
         foreach ($tableData['custom_group'] as $fieldName) {
-          $fullFieldName = 'custom_group_id.'  . $fieldName;
+          $fullFieldName = 'custom_group_id.' . $fieldName;
           if ($fieldName === 'id' ||
             is_null($fields[$fullFieldName])
           ) {
