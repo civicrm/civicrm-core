@@ -1745,6 +1745,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         'time_format',
         'option_group_id',
         'in_selector',
+        'serialize',
       ],
       'custom_group' => [
         'id',
@@ -1760,17 +1761,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         'extends_entity_column_id',
         'extends_entity_column_value',
         'max_multiple',
+        'is_public',
       ],
     ];
-    $current_db_version = CRM_Core_BAO_Domain::version();
-    $is_public_version = version_compare($current_db_version, '4.7.19', '>=');
-    $serialize_version = version_compare($current_db_version, '5.27.alpha1', '>=');
-    if ($is_public_version) {
-      $tableData['custom_group'][] = 'is_public';
-    }
-    if ($serialize_version) {
-      $tableData['custom_field'][] = 'serialize';
-    }
+
     $toReturn = $tableData;
 
     // create select
