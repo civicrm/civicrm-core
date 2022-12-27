@@ -1788,7 +1788,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   private static function buildGroupTree($entityType, $checkPermission, $subTypes) {
 
     // create a new tree
-
+    $groupTree = $multipleFieldGroups = [];
     // legacy hardcoded list of data to return
     $tableData = [
       'custom_field' => [
@@ -1824,84 +1824,20 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         'style',
         'is_multiple',
         'extends',
-        'extends_entity_column_id',
-        'extends_entity_column_value',
         'max_multiple',
         'is_public',
       ],
     ];
 
-    $toReturn = $tableData;
-
-    // create select
-    $select = [];
-    foreach ($toReturn as $tableName => $tableColumn) {
-      foreach ($tableColumn as $columnName) {
-        $select[] = "civicrm_{$tableName}.{$columnName} as civicrm_{$tableName}_{$columnName}";
-      }
-    }
-    $strSelect = "SELECT " . implode(', ', $select);
-
-    // from, where, order by
-    $strFrom = "
-FROM     civicrm_custom_group
-LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicrm_custom_group.id)
-";
-    $in = "'$entityType', 'Contact'";
-
-    $params = [];
-    $sqlParamKey = 1;
-    $subType = '';
-    if (!empty($subTypes)) {
-      foreach ($subTypes as $key => $subType) {
-        $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", CRM_Core_BAO_CustomGroup::validateSubTypeByEntity($entityType, $subType));
-      }
-      $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
-      $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
-
-      $strWhere = "
-WHERE civicrm_custom_group.is_active = 1
-  AND civicrm_custom_field.is_active = 1
-  AND civicrm_custom_group.extends IN ($in)
-  AND $subTypeClause
-";
-    }
-    else {
-      $strWhere = "
-WHERE civicrm_custom_group.is_active = 1
-  AND civicrm_custom_field.is_active = 1
-  AND civicrm_custom_group.extends IN ($in)
-";
-    }
-
-    if ($checkPermission) {
-      // ensure that the user has access to these custom groups
-      $strWhere .= " AND " .
-        CRM_Core_Permission::customGroupClause($checkPermission,
-          'civicrm_custom_group.'
-        );
-    }
-
-    $orderBy = "
-ORDER BY civicrm_custom_group.weight,
-         civicrm_custom_group.title,
-         civicrm_custom_field.weight,
-         civicrm_custom_field.label
-";
-
-    // final query string
-    $queryString = "$strSelect $strFrom $strWhere $orderBy";
-    $groupTree = $multipleFieldGroups = [];
-    $crmDAO = CRM_Core_DAO::executeQuery($queryString, $params);
-    $customValueTables = [];
+    $fields = CRM_Core_BAO_CustomField::getAllCustomFieldsForContactType($entityType, $checkPermission, $subTypes);
 
     // process records
-    while ($crmDAO->fetch()) {
+    foreach ($fields as $field) {
       // get the id's
-      $groupID = $crmDAO->civicrm_custom_group_id;
-      $fieldId = $crmDAO->civicrm_custom_field_id;
-      if ($crmDAO->civicrm_custom_group_is_multiple) {
-        $multipleFieldGroups[$groupID] = $crmDAO->civicrm_custom_group_table_name;
+      $groupID = $field['custom_group_id'];
+      $fieldId = $field['id'];
+      if ($field['is_multiple']) {
+        $multipleFieldGroups[$groupID] = $field['custom_group_id.table_name'];
       }
       // create an array for groups if it does not exist
       if (!array_key_exists($groupID, $groupTree)) {
@@ -1909,24 +1845,18 @@ ORDER BY civicrm_custom_group.weight,
         $groupTree[$groupID]['id'] = $groupID;
 
         // populate the group information
-        foreach ($toReturn['custom_group'] as $fieldName) {
-          $fullFieldName = "civicrm_custom_group_$fieldName";
-          if ($fieldName == 'id' ||
-            is_null($crmDAO->$fullFieldName)
+        foreach ($tableData['custom_group'] as $fieldName) {
+          $fullFieldName = 'custom_group_id.'  . $fieldName;
+          if ($fieldName === 'id' ||
+            is_null($fields[$fullFieldName])
           ) {
             continue;
           }
-          // CRM-5507
-          // This is an old bit of code - per the CRM number & probably does not work reliably if
-          // that one contact sub-type exists.
-          if ($fieldName == 'extends_entity_column_value' && !empty($subTypes[0])) {
-            $groupTree[$groupID]['subtype'] = CRM_Core_BAO_CustomGroup::validateSubTypeByEntity($entityType, $subType);
-          }
-          $groupTree[$groupID][$fieldName] = $crmDAO->$fullFieldName;
+          $groupTree[$groupID][$fieldName] = $fields[$fullFieldName];
         }
         $groupTree[$groupID]['fields'] = [];
 
-        $customValueTables[$crmDAO->civicrm_custom_group_table_name] = [];
+        $customValueTables[$fields['custom_group_id.table_name']] = [];
       }
 
       // add the fields now (note - the query row will always contain a field)
@@ -1935,17 +1865,16 @@ ORDER BY civicrm_custom_group.weight,
         $groupTree[$groupID]['fields'][$fieldId] = [];
       }
 
-      $customValueTables[$crmDAO->civicrm_custom_group_table_name][$crmDAO->civicrm_custom_field_column_name] = 1;
+      $customValueTables[$fields['custom_group_id.table_name']][$fields['column_name']] = 1;
       $groupTree[$groupID]['fields'][$fieldId]['id'] = $fieldId;
       // populate information for a custom field
-      foreach ($toReturn['custom_field'] as $fieldName) {
-        $fullFieldName = "civicrm_custom_field_$fieldName";
-        if ($fieldName == 'id' ||
-          is_null($crmDAO->$fullFieldName)
+      foreach ($tableData['custom_field'] as $fieldName) {
+        if ($fieldName === 'id' ||
+          is_null($fields[$fieldName])
         ) {
           continue;
         }
-        $groupTree[$groupID]['fields'][$fieldId][$fieldName] = $crmDAO->$fullFieldName;
+        $groupTree[$groupID]['fields'][$fieldId][$fieldName] = $fields[$fieldName];
       }
     }
 
