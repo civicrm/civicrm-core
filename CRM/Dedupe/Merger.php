@@ -1706,20 +1706,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   private static function getTree(
     $entityType,
-    $entityID = NULL,
-    $subTypes = [],
+    int $entityID,
+    array $subTypes,
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
-    if (!is_array($subTypes)) {
-      if (!empty($subTypes)) {
-        if (stripos($subTypes, ',') !== FALSE) {
-          $subTypes = explode(',', $subTypes);
-        }
-        else {
-          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
-        }
-      }
-    }
 
     // create a new tree
 
