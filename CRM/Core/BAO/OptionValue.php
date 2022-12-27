@@ -126,18 +126,13 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   deprecated Reference array contains the id.
    *
    * @return \CRM_Core_DAO_OptionValue
    *
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params, $ids = []) {
-    if (!empty($ids['optionValue']) && empty($params['id'])) {
-      CRM_Core_Error::deprecatedFunctionWarning('$params[\'id\'] should be set, $ids is deprecated');
-    }
-    $id = $params['id'] ?? $ids['optionValue'] ?? NULL;
+  public static function add(&$params) {
+    $id = $params['id'] ?? NULL;
 
     // Update custom field data to reflect the new value
     if ($id && isset($params['value'])) {
