@@ -78,14 +78,12 @@ class CRM_Extension_ClassLoader {
 
     $file = $this->getCacheFile();
     if (file_exists($file)) {
-      $this->loader = require $file;
+      $this->loader = unserialize(file_get_contents($file, LOCK_EX));
     }
     else {
       $this->loader = $this->buildClassLoader();
       $ser = serialize($this->loader);
-      file_put_contents($file,
-        sprintf("<?php\nreturn unserialize(%s);", var_export($ser, 1))
-      );
+      file_put_contents($file, $ser, LOCK_EX);
     }
     return $this->loader->register();
   }
