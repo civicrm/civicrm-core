@@ -49,36 +49,6 @@ class CRM_Utils_File {
   }
 
   /**
-   * Given a file name, determine if the file contents make it an html file
-   *
-   * @param string $name
-   *   Name of file.
-   *
-   * @return bool
-   *   true if file is html
-   */
-  public static function isHtml($name) {
-    $fd = fopen($name, "r");
-    if (!$fd) {
-      return FALSE;
-    }
-
-    $html = FALSE;
-    $lineCount = 0;
-    while (!feof($fd) & $lineCount <= 5) {
-      $lineCount++;
-      $line = fgets($fd, 8192);
-      if (!CRM_Utils_String::isHtml($line)) {
-        $html = TRUE;
-        break;
-      }
-    }
-
-    fclose($fd);
-    return $html;
-  }
-
-  /**
    * Create a directory given a path name, creates parent directories
    * if needed
    *
