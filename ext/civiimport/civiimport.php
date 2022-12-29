@@ -172,11 +172,13 @@ function civiimport_civicrm_alterTemplateFile($formName, $form, $type, &$templat
  *
  * @param array $tasks
  * @param bool $checkPermissions
- * @param int|null $userId
+ * @param int|null $userID
+ * @param array|null $search
+ * @param array|null $display
  *
  * @noinspection PhpUnused
  */
-function civiimport_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userId) {
+function civiimport_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userID, ?array $search = [], ?array $display = []) {
   foreach (Import::getImportTables() as $import) {
     $tasks['Import_' . $import['user_job_id']]['validate'] = [
       'title' => E::ts('Validate'),
