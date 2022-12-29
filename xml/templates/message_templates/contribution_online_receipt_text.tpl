@@ -176,7 +176,7 @@
   {$contact_phone}
 {/if}
 {/if}
-{if !empty($is_deductible) AND !empty($price)}
+{if $is_deductible AND !empty($price)}
 
 {ts 1=$price|crmMoney:$currency}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}{/if}
 {/if}
