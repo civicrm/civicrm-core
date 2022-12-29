@@ -373,27 +373,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
       }
 
-      //check if Membership Block is enabled, if Membership Fields are included in profile
-      //get membership section for this contribution page
-      $this->_membershipBlock = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
-      $this->set('membershipBlock', $this->_membershipBlock);
-
-      if (!empty($this->_values['custom_pre_id'])) {
-        $preProfileType = CRM_Core_BAO_UFField::getProfileType($this->_values['custom_pre_id']);
-      }
-
-      if (!empty($this->_values['custom_post_id'])) {
-        $postProfileType = CRM_Core_BAO_UFField::getProfileType($this->_values['custom_post_id']);
-      }
-
-      if (((isset($postProfileType) && $postProfileType === 'Membership') ||
-          (isset($preProfileType) && $preProfileType === 'Membership')
-        ) &&
-        !$this->_membershipBlock['is_active']
-      ) {
-        CRM_Core_Error::statusBounce(ts('This page includes a Profile with Membership fields - but the Membership Block is NOT enabled. Please notify the site administrator.'));
-      }
-
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
 
       if ($pledgeBlock) {
@@ -420,6 +399,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->set('values', $this->_values);
       $this->set('fields', $this->_fields);
     }
+    $this->set('membershipBlock', $this->getMembershipBlock());
 
     // Handle PCP
     $pcpId = CRM_Utils_Request::retrieve('pcpId', 'Positive', $this);
@@ -445,9 +425,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->assign('pledgeBlock', TRUE);
     }
 
-    // check if one of the (amount , membership)  blocks is active or not.
-    $this->_membershipBlock = $this->get('membershipBlock');
-
+    // @todo - move this check to `getMembershipBlock`
     if (!$this->isFormSupportsNonMembershipContributions() &&
       !$this->_membershipBlock['is_active'] &&
       !$this->_priceSetId
@@ -1284,6 +1262,31 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public function isFormSupportsNonMembershipContributions(): bool {
     return (bool) ($this->_values['amount_block_is_active'] ?? FALSE);
+  }
+
+  /**
+   * Get the membership block configured for the page, fetching if needed.
+   *
+   * The membership block is configured memberships are available to purchase via
+   * a quick-config price set.
+   *
+   * @return array|false
+   */
+  protected function getMembershipBlock() {
+    if (!isset($this->_membershipBlock)) {
+      //check if Membership Block is enabled, if Membership Fields are included in profile
+      //get membership section for this contribution page
+      $this->_membershipBlock = CRM_Member_BAO_Membership::getMembershipBlock($this->_id) ?? FALSE;
+      $preProfileType = empty($this->_values['custom_pre_id']) ? NULL : CRM_Core_BAO_UFField::getProfileType($this->_values['custom_pre_id']);
+      $postProfileType = empty($this->_values['custom_post_id']) ? NULL : CRM_Core_BAO_UFField::getProfileType($this->_values['custom_post_id']);
+
+      if ((($postProfileType === 'Membership') || ($preProfileType === 'Membership')) &&
+        !$this->_membershipBlock['is_active']
+      ) {
+        CRM_Core_Error::statusBounce(ts('This page includes a Profile with Membership fields - but the Membership Block is NOT enabled. Please notify the site administrator.'));
+      }
+    }
+    return $this->_membershipBlock;
   }
 
 }
