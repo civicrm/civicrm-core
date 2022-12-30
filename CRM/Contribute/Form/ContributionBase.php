@@ -492,16 +492,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
     // get price info
     if ($priceSetId) {
-      if ($form->_action & CRM_Core_Action::UPDATE) {
-        $form->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($form->_id, 'contribution');
-        $required = FALSE;
-      }
-      else {
-        $required = TRUE;
-      }
-
       $form->_priceSetId = $priceSetId;
-      $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, $required);
+      $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE);
       $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
       $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
 
