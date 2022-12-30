@@ -178,7 +178,7 @@ class CRM_Extension_ClassLoader {
    */
   protected function getCacheFile() {
     $envId = \CRM_Core_Config_Runtime::getId();
-    $file = \Civi::paths()->getPath("[civicrm.compile]/CachedExtLoader.{$envId}.php");
+    $file = \Civi::paths()->getPath("[civicrm.compile]/CachedExtLoader.{$envId}.php.meta");
     return $file;
   }
 
