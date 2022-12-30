@@ -21,6 +21,20 @@
 class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
 
   /**
+   * Path to a IMAP directory to store ignored emails
+   *
+   * @var string
+   */
+  private $_ignored;
+
+  /**
+   * Path to a IMAP directory to store ignored emails
+   *
+   * @var string
+   */
+  private $_processed;
+
+  /**
    * Connect to the supplied IMAP server and make sure the two mailboxes exist.
    *
    * @param string $host
