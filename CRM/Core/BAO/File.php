@@ -763,15 +763,15 @@ HEREDOC;
   /**
    * Get a reference to the file-search service (if one is available).
    *
-   * @return CRM_Core_FileSearchInterface|NULL
+   * @return CRM_Core_FileSearchInterface|null
    */
   public static function getSearchService() {
     $fileSearches = [];
     CRM_Utils_Hook::fileSearches($fileSearches);
 
     // use the first available search
+    /** @var CRM_Core_FileSearchInterface $fileSearch */
     foreach ($fileSearches as $fileSearch) {
-      /** @var $fileSearch CRM_Core_FileSearchInterface */
       return $fileSearch;
     }
     return NULL;
