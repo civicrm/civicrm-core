@@ -231,8 +231,8 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
   }
 
   public function fillTable() {
+    /** @var CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery $partialQuery */
     foreach ($this->_partialQueries as $partialQuery) {
-      /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
       if (!$this->_table || $this->_table == $partialQuery->getName()) {
         if ($partialQuery->isActive()) {
           $result = $partialQuery->fillTempTable($this->_text, $this->_entityIDTableName, $this->_tableName, $this->_limitClause, $this->_limitDetailClause);
@@ -301,8 +301,8 @@ WHERE      t.table_name = 'Activity' AND
 
     // also add a select box to allow the search to be constrained
     $tables = ['' => ts('All tables')];
+    /** @var CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery $partialQuery */
     foreach ($this->_partialQueries as $partialQuery) {
-      /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
       if ($partialQuery->isActive()) {
         $tables[$partialQuery->getName()] = $partialQuery->getLabel();
       }
@@ -360,8 +360,8 @@ WHERE      t.table_name = 'Activity' AND
     $this->initialize();
 
     $summary = [];
+    /** @var CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery $partialQuery */
     foreach ($this->_partialQueries as $partialQuery) {
-      /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
       $summary[$partialQuery->getName()] = [];
     }
 
