@@ -21,10 +21,31 @@
 class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
 
   /**
+   * Directory to operate upon.
+   *
+   * @var string
+   */
+  private $_dir;
+
+  /**
+   * Path to a local directory to store ignored emails
+   *
+   * @var string
+   */
+  private $_ignored;
+
+  /**
+   * Path to a local directory to store ignored emails
+   *
+   * @var string
+   */
+  private $_processed;
+
+  /**
    * Connect to the supplied dir and make sure the two mail dirs exist.
    *
    * @param string $dir
-   *   Dir to operate upon.
+   *   Directory to operate upon.
    *
    * @return \CRM_Mailing_MailStore_Localdir
    */
