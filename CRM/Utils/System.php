@@ -38,7 +38,7 @@
  * @method static array synchronizeUsers() Create CRM contacts for all existing CMS users.
  * @method static void appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
  * @method static void alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
- * @method static exitAfterFatal() Should the current execution exit after a fatal error?
+ * @method static bool shouldExitAfterFatal() Should the current execution exit after a fatal error?
  */
 class CRM_Utils_System {
 
