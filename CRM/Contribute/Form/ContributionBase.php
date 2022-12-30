@@ -488,9 +488,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id);
     //check if price set is is_config
     if (is_numeric($priceSetId)) {
-      if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config') && $form->getVar('_name') != 'Participant') {
-        $form->assign('quickConfig', 1);
-      }
+      $form->assign('quickConfig', CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config'));
     }
     // get price info
     if ($priceSetId) {
