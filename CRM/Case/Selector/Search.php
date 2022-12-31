@@ -244,12 +244,10 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Returns total number of rows for the query.
    *
-   * @param
-   *
    * @return int
    *   Total number of rows
    */
-  public function getTotalCount($action) {
+  public function getTotalCount() {
     return $this->_query->searchQuery(0, 0, NULL,
       TRUE, FALSE,
       FALSE, FALSE,

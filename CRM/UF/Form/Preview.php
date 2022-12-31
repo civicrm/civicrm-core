@@ -27,8 +27,6 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
    *
    * gets session variables for group or field id
    *
-   * @param
-   *
    * @return void
    */
   public function preProcess() {

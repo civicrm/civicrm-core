@@ -35,8 +35,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @param
-   *
    * @return array
    */
   public static function &actionLinks() {
@@ -286,11 +284,9 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   /**
    * Browse all uf data groups.
    *
-   * @param
-   *
    * @return void
    */
-  public function browse($action = NULL) {
+  public function browse() {
     $ufGroup = [];
     $allUFGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup();
     if (empty($allUFGroups)) {
