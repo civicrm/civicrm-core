@@ -117,8 +117,8 @@ class CRM_Core_Smarty extends Smarty {
     // add the session and the config here
     $session = CRM_Core_Session::singleton();
 
-    $this->assign_by_ref('config', $config);
-    $this->assign_by_ref('session', $session);
+    $this->assign('config', $config);
+    $this->assign('session', $session);
 
     $tsLocale = CRM_Core_I18n::getLocale();
     $this->assign('tsLocale', $tsLocale);
