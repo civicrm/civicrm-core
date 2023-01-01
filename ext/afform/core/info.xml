@@ -21,7 +21,7 @@
   <comments>The Form Core extension is required to use any dynamic form. To administer and edit forms, also install the FormBuilder extension.</comments>
   <civix>
     <namespace>CRM/Afform</namespace>
-    <format>22.10.0</format>
+    <format>22.12.1</format>
   </civix>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
@@ -35,4 +35,5 @@
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
   </mixins>
+  <upgrader>CRM_Afform_Upgrader</upgrader>
 </extension>
