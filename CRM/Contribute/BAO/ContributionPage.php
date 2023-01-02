@@ -946,8 +946,10 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    *
    * @return bool
    *   isSeparateMembershipPayment
+   * @deprecated
    */
   public static function getIsMembershipPayment($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     $membershipBlocks = civicrm_api3('membership_block', 'get', [
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $id,
