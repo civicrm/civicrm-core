@@ -5298,10 +5298,6 @@ civicrm_relationship.start_date > {$today}
   ) {
     // @todo - remove dateFormat - pretty sure it's never passed in...
     [$name, $op, $value, $grouping, $wildcard] = $values;
-    if ($name !== $fieldName && $name !== "{$fieldName}_low" && $name !== "{$fieldName}_high") {
-      CRM_Core_Error::deprecatedFunctionWarning('Date query builder called unexpectedly');
-      return;
-    }
     if ($tableName === 'civicrm_contact') {
       // Special handling for contact table as it has a known alias in advanced search.
       $tableName = 'contact_a';
