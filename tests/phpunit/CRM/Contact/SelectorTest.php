@@ -21,6 +21,11 @@
  */
 class CRM_Contact_SelectorTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    parent::tearDown();
+    $this->quickCleanup(['civicrm_tag', 'civicrm_entity_tag']);
+  }
+
   /**
    * Test the query from the selector class is consistent with the dataset expectation.
    *
@@ -29,11 +34,10 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    *   clause will need changing.
    *
    * @dataProvider querySets
-   * @throws \Exception
    */
-  public function testSelectorQuery($dataSet) {
+  public function testSelectorQuery(array $dataSet): void {
     $tag = $this->callAPISuccess('Tag', 'create', [
-      'name' => 'Test Tag Name' . uniqid(),
+      'name' => 'Test Tag Name',
       'parent_id' => 1,
     ]);
     if (!empty($dataSet['limitedPermissions'])) {
@@ -43,7 +47,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       ];
     }
     $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, []);
-    $isDeleted = in_array(['deleted_contacts', '=', 1, 0, 0], $params);
+    $isDeleted = in_array(['deleted_contacts', '=', 1, 0, 0], $params, TRUE);
     foreach ($dataSet['settings'] as $setting) {
       $this->callAPISuccess('Setting', 'create', [$setting['name'] => $setting['value']]);
     }
@@ -94,7 +98,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'country_id' => 'IN',
         ]);
         $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
-        $this->assertEquals(1, count($rows));
+        $this->assertCount(1, $rows);
 
         CRM_Core_DAO::reenableFullGroupByMode();
         $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
@@ -111,15 +115,14 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     if (!empty($dataSet['limitedPermissions'])) {
       $this->cleanUpAfterACLs();
     }
-    $this->callAPISuccess('Tag', 'delete', ['id' => $tag['id']]);
   }
 
   /**
    * Test advanced search results by uf_group_id.
    */
-  public function testSearchByProfile() {
+  public function testSearchByProfile(): void {
     //Create search profile for contacts.
-    $ufGroup = $this->callAPISuccess('uf_group', 'create', [
+    $ufGroup = $this->callAPISuccess('UFGroup', 'create', [
       'group_type' => 'Contact',
       'name' => 'test_search_profile',
       'title' => 'Test Search Profile',
@@ -169,13 +172,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       $dataSet['context']
     );
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
-    $this->assertEquals(1, count($rows));
+    $this->assertCount(1, $rows);
     $this->assertEquals($contactID, key($rows));
 
     //Check if email column contains (On Hold) string.
     foreach ($rows[$contactID] as $key => $value) {
       if (strpos($key, 'email') !== FALSE) {
-        $this->assertStringContainsString("(On Hold)", (string) $value);
+        $this->assertStringContainsString('(On Hold)', (string) $value);
       }
     }
   }
@@ -183,7 +186,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
   /**
    * Test the civicrm_prevnext_cache entry if it correctly stores the search query result
    */
-  public function testPrevNextCache() {
+  public function testPrevNextCache(): void {
     $contactID = $this->individualCreate(['email' => 'mickey@mouseville.com']);
     $dataSet = [
       'description' => 'Normal default behaviour',
@@ -216,23 +219,22 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       $dataSet['context']
     );
     // set cache key
-    $key = substr(sha1(rand()), 0, 7);
-    $selector->setKey($key);
+    $selector->setKey('abc');
 
     // fetch row and check the result
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
-    $this->assertEquals(1, count($rows));
+    $this->assertCount(1, $rows);
     $this->assertEquals($contactID, key($rows));
 
     // build cache key and use to it to fetch prev-next cache record
-    $cacheKey = 'civicrm search ' . $key;
+    $cacheKey = 'civicrm search abc';
     $contacts = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache')
       ->select(['entity_id1', 'cachekey'])
-      ->where("cachekey = @key")
+      ->where('cachekey = @key')
       ->param('key', $cacheKey)
       ->execute()
       ->fetchAll();
-    $this->assertEquals(1, count($contacts));
+    $this->assertCount(1, $contacts);
     // check the prevNext record matches
     $expectedEntry = [
       'entity_id1' => $contactID,
@@ -244,7 +246,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
   /**
    * Data sets for testing.
    */
-  public function querySets() {
+  public function querySets(): array {
     return [
       [
         [
@@ -274,7 +276,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [],
-          'where_contains' => 'tag_id IN ( 1,@tagid )',
+          'where_contains' => 'tag_id IN ( @tagid )',
         ],
       ],
       [
@@ -482,7 +484,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Test the contact ID query does not fail on country search.
    */
-  public function testContactIDQuery() {
+  public function testContactIDQuery(): void {
     $params = [
       [
         0 => 'country-1',
@@ -500,7 +502,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Test the Search Builder using Non ASCII location type for email filter
    */
-  public function testSelectorQueryOnNonASCIIlocationType() {
+  public function testSelectorQueryOnNonASCILocationType(): void {
     $contactID = $this->individualCreate();
     $locationTypeID = $this->locationTypeCreate([
       'name' => 'Non ASCII Location Type',
@@ -546,16 +548,16 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     $sql = $selector->getQueryObject()->query();
 
     $expectedQuery = [
-      0 => "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, `Non_ASCII_Location_Type-location_type`.id as `Non_ASCII_Location_Type-location_type_id`, `Non_ASCII_Location_Type-location_type`.name as `Non_ASCII_Location_Type-location_type`, `Non_ASCII_Location_Type-address`.id as `Non_ASCII_Location_Type-address_id`, `Non_ASCII_Location_Type-email`.id as `Non_ASCII_Location_Type-email_id`, `Non_ASCII_Location_Type-email`.email as `Non_ASCII_Location_Type-email`",
+      0 => 'SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, `Non_ASCII_Location_Type-location_type`.id as `Non_ASCII_Location_Type-location_type_id`, `Non_ASCII_Location_Type-location_type`.name as `Non_ASCII_Location_Type-location_type`, `Non_ASCII_Location_Type-address`.id as `Non_ASCII_Location_Type-address_id`, `Non_ASCII_Location_Type-email`.id as `Non_ASCII_Location_Type-email_id`, `Non_ASCII_Location_Type-email`.email as `Non_ASCII_Location_Type-email`',
       // @TODO these FROM clause doesn't matches due to extra spaces or special character
-      2 => "WHERE  (  ( `Non_ASCII_Location_Type-email`.email IS NOT NULL )  )  AND ( 1 ) AND (contact_a.is_deleted = 0)",
+      2 => 'WHERE  (  ( `Non_ASCII_Location_Type-email`.email IS NOT NULL )  )  AND ( 1 ) AND (contact_a.is_deleted = 0)',
     ];
     foreach ($expectedQuery as $index => $queryString) {
       $this->assertEquals($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
 
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
-    $this->assertEquals(1, count($rows));
+    $this->assertCount(1, $rows);
     $this->assertEquals($contactID, key($rows));
     $this->assertEquals('test@test.com', $rows[$contactID]['Non_ASCII_Location_Type-email']);
   }
@@ -563,7 +565,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Test the value use in where clause if it's case sensitive or not against each MySQL operators
    */
-  public function testWhereClauseByOperator() {
+  public function testWhereClauseByOperator(): void {
     $contactID = $this->individualCreate(['first_name' => 'Adam']);
 
     $filters = [
@@ -609,7 +611,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
       $this->assertEquals(TRUE, strpos($sql[2], $filtersByWhereClause[$op]));
 
       $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
-      $this->assertEquals(1, count($rows));
+      $this->assertCount(1, $rows);
       $this->assertEquals($contactID, key($rows));
     }
   }
@@ -617,8 +619,10 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Test if custom table is added in from clause when
    * search results are ordered by a custom field.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testSelectorQueryOrderByCustomField() {
+  public function testSelectorQueryOrderByCustomField(): void {
     //Search for any params.
     $params = [
       [
@@ -632,14 +636,14 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
 
     //Create a test custom group and field.
     $customGroup = $this->callAPISuccess('CustomGroup', 'create', [
-      'title' => "test custom group",
-      'extends' => "Individual",
+      'title' => 'test custom group',
+      'extends' => 'Individual',
     ]);
     $cgTableName = $customGroup['values'][$customGroup['id']]['table_name'];
     $customField = $this->callAPISuccess('CustomField', 'create', [
       'custom_group_id' => $customGroup['id'],
-      'label' => "test field",
-      'html_type' => "Text",
+      'label' => 'test field',
+      'html_type' => 'Text',
     ]);
     $customFieldId = $customField['id'];
 
@@ -647,7 +651,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     $sortParams = [
       1 => [
         'name' => 'test field',
-        'sort' => "custom_{$customFieldId}",
+        'sort' => "custom_$customFieldId",
       ],
     ];
     $sort = new CRM_Utils_Sort($sortParams, '1_d');
@@ -659,14 +663,11 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
       FALSE, TRUE, TRUE, NULL,
       'AND'
     );
-    $query->searchQuery(0, 0, $sort,
-      FALSE, FALSE, FALSE,
-      FALSE, FALSE
-    );
+    $query->searchQuery(0, 0, $sort);
     //Check if custom table is included in $query->_tables.
-    $this->assertTrue(array_key_exists($cgTableName, $query->_tables));
+    $this->assertArrayHasKey($cgTableName, $query->_tables);
     //Assert if from clause joins the custom table.
-    $this->assertTrue(strpos($query->_fromClause, $cgTableName) !== FALSE);
+    $this->assertNotFalse(strpos($query->_fromClause, $cgTableName));
     $this->callAPISuccess('CustomField', 'delete', ['id' => $customField['id']]);
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $customGroup['id']]);
   }
@@ -674,14 +675,13 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Check where clause of a date custom field when 'IS NOT EMPTY' operator is used
    */
-  public function testCustomDateField() {
+  public function testCustomDateField(): void {
     $contactID = $this->individualCreate();
     //Create a test custom group and field.
     $customGroup = $this->callAPISuccess('CustomGroup', 'create', [
-      'title' => "test custom group",
-      'extends' => "Individual",
+      'title' => 'test custom group',
+      'extends' => 'Individual',
     ]);
-    $customTableName = $this->callAPISuccess('CustomGroup', 'getValue', ['id' => $customGroup['id'], 'return' => 'table_name']);
     $customGroupTableName = $customGroup['values'][$customGroup['id']]['table_name'];
 
     $createdField = $this->callAPISuccess('customField', 'create', [
@@ -719,18 +719,18 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     );
 
     $whereClause = $selector->getQueryObject()->query()[2];
-    $expectedClause = sprintf("( %s.%s IS NOT NULL )", $customGroupTableName, $customFieldColumnName);
+    $expectedClause = sprintf('( %s.%s IS NOT NULL )', $customGroupTableName, $customFieldColumnName);
     // test the presence of expected date clause
     $this->assertEquals(TRUE, strpos($whereClause, $expectedClause));
 
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
-    $this->assertEquals(1, count($rows));
+    $this->assertCount(1, $rows);
   }
 
   /**
    * Get the default select string since this is generally consistent.
    */
-  public function getDefaultSelectString() {
+  public function getDefaultSelectString(): string {
     return 'SELECT contact_a.id as contact_id, contact_a.contact_type  as `contact_type`, contact_a.contact_sub_type  as `contact_sub_type`, contact_a.sort_name  as `sort_name`,'
       . ' contact_a.display_name  as `display_name`, contact_a.do_not_email  as `do_not_email`, contact_a.do_not_phone as `do_not_phone`, contact_a.do_not_mail  as `do_not_mail`,'
       . ' contact_a.do_not_sms  as `do_not_sms`, contact_a.do_not_trade as `do_not_trade`, contact_a.is_opt_out  as `is_opt_out`, contact_a.legal_identifier  as `legal_identifier`,'
@@ -753,7 +753,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Get the default from string since this is generally consistent.
    */
-  public function getDefaultFromString() {
+  public function getDefaultFromString(): string {
     return ' FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )'
       . ' LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) '
       . ' LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1)'
@@ -769,7 +769,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
    *
    * @return string
    */
-  public function strWrangle($string) {
+  public function strWrangle(string $string): string {
     return trim(str_replace('  ', ' ', $string));
   }
 
@@ -781,11 +781,11 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
    *
    * @param array $expectedQuery
    */
-  public function wrangleDefaultClauses(&$expectedQuery) {
-    if (CRM_Utils_Array::value(0, $expectedQuery) == 'default') {
+  public function wrangleDefaultClauses(array &$expectedQuery): void {
+    if ($expectedQuery[0] ?? NULL === 'default') {
       $expectedQuery[0] = $this->getDefaultSelectString();
     }
-    if (CRM_Utils_Array::value(1, $expectedQuery) == 'default') {
+    if ($expectedQuery[1] ?? NULL === 'default') {
       $expectedQuery[1] = $this->getDefaultFromString();
     }
   }
