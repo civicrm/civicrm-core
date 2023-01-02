@@ -48,7 +48,7 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
     $this->_tags = CRM_Core_BAO_Tag::getTags('civicrm_activity');
 
     foreach ($this->_tags as $tagID => $tagName) {
-      $this->_tagElement = &$this->addElement('checkbox', "tag[$tagID]", NULL, $tagName);
+      $this->addElement('checkbox', "tag[$tagID]", NULL, $tagName);
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_activity');
