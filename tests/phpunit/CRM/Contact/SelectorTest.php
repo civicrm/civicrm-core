@@ -65,7 +65,6 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     // Make sure there is no fail on alphabet query.
     $selector->alphabetQuery()->fetchAll();
     $sql = $queryObject->query(FALSE, FALSE, FALSE, $isDeleted);
-    $this->wrangleDefaultClauses($dataSet['expected_query']);
     foreach ($dataSet['expected_query'] as $index => $queryString) {
       $this->assertLike($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
@@ -248,7 +247,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    */
   public function querySets(): array {
     return [
-      [
+      'Empty group test' => [
         [
           'description' => 'Empty group test',
           'class' => 'CRM_Contact_Selector',
@@ -263,7 +262,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'expected_query' => [],
         ],
       ],
-      [
+      'Tag Equals Test' => [
         [
           'description' => 'Tag Equals Test',
           'class' => 'CRM_Contact_Selector',
@@ -279,7 +278,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'where_contains' => 'tag_id IN ( @tagid )',
         ],
       ],
-      [
+      'Normal default behaviour' => [
         [
           'description' => 'Normal default behaviour',
           'class' => 'CRM_Contact_Selector',
@@ -292,13 +291,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'default',
-            1 => 'default',
+            0 => self::getDefaultSelectString(),
+            1 => self::getDefaultFromString(),
             2 => "WHERE  ( civicrm_email.email LIKE '%mickey@mouseville.com%' )  AND ( 1 ) AND (contact_a.is_deleted = 0)",
           ],
         ],
       ],
-      [
+      'Normal default + user added wildcard' => [
         [
           'description' => 'Normal default + user added wildcard',
           'class' => 'CRM_Contact_Selector',
@@ -311,13 +310,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'default',
-            1 => 'default',
+            0 => self::getDefaultSelectString(),
+            1 => self::getDefaultFromString(),
             2 => "WHERE  ( civicrm_email.email LIKE '%mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE '%Mouse%' ) OR ( civicrm_email.email LIKE '%Mouse%' ) ) ) ) AND ( 1 ) AND (contact_a.is_deleted = 0)",
           ],
         ],
       ],
-      [
+      'Site set to not pre-pend wildcard' => [
         [
           'description' => 'Site set to not pre-pend wildcard',
           'class' => 'CRM_Contact_Selector',
@@ -330,13 +329,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'default',
-            1 => 'default',
+            0 => self::getDefaultSelectString(),
+            1 => self::getDefaultFromString(),
             2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND ( 1 ) AND (contact_a.is_deleted = 0)",
           ],
         ],
       ],
-      [
+      'Site set to not pre-pend wildcard and check that trash value is respected' => [
         [
           'description' => 'Site set to not pre-pend wildcard and check that trash value is respected',
           'class' => 'CRM_Contact_Selector',
@@ -349,13 +348,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'default',
-            1 => 'default',
+            0 => self::getDefaultSelectString(),
+            1 => self::getDefaultFromString(),
             2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND ( 1 ) AND (contact_a.is_deleted)",
           ],
         ],
       ],
-      [
+      'Ensure that the Join to the acl contact cache is correct' => [
         [
           'description' => 'Ensure that the Join to the acl contact cache is correct and that if we are searching in deleted contacts appropriate where clause is added',
           'class' => 'CRM_Contact_Selector',
@@ -369,13 +368,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'searchDescendentGroups' => FALSE,
           'limitedPermissions' => TRUE,
           'expected_query' => [
-            0 => 'default',
+            0 => self::getDefaultSelectString(),
             1 => 'FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1) LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1) LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id INNER JOIN civicrm_acl_contact_cache aclContactCache ON contact_a.id = aclContactCache.contact_id',
             2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND  aclContactCache.user_id = 0 AND (contact_a.is_deleted)",
           ],
         ],
       ],
-      [
+      'Ensure that the Join to the acl contact cache is correct, no deleted contacts' => [
         [
           'description' => 'Ensure that the Join to the acl contact cache is correct and that if we are not searching in the trash trashed contacts are not returned',
           'class' => 'CRM_Contact_Selector',
@@ -389,13 +388,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'searchDescendentGroups' => FALSE,
           'limitedPermissions' => TRUE,
           'expected_query' => [
-            0 => 'default',
+            0 => self::getDefaultSelectString(),
             1 => 'FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1) LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1) LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id INNER JOIN civicrm_acl_contact_cache aclContactCache ON contact_a.id = aclContactCache.contact_id',
             2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND  aclContactCache.user_id = 0 AND (contact_a.is_deleted = 0)",
           ],
         ],
       ],
-      [
+      'Use of quotes for exact string' => [
         [
           'description' => 'Use of quotes for exact string',
           'use_case_comments' => 'This is something that was in the code but seemingly not working. No UI info on it though!',
@@ -409,13 +408,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'default',
-            1 => 'default',
+            0 => self::getDefaultSelectString(),
+            1 => self::getDefaultFromString(),
             2 => "WHERE  ( civicrm_email.email = 'mickey@mouseville.com'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND ( 1 ) AND (contact_a.is_deleted = 0)",
           ],
         ],
       ],
-      [
+      'Normal search builder behaviour' => [
         [
           'description' => 'Normal search builder behaviour',
           'class' => 'CRM_Contact_Selector',
@@ -438,7 +437,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           ],
         ],
       ],
-      [
+      'Search builder behaviour for Activity' => [
         [
           'description' => 'Search builder behaviour for Activity',
           'class' => 'CRM_Contact_Selector',
@@ -458,7 +457,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           ],
         ],
       ],
-      [
+      'Test display relationships' => [
         [
           'description' => 'Test display relationships',
           'class' => 'CRM_Contact_Selector',
@@ -730,7 +729,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Get the default select string since this is generally consistent.
    */
-  public function getDefaultSelectString(): string {
+  public static function getDefaultSelectString(): string {
     return 'SELECT contact_a.id as contact_id, contact_a.contact_type  as `contact_type`, contact_a.contact_sub_type  as `contact_sub_type`, contact_a.sort_name  as `sort_name`,'
       . ' contact_a.display_name  as `display_name`, contact_a.do_not_email  as `do_not_email`, contact_a.do_not_phone as `do_not_phone`, contact_a.do_not_mail  as `do_not_mail`,'
       . ' contact_a.do_not_sms  as `do_not_sms`, contact_a.do_not_trade as `do_not_trade`, contact_a.is_opt_out  as `is_opt_out`, contact_a.legal_identifier  as `legal_identifier`,'
@@ -753,7 +752,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Get the default from string since this is generally consistent.
    */
-  public function getDefaultFromString(): string {
+  public static function getDefaultFromString(): string {
     return ' FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )'
       . ' LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) '
       . ' LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1)'
@@ -771,23 +770,6 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
    */
   public function strWrangle(string $string): string {
     return trim(str_replace('  ', ' ', $string));
-  }
-
-  /**
-   * Swap out default parts of the query for the actual string.
-   *
-   * Note that it seems to make more sense to resolve this earlier & pass it in from a clean code point of
-   * view, but the output on fail includes long sql statements that are of low relevance then.
-   *
-   * @param array $expectedQuery
-   */
-  public function wrangleDefaultClauses(array &$expectedQuery): void {
-    if ($expectedQuery[0] ?? NULL === 'default') {
-      $expectedQuery[0] = $this->getDefaultSelectString();
-    }
-    if ($expectedQuery[1] ?? NULL === 'default') {
-      $expectedQuery[1] = $this->getDefaultFromString();
-    }
   }
 
 }
