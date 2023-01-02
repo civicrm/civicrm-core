@@ -231,9 +231,7 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
   /**
    * Get the mailing object for this queue event instance.
    *
-   * @param
-   *
-   * @return object
+   * @return CRM_Mailing_BAO_Mailing
    *   Mailing BAO
    */
   public function &getMailing() {

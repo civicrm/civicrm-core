@@ -2153,8 +2153,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Get the count of mailings.
    *
-   * @param
-   *
    * @return int
    *   Count
    */

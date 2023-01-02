@@ -33,8 +33,6 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
   /**
    * Build all the data structures needed to build the form.
    *
-   * @param
-   *
    * @return void
    * @throws \CRM_Core_Exception
    */

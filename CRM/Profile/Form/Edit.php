@@ -35,8 +35,6 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   /**
    * Pre processing work done here.
    *
-   * @param
-   *
    */
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
