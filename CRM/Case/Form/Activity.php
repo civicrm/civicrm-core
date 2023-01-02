@@ -23,14 +23,14 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   /**
    * Cases this activity belongs to.
    *
-   * @var []int
+   * @var int[]
    */
   public $_caseId;
 
   /**
    * The default case type variable defined.
    *
-   * @var []int
+   * @var int[]
    */
   public $_caseType;
 

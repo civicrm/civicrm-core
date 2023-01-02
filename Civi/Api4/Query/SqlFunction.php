@@ -106,7 +106,7 @@ abstract class SqlFunction extends SqlExpression {
   /**
    * Render the expression for insertion into the sql query
    *
-   * @param Civi\Api4\Query\Api4SelectQuery $query
+   * @param \Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
   public function render(Api4SelectQuery $query): string {
@@ -122,7 +122,7 @@ abstract class SqlFunction extends SqlExpression {
 
   /**
    * @param array $arg
-   * @param Civi\Api4\Query\Api4SelectQuery $query
+   * @param \Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
   private function renderArg($arg, Api4SelectQuery $query): string {
