@@ -567,6 +567,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // and contain the search criteria (parameters)
     // note that the default action is basic
     if ($rowCount) {
+      throw new CRM_Core_Exception('looking for tests');
       /** @var CRM_Core_PrevNextCache_Interface $prevNext */
       $prevNext = Civi::service('prevnext');
       $cacheKey = $this->buildPrevNextCache($sort);
