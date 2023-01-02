@@ -1833,7 +1833,22 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       }
     }
 
-    $contribution->loadRelatedObjects($input, $ids);
+    $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
+      'paymentProcessor',
+      $ids
+    ));
+
+    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $contribution->contribution_page_id) {
+      $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
+        $contribution->contribution_page_id,
+        'payment_processor'
+      );
+      if ($paymentProcessorID) {
+        $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
+      }
+    }
+
+    $contribution->loadRelatedObjects($paymentProcessorID, $ids);
 
     $memberships = $contribution->_relatedObjects['membership'] ?? [];
     $participant = $contribution->_relatedObjects['participant'] ?? [];
@@ -2310,38 +2325,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * Note that the unit test for the BaseIPN class tests this function
    *
-   * @param array $input
-   *   Input as delivered from Payment Processor.
+   * @param int $paymentProcessorID
+   *   Payment Processor ID.
    * @param array $ids
    *   Ids as Loaded by Payment Processor.
    *
    * @return bool
    * @throws CRM_Core_Exception
    */
-  public function loadRelatedObjects($input, &$ids) {
-    // @todo deprecate this function - the steps should be
-    // 1) add additional functions like 'getRelatedMemberships'
-    // 2) switch all calls that refer to ->_relatedObjects to
-    // using the helper functions
-    // 3) make ->_relatedObjects noisy in some way (deprecation won't work for properties - hmm
-    // 4) make ->_relatedObjects protected
-    // 5) hone up the individual functions to not use rely on this having been called
-    // 6) deprecate like mad
-
-    $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
-      'paymentProcessor',
-      $ids
-    ));
-
-    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id) {
-      $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
-        $this->contribution_page_id,
-        'payment_processor'
-      );
-      if ($paymentProcessorID) {
-        $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
-      }
-    }
+  public function loadRelatedObjects($paymentProcessorID, &$ids) {
+    // @todo deprecate this function - we are slowly returning the functionality to
+    // the calling functions so this can be unravelled. It is only called from
+    // tests, composeMessage & transitionComponents. The last of these is itself
+    // deprecated, to be replaced by using Payment.create. Many parts of this are
+    // used by only one, or neither, of the actual calling functions.
 
     $ids['contributionType'] = $this->financial_type_id;
     $ids['financialType'] = $this->financial_type_id;
@@ -2468,7 +2465,23 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (empty($this->financial_type_id)) {
       $this->find(TRUE);
     }
-    $this->loadRelatedObjects($input, $ids);
+
+    $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
+      'paymentProcessor',
+      $ids
+    ));
+
+    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id) {
+      $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
+        $this->contribution_page_id,
+        'payment_processor'
+      );
+      if ($paymentProcessorID) {
+        $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
+      }
+    }
+
+    $this->loadRelatedObjects($paymentProcessorID, $ids);
 
     if (empty($this->_component)) {
       $this->_component = $input['component'] ?? NULL;
