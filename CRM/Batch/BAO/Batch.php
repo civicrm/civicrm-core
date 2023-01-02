@@ -692,10 +692,9 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
 
     // If a custom field was passed as a param,
     // we'll take it into account.
-    $customSearchFields = [];
     if (!empty($params)) {
       foreach ($params as $name => $param) {
-        if (substr($name, 0, 6) == 'custom') {
+        if (strpos($name, 'custom') === 0) {
           $searchFields[] = $name;
         }
       }
@@ -704,7 +703,7 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
     foreach ($searchFields as $field) {
       if (isset($params[$field])) {
         $values[$field] = $params[$field];
-        if ($field == 'sort_name') {
+        if ($field === 'sort_name') {
           $from .= " LEFT JOIN civicrm_contact contact_b ON contact_b.id = civicrm_contribution.contact_id
           LEFT JOIN civicrm_email ON contact_b.id = civicrm_email.contact_id";
         }
