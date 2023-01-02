@@ -428,7 +428,7 @@ FROM   {$this->_componentTable}
   /**
    * Get the name of the component.
    *
-   * @return array
+   * @return string
    */
   protected function getComponentName(): string {
     // CRM_Export_Controller_Standalone has this method

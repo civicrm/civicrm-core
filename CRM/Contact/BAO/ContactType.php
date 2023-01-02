@@ -526,7 +526,7 @@ WHERE contact_sub_type LIKE '%{$subType}%'";
    * @param array $params
    *   An assoc array of name/value pairs.
    *
-   * @return object|void
+   * @return CRM_Contact_DAO_ContactType|NULL
    * @throws \CRM_Core_Exception
    */
   public static function add($params) {

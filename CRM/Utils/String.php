@@ -670,8 +670,8 @@ class CRM_Utils_String {
   /**
    * Generate a random string.
    *
-   * @param $len
-   * @param $alphabet
+   * @param int $len
+   * @param string $alphabet
    * @return string
    */
   public static function createRandom($len, $alphabet) {

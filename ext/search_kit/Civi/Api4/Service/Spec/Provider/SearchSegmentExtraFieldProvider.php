@@ -71,7 +71,7 @@ class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
    * Generates the sql case statement with a clause for each item.
    *
    * @param array $field
-   * @param Civi\Api4\Query\Api4SelectQuery $query
+   * @param \Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
   public static function renderSql(array $field, Api4SelectQuery $query): string {

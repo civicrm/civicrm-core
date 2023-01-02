@@ -129,7 +129,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    * We check that contact_type_a is Individual, but not contact_type_b because there's
    * nowhere in the code that requires it to be Organization.
    *
-   * @return int|string
+   * @return int
    *
    * @throws \CRM_Core_Exception
    */

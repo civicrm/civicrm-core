@@ -1125,7 +1125,7 @@ class CRM_Financial_BAO_Order {
   /**
    * Get the line items from a template.
    *
-   * @return \Civi\Api4\Generic\Result
+   * @return array
    *
    * @throws \CRM_Core_Exception
    */

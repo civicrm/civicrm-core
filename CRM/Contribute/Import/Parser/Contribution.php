@@ -501,7 +501,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *
    * @throws \CRM_Core_Exception
    *
-   * @return array|null
+   * @return array
    */
   private function lookupContribution(array $params): array {
     $where = [];

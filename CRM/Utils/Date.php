@@ -2231,7 +2231,7 @@ class CRM_Utils_Date {
   /**
    * Print out a date object in specified format in local timezone
    *
-   * @param DateTimeObject $dateObject
+   * @param DateTimeInterface $dateObject
    * @param string $format
    * @return string
    */

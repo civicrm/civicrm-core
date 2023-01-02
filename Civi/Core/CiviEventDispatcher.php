@@ -21,7 +21,7 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
   const DEFAULT_HOOK_PRIORITY = -100;
 
   /**
-   * @var Symfony\Component\EventDispatcher\EventDispatcher
+   * @var \Symfony\Component\EventDispatcher\EventDispatcher
    */
   private $dispatcher;
 
