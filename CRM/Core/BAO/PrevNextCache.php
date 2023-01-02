@@ -437,30 +437,6 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
   }
 
   /**
-   * Old function to clean up he cache.
-   *
-   * @deprecated.
-   */
-  public static function cleanupCache() {
-    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
-    Civi::service('prevnext')->cleanup();
-  }
-
-  /**
-   * Get the selections.
-   *
-   * NOTE: This stub has been preserved because one extension in `universe`
-   * was referencing the function.
-   *
-   * @deprecated
-   * @see CRM_Core_PrevNextCache_Sql::getSelection()
-   */
-  public static function getSelection($cacheKey, $action = 'get') {
-    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
-    return Civi::service('prevnext')->getSelection($cacheKey, $action);
-  }
-
-  /**
    * Flip 2 contacts in the prevNext cache.
    *
    * @param array $prevNextId
