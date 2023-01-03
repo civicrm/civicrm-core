@@ -2851,11 +2851,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'payment_processor_id' => 0,
       ];
     }
-
-    CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
-      $form->_values,
-      $contribution->is_test
-    );
+    throw new CRM_Core_Exception('code is unreachable, exception is for clarity for refactoring');
   }
 
   /**
