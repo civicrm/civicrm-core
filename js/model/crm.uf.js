@@ -358,12 +358,14 @@
      *
      */
     markDuplicates: function() {
-      var ufFieldModelsByKey = this.groupBy(function(ufFieldModel) {
+      const ufFieldModelsByKey = this.groupBy(function(ufFieldModel) {
         return ufFieldModel.getSignature();
       });
       this.each(function(ufFieldModel){
-        var is_duplicate = ufFieldModelsByKey[ufFieldModel.getSignature()].length > 1;
-        if (is_duplicate != ufFieldModel.get('is_duplicate')) {
+        const length = ufFieldModelsByKey[ufFieldModel.getSignature()].length > 1;
+        const label = ufFieldModelsByKey[ufFieldModel.getSignature()][0].attributes.label !== 'Free HTML';
+        const is_duplicate = length && label;
+        if (is_duplicate !== ufFieldModel.get('is_duplicate')) {
           ufFieldModel.set('is_duplicate', is_duplicate);
         }
       });
