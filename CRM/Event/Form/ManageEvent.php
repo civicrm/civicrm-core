@@ -116,14 +116,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       $participantListingID = $eventInfo['participant_listing_id'] ?? NULL;
       //CRM_Core_DAO::getFieldValue( 'CRM_Event_DAO_Event', $this->_id, 'participant_listing_id' );
-      if ($participantListingID) {
-        $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
-          "reset=1&id={$this->_id}",
-          TRUE, NULL, TRUE, TRUE
-        );
-        $this->assign('participantListingURL', $participantListingURL);
-      }
-
+      $this->assign('participantListingID', $participantListingID);
       $this->assign('isOnlineRegistration', CRM_Utils_Array::value('is_online_registration', $eventInfo));
 
       $this->assign('id', $this->_id);
