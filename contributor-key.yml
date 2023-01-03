@@ -1633,3 +1633,7 @@
 - github      : Toby-fz
   name        : Toby Messerli
   organization: Fuzion
+
+- github      : gellweiler
+  name        : Sebastian Gellweiler
+  organization: craft-coders.de
