@@ -54,7 +54,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental
    * @param string $rev
    *   The version number matching this function name
    */
-  public function upgrade_5_57_beta1($rev): void {
+  public function upgrade_5_57_0($rev): void {
     $this->addTask('Fix broken quicksearch options', 'fixQuicksearchOptions');
   }
 
