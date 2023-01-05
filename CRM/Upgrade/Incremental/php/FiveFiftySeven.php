@@ -48,4 +48,49 @@ class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental
     return TRUE;
   }
 
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_57_beta1($rev): void {
+    $this->addTask('Fix broken quicksearch options', 'fixQuicksearchOptions');
+  }
+
+  public static function fixQuicksearchOptions($ctx): bool {
+    $default_options = [
+      0 => 'sort_name',
+      1 => 'contact_id',
+      2 => 'external_identifier',
+      3 => 'first_name',
+      4 => 'last_name',
+      5 => 'email',
+      6 => 'phone_numeric',
+      7 => 'street_address',
+      8 => 'city',
+      9 => 'postal_code',
+      10 => 'job_title',
+    ];
+
+    $opts = \Civi::settings()->get('quicksearch_options');
+    if ($opts === NULL) {
+      // Super-borked => just reset to defaults
+      $opts = \Civi::settings()->set('quicksearch_options', $default_options);
+    }
+    elseif (is_string($opts)) {
+      // Has the desired values but we need to put back in array format
+      $opts = trim($opts, CRM_Core_DAO::VALUE_SEPARATOR);
+      $opts = explode(CRM_Core_DAO::VALUE_SEPARATOR, $opts);
+      if (empty($opts)) {
+        // hmm, just reset to defaults
+        \Civi::settings()->set('quicksearch_options', $default_options);
+      }
+      else {
+        \Civi::settings()->set('quicksearch_options', $opts);
+      }
+    }
+    return TRUE;
+  }
+
 }

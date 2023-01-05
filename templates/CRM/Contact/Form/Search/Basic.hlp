@@ -20,7 +20,7 @@
   {ts}Group Search{/ts}
 {/htxt}
 {htxt id="id-smog-criteria"}
-    <p>{ts 1=$params.group_title}Contacts in the <strong>%1</strong> group are listed below.{/ts}
+    <p>{ts 1=$params.group_title|smarty:nodefaults|escape}Contacts in the <strong>%1</strong> group are listed below.{/ts}
       <ul>
         <li>{ts}Use 'Find Contacts within this Group' to search for specific contacts.{/ts}</li>
         <li>{ts}Use the 'Group Status...' checkboxes to view contacts with 'Pending' status and/or contacts who have been 'Removed' from this group.{/ts}</li>
@@ -32,7 +32,7 @@
   {ts}Add to Group{/ts}
 {/htxt}
 {htxt id="id-amtg-criteria"}
-    {ts 1=$params.group_title}Use this Search form to find contacts. Mark the contacts you want to add to this group. Then click 'Add Contacts to %1'.{/ts}
+    {ts 1=$params.group_title|smarty:nodefaults|escape}Use this Search form to find contacts. Mark the contacts you want to add to this group. Then click 'Add Contacts to %1'.{/ts}
 {/htxt}
 
 {htxt id="id-edit-smartGroup-title"}
