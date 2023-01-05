@@ -730,7 +730,15 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       $checkPermission = CRM_Core_Permission::EDIT;
     }
     $cacheKey = 'uf_group_custom_fields_' . $ctype . '_' . (int) $checkPermission;
-    if (!Civi::cache('metadata')->has($cacheKey)) {
+    // Check if we have cached information.
+    $customFieldCount = 0; // Assume no custom fields
+    if (Civi::cache('metadata')->has($cacheKey)) {
+      //get the cached data
+      [$customFields, $addressCustomFields] = Civi::cache('metadata')->get($cacheKey);
+      $customFieldCount = count($customFields);
+    }
+    if ($customFieldCount <1) {
+      // We had no custom field data in the cache so we get them again.
       $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, $checkPermission, TRUE);
 
       // hack to add custom data for components
@@ -1414,19 +1422,19 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'delete' && $event->id) {
       // Check whether this group contains any profile fields
-      $profileField = new CRM_Core_DAO_UFField();
+    $profileField = new CRM_Core_DAO_UFField();
       $profileField->uf_group_id = $event->id;
-      $profileField->find();
-      while ($profileField->fetch()) {
+    $profileField->find();
+    while ($profileField->fetch()) {
         CRM_Core_BAO_UFField::deleteRecord(['id' => $profileField->id]);
-      }
+    }
 
       // Delete records from uf join table
       // Should probably use a deleteRecord rather than direct delete
-      $ufJoin = new CRM_Core_DAO_UFJoin();
+    $ufJoin = new CRM_Core_DAO_UFJoin();
       $ufJoin->uf_group_id = $event->id;
-      $ufJoin->delete();
-    }
+    $ufJoin->delete();
+  }
   }
 
   /**
@@ -1894,9 +1902,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     elseif (substr($fieldName, 0, 9) === 'image_URL') {
-      if (!isset($attributes['accept'])) {
-        $attributes['accept'] = 'image/png, image/jpeg, image/gif';
-      }
       $form->add('file', $name, $title, $attributes, $required);
       $form->addUploadElement($name);
     }
