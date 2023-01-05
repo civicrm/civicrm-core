@@ -280,10 +280,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
           $this->assign('registerURL', $url);
         }
       }
-      elseif (CRM_Core_Permission::check('register for events')) {
-        $this->assign('registerClosed', TRUE);
-      }
     }
+    $this->assign('registerClosed', !empty($values['event']['is_online_registration']) && !$isEventOpenForRegistration);
 
     $this->assign('allowRegistration', $allowRegistration);
 
