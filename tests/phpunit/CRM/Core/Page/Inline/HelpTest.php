@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Class CRM_Core_Page_HelpTest
+ * Class CRM_Core_Page_Inline_HelpTest
  * @group headless
  */
-class CRM_Core_Page_HelpTest extends CiviUnitTestCase {
+class CRM_Core_Page_Inline_HelpTest extends CiviUnitTestCase {
 
   /**
    * various test cases
