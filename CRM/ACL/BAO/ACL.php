@@ -472,38 +472,34 @@ SELECT g.*
   protected static function loadPermittedIDs(int $contactID, string $tableName, int $type, $allGroups): array {
     $ids = [];
     $acls = CRM_ACL_BAO_Cache::build($contactID);
-    $aclKeys = array_keys($acls);
-    $aclKeys = implode(',', $aclKeys);
-    $query = "
-SELECT   a.operation, a.object_id
-  FROM   civicrm_acl_cache c, civicrm_acl a
- WHERE   c.acl_id       =  a.id
-   AND   a.is_active    =  1
-   AND   a.object_table = %1
-   AND   a.id        IN ( $aclKeys )
-GROUP BY a.operation,a.object_id
-ORDER BY a.object_id
-";
+    $aclKeys = implode(',', array_keys($acls));
+    $query = <<<SQL
+      SELECT   a.operation, a.object_id
+        FROM   civicrm_acl_cache c, civicrm_acl a
+       WHERE   c.acl_id       =  a.id
+         AND   a.is_active    =  1
+         AND   a.object_table = %1
+         AND   a.id        IN ( $aclKeys )
+      GROUP BY a.operation,a.object_id
+      ORDER BY a.object_id
+      SQL;
     $params = [1 => [$tableName, 'String']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
-      if ($dao->object_id) {
-        if (self::matchType($type, $dao->operation)) {
-          $ids[] = $dao->object_id;
+      if (self::matchType($type, $dao->operation)) {
+        if ($dao->object_id) {
+          // Permission allowed for this ID.
+          $ids[$dao->object_id] = TRUE;
         }
-      }
-      else {
-        // this user has got the permission for all objects of this type
-        // check if the type matches
-        if (self::matchType($type, $dao->operation)) {
-          foreach ($allGroups as $id => $dontCare) {
-            $ids[] = $id;
-          }
+        elseif (is_array($allGroups)) {
+          // Permission allowed for all objects of this type.
+          $ids += $allGroups;
+          // We don't need to look any further now, assuming allGroups is literally all groups.
+          break;
         }
-        break;
       }
     }
-    return $ids;
+    return array_keys($ids);
   }
 
 }
