@@ -62,17 +62,6 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
     $approvedId = CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCP', 'status_id', 'Approved');
 
-    // check if PCP is created by anonymous user
-    $anonymousPCP = CRM_Utils_Request::retrieve('ap', 'Boolean', $this);
-    if ($anonymousPCP) {
-      $loginURL = $config->userSystem->getLoginURL();
-      $anonMessage = ts('Once you\'ve received your new account welcome email, you can <a href=%1>click here</a> to login and promote your campaign page.', [1 => $loginURL]);
-      CRM_Core_Session::setStatus($anonMessage, ts('Success'), 'success');
-    }
-    else {
-      $statusMessage = ts('The personal campaign page you requested is currently unavailable. However you can still support the campaign by making a contribution here.');
-    }
-
     $pcpBlock = new CRM_PCP_DAO_PCPBlock();
     $pcpBlock->entity_table = CRM_PCP_BAO_PCP::getPcpEntityTable($pcpInfo['page_type']);
     $pcpBlock->entity_id = $pcpInfo['page_id'];
@@ -84,6 +73,21 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     }
     elseif ($pcpInfo['page_type'] == 'event') {
       $urlBase = 'civicrm/event/register';
+    }
+
+    // check if PCP is created by anonymous user
+    $anonymousPCP = CRM_Utils_Request::retrieve('ap', 'Boolean', $this);
+    if ($anonymousPCP) {
+      $loginURL = $config->userSystem->getLoginURL();
+      $anonMessage = ts('Once you\'ve received your new account welcome email, you can <a href=%1>click here</a> to login and promote your campaign page.', [1 => $loginURL]);
+      CRM_Core_Session::setStatus($anonMessage, ts('Success'), 'success');
+      CRM_Utils_System::redirect(CRM_Utils_System::url($urlBase,
+          "reset=1&id=" . $pcpInfo['page_id'],
+          FALSE, NULL, FALSE, TRUE
+      ));
+    }
+    else {
+      $statusMessage = ts('The personal campaign page you requested is currently unavailable. However you can still support the campaign by making a contribution here.');
     }
 
     if ($pcpInfo['status_id'] != $approvedId || !$pcpInfo['is_active']) {
