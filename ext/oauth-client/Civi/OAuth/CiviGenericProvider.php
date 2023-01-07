@@ -17,8 +17,15 @@ use League\OAuth2\Client\Token\AccessToken;
  *   and proprietary scopes+URLs. To use this, set the the option:
  *
  *    "urlResourceOwnerDetails": "{{use_id_token}}",
+ * - Allow support for {{tenant}} token in provider URLs, if the provider has
+ *   the 'tenancy' option set to TRUE (eg: ms-exchange).
  */
 class CiviGenericProvider extends \League\OAuth2\Client\Provider\GenericProvider {
+
+  /**
+   * @var string
+   */
+  protected $tenant;
 
   protected function getAuthorizationParameters(array $options) {
     $newOptions = parent::getAuthorizationParameters($options);
@@ -28,6 +35,46 @@ class CiviGenericProvider extends \League\OAuth2\Client\Provider\GenericProvider
       unset($newOptions['approval_prompt']);
     }
     return $newOptions;
+  }
+
+  /**
+   * Returns the base URL for authorizing a client.
+   *
+   * Eg. https://oauth.service.com/authorize
+   *
+   * @return string
+   */
+  public function getBaseAuthorizationUrl() {
+    $url = parent::getBaseAuthorizationUrl();
+    return $this->replaceTenantToken($url);
+  }
+
+  /**
+   * Returns the base URL for requesting an access token.
+   *
+   * Eg. https://oauth.service.com/token
+   *
+   * @param array $params
+   * @return string
+   */
+  public function getBaseAccessTokenUrl(array $params) {
+    $url = parent::getBaseAccessTokenUrl($params);
+    return $this->replaceTenantToken($url);
+  }
+
+  /**
+   * Replace {{tenant}} in the endpoint URLs with 'common' for consumer accounts
+   * or the tenancy ID for dedicated services.
+   *
+   * @param string $str URL to replace
+   * @return string
+   */
+  private function replaceTenantToken($str) {
+    if (strpos($str, '{{tenant}}') !== FALSE) {
+      $tenant = !empty($this->tenant) ? $this->tenant : 'common';
+      $str = str_replace('{{tenant}}', $tenant, $str);
+    }
+    return $str;
   }
 
   /**

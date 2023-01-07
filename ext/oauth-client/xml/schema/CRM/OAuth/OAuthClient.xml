@@ -49,6 +49,18 @@
   </index>
 
   <field>
+    <name>tenant</name>
+    <title>Tenant ID</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Tenant ID</comment>
+    <add>5.57</add>
+    <permission>
+      manage OAuth client
+    </permission>
+  </field>
+
+  <field>
     <name>secret</name>
     <title>Client Secret</title>
     <type>text</type>

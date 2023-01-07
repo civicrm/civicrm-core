@@ -1,8 +1,8 @@
 {
   "title": "Microsoft Exchange Online",
   "options": {
-    "urlAuthorize": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
-    "urlAccessToken": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    "urlAuthorize": "https://login.microsoftonline.com/{{tenant}}/oauth2/v2.0/authorize",
+    "urlAccessToken": "https://login.microsoftonline.com/{{tenant}}/oauth2/v2.0/token",
     "urlResourceOwnerDetails": "{{use_id_token}}",
     "scopeSeparator": " ",
     "scopes": [
@@ -12,7 +12,8 @@
       "openid",
       "email",
       "offline_access"
-    ]
+    ],
+    "tenancy": true
   },
   "mailSettingsTemplate": {
     "name": "{{token.resource_owner.email}}",

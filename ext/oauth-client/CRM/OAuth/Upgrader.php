@@ -36,4 +36,16 @@ class CRM_OAuth_Upgrader extends CRM_OAuth_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * Add support for tenancy
+   *
+   * @return bool
+   * @throws Exception
+   */
+  public function upgrade_5581(): bool {
+    $this->ctx->log->info('Applying oauth-client update 5581. Adding tenant column to the civicrm_oauth_client table.');
+    $this->addTask('Add Tenant ID to civicrm_oauth_client', 'addColumn', 'civicrm_oauth_client', 'tenant', 'varchar(128) NULL COMMENT "Tenant ID" AFTER guid');
+    return TRUE;
+  }
+
 }
