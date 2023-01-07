@@ -26,10 +26,58 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   private $_mergeCases = FALSE;
 
   /**
+   * Related case view
+   *
+   * @var bool
+   * @internal
+   */
+  public $_showRelatedCases = FALSE;
+
+  /**
+   * Does user have capabilities to access all cases and activities
+   *
+   * @var bool
+   * @internal
+   */
+  public $_hasAccessToAllCases = FALSE;
+
+  /**
+   * ID of contact being viewed
+   *
+   * @var int
+   * @internal
+   */
+  public $_contactID;
+
+  /**
+   * ID of case being viewed
+   *
+   * @var int
+   * @internal
+   */
+  public $_caseID;
+
+  /**
+   * Various case details, for use in the template
+   *
+   * @var array
+   * @internal
+   */
+  public $_caseDetails = [];
+
+  /**
+   * The name of the type associated with the current case
+   *
+   * @var string
+   * @internal
+   */
+  public $_caseType;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->_showRelatedCases = $_GET['relatedCases'] ?? NULL;
+    $this->_showRelatedCases = (bool) ($_GET['relatedCases'] ?? FALSE);
 
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
     $isMultiClient = $xmlProcessorProcess->getAllowMultipleCaseClients();
@@ -40,7 +88,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     if ($this->_showRelatedCases) {
       $relatedCases = $this->get('relatedCases');
       if (!isset($relatedCases)) {
-        $cId = CRM_Utils_Request::retrieve('cid', 'Integer');
         $caseId = CRM_Utils_Request::retrieve('id', 'Integer');
         $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId);
       }
