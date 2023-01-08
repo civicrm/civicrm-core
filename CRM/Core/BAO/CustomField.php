@@ -752,7 +752,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   True if used for search else false.
    * @param string $label
    *   Label for custom field.
-   * @return \HTML_QuickForm_Element|null
+   * @return \HTML_QuickForm_element|null
    * @throws \CRM_Core_Exception
    */
   public static function addQuickFormElement(

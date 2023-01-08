@@ -416,7 +416,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   For datepicker elements this is consistent with the data
    *   from CRM_Utils_Date::getDatePickerExtra
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    *   Could be an error object
    *
    * @throws \CRM_Core_Exception
@@ -1598,7 +1598,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - context - @see CRM_Core_DAO::buildOptionsContext
    * @param bool $required
    * @throws CRM_Core_Exception
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addSelect($name, $props = [], $required = FALSE) {
     if (!isset($props['entity'])) {
@@ -1713,7 +1713,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws \CRM_Core_Exception
    * @throws \Exception
    * @return mixed
-   *   HTML_QuickForm_Element
+   *   HTML_QuickForm_element
    *   void
    */
   public function addField($name, $props = [], $required = FALSE, $legacyDate = TRUE) {
@@ -2138,7 +2138,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $defaultCurrency
    * @param bool $freezeCurrency
    *
-   * @return \HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addMoney(
     $name,
@@ -2222,7 +2222,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - class, etc. - other html properties
    * @param bool $required
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addEntityRef($name, $label = '', $props = [], $required = FALSE) {
     // Default properties
@@ -2538,7 +2538,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $elementName
    * @param array $settings
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addChainSelect($elementName, $settings = []) {
     $required = $settings['required'] ?? FALSE;

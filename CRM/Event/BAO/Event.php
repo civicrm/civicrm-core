@@ -722,13 +722,13 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
   /**
    * Get the complete information for one or more events.
    *
-   * @param date $start
+   * @param Date $start
    *   Get events with start date >= this date.
    * @param int $type Get events on the a specific event type (by event_type_id).
    *   Get events on the a specific event type (by event_type_id).
    * @param int $eventId Return a single event - by event id.
    *   Return a single event - by event id.
-   * @param date $end
+   * @param Date $end
    *   Also get events with end date >= this date.
    * @param bool $onlyPublic Include public events only, default TRUE.
    *   Include public events only, default TRUE.
