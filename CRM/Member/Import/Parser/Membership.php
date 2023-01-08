@@ -204,7 +204,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       if (empty($formatValues['id']) && empty($formatValues['contact_id'])) {
         $error = $this->checkContactDuplicate($formatValues);
 
-        if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
+        if (CRM_Core_Error::isAPIError($error, CRM_Core_Error::DUPLICATE_CONTACT)) {
           $matchedIDs = (array) $error['error_message']['params'];
           if (count($matchedIDs) > 1) {
             throw new CRM_Core_Exception('Multiple matching contact records detected for this row. The membership was not imported', CRM_Import_Parser::ERROR);

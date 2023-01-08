@@ -2695,7 +2695,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $communicationMethods = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
 
     // Explode padded values.
-    $values = CRM_utils_array::explodePadded($value);
+    $values = CRM_Utils_Array::explodePadded($value);
     // Flip values, compute intersection with $communicationMethods, and implode with commas.
     $value = implode(', ', array_intersect_key($communicationMethods, array_flip($values)));
     return $value;
