@@ -20,6 +20,10 @@
  */
 class CRM_Case_Form_Activity_ChangeCaseStatus {
 
+  public $_caseId;
+
+  public $_oldCaseStatus;
+
   /**
    * @param CRM_Core_Form $form
    *

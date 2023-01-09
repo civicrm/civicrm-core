@@ -49,6 +49,10 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    */
   public $_caseTypeDefinition;
 
+  public $_defaultCaseStatus;
+
+  public $_oldCaseStatus;
+
   /**
    * Build the form object.
    */

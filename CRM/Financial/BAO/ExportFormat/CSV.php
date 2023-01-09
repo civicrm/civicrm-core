@@ -32,6 +32,10 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     'CUST',
   ];
 
+  protected $_batchIds;
+
+  protected $_downloadFile;
+
   /**
    * @param array $exportParams
    */

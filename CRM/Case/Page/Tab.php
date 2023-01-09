@@ -28,6 +28,9 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   public static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
+  public $_action = NULL;
+  public $_id;
+  public $_context;
 
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');

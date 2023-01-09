@@ -31,6 +31,13 @@ trait CRM_Core_Form_EntityFormTrait {
   protected $_entitySubTypeId = NULL;
 
   /**
+   * Message to show when we are deleting an entity
+   *
+   * @var string
+   */
+  protected $deleteMessage;
+
+  /**
    * Get entity fields for the entity to be added to the form.
    *
    * @return array

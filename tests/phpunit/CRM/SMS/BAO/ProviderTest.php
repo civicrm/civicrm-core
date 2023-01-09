@@ -19,6 +19,12 @@
 class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
 
   /**
+   * SMS Provider Option ID
+   * @var int
+   */
+  protected $option_value;
+
+  /**
    * Set Up Funtion
    */
   public function setUp(): void {

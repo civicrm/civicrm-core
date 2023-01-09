@@ -34,6 +34,28 @@ class CRM_Import_Forms extends CRM_Core_Form {
   protected $userJobID;
 
   /**
+   * Number of columns
+   *
+   * @var int
+   */
+  protected $_columnCount;
+
+
+  /**
+   * Column Names
+   *
+   * @var array
+   */
+  protected $_columnNames;
+
+  /**
+   * Values
+   *
+   * @var array
+   */
+  protected $_dataValues;
+
+  /**
    * @return int|null
    */
   public function getUserJobID(): ?int {

@@ -73,6 +73,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    */
   public $_caseType;
 
+  public $_entityTagValues;
+
   /**
    * Set variables up before form is built.
    */

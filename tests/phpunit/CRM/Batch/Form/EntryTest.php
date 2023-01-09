@@ -82,6 +82,18 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    */
   protected $isValidateFinancialsOnPostAssert = TRUE;
 
+  protected $_relationshipTypeId;
+
+  protected $_orgContactID;
+
+  protected $_financialTypeId;
+
+  protected $_orgContactID2;
+
+  protected $_membershipTypeID2;
+
+  protected $_membershipStatusID;
+
   /**
    * @throws \CRM_Core_Exception
    */

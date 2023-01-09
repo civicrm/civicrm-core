@@ -193,6 +193,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public $setupIDs = [];
 
+  protected $tablesToTruncate;
+
   /**
    *  Constructor.
    *

@@ -108,6 +108,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $currentRowExistingMembership;
 
   /**
+   * @var array
+   */
+  protected $_priceSet;
+
+  /**
    * Get the contribution id for the current row.
    *
    * @return int

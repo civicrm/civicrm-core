@@ -26,6 +26,26 @@ class CRM_Core_ScheduledJob {
 
   public $remarks = [];
 
+  public $class;
+
+  public $parameters;
+
+  public $last_run;
+
+  public $id;
+
+  public $domain_id;
+
+  public $run_frequency;
+
+  public $description;
+
+  public $api_entity;
+
+  public $api_action;
+
+  public $is_active;
+
   /**
    * @param array $params
    */

@@ -19,7 +19,6 @@
  * This class generates form element for free tag widget.
  */
 class CRM_Core_Form_Tag {
-  public $_entityTagValues;
 
   /**
    * Build tag widget if correct parent is passed
