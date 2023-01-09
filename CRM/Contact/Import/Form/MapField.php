@@ -473,11 +473,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * e.g ['first_name' => FALSE, 'email' => TRUE, 'street_address' => TRUE']
    *
-   * @param bool $name
+   * @param string $name
    *
    * @return bool
    */
-  private function isLocationTypeRequired(bool $name): bool {
+  private function isLocationTypeRequired(string $name): bool {
     if (!isset(Civi::$statics[__CLASS__]['location_fields'])) {
       Civi::$statics[__CLASS__]['location_fields'] = (new CRM_Contact_Import_Parser_Contact())->setUserJobID($this->getUserJobID())->getFieldsWhichSupportLocationTypes();
     }
