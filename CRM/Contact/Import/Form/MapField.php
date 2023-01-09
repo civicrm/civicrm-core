@@ -75,8 +75,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     //format custom field names, CRM-2676
     $contactType = $this->getContactType();
 
-    $this->_contactType = $contactType;
-
     if ($this->isIgnoreDuplicates()) {
       //Mark Dedupe Rule Fields as required, since it's used in matching contact
       foreach (CRM_Contact_BAO_ContactType::basicTypes() as $cType) {
@@ -117,8 +115,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
-    $hasColumnNames = $this->getSubmittedValue('skipColumnHeader');
-
+    $hasColumnNames = !empty($this->getDataSourceObject()->getColumnHeaders());
 
     $this->getLocationTypes();
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
@@ -203,7 +200,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
 
         //fix to append custom group name to field name, CRM-2676
-        if (empty($this->_formattedFieldNames[$cType]) || $cType == $this->_contactType) {
+        if (empty($this->_formattedFieldNames[$cType]) || $cType === $this->getContactType()) {
           $this->_formattedFieldNames[$cType] = $this->formatCustomFieldName($values);
         }
 
@@ -215,7 +212,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           is_array($this->_dedupeFields[$cType])
         ) {
           static $cTypeArray = [];
-          if ($cType != $this->_contactType && !in_array($cType, $cTypeArray)) {
+          if ($cType !== $this->getContactType() && !in_array($cType, $cTypeArray)) {
             foreach ($this->_dedupeFields[$cType] as $val) {
               if ($valTitle = CRM_Utils_Array::value($val, $this->_formattedFieldNames[$cType])) {
                 $this->_formattedFieldNames[$cType][$val] = $valTitle . ' (match to contact)';
@@ -226,7 +223,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
 
         foreach ($highlightedFields as $k => $v) {
-          if ($v == $cType || $v === 'All') {
+          if ($v === $cType || $v === 'All') {
             $highlightedRelFields[$key][] = $k;
           }
         }
