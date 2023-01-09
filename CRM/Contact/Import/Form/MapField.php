@@ -72,7 +72,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function preProcess(): void {
     $this->_mapperFields = $this->getAvailableFields();
-    $this->_contactSubType = $this->getSubmittedValue('contactSubType');
     //format custom field names, CRM-2676
     $contactType = $this->getContactType();
 
