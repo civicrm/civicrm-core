@@ -173,12 +173,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $id = $first = $second = NULL;
       }
       if (($first === 'a' && $second === 'b') || ($first === 'b' && $second === 'a')) {
-        $cType = $contactRelationCache[$id]["contact_type_{$second}"];
+        $cType = $contactRelationCache[$id]["contact_type_$second"];
 
-        //CRM-5125 for contact subtype specific relationshiptypes
+        //CRM-5125 for contact subtype specific RelationshipTypes
         $cSubType = NULL;
-        if (!empty($contactRelationCache[$id]["contact_sub_type_{$second}"])) {
-          $cSubType = $contactRelationCache[$id]["contact_sub_type_{$second}"];
+        if (!empty($contactRelationCache[$id]["contact_sub_type_$second"])) {
+          $cSubType = $contactRelationCache[$id]["contact_sub_type_$second"];
         }
 
         if (!$cType) {
@@ -328,10 +328,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array|bool
+   * @return bool
    *   list of errors to be posted back to the form
    */
-  public static function formRule(array $fields) {
+  public static function formRule(array $fields): bool {
     if (!empty($fields['saveMapping'])) {
       // todo - this is nonsensical - sane js is better. PR to fix got stale but
       // is here https://github.com/civicrm/civicrm-core/pull/23950
@@ -374,7 +374,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       if (!empty($groupTitles)) {
         foreach ($groupTitles as $fId => $values) {
-          $key = "custom_{$fId}";
+          $key = "custom_$fId";
           $groupTitle = $values['groupTitle'];
           $formattedFieldNames[$key] = $fields[$key] . ' :: ' . $groupTitle;
         }
