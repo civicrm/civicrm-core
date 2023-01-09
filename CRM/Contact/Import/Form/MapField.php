@@ -120,10 +120,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $hasColumnNames = $this->getSubmittedValue('skipColumnHeader');
 
 
-    $this->_location_types = ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $this->getLocationTypes();
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     $this->assign('defaultLocationType', $defaultLocationType->id);
-    $this->assign('defaultLocationTypeLabel', $this->_location_types[$defaultLocationType->id]);
+    $this->assign('defaultLocationTypeLabel', $this->getLocationTypeLabel($defaultLocationType->id));
 
     /* Initialize all field usages to false */
     foreach ($mapperKeys as $key) {
@@ -137,7 +137,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
-    foreach ($this->_location_types as $key => $value) {
+    foreach ($this->getLocationTypes() as $key => $value) {
       $sel3['phone'][$key] = &$phoneTypes;
       $sel3['phone_ext'][$key] = &$phoneTypes;
       //build array for IM service provider type for contact
@@ -192,7 +192,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         foreach ($relatedFields as $name => $field) {
           $values[$name] = $field['title'];
           if ($this->isLocationTypeRequired($name)) {
-            $sel3[$key][$name] = $this->_location_types;
+            $sel3[$key][$name] = $this->getLocationTypes();
           }
           elseif ($name === 'url') {
             $sel3[$key][$name] = $websiteTypes;
@@ -246,7 +246,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           }
         }
 
-        foreach ($this->_location_types as $k => $value) {
+        foreach ($this->getLocationTypes() as $k => $value) {
           $sel4[$key]['phone'][$k] = &$phoneTypes;
           $sel4[$key]['phone_ext'][$k] = &$phoneTypes;
           //build array of IM service provider for related contact
@@ -256,7 +256,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       else {
         $options = NULL;
         if ($this->isLocationTypeRequired($key)) {
-          $options = $this->_location_types;
+          $options = $this->getLocationTypes();
         }
         elseif ($key === 'url') {
           $options = $websiteTypes;
@@ -489,6 +489,25 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($this->getUserJobID());
     return $parser;
+  }
+
+  /**
+   * Get the location types for import, including the pseudo-type 'Primary'.
+   *
+   * @return array
+   */
+  protected function getLocationTypes(): array {
+    return ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+  }
+
+  /**
+   * Get the location types for import, including the pseudo-type 'Primary'.
+   * @param int|string $type
+   *   Location Type ID or 'Primary'.
+   * @return string
+   */
+  protected function getLocationTypeLabel($type): string {
+    return $this->getLocationTypes()[$type];
   }
 
 }
