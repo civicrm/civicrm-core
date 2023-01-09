@@ -41,7 +41,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return string
    */
-  public function defaultFromColumnName($columnName) {
+  public function defaultFromColumnName(string $columnName): string {
 
     if (!preg_match('/^[a-z0-9 ]$/i', $columnName)) {
       if ($columnKey = array_search($columnName, $this->getFieldTitles())) {
@@ -70,7 +70,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function preProcess() {
+  public function preProcess(): void {
     $this->_mapperFields = $this->getAvailableFields();
     $this->_contactSubType = $this->getSubmittedValue('contactSubType');
     //format custom field names, CRM-2676
@@ -109,7 +109,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->addSavedMappingFields();
 
     $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'formRule']);
@@ -334,7 +334,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public static function formRule(array $fields) {
     if (!empty($fields['saveMapping'])) {
-      // todo - this is non-sensical - sane js is better. PR to fix got stale but
+      // todo - this is nonsensical - sane js is better. PR to fix got stale but
       // is here https://github.com/civicrm/civicrm-core/pull/23950
       CRM_Core_Smarty::singleton()->assign('isCheked', TRUE);
     }
@@ -343,8 +343,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Process the mapped fields and map it into the uploaded file.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $params = $this->controller->exportValues('MapField');
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     $this->submit($params);
@@ -359,7 +361,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array
    */
-  public function formatCustomFieldName($fields) {
+  public function formatCustomFieldName(array $fields): array {
     //CRM-2676, replacing the conflict for same custom field name from different custom group.
     $fieldIds = $formattedFieldNames = [];
     foreach ($fields as $key => $value) {
@@ -388,12 +390,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * Extracted to add testing & start refactoring.
    *
-   * @param $params
-   * @param $mapperKeys
+   * @param array $params
    *
    * @throws \CRM_Core_Exception
    */
-  public function submit($params) {
+  public function submit(array $params): void {
     $this->set('columnNames', $this->_columnNames);
 
     // store mapping Id to display it in the preview page
@@ -431,7 +432,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Did the user specify duplicates matching should not be attempted.
    *
    * @return bool
-   * @throws \CRM_Core_Exception
    */
   private function isIgnoreDuplicates(): bool {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_NOCHECK;
@@ -473,9 +473,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * e.g ['first_name' => FALSE, 'email' => TRUE, 'street_address' => TRUE']
    *
+   * @param bool $name
+   *
    * @return bool
    */
-  private function isLocationTypeRequired($name): bool {
+  private function isLocationTypeRequired(bool $name): bool {
     if (!isset(Civi::$statics[__CLASS__]['location_fields'])) {
       Civi::$statics[__CLASS__]['location_fields'] = (new CRM_Contact_Import_Parser_Contact())->setUserJobID($this->getUserJobID())->getFieldsWhichSupportLocationTypes();
     }
