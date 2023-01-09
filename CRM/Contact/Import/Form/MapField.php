@@ -117,7 +117,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
-    $hasColumnNames = !empty($this->_columnNames);
+    $hasColumnNames = $this->getSubmittedValue('skipColumnHeader');
+
 
     $this->_location_types = ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
@@ -292,7 +293,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       else {
         if ($hasColumnNames) {
           // do array search first to see if has mapped key
-          $columnKey = array_search($this->_columnNames[$i], $this->getFieldTitles());
+          $columnKey = array_search($columnHeader, $this->getFieldTitles(), TRUE);
           if (isset($this->_fieldUsed[$columnKey])) {
             $defaults["mapper[$i]"] = [$columnKey];
             $this->_fieldUsed[$key] = TRUE;
@@ -300,7 +301,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           else {
             // Infer the default from the column names if we have them
             $defaults["mapper[$i]"] = [
-              $this->defaultFromColumnName($this->_columnNames[$i]),
+              $this->defaultFromColumnName($columnHeader),
             ];
           }
         }
@@ -394,8 +395,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function submit(array $params): void {
-    $this->set('columnNames', $this->_columnNames);
-
     // store mapping Id to display it in the preview page
     $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
 
