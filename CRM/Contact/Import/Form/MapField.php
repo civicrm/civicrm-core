@@ -277,9 +277,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor->setContactSubType($this->getSubmittedValue('contactSubType'));
     $mapper = $this->getSubmittedValue('mapper');
 
-    for ($i = 0; $i < $this->_columnCount; $i++) {
+    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
-      $last_key = 0;
 
       // Don't set any defaults if we are going to the next page.
       // ... or coming back.

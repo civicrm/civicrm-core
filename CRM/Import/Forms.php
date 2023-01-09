@@ -678,7 +678,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function assignMapFieldVariables(): void {
     $this->addExpectedSmartyVariables(['highlightedRelFields', 'initHideBoxes']);
-    $this->_columnCount = $this->getNumberOfColumns();
     $this->_columnNames = $this->getColumnHeaders();
     $this->_dataValues = array_values($this->getDataRows([], 2));
     $this->assign('columnNames', $this->getColumnHeaders());

@@ -39,13 +39,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   protected $_mapperFields;
 
   /**
-   * Number of columns in import file
-   *
-   * @var int
-   */
-  protected $_columnCount;
-
-  /**
    * Column headers, if we have them
    *
    * @var array
