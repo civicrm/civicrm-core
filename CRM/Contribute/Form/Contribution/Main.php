@@ -1406,6 +1406,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Set form variables if contribution ID is found
    */
   public function assignFormVariablesByContributionID() {
+    $dummyTitle = 0;
+    foreach ($this->_paymentProcessors as $pp) {
+      if ($pp['class_name'] == 'Payment_Dummy') {
+        $dummyTitle = $pp['name'];
+        break;
+      }
+    }
+    $this->assign('dummyTitle', $dummyTitle);
+
     if (empty($this->_ccid)) {
       return;
     }
