@@ -145,7 +145,7 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
           'asset' => [$name, $params],
           'exp' => 86400 * (floor(\CRM_Utils_Time::time() / 86400) + 2),
           // Caching-friendly TTL -- We want the URL to be stable for a decent amount of time.
-        ]),
+        ], ['SIGN', 'WEAK_SIGN']),
       ], TRUE, NULL, FALSE);
     }
   }
@@ -342,7 +342,7 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
       /** @var Assetbuilder $assets */
       $assets = \Civi::service('asset_builder');
 
-      $obj = \Civi::service('crypto.jwt')->decode($get['aj']);
+      $obj = \Civi::service('crypto.jwt')->decode($get['aj'], ['SIGN', 'WEAK_SIGN']);
       $arr = json_decode(json_encode($obj), TRUE);
       return $assets->render($arr['asset'][0], $arr['asset'][1]);
     }
