@@ -4,7 +4,7 @@ use CRM_Afform_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Afform_Upgrader extends CRM_Afform_Upgrader_Base {
+class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Update names of blocks and joins
