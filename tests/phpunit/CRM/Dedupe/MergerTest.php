@@ -787,7 +787,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCustomDataOverwrite() {
+  public function testCustomDataOverwrite(): void {
     // Create Custom Field
     $createGroup = $this->setupCustomGroupForIndividual();
     $createField = $this->setupCustomField('Graduation', $createGroup);
@@ -819,7 +819,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // update the text custom field for duplicate contact 2 with value 'ghi'
     $this->callAPISuccess('Contact', 'create', [
       'id' => $duplicateContactID2,
-      "{$customFieldName}" => 'ghi',
+      (string) ($customFieldName) => 'ghi',
     ]);
     $this->assertCustomFieldValue($duplicateContactID2, 'ghi', $customFieldName);
 
