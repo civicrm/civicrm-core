@@ -21,6 +21,12 @@
 class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
 
   /**
+   * @var CRM_Utils_Pager
+   * @internal
+   */
+  public $_pager;
+
+  /**
    * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
