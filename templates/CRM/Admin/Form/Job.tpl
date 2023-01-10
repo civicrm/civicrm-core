@@ -92,7 +92,7 @@ CRM.$(function($) {
     <tr class="crm-job-form-block-scheduled-run-date">
         <td class="label">{$form.scheduled_run_date.label}</td>
         <td>{$form.scheduled_run_date.html}<br />
-            <div dlass="description">{ts}Do not run this job before this date / time. The run frequency selected above will apply thereafter.{/ts}<br />
+            <div class="description">{ts}Do not run this job before this date / time. The run frequency selected above will apply thereafter.{/ts}<br />
               {if $action eq 1}{ts}Leave blank to run as soon as possible.{/ts}{else}{ts}Leave blank to run at next run frequency.{/ts}{/if}
             </div>
         </td>
