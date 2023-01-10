@@ -1114,4 +1114,13 @@ abstract class CRM_Utils_System_Base {
     return [];
   }
 
+  /**
+   * Suppress profile form errors
+   *
+   * @return bool
+   */
+  public function suppressProfileFormErrors() {
+    return FALSE;
+  }
+
 }
