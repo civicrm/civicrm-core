@@ -19,6 +19,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   protected $_params;
   protected $_noteID;
   protected $_note;
+  protected $_createdDate;
 
   public function setUp(): void {
 
