@@ -27,94 +27,96 @@ use Civi\Test\TransactionalInterface;
  */
 class SaveTest extends Api4TestBase implements TransactionalInterface {
 
+  public function provideDataForSaveTestWithMatchingCriteria() {
+    return [
+      'non-empty match value' => ['Foo'],
+      'empty string match value' => [''],
+      'null match value' => [NULL],
+    ];
+  }
+
   /**
    * @return void
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
+   * @dataProvider provideDataForSaveTestWithMatchingCriteria
    */
-  public function testSaveWithMatchingCriteria() {
-    foreach (['Kiddo', '', NULL] as $testValue) {
-      $zakOriginal = [
-        'nick_name' => $testValue,
-        'first_name' => 'Zak',
-        'last_name' => 'Original',
-      ];
+  public function testSaveWithMatchingCriteria($matchValueUnderTest) {
+    $originalZak = [
+      'nick_name' => $matchValueUnderTest,
+      'first_name' => 'Zak',
+      'last_name' => 'Original',
+    ];
 
-      $zakOriginal['id'] = Contact::create(FALSE)
-        ->setValues($zakOriginal)
-        ->execute()->single()['id'];
+    $originalZak['id'] = Contact::create(FALSE)
+      ->setValues($originalZak)
+      ->execute()->single()['id'];
 
-      $bobOriginal = [
-        'nick_name' => 'bob',
-        'first_name' => 'Bob',
-        'last_name' => 'Original',
-      ];
+    $originalBob = [
+      'nick_name' => 'bob',
+      'first_name' => 'Bob',
+      'last_name' => 'Original',
+    ];
 
-      $bobOriginal['id'] = Contact::create(FALSE)
-        ->setValues($bobOriginal)
-        ->execute()->single()['id'];
+    $originalBob['id'] = Contact::create(FALSE)
+      ->setValues($originalBob)
+      ->execute()->single()['id'];
 
-      // This modified version of Zak will match with the existing Zak
-      // (nickname and first name both match)
+    // This modified version of Zak will match with the existing Zak
+    // (nickname and first name both match)
 
-      $sameZakWithChangedLastName = [
-        'nick_name' => $zakOriginal['nick_name'],
-        'first_name' => $zakOriginal['first_name'],
-        'last_name' => 'Changed',
-      ];
+    $sameZakWithChangedLastName = [
+      'nick_name' => $originalZak['nick_name'],
+      'first_name' => $originalZak['first_name'],
+      'last_name' => 'Changed',
+    ];
 
-      $sameZakWithChangedLastName['id'] = Contact::save(FALSE)
-        ->setMatch(['first_name', 'nick_name'])
-        ->setRecords([$sameZakWithChangedLastName])
-        ->execute()->single()['id'];
+    $sameZakWithChangedLastName['id'] = Contact::save(FALSE)
+      ->setMatch(['first_name', 'nick_name'])
+      ->setRecords([$sameZakWithChangedLastName])
+      ->execute()->single()['id'];
 
-      self::assertEquals($zakOriginal['id'], $sameZakWithChangedLastName['id']);
+    self::assertEquals($originalZak['id'], $sameZakWithChangedLastName['id']);
 
-      // This new Bob will not match the existing Bob
-      // (first name matches, but nickname is different)
+    // This new Bob will not match the existing Bob
+    // (first name matches, but nickname is different)
 
-      self::assertNotEquals($bobOriginal['nick_name'], $testValue);
+    self::assertNotEquals($originalBob['nick_name'], $matchValueUnderTest);
 
-      $anotherBob = [
-        'nick_name' => $testValue,
-        'first_name' => $bobOriginal['first_name'],
-        'last_name' => 'Changed',
-      ];
+    $otherBob = [
+      'nick_name' => $matchValueUnderTest,
+      'first_name' => $originalBob['first_name'],
+      'last_name' => 'Changed',
+    ];
 
-      $anotherBob['id'] = Contact::save(FALSE)
-        ->setMatch(['first_name', 'nick_name'])
-        ->setRecords([$anotherBob])
-        ->execute()->single()['id'];
+    $otherBob['id'] = Contact::save(FALSE)
+      ->setMatch(['first_name', 'nick_name'])
+      ->setRecords([$otherBob])
+      ->execute()->single()['id'];
 
-      self::assertGreaterThan($bobOriginal['id'], $anotherBob['id']);
+    self::assertGreaterThan($originalBob['id'], $otherBob['id']);
 
-      $allContactIds = [
-        $zakOriginal['id'],
-        $sameZakWithChangedLastName['id'],
-        $bobOriginal['id'],
-        $anotherBob['id'],
-      ];
+    $allContactIds = [
+      $originalZak['id'],
+      $sameZakWithChangedLastName['id'],
+      $originalBob['id'],
+      $otherBob['id'],
+    ];
 
-      $allCreatedAndSavedContacts = Contact::get(FALSE)
-        ->setSelect(['id', 'first_name', 'last_name', 'nick_name'])
-        ->addWhere('id', 'IN', $allContactIds)
-        ->execute()->indexBy('id');
+    $allCreatedAndSavedContacts = Contact::get(FALSE)
+      ->setSelect(['id', 'first_name', 'last_name', 'nick_name'])
+      ->addWhere('id', 'IN', $allContactIds)
+      ->execute()->indexBy('id');
 
-      self::assertCount(3, $allCreatedAndSavedContacts);
+    self::assertCount(3, $allCreatedAndSavedContacts);
 
-      $expected = [
-        $zakOriginal['id'] => $sameZakWithChangedLastName,
-        $bobOriginal['id'] => $bobOriginal,
-        $anotherBob['id'] => $anotherBob,
-      ];
+    $expected = [
+      $originalZak['id'] => $sameZakWithChangedLastName,
+      $originalBob['id'] => $originalBob,
+      $otherBob['id'] => $otherBob,
+    ];
 
-      self::assertEquals($expected, $allCreatedAndSavedContacts->getArrayCopy());
-
-      Contact::delete(FALSE)
-        ->setUseTrash(FALSE)
-        ->addWhere('id', 'IN', $allContactIds)
-        ->execute();
-    }
+    self::assertEquals($expected, $allCreatedAndSavedContacts->getArrayCopy());
   }
 
 }
