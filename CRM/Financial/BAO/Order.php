@@ -1246,7 +1246,7 @@ class CRM_Financial_BAO_Order {
         $lineItemTitle .= ' ' . CRM_Utils_String::ellipsify($description, 30);
       }
     }
-    return $lineItemTitle;
+    return $lineItemTitle ?? '';
   }
 
 }
