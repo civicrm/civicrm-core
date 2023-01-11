@@ -1159,4 +1159,34 @@ abstract class CRM_Utils_System_Base {
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
   }
 
+  /**
+   * Has CMS users table
+   *
+   * @return bool
+   */
+  public function hasUsersTable():bool {
+    return FALSE;
+  }
+
+  /**
+   * CiviCRM Table prefixes
+   *   To display for CMS integration.
+   *
+   * @return string
+   */
+  public function viewsIntegration():string {
+    return '';
+  }
+
+  /**
+   * Can set base page for CiviCRM
+   *   By default, CiviCRM will generate front-facing pages
+   *   using the home page. This allows a different template
+   *   for CiviCRM pages.
+   * @return bool
+   */
+  public function canSetBasePage():bool {
+    return FALSE;
+  }
+
 }
