@@ -171,19 +171,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $id = $first = $second = NULL;
       }
       if (($first === 'a' && $second === 'b') || ($first === 'b' && $second === 'a')) {
-        $cType = $contactRelationCache[$id]["contact_type_$second"];
+        $relatedContactType = $contactRelationCache[$id]["contact_type_$second"] ?: 'All';
 
         //CRM-5125 for contact subtype specific RelationshipTypes
-        $cSubType = NULL;
-        if (!empty($contactRelationCache[$id]["contact_sub_type_$second"])) {
-          $cSubType = $contactRelationCache[$id]["contact_sub_type_$second"];
-        }
+        $relatedContactSubType = $contactRelationCache[$id]["contact_sub_type_$second"] ?? NULL;
 
-        if (!$cType) {
-          $cType = 'All';
-        }
-
-        $relatedFields = CRM_Contact_BAO_Contact::importableFields($cType);
+        $relatedFields = CRM_Contact_BAO_Contact::importableFields($relatedContactType);
         unset($relatedFields['']);
         $values = [];
         foreach ($relatedFields as $name => $field) {
@@ -200,39 +193,39 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
 
         //fix to append custom group name to field name, CRM-2676
-        if (empty($this->_formattedFieldNames[$cType]) || $cType === $this->getContactType()) {
-          $this->_formattedFieldNames[$cType] = $this->formatCustomFieldName($values);
+        if (empty($this->_formattedFieldNames[$relatedContactType]) || $relatedContactType === $this->getContactType()) {
+          $this->_formattedFieldNames[$relatedContactType] = $this->formatCustomFieldName($values);
         }
 
-        $this->_formattedFieldNames[$cType] = array_merge($values, $this->_formattedFieldNames[$cType]);
+        $this->_formattedFieldNames[$relatedContactType] = array_merge($values, $this->_formattedFieldNames[$relatedContactType]);
 
         //Modified the Relationship fields if the fields are
         //present in dedupe rule
-        if ($this->isIgnoreDuplicates() && !empty($this->_dedupeFields[$cType]) &&
-          is_array($this->_dedupeFields[$cType])
+        if ($this->isIgnoreDuplicates() && !empty($this->_dedupeFields[$relatedContactType]) &&
+          is_array($this->_dedupeFields[$relatedContactType])
         ) {
           static $cTypeArray = [];
-          if ($cType !== $this->getContactType() && !in_array($cType, $cTypeArray)) {
-            foreach ($this->_dedupeFields[$cType] as $val) {
-              if ($valTitle = CRM_Utils_Array::value($val, $this->_formattedFieldNames[$cType])) {
-                $this->_formattedFieldNames[$cType][$val] = $valTitle . ' (match to contact)';
+          if ($relatedContactType !== $this->getContactType() && !in_array($relatedContactType, $cTypeArray)) {
+            foreach ($this->_dedupeFields[$relatedContactType] as $val) {
+              if ($valTitle = CRM_Utils_Array::value($val, $this->_formattedFieldNames[$relatedContactType])) {
+                $this->_formattedFieldNames[$relatedContactType][$val] = $valTitle . ' (match to contact)';
               }
             }
-            $cTypeArray[] = $cType;
+            $cTypeArray[] = $relatedContactType;
           }
         }
 
         foreach ($highlightedFields as $k => $v) {
-          if ($v === $cType || $v === 'All') {
+          if ($v === $relatedContactType || $v === 'All') {
             $highlightedRelFields[$key][] = $k;
           }
         }
         $this->assign('highlightedRelFields', $highlightedRelFields);
-        $sel2[$key] = $this->_formattedFieldNames[$cType];
+        $sel2[$key] = $this->_formattedFieldNames[$relatedContactType];
 
-        if (!empty($cSubType)) {
+        if (!empty($relatedContactSubType)) {
           //custom fields for sub type
-          $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($cSubType);
+          $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($relatedContactSubType);
 
           if (!empty($subTypeFields)) {
             $subType = NULL;
