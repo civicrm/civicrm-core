@@ -729,7 +729,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
     if ($checkPermission == CRM_Core_Permission::CREATE) {
       $checkPermission = CRM_Core_Permission::EDIT;
     }
-    $cacheKey = 'uf_group_custom_fields_' . $ctype . '_' . (int) $checkPermission;
+    // Make the cache user specific by adding the ID to the key.
+    $id = CRM_Core_Session::getLoggedInContactID();
+    $cacheKey = 'uf_group_custom_fields_' . $ctype . '_' . $id . '_' . (int) $checkPermission;
     if (!Civi::cache('metadata')->has($cacheKey)) {
       $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, $checkPermission, TRUE);
 
@@ -916,10 +918,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
 
         $template = CRM_Core_Smarty::singleton();
 
-        // Hide CRM error messages if they are set by the CMS.
-        if (!empty($_POST)) {
-          $supressForm = CRM_Core_Config::singleton()->userSystem->suppressProfileFormErrors();
-          $template->assign('suppressForm', $supressForm);
+        // Hide CRM error messages if they are displayed using drupal form_set_error.
+        if (!empty($_POST) && CRM_Core_Config::singleton()->userFramework == 'Drupal') {
+          if (arg(0) == 'user' || (arg(0) == 'admin' && arg(1) == 'people')) {
+            $template->assign('suppressForm', TRUE);
+          }
         }
 
         $templateFile = "CRM/Profile/Form/{$profileID}/Dynamic.tpl";
