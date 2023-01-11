@@ -915,4 +915,33 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return '<p><strong>' . ts('To enable CiviCRM Views integration, install the <a %1>CiviCRM Entity</a> module.', [1 => 'href="https://www.drupal.org/project/civicrm_entity"']) . '</strong></p>';
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    $ret = FALSE;
+
+    if (!$print) {
+      if ($maintenance) {
+        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+          CRM_Utils_System::addHTMLHead($region->render(''));
+        }
+        $renderer = \Drupal::service('bare_html_page_renderer');
+        $response = $renderer->renderBarePage($content, '', 'maintenance_page');
+        print $response->getContent();
+        exit();
+      }
+      $ret = TRUE;
+    }
+    $out = $content;
+
+    if ($ret) {
+      return $out;
+    }
+    else {
+      print $out;
+      return NULL;
+    }
+  }
+
 }
