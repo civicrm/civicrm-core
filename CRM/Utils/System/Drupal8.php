@@ -919,29 +919,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritdoc
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
-    $ret = FALSE;
-
-    if (!$print) {
-      if ($maintenance) {
-        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
-          CRM_Utils_System::addHTMLHead($region->render(''));
-        }
-        $renderer = \Drupal::service('bare_html_page_renderer');
-        $response = $renderer->renderBarePage($content, '', 'maintenance_page');
-        print $response->getContent();
-        exit();
-      }
-      $ret = TRUE;
-    }
-    $out = $content;
-
-    if ($ret) {
-      return $out;
-    }
-    else {
-      print $out;
-      return NULL;
-    }
+    // @todo use Drupal "maintenance page" template and theme during installation
+    // or upgrade.
+    print $content;
+    return NULL;
   }
 
 }
