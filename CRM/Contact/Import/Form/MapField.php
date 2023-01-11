@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\RelationshipType;
+
 /**
  * This class gets the name of the file to upload.
  */
@@ -143,16 +145,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $sel4 = NULL;
 
-    // store and cache all relationship types
-    $contactRelation = new CRM_Contact_DAO_RelationshipType();
-    $contactRelation->find();
-    while ($contactRelation->fetch()) {
-      $contactRelationCache[$contactRelation->id] = [];
-      $contactRelationCache[$contactRelation->id]['contact_type_a'] = $contactRelation->contact_type_a;
-      $contactRelationCache[$contactRelation->id]['contact_sub_type_a'] = $contactRelation->contact_sub_type_a;
-      $contactRelationCache[$contactRelation->id]['contact_type_b'] = $contactRelation->contact_type_b;
-      $contactRelationCache[$contactRelation->id]['contact_sub_type_b'] = $contactRelation->contact_sub_type_b;
-    }
     $highlightedFields = $highlightedRelFields = [];
 
     $highlightedFields['email'] = 'All';
@@ -166,16 +158,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       // check if there is a _a_b or _b_a in the key
       if (strpos($key, '_a_b') || strpos($key, '_b_a')) {
         [$id, $first, $second] = explode('_', $key);
+        $relatedContactType = $this->getRelatedContactType($key);
+        //CRM-5125 for contact subtype specific RelationshipTypes
+        $relatedContactSubType = $this->getRelatedContactSubType($key);
       }
       else {
         $id = $first = $second = NULL;
       }
       if (($first === 'a' && $second === 'b') || ($first === 'b' && $second === 'a')) {
-        $relatedContactType = $contactRelationCache[$id]["contact_type_$second"] ?: 'All';
-
-        //CRM-5125 for contact subtype specific RelationshipTypes
-        $relatedContactSubType = $contactRelationCache[$id]["contact_sub_type_$second"] ?? NULL;
-
         $relatedFields = CRM_Contact_BAO_Contact::importableFields($relatedContactType);
         unset($relatedFields['']);
         $values = [];
@@ -492,12 +482,63 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Get the location types for import, including the pseudo-type 'Primary'.
+   *
    * @param int|string $type
    *   Location Type ID or 'Primary'.
    * @return string
    */
   protected function getLocationTypeLabel($type): string {
     return $this->getLocationTypes()[$type];
+  }
+
+  /**
+   * Get the type of the related contact.
+   *
+   * @param string $key
+   *
+   * @return string
+   */
+  protected function getRelatedContactType(string $key): string {
+    $relationship = $this->getRelationshipType($key);
+    if (strpos($key, '_a_b')) {
+      return $relationship['contact_type_b'] ?: 'All';
+    }
+    return $relationship['contact_type_a'] ?: 'All';
+  }
+
+  /**
+   * Get the sub_type of the related contact.
+   *
+   * @param string $key
+   *
+   * @return string|null
+   */
+  protected function getRelatedContactSubType(string $key): ?string {
+    $relationship = $this->getRelationshipType($key);
+    if (strpos($key, '_a_b')) {
+      return $relationship['contact_sub_type_b'];
+    }
+    return $relationship['contact_sub_type_a'];
+  }
+
+  /**
+   * Get the relationship type.
+   *
+   * @param string $key
+   *   e.g 5_a_b for relationship ID 5 in an a-b direction.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function getRelationshipType(string $key): array {
+    $relationshipTypeID = str_replace(['_a_b', '_b_a'], '', $key);
+    if (!isset(Civi::$statics[__CLASS__]['relationship_type'][$relationshipTypeID])) {
+      Civi::$statics[__CLASS__]['relationship_type'][$relationshipTypeID] = RelationshipType::get(FALSE)
+        ->addWhere('id', '=', $relationshipTypeID)
+        ->addSelect('contact_type_a', 'contact_type_b', 'contact_sub_type_a', 'contact_sub_type_b')
+        ->execute()->first();
+    }
+    return Civi::$statics[__CLASS__]['relationship_type'][$relationshipTypeID];
   }
 
 }
