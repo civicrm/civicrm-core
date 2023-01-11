@@ -196,6 +196,7 @@ FROM civicrm_action_schedule cas
    * @deprecated
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     if (empty($params)) {
       return NULL;
     }
