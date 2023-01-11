@@ -307,14 +307,15 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
 
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
+      $eventID = (int) $dao->id;
       if ((!$checkPermission ||
-          CRM_Event_BAO_Event::checkPermission($dao->id)
+          CRM_Event_BAO_Event::checkPermission($eventID)
         ) &&
         $dao->title
       ) {
-        $events[$dao->id] = $dao->title;
+        $events[$eventID] = $dao->title;
         if (!$titleOnly) {
-          $events[$dao->id] .= ' - ' . CRM_Utils_Date::customFormat($dao->start_date);
+          $events[$eventID] .= ' - ' . CRM_Utils_Date::customFormat($dao->start_date);
         }
       }
     }

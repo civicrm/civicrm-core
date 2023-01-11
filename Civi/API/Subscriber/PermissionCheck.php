@@ -89,6 +89,7 @@ class PermissionCheck implements EventSubscriberInterface {
    * @param array $apiRequest
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public function checkACLPermission($apiRequest) {
     switch ($apiRequest['entity']) {
@@ -105,14 +106,9 @@ class PermissionCheck implements EventSubscriberInterface {
 
       //CRM-16777: Disable schedule reminder with ACLs.
       case 'ActionSchedule':
-        $events = \CRM_Event_BAO_Event::getEvents();
-        $aclEdit = \CRM_ACL_API::group(\CRM_Core_Permission::EDIT, NULL, 'civicrm_event', $events);
-        $param = ['id' => $apiRequest['params']['id']];
-        $eventId = \CRM_Core_BAO_ActionSchedule::retrieve($param, $value = []);
-        if (in_array($eventId->entity_value, $aclEdit)) {
-          return TRUE;
-        }
-        break;
+        $permittedEvents = \CRM_Event_BAO_Event::getEvents();
+        $eventId = (int) \CRM_Core_DAO::getFieldValue('CRM_Core_BAO_ActionSchedule', $apiRequest['params']['id'], 'entity_value');
+        return (in_array($eventId, $permittedEvents, TRUE));
     }
 
     return FALSE;
