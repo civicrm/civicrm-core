@@ -904,9 +904,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritdoc
    */
-  public function suppressProfileFormErrors() {
+  public function suppressProfileFormErrors():bool {
     // Suppress the errors if they are displayed using
-    // drupal form_set_error.
+    // setErrorByName method on FormStateInterface.
     $current_path = \Drupal::service('path.current')->getPath();
     $path_args = explode('/', $current_path);
     if ($path_args[1] == 'user' || ($path_args[1] == 'admin' && $path_args[2] == 'people')) {

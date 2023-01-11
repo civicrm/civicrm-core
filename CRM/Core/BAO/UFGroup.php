@@ -916,8 +916,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
 
         $template = CRM_Core_Smarty::singleton();
 
-        // Hide CRM error messages if they are set based on CMS
-        // criteria.
+        // Hide CRM error messages if they are set by the CMS.
         if (!empty($_POST)) {
           $supressForm = CRM_Core_Config::singleton()->userSystem->suppressProfileFormErrors();
           $template->assign('suppressForm', $supressForm);

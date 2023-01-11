@@ -1119,7 +1119,7 @@ abstract class CRM_Utils_System_Base {
    *
    * @return bool
    */
-  public function suppressProfileFormErrors() {
+  public function suppressProfileFormErrors():bool {
     return FALSE;
   }
 
