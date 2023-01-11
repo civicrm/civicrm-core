@@ -92,16 +92,9 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the Backdrop db.
-   *
-   * @param array $params
-   *   Array of name and mail values.
-   * @param array $errors
-   *   Array of errors.
-   * @param string $emailName
-   *   Field label for the 'email'.
+   * @inheritdoc
    */
-  public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+  public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     if ($backdrop_errors = form_get_errors()) {
       // unset Backdrop messages to avoid twice display of errors
       unset($_SESSION['messages']);
