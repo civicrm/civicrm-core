@@ -901,4 +901,18 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return 'Unknown';
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function suppressProfileFormErrors():bool {
+    // Suppress the errors if they are displayed using
+    // setErrorByName method on FormStateInterface.
+    $current_path = \Drupal::service('path.current')->getPath();
+    $path_args = explode('/', $current_path);
+    if ($path_args[1] == 'user' || ($path_args[1] == 'admin' && $path_args[2] == 'people')) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }

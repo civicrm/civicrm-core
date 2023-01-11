@@ -721,4 +721,16 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     ];
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function suppressProfileFormErrors():bool {
+    // Suppress the errors if they are displayed using
+    // form_set_error.
+    if (arg(0) == 'user' || (arg(0) == 'admin' && arg(1) == 'people')) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
