@@ -1672,7 +1672,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   array of ufgroups for a module
    */
   public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW, $returnFields = NULL) {
-    $selectFields = ['id', 'title', 'created_id', 'is_active', 'is_reserved', 'group_type', 'description'];
+    $selectFields = ['id', 'name', 'title', 'created_id', 'is_active', 'is_reserved', 'group_type', 'description'];
 
     if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_uf_group', 'frontend_title')) {
       $selectFields[] = 'frontend_title';
