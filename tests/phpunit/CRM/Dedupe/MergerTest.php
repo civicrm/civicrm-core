@@ -170,7 +170,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $dao->contact_type = 'Individual';
     $dao->name = 'IndividualSupervised';
-    $dao->is_default = 1;
+    $dao->is_reserved = 1;
     $dao->find(TRUE);
 
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($dao->id, $this->_groupId);
@@ -240,7 +240,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $dao->contact_type = 'Individual';
     $dao->name = 'IndividualSupervised';
-    $dao->is_default = 1;
+    $dao->is_reserved = 1;
     $dao->find(TRUE);
 
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($dao->id, $this->_groupId);
