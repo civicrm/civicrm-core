@@ -138,9 +138,14 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
     }
     else {
       return \CRM_Utils_System::url('civicrm/asset/builder', [
+        // The 'an' and 'ad' provide hints for cache lifespan and debugging/inspection.
         'an' => $name,
-        'ap' => $this->encode($params),
         'ad' => $this->digest($name, $params),
+        'aj' => \Civi::service('crypto.jwt')->encode([
+          'asset' => [$name, $params],
+          'exp' => 86400 * (floor(\CRM_Utils_Time::time() / 86400) + 2),
+          // Caching-friendly TTL -- We want the URL to be stable for a decent amount of time.
+        ], ['SIGN', 'WEAK_SIGN']),
       ], TRUE, NULL, FALSE);
     }
   }
@@ -281,7 +286,6 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
    * @return string
    */
   protected function digest($name, $params) {
-    // WISHLIST: For secure digest, generate+persist privatekey & call hash_hmac.
     ksort($params);
     $digest = md5(
       $name .
@@ -290,40 +294,6 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
       json_encode($params)
     );
     return $digest;
-  }
-
-  /**
-   * Encode $params in a format that's optimized for shorter URLs.
-   *
-   * @param array $params
-   * @return string
-   */
-  protected function encode($params) {
-    if (empty($params)) {
-      return '';
-    }
-
-    $str = json_encode($params);
-    if (function_exists('gzdeflate')) {
-      $str = gzdeflate($str);
-    }
-    return base64_encode($str);
-  }
-
-  /**
-   * @param string $str
-   * @return array
-   */
-  protected function decode($str) {
-    if ($str === NULL || $str === FALSE || $str === '') {
-      return [];
-    }
-
-    $str = base64_decode($str);
-    if (function_exists('gzdeflate')) {
-      $str = gzinflate($str);
-    }
-    return json_decode($str, TRUE);
   }
 
   /**
@@ -372,16 +342,9 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
       /** @var Assetbuilder $assets */
       $assets = \Civi::service('asset_builder');
 
-      $expectDigest = $assets->digest($get['an'], $assets->decode($get['ap']));
-      if ($expectDigest !== $get['ad']) {
-        return [
-          'statusCode' => 500,
-          'mimeType' => 'text/plain',
-          'content' => 'Invalid digest',
-        ];
-      }
-
-      return $assets->render($get['an'], $assets->decode($get['ap']));
+      $obj = \Civi::service('crypto.jwt')->decode($get['aj'], ['SIGN', 'WEAK_SIGN']);
+      $arr = json_decode(json_encode($obj), TRUE);
+      return $assets->render($arr['asset'][0], $arr['asset'][1]);
     }
     catch (UnknownAssetException $e) {
       return [
