@@ -729,7 +729,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
     if ($checkPermission == CRM_Core_Permission::CREATE) {
       $checkPermission = CRM_Core_Permission::EDIT;
     }
-    $cacheKey = 'uf_group_custom_fields_' . $ctype . '_' . (int) $checkPermission;
+    // Make the cache user specific by adding the ID to the key.
+    $contactId = CRM_Core_Session::getLoggedInContactID();
+    $cacheKey = 'uf_group_custom_fields_' . $ctype . '_' . $contactId . '_' . (int) $checkPermission;
     if (!Civi::cache('metadata')->has($cacheKey)) {
       $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, $checkPermission, TRUE);
 
