@@ -442,4 +442,18 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertFalse(CRM_Utils_String::unserialize($str));
   }
 
+  /**
+   * Test that we get a meaningful error if Smarty syntax is wrong.
+   */
+  public function testSmartyExceptionHandling(): void {
+    try {
+      CRM_Utils_String::parseOneOffStringThroughSmarty('{if}');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringStartsWith('Message was not parsed due to invalid smarty syntax', $e->getMessage());
+      return;
+    }
+    $this->fail('Exception expected');
+  }
+
 }

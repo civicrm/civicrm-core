@@ -19,6 +19,9 @@
  * Fix for bug CRM-392. Not sure if this is the best fix or it will impact
  * other similar PEAR packages. doubt it
  */
+
+use Civi\Core\Event\SmartyErrorEvent;
+
 if (!class_exists('Smarty')) {
   require_once 'Smarty/Smarty.class.php';
 }
@@ -194,6 +197,21 @@ class CRM_Core_Smarty extends Smarty {
       }
     }
     return $output;
+  }
+
+  /**
+   * Handle smarty error in one off string.
+   *
+   * @param int $errorNumber
+   * @param string $errorMessage
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function handleSmartyError(int $errorNumber, string $errorMessage): void {
+    $event = new SmartyErrorEvent($errorNumber, $errorMessage);
+    \Civi::dispatcher()->dispatch('civi.smarty.error', $event);
+    restore_error_handler();
+    throw new \CRM_Core_Exception('Message was not parsed due to invalid smarty syntax : ' . $errorMessage);
   }
 
   /**
