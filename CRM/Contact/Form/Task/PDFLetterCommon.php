@@ -110,30 +110,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
   }
 
   /**
-   * Convert from a vague-type/file-extension to mime-type.
-   *
-   * @param string $type
-   * @return string
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated
-   */
-  private static function getMimeType($type) {
-    $mimeTypes = [
-      'pdf' => 'application/pdf',
-      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'odt' => 'application/vnd.oasis.opendocument.text',
-      'html' => 'text/html',
-    ];
-    if (isset($mimeTypes[$type])) {
-      return $mimeTypes[$type];
-    }
-    else {
-      throw new \CRM_Core_Exception("Cannot determine mime type");
-    }
-  }
-
-  /**
    * Get the categories required for rendering tokens.
    *
    * @deprecated
