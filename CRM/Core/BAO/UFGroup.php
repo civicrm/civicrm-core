@@ -730,8 +730,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       $checkPermission = CRM_Core_Permission::EDIT;
     }
     // Make the cache user specific by adding the ID to the key.
-    $id = CRM_Core_Session::getLoggedInContactID();
-    $cacheKey = 'uf_group_custom_fields_' . $ctype . '_' . $id . '_' . (int) $checkPermission;
+    $contactId = CRM_Core_Session::getLoggedInContactID();
+    $cacheKey = 'uf_group_custom_fields_' . $ctype . '_' . $contactId . '_' . (int) $checkPermission;
     if (!Civi::cache('metadata')->has($cacheKey)) {
       $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, $checkPermission, TRUE);
 
@@ -922,7 +922,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
         if (!empty($_POST)) {
           $supressForm = CRM_Core_Config::singleton()->userSystem->suppressProfileFormErrors();
           $template->assign('suppressForm', $supressForm);
-          }
+        }
 
         $templateFile = "CRM/Profile/Form/{$profileID}/Dynamic.tpl";
         if (!$template->template_exists($templateFile)) {
