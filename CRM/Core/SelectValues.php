@@ -524,6 +524,24 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * Different type of Pledge Tokens.
+   *
+   * @return array
+   */
+  public static function pledgeTokens() {
+    return [
+      '{pledge.pledge_balance}' => ts('Pledge Balance'),
+      '{pledge.id}' => ts('Pledge ID'),
+      '{pledge.pledge_financial_type}' => ts('Pledge Financial Type'),
+      '{pledge.pledge_amount}' => ts('Total pledge amount'),
+      '{pledge.create_date}' => ts('Pledge Start Date'),
+      '{pledge.pledge_next_pay_date}' => ts('Upcoming pledge payment date'),
+      '{pledge.pledge_next_pay_amount}' => ts('Upcoming pledge payment amount'),
+      '{pledge.pledge_total_paid}' => ts('Total pledge payments'),
+    ];
+  }
+
+  /**
    * Different type of Activity Tokens.
    *
    * @return array

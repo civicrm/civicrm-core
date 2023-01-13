@@ -504,6 +504,77 @@ class CRM_Utils_Token {
     return $value;
   }
 
+  protected static function _buildPledgeTokens() {
+    $key = 'pledge';
+    if (self::$_tokens[$key] == NULL) {
+      self::$_tokens[$key] = array_keys(array_merge(CRM_Pledge_BAO_Pledge::exportableFields('All'),
+        ['financial_type'],
+        self::getCustomFieldTokens('Pledge')
+      ));
+    }
+  }
+
+  public static function replacePledgeTokens($str, &$pledge, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
+    $key = 'pledge';
+    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+      //early return
+      return $str;
+    }
+    self::_buildPledgeTokens();
+
+    // here we intersect with the list of pre-configured valid tokens
+    // so that we remove anything we do not recognize
+    // I hope to move this step out of here soon and
+    // then we will just iterate on a list of tokens that are passed to us
+
+    $str = preg_replace_callback(
+      self::tokenRegex($key),
+      function ($matches) use (&$pledge, $html, $escapeSmarty) {
+        return CRM_Utils_Token::getPledgeTokenReplacement($matches[1], $pledge, $html, $escapeSmarty);
+      },
+      $str
+    );
+
+    $str = preg_replace('/\\\\|\{(\s*)?\}/', ' ', $str);
+    return $str;
+  }
+
+  public static function getPledgeTokenReplacement($token, &$pledge, $html = FALSE, $escapeSmarty = FALSE) {
+    self::_buildPledgeTokens();
+    switch ($token) {
+      case 'pledge_balance':
+        $value = CRM_Utils_Money::format($pledge['pledge_amount'] - $pledge['pledge_total_paid']);
+       break;
+      case 'pledge_amount':
+      case 'pledge_next_pay_amount':
+      case 'pledge_outstanding_amount':
+      case 'pledge_total_paid':
+        $value = CRM_Utils_Money::format(CRM_Utils_Array::retrieveValueRecursive($pledge, $token) ?? 0);
+        break;
+
+      case 'create_date':
+      case 'start_date':
+      case 'pledge_next_pay_date':
+        $value = CRM_Utils_Array::retrieveValueRecursive($pledge, $token);
+        $value = CRM_Utils_Date::customFormat($value, NULL, ['j', 'm', 'Y']);
+        break;
+
+      default:
+        if (!in_array($token, self::$_tokens['pledge'])) {
+          $value = "{pledge.$token}";
+        }
+        else {
+          $value = CRM_Utils_Array::retrieveValueRecursive($pledge, $token);
+        }
+        break;
+    }
+
+    if ($escapeSmarty) {
+      $value = self::tokenEscapeSmarty($value);
+    }
+    return $value;
+  }
+
   /**
    * Replace all the contact-level tokens in $str with information from
    * $contact.
