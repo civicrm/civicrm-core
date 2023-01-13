@@ -743,7 +743,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
           }
           elseif (
             $civiTableSpecs[$col]['COLUMN_DEFAULT'] != ($logTableSpecs[$col]['COLUMN_DEFAULT'] ?? NULL)
-            && !stristr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'timestamp')
+            && !stristr(($civiTableSpecs[$col]['COLUMN_DEFAULT'] ?? ''), 'timestamp')
             && !($civiTableSpecs[$col]['COLUMN_DEFAULT'] === NULL && ($logTableSpecs[$col]['COLUMN_DEFAULT'] ?? NULL) === 'NULL')
           ) {
             // if default property is different, and its not about a timestamp column, consider it
