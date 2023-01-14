@@ -6,6 +6,24 @@
  */
 class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
 
+  /**
+   * Name of contact subtype
+   * @var string
+   */
+  private $student;
+
+  /**
+   * Name of contact subtype
+   * @var string
+   */
+  private $parent;
+
+  /**
+   * Name of contact subtype
+   * @var string
+   */
+  private $sponsor;
+
   public function setUp(): void {
     parent::setUp();
 
@@ -17,7 +35,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::add($params);
     $this->student = $params['name'];
 
     $params = [
@@ -27,7 +45,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::add($params);
     $this->parent = $params['name'];
 
     $params = [
@@ -37,7 +55,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::add($params);
     $this->sponsor = $params['name'];
 
     //create contacts
@@ -46,7 +64,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'last_name' => 'Grant',
       'contact_type' => 'Individual',
     ];
-    $this->individual = $this->individualCreate($params);
+    $this->individualCreate($params);
 
     $params = [
       'first_name' => 'Bill',
@@ -54,7 +72,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'contact_sub_type' => $this->student,
     ];
-    $this->indivi_student = $this->individualCreate($params);
+    $this->individualCreate($params);
 
     $params = [
       'first_name' => 'Alen',
@@ -62,20 +80,20 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'contact_sub_type' => $this->parent,
     ];
-    $this->indivi_parent = $this->individualCreate($params);
+    $this->individualCreate($params);
 
     $params = [
       'organization_name' => 'Compumentor',
       'contact_type' => 'Organization',
     ];
-    $this->organization = $this->organizationCreate($params);
+    $this->organizationCreate($params);
 
     $params = [
       'organization_name' => 'Conservation Corp',
       'contact_type' => 'Organization',
       'contact_sub_type' => $this->sponsor,
     ];
-    $this->organization_sponsor = $this->organizationCreate($params);
+    $this->organizationCreate($params);
   }
 
   public function tearDown(): void {
