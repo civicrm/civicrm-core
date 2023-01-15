@@ -26,7 +26,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @param array $params
    *   An assoc array of name/value pairs.
    *
-   * @return CRM_Financial_DAO_PaymentProcessorType
+   * @return CRM_Core_DAO_Job
    */
   public static function create($params) {
     $job = new CRM_Core_DAO_Job();

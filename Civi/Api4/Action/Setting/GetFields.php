@@ -15,7 +15,7 @@ namespace Civi\Api4\Action\Setting;
 /**
  * Get information about CiviCRM settings.
  *
- * @method int getDomainId
+ * @method int getDomainId()
  * @method $this setDomainId(int $domainId)
  */
 class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {

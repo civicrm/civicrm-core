@@ -183,7 +183,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   /**
    * Get the fields exposed from related entities.
    *
-   * @return \string[][]
+   * @return string[][]
    */
   protected function getRelatedEntityTokenMetadata(): array {
     return [

@@ -394,7 +394,7 @@ class CRM_Utils_Mail_Incoming {
   }
 
   /**
-   * @param $address
+   * @param ezcMailAddress $address
    * @param array $params
    * @param $subParam
    * @param $mail
@@ -418,7 +418,7 @@ class CRM_Utils_Mail_Incoming {
   }
 
   /**
-   * @param $addresses
+   * @param ezcMailAddress[] $addresses
    * @param $token
    * @param array $params
    * @param $mail
