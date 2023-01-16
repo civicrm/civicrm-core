@@ -11,15 +11,12 @@ use CRM_Eventcart_ExtensionUtil as E;
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
 function eventcart_civicrm_config(&$config) {
-  if (isset(Civi::$statics[__FUNCTION__])) {
+  // Since as a hidden extension it's always enabled, until this is a "real" extension you can turn off we need to check the legacy setting.
+  if (isset(Civi::$statics[__FUNCTION__]) || !Civi::settings()->get('enable_cart')) {
     return;
   }
   Civi::$statics[__FUNCTION__] = 1;
-  // Since as a hidden extension it's always enabled, until this is a "real" extension you can turn off we need to check the legacy setting.
-  if ((bool) Civi::settings()->get('enable_cart')) {
-    Civi::dispatcher()->addListener('hook_civicrm_pageRun', 'CRM_Event_Cart_PageCallback::run');
-  }
-
+  Civi::dispatcher()->addListener('hook_civicrm_pageRun', 'CRM_Event_Cart_PageCallback::run');
   _eventcart_civix_civicrm_config($config);
 }
 
