@@ -1544,6 +1544,32 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that onhold emails are not returned by getEmailDetails().
+   */
+  public function testGetEmailDetails() {
+    $firstName = 'Tyler';
+    $lastName = 'Test';
+    $params = [
+      'first_name' => $firstName,
+      'last_name' => $lastName,
+      'contact_type' => 'Individual',
+    ];
+
+    $contact = CRM_Contact_BAO_Contact::add($params);
+    $contactId = $contact->id;
+    $onHoldEmail = civicrm_api4('Email', 'create', [
+      'values' => [
+        'contact_id' => $contactId,
+        'on_hold' => 1,
+        'location_type_id' => 1,
+        'email' => 'tyler@test.com',
+      ],
+    ]);
+    $result = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactId);
+    $this->assertNotContains('tyler@test.com', $result, "Result contains onhold email.");
+  }
+
+  /**
    * dev/core#1605 State/province not copied on shared address
    * 1. First, create contacts: A and B
    * 2. Create an address for contact A

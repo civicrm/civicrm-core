@@ -36,6 +36,8 @@ class CRM_Contact_BAO_Contact_Location {
         'location_type_id' => $locationTypeID,
         'sequential' => 0,
         'return' => array('email', 'location_type_id', 'id'),
+        //This has to be 1 instead of 0 because of on hold opt out.
+        'on_hold' => ['!=' => 1],
       ),
     );
     if ($isPrimary) {
