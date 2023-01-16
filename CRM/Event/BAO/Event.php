@@ -95,9 +95,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
-    if (empty($params['is_template'])) {
-      $params['is_template'] = 0;
-    }
     // check if new event, if so set the created_id (if not set)
     // and always set created_date to now
     if (empty($params['id'])) {
