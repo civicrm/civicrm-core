@@ -88,15 +88,21 @@ trait CRM_Queue_Queue_SqlTrait {
    *   Ex: ['release_time' => strtotime('+3 hours')]
    */
   public function createItem($data, $options = []) {
-    $dao = new CRM_Queue_DAO_QueueItem();
-    $dao->queue_name = $this->getName();
-    $dao->submit_time = CRM_Utils_Time::getTime('YmdHis');
-    $dao->data = serialize($data);
-    $dao->weight = CRM_Utils_Array::value('weight', $options, 0);
-    if (isset($options['release_time'])) {
-      $dao->release_time = date('Y-m-d H:i:s', $options['release_time']);
+    if (!isset($options['release_time'])) {
+      $releaseTime = 'null';
     }
-    $dao->save();
+    elseif (is_numeric($options['release_time'])) {
+      $releaseTime = sprintf('FROM_UNIXTIME(%d)', $options['release_time']);
+    }
+    else {
+      throw new \CRM_Core_Exception("Cannot enqueue item. Malformed release_time.");
+    }
+
+    \CRM_Core_DAO::executeQuery("INSERT INTO civicrm_queue_item (queue_name, submit_time, data, weight, release_time) VALUES (%1, now(), %2, %3, {$releaseTime})", [
+      1 => [$this->getName(), 'String'],
+      2 => [serialize($data), 'String'],
+      3 => [CRM_Utils_Array::value('weight', $options, 0), 'Integer'],
+    ], TRUE, NULL, FALSE, FALSE);
   }
 
   /**
