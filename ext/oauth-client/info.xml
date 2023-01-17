@@ -36,6 +36,6 @@
   </mixins>
   <civix>
     <namespace>CRM/OAuth</namespace>
-    <format>22.10.0</format>
+    <format>22.12.1</format>
   </civix>
 </extension>
