@@ -2784,6 +2784,7 @@ tbody.scrollContent tr.alternateRow {
 }
 
 .crm-container .disabled,
+.crm-container .crm-disabled,
 .crm-container .disabled *,
 .crm-container .cancelled,
 .crm-container .cancelled td,
