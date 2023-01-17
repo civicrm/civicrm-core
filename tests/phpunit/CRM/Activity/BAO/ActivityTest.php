@@ -1440,7 +1440,7 @@ $text
 
   /**
    * Test that when a number is specified in the To Param of the SMS provider parameters that an SMS is sent
-   * @see dev/core/#273
+   * @see dev/core#273
    */
   public function testSendSMSMobileInToProviderParam(): void {
     $sent = $this->createSendSmsTest(TRUE, 2, TRUE);
@@ -1449,7 +1449,7 @@ $text
 
   /**
    * Test that when a numbe ris specified in the To Param of the SMS provider parameters that an SMS is sent
-   * @see dev/core/#273
+   * @see dev/core#273
    */
   public function testSendSMSMobileInToProviderParamWithDoNotSMS(): void {
     $sent = $this->createSendSmsTest(FALSE, 2, TRUE, ['do_not_sms' => 1]);
