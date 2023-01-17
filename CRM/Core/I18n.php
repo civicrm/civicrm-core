@@ -180,7 +180,7 @@ class CRM_Core_I18n {
 
     if (!$all) {
       $optionValues = [];
-      // Use `getValues`, not `buildOptions` to bypass hook_civicrm_fieldOptions.  See core#1132.
+      // Use `getValues`, not `buildOptions` to bypass hook_civicrm_fieldOptions.  See dev/core#1132.
       CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'weight', TRUE);
       $all = array_column($optionValues, 'label', 'name');
 

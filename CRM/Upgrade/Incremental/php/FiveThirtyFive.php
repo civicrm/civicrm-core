@@ -22,11 +22,11 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFive extends CRM_Upgrade_Incremental
   public function upgrade_5_35_alpha1(string $rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
-    $this->addTask('dev/core/#2329 - Add is_active to Country', 'addColumn',
+    $this->addTask('dev/core#2329 - Add is_active to Country', 'addColumn',
       'civicrm_country', 'is_active', "tinyint DEFAULT 1 COMMENT 'Is this Country active?'");
-    $this->addTask('dev/core/#2329 - Add is_active to StateProvince', 'addColumn',
+    $this->addTask('dev/core#2329 - Add is_active to StateProvince', 'addColumn',
       'civicrm_state_province', 'is_active', "tinyint DEFAULT 1 COMMENT 'Is this StateProvince active?'");
-    $this->addTask('dev/core/#2329 - Add is_active to County', 'addColumn',
+    $this->addTask('dev/core#2329 - Add is_active to County', 'addColumn',
       'civicrm_county', 'is_active', "tinyint DEFAULT 1 COMMENT 'Is this County active?'");
   }
 
