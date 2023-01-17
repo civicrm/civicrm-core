@@ -59,12 +59,12 @@ trait CRM_Queue_Queue_SqlTrait {
     switch ($name) {
       case 'ready':
         return (int) CRM_Core_DAO::singleValueQuery(
-          'SELECT count(*) FROM civicrm_queue_item WHERE queue_name = %1 AND (release_time is null OR release_time <= FROM_UNIXTIME(%2))',
+          'SELECT count(*) FROM civicrm_queue_item WHERE queue_name = %1 AND (release_time is null OR UNIX_TIMESTAMP(release_time) <= %2)',
           [1 => [$this->getName(), 'String'], 2 => [CRM_Utils_Time::time(), 'Int']]);
 
       case 'blocked':
         return (int) CRM_Core_DAO::singleValueQuery(
-          'SELECT count(*) FROM civicrm_queue_item WHERE queue_name = %1 AND release_time > FROM_UNIXTIME(%2)',
+          'SELECT count(*) FROM civicrm_queue_item WHERE queue_name = %1 AND UNIX_TIMESTAMP(release_time) > %2',
           [1 => [$this->getName(), 'String'], 2 => [CRM_Utils_Time::time(), 'Int']]);
 
       case 'total':
