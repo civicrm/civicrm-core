@@ -573,4 +573,26 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     CRM_Core_Config::singleton()->doNotResetCache = $enabled ? 0 : 1;
   }
 
+  /**
+   * Register a template directory with the template engine.
+   *
+   * @param array $templateDirectory Array describing the template directory with
+   *  - path Full file path
+   *  - type Currently always 'Smarty'
+   *  - version Currently always 2 - ie Smarty v2, currently ignored.
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function registerTemplateDirectory(array $templateDirectory): void {
+    if (!file_exists($templateDirectory['path'])) {
+      return;
+    }
+    if (($templateDirectory['type'] ?? 'Smarty') === 'Smarty') {
+      CRM_Core_Smarty::singleton()->addTemplateDir($templateDirectory['path']);
+      return;
+    }
+    throw new CRM_Core_Exception('Only Smarty supported currently');
+  }
+
 }
