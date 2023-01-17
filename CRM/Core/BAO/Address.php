@@ -1149,7 +1149,8 @@ SELECT is_primary,
    * @param bool $returnStatus
    *   By default false.
    *
-   * @return string
+   * @return array|void
+   *   If ($returnStatus == true) the returned value is an array containing contactList and count
    */
   public static function setSharedAddressDeleteStatus($addressId = NULL, $contactId = NULL, $returnStatus = FALSE) {
     // check if address that is being deleted has any shared
