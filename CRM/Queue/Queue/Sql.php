@@ -56,29 +56,24 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
           ORDER BY weight, id
           LIMIT 1
         ) first_in_queue
-        WHERE release_time IS NULL OR release_time < %2
+        WHERE release_time IS NULL OR UNIX_TIMESTAMP(release_time) < %2
       ';
     $params = [
       1 => [$this->getName(), 'String'],
-      2 => [CRM_Utils_Time::getTime(), 'Timestamp'],
+      2 => [CRM_Utils_Time::time(), 'Integer'],
     ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
 
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       $dao->run_count++;
-      $sql = 'UPDATE civicrm_queue_item SET release_time = %1, run_count = %3 WHERE id = %2';
+      $sql = 'UPDATE civicrm_queue_item SET release_time = from_unixtime(unix_timestamp() + %1), run_count = %3 WHERE id = %2';
       $sqlParams = [
-        '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
+        '1' => [CRM_Utils_Time::delta() + $lease_time, 'Integer'],
         '2' => [$dao->id, 'Integer'],
         '3' => [$dao->run_count, 'Integer'],
       ];
       CRM_Core_DAO::executeQuery($sql, $sqlParams);
-      // (Comment by artfulrobot Sep 2019: Not sure what the below comment means, should be removed/clarified?)
-      // work-around: inconsistent date-formatting causes unintentional breakage
-      #        $dao->submit_time = date('YmdHis', strtotime($dao->submit_time));
-      #        $dao->release_time = date('YmdHis', $nowEpoch + $lease_time);
-      #        $dao->save();
       $dao->data = unserialize($dao->data);
       $result = $dao;
     }
@@ -114,8 +109,8 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       $dao->run_count++;
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
-        '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = from_unixtime(unix_timestamp() + %1) WHERE id = %2", [
+        '1' => [CRM_Utils_Time::delta() + $lease_time, 'Integer'],
         '2' => [$dao->id, 'Integer'],
       ]);
       $dao->data = unserialize($dao->data);
