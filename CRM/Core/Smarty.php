@@ -131,7 +131,6 @@ class CRM_Core_Smarty extends Smarty {
       $this->assign('langSwitch', CRM_Core_I18n::uiLanguages());
     }
 
-    $this->register_function('crmURL', ['CRM_Utils_System', 'crmURL']);
     if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
       // When default escape is enabled if the core escape is called before
       // any custom escaping is done the modifier_escape function is not
