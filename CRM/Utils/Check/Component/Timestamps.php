@@ -19,6 +19,48 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
   const DOCTOR_WHEN = 'https://github.com/civicrm/org.civicrm.doctorwhen';
 
   /**
+   * Check that MySQL actually supports timezone operations.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkTimezoneAPIs() {
+    $messages = [];
+
+    try {
+      $tzCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM mysql.time_zone_name');
+    }
+    catch (\Exception $e) {
+      $tzCount = 0;
+    }
+
+    try {
+      $convertedTime = CRM_Core_DAO::singleValueQuery('SELECT CONVERT_TZ("2001-02-03 04:05:00", "GMT", "America/New_York")');
+    }
+    catch (\Exception $e) {
+      $convertedTime = NULL;
+    }
+    $expectedTime = '2001-02-02 23:05:00';
+
+    if ($tzCount < 5 || $convertedTime !== $expectedTime) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The MySQL database does not fully support timezones. Please ask the database administrator to <a %1>load timezone data</a>.', [
+          // If we had a manual page, it would make sense to link to that. Such a page might
+          // (a) point out that the process is similar for MySQL 5.x/8.x and MariaDB,
+          // and (b) talk more about potential impacts (re: current code; extensions; future changes).
+          // We don't have that page. But this link gives the general gist.
+          1 => 'target="_blank" href="https://dev.mysql.com/doc/refman/8.0/en/mysql-tzinfo-to-sql.html"',
+        ]),
+        ts('MySQL Timezone Problem'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-clock-o'
+      );
+    }
+
+    return $messages;
+  }
+
+  /**
    * Check that various columns are TIMESTAMP and not DATETIME. (CRM-9683, etal)
    *
    * @return CRM_Utils_Check_Message[]
