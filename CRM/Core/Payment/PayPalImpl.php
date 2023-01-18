@@ -939,7 +939,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $notifyURL = $this->getNotifyUrl();
 
     $config = CRM_Core_Config::singleton();
-    $url = ($this->_component == 'event') ? 'civicrm/event/register' : 'civicrm/contribute/transact';
+    $url = $this->getBaseReturnUrl();
     $cancel = ($this->_component == 'event') ? '_qf_Register_display' : '_qf_Main_display';
 
     $cancelUrlString = "$cancel=1&cancel=1&qfKey={$params['qfKey']}";
