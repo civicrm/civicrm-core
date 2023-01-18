@@ -18,6 +18,16 @@ class api_v3_EventTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_entity;
 
+  /**
+   * @var int[]
+   */
+  protected $_eventIds = [];
+
+  /**
+   * @var array
+   */
+  protected $_events = [];
+
   public function setUp(): void {
     parent::setUp();
     $this->_apiversion = 3;
@@ -72,8 +82,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
       ],
     ];
 
-    $this->events = [];
-    $this->eventIds = [];
+    $this->_events = [];
+    $this->_eventIds = [];
     foreach ($params as $event) {
       $result = $this->callAPISuccess('Event', 'Create', $event);
       $this->_events[] = $result;
@@ -82,9 +92,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
-    foreach ($this->eventIds as $eventId) {
-      $this->eventDelete($eventId);
-    }
     $tablesToTruncate = [
       'civicrm_participant',
       'civicrm_event',
