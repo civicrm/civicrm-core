@@ -5,6 +5,7 @@ namespace Civi\Afform;
 require_once __DIR__ . '/../../../../../../../tests/phpunit/api/v4/Api4TestBase.php';
 
 use Civi\Api4\Afform;
+use Civi\Test\CiviEnvBuilder;
 
 /**
  * @group headless
@@ -19,7 +20,7 @@ class AfformContactSummaryTest extends \api\v4\Api4TestBase {
     'contact_summary_test5',
   ];
 
-  public function setUpHeadless() {
+  public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()->installMe(__DIR__)->install('org.civicrm.search_kit')->apply();
   }
 

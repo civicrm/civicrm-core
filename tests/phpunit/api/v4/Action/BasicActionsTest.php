@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
 
@@ -40,7 +41,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $e->entities['MockBasicEntity'] = MockBasicEntity::getInfo();
   }
 
-  public function setUpHeadless() {
+  public function setUpHeadless(): CiviEnvBuilder {
     // Ensure MockBasicEntity gets added via above listener
     \Civi::cache('metadata')->clear();
     return parent::setUpHeadless();

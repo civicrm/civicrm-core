@@ -19,8 +19,10 @@
 
 namespace api\v4;
 
+use Civi\Api4\Generic\Result;
 use Civi\Api4\UFMatch;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
 
 /**
@@ -47,16 +49,19 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
     error_reporting(E_ALL);
   }
 
-  public function setUpHeadless() {
+  public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()->apply();
   }
 
   /**
+   * Post test cleanup.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $impliments = class_implements($this);
+    $implements = class_implements($this);
     // If not created in a transaction, test records must be deleted
-    if (!in_array('Civi\Test\TransactionalInterface', $impliments, TRUE)) {
+    if (!in_array('Civi\Test\TransactionalInterface', $implements, TRUE)) {
       // Delete all test records in reverse order to prevent fk constraints
       foreach (array_reverse($this->testRecords) as $record) {
         $params = ['checkPermissions' => FALSE, 'where' => $record[1]];
@@ -78,28 +83,30 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    *
    * @param array $params
    */
-  public function cleanup($params) {
+  public function cleanup(array $params): void {
     $params += [
       'tablesToTruncate' => [],
     ];
-    \CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
+    \CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0;');
     foreach ($params['tablesToTruncate'] as $table) {
       \Civi::log()->info('truncating: ' . $table);
       $sql = "TRUNCATE TABLE $table";
       \CRM_Core_DAO::executeQuery($sql);
     }
-    \CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+    \CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1;');
   }
 
   /**
    * Emulate a logged in user since certain functions use that.
    * value to store a record in the DB (like activity)
+   *
    * @see https://issues.civicrm.org/jira/browse/CRM-8180
    *
    * @return int
    *   Contact ID of the created user.
+   * @throws \CRM_Core_Exception
    */
-  public function createLoggedInUser() {
+  public function createLoggedInUser(): int {
     $contactID = $this->createTestRecord('Contact')['id'];
     UFMatch::delete(FALSE)->addWhere('uf_id', '=', 6)->execute();
     $this->createTestRecord('UFMatch', [
@@ -124,7 +131,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public function createTestRecord(string $entityName, array $values = []) {
+  public function createTestRecord(string $entityName, array $values = []): ?array {
     return $this->saveTestRecords($entityName, ['records' => [$values]])->single();
   }
 
@@ -139,7 +146,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public function saveTestRecords(string $entityName, array $saveParams) {
+  public function saveTestRecords(string $entityName, array $saveParams): Result {
     $saveParams += [
       'checkPermissions' => FALSE,
       'defaults' => [],
@@ -163,7 +170,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    * @param int $len
    * @return string
    */
-  public function randomLetters(int $len = 10) {
+  public function randomLetters(int $len = 10): string {
     return \CRM_Utils_String::createRandom($len, implode('', range('a', 'z')));
   }
 
@@ -176,7 +183,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function getRequiredValuesToCreate(string $entity, &$values = []) {
+  public function getRequiredValuesToCreate(string $entity, array &$values = []): array {
     $requiredFields = civicrm_api4($entity, 'getfields', [
       'action' => 'create',
       'loadOptions' => TRUE,
@@ -185,7 +192,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
         ['OR',
           [
             ['required', '=', TRUE],
-            // Include contitionally-required fields only if they don't create a circular FK reference
+            // Include conditionally-required fields only if they don't create a circular FK reference
             ['AND', [['required_if', 'IS NOT EMPTY'], ['fk_entity', '!=', $entity]]],
           ],
         ],
@@ -226,51 +233,51 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
 
       case 'CaseType':
         $extraValues['definition'] = [
-          "activityTypes" => [
+          'activityTypes' => [
             [
-              "name" => "Open Case",
-              "max_instances" => "1",
+              'name' => 'Open Case',
+              'max_instances' => 1,
             ],
             [
-              "name" => "Follow up",
+              'name' => 'Follow up',
             ],
           ],
-          "activitySets" => [
+          'activitySets' => [
             [
-              "name" => "standard_timeline",
-              "label" => "Standard Timeline",
-              "timeline" => 1,
-              "activityTypes" => [
+              'name' => 'standard_timeline',
+              'label' => 'Standard Timeline',
+              'timeline' => 1,
+              'activityTypes' => [
                 [
-                  "name" => "Open Case",
-                  "status" => "Completed",
+                  'name' => 'Open Case',
+                  'status' => 'Completed',
                 ],
                 [
-                  "name" => "Follow up",
-                  "reference_activity" => "Open Case",
-                  "reference_offset" => "3",
-                  "reference_select" => "newest",
+                  'name' => 'Follow up',
+                  'reference_activity' => 'Open Case',
+                  'reference_offset' => 3,
+                  'reference_select' => 'newest',
                 ],
               ],
             ],
           ],
-          "timelineActivityTypes" => [
+          'timelineActivityTypes' => [
             [
-              "name" => "Open Case",
-              "status" => "Completed",
+              'name' => 'Open Case',
+              'status' => 'Completed',
             ],
             [
-              "name" => "Follow up",
-              "reference_activity" => "Open Case",
-              "reference_offset" => "3",
-              "reference_select" => "newest",
+              'name' => 'Follow up',
+              'reference_activity' => 'Open Case',
+              'reference_offset' => 3,
+              'reference_select' => 'newest',
             ],
           ],
-          "caseRoles" => [
+          'caseRoles' => [
             [
-              "name" => "Parent of",
-              "creator" => "1",
-              "manager" => "1",
+              'name' => 'Parent of',
+              'creator' => 1,
+              'manager' => 1,
             ],
           ],
         ];
@@ -288,7 +295,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    * @param array $field
    *
    * @return mixed
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   private function getRequiredValue(array $field) {
     if (!empty($field['options'])) {
@@ -332,7 +339,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    *
    * @throws \CRM_Core_Exception
    */
-  private function getFkID(string $fkEntity) {
+  private function getFkID(string $fkEntity): int {
     $params = ['checkPermissions' => FALSE];
     // Be predictable about what type of contact we select
     if ($fkEntity === 'Contact') {
@@ -351,6 +358,9 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    * @param $dataType
    *
    * @return int|null|string
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
   private function getRandomValue($dataType) {
     switch ($dataType) {
@@ -367,7 +377,7 @@ class Api4TestBase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
         return $this->randomLetters(100);
 
       case 'Money':
-        return sprintf('%d.%2d', rand(0, 2000), rand(10, 99));
+        return sprintf('%d.%2d', random_int(0, 2000), random_int(10, 99));
 
       case 'Date':
         return '20100102';

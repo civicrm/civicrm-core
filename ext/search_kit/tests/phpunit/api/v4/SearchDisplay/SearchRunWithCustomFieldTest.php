@@ -10,13 +10,14 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Test\CiviEnvBuilder;
 
 /**
  * @group headless
  */
 class SearchRunWithCustomFieldTest extends CustomTestBase {
 
-  public function setUpHeadless() {
+  public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()
       ->installMe(__DIR__)
       ->apply();

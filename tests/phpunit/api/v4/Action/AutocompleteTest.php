@@ -25,6 +25,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\SavedSearch;
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
 
@@ -54,7 +55,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     }
   }
 
-  public function setUpHeadless() {
+  public function setUpHeadless(): CiviEnvBuilder {
     // TODO: search_kit should probably be part of the 'headless()' baseline.
     return \Civi\Test::headless()->install(['org.civicrm.search_kit'])->apply();
   }
