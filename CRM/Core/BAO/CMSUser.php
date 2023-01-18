@@ -198,10 +198,16 @@ class CRM_Core_BAO_CMSUser {
         $params = [
           'name' => $fields['cms_name'],
           'mail' => $fields[$emailName],
+          'pass' => $fields['cms_pass'],
         ];
       }
 
       $config->userSystem->checkUserNameEmailExists($params, $errors, $emailName);
+
+      // Verify the password.
+      if ($config->userSystem->isPasswordUserGenerated()) {
+        $config->userSystem->verifyPassword($params, $errors);
+      }
     }
     return (!empty($errors)) ? $errors : TRUE;
   }

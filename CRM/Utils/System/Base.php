@@ -459,6 +459,17 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Verify password
+   *
+   * @param array $params
+   *   Array of name, mail and password values.
+   * @param array $errors
+   *   Array of errors.
+   */
+  public function verifyPassword($params, &$errors) {
+  }
+
+  /**
    * Is a front end page being accessed.
    *
    * Generally this would be a contribution form or other public page as opposed to a backoffice page (like contact edit).
