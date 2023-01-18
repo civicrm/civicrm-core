@@ -179,7 +179,12 @@ class CRM_Extension_ClassLoader {
    * @return string
    */
   protected function getCacheFile() {
-    $envId = \CRM_Core_Config_Runtime::getId();
+    $envId = md5(implode(',', array_merge(
+      [\CRM_Core_Config_Runtime::getId()],
+      array_column($this->mapper->getActiveModuleFiles(), 'prefix')
+      // dev/core#4055 - When toggling ext's on systems with opcode caching, you may get stale reads for a moment.
+      // New cache key ensures new data-set.
+    )));
     $file = \Civi::paths()->getPath("[civicrm.compile]/CachedExtLoader.{$envId}.php");
     return $file;
   }
