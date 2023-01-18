@@ -2112,8 +2112,15 @@ ORDER BY civicrm_custom_group.weight,
       $submitted = [];
     }
     foreach ($submitted as $key => $value) {
-      if (substr($key, 0, 7) === 'custom_') {
-        $submitted = self::processCustomFields($mainId, $key, $cFields, $submitted, $value);
+      if (strpos($key, 'custom_') === 0) {
+        $fieldID = (int) substr($key, 7);
+        if (empty($cFields[$fieldID])) {
+          $htmlType = $cFields[$fieldID]['attributes']['html_type'];
+          $isSerialized = CRM_Core_BAO_CustomField::isSerialized($cFields[$fieldID]['attributes']);
+          $isView = $cFields[$fieldID]['attributes']['is_view'];
+          $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
+
+        }
       }
     }
 
@@ -2526,31 +2533,27 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @param int $mainId
    * @param string $key
-   * @param array $cFields
    * @param array $submitted
    * @param mixed $value
+   * @param int $fieldID
+   * @param bool $isView
+   * @param string $htmlType
+   * @param bool $isSerialized
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function processCustomFields($mainId, $key, $cFields, $submitted, $value) {
-    $fid = (int) substr($key, 7);
-    if (empty($cFields[$fid])) {
-      return $submitted;
-    }
-    $htmlType = $cFields[$fid]['attributes']['html_type'];
-    $isSerialized = CRM_Core_BAO_CustomField::isSerialized($cFields[$fid]['attributes']);
-
+  protected static function processCustomFields(int $mainId, string $key, array $submitted, $value, int $fieldID, bool $isView, string $htmlType, bool $isSerialized): array {
     if ($htmlType === 'File') {
       // Handled in CustomField->move(). Tested in testMergeCustomFields.
-      unset($submitted["custom_$fid"]);
+      unset($submitted["custom_$fieldID"]);
     }
     elseif (!$isSerialized && ($htmlType === 'Select Country' || $htmlType === 'Select State/Province')) {
       // @todo Test in testMergeCustomFields disabled as this does not work, Handle in CustomField->move().
-      $submitted[$key] = CRM_Core_BAO_CustomField::displayValue($value, $fid);
+      $submitted[$key] = CRM_Core_BAO_CustomField::displayValue($value, $fieldID);
     }
     elseif ($htmlType === 'Select Date') {
-      if ($cFields[$fid]['attributes']['is_view']) {
+      if ($isView) {
         $submitted[$key] = date('YmdHis', strtotime($submitted[$key]));
       }
     }
