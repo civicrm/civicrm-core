@@ -45,7 +45,9 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $spec->getFieldByName('activity_type_id')
         ->setDefaultValue(NULL)
         ->setRequired($action === 'create');
+    }
 
+    if (in_array($action, ['get', 'create', 'update'], TRUE)) {
       $field = new FieldSpec('source_contact_id', 'Activity', 'Integer');
       $field->setTitle(ts('Source Contact'));
       $field->setLabel(ts('Added by'));
@@ -53,6 +55,7 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setRequired($action === 'create');
       $field->setFkEntity('Contact');
       $field->setInputType('EntityRef');
+      $field->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
       $spec->addFieldSpec($field);
 
       $field = new FieldSpec('target_contact_id', 'Activity', 'Array');
@@ -62,6 +65,7 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setFkEntity('Contact');
       $field->setInputType('EntityRef');
       $field->setInputAttrs(['multiple' => TRUE]);
+      $field->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
       $spec->addFieldSpec($field);
 
       $field = new FieldSpec('assignee_contact_id', 'Activity', 'Array');
@@ -71,6 +75,7 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setFkEntity('Contact');
       $field->setInputType('EntityRef');
       $field->setInputAttrs(['multiple' => TRUE]);
+      $field->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
       $spec->addFieldSpec($field);
     }
   }
