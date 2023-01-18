@@ -15,6 +15,12 @@
  */
 class CRM_Utils_ZipTest extends CiviUnitTestCase {
 
+  /**
+   * Reference to filename, to allow cleanup in tearDown
+   * @var string|false
+   */
+  private $file = FALSE;
+
   public function setUp(): void {
     parent::setUp();
     $this->file = FALSE;
