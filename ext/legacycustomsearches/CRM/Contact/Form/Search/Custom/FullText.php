@@ -449,13 +449,7 @@ WHERE      t.table_name = 'Activity' AND
    */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     $this->initialize();
-
-    if ($returnSQL) {
-      return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
-    }
-    else {
-      return CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM {$this->tableName}");
-    }
+    return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
   /**
