@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\RelationshipType;
+
 /**
  * This class gets the name of the file to upload.
  */
@@ -41,7 +43,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return string
    */
-  public function defaultFromColumnName($columnName) {
+  public function defaultFromColumnName(string $columnName): string {
 
     if (!preg_match('/^[a-z0-9 ]$/i', $columnName)) {
       if ($columnKey = array_search($columnName, $this->getFieldTitles())) {
@@ -70,13 +72,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function preProcess() {
+  public function preProcess(): void {
     $this->_mapperFields = $this->getAvailableFields();
-    $this->_contactSubType = $this->getSubmittedValue('contactSubType');
     //format custom field names, CRM-2676
     $contactType = $this->getContactType();
-
-    $this->_contactType = $contactType;
 
     if ($this->isIgnoreDuplicates()) {
       //Mark Dedupe Rule Fields as required, since it's used in matching contact
@@ -109,7 +108,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->addSavedMappingFields();
 
     $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'formRule']);
@@ -118,12 +117,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
-    $hasColumnNames = !empty($this->_columnNames);
+    $hasColumnNames = !empty($this->getDataSourceObject()->getColumnHeaders());
 
-    $this->_location_types = ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $this->getLocationTypes();
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     $this->assign('defaultLocationType', $defaultLocationType->id);
-    $this->assign('defaultLocationTypeLabel', $this->_location_types[$defaultLocationType->id]);
+    $this->assign('defaultLocationTypeLabel', $this->getLocationTypeLabel($defaultLocationType->id));
 
     /* Initialize all field usages to false */
     foreach ($mapperKeys as $key) {
@@ -137,7 +136,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
-    foreach ($this->_location_types as $key => $value) {
+    foreach ($this->getLocationTypes() as $key => $value) {
       $sel3['phone'][$key] = &$phoneTypes;
       $sel3['phone_ext'][$key] = &$phoneTypes;
       //build array for IM service provider type for contact
@@ -146,16 +145,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $sel4 = NULL;
 
-    // store and cache all relationship types
-    $contactRelation = new CRM_Contact_DAO_RelationshipType();
-    $contactRelation->find();
-    while ($contactRelation->fetch()) {
-      $contactRelationCache[$contactRelation->id] = [];
-      $contactRelationCache[$contactRelation->id]['contact_type_a'] = $contactRelation->contact_type_a;
-      $contactRelationCache[$contactRelation->id]['contact_sub_type_a'] = $contactRelation->contact_sub_type_a;
-      $contactRelationCache[$contactRelation->id]['contact_type_b'] = $contactRelation->contact_type_b;
-      $contactRelationCache[$contactRelation->id]['contact_sub_type_b'] = $contactRelation->contact_sub_type_b;
-    }
     $highlightedFields = $highlightedRelFields = [];
 
     $highlightedFields['email'] = 'All';
@@ -169,30 +158,21 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       // check if there is a _a_b or _b_a in the key
       if (strpos($key, '_a_b') || strpos($key, '_b_a')) {
         [$id, $first, $second] = explode('_', $key);
+        $relatedContactType = $this->getRelatedContactType($key);
+        //CRM-5125 for contact subtype specific RelationshipTypes
+        $relatedContactSubType = $this->getRelatedContactSubType($key);
       }
       else {
         $id = $first = $second = NULL;
       }
       if (($first === 'a' && $second === 'b') || ($first === 'b' && $second === 'a')) {
-        $cType = $contactRelationCache[$id]["contact_type_{$second}"];
-
-        //CRM-5125 for contact subtype specific relationshiptypes
-        $cSubType = NULL;
-        if (!empty($contactRelationCache[$id]["contact_sub_type_{$second}"])) {
-          $cSubType = $contactRelationCache[$id]["contact_sub_type_{$second}"];
-        }
-
-        if (!$cType) {
-          $cType = 'All';
-        }
-
-        $relatedFields = CRM_Contact_BAO_Contact::importableFields($cType);
+        $relatedFields = CRM_Contact_BAO_Contact::importableFields($relatedContactType);
         unset($relatedFields['']);
         $values = [];
         foreach ($relatedFields as $name => $field) {
           $values[$name] = $field['title'];
           if ($this->isLocationTypeRequired($name)) {
-            $sel3[$key][$name] = $this->_location_types;
+            $sel3[$key][$name] = $this->getLocationTypes();
           }
           elseif ($name === 'url') {
             $sel3[$key][$name] = $websiteTypes;
@@ -203,39 +183,39 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
 
         //fix to append custom group name to field name, CRM-2676
-        if (empty($this->_formattedFieldNames[$cType]) || $cType == $this->_contactType) {
-          $this->_formattedFieldNames[$cType] = $this->formatCustomFieldName($values);
+        if (empty($this->_formattedFieldNames[$relatedContactType]) || $relatedContactType === $this->getContactType()) {
+          $this->_formattedFieldNames[$relatedContactType] = $this->formatCustomFieldName($values);
         }
 
-        $this->_formattedFieldNames[$cType] = array_merge($values, $this->_formattedFieldNames[$cType]);
+        $this->_formattedFieldNames[$relatedContactType] = array_merge($values, $this->_formattedFieldNames[$relatedContactType]);
 
         //Modified the Relationship fields if the fields are
         //present in dedupe rule
-        if ($this->isIgnoreDuplicates() && !empty($this->_dedupeFields[$cType]) &&
-          is_array($this->_dedupeFields[$cType])
+        if ($this->isIgnoreDuplicates() && !empty($this->_dedupeFields[$relatedContactType]) &&
+          is_array($this->_dedupeFields[$relatedContactType])
         ) {
           static $cTypeArray = [];
-          if ($cType != $this->_contactType && !in_array($cType, $cTypeArray)) {
-            foreach ($this->_dedupeFields[$cType] as $val) {
-              if ($valTitle = CRM_Utils_Array::value($val, $this->_formattedFieldNames[$cType])) {
-                $this->_formattedFieldNames[$cType][$val] = $valTitle . ' (match to contact)';
+          if ($relatedContactType !== $this->getContactType() && !in_array($relatedContactType, $cTypeArray)) {
+            foreach ($this->_dedupeFields[$relatedContactType] as $val) {
+              if ($valTitle = CRM_Utils_Array::value($val, $this->_formattedFieldNames[$relatedContactType])) {
+                $this->_formattedFieldNames[$relatedContactType][$val] = $valTitle . ' (match to contact)';
               }
             }
-            $cTypeArray[] = $cType;
+            $cTypeArray[] = $relatedContactType;
           }
         }
 
         foreach ($highlightedFields as $k => $v) {
-          if ($v == $cType || $v === 'All') {
+          if ($v === $relatedContactType || $v === 'All') {
             $highlightedRelFields[$key][] = $k;
           }
         }
         $this->assign('highlightedRelFields', $highlightedRelFields);
-        $sel2[$key] = $this->_formattedFieldNames[$cType];
+        $sel2[$key] = $this->_formattedFieldNames[$relatedContactType];
 
-        if (!empty($cSubType)) {
+        if (!empty($relatedContactSubType)) {
           //custom fields for sub type
-          $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($cSubType);
+          $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($relatedContactSubType);
 
           if (!empty($subTypeFields)) {
             $subType = NULL;
@@ -246,7 +226,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           }
         }
 
-        foreach ($this->_location_types as $k => $value) {
+        foreach ($this->getLocationTypes() as $k => $value) {
           $sel4[$key]['phone'][$k] = &$phoneTypes;
           $sel4[$key]['phone_ext'][$k] = &$phoneTypes;
           //build array of IM service provider for related contact
@@ -256,7 +236,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       else {
         $options = NULL;
         if ($this->isLocationTypeRequired($key)) {
-          $options = $this->_location_types;
+          $options = $this->getLocationTypes();
         }
         elseif ($key === 'url') {
           $options = $websiteTypes;
@@ -277,9 +257,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor->setContactSubType($this->getSubmittedValue('contactSubType'));
     $mapper = $this->getSubmittedValue('mapper');
 
-    for ($i = 0; $i < $this->_columnCount; $i++) {
+    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
-      $last_key = 0;
 
       // Don't set any defaults if we are going to the next page.
       // ... or coming back.
@@ -294,7 +273,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       else {
         if ($hasColumnNames) {
           // do array search first to see if has mapped key
-          $columnKey = array_search($this->_columnNames[$i], $this->getFieldTitles());
+          $columnKey = array_search($columnHeader, $this->getFieldTitles(), TRUE);
           if (isset($this->_fieldUsed[$columnKey])) {
             $defaults["mapper[$i]"] = [$columnKey];
             $this->_fieldUsed[$key] = TRUE;
@@ -302,7 +281,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           else {
             // Infer the default from the column names if we have them
             $defaults["mapper[$i]"] = [
-              $this->defaultFromColumnName($this->_columnNames[$i]),
+              $this->defaultFromColumnName($columnHeader),
             ];
           }
         }
@@ -330,12 +309,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array|bool
+   * @return bool
    *   list of errors to be posted back to the form
    */
-  public static function formRule(array $fields) {
+  public static function formRule(array $fields): bool {
     if (!empty($fields['saveMapping'])) {
-      // todo - this is non-sensical - sane js is better. PR to fix got stale but
+      // todo - this is nonsensical - sane js is better. PR to fix got stale but
       // is here https://github.com/civicrm/civicrm-core/pull/23950
       CRM_Core_Smarty::singleton()->assign('isCheked', TRUE);
     }
@@ -344,8 +323,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Process the mapped fields and map it into the uploaded file.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $params = $this->controller->exportValues('MapField');
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     $this->submit($params);
@@ -360,7 +341,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array
    */
-  public function formatCustomFieldName($fields) {
+  public function formatCustomFieldName(array $fields): array {
     //CRM-2676, replacing the conflict for same custom field name from different custom group.
     $fieldIds = $formattedFieldNames = [];
     foreach ($fields as $key => $value) {
@@ -374,7 +355,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       if (!empty($groupTitles)) {
         foreach ($groupTitles as $fId => $values) {
-          $key = "custom_{$fId}";
+          $key = "custom_$fId";
           $groupTitle = $values['groupTitle'];
           $formattedFieldNames[$key] = $fields[$key] . ' :: ' . $groupTitle;
         }
@@ -389,14 +370,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * Extracted to add testing & start refactoring.
    *
-   * @param $params
-   * @param $mapperKeys
+   * @param array $params
    *
    * @throws \CRM_Core_Exception
    */
-  public function submit($params) {
-    $this->set('columnNames', $this->_columnNames);
-
+  public function submit(array $params): void {
     // store mapping Id to display it in the preview page
     $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
 
@@ -432,7 +410,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * Did the user specify duplicates matching should not be attempted.
    *
    * @return bool
-   * @throws \CRM_Core_Exception
    */
   private function isIgnoreDuplicates(): bool {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_NOCHECK;
@@ -474,9 +451,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * e.g ['first_name' => FALSE, 'email' => TRUE, 'street_address' => TRUE']
    *
+   * @param string $name
+   *
    * @return bool
    */
-  private function isLocationTypeRequired($name): bool {
+  private function isLocationTypeRequired(string $name): bool {
     if (!isset(Civi::$statics[__CLASS__]['location_fields'])) {
       Civi::$statics[__CLASS__]['location_fields'] = (new CRM_Contact_Import_Parser_Contact())->setUserJobID($this->getUserJobID())->getFieldsWhichSupportLocationTypes();
     }
@@ -490,6 +469,76 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($this->getUserJobID());
     return $parser;
+  }
+
+  /**
+   * Get the location types for import, including the pseudo-type 'Primary'.
+   *
+   * @return array
+   */
+  protected function getLocationTypes(): array {
+    return ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+  }
+
+  /**
+   * Get the location types for import, including the pseudo-type 'Primary'.
+   *
+   * @param int|string $type
+   *   Location Type ID or 'Primary'.
+   * @return string
+   */
+  protected function getLocationTypeLabel($type): string {
+    return $this->getLocationTypes()[$type];
+  }
+
+  /**
+   * Get the type of the related contact.
+   *
+   * @param string $key
+   *
+   * @return string
+   */
+  protected function getRelatedContactType(string $key): string {
+    $relationship = $this->getRelationshipType($key);
+    if (strpos($key, '_a_b')) {
+      return $relationship['contact_type_b'] ?: 'All';
+    }
+    return $relationship['contact_type_a'] ?: 'All';
+  }
+
+  /**
+   * Get the sub_type of the related contact.
+   *
+   * @param string $key
+   *
+   * @return string|null
+   */
+  protected function getRelatedContactSubType(string $key): ?string {
+    $relationship = $this->getRelationshipType($key);
+    if (strpos($key, '_a_b')) {
+      return $relationship['contact_sub_type_b'];
+    }
+    return $relationship['contact_sub_type_a'];
+  }
+
+  /**
+   * Get the relationship type.
+   *
+   * @param string $key
+   *   e.g 5_a_b for relationship ID 5 in an a-b direction.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function getRelationshipType(string $key): array {
+    $relationshipTypeID = str_replace(['_a_b', '_b_a'], '', $key);
+    if (!isset(Civi::$statics[__CLASS__]['relationship_type'][$relationshipTypeID])) {
+      Civi::$statics[__CLASS__]['relationship_type'][$relationshipTypeID] = RelationshipType::get(FALSE)
+        ->addWhere('id', '=', $relationshipTypeID)
+        ->addSelect('contact_type_a', 'contact_type_b', 'contact_sub_type_a', 'contact_sub_type_b')
+        ->execute()->first();
+    }
+    return Civi::$statics[__CLASS__]['relationship_type'][$relationshipTypeID];
   }
 
 }

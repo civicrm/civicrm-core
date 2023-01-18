@@ -25,25 +25,11 @@ use Civi\Api4\MappingField;
 abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
 
   /**
-   * Cache of preview data values
-   *
-   * @var array
-   */
-  protected $_dataValues;
-
-  /**
    * Mapper fields
    *
    * @var array
    */
   protected $_mapperFields;
-
-  /**
-   * Number of columns in import file
-   *
-   * @var int
-   */
-  protected $_columnCount;
 
   /**
    * Column headers, if we have them
@@ -139,46 +125,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       }
     }
     return '';
-  }
-
-  /**
-   * Guess at the field names given the data and patterns from the schema.
-   *
-   * @param array $patterns
-   * @param string $index
-   *
-   * @return string
-   */
-  public function defaultFromData($patterns, $index) {
-    $best = '';
-    $bestHits = 0;
-    $n = count($this->_dataValues);
-
-    foreach ($patterns as $key => $re) {
-      // Skip empty key/patterns
-      if (!$key || !$re || strlen("$re") < 5) {
-        continue;
-      }
-
-      /* Take a vote over the preview data set */
-      $hits = 0;
-      for ($i = 0; $i < $n; $i++) {
-        if (isset($this->_dataValues[$i][$index])) {
-          if (preg_match($re, $this->_dataValues[$i][$index])) {
-            $hits++;
-          }
-        }
-      }
-      if ($hits > $bestHits) {
-        $bestHits = $hits;
-        $best = $key;
-      }
-    }
-
-    if ($best != '') {
-      $this->_fieldUsed[$best] = TRUE;
-    }
-    return $best;
   }
 
   /**
