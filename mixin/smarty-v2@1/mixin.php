@@ -18,15 +18,22 @@ return function ($mixInfo, $bootCache) {
     return;
   }
 
-  // Is it good or bad that this hasn't different static-guard-i-ness than the old 'hook_config' boilerplate?
+  $register = function() use ($dir) {
+    // This implementation is useful for older versions of CiviCRM. It can be replaced/updated going forward.
+    $smarty = CRM_Core_Smarty::singleton();
+    if (!is_array($smarty->template_dir)) {
+      $this->template_dir = [$smarty->template_dir];
+    }
+    if (!in_array($dir, $smarty->template_dir)) {
+      array_unshift($smarty->template_dir, $dir);
+    }
+  };
 
   if ($mixInfo->isActive()) {
-    \Civi::dispatcher()->addListener('hook_civicrm_config', function () use ($dir) {
-      \CRM_Core_Smarty::singleton()->addTemplateDir($dir);
-    });
+    \Civi::dispatcher()->addListener('hook_civicrm_config', $register);
   }
   elseif (CRM_Extension_System::singleton()->getManager()->extensionIsBeingInstalledOrEnabled($mixInfo->longName)) {
-    \CRM_Core_Smarty::singleton()->addTemplateDir($dir);
+    $register();
   }
 
 };
