@@ -500,11 +500,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     if ($this->_paymentProcessor['billing_mode'] == 4) {
-      $this->doPaymentRedirectToPayPal($params, $component);
+      $this->doPaymentRedirectToPayPal($params);
       // redirect calls CiviExit() so execution is stopped
     }
     else {
-      $result = $this->doPaymentPayPalButton($params, $component);
+      $result = $this->doPaymentPayPalButton($params);
       if (is_array($result) && !isset($result['payment_status_id'])) {
         if (!empty($params['is_recur'])) {
           $result = $this->setStatusPaymentPending($result);
@@ -537,12 +537,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @param string $component
    * @return array
    *   the result in an nice formatted array (or an error object)
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doPaymentPayPalButton(&$params, $component = 'contribute') {
+  public function doPaymentPayPalButton(&$params) {
     $args = [];
 
     $result = $this->setStatusPaymentPending([]);
@@ -590,7 +589,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['totalbillingcycles'] = $params['installments'] ?? NULL;
       $args['version'] = 56.0;
       $args['PROFILEREFERENCE'] = "" .
-        "i=" . $params['invoiceID'] . "&m=" . $component .
+        "i=" . $params['invoiceID'] . "&m=" . $this->_component .
         "&c=" . $params['contactID'] . "&r=" . $params['contributionRecurID'] .
         "&b=" . $params['contributionID'] . "&p=" . $params['contributionPageID'];
     }
@@ -915,12 +914,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
   /**
    * @param array $params
-   * @param string $component
    *
    * @throws Exception
    */
-  public function doPaymentRedirectToPayPal(&$params, $component = 'contribute') {
-    $notifyParameters = ['module' => $component];
+  public function doPaymentRedirectToPayPal(&$params) {
+    $notifyParameters = ['module' => $this->_component];
     $notifyParameterMap = [
       'contactID' => 'contactID',
       'contributionID' => 'contributionID',
@@ -941,8 +939,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $notifyURL = $this->getNotifyUrl();
 
     $config = CRM_Core_Config::singleton();
-    $url = ($component == 'event') ? 'civicrm/event/register' : 'civicrm/contribute/transact';
-    $cancel = ($component == 'event') ? '_qf_Register_display' : '_qf_Main_display';
+    $url = ($this->_component == 'event') ? 'civicrm/event/register' : 'civicrm/contribute/transact';
+    $cancel = ($this->_component == 'event') ? '_qf_Register_display' : '_qf_Main_display';
 
     $cancelUrlString = "$cancel=1&cancel=1&qfKey={$params['qfKey']}";
     if (!empty($params['is_recur'])) {
