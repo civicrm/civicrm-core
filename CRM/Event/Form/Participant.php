@@ -516,7 +516,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->assign('participant_is_pay_later', TRUE);
       }
 
-      $this->assign('participant_status_id', $defaults[$this->_id]['participant_status_id']);
       $eventID = $defaults[$this->_id]['event_id'];
 
       $this->_eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventID, 'event_type_id', 'id');
@@ -1025,6 +1024,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $this->_params['participant_status_id'] = $params['status_id'];
     $this->_params['participant_role_id'] = is_array($params['role_id']) ? $params['role_id'] : explode(',', $params['role_id']);
     $roleIdWithSeparator = implode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_params['participant_role_id']);
+    $this->assign('participant_status_id', $params['status_id']);
 
     $now = date('YmdHis');
 
