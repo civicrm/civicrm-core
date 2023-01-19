@@ -622,6 +622,8 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'url' => 'civicrm/case/activity/view',
           'qs' => 'reset=1&cid=%%cid%%&caseid=%%caseid%%&aid=%%aid%%',
           'title' => ts('View'),
+          'accessKey' => '',
+          'ref' => 'View',
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
@@ -629,6 +631,8 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'qs' => 'reset=1&cid=%%cid%%&caseid=%%caseid%%&id=%%aid%%&action=update%%cxt%%',
           'title' => ts('Edit'),
           'icon' => 'fa-pencil',
+          'accessKey' => '',
+          'ref' => 'Edit',
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
@@ -636,6 +640,8 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'qs' => 'reset=1&cid=%%cid%%&caseid=%%caseid%%&id=%%aid%%&action=delete%%cxt%%',
           'title' => ts('Delete'),
           'icon' => 'fa-trash',
+          'accessKey' => '',
+          'ref' => 'Delete',
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Restore'),
@@ -643,6 +649,8 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'qs' => 'reset=1&cid=%%cid%%&caseid=%%caseid%%&id=%%aid%%&action=renew%%cxt%%',
           'title' => ts('Restore'),
           'icon' => 'fa-undo',
+          'accessKey' => '',
+          'ref' => 'Restore',
         ],
         CRM_Core_Action::DETACH => [
           'name' => ts('Move To Case'),
@@ -650,6 +658,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'title' => ts('Move To Case'),
           'extra' => 'onclick = "Javascript:fileOnCase( \'move\', %%aid%%, %%caseid%%, this ); return false;"',
           'icon' => 'fa-clipboard',
+          'accessKey' => '',
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy To Case'),
@@ -657,6 +666,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'title' => ts('Copy To Case'),
           'extra' => 'onclick = "Javascript:fileOnCase( \'copy\', %%aid%%, %%caseid%%, this ); return false;"',
           'icon' => 'fa-files-o',
+          'accessKey' => '',
         ],
       ];
     }
