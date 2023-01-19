@@ -1175,11 +1175,11 @@ abstract class CRM_Core_Payment {
    * Get url to return to after cancelled or failed transaction.
    *
    * @param string $qfKey
-   * @param int $participantID
+   * @param int|NULL $participantID
    *
    * @return string cancel url
    */
-  public function getCancelUrl($qfKey, $participantID) {
+  public function getCancelUrl($qfKey, $participantID = NULL) {
     if (isset($this->cancelUrl)) {
       return $this->cancelUrl;
     }
