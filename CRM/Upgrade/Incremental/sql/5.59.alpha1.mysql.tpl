@@ -10,7 +10,7 @@ INSERT IGNORE INTO `civicrm_state_province` (`country_id`, `abbreviation`, `name
 INSERT IGNORE INTO `civicrm_state_province` (`country_id`, `abbreviation`, `name`) VALUES (@country_id, 'RM', 'Remich');
 INSERT IGNORE INTO `civicrm_state_province` (`country_id`, `abbreviation`, `name`) VALUES (@country_id, 'VD', 'Vianden');
 INSERT IGNORE INTO `civicrm_state_province` (`country_id`, `abbreviation`, `name`) VALUES (@country_id, 'WI', 'Wiltz');
-UPDATE `civicrm_state_province` SET abbreviation = 'LU' WHERE name = 'Luxembourg';
-UPDATE `civicrm_state_province` SET abbreviation = 'DI' WHERE name = 'Diekirch';
-UPDATE `civicrm_state_province` SET name = 'Grevenmacher' WHERE name = 'GreveNmacher';
-UPDATE `civicrm_state_province` SET abbreviation = 'GR' WHERE name = 'Grevenmacher';
+UPDATE `civicrm_state_province` SET abbreviation = 'LU' WHERE name = 'Luxembourg' AND country_id = @country_id;
+UPDATE `civicrm_state_province` SET abbreviation = 'DI' WHERE name = 'Diekirch' AND country_id = @country_id;
+UPDATE `civicrm_state_province` SET name = 'Grevenmacher' WHERE name = 'GreveNmacher' AND country_id = @country_id;
+UPDATE `civicrm_state_province` SET abbreviation = 'GR' WHERE name = 'Grevenmacher' AND country_id = @country_id;
