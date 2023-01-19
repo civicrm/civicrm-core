@@ -14,6 +14,7 @@ use Civi\Api4\Phone;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\UFMatch;
+use Civi\Test\CiviEnvBuilder;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -22,7 +23,7 @@ use Civi\Test\TransactionalInterface;
 class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   use \Civi\Test\ACLPermissionTrait;
 
-  public function setUpHeadless() {
+  public function setUpHeadless(): CiviEnvBuilder {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
     return \Civi\Test::headless()
