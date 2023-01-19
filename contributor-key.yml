@@ -488,9 +488,6 @@
 - name        : Fabian Schuttenberg
   organization: Systopia
 
-- name        : Fabian Schuttenberg
-  organization: Systopia
-
 - name        : Fatih Ateş
 
 - name        : Fedor Khodkov
@@ -743,6 +740,10 @@
 - github      : johntwyman
   name        : John Twyman
   organization: Australian Greens
+
+- github      : jofranz
+  organization: Systopia
+  name        : Johannes
 
 - github      : jorich-2000
   name        : Jonathan Richardson
