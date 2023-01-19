@@ -18,26 +18,26 @@ class EntityTypesTest extends \PHPUnit\Framework\Assert {
 
   const EXAMPLE_NAME = 'ShimThing';
 
-  public function testPreConditions($cv) {
+  public function testPreConditions($cv): void {
     $this->assertFileExists(static::getPath('/xml/schema/CRM/Shimmy/ShimThing.xml'), 'The shimmy extension must have *.xml.');
     $this->assertFileExists(static::getPath('/xml/schema/CRM/Shimmy/ShimThing.entityType.php'), 'The shimmy extension must have *.entityTYpe.php.');
     $this->assertFileExists(static::getPath('/CRM/Shimmy/DAO/ShimThing.php'), 'The shimmy extension must have DAO.');
   }
 
-  public function testInstalled($cv) {
+  public function testInstalled($cv): void {
     $this->assertEquals(self::EXAMPLE_NAME, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getBriefName', [self::EXAMPLE_DAO]));
     $this->assertEquals(self::EXAMPLE_TABLE, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getTableForClass', [self::EXAMPLE_DAO]));
     $this->assertEquals(self::EXAMPLE_NAME, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getEntityNameForTable', [self::EXAMPLE_TABLE]));
     $this->assertEquals('ShimThing ID', $cv->phpEval('return \CRM_Shimmy_DAO_ShimThing::fields()["id"]["title"];'));
   }
 
-  public function testDisabled($cv) {
+  public function testDisabled($cv): void {
     $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getBriefName', [self::EXAMPLE_DAO]));
     $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getTableForClass', [self::EXAMPLE_DAO]));
     $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getEntityNameForTable', [self::EXAMPLE_TABLE]));
   }
 
-  public function testUninstalled($cv) {
+  public function testUninstalled($cv): void {
     $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getBriefName', [self::EXAMPLE_DAO]));
     $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getTableForClass', [self::EXAMPLE_DAO]));
     $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getEntityNameForTable', [self::EXAMPLE_TABLE]));

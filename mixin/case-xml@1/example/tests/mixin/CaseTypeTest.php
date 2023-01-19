@@ -12,11 +12,11 @@ namespace Civi\Shimmy\Mixins;
  */
 class CaseTypeTest extends \PHPUnit\Framework\Assert {
 
-  public function testPreConditions($cv) {
+  public function testPreConditions($cv): void {
     $this->assertFileExists(static::getPath('/xml/case/DuckDance.xml'), 'The shimmy extension must have a Case XML file.');
   }
 
-  public function testInstalled($cv) {
+  public function testInstalled($cv): void {
     $items = $cv->api4('CaseType', 'get', ['where' => [['name', '=', 'DuckDance']]]);
     $this->assertEquals('The mysterious case of the dancing duck', $items[0]['description']);
     $this->assertEquals('DuckDance', $items[0]['name']);
@@ -35,7 +35,7 @@ class CaseTypeTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals(TRUE, $actTypes[0]['is_active'], 'ActivityType "Quack" should be auto enabled. It\'s inactive.');
   }
 
-  public function testDisabled($cv) {
+  public function testDisabled($cv): void {
     $items = $cv->api4('CaseType', 'get', ['where' => [['name', '=', 'DuckDance']]]);
     $this->assertEquals('The mysterious case of the dancing duck', $items[0]['description']);
     $this->assertEquals('DuckDance', $items[0]['name']);
@@ -44,7 +44,7 @@ class CaseTypeTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals(1, count($items));
   }
 
-  public function testUninstalled($cv) {
+  public function testUninstalled($cv): void {
     $items = $cv->api4('CaseType', 'get', ['where' => [['name', '=', 'DuckDance']]]);
     $this->assertEquals(0, count($items));
 
