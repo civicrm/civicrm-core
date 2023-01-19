@@ -30,9 +30,15 @@ return function ($mixInfo, $bootCache) {
   };
 
   if ($mixInfo->isActive()) {
+    // Typical: The extension is already installed, and we're booting Civi normally.
+    // We put this first because it's most common.
+    // We defer the actual registration for a moment -- to ensure that Smarty is online.
     \Civi::dispatcher()->addListener('hook_civicrm_config', $register);
   }
   elseif (CRM_Extension_System::singleton()->getManager()->extensionIsBeingInstalledOrEnabled($mixInfo->longName)) {
+    // New Install: The extension has just been enabled, and we're now setting it up.
+    // We put this second because it's less common, and checking it requires more resources (eg `Manager` instance).
+    // We register immediately because Smarty is already online, and the new templates may be needed for upcoming installation steps.
     $register();
   }
 
