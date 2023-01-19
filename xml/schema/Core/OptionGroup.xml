@@ -6,6 +6,10 @@
   <name>civicrm_option_group</name>
   <add>1.5</add>
   <log>true</log>
+  <paths>
+    <add>civicrm/admin/options?action=add&amp;reset=1</add>
+    <update>civicrm/admin/options?action=update&amp;reset=1&amp;id=[id]</update>
+  </paths>
   <field>
     <name>id</name>
     <title>Option Group ID</title>
