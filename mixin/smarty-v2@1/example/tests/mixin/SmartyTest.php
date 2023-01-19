@@ -12,16 +12,16 @@ namespace Civi\Shimmy\Mixins;
  */
 class SmartyTest extends \PHPUnit\Framework\Assert {
 
-  public function testPreConditions($cv): void {
+  public function testPreConditions(object $cv): void {
     $this->assertFileExists(static::getPath('/templates/CRM/Shimmy/Example.tpl'), 'The shimmy extension must have example TPL files.');
   }
 
-  public function testInstalled($cv): void {
+  public function testInstalled(object $cv): void {
     $out = $this->renderExample($cv, 'CRM/Shimmy/Example.tpl');
     $this->assertEquals('<p>OK</p>', trim($out));
   }
 
-  public function testDisabled($cv): void {
+  public function testDisabled(object $cv): void {
     if ($cv->isLocal()) {
       // Historically, Smarty templates have been left active for duration of same-process (post-disabling).
       // We'll ignore testing this edge-case until someone decides that a change in behavior is better.
@@ -32,7 +32,7 @@ class SmartyTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals('', trim($out));
   }
 
-  public function testUninstalled($cv): void {
+  public function testUninstalled(object $cv): void {
     // Same as disabled....
     $this->testDisabled($cv);
   }
@@ -44,11 +44,11 @@ class SmartyTest extends \PHPUnit\Framework\Assert {
   /**
    * Render a template with the system-under-test.
    *
-   * @param $cv
+   * @param \object $cv
    * @param string $name
    * @return string
    */
-  protected function renderExample($cv, string $name) {
+  protected function renderExample(object $cv, string $name) {
     try {
       putenv('SHIMMY_FOOBAR=' . $name);
       try {
