@@ -88,7 +88,7 @@ class E2E_Shimmy_LifecycleTest extends \PHPUnit\Framework\TestCase implements \C
     return dirname(__DIR__, 4) . $suffix;
   }
 
-  protected function runMethods(string $method, ...$args) {
+  protected function runMethods(string $method, ...$args): void {
     if (empty($this->mixinTests)) {
       $this->fail('Cannot run methods. No mixin tests found.');
     }
