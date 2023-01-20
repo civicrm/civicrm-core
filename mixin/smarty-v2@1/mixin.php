@@ -29,17 +29,28 @@ return function ($mixInfo, $bootCache) {
     }
   };
 
-  if ($mixInfo->isActive()) {
-    // Typical: The extension is already installed, and we're booting Civi normally.
-    // We put this first because it's most common.
-    // We defer the actual registration for a moment -- to ensure that Smarty is online.
-    \Civi::dispatcher()->addListener('hook_civicrm_config', $register);
+  // Let's figure out what environment we're in -- so that we know the best way to call $register().
+
+  if (!empty($GLOBALS['_CIVIX_MIXIN_POLYFILL'])) {
+    // Polyfill Loader (v<=5.45): We're already in the middle of firing `hook_config`.
+    if ($mixInfo->isActive()) {
+      $register();
+    }
+    return;
   }
-  elseif (CRM_Extension_System::singleton()->getManager()->extensionIsBeingInstalledOrEnabled($mixInfo->longName)) {
-    // New Install: The extension has just been enabled, and we're now setting it up.
-    // We put this second because it's less common, and checking it requires more resources (eg `Manager` instance).
-    // We register immediately because Smarty is already online, and the new templates may be needed for upcoming installation steps.
+
+  if (CRM_Extension_System::singleton()->getManager()->extensionIsBeingInstalledOrEnabled($mixInfo->longName)) {
+    // New Install, Standard Loader: The extension has just been enabled, and we're now setting it up.
+    // System has already booted. New templates may be needed for upcoming installation steps.
     $register();
+    return;
   }
+
+  // Typical Pageview, Standard Loader: Defer the actual registration for a moment -- to ensure that Smarty is online.
+  \Civi::dispatcher()->addListener('hook_civicrm_config', function() use ($mixInfo, $register) {
+    if ($mixInfo->isActive()) {
+      $register();
+    }
+  });
 
 };
