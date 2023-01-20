@@ -36,7 +36,7 @@
         <td class='html-adjust'>{$form.in_selector.html} {help id="id-in_selector"}</td>
       </tr>
     {/if}
-    <tr class="crm-custom-field-form-block-text_length"  id="textLength" {if !( $action eq 1 || $action eq 2 ) && ($form.data_type.value.0.0 != 0)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-text_length"  id="textLength">
       <td class="label">{$form.text_length.label}</td>
       <td class="html-adjust">{$form.text_length.html}</td>
     </tr>
@@ -67,31 +67,31 @@
         <span class="description">{ts}Filter contact search results for this field using Contact get API parameters. EXAMPLE: To list Students in group 3:{/ts} "action=get&group=3&contact_sub_type=Student" {docURL page="dev/api"}</span>
       </td>
     </tr>
-    <tr class="crm-custom-field-form-block-options_per_line" id="optionsPerLine" {if $action neq 2 && ($form.data_type.value.0.0 >= 4 && $form.data_type.value.1.0 neq 'CheckBox' || $form.data_type.value.1.0 neq 'Radio' )}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-options_per_line" id="optionsPerLine">
       <td class="label">{$form.options_per_line.label}</td>
       <td class="html-adjust">{$form.options_per_line.html|crmAddClass:two}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-start_date_years" id="startDateRange" {if $action neq 2 && ($form.data_type.value.0.0 != 5)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-start_date_years" id="startDateRange">
       <td class="label">{$form.start_date_years.label}</td>
       <td class="html-adjust">{$form.start_date_years.html} {ts}years prior to current date.{/ts}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-end_date_years" id="endDateRange" {if $action neq 2 && ($form.data_type.value.0.0 != 5)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-end_date_years" id="endDateRange">
       <td class="label">{$form.end_date_years.label}</td>
       <td class="html-adjust">{$form.end_date_years.html} {ts}years after the current date.{/ts}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-date_format"  id="includedDatePart" {if $action neq 2 && ($form.data_type.value.0.0 != 5)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-date_format"  id="includedDatePart">
       <td class="label">{$form.date_format.label}</td>
       <td class="html-adjust">{$form.date_format.html}&nbsp;&nbsp;&nbsp;{$form.time_format.label}&nbsp;&nbsp;{$form.time_format.html}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-note_rows"  id="noteRows" {if $action neq 2 && ($form.data_type.value.0.0 != 4)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-note_rows"  id="noteRows" >
       <td class="label">{$form.note_rows.label}</td>
       <td class="html-adjust">{$form.note_rows.html}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-note_columns" id="noteColumns" {if $action neq 2 && ($form.data_type.value.0.0 != 4)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-note_columns" id="noteColumns" >
       <td class="label">{$form.note_columns.label}</td>
       <td class="html-adjust">{$form.note_columns.html}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-note_length" id="noteLength" {if $action neq 2 && ($form.data_type.value.0.0 != 4)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-note_length" id="noteLength" >
       <td class="label">{$form.note_length.label}</td>
       <td class="html-adjust">{$form.note_length.html} <span class="description">{ts}Leave blank for unlimited. This limit is not implemented by all browsers and rich text editors.{/ts}</span></td>
     </tr>
@@ -104,11 +104,11 @@
         {/if}
       </td>
     </tr>
-    <tr class="crm-custom-field-form-block-default_value" id="hideDefault" {if $action eq 2 && ($form.data_type.value.0.0 < 4 && $form.data_type.value.1.0 NEQ 'Text')}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-default_value" id="hideDefault" >
       <td class="label">{$form.default_value.label}</td>
       <td class="html-adjust">{$form.default_value.html}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-description"  id="hideDesc" {if $action neq 4 && $action eq 2 && ($form.data_type.value.0.0 < 4 && $form.data_type.value.1.0 NEQ 'Text')}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-description"  id="hideDesc" >
       <td class="label">&nbsp;</td>
       <td class="html-adjust"><span class="description">{ts}If you want to provide a default value for this field, enter it here. For date fields, format is YYYY-MM-DD.{/ts}</span></td>
     </tr>
