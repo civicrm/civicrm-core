@@ -292,7 +292,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('birth_date', '=', 'CURDATE()', TRUE)
       ->selectRowCount()
       ->execute();
-    $this->assertCount(1, $result);
+    $this->assertCount(1, $result, 'bdate: ' . \CRM_Core_DAO::singleValueQuery("SELECT birth_date FROM civicrm_contact WHERE last_name='$lastName' ORDER BY id LIMIT 1") . ', CURDATE: ' . \CRM_Core_DAO::singleValueQuery('SELECT CURDATE()') . ', phptz: ' . \date_default_timezone_get() . ', sqltz: ' . \CRM_Core_DAO::singleValueQuery('SELECT @@time_zone') . ', sqltz2: ' . \CRM_Core_DAO::singleValueQuery('SELECT @@system_time_zone'));
 
     $result = Contact::get(FALSE)
       ->addWhere('last_name', '=', $lastName)
