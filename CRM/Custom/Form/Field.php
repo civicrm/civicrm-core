@@ -228,6 +228,14 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     $this->add('checkbox', 'serialize', ts('Multi-Select'));
 
+    $this->addAutocomplete('fk_entity', ts('Entity'), [
+      'class' => 'twenty',
+      // Don't allow entity to be changed once field is created
+      'disabled' => $this->_action == CRM_Core_Action::UPDATE && !empty($this->_values['fk_entity']),
+      'entity' => 'Entity',
+      'select' => ['minimumInputLength' => 0],
+    ]);
+
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->freeze('data_type');
       if (!empty($this->_values['option_group_id'])) {
@@ -610,6 +618,12 @@ SELECT count(*)
           }
           $self->setDefaults(['filter_selected', $fields['filter_selected']]);
           break;
+      }
+    }
+
+    if ($dataType === 'EntityReference') {
+      if (empty($fields['fk_entity'])) {
+        $errors['fk_entity'] = ts('Selecting an entity is required');
       }
     }
 

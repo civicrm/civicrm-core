@@ -26,6 +26,10 @@
       <td class="label">{$form.html_type.label}</td>
       <td class="html-adjust">{$form.html_type.html}</td>
     </tr>
+    <tr class="crm-custom-field-form-block-fk_entity">
+      <td class="label">{$form.fk_entity.label} <span class="crm-marker">*</span></td>
+      <td class="html-adjust">{$form.fk_entity.html}</td>
+    </tr>
     <tr class="crm-custom-field-form-block-serialize">
       <td class="label">{$form.serialize.label}</td>
       <td class="html-adjust">{$form.serialize.html}</td>
@@ -185,8 +189,13 @@
       if (!$('#html_type', $form).val()) {
         $('#html_type', $form).val(dataToHTML[dataType][0]).change();
       }
+      // Hide html_type if there is only one option
+      $('.crm-custom-field-form-block-html_type').toggle(allowedHtmlTypes.length > 1);
       customOptionHtmlType(dataType);
       makeDefaultValueField(dataType);
+
+      // Show/hide entityReference selector
+      $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
     }
 
     function onChangeHtmlType() {
@@ -282,7 +291,7 @@
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 
-      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select' || htmlType === 'Autocomplete-Select');
+      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select' || htmlType === 'Autocomplete-Select' && dataType !== 'EntityReference');
     }
 
     function makeDefaultValueField(dataType) {
