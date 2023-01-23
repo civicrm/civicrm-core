@@ -27,11 +27,8 @@
           this.placeholders.push({});
         }
 
-        this.getResults = _.debounce(function() {
-          $scope.$apply(function() {
-            ctrl.runSearch();
-          });
-        }, 800);
+        // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 800ms
+        this.getResults = _.debounce(ctrl.runSearch, 800, {leading: true, trailing: false});
 
         // Update totalCount variable if used.
         // Integrations can pass in `total-count="somevar" to keep track of the number of results returned
