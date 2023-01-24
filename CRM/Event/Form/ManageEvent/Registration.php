@@ -116,7 +116,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           $defaults["custom_post_id_multiple[$key]"] = $value;
         }
       }
-      $this->assign('profilePostMultiple', $defaults['custom_post'] ?? NULL);
+
+      $this->assign('profilePostMultiple', CRM_Utils_Array::value('custom_post', $defaults));
 
       // CRM-17745: Make max additional participants configurable
       if (empty($defaults['max_additional_participants'])) {
@@ -148,18 +149,22 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
             $defaults["additional_custom_post_id_multiple[$key]"] = $value;
           }
         }
+        $this->assign('profilePostMultipleAdd', CRM_Utils_Array::value('additional_custom_post', $defaults, []));
       }
-      $this->assign('profilePostMultipleAdd', $defaults['additional_custom_post'] ?? []);
+      else {
+        // Avoid PHP notices in the template
+        $this->assign('profilePostMultipleAdd', []);
+      }
     }
     else {
       $defaults['is_email_confirm'] = 0;
     }
 
     // provide defaults for required fields if empty (and as a 'hint' for approval message field)
-    $defaults['registration_link_text'] ??= ts('Register Now');
-    $defaults['confirm_title'] ??= ts('Confirm Your Registration Information');
-    $defaults['thankyou_title'] ??= ts('Thank You for Registering');
-    $defaults['approval_req_text'] ??= ts('Participation in this event requires approval. Submit your registration request here. Once approved, you will receive an email with a link to a web page where you can complete the registration process.');
+    $defaults['registration_link_text'] = CRM_Utils_Array::value('registration_link_text', $defaults, ts('Register Now'));
+    $defaults['confirm_title'] = CRM_Utils_Array::value('confirm_title', $defaults, ts('Confirm Your Registration Information'));
+    $defaults['thankyou_title'] = CRM_Utils_Array::value('thankyou_title', $defaults, ts('Thank You for Registering'));
+    $defaults['approval_req_text'] = CRM_Utils_Array::value('approval_req_text', $defaults, ts('Participation in this event requires approval. Submit your registration request here. Once approved, you will receive an email with a link to a web page where you can complete the registration process.'));
 
     return $defaults;
   }
