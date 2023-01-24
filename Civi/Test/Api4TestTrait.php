@@ -48,14 +48,12 @@ trait Api4TestTrait {
       'defaults' => [],
     ];
     $idField = CoreUtil::getIdFieldName($entityName);
-    foreach ($saveParams['records'] as &$record) {
-      $record += $saveParams['defaults'];
+    foreach ($saveParams['records'] as $index => $record) {
+      $saveParams['records'][$index] += $saveParams['defaults'];
       if (empty($record[$idField])) {
-        $this->getRequiredValuesToCreate($entityName, $record);
+        $saveParams['records'][$index] = $this->getRequiredValuesToCreate($entityName, $saveParams['records'][$index]);
       }
     }
-    // Unset for clarity as it leaks from the foreach & is a reference.
-    unset($record);
     $saved = civicrm_api4($entityName, 'save', $saveParams);
     foreach ($saved as $item) {
       $this->testRecords[] = [$entityName, [[$idField, '=', $item[$idField]]]];
@@ -81,7 +79,7 @@ trait Api4TestTrait {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function getRequiredValuesToCreate(string $entity, array &$values = []): array {
+  public function getRequiredValuesToCreate(string $entity, array $values = []): array {
     $requiredFields = civicrm_api4($entity, 'getfields', [
       'action' => 'create',
       'loadOptions' => TRUE,
