@@ -4163,7 +4163,21 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 -- Add in missing Indian State provinces
 
 (NULL, 1101, "DH", "Dādra and Nagar Haveli and Damān and Diu"),
-(NULL, 1101, "LA", "Ladākh")
+(NULL, 1101, "LA", "Ladākh"),
 
  -- end of statement:
+
+-- Add missing provinces for Luxembourg
+(NULL, 1020, 'CA', 'Capellen'),
+(NULL, 1020, 'CL', 'Clervaux'),
+(NULL, 1020, 'EC', 'Echternach'),
+(NULL, 1020, 'ES', 'Esch-sur-Alzette'),
+(NULL, 1020, 'GR', 'Grevenmacher'),
+(NULL, 1020, 'ME', 'Mersch'),
+(NULL, 1020, 'RD', 'Redange-sur-Attert'),
+(NULL, 1020, 'RM', 'Remich'),
+(NULL, 1020, 'VD', 'Vianden'),
+(NULL, 1020, 'WI', 'Wiltz')
+
+-- end of statement:
  ;
