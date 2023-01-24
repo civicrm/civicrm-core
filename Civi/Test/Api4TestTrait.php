@@ -17,6 +17,13 @@ use Civi\Api4\Utils\CoreUtil;
 trait Api4TestTrait {
 
   /**
+   * Records created which will be deleted during tearDown
+   *
+   * @var array
+   */
+  private $testRecords = [];
+
+  /**
    * Inserts a test record, supplying all required values if not provided.
    *
    * Test records will be automatically deleted during tearDown.

@@ -20,6 +20,7 @@
 namespace api\v4;
 
 use Civi\Api4\UFMatch;
+use Civi\Test;
 use Civi\Test\Api4TestTrait;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
@@ -31,13 +32,6 @@ use PHPUnit\Framework\TestCase;
 class Api4TestBase extends TestCase implements HeadlessInterface {
 
   use Api4TestTrait;
-
-  /**
-   * Records created which will be deleted during tearDown
-   *
-   * @var array
-   */
-  public $testRecords = [];
 
   /**
    * @see CiviUnitTestCase
@@ -52,13 +46,11 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
   }
 
   public function setUpHeadless(): CiviEnvBuilder {
-    return \Civi\Test::headless()->apply();
+    return Test::headless()->apply();
   }
 
   /**
    * Post test cleanup.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $implements = class_implements($this);
