@@ -102,10 +102,10 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    *   Field label for the 'email'.
    */
   public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
-    $errors = form_get_errors();
-    if ($errors) {
+    if ($backdrop_errors = form_get_errors()) {
       // unset Backdrop messages to avoid twice display of errors
       unset($_SESSION['messages']);
+      $errors = array_merge($errors, $backdrop_errors);
     }
 
     if (!empty($params['name'])) {
@@ -428,10 +428,10 @@ AND    u.status = 1
    * @inheritdoc
    */
   public function verifyPassword($params, &$errors) {
-    $errors = form_get_errors();
-    if ($errors) {
+    if ($backdrop_errors = form_get_errors()) {
       // unset Backdrop messages to avoid twice display of errors
       unset($_SESSION['messages']);
+      $errors = array_merge($errors, $backdrop_errors);
     }
 
     $password = trim($params['pass']);
