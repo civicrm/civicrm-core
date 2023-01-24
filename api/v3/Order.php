@@ -84,7 +84,9 @@ function civicrm_api3_order_create(array $params): array {
     }
     $params['skipCleanMoney'] = TRUE;
   }
-  $params['contribution_status_id'] = 'Pending';
+  if (empty($params['id']) && empty($params['contribution_status_id'])) {
+    $params['contribution_status_id'] = 'Pending';
+  }
   $order = new CRM_Financial_BAO_Order();
   $order->setDefaultFinancialTypeID($params['financial_type_id'] ?? NULL);
 
