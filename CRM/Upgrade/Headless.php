@@ -15,6 +15,12 @@
 class CRM_Upgrade_Headless {
 
   /**
+   * Pre Upgrade Message
+   * @var string
+   */
+  private $preUpgradeMessage;
+
+  /**
    * Perform an upgrade without using the web-frontend
    *
    * @param bool $enablePrint
@@ -38,8 +44,11 @@ class CRM_Upgrade_Headless {
     CRM_Core_DAO::dropTriggers();
 
     // CRM-11156
-    $preUpgradeMessage = NULL;
-    $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
+    if (empty($this->preUpgradeMessage)) {
+      $preUpgradeMessage = NULL;
+      $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
+      $this->preUpgradeMessage = $preUpgradeMessage;
+    }
 
     $postUpgradeMessageFile = CRM_Utils_File::tempnam('civicrm-post-upgrade');
     $queueRunner = new CRM_Queue_Runner([
@@ -65,6 +74,27 @@ class CRM_Upgrade_Headless {
       'message' => $message,
       'text' => CRM_Utils_String::htmlToText($message),
     ];
+  }
+
+  /**
+   * Get the PreUpgrade message
+   * @return string
+   * @throws \Exception
+   */
+  public function getPreUpgradeMessage(): string {
+    $upgrade = new CRM_Upgrade_Form();
+    [$currentVer, $latestVer] = $upgrade->getUpgradeVersions();
+
+    if ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
+      throw new Exception($error);
+    }
+    // CRM-11156
+    if (empty($this->preUpgradeMessage)) {
+      $preUpgradeMessage = NULL;
+      $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
+      $this->preUpgradeMessage = $preUpgradeMessage;
+    }
+    return $this->preUpgradeMessage;
   }
 
 }
