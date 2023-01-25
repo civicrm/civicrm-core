@@ -1984,8 +1984,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3519, 1125, "TE", "Telšių Apskritis"),
 (3520, 1125, "UT", "Utenos Apskritis"),
 (3521, 1125, "VL", "Vilniaus Apskritis"),
-(3522, 1126, "D", "Diekirch"),
-(3523, 1126, "G", "GreveNmacher"),
+(3522, 1126, "DI", "Diekirch"),
+(3523, 1126, "GR", "Grevenmacher"),
 (3550, 1119, "DGV", "Daugavpils"),
 (3551, 1119, "JEL", "Jelgava"),
 (3552, 1119, "JUR", "Jūrmala"),
@@ -3757,7 +3757,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1045, "ZW", "Zhongwei"),
 
 -- CRM-10863 Added Missing Province for Luxembourg
-(NULL, 1126, "L", "Luxembourg"),
+(NULL, 1126, "LU", "Luxembourg"),
 
 -- CRM-11367 Latvian regions
 (NULL, 1119, "002", "Aizkraukles novads"),
@@ -4168,16 +4168,15 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
  -- end of statement:
 
 -- Add missing provinces for Luxembourg
-(NULL, 1020, 'CA', 'Capellen'),
-(NULL, 1020, 'CL', 'Clervaux'),
-(NULL, 1020, 'EC', 'Echternach'),
-(NULL, 1020, 'ES', 'Esch-sur-Alzette'),
-(NULL, 1020, 'GR', 'Grevenmacher'),
-(NULL, 1020, 'ME', 'Mersch'),
-(NULL, 1020, 'RD', 'Redange-sur-Attert'),
-(NULL, 1020, 'RM', 'Remich'),
-(NULL, 1020, 'VD', 'Vianden'),
-(NULL, 1020, 'WI', 'Wiltz')
+(NULL, 1126, 'CA', 'Capellen'),
+(NULL, 1126, 'CL', 'Clervaux'),
+(NULL, 1126, 'EC', 'Echternach'),
+(NULL, 1126, 'ES', 'Esch-sur-Alzette'),
+(NULL, 1126, 'ME', 'Mersch'),
+(NULL, 1126, 'RD', 'Redange-sur-Attert'),
+(NULL, 1126, 'RM', 'Remich'),
+(NULL, 1126, 'VD', 'Vianden'),
+(NULL, 1126, 'WI', 'Wiltz')
 
 -- end of statement:
  ;
