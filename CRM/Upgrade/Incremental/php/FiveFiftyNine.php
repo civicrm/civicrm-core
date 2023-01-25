@@ -29,6 +29,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyNine extends CRM_Upgrade_Incremental_
    */
   public function upgrade_5_59_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Drop column civicrm_custom_field.mask', 'dropColumn', 'civicrm_custom_field', 'mask');
   }
 
 }
