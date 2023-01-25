@@ -12,6 +12,16 @@ if (file_exists('/etc/timezone')) {
   }
 }
 
+$GLOBALS['CIVICRM_FORCE_MODULES'][] = 'civitest';
+
+function civitest_civicrm_scanClasses(array &$classes): void {
+  $phpunit = \Civi::paths()->getPath('[civicrm.root]/tests/phpunit');
+  if (strpos(get_include_path(), $phpunit) !== FALSE) {
+    \Civi\Core\ClassScanner::scanFolders($classes, $phpunit, 'CRM/*/WorkflowMessage', '_');
+    \Civi\Core\ClassScanner::scanFolders($classes, $phpunit, 'Civi/*/WorkflowMessage', '\\');
+  }
+}
+
 # Crank up the memory
 ini_set('memory_limit', '2G');
 define('CIVICRM_TEST', 1);
