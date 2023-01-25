@@ -3,16 +3,20 @@
 namespace Civi\Test;
 
 use Civi\Api4\Generic\Result;
+use Civi\Api4\Service\Spec\Provider\FinancialItemCreationSpecProvider;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
- * Class Api3TestTrait
+ * Class Api4TestTrait
  *
  * @package Civi\Test
  *
- * This trait defines a number of helper functions for testing APIv4.
+ * This trait defines apiv4 helper functions to create, track and cleanup test data.
  *
- * This trait is intended for use with PHPUnit-based test cases.
+ * Specifically:
+ * - `createTestRecord()` will create a new entity record with example data.
+ * - `saveTestRecords()` is the same as `createTestRecord` for multiple creation of the same entity type.
+ * - `deleteTestRecords()` will batch-delete all the test-data created by `createTestRecord()`
  */
 trait Api4TestTrait {
 
@@ -26,13 +30,18 @@ trait Api4TestTrait {
   /**
    * Inserts a test record, supplying all required values if not provided.
    *
-   * Test records will be automatically deleted during tearDown.
+   * Test records will be automatically deleted if `deleteTestRecords` is called.
+   *
+   * This is a convenience helper for `saveTestRecords` when working with a
+   * single entity.
    *
    * @param string $entityName
    * @param array $values
+   *
    * @return array|null
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\NotImplementedException
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   public function createTestRecord(string $entityName, array $values = []): ?array {
     return $this->saveTestRecords($entityName, ['records' => [$values]])->single();
@@ -41,13 +50,20 @@ trait Api4TestTrait {
   /**
    * Saves one or more test records, supplying default values.
    *
-   * Test records will be automatically deleted during tearDown.
+   * Test records will be deleted when the `deleteTestRecords` function is
+   * called, usually in `tearDown`.
+   *
+   * If the transactional method is in use (and nothing is down to cause
+   * the transaction to commit, such as creating custom fields) then the
+   * `deleteTestRecords` function does not need to be called.
    *
    * @param string $entityName
    * @param array $saveParams
+   *
    * @return \Civi\Api4\Generic\Result
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\NotImplementedException
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   public function saveTestRecords(string $entityName, array $saveParams): Result {
     $saveParams += [
@@ -69,11 +85,12 @@ trait Api4TestTrait {
   }
 
   /**
-   * Generate some random lowercase letters
+   * Generate some random lowercase letters.
+   *
    * @param int $len
    * @return string
    */
-  protected function randomLetters(int $len = 10): string {
+  private function randomLetters(int $len = 10): string {
     return \CRM_Utils_String::createRandom($len, implode('', range('a', 'z')));
   }
 
@@ -86,7 +103,7 @@ trait Api4TestTrait {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function getRequiredValuesToCreate(string $entity, array $values = []): array {
+  protected function getRequiredValuesToCreate(string $entity, array $values = []): array {
     $requiredFields = civicrm_api4($entity, 'getfields', [
       'action' => 'create',
       'loadOptions' => TRUE,
@@ -217,7 +234,7 @@ trait Api4TestTrait {
       // What could possibly go wrong with this?
       switch ($field['table_name'] ?? NULL) {
         case 'civicrm_financial_item':
-          return $this->getFkID(\Civi\Api4\Service\Spec\Provider\FinancialItemCreationSpecProvider::DEFAULT_ENTITY);
+          return $this->getFkID(FinancialItemCreationSpecProvider::DEFAULT_ENTITY);
 
         default:
           return $this->getFkID('Contact');
@@ -233,6 +250,14 @@ trait Api4TestTrait {
     throw new \CRM_Core_Exception('Could not provide default value');
   }
 
+  /**
+   * Delete records previously created by the `saveTestRecords` function.
+   *
+   * This should be called during the `tearDown` function if the test
+   * class does not use the transactional interface.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
   protected function deleteTestRecords(): void {
     // Delete all test records in reverse order to prevent fk constraints
     foreach (array_reverse($this->testRecords) as $record) {
