@@ -34,6 +34,8 @@ class CRM_Upgrade_Incremental_php_FiveFiftyEight extends CRM_Upgrade_Incremental
 
   public static function addOptionGroupDescriptions($ctx): bool {
     CRM_Upgrade_Incremental_Base::alterColumn($ctx, 'civicrm_option_group', 'description', "TEXT COMMENT 'Option group description.'", TRUE);
+    $schema = new CRM_Logging_Schema();
+    $schema->fixSchemaDifferences();
     $values = [
       [
         'group' => 'gender',
