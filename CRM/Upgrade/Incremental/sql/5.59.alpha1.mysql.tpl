@@ -1,3 +1,4 @@
+{* file to handle db changes in 5.59.alpha1 during upgrade *}
 -- Add missing provinces for Luxembourg
 SELECT @country_id := id from civicrm_country where name = 'Luxembourg' AND iso_code = 'LU';
 INSERT IGNORE INTO `civicrm_state_province` (`country_id`, `abbreviation`, `name`) VALUES (@country_id, 'CA', 'Capellen');
