@@ -346,7 +346,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
 
     $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-    $this->assign('isOnWaitlist', (bool) ($params['status_id'][$waitStatus] ?? FALSE));
+    $this->assign('isOnWaitlist', (bool) in_array($params['status_id'], $waitStatus));
     $this->assign('contactID', $this->_contactId);
 
     $sendTemplateParams = [
