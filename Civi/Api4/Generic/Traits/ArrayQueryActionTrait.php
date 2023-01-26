@@ -178,7 +178,8 @@ trait ArrayQueryActionTrait {
           return in_array($expected, $value);
         }
         elseif (is_string($value) || is_numeric($value)) {
-          return strpos((string) $value, (string) $expected) !== FALSE;
+          // Lowercase check if string contains string
+          return strpos(strtolower((string) $value), strtolower((string) $expected)) !== FALSE;
         }
         return $value == $expected;
 

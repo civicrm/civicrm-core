@@ -15,6 +15,8 @@ namespace Civi\Api4;
  *
  * @see \Civi\Api4\Generic\AbstractEntity
  *
+ * @primaryKey name
+ * @labelField title_plural
  * @searchable none
  * @since 5.19
  * @package Civi\Api4
@@ -145,6 +147,15 @@ class Entity extends Generic\AbstractEntity {
     return (new Generic\BasicGetFieldsAction('Entity', __FUNCTION__, function(Generic\BasicGetFieldsAction $getFields) {
       return Entity::$entityFields;
     }))->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Generic\AutocompleteAction
+   */
+  public static function autocomplete($checkPermissions = TRUE) {
+    return (new Generic\AutocompleteAction('Entity', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
