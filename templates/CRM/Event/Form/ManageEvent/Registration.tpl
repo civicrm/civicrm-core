@@ -50,7 +50,7 @@
 
   <tr class="crm-event-manage-registration-form-block-registration_link_text">
     <td scope="row" class="label"
-        width="20%">{$form.registration_link_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='registration_link_text' id=$eventID}{/if}</td>
+        width="20%">{$form.registration_link_text.label} <span class="crm-marker">*</span>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='registration_link_text' id=$eventID}{/if}</td>
     <td>{$form.registration_link_text.html} {help id="id-link_text"}</td>
   </tr>
   {if !$isTemplate}
