@@ -6,6 +6,14 @@
  */
 class CRM_Utils_StringTest extends CiviUnitTestCase {
 
+  /**
+   * Set up for tests.
+   */
+  public function setUp(): void {
+    $this->useTransaction();
+    parent::setUp();
+  }
+
   public function testBase64Url(): void {
     $examples = [
       'a' => 'YQ',
