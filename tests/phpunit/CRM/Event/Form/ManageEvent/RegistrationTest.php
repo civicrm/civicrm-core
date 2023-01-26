@@ -16,6 +16,7 @@ class CRM_Event_Form_ManageEvent_RegistrationTest extends CiviUnitTestCase {
       'is_email_confirm' => 0,
       'confirm_title' => 'Confirm your registration',
       'thankyou_title' => 'Thank you for your registration',
+      'registration_link_text' => 'Register Now',
     ];
   }
 
