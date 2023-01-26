@@ -27,6 +27,9 @@ use Civi\Api4\CustomField;
  * Use this base class for any APIv4 tests which create custom groups/fields,
  * to ensure they get cleaned up properly.
  *
+ * Note that this should be reconciled with The CustomDataTestTrait that is
+ * more widely used in our tests & a stable version put in Civi::test();
+ *
  * Note: The TransactionalInterface won't work with custom fields because of adding/dropping tables.
  * So these tests have to do their own cleanup of any contacts or other entities created.
  * The recommended way is to override the `tearDown` function and calling `parent::tearDown()`.

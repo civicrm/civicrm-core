@@ -1,24 +1,30 @@
 <?php
 namespace api\v4\SearchDisplay;
 
-// This is apparently necessary due to autoloader issues with test classes
-require_once 'tests/phpunit/api/v4/Api4TestBase.php';
-require_once 'tests/phpunit/api/v4/Custom/CustomTestBase.php';
-
-use api\v4\Custom\CustomTestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\OptionGroup;
+use Civi\Test;
+use Civi\Test\Api4TestTrait;
 use Civi\Test\CiviEnvBuilder;
+use Civi\Test\HeadlessInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group headless
  */
-class SearchRunWithCustomFieldTest extends CustomTestBase {
+class SearchRunWithCustomFieldTest extends TestCase implements HeadlessInterface {
 
+  use Api4TestTrait;
+
+  /**
+   * @return \Civi\Test\CiviEnvBuilder
+   * @throws \CRM_Extension_Exception_ParseException
+   */
   public function setUpHeadless(): CiviEnvBuilder {
-    return \Civi\Test::headless()
+    return Test::headless()
       ->installMe(__DIR__)
       ->apply();
   }
@@ -29,22 +35,26 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
+    $this->deleteTestRecords();
     // Core bug: `civicrm_entity_file` doesn't get cleaned up when a contact is deleted,
     // so trying to delete `civicrm_file` causes a constraint violation :(
     // For now, truncate the table manually.
-    $this->cleanup([
-      'tablesToTruncate' => [
-        'civicrm_entity_file',
-      ],
-    ]);
-    // Now the file record can be auto-deleted
+    \CRM_Core_DAO::executeQuery('TRUNCATE civicrm_entity_file');
+    $optionGroups = CustomField::get(FALSE)->addSelect('option_group_id')->addWhere('option_group_id', 'IS NOT NULL')->execute();
+    foreach ($optionGroups as $optgroup) {
+      OptionGroup::delete(FALSE)->addWhere('id', '=', $optgroup['option_group_id'])->execute();
+    }
+    CustomField::delete(FALSE)->addWhere('id', '>', 0)->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
     parent::tearDown();
   }
 
   /**
    * Test running a searchDisplay with various filters.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRunWithImageField() {
+  public function testRunWithImageField(): void {
     CustomGroup::create(FALSE)
       ->addValue('title', 'TestSearchFields')
       ->addValue('extends', 'Individual')
@@ -57,7 +67,7 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
       ->addValue('data_type', 'File')
       ->execute();
 
-    $lastName = uniqid(__FUNCTION__);
+    $lastName = 'last_name';
 
     $file = $this->createTestRecord('File', [
       'mime_type' => 'image/png',
@@ -97,7 +107,7 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
               'key' => 'TestSearchFields.MyFile',
               'label' => 'Type',
               'type' => 'image',
-              'empty_value' => 'http://example.com/image',
+              'empty_value' => 'https://example.com/image',
             ],
           ],
           'sort' => [
@@ -115,7 +125,12 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     $this->assertStringContainsString('example.com', $result[1]['columns'][1]['img']['src']);
   }
 
-  public function testEditableRelationshipCustomFields() {
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public function testEditableRelationshipCustomFields(): void {
 
     CustomGroup::create(FALSE)
       ->addValue('title', 'TestChildFields')
@@ -272,8 +287,11 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][4]);
   }
 
-  public function testEditableCustomFields() {
-    $subject = uniqid(__FUNCTION__);
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testEditableCustomFields(): void {
+    $subject = 'subject';
 
     $contact = Contact::create(FALSE)
       ->execute()->single();
@@ -380,10 +398,15 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     // Third Activity
     $expectedSubjectEdit['record']['id'] = $activity[2]['id'];
     $this->assertEquals($expectedSubjectEdit, $result[2]['columns'][0]['edit']);
-    $this->assertTrue(!isset($result[2]['columns'][1]['edit']));
+    $this->assertNotTrue(isset($result[2]['columns'][1]['edit']));
     $this->assertEquals($activityTypes['Email'], $result[2]['data']['activity_type_id']);
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
   public function testMultiValuedFields():void {
     CustomGroup::create(FALSE)
       ->addValue('extends', 'Contact')
@@ -397,7 +420,7 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
       )
       ->execute();
 
-    $lastName = uniqid(__FUNCTION__);
+    $lastName = 'last_name';
 
     $sampleContacts = [
       ['first_name' => 'A', 'my_test.my_field' => [0, 2, 3]],
