@@ -441,13 +441,13 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   public static function formRule($values, $files, $form) {
     if (!empty($values['is_online_registration'])) {
 
-      if (!$values['registration_link_text']) {
+      if (($values['registration_link_text'] ?? '') === '') {
         $errorMsg['registration_link_text'] = ts('Please enter Registration Link Text');
       }
-      if (!$values['confirm_title']) {
+      if (($values['confirm_title'] ?? '') === '') {
         $errorMsg['confirm_title'] = ts('Please enter a Title for the registration Confirmation Page');
       }
-      if (!$values['thankyou_title']) {
+      if (($values['thankyou_title'] ?? '') === '') {
         $errorMsg['thankyou_title'] = ts('Please enter a Title for the registration Thank-you Page');
       }
       if ($values['is_email_confirm']) {
