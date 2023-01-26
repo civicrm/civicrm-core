@@ -177,6 +177,41 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   }
 
   /**
+   * The column 'civicrm_activity.original_id' should not have 'ON DELETE CASCADE'.
+   * It is OK to have 'ON DELETE SET NULL' or to have no constraint.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkOldAcitvityCascade(): array {
+    $messages = [];
+
+    $sql = "SELECT CONSTRAINT_NAME, DELETE_RULE
+      FROM information_schema.referential_constraints
+      WHERE CONSTRAINT_SCHEMA=database() AND TABLE_NAME='civicrm_activity' AND CONSTRAINT_NAME='FK_civicrm_activity_original_id'
+    ";
+    $cascades = CRM_Core_DAO::executeQuery($sql, [], FALSE, NULL, FALSE, FALSE)
+      ->fetchMap('CONSTRAINT_NAME', 'DELETE_RULE');
+    $cascade = $cascades['FK_civicrm_activity_original_id'] ?? NULL;
+    if ($cascade === 'CASCADE') {
+      $docUrl = 'https://civicrm.org/redirect/activities-5.57';
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts(
+          '<p>The table <code>%1</code> includes an incorrect constraint. <a %2>Learn how to fix this.</a>', [
+            1 => 'civicrm_activity',
+            2 => 'target="_blank" href="' . htmlentities($docUrl) . '"',
+          ]
+        ),
+        ts('Schema Error'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+
+    return $messages;
+  }
+
+  /**
    * @return CRM_Utils_Check_Message[]
    */
   public function checkMoneyValueFormatConfig() {
