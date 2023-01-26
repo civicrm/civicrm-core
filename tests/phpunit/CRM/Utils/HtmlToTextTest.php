@@ -6,6 +6,11 @@
  */
 class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    $this->useTransaction();
+    parent::setUp();
+  }
+
   /**
    * @return array
    */

@@ -6,6 +6,14 @@
  */
 class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
+  /**
+   * Set up for tests.
+   */
+  public function setUp(): void {
+    $this->useTransaction();
+    parent::setUp();
+  }
+
   public function testAsColumns() {
     $rowsNum = [
       ['a' => 10, 'b' => 11],

@@ -25,6 +25,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
   protected $client;
 
   public function setUp(): void {
+    $this->useTransaction();
     parent::setUp();
 
     $this->tmpFile = $this->createTempDir() . '/example.txt';
