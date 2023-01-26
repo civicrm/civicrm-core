@@ -6,6 +6,11 @@
  */
 class CRM_Extension_InfoTest extends CiviUnitTestCase {
 
+  /**
+   * @var string|null
+   */
+  private $file;
+
   public function setUp(): void {
     parent::setUp();
     $this->file = NULL;
