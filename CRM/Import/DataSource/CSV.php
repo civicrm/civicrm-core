@@ -41,7 +41,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * It should add all fields necessary to get the data
    * uploaded to the temporary table in the DB.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Contact_Import_Form_DataSource|\CRM_Import_Form_DataSourceConfig $form
    *
    * @throws \CRM_Core_Exception
    */
@@ -56,6 +56,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
     $form->assign('uploadSize', $uploadSize);
     $form->add('File', 'uploadFile', ts('Import Data File'), NULL, TRUE);
+    $form->addElement('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2]);
     $form->setMaxFileSize($uploadFileSize);
     $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
       1 => $uploadSize,
@@ -63,7 +64,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     ]), 'maxfilesize', $uploadFileSize);
     $form->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
     $form->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
-
+    $form->setDataSourceDefaults($this->getDefaultValues());
     $form->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
   }
 
@@ -258,6 +259,19 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $string = mb_convert_encoding($string, 'UTF-8', [$encoding]);
     }
     return preg_replace("/^(\u{a0})+|(\u{a0})+$/", '', $string);
+  }
+
+  /**
+   * Get default values for csv dataSource fields.
+   *
+   * @return array
+   */
+  public function getDefaultValues(): array {
+    return [
+      'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
+      'skipColumnHeader' => 1,
+    ];
+
   }
 
 }
