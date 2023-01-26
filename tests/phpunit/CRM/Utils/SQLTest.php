@@ -6,6 +6,11 @@
  */
 class CRM_Utils_SQLTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    $this->useTransaction();
+    parent::setUp();
+  }
+
   public function testInterpolate() {
     // This function is a thin wrapper for `CRM_Utils_SQL_BaseParamQuery::interpolate()`, which already has
     // lots of coverage in other test classes. This test just checks the basic wiring.

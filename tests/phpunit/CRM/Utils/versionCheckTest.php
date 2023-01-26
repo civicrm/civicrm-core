@@ -8,6 +8,11 @@ use Civi\Test\Invasive;
  */
 class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    $this->useTransaction();
+    parent::setUp();
+  }
+
   /**
    * @var array
    */

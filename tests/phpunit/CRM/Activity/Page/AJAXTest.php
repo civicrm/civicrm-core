@@ -5,6 +5,16 @@
  */
 class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
 
+  /**
+   * @var int
+   */
+  private $loggedInUser;
+
+  /**
+   * @var int
+   */
+  private $target;
+
   public function setUp(): void {
     parent::setUp();
 
