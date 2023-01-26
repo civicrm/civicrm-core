@@ -40,7 +40,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental
       // don't add the task farther down below, then tell people what to do at
       // their convenience.
       elseif ($activityCount >= self::ACTIVITY_THRESHOLD) {
-        $preUpgradeMessage .= '<p>' . ts('Your database contains too many activities to efficiently run a query needed to check for deprecated case activity revisions and to fix a bad foreign key constraint and it may take hours to run. You can run these queries manually at your convenience:<ul><li>SELECT COUNT(id) FROM `civicrm_activity` WHERE `is_current_revision` = 0;</li><li>ALTER TABLE `civicrm_activity` DROP FOREIGN KEY `FK_civicrm_activity_original_id`;</li><li>ALTER TABLE `civicrm_activity` ADD CONSTRAINT `FK_civicrm_activity_original_id` FOREIGN KEY (`original_id`) REFERENCES `civicrm_activity` (`id`) ON DELETE SET NULL;</li><li>For more information see this <a %1>Lab Snippet</a>.</li></ul>', [1 => $docAnchor]) . '</p>';
+        $preUpgradeMessage .= '<p>' . ts('The activity table <strong>will not update automatically</strong> because it contains too many records. You will need to apply a <strong>manual update</strong>. Please read about <a %1>how to clean data from the defunct "Embedded Activity Revisions" setting</a>.', [1 => $docAnchor]) . '</p>';
       }
     }
   }
