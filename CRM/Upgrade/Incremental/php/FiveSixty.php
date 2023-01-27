@@ -29,6 +29,18 @@ class CRM_Upgrade_Incremental_php_FiveSixty extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_5_60_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add scheduled_reminder_smarty setting', 'addScheduledReminderSmartySetting');
+  }
+
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
+    if ($rev === '5.60.alpha1') {
+      $postUpgradeMessage .= '<p>' . ts('You can now choose whether to use Smarty in Scheduled Reminders at <em>Administer >> CiviMail >> CiviMail Component Settings</em>. The setting is disabled by default on new installations but we have enabled it during this upgrade to preserve the existing behavior. More information <a %1>in this lab ticket</a>.', [1 => 'href="https://lab.civicrm.org/dev/core/-/issues/4100" target="_blank"']) . '<p>';
+    }
+  }
+
+  public static function addScheduledReminderSmartySetting(): bool {
+    Civi::settings()->set('scheduled_reminder_smarty', TRUE);
+    return TRUE;
   }
 
 }
