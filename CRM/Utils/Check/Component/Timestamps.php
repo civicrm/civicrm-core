@@ -27,21 +27,27 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
     $messages = [];
 
     try {
-      $tzCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM mysql.time_zone_name');
+      $convertedTimeNY = CRM_Core_DAO::singleValueQuery('SELECT CONVERT_TZ("2001-02-03 04:05:00", "GMT", "America/New_York")');
     }
     catch (\Exception $e) {
-      $tzCount = 0;
+      $convertedTimeNY = NULL;
     }
+    $expectedTimeNY = '2001-02-02 23:05:00';
 
+    $oldTz = CRM_Core_DAO::singleValueQuery('SELECT @@time_zone');
     try {
-      $convertedTime = CRM_Core_DAO::singleValueQuery('SELECT CONVERT_TZ("2001-02-03 04:05:00", "GMT", "America/New_York")');
+      CRM_Core_DAO::singleValueQuery('SET @@time_zone = "Europe/Berlin"');
+      $convertedTimeDE = CRM_Core_DAO::singleValueQuery('SELECT FROM_UNIXTIME(981176700)');
     }
     catch (\Exception $e) {
-      $convertedTime = NULL;
+      $convertedTimeDE = NULL;
     }
-    $expectedTime = '2001-02-02 23:05:00';
+    finally {
+      CRM_Core_DAO::singleValueQuery('SET @@time_zone = %1', [1 => [$oldTz, 'String']]);
+    }
+    $expectedTimeDE = '2001-02-03 06:05:00';
 
-    if ($tzCount < 5 || $convertedTime !== $expectedTime) {
+    if ($convertedTimeNY !== $expectedTimeNY || $convertedTimeDE !== $expectedTimeDE) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('The MySQL database does not fully support timezones. Please ask the database administrator to <a %1>load timezone data</a>.', [
