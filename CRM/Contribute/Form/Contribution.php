@@ -208,6 +208,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   protected $previousContributionStatus;
 
+
+  /**
+   * Payment Instrument ID
+   *
+   * @var int
+   */
+  public $payment_instrument_id;
+
   /**
    * Explicitly declare the form context.
    */
@@ -590,7 +598,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
-    $this->payment_instrument_id = CRM_Utils_Array::value('payment_instrument_id', $defaults, $this->getDefaultPaymentInstrumentId());
+    $this->payment_instrument_id = $defaults['payment_instrument_id'] ?? $this->getDefaultPaymentInstrumentId();
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->payment_instrument_id);
     if (!empty($this->_recurPaymentProcessors)) {
       $buildRecurBlock = TRUE;

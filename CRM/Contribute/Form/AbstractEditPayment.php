@@ -707,7 +707,7 @@ WHERE  contribution_id = {$id}
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getDefaultPaymentInstrumentId() {
+  protected function getDefaultPaymentInstrumentId(): int {
     $paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer');
     return (int) ($paymentInstrumentID ?? $this->_paymentProcessor['payment_instrument_id']);
   }
