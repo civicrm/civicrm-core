@@ -6,11 +6,25 @@
  */
 class CRM_Utils_HookTest extends CiviUnitTestCase {
 
+  /**
+   * @var object|null
+   */
   public static $activeTest = NULL;
 
+  /**
+   * @var array
+   */
   public $fakeModules;
 
+  /**
+   * @var array
+   */
   public $log;
+
+  /**
+   * @var CRM_Utils_Hook_UnitTests
+   */
+  public $hook;
 
   public function setUp(): void {
     $this->useTransaction();
