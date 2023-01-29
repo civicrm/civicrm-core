@@ -5459,6 +5459,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'title' => $options['prefix_label'] . ts('Contact Name (in sort format)'),
         'is_fields' => TRUE,
         'is_filters' => TRUE,
+        'operatorType' => CRM_Report_Form::OP_STRING,
         'is_order_bys' => TRUE,
       ],
       $options['prefix'] . 'id' => [
@@ -5470,12 +5471,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_group_bys' => TRUE,
         'is_fields' => TRUE,
         'is_filters' => TRUE,
-      ],
-      $options['prefix'] . 'external_identifier' => [
-        'name' => 'external_identifier',
-        'title' => $options['prefix_label'] . ts('External ID'),
-        'type' => CRM_Utils_Type::T_INT,
-        'is_fields' => TRUE,
+        'operatorType' => CRM_Report_Form::OP_STRING,
       ],
       $options['prefix'] . 'contact_type' => [
         'title' => $options['prefix_label'] . ts('Contact Type'),
