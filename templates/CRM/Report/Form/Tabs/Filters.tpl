@@ -33,7 +33,7 @@
                       {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName=$fieldName hideRelativeLabel=1 from='_from' to='_to' class='' colspan=''}
                   </tr>
                 {elseif $form.$fieldOp.html}
-                  <tr class="report-contents crm-report crm-report-criteria-filter crm-report-criteria-filter-{$tableName}" {if !empty($field.no_display)} style="display: none;"{/if}>
+                  <tr class="report-contents crm-report crm-report-criteria-filter crm-report-criteria-filter-{$tableName}" {if array_key_exists('no_display', $field) && !empty($field.no_display)} style="display: none;"{/if}>
                     <td class="label report-contents">{if !empty($field.title)}{$field.title}{/if}</td>
                     <td class="report-contents">{$form.$fieldOp.html}</td>
                     <td>
