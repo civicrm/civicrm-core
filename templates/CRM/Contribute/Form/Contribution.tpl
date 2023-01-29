@@ -66,7 +66,7 @@
         </tr>
         <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
           <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
-            {if !empty($is_test)}
+            {if $is_test}
               {ts}(test){/ts}
             {/if} {help id="id-financial_type"}
           </td>
