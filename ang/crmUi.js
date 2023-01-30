@@ -753,7 +753,7 @@
           if (ctrl.ngModel) {
             // Ensure widget is updated when model changes
             ctrl.ngModel.$render = function() {
-              element.val(ctrl.ngModel.$viewValue || '');
+              element.val(ctrl.ngModel.$viewValue || '').change();
             };
 
             // Copied from ng-list
