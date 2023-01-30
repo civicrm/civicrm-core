@@ -100,4 +100,38 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($expectedActivityContacts, $activityContacts, "ActivityContacts not as expected after update.");
   }
 
+  public function testActivityGetVirtualFields() {
+    $meetingActivityTypeID = \Civi\Api4\OptionValue::get()
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'activity_type')
+      ->execute()->first()['value'];
+
+    $sourceContactId = \CRM_Core_BAO_Domain::getDomain()->contact_id;
+    $c1 = Contact::create(FALSE)->addValue('first_name', '1')->execute()->first()['id'];
+    $c2 = Contact::create(FALSE)->addValue('first_name', '2')->execute()->first()['id'];
+    $c3 = Contact::create(FALSE)->addValue('first_name', '3')->execute()->first()['id'];
+    $c4 = Contact::create(FALSE)->addValue('first_name', '4')->execute()->first()['id'];
+
+    $targetContactIds = [$c1, $c2];
+    $assigneeContactIds = [$c3, $c4];
+
+    $activityID = Activity::create(FALSE)
+      ->setValues([
+        'target_contact_id'   => $targetContactIds,
+        'assignee_contact_id' => $assigneeContactIds,
+        'activity_type_id'    => $meetingActivityTypeID,
+        'source_contact_id'   => $sourceContactId,
+        'subject'             => 'test activity',
+      ])->execute()->first()['id'];
+
+    $activity = Activity::get(FALSE)
+      ->addSelect('id', 'source_contact_id', 'target_contact_id', 'assignee_contact_id')
+      ->addWhere('id', '=', $activityID)
+      ->execute()->first();
+
+    $this->assertEquals($sourceContactId, $activity['source_contact_id']);
+    $this->assertEquals($targetContactIds, $activity['target_contact_id']);
+    $this->assertEquals($assigneeContactIds, $activity['assignee_contact_id']);
+  }
+
 }

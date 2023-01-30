@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
+use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 
@@ -65,7 +66,8 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setFkEntity('Contact');
       $field->setInputType('EntityRef');
       $field->setInputAttrs(['multiple' => TRUE]);
-      $field->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
+      $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
+      $field->addOutputFormatter([__CLASS__, 'formatOutputForActivityContactIds']);
       $spec->addFieldSpec($field);
 
       $field = new FieldSpec('assignee_contact_id', 'Activity', 'Array');
@@ -75,7 +77,8 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setFkEntity('Contact');
       $field->setInputType('EntityRef');
       $field->setInputAttrs(['multiple' => TRUE]);
-      $field->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
+      $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
+      $field->addOutputFormatter([__CLASS__, 'formatOutputForActivityContactIds']);
       $spec->addFieldSpec($field);
     }
   }
@@ -85,6 +88,26 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
    */
   public function applies($entity, $action) {
     return $entity === 'Activity';
+  }
+
+  public static function renderSqlForActivityContactIds(array $field, Api4SelectQuery $query): string {
+    $contactLinkTypes = [
+      'source_contact_id' => 'Activity Source',
+      'target_contact_id' => 'Activity Targets',
+      'assignee_contact_id' => 'Activity Assignees',
+    ];
+    $recordTypeId = \CRM_Core_PseudoConstant::getKey(
+        'CRM_Activity_BAO_ActivityContact',
+        'record_type_id',
+        $contactLinkTypes[$field['name']]);
+    return '(SELECT GROUP_CONCAT(`civicrm_activity_contact`.`contact_id`) '
+          . 'FROM `civicrm_activity_contact` '
+          . 'WHERE `civicrm_activity_contact`.`activity_id` = `a`.`id` '
+          . 'AND record_type_id = ' . $recordTypeId . ')';
+  }
+
+  public static function formatOutputForActivityContactIds(?string &$value, array $row, array $field): void {
+    $value = explode(',', $value ?? '');
   }
 
 }

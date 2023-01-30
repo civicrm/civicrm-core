@@ -72,7 +72,7 @@ class ActivitySchemaMapSubscriber extends \Civi\Core\Service\AutoService impleme
         $fieldName))
         ->setBaseTable('civicrm_activity')
         ->setJoinType(Joinable::JOIN_TYPE_ONE_TO_MANY)
-        ->addCondition('`{target_table}`.`id` = '
+        ->addCondition('`{target_table}`.`id` IN '
           . '(SELECT `civicrm_activity_contact`.`contact_id` '
           . 'FROM `civicrm_activity_contact` '
           . 'WHERE `civicrm_activity_contact`.`activity_id` = `{base_table}`.`id` '
