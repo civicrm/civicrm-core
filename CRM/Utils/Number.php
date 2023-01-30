@@ -118,6 +118,7 @@ class CRM_Utils_Number {
    */
   public static function formatLocaleNumeric(string $amount, $locale = NULL): string {
     if ($amount === "") {
+      CRM_Core_Error::deprecatedWarning('Passing an empty string for amount is deprecated.');
       return $amount;
     }
 
