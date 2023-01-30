@@ -49,12 +49,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   protected $_separator;
 
   /**
-   * Total number of lines in file
-   * @var int
-   */
-  protected $_lineCount;
-
-  /**
    * Get information about the provided job.
    *  - name
    *  - id (generally the same as name)

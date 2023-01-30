@@ -46,13 +46,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   protected $_separator;
 
   /**
-   * Total number of lines in file.
-   *
-   * @var int
-   */
-  protected $_lineCount;
-
-  /**
    * Whether the file has a column header or not
    *
    * @var bool

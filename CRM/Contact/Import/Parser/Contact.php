@@ -38,13 +38,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   protected $_newContacts = [];
 
-  /**
-   * Line count id.
-   *
-   * @var int
-   */
-  protected $_lineCount;
-
   protected $_tableName;
 
   /**
@@ -525,6 +518,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         throw new CRM_Core_Exception($errorMessage);
       }
       //otherwise, count it and move on
+      // @todo - lineCount is always 0
       $this->_allExternalIdentifiers[$externalID] = $this->_lineCount;
     }
 
