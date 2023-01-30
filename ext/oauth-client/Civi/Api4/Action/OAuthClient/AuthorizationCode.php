@@ -91,19 +91,20 @@ class AuthorizationCode extends AbstractGrantAction {
     parent::validate();
     if ($this->landingUrl) {
       $landingUrlParsed = parse_url($this->landingUrl);
-      $landingUrlIp = gethostbyname($landingUrlParsed['host'] . '.');
+      $landingUrlIp = gethostbyname($landingUrlParsed['host']);
       $allowedBases = [
         \Civi::paths()->getVariable('cms.root', 'url'),
         \Civi::paths()->getVariable('civicrm.root', 'url'),
       ];
-      foreach ($allowedBases as $allowed) {
+      $ok = max(array_map(function($allowed) use ($landingUrlParsed, $landingUrlIp) {
         $allowedParsed = parse_url($allowed);
-        $allowedIp = gethostbyname($allowedParsed['host'] . '.');
-        if ($landingUrlIp === $allowedIp && $landingUrlParsed['scheme'] == $allowedParsed['scheme']) {
-          return;
-        }
+        $allowedIp = gethostbyname($allowedParsed['host']);
+        $ok = $landingUrlIp === $allowedIp && $landingUrlParsed['scheme'] == $allowedParsed['scheme'];
+        return (int) $ok;
+      }, $allowedBases));
+      if (!$ok) {
+        throw new OAuthException("Cannot initiate OAuth. Unsupported landing URL.");
       }
-      throw new OAuthException("Cannot initiate OAuth. Unsupported landing URL.");
     }
   }
 
