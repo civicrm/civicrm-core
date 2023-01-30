@@ -114,13 +114,22 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $idField = CoreUtil::getIdFieldName($entity['type']);
     if ($ids && !empty($entity['fields'][$idField]['defn']['saved_search'])) {
       $ids = $this->validateBySavedSearch($entity, $ids);
+      $result = civicrm_api4($entity['type'], 'get', [
+        'checkPermissions' => FALSE,
+        'where' => [['id', 'IN', $ids]],
+        'select' => array_keys($entity['fields']),
+      ])->indexBy($idField);
     }
     if (!$ids) {
       return;
     }
-    $result = $this->apiGet($api4, $entity['type'], $entity['fields'], [
-      'where' => [['id', 'IN', $ids]],
-    ]);
+
+    if (empty($result)) {
+      $result = $this->apiGet($api4, $entity['type'], $entity['fields'], [
+        'where' => [['id', 'IN', $ids]],
+      ]);
+    }
+
     foreach ($ids as $index => $id) {
       $this->_entityIds[$entity['name']][$index] = [
         $idField => isset($result[$id]) ? $id : NULL,
