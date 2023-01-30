@@ -409,7 +409,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     ];
 
     $contributionSofts = ContributionSoft::get()
-      ->addSelect('*', 'contribution_id.receive_date', 'contribution_id.contact_id', 'contribution_id.contact_id.display_name', 'soft_credit_type_id:label', 'contribution_id.contribution_status_id:label', 'contribution_id.financial_type_id:label', 'pcp_id.title')
+      ->addSelect('*', 'contribution_id.receive_date', 'contribution_id.contact_id', 'contribution_id.contact_id.display_name', 'soft_credit_type_id:label', 'contribution_id.contribution_status_id:label', 'contribution_id.financial_type_id:label', 'pcp_id.title', 'row_count')
       ->addWhere('contact_id', '=', $contact_id)
       ->addWhere('contribution_id.is_test', '=', $isTest);
 
