@@ -314,7 +314,7 @@ class CRM_Core_Smarty extends Smarty {
       // More recent versions of Smarty have this method.
       return parent::addTemplateDir($template_dir, $key, $isConfig);
     }
-    if (is_array($this->template_dir)) {
+    if (is_array($this->template_dir) && !in_array($template_dir, $this->template_dir, TRUE)) {
       array_unshift($this->template_dir, $template_dir);
     }
     else {
