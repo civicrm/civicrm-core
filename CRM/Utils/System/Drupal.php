@@ -100,25 +100,13 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the drupal db.
-   *
-   * @param array $params
-   *   Array of name and mail values.
-   * @param array $errors
-   *   Array of errors.
-   * @param string $emailName
-   *   Field label for the 'email'.
+   * @inheritdoc
    */
-  public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
-    $config = CRM_Core_Config::singleton();
-
-    $dao = new CRM_Core_DAO();
-    $name = $dao->escape(CRM_Utils_Array::value('name', $params));
-    $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
-    $errors = form_get_errors();
-    if ($errors) {
-      // unset drupal messages to avoid twice display of errors
+  public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+    if ($drupal_errors = form_get_errors()) {
+      // unset Drupal messages to avoid twice display of errors
       unset($_SESSION['messages']);
+      $errors = array_merge($errors, $drupal_errors);
     }
 
     if (!empty($params['name'])) {

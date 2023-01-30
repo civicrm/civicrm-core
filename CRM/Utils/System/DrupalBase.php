@@ -733,4 +733,27 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return FALSE;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
+    $emailName = '';
+
+    if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
+      // this is a transaction related page
+      $emailName = 'email-' . $form->_bltID;
+    }
+    else {
+      // find the email field in a profile page
+      foreach ($fields as $name => $dontCare) {
+        if (substr($name, 0, 5) == 'email') {
+          $emailName = $name;
+          break;
+        }
+      }
+    }
+
+    return $emailName;
+  }
+
 }
