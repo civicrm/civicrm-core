@@ -116,8 +116,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           $defaults["custom_post_id_multiple[$key]"] = $value;
         }
       }
-
-      $this->assign('profilePostMultiple', CRM_Utils_Array::value('custom_post', $defaults));
+      $this->assign('profilePostMultiple', $defaults['custom_post'] ?? NULL);
 
       // CRM-17745: Make max additional participants configurable
       if (empty($defaults['max_additional_participants'])) {
@@ -149,7 +148,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
             $defaults["additional_custom_post_id_multiple[$key]"] = $value;
           }
         }
-        $this->assign('profilePostMultipleAdd', CRM_Utils_Array::value('additional_custom_post', $defaults, []));
+        $this->assign('profilePostMultipleAdd', $defaults['additional_custom_post'] ?? []);
       }
       else {
         // Avoid PHP notices in the template
@@ -161,10 +160,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     }
 
     // provide defaults for required fields if empty (and as a 'hint' for approval message field)
-    $defaults['registration_link_text'] = CRM_Utils_Array::value('registration_link_text', $defaults, ts('Register Now'));
-    $defaults['confirm_title'] = CRM_Utils_Array::value('confirm_title', $defaults, ts('Confirm Your Registration Information'));
-    $defaults['thankyou_title'] = CRM_Utils_Array::value('thankyou_title', $defaults, ts('Thank You for Registering'));
-    $defaults['approval_req_text'] = CRM_Utils_Array::value('approval_req_text', $defaults, ts('Participation in this event requires approval. Submit your registration request here. Once approved, you will receive an email with a link to a web page where you can complete the registration process.'));
+    $defaults['registration_link_text'] = $defaults['registration_link_text'] ?? ts('Register Now');
+    $defaults['confirm_title'] = $defaults['confirm_title'] ?? ts('Confirm Your Registration Information');
+    $defaults['thankyou_title'] = $defaults['thankyou_title'] ?? ts('Thank You for Registering');
+    $defaults['approval_req_text'] = $defaults['approval_req_text'] ?? ts('Participation in this event requires approval. Submit your registration request here. Once approved, you will receive an email with a link to a web page where you can complete the registration process.');
 
     return $defaults;
   }
@@ -442,10 +441,13 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   public static function formRule($values, $files, $form) {
     if (!empty($values['is_online_registration'])) {
 
-      if (!$values['confirm_title']) {
+      if (($values['registration_link_text'] ?? '') === '') {
+        $errorMsg['registration_link_text'] = ts('Please enter Registration Link Text');
+      }
+      if (($values['confirm_title'] ?? '') === '') {
         $errorMsg['confirm_title'] = ts('Please enter a Title for the registration Confirmation Page');
       }
-      if (!$values['thankyou_title']) {
+      if (($values['thankyou_title'] ?? '') === '') {
         $errorMsg['thankyou_title'] = ts('Please enter a Title for the registration Thank-you Page');
       }
       if ($values['is_email_confirm']) {

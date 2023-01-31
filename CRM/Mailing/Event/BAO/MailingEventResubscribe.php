@@ -20,9 +20,9 @@ use Civi\Token\TokenProcessor;
 require_once 'Mail/mime.php';
 
 /**
- * Class CRM_Mailing_Event_BAO_Resubscribe
+ * Class CRM_Mailing_Event_BAO_MailingEventResubscribe
  */
-class CRM_Mailing_Event_BAO_Resubscribe {
+class CRM_Mailing_Event_BAO_MailingEventResubscribe {
 
   /**
    * Resubscribe a contact to the groups, he/she was unsubscribed from.
