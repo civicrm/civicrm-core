@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="civiimport" type="module">
   <file>civiimport</file>
-  <name>CiviImport</name>
+  <name>Civi-Import</name>
   <description>CiviCRM core import code</description>
   <license>AGPL-3.0</license>
   <maintainer>
