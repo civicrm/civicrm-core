@@ -367,7 +367,7 @@ abstract class CRM_Import_DataSource {
   }
 
   /**
-   * Get the table name for the datajob.
+   * Get the table name for the import job.
    *
    * @return string|null
    *
@@ -416,8 +416,6 @@ abstract class CRM_Import_DataSource {
 
   /**
    * Initialize the datasource, based on the submitted values stored in the user job.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function initialize(): void {
 
@@ -462,7 +460,7 @@ abstract class CRM_Import_DataSource {
    *   If the dataSource is being updated to another variant of the same
    *   class (eg. the csv upload was set to no column headers and they
    *   have resubmitted WITH skipColumnHeader (first row is a header) then
-   *   the dataSource is still CSV and the params for the new intance
+   *   the dataSource is still CSV and the params for the new instance
    *   are passed in. When changing from csv to SQL (for example) newParams is
    *   empty.
    *

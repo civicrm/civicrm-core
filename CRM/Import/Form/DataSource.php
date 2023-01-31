@@ -96,11 +96,10 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   }
 
   public function setDefaultValues() {
-    return [
+    return array_merge($this->dataSourceDefaults, [
       'dataSource' => $this->getDefaultDataSource(),
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
-      'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
-    ];
+    ]);
 
   }
 
@@ -189,6 +188,25 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    */
   private function instantiateDataSource(): void {
     $this->getDataSourceObject()->initialize();
+  }
+
+  /**
+   * Default values for datasource fields.
+   *
+   * @var array
+   */
+  protected $dataSourceDefaults = [];
+
+  /**
+   * Set dataSource default values.
+   *
+   * @param array $dataSourceDefaults
+   *
+   * @return self
+   */
+  public function setDataSourceDefaults(array $dataSourceDefaults): self {
+    $this->dataSourceDefaults = $dataSourceDefaults;
+    return $this;
   }
 
 }

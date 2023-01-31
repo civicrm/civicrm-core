@@ -61,10 +61,6 @@
           <td><span>{$form.multipleCustomData.html}</span> </td>
         </tr>
       {/if}
-        <tr class="crm-import-datasource-form-block-fieldSeparator">
-          <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
-          <td>{$form.fieldSeparator.html}</td>
-        </tr>
        <tr class="crm-import-uploadfile-form-block-date">{include file="CRM/Core/Date.tpl"}</tr>
        {if array_key_exists('savedMapping', $form)}
          <tr class="crm-import-uploadfile-form-block-savedMapping">
