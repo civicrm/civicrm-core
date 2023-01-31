@@ -1726,9 +1726,11 @@ LIKE %1
    * @param array $params
    * @param bool $abort
    * @param bool $i18nRewrite
+   *
    * @return string|null
    *   the result of the query if any
    *
+   * @throws \CRM_Core_Exception
    */
   public static function &singleValueQuery(
     $query,
