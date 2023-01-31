@@ -29,7 +29,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   use CRM_Contact_Import_MetadataTrait;
 
-  protected $_allExternalIdentifiers = [];
+  private $externalIdentifiers = [];
 
   /**
    * Array of successfully imported contact id's
@@ -507,20 +507,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
     }
-
-    //check for duplicate external Identifier
-    $externalID = $params['external_identifier'] ?? NULL;
-    if ($externalID) {
-      /* If it's a dupe,external Identifier  */
-
-      if ($externalDupe = CRM_Utils_Array::value($externalID, $this->_allExternalIdentifiers)) {
-        $errorMessage = ts('External ID conflicts with record %1', [1 => $externalDupe]);
-        throw new CRM_Core_Exception($errorMessage);
-      }
-      //otherwise, count it and move on
-      // @todo - lineCount is always 0
-      $this->_allExternalIdentifiers[$externalID] = $this->_lineCount;
-    }
+    $this->checkForDuplicateExternalIdentifiers($params['external_identifier'] ?? '');
 
     //date-format part ends
 
@@ -1731,6 +1718,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       CRM_Import_Parser::ERROR => 'ERROR',
       CRM_Import_Parser::NO_MATCH => 'invalid_no_match',
     ][$outcome] ?? 'ERROR';
+  }
+
+  /**
+   * Return an error if the csv has more than one row with the same external identifier.
+   *
+   * @param string $externalIdentifier
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function checkForDuplicateExternalIdentifiers(string $externalIdentifier): void {
+    if ($externalIdentifier) {
+      $existingRow = array_search($externalIdentifier, $this->externalIdentifiers, TRUE);
+      if ($existingRow !== FALSE) {
+        throw new CRM_Core_Exception(ts('External ID conflicts with record %1', [1 => $existingRow + 1]));
+      }
+      $this->externalIdentifiers[] = $externalIdentifier;
+    }
   }
 
 }
