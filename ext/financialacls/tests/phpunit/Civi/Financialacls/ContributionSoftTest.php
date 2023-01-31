@@ -73,7 +73,9 @@ class ContributionSoftTest extends BaseTestClass {
         'sct_label' => NULL,
       ],
     ];
-    $list = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->ids['Contact']['credited']);
+    $dataTableParameters = [];
+    $list = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->ids['Contact']['credited'], NULL, 0, $dataTableParameters);
+    $this->assertEquals(2, $dataTableParameters['total']);
     foreach ($expectedCredits[1] as $key => $value) {
       $this->assertEquals($value, $list[1][$key], $key);
     }
