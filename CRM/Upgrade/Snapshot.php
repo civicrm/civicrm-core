@@ -133,8 +133,6 @@ class CRM_Upgrade_Snapshot {
    *   Ex: '5.50'
    * @param string $name
    * @param \CRM_Utils_SQL_Select $select
-   *
-   * @return iterable
    * @throws \CRM_Core_Exception
    */
   public static function createTasks(string $owner, string $version, string $name, CRM_Utils_SQL_Select $select): iterable {
