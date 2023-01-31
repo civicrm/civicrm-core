@@ -21,13 +21,22 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFiftyNine extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
+    if ($rev === '5.59.alpha1') {
+      if (empty(CRM_Core_Config::singleton()->userSystem->is_wordpress)) {
+        $preUpgradeMessage .= '<p>' . ts('The handling of invalid smarty template code in mailings, reminders and other automated messages has changed . For details, see <a %1>upgrade notes</a>.',
+            [1 => 'href="https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/#civicrm-559" target="_blank"']) . '</p>';
+      }
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
    * @param string $rev
    *   The version number matching this function name
    */
-  public function upgrade_5_59_alpha1($rev): void {
+  public function upgrade_5_59_alpha1(string $rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Drop column civicrm_custom_field.mask', 'dropColumn', 'civicrm_custom_field', 'mask');
   }
