@@ -63,7 +63,7 @@ class CRM_Upgrade_Snapshot {
           // Use select MAX(id) rather than COUNT as COUNT is slow on large databases.
           $max = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM `{$table}`");
         }
-        catch (CRM_Core_Exception $e) {
+        catch (\Exception $e) {
           $max = 0;
         }
         if ($max > $limit) {
