@@ -581,15 +581,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function loadUser($user) {
     $userdata = get_user_by('login', $user);
-    if (!$userdata->data->ID) {
+    if (empty($userdata->ID)) {
       return FALSE;
     }
 
-    $uid = $userdata->data->ID;
+    $uid = $userdata->ID;
     wp_set_current_user($uid);
     $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
 
-    // lets store contact id and user id in session
+    // Lets store contact id and user id in session.
     $session = CRM_Core_Session::singleton();
     $session->set('ufID', $uid);
     $session->set('userID', $contactID);
@@ -616,10 +616,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getUfId($username) {
     $userdata = get_user_by('login', $username);
-    if (!$userdata->data->ID) {
+    if (empty($userdata->ID)) {
       return NULL;
     }
-    return $userdata->data->ID;
+    return $userdata->ID;
   }
 
   /**
