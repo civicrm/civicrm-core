@@ -313,6 +313,17 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $this->loadBootStrap();
     }
 
+    // If caller didn't express a clear preference for frontend xor backend, then use default.
+    // Aside: I definitely find it confusing that this decision is spread across two variables.
+    if ($frontend === $forceBackend) {
+      if (CRM_Core_Menu::isPublicRoute($path)) {
+        $frontend = TRUE;
+      }
+      else {
+        $forceBackend = TRUE;
+      }
+    }
+
     // When on the front-end.
     if ($config->userFrameworkFrontend) {
 

@@ -111,6 +111,10 @@ abstract class CRM_Utils_System_Base {
   /**
    * Generate the url string to a CiviCRM path.
    *
+   * Note: The options `$frontend` and `$forceBackend` are opposites. If you use exactly one (and not
+   * the other), then the URL will follow your request. If you leave the default values, or if you
+   * give incompatible values, then we will use the route's preferred default (from `civicrm_menu.is_public`).
+   *
    * @param string $path
    *   The path being linked to, such as "civicrm/add".
    * @param string $query
