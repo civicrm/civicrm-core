@@ -11,6 +11,7 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\API\Request;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -66,7 +67,8 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
     // Default sort order
     $e->display['settings']['sort'] = self::getDefaultSort($entityName);
 
-    $fields = CoreUtil::getApiClass($entityName)::get()->entityFields();
+    $apiGet = Request::create($entityName, 'get', ['version' => 4]);
+    $fields = $apiGet->entityFields();
     $columns = [$labelField];
     // Add grouping fields like "event_type_id" in the description
     $grouping = (array) (CoreUtil::getCustomGroupExtends($entityName)['grouping'] ?? []);
