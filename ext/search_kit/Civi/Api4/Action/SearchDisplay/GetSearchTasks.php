@@ -17,7 +17,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * An array containing the searchDisplay definition
-   * @var array
+   * @var string|array
    */
   protected $display;
 
