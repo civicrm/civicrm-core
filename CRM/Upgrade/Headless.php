@@ -17,6 +17,7 @@ class CRM_Upgrade_Headless {
   /**
    * Pre Upgrade Message
    * @var string
+   *   HTML-formatted message
    */
   private $preUpgradeMessage;
 
@@ -77,11 +78,14 @@ class CRM_Upgrade_Headless {
   }
 
   /**
-   * Get the PreUpgrade message
-   * @return string
+   * Get the pre-upgrade message.
+   *
+   * @return array
+   *   The upgrade message, in HTML and text formats.
+   *   Ex: ['message' => '<p>Foo</p><b>Bar</p>', 'text' => ["Foo\n\nBar"]]
    * @throws \Exception
    */
-  public function getPreUpgradeMessage(): string {
+  public function getPreUpgradeMessage(): array {
     $upgrade = new CRM_Upgrade_Form();
     [$currentVer, $latestVer] = $upgrade->getUpgradeVersions();
 
@@ -94,7 +98,10 @@ class CRM_Upgrade_Headless {
       $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
       $this->preUpgradeMessage = $preUpgradeMessage;
     }
-    return $this->preUpgradeMessage;
+    return [
+      'message' => $this->preUpgradeMessage,
+      'text' => CRM_Utils_String::htmlToText($this->preUpgradeMessage),
+    ];
   }
 
 }
