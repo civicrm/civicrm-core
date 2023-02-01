@@ -74,7 +74,7 @@
           ctrl.page = 1;
           // Only refresh if search has already been run
           if (ctrl.results) {
-            ctrl.getResultsPronto();
+            ctrl.getResultsSoon();
           }
         }
 
