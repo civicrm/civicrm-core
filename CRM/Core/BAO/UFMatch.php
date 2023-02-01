@@ -275,7 +275,7 @@ AND    domain_id = %2
           }
         }
 
-        $contactId = civicrm_api3('Contact', 'create', $params)['id'];
+        $contactId = CRM_Contact_BAO_Contact::createProfileContact($params);
         $ufmatch->contact_id = $contactId;
         $ufmatch->uf_name = $uniqId;
       }
