@@ -15,21 +15,6 @@
 class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
 
   /**
-   * @throws \Exception
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->_contactIds = [
-      $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
-      $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']),
-    ];
-    $this->_optionValue = $this->callAPISuccess('optionValue', 'create', [
-      'label' => '"Seamus Lee" <seamus@example.com>',
-      'option_group_id' => 'from_email_address',
-    ]);
-  }
-
-  /**
    * Test creating a hidden smart group from a search builder search.
    *
    * A hidden smart group is a group used for sending emails.
