@@ -364,11 +364,11 @@ Czech Republic
     $variants = [
       [
         'string' => '{contact.individual_prefix}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.individual_suffix}',
-        'expected' => 'Mr. Anthony  Anderson II',
+        'expected' => 'Mr. Anthony Anderson II',
       ],
       [
         'string' => '{contact.prefix_id:label}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.suffix_id:label}',
-        'expected' => 'Mr. Anthony  Anderson II',
+        'expected' => 'Mr. Anthony Anderson II',
       ],
     ];
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
