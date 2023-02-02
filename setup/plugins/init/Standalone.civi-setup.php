@@ -29,6 +29,10 @@ if (!defined('CIVI_SETUP')) {
     }
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
+    // NOTE: in here, $model->webroot refers to the root of the *application*, not the actual webroot as reachable by http.
+    // Typically this means that $model->webroot might be like /var/www/example.org/ and the actual web root would be
+    // /var/www/example.org/web/
+
     // Compute settingsPath.
     // We use this structure: /var/www/standalone/data/{civicrm.settings.php,templates_c}
     // to reduce the number of directories that admins have to chmod
@@ -37,10 +41,10 @@ if (!defined('CIVI_SETUP')) {
 
     // Compute DSN.
     $model->db = $model->cmsDb = [
-      'server' => 'localhost',
-      'username' => '',
-      'password' => '',
-      'database' => '',
+      'server' => 'mysql',
+      'username' => 'loner',
+      'password' => 'somepass',
+      'database' => 'standalone_civicrm',
     ];
 
     // Compute URLs (@todo?)
