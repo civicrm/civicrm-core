@@ -212,7 +212,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * Bootstrap the non-existent CMS
+   * Bootstrap composer libs.
+   *
+   * This is used by cv and civix, but not I (artfulrobot) think, in the main http requests.
    *
    * @param array $params
    *   Either uid, or name & pass.
@@ -226,14 +228,30 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @Todo Handle setting cleanurls configuration for CiviCRM?
    */
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
-    static $run_once = FALSE;
-    if ($run_once) {
+    static $runOnce;
+    if (!isset($runOnce)) {
+      $runOnce = TRUE;
       return TRUE;
     }
-    else {
-      $run_once = TRUE;
+
+    if (!($root = $this->cmsRootPath())) {
+      // What does this guard against?
+      return FALSE;
     }
-    // @todo ?
+    chdir($root);
+
+    // Create a mock $request object
+    require_once $root . '../vendor/autoload.php'; /* assumes $root to be the _web_ root path, not the project root path. */
+
+    if ($loadUser) {
+      // @todo
+      // if (!empty($params['uid']) && ...) {
+      //   $this->loadUser($username);
+      // }
+      // elseif (!empty($params['name']) && !empty($params['pass']) && ...can authenticate...) {
+      //   $this->loadUser($params['name']);
+      // }
+    }
     return TRUE;
   }
 
@@ -265,9 +283,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     if (!empty($civicrm_paths['cms.root']['path'])) {
       return $civicrm_paths['cms.root']['path'];
     }
-
-    // @todo?
-    throw new \RuntimeException("Standalone requires that you set \$civicrm_paths['cms.root']['path'] in civicrm.settings.php");
+    throw new \RuntimeException("Standalone requires the path is set for now. Set \$civicrm_paths['cms.root']['path'] in civicrm.settings.php to the webroot.");
   }
 
   /**
