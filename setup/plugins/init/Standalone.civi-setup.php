@@ -44,8 +44,22 @@ if (!defined('CIVI_SETUP')) {
     ];
 
     // Compute URLs (@todo?)
-    $model->cmsBaseUrl = $_SERVER['HTTP_ORIGIN'] ?: $_SERVER['HTTP_REFERER'];
+    // $model->cmsBaseUrl = $_SERVER['HTTP_ORIGIN'] ?: $_SERVER['HTTP_REFERER'];
+    $model->cmsBaseUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+
+    // These mandatorySettings become 'extra settings from installer' and set values in
+    // $civicrm_setting['domain'][k] = v;
     $model->mandatorySettings['userFrameworkResourceURL'] = $model->cmsBaseUrl . '/assets/civicrm/core';
+
+    // These paths get set as
+    // $civicrm_paths[k]['url'|'path'] = v
+    $model->paths['cms.root'] = [
+      'path' => $model->webroot . DIRECTORY_SEPARATOR . 'web',
+    ];
+    $model->paths['civicrm.files'] = [
+      'path' => rtrim($model->webroot . DIRECTORY_SEPARATOR . 'web') . DIRECTORY_SEPARATOR . 'upload',
+      'url' => $model->cmsBaseUrl . '/upload',
+    ];
 
     // Compute default locale.
     $model->lang = $_REQUEST['lang'] ?? 'en_US';
