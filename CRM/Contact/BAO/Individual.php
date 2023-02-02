@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * Class contains functions for individual contact type.
  */
@@ -190,18 +192,15 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         }
       }
 
+      $formatted['id'] = $contact->id ?? $params['id'] ?? 0;
       //build the sort name.
       $format = Civi::settings()->get('sort_name_format');
-      $sortName = CRM_Utils_Address::format($formatted, $format,
-        FALSE, FALSE, $tokenFields
-      );
+      $sortName = self::processNameFormat($formatted, $format, 'sort_name');
       $sortName = trim($sortName);
 
       //build the display name.
       $format = Civi::settings()->get('display_name_format');
-      $displayName = CRM_Utils_Address::format($formatted, $format,
-        FALSE, FALSE, $tokenFields
-      );
+      $displayName = self::processNameFormat($formatted, $format, 'display_name');
       $displayName = trim($displayName);
     }
 
@@ -368,6 +367,38 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Render a name in a given format for either sort name or display name format
+   * @param array $contactFields
+   * @param string|null $nameFormat
+   * @param string $fieldName
+   *
+   * @return string
+   */
+  private static function processNameFormat(array $contactFields, ?string $nameFormat, string $fieldName): string {
+    if (empty($nameFormat)) {
+      $nameFormat = Civi::settings()->get('address_format');
+    }
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'class' => __CLASS__,
+      'schema' => ['contactId'],
+    ]);
+    $tokenProcessor->addRow(['contactId' => $contactFields['id'] ?? 0, 'contact' => (array) $contactFields]);
+    $tokenProcessor->addMessage($fieldName, $nameFormat, 'text/plain');
+
+    $tokenProcessor->evaluate();
+    /* @var \Civi\Token\TokenRow $row */
+    $row = $tokenProcessor->getRow(0);
+    $value = "\n" . $row->render($fieldName) . "\n";
+    $value = preg_replace('/\n{[^{}]*}/u', "\n", $value);
+    $value = preg_replace('/{[^{}]*}\n/u', "\n", $value);
+    $value = preg_replace('/{([^{}]*)}({[^{}]*})+/u', '\1', $value);
+    $value = str_replace(['{', '}'], '', $value);
+    $value = preg_replace('/^[ \t]*[\r\n]+/m', '', $value);
+    $value = str_replace('  ', ' ', $value);
+    return $value ?? '';
   }
 
 }
