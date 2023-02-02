@@ -6,6 +6,10 @@
  */
 class CRM_Utils_FileTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->callAPISuccess('OptionValue', 'get', ['option_group_id' => 'safe_file_extension', 'value' => 17, 'api.option_value.delete' => ['id' => "\$value.id"]]);
+  }
+
   /**
    * Test is child path.
    */
@@ -644,6 +648,36 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
       }
       $this->assertEquals($expectMatches, $actualMatches, "The file $expectFile should be found as follows:");
     }
+  }
+
+  /**
+   * Generate examples to test the safe file extension
+   * @return array
+   */
+  public static function safeFileExtensionExamples(): array {
+    $cases = [
+      'PDF File Extension' => ['pdf', TRUE, TRUE],
+      'PHP File Extension' => ['php', FALSE, FALSE],
+      'PHAR' => ['phar', FALSE, FALSE],
+      'PHP5 File Extension' => ['php5', FALSE, FALSE],
+    ];
+    return $cases;
+  }
+
+  /**
+   * Test that modifying the safe File Extension option group still ensures some are blocked
+   * @dataProvider safeFileExtensionExamples
+   */
+  public function testSafeFileExtensionValidation($extension, $standardInstallCheck, $afterModificationCheck): void {
+    $this->assertEquals($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
+    $optionValue = $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'safe_file_extension',
+      'label' => $extension,
+      'name' => $extension,
+      'value' => 17,
+    ]);
+    unset(Civi::$statics['CRM_Utils_File']['file_extensions']);
+    $this->assertEquals($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
   }
 
 }
