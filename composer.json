@@ -52,7 +52,6 @@
   "require": {
     "php": "~7.3 || ~8",
     "composer-runtime-api": "~2.0",
-    "cache/integration-tests": "~0.17.0",
     "dompdf/dompdf" : "~2.0.2",
     "firebase/php-jwt": ">=3 <6",
     "rubobaquero/phpquery": "^0.9.15",
@@ -106,6 +105,9 @@
     "html2text/html2text": "^4.3.1",
     "psr/container": "~1.0",
     "ext-fileinfo": "*"
+  },
+  "require-dev": {
+    "cache/integration-tests": "~0.17.0"
   },
   "scripts": {
     "post-install-cmd": [
