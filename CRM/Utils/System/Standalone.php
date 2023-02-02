@@ -49,7 +49,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : [];
-    return \Drupal\Core\Url::fromRoute('user.login', [], ['query' => $query])->toString();
+    // @todo
+    throw new \RuntimeException("Standalone getLoginURL not written yet!");
   }
 
   /**
@@ -106,12 +107,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * Check if a resource url is within the drupal directory and format appropriately.
+   * Check if a resource url is within the public webroot and format appropriately.
    *
-   * This seems to be a legacy function. We assume all resources are within the drupal
-   * directory and always return TRUE. As well, we clean up the $url.
+   * This seems to be a legacy function. We assume all resources are
+   * ok directory and always return TRUE. As well, we clean up the $url.
    *
-   * FIXME: This is not a legacy function and the above is not a safe assumption.
+   * @todo: This is not a legacy function and the above is not a safe assumption.
    * External urls are allowed by CRM_Core_Resources and this needs to return the correct value.
    *
    * @param $url
@@ -126,13 +127,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     if (($pos = strpos($url, '?')) !== FALSE) {
       $url = substr($url, 0, $pos);
     }
-    // FIXME: Should not unconditionally return true
+    // @todo: Should not unconditionally return true
     return TRUE;
   }
 
   /**
-   * This function does nothing in Drupal 8. Changes to the base_url should be made
-   * in settings.php directly.
+   * Changes to the base_url should be made in settings.php directly.
    */
   public function mapConfigToSSL() {
   }
@@ -159,40 +159,16 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    $system = new CRM_Utils_System_Drupal8();
-    $system->loadBootStrap([], FALSE);
-
-    $uid = \Drupal::service('user.auth')->authenticate($name, $password);
-    if ($uid) {
-      if ($this->loadUser($name)) {
-        $contact_id = CRM_Core_BAO_UFMatch::getContactId($uid);
-        return [$contact_id, $uid, mt_rand()];
-      }
-    }
-
-    return FALSE;
+    // @todo
+    throw new \RuntimeException("Standalone authenticate not written yet!");
   }
 
   /**
    * @inheritDoc
    */
   public function loadUser($username) {
-    $user = user_load_by_name($username);
-    if (!$user) {
-      return FALSE;
-    }
-
-    // Set Drupal's current user to the loaded user.
-    \Drupal::currentUser()->setAccount($user);
-
-    $uid = $user->id();
-    $contact_id = CRM_Core_BAO_UFMatch::getContactId($uid);
-
-    // Store the contact id and user id in the session
-    $session = CRM_Core_Session::singleton();
-    $session->set('ufID', $uid);
-    $session->set('userID', $contact_id);
-    return TRUE;
+    // @todo
+    throw new \RuntimeException("Standalone loadUser not written yet!");
   }
 
   /**
@@ -202,9 +178,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return int|null
    */
   public function getUfId($username) {
-    if ($id = user_load_by_name($username)->id()) {
-      return $id;
-    }
+    // @todo
+    throw new \RuntimeException("Standalone getUfId not written yet!");
   }
 
   /**
@@ -237,7 +212,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * Load drupal bootstrap.
+   * Bootstrap the non-existent CMS
    *
    * @param array $params
    *   Either uid, or name & pass.
@@ -258,47 +233,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     else {
       $run_once = TRUE;
     }
-
-    if (!($root = $this->cmsRootPath())) {
-      return FALSE;
-    }
-    chdir($root);
-
-    // Create a mock $request object
-    $autoloader = require_once $root . '/autoload.php';
-    if ($autoloader === TRUE) {
-      $autoloader = ComposerAutoloaderInitDrupal8::getLoader();
-    }
-    // @Todo: do we need to handle case where $_SERVER has no HTTP_HOST key, ie. when run via cli?
-    $request = new \Symfony\Component\HttpFoundation\Request([], [], [], [], [], $_SERVER);
-
-    // Create a kernel and boot it.
-    $kernel = \Drupal\Core\DrupalKernel::createFromRequest($request, $autoloader, 'prod');
-    $kernel->boot();
-    $kernel->preHandle($request);
-    $container = $kernel->rebuildContainer();
-    // Add our request to the stack and route context.
-    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT, new \Symfony\Component\Routing\Route('<none>'));
-    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_NAME, '<none>');
-    $container->get('request_stack')->push($request);
-    $container->get('router.request_context')->fromRequest($request);
-
-    // Initialize Civicrm
-    \Drupal::service('civicrm')->initialize();
-
-    // We need to call the config hook again, since we now know
-    // all the modules that are listening on it (CRM-8655).
-    $config = CRM_Core_Config::singleton();
-    CRM_Utils_Hook::config($config);
-
-    if ($loadUser) {
-      if (!empty($params['uid']) && $username = \Drupal\user\Entity\User::load($params['uid'])->getAccountName()) {
-        $this->loadUser($username);
-      }
-      elseif (!empty($params['name']) && !empty($params['pass']) && \Drupal::service('user.auth')->authenticate($params['name'], $params['pass'])) {
-        $this->loadUser($params['name']);
-      }
-    }
+    // @todo ?
     return TRUE;
   }
 
@@ -331,32 +266,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       return $civicrm_paths['cms.root']['path'];
     }
 
-    if (defined('DRUPAL_ROOT')) {
-      return DRUPAL_ROOT;
-    }
-
-    // It looks like Drupal hasn't been bootstrapped.
-    // We're going to attempt to discover the root Drupal path
-    // by climbing out of the folder hierarchy and looking around to see
-    // if we've found the Drupal root directory.
-    if (!$path) {
-      $path = $_SERVER['SCRIPT_FILENAME'];
-    }
-
-    // Normalize and explode path into its component paths.
-    $paths = explode(DIRECTORY_SEPARATOR, realpath($path));
-
-    // Remove script filename from array of directories.
-    array_pop($paths);
-
-    while (count($paths)) {
-      $candidate = implode('/', $paths);
-      if (file_exists($candidate . "/core/includes/bootstrap.inc")) {
-        return $candidate;
-      }
-
-      array_pop($paths);
-    }
+    // @todo?
+    throw new \RuntimeException("Standalone requires that you set \$civicrm_paths['cms.root']['path'] in civicrm.settings.php");
   }
 
   /**
@@ -456,12 +367,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * Function to return current language of Drupal8
+   * Function to return current language.
    *
    * @return string
    */
   public function getCurrentLanguage() {
-    // @todo FIXME
+    // @todo
     Civi::log()->debug('CRM_Utils_System_Standalone::getCurrentLanguage: not implemented');
     return NULL;
   }
@@ -511,7 +422,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * Append Drupal8 js to coreResourcesList.
+   * Append any Standalone js to coreResourcesList.
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
@@ -530,22 +441,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function setUFLocale($civicrm_language) {
-    $langcode = substr(str_replace('_', '', $civicrm_language), 0, 2);
-    $languageManager = \Drupal::languageManager();
-    $languages = $languageManager->getLanguages();
-
-    if (isset($languages[$langcode])) {
-      $languageManager->setConfigOverrideLanguage($languages[$langcode]);
-
-      // Config must be re-initialized to reset the base URL
-      // otherwise links will have the wrong language prefix/domain.
-      $config = CRM_Core_Config::singleton();
-      $config->free();
-
-      return TRUE;
-    }
-
-    return FALSE;
+    throw new \RuntimeException("Standalone setUFLocale not written yet!");
+    // @todo
   }
 
   /**
@@ -556,57 +453,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       return $url;
     }
 
-    // Drupal might not be bootstrapped if being called by the REST API.
-    if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
-      return $url;
-    }
-
-    $language = $this->getCurrentLanguage();
-    if (\Drupal::service('module_handler')->moduleExists('language')) {
-      $config = \Drupal::config('language.negotiation')->get('url');
-
-      //does user configuration allow language
-      //support from the URL (Path prefix or domain)
-      $enabledLanguageMethods = \Drupal::config('language.types')->get('negotiation.language_interface.enabled') ?: [];
-      if (array_key_exists(\Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::METHOD_ID, $enabledLanguageMethods)) {
-        $urlType = $config['source'];
-
-        //url prefix
-        if ($urlType == \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::CONFIG_PATH_PREFIX) {
-          if (!empty($language)) {
-            if ($addLanguagePart && !empty($config['prefixes'][$language])) {
-              $url .= $config['prefixes'][$language] . '/';
-            }
-            if ($removeLanguagePart && !empty($config['prefixes'][$language])) {
-              $url = str_replace("/" . $config['prefixes'][$language] . "/", '/', $url);
-            }
-          }
-        }
-        //domain
-        if ($urlType == \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::CONFIG_DOMAIN) {
-          if (isset($language->domain) && $language->domain) {
-            if ($addLanguagePart) {
-              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $config['domains'][$language] . base_path();
-            }
-            if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
-              $url = str_replace('\\', '/', $url);
-              $parseUrl = parse_url($url);
-
-              //kinda hackish but not sure how to do it right
-              //hope http_build_url() will help at some point.
-              if (is_array($parseUrl) && !empty($parseUrl)) {
-                $urlParts = explode('/', $url);
-                $hostKey = array_search($parseUrl['host'], $urlParts);
-                $ufUrlParts = parse_url(CIVICRM_UF_BASEURL);
-                $urlParts[$hostKey] = $ufUrlParts['host'];
-                $url = implode('/', $urlParts);
-              }
-            }
-          }
-        }
-      }
-    }
-
+    // @todo
+    \Civi::log()->warning("Standalone languageNegotiationURL is not written, but was called");
     return $url;
   }
 
@@ -615,7 +463,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return array
    */
   public function getCMSPermissionsUrlParams() {
-    return ['ufAccessURL' => \Drupal\Core\Url::fromRoute('user.admin_permissions')->toString()];
+    // @todo
+    \Civi::log()->warning("Standalone getCMSPermissionsUrlParams is not written, but was called");
+    return ['ufAccessURL' => '/fixme/standalone/permissions/url/params'];
   }
 
   /**
@@ -636,8 +486,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * Helper function to rebuild the Drupal 8 or 9 dynamic routing cache.
-   * We need to do this after enabling extensions that add routes and it's worth doing when we reset Civi paths.
+   * @todo is anything needed here for Standalone?
    */
   public function invalidateRouteCache() {
   }
