@@ -27,7 +27,7 @@
   <field>
     <name>contact_id</name>
     <type>int unsigned</type>
-    <comment>FK to Contact</comment>
+    <comment>FK to Contact - possibly redundant</comment>
   </field>
   <foreignKey>
     <name>contact_id</name>
@@ -97,10 +97,15 @@
 
   <field>
     <name>language</name>
-    <type>varchar</type>
-    <length>12</length>
-    <required>false</required>
-    <comment>User's language</comment>
+    <type>int unsigned</type>
+    <title>Language</title>
+    <pseudoconstant>
+      <optionGroupName>languages</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <comment>The language for the user.</comment>
   </field>
 
 </table>
