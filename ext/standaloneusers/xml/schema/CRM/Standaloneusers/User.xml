@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Standaloneusers</base>
+  <class>User</class>
+  <name>civicrm_user</name>
+  <comment>A standalone user account</comment>
+  <labelField>username</labelField>
+  <searchField>username</searchField>
+  <descriptionField>email</descriptionField>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique User ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Contact</comment>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>username</name>
+    <required>true</required>
+    <type>varchar</type>
+    <length>60</length>
+  </field>
+  <index>
+    <name>UI_username</name>
+    <fieldName>username</fieldName>
+    <unique>true</unique>
+  </index>
+
+  <field>
+    <name>password</name>
+    <type>varchar</type>
+    <required>true</required>
+    <length>128</length>
+    <comment>Hashed password</comment>
+  </field>
+
+  <field>
+    <name>email</name>
+    <type>varchar</type>
+    <required>true</required>
+    <length>255</length>
+    <comment>Email (e.g. for password resets)</comment>
+  </field>
+
+  <field>
+    <name>when_created</name>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+  </field>
+
+  <field>
+    <name>when_last_accessed</name>
+    <type>timestamp</type>
+  </field>
+
+  <field>
+    <name>when_updated</name>
+    <type>timestamp</type>
+  </field>
+
+  <field>
+    <name>is_active</name>
+    <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
+  </field>
+
+  <field>
+    <name>timezone</name>
+    <type>varchar</type>
+    <length>32</length>
+    <required>false</required>
+    <comment>User's timezone</comment>
+  </field>
+
+  <field>
+    <name>language</name>
+    <type>varchar</type>
+    <length>12</length>
+    <required>false</required>
+    <comment>User's language</comment>
+  </field>
+
+</table>

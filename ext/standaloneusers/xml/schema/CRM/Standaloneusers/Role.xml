@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Standaloneusers</base>
+  <class>Role</class>
+  <name>civicrm_role</name>
+  <comment>Permissions are assigned to roles which are assigned to users</comment>
+  <log>true</log>
+  <searchField>name</searchField>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique Role ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>name</name>
+    <type>varchar</type>
+    <required>true</required>
+    <length>64</length>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <unique>true</unique>
+    <fieldName>name</fieldName>
+  </index>
+
+</table>
