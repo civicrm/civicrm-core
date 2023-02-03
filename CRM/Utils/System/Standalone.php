@@ -33,9 +33,37 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   *
+   * Create a user in the CMS.
+   *
+   * @param array $params keys:
+   *    - 'cms_name'
+   *    - 'cms_pass' plaintext password
+   *    - 'notify' boolean
+   * @param string $mail
+   *   Email id for cms user.
+   *
+   * @return int|bool
+   *   uid if user was created, false otherwise
    */
   public function createUser(&$params, $mail) {
-    return FALSE;
+
+    try {
+      $userID = \Civi\Api4\User::create(TRUE)
+      ->addValue('username', $params['cms_name'])
+      ->addValue('mail', $mail)
+      // @todo the Api should ensure a password is encrypted? Or call a method to do that here?
+      ->addValue('password', $params['cms_pass'])
+      ->execute()->single()['id'];
+      }
+    catch (\Exception $e) {
+      \Civi::log()->warning("Failed to create user '$mail': " . $e->getMessage());
+      return FALSE;
+    }
+
+    // @todo This is what Drupal does, but it's unclear why.
+    // CRM_Core_Config::singleton()->inCiviCRM = FALSE;
+    return (int) $userID;
   }
 
   /**
