@@ -469,7 +469,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     }
 
     // @todo
-    \Civi::log()->warning("Standalone languageNegotiationURL is not written, but was called");
+    // \Civi::log()->warning("Standalone languageNegotiationURL is not written, but was called");
     return $url;
   }
 
