@@ -20,6 +20,12 @@
  */
 class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
+  public const ITOA64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+  public static $minHashCount = 7;
+  public static $maxHashCount = 30;
+  public static $hashLength = 55;
+
   /**
    * @inheritdoc
    */
@@ -70,6 +76,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
+    \Civi\Api4\User::update(FALSE)
+    ->addWhere('id', '=', $ufID)
+    ->addValue('email', $email)
+    ->execute();
   }
 
   /**
@@ -185,11 +195,164 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   * Authenticate the user against the CMS db.
+   *
+   * @param string $name
+   *   The user name.
+   * @param string $password
+   *   The password for the above user.
+   * @param bool $loadCMSBootstrap
+   *   Load cms bootstrap?.
+   * @param string $realPath
+   *   Filename of script
+   *
+   * @return array|bool
+   *   [contactID, ufID, unique string] else false if no auth
+   * @throws \CRM_Core_Exception.
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    // @todo
-    throw new \RuntimeException("Standalone authenticate not written yet!");
+
+    // this comment + session lines: copied from Drupal's implementation in case it's important...
+    /* Before we do any loading, let's start the session and write to it.
+     * We typically call authenticate only when we need to bootstrap the CMS
+     * directly via Civi and hence bypass the normal CMS auth and bootstrap
+     * process typically done in CLI and cron scripts. See: CRM-12648
+     */
+    $session = CRM_Core_Session::singleton();
+    $session->set('civicrmInitSession', TRUE);
+
+    $user = \Civi\Api4\User::get(FALSE)
+    ->addWhere('name', '=', $name)
+    ->addWhere('is_active', '=', TRUE)
+    ->addSelect('password', 'contact_id')
+    ->execute()->first() ?? [];
+    $user += ['password' => ''];
+
+    // @todo consider moving this elsewhere.
+    $type = substr($user['password'], 0, 3);
+    switch ($type) {
+      case '$S$':
+        // A normal Drupal 7 password using sha512.
+        $hash = $this->_password_crypt('sha512', $password, $user['password']);
+        break;
+      default:
+      return FALSE;
+    }
+
+    if (!hash_equals($user['password'], $hash)) {
+      return FALSE;
+    }
+
+    // Note: random_int is more appropriate for cryptographical use than mt_rand
+    // The long number is the max 32 bit value.
+    return [$user['civicrm_id'], $user['id'], random_int(0, 2147483647)];
   }
+
+  /**
+   * This is a copy of Drupal 7's _password_crypt() function.
+   *
+   * Hash a password using a secure stretched hash.
+   *
+   * By using a salt and repeated hashing the password is "stretched". Its
+   * security is increased because it becomes much more computationally costly
+   * for an attacker to try to break the hash by brute-force computation of the
+   * hashes of a large number of plain-text words or strings to find a match.
+   *
+   * @param $algo
+   *   The string name of a hashing algorithm usable by hash(), like 'sha256'.
+   * @param $password
+   *   Plain-text password up to 512 bytes (128 to 512 UTF-8 characters) to hash.
+   * @param $setting
+   *   An existing hash or the output of _password_generate_salt().  Must be
+   *   at least 12 characters (the settings and salt).
+   *
+   * @return
+   *   A string containing the hashed password (and salt) or FALSE on failure.
+   *   The return string will be truncated at DRUPAL_HASH_LENGTH characters max.
+   */
+  protected function _password_crypt($algo, $password, $setting) {
+    // Prevent DoS attacks by refusing to hash large passwords.
+    if (strlen($password) > 512) {
+      return FALSE;
+    }
+    // The first 12 characters of an existing hash are its setting string.
+    $setting = substr($setting, 0, 12);
+
+    if ($setting[0] != '$' || $setting[2] != '$') {
+      return FALSE;
+    }
+
+    $count_log2 = strpos(self::ITOA64, $setting[3]);
+
+    // Hashes may be imported from elsewhere, so we allow != DRUPAL_HASH_COUNT
+    if ($count_log2 < self::$minHashCount || $count_log2 > self::$maxHashCount) {
+      return FALSE;
+    }
+    $salt = substr($setting, 4, 8);
+    // Hashes must have an 8 character salt.
+    if (strlen($salt) != 8) {
+      return FALSE;
+    }
+
+    // Convert the base 2 logarithm into an integer.
+    $count = 1 << $count_log2;
+    $hash = hash($algo, $password, TRUE);
+    do {
+      $hash = hash($algo, $hash . $password, TRUE);
+    } while (--$count);
+
+    $len = strlen($hash);
+    $output =  $setting . $this->_password_base64_encode($hash, $len);
+    // _password_base64_encode() of a 16 byte MD5 will always be 22 characters.
+    // _password_base64_encode() of a 64 byte sha512 will always be 86 characters.
+    $expected = 12 + ceil((8 * $len) / 6);
+    return (strlen($output) == $expected) ? substr($output, 0, self::$hashLength) : FALSE;
+  }
+
+
+  /**
+   * This is an exact copy from Drupal 7
+   *
+   * Encodes bytes into printable base 64 using the *nix standard from crypt().
+   *
+   * @param $input
+   *   The string containing bytes to encode.
+   * @param $count
+   *   The number of characters (bytes) to encode.
+   *
+   * @return
+   *   Encoded string
+   */
+  public function _password_base64_encode($input, $count) {
+    $output = '';
+    $i = 0;
+    $itoa64 = self::ITOA64;
+    do {
+      $value = ord($input[$i++]);
+      $output .= $itoa64[$value & 0x3f];
+      if ($i < $count) {
+        $value |= ord($input[$i]) << 8;
+      }
+      $output .= $itoa64[($value >> 6) & 0x3f];
+      if ($i++ >= $count) {
+        break;
+      }
+      if ($i < $count) {
+        $value |= ord($input[$i]) << 16;
+      }
+      $output .= $itoa64[($value >> 12) & 0x3f];
+      if ($i++ >= $count) {
+        break;
+      }
+      $output .= $itoa64[($value >> 18) & 0x3f];
+    } while ($i < $count);
+
+    return $output;
+  }
+
+  /**
+   * This is a copy of Drupal7's _password_get_count_log2
+   */
 
   /**
    * @inheritDoc
@@ -397,7 +560,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getUniqueIdentifierFromUserObject($user) {
-    return $user->get('mail')->value;
+    // @todo I (artfulrobot) am not sure what object the 'user' is here.
+    // Pretty sure this won't work.
+    return $user->get('email')->value;
   }
 
   /**
@@ -411,7 +576,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function synchronizeUsers() {
-    // @todo
+    // @todo? artfulrobot says: I don't think we will need this?
     Civi::log()->debug('CRM_Utils_System_Standalone::synchronizeUsers: not implemented');
   }
 
