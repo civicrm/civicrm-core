@@ -240,7 +240,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     }
     chdir($root);
 
-    // Create a mock $request object
     require_once $root . '../vendor/autoload.php'; /* assumes $root to be the _web_ root path, not the project root path. */
 
     if ($loadUser) {
