@@ -165,21 +165,36 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   *
+   * Note that the parent signature in the docblock says object, but we use a string username for stanalone.
+   *
+   * @todo I (artfulrobot) am unclear what this is really needed for/expected to do.
    */
   public function loadUser($username) {
-    // @todo
-    throw new \RuntimeException("Standalone loadUser not written yet!");
+    $user = \Civi\Api4\User::get(FALSE)
+    ->addWhere('username', '=', $username)
+    ->execute()
+    ->single();
+
+    // Do we do something like this?:
+    // CRM_Core_Session::singleton()->set('userID', $user['id']);
+    // (but we'd need to clear the session etc. and probably use a special method for this?
+    // or maybe this IS the special method for that?)
   }
 
   /**
-   * Determine the native ID of the CMS user.
+   * Determine the CMS-native ID from the user name
+   *
+   * In standalone this means the User ID.
    *
    * @param string $username
    * @return int|null
    */
   public function getUfId($username) {
-    // @todo
-    throw new \RuntimeException("Standalone getUfId not written yet!");
+    return \Civi\Api4\User::get(FALSE)
+    ->addWhere('username', '=', $username)
+    ->execute()
+    ->single()['id'];
   }
 
   /**
