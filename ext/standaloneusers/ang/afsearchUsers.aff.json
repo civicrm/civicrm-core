@@ -1,0 +1,9 @@
+{
+    "type": "search",
+    "title": "Users",
+    "description": "Administer users",
+    "icon": "fa-list-alt",
+    "server_route": "civicrm/admin/users",
+    "permission": "access CiviCRM"
+}
+
