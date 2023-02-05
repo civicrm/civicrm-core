@@ -19,12 +19,19 @@
 class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
 
   /**
+   * Reference to option value in sms_provider_name group.
+   *
+   * @var int
+   */
+  private $optionValueID;
+
+  /**
    * Set Up Funtion
    */
   public function setUp(): void {
     parent::setUp();
     $option = $this->callAPISuccess('option_value', 'create', ['option_group_id' => 'sms_provider_name', 'name' => 'test_provider_name', 'label' => 'test_provider_name', 'value' => 1]);
-    $this->option_value = $option['id'];
+    $this->optionValueID = $option['id'];
   }
 
   /**
@@ -32,7 +39,7 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     parent::tearDown();
-    $this->callAPISuccess('option_value', 'delete', ['id' => $this->option_value]);
+    $this->callAPISuccess('option_value', 'delete', ['id' => $this->optionValueID]);
   }
 
   /**
