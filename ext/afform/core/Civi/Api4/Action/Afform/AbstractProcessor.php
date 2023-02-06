@@ -140,6 +140,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
           $joinIdField = CoreUtil::getIdFieldName($joinEntity);
           $data['joins'][$joinEntity] = array_values($this->apiGet($api4, $joinEntity, $join['fields'], [
+            'join' => TRUE,
             'where' => self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $id),
             'limit' => !empty($join['af-repeat']) ? $join['max'] ?? 0 : 1,
             'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
@@ -163,7 +164,14 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   private function apiGet($api4, $entityName, $entityFields, $params) {
     $idField = CoreUtil::getIdFieldName($entityName);
     $params['select'] = array_unique(array_merge([$idField], array_keys($entityFields)));
-    $result = (array) $api4($entityName, 'get', $params)->indexBy($idField);
+    if (!empty($params['join'])) {
+      unset($params['join']);
+      $params['checkPermissions'] = FALSE;
+      $result = (array) civicrm_api4($entityName, 'get', $params)->indexBy($idField);
+    }
+    else {
+      $result = (array) $api4($entityName, 'get', $params)->indexBy($idField);
+    }
     // Check for file fields
     $fieldInfo = civicrm_api4($entityName, 'getFields', [
       'checkPermissions' => FALSE,
