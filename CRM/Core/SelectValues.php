@@ -565,6 +565,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function eventTokens(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['eventId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
