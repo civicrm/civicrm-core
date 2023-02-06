@@ -3261,7 +3261,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  public function getBooleanDataProvider() {
+  public function getBooleanDataProvider(): array {
     return [[TRUE], [FALSE]];
   }
 
@@ -3270,14 +3270,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * Note that this only covers some common scenarios.
    *
-   * It does not cater for a situation where the thousand separator is a [space]
-   * Latter is the Norwegian localization. At least some tests need to
-   * use setMonetaryDecimalPoint and setMonetaryThousandSeparator directly
-   * to provide broader coverage.
+   * Most notably it tests our legacy way of setting currency separators.
+   *
+   * It is now preferred to use the locale instead. This test disables partial_locales
+   * in order to test our legacy method.
    *
    * @param string $thousandSeparator
    */
   protected function setCurrencySeparators(string $thousandSeparator): void {
+    Civi::settings()->set('partial_locales', FALSE);
     Civi::settings()->set('monetaryThousandSeparator', $thousandSeparator);
     Civi::settings()->set('monetaryDecimalPoint', ($thousandSeparator === ',' ? '.' : ','));
   }
