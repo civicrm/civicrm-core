@@ -540,6 +540,8 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Membership Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
   public static function membershipTokens(): array {
