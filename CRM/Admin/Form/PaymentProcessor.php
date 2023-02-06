@@ -217,8 +217,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       'payment_processor_type_id',
       ts('Payment Processor Type'),
       CRM_Financial_BAO_PaymentProcessor::buildOptions('payment_processor_type_id'),
-      TRUE,
-      ['onchange' => "reload(true)"]
+      TRUE
     );
 
     // Financial Account of account type asset CRM-11515
