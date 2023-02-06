@@ -529,6 +529,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritdoc
+   */
+  public function hasUsersTable():bool {
+    return TRUE;
+  }
+
+  /**
    * Get an array of user details for a contact, containing at minimum the user ID & name.
    *
    * @param int $contactID

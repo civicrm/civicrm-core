@@ -1624,4 +1624,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function canSetBasePage():bool {
+    return TRUE;
+  }
+
 }

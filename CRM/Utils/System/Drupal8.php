@@ -908,4 +908,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return FALSE;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function viewsIntegration(): string {
+    return '<p><strong>' . ts('To enable CiviCRM Views integration, install the <a %1>CiviCRM Entity</a> module.', [1 => 'href="https://www.drupal.org/project/civicrm_entity"']) . '</strong></p>';
+  }
+
 }
