@@ -1197,6 +1197,7 @@ class CRM_Utils_Token {
    * @deprecated
    */
   public static function getMembershipTokenDetails($membershipIDs) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $memberships = civicrm_api3('membership', 'get', [
       'options' => ['limit' => 0],
       'membership_id' => ['IN' => (array) $membershipIDs],
@@ -1389,6 +1390,7 @@ class CRM_Utils_Token {
    *   string with replacements made
    */
   public static function replaceEntityTokens($entity, $entityArray, $str, $knownTokens = [], $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (!$knownTokens || empty($knownTokens[$entity])) {
       return $str;
     }

@@ -467,20 +467,17 @@ contribution_recur.payment_instrument_id:name :Check
     $this->restoreMembershipTypes();
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership']);
     $expectedTokens = $this->getMembershipTokens();
+    // This get also creates...
+    $this->getMembershipID();
     $newStyleTokens = "\n{membership.status_id:label}\n{membership.membership_type_id:label}\n";
     $tokenString = $newStyleTokens . implode("\n", array_keys($this->getMembershipTokens()));
-
-    $memberships = CRM_Utils_Token::getMembershipTokenDetails([$this->getMembershipID()]);
-    $messageToken = CRM_Utils_Token::getTokens($tokenString);
-    $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $memberships[$this->getMembershipID()], $tokenString, $messageToken);
-    $this->assertEquals($this->getExpectedMembershipTokenOutput(), $tokenHtml);
 
     // Custom fields work in the processor so test it....
     $tokenString .= "\n{membership." . $this->getCustomFieldName('text') . '}';
     // Now compare with scheduled reminder
     $mut = new CiviMailUtils($this);
     CRM_Utils_Time::setTime('2007-01-22 15:00:00');
-    $this->callAPISuccess('action_schedule', 'create', [
+    $this->callAPISuccess('ActionSchedule', 'create', [
       'title' => 'job',
       'subject' => 'job',
       'entity_value' => 1,
@@ -491,7 +488,7 @@ contribution_recur.payment_instrument_id:name :Check
       'start_action_unit' => 'day',
       'body_html' => $tokenString,
     ]);
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callAPISuccess('Job', 'send_reminder', []);
     $expected = $this->getExpectedMembershipTokenOutput();
     // Unlike the legacy method custom fields are resolved by the processor.
     $expected .= "\nmy field";
