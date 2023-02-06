@@ -466,9 +466,7 @@ contribution_recur.payment_instrument_id:name :Check
     $this->createLoggedInUser();
     $this->restoreMembershipTypes();
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership']);
-    $tokens = CRM_Core_SelectValues::membershipTokens();
     $expectedTokens = $this->getMembershipTokens();
-    $this->assertEquals($expectedTokens, $tokens);
     $newStyleTokens = "\n{membership.status_id:label}\n{membership.membership_type_id:label}\n";
     $tokenString = $newStyleTokens . implode("\n", array_keys($this->getMembershipTokens()));
 

@@ -545,6 +545,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function membershipTokens(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     return [
       '{membership.id}' => ts('Membership ID'),
       '{membership.status_id:label}' => ts('Status'),
