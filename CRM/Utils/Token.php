@@ -1720,12 +1720,15 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
    * @param $value
    * @param $token
    *
    * @return bool|int|mixed|string|null
    */
   protected static function convertPseudoConstantsUsingMetadata($value, $token) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     // Convert pseudoconstants using metadata
     if ($value && is_numeric($value)) {
       $allFields = CRM_Contact_BAO_Contact::exportableFields('All');
