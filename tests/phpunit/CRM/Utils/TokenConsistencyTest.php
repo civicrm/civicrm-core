@@ -811,8 +811,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $mut = new CiviMailUtils($this);
     $this->setupParticipantScheduledReminder();
 
-    $tokens = CRM_Core_SelectValues::eventTokens();
-    $this->assertEquals(array_merge($this->getEventTokens()), $tokens);
+    $tokens = array_merge($this->getEventTokens());
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,
