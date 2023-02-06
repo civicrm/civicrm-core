@@ -1025,6 +1025,12 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param int $start
    * @param int $end
    *
+   * @todo - use test cover in CRM_Contact_Form_Search_BasicTest to
+   * to remove the extraneous logging that happens in the tested
+   * scenario (It does the catch & then write to the log - I was
+   * going to fix but got stalled on getting https://github.com/civicrm/civicrm-core/pull/25392
+   * merged - this comment won't conflict with that PR :-)
+   *
    * @throws \CRM_Core_Exception
    */
   public function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = self::CACHE_SIZE) {

@@ -3226,6 +3226,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         $_SESSION['_' . $form->controller->_name . '_container']['values']['Preview'] = $formValues;
         return $form;
 
+      case strpos($class, 'Search') !== FALSE:
+        $form->controller = new CRM_Contact_Controller_Search();
+        break;
+
       case strpos($class, '_Form_') !== FALSE:
         $form->controller = new CRM_Core_Controller_Simple($class, $pageName);
         break;
