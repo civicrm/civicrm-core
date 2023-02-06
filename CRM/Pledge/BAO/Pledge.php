@@ -870,14 +870,8 @@ SELECT  pledge.contact_id              as contact_id,
     }
 
     if ($sendReminders) {
-      // retrieve domain tokens
-      $tokens = [
-        'domain' => ['name', 'phone', 'address', 'email'],
-        'contact' => CRM_Core_SelectValues::contactTokens(),
-      ];
 
       // retrieve contact tokens
-
       // this function does NOT return Deceased contacts since we don't want to send them email
       $contactDetails = civicrm_api3('Contact', 'get', [
         'is_deceased' => 0,
