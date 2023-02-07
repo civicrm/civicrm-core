@@ -1726,8 +1726,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $returnAll = FALSE,
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
-    $singleRecord = NULL;
-    $showPublicOnly = FALSE;
     if ($checkPermission === TRUE) {
       CRM_Core_Error::deprecatedWarning('Unexpected TRUE passed to CustomGroup::getTree $checkPermission param.');
       $checkPermission = CRM_Core_Permission::EDIT;
