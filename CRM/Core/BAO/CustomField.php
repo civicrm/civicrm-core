@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\CustomField;
+
 /**
  * Business objects for managing custom data fields.
  */
@@ -608,6 +610,83 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     return self::$_importFields[$cacheKey];
+  }
+
+  /**
+   * Get all active custom fields (cached wrapper).
+   *
+   * @param false|int $permissionType
+   *   - Either FALSE (do not check) or CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT
+   *
+   * @return array
+   *   List of customField details keyed by customFieldID
+   * @throws \CRM_Core_Exception
+   */
+  public static function getAllCustomFields($permissionType): array {
+    if ($permissionType !== FALSE && !is_int($permissionType)) {
+      throw new CRM_Core_Exception('permissionCheck must be FALSE or CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT');
+    }
+    $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
+    if ($permissionType) {
+      $cacheString .= 'check_' . $permissionType . '_user_' . CRM_Core_Session::getLoggedInContactID();
+    }
+    if (!Civi::cache('metadata')->has($cacheString)) {
+      $apiCall = CustomField::get(FALSE)
+        ->addOrderBy('custom_group_id.title')
+        ->addOrderBy('custom_group_id.weight')
+        ->addOrderBy('weight')
+        ->addOrderBy('label')
+        ->addSelect('*')
+        ->addSelect('custom_group_id.extends')
+        ->addSelect('custom_group_id.extends_entity_column_id')
+        ->addSelect('custom_group_id.extends_entity_column_value')
+        ->addSelect('custom_group_id.is_active')
+        ->addSelect('custom_group_id.name')
+        ->addSelect('custom_group_id.table_name')
+        ->addSelect('custom_group_id.is_public');
+      if ($permissionType && !CRM_Core_Permission::customGroupAdmin()) {
+        $availableGroups = CRM_Core_Permission::customGroup($permissionType);
+        $apiCall->addWhere('custom_group_id', 'IN', empty($availableGroups) ? [0] : $availableGroups);
+      }
+
+      $types = (array) $apiCall->execute()->indexBy('id');
+
+      Civi::cache('metadata')->set($cacheString, $types);
+    }
+    return Civi::cache('metadata')->get($cacheString);
+  }
+
+  /**
+   * Get all active custom fields for the given contact type.
+   *
+   * This is formatted as an apiv4 Style array.
+   *
+   * @param string $contactType
+   * @param bool|int $permissionType
+   *  - Either FALSE (do not check) or CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT
+   * @param array $contactSubTypes
+   *
+   * @return array $fields
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function getCustomFieldsForContactType(string $contactType, $permissionType, array $contactSubTypes = []): array {
+    $fields = [];
+    foreach (self::getAllCustomFields($permissionType) as $field) {
+      if ($field['custom_group_id.extends'] === $contactType || $field['custom_group_id.extends'] === 'Contact') {
+        if (empty($contactSubTypes) || empty($field['custom_group_id.extends_entity_column_value'])) {
+          $fields[$field['id']] = $field;
+        }
+        else {
+          foreach ($contactSubTypes as $contactSubType) {
+            if (in_array($contactSubType, $field['custom_group_id.extends_entity_column_value'], TRUE)) {
+              $fields[$field['id']] = $field;
+            }
+          }
+        }
+      }
+    }
+    return $fields;
   }
 
   /**

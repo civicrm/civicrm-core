@@ -2105,34 +2105,29 @@ ORDER BY civicrm_custom_group.weight,
       'groupName' => 'postal_greeting',
     ];
     CRM_Core_OptionGroup::lookupValues($submitted, $names, TRUE);
-    // fix custom fields so they're edible by createProfileContact()
-    $cFields = self::getCustomFieldMetadata($contactType);
 
     if (!isset($submitted)) {
       $submitted = [];
     }
+
+    // Move view only custom fields CRM-5362
+    $viewOnlyCustomFields = [];
     foreach ($submitted as $key => $value) {
       if (strpos($key, 'custom_') === 0) {
         $fieldID = (int) substr($key, 7);
-        if (empty($cFields[$fieldID])) {
-          $htmlType = $cFields[$fieldID]['attributes']['html_type'];
-          $isSerialized = CRM_Core_BAO_CustomField::isSerialized($cFields[$fieldID]['attributes']);
-          $isView = $cFields[$fieldID]['attributes']['is_view'];
+        $fieldMetadata = CRM_Core_BAO_CustomField::getCustomFieldsForContactType($contactType, FALSE)[$fieldID] ?? NULL;
+        if ($fieldMetadata) {
+          $htmlType = $fieldMetadata['html_type'];
+          $isSerialized = CRM_Core_BAO_CustomField::isSerialized($fieldMetadata);
+          $isView = $fieldMetadata['is_view'];
+          if ($isView) {
+            $viewOnlyCustomFields[$key] = $value;
+          }
           $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
-
         }
       }
     }
 
-    // move view only custom fields CRM-5362
-    $viewOnlyCustomFields = [];
-    foreach ($submitted as $key => $value) {
-      $fid = CRM_Core_BAO_CustomField::getKeyID($key);
-      if ($fid && array_key_exists($fid, $cFields) && !empty($cFields[$fid]['attributes']['is_view'])
-      ) {
-        $viewOnlyCustomFields[$key] = $value;
-      }
-    }
     // special case to set values for view only, CRM-5362
     if (!empty($viewOnlyCustomFields)) {
       $viewOnlyCustomFields['entityID'] = $mainId;
@@ -2149,7 +2144,7 @@ ORDER BY civicrm_custom_group.weight,
       'return' => ['created_date'],
     ])['created_date'];
     if ($otherCreatedDate < $mainCreatedDate && !empty($otherCreatedDate)) {
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_contact SET created_date = %1 WHERE id = %2", [
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET created_date = %1 WHERE id = %2', [
         1 => [$otherCreatedDate, 'String'],
         2 => [$mainId, 'Positive'],
       ]);
@@ -2610,43 +2605,6 @@ ORDER BY civicrm_custom_group.weight,
       }
     }
     return $submitted;
-  }
-
-  /**
-   * Get metadata for the custom fields for the merge.
-   *
-   * @param string $contactType
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  protected static function getCustomFieldMetadata($contactType) {
-    $treeCache = [];
-    if (!array_key_exists($contactType, $treeCache)) {
-      $treeCache[$contactType] = CRM_Core_BAO_CustomGroup::getTree(
-        $contactType,
-        NULL,
-        NULL,
-        -1,
-        [],
-        NULL,
-        TRUE,
-        NULL,
-        FALSE,
-        FALSE
-      );
-    }
-
-    $cFields = [];
-    foreach ($treeCache[$contactType] as $key => $group) {
-      if (!isset($group['fields'])) {
-        continue;
-      }
-      foreach ($group['fields'] as $fid => $field) {
-        $cFields[$fid]['attributes'] = $field;
-      }
-    }
-    return $cFields;
   }
 
   /**
