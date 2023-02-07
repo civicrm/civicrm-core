@@ -1944,7 +1944,7 @@ ORDER BY civicrm_custom_group.weight,
     // add info to groupTree
 
     if (isset($groupTree['info']) && !empty($groupTree['info']) &&
-      !empty($groupTree['info']['tables']) && $singleRecord != 'new'
+      !empty($groupTree['info']['tables'])
     ) {
       $select = $from = $where = [];
       $groupTree['info']['where'] = NULL;
@@ -1978,7 +1978,7 @@ ORDER BY civicrm_custom_group.weight,
       }
       $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
       if (!empty($multipleFieldTablesWithEntityData)) {
-        CRM_Core_BAO_CustomGroup::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData, $singleRecord);
+        CRM_Core_BAO_CustomGroup::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData);
       }
 
     }
