@@ -1898,10 +1898,6 @@ WHERE civicrm_custom_group.is_active = 1
         );
     }
 
-    if ($showPublicOnly && $is_public_version) {
-      $strWhere .= "AND civicrm_custom_group.is_public = 1";
-    }
-
     $orderBy = "
 ORDER BY civicrm_custom_group.weight,
          civicrm_custom_group.title,
