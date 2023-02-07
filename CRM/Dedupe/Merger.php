@@ -1699,9 +1699,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   api - through which it is properly tested - so can be refactored with some comfort.)
    * @param bool|int $checkPermission
    *   Either a CRM_Core_Permission constant or FALSE to disable checks
-   * @param string|int $singleRecord
-   *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
-   * @param bool $showPublicOnly
    *
    * @return array
    *   Custom field 'tree'.
@@ -1717,7 +1714,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getTree(
+  private static function getTree(
     $entityType,
     $toReturn = [],
     $entityID = NULL,
@@ -1727,10 +1724,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $fromCache = TRUE,
     $onlySubType = NULL,
     $returnAll = FALSE,
-    $checkPermission = CRM_Core_Permission::EDIT,
-    $singleRecord = NULL,
-    $showPublicOnly = FALSE
+    $checkPermission = CRM_Core_Permission::EDIT
   ) {
+    $singleRecord = NULL;
+    $showPublicOnly = FALSE;
     if ($checkPermission === TRUE) {
       CRM_Core_Error::deprecatedWarning('Unexpected TRUE passed to CustomGroup::getTree $checkPermission param.');
       $checkPermission = CRM_Core_Permission::EDIT;
