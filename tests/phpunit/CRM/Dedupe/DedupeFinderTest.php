@@ -42,7 +42,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   /**
    * Test the unsupervised dedupe rule against a group.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function testUnsupervisedDupes(): void {
     // make dupe checks based on following contact sets:

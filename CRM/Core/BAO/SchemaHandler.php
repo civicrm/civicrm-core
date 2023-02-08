@@ -907,6 +907,49 @@ MODIFY      {$columnName} varchar( $length )
   }
 
   /**
+   * Get estimated number of rows in the given tables.
+   *
+   * Note that this query is less precise than SELECT(*) - especially on
+   * larger tables but performs significantly better.
+   * See https://dba.stackexchange.com/questions/184685/why-is-count-slow-when-explain-knows-the-answer
+   *
+   * @param array $tables
+   *   e.g ['civicrm_contact', 'civicrm_activity']
+   *
+   * @return array
+   *   e.g ['civicrm_contact' => 200000, 'civicrm_activity' => 100000]
+   */
+  public static function getRowCountForTables(array $tables): array {
+    $cachedResults = Civi::$statics[__CLASS__][__FUNCTION__] ?? [];
+    // Compile list of tables not already cached.
+    $tablesToCheck = array_keys(array_diff_key(array_flip($tables), $cachedResults));
+    $result = CRM_Core_DAO::executeQuery('
+      SELECT TABLE_ROWS as row_count, TABLE_NAME as table_name FROM information_schema.TABLES WHERE
+      TABLE_NAME IN("' . implode('","', $tablesToCheck) . '")
+      AND TABLE_SCHEMA = DATABASE()'
+    );
+    while ($result->fetch()) {
+      $cachedResults[$result->table_name] = (int) $result->row_count;
+    }
+    Civi::$statics[__CLASS__][__FUNCTION__] = $cachedResults;
+    return array_intersect_key($cachedResults, array_fill_keys($tables, TRUE));
+  }
+
+  /**
+   * Get estimated number of rows in the given table.
+   *
+   * @see self::getRowCountForTables
+   *
+   * @param string $tableName
+   *
+   * @return int
+   *   The approximate number of rows in the table. This is also 0 if the table does not exist.
+   */
+  public static function getRowCountForTable(string $tableName): int {
+    return self::getRowCountForTables([$tableName])[$tableName] ?? 0;
+  }
+
+  /**
    * Does the database support utf8mb4.
    *
    * Utf8mb4 is required to support emojis but older databases may not have it enabled.
