@@ -547,23 +547,23 @@ MODIFY      {$columnName} varchar( $length )
 
   /**
    * Check if a foreign key Exists
+   *
    * @param string $table_name
    * @param string $constraint_name
+   *
    * @return bool TRUE if FK is found
    */
-  public static function checkFKExists($table_name, $constraint_name) {
-    $dao = new CRM_Core_DAO();
+  public static function checkFKExists(string $table_name, string $constraint_name): bool {
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-      WHERE TABLE_SCHEMA = %1
-      AND TABLE_NAME = %2
-      AND CONSTRAINT_NAME = %3
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = %1
+      AND CONSTRAINT_NAME = %2
       AND CONSTRAINT_TYPE = 'FOREIGN KEY'
     ";
     $params = [
-      1 => [$dao->_database, 'String'],
-      2 => [$table_name, 'String'],
-      3 => [$constraint_name, 'String'],
+      1 => [$table_name, 'String'],
+      2 => [$constraint_name, 'String'],
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
 
