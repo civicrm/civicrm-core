@@ -24,6 +24,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   protected $contactIDs = [];
 
+  protected $aclGroupID = NULL;
+
   /**
    * Our group reports use an alter so transaction cleanup won't work.
    *
@@ -33,6 +35,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'], TRUE);
     (new CRM_Logging_Schema())->dropAllLogTables();
+    CRM_Utils_Hook::singleton()->reset();
+    $config = CRM_Core_Config::singleton();
+    unset($config->userPermissionClass->permissions);
     parent::tearDown();
   }
 
@@ -435,6 +440,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     return $templates;
   }
 
+  public static function getConactMenbershipAndContributionReportTemplatesForACLGroupTests(): array {
+    $templates = array_merge([['contact/summary']], self::getMembershipAndContributionReportTemplatesForGroupTests());
+    return $templates;
+  }
+
   /**
    * Test Lybunt report to check basic inclusion of a contact who gave in the year before the chosen year.
    *
@@ -678,6 +688,33 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
       'gid_value' => [$groupID],
+      'gid_op' => 'in',
+      'options' => ['metadata' => ['sql']],
+    ]);
+    $this->assertNumberOfContactsInResult(1, $rows, $template);
+  }
+
+  /**
+   * Test the group filter works on various reports when ACLed user is in play
+   *
+   * @dataProvider getConactMenbershipAndContributionReportTemplatesForACLGroupTests
+   *
+   * @param string $template
+   *   Report template unique identifier.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testReportsWithNonSmartGroupFilterWithACL($template): void {
+    $this->aclGroupID = $this->setUpPopulatedGroup();
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+    $this->callAPISuccessGetCount('Group', ['check_permissions' => 1], 0);
+    $this->hookClass->setHook('civicrm_aclGroup', [$this, 'aclGroupOnly']);
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclGroupContactsOnly']);
+    unset(Civi::$statics['CRM_ACL_API']['group_permission']);
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => $template,
+      'gid_value' => [$this->aclGroupID],
       'gid_op' => 'in',
       'options' => ['metadata' => ['sql']],
     ]);
@@ -1772,6 +1809,35 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     // every trigger.
     CRM_Core_Config::singleton(TRUE, TRUE);
     \Civi::service('sql_triggers')->rebuild(NULL, TRUE);
+  }
+
+  /**
+   * Implement hook to restrict to test group 1.
+   *
+   * @param string $type
+   * @param int $contactID
+   * @param string $tableName
+   * @param array $allGroups
+   * @param array $ids
+   */
+  public function aclGroupOnly($type, $contactID, $tableName, $allGroups, &$ids) {
+    $ids = [$this->aclGroupID];
+  }
+
+  /**
+   * Implements hook to limit to contacts only in the aclGroup
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int|null $contactID
+   * @param string $where
+   */
+  public function aclGroupContactsOnly($type, &$tables, &$whereTables, &$contactID, &$where) {
+    if (!empty($where)) {
+      $where .= ' AND ';
+    }
+    $where .= 'contact_a.id IN (SELECT contact_id FROM civicrm_group_contact WHERE status = \'Added\' AND group_id = ' . $this->aclGroupID . ')';
   }
 
 }

@@ -3770,14 +3770,18 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
 
     CRM_Contact_BAO_GroupContactCache::check($smartGroups);
-
+    $aclFilter = NULL;
+    $selectWhereClauses = array_filter(CRM_Contact_BAO_Group::getSelectWhereClause('group'));
+    $aclFilter = implode(' AND ', $selectWhereClauses);
+    $aclFilter = !empty($aclFilter) ? ' AND ' . $aclFilter : '';
     $smartGroupQuery = '';
     if (!empty($smartGroups)) {
       $smartGroups = implode(',', $smartGroups);
       $smartGroupQuery = " UNION DISTINCT
                   SELECT DISTINCT smartgroup_contact.contact_id
                   FROM civicrm_group_contact_cache smartgroup_contact
-                  WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
+                  INNER JOIN `civicrm_group` AS `group` ON `group`.id = smartgroup_contact.group_id
+                  WHERE smartgroup_contact.group_id IN ({$smartGroups}) {$aclFilter}";
     }
 
     $sqlOp = $this->getSQLOperator($op);
@@ -3796,7 +3800,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     return " {$contactAlias}.id {$sqlOp} (
                           SELECT DISTINCT {$this->_aliases['civicrm_group']}.contact_id
                           FROM civicrm_group_contact {$this->_aliases['civicrm_group']}
-                          WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added'
+                          INNER JOIN `civicrm_group` AS `group` ON `group`.id = {$this->_aliases['civicrm_group']}.group_id
+                          WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added' {$aclFilter}
                           {$smartGroupQuery} ) ";
   }
 
@@ -3950,6 +3955,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $ret = [];
     foreach ($this->selectedTables() as $tableName) {
       $baoName = str_replace('_DAO_', '_BAO_', (CRM_Core_DAO_AllCoreTables::getClassForTable($tableName) ?? ''));
+      // Do not include CiviCRM group add Select Where clause because we don't necessarily join here for reports with optimisedGroupFilters
+      if ($baoName === 'CRM_Contact_BAO_Group') {
+        continue;
+      }
       if ($baoName && class_exists($baoName) && !empty($this->_columns[$tableName]['alias'])) {
         $tableAlias = $this->_columns[$tableName]['alias'];
         $clauses = array_filter($baoName::getSelectWhereClause($tableAlias));
