@@ -114,6 +114,7 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
     \CRM_Core_Session::singleton()->set('userID', NULL);
     // ugh, performance
     $config = \CRM_Core_Config::singleton(TRUE, TRUE);
+    $config->userSystem->setMySQLTimeZone();
 
     if (property_exists($config->userPermissionClass, 'permissions')) {
       $config->userPermissionClass->permissions = NULL;
