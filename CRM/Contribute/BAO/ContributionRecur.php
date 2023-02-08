@@ -230,6 +230,8 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array $ids
    *   (reference ) an array of recurring contribution ids.
    *
+   * @deprecated use the api.
+   *
    * @return array
    *   an array of recurring ids count
    */
