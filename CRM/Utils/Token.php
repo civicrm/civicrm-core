@@ -683,6 +683,7 @@ class CRM_Utils_Token {
     $html = FALSE,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (!$categories) {
       $categories = self::getTokenCategories();
     }
