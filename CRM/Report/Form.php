@@ -3780,7 +3780,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       $smartGroupQuery = " UNION DISTINCT
                   SELECT DISTINCT smartgroup_contact.contact_id
                   FROM civicrm_group_contact_cache smartgroup_contact
-                  INNER JOIN civicrm_group group ON group.id = smartgroup_contact.group_id
+                  INNER JOIN `civicrm_group` AS `group` ON `group`.id = smartgroup_contact.group_id
                   WHERE smartgroup_contact.group_id IN ({$smartGroups}) {$aclFilter}";
     }
 
@@ -3800,7 +3800,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     return " {$contactAlias}.id {$sqlOp} (
                           SELECT DISTINCT {$this->_aliases['civicrm_group']}.contact_id
                           FROM civicrm_group_contact {$this->_aliases['civicrm_group']}
-                          INNER JOIN civicrm_group group ON group.id = smartgroup_contact.group_id
+                          INNER JOIN `civicrm_group` AS `group` ON `group`.id = {$this->_aliases['civicrm_group']}.group_id
                           WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added' {$aclFilter}
                           {$smartGroupQuery} ) ";
   }
