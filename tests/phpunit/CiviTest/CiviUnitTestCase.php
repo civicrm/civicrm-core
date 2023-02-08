@@ -3838,9 +3838,9 @@ WHERE a1.is_primary = 0
    * Get an array of tables with rows - useful for diagnosing cleanup issues.
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   protected function getTablesWithData(): array {
-    $dataObject = new CRM_Core_DAO();
     $data = [];
     $sql = CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(
       'SELECT \"',
@@ -3852,7 +3852,7 @@ WHERE a1.is_primary = 0
       '`' SEPARATOR ' UNION  '
     )
 FROM INFORMATION_SCHEMA.TABLES
-WHERE table_schema = '$dataObject->_database'");
+WHERE table_schema = DATABASE()");
     $result = CRM_Core_DAO::executeQuery($sql);
     while ($result->fetch()) {
       $count = (int) $result->row_count;
