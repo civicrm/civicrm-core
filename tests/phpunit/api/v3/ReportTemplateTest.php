@@ -24,7 +24,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   protected $contactIDs = [];
 
-  protected $aclGroupId = NULL;
+  protected $aclGroupID = NULL;
 
   /**
    * Our group reports use an alter so transaction cleanup won't work.
@@ -440,6 +440,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     return $templates;
   }
 
+  public static function getConactMenbershipAndContributionReportTemplatesForACLGroupTests(): array {
+    $templates = array_merge([['contact/summary']], self::getMembershipAndContributionReportTemplatesForGroupTests());
+    return $templates;
+  }
+
   /**
    * Test Lybunt report to check basic inclusion of a contact who gave in the year before the chosen year.
    *
@@ -692,15 +697,15 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   /**
    * Test the group filter works on various reports when ACLed user is in play
    *
-   * @dataProvider getMembershipAndContributionReportTemplatesForGroupTests
+   * @dataProvider getConactMenbershipAndContributionReportTemplatesForACLGroupTests
    *
    * @param string $template
    *   Report template unique identifier.
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReportsWithNonSmartGroupFilterWithACL($template) {
-    $this->aclGroupId = $this->setUpPopulatedGroup();
+  public function testReportsWithNonSmartGroupFilterWithACL($template): void {
+    $this->aclGroupID = $this->setUpPopulatedGroup();
     $this->createLoggedInUser();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $this->callAPISuccessGetCount('Group', ['check_permissions' => 1], 0);
@@ -709,7 +714,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     unset(Civi::$statics['CRM_ACL_API']['group_permission']);
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
-      'gid_value' => [$this->aclGroupId],
+      'gid_value' => [$this->aclGroupID],
       'gid_op' => 'in',
       'options' => ['metadata' => ['sql']],
     ]);
@@ -1816,7 +1821,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param array $ids
    */
   public function aclGroupOnly($type, $contactID, $tableName, $allGroups, &$ids) {
-    $ids = [$this->aclGroupId];
+    $ids = [$this->aclGroupID];
   }
 
   /**
@@ -1832,7 +1837,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if (!empty($where)) {
       $where .= ' AND ';
     }
-    $where .= 'contact_a.id IN (SELECT contact_id FROM civicrm_group_contact WHERE status = \'Added\' AND group_id = ' . $this->aclGroupId . ')';
+    $where .= 'contact_a.id IN (SELECT contact_id FROM civicrm_group_contact WHERE status = \'Added\' AND group_id = ' . $this->aclGroupID . ')';
   }
 
 }
