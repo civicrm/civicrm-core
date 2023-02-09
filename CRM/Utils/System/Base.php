@@ -769,7 +769,7 @@ abstract class CRM_Utils_System_Base {
     $timeZoneOffset = $this->getTimeZoneOffset();
     if ($timeZoneOffset) {
       $sql = "SET time_zone = '$timeZoneOffset'";
-      CRM_Core_DAO::executequery($sql);
+      CRM_Core_DAO::executeQuery($sql);
     }
   }
 
