@@ -199,6 +199,10 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAddPartialPayment() {
+    // First add an unrelated contribution since otherwise the contribution and
+    // participant ids are all 1 so they might match by accident.
+    $this->contributionCreate(['contact_id' => $this->individualCreate([], 0, TRUE)]);
+
     $feeAmt = 100;
     $amtPaid = (float) 60;
     $balance = (float) 40;
@@ -212,6 +216,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $this->assertEquals('Partially paid', $result['contribution']['contribution_status']);
     $this->assertEquals('Partially paid', $result['participant']['participant_status']);
+
+    // Check the record payment link has the right id and that it doesn't
+    // match by accident.
+    $this->assertNotEquals($result['contribution']['id'], $result['participant']['id']);
+    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($result['participant']['id'], 'event');
+    $this->assertEquals('Record Payment', $paymentInfo['payment_links'][0]['title']);
+    $this->assertEquals($result['contribution']['id'], $paymentInfo['payment_links'][0]['qs']['id']);
   }
 
   /**

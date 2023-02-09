@@ -3607,7 +3607,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $info['transaction'] = self::getContributionTransactionInformation($contributionId, $contribution['financial_type_id']);
     }
 
-    $info['payment_links'] = self::getContributionPaymentLinks($id, $info['contribution_status']);
+    $info['payment_links'] = self::getContributionPaymentLinks($contributionId, $info['contribution_status']);
     return $info;
   }
 
