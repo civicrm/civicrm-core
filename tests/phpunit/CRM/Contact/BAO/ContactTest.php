@@ -229,7 +229,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    *
    * Test with missing params.
    */
-  public function testCreateWithEmptyParams() {
+  public function testCreateWithEmptyParams(): void {
     $params = [
       'first_name' => 'Bill',
       'last_name' => 'Adams',
@@ -246,7 +246,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test with all params.
    * ( create and update modes ).
    */
-  public function testCreateWithAll() {
+  public function testCreateWithAll(): void {
     //take the common contact params
     $params = $this->contactParams();
     $params['note'] = 'test note';
@@ -703,7 +703,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'supplemental_address_3-Primary' => 'My Town',
       'user_unique_id' => '123456789',
       'is_bulkmail' => '1',
-      'world_region' => 'India',
       'tag' => [
         '3' => '1',
         '4' => '1',
@@ -901,7 +900,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'supplemental_address_3-Primary' => 'Anywhere',
       'user_unique_id' => '1122334455',
       'is_bulkmail' => '1',
-      'world_region' => 'India',
       'tag' => [
         '2' => '1',
         '5' => '1',
@@ -1103,7 +1101,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test case for getPrimaryEmail.
    */
-  public function testGetPrimaryEmail() {
+  public function testGetPrimaryEmail(): void {
     //get the contact params
     $params = $this->contactParams();
     $params['email'][2] = $params['email'][1];
@@ -1722,7 +1720,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Show age of contact on Deceased date
    */
-  public function testAgeOfDeceasedContact() {
+  public function testAgeOfDeceasedContact(): void {
     $birthDate = '1961-06-06';
     $deceasedDate = '1991-07-07';
     $age = CRM_Utils_Date::calculateAge($birthDate, $deceasedDate);
@@ -1732,7 +1730,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Show age of Contact with current date
    */
-  public function testAgeOfNormalContact() {
+  public function testAgeOfNormalContact(): void {
     $birthDate = '1961-06-06';
     $age = CRM_Utils_Date::calculateAge($birthDate);
     $this->assertGreaterThanOrEqual('59', $age['years']);
@@ -1741,7 +1739,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test invalidateChecksum hook.
    */
-  public function testInvalidateChecksumHook() {
+  public function testInvalidateChecksumHook(): void {
     $contact_id = $this->individualCreate();
     $checksum = CRM_Contact_BAO_Contact_Utils::generateChecksum($contact_id);
     // without the hook it's valid
@@ -1758,7 +1756,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * @param string $inputCheck
    * @param bool $invalid
    */
-  public function hookForInvalidateChecksum(int $contactID, string $inputCheck, bool &$invalid) {
+  public function hookForInvalidateChecksum(int $contactID, string $inputCheck, bool &$invalid): void {
     // invalidate all checksums
     $invalid = TRUE;
   }
