@@ -203,7 +203,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    */
   public static function getMessageTemplates($all = TRUE, $isSMS = FALSE) {
 
-    $messageTemplates = \Civi\Api4\MessageTemplate::get()
+    $messageTemplates = MessageTemplate::get()
       ->addSelect('id', 'msg_title')
       ->addWhere('is_active', '=', TRUE)
       ->addWhere('is_sms', '=', $isSMS);
@@ -216,6 +216,24 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
 
     asort($msgTpls);
     return $msgTpls;
+  }
+
+  /**
+   * Get the appropriate pdf format for the given template.
+   *
+   * @param string $workflow
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public static function getPDFFormatForTemplate(string $workflow): array {
+    $pdfFormatID = MessageTemplate::get(FALSE)
+      ->addWhere('workflow_name', '=', $workflow)
+      ->addSelect('pdf_format_id')
+      ->execute()->first()['pdf_format_id'] ?? 0;
+    // Get by ID will fall back to retrieving the default values if
+    // it does not find the appropriate ones - hence passing in 0 works.
+    return CRM_Core_BAO_PdfFormat::getById($pdfFormatID);
   }
 
   /**
