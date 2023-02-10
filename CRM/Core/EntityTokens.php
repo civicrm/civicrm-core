@@ -611,7 +611,8 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param string $prefix
    */
   protected function addFieldToTokenMetadata(array &$tokensMetadata, array $field, array $exposedFields, string $prefix = ''): void {
-    if ($field['type'] !== 'Custom' && !in_array($field['name'], $exposedFields, TRUE)) {
+    $isExposed = in_array(str_replace($prefix . '.', '', $field['name']), $exposedFields, TRUE);
+    if ($field['type'] !== 'Custom' && !$isExposed) {
       return;
     }
     $field['audience'] = $field['audience'] ?? 'user';
@@ -635,8 +636,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       $tokensMetadata[$tokenName] = $field;
       return;
     }
-    $tokenName = $prefix ? ($prefix . '.' . $field['name']) : $field['name'];
-    if (in_array($field['name'], $exposedFields, TRUE)) {
+    $tokenName = $field['name'];
+    // Presumably this line can not be reached unless isExposed = TRUE.
+    if ($isExposed) {
       if (
         ($field['options'] || !empty($field['suffixes']))
         // At the time of writing currency didn't have a label option - this may have changed.
