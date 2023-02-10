@@ -38,6 +38,7 @@ if (!defined('CIVI_SETUP')) {
     // to reduce the number of directories that admins have to chmod
     $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$model->projectRootPath, 'data', 'civicrm.settings.php']);
     $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$model->projectRootPath, 'data', 'templates_c']);
+    print "\n-------------------------\nSet model->templateCompilePath = $model->templateCompilePath\n-----------------------------\n";
 
     // Compute DSN.
     $model->db = $model->cmsDb = [
