@@ -45,12 +45,13 @@ if (!defined('CIVI_SETUP')) {
     print "\n-------------------------\nSet model values:\n" . json_encode($model->getValues(), JSON_PRETTY_PRINT) . "\n-----------------------------\n";
 
     // Compute DSN.
-    $model->db = $model->cmsDb = [
-      'server' => 'mysql',
-      'username' => 'loner',
-      'password' => 'somepass',
-      'database' => 'standalone_civicrm',
-    ];
+    print "=======================\n". json_encode(['model' => $model->getValues(), 'server' => $_SERVER], JSON_PRETTY_PRINT) ."\n";
+    // $model->db = $model->cmsDb = [
+    //   'server' => 'mysql',
+    //   'username' => 'loner',
+    //   'password' => 'somepass',
+    //   'database' => 'standalone_civicrm',
+    // ];
 
     // Compute URLs (@todo?)
     // $model->cmsBaseUrl = $_SERVER['HTTP_ORIGIN'] ?: $_SERVER['HTTP_REFERER'];
