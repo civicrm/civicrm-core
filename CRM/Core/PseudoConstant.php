@@ -1500,6 +1500,10 @@ WHERE  id = %1
     $from = 'FROM %3';
     $wheres = [];
     $order = 'ORDER BY %2';
+    if (in_array('id', $availableFields, TRUE)) {
+      // Example: 'ORDER BY abbreviation, id' because `abbreviation`s are not unique.
+      $order .= ', id';
+    }
 
     // Use machine name in certain contexts
     if ($context === 'validate' || $context === 'match') {
