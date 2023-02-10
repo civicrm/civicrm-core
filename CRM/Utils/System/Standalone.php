@@ -20,7 +20,6 @@
  */
 class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
-
   /**
    * @inheritdoc
    */
@@ -329,6 +328,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     static $runOnce;
+
+    error_log("artfulrobot: " . __FILE__ . " " . __METHOD__);
     if (!isset($runOnce)) {
       $runOnce = TRUE;
       return TRUE;
@@ -382,6 +383,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     if (!empty($civicrm_paths['cms.root']['path'])) {
       return $civicrm_paths['cms.root']['path'];
     }
+    error_log("artfulrobot: " . __FILE__ . " " . __METHOD__);
     throw new \RuntimeException("Standalone requires the path is set for now. Set \$civicrm_paths['cms.root']['path'] in civicrm.settings.php to the webroot.");
   }
 

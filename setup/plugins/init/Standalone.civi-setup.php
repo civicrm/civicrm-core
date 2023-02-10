@@ -30,6 +30,7 @@ if (!defined('CIVI_SETUP')) {
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
 
+  error_log('artfulrobot: ' . __FILE__ . ' listener for civi.setup.init');
     // Compute settingsPath.
     // We use this structure: /var/www/standalone/data/{civicrm.settings.php,templates_c}
     // to reduce the number of directories that admins have to chmod
