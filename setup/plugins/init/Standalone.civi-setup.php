@@ -29,15 +29,15 @@ if (!defined('CIVI_SETUP')) {
     }
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
-    // NOTE: in here, $model->webroot refers to the root of the *application*, not the actual webroot as reachable by http.
-    // Typically this means that $model->webroot might be like /var/www/example.org/ and the actual web root would be
+    // NOTE: in here, $model->projectRootPath refers to the root of the *application*, not the actual webroot as reachable by http.
+    // Typically this means that $model->projectRootPath might be like /var/www/example.org/ and the actual web root would be
     // /var/www/example.org/web/
 
     // Compute settingsPath.
     // We use this structure: /var/www/standalone/data/{civicrm.settings.php,templates_c}
     // to reduce the number of directories that admins have to chmod
-    $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$model->webroot, 'data', 'civicrm.settings.php']);
-    $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$model->webroot, 'data', 'templates_c']);
+    $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$model->projectRootPath, 'data', 'civicrm.settings.php']);
+    $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$model->projectRootPath, 'data', 'templates_c']);
 
     // Compute DSN.
     $model->db = $model->cmsDb = [
@@ -58,10 +58,10 @@ if (!defined('CIVI_SETUP')) {
     // These paths get set as
     // $civicrm_paths[k]['url'|'path'] = v
     $model->paths['cms.root'] = [
-      'path' => $model->webroot . DIRECTORY_SEPARATOR . 'web',
+      'path' => $model->projectRootPath . DIRECTORY_SEPARATOR . 'web',
     ];
     $model->paths['civicrm.files'] = [
-      'path' => rtrim($model->webroot . DIRECTORY_SEPARATOR . 'web') . DIRECTORY_SEPARATOR . 'upload',
+      'path' => rtrim($model->projectRootPath . DIRECTORY_SEPARATOR . 'web') . DIRECTORY_SEPARATOR . 'upload',
       'url' => $model->cmsBaseUrl . '/upload',
     ];
 
