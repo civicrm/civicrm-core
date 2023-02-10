@@ -273,6 +273,24 @@ case.custom_1 :' . '
   }
 
   /**
+   * Test the standard new location token format - which matches apiv4 return properties.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testLocationTokens(): void {
+    $contactID = $this->individualCreate(['email' => 'me@example.com']);
+    Address::create()->setValues([
+      'contact_id' => $contactID,
+      'is_primary' => TRUE,
+      'street_address' => 'Heartbreak Hotel',
+      'supplemental_address_1' => 'Lonely Street',
+    ])->execute();
+    $text = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address}';
+    $text = $this->renderText(['contactId' => $contactID], $text);
+    $this->assertEquals('Anthony me@example.com Heartbreak Hotel', $text);
+  }
+
+  /**
    * Test tokens in 2 ways to ensure consistent handling.
    *
    * 1) as part of the greeting processing
@@ -563,6 +581,8 @@ contribution_recur.payment_instrument_id:name :Check
   /**
    * Get expected output from token parsing.
    *
+   * @param int|null $participantCreatedID
+   *
    * @return string
    */
   protected function getExpectedParticipantTokenOutput(int $participantCreatedID = NULL): string {
@@ -811,13 +831,8 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $mut = new CiviMailUtils($this);
     $this->setupParticipantScheduledReminder();
 
-    $tokens = CRM_Core_SelectValues::eventTokens();
-    $this->assertEquals(array_merge($this->getEventTokens()), $tokens);
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
-      'controller' => __CLASS__,
-      'smarty' => FALSE,
-      'schema' => ['eventId'],
-    ]);
+    $tokens = array_merge($this->getEventTokens());
+    $tokenProcessor = $this->getTokenProcessor(['schema' => ['eventId']]);
     $this->assertEquals(array_merge($tokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
 
     $expectedEventString = $this->getExpectedEventTokenOutput();
@@ -1024,6 +1039,38 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $rendered = CRM_Core_TokenSmarty::render($messages, $context);
 
     $this->assertEquals($expected, $rendered);
+  }
+
+  /**
+   * @param array $override
+   *
+   * @return \Civi\Token\TokenProcessor
+   */
+  protected function getTokenProcessor(array $override): TokenProcessor {
+    return new TokenProcessor(\Civi::dispatcher(), array_merge([
+      'controller' => __CLASS__,
+    ], $override));
+  }
+
+  /**
+   * Render the text via the token processor.
+   *
+   * @param array $rowContext
+   * @param string $text
+   * @param array $context
+   *
+   * @return string
+   */
+  protected function renderText(array $rowContext, string $text, array $context = []): string {
+    $context['schema'] = $context['schema'] ?? [];
+    foreach (array_keys($rowContext) as $key) {
+      $context['schema'][] = $key;
+    }
+    $tokenProcessor = $this->getTokenProcessor($context);
+    $tokenProcessor->addRow($rowContext);
+    $tokenProcessor->addMessage('text', $text, 'text/html');
+    $tokenProcessor->evaluate();
+    return $tokenProcessor->getRow(0)->render('text');
   }
 
 }
