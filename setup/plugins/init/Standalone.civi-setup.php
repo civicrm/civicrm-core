@@ -43,16 +43,16 @@ if (!defined('CIVI_SETUP')) {
     $projectRootPath = dirname($model->srcPath, 3);
     $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'civicrm.settings.php']);
     $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'templates_c']);
-    print "\n-------------------------\nSet model values:\n" . json_encode($model->getValues(), JSON_PRETTY_PRINT) . "\n-----------------------------\n";
+    // print "\n-------------------------\nSet model values:\n" . json_encode($model->getValues(), JSON_PRETTY_PRINT) . "\n-----------------------------\n";
 
     // Compute DSN.
-    print "=======================\n". json_encode(['model' => $model->getValues(), 'server' => $_SERVER], JSON_PRETTY_PRINT) ."\n";
-    // $model->db = $model->cmsDb = [
-    //   'server' => 'mysql',
-    //   'username' => 'loner',
-    //   'password' => 'somepass',
-    //   'database' => 'standalone_civicrm',
-    // ];
+    // print "=======================\n". json_encode(['model' => $model->getValues(), 'server' => $_SERVER], JSON_PRETTY_PRINT) ."\n";
+    $model->db = $model->cmsDb = [
+      'server' => 'localhost',
+      'username' => '',
+      'password' => '',
+      'database' => '',
+    ];
 
     // Compute URLs (@todo?)
     // original: $model->cmsBaseUrl = $_SERVER['HTTP_ORIGIN'] ?: $_SERVER['HTTP_REFERER'];
