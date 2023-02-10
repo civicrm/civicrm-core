@@ -54,10 +54,13 @@ if (!defined('CIVI_SETUP')) {
     // ];
 
     // Compute URLs (@todo?)
-    // $model->cmsBaseUrl = $_SERVER['HTTP_ORIGIN'] ?: $_SERVER['HTTP_REFERER'];
-    $model->cmsBaseUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+    // original: $model->cmsBaseUrl = $_SERVER['HTTP_ORIGIN'] ?: $_SERVER['HTTP_REFERER'];
+    if (empty($model->cmsBaseUrl)) {
+      // A buildkit install (which uses cv core:install) sets this correctly. But a standard composer-then-website type install does not.
+      $model->cmsBaseUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+    }
 
-    // These mandatorySettings become 'extra settings from installer' and set values in
+    // These mandatorySettings become 'Additional settings from installer' (via 'extraSettings') and set values in
     // $civicrm_setting['domain'][k] = v;
     $model->mandatorySettings['userFrameworkResourceURL'] = $model->cmsBaseUrl . '/assets/civicrm/core';
 
