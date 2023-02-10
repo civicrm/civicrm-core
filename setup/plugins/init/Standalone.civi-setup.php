@@ -29,15 +29,19 @@ if (!defined('CIVI_SETUP')) {
     }
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
-    // NOTE: in here, $model->projectRootPath refers to the root of the *application*, not the actual webroot as reachable by http.
-    // Typically this means that $model->projectRootPath might be like /var/www/example.org/ and the actual web root would be
-    // /var/www/example.org/web/
 
     // Compute settingsPath.
     // We use this structure: /var/www/standalone/data/{civicrm.settings.php,templates_c}
     // to reduce the number of directories that admins have to chmod
-    $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$model->projectRootPath, 'data', 'civicrm.settings.php']);
-    $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$model->projectRootPath, 'data', 'templates_c']);
+
+    /** @var string $projectRootPath
+     *       refers to the root of the *application*, not the actual webroot as reachable by http.
+     *       Typically this means that $projectRootPath might be like /var/www/example.org/ and
+     *       the actual web root would be /var/www/example.org/web/
+     */
+    $projectRootPath = dirname($model->srcPath, 3);
+    $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'civicrm.settings.php']);
+    $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'templates_c']);
     print "\n-------------------------\nSet model values:\n" . json_encode($model->getValues(), JSON_PRETTY_PRINT) . "\n-----------------------------\n";
 
     // Compute DSN.
@@ -59,10 +63,10 @@ if (!defined('CIVI_SETUP')) {
     // These paths get set as
     // $civicrm_paths[k]['url'|'path'] = v
     $model->paths['cms.root'] = [
-      'path' => $model->projectRootPath . DIRECTORY_SEPARATOR . 'web',
+      'path' => $projectRootPath . DIRECTORY_SEPARATOR . 'web',
     ];
     $model->paths['civicrm.files'] = [
-      'path' => rtrim($model->projectRootPath . DIRECTORY_SEPARATOR . 'web') . DIRECTORY_SEPARATOR . 'upload',
+      'path' => rtrim($projectRootPath . DIRECTORY_SEPARATOR . 'web') . DIRECTORY_SEPARATOR . 'upload',
       'url' => $model->cmsBaseUrl . '/upload',
     ];
 
