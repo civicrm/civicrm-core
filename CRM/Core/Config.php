@@ -589,7 +589,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       return;
     }
     if (($templateDirectory['type'] ?? 'Smarty') === 'Smarty') {
-      CRM_Core_Smarty::singleton()->addTemplateDir($templateDirectory['path']);
+      \Civi::$statics['CRM_Core_Smarty']['PATHS'][] = $templateDirectory['path'];
+      if (CRM_Core_Smarty::$_singleton !== NULL) {
+        CRM_Core_Smarty::singleton()->addTemplateDir($templateDirectory['path']);
+      }
       return;
     }
     throw new CRM_Core_Exception('Only Smarty supported currently');

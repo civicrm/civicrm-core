@@ -55,7 +55,7 @@ class CRM_Core_Smarty extends Smarty {
    *
    * @var object
    */
-  static private $_singleton = NULL;
+  static public $_singleton = NULL;
 
   /**
    * Backup frames.
@@ -69,14 +69,14 @@ class CRM_Core_Smarty extends Smarty {
   private function initialize() {
     $config = CRM_Core_Config::singleton();
 
+    $this->template_dir = $config->templateDir;
     if (isset($config->customTemplateDir) && $config->customTemplateDir) {
-      $this->template_dir = array_merge([$config->customTemplateDir],
-        $config->templateDir
-      );
+      $this->addTemplateDir($config->customTemplateDir);
     }
-    else {
-      $this->template_dir = $config->templateDir;
+    foreach (\Civi::$statics['CRM_Core_Smarty']['PATHS'] ?? [] as $dir) {
+      $this->addTemplateDir($dir);
     }
+
     $this->compile_dir = CRM_Utils_File::addTrailingSlash(CRM_Utils_File::addTrailingSlash($config->templateCompileDir) . $this->getLocale());
     CRM_Utils_File::createDir($this->compile_dir);
     CRM_Utils_File::restrictAccess($this->compile_dir);
