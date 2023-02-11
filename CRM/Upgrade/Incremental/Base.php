@@ -225,7 +225,9 @@ class CRM_Upgrade_Incremental_Base {
     // Hrm, `enable()` normally does these things... but not during upgrade...
     // Note: A good test-scenario is to install 5.45; enable logging and CiviGrant; disable searchkit+afform; then upgrade to 5.47.
     $schema = new CRM_Logging_Schema();
-    $schema->fixSchemaDifferences();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferences();
+    }
 
     CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
@@ -298,6 +300,10 @@ class CRM_Upgrade_Incremental_Base {
       }
       foreach ($queries as $query) {
         CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+      }
+      $schema = new CRM_Logging_Schema();
+      if ($schema->isEnabled()) {
+        $schema->fixSchemaDifferencesFor($table);
       }
     }
     if ($locales && $triggerRebuild) {
@@ -517,6 +523,10 @@ class CRM_Upgrade_Incremental_Base {
       CRM_Core_DAO::executeQuery("ALTER TABLE `$table` DROP COLUMN `$column`",
         [], TRUE, NULL, FALSE, FALSE);
     }
+    $schema = new CRM_Logging_Schema();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferencesFor($table);
+    }
     return TRUE;
   }
 
@@ -598,6 +608,10 @@ class CRM_Upgrade_Incremental_Base {
     }
     foreach ($queries as $query) {
       CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+    }
+    $schema = new CRM_Logging_Schema();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferencesFor($table);
     }
     return TRUE;
   }
