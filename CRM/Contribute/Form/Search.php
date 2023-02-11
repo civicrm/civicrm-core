@@ -75,6 +75,8 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->_done = FALSE;
 
     parent::preProcess();
+    // For contributionTotals.tpl
+    $this->addExpectedSmartyVariables(['annual']);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Contribute_Selector_Search($this->_queryParams,
