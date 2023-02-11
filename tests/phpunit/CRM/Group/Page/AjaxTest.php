@@ -723,10 +723,10 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
       ) VALUES (55, 'civicrm_group', $groupId, 1);
     ");
     // Put the user into this group
-    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
+    $loggedInUser = CRM_Core_Session::singleton()->get('userID');
     $this->callAPISuccess('group_contact', 'create', [
       'group_id' => $groupId,
-      'contact_id' => $this->_loggedInUser,
+      'contact_id' => $loggedInUser,
     ]);
     // Add the ACL
     CRM_Core_DAO::executeQuery("
