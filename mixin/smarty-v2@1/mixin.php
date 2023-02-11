@@ -4,7 +4,7 @@
  * Auto-register "templates/" folder.
  *
  * @mixinName smarty-v2
- * @mixinVersion 1.0.0
+ * @mixinVersion 1.1.0
  * @since 5.59
  *
  * @param CRM_Extension_MixInfo $mixInfo
@@ -19,13 +19,12 @@ return function ($mixInfo, $bootCache) {
   }
 
   $register = function() use ($dir) {
-    // This implementation is useful for older versions of CiviCRM. It can be replaced/updated going forward (v1.1+).
-    $smarty = CRM_Core_Smarty::singleton();
-    if (!is_array($smarty->template_dir)) {
-      $this->template_dir = [$smarty->template_dir];
-    }
-    if (!in_array($dir, $smarty->template_dir)) {
-      array_unshift($smarty->template_dir, $dir);
+    \Civi::$statics['CRM_Core_Smarty']['PATHS'][] = $dir;;
+    if (class_exists('CRM_Core_Smarty', FALSE)) {
+      $smarty = CRM_Core_Smarty::singleton(FALSE);
+      if ($smarty !== NULL) {
+        $smarty->addTemplateDir($dir);
+      }
     }
   };
 
