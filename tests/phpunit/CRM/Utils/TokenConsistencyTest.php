@@ -520,7 +520,7 @@ contribution_recur.payment_instrument_id:name :Check
     $tokens = $tokenProcessor->listTokens();
     // Add in custom tokens as token processor supports these.
     $expectedTokens = array_merge($expectedTokens, $this->getTokensAdvertisedByTokenProcessorButNotLegacy());
-    $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens()), $tokens);
+    $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens(), $this->getRecurEntityTokens('membership')), $tokens);
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
     $tokenProcessor->addRow(['membershipId' => $this->getMembershipID()]);
     $tokenProcessor->evaluate();
@@ -954,6 +954,27 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{event.registration_url}' => 'Event Registration URL',
       '{event.pay_later_receipt}' => 'Pay Later Receipt Text',
       '{event.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
+    ];
+  }
+
+  /**
+   * @param string $entity
+   *
+   * @return string[]
+   */
+  protected function getRecurEntityTokens($entity): array {
+    return [
+      '{' . $entity . '.contribution_recur_id.id}' => 'Recurring Contribution ID',
+      '{' . $entity . '.contribution_recur_id.contact_id}' => 'Contact ID',
+      '{' . $entity . '.contribution_recur_id.amount}' => 'Amount',
+      '{' . $entity . '.contribution_recur_id.currency}' => 'Currency',
+      '{' . $entity . '.contribution_recur_id.frequency_unit}' => 'Frequency Unit',
+      '{' . $entity . '.contribution_recur_id.frequency_interval}' => 'Interval (number of units)',
+      '{' . $entity . '.contribution_recur_id.start_date}' => 'Start Date',
+      '{' . $entity . '.contribution_recur_id.cancel_date}' => 'Cancel Date',
+      '{' . $entity . '.contribution_recur_id.cancel_reason}' => 'Cancellation Reason',
+      '{' . $entity . '.contribution_recur_id.end_date}' => 'Recurring Contribution End Date',
+      '{' . $entity . '.contribution_recur_id.financial_type_id}' => 'Financial Type ID',
     ];
   }
 
