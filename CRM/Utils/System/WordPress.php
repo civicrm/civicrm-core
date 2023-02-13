@@ -1631,4 +1631,27 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return TRUE;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    if (!$print) {
+      if (!function_exists('is_admin')) {
+        throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
+      }
+      if (!defined('ABSPATH')) {
+        throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
+      }
+      if (is_admin()) {
+        require_once ABSPATH . 'wp-admin/admin-header.php';
+      }
+      else {
+        // FIXME: we need to figure out to replace civicrm content on the frontend pages
+      }
+    }
+
+    print $content;
+    return NULL;
+  }
+
 }

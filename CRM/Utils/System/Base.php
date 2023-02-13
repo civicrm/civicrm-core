@@ -274,55 +274,8 @@ abstract class CRM_Utils_System_Base {
    * @todo Better to always return, and never print.
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
-    $ret = FALSE;
-
-    // TODO: Split up; this was copied verbatim from CiviCRM 4.0's multi-UF theming function
-    // but the parts should be copied into cleaner subclass implementations
-    $config = CRM_Core_Config::singleton();
-    if (
-      $config->userSystem->is_drupal &&
-      function_exists('theme') &&
-      !$print
-    ) {
-      if ($maintenance) {
-        drupal_set_breadcrumb('');
-        drupal_maintenance_theme();
-        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
-          CRM_Utils_System::addHTMLHead($region->render(''));
-        }
-        print theme('maintenance_page', ['content' => $content]);
-        exit();
-      }
-      // TODO: Figure out why D7 returns but everyone else prints
-      $ret = TRUE;
-    }
-    $out = $content;
-
-    if (
-      !$print &&
-      CRM_Core_Config::singleton()->userFramework == 'WordPress'
-    ) {
-      if (!function_exists('is_admin')) {
-        throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
-      }
-      if (!defined('ABSPATH')) {
-        throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
-      }
-      if (is_admin()) {
-        require_once ABSPATH . 'wp-admin/admin-header.php';
-      }
-      else {
-        // FIXME: we need to figure out to replace civicrm content on the frontend pages
-      }
-    }
-
-    if ($ret) {
-      return $out;
-    }
-    else {
-      print $out;
-      return NULL;
-    }
+    print $content;
+    return NULL;
   }
 
   /**
