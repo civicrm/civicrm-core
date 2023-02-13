@@ -50,12 +50,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
     try {
       $userID = \Civi\Api4\User::create(TRUE)
-      ->addValue('username', $params['cms_name'])
-      ->addValue('mail', $mail)
-      // @todo the Api should ensure a password is encrypted? Or call a method to do that here?
-      ->addValue('password', $params['cms_pass'])
-      ->execute()->single()['id'];
-      }
+        ->addValue('username', $params['cms_name'])
+        ->addValue('mail', $mail)
+        // @todo the Api should ensure a password is encrypted? Or call a method to do that here?
+        ->addValue('password', $params['cms_pass'])
+        ->execute()->single()['id'];
+    }
     catch (\Exception $e) {
       \Civi::log()->warning("Failed to create user '$mail': " . $e->getMessage());
       return FALSE;
@@ -71,9 +71,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function updateCMSName($ufID, $email) {
     \Civi\Api4\User::update(FALSE)
-    ->addWhere('id', '=', $ufID)
-    ->addValue('email', $email)
-    ->execute();
+      ->addWhere('id', '=', $ufID)
+      ->addValue('email', $email)
+      ->execute();
   }
 
   /**
@@ -216,10 +216,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $session->set('civicrmInitSession', TRUE);
 
     $user = \Civi\Api4\User::get(FALSE)
-    ->addWhere('name', '=', $name)
-    ->addWhere('is_active', '=', TRUE)
-    ->addSelect('password', 'contact_id')
-    ->execute()->first() ?? [];
+      ->addWhere('name', '=', $name)
+      ->addWhere('is_active', '=', TRUE)
+      ->addSelect('password', 'contact_id')
+      ->execute()->first() ?? [];
     $user += ['password' => ''];
 
     // @todo consider moving this elsewhere.
@@ -229,8 +229,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
         // A normal Drupal 7 password using sha512.
         $hash = $this->_password_crypt('sha512', $password, $user['password']);
         break;
+
       default:
-      return FALSE;
+        return FALSE;
     }
 
     if (!hash_equals($user['password'], $hash)) {
@@ -241,7 +242,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     // The long number is the max 32 bit value.
     return [$user['civicrm_id'], $user['id'], random_int(0, 2147483647)];
   }
-
 
   /**
    * This is a copy of Drupal7's _password_get_count_log2
@@ -256,9 +256,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function loadUser($username) {
     $user = \Civi\Api4\User::get(FALSE)
-    ->addWhere('username', '=', $username)
-    ->execute()
-    ->single();
+      ->addWhere('username', '=', $username)
+      ->execute()
+      ->single();
 
     // Do we do something like this?:
     // CRM_Core_Session::singleton()->set('userID', $user['id']);
@@ -276,9 +276,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function getUfId($username) {
     return \Civi\Api4\User::get(FALSE)
-    ->addWhere('username', '=', $username)
-    ->execute()
-    ->single()['id'];
+      ->addWhere('username', '=', $username)
+      ->execute()
+      ->single()['id'];
   }
 
   /**
