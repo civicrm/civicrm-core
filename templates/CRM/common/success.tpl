@@ -48,10 +48,6 @@
         </p>
       </div>
       <p><span class="crm-status-icon success"> </span>{$message}</p>
-      {if array_key_exists($afterUpgradeMessage, $form) && $afterUpgradeMessage}
-        <h3>{ts}Important Notes{/ts}</h3>
-        <p>{$afterUpgradeMessage|smarty:nodefaults}</p>
-      {/if}
       <p><a href="{crmURL p='civicrm/dashboard' q='reset=1'}" title="{ts}CiviCRM home page{/ts}" style="text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
     </div>
 {/if}
