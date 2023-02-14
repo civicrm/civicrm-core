@@ -598,13 +598,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     if (!empty(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
-      // should call $config->userSystem->logger($message) here - but I got a situation where userSystem was not an object - not sure why
-      if ($config->userSystem->is_drupal and function_exists('watchdog')) {
-        watchdog('civicrm', '%message', ['%message' => $message], $priority ?? WATCHDOG_DEBUG);
-      }
-      elseif ($config->userSystem->is_drupal and CIVICRM_UF == 'Drupal8') {
-        \Drupal::logger('civicrm')->log($priority ?? \Drupal\Core\Logger\RfcLogLevel::DEBUG, '%message', ['%message' => $message]);
-      }
+      $config->userSystem->logger($message, $priority);
     }
 
     return $str;
