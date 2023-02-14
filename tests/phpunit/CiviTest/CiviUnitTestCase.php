@@ -1414,11 +1414,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $params
    *
-   * @return array|int
-   *
-   * @throws \CRM_Core_Exception
+   * @return array
    */
-  public function activityCreate($params = []) {
+  public function activityCreate(array $params = []): array {
     $params = array_merge([
       'subject' => 'Discussion on warm beer',
       'activity_date_time' => date('Ymd'),
@@ -1444,7 +1442,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $params['assignee_contact_id'] = $params['target_contact_id'];
     }
 
-    $result = civicrm_api3('Activity', 'create', $params);
+    $result = $this->callAPISuccess('Activity', 'create', $params);
 
     $result['target_contact_id'] = $params['target_contact_id'];
     $result['assignee_contact_id'] = $params['assignee_contact_id'];
