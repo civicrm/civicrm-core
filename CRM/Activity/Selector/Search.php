@@ -303,6 +303,10 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
           'id' => $result->activity_id,
           'cid' => $contactId,
           'cxt' => $this->_context,
+          // Parameter for hook locked in by CRM_Activity_Selector_SearchTest
+          // Any additional parameters added should follow apiv4 style
+          // and be added to the test.
+          'activity_type_id' => $row['activity_type_id'],
         ],
         ts('more'),
         FALSE,
