@@ -925,4 +925,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return NULL;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function ipAddress():?string {
+    return class_exists('Drupal') ? \Drupal::request()->getClientIp() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
+  }
+
 }
