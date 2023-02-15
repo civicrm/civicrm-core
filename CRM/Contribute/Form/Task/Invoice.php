@@ -233,10 +233,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $refundedStatusId = CRM_Utils_Array::key('Refunded', $contributionStatusID);
     $cancelledStatusId = CRM_Utils_Array::key('Cancelled', $contributionStatusID);
     $pendingStatusId = CRM_Utils_Array::key('Pending', $contributionStatusID);
-    $pdfFormat = CRM_Core_BAO_PdfFormat::getByName('default_invoice_pdf_format');
-
+    $pdfFormat = CRM_Core_BAO_MessageTemplate::getPDFFormatForTemplate('contribution_invoice_receipt');
     foreach ($elementDetails as $contributionID => $detail) {
-      $input = $ids = [];
+      $input = [];
       if (in_array($detail['contact'], $excludedContactIDs)) {
         continue;
       }
