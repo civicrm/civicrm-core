@@ -1654,4 +1654,22 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return NULL;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getContactDetailsFromUser($uf_match):array {
+    $contactParameters = [];
+
+    $user = $uf_match['user'];
+    $contactParameters['email'] = $user->user_email;
+    if ($user->first_name) {
+      $contactParameters['first_name'] = $user->first_name;
+    }
+    if ($user->last_name) {
+      $contactParameters['last_name'] = $user->last_name;
+    }
+
+    return $contactParameters;
+  }
+
 }

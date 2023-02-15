@@ -1017,4 +1017,18 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     ];
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getContactDetailsFromUser($uf_match):array {
+    $contactParameters = [];
+    $user = $uf_match['user'];
+    $contactParameters['email'] = $user->email;
+    if ($user->name) {
+      CRM_Utils_String::extractName($user->name, $contactParameters);
+    }
+
+    return $contactParameters;
+  }
+
 }

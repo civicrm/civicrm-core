@@ -814,4 +814,14 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return (bool) $enableWorkflow;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getContactDetailsFromUser($uf_match):array {
+    $contactParameters = [];
+    $contactParameters['email'] = $uf_match['uniqId'];
+
+    return $contactParameters;
+  }
+
 }
