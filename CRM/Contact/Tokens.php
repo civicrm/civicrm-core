@@ -397,14 +397,17 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       foreach ($metadata as $field) {
         if ($entity === 'website') {
           // It's not the primary - it's 'just one of them' - so the name is _first not _primary
+          $field['name'] = 'website_first.' . $field['name'];
           $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, 'website_first');
         }
         else {
+          $field['name'] = $entity . '_primary.' . $field['name'];
           $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, $entity . '_primary');
           $field['label'] .= ' (' . ts('Billing') . ')';
           // Set audience to sysadmin in case adding them to UI annoys people. If people ask to see this
           // in the UI we could set to 'user'.
           $field['audience'] = 'sysadmin';
+          $field['name'] = $entity . '_billing.' . $field['name'];
           $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, $entity . '_billing');
         }
       }
@@ -453,13 +456,11 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         if ($fieldSpec['table_name'] === 'civicrm_website') {
           $tableAlias = 'website_first';
           $joins[$tableAlias] = $fieldSpec['entity'];
-          $prefix = $tableAlias . '.';
         }
         if ($fieldSpec['table_name'] === 'civicrm_openid') {
           // We could start to deprecate this one maybe..... I've made it un-advertised.
           $tableAlias = 'openid_primary';
           $joins[$tableAlias] = $fieldSpec['entity'];
-          $prefix = $tableAlias . '.';
         }
         if ($fieldSpec['type'] === 'Custom') {
           $customFields['custom_' . $fieldSpec['custom_field_id']] = $fieldSpec['name'];
