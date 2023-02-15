@@ -763,4 +763,17 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return $emailName;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function mailingWorkflowIsEnabled():bool {
+    if (!module_exists('rules')) {
+      return FALSE;
+    }
+
+    $enableWorkflow = Civi::settings()->get('civimail_workflow');
+
+    return (bool) $enableWorkflow;
+  }
+
 }

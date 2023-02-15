@@ -1152,4 +1152,13 @@ abstract class CRM_Utils_System_Base {
     return $_SERVER['REMOTE_ADDR'] ?? NULL;
   }
 
+  /**
+   * Check if mailing workflow is enabled
+   *
+   * @return bool
+   */
+  public function mailingWorkflowIsEnabled():bool {
+    return FALSE;
+  }
+
 }
