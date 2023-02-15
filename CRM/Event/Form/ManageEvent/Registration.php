@@ -444,7 +444,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       if (($values['registration_link_text'] ?? '') === '') {
         $errorMsg['registration_link_text'] = ts('Please enter Registration Link Text');
       }
-      if (($values['confirm_title'] ?? '') === '') {
+      // Check if the confirm text is set if we have enabled the confirmation page or page is monetary which forces the confirm page.
+      if (($values['confirm_title'] ?? '') === '' && (!empty($values['is_confirm_enabled']) || CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_id, 'is_monetary'))) {
         $errorMsg['confirm_title'] = ts('Please enter a Title for the registration Confirmation Page');
       }
       if (($values['thankyou_title'] ?? '') === '') {
