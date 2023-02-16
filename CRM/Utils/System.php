@@ -445,13 +445,14 @@ class CRM_Utils_System {
   }
 
   /**
-   * Called from a template to compose a url.
+   * Compose a URL. This is a wrapper for `url()` which is optimized for use in Smarty.
    *
+   * @see \smarty_function_crmURL()
    * @param array $params
-   *   List of parameters.
-   *
+   *   URL properties. Keys are abbreviated ("p"<=>"path").
+   *   See Smarty doc for full details.
    * @return string
-   *   url
+   *   URL
    */
   public static function crmURL($params) {
     $p = $params['p'] ?? NULL;
@@ -1285,14 +1286,8 @@ class CRM_Utils_System {
    *   IP address of logged in user.
    */
   public static function ipAddress($strictIPV4 = TRUE) {
-    $address = $_SERVER['REMOTE_ADDR'] ?? NULL;
-
     $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal && function_exists('ip_address')) {
-      // drupal function handles the server being behind a proxy securely. We still have legacy ipn methods
-      // that reach this point without bootstrapping hence the check that the fn exists
-      $address = ip_address();
-    }
+    $address = $config->userSystem->ipAddress();
 
     // hack for safari
     if ($address == '::1') {

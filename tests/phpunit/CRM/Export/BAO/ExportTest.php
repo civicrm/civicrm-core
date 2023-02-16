@@ -723,7 +723,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function testExportCustomData(): void {
     $this->setUpContactExportData();
-    $this->entity = 'Contact';
     $this->createCustomGroupWithFieldsOfAllTypes();
     $longString = 'Blah';
     for ($i = 0; $i < 70; $i++) {

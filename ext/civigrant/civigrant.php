@@ -13,17 +13,6 @@ function civigrant_civicrm_config(&$config) {
 }
 
 /**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function civigrant_civicrm_entityTypes(&$entityTypes) {
-  _civigrant_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
  * Implements hook_civicrm_links().
  *
  * Add shortcut link to create new grant.

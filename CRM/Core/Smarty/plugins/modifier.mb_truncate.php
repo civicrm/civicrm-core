@@ -58,7 +58,7 @@ function smarty_modifier_mb_truncate($string, $length = 80, $etc = '...',
 
   }
 
-  if ($strlen($string) > $length) {
+  if ($string !== NULL && $strlen($string) > $length) {
     $length -= $strlen($etc);
     if (!$break_words) {
       $string = preg_replace('/\s+?(\S+)?$/', '', $substr($string, 0, $length + 1));

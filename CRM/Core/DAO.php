@@ -1108,7 +1108,7 @@ class CRM_Core_DAO extends DB_DataObject {
     $dao = CRM_Core_DAO::executeQuery(
       "SELECT TABLE_NAME
        FROM information_schema.TABLES
-       WHERE TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
+       WHERE TABLE_SCHEMA = DATABASE()
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE '%_tmp%'
       ");
@@ -1130,7 +1130,7 @@ class CRM_Core_DAO extends DB_DataObject {
       "SELECT count(*)
        FROM information_schema.TABLES
        WHERE ENGINE = 'MyISAM'
-         AND TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
+         AND TABLE_SCHEMA = DATABASE()
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_tmp_%'
       ");
@@ -1139,11 +1139,12 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Get the name of the CiviCRM database.
    *
+   * @deprecated use mysql DATABASE() within the query.
+   *
    * @return string
    */
-  public static function getDatabaseName() {
-    $daoObj = new CRM_Core_DAO();
-    return $daoObj->database();
+  public static function getDatabaseName(): string {
+    return (new CRM_Core_DAO())->database();
   }
 
   /**

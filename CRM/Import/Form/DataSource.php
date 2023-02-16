@@ -25,6 +25,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * Set variables up before form is built.
    */
   public function preProcess(): void {
+    $this->pushUrlToUserContext();
     // check for post max size
     CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
     $this->assign('importEntity', $this->getTranslatedEntity());
@@ -176,7 +177,12 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       $this->flushDataSource();
       $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     }
-    $this->instantiateDataSource();
+    try {
+      $this->instantiateDataSource();
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::statusBounce($e->getMessage());
+    }
   }
 
   /**

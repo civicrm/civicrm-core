@@ -207,12 +207,11 @@ class CRM_Upgrade_Snapshot {
     $query = '
       SELECT TABLE_NAME as tableName
       FROM   INFORMATION_SCHEMA.TABLES
-      WHERE  TABLE_SCHEMA = %1
-      AND TABLE_NAME LIKE %2
+      WHERE  TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME LIKE %1
     ';
     $tables = CRM_Core_DAO::executeQuery($query, [
-      1 => [$dao->database(), 'String'],
-      2 => ["snap_{$owner}_v%", 'String'],
+      1 => ["snap_{$owner}_v%", 'String'],
     ])->fetchMap('tableName', 'tableName');
 
     $oldTables = array_filter($tables, function($table) use ($owner, $cutoff) {

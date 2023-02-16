@@ -629,8 +629,19 @@ function _civicrm_api3_order_by_weight($a, $b) {
  */
 function _civicrm_api3_map_profile_fields_to_entity(&$field) {
   $entity = $field['field_type'];
-  $contactTypes = civicrm_api3('contact', 'getoptions', ['field' => 'contact_type']);
-  if (in_array($entity, $contactTypes['values'])) {
+  // let's get the contact types and subtypes so that we can change the entity
+  // of such fields to 'contact'
+  $result = civicrm_api3('ContactType', 'get', [
+    'return' => ["name"],
+    'options' => ['limit' => 0],
+  ]);
+
+  $contactTypes = [];
+  foreach ($result['values'] as $type) {
+    $contactTypes[$type['id']] = $type['name'];
+  }
+
+  if (in_array($entity, $contactTypes)) {
     $entity = 'contact';
   }
   $entity = _civicrm_api_get_entity_name_from_camel($entity);

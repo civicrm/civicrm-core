@@ -202,6 +202,12 @@ class Submit extends AbstractProcessor {
       return NULL;
     }
     $fullDefn = FormDataModel::getField($apiEntity, $fieldName, 'create');
+
+    // we don't need to validate the file fields as it's handled separately
+    if ($fullDefn['input_type'] === 'File') {
+      return NULL;
+    }
+
     $isRequired = $attributes['defn']['required'] ?? $fullDefn['required'] ?? FALSE;
     if ($isRequired) {
       $label = $attributes['defn']['label'] ?? $fullDefn['label'];
@@ -361,9 +367,11 @@ class Submit extends AbstractProcessor {
           ];
           // Reciprocal relationship types need an extra check
           if ($isReciprocal) {
-            $where[] = ['OR',
-              ['AND', ['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]],
-              ['AND', ['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]],
+            $where[] = [
+              'OR', [
+                ['AND', [['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]]],
+                ['AND', [['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]]],
+              ],
             ];
           }
           else {

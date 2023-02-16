@@ -1794,7 +1794,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction, 'dedupe_rule_id' => $ruleGroupId]);
     $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($this->userJobID);
-    $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->init();
 
     $parser->import($values);

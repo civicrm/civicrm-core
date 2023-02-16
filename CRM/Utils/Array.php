@@ -580,6 +580,10 @@ class CRM_Utils_Array {
       $collator = new Collator($lcMessages . '.utf8');
       $collator->asort($array);
     }
+    elseif (version_compare(PHP_VERSION, '8', '<') && class_exists('Collator')) {
+      $collator = new Collator('en_US.utf8');
+      $collator->asort($array);
+    }
     else {
       // This calls PHP's built-in asort().
       asort($array);

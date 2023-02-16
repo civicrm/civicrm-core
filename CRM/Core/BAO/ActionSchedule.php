@@ -631,7 +631,7 @@ FROM civicrm_action_schedule cas
       'controller' => __CLASS__,
       'actionSchedule' => $schedule,
       'actionMapping' => $mapping,
-      'smarty' => TRUE,
+      'smarty' => Civi::settings()->get('scheduled_reminder_smarty'),
       'schema' => ['contactId'],
     ]);
     $tp->addMessage('body_text', $schedule->body_text, 'text/plain');

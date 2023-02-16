@@ -171,9 +171,6 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    */
   public function acquire($timeout = NULL) {
     if (!$this->_hasLock) {
-      if (!CRM_Utils_SQL::supportsMultipleLocks() && self::$jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '" . self::$jobLog . "')")) {
-        return $this->hackyHandleBrokenCode(self::$jobLog);
-      }
 
       $query = "SELECT GET_LOCK( %1, %2 )";
       $params = [
@@ -233,31 +230,6 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    */
   public function isAcquired() {
     return $this->_hasLock;
-  }
-
-  /**
-   * CRM-12856 locks were originally set up for jobs, but the concept was extended to caching & groups without
-   * understanding that would undermine the job locks (because grabbing a lock implicitly releases existing ones)
-   * this is all a big hack to mitigate the impact of that - but should not be seen as a fix. Not sure correct fix
-   * but maybe locks should be used more selectively? Or else we need to handle is some cool way that Tim is yet to write :-)
-   * if we are running in the context of the cron log then we would rather die (or at least let our process die)
-   * than release that lock - so if the attempt is being made by setCache or something relatively trivial
-   * we'll just return TRUE, but if it's another job then we will crash as that seems 'safer'
-   *
-   * @param string $jobLog
-   * @throws CRM_Core_Exception
-   * @return bool
-   */
-  public function hackyHandleBrokenCode($jobLog) {
-    if (stristr($this->_name, 'job')) {
-      \Civi::log()->debug('lock acquisition for ' . $this->_name . '(' . $this->_id . ')' . ' attempted when ' . $jobLog . ' is not released');
-      throw new CRM_Core_Exception('lock acquisition for ' . $this->_name . '(' . $this->_id . ')' . ' attempted when ' . $jobLog . ' is not released');
-    }
-    if (defined('CIVICRM_LOCK_DEBUG')) {
-      \Civi::log()->debug('(CRM-12856) faking lock for ' . $this->_name . '(' . $this->_id . ')');
-    }
-    $this->_hasLock = TRUE;
-    return TRUE;
   }
 
 }

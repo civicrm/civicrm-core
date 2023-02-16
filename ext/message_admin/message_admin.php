@@ -32,17 +32,6 @@ function message_admin_civicrm_enable() {
   _message_admin_civix_civicrm_enable();
 }
 
-/**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function message_admin_civicrm_entityTypes(&$entityTypes) {
-  _message_admin_civix_civicrm_entityTypes($entityTypes);
-}
-
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**

@@ -508,6 +508,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($extra['option_context']);
     }
 
+    // Allow disabled to be a boolean
+    if (isset($attributes['disabled']) && $attributes['disabled'] === FALSE) {
+      unset($attributes['disabled']);
+    }
+
     $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
@@ -1151,7 +1156,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * If renderer is not set create one and initialize it.
    *
-   * @return object
+   * @return CRM_Core_Form_Renderer
    */
   public function &getRenderer() {
     if (!isset($this->_renderer)) {
@@ -2204,6 +2209,33 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * @param string $name
+   * @param string $label
+   * @param array $props
+   * @param bool $required
+   *
+   * @return HTML_QuickForm_Element
+   */
+  public function addAutocomplete(string $name, string $label = '', array $props = [], bool $required = FALSE) {
+    $props += [
+      'entity' => 'Contact',
+      'api' => [],
+      'select' => [],
+    ];
+    $props['api'] += [
+      'formName' => 'qf:' . get_class($this),
+      'fieldName' => $name,
+    ];
+    $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-autocomplete');
+    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
+    $props['data-select-params'] = json_encode($props['select']);
+    $props['data-api-params'] = json_encode($props['api']);
+    $props['data-api-entity'] = $props['entity'];
+    CRM_Utils_Array::remove($props, 'select', 'api', 'entity');
+    return $this->add('text', $name, $label, $props, $required);
+  }
+
+  /**
    * Create a single or multiple entity ref field.
    * @param string $name
    * @param string $label
@@ -2613,6 +2645,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
     }
+  }
+
+  /**
+   * Push the current url to the userContext.
+   *
+   * This is like a save point :-). The next status bounce will
+   * return the browser to this url unless another is added.
+   */
+  protected function pushUrlToUserContext(): void {
+    CRM_Core_Session::singleton()
+      ->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
   }
 
   /**
