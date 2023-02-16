@@ -1142,4 +1142,14 @@ abstract class CRM_Utils_System_Base {
     return FALSE;
   }
 
+  /**
+   * Get the client's IP address.
+   *
+   * @return string
+   *   IP address
+   */
+  public function ipAddress():?string {
+    return $_SERVER['REMOTE_ADDR'] ?? NULL;
+  }
+
 }

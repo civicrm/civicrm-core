@@ -1186,4 +1186,14 @@ AND    u.status = 1
     }
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function ipAddress():?string {
+    // Backdrop function handles the server being behind a proxy securely. We
+    // still have legacy ipn methods that reach this point without bootstrapping
+    // hence the check that the fn exists.
+    return function_exists('ip_address') ? ip_address() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
+  }
+
 }
