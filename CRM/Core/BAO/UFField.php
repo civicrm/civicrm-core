@@ -285,12 +285,15 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * Copy existing profile fields to
    * new profile from the already built profile
    *
+   * @deprecated
+   *
    * @param int $old_id
    *   From which we need to copy.
    * @param bool $new_id
    *   In which to copy.
    */
   public static function copy($old_id, $new_id) {
+    CRM_Core_Error::deprecatedFunctionWarning('');
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->uf_group_id = $old_id;
     $ufField->find();
