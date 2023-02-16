@@ -68,4 +68,34 @@ class RequestTest extends \CiviUnitTestCase {
     Request::create($inEntity, $inAction, ['version' => $inVersion], NULL);
   }
 
+  public function getCastingExamples(): array {
+    $exs = [];
+    // We run the same tests on `$checkPermissions` (which has real PHP setter method)
+    // and `$useTrash` (which has a generic magic method) to show that casting is similar.
+    $exs[] = ['Contact.delete checkPermissions', 0, FALSE];
+    $exs[] = ['Contact.delete checkPermissions', '0', FALSE];
+    $exs[] = ['Contact.delete checkPermissions', 1, TRUE];
+    $exs[] = ['Contact.delete checkPermissions', '1', TRUE];
+    $exs[] = ['Contact.delete useTrash', 0, FALSE];
+    $exs[] = ['Contact.delete useTrash', '0', FALSE];
+    $exs[] = ['Contact.delete useTrash', 1, TRUE];
+    $exs[] = ['Contact.delete useTrash', '1', TRUE];
+    return $exs;
+  }
+
+  /**
+   * @param $entityActionField
+   * @param $inputValue
+   * @param $expectValue
+   * @dataProvider getCastingExamples
+   */
+  public function testCasting(string $entityActionField, $inputValue, $expectValue): void {
+    [$entity, $action, $field] = preg_split('/[ \.]/', $entityActionField);
+    $request = Request::create($entity, $action, ['version' => 4, $field => $inputValue]);
+    $getter = 'get' . ucfirst($field);
+    $actualValue = call_user_func([$request, $getter]);
+    $this->assertEquals(gettype($actualValue), gettype($expectValue));
+    $this->assertTrue($actualValue === $expectValue);
+  }
+
 }

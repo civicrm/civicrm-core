@@ -216,4 +216,36 @@ class ReflectionUtils {
     }
   }
 
+  /**
+   * Cast the $value to the preferred $type.
+   *
+   * This is like PHP's `settype()` but totally not. It only casts in narrow circumstances.
+   * This reflects an opinion that some casts are better than others.
+   *
+   *    - Good:   1         =>   TRUE
+   *    - Bad:    'hello'   =>   TRUE
+   *
+   * @param mixed $value
+   * @param array $paramInfo
+   * @return mixed
+   *   If the $value is agreeable to casting according to a type-rule from $paramInfo, then
+   *   we return the converted value. Otherwise, leave return the original value.
+   */
+  public static function castTypeSoftly($value, array $paramInfo) {
+    if (count($paramInfo['type'] ?? []) !== 1) {
+      // I don't know when or why fields can have multiple types. We're just gone leave-be.
+      return $value;
+    }
+
+    switch ($paramInfo['type'][0]) {
+      case 'bool':
+        if (in_array($value, [0, 1, '0', '1'], TRUE)) {
+          return (bool) $value;
+        }
+        break;
+    }
+
+    return $value;
+  }
+
 }
