@@ -39,13 +39,6 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public $submitOnce = TRUE;
 
   /**
-   * Build the form object.
-   */
-  public function buildQuickForm() {
-    parent::buildQuickForm();
-  }
-
-  /**
    * @return CRM_Activity_Import_Parser_Activity
    */
   protected function getParser(): CRM_Activity_Import_Parser_Activity {
