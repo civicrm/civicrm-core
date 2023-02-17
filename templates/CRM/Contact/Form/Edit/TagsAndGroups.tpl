@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $title}
+{if isset($title) && $title}
 <div class="crm-accordion-wrapper crm-tagGroup-accordion collapsed">
   <div class="crm-accordion-header">{$title}</div>
   <div class="crm-accordion-body" id="tagGroup">
@@ -15,7 +15,7 @@
     <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
       <tr>
         <td>
-          {if $form.tag}
+          {if isset($form.tag) && $form.tag}
             <div class="crm-section tag-section">
               {if !empty($title)}{$form.tag.label}<br>{/if}
               {$form.tag.html}
@@ -47,7 +47,7 @@
         {/if}
       </tr>
     </table>
-{if $title}
+{if isset($title) && $title}
   </div>
 </div><!-- /.crm-accordion-wrapper -->
 {/if}
