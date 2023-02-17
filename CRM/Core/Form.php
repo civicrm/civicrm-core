@@ -2616,6 +2616,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Push the current url to the userContext.
+   *
+   * This is like a save point :-). The next status bounce will
+   * return the browser to this url unless another is added.
+   */
+  protected function pushUrlToUserContext(): void {
+    CRM_Core_Session::singleton()
+      ->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
+  }
+
+  /**
    * Set options and attributes for chain select fields based on the controlling field's value
    */
   private function preProcessChainSelectFields() {
