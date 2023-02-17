@@ -22,10 +22,6 @@ use Civi\Api4\CustomGroup;
  */
 class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/import/custom';
-
-  const IMPORT_ENTITY = 'Multi value custom data';
-
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
    *
