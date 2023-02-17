@@ -41,10 +41,46 @@ class AbstractActionTest extends Api4TestBase {
       protected $magicBool;
 
       /**
+       * @var float
+       */
+      protected $simpleFloat;
+
+      /**
+       * @var float
+       */
+      protected $magicFloat;
+
+      /**
+       * @var int
+       */
+      protected $simpleInt;
+
+      /**
+       * @var int
+       */
+      protected $magicInt;
+
+      /**
        * @param bool $simpleBool
        */
       public function setSimpleBool(bool $simpleBool) {
         $this->simpleBool = $simpleBool;
+        return $this;
+      }
+
+      /**
+       * @param float $simpleFloat
+       */
+      public function setSimpleFloat(float $simpleFloat) {
+        $this->simpleFloat = $simpleFloat;
+        return $this;
+      }
+
+      /**
+       * @param int $simpleInt
+       */
+      public function setSimpleInt(int $simpleInt) {
+        $this->simpleInt = $simpleInt;
         return $this;
       }
 
@@ -69,6 +105,36 @@ class AbstractActionTest extends Api4TestBase {
         [1, TRUE],
         ['1', TRUE],
       ],
+    ];
+
+    $exs['float'] = [
+      ['simpleFloat', 'magicFloat'],
+      [
+        // Each item is an example: [$inputValue, $expectValue]
+        [0, 0.0],
+        ['0', 0.0],
+        [100, 100.0],
+        ['200', 200.0],
+        [300.5, 300.5],
+        ['400.6', 400.6],
+      ],
+    ];
+
+    $exs['int'] = [
+      ['simpleInt', 'magicInt'],
+      [
+        // Each item is an example: [$inputValue, $expectValue]
+        [0, 0],
+        ['0', 0],
+        [100, 100],
+        ['200', 200],
+      ],
+    ];
+
+    // Magic fields are nullable. Not saying that's good or bad. It just is.
+    $exs['null'] = [
+      ['magicBool', 'magicFloat', 'magicInt'],
+      [[NULL, NULL]],
     ];
 
     return $exs;
