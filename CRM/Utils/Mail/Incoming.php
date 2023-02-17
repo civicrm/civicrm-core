@@ -400,7 +400,7 @@ class CRM_Utils_Mail_Incoming {
    * @param $mail
    * @param $createContact
    */
-  public static function parseAddress(&$address, &$params, &$subParam, &$mail, $createContact = TRUE) {
+  private static function parseAddress(&$address, &$params, &$subParam, &$mail, $createContact = TRUE) {
     // CRM-9484
     if (empty($address->email)) {
       return;
