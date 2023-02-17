@@ -142,8 +142,33 @@
         });
       };
 
+      // correct the type for the value, make sure numbers are numbers and not string
+      function correctValueType(value, dataType) {
+        // let's skip type correction for null values
+        if (value === null) {
+          return value;
+        }
+
+        // if value is a number than change it to number
+        if (Array.isArray(value)) {
+          var newValue = [];
+          value.forEach((v, index) => {
+            newValue[index] = correctValueType(v);
+          });
+          value = newValue;
+        } else if (dataType == 'Integer') {
+          value = +value;
+        } else if (dataType == 'Boolean') {
+          value = (value == 1);
+        }
+        return value;
+      }
+
       // Set default value; ensure data type matches input type
       function setValue(value) {
+        // correct the value type
+        value = correctValueType(value, ctrl.defn.data_type);
+
         if (ctrl.defn.input_type === 'Number' && ctrl.defn.search_range) {
           if (!_.isPlainObject(value)) {
             value = {
