@@ -798,6 +798,9 @@
                     code.short += ' +l ' + (params.limit || '0') + (params.offset ? ('@' + params.offset) : '');
                   }
                   break;
+                case (typeof param === 'boolean'):
+                  code.short += ' ' + key + '=' + (param ? 1 : 0);
+                  break;
                 default:
                   code.short += ' ' + key + '=' + (typeof param === 'string' ? cliFormat(param) : cliFormat(JSON.stringify(param)));
               }
