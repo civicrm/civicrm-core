@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $trackingFields and ! empty($trackingFields)}
+{if array_key_exists('trackingFields', $form) and !empty($trackingFields)}
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
