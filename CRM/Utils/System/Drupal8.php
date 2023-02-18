@@ -932,4 +932,17 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return class_exists('Drupal') ? \Drupal::request()->getClientIp() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function mailingWorkflowIsEnabled():bool {
+    if (!\Drupal::moduleHandler()->moduleExists('rules')) {
+      return FALSE;
+    }
+
+    $enableWorkflow = Civi::settings()->get('civimail_workflow');
+
+    return (bool) $enableWorkflow;
+  }
+
 }
