@@ -361,9 +361,11 @@ class Submit extends AbstractProcessor {
           ];
           // Reciprocal relationship types need an extra check
           if ($isReciprocal) {
-            $where[] = ['OR',
-              ['AND', ['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]],
-              ['AND', ['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]],
+            $where[] = [
+              'OR', [
+                ['AND', [['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]]],
+                ['AND', [['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]]],
+              ],
             ];
           }
           else {
