@@ -675,60 +675,6 @@ function civicrm_api3_contribution_repeattransaction($params) {
 }
 
 /**
- * Calls IPN complete transaction for completing or repeating a transaction.
- *
- * The IPN function is overloaded with two purposes - this is simply a wrapper for that
- * when separating them in the api layer.
- *
- * @deprecated
- *
- * @param array $params
- * @param CRM_Contribute_BAO_Contribution $contribution
- * @param array $input
- *
- * @param array $ids
- *
- * @return mixed
- * @throws \CRM_Core_Exception
- */
-function _ipn_process_transaction($params, $contribution, $input, $ids) {
-  CRM_Core_Error::deprecatedFunctionWarning('API3 contribution.completetransaction or contribution.repeattransaction');
-  $objects = $contribution->_relatedObjects;
-  $objects['contribution'] = &$contribution;
-  $input['component'] = $contribution->_component;
-  $input['is_test'] = $contribution->is_test;
-  $input['amount'] = empty($input['total_amount']) ? $contribution->total_amount : $input['total_amount'];
-
-  if (isset($params['is_email_receipt'])) {
-    $input['is_email_receipt'] = $params['is_email_receipt'];
-  }
-  if (!empty($params['trxn_date'])) {
-    $input['trxn_date'] = $params['trxn_date'];
-  }
-  if (!empty($params['receive_date'])) {
-    $input['receive_date'] = $params['receive_date'];
-  }
-  if (empty($contribution->contribution_page_id)) {
-    static $domainFromName;
-    static $domainFromEmail;
-    if (empty($domainFromEmail) && (empty($params['receipt_from_name']) || empty($params['receipt_from_email']))) {
-      [$domainFromName, $domainFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
-    }
-    $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
-    $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
-  }
-  $input['card_type_id'] = $params['card_type_id'] ?? NULL;
-  $input['pan_truncation'] = $params['pan_truncation'] ?? NULL;
-  if (!empty($params['payment_instrument_id'])) {
-    $input['payment_instrument_id'] = $params['payment_instrument_id'];
-  }
-  return CRM_Contribute_BAO_Contribution::completeOrder($input,
-    !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-   $objects['contribution']->id ?? NULL,
-    $params['is_post_payment_create'] ?? NULL);
-}
-
-/**
  * Provide function metadata.
  *
  * @param array $params
