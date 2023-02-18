@@ -105,8 +105,9 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $sum += $financialItem['amount'];
     }
     $this->assertEquals(55, $sum);
-
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $this->eventFeeBlock, $lineItem);
+    $priceSetID = $this->ids['PriceSet']['event'];
+    $eventFeeBlock = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID)[$priceSetID]['fields'];
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $eventFeeBlock, $lineItem);
     // Check that no payment records have been created.
     // In https://lab.civicrm.org/dev/financial/issues/94 we had an issue where payments were created when none happend.
     $payments = $this->callAPISuccess('Payment', 'get', [])['values'];

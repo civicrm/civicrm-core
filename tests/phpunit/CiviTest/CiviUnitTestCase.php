@@ -1089,9 +1089,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->ids['Event'][$key] = (int) $event['id'];
     $this->ids['PriceSet'][$key] = $this->eventPriceSetCreate(55, 0, 'Radio', $options);
     CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->ids['PriceSet'][$key]);
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->ids['PriceSet'][$key], TRUE, FALSE);
-    $priceSet = $priceSet[$this->ids['PriceSet'][$key]] ?? NULL;
-    $this->eventFeeBlock = $priceSet['fields'] ?? NULL;
     return $event;
   }
 
