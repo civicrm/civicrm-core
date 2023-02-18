@@ -227,6 +227,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     // assign vars to templates
     $this->assign('action', $action);
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks());
+    $this->assign('isShowICalIconsInline', FALSE);
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0, 'REQUEST'
     );
