@@ -20,8 +20,6 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
   /**
    * Clean up DB.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -76,7 +74,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'cvv2' => 234,
       'credit_card_exp_date' => [
         'M' => 2,
-        'Y' => CRM_Utils_Time::date('Y') + 1,
+        'Y' => ((int) CRM_Utils_Time::date('Y')) + 1,
       ],
       'credit_card_type' => 'Visa',
       'email-5' => 'test@test.com',
@@ -127,7 +125,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     // check that contribution page ID isn't changed
     $this->assertEquals($contributionPageID1, $contribution['contribution_page_id']);
     // check that paid later information is present in contribution's source
-    $this->assertRegExp("/Paid later via page ID: $contributionPageID2/", $contribution['contribution_source']);
+    $this->assertMatchesRegularExpression("/Paid later via page ID: $contributionPageID2/", $contribution['contribution_source']);
     // check that contribution status is changed to 'Completed' from 'Pending'
     $this->assertEquals('Completed', $contribution['contribution_status']);
 
@@ -191,8 +189,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   /**
    * @param array $params
    *
-   * @return mixed
-   * @throws \CRM_Core_Exception
+   * @return int
    */
   protected function createContributionPage(array $params): int {
     return (int) $this->callAPISuccess('ContributionPage', 'create', array_merge([
