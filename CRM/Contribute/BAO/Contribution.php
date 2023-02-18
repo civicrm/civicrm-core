@@ -1851,6 +1851,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     }
 
     $contribution->loadRelatedObjects($paymentProcessorID, $ids);
+    unset($ids);
 
     $memberships = $contribution->_relatedObjects['membership'] ?? [];
     $participant = $contribution->_relatedObjects['participant'] ?? [];
