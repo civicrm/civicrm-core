@@ -37,6 +37,7 @@ use Civi\Api4\LineItem;
 use Civi\Api4\MembershipType;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\Phone;
+use Civi\Api4\PriceSet;
 use Civi\Api4\RelationshipType;
 use Civi\Payment\System;
 use Civi\Api4\OptionValue;
@@ -805,7 +806,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return int
    *   Id Payment Processor
    */
-  public function processorCreate($params = []) {
+  public function processorCreate($params = []): int {
     $processorParams = [
       'domain_id' => 1,
       'name' => 'Dummy',
@@ -834,9 +835,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return \CRM_Core_Payment_Dummy
    *   Instance of Dummy Payment Processor
    *
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpIncompatibleReturnTypeInspection
    */
-  public function dummyProcessorCreate($processorParams = []) {
+  public function dummyProcessorCreate(array $processorParams = []): CRM_Core_Payment_Dummy {
     $paymentProcessorID = $this->processorCreate($processorParams);
     $this->ids['PaymentProcessor']['dummy_test'] = $paymentProcessorID;
     // For the tests we don't need a live processor, but as core ALWAYS creates a processor in live mode and one in test mode we do need to create both
@@ -1072,10 +1073,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *   Index for storing event ID in ids array.
    *
    * @return array
-   *
-   * @throws \CRM_Core_Exception
    */
-  protected function eventCreatePaid(array $params, array $options = [['name' => 'hundy', 'amount' => 100]], $key = 'event'): array {
+  protected function eventCreatePaid(array $params = [], array $options = [['name' => 'hundred', 'amount' => 100]], $key = 'event'): array {
     // @todo - uncomment these - but need to fix an e-notice first.
     // $this->dummyProcessorCreate();
     // $params['payment_processor'] = [$this->ids['PaymentProcessor']['dummy_live']];
@@ -1089,9 +1088,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->ids['Event'][$key] = (int) $event['id'];
     $this->ids['PriceSet'][$key] = $this->eventPriceSetCreate(55, 0, 'Radio', $options);
     CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->ids['PriceSet'][$key]);
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->ids['PriceSet'][$key], TRUE, FALSE);
-    $priceSet = $priceSet[$this->ids['PriceSet'][$key]] ?? NULL;
-    $this->eventFeeBlock = $priceSet['fields'] ?? NULL;
     return $event;
   }
 
@@ -2520,22 +2516,20 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return int
    *   Price Set ID.
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function eventPriceSetCreate($feeTotal, $minAmt = 0, $type = 'Text', $options = [['name' => 'hundy', 'amount' => 100]]) {
-    // creating price set, price field
+  protected function eventPriceSetCreate($feeTotal, $minAmt = 0, string $type = 'Text', array $options = [['name' => 'hundred', 'amount' => 100]]): int {
     $paramsSet['title'] = 'Price Set';
-    $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
+    $paramsSet['name'] = 'price_set';
     $paramsSet['is_active'] = FALSE;
     $paramsSet['extends'] = 1;
     $paramsSet['min_amount'] = $minAmt;
 
-    $priceSet = CRM_Price_BAO_PriceSet::create($paramsSet);
-    $this->_ids['price_set'] = $priceSet->id;
+    $priceSetID = PriceSet::create()->setValues($paramsSet)->execute()->first()['id'];
 
     $paramsField = [
       'label' => 'Price Field',
-      'name' => CRM_Utils_String::titleToVar('Price Field'),
+      'name' => 'price_field',
       'html_type' => $type,
       'price' => $feeTotal,
       'option_label' => ['1' => 'Price Field'],
@@ -2547,7 +2541,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'weight' => 1,
       'options_per_line' => 1,
       'is_active' => ['1' => 1],
-      'price_set_id' => $this->_ids['price_set'],
+      'price_set_id' => $priceSetID,
       'is_enter_qty' => 1,
       'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
     ];
@@ -2560,13 +2554,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       }
 
     }
-    $this->callAPISuccess('PriceField', 'create', $paramsField);
-    $fields = $this->callAPISuccess('PriceField', 'get', ['price_set_id' => $this->_ids['price_set']]);
-    $this->_ids['price_field'] = array_keys($fields['values']);
-    $fieldValues = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $this->_ids['price_field'][0]]);
-    $this->_ids['price_field_value'] = array_keys($fieldValues['values']);
-
-    return $this->_ids['price_set'];
+    $priceFieldID = $this->callAPISuccess('PriceField', 'create', $paramsField)['id'];
+    $this->ids['PriceField']['event_' . strtolower($type)] = $priceFieldID;
+    $this->_ids['price_field'] = [$priceFieldID];
+    $fieldValues = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceFieldID])['values'];
+    foreach ($fieldValues as $priceFieldValue) {
+      $this->ids['PriceFieldValue'][strtolower($priceFieldValue['name'])] = $priceFieldValue['id'];
+    }
+    $this->_ids['price_field_value'] = array_keys($fieldValues);
+    return $priceSetID;
   }
 
   /**
