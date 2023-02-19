@@ -11,6 +11,8 @@ use Civi\Api4\Participant;
 class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_OrderTrait;
+  use CRMTraits_Financial_PriceSetTrait;
+
   /**
    * Options on the from Email address array.
    *
@@ -19,7 +21,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   protected $fromEmailAddressOptions = [];
 
   public function setUp(): void {
-    $this->useTransaction(TRUE);
+    $this->useTransaction();
     parent::setUp();
   }
 
@@ -44,7 +46,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testSubmitUnpaidPriceChangeWhileStillPending() {
+  public function testSubmitUnpaidPriceChangeWhileStillPending(): void {
     $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
     $form->_quickConfig = TRUE;
 
@@ -72,13 +74,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ],
     ];
     $form->setAction(CRM_Core_Action::ADD);
-    $form->_priceSetId = $this->getPriceSetID();
+    $form->_priceSetId = $this->getPriceSetID('event');
     $form->submit([
       'register_date' => date('Ymd'),
       'status_id' => 5,
       'role_id' => 1,
       'event_id' => $form->_eventId,
-      'priceSetId' => $this->getPriceSetID(),
+      'priceSetId' => $this->getPriceSetID('event'),
       $this->getPriceFieldKey() => $this->_ids['price_field_value'][0],
       'is_pay_later' => 1,
       'amount_level' => 'Too much',
@@ -106,12 +108,14 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     }
     $this->assertEquals(55, $sum);
 
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $this->eventFeeBlock, $lineItem);
+    $priceSetID = $this->ids['PriceSet']['event'];
+    $eventFeeBlock = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID)[$priceSetID]['fields'];
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $eventFeeBlock, $lineItem);
     // Check that no payment records have been created.
-    // In https://lab.civicrm.org/dev/financial/issues/94 we had an issue where payments were created when none happend.
+    // In https://lab.civicrm.org/dev/financial/issues/94 we had an issue where payments were created when none happened.
     $payments = $this->callAPISuccess('Payment', 'get', [])['values'];
     $this->assertCount(0, $payments);
-    $lineItem = CRM_Price_BAO_LineItem::getLineItems($participant['id'], 'participant');
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($participant['id']);
     // Participants is updated to 0 but line remains.
     $this->assertEquals(0, $lineItem[1]['subTotal']);
     $this->assertEquals(1550.55, $lineItem[2]['subTotal']);
@@ -138,13 +142,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     // 5. Record the additional amount which $40 ($50-$10)
     // Expected : Check the amount of new Financial Item created is $40
     $this->createParticipantRecordsFromTwoFieldPriceSet();
-    $priceSetBlock = CRM_Price_BAO_PriceSet::getSetDetail($this->getPriceSetID(), TRUE, FALSE)[$this->getPriceSetID()]['fields'];
+    $priceSetBlock = CRM_Price_BAO_PriceSet::getSetDetail($this->getPriceSetID('event'), TRUE, FALSE)[$this->getPriceSetID('event')]['fields'];
 
     $priceSetParams = [
-      'priceSetId' => $this->getPriceSetID(),
+      'priceSetId' => $this->getPriceSetID('event'),
       // The 1 & 5 refer to qty as they are text fields.
-      'price_' . $this->_ids['price_field']['first_text_field'] => 5,
-      'price_' . $this->_ids['price_field']['second_text_field'] => 1,
+      'price_' . $this->ids['PriceField']['first_text_field'] => 5,
+      'price_' . $this->ids['PriceField']['second_text_field'] => 1,
     ];
     $participant = $this->callAPISuccess('Participant', 'get', []);
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participant['id'], 'participant');
@@ -185,7 +189,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testSubmitWithPayment($thousandSeparator) {
+  public function testSubmitWithPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
     $form->_mode = 'Live';
@@ -207,7 +211,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'unit_price' => 1550.55,
       'line_total' => 1550.55,
       'participant_count' => 0,
-      'price_field_id' => $this->_ids['price_field'][0],
+      'price_field_id' => $this->getPriceFieldID(),
       'price_field_value_id' => $this->_ids['price_field_value'][1],
       'tax_amount' => 0,
       // Interestingly the financial_type_id set in this test is ignored but currently locking in what is happening with this test so setting to 'actual'
@@ -228,7 +232,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testSubmitWithFailedPayment($thousandSeparator, $fromEmails = []) {
+  public function testSubmitWithFailedPayment(string $thousandSeparator, $fromEmails = []) {
     $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
     $form->_mode = 'Live';
@@ -380,7 +384,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function createParticipantRecordsFromTwoFieldPriceSet() {
+  protected function createParticipantRecordsFromTwoFieldPriceSet(): void {
     // Create financial type - Event Fee 2
     $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
 
@@ -393,7 +397,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
         'option_amount' => ['1' => $fieldToCreate['amount']],
         'option_weight' => ['1' => $fieldToCreate['amount']],
         'is_display_amounts' => 1,
-        'price_set_id' => $this->_ids['price_set'],
+        'price_set_id' => $this->getPriceSetID('event'),
         'is_enter_qty' => 1,
         'html_type' => 'Text',
         'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
@@ -401,15 +405,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $fieldParams['label'] = $fieldToCreate['label'];
       $fieldParams['name'] = CRM_Utils_String::titleToVar($fieldToCreate['label']);
       $fieldParams['price'] = $fieldToCreate['amount'];
-      $this->_ids['price_field'][strtolower(CRM_Utils_String::titleToVar($fieldToCreate['label']))] = $textPriceFieldID = $this->callAPISuccess('PriceField', 'create', $fieldParams)['id'];
-      $this->_ids['price_field_value'][strtolower(CRM_Utils_String::titleToVar($fieldToCreate['label']))] = (int) $this->callAPISuccess('PriceFieldValue', 'getsingle', ['price_field_id' => $textPriceFieldID])['id'];
+      $this->ids['PriceField'][strtolower($fieldParams['name'])] = $textPriceFieldID = $this->callAPISuccess('PriceField', 'create', $fieldParams)['id'];
+      $this->ids['PriceFieldValue'][strtolower($fieldParams['name'])] = (int) $this->callAPISuccess('PriceFieldValue', 'getsingle', ['price_field_id' => $textPriceFieldID])['id'];
     }
 
     $form->_lineItem = [
       0 => [
         13 => [
-          'price_field_id' => $this->_ids['price_field']['second_text_field'],
-          'price_field_value_id' => $this->_ids['price_field_value']['second_text_field'],
+          'price_field_id' => $this->ids['PriceField']['second_text_field'],
+          'price_field_value_id' => $this->ids['PriceFieldValue']['second_text_field'],
           'label' => 'Event Fee 1',
           'field_title' => 'Event Fee 1',
           'description' => NULL,
@@ -427,8 +431,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
           'non_deductible_amount' => '0.00',
         ],
         14 => [
-          'price_field_id' => $this->_ids['price_field']['first_text_field'],
-          'price_field_value_id' => $this->_ids['price_field_value']['first_text_field'],
+          'price_field_id' => $this->ids['PriceField']['first_text_field'],
+          'price_field_value_id' => $this->ids['PriceFieldValue']['first_text_field'],
           'label' => 'Event Fee 2',
           'field_title' => 'Event Fee 2',
           'description' => NULL,
@@ -448,7 +452,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ],
     ];
     $form->setAction(CRM_Core_Action::ADD);
-    $form->_priceSetId = $this->_ids['price_set'];
+    $form->_priceSetId = $this->getPriceSetID('event');
 
     $form->submit([
       'register_date' => date('Ymd'),
@@ -456,9 +460,9 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'status_id' => 5,
       'role_id' => 1,
       'event_id' => $this->getEventID(),
-      'priceSetId' => $this->_ids['price_set'],
-      'price_' . $this->_ids['price_field']['first_text_field'] => [$this->_ids['price_field_value']['first_text_field'] => 1],
-      'price_' . $this->_ids['price_field']['second_text_field'] => [$this->_ids['price_field_value']['second_text_field'] => 1],
+      'priceSetId' => $this->getPriceSetID('event'),
+      'price_' . $this->ids['PriceField']['first_text_field'] => [$this->ids['PriceFieldValue']['first_text_field'] => 1],
+      'price_' . $this->ids['PriceField']['second_text_field'] => [$this->ids['PriceFieldValue']['second_text_field'] => 1],
       'amount_level' => 'Too much',
       'fee_amount' => 65,
       'total_amount' => 65,
@@ -499,7 +503,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'billing_postal_code-5' => 10545,
       'billing_country_id-5' => 1228,
       'payment_processor_id' => $paymentProcessorID,
-      'priceSetId' => $this->getPriceSetID(),
+      'priceSetId' => $this->getPriceSetID('event'),
       $this->getPriceFieldKey()  => $this->getPriceFieldValueID(),
       'amount_level' => 'Too much',
       'fee_amount' => $this->formatMoneyInput(1550.55),
@@ -526,7 +530,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'status_id' => 1,
       'role_id' => 1,
       $this->getPriceFieldKey() => $this->getPriceFieldValueID(),
-      'priceSetId' => $this->getPriceSetID(),
+      'priceSetId' => $this->getPriceSetID('event'),
       'event_id' => $this->getEventID(),
       'record_contribution' => TRUE,
       'amount_level' => 'blah',
@@ -553,12 +557,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   public function testSubmitPartialPayment($isQuickConfig) {
     $mut = new CiviMailUtils($this, TRUE);
     $form = $this->getForm(['is_monetary' => 1]);
-    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID()]);
+    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('event')]);
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $submitParams = [
       'hidden_feeblock' => '1',
       'hidden_eventFullMsg' => '',
-      'priceSetId' => $this->getPriceSetID(),
+      'priceSetId' => $this->getPriceSetID('event'),
       $this->getPriceFieldKey() => $this->getPriceFieldValueID(),
       'check_number' => '879',
       'record_contribution' => '1',
@@ -599,10 +603,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitPendingPartiallyPaidAddPayment($isQuickConfig) {
+  public function testSubmitPendingPartiallyPaidAddPayment(bool $isQuickConfig): void {
     $mut = new CiviMailUtils($this, TRUE);
     $form = $this->getForm(['is_monetary' => 1]);
-    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID()]);
+    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('event')]);
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $submitParams = $this->getRecordContributionParams('Partially paid', $form);
     $form->submit($submitParams);
@@ -626,10 +630,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitPendingAddPayment($isQuickConfig) {
+  public function testSubmitPendingAddPayment($isQuickConfig): void {
     $mut = new CiviMailUtils($this, TRUE);
     $form = $this->getForm(['is_monetary' => 1]);
-    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID()]);
+    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('event')]);
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $submitParams = $this->getRecordContributionParams('Pending from pay later', 'Pending');
     // Create the pending contribution for the full amount to be paid.
@@ -650,7 +654,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @param bool $isAmountPaidOnForm
    *   Was the amount paid entered on the form (if so this should be on the receipt)
    */
-  protected function assertPartialPaymentResult($isQuickConfig, CiviMailUtils $mut, $isAmountPaidOnForm = TRUE) {
+  protected function assertPartialPaymentResult(bool $isQuickConfig, CiviMailUtils $mut, $isAmountPaidOnForm = TRUE): void {
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $expected = [
@@ -741,21 +745,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Get the id of the configured price set.
-   *
-   * @return int
-   */
-  protected function getPriceSetID() {
-    return (int) $this->_ids['price_set'];
-  }
-
-  /**
    * Get the price field id that has been created for the test.
    *
    * @return int
    */
-  protected function getPriceFieldID() {
-    return (int) $this->_ids['price_field'][0];
+  protected function getPriceFieldID(): int {
+    return (int) reset($this->ids['PriceField']);
   }
 
   /**
@@ -784,11 +779,11 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getRecordContributionParams($participantStatus, $contributionStatus): array {
+  protected function getRecordContributionParams(string $participantStatus, $contributionStatus): array {
     $submitParams = [
       'hidden_feeblock' => '1',
       'hidden_eventFullMsg' => '',
-      'priceSetId' => $this->getPriceSetID(),
+      'priceSetId' => $this->getPriceSetID('event'),
       $this->getPriceFieldKey() => $this->getPriceFieldValueID(),
       'check_number' => '879',
       'record_contribution' => '1',
