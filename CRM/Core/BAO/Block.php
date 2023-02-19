@@ -457,7 +457,7 @@ class CRM_Core_BAO_Block {
    * @param array $locations
    */
   public static function sortPrimaryFirst(&$locations) {
-    uasort($locations, 'self::primaryComparison');
+    uasort($locations, [__CLASS__, 'primaryComparison']);
   }
 
   /**
