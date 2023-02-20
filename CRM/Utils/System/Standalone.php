@@ -25,7 +25,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public $missingStandaloneExtension = TRUE;
 
   public function __construct() {
-    $this->missingStandaloneExtension = class_exists(\Civi\Standalone\Security::class);
+    $this->missingStandaloneExtension = !class_exists(\Civi\Standalone\Security::class);
   }
 
   /**
