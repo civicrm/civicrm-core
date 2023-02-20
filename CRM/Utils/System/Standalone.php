@@ -29,6 +29,20 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
+   * Start a new session.
+   */
+  public function sessionStart() {
+    parent::sessionStart();
+    if ($this->missingStandaloneExtension) {
+      // Provide a fake contact and user ID, otherwise we don't get a menu.
+      $session = CRM_Core_Session::singleton();
+      $session->set('userID', 1);
+      $session->set('ufID', 1);
+    }
+  }
+
+
+  /**
    * @inheritdoc
    */
   public function getDefaultFileStorage() {
