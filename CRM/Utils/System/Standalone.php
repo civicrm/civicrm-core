@@ -192,7 +192,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $fragment = $fragment ? ('#' . $fragment) : '';
     $url = "/{$path}?{$query}$fragment";
     if ($absolute) {
-      return rtrim(Civi::settings()->get('userFrameworkResourceURL'), '/') . $url;
+      // @fixme
+      // return implode('/', [rtrim(Civi::settings()->get('userFrameworkResourceURL'), '/') . ltrim($url, '/')]);
     }
     return $url;
   }
