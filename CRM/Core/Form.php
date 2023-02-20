@@ -508,6 +508,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($extra['option_context']);
     }
 
+    // Allow disabled to be a boolean
+    if (isset($attributes['disabled']) && $attributes['disabled'] === FALSE) {
+      unset($attributes['disabled']);
+    }
+
     $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
@@ -2201,6 +2206,33 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($setDefaultCurrency) {
       $this->setDefaults([$name => $defaultCurrency]);
     }
+  }
+
+  /**
+   * @param string $name
+   * @param string $label
+   * @param array $props
+   * @param bool $required
+   *
+   * @return HTML_QuickForm_Element
+   */
+  public function addAutocomplete(string $name, string $label = '', array $props = [], bool $required = FALSE) {
+    $props += [
+      'entity' => 'Contact',
+      'api' => [],
+      'select' => [],
+    ];
+    $props['api'] += [
+      'formName' => 'qf:' . get_class($this),
+      'fieldName' => $name,
+    ];
+    $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-autocomplete');
+    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
+    $props['data-select-params'] = json_encode($props['select']);
+    $props['data-api-params'] = json_encode($props['api']);
+    $props['data-api-entity'] = $props['entity'];
+    CRM_Utils_Array::remove($props, 'select', 'api', 'entity');
+    return $this->add('text', $name, $label, $props, $required);
   }
 
   /**

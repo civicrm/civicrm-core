@@ -200,6 +200,7 @@ input.crm-form-checkbox + label {
   width: 15em;
 }
 .crm-container .huge,
+input.crm-form-autocomplete,
 input.crm-form-entityref {
   width: 25em;
 }

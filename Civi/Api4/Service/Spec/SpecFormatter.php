@@ -37,6 +37,9 @@ class SpecFormatter {
         $field->setType('Field');
         $field->setTableName($data['custom_group_id.table_name']);
       }
+      if ($dataTypeName === 'EntityReference') {
+        $field->setFkEntity($data['fk_entity']);
+      }
       $field->setColumnName($data['column_name']);
       $field->setNullable(empty($data['is_required']));
       $field->setCustomFieldId($data['id'] ?? NULL);
@@ -293,7 +296,7 @@ class SpecFormatter {
       'Link' => 'Url',
     ];
     $inputType = $map[$inputType] ?? $inputType;
-    if ($dataTypeName === 'ContactReference') {
+    if ($dataTypeName === 'ContactReference' || $dataTypeName === 'EntityReference') {
       $inputType = 'EntityRef';
     }
     if (in_array($inputType, ['Select', 'EntityRef'], TRUE) && !empty($data['serialize'])) {
