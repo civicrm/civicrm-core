@@ -1251,7 +1251,19 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             $display = implode(', ', $displayNames);
           }
         }
-        elseif ($field['data_type'] == 'ContactReference') {
+        elseif ($field['data_type'] == 'EntityReference' && $value) {
+          try {
+            $result = civicrm_api4($field['fk_entity'], 'autocomplete', [
+              'checkPermissions' => FALSE,
+              'ids' => [$value],
+            ]);
+            $display = $result->single()['label'];
+          }
+          catch (CRM_Core_Exception $e) {
+            $display = '';
+          }
+        }
+        elseif (in_array($field['data_type'], ['ContactReference', 'EntityReference'])) {
           $display = $value;
         }
         elseif (is_array($value)) {
