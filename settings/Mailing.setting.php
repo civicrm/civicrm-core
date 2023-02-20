@@ -393,4 +393,18 @@ return [
     'description' => ts('The frequency that CiviMail updates its sent mail database.'),
     'help_text' => NULL,
   ],
+  'scheduled_reminder_smarty' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'scheduled_reminder_smarty',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'default' => 0,
+    'title' => ts('Use Smarty in scheduled reminders'),
+    'add' => '5.60',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Controls whether scheduled reminders will attempt to process smarty tokens.'),
+    'help_text' => NULL,
+  ],
 ];
