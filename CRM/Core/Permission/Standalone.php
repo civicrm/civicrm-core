@@ -43,25 +43,13 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
     if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
       return TRUE;
     }
+
+    if (class_exists(\Civi\Standalone\Security::class)) {
+      return \Civi\Standalone\Security::singleton()->checkPermission($this, $str, $userId);
+    }
+
     // return the stubbed permission (defaulting to true if the array is missing)
     return isset($this->permissions) && is_array($this->permissions) ? in_array($str, $this->permissions) : TRUE;
-  }
-
-  /**
-   * Get the permissioned where clause for the user.
-   *
-   * @param int $type
-   *   The type of permission needed.
-   * @param array $tables
-   *   (reference ) add the tables that are needed for the select clause.
-   * @param array $whereTables
-   *   (reference ) add the tables that are needed for the where clause.
-   *
-   * @return string
-   *   the group where clause for this user
-   */
-  public function whereClause($type, &$tables, &$whereTables) {
-    return '( 1 )';
   }
 
 }
