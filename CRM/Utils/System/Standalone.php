@@ -22,10 +22,9 @@ use Civi\Standalone\Security;
  */
 class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
-  public $missingStandaloneExtension = TRUE;
-
-  public function __construct() {
-    $this->missingStandaloneExtension = !class_exists(\Civi\Standalone\Security::class);
+  public function missingStandaloneExtension() {
+    error_log("sessionStart, " . (class_exists(\Civi\Standalone\Security::class) ? 'exists' : 'no ext'));
+    return !class_exists(\Civi\Standalone\Security::class);
   }
 
   /**
@@ -33,7 +32,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function sessionStart() {
     parent::sessionStart();
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       // Provide a fake contact and user ID, otherwise we don't get a menu.
       $session = CRM_Core_Session::singleton();
       $session->set('userID', 1);
@@ -69,7 +68,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    *   uid if user was created, false otherwise
    */
   public function createUser(&$params, $mail) {
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return FALSE;
     }
     return Security::singleton()->createUser($params, $mail);
@@ -79,7 +78,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return FALSE;
     }
     return Security::singleton()->updateCMSName($ufID, $email);
@@ -216,7 +215,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @throws \CRM_Core_Exception.
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return FALSE;
     }
     return Security::singleton()->authenticate($name, $password, $loadCMSBootstrap, $realPath);
@@ -231,7 +230,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return int|null
    */
   public function getUfId($username) {
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return NULL;
     }
     return Security::singleton()->getUserIDFromUsername($username);
@@ -244,7 +243,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    *   This function should be removed in favor of linking to the CMS's logout page
    */
   public function logout() {
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return;
     }
     return Security::singleton()->logoutUser();
@@ -301,9 +300,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $config = CRM_Core_Config::singleton();
     $config->cleanURL = 1;
 
-    // Re-check now we have a bit more to go on.
-    $this->missingStandaloneExtension = class_exists(\Civi\Standalone\Security::class);
-
     // I don't *think* this applies to Standalone:
     //
     // we need to call the config hook again, since we now know
@@ -316,7 +312,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       return TRUE;
     }
 
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return FALSE;
     }
 
@@ -378,7 +374,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function isUserLoggedIn() {
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return TRUE;
     }
     return Security::singleton()->isUserLoggedIn();
@@ -413,7 +409,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function getLoggedInUfID() {
 
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       // This helps towards getting the CiviCRM menu to display
       return 1;
     }
@@ -433,7 +429,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function synchronizeUsers() {
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return parent::synchronizeUsers();
     }
     return Security::singleton()->synchronizeUsers();
@@ -454,7 +450,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return string
    */
   public function getCurrentLanguage() {
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return NULL;
     }
     return Security::singleton()->getCurrentLanguage();
@@ -532,7 +528,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
     // Notice: we CANNOT call log here, it creates a nasty crash.
     // \Civi::log()->warning("Standalone languageNegotiationURL is not written, but was called");
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return $url;
     }
     return Security::singleton()->languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE);
@@ -543,7 +539,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return array
    */
   public function getCMSPermissionsUrlParams() {
-    if ($this->missingStandaloneExtension) {
+    if ($this->missingStandaloneExtension()) {
       return ['ufAccessURL' => '/fixme/standalone/permissions/url/params'];
     }
     return Security::singleton()->getCMSPermissionsUrlParams();
