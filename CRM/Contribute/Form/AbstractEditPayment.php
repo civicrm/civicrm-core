@@ -87,18 +87,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $entity;
 
   /**
-   * The id of the premium that we are proceessing.
-   *
-   * @var int
-   */
-  public $_premiumID = NULL;
-
-  /**
-   * @var CRM_Contribute_DAO_ContributionProduct
-   */
-  public $_productDAO = NULL;
-
-  /**
    * The id of the note
    *
    * @var int
@@ -349,23 +337,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, 1, $type, $entityId);
     CRM_Custom_Form_CustomData::buildQuickForm($this);
     CRM_Custom_Form_CustomData::setDefaultValues($this);
-  }
-
-  /**
-   * @param int $id
-   * @todo - this function is a long way, non standard of saying $dao = new CRM_Contribute_DAO_ContributionProduct(); $dao->id = $id; $dao->find();
-   */
-  public function assignPremiumProduct($id) {
-    $sql = "
-SELECT *
-FROM   civicrm_contribution_product
-WHERE  contribution_id = {$id}
-";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    if ($dao->fetch()) {
-      $this->_premiumID = $dao->id;
-      $this->_productDAO = $dao;
-    }
   }
 
   /**

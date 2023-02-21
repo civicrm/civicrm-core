@@ -2134,4 +2134,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     return $this->getSubmittedValue('price_set_id');
   }
 
+  /**
+   * @param int $id
+   * @todo - this function is a long way, non standard of saying $dao = new CRM_Contribute_DAO_ContributionProduct(); $dao->id = $id; $dao->find();
+   */
+  private function assignPremiumProduct($id): void {
+    $sql = "
+SELECT *
+FROM   civicrm_contribution_product
+WHERE  contribution_id = {$id}
+";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    if ($dao->fetch()) {
+      $this->_premiumID = $dao->id;
+      $this->_productDAO = $dao;
+    }
+  }
+
 }
