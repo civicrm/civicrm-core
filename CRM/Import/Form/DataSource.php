@@ -181,7 +181,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       $this->instantiateDataSource();
     }
     catch (CRM_Core_Exception $e) {
-      CRM_Core_Error::statusBounce($e->getMessage());
+      CRM_Core_Error::statusBounce($e->getUserMessage());
     }
   }
 
