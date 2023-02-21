@@ -1599,7 +1599,7 @@ ORDER BY civicrm_custom_group.weight,
       return [];
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type, [], NULL, NULL, [], NULL, TRUE, NULL, TRUE);
     $customValue = [];
     $htmlType = [
       'CheckBox',
