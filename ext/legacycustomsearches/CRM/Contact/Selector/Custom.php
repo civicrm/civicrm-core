@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id: Selector.php 11510 2007-09-18 09:21:34Z lobo $
  */
 
 /**
@@ -28,7 +27,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @var array
    */
-  public static $_links = NULL;
+  public static $_links;
 
   /**
    * We use desc to remind us what that column is, name is used in the tpl
@@ -358,6 +357,107 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     $this->buildPrevNextCache($sort);
 
     return $rows;
+  }
+
+  /**
+   * @param CRM_Utils_Sort $sort
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private function buildPrevNextCache($sort): string {
+    $cacheKey = 'civicrm search ' . $this->_key;
+
+    // We should clear the cache in following conditions:
+    // 1. when starting from scratch, i.e new search
+    // 2. if records are sorted
+
+    // get current page requested
+    $pageNum = CRM_Utils_Request::retrieve('crmPID', 'Integer');
+
+    // get the current sort order
+    $currentSortID = CRM_Utils_Request::retrieve('crmSID', 'String');
+
+    $session = CRM_Core_Session::singleton();
+
+    // get previous sort id
+    $previousSortID = $session->get('previousSortID');
+
+    // check for current != previous to ensure cache is not reset if paging is done without changing
+    // sort criteria
+    if (!$pageNum || (!empty($currentSortID) && $currentSortID != $previousSortID)) {
+      Civi::service('prevnext')->deleteItem(NULL, $cacheKey, 'civicrm_contact');
+      // this means it's fresh search, so set pageNum=1
+      if (!$pageNum) {
+        $pageNum = 1;
+      }
+    }
+
+    // set the current sort as previous sort
+    if (!empty($currentSortID)) {
+      $session->set('previousSortID', $currentSortID);
+    }
+
+    $pageSize = CRM_Utils_Request::retrieve('crmRowCount', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, 50);
+    $firstRecord = ($pageNum - 1) * $pageSize;
+
+    //for alphabetic pagination selection save
+    $sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String');
+
+    //for text field pagination selection save
+    $countRow = Civi::service('prevnext')->getCount($cacheKey);
+    // $sortByCharacter triggers a refresh in the prevNext cache
+    if ($sortByCharacter && $sortByCharacter !== 'all') {
+      $this->fillPrevNextCache($sort, $cacheKey, 0, max(self::CACHE_SIZE, $pageSize));
+    }
+    elseif (($firstRecord + $pageSize) >= $countRow) {
+      $this->fillPrevNextCache($sort, $cacheKey, $countRow, max(self::CACHE_SIZE, $pageSize) + $firstRecord - $countRow);
+    }
+    return $cacheKey;
+  }
+
+  /**
+   * @param CRM_Utils_Sort $sort
+   * @param string $cacheKey
+   * @param int $start
+   * @param int $end
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function fillPrevNextCache($sort, $cacheKey, $start = 0, $end = self::CACHE_SIZE): void {
+    $sql = $this->_search->contactIDs($start, $end, $sort, TRUE);
+
+    // CRM-9096
+    // due to limitations in our search query writer, the above query does not work
+    // in cases where the query is being sorted on a non-contact table
+    // this results in a fatal error :(
+    // see below for the gross hack of trapping the error and not filling
+    // the prev next cache in this situation
+    // the other alternative of running the FULL query will just be incredibly inefficient
+    // and slow things down way too much on large data sets / complex queries
+
+    $selectSQL = CRM_Core_DAO::composeQuery("SELECT DISTINCT %1, contact_a.id, contact_a.sort_name", [1 => [$cacheKey, 'String']]);
+
+    $sql = str_ireplace(['SELECT contact_a.id as contact_id', 'SELECT contact_a.id as id'], $selectSQL, $sql);
+    $sql = str_ireplace('ORDER BY `contact_id`', 'ORDER BY `id`', $sql, $sql);
+
+    try {
+      Civi::service('prevnext')->fillWithSql($cacheKey, $sql);
+    }
+    catch (\Exception $e) {
+      CRM_Core_Error::deprecatedFunctionWarning('Custom searches should return sql capable of filling the prevnext cache.');
+      // This will always show for CiviRules :-( as a) it orders by 'rule_label'
+      // which is not available in the query & b) it uses contact not contact_a
+      // as an alias.
+      // CRM_Core_Session::setStatus(ts('Query Failed'));
+      return;
+    }
+
+    if (Civi::service('prevnext') instanceof CRM_Core_PrevNextCache_Sql) {
+      // SQL-backed prevnext cache uses an extra record for pruning the cache.
+      // Also ensure that caches stay alive for 2 days as per previous code
+      Civi::cache('prevNextCache')->set($cacheKey, $cacheKey, 60 * 60 * 24 * CRM_Core_PrevNextCache_Sql::cacheDays);
+    }
   }
 
   /**
