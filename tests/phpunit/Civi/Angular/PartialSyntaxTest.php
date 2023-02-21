@@ -68,6 +68,10 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
       '<div ng-if="a && b"></div>',
       '<div ng-if="a && b"></div>',
     ];
+    $cases[7] = [
+      '<div double="{a: \'abc\', &quot;b.c&quot;: \'b&c\'}" single=\'{"foo": &quot;bar&quot;}\'></div>',
+      '<div double="{a: \'abc\', &quot;b.c&quot;: \'b&c\'}" single=\'{"foo": "bar"}\'></div>',
+    ];
 
     return $cases;
   }
