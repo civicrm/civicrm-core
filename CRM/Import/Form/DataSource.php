@@ -177,7 +177,12 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       $this->flushDataSource();
       $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     }
-    $this->instantiateDataSource();
+    try {
+      $this->instantiateDataSource();
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::statusBounce($e->getMessage());
+    }
   }
 
   /**
