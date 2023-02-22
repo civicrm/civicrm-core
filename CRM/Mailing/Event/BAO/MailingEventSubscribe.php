@@ -343,7 +343,7 @@ SELECT     civicrm_email.id as email_id
     $success = NULL;
     foreach ($groups as $groupID) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $groupID, 'title');
-      $fontend_title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $groupID, 'fontend_title');
+      $frontend_title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $groupID, 'frontend_title');
       if (array_key_exists($groupID, $contactGroups) && $contactGroups[$groupID]['status'] != 'Removed') {
         $group[$groupID]['title'] = $contactGroups[$groupID]['title'];
         $group[$groupID]['frontend_title'] = $contactGroups[$groupID]['frontend_title'];
