@@ -226,9 +226,10 @@ SELECT     civicrm_email.id as email_id
     $bao->body_text = $text;
     $bao->body_html = $html;
     $templates = $bao->getTemplates();
+    $groupTitle = empty($group->frontend_title) ? $group->title : $group->frontend_title; 
 
-    $html = CRM_Utils_Token::replaceSubscribeTokens($templates['html'], $group->title, $url, TRUE);
-    $text = CRM_Utils_Token::replaceSubscribeTokens($templates['text'], $group->title, $url, FALSE);
+    $html = CRM_Utils_Token::replaceSubscribeTokens($templates['html'], $groupTitle, $url, TRUE);
+    $text = CRM_Utils_Token::replaceSubscribeTokens($templates['text'], $groupTitle, $url, FALSE);
 
     // render the &amp; entities in text mode, so that the links work
     $text = str_replace('&amp;', '&', $text);
@@ -286,7 +287,7 @@ SELECT     civicrm_email.id as email_id
   public static function getContactGroups($email, $contactID = NULL) {
     if ($contactID) {
       $query = "
-                 SELECT DISTINCT group_a.group_id, group_a.status, civicrm_group.title
+                 SELECT DISTINCT group_a.group_id, group_a.status, civicrm_group.title, civicrm_group.frontend_title
                  FROM civicrm_group_contact group_a
                  LEFT JOIN civicrm_group ON civicrm_group.id = group_a.group_id
                  LEFT JOIN civicrm_contact ON ( group_a.contact_id = civicrm_contact.id )
@@ -299,7 +300,7 @@ SELECT     civicrm_email.id as email_id
       $email = $strtolower($email);
 
       $query = "
-                 SELECT DISTINCT group_a.group_id, group_a.status, civicrm_group.title
+                 SELECT DISTINCT group_a.group_id, group_a.status, civicrm_group.title, civicrm_group.frontend_title
                  FROM civicrm_group_contact group_a
                  LEFT JOIN civicrm_group ON civicrm_group.id = group_a.group_id
                  LEFT JOIN civicrm_contact ON ( group_a.contact_id = civicrm_contact.id ) AND civicrm_contact.is_deleted = 0
@@ -315,6 +316,7 @@ SELECT     civicrm_email.id as email_id
       $groups[$dao->group_id] = [
         'id' => $dao->group_id,
         'title' => $dao->title,
+        'frontend_title' => $dao->frontend_title,
         'status' => $dao->status,
       ];
     }
@@ -341,12 +343,14 @@ SELECT     civicrm_email.id as email_id
     $success = NULL;
     foreach ($groups as $groupID) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $groupID, 'title');
+      $fontend_title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $groupID, 'fontend_title');
       if (array_key_exists($groupID, $contactGroups) && $contactGroups[$groupID]['status'] != 'Removed') {
         $group[$groupID]['title'] = $contactGroups[$groupID]['title'];
+        $group[$groupID]['frontend_title'] = $contactGroups[$groupID]['frontend_title'];
 
         $group[$groupID]['status'] = $contactGroups[$groupID]['status'];
         $status = ts('You are already subscribed in %1, your subscription is %2.', [
-          1 => $group[$groupID]['title'],
+          1 => empty($group[$groupID]['frontend_title']) ? $group[$groupID]['title'] : $group[$groupID]['frontend_title'],
           2 => ts($group[$groupID]['status']),
         ]);
         CRM_Utils_System::setUFMessage($status);
@@ -358,14 +362,14 @@ SELECT     civicrm_email.id as email_id
       );
       if ($se !== NULL) {
         $success = TRUE;
-        $groupAdded[] = $title;
+        $groupAdded[] = empty($frontend_title) ? $title : $frontend_title;
 
         // Ask the contact for confirmation
         $se->send_confirm_request($params['email']);
       }
       else {
         $success = FALSE;
-        $groupFailed[] = $title;
+        $groupFailed[] = empty($frontend_title) ? $title : $frontend_title;
       }
     }
     if ($success) {
