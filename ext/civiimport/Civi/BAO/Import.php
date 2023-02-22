@@ -203,7 +203,12 @@ class Import extends CRM_Core_DAO {
     $headers = UserJob::get(FALSE)
       ->addWhere('metadata', 'LIKE', '%' . $tableName . '%')
       ->addSelect('metadata')->execute()->first()['metadata']['DataSource']['column_headers'] ?? [];
-    $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
+    try {
+      $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
+    }
+    catch (\PEAR_Exception $e) {
+      throw new CRM_Core_Exception('Import table no longer exists');
+    }
     $userFieldIndex = 0;
     while ($result->fetch()) {
       $columns[$result->Field] = ['name' => $result->Field, 'table_name' => $tableName];
