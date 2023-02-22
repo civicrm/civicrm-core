@@ -30,6 +30,8 @@ class CRM_Upgrade_Incremental_php_FiveSixty extends CRM_Upgrade_Incremental_Base
   public function upgrade_5_60_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add scheduled_reminder_smarty setting', 'addScheduledReminderSmartySetting');
+    $this->addTask('Add column civicrm_custom_field.fk_entity', 'addColumn', 'civicrm_custom_field', 'fk_entity', "varchar(255) DEFAULT NULL COMMENT 'Name of entity being referenced.'");
+
   }
 
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
