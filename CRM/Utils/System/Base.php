@@ -923,8 +923,9 @@ abstract class CRM_Utils_System_Base {
    * Log error to CMS.
    *
    * @param string $message
+   * @param string|NULL $priority
    */
-  public function logger($message) {
+  public function logger($message, $priority = NULL) {
   }
 
   /**

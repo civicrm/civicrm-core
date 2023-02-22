@@ -540,6 +540,15 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
+  public function logger($message, $priority = NULL) {
+    if (CRM_Core_Config::singleton()->userFrameworkLogging) {
+      \Drupal::logger('civicrm')->log($priority ?? \Drupal\Core\Logger\RfcLogLevel::DEBUG, '%message', ['%message' => $message]);
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function flush() {
     // CiviCRM and Drupal both provide (different versions of) Symfony (and possibly share other classes too).
     // If we call drupal_flush_all_caches(), Drupal will attempt to rediscover all of its classes, use Civicrm's
