@@ -49,14 +49,16 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
   public static function create(&$params) {
 
     $extendedParams = self::loadExistingRelationshipDetails($params);
-    // When id is specified we always wan't to update, so we don't need to
-    // check for duplicate relations.
+    // When id is specified we always want to update, so we don't need to check for duplicate relations.
     if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, (int) $extendedParams['contact_id_a'], (int) $extendedParams['contact_id_b'], CRM_Utils_Array::value('id', $extendedParams, 0))) {
       throw new CRM_Core_Exception('Duplicate Relationship');
     }
     $params = $extendedParams;
-    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'],
-      $params['relationship_type_id'])) {
+    // Check if this is a "simple" disable relationship. If it is don't check the relationshipType
+    if (!empty($params['id']) && array_key_exists('is_active', $params) && empty($params['is_active'])) {
+      $disableRelationship = TRUE;
+    }
+    if (empty($disableRelationship) && !CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'], $params['relationship_type_id'])) {
       throw new CRM_Core_Exception('Invalid Relationship');
     }
     $relationship = self::add($params);

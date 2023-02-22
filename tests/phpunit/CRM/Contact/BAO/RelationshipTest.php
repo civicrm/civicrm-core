@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Relationship;
+
 /**
  * Test class for CRM_Contact_BAO_Relationship
  *
@@ -318,6 +320,58 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($relationshipObj->contact_id_b, $contact_id_2);
     $this->assertEquals($relationshipObj->is_active, 1);
     $this->assertEquals($relationshipObj->end_date, $today);
+  }
+
+  /**
+   * This tests that you can disable an invalid relationship.
+   * It is quite easy to end up with invalid relationships if you change contact subtypes.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function testDisableInvalidRelationship() {
+    $individualStaff = civicrm_api3('Contact', 'create', [
+      'display_name' => 'Individual A',
+      'contact_type' => 'Individual',
+      'contact_sub_type' => 'Staff',
+    ]);
+    $individualStudent = civicrm_api3('Contact', 'create', [
+      'display_name' => 'Individual B',
+      'contact_type' => 'Individual',
+      'contact_sub_type' => 'Student',
+    ]);
+
+    $personToOrgType = 'A_B_relationship';
+    $orgToPersonType = 'B_A_relationship';
+
+    $relationshipTypeID = civicrm_api3('RelationshipType', 'create', [
+      'name_a_b' => $personToOrgType,
+      'name_b_a' => $orgToPersonType,
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Individual',
+      'contact_sub_type_a' => 'Staff',
+      'contact_sub_type_b' => 'Student',
+    ])['id'];
+
+    // Create a relationship between the two individuals with sub types
+    $relationship = Relationship::create(FALSE)
+      ->addValue('contact_id_a', $individualStaff['id'])
+      ->addValue('contact_id_b', $individualStudent['id'])
+      ->addValue('relationship_type_id', $relationshipTypeID)
+      ->execute()
+      ->first();
+
+    // This makes the relationship invalid because one contact sub type is no longer matching the required one
+    civicrm_api3('Contact', 'create', [
+      'id' => $individualStaff['id'],
+      'contact_sub_type' => 'Parent',
+    ]);
+
+    // Check that we can disable the invalid relationship
+    Relationship::update(FALSE)
+      ->addValue('is_active', FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->execute();
   }
 
 }
