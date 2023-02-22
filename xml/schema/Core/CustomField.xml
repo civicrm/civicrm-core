@@ -339,7 +339,7 @@
     <length>255</length>
     <default>NULL</default>
     <comment>Name of entity being referenced.</comment>
-    <add>5.59</add>
+    <add>5.60</add>
   </field>
   <index>
     <name>UI_label_custom_group_id</name>
