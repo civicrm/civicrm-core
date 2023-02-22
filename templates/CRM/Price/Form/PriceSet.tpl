@@ -9,7 +9,7 @@
 *}
 {crmRegion name="price-set-1"}
 <div id="priceset" class="crm-section price_set-section">
-    {if $priceSet.help_pre}
+    {if isset($priceSet.help_pre) && $priceSet.help_pre}
         <div class="messages help">{$priceSet.help_pre}</div>
     {/if}
 
@@ -28,7 +28,7 @@
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
         {if $element.visibility EQ 'public' || ($element.visibility EQ 'admin' && $adminFld EQ true) || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard' || $action eq 1024}
-            {if $element.help_pre}<span class="content description">{$element.help_pre}</span><br />{/if}
+            {if isset($priceSet.help_pre) && $element.help_pre}<span class="content description">{$element.help_pre}</span><br />{/if}
             <div class="crm-section {$element.name}-section crm-price-field-id-{$field_id}">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_"|cat:$field_id}
@@ -52,7 +52,7 @@
                     {/if}
                   {/if}
                 {/foreach}
-                {if $element.help_post}
+                {if isset($element.help_post) && $element.help_post}
                   <div class="description">{$element.help_post}</div>
                 {/if}
               </div>
@@ -91,7 +91,7 @@
                       {/if}
                     {/if}
                   {/if}
-                  {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
+                  {if isset($element.help_post) && $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
                 </div>
 
             {/if}
@@ -115,7 +115,7 @@
         {/if}
     {/foreach}
 
-    {if $priceSet.help_post}
+    {if isset($element.help_post) && $priceSet.help_post}
       <div class="messages help">{$priceSet.help_post}</div>
     {/if}
 

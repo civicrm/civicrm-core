@@ -4,7 +4,7 @@
   {/if}
 
   {assign var=profileFieldName value=$field.name}
-  {if $prefix}
+  {if isset($prefix) && $prefix}
     {assign var="formElement" value=$form.$prefix.$profileFieldName}
     {assign var="rowIdentifier" value=$form.$prefix.$profileFieldName.id}
   {else}
@@ -47,7 +47,7 @@
         <div class="content description">{$field.help_pre}</div>
       </div>
     {/if}
-    {if $field.options_per_line != 0}
+    {if isset($field.options_per_line) && $field.options_per_line != 0}
       <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}">
         <div class="label option-label">{$formElement.label}</div>
         <div class="content 3">
@@ -93,7 +93,7 @@
             {include file="CRM/Profile/Form/GreetingType.tpl"}
           {elseif ($profileFieldName eq 'group' && $form.group) || ($profileFieldName eq 'tag' && $form.tag)}
             {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$profileFieldName title=null context="profile"}
-          {elseif $field.is_datetime_field && $action & 4}
+          {elseif isset($field.is_datetime_field) && $field.is_datetime_field && $action & 4}
             <span class="crm-frozen-field">
               {$formElement.value|crmDate:$field.smarty_view_format}
               <input type="hidden"
@@ -117,7 +117,7 @@
               &nbsp;{$form.$phone_ext_field.html}
             {/if}
           {else}
-            {if $prefix}
+            {if isset($prefix) && $prefix}
               {if $profileFieldName eq 'organization_name' && !empty($form.onbehalfof_id)}
                 {$form.onbehalfof_id.html}
               {/if}
