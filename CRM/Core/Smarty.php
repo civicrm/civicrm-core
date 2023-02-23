@@ -144,6 +144,7 @@ class CRM_Core_Smarty extends Smarty {
       $this->default_modifiers[] = 'escape:"htmlall"';
     }
     $this->load_filter('pre', 'resetExtScope');
+    $this->load_filter('pre', 'htxtFilter');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
