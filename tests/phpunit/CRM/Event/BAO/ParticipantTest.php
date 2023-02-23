@@ -279,6 +279,9 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $this->assertDBCompareValue('CRM_Activity_DAO_Activity', $this->_contactId, 'source_record_id',
       'source_contact_id', $participant->id, 'Check DB for activity added for the participant'
     );
+    //Checking for participant contact_id added to activity target.
+    $params_activity = ['contact_id' => $this->_contactId, 'record_type_id' => 3];
+    $this->assertDBCompareValues('CRM_Activity_DAO_ActivityContact', $params_activity, $params_activity);
 
     $params = array_merge($params, [
       'id' => $participant->id,
@@ -303,6 +306,9 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $this->assertDBCompareValue('CRM_Activity_DAO_Activity', $this->_contactId, 'source_record_id',
       'source_contact_id', $participant->id, 'Check DB for activity added for the participant'
     );
+    //Checking for participant contact_id added to activity target.
+    $params_activity = ['contact_id' => $this->_contactId, 'record_type_id' => 3];
+    $this->assertDBCompareValues('CRM_Activity_DAO_ActivityContact', $params_activity, $params_activity);
 
     //Checking for Note added in the table for relative participant.
     $session = CRM_Core_Session::singleton();
