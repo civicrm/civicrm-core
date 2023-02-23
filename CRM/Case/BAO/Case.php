@@ -765,7 +765,7 @@ HERESQL;
     $caseTypes = array_flip($caseTypes);
 
     // get statuses as headers for the table
-    $url = CRM_Utils_System::url('civicrm/case/search', "reset=1&force=1&all=1&status=");
+    $url = CRM_Utils_System::url('civicrm/case/search', "reset=1&force=1&all=1&case_status_id=");
     foreach ($caseStatuses as $key => $name) {
       $caseSummary['headers'][$key]['status'] = $name;
       $caseSummary['headers'][$key]['url'] = $url . $key;
@@ -831,7 +831,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         $rows[$res->case_type][$res->case_status] = [
           'count' => 1,
           'url' => CRM_Utils_System::url('civicrm/case/search',
-            "reset=1&force=1&status={$res->status_id}&type={$res->case_type_id}&case_owner={$case_owner}"
+            "reset=1&force=1&case_status_id={$res->status_id}&case_type_id={$res->case_type_id}&case_owner={$case_owner}"
           ),
         ];
       }
