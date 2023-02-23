@@ -2579,10 +2579,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         $values['preferred_mail_format'] = $preferredMailingFormat[$contact->preferred_mail_format];
       }
 
-      // get preferred languages
-      if (!empty($contact->preferred_language)) {
-        $values['preferred_language'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $contact->preferred_language);
-      }
+      $values['preferred_language'] = empty($contact->preferred_language) ? NULL : CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $contact->preferred_language);
 
       // Calculating Year difference
       if ($contact->birth_date) {
