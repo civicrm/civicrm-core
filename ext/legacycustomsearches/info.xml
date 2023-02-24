@@ -31,9 +31,10 @@
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Legacycustomsearches</namespace>
-    <format>22.10.0</format>
+    <format>23.02.0</format>
   </civix>
 </extension>
