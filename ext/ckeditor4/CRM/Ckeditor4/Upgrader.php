@@ -4,7 +4,7 @@ use CRM_Ckeditor4_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Ckeditor4_Upgrader extends CRM_Ckeditor4_Upgrader_Base {
+class CRM_Ckeditor4_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Install extension.
