@@ -39,6 +39,6 @@
   </mixins>
   <civix>
     <namespace>CRM/Search</namespace>
-    <format>22.10.0</format>
+    <format>23.02.0</format>
   </civix>
 </extension>
