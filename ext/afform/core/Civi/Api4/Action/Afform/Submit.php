@@ -202,6 +202,12 @@ class Submit extends AbstractProcessor {
       return NULL;
     }
     $fullDefn = FormDataModel::getField($apiEntity, $fieldName, 'create');
+
+    // we don't need to validate the file fields as it's handled separately
+    if ($fullDefn['input_type'] === 'File') {
+      return NULL;
+    }
+
     $isRequired = $attributes['defn']['required'] ?? $fullDefn['required'] ?? FALSE;
     if ($isRequired) {
       $label = $attributes['defn']['label'] ?? $fullDefn['label'];
