@@ -361,17 +361,6 @@ function _afform_get_partials($moduleName, $module) {
 }
 
 /**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_entityTypes
- */
-function afform_civicrm_entityTypes(&$entityTypes) {
-  _afform_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
  * Implements hook_civicrm_buildAsset().
  */
 function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
