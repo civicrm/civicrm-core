@@ -26,7 +26,7 @@
           {assign var="index" value="1"}
           {foreach name=outer key=key item=item from=$formElement}
           {if $index < 10}
-          {assign var="index" value=`$index+1`}
+          {assign var="index" value=$index+1}
           {else}
           <td class="labels font-light">{$formElement.$key.html}</td>
           {if $count == $element.options_per_line}
@@ -34,7 +34,7 @@
         <tr>
           {assign var="count" value="1"}
           {else}
-          {assign var="count" value=`$count+1`}
+          {assign var="count" value=$count+1}
           {/if}
           {/if}
           {/foreach}
