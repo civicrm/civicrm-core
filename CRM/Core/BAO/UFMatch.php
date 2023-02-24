@@ -266,7 +266,7 @@ AND    domain_id = %2
         // extract first / middle / last name
         // for joomla
         if ($uf === 'Joomla' && $user->name) {
-          CRM_Utils_String::extractName($user->name, $dedupeParameters);
+          CRM_Utils_String::extractName($user->name, $contactParameters);
         }
 
         if ($uf === 'WordPress') {
