@@ -2673,20 +2673,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isRecur
   ): array {
     $form = $this;
-    CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
-    $isPaymentTransaction = self::isPaymentTransaction($form);
+    CRM_Core_Payment_Form::mapParams($this->_bltID, $form->_params, $paymentParams, TRUE);
+    $isPaymentTransaction = self::isPaymentTransaction($this);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
-    if ($financialType->is_deductible) {
-      $form->assign('is_deductible', TRUE);
-      $form->set('is_deductible', TRUE);
-    }
+    $this->assign('is_deductible', $financialType->is_deductible);
 
     // add some financial type details to the params list
     // if folks need to use it
-    $paymentParams['financial_type_id'] = $paymentParams['financialTypeID'] = $financialType->id;
+    $paymentParams['financial_type_id'] = $paymentParams['financialTypeID'] = $financialTypeID;
     //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
     $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $financialType->name;
     //CRM-11456
