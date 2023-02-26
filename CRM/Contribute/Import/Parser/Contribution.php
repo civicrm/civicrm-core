@@ -69,12 +69,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   protected $_separator;
 
   /**
-   * Total number of lines in file
-   * @var int
-   */
-  protected $_lineCount;
-
-  /**
    * Running total number of valid soft credit rows
    * @var int
    */
