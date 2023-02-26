@@ -227,4 +227,14 @@ trait CRMTraits_Financial_PriceSetTrait {
     $this->ids['PriceFieldValue']['contribution'] = $priceFieldValue;
   }
 
+  /**
+   * Get the label for the form price field - eg price_6
+   * @param string $key
+   *
+   * @return string
+   */
+  protected function getPriceFieldFormLabel(string $key): string {
+    return 'price_' . $this->ids['PriceField'][$key];
+  }
+
 }

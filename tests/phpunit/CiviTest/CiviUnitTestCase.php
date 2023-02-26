@@ -196,6 +196,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   public $setupIDs = [];
 
   /**
+   * Form controller being used.
+   *
+   * We need to re-use this for multi-part forms.
+   *
+   * @var \CRM_Event_Controller_Registration
+   */
+  protected $formController;
+
+  /**
    *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
@@ -3125,7 +3134,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $formValues
    *
-   * @param string $pageName
+   * @param string|null $pageName
    *
    * @param array $searchFormValues
    *   Values for the search form if the form is a task eg.
@@ -3136,10 +3145,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *      'mark_x_6' => 1,
    *      'mark_x_8' => 1,
    *   ]
+   * @param \HTML_QuickForm_Controller|null $controller
    *
-   * @return \CRM_Core_Form
+   * @return \CRM_Core_Form|CRM_Event_Form_Registration_Register
+   *
+   * @noinspection PhpReturnDocTypeMismatchInspection
    */
-  public function getFormObject($class, $formValues = [], $pageName = '', $searchFormValues = []) {
+  public function getFormObject(string $class, array $formValues = [], ?string $pageName = '', array $searchFormValues = [], $controller = NULL) {
     $_POST = $formValues;
     /** @var CRM_Core_Form $form */
     $form = new $class();
@@ -3150,8 +3162,19 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         $form->controller = new CRM_Event_Cart_Controller_Checkout();
         break;
 
+      case 'CRM_Event_Form_Registration_Register':
+        $form->controller = $this->formController = new CRM_Event_Controller_Registration();
+        break;
+
       case 'CRM_Event_Form_Registration_Confirm':
-        $form->controller = new CRM_Event_Controller_Registration();
+      case 'CRM_Event_Form_Registration_AdditionalParticipant':
+        if ($this->formController) {
+          // Add to the existing form controller.
+          $form->controller = $this->formController;
+        }
+        else {
+          $form->controller = $this->formController = new CRM_Event_Controller_Registration();
+        }
         break;
 
       case 'CRM_Contribute_Form_Contribution_Confirm':
