@@ -68,7 +68,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Does this form support a separate membership payment
+   *
    * @var bool
+   *
+   * @deprecated use $this->isSeparateMembershipPayment() function.
    */
   protected $_separateMembershipPayment;
 
@@ -1257,6 +1260,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
     return $this->_membershipBlock;
+  }
+
+  /**
+   * Is the contribution page configured for 2 payments, one being membership & one not.
+   *
+   * @return bool
+   */
+  protected function isSeparateMembershipPayment(): bool {
+    return $this->getMembershipBlock() && $this->getMembershipBlock()['is_separate_payment'];
   }
 
 }

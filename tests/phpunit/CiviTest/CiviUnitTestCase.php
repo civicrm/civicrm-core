@@ -34,6 +34,7 @@ use Civi\Api4\Event;
 use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
+use Civi\Api4\MembershipBlock;
 use Civi\Api4\MembershipType;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\Phone;
@@ -2995,7 +2996,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public function createPriceSetWithPage($entity = NULL, $params = []) {
     $membershipTypeID = $this->membershipTypeCreate(['name' => 'Special']);
-    $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', [
+    $contributionPageID = $this->callAPISuccess('contribution_page', 'create', [
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'NZD',
@@ -3003,7 +3004,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_pay_later' => 1,
       'is_monetary' => TRUE,
       'is_email_receipt' => FALSE,
-    ]);
+    ])['id'];
     $priceSet = $this->callAPISuccess('price_set', 'create', [
       'is_quick_config' => 0,
       'extends' => 'CiviMember',
@@ -3012,7 +3013,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ]);
     $priceSetID = $priceSet['id'];
 
-    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageID, $priceSetID);
     $priceField = $this->callAPISuccess('price_field', 'create', [
       'price_set_id' => $priceSetID,
       'label' => 'Goat Breed',
@@ -3046,10 +3047,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'amount' => 10,
       'financial_type_id' => 'Donation',
     ]);
+    MembershipBlock::create(FALSE)->setValues([
+      'entity_id' => $contributionPageID,
+      'entity_table' => 'civicrm_contribution_page',
+      'is_separate_payment' => FALSE,
+    ])->execute();
     $this->_ids['price_field_value']['cont'] = $priceFieldValue['id'];
 
     $this->_ids['price_set'] = $priceSetID;
-    $this->_ids['contribution_page'] = $contributionPageResult['id'];
+    $this->_ids['contribution_page'] = $contributionPageID;
     $this->_ids['price_field'] = [$priceField['id']];
 
     $this->_ids['membership_type'] = $membershipTypeID;
@@ -3147,6 +3153,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       case 'CRM_Event_Form_Registration_Confirm':
         $form->controller = new CRM_Event_Controller_Registration();
         break;
+
+      case 'CRM_Contribute_Form_Contribution_Confirm':
+        $form->controller = new CRM_Contribute_Controller_Contribution();
+        $form->controller->setStateMachine(new CRM_Contribute_StateMachine_Contribution($form->controller));
+        // The submitted values are on the Main form.
+        $_SESSION['_' . $form->controller->_name . '_container']['values']['Main'] = $formValues;
+        return $form;
 
       case 'CRM_Contact_Import_Form_DataSource':
       case 'CRM_Contact_Import_Form_MapField':
