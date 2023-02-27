@@ -213,9 +213,9 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
       $query = "SELECT RELEASE_LOCK( %1 )";
       $params = [1 => [$this->_id, 'String']];
       if (CRM_Core_Transaction::isActive()) {
-        CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, function () {
+        CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, function ($query, $params) {
           return CRM_Core_DAO::singleValueQuery($query, $params);
-        });
+        }, [$query, $params]);
       }
       else {
         return CRM_Core_DAO::singleValueQuery($query, $params);
