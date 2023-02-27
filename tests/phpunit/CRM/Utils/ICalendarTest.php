@@ -15,6 +15,11 @@
  */
 class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    $this->useTransaction();
+    parent::setUp();
+  }
+
   /**
    * @return array
    */
@@ -27,6 +32,8 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
 
     this is, a \"test\"!",
     ];
+    $cases[] = ["one, two, three; aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahh ahh ahhh"];
+    $cases[] = ["Bonjour! éèçô, этому скромному разработчику не нравится война на Украине 💓 💔 🌈 💕 💖"];
     return $cases;
   }
 

@@ -123,8 +123,17 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    * Run the basic page.
    */
   public function run() {
-    $sort = 'mapping_type asc';
-    return parent::run($sort);
+    $sort = 'mapping_type_id ASC, name ASC';
+    return parent::run(NULL, NULL, $sort);
+  }
+
+  /**
+   * Get any properties that should always be present in each row (null if no value).
+   *
+   * @return array
+   */
+  protected function getExpectedRowProperties(): array {
+    return ['description'];
   }
 
 }

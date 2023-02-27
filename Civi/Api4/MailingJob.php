@@ -10,20 +10,16 @@
  */
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\Traits\ReadOnlyEntity;
-
 /**
  * Mailing job.
  *
  * Mailing job tracks the batching of CiviMails.
- *
- * @searchable none
  *
  * @see https://docs.civicrm.org/user/en/latest/email/what-is-civimail/
  * @since 5.48
  * @package Civi\Api4
  */
 class MailingJob extends Generic\DAOEntity {
-  use ReadOnlyEntity;
+  use Generic\Traits\ReadOnlyEntity;
 
 }

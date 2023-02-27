@@ -2,6 +2,7 @@
 
 namespace Civi\Api4;
 
+use Civi\Api4\Generic\AutocompleteAction;
 use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
@@ -16,6 +17,8 @@ use Civi\Api4\Generic\BasicGetFieldsAction;
  *      The `prefill` and `submit` actions are used for preparing forms and processing submissions.
  *
  * @see https://lab.civicrm.org/extensions/afform
+ * @labelField title
+ * @iconField type:icon
  * @searchable none
  * @package Civi\Api4
  */
@@ -54,6 +57,15 @@ class Afform extends Generic\AbstractEntity {
    */
   public static function save($checkPermissions = TRUE) {
     return (new Action\Afform\Save('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Generic\AutocompleteAction
+   */
+  public static function autocomplete($checkPermissions = TRUE) {
+    return (new AutocompleteAction('Afform', __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -123,8 +135,7 @@ class Afform extends Generic\AbstractEntity {
         ],
         [
           'name' => 'type',
-          'options' => $self->pseudoconstantOptions('afform_type'),
-          'suffixes' => ['id', 'name', 'label', 'icon'],
+          'pseudoconstant' => ['optionGroupName' => 'afform_type'],
         ],
         [
           'name' => 'requires',
@@ -166,6 +177,15 @@ class Afform extends Generic\AbstractEntity {
           ],
         ],
         [
+          'name' => 'summary_contact_type',
+          'data_type' => 'Array',
+          'options' => \CRM_Contact_BAO_ContactType::contactTypePairs(),
+        ],
+        [
+          'name' => 'icon',
+          'description' => 'Icon shown in the contact summary tab',
+        ],
+        [
           'name' => 'server_route',
         ],
         [
@@ -177,6 +197,11 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'create_submission',
           'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'navigation',
+          'data_type' => 'Array',
+          'description' => 'Insert into navigation menu {parent: string, label: string, weight: int}',
         ],
         [
           'name' => 'layout',
@@ -216,7 +241,7 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'String',
           'description' => 'Name of extension which provides this form',
           'readonly' => TRUE,
-          'options' => $self->getLoadOptions() ? \CRM_Core_PseudoConstant::getExtensions() : TRUE,
+          'pseudoconstant' => ['callback' => ['CRM_Core_PseudoConstant', 'getExtensions']],
         ];
         $fields[] = [
           'name' => 'search_displays',
@@ -236,8 +261,8 @@ class Afform extends Generic\AbstractEntity {
    */
   public static function permissions() {
     return [
-      "meta" => ["access CiviCRM"],
-      "default" => ["administer CiviCRM"],
+      'meta' => ['access CiviCRM'],
+      'default' => [['administer CiviCRM', 'administer afform']],
       // These all check form-level permissions
       'get' => [],
       'getOptions' => [],

@@ -64,8 +64,6 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
   /**
    * Build all the data structures needed to build the form.
    *
-   * @param
-   *
    * @return void
    */
   public function preProcess() {
@@ -428,7 +426,7 @@ FROM   {$this->_componentTable}
   /**
    * Get the name of the component.
    *
-   * @return array
+   * @return string
    */
   protected function getComponentName(): string {
     // CRM_Export_Controller_Standalone has this method

@@ -115,6 +115,7 @@
     <add>5.29</add>
     <html>
       <label>Relationship to contact</label>
+      <type>Select</type>
     </html>
     <pseudoconstant>
       <callback>CRM_Core_PseudoConstant::relationshipTypeOptions</callback>
@@ -152,6 +153,7 @@
     <add>5.29</add>
     <html>
       <label>Relationship from contact</label>
+      <type>Select</type>
     </html>
     <pseudoconstant>
       <callback>CRM_Core_PseudoConstant::relationshipTypeOptions</callback>
@@ -199,6 +201,7 @@
     <add>5.29</add>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
     <readonly>true</readonly>
   </field>
@@ -237,6 +240,7 @@
     <comment>FK to civicrm_case</comment>
     <html>
       <label>Case</label>
+      <type>EntityRef</type>
     </html>
     <add>5.44</add>
     <readonly>true</readonly>

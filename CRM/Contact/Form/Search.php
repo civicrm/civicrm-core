@@ -78,7 +78,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * @var array
    */
   public $_tag;
-  public $_tagElement;
 
   /**
    * The params used for search.
@@ -905,7 +904,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * Load metadata for fields on the form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function loadMetadata() {
     // can't by pass acls by passing search criteria in the url.

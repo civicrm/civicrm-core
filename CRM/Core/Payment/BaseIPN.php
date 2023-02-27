@@ -65,104 +65,6 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Validate incoming data.
-   *
-   * This function is intended to ensure that incoming data matches
-   * It provides a form of pseudo-authentication - by checking the calling fn already knows
-   * the correct contact id & contribution id (this can be problematic when that has changed in
-   * the meantime for transactions that are delayed & contacts are merged in-between. e.g
-   * Paypal allows you to resend Instant Payment Notifications if you, for example, moved site
-   * and didn't update your IPN URL.
-   *
-   * @param array $input
-   *   Interpreted values from the values returned through the IPN.
-   * @param array $ids
-   *   More interpreted values (ids) from the values returned through the IPN.
-   * @param array $objects
-   *   An empty array that will be populated with loaded object.
-   * @param bool $required
-   *   Boolean Return FALSE if the relevant objects don't exist.
-   * @param int $paymentProcessorID
-   *   Id of the payment processor ID in use.
-   *
-   * @deprecated
-   *
-   * @return bool
-   */
-  public function validateData($input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused');
-    // Check if the contribution exists
-    // make sure contribution exists and is valid
-    $contribution = new CRM_Contribute_BAO_Contribution();
-    $contribution->id = $ids['contribution'];
-    if (!$contribution->find(TRUE)) {
-      throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
-    }
-
-    // make sure contact exists and is valid
-    // use the contact id from the contribution record as the id in the IPN may not be valid anymore.
-    $contact = new CRM_Contact_BAO_Contact();
-    $contact->id = $contribution->contact_id;
-    $contact->find(TRUE);
-    if ($contact->id != $ids['contact']) {
-      // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
-      CRM_Core_Error::debug_log_message("Contact ID in IPN {$ids['contact']} not found but contact_id found in contribution {$contribution->contact_id} used instead");
-      echo "WARNING: Could not find contact record: {$ids['contact']}<p>";
-      $ids['contact'] = $contribution->contact_id;
-    }
-
-    if (!empty($ids['contributionRecur'])) {
-      $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
-      $contributionRecur->id = $ids['contributionRecur'];
-      if (!$contributionRecur->find(TRUE)) {
-        CRM_Core_Error::debug_log_message("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
-        echo "Failure: Could not find contribution recur record: {$ids['ContributionRecur']}<p>";
-        return FALSE;
-      }
-    }
-
-    $objects['contact'] = &$contact;
-    $objects['contribution'] = &$contribution;
-
-    // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
-    if (!empty($ids['contributionPage']) && !is_numeric($ids['contributionPage'])) {
-      // We don't need to worry if about removing contribution page id as it will be set later in
-      //  CRM_Contribute_BAO_Contribution::loadRelatedObjects(..) using $objects['contribution']->contribution_page_id
-      unset($ids['contributionPage']);
-    }
-
-    if (!$this->loadObjects($input, $ids, $objects, $required, $paymentProcessorID)) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
-   * Load objects related to contribution.
-   *
-   * @deprecated
-   *
-   * @input array information from Payment processor
-   *
-   * @param array $input
-   * @param array $ids
-   * @param array $objects
-   * @param bool $required
-   * @param int $paymentProcessorID
-   *
-   * @return bool|array
-   * @throws \CRM_Core_Exception
-   */
-  public function loadObjects($input, &$ids, &$objects, $required, $paymentProcessorID) {
-    CRM_Core_Error::deprecatedFunctionWarning('use api methods in ipn');
-    $contribution = &$objects['contribution'];
-    $ids['paymentProcessor'] = $paymentProcessorID;
-    $success = $contribution->loadRelatedObjects($input, $ids);
-    $objects = array_merge($objects, $contribution->_relatedObjects);
-    return $success;
-  }
-
-  /**
    * Set contribution to failed.
    *
    * @param array $objects
@@ -170,7 +72,7 @@ class CRM_Core_Payment_BaseIPN {
    * @deprecated use the api.
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
   public function failed($objects) {
     CRM_Core_Error::deprecatedFunctionWarning('use the api');
@@ -239,7 +141,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $objects
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
   public function cancelled($objects) {
     CRM_Core_Error::deprecatedFunctionWarning('Use Contribution create api to cancel the contribution');
@@ -319,7 +221,7 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @param $participantID
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private function cancelParticipant($participantID) {
     // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
@@ -401,7 +303,7 @@ class CRM_Core_Payment_BaseIPN {
    *        // @todo check if it is a repeat transaction & call repeattransaction instead.
    *        civicrm_api3('contribution', 'completetransaction', array('id' => $this->transaction_id));
    *      }
-   *     catch (CiviCRM_API3_Exception $e) {
+   *     catch (CRM_Core_Exception $e) {
    *     if (!stristr($e->getMessage(), 'Contribution already completed')) {
    *       $this->handleError('error', $this->transaction_id  . $e->getMessage(), 'ipn_completion', 9000, 'An error may
    *         have occurred. Please check your receipt is correct');
@@ -417,7 +319,6 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $objects
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function completeTransaction($input, $ids, $objects) {
     CRM_Core_Error::deprecatedFunctionWarning('Use Payment.create api');
@@ -457,7 +358,7 @@ class CRM_Core_Payment_BaseIPN {
    *   Related object IDs.
    * @param array $objects
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function sendMail($input, $ids, $objects) {
     CRM_Core_Error::deprecatedFunctionWarning('this should be done via completetransaction api');

@@ -1,4 +1,4 @@
-{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 {if !empty($event.confirm_email_text) AND (empty($isOnWaitlist) AND empty($isRequireApproval))}
 {$event.confirm_email_text}
 {/if}
@@ -41,8 +41,8 @@
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
-{$event.event_title}
-{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+{event.title}
+{event.start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
 
 {if !empty($event.participant_role) and $event.participant_role neq 'Attendee' and empty($defaultRole)}
 {ts}Participant Role{/ts}: {$event.participant_role}
@@ -68,7 +68,9 @@
 
 {if !empty($event.is_public)}
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
-{ts}Download iCalendar File:{/ts} {$icalFeed}
+{ts}Download iCalendar entry for this event.{/ts} {$icalFeed}
+{capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+{ts}Add event to Google Calendar{/ts} {$gCalendar}
 {/if}
 
 {if !empty($email)}

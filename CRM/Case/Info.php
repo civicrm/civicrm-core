@@ -112,7 +112,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   public function getReferenceCounts($dao) {
     $result = [];
     if ($dao instanceof CRM_Core_DAO_OptionValue) {
-      /** @var $dao CRM_Core_DAO_OptionValue */
+      /** @var CRM_Core_DAO_OptionValue $dao */
       $activity_type_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'activity_type', 'id', 'name');
       if ($activity_type_gid == $dao->option_group_id) {
         $count = CRM_Case_XMLRepository::singleton()
@@ -127,7 +127,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       }
     }
     elseif ($dao instanceof CRM_Contact_DAO_RelationshipType) {
-      /** @var $dao CRM_Contact_DAO_RelationshipType */
+      /** @var CRM_Contact_DAO_RelationshipType $dao  */
 
       // Need to look both directions, but no need to translate case role
       // direction from XML perspective to client-based perspective
@@ -196,7 +196,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
 
   /**
    * add shortcut to Create New.
-   * @param $shortCuts
+   * @param array $shortCuts
    */
   public function creatNewShortcut(&$shortCuts) {
     if (CRM_Core_Permission::check('access all cases and activities') ||

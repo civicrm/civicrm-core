@@ -48,7 +48,8 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     if (array_key_exists($this->_type, $contactTypes)) {
       $this->assign('contactId', $this->_entityId);
     }
-    if (!is_array($this->_subType) && strstr($this->_subType, CRM_Core_DAO::VALUE_SEPARATOR)) {
+    if (!is_array($this->_subType) && strstr($this->_subType ?? '', CRM_Core_DAO::VALUE_SEPARATOR)) {
+      CRM_Core_Error::deprecatedWarning('Using a CRM_Core_DAO::VALUE_SEPARATOR separated subType on civicrm/custom route is deprecated, use a comma-separated string instead.');
       $this->_subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
     CRM_Custom_Form_CustomData::setGroupTree($this, $this->_subType, $this->_groupID, $this->_onlySubtype);

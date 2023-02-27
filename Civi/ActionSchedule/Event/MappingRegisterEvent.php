@@ -2,7 +2,7 @@
 namespace Civi\ActionSchedule\Event;
 
 use Civi\ActionSchedule\MappingInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Class ActionScheduleEvent
@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * Event name: 'civi.actionSchedule.getMappings'
  */
-class MappingRegisterEvent extends Event {
+class MappingRegisterEvent extends GenericHookEvent {
 
   /**
    * @var array

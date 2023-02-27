@@ -342,6 +342,14 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'payment_or_refund_notification', 'type' => 'text'],
         ],
       ],
+      [
+        'version' => '5.53.alpha1',
+        'upgrade_descriptor' => ts('Update to new smarty variables for line items, tax'),
+        'templates' => [
+          ['name' => 'contribution_offline_receipt', 'type' => 'text'],
+          ['name' => 'contribution_offline_receipt', 'type' => 'html'],
+        ],
+      ],
     ];
   }
 
@@ -350,7 +358,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
    *
    * @return array
    */
-  public function getTemplatesToUpdate() {
+  public function getTemplatesToUpdate(): array {
     $templates = $this->getTemplateUpdates();
     $return = [];
     foreach ($templates as $templateArray) {
@@ -438,7 +446,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
    * @param string $old
    * @param string $new
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function replaceTokenInGreetingOptions(string $old, string $new): void {
     $oldToken = '{' . $old . '}';
@@ -518,6 +526,88 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         }
       }
     }
+  }
+
+  /**
+   * Make sure *all* reserved ones get updated. Might be inefficient because we either already updated or
+   * there were no changes to a given template, but there's only about 30.
+   * This runs near the final steps of the upgrade, otherwise the earlier checks that run during the
+   * individual revisions wouldn't accurately be checking against the right is_reserved version to see
+   * if it had changed.
+   * @todo - do we still need those earlier per-version runs? e.g. the token replacement functions should still work as-is?
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function updateReservedAndMaybeDefaultTemplates(CRM_Queue_TaskContext $ctx): bool {
+    // This has to come first otherwise it would be checking against is_reserved we already updated.
+    $uneditedTemplates = self::getUneditedTemplates();
+
+    $dao = CRM_Core_DAO::executeQuery('SELECT id, workflow_id, workflow_name FROM civicrm_msg_template WHERE is_reserved=1');
+    while ($dao->fetch()) {
+      foreach (['html', 'text', 'subject'] as $type) {
+        $filePath = \Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $dao->workflow_name . '_' . $type . '.tpl');
+        if (!file_exists($filePath)) {
+          // The query may have picked up some non-core templates that will not have files to find.
+          continue;
+        }
+        $content = file_get_contents($filePath);
+        if ($content) {
+          CRM_Core_DAO::executeQuery(
+            "UPDATE civicrm_msg_template SET msg_{$type} = %1 WHERE id = %2", [
+              1 => [$content, 'String'],
+              2 => [$dao->id, 'Integer'],
+            ]
+          );
+
+          // If the same workflow_id and type appears in our list of unedited templates, update it too.
+          // There's probably a more efficient way to look this up but simple for now.
+          foreach ($uneditedTemplates as $uneditedTemplate) {
+            if ($uneditedTemplate['workflow_id'] === $dao->workflow_id && $uneditedTemplate['type'] === $type) {
+              CRM_Core_DAO::executeQuery(
+                "UPDATE civicrm_msg_template SET msg_{$type} = %1 WHERE id = %2", [
+                  1 => [$content, 'String'],
+                  2 => [$uneditedTemplate['id'], 'Integer'],
+                ]
+              );
+              break;
+            }
+          }
+        }
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Get all the is_default templates that are the unchanged from their is_reserved counterpart, which
+   * at the time this runs was the version shipped with core when it was last changed.
+   *
+   * @todo have pulled this out since want to re-use it to get the preUpgrade message right. Currently
+   * it always tells you all the ones in the hardcoded per-version list have been customized.
+   *
+   * @return array
+   */
+  public static function getUneditedTemplates(): array {
+    $templates = [];
+    foreach (['html', 'text', 'subject'] as $type) {
+      $dao = CRM_Core_DAO::executeQuery("
+        SELECT default_template.id, default_template.workflow_id FROM civicrm_msg_template reserved
+        LEFT JOIN civicrm_msg_template default_template
+          ON reserved.workflow_id = default_template.workflow_id
+        WHERE reserved.is_reserved = 1 AND default_template.is_default = 1 AND reserved.id <> default_template.id
+        AND reserved.msg_{$type} = default_template.msg_{$type}
+      ");
+      while ($dao->fetch()) {
+        // Note the same id can appear multiple times, e.g. you might change the html but not the subject.
+        $templates[] = [
+          'id' => $dao->id,
+          'type' => $type,
+          'workflow_id' => $dao->workflow_id,
+        ];
+      }
+    }
+    return $templates;
   }
 
 }

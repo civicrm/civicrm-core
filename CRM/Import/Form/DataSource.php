@@ -14,6 +14,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Base class for upload-only import forms (all but Contact import).
  */
@@ -22,14 +24,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   /**
    * Set variables up before form is built.
    */
-  public function preProcess() {
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    $params = "reset=1";
-    if ($this->_id) {
-      $params .= "&id={$this->_id}";
-    }
-    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url(static::PATH, $params));
-
+  public function preProcess(): void {
+    $this->pushUrlToUserContext();
     // check for post max size
     CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
     $this->assign('importEntity', $this->getTranslatedEntity());
@@ -44,7 +40,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * @return string
    */
   protected function getTranslatedEntity(): string {
-    return (string) Civi\Api4\Utils\CoreUtil::getInfoItem($this::IMPORT_ENTITY, 'title');
+    return (string) CoreUtil::getInfoItem($this->getBaseEntity(), 'title');
   }
 
   /**
@@ -55,41 +51,26 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * @return string
    */
   protected function getTranslatedEntities(): string {
-    return (string) Civi\Api4\Utils\CoreUtil::getInfoItem($this::IMPORT_ENTITY, 'title_plural');
+    return (string) CoreUtil::getInfoItem($this->getBaseEntity(), 'title_plural');
   }
 
   /**
    * Common form elements.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
+    $this->assign('errorMessage', $this->getErrorMessage());
     $config = CRM_Core_Config::singleton();
 
-    $uploadFileSize = CRM_Utils_Number::formatUnitSize($config->maxFileSize . 'm', TRUE);
+    $this->assign('urlPath', 'civicrm/import/datasource');
+    $this->assign('urlPathVar', 'snippet=4&user_job_id=' . $this->get('user_job_id'));
 
-    //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
-    if (empty($uploadFileSize)) {
-      $uploadFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
-    }
-    $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
+    $this->add('select', 'dataSource', ts('Data Source'), $this->getDataSources(), TRUE,
+      ['onchange' => 'buildDataSourceFormBlock(this.value);']
+    );
 
-    $this->assign('uploadSize', $uploadSize);
-
-    $this->add('File', 'uploadFile', ts('Import Data File'), NULL, TRUE);
-    $this->setMaxFileSize($uploadFileSize);
-    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
-      1 => $uploadSize,
-      2 => $uploadFileSize,
-    ]), 'maxfilesize', $uploadFileSize);
-    $this->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
-    $this->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
-
-    $this->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
-
-    $this->add('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2], TRUE);
-    $this->setDefaults(['fieldSeparator' => $config->fieldSeparator]);
-    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . static::IMPORT_ENTITY);
-
-    $this->assign('savedMapping', $mappingArray);
+    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . $this->getBaseEntity());
     $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
     if ($loadedMapping = $this->get('loadedMapping')) {
@@ -98,6 +79,8 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
     //build date formats
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
+
+    $this->buildDataSourceFields();
 
     $this->addButtons([
         [
@@ -113,6 +96,23 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
     ]);
   }
 
+  public function setDefaultValues() {
+    return array_merge($this->dataSourceDefaults, [
+      'dataSource' => $this->getDefaultDataSource(),
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+    ]);
+
+  }
+
+  /**
+   * Get an error message to assign to the template.
+   *
+   * @return string
+   */
+  protected function getErrorMessage(): string {
+    return '';
+  }
+
   /**
    * A long-winded way to add one radio element to the form.
    */
@@ -120,18 +120,18 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
     //contact types option
     $contactTypeOptions = [];
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-      $contactTypeOptions[CRM_Import_Parser::CONTACT_INDIVIDUAL] = ts('Individual');
+      $contactTypeOptions['Individual'] = ts('Individual');
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-      $contactTypeOptions[CRM_Import_Parser::CONTACT_HOUSEHOLD] = ts('Household');
+      $contactTypeOptions['Household'] = ts('Household');
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-      $contactTypeOptions[CRM_Import_Parser::CONTACT_ORGANIZATION] = ts('Organization');
+      $contactTypeOptions['Organization'] = ts('Organization');
     }
     $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions);
 
     $this->setDefaults([
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
     ]);
   }
 
@@ -147,35 +147,12 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   }
 
   /**
-   * Common form postProcess.
-   *
-   * @param string $parserClassName
-   *
-   * @param string|null $entity
-   *   Entity to set for paraser currently only for custom import
+   * Common postProcessing.
    */
-  protected function submitFileForMapping($parserClassName, $entity = NULL) {
+  public function postProcess() {
+    $this->processDatasource();
     $this->controller->resetPage('MapField');
-    CRM_Core_Session::singleton()->set('dateTypes', $this->getSubmittedValue('dateFormats'));
-
-    $mapper = [];
-
-    $parser = new $parserClassName($mapper);
-    if ($entity) {
-      $parser->setEntity($this->get($entity));
-    }
-    $parser->setMaxLinesToProcess(100);
-    $parser->run(
-      $this->getSubmittedValue('uploadFile'),
-      $this->getSubmittedValue('fieldSeparator'),
-      [],
-      $this->getSubmittedValue('skipColumnHeader'),
-      CRM_Import_Parser::MODE_MAPFIELD,
-      $this->getSubmittedValue('contactType')
-    );
-
-    // add all the necessary variables to the form
-    $parser->set($this);
+    parent::postProcess();
   }
 
   /**
@@ -185,6 +162,57 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    */
   public function getTitle() {
     return ts('Upload Data');
+  }
+
+  /**
+   * Process the datasource submission - setting up the job and data source.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function processDatasource(): void {
+    if (!$this->getUserJobID()) {
+      $this->createUserJob();
+    }
+    else {
+      $this->flushDataSource();
+      $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+    }
+    try {
+      $this->instantiateDataSource();
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::statusBounce($e->getMessage());
+    }
+  }
+
+  /**
+   * Instantiate the datasource.
+   *
+   * This gives the datasource a chance to do any table creation etc.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function instantiateDataSource(): void {
+    $this->getDataSourceObject()->initialize();
+  }
+
+  /**
+   * Default values for datasource fields.
+   *
+   * @var array
+   */
+  protected $dataSourceDefaults = [];
+
+  /**
+   * Set dataSource default values.
+   *
+   * @param array $dataSourceDefaults
+   *
+   * @return self
+   */
+  public function setDataSourceDefaults(array $dataSourceDefaults): self {
+    $this->dataSourceDefaults = $dataSourceDefaults;
+    return $this;
   }
 
 }

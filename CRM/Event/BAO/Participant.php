@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
+class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Civi\Core\HookInterface {
 
   /**
    * Static field for all the participant information that we can potentially import.
@@ -181,7 +181,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     ) {
       // Default status if not specified
       $participant->status_id = $participant->status_id ?: self::fields()['participant_status_id']['default'];
-      CRM_Activity_BAO_Activity::addActivity($participant, 'Event Registration');
+      CRM_Activity_BAO_Activity::addActivity($participant, 'Event Registration', $participant->contact_id);
     }
 
     //CRM-5403
@@ -578,6 +578,10 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
    * @param bool $checkPermission
    *   Is this a permissioned retrieval?
    *
+   * @deprecated only called from event search, but without most of the details
+   * returned. Event search should call stop using this & get the metadata
+   * a better way.
+   *
    * @return array
    *   array of importable Fields
    */
@@ -608,6 +612,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
 
       // Split status and status id into 2 fields
       // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+      // note import undoes this - it is still here in case the search usage uses it.
       $participantStatus = [
         'participant_status' => [
           'title' => ts('Participant Status'),
@@ -619,6 +624,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
 
       // Split role and role id into 2 fields
       // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+      // note import undoes this - it is still here in case the search usage uses it.
       $participantRole = [
         'participant_role' => [
           'title' => ts('Participant Role'),
@@ -953,7 +959,7 @@ WHERE  civicrm_participant.id = {$participantId}
    * Get the ID of the default (first) participant role
    *
    * @return int
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getDefaultRoleID() {
     return (int) civicrm_api3('OptionValue', 'getvalue', [
@@ -1104,7 +1110,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
         }
         return TRUE;
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         throw new CRM_Core_Exception('Failed to update additional participant status in database');
       }
     }
@@ -1416,7 +1422,7 @@ UPDATE  civicrm_participant
         $receiptFrom = $eventDetails['confirm_from_name'] . ' <' . $eventDetails['confirm_from_email'] . '>';
       }
 
-      list($mailSent, $subject) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [$mailSent, $subject] = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
           'workflow' => 'participant_' . strtolower($mailType),
           'contactId' => $contactId,
@@ -1853,7 +1859,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $details['eligible'] = TRUE;
       $details['status']  = $dao->status;
       $details['role'] = $dao->role;
-      $details['fee_level'] = trim($dao->fee_level, CRM_Core_DAO::VALUE_SEPARATOR);
+      $details['fee_level'] = trim(($dao->fee_level ?? ''), CRM_Core_DAO::VALUE_SEPARATOR);
       $details['fee_amount'] = $dao->fee_amount;
       $details['register_date'] = $dao->register_date;
       $details['event_start_date'] = $dao->start_date;
@@ -1882,7 +1888,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $timenow = new Datetime();
     if (!$isBackOffice && isset($time_limit)) {
       $cancelHours = abs($time_limit);
-      $cancelInterval = new DateInterval("PT${cancelHours}H");
+      $cancelInterval = new DateInterval("PT{$cancelHours}H");
       $cancelInterval->invert = $time_limit < 0 ? 1 : 0;
       $cancelDeadline = (new Datetime($start_date))->sub($cancelInterval);
       if ($timenow > $cancelDeadline) {
@@ -1896,6 +1902,38 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       }
     }
     return $details;
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['created_id'])) {
+      // Set the "created_id" field if not already set.
+      // The created_id should always be the person that actually did the registration.
+      // That might be the first participant, but it might be someone registering someone without registering themselves.
+      // 1. Prefer logged in contact id
+      // 2. Fall back to 'registered_by_id' param.
+      // 3. Fall back to participant contact_id (for anonymous person registering themselves)
+      $event->params['created_id'] = CRM_Core_Session::getLoggedInContactID();
+      if (empty($event->params['created_id'])) {
+        if (!empty($event->params['registered_by_id'])) {
+          // No logged in contact but participant was registered by someone else.
+          // Look up the contact ID of that participant and record
+          $participant = \Civi\Api4\Participant::get(FALSE)
+            ->addSelect('contact_id')
+            ->addWhere('id', '=', $event->params['registered_by_id'])
+            ->execute()
+            ->first();
+          $event->params['created_id'] = $participant['contact_id'];
+        }
+        else {
+          $event->params['created_id'] = $event->params['contact_id'];
+        }
+      }
+    }
   }
 
 }

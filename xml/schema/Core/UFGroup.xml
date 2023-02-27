@@ -7,6 +7,13 @@
   <comment>User framework groups. Each group represents a form which encompasses a set of fields defined in civicrm_uf_fields table. Initially will be used for CiviCRM Profile form(s). Subsequently we anticipate using this to define other public facing forms (e.g. online donation solicitation forms, mailing list preferences, etc.).</comment>
   <add>1.1</add>
   <log>true</log>
+  <title>Profile</title>
+  <paths>
+    <add>civicrm/admin/uf/group/add?action=add&amp;reset=1</add>
+    <preview>civicrm/admin/uf/group/preview?reset=1&amp;gid=[id]</preview>
+    <update>civicrm/admin/uf/group/update?action=update&amp;reset=1&amp;id=[id]</update>
+    <delete>civicrm/admin/uf/group/update?action=delete&amp;reset=1&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Profile ID</title>
@@ -28,7 +35,11 @@
     <type>boolean</type>
     <default>1</default>
     <required>true</required>
-    <comment>Is this form currently active? If false, hide all related fields for all sharing contexts.</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <comment>Is this profile currently active? If false, hide all related fields for all sharing contexts.</comment>
     <add>1.1</add>
   </field>
   <field>
@@ -220,6 +231,9 @@
     <type>boolean</type>
     <default>0</default>
     <required>true</required>
+    <html>
+      <type>Radio</type>
+    </html>
     <comment>Is this group reserved for use by some other CiviCRM functionality?</comment>
     <add>3.0</add>
   </field>

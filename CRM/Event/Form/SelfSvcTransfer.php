@@ -298,7 +298,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * Process transfer - first add the new participant to the event, then cancel
    * source participant - send confirmation email to transferee
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     //For transfer, process form to allow selection of transferree
@@ -344,9 +344,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    *
    * @param CRM_Event_BAO_Participant $participant
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function participantTransfer($participant): void {
     $contactDetails = civicrm_api3('Contact', 'getsingle', ['id' => $participant->contact_id, 'return' => ['display_name', 'email']]);
@@ -398,8 +396,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       ];
 
       $sendTemplateParams = [
-        'groupName' => 'msg_tpl_workflow_event',
-        'valueName' => 'event_online_receipt',
+        'workflow' => 'event_online_receipt',
         'contactId' => $participantDetails[$participant->id]['contact_id'],
         'tplParams' => $tplParams,
         'from' => $receiptFrom,
@@ -407,6 +404,10 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'toEmail' => $toEmail,
         'cc' => $eventDetails['cc_confirm'] ?? NULL,
         'bcc' => $eventDetails['bcc_confirm'] ?? NULL,
+        'modelProps' => [
+          'participantID' => $participant->id,
+          'eventID' => $participant->event_id,
+        ],
       ];
       CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }
@@ -462,7 +463,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * @param int $fromParticipantID
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function transferParticipantRegistration($toContactID, $fromParticipantID) {
     $toParticipantValues = \Civi\Api4\Participant::get()

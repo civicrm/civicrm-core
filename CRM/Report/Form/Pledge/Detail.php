@@ -109,6 +109,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           ],
           'pledge_create_date' => [
             'title' => ts('Pledge Made Date'),
+            'type' => CRM_Utils_Type::T_DATE,
           ],
           'start_date' => [
             'title' => ts('Pledge Start Date'),
@@ -120,7 +121,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           ],
           'status_id' => [
             'title' => ts('Pledge Status'),
-            'required' => TRUE,
+            'default' => TRUE,
           ],
         ],
         'filters' => [
@@ -194,9 +195,9 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
    * If we are retrieving total paid we need to define the inclusion of pledge_payment.
    *
    * @param string $tableName
-   * @param $tableKey
+   * @param string $tableKey
    * @param string $fieldName
-   * @param $field
+   * @param array $field
    *
    * @return bool|string
    */

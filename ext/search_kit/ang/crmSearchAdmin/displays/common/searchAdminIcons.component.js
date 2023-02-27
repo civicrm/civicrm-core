@@ -22,12 +22,6 @@
         };
       };
 
-      function initWidgets() {
-        CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
-          $('.crm-search-admin-field-icon > input.crm-icon-picker[ng-model]', $element).crmIconPicker();
-        });
-      }
-
       this.$onInit = function() {
         $element.on('hidden.bs.dropdown', function() {
           $timeout(function() {
@@ -51,7 +45,6 @@
         }
         ctrl.iconFields = _.transform(allFields, getIconFields, []);
         ctrl.iconFieldMap = _.indexBy(ctrl.iconFields, 'id');
-        $timeout(initWidgets);
       };
 
       this.onSelectField = function(clause) {
@@ -72,7 +65,6 @@
           searchMeta.pickIcon().then(function(icon) {
             if (icon) {
               ctrl.item.icons.push({icon: icon, side: 'left', if: []});
-              $timeout(initWidgets);
             }
           });
         }
@@ -85,7 +77,6 @@
             item.icon = icon;
             delete item.field;
             item.if = item.if || [];
-            $timeout(initWidgets);
           }
         });
       };

@@ -9,6 +9,7 @@
   <archive>true</archive>
   <icon>fa-envelope-o</icon>
   <component>CiviMail</component>
+  <labelField>name</labelField>
   <paths>
     <add>civicrm/a/#/mailing/new</add>
     <update>civicrm/a/#/mailing/[id]</update>

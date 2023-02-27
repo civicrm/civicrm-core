@@ -1,15 +1,17 @@
 <?php
+use CRM_CivicrmAdminUi_ExtensionUtil as E;
+
 return [
   [
     'name' => 'SavedSearch_Administer_Custom_Groups',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'Administer_Custom_Groups',
-        'label' => 'Administer Custom Groups',
+        'label' => E::ts('Administer Custom Groups'),
         'form_values' => NULL,
         'search_custom_id' => NULL,
         'api_entity' => 'CustomGroup',
@@ -51,13 +53,13 @@ return [
   [
     'name' => 'SavedSearch_Administer_Custom_Groups_SearchDisplay_Table',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'Table',
-        'label' => 'Table',
+        'label' => E::ts('Table'),
         'saved_search_id.name' => 'Administer_Custom_Groups',
         'type' => 'table',
         'settings' => [
@@ -77,21 +79,21 @@ return [
               'type' => 'field',
               'key' => 'id',
               'dataType' => 'String',
-              'label' => 'ID',
+              'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'title',
               'dataType' => 'String',
-              'label' => 'Group Title',
+              'label' => E::ts('Group Title'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
               'dataType' => 'Boolean',
-              'label' => 'Enabled',
+              'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
@@ -99,7 +101,7 @@ return [
               'type' => 'field',
               'key' => 'extends_entity_column_id:label',
               'dataType' => 'Integer',
-              'label' => 'Used for',
+              'label' => E::ts('Used for'),
               'sortable' => TRUE,
               'empty_value' => '[extends:label]',
             ],
@@ -107,7 +109,7 @@ return [
               'type' => 'field',
               'key' => 'style:label',
               'dataType' => 'String',
-              'label' => 'Style',
+              'label' => E::ts('Style'),
               'sortable' => TRUE,
             ],
             [
@@ -119,7 +121,7 @@ return [
                   'join' => '',
                   'target' => '',
                   'icon' => 'fa-list-alt',
-                  'text' => 'Fields ([COUNT_CustomGroup_CustomField_custom_group_id_01_id])',
+                  'text' => E::ts('Fields (%1)', [1 => '[COUNT_CustomGroup_CustomField_custom_group_id_01_id]']),
                   'style' => 'default',
                   'path' => 'civicrm/admin/custom/group/fields#/?gid=[id]',
                 ],
@@ -129,7 +131,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => 'Settings',
+                  'text' => E::ts('Settings'),
                   'style' => 'default',
                 ],
               ],
@@ -148,7 +150,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-eye',
-                  'text' => 'Preview Group',
+                  'text' => E::ts('Preview Group'),
                   'style' => 'default',
                 ],
                 [
@@ -157,7 +159,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => 'Delete Group',
+                  'text' => E::ts('Delete Group'),
                   'style' => 'danger',
                 ],
               ],

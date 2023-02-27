@@ -40,6 +40,26 @@ class CRM_Utils_Signer {
   const SALT_LEN = 4;
 
   /**
+   * @var string
+   */
+  private $secret;
+
+  /**
+   * @var array
+   */
+  private $paramNames;
+
+  /**
+   * @var string
+   */
+  public $signDelim;
+
+  /**
+   * @var string
+   */
+  private $defaultSalt;
+
+  /**
    * Instantiate a signature-processor
    *
    * @param string $secret

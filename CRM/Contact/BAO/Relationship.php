@@ -12,7 +12,7 @@
 /**
  * Class CRM_Contact_BAO_Relationship.
  */
-class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
+class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implements \Civi\Core\HookInterface {
 
   /**
    * Various constants to indicate different type of relationships.
@@ -51,7 +51,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $extendedParams = self::loadExistingRelationshipDetails($params);
     // When id is specified we always wan't to update, so we don't need to
     // check for duplicate relations.
-    if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, $extendedParams['contact_id_a'], $extendedParams['contact_id_b'], CRM_Utils_Array::value('id', $extendedParams, 0))) {
+    if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, (int) $extendedParams['contact_id_a'], (int) $extendedParams['contact_id_b'], CRM_Utils_Array::value('id', $extendedParams, 0))) {
       throw new CRM_Core_Exception('Duplicate Relationship');
     }
     $params = $extendedParams;
@@ -116,7 +116,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $relationshipIDs[] = $relationship['id'];
         $valid++;
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         switch ($e->getMessage()) {
           case 'Duplicate Relationship':
             $duplicate++;
@@ -142,85 +142,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   }
 
   /**
-   * Only called from import now... plus one place outside of core & tests.
-   *
-   * @todo - deprecate more aggressively - will involve copying to the import
-   * class, adding a deprecation notice here & removing from tests.
-   *
-   * Takes an associative array and creates a relationship object.
-   *
-   * @deprecated For single creates use the api instead (it's tested).
-   * For multiple a new variant of this function needs to be written and migrated to as this is a bit
-   * nasty
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   The array that holds all the db ids.
-   *   per http://wiki.civicrm.org/confluence/display/CRM/Database+layer
-   *  "we are moving away from the $ids param "
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function legacyCreateMultiple($params, $ids = []) {
-    CRM_Core_Error::deprecatedFunctionWarning('api v4');
-    // clarify that the only key ever pass in the ids array is 'contact'
-    // There is legacy handling for other keys but a universe search on
-    // calls to this function (not supported to be called from outside core)
-    // only returns 2 calls - one in CRM_Contact_Import_Parser_Contact
-    // and the other in jma grant applications (CRM_Grant_Form_Grant_Confirm)
-    // both only pass in contact as a key here.
-    $contactID = $ids['contact'];
-    unset($ids);
-    // There is only ever one value passed in from the 2 places above that call
-    // this - by clarifying here like this we can cleanup within this
-    // function without having to do more universe searches.
-    $relatedContactID = key($params['contact_check']);
-
-    // check if the relationship is valid between contacts.
-    // step 1: check if the relationship is valid if not valid skip and keep the count
-    // step 2: check the if two contacts already have a relationship if yes skip and keep the count
-    // step 3: if valid relationship then add the relation and keep the count
-
-    // step 1
-    [$contactFields['relationship_type_id'], $firstLetter, $secondLetter] = explode('_', $params['relationship_type_id']);
-    $contactFields['contact_id_' . $firstLetter] = $contactID;
-    $contactFields['contact_id_' . $secondLetter] = $relatedContactID;
-    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
-      $contactFields['relationship_type_id'])) {
-      return [0, 0];
-    }
-
-    //CRM-16978:check duplicate relationship as per case id.
-    // https://issues.civicrm.org/jira/browse/CRM-16978
-    if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
-      CRM_Core_Error::deprecatedWarning('this code is believed to be unreachable');
-      $contactFields['case_id'] = $caseId;
-    }
-    if (
-    self::checkDuplicateRelationship(
-      $contactFields,
-      $contactID,
-      // step 2
-      $relatedContactID
-    )
-    ) {
-      return [0, 1];
-    }
-
-    $singleInstanceParams = array_merge($params, $contactFields);
-    $relationship = self::add($singleInstanceParams);
-
-    // do not add to recent items for import, CRM-4399
-    if (empty($params['skipRecentView'])) {
-      self::addRecent($params, $relationship);
-    }
-
-    return [1, 0];
-  }
-
-  /**
    * This is the function that check/add if the relationship created is valid.
    *
    * @param array $params
@@ -230,7 +151,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @return CRM_Contact_BAO_Relationship
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function add($params, $ids = []) {
     $params['id'] = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
@@ -241,11 +162,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
     CRM_Utils_Hook::pre($hook, 'Relationship', $params['id'], $params);
 
-    $relationshipTypes = $params['relationship_type_id'] ?? NULL;
+    $relationshipTypes = $params['relationship_type_id'] ?? '';
     // explode the string with _ to get the relationship type id
     // and to know which contact has to be inserted in
     // contact_id_a and which one in contact_id_b
-    list($relationshipTypeID) = explode('_', $relationshipTypes);
+    [$relationshipTypeID] = explode('_', $relationshipTypes);
 
     $relationship = new CRM_Contact_BAO_Relationship();
     if (!empty($params['id'])) {
@@ -623,38 +544,50 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @return CRM_Contact_DAO_Relationship
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
+   *
+   * @deprecated
    */
   public static function del($id) {
-    // delete from relationship table
-    CRM_Utils_Hook::pre('delete', 'Relationship', $id);
+    return static::deleteRecord(['id' => $id]);
+  }
 
-    $relationship = self::clearCurrentEmployer($id, CRM_Core_Action::DELETE);
-    $relationship->delete();
-    if (CRM_Core_Permission::access('CiviMember')) {
-      // create $params array which isrequired to delete memberships
-      // of the related contacts.
-      $params = [
-        'relationship_type_id' => "{$relationship->relationship_type_id}_a_b",
-        'contact_check' => [$relationship->contact_id_b => 1],
-      ];
-
-      $ids = [];
-      // calling relatedMemberships to delete the memberships of
-      // related contacts.
-      self::relatedMemberships($relationship->contact_id_a,
-        $params,
-        $ids,
-        CRM_Core_Action::DELETE,
-        FALSE
-      );
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      self::clearCurrentEmployer($event->id, CRM_Core_Action::DELETE);
     }
+  }
 
-    CRM_Core_Session::setStatus(ts('Selected relationship has been deleted successfully.'), ts('Record Deleted'), 'success');
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      if (CRM_Core_Permission::access('CiviMember')) {
+        // create $params array which isrequired to delete memberships
+        // of the related contacts.
+        $params = [
+          'relationship_type_id' => "{$event->object->relationship_type_id}_a_b",
+          'contact_check' => [$event->object->contact_id_b => 1],
+        ];
 
-    CRM_Utils_Hook::post('delete', 'Relationship', $id, $relationship);
-
-    return $relationship;
+        $ids = [];
+        // calling relatedMemberships to delete the memberships of
+        // related contacts.
+        self::relatedMemberships($event->object->contact_id_a,
+          $params,
+          $ids,
+          CRM_Core_Action::DELETE,
+          FALSE
+        );
+      }
+    }
   }
 
   /**
@@ -669,7 +602,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param bool $active
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function disableEnableRelationship($id, $action, $params = [], $ids = [], $active = FALSE) {
     $relationship = self::clearCurrentEmployer($id, $action);
@@ -831,14 +763,14 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @return bool
    *   true if record exists else false
    */
-  public static function checkDuplicateRelationship($params, $id, $contactId = 0, $relationshipId = 0) {
+  public static function checkDuplicateRelationship(array $params, int $id, int $contactId = 0, int $relationshipId = 0): bool {
     $relationshipTypeId = $params['relationship_type_id'] ?? NULL;
-    list($type) = explode('_', $relationshipTypeId);
+    [$type] = explode('_', $relationshipTypeId);
 
-    $queryString = "
+    $queryString = '
 SELECT id
 FROM   civicrm_relationship
-WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
+WHERE  is_active = 1 AND relationship_type_id = ' . CRM_Utils_Type::escape($type, 'Integer');
 
     /*
      * CRM-11792 - date fields from API are in ISO format, but this function
@@ -951,7 +883,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    *
    * @return bool
    *
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public static function setIsActive($id, $is_active) {
     // as both the create & add functions have a bunch of logic in them that
@@ -967,7 +899,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
     ]);
 
     if (is_array($result) && !empty($result['is_error']) && $result['error_message'] != 'Duplicate Relationship') {
-      throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
+      throw new CRM_Core_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
     }
 
     return TRUE;
@@ -1029,7 +961,6 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    *   [select, from, where]
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function makeURLClause($contactId, $status, $numRelationship, $count, $relationshipId, $direction, $params = []) {
     $select = $from = $where = '';
@@ -1188,7 +1119,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    *   relationship records
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function getRelationship(
     $contactId = NULL,
@@ -1203,10 +1133,10 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       return $values;
     }
 
-    list($select1, $from1, $where1) = self::makeURLClause($contactId, $status, $numRelationship,
+    [$select1, $from1, $where1] = self::makeURLClause($contactId, $status, $numRelationship,
       $count, $relationshipId, 'a_b', $params
     );
-    list($select2, $from2, $where2) = self::makeURLClause($contactId, $status, $numRelationship,
+    [$select2, $from2, $where2] = self::makeURLClause($contactId, $status, $numRelationship,
       $count, $relationshipId, 'b_a', $params
     );
 
@@ -1445,7 +1375,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @param bool $active
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function relatedMemberships($contactId, $params, $ids, $action = CRM_Core_Action::ADD, $active = TRUE) {
     // Check the end date and set the status of the relationship
@@ -1551,7 +1480,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $relTypeIds = [];
         if ($action & CRM_Core_Action::DELETE) {
           // @todo don't return relTypeId here - but it seems to be used later in a cryptic way (hint cryptic is not a complement).
-          list($relTypeId, $isDeletable) = self::isInheritedMembershipInvalidated($membershipValues, $values, $cid);
+          [$relTypeId, $isDeletable] = self::isInheritedMembershipInvalidated($membershipValues, $values, $cid);
           if ($isDeletable) {
             CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['contact_id']);
           }
@@ -1839,7 +1768,7 @@ AND cc.sort_name LIKE '%$name%'";
    *
    * @return bool
    *   True on success, false if error is encountered.
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function disableExpiredRelationships() {
     $query = "SELECT id FROM civicrm_relationship WHERE is_active = 1 AND end_date < CURDATE()";
@@ -1867,7 +1796,7 @@ AND cc.sort_name LIKE '%$name%'";
    * @param string $direction
    *
    * @return array|void
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function membershipTypeToRelationshipTypes(&$params, $direction = NULL) {
     $membershipType = civicrm_api3('membership_type', 'getsingle', [
@@ -2138,7 +2067,7 @@ AND cc.sort_name LIKE '%$name%'";
    *
    * @return bool
    *   TRUE if current employer needs to be cleared.
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $updatedRelTypeID = NULL) {
     $existingTypeID = (int) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Relationship', $relationshipId, 'relationship_type_id');
@@ -2194,7 +2123,7 @@ AND cc.sort_name LIKE '%$name%'";
    * @param int $cid
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private static function isInheritedMembershipInvalidated($membershipValues, array $values, $cid): array {
     // @todo most of this can go - it's just the weird historical returning of $relTypeId that it does.
@@ -2219,7 +2148,7 @@ AND cc.sort_name LIKE '%$name%'";
    *
    * @return bool
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private static function isContactHasValidRelationshipToInheritMembershipType(int $contactID, int $membershipTypeID, int $parentMembershipID): bool {
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);

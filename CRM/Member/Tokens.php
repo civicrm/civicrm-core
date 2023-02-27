@@ -57,7 +57,7 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
 
   /**
    * @inheritDoc
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     if ($field === 'fee') {

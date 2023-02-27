@@ -12,6 +12,7 @@
 namespace Civi\API\Subscriber;
 
 use Civi\API\Events;
+use Civi\Core\Locale;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -24,8 +25,9 @@ class I18nSubscriber implements EventSubscriberInterface {
    * Used for rolling back language to its original setting after the api call.
    *
    * @var array
+   *   Array(string $requestId => \Civi\Core\Locale $locale).
    */
-  public $originalLang = [];
+  protected $originalLocale = [];
 
   /**
    * @return array
@@ -43,7 +45,7 @@ class I18nSubscriber implements EventSubscriberInterface {
    * @param \Civi\API\Event\Event $event
    *   API preparation event.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function onApiPrepare(\Civi\API\Event\Event $event) {
     $apiRequest = $event->getApiRequest();
@@ -56,7 +58,11 @@ class I18nSubscriber implements EventSubscriberInterface {
       $language = $params['language'] ?? NULL;
     }
     if ($language) {
-      $this->setLocale($language, $apiRequest['id']);
+      $newLocale = Locale::negotiate($language);
+      if ($newLocale) {
+        $this->originalLocale[$apiRequest['id']] = Locale::detect();
+        $newLocale->apply();
+      }
     }
   }
 
@@ -65,53 +71,14 @@ class I18nSubscriber implements EventSubscriberInterface {
    *
    * @param \Civi\API\Event\Event $event
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function onApiRespond(\Civi\API\Event\Event $event) {
     $apiRequest = $event->getApiRequest();
 
-    if (!empty($this->originalLang[$apiRequest['id']])) {
-      global $tsLocale;
-      global $dbLocale;
-      $tsLocale = $this->originalLang[$apiRequest['id']]['tsLocale'];
-      $dbLocale = $this->originalLang[$apiRequest['id']]['dbLocale'];
-    }
-  }
-
-  /**
-   * Sets the tsLocale and dbLocale for multi-lingual sites.
-   * Some code duplication from CRM/Core/BAO/ConfigSetting.php retrieve()
-   * to avoid regressions from refactoring.
-   * @param string $lcMessages
-   * @param int $requestId
-   * @throws \API_Exception
-   */
-  public function setLocale($lcMessages, $requestId) {
-    $domain = new \CRM_Core_DAO_Domain();
-    $domain->id = \CRM_Core_Config::domainID();
-    $domain->find(TRUE);
-
-    // Check if the site is multi-lingual
-    if ($domain->locales && $lcMessages) {
-      // Validate language, otherwise a bad dbLocale could probably lead to sql-injection.
-      if (!array_key_exists($lcMessages, \Civi::settings()->get('languageLimit'))) {
-        throw new \API_Exception(ts('Language not enabled: %1', [1 => $lcMessages]));
-      }
-
-      global $dbLocale;
-      global $tsLocale;
-
-      // Store original value to be restored in $this->onApiRespond
-      $this->originalLang[$requestId] = [
-        'tsLocale' => $tsLocale,
-        'dbLocale' => $dbLocale,
-      ];
-
-      // Set suffix for table names - use views if more than one language
-      $dbLocale = "_{$lcMessages}";
-
-      // Also set tsLocale - CRM-4041
-      $tsLocale = $lcMessages;
+    if (!empty($this->originalLocale[$apiRequest['id']])) {
+      $this->originalLocale[$apiRequest['id']]->apply();
+      unset($this->originalLocale[$apiRequest['id']]);
     }
   }
 

@@ -61,7 +61,7 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
 
   /**
    * @inheritDoc
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     $this->prefetch = (array) $prefetch;

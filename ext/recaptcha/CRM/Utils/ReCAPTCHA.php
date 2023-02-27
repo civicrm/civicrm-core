@@ -39,7 +39,7 @@ class CRM_Utils_ReCAPTCHA {
   /**
    * Singleton function used to manage this object.
    *
-   * @return object
+   * @return CRM_Utils_ReCAPTCHA
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {
@@ -60,7 +60,7 @@ class CRM_Utils_ReCAPTCHA {
    *
    * @param CRM_Core_Form $form
    */
-  public static function add(&$form) {
+  private static function add(&$form) {
     $error = NULL;
 
     // If we already added reCAPTCHA then don't add it again.
@@ -76,7 +76,6 @@ class CRM_Utils_ReCAPTCHA {
     $html = recaptcha_get_html(\Civi::settings()->get('recaptchaPublicKey'), $error, $useHTTPS);
 
     $form->assign('recaptchaHTML', $html);
-    $form->assign('recaptchaOptions', \Civi::settings()->get('recaptchaOptions'));
     $form->add(
       'text',
       'g-recaptcha-response',
@@ -95,28 +94,128 @@ class CRM_Utils_ReCAPTCHA {
   }
 
   /**
-   * Enable ReCAPTCHA on Contribution form
+   * Enable ReCAPTCHA on form
+   *
+   * DO NOT USE OUTSIDE OF CiviCRM core.
    *
    * @param CRM_Core_Form $form
+   * @param bool $checkStandardConditions Check the standard conditions before adding?
    */
-  public static function enableCaptchaOnForm(&$form) {
+  public static function enableCaptchaOnForm(&$form, bool $checkStandardConditions = TRUE) {
+    if ($checkStandardConditions && !self::checkStandardConditionsForEnableReCAPTCHA()) {
+      return;
+    }
     $captcha = CRM_Utils_ReCAPTCHA::singleton();
     if ($captcha->hasSettingsAvailable()) {
       $captcha->add($form);
       $form->assign('isCaptcha', TRUE);
+      CRM_Core_Region::instance('page-body')->add(['template' => 'CRM/common/ReCAPTCHA.tpl']);
     }
   }
 
   /**
+   * Check the standard conditions for adding a ReCAPTCHA to the form
+   *
+   * @return bool
+   */
+  private static function checkStandardConditionsForEnableReCAPTCHA(): bool {
+    if (!CRM_Core_Session::getLoggedInContactID()) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * This checks the form criteria to see if reCAPTCHA should be added and then it adds it to the form if required.
+   * DO NOT USE OUTSIDE OF CiviCRM core.
+   *
+   * @param string $formName
+   * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function checkAndAddCaptchaToForm($formName, &$form) {
+    $addCaptcha = FALSE;
+    $ufGroupIDs = [];
+
+    switch ($formName) {
+      case 'CRM_Contribute_Form_Contribution_Main':
+        if (\Civi::settings()->get('forceRecaptcha')) {
+          $addCaptcha = TRUE;
+        }
+        else {
+          $ufGroupIDs = $form->getUFGroupIDs();
+        }
+        break;
+
+      case 'CRM_Mailing_Form_Subscribe':
+      case 'CRM_Event_Cart_Form_Checkout_Payment':
+        $addCaptcha = TRUE;
+        break;
+
+      case 'CRM_PCP_Form_PCPAccount':
+      case 'CRM_Campaign_Form_Petition_Signature':
+        $ufGroupIDs = $form->getUFGroupIDs();
+        break;
+
+      case 'CRM_Profile_Form_Edit':
+        // add captcha only for create mode.
+        if ($form->getIsCreateMode()) {
+          $ufGroupIDs = $form->getUFGroupIDs();
+        }
+        break;
+
+      case 'CRM_Event_Form_Registration_Register':
+        $button = substr($form->controller->getButtonName(), -4);
+        // We show reCAPTCHA for anonymous user if enabled.
+        // 'skip' button is on additional participant forms, we only show reCAPTCHA on the primary form.
+        if ($button !== 'skip') {
+          $ufGroupIDs = $form->getUFGroupIDs();
+        }
+        break;
+
+    }
+
+    if (!empty($ufGroupIDs) && empty($addCaptcha)) {
+      foreach ($ufGroupIDs as $ufGroupID) {
+        $addCaptcha = \Civi\Api4\UFGroup::get(FALSE)
+          ->addWhere('id', '=', $ufGroupID)
+          ->execute()
+          ->first()['add_captcha'];
+        if ($addCaptcha) {
+          break;
+        }
+      }
+    }
+
+    if ($addCaptcha) {
+      CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($form);
+    }
+  }
+
+  /**
+   * QuickForm validate callback
+   *
    * @param $value
    * @param CRM_Core_Form $form
    *
    * @return mixed
    */
   public static function validate($value, $form) {
+    return self::checkResponse($_POST['g-recaptcha-response']);
+  }
+
+  /**
+   * @param string $response
+   * @return bool
+   */
+  public static function checkResponse($response) {
+    require_once E::path('lib/recaptcha/recaptchalib.php');
+
     $resp = recaptcha_check_answer(CRM_Core_Config::singleton()->recaptchaPrivateKey,
-      $_SERVER['REMOTE_ADDR'],
-      $_POST['g-recaptcha-response']
+      CRM_Utils_System::ipAddress(),
+      $response
     );
     return $resp->is_valid;
   }

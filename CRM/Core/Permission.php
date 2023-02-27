@@ -53,10 +53,19 @@ class CRM_Core_Permission {
   const AUTH_SRC_UNKNOWN = 0, AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4;
 
   /**
-   * Get the current permission of this user.
+   * Get the maximum permission of the current user with respect to _any_ contact records.
    *
-   * @return string
-   *   the permission of the user (edit or view or null)
+   * Note: This appears to be hydrated via `CRM_Core_Permission*::group()`, which appears to run in
+   * many page-views, but I'm not certain that it's guaranteed.
+   *
+   * @return int|string|null
+   *   Highest permission held by the current user.
+   *   If the user has "edit" rights to at least 1 contact (via permission or ACL),
+   *     then CRM_Core_Permission::EDIT.
+   *   If the user has "view" rights to at least 1 contact (via permission or ACL),
+   *     then CRM_Core_Permission::VIEW.
+   *   Otherwise, NULL.
+   * @see \CRM_Core_Permission_Base::group()
    */
   public static function getPermission() {
     $config = CRM_Core_Config::singleton();
@@ -467,9 +476,7 @@ class CRM_Core_Permission {
         'CiviMember' => 'edit memberships',
         'CiviPledge' => 'edit pledges',
         'CiviContribute' => 'edit contributions',
-        'CiviGrant' => 'edit grants',
         'CiviMail' => 'access CiviMail',
-        'CiviAuction' => 'add auction items',
       ];
       $permissionName = $editPermissions[$module] ?? NULL;
     }
@@ -1052,6 +1059,11 @@ class CRM_Core_Permission {
         'edit all contacts',
       ],
     ];
+    // Readonly relationship_cache table
+    $permissions['relationship_cache'] = [
+      // get is managed by BAO::addSelectWhereClause
+      'get' => [],
+    ];
 
     // CRM-17741 - Permissions for RelationshipType.
     $permissions['relationship_type'] = [
@@ -1152,6 +1164,7 @@ class CRM_Core_Permission {
     $permissions['entity_financial_account']['get'] = $permissions['contribution']['get'];
     $permissions['financial_account']['get'] = $permissions['contribution']['get'];
     $permissions['financial_trxn']['get'] = $permissions['contribution']['get'];
+    $permissions['contribution_soft'] = $permissions['contribution'];
 
     // Payment permissions
     $permissions['payment'] = [
@@ -1222,6 +1235,7 @@ class CRM_Core_Permission {
     $permissions['job'] = [
       'process_batch_merge' => ['merge duplicate contacts'],
     ];
+    $permissions['job_log'] = ['default' => 'administer CiviCRM system'];
     $permissions['rule_group']['get'] = [['merge duplicate contacts', 'administer CiviCRM']];
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
@@ -1265,7 +1279,9 @@ class CRM_Core_Permission {
     $permissions['group_nesting'] = $permissions['group'];
     $permissions['group_organization'] = $permissions['group'];
 
-    //Group Contact permission
+    // Note: The v3 GroupContact API is nonstandard and not easy to fix, so these permissions
+    // are unnecessarily strict for v3. The v4 API overrides them.
+    // @see Civi\Api4\GroupContact::permissions
     $permissions['group_contact'] = [
       'get' => [
         'access CiviCRM',

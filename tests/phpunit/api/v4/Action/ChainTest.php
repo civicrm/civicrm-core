@@ -19,16 +19,17 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ChainTest extends UnitTestCase {
+class ChainTest extends Api4TestBase implements TransactionalInterface {
 
   public function tearDown(): void {
     CustomField::delete()

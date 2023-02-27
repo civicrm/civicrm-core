@@ -245,7 +245,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   public function testFindById() {
     $params = $this->sampleContact('Individual', 4);
     $existing_contact = $this->callAPISuccess('Contact', 'create', $params);
-    /* @var CRM_Contact_DAO_Contact $contact */
+    /** @var CRM_Contact_DAO_Contact $contact */
     $contact = CRM_Contact_BAO_Contact::findById($existing_contact['id']);
     $this->assertEquals($existing_contact['id'], $contact->id);
     $deleted_contact_id = $existing_contact['id'];
@@ -499,6 +499,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * Demonstrate it is modified showing the query now breaks.
    */
   public function testModifyAndBreakQuery() {
+    $dbNameString = stripos(CRM_Utils_SQL::getDatabaseVersion(), 'mariadb') !== FALSE ? 'MariaDB' : 'MySQL';
     /**
      * @param \Civi\Core\Event\QueryEvent $e
      */
@@ -511,7 +512,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
     catch (PEAR_Exception $e) {
       $this->assertEquals(
-        "SELECT * FROM civicrm_domain [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '/* Forgot trailing comment markerSELECT * FROM civicrm_domain' at line 1]",
+        "SELECT * FROM civicrm_domain [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your $dbNameString server version for the right syntax to use near '/* Forgot trailing comment markerSELECT * FROM civicrm_domain' at line 1]",
         $e->getCause()->getUserInfo()
       );
       Civi::dispatcher()->removeListener('civi.db.query', $listener);

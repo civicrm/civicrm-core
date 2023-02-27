@@ -28,24 +28,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
   const MAX_NOTES = 3;
 
   /**
-   * Given a note id, retrieve the note text.
-   *
-   * @param int $id
-   *   Id of the note to retrieve.
-   *
-   * @return string
-   *   the note text or NULL if note not found
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated
-   */
-  public static function getNoteText($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function');
-    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'note');
-  }
-
-  /**
    * Given a note id, retrieve the note subject
    *
    * @param int $id

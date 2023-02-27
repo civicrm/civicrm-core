@@ -17,12 +17,17 @@ use Civi\Api4\Event\Events;
 use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Civi\Core\Service\AutoService;
+use Civi\Core\CiviEventDispatcherInterface;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
-class SchemaMapBuilder {
+/**
+ * @service schema_map_builder
+ */
+class SchemaMapBuilder extends AutoService {
+
   /**
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Civi\Core\CiviEventDispatcherInterface
    */
   protected $dispatcher;
   /**
@@ -31,9 +36,10 @@ class SchemaMapBuilder {
   protected $apiEntities;
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @inject dispatcher
+   * @param \Civi\Core\CiviEventDispatcherInterface $dispatcher
    */
-  public function __construct(EventDispatcherInterface $dispatcher) {
+  public function __construct(CiviEventDispatcherInterface $dispatcher) {
     $this->dispatcher = $dispatcher;
     $this->apiEntities = array_keys((array) Entity::get(FALSE)->addSelect('name')->execute()->indexBy('name'));
   }
@@ -82,14 +88,6 @@ class SchemaMapBuilder {
     if ($fkClass) {
       $tableName = AllCoreTables::getTableForClass($fkClass);
       $fkKey = $data['FKKeyColumn'] ?? 'id';
-      // Backward-compatibility for older api calls using e.g. "contact" instead of "contact_id"
-      if (strpos($field, '_id')) {
-        $alias = str_replace('_id', '', $field);
-        $joinable = new Joinable($tableName, $fkKey, $alias);
-        $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
-        $joinable->setDeprecated();
-        $table->addTableLink($field, $joinable);
-      }
       $joinable = new Joinable($tableName, $fkKey, $field);
       $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
       $table->addTableLink($field, $joinable);

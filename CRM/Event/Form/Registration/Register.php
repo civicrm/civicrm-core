@@ -206,7 +206,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return array
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setDefaultValues() {
     $this->_defaults = [];
@@ -310,7 +309,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $unsetSubmittedOptions[$val['id']] = $optionFullIds;
       }
       //reset values for all options those are full.
-      CRM_Event_Form_Registration::resetElementValue($unsetSubmittedOptions, $this);
+      CRM_Event_Form_Registration::resetElementValue($unsetSubmittedOptions ?? [], $this);
     }
 
     //set default participant fields, CRM-4320.
@@ -368,8 +367,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
 
     $contactID = $this->getContactID();
+    $this->assign('contact_id', $contactID);
     if ($contactID) {
-      $this->assign('contact_id', $contactID);
       $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
     }
 

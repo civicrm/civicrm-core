@@ -18,16 +18,23 @@ use Civi\Api4\Activity;
 class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
 
   /**
+   * Option value for 'From Email Address' option,
+   * created as part of test setup.
+   *
+   * @var array
+   */
+  private $optionValue;
+
+  /**
    * Set up for tests.
    *
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->_contactIds = [
-      $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
-      $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']),
-    ];
-    $this->_optionValue = $this->callAPISuccess('optionValue', 'create', [
+    $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']);
+    $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']);
+
+    $this->optionValue = $this->callAPISuccess('optionValue', 'create', [
       'label' => '"Seamus Lee" <seamus@example.com>',
       'option_group_id' => 'from_email_address',
     ]);
@@ -50,18 +57,16 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     $emails = CRM_Core_BAO_Email::domainEmails();
     $this->assertNotEmpty($emails);
     $optionValue = $this->callAPISuccess('OptionValue', 'Get', [
-      'id' => $this->_optionValue['id'],
+      'id' => $this->optionValue['id'],
     ]);
     $this->assertArrayHasKey('"Seamus Lee" <seamus@example.com>', $emails);
-    $this->assertEquals('"Seamus Lee" <seamus@example.com>', $optionValue['values'][$this->_optionValue['id']]['label']);
+    $this->assertEquals('"Seamus Lee" <seamus@example.com>', $optionValue['values'][$this->optionValue['id']]['label']);
   }
 
   /**
    * Test email uses signature.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testPostProcessWithSignature(): void {
@@ -95,7 +100,7 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     }
     $deceasedContactID = $this->individualCreate(['is_deceased' => 1, 'email' => 'dead@example.com']);
     $to[] = $deceasedContactID . '::' . 'dead@example.com';
-    /* @var CRM_Contact_Form_Task_Email $form*/
+    /** @var CRM_Contact_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
       'to' => implode(',', $to),
       'subject' => 'Really interesting stuff',

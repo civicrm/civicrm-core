@@ -7,9 +7,19 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+
+{htxt id='relative_absolute_schedule_dates-title'}
+  {ts}When scheduled reminders will or won't be sent{/ts}
+{/htxt}
+{htxt id="relative_absolute_schedule_dates"}
+  <p>{ts}If you set a scheduled reminder for an event to be sent on a specific date, it will be sent only on that date.{/ts} {ts}Contacts who registered before that date will receive the scheduled reminder shortly after midnight and contacts who register on that date will receive the reminder shortly after they register. Contacts who register after that date will not receive the reminder.{/ts}</p>
+  <p>{ts}If you set a scheduled reminder relative to the event start or end (e.g. 24 hours before the event start), reminders will generally also be sent to contacts who register after that time.{/ts} {ts}If you set a reminder for before the event start or end, it will be sent to all registrants who register before the event ends.{/ts} {ts}If you set a reminder for after the event start or end, it will be sent to any registrant, no matter when they register.{/ts}</p>
+<p>{ts}If you set a reminder for before the registration start or end, it will be sent to any contacts who register up to the registration end.{/ts} {ts}Reminders set for after the registration start or end won't be sent at all.{/ts}</p>
+{/htxt}
+
 {htxt id="limit_to"}
   <p>{ts}Select 'Limit to' if you want to only send reminders to contacts with the criteria selected above AND who ALSO match this criteria. If you select 'Choose Recipients' - only the chosen contacts will receive the reminder (AND only if they ALSO match the criteria above).{/ts}</p>
-  <p>{ts}Select 'Also include' if you want to also send reminders to contacts who match this criteria. If you select 'Choose Recipients' - the chosen contacts will also receive the reminder (in ADDITION TO the contacts who match the criteria above).{/ts}
+  <p>{ts}Select 'Also include' if you want to also send reminders to contacts who match this criteria. If you select 'Choose Recipients' - the chosen contacts will also receive the reminder (in ADDITION TO the contacts who match the criteria above).{/ts}</p>
 {/htxt}
 
 {htxt id="recipient"}

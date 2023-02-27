@@ -13,20 +13,19 @@
  * Test ContributionPage translation features.
  *
  * @group headless
+ * @group locale
  */
 class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    $this->_financialTypeID = 1;
-    $this->enableMultilingual();
-    CRM_Core_I18n_Schema::addLocale('fr_FR', 'en_US');
+    $this->enableMultilingual(['en_US' => 'fr_FR']);
   }
 
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
-      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+      $this->disableMultilingual();
     }
     parent::tearDown();
   }
@@ -39,7 +38,7 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
 
     $params = [
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_financialTypeID,
+      'financial_type_id' => 1,
       'is_for_organization' => 0,
       'for_organization' => ' I am contributing on behalf of an organization',
       'goal_amount' => '400',

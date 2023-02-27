@@ -143,7 +143,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
   public function browse() {
     // check if non-prod mode is enabled.
     if (CRM_Core_Config::environment() != 'Production') {
-      CRM_Core_Session::setStatus(ts('Execution of scheduled jobs has been turned off by default since this is a non-production environment. You can override this for particular jobs by adding runInNonProductionEnvironment=TRUE as a parameter.'), ts("Non-production Environment"), "warning", array('expires' => 0));
+      CRM_Core_Session::setStatus(ts('Execution of scheduled jobs has been turned off by default since this is a non-production environment. You can override this for particular jobs by adding runInNonProductionEnvironment=TRUE as a parameter. This will ignore email settings for this job and will send actual emails if this job is sending mails!'), ts("Non-production Environment"), "warning", array('expires' => 0));
     }
     else {
       $cronError = Civi\Api4\System::check(FALSE)

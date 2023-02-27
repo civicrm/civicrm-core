@@ -105,23 +105,23 @@ class CRM_Utils_Mail_EmailProcessor {
     }
 
     $config = CRM_Core_Config::singleton();
-    $verpSeparator = preg_quote($config->verpSeparator);
+    $verpSeparator = preg_quote($config->verpSeparator ?? '');
     $twoDigitStringMin = $verpSeparator . '(\d+)' . $verpSeparator . '(\d+)';
     $twoDigitString = $twoDigitStringMin . $verpSeparator;
     $threeDigitString = $twoDigitString . '(\d+)' . $verpSeparator;
 
     // FIXME: legacy regexen to handle CiviCRM 2.1 address patterns, with domain id and possible VERP part
-    $commonRegex = '/^' . preg_quote($dao->localpart) . '(b|bounce|c|confirm|o|optOut|r|reply|re|e|resubscribe|u|unsubscribe)' . $threeDigitString . '([0-9a-f]{16})(-.*)?@' . preg_quote($dao->domain) . '$/';
-    $subscrRegex = '/^' . preg_quote($dao->localpart) . '(s|subscribe)' . $twoDigitStringMin . '@' . preg_quote($dao->domain) . '$/';
+    $commonRegex = '/^' . preg_quote($dao->localpart ?? '') . '(b|bounce|c|confirm|o|optOut|r|reply|re|e|resubscribe|u|unsubscribe)' . $threeDigitString . '([0-9a-f]{16})(-.*)?@' . preg_quote($dao->domain ?? '') . '$/';
+    $subscrRegex = '/^' . preg_quote($dao->localpart ?? '') . '(s|subscribe)' . $twoDigitStringMin . '@' . preg_quote($dao->domain ?? '') . '$/';
 
     // a common-for-all-actions regex to handle CiviCRM 2.2 address patterns
-    $regex = '/^' . preg_quote($dao->localpart) . '(b|c|e|o|r|u)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '$/';
+    $regex = '/^' . preg_quote($dao->localpart ?? '') . '(b|c|e|o|r|u)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain ?? '') . '$/';
 
     // a tighter regex for finding bounce info in soft bounces’ mail bodies
-    $rpRegex = '/Return-Path:\s*' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
+    $rpRegex = '/Return-Path:\s*' . preg_quote($dao->localpart ?? '') . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain ?? '') . '/';
 
     // a regex for finding bound info X-Header
-    $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/i';
+    $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart ?? '') . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain ?? '') . '/i';
     // CiviMail in regex and Civimail in header !!!
 
     // retrieve the emails
@@ -145,31 +145,31 @@ class CRM_Utils_Mail_EmailProcessor {
 
         if ($usedfor == 1) {
           foreach ($mail->to as $address) {
-            if (preg_match($regex, $address->email, $matches)) {
-              list($match, $action, $job, $queue, $hash) = $matches;
+            if (preg_match($regex, ($address->email ?? ''), $matches)) {
+              [$match, $action, $job, $queue, $hash] = $matches;
               break;
               // FIXME: the below elseifs should be dropped when we drop legacy support
             }
-            elseif (preg_match($commonRegex, $address->email, $matches)) {
-              list($match, $action, $_, $job, $queue, $hash) = $matches;
+            elseif (preg_match($commonRegex, ($address->email ?? ''), $matches)) {
+              [$match, $action, $_, $job, $queue, $hash] = $matches;
               break;
             }
-            elseif (preg_match($subscrRegex, $address->email, $matches)) {
-              list($match, $action, $_, $job) = $matches;
+            elseif (preg_match($subscrRegex, ($address->email ?? ''), $matches)) {
+              [$match, $action, $_, $job] = $matches;
               break;
             }
           }
 
           // CRM-5471: if $matches is empty, it still might be a soft bounce sent
           // to another address, so scan the body for ‘Return-Path: …bounce-pattern…’
-          if (!$matches and preg_match($rpRegex, $mail->generateBody(), $matches)) {
-            list($match, $action, $job, $queue, $hash) = $matches;
+          if (!$matches and preg_match($rpRegex, ($mail->generateBody() ?? ''), $matches)) {
+            [$match, $action, $job, $queue, $hash] = $matches;
           }
 
           // if $matches is still empty, look for the X-CiviMail-Bounce header
           // CRM-9855
-          if (!$matches and preg_match($rpXheaderRegex, $mail->generateBody(), $matches)) {
-            list($match, $action, $job, $queue, $hash) = $matches;
+          if (!$matches and preg_match($rpXheaderRegex, ($mail->generateBody() ?? ''), $matches)) {
+            [$match, $action, $job, $queue, $hash] = $matches;
           }
           // With Mandrilla, the X-CiviMail-Bounce header is produced by generateBody
           // is base64 encoded
@@ -180,16 +180,16 @@ class CRM_Utils_Mail_EmailProcessor {
               if ($v_part instanceof ezcMailFile) {
                 $p_file = $v_part->__get('fileName');
                 $c_file = file_get_contents($p_file);
-                if (preg_match($rpXheaderRegex, $c_file, $matches)) {
-                  list($match, $action, $job, $queue, $hash) = $matches;
+                if (preg_match($rpXheaderRegex, ($c_file ?? ''), $matches)) {
+                  [$match, $action, $job, $queue, $hash] = $matches;
                 }
               }
             }
           }
 
           // if all else fails, check Delivered-To for possible pattern
-          if (!$matches and preg_match($regex, $mail->getHeader('Delivered-To'), $matches)) {
-            list($match, $action, $job, $queue, $hash) = $matches;
+          if (!$matches and preg_match($regex, ($mail->getHeader('Delivered-To') ?? ''), $matches)) {
+            [$match, $action, $job, $queue, $hash] = $matches;
           }
         }
 
@@ -243,7 +243,7 @@ class CRM_Utils_Mail_EmailProcessor {
 
         // get $replyTo from either the Reply-To header or from From
         // FIXME: make sure it works with Reply-Tos containing non-email stuff
-        $replyTo = $mail->getHeader('Reply-To') ? $mail->getHeader('Reply-To') : $mail->from->email;
+        $replyTo = $mail->getHeader('Reply-To') ? $mail->getHeader('Reply-To') : ($mail->from ? $mail->from->email : "");
 
         // handle the action by passing it to the proper API call
         // FIXME: leave only one-letter cases when dropping legacy support

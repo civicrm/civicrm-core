@@ -35,6 +35,7 @@
     <required>true</required>
     <comment>id of the first contact</comment>
     <html>
+      <type>EntityRef</type>
       <label>Contact A</label>
     </html>
     <add>1.1</add>
@@ -124,6 +125,7 @@
     <add>1.1</add>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
   </field>
   <field>
@@ -175,6 +177,7 @@
     <default>NULL</default>
     <comment>FK to civicrm_case</comment>
     <html>
+      <type>EntityRef</type>
       <label>Case</label>
     </html>
     <add>2.2</add>

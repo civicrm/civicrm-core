@@ -2,13 +2,13 @@
 
 <tables xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<xi:include href="Component.xml"     parse="xml" />
+<xi:include href="MailingComponent.xml"     parse="xml" />
 <xi:include href="Mailing.xml"       parse="xml" />
 <xi:include href="MailingAB.xml"     parse="xml" />
 <xi:include href="MailingGroup.xml"  parse="xml" />
 <xi:include href="TrackableURL.xml"  parse="xml" />
 <xi:include href="MailingJob.xml"    parse="xml" />
-<xi:include href="Recipients.xml"    parse="xml" />
+<xi:include href="MailingRecipients.xml"    parse="xml" />
 <xi:include href="BounceType.xml"    parse="xml" />
 <xi:include href="BouncePattern.xml" parse="xml" />
 <xi:include href="Spool.xml"         parse="xml" />

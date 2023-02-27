@@ -13,26 +13,6 @@ function civigrant_civicrm_config(&$config) {
 }
 
 /**
- * Implements hook_civicrm_alterSettingsFolders().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
- */
-function civigrant_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _civigrant_civix_civicrm_alterSettingsFolders($metaDataFolders);
-}
-
-/**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function civigrant_civicrm_entityTypes(&$entityTypes) {
-  _civigrant_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
  * Implements hook_civicrm_links().
  *
  * Add shortcut link to create new grant.
@@ -74,15 +54,15 @@ function civigrant_civicrm_summaryActions(&$menu, $cid) {
  */
 function civigrant_civicrm_permission(&$permissions) {
   $permissions['access CiviGrant'] = [
-    E::ts('access CiviGrant'),
+    E::ts('CiviGrant:') . ' ' . E::ts('access CiviGrant'),
     E::ts('View all grants'),
   ];
   $permissions['edit grants'] = [
-    E::ts('edit grants'),
+    E::ts('CiviGrant:') . ' ' . E::ts('edit grants'),
     E::ts('Create and update grants'),
   ];
   $permissions['delete in CiviGrant'] = [
-    E::ts('delete in CiviGrant'),
+    E::ts('CiviGrant:') . ' ' . E::ts('delete in CiviGrant'),
     E::ts('Delete grants'),
   ];
 }

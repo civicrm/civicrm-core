@@ -52,9 +52,10 @@ class Request {
         }
         // Check enabled components
         $daoName = \CRM_Core_DAO_AllCoreTables::getFullName($entity);
-        if ($daoName && defined("{$daoName}::COMPONENT") && !\CRM_Core_Component::isEnabled($daoName::COMPONENT)) {
+        if ($daoName && !$daoName::isComponentEnabled()) {
           throw new \Civi\API\Exception\NotImplementedException("$entity API is not available because " . $daoName::COMPONENT . " component is disabled");
         }
+        // Extra arguments used e.g. by dynamic entities like Multi-Record custom groups & the ECK extension
         $args = (array) CoreUtil::getInfoItem($entity, 'class_args');
         $apiRequest = call_user_func_array($callable, $args);
         foreach ($params as $name => $param) {

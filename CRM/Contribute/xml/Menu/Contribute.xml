@@ -120,6 +120,11 @@
     <weight>580</weight>
   </item>
   <item>
+    <path>civicrm/admin/financial/financialType/edit</path>
+    <title>Edit Financial Type</title>
+    <page_callback>CRM_Financial_Form_FinancialType</page_callback>
+  </item>
+  <item>
     <path>civicrm/payment</path>
     <title>New Payment</title>
     <page_callback>CRM_Contribute_Form_AdditionalPayment</page_callback>
@@ -135,6 +140,11 @@
     <desc>Financial types are used to categorize contributions for reporting and accounting purposes. These are also referred to as Funds.</desc>
     <adminGroup>CiviContribute</adminGroup>
     <weight>370</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/financial/financialAccount/edit</path>
+    <title>Edit Financial Accounts</title>
+    <page_callback>CRM_Financial_Form_FinancialAccount</page_callback>
   </item>
   <item>
     <path>civicrm/admin/options/payment_instrument</path>

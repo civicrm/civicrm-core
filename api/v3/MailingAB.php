@@ -96,22 +96,22 @@ function _civicrm_api3_mailing_a_b_submit_spec(&$spec) {
  * @param array $params
  *
  * @return array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_mailing_a_b_submit($params) {
   civicrm_api3_verify_mandatory($params, 'CRM_Mailing_DAO_MailingAB', ['id', 'status']);
 
   if (!isset($params['scheduled_date']) && !isset($updateParams['approval_date'])) {
-    throw new API_Exception("Missing parameter scheduled_date and/or approval_date");
+    throw new CRM_Core_Exception("Missing parameter scheduled_date and/or approval_date");
   }
 
   $dao = new CRM_Mailing_DAO_MailingAB();
   $dao->id = $params['id'];
   if (!$dao->find(TRUE)) {
-    throw new API_Exception("Failed to locate A/B test by ID");
+    throw new CRM_Core_Exception("Failed to locate A/B test by ID");
   }
   if (empty($dao->mailing_id_a) || empty($dao->mailing_id_b) || empty($dao->mailing_id_c)) {
-    throw new API_Exception("Missing mailing IDs for A/B test");
+    throw new CRM_Core_Exception("Missing mailing IDs for A/B test");
   }
 
   $submitParams = CRM_Utils_Array::subset($params, [
@@ -124,7 +124,7 @@ function civicrm_api3_mailing_a_b_submit($params) {
   switch ($params['status']) {
     case 'Testing':
       if (!empty($dao->status) && $dao->status != 'Draft') {
-        throw new API_Exception("Cannot transition to state 'Testing'");
+        throw new CRM_Core_Exception("Cannot transition to state 'Testing'");
       }
       civicrm_api3('Mailing', 'submit', $submitParams + [
         'id' => $dao->mailing_id_a,
@@ -139,7 +139,7 @@ function civicrm_api3_mailing_a_b_submit($params) {
 
     case 'Final':
       if ($dao->status != 'Testing') {
-        throw new API_Exception("Cannot transition to state 'Final'");
+        throw new CRM_Core_Exception("Cannot transition to state 'Final'");
       }
       if (!empty($params['winner_id'])) {
         _civicrm_api3_mailing_a_b_fill_winner($params['winner_id'], $dao->mailing_id_c);
@@ -151,7 +151,7 @@ function civicrm_api3_mailing_a_b_submit($params) {
       break;
 
     default:
-      throw new API_Exception("Unrecognized submission status");
+      throw new CRM_Core_Exception("Unrecognized submission status");
   }
 
   return civicrm_api3('MailingAB', 'create', [
@@ -168,7 +168,7 @@ function civicrm_api3_mailing_a_b_submit($params) {
  *   The experimental mailing chosen as the "winner".
  * @param int $final_id
  *   The final mailing which should imitate the "winner".
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_mailing_a_b_fill_winner($winner_id, $final_id) {
   $copyFields = [
@@ -206,7 +206,7 @@ function _civicrm_api3_mailing_a_b_fill_winner($winner_id, $final_id) {
     ->execute()
     ->fetchAll();
   if (count($f) !== 1) {
-    throw new API_Exception('Invalid winner_id');
+    throw new CRM_Core_Exception('Invalid winner_id');
   }
   foreach ($f as $winner) {
     civicrm_api3('Mailing', 'create', $winner + [
@@ -250,7 +250,7 @@ function _civicrm_api3_mailing_a_b_graph_stats_spec(&$params) {
  * @param array $params
  *
  * @return array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_mailing_a_b_graph_stats($params) {
   civicrm_api3_verify_mandatory($params,
@@ -274,7 +274,7 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
   foreach ($ABFormat as $name => $column) {
     switch (strtolower($params['criteria'])) {
       case 'open':
-        $result = CRM_Mailing_Event_BAO_Opened::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_opened.time_stamp ASC");
+        $result = CRM_Mailing_Event_BAO_MailingEventOpened::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_opened.time_stamp ASC");
         $startDate = CRM_Utils_Date::processDate($result[0]['date']);
         $targetDate = CRM_Utils_Date::processDate($params['target_date']);
         $dateDuration = round(round(strtotime($targetDate) - strtotime($startDate)) / $params['split_count']);
@@ -282,14 +282,14 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $toDate = date('YmdHis', $toDate);
         $graphStats[$name] = [
           $params['split_count_select'] => [
-            'count' => CRM_Mailing_Event_BAO_Opened::getTotalCount($mailingAB[$column], NULL, TRUE, $toDate),
+            'count' => CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($mailingAB[$column], NULL, TRUE, $toDate),
             'time' => CRM_Utils_Date::customFormat($toDate),
           ],
         ];
         break;
 
       case 'total unique clicks':
-        $result = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
+        $result = CRM_Mailing_Event_BAO_MailingEventClickThrough::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
         $startDate = CRM_Utils_Date::processDate($result[0]['date']);
         $targetDate = CRM_Utils_Date::processDate($params['target_date']);
         $dateDuration = round(abs(strtotime($targetDate) - strtotime($startDate)) / $params['split_count']);
@@ -297,7 +297,7 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $toDate = date('YmdHis', $toDate);
         $graphStats[$name] = [
           $params['split_count_select'] => [
-            'count' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, NULL, $toDate),
+            'count' => CRM_Mailing_Event_BAO_MailingEventClickThrough::getTotalCount($params['mailing_id'], NULL, FALSE, NULL, $toDate),
             'time' => CRM_Utils_Date::customFormat($toDate),
           ],
         ];
@@ -305,11 +305,11 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
 
       case 'total clicks on a particular link':
         if (empty($params['target_url'])) {
-          throw new API_Exception("Provide url to get stats result for total clicks on a particular link");
+          throw new CRM_Core_Exception("Provide url to get stats result for total clicks on a particular link");
         }
         // FIXME: doesn't make sense to get url_id mailing_id_(a|b) while getting start date in mailing_id_a
         $url_id = CRM_Mailing_BAO_TrackableURL::getTrackerURLId($mailingAB[$column], $params['target_url']);
-        $result = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($mailingAB['mailing_id_a'], NULL, FALSE, $url_id, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
+        $result = CRM_Mailing_Event_BAO_MailingEventClickThrough::getRows($mailingAB['mailing_id_a'], NULL, FALSE, $url_id, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
         $startDate = CRM_Utils_Date::processDate($result[0]['date']);
         $targetDate = CRM_Utils_Date::processDate($params['target_date']);
         $dateDuration = round(abs(strtotime($targetDate) - strtotime($startDate)) / $params['split_count']);
@@ -317,7 +317,7 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $toDate = CRM_Utils_Date::processDate($toDate);
         $graphStats[$name] = [
           $params['split_count_select'] => [
-            'count' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, $url_id, $toDate),
+            'count' => CRM_Mailing_Event_BAO_MailingEventClickThrough::getTotalCount($params['mailing_id'], NULL, FALSE, $url_id, $toDate),
             'time' => CRM_Utils_Date::customFormat($toDate),
           ],
         ];

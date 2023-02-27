@@ -102,7 +102,7 @@
             {if $totalTaxAmount}
               {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
             {/if}
-            {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if}: <strong>{$amount|crmMoney}{if $amount_level } &ndash; {$amount_level}{/if}</strong>
+            {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if}: <strong>{$amount|crmMoney:$currency}{if $amount_level } &ndash; {$amount_level}{/if}</strong>
           {/if}
         {/if}
         {if $receive_date}
@@ -120,10 +120,23 @@
           {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
-              {if $frequency_interval > 1}
-                <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
+              {if $installments > 1}
+                {if $frequency_interval > 1}
+                  <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
+                {else}
+                  <strong>{ts 1=$frequency_unit}This membership will be renewed automatically every %1.{/ts}</strong>
+                {/if}
               {else}
-                <strong>{ts 1=$frequency_unit}This membership will be renewed automatically every %1.{/ts}</strong>
+                  {* dev/translation#80 All 'every %1' strings are incorrectly using ts, but focusing on the most important one until we find a better fix. *}
+                  {if $frequency_unit eq 'day'}
+                    <strong>{ts}This membership will be renewed automatically every day.{/ts}</strong>
+                  {elseif $frequency_unit eq 'week'}
+                    <strong>{ts}This membership will be renewed automatically every week.{/ts}</strong>
+                  {elseif $frequency_unit eq 'month'}
+                    <strong>{ts}This membership will be renewed automatically every month.{/ts}</strong>
+                  {elseif $frequency_unit eq 'year'}
+                    <strong>{ts}This membership will be renewed automatically every year.{/ts}</strong>
+                  {/if}
               {/if}
               <div class="description crm-auto-renew-cancel-info">({ts}You will receive an email receipt which includes information about how to cancel the auto-renewal option.{/ts})</div>
             {/crmRegion}
@@ -215,26 +228,22 @@
     </fieldset>
   {/if}
 
-  {if $pcpBlock}
+  {if $pcpBlock && $pcp_display_in_roll}
     <div class="crm-group pcp_display-group">
       <div class="header-dark">
         {ts}Contribution Honor Roll{/ts}
       </div>
       <div class="display-block">
-        {if $pcp_display_in_roll}
-          {ts}List my contribution{/ts}
-          {if $pcp_is_anonymous}
-            <strong>{ts}anonymously{/ts}.</strong>
-          {else}
-            {ts}under the name{/ts}: <strong>{$pcp_roll_nickname}</strong><br/>
-            {if $pcp_personal_note}
-              {ts}With the personal note{/ts}: <strong>{$pcp_personal_note}</strong>
-            {else}
-              <strong>{ts}With no personal note{/ts}</strong>
-            {/if}
-          {/if}
+        {ts}List my contribution{/ts}
+        {if $pcp_is_anonymous}
+          <strong>{ts}anonymously{/ts}.</strong>
         {else}
-          {ts}Don't list my contribution in the honor roll.{/ts}
+          {ts}under the name{/ts}: <strong>{$pcp_roll_nickname}</strong><br/>
+          {if $pcp_personal_note}
+            {ts}With the personal note{/ts}: <strong>{$pcp_personal_note}</strong>
+          {else}
+            <strong>{ts}With no personal note{/ts}</strong>
+          {/if}
         {/if}
         <br />
       </div>
@@ -259,7 +268,7 @@
         </div>
       {/if}
     {/if}
-    {if $email}
+    {if !$emailExists}
       <div class="crm-group contributor_email-group">
         <div class="header-dark">
           {ts}Your Email{/ts}

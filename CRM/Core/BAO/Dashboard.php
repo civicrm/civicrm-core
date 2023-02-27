@@ -42,7 +42,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @return array
    *   array of dashlets
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getContactDashlets(): array {
     $cid = CRM_Core_Session::getLoggedInContactID();

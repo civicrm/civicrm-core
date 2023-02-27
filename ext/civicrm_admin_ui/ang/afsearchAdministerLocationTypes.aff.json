@@ -1,0 +1,7 @@
+{
+    "type": "search",
+    "title": "Location Types",
+    "icon": "fa-list-alt",
+    "server_route": "civicrm/admin/locationType",
+    "permission": "administer CiviCRM"
+}

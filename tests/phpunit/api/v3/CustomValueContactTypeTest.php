@@ -10,43 +10,74 @@
  */
 
 /**
- *  Test APIv3 civicrm_activity_* functions
- *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
  * @group headless
  */
 class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
-  protected $_contactID;
-  protected $_apiversion = 3;
-  protected $CustomGroupIndividual;
-  protected $individualStudent;
+
+  /**
+   * @var int
+   */
+  private $individualFieldID;
+
+  /**
+   * @var int
+   */
+  private $individualStudentFieldID;
+
+  /**
+   * @var int
+   */
+  private $individualContactID;
+
+  /**
+   * @var int
+   */
+  private $individualStudentContactID;
+
+  /**
+   * @var int
+   */
+  private $individualParentContactID;
+
+  /**
+   * @var int
+   */
+  private $organizationContactID;
+
+  /**
+   * @var int
+   */
+  private $organizationSponsorContactID;
 
   public function setUp(): void {
     parent::setUp();
     //  Create Group For Individual  Contact Type
     $groupIndividual = [
-      'title' => 'TestGroup For Indivi' . substr(sha1(rand()), 0, 5),
+      'title' => 'TestGroup For Individual' . substr(sha1(rand()), 0, 5),
       'extends' => ['Individual'],
       'style' => 'Inline',
       'is_active' => 1,
     ];
 
-    $this->CustomGroupIndividual = $this->customGroupCreate($groupIndividual);
+    $customGroupIndividual = $this->customGroupCreate($groupIndividual);
 
-    $this->IndividualField = $this->customFieldCreate(['custom_group_id' => $this->CustomGroupIndividual['id']]);
+    $individualField = $this->customFieldCreate(['custom_group_id' => $customGroupIndividual['id']]);
+    $this->individualFieldID = $individualField['id'];
 
     //  Create Group For Individual-Student  Contact Sub  Type
-    $groupIndiStudent = [
+    $groupIndividualStudent = [
       'title' => 'Student Test' . substr(sha1(rand()), 0, 5),
       'extends' => ['Individual', ['Student']],
       'style' => 'Inline',
       'is_active' => 1,
     ];
 
-    $this->CustomGroupIndiStudent = $this->customGroupCreate($groupIndiStudent);
+    $customGroupIndividualStudent = $this->customGroupCreate($groupIndividualStudent);
 
-    $this->IndiStudentField = $this->customFieldCreate(['custom_group_id' => $this->CustomGroupIndiStudent['id']]);
+    $individualStudentField = $this->customFieldCreate(['custom_group_id' => $customGroupIndividualStudent['id']]);
+    $this->individualStudentFieldID = $individualStudentField['id'];
 
     $params = [
       'first_name' => 'Mathev',
@@ -54,7 +85,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ];
 
-    $this->individual = $this->individualCreate($params);
+    $this->individualContactID = $this->individualCreate($params);
 
     $params = [
       'first_name' => 'Steve',
@@ -62,7 +93,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'contact_sub_type' => 'Student',
     ];
-    $this->individualStudent = $this->individualCreate($params);
+    $this->individualStudentContactID = $this->individualCreate($params);
 
     $params = [
       'first_name' => 'Mark',
@@ -70,24 +101,25 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'contact_sub_type' => 'Parent',
     ];
-    $this->individualParent = $this->individualCreate($params);
+    $this->individualParentContactID = $this->individualCreate($params);
 
     $params = [
       'organization_name' => 'Wellspring',
       'contact_type' => 'Organization',
     ];
-    $this->organization = $this->organizationCreate($params);
+    $this->organizationContactID = $this->organizationCreate($params);
 
     $params = [
       'organization_name' => 'SubUrban',
       'contact_type' => 'Organization',
       'contact_sub_type' => 'Sponsor',
     ];
-    $this->organizationSponsor = $this->organizationCreate($params);
+    $this->organizationSponsorContactID = $this->organizationCreate($params);
+
     //refresh php cached variables
     CRM_Core_PseudoConstant::flush();
-    CRM_Core_BAO_CustomField::getTableColumnGroup($this->IndividualField['id'], TRUE);
-    CRM_Core_BAO_CustomField::getTableColumnGroup($this->IndiStudentField['id'], TRUE);
+    CRM_Core_BAO_CustomField::getTableColumnGroup($this->individualFieldID);
+    CRM_Core_BAO_CustomField::getTableColumnGroup($this->individualStudentFieldID);
   }
 
   public function tearDown(): void {
@@ -100,19 +132,19 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
    */
   public function testGetFields() {
     $result = $this->callAPISuccess('Contact', 'getfields', []);
-    $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values'], 'If This fails there is probably a caching issue - failure in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
+    $this->assertArrayHasKey("custom_{$this->individualFieldID}", $result['values'], 'If This fails there is probably a caching issue - failure in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
     $result = $this->callAPISuccess('Contact', 'getfields', [
       'action' => 'create',
       'contact_type' => 'Individual',
     ], 'in line' . __LINE__);
-    $this->assertArrayHasKey("custom_{$this->IndividualField['id']}", $result['values']);
+    $this->assertArrayHasKey("custom_{$this->individualFieldID}", $result['values']);
     $result = $this->callAPISuccess('Contact', 'getfields', [
       'action' => 'create',
       'contact_type' => 'Organization',
     ]);
-    $this->assertArrayNotHasKey("custom_{$this->IndividualField['id']}", $result['values'], 'in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
+    $this->assertArrayNotHasKey("custom_{$this->individualFieldID}", $result['values'], 'in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
     $result = $this->callAPISuccess('Relationship', 'getfields', ['action' => 'create'], 'in line' . __LINE__);
-    $this->assertArrayNotHasKey("custom_{$this->IndividualField['id']}", $result['values']);
+    $this->assertArrayNotHasKey("custom_{$this->individualFieldID}", $result['values']);
   }
 
   /**
@@ -121,16 +153,16 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   public function testAddIndividualCustomDataToOrganization() {
 
     $params = [
-      'id' => $this->organization,
+      'id' => $this->organizationContactID,
       'contact_type' => 'Organization',
-      "custom_{$this->IndividualField['id']}" => 'Test String',
+      "custom_{$this->individualFieldID}" => 'Test String',
       // so that undefined_fields is returned
       'debug' => 1,
     ];
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $this->assertTrue(is_array($contact['undefined_fields']), __LINE__);
-    $this->assertTrue(in_array("custom_{$this->IndividualField['id']}", $contact['undefined_fields']), __LINE__);
+    $this->assertTrue(in_array("custom_{$this->individualFieldID}", $contact['undefined_fields']), __LINE__);
   }
 
   /**
@@ -149,18 +181,18 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   public function testAddValidCustomDataToIndividual() {
 
     $params = [
-      'contact_id' => $this->individual,
+      'contact_id' => $this->individualContactID,
       'contact_type' => 'Individual',
-      "custom_{$this->IndividualField['id']}" => 'Test String',
+      "custom_{$this->individualFieldID}" => 'Test String',
     ];
     $contact = $this->callAPISuccess('contact', 'create', $params);
 
     $this->assertNotNull($contact['id']);
-    $entityValues = CRM_Core_BAO_CustomValueTable::getEntityValues($this->individual);
-    $elements["custom_{$this->IndividualField['id']}"] = $entityValues["{$this->IndividualField['id']}"];
+    $entityValues = CRM_Core_BAO_CustomValueTable::getEntityValues($this->individualContactID);
+    $elements["custom_{$this->individualFieldID}"] = $entityValues["{$this->individualFieldID}"];
 
     // Check the Value in Database
-    $this->assertEquals($elements["custom_{$this->IndividualField['id']}"], 'Test String');
+    $this->assertEquals($elements["custom_{$this->individualFieldID}"], 'Test String');
   }
 
   /**
@@ -169,16 +201,16 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   public function testAddIndividualStudentCustomDataToOrganizationSponsor() {
 
     $params = [
-      'contact_id' => $this->organizationSponsor,
+      'contact_id' => $this->organizationSponsorContactID,
       'contact_type' => 'Organization',
-      "custom_{$this->IndiStudentField['id']}" => 'Test String',
+      "custom_{$this->individualStudentFieldID}" => 'Test String',
       // so that undefined_fields is returned
       'debug' => 1,
     ];
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $this->assertTrue(is_array($contact['undefined_fields']), __LINE__);
-    $this->assertTrue(in_array("custom_{$this->IndiStudentField['id']}", $contact['undefined_fields']), __LINE__);
+    $this->assertTrue(in_array("custom_{$this->individualStudentFieldID}", $contact['undefined_fields']), __LINE__);
   }
 
   /**
@@ -187,19 +219,19 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   public function testCreateValidCustomDataToIndividualStudent() {
 
     $params = [
-      'contact_id' => $this->individualStudent,
+      'contact_id' => $this->individualStudentContactID,
       'contact_type' => 'Individual',
-      "custom_{$this->IndiStudentField['id']}" => 'Test String',
+      "custom_{$this->individualStudentFieldID}" => 'Test String',
     ];
 
     $result = $this->callAPISuccess('contact', 'create', $params);
 
     $this->assertNotNull($result['id']);
-    $entityValues = CRM_Core_BAO_CustomValueTable::getEntityValues($this->individualStudent);
-    $elements["custom_{$this->IndiStudentField['id']}"] = $entityValues["{$this->IndiStudentField['id']}"];
+    $entityValues = CRM_Core_BAO_CustomValueTable::getEntityValues($this->individualStudentContactID);
+    $elements["custom_{$this->individualStudentFieldID}"] = $entityValues["{$this->individualStudentFieldID}"];
 
     // Check the Value in Database
-    $this->assertEquals($elements["custom_{$this->IndiStudentField['id']}"], 'Test String');
+    $this->assertEquals($elements["custom_{$this->individualStudentFieldID}"], 'Test String');
   }
 
   /**
@@ -208,15 +240,15 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   public function testAddIndividualStudentCustomDataToIndividualParent() {
 
     $params = [
-      'contact_id' => $this->individualParent,
+      'contact_id' => $this->individualParentContactID,
       'contact_type' => 'Individual',
-      "custom_{$this->IndiStudentField['id']}" => 'Test String',
+      "custom_{$this->individualStudentFieldID}" => 'Test String',
       // so that undefined_fields is returned
       'debug' => 1,
     ];
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $this->assertTrue(is_array($contact['undefined_fields']), __LINE__);
-    $this->assertTrue(in_array("custom_{$this->IndiStudentField['id']}", $contact['undefined_fields']), __LINE__);
+    $this->assertTrue(in_array("custom_{$this->individualStudentFieldID}", $contact['undefined_fields']), __LINE__);
   }
 
   // Retrieve Methods
@@ -227,23 +259,23 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   public function testRetrieveValidCustomDataToIndividual() {
 
     $params = [
-      'contact_id' => $this->individual,
+      'contact_id' => $this->individualContactID,
       'contact_type' => 'Individual',
-      "custom_" . $this->IndividualField['id'] => 'Test String',
+      "custom_" . $this->individualFieldID => 'Test String',
     ];
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
 
     $this->assertAPISuccess($contact);
     $params = [
-      'contact_id' => $this->individual,
+      'contact_id' => $this->individualContactID,
       'contact_type' => 'Individual',
-      "return.custom_{$this->IndividualField['id']}" => 1,
+      "return.custom_{$this->individualFieldID}" => 1,
     ];
 
     $getContact = $this->callAPISuccess('contact', 'get', $params);
 
-    $this->assertEquals($getContact['values'][$this->individual]["custom_" . $this->IndividualField['id']], 'Test String');
+    $this->assertEquals($getContact['values'][$this->individualContactID]["custom_" . $this->individualFieldID], 'Test String');
   }
 
   /**
@@ -252,24 +284,24 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   public function testRetrieveValidCustomDataToIndividualStudent() {
 
     $params = [
-      'contact_id' => $this->individualStudent,
+      'contact_id' => $this->individualStudentContactID,
       'contact_type' => 'Individual',
       'contact_sub_type' => 'Student',
-      "custom_{$this->IndiStudentField['id']}" => 'Test String',
+      "custom_{$this->individualStudentFieldID}" => 'Test String',
     ];
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $this->assertAPISuccess($contact);
     $params = [
-      'contact_id' => $this->individualStudent,
+      'contact_id' => $this->individualStudentContactID,
       'contact_type' => 'Individual',
       'contact_sub_type' => 'Student',
-      "return.custom_{$this->IndiStudentField['id']}" => 1,
+      "return.custom_{$this->individualStudentFieldID}" => 1,
     ];
 
     $getContact = $this->callAPISuccess('contact', 'get', $params);
 
-    $this->assertEquals($getContact['values'][$this->individualStudent]["custom_{$this->IndiStudentField['id']}"], 'Test String');
+    $this->assertEquals($getContact['values'][$this->individualStudentContactID]["custom_{$this->individualStudentFieldID}"], 'Test String');
   }
 
 }

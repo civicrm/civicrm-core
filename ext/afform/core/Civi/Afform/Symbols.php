@@ -35,7 +35,16 @@ class Symbols {
    */
   public static function scan($html) {
     $symbols = new static();
+    $oldErrorStatus = libxml_use_internal_errors(TRUE);
     $doc = new \DOMDocumentWrapper($html, 'text/html');
+    // Angular isn't fussy about technically invalid html, such as unescaped
+    // `>` in ng-if statements. But php/libxml is. Since this is all for
+    // angular, let's also be less fussy. This will mean silly typos which
+    // might be otherwise quickly noticed via the error will be more hidden,
+    // but that's the same as before, and it's not worth flooding logs with
+    // known issues.
+    libxml_clear_errors();
+    libxml_use_internal_errors($oldErrorStatus);
     $symbols->scanNode($doc->root);
     return $symbols;
   }

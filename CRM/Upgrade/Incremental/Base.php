@@ -52,7 +52,7 @@ class CRM_Upgrade_Incremental_Base {
     $sqlGlob = implode(DIRECTORY_SEPARATOR, [dirname(__FILE__), 'sql', $this->getMajorMinor() . '.*.mysql.tpl']);
     $sqlFiles = glob($sqlGlob);;
     foreach ($sqlFiles as $file) {
-      $revList[] = str_replace('.mysql.tpl', '', basename($file));
+      $revList[] = basename($file, '.mysql.tpl');
     }
 
     $c = new ReflectionClass(static::class);
@@ -159,17 +159,51 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Add a task to store a snapshot of some data (if upgrade-snapshots are supported).
+   *
+   * If there is a large amount of data, this may actually add multiple tasks.
+   *
+   * Ex :$this->addSnapshotTask('event_dates', CRM_Utils_SQL_Select::from('civicrm_event')
+   *      ->select('id, start_date, end_date'));
+   *
+   * @param string $name
+   *   Logical name for the snapshot. This will become part of the table.
+   * @param \CRM_Utils_SQL_Select $select
+   * @throws \CRM_Core_Exception
+   */
+  protected function addSnapshotTask(string $name, CRM_Utils_SQL_Select $select): void {
+    CRM_Upgrade_Snapshot::createTableName('civicrm', $this->getMajorMinor(), $name);
+    // ^^ To simplify QA -- we should always throw an exception for bad snapshot names, even if the local policy doesn't use snapshots.
+
+    if (!empty(CRM_Upgrade_Snapshot::getActivationIssues())) {
+      return;
+    }
+
+    $queue = CRM_Queue_Service::singleton()->load([
+      'type' => 'Sql',
+      'name' => CRM_Upgrade_Form::QUEUE_NAME,
+    ]);
+    foreach (CRM_Upgrade_Snapshot::createTasks('civicrm', $this->getMajorMinor(), $name, $select) as $task) {
+      $queue->createItem($task, ['weight' => -1]);
+    }
+  }
+
+  /**
    * Add a task to activate an extension. This task will run post-upgrade (after all
    * changes to core DB are settled).
    *
    * @param string $title
    * @param string[] $keys
    *   List of extensions to enable.
+   * @param int $weight
+   *   A weight > 1500 will install after extension upgrades run. Do this for brand-new extensions.
+   *   A weight < 1500 will install before extension upgrades. Do this if the extension may
+   *   have previously been enabled.
    */
-  protected function addExtensionTask(string $title, array $keys): void {
+  protected function addExtensionTask(string $title, array $keys, int $weight = 2000): void {
     Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
       new CRM_Queue_Task([static::CLASS, 'enableExtension'], [$keys], $title),
-      ['weight' => 2000]
+      ['weight' => $weight]
     );
   }
 
@@ -183,10 +217,7 @@ class CRM_Upgrade_Incremental_Base {
     // The `enableExtension` has a very high value of `weight`, so this runs after all
     // core DB schema updates have been resolved. We can use high-level services.
 
-    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.finish'));
-    $restore = \CRM_Utils_AutoClean::with(function() {
-      Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
-    });
+    CRM_Upgrade_DispatchPolicy::assertActive('upgrade.finish');
 
     $manager = CRM_Extension_System::singleton()->getManager();
     $manager->enable($manager->findInstallRequirements($keys));
@@ -194,7 +225,9 @@ class CRM_Upgrade_Incremental_Base {
     // Hrm, `enable()` normally does these things... but not during upgrade...
     // Note: A good test-scenario is to install 5.45; enable logging and CiviGrant; disable searchkit+afform; then upgrade to 5.47.
     $schema = new CRM_Logging_Schema();
-    $schema->fixSchemaDifferences();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferences();
+    }
 
     CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
@@ -208,7 +241,7 @@ class CRM_Upgrade_Incremental_Base {
    * @param CRM_Queue_TaskContext $ctx
    * @param string $name
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function removePaymentProcessorType(CRM_Queue_TaskContext $ctx, $name) {
     $processors = civicrm_api3('PaymentProcessor', 'getcount', ['payment_processor_type_id' => $name]);
@@ -267,6 +300,10 @@ class CRM_Upgrade_Incremental_Base {
       }
       foreach ($queries as $query) {
         CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+      }
+      $schema = new CRM_Logging_Schema();
+      if ($schema->isEnabled()) {
+        $schema->fixSchemaDifferencesFor($table);
       }
     }
     if ($locales && $triggerRebuild) {
@@ -486,6 +523,10 @@ class CRM_Upgrade_Incremental_Base {
       CRM_Core_DAO::executeQuery("ALTER TABLE `$table` DROP COLUMN `$column`",
         [], TRUE, NULL, FALSE, FALSE);
     }
+    $schema = new CRM_Logging_Schema();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferencesFor($table);
+    }
     return TRUE;
   }
 
@@ -550,6 +591,27 @@ class CRM_Upgrade_Incremental_Base {
     $locales = CRM_Core_I18n::getMultilingual();
     if ($locales) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version);
+    }
+    return TRUE;
+  }
+
+  public static function alterColumn($ctx, $table, $column, $properties, $localizable = FALSE): bool {
+    $locales = CRM_Core_I18n::getMultilingual();
+    $queries = [];
+    if ($localizable && $locales) {
+      foreach ($locales as $locale) {
+        $queries[] = "ALTER TABLE `$table` CHANGE `{$column}_{$locale}` `{$column}_{$locale}` $properties";
+      }
+    }
+    else {
+      $queries[] = "ALTER TABLE `$table` CHANGE `$column` `$column` $properties";
+    }
+    foreach ($queries as $query) {
+      CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+    }
+    $schema = new CRM_Logging_Schema();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferencesFor($table);
     }
     return TRUE;
   }

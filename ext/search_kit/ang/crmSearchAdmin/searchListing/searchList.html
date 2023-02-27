@@ -17,14 +17,46 @@
         </a>
       </li>
     </ul>
-    <a class="btn btn-primary" href="#/create/Contact/" ng-if="$ctrl.tab !== 'segment'">
-      <i class="crm-i fa-plus"></i>
-      {{:: ts('New Search') }}
-    </a>
-    <a class="btn btn-primary" href ng-if="$ctrl.tab === 'segment'" title="{{:: ts('New Data Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html">
-      <i class="crm-i fa-plus"></i>
-      {{:: ts('New Segment') }}
-    </a>
+    <div class="btn-group" ng-if="$ctrl.tab !== 'segment'">
+      <a class="btn btn-primary" href="#/create/Contact" >
+        <i class="crm-i fa-plus"></i>
+        {{:: ts('New Search') }}
+      </a>
+      <button type="button" ng-click="$ctrl.getPrimaryEntities()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-right">
+        <li ng-repeat="entity in $ctrl.primaryEntities">
+          <a ng-href="#/create/{{ entity.name }}">
+            <i class="crm-i {{:: entity.icon }}"></i>
+            {{:: entity.title_plural }}
+          </a>
+        </li>
+        <li title="{{:: ts('Choose other entities on the search screen') }}">
+          <a href="#/create/Contact">{{:: ts('More...') }}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="btn-group" ng-if="$ctrl.tab === 'segment'">
+      <a class="btn btn-primary" href title="{{:: ts('New Data Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html">
+        <i class="crm-i fa-plus"></i>
+        {{:: ts('New Data Segment') }}
+      </a>
+      <button type="button" ng-click="$ctrl.getPrimaryEntities()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-right">
+        <li ng-repeat="entity in $ctrl.primaryEntities">
+          <a href title="{{:: ts('New Data Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html" popup-data="{entity_name: entity.name}">
+            <i class="crm-i {{:: entity.icon }}"></i>
+            {{:: entity.title_plural }}
+          </a>
+        </li>
+        <li title="{{:: ts('Choose other entities on the search screen') }}">
+          <a href title="{{:: ts('New Data Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html">{{:: ts('More...') }}</a>
+        </li>
+      </ul>
+    </div>
   </div>
 
   <div ng-repeat="tab in $ctrl.tabs" ng-show="$ctrl.tab === tab.name">

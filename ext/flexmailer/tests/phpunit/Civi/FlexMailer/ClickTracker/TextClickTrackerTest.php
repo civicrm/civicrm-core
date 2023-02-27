@@ -27,7 +27,6 @@ class TextClickTrackerTest extends \CiviUnitTestCase {
     }
 
     parent::setUp();
-    \Civi::settings()->set('flexmailer_traditional', 'flexmailer');
   }
 
   public function getHrefExamples() {
@@ -70,7 +69,11 @@ class TextClickTrackerTest extends \CiviUnitTestCase {
       '<p><a href="http://example.com/1">First</a><a href="http://example.com/2">Second</a><a href=\'http://example.com/3\'>Third</a><a href="http://example.com/4">Fourth</a></p>',
       '<p><a href="tracking(http://example.com/1)" rel=\'nofollow\'>First</a><a href="tracking(http://example.com/2)" rel=\'nofollow\'>Second</a><a href=\'tracking(http://example.com/3)\' rel=\'nofollow\'>Third</a><a href="tracking(http://example.com/4)" rel=\'nofollow\'>Fourth</a></p>',
     ];
-
+    $exs[] = [
+      // Messy looking URL, including hyphens
+      '<p><a href=\'https://sub.example-url.com/foo-bar.php?whiz=%2Fbang%2F&pie[fruit]=apple-pie\'>Foo</a></p>',
+      '<p><a href=\'tracking(https://sub.example-url.com/foo-bar.php?whiz=%2Fbang%2F&pie[fruit]=apple-pie)\' rel=\'nofollow\'>Foo</a></p>',
+    ];
     return $exs;
   }
 

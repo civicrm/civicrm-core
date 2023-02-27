@@ -8,6 +8,11 @@ use Civi\Test\Invasive;
  */
 class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
+  protected $assignee1;
+  protected $assignee2;
+  protected $target;
+  protected $source;
+
   public function setUp():void {
     parent::setUp();
     $this->assignee1 = $this->individualCreate([
@@ -305,7 +310,6 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
    * way to do it.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testInboundEmailDisplaysWithLineBreaks(): void {
     // Change label

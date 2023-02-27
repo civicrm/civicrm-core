@@ -18,10 +18,12 @@ class SqlFunctionAVG extends SqlFunction {
 
   protected static $category = self::CATEGORY_AGGREGATE;
 
+  protected static $dataType = 'Float';
+
   protected static function params(): array {
     return [
       [
-        'flag_before' => ['DISTINCT' => ts('Distinct')],
+        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
         'must_be' => ['SqlField'],
       ],
     ];

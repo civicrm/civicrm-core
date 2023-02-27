@@ -49,36 +49,6 @@ class CRM_Utils_File {
   }
 
   /**
-   * Given a file name, determine if the file contents make it an html file
-   *
-   * @param string $name
-   *   Name of file.
-   *
-   * @return bool
-   *   true if file is html
-   */
-  public static function isHtml($name) {
-    $fd = fopen($name, "r");
-    if (!$fd) {
-      return FALSE;
-    }
-
-    $html = FALSE;
-    $lineCount = 0;
-    while (!feof($fd) & $lineCount <= 5) {
-      $lineCount++;
-      $line = fgets($fd, 8192);
-      if (!CRM_Utils_String::isHtml($line)) {
-        $html = TRUE;
-        break;
-      }
-    }
-
-    fclose($fd);
-    return $html;
-  }
-
-  /**
    * Create a directory given a path name, creates parent directories
    * if needed
    *
@@ -373,7 +343,7 @@ class CRM_Utils_File {
    *   stripped string
    */
   public static function stripComments($string) {
-    return preg_replace("/^(#|--).*\R*/m", "", $string);
+    return preg_replace("/^(#|--).*\R*/m", "", ($string ?? ''));
   }
 
   /**
@@ -382,8 +352,7 @@ class CRM_Utils_File {
    * @return bool
    */
   public static function isExtensionSafe($ext) {
-    static $extensions = NULL;
-    if (!$extensions) {
+    if (!isset(Civi::$statics[__CLASS__]['file_extensions'])) {
       $extensions = CRM_Core_OptionGroup::values('safe_file_extension', TRUE);
 
       // make extensions to lowercase
@@ -400,9 +369,11 @@ class CRM_Utils_File {
         unset($extensions['html']);
         unset($extensions['htm']);
       }
+      Civi::$statics[__CLASS__]['file_extensions'] = $extensions;
     }
+    $restricted = CRM_Utils_Constant::value('CIVICRM_RESTRICTED_UPLOADS', '/(php|php\d|phtml|phar|pl|py|cgi|asp|js|sh|exe|pcgi\d)/i');
     // support lower and uppercase file extensions
-    return (bool) isset($extensions[strtolower($ext)]);
+    return (bool) isset(Civi::$statics[__CLASS__]['file_extensions'][strtolower($ext)]) && !preg_match($restricted, strtolower($ext));
   }
 
   /**
@@ -446,9 +417,9 @@ class CRM_Utils_File {
     $uniqID = md5(uniqid(rand(), TRUE));
     $info = pathinfo($name);
     $basename = substr($info['basename'],
-      0, -(strlen(CRM_Utils_Array::value('extension', $info)) + (CRM_Utils_Array::value('extension', $info) == '' ? 0 : 1))
+      0, -(strlen(CRM_Utils_Array::value('extension', $info, '')) + (CRM_Utils_Array::value('extension', $info, '') == '' ? 0 : 1))
     );
-    if (!self::isExtensionSafe(CRM_Utils_Array::value('extension', $info))) {
+    if (!self::isExtensionSafe(CRM_Utils_Array::value('extension', $info, ''))) {
       // munge extension so it cannot have an embbeded dot in it
       // The maximum length of a filename for most filesystems is 255 chars.
       // We'll truncate at 240 to give some room for the extension.
@@ -531,6 +502,11 @@ class CRM_Utils_File {
     if (!empty($dir) && is_dir($dir)) {
       $htaccess = <<<HTACCESS
 <Files "*">
+# OpenLiteSpeed 1.4.38+
+  <IfModule !authz_core_module>
+    RewriteRule .* - [F,L]
+  </IfModule>
+
 # Apache 2.2
   <IfModule !authz_core_module>
     Order allow,deny
@@ -739,9 +715,13 @@ HTACCESS;
    *   glob pattern, eg "*.txt".
    * @param bool $relative
    *   TRUE if paths should be made relative to $dir
+   * @param int|null $maxDepth
+   *   Maximum depth of subdirs to check.
+   *   For no limit, use NULL.
+   *
    * @return array(string)
    */
-  public static function findFiles($dir, $pattern, $relative = FALSE) {
+  public static function findFiles($dir, $pattern, $relative = FALSE, ?int $maxDepth = NULL) {
     if (!is_dir($dir) || !is_readable($dir)) {
       return [];
     }
@@ -752,7 +732,8 @@ HTACCESS;
       ? constant('CIVICRM_EXCLUDE_DIRS_PATTERN')
       : '@' . preg_quote(DIRECTORY_SEPARATOR) . '\.@';
 
-    $dir = rtrim($dir, '/');
+    $dir = rtrim($dir, '/' . DIRECTORY_SEPARATOR);
+    $baseDepth = static::findPathDepth($dir);
     $todos = [$dir];
     $result = [];
     while (!empty($todos)) {
@@ -766,27 +747,34 @@ HTACCESS;
         }
       }
       // Find subdirs to recurse into.
-      if ($dh = opendir($subdir)) {
-        while (FALSE !== ($entry = readdir($dh))) {
-          $path = $subdir . DIRECTORY_SEPARATOR . $entry;
-          // Exclude . (self) and .. (parent) to avoid infinite loop.
-          // Exclude configured exclude dirs.
-          // Exclude dirs we can't read.
-          // Exclude anything that's not a dir.
-          if (
-            $entry !== '.'
-            && $entry !== '..'
-            && (empty($excludeDirsPattern) || !preg_match($excludeDirsPattern, $path))
-            && is_dir($path)
-            && is_readable($path)
-          ) {
-            $todos[] = $path;
-          }
+      $depth = static::findPathDepth($subdir) - $baseDepth + 1;
+      if ($maxDepth === NULL || $depth <= $maxDepth) {
+        $subdirs = glob("$subdir/*", GLOB_ONLYDIR);
+        if (!empty($excludeDirsPattern)) {
+          $subdirs = preg_grep($excludeDirsPattern, $subdirs, PREG_GREP_INVERT);
         }
-        closedir($dh);
+        $todos = array_merge($todos, $subdirs);
       }
     }
     return $result;
+  }
+
+  /**
+   * Determine the absolute depth of a path expression.
+   *
+   * @param string $path
+   *   Ex: '/var/www/foo'
+   * @return int
+   *   Ex: 3
+   */
+  private static function findPathDepth(string $path): int {
+    // Both PHP-Unix and PHP-Windows support '/'s. Additionally, PHP-Windows also supports '\'s.
+    // They are roughly equivalent. (The differences are described by a secret book hidden in the tower of Mordor.)
+    $depth = substr_count($path, '/');
+    if (DIRECTORY_SEPARATOR !== '/') {
+      $depth += substr_count($path, DIRECTORY_SEPARATOR);
+    }
+    return $depth;
   }
 
   /**
@@ -1058,7 +1046,7 @@ HTACCESS;
     }
     $iconClasses = Civi::$statics[__CLASS__]['mimeIcons'];
     foreach ($iconClasses as $text => $icon) {
-      if (strpos($mimeType, $text) === 0) {
+      if (strpos(($mimeType ?? ''), $text) === 0) {
         return $icon;
       }
     }
@@ -1128,6 +1116,9 @@ HTACCESS;
    *   In php8 the return value from is_dir() is always bool but in php7 it can be null.
    */
   public static function isDir(?string $dir) {
+    if ($dir === NULL) {
+      return FALSE;
+    }
     set_error_handler(function($errno, $errstr) {
       // If this is open_basedir-related, convert it to an exception so we
       // can catch it.

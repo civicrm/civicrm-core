@@ -310,7 +310,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       // CRM-8708, preserve case ID even though it's not part of the SQL model
       $activity->case_id = $params['case_id'];
     }
-    elseif (is_numeric($activity->id)) {
+    elseif ($action === 'edit' && CRM_Core_Component::isEnabled('CiviCase')) {
       // CRM-8708, preserve case ID even though it's not part of the SQL model
       $activity->case_id = CRM_Case_BAO_Case::getCaseIdByActivityId($activity->id);
     }
@@ -456,9 +456,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     if (empty($params['skipRecentView'])) {
       $recentOther = [];
       if (!empty($params['case_id'])) {
-        $caseContactID = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $params['case_id'], 'contact_id', 'case_id');
+        $caseId = CRM_Utils_Array::first((array) $params['case_id']);
+        $caseContactID = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $caseId, 'contact_id', 'case_id');
         $url = CRM_Utils_System::url('civicrm/case/activity/view',
-          "reset=1&aid={$activity->id}&cid={$caseContactID}&caseID={$params['case_id']}&context=home"
+          "reset=1&aid={$activity->id}&cid={$caseContactID}&caseID={$caseId}&context=home"
         );
       }
       else {
@@ -521,37 +522,17 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
-    // if the subject contains a ‘[case #…]’ string, file that activity on the related case (CRM-5916)
-    $matches = [];
-    $subjectToMatch = $params['subject'] ?? NULL;
-    if (preg_match('/\[case #([0-9a-h]{7})\]/', $subjectToMatch, $matches)) {
-      $key = CRM_Core_DAO::escapeString(CIVICRM_SITE_KEY);
-      $hash = $matches[1];
-      $query = "SELECT id FROM civicrm_case WHERE SUBSTR(SHA1(CONCAT('$key', id)), 1, 7) = '" . CRM_Core_DAO::escapeString($hash) . "'";
+    // Add to case
+    if (isset($params['case_id'])) {
+      CRM_Case_BAO_Case::updateCaseActivity($activity->id, $params['case_id']);
     }
-    elseif (preg_match('/\[case #(\d+)\]/', $subjectToMatch, $matches)) {
-      $query = "SELECT id FROM civicrm_case WHERE id = '" . CRM_Core_DAO::escapeString($matches[1]) . "'";
-    }
-    if (!empty($matches)) {
-      $caseParams = [
-        'activity_id' => $activity->id,
-        'case_id' => CRM_Core_DAO::singleValueQuery($query),
-      ];
-      if ($caseParams['case_id']) {
-        CRM_Case_BAO_Case::processCaseActivity($caseParams);
-      }
-      else {
-        self::logActivityAction($activity, "Case details for {$matches[1]} not found while recording an activity on case.");
-      }
-    }
+
     CRM_Utils_Hook::post($action, 'Activity', $activity->id, $activity);
     return $result;
   }
 
   /**
-   * Create an activity.
-   *
-   * @todo elaborate on what this does.
+   * Adds an entry to the log table about an activity
    *
    * @param CRM_Activity_DAO_Activity $activity
    * @param string $logMessage
@@ -593,7 +574,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *
    * @return array
    *   Relevant data object values of open activities
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getActivities($params) {
     $activities = [];
@@ -947,7 +928,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    */
   public static function createEmailActivity($sourceContactID, $subject, $html, $text, $additionalDetails, $campaignID, $attachments, $caseID) {
     $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email');
-
+    CRM_Core_Error::deprecatedFunctionWarning('none');
     // CRM-6265: save both text and HTML parts in details (if present)
     if ($html and $text) {
       $details = "-ALTERNATIVE ITEM 0-\n{$html}{$additionalDetails}\n-ALTERNATIVE ITEM 1-\n{$text}{$additionalDetails}\n-ALTERNATIVE END-\n";
@@ -993,8 +974,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *   The array of contact details to send the email.
    * @param string $subject
    *   The subject of the message.
-   * @param $text
-   * @param $html
+   * @param string|null $text
+   * @param string|null $html
    * @param string $emailAddress
    *   Use this 'to' email address instead of the default Primary address.
    * @param int|null $userID
@@ -1020,7 +1001,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *
    * @deprecated
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function sendEmail(
@@ -1040,11 +1020,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $campaignId = NULL,
     $caseId = NULL
   ) {
-    // @todo add noisy deprecation.
-    // This function is no longer called from core.
-    // I just left off the noisy deprecation for now as there
-    // are already a lot of other noisy deprecation points in 5.43.
-    // get the contact details of logged in contact, which we set as from email
+    CRM_Core_Error::deprecatedFunctionWarning('none');
     if ($userID == NULL) {
       $userID = CRM_Core_Session::getLoggedInContactID();
     }
@@ -1088,13 +1064,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
 
       $tokenSubject = $subject;
-      $tokenText = in_array($values['preferred_mail_format'], ['Both', 'Text'], TRUE) ? $text : '';
-      $tokenHtml = in_array($values['preferred_mail_format'], ['Both', 'HTML'], TRUE) ? $html : '';
 
       $renderedTemplate = CRM_Core_BAO_MessageTemplate::renderTemplate([
         'messageTemplate' => [
-          'msg_text' => $tokenText,
-          'msg_html' => $tokenHtml,
+          'msg_text' => $text,
+          'msg_html' => $html,
           'msg_subject' => $tokenSubject,
         ],
         'tokenContext' => $tokenContext,
@@ -1302,7 +1276,7 @@ WHERE entity_id =%1 AND entity_table = %2";
    *
    * @param int $toID
    *   The contact id of the recipient.
-   * @param $tokenText
+   * @param string $tokenText
    * @param array $smsProviderParams
    *   The params used for sending sms.
    * @param int $activityID
@@ -1373,8 +1347,8 @@ WHERE entity_id =%1 AND entity_table = %2";
    *   The contact id of the recipient.
    * @param string $subject
    *   The subject of the message.
-   * @param $text_message
-   * @param $html_message
+   * @param string|null $text_message
+   * @param string|null $html_message
    * @param string $emailAddress
    *   Use this 'to' email address instead of the default Primary address.
    * @param int $activityID
@@ -1401,6 +1375,7 @@ WHERE entity_id =%1 AND entity_table = %2";
     $cc = NULL,
     $bcc = NULL
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('none');
     [$toDisplayName, $toEmail, $toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($toID);
     if ($emailAddress) {
       $toEmail = trim($emailAddress);
@@ -1454,11 +1429,12 @@ WHERE entity_id =%1 AND entity_table = %2";
    * next week or so, before this can be called complete.
    *
    * @param bool $status
-   *
+   * @deprecated
    * @return array
    *   array of importable Fields
    */
   public static function &importableFields($status = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     if (empty(Civi::$statics[__CLASS__][__FUNCTION__])) {
       Civi::$statics[__CLASS__][__FUNCTION__] = [];
       if (!$status) {
@@ -1653,6 +1629,7 @@ WHERE      activity.id IN ($activityIds)";
     //CRM-4027
     if ($targetContactID) {
       $activityParams['target_contact_id'][] = $targetContactID;
+      $activityParams['target_contact_id'] = array_unique($activityParams['target_contact_id'], SORT_NUMERIC);
     }
     // @todo - use api - remove lots of wrangling above. Remove deprecated fatal & let form layer
     // deal with any exceptions.
@@ -1747,7 +1724,7 @@ WHERE      activity.id IN ($activityIds)";
   /**
    * Get all prior activities of currently viewed activity.
    *
-   * @param $activityID
+   * @param int $activityID
    *   Current activity id.
    * @param bool $onlyPriorRevisions
    *
@@ -1930,7 +1907,7 @@ AND cl.modified_id  = c.id
    * @param int $type
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getStatusesByType($type) {
     if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
@@ -1956,7 +1933,7 @@ AND cl.modified_id  = c.id
    * @param array $activity
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function isOverdue($activity) {
     return array_key_exists($activity['status_id'], self::getStatusesByType(self::INCOMPLETE)) && CRM_Utils_Date::overdue($activity['activity_date_time']);

@@ -1,4 +1,4 @@
-{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 {if !empty($receipt_text)}
 {$receipt_text}
 {/if}
@@ -210,7 +210,7 @@
   {$contact_phone}
 {/if}
 {/if}
-{if !empty($is_deductible) AND !empty($price)}
+{if $is_deductible AND !empty($price)}
 
 {ts 1=$price|crmMoney}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}{/if}
 {/if}

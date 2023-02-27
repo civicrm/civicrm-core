@@ -68,6 +68,60 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
   protected $_aclWhere = NULL;
 
   /**
+   * Include Groups
+   * @var array
+   */
+  protected $_includeGroups;
+
+  /**
+   * Exclude Groups
+   * @var array
+   */
+  protected $_excludeGroups;
+
+  /**
+   * Include Tags
+   * @var array
+   */
+  protected $_includeTags;
+
+  /**
+   * Exclude Tags
+   * @var array
+   */
+  protected $_excludeTags;
+
+  /**
+   * All Search
+   * @var bool
+   */
+  protected $_allSearch;
+
+  /**
+   * Does this search use groups
+   * @var bool
+   */
+  protected $_groups;
+
+  /**
+   * Does this search use tags
+   * @var bool
+   */
+  protected $_tags;
+
+  /**
+   * Is this search And or OR search
+   * @var string
+   */
+  protected $_andOr;
+
+  /**
+   * Search Columns
+   * @var array
+   */
+  protected $_columns;
+
+  /**
    * Class constructor.
    *
    * @param array $formValues

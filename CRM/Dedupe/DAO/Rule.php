@@ -1,12 +1,6 @@
 <?php
 
 /**
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
+ * DAO class was renamed in 5.39
  */
-
-/**
- * Database access object for the DedupeRule entity.
- */
-class CRM_Dedupe_DAO_Rule extends CRM_Dedupe_DAO_DedupeRule {}
+class_alias('CRM_Dedupe_DAO_DedupeRule', 'CRM_Dedupe_DAO_Rule');

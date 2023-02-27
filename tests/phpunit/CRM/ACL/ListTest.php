@@ -11,6 +11,11 @@
 class CRM_ACL_ListTest extends CiviUnitTestCase {
 
   /**
+   * @var array
+   */
+  protected $allowedContactsACL = [];
+
+  /**
    * Set up function.
    */
   public function setUp(): void {

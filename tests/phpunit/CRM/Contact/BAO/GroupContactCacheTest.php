@@ -22,9 +22,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   /**
    * Manually add and remove contacts from a smart group.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testManualAddRemove(): void {
     [$group, $living, $deceased] = $this->setupSmartGroup();
@@ -63,9 +61,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * Allow removing contact from a parent group even if contact is in a child
    * group. (CRM-8858).
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testRemoveFromParentSmartGroup(): void {
     // Create $c1, $c2, $c3
@@ -186,7 +182,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * Test the opportunistic refresh cache function does refresh expired entries
    * if mode is deterministic.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testOpportunisticRefreshNoChangeWithDeterministicSetting(): void {
     [, , $deceased] = $this->setupSmartGroup();
@@ -291,7 +287,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       );
       return [$group, $living, $deceased];
     }
-    catch (CRM_Core_Exception | API_Exception | CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception | CRM_Core_Exception | CRM_Core_Exception $e) {
       $this->fail('failed test setup' . $e->getMessage());
     }
     // unreachable but it cheers up IDE analysis.

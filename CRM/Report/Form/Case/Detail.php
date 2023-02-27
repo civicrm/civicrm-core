@@ -28,7 +28,10 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
   protected $_caseDetailExtra = [];
 
-  protected $_customGroupExtends = ['Case'];
+  protected $_customGroupExtends = [
+    'Case',
+    'Contact',
+  ];
 
   protected $_caseTypeNameOrderBy = FALSE;
 
@@ -194,6 +197,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Address',
         'fields' => [
           'street_address' => NULL,
+          'city' => NULL,
           'state_province_id' => [
             'title' => ts('State/Province'),
           ],
@@ -248,6 +252,12 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           ],
         ],
         'filters' => [
+          'last_activity_activity_type' => [
+            'name' => 'activity_type_id',
+            'title' => ts('Activity type of the last activity'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
+          ],
           'last_activity_date_time' => [
             'name' => 'activity_date_time',
             'title' => ts('Last Action Date'),

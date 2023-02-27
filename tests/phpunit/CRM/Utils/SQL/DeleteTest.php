@@ -6,6 +6,11 @@
  */
 class CRM_Utils_SQL_DeleteTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    $this->useTransaction();
+    parent::setUp();
+  }
+
   public function testGetDefault() {
     $del = CRM_Utils_SQL_Delete::from('foo');
     $this->assertLike('DELETE FROM foo', $del->toSQL());

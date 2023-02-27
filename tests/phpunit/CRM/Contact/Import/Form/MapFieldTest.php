@@ -14,6 +14,7 @@
  * File for the CRM_Contact_Import_Form_MapFieldTest class.
  */
 
+use Civi\Api4\MappingField;
 use Civi\Api4\UserJob;
 
 /**
@@ -21,6 +22,7 @@ use Civi\Api4\UserJob;
  *
  * @package CiviCRM
  * @group headless
+ * @group import
  */
 class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
 
@@ -38,7 +40,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * Delete any saved mapping config.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field']);
+    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field'], TRUE);
     parent::tearDown();
   }
 
@@ -50,18 +52,17 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @dataProvider getSubmitData
    *
    * @param array $params
-   * @param array $mapper
+   * @param array $mapper Mapping as entered on MapField form.
+   *   e.g [['first_name']['email', 1]].
+   *   {@see \CRM_Contact_Import_Parser_Contact::getMappingFieldFromMapperInput}
    * @param array $expecteds
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmit(array $params, array $mapper, array $expecteds = []): void {
-    $form = $this->getMapFieldFormObject();
-    $form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
+    $form = $this->getMapFieldFormObject(array_merge($params, ['mapper' => $mapper]));
     $form->preProcess();
-    $form->submit($params, $mapper);
+    $form->postProcess();
 
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_tmp_d_import_job_xxx');
     if (!empty($expecteds)) {
@@ -77,7 +78,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
         }
       }
     }
-    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field']);
   }
 
   /**
@@ -119,10 +119,10 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
             'count' => 4,
             'values' => [],
             'result' => [
-              0 => ['name' => '- do not import -'],
-              1 => ['name' => 'First Name'],
-              2 => ['name' => 'Last Name'],
-              3 => ['name' => 'Street Address', 'location_type_id' => 2],
+              0 => ['name' => 'do_not_import'],
+              1 => ['name' => 'first_name'],
+              2 => ['name' => 'last_name'],
+              3 => ['name' => 'street_address', 'location_type_id' => 2],
             ],
           ],
         ],
@@ -138,15 +138,16 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    *   Some defaults are provided.
    *
    * @return \CRM_Contact_Import_Form_MapField
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function getMapFieldFormObject(array $submittedValues = []): CRM_Contact_Import_Form_MapField {
     CRM_Core_DAO::executeQuery('CREATE TABLE IF NOT EXISTS civicrm_tmp_d_import_job_xxx (`nada` text, `first_name` text, `last_name` text, `address` text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci');
     $submittedValues = array_merge([
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
+      'contactSubType' => '',
       'dataSource' => 'CRM_Import_DataSource_SQL',
       'sqlQuery' => 'SELECT * FROM civicrm_tmp_d_import_job_xxx',
+      'dedupe_rule_id' => '',
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
     ], $submittedValues);
     $userJobID = UserJob::create()->setValues([
@@ -154,15 +155,15 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
         'submitted_values' => $submittedValues,
       ],
       'status_id:name' => 'draft',
-      'type_id:name' => 'contact_import',
+      'job_type' => 'contact_import',
     ])->execute()->first()['id'];
 
     $dataSource = new CRM_Import_DataSource_SQL($userJobID);
     $null = NULL;
-    /* @var CRM_Contact_Import_Form_MapField $form */
+    /** @var CRM_Contact_Import_Form_MapField $form */
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField', $submittedValues);
     $form->set('user_job_id', $userJobID);
-    $dataSource->postProcess($submittedValues, $null, $form);
+    $dataSource->initialize();
 
     $contactFields = CRM_Contact_BAO_Contact::importableFields();
     $fields = [];
@@ -183,7 +184,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @param string $expectedJS
    * @param array $expectedDefaults
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testLoadSavedMapping(array $fieldSpec, string $expectedJS, array $expectedDefaults): void {
@@ -203,83 +203,11 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * In conjunction with testing our existing  function this  tests the methods we want to migrate to
    * to  clean it up.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testLoadSavedMappingDirect(): void {
-    $this->entity = 'Contact';
-    $this->createCustomGroupWithFieldOfType(['title' => 'My Field']);
+    $mapping = $this->storeComplexMapping();
     $this->setUpMapFieldForm();
-    $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'my test', 'label' => 'Special custom']);
-    foreach ([
-      [
-        'name' => 'Addressee',
-        'column_number' => '0',
-      ],
-      [
-        'name' => 'Postal Greeting',
-        'column_number' => '1',
-      ],
-      [
-        'name' => 'Phone',
-        'column_number' => '2',
-        'location_type_id' => '1',
-        'phone_type_id' => '1',
-      ],
-      [
-        'name' => 'Street Address',
-        'column_number' => '3',
-      ],
-      [
-        'name' => 'Enter text here :: My Field',
-        'column_number' => '4',
-      ],
-      [
-        'name' => 'Street Address',
-        'column_number' => '5',
-        'location_type_id' => '1',
-      ],
-      [
-        'name' => 'City',
-        'column_number' => '6',
-        'location_type_id' => '1',
-      ],
-      [
-        'name' => 'State Province',
-        'column_number' => '7',
-        'relationship_type_id' => 4,
-        'relationship_direction' => 'a_b',
-        'location_type_id' => '1',
-      ],
-      [
-        'name' => 'Url',
-        'column_number' => '8',
-        'relationship_type_id' => 4,
-        'relationship_direction' => 'a_b',
-        'website_type_id' => 2,
-      ],
-      [
-        'name' => 'Phone',
-        'column_number' => '9',
-        'relationship_type_id' => 4,
-        'location_type_id' => '1',
-        'relationship_direction' => 'a_b',
-        'phone_type_id' => 2,
-      ],
-      [
-        'name' => 'Phone',
-        'column_number' => '10',
-        'location_type_id' => '1',
-        'phone_type_id' => '3',
-      ],
-    ] as $mappingField) {
-      $this->callAPISuccess('MappingField', 'create', array_merge([
-        'mapping_id' => $mapping['id'],
-        'grouping' => 1,
-        'contact_type' => 'Individual',
-      ], $mappingField));
-    }
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mapping['id']);
     $processor->setMetadata($this->getContactImportMetadata());
@@ -292,9 +220,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $this->assertEquals('street_address', $processor->getFieldName(3));
     $this->assertEquals($this->getCustomFieldName('text'), $processor->getFieldName(4));
     $this->assertEquals('url', $processor->getFieldName(8));
-
-    $processor->setContactTypeByConstant(CRM_Import_Parser::CONTACT_HOUSEHOLD);
-    $this->assertEquals('Household', $processor->getContactType());
   }
 
   /**
@@ -303,44 +228,39 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   public function mapFieldDataProvider(): array {
     return [
       [
-        ['name' => 'First Name', 'contact_type' => 'Individual', 'column_number' => 0],
-        "document.forms.MapField['mapper[0][1]'].style.display = 'none';
-document.forms.MapField['mapper[0][2]'].style.display = 'none';
-document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
-        ['mapper[0]' => ['first_name', 0, NULL]],
+        ['name' => 'first_name', 'contact_type' => 'Individual', 'column_number' => 0],
+        "swapOptions(document.forms.MapField, 'mapper[0]', 0, 4, 'hs_mapper_0_');\n",
+        ['mapper[0]' => ['first_name']],
       ],
       [
-        ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'location_type_id' => 2],
-        "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['name' => 'phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'location_type_id' => 2],
+        "swapOptions(document.forms.MapField, 'mapper[0]', 2, 4, 'hs_mapper_0_');\n",
         ['mapper[0]' => ['phone', 2, 1]],
       ],
       [
-        ['name' => 'IM Screen Name', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
-        "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['name' => 'im', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
+        "swapOptions(document.forms.MapField, 'mapper[0]', 2, 4, 'hs_mapper_0_');\n",
         ['mapper[0]' => ['im', 2, 1]],
       ],
       [
-        ['name' => 'Website', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1],
-        "document.forms.MapField['mapper[0][2]'].style.display = 'none';
-document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['name' => 'url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1],
+        "swapOptions(document.forms.MapField, 'mapper[0]', 1, 4, 'hs_mapper_0_');\n",
         ['mapper[0]' => ['url', 1]],
       ],
       [
         // Yes, the relationship mapping really does use url whereas non relationship uses website because... legacy
-        ['name' => 'Url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
-        "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['name' => 'url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
+        "swapOptions(document.forms.MapField, 'mapper[0]', 2, 4, 'hs_mapper_0_');\n",
         ['mapper[0]' => ['1_a_b', 'url', 1]],
       ],
       [
-        ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'b_a'],
+        ['name' => 'phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'b_a'],
         '',
         ['mapper[0]' => ['1_b_a', 'phone', 'Primary', 1]],
       ],
       [
-        ['name' => '- do not import -', 'contact_type' => 'Individual', 'column_number' => 0],
-        "document.forms.MapField['mapper[0][1]'].style.display = 'none';
-document.forms.MapField['mapper[0][2]'].style.display = 'none';
-document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['name' => 'do_not_import', 'contact_type' => 'Individual', 'column_number' => 0],
+        "swapOptions(document.forms.MapField, 'mapper[0]', 0, 4, 'hs_mapper_0_');\n",
         ['mapper[0]' => []],
       ],
     ];
@@ -354,7 +274,6 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    * @param $columnHeader
    * @param $mapsTo
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testDefaultFromColumnNames($columnHeader, $mapsTo): void {
@@ -391,6 +310,16 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
   }
 
   /**
+   * This is accessed by virtue of the MetaDataTrait being included.
+   *
+   * The use of the metadataTrait came from a transitional refactor
+   * but it probably should be phased out again.
+   */
+  protected function getContactSubType(): string {
+    return $this->_contactSubType ?? '';
+  }
+
+  /**
    * Wrapper for loadSavedMapping.
    *
    * This signature of the function we are calling is funky as a new extraction & will be refined.
@@ -400,31 +329,145 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function loadSavedMapping(int $mappingID, int $columnNumber): array {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
     $processor->setMetadata($this->getContactImportMetadata());
-    $processor->setContactTypeByConstant(CRM_Import_Parser::CONTACT_INDIVIDUAL);
+    $processor->setContactType('Individual');
 
     $defaults = [];
     $defaults["mapper[$columnNumber]"] = $processor->getSavedQuickformDefaultsForColumn($columnNumber);
-    $js = $processor->getQuickFormJSForField($columnNumber);
 
-    return ['defaults' => $defaults, 'js' => $js];
+    return ['defaults' => $defaults];
   }
 
   /**
    * Set up the mapping form.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   private function setUpMapFieldForm(): void {
     $this->form = $this->getMapFieldFormObject();
-    $this->form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
+    $this->form->set('contactType', 'Individual');
+  }
+
+  /**
+   * Tests the routing used in the 5.50 upgrade script to stop using labels...
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testConvertFields(): void {
+    $mapping = $this->storeComplexMapping(TRUE);
+    CRM_Import_ImportProcessor::convertSavedFields();
+    $updatedMapping = MappingField::get()
+      ->addWhere('mapping_id', '=', $mapping['id'])
+      ->addSelect('id', 'name')->execute();
+
+    $expected = [
+      0 => 'addressee',
+      1 => 'postal_greeting',
+      2 => 'phone',
+      3 => 'street_address',
+      4 => 'custom_1',
+      5 => 'street_address',
+      6 => 'city',
+      7 => 'state_province',
+      8 => 'url',
+      9 => 'phone',
+      10 => 'phone',
+    ];
+    foreach ($updatedMapping as $index => $mappingField) {
+      $this->assertEquals($expected[$index], $mappingField['name']);
+    }
+  }
+
+  /**
+   * Store a mapping with a complex set of fields.
+   *
+   * @param bool $legacyMode
+   *
+   * @return array
+   */
+  private function storeComplexMapping(bool $legacyMode = FALSE): array {
+    $this->createCustomGroupWithFieldOfType(['title' => 'My Field']);
+    $mapping = $this->callAPISuccess('Mapping', 'create', [
+      'name' => 'my test',
+      'label' => 'Special custom',
+      'mapping_type_id' => 'Import Contact',
+    ]);
+    foreach (
+      [
+        [
+          'name' => $legacyMode ? 'Addressee' : 'addressee',
+          'column_number' => '0',
+        ],
+        [
+          'name' => $legacyMode ? 'Postal Greeting' : 'postal_greeting',
+          'column_number' => '1',
+        ],
+        [
+          'name' => $legacyMode ? 'Phone' : 'phone',
+          'column_number' => '2',
+          'location_type_id' => '1',
+          'phone_type_id' => '1',
+        ],
+        [
+          'name' => $legacyMode ? 'Street Address' : 'street_address',
+          'column_number' => '3',
+        ],
+        [
+          'name' => $legacyMode ? 'Enter text here :: My Field' : $this->getCustomFieldName('text'),
+          'column_number' => '4',
+        ],
+        [
+          'name' => $legacyMode ? 'Street Address' : 'street_address',
+          'column_number' => '5',
+          'location_type_id' => '1',
+        ],
+        [
+          'name' => $legacyMode ? 'City' : 'city',
+          'column_number' => '6',
+          'location_type_id' => '1',
+        ],
+        [
+          'name' => $legacyMode ? 'State Province' : 'state_province',
+          'column_number' => '7',
+          'relationship_type_id' => 4,
+          'relationship_direction' => 'a_b',
+          'location_type_id' => '1',
+        ],
+        [
+          'name' => $legacyMode ? 'Url' : 'url',
+          'column_number' => '8',
+          'relationship_type_id' => 4,
+          'relationship_direction' => 'a_b',
+          'website_type_id' => 2,
+        ],
+        [
+          'name' => $legacyMode ? 'Phone' : 'phone',
+          'column_number' => '9',
+          'relationship_type_id' => 4,
+          'location_type_id' => '1',
+          'relationship_direction' => 'a_b',
+          'phone_type_id' => 2,
+        ],
+        [
+          'name' => $legacyMode ? 'Phone' : 'phone',
+          'column_number' => '10',
+          'location_type_id' => '1',
+          'phone_type_id' => '3',
+        ],
+      ] as $mappingField) {
+      $this->callAPISuccess('MappingField', 'create', array_merge([
+        'mapping_id' => $mapping['id'],
+        'grouping' => 1,
+        'contact_type' => 'Individual',
+      ], $mappingField));
+    }
+    return $mapping;
   }
 
 }

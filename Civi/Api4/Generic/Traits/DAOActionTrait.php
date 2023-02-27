@@ -19,20 +19,13 @@ use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
- * @method string getLanguage()
- * @method $this setLanguage(string $language)
+ * Common properties and helper-methods used for DB-oriented actions.
  */
 trait DAOActionTrait {
 
   /**
-   * Specify the language to use if this is a multi-lingual environment.
-   *
-   * E.g. "en_US" or "fr_CA"
-   *
-   * @var string
+   * @var array
    */
-  protected $language;
-
   private $_maxWeights = [];
 
   /**
@@ -52,13 +45,15 @@ trait DAOActionTrait {
    * @return array
    */
   public function baoToArray($bao, $input) {
-    $allFields = array_column($bao->fields(), 'name');
+    $entityFields = array_column($bao->fields(), 'name');
+    $inputFields = array_map(function($key) {
+      return explode(':', $key)[0];
+    }, array_keys($input));
+    $combinedFields = array_unique(array_merge($entityFields, $inputFields));
     if (!empty($this->reload)) {
-      $inputFields = $allFields;
       $bao->find(TRUE);
     }
     else {
-      $inputFields = array_keys($input);
       // Convert 'null' input to true null
       foreach ($inputFields as $key) {
         if (($bao->$key ?? NULL) === 'null') {
@@ -67,8 +62,8 @@ trait DAOActionTrait {
       }
     }
     $values = [];
-    foreach ($allFields as $field) {
-      if (isset($bao->$field) || in_array($field, $inputFields)) {
+    foreach ($combinedFields as $field) {
+      if (isset($bao->$field) || in_array($field, $inputFields) || (!empty($this->reload) && in_array($field, $entityFields))) {
         $values[$field] = $bao->$field ?? NULL;
       }
     }
@@ -103,7 +98,6 @@ trait DAOActionTrait {
    *
    * @return array
    *   The records after being written to the DB (e.g. including newly assigned "id").
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function writeObjects($items) {
@@ -119,9 +113,10 @@ trait DAOActionTrait {
     }
 
     $result = [];
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
 
     foreach ($items as &$item) {
-      $entityId = $item['id'] ?? NULL;
+      $entityId = $item[$idField] ?? NULL;
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
 
@@ -139,7 +134,7 @@ trait DAOActionTrait {
     foreach ($this->write($items) as $index => $dao) {
       if (!$dao) {
         $errMessage = sprintf('%s write operation failed', $this->getEntityName());
-        throw new \API_Exception($errMessage);
+        throw new \CRM_Core_Exception($errMessage);
       }
       $result[] = $this->baoToArray($dao, $items[$index]);
     }
@@ -234,7 +229,6 @@ trait DAOActionTrait {
    * @param array $params
    * @param int $entityId
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function formatCustomParams(&$params, $entityId) {
@@ -268,7 +262,7 @@ trait DAOActionTrait {
         require_once 'api/v3/utils.php';
         $value = \_civicrm_api3_resolve_contactID($value);
         if ('unknown-user' === $value) {
-          throw new \API_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
+          throw new \CRM_Core_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
         }
       }
 
@@ -307,11 +301,13 @@ trait DAOActionTrait {
     if (!isset($info[$fieldName])) {
       $info = [];
       $fields = CustomField::get(FALSE)
-        ->addSelect('id', 'name', 'html_type', 'data_type', 'custom_group_id.extends')
+        ->addSelect('id', 'name', 'html_type', 'data_type', 'custom_group_id.extends', 'column_name', 'custom_group_id.table_name')
         ->addWhere('custom_group_id.name', '=', $groupName)
         ->execute()->indexBy('name');
       foreach ($fields as $name => $field) {
         $field['custom_field_id'] = $field['id'];
+        $field['table_name'] = $field['custom_group_id.table_name'];
+        unset($field['custom_group_id.table_name']);
         $field['name'] = $groupName . '.' . $name;
         $field['entity'] = CustomGroupJoinable::getEntityFromExtends($field['custom_group_id.extends']);
         $info[$name] = $field;
@@ -336,7 +332,6 @@ trait DAOActionTrait {
     if (!isset($record[$weightField]) && !empty($record[$idField])) {
       return;
     }
-    $daoFields = $daoName::getSupportedFields();
     $newWeight = $record[$weightField] ?? NULL;
     $oldWeight = empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $weightField);
 

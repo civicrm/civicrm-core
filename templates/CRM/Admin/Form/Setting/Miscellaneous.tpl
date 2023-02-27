@@ -41,6 +41,12 @@
         {/if}
         </td>
       </tr>
+      <tr class="crm-miscellaneous-form-block-enableBackgroundQueue">
+        <td class="label">{$form.enableBackgroundQueue.label}</td>
+        <td>{$form.enableBackgroundQueue.html}<br />
+          <span class="description">{$setting_descriptions.enableBackgroundQueue}</span>
+        </td>
+      </tr>
       <tr class="crm-miscellaneous-form-block-doNotAttachPDFReceipt">
         <td class="label">{$form.doNotAttachPDFReceipt.label}</td>
         <td>{$form.doNotAttachPDFReceipt.html}<br />

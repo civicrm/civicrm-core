@@ -56,6 +56,12 @@
                     <span class="description">{ts}Path where CiviCRM extensions are stored.{/ts}</span>
                 </td>
             </tr>
+             <tr class="crm-path-form-block-ext_max_depth">
+               <td class="label">{$form.ext_max_depth.label}</td>
+               <td>{$form.ext_max_depth.html}<br />
+                 <span class="description">{ts}When searching for extensions, limit the number of subdirectories.{/ts}</span>
+               </td>
+             </tr>
         </table>
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

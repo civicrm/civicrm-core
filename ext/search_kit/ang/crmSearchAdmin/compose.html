@@ -26,7 +26,10 @@
     <fieldset ng-if=":: $ctrl.paramExists('groupBy')">
       <div class="form-inline" ng-repeat="groupBy in $ctrl.savedSearch.api_params.groupBy">
         <label for="crm-search-groupBy-{{ $index }}">{{:: ts('Group By') }}</label>
-        <input id="crm-search-groupBy-{{ $index }}" class="form-control huge" ng-model="$ctrl.savedSearch.api_params.groupBy[$index]" crm-ui-select="{placeholder: ' ', data: fieldsForGroupBy}" ng-change="changeGroupBy($index)" />
+        <crm-search-function class="form-group" expr="$ctrl.savedSearch.api_params.groupBy[$index]" mode="groupBy"></crm-search-function>
+        <span ng-if="!$ctrl.hasFunction($ctrl.savedSearch.api_params.groupBy[$index])">
+          <input id="crm-search-groupBy-{{ $index }}" class="form-control huge" ng-model="$ctrl.savedSearch.api_params.groupBy[$index]" crm-ui-select="{placeholder: ' ', data: fieldsForGroupBy}" ng-change="changeGroupBy($index)" />
+        </span>
         <hr>
       </div>
       <div class="form-inline">

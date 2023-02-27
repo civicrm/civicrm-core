@@ -166,7 +166,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $params['contact_id'] = $session->get('userID');
 
-    if ($params['parent_id']) {
+    if (!empty($params['parent_id'])) {
       $params['entity_table'] = 'civicrm_note';
       $params['entity_id'] = $params['parent_id'];
     }

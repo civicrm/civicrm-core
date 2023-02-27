@@ -6,6 +6,7 @@
   <name>civicrm_saved_search</name>
   <comment>Users can save their complex SQL queries and use them later.</comment>
   <icon>fa-search-plus</icon>
+  <labelField>label</labelField>
   <add>1.1</add>
   <field>
     <name>id</name>
@@ -14,6 +15,7 @@
     <required>true</required>
     <comment>Saved Search ID</comment>
     <html>
+      <label>ID</label>
       <type>Number</type>
     </html>
     <add>1.1</add>
@@ -31,6 +33,7 @@
     <default>NULL</default>
     <comment>Unique name of saved search</comment>
     <html>
+      <label>Name</label>
       <type>Text</type>
     </html>
     <add>1.0</add>
@@ -128,6 +131,10 @@
     <length>255</length>
     <comment>Entity name for API based search</comment>
     <add>5.24</add>
+    <html>
+      <label>For</label>
+      <type>Select</type>
+    </html>
     <pseudoconstant>
       <callback>CRM_Contact_BAO_SavedSearch::getApiEntityOptions</callback>
     </pseudoconstant>
@@ -208,6 +215,7 @@
     <type>text</type>
     <title>Saved Search Description</title>
     <html>
+      <label>Description</label>
       <type>TextArea</type>
       <rows>2</rows>
       <cols>60</cols>

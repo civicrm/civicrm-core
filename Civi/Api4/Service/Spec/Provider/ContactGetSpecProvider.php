@@ -16,7 +16,11 @@ use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class ContactGetSpecProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
@@ -29,6 +33,7 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
       ->setColumnName('id')
       ->setDescription(ts('Groups (or sub-groups of groups) to which this contact belongs'))
       ->setType('Filter')
+      ->setInputType('Select')
       ->setOperators(['IN', 'NOT IN'])
       ->addSqlFilter([__CLASS__, 'getContactGroupSql'])
       ->setSuffixes(['name', 'label'])
@@ -41,12 +46,73 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
       $field->setLabel(ts('Age (years)'))
         ->setTitle(ts('Age (years)'))
         ->setColumnName('birth_date')
+        ->setInputType('Number')
         ->setDescription(ts('Age of individual (in years)'))
         ->setType('Extra')
         ->setReadonly(TRUE)
         ->setSqlRenderer([__CLASS__, 'calculateAge']);
       $spec->addFieldSpec($field);
     }
+
+    // Address, Email, Phone, IM primary/billing virtual fields
+    // This exposes the joins created by
+    // \Civi\Api4\Event\Subscriber\ContactSchemaMapSubscriber::onSchemaBuild()
+    $entities = [
+      'Address' => [
+        'primary' => [
+          'title' => ts('Primary Address ID'),
+          'label' => ts('Primary Address'),
+        ],
+        'billing' => [
+          'title' => ts('Billing Address ID'),
+          'label' => ts('Billing Address'),
+        ],
+      ],
+      'Email' => [
+        'primary' => [
+          'title' => ts('Primary Email ID'),
+          'label' => ts('Primary Email'),
+        ],
+        'billing' => [
+          'title' => ts('Billing Email ID'),
+          'label' => ts('Billing Email'),
+        ],
+      ],
+      'Phone' => [
+        'primary' => [
+          'title' => ts('Primary Phone ID'),
+          'label' => ts('Primary Phone'),
+        ],
+        'billing' => [
+          'title' => ts('Billing Phone ID'),
+          'label' => ts('Billing Phone'),
+        ],
+      ],
+      'IM' => [
+        'primary' => [
+          'title' => ts('Primary IM ID'),
+          'label' => ts('Primary IM'),
+        ],
+        'billing' => [
+          'title' => ts('Billing IM ID'),
+          'label' => ts('Billing IM'),
+        ],
+      ],
+    ];
+    foreach ($entities as $entity => $types) {
+      foreach ($types as $type => $info) {
+        $name = strtolower($entity) . '_' . $type;
+        $field = new FieldSpec($name, 'Contact', 'Integer');
+        $field->setLabel($info['label'])
+          ->setTitle($info['title'])
+          ->setColumnName('id')
+          ->setType('Extra')
+          ->setFkEntity($entity)
+          ->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
+        $spec->addFieldSpec($field);
+      }
+    }
+
   }
 
   /**
@@ -113,7 +179,7 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
    * @param array $field
    * @return string
    */
-  public static function calculateAge(array $field) {
+  public static function calculateAge(array $field): string {
     return "TIMESTAMPDIFF(YEAR, {$field['sql_name']}, CURDATE())";
   }
 

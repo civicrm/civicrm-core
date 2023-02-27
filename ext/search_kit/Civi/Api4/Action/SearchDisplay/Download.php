@@ -47,7 +47,7 @@ class Download extends AbstractRunAction {
 
   /**
    * @param \Civi\Api4\Result\SearchDisplayRunResult $result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function processResult(\Civi\Api4\Result\SearchDisplayRunResult $result) {
     $entityName = $this->savedSearch['api_entity'];
@@ -75,8 +75,15 @@ class Download extends AbstractRunAction {
     $columns = [];
     foreach ($this->display['settings']['columns'] as $index => $col) {
       $col += ['type' => NULL, 'label' => '', 'rewrite' => FALSE];
-      if ($col['type'] === 'field' && !empty($col['key'])) {
+      if (!empty($col['key'])) {
         $columns[$index] = $col;
+      }
+      // Convert html to plain text
+      if ($col['type'] === 'html') {
+        foreach ($rows as $i => $row) {
+          $row['columns'][$index]['val'] = htmlspecialchars_decode(strip_tags($row['columns'][$index]['val']));
+          $rows[$i] = $row;
+        }
       }
     }
 

@@ -431,13 +431,13 @@ class CRM_Core_Session {
    * @param bool $reset
    *   Should we reset the status variable?.
    *
-   * @return string
+   * @return array
    *   the status message if any
    */
-  public function getStatus($reset = FALSE) {
+  public function getStatus($reset = FALSE) : array {
     $this->initialize();
 
-    $status = NULL;
+    $status = [];
     if (array_key_exists('status', $this->_session[$this->_key])) {
       $status = $this->_session[$this->_key]['status'];
     }
@@ -563,7 +563,7 @@ class CRM_Core_Session {
    *
    * @return string
    *
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public function getLoggedInContactDisplayName() {
     $userContactID = CRM_Core_Session::getLoggedInContactID();

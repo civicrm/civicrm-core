@@ -112,7 +112,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    *
    * @param \Civi\Core\Event\PreEvent $event
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function self_hook_civicrm_pre(PreEvent $event): void {
@@ -129,7 +129,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    * We check that contact_type_a is Individual, but not contact_type_b because there's
    * nowhere in the code that requires it to be Organization.
    *
-   * @return int|string
+   * @return int
    *
    * @throws \CRM_Core_Exception
    */
@@ -141,12 +141,12 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
           ->addWhere('contact_type_a', '=', 'Individual')
           ->addSelect('id')->execute()->first();
         if (empty($relationship)) {
-          throw new API_Exception('no valid relationship');
+          throw new CRM_Core_Exception('no valid relationship');
         }
         Civi::cache('metadata')->set(__CLASS__ . __FUNCTION__, $relationship['id']);
       }
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Employee of'"));
     }
     return Civi::cache('metadata')->get(__CLASS__ . __FUNCTION__);

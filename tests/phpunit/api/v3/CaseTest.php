@@ -495,126 +495,6 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertContains($case['id'], $result['case_id']);
   }
 
-  /**
-   * Test activity api update for case activities.
-   */
-  public function testCaseActivityUpdate_Tracked() {
-    $this->settingsStack->push('civicaseActivityRevisions', TRUE);
-
-    // Need to create the case and activity before we can update it
-    $this->testCaseActivityCreate();
-
-    $params = [
-      'activity_id' => $this->_caseActivityId,
-      'case_id' => 1,
-      'activity_type_id' => 14,
-      'source_contact_id' => $this->_loggedInUser,
-      'subject' => 'New subject',
-    ];
-    $result = $this->callAPISuccess('activity', 'create', $params);
-
-    $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject']);
-
-    // id should be one greater, since this is a new revision
-    $this->assertEquals($result['values'][$result['id']]['id'], $this->_caseActivityId + 1);
-    $this->assertEquals($result['values'][$result['id']]['original_id'], $this->_caseActivityId);
-
-    // Check revision is as expected
-    $revParams = [
-      'activity_id' => $this->_caseActivityId,
-    ];
-    $revActivity = $this->callAPISuccess('activity', 'get', $revParams);
-    $this->assertEquals($revActivity['values'][$this->_caseActivityId]['is_current_revision'],
-      0);
-    $this->assertEquals($revActivity['values'][$this->_caseActivityId]['is_deleted'],
-      0
-    );
-  }
-
-  /**
-   * If you disable `civicaseActivityRevisions`, then editing an activity
-   * will *not* create or change IDs.
-   */
-  public function testCaseActivityUpdate_Untracked() {
-    $this->settingsStack->push('civicaseActivityRevisions', FALSE);
-
-    //  Need to create the case and activity before we can update it
-    $this->testCaseActivityCreate();
-
-    $oldIDs = CRM_Utils_SQL_Select::from('civicrm_activity')
-      ->select('id, original_id, is_current_revision')
-      ->orderBy('id')
-      ->execute()->fetchAll();
-
-    $params = [
-      'activity_id' => $this->_caseActivityId,
-      'case_id' => 1,
-      'activity_type_id' => 14,
-      'source_contact_id' => $this->_loggedInUser,
-      'subject' => 'New subject',
-    ];
-    $result = $this->callAPISuccess('activity', 'create', $params);
-    $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject']);
-
-    // id should not change because we've opted out.
-    $this->assertEquals($this->_caseActivityId, $result['values'][$result['id']]['id']);
-    $this->assertEmpty($result['values'][$result['id']]['original_id']);
-
-    $newIDs = CRM_Utils_SQL_Select::from('civicrm_activity')
-      ->select('id, original_id, is_current_revision')
-      ->orderBy('id')
-      ->execute()->fetchAll();
-    $this->assertEquals($oldIDs, $newIDs);
-  }
-
-  public function testCaseActivityUpdateCustom() {
-    $this->settingsStack->push('civicaseActivityRevisions', TRUE);
-
-    // Create a case first
-    $result = $this->callAPISuccess('case', 'create', $this->_params);
-
-    // Create custom field group
-    // Note the second parameter is Activity on purpose, not Case.
-    $custom_ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ActivityTest.php');
-
-    // create activity
-    $params = [
-      'case_id' => $result['id'],
-      // follow up
-      'activity_type_id' => 14,
-      'subject' => 'Test followup',
-      'source_contact_id' => $this->_loggedInUser,
-      'target_contact_id' => $this->_params['contact_id'],
-      'custom_' . $custom_ids['custom_field_id'] => "custom string",
-    ];
-    $result = $this->callAPISuccess('activity', 'create', $params);
-
-    $aid = $result['values'][$result['id']]['id'];
-
-    // Update activity
-    $params = [
-      'activity_id' => $aid,
-      'case_id' => 1,
-      'activity_type_id' => 14,
-      'source_contact_id' => $this->_loggedInUser,
-      'subject' => 'New subject',
-    ];
-    $this->callAPISuccess('activity', 'create', $params);
-
-    // Retrieve revision and check custom fields got copied.
-    $revParams = [
-      'activity_id' => $aid + 1,
-      'return.custom_' . $custom_ids['custom_field_id'] => 1,
-    ];
-    $revAct = $this->callAPISuccess('activity', 'get', $revParams);
-
-    $this->assertEquals($revAct['values'][$aid + 1]['custom_' . $custom_ids['custom_field_id']], "custom string",
-      "Error message: " . CRM_Utils_Array::value('error_message', $revAct));
-
-    $this->customFieldDelete($custom_ids['custom_field_id']);
-    $this->customGroupDelete($custom_ids['custom_group_id']);
-  }
-
   public function testCaseGetByStatus() {
     // Create 2 cases with different status ids.
     $case1 = $this->callAPISuccess('Case', 'create', [
@@ -933,15 +813,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    *
    * See the case.addtimeline api.
    *
-   * @param bool $enableRevisions
-   *
-   * @dataProvider caseActivityRevisionExamples
-   *
    * @throws \Exception
    */
-  public function testCaseAddtimeline($enableRevisions) {
-    $this->settingsStack->push('civicaseActivityRevisions', $enableRevisions);
-
+  public function testCaseAddtimeline() {
     $caseSpec = [
       'title' => 'Application with Definition',
       'name' => 'Application_with_Definition',
@@ -1023,18 +897,6 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     $result = $this->callAPISuccess('Case', 'getsingle', ['id' => $case2['id']]);
     $this->assertEquals(1, $result['is_deleted']);
-  }
-
-  /**
-   * Get case activity revision sample data.
-   *
-   * @return array
-   */
-  public function caseActivityRevisionExamples() {
-    $examples = [];
-    $examples[] = [FALSE];
-    $examples[] = [TRUE];
-    return $examples;
   }
 
   public function testTimestamps() {

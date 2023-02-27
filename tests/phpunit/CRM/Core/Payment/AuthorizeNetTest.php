@@ -19,12 +19,16 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   use CRM_Core_Payment_AuthorizeNetTrait;
 
+  /**
+   * @var int
+   */
+  protected $paymentProcessorID;
+
   public function setUp(): void {
     parent::setUp();
-    $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate();
+    $this->paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate();
 
-    $this->processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
-    $this->_financialTypeId = 1;
+    $this->processor = Civi\Payment\System::singleton()->getById($this->paymentProcessorID);
 
     // for some strange unknown reason, in batch mode this value gets set to null
     // so crude hack here to avoid an exception and hence an error
@@ -40,7 +44,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * Test doing a one-off payment.
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSinglePayment() {
     $this->setupMockHandler();
@@ -78,7 +82,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'invoice_id' => $invoiceID,
       'contribution_status_id' => 2,
       'is_test' => 1,
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->paymentProcessorID,
     ]);
 
     $contribution = $this->callAPISuccess('Contribution', 'create', [
@@ -102,12 +106,12 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => 12,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => 1,
       'is_email_receipt' => 1,
       'from_email_address' => 'john.smith@example.com',
       'receive_date' => date('Ymd'),
       'receipt_date_time' => '',
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
@@ -202,13 +206,13 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'invoice_id' => $invoiceID,
       'contribution_status_id' => '',
       'is_test' => 1,
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->paymentProcessorID,
     ];
     $recur = $this->callAPISuccess('ContributionRecur', 'create', $contributionRecurParams);
 
     $contributionParams = [
       'contact_id' => $contactId,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => 1,
       'receive_date' => $start_date,
       'total_amount' => $amount,
       'invoice_id' => $invoiceID,
@@ -242,12 +246,12 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => 3,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => 1,
       'is_email_receipt' => 1,
       'from_email_address' => "{$firstName}.{$lastName}@example.com",
       'receive_date' => $start_date,
       'receipt_date_time' => '',
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',

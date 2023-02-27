@@ -290,7 +290,7 @@
     <add>1.5</add>
     <html>
       <type>CheckBox</type>
-      <label>Enabled?</label>
+      <label>Enabled</label>
     </html>
   </field>
 </table>

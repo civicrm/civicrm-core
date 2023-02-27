@@ -29,32 +29,12 @@
       this.$onInit = function() {
         var closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
         $scope.dataProvider = closestController.is('[af-repeat-item]') ? ctrl.afRepeatItem : ctrl.afJoin || ctrl.afFieldset;
-        $scope.fieldId = ctrl.fieldName + '-' + id++;
+        $scope.fieldId = _.kebabCase(ctrl.fieldName) + '-' + id++;
 
         $element.addClass('af-field-type-' + _.kebabCase(ctrl.defn.input_type));
 
         if (this.defn.name !== this.fieldName) {
           namePrefix = this.fieldName.substr(0, this.fieldName.length - this.defn.name.length);
-        }
-
-        if (ctrl.defn.search_range) {
-          // Initialize value as object unless using relative date select
-          var initialVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
-          if (!_.isArray($scope.dataProvider.getFieldData()[ctrl.fieldName]) &&
-            (ctrl.defn.input_type !== 'Select' || !ctrl.defn.is_date || initialVal !== '{}')
-          ) {
-            $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
-          }
-          // Initialize inputAttrs (only used for datePickers at the moment)
-          if (ctrl.defn.is_date) {
-            this.inputAttrs.push(ctrl.defn.input_attrs || {});
-            for (var i = 1; i <= 2; ++i) {
-              var attrs = _.cloneDeep(ctrl.defn.input_attrs || {});
-              attrs.placeholder = attrs['placeholder' + i];
-              attrs.timePlaceholder = attrs['timePlaceholder' + i];
-              ctrl.inputAttrs.push(attrs);
-            }
-          }
         }
 
         // is_primary field - watch others in this afRepeat block to ensure only one is selected
@@ -135,6 +115,26 @@
           else if (ctrl.defn.afform_default) {
             setValue(ctrl.defn.afform_default);
           }
+
+          if (ctrl.defn.search_range) {
+            // Initialize value as object unless using relative date select
+            var initialVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
+            if (!_.isArray($scope.dataProvider.getFieldData()[ctrl.fieldName]) &&
+              (ctrl.defn.input_type !== 'Select' || !ctrl.defn.is_date || initialVal === '{}')
+            ) {
+              $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
+            }
+            // Initialize inputAttrs (only used for datePickers at the moment)
+            if (ctrl.defn.is_date) {
+              ctrl.inputAttrs.push(ctrl.defn.input_attrs || {});
+              for (var i = 1; i <= 2; ++i) {
+                var attrs = _.cloneDeep(ctrl.defn.input_attrs || {});
+                attrs.placeholder = attrs['placeholder' + i];
+                attrs.timePlaceholder = attrs['timePlaceholder' + i];
+                ctrl.inputAttrs.push(attrs);
+              }
+            }
+          }
         });
       };
 
@@ -149,13 +149,17 @@
           }
         } else if (ctrl.defn.input_type === 'Number') {
           value = +value;
-        } else if (ctrl.defn.search_range && !_.isPlainObject(value)) {
+        }
+        // Initialze search range unless the field also has options (as in a date search) and
+        // the default value is a valid option.
+        else if (ctrl.defn.search_range && !_.isPlainObject(value) &&
+          !(ctrl.defn.options && _.findWhere(ctrl.defn.options, {id: value}))
+        ) {
           value = {
             '>=': ('' + value).split('-')[0],
             '<=': ('' + value).split('-')[1] || '',
           };
         }
-
         $scope.dataProvider.getFieldData()[ctrl.fieldName] = value;
       }
 
@@ -169,6 +173,27 @@
         }
       };
 
+      ctrl.isReadonly = function() {
+        if (ctrl.defn.is_id) {
+          return ctrl.afFieldset.getEntity().actions.update === false;
+        }
+        // TODO: Not actually used, but could be used if we wanted to render displayOnly
+        // fields as more than just raw data. I think we probably ought to do so for entityRef fields
+        // Since the ids are kind of meaningless. Making that change would require adding a function
+        // to get the widget template rather than just concatenating the input_type into an ngInclude.
+        return ctrl.defn.input_type === 'DisplayOnly';
+      };
+
+      // ngChange callback from Existing entity field
+      ctrl.onSelectEntity = function() {
+        if (ctrl.defn.is_id) {
+          var val = $scope.getSetSelect();
+          var entity = ctrl.afFieldset.modelName;
+          var index = ctrl.getEntityIndex();
+          ctrl.afFieldset.afFormCtrl.loadData(entity, index, val);
+        }
+      };
+
       // Params for the Afform.submitFile API when uploading a file field
       ctrl.getFileUploadParams = function() {
         return {
@@ -178,6 +203,10 @@
           entityIndex: ctrl.getEntityIndex(),
           joinIndex: ctrl.afJoin && $scope.dataProvider.repeatIndex || null
         };
+      };
+
+      ctrl.getAutocompleteFieldName = function() {
+        return ctrl.afFieldset.modelName + (ctrl.afJoin ? ('+' + ctrl.afJoin.entity) : '') + ':' + ctrl.fieldName;
       };
 
       $scope.getOptions = function () {
@@ -207,16 +236,9 @@
           else if (ctrl.defn.search_range) {
             return ($scope.dataProvider.getFieldData()[ctrl.fieldName]['>='] = val);
           }
-          // A multi-select needs to split string value into an array
-          if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.multiple) {
-            val = val ? val.split(',') : [];
-          }
           return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val);
         }
         // Getter
-        if (_.isArray(currentVal)) {
-          return currentVal.join(',');
-        }
         if (ctrl.defn.is_date) {
           return _.isPlainObject(currentVal) ? '{}' : currentVal;
         }

@@ -18,7 +18,7 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Domain;
 use Civi\Api4\MembershipType;
@@ -27,7 +27,7 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class MembershipTest extends UnitTestCase implements TransactionalInterface {
+class MembershipTest extends Api4TestBase implements TransactionalInterface {
 
   public function testUpdateWeights() {
     $getValues = function($domain) {

@@ -24,10 +24,19 @@
   </div>
 {/if}
 
-{if $pageTitle}
-  <div class="crm-title">
-    <h1 class="title">{if $isDeleted}<del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
-  </div>
+{if $urlIsPublic}
+    {if $pageTitle}
+      <div class="crm-title">
+        <h2 class="title">{$pageTitle}</h2>
+      </div>
+    {/if}
+{else}
+    {if $pageTitle}
+      <div class="crm-title">
+        <h1 class="title">{if $isDeleted}
+          <del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
+      </div>
+    {/if}
 {/if}
 
 {crmRegion name='page-header'}

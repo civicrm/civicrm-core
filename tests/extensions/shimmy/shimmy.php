@@ -106,3 +106,27 @@ function shimmy_civicrm_entityTypes(&$entityTypes) {
 //  ));
 //  _shimmy_civix_navigationMenu($menu);
 //}
+
+/**
+ * Assert that there is a service with a given name+type.
+ *
+ * @param string $class
+ * @param string $expectServiceName
+ * @param string $notServiceName
+ * @throws \Exception
+ */
+function _shimmy_assert_service_object(string $class, string $expectServiceName, string $notServiceName) {
+  if (Civi::container()->has($expectServiceName) && Civi::container()->has($notServiceName)) {
+    throw new \Exception("Oops! Found both names ($expectServiceName and $notServiceName)!");
+  }
+  elseif (!Civi::container()->has($expectServiceName) && Civi::container()->has($notServiceName)) {
+    throw new \Exception("Oops! Found ($notServiceName) and missing expected ($expectServiceName)!");
+  }
+
+  if (!(Civi::container()->get($expectServiceName) instanceof $class)) {
+    $actual = Civi::container()->get($expectServiceName);
+    $actualType = is_object($actual) ? get_class($actual) : gettype($actual);
+    throw new \Exception("Oops! The service ($expectServiceName) should be an instance the class ($class). But found ($actualType)!");
+  }
+
+}

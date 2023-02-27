@@ -215,7 +215,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Form preProcess function.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
@@ -354,7 +353,7 @@ DESC limit 1");
 
     $subscriptionCancelled = FALSE;
     if (!empty($defaults['id'])) {
-      $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled($this->_id);
+      $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $this->_id);
     }
 
     $alreadyAutoRenew = FALSE;
@@ -474,7 +473,7 @@ DESC limit 1");
     // Throw status bounce when no Membership type or priceset is present
     if (empty($this->allMembershipTypeDetails) && empty($priceSets)
     ) {
-      CRM_Core_Error::statusBounce(ts('You do not have all the permissions needed for this page.'));
+      CRM_Core_Error::statusBounce(ts("You either do not have all the permissions needed for this page, or the membership types haven't been fully configured."));
     }
     // retrieve all memberships
     $allMembershipInfo = [];
@@ -659,7 +658,7 @@ DESC limit 1");
    *   mixed true or array of errors
    *
    * @throws \CRM_Core_Exception
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public static function formRule($params, $files, $self) {
     $errors = [];
@@ -864,7 +863,6 @@ DESC limit 1");
    * Process the form submission.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -917,7 +915,6 @@ DESC limit 1");
    * @return bool
    *   true if mail was sent successfully
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    *
    * @deprecated
    *   This function was shared with Batch_Entry which had limited overlap
@@ -1004,8 +1001,6 @@ DESC limit 1");
    * This is also accessed by unit tests.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
    */
   public function submit(): void {
     $this->storeContactFields($this->_params);
@@ -1390,7 +1385,6 @@ DESC limit 1");
    *      submitted form values
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function updateContributionOnMembershipTypeChange($inputParams) {
     if (Civi::settings()->get('update_contribution_on_membership_type_change') &&
@@ -1496,7 +1490,7 @@ DESC limit 1");
    * Get status message for updating membership.
    *
    * @return string
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getStatusMessageForUpdate(): string {
     foreach ($this->getCreatedMemberships() as $membership) {
@@ -1514,7 +1508,7 @@ DESC limit 1");
    * Get status message for create action.
    *
    * @return string
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getStatusMessageForCreate(): string {
     foreach ($this->getCreatedMemberships() as $membership) {
@@ -1568,7 +1562,7 @@ DESC limit 1");
     if ($this->_action & CRM_Core_Action::UPDATE
       && CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getEntityId(),
         'contribution_recur_id')
-      && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->getEntityId())) {
+      && !CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $this->getEntityId())) {
 
       $isRecur = TRUE;
     }
@@ -1582,7 +1576,6 @@ DESC limit 1");
    *
    * @return bool
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function emailMembershipReceipt($formValues) {
     $customValues = $this->getCustomValuesForReceipt($formValues);
@@ -1665,8 +1658,7 @@ DESC limit 1");
    *
    * @return int|null
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getContributionRecurID():?int {
     if (!array_key_exists('ContributionRecur', $this->ids)) {
@@ -1680,8 +1672,7 @@ DESC limit 1");
    *
    * This function was copied from another form & needs cleanup.
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function createRecurringContribution(): void {
     if (!$this->isCreateRecurringContribution()) {
@@ -1736,7 +1727,7 @@ DESC limit 1");
    * Get the membership type, if any, to be recurred.
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRecurMembershipType(): array {
     foreach ($this->order->getRenewableMembershipTypes() as $type) {
@@ -1749,7 +1740,7 @@ DESC limit 1");
    * Get the frequency interval.
    *
    * @return int|null
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getFrequencyInterval(): ?int {
     $membershipType = $this->getRecurMembershipType();
@@ -1760,7 +1751,7 @@ DESC limit 1");
    * Get the frequency interval.
    *
    * @return string|null
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getFrequencyUnit(): ?string {
     $membershipType = $this->getRecurMembershipType();
@@ -1779,8 +1770,7 @@ DESC limit 1");
    * against breakage if code is moved around).
    *
    * @return array
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getFormMembershipParams(): array {
     $submittedValues = $this->controller->exportValues($this->_name);
@@ -1825,7 +1815,7 @@ DESC limit 1");
    * Get memberships submitted through the form submission.
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getCreatedMemberships(): array {
     return civicrm_api3('Membership', 'get', ['id' => ['IN' => $this->_membershipIDs]])['values'];
@@ -1835,7 +1825,7 @@ DESC limit 1");
    * Get parameters for membership create for all memberships to be created.
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getMembershipParameters(): array {
     $membershipTypeValues = [];
@@ -1917,7 +1907,7 @@ DESC limit 1");
    * Get the membership (or last membership) created or edited on this form.
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getMembership(): array {
     if (empty($this->membership)) {
@@ -1943,7 +1933,7 @@ DESC limit 1");
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getLineItemForOrderApi(): array {
     $lineItems = [];
@@ -1966,7 +1956,7 @@ DESC limit 1");
    * @param int $membershipTypeID
    *
    * @return mixed
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getMembershipParamsForType(int $membershipTypeID) {
     return array_merge($this->getFormMembershipParams(), $this->getMembershipParameters()[$membershipTypeID]);

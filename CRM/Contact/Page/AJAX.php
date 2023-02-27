@@ -221,7 +221,7 @@ class CRM_Contact_Page_AJAX {
 
     $ret = ['is_error' => 0];
 
-    list($relTypeId, $b, $a) = explode('_', $relType);
+    [$relTypeId, $b, $a] = explode('_', $relType);
 
     if ($relationshipID && $originalCid) {
       CRM_Case_BAO_Case::endCaseRole($caseID, $a, $originalCid, $relTypeId);
@@ -249,7 +249,7 @@ class CRM_Contact_Page_AJAX {
         ]);
         $result = civicrm_api3('relationship', 'create', $params);
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         $ret['is_error'] = 1;
         $ret['error_message'] = $e->getMessage();
       }
@@ -362,7 +362,7 @@ class CRM_Contact_Page_AJAX {
       $rowCount = Civi::settings()->get('search_autocomplete_count');
 
       // add acl clause here
-      list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+      [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
       if ($aclWhere) {
         $aclWhere = "AND {$aclWhere}";
       }
@@ -371,7 +371,7 @@ class CRM_Contact_Page_AJAX {
 SELECT sort_name name, ce.email, cc.id
 FROM   civicrm_email ce INNER JOIN civicrm_contact cc ON cc.id = ce.contact_id
        {$aclFrom}
-WHERE  ce.on_hold = 0 AND cc.is_deceased = 0 AND cc.do_not_email = 0 AND {$queryString}
+WHERE  ce.on_hold = 0 AND cc.is_deceased = 0 AND cc.do_not_email = 0 AND cc.is_deleted = 0 AND {$queryString}
        {$aclWhere}
 LIMIT {$rowCount}
 )";
@@ -426,7 +426,7 @@ LIMIT {$rowCount}
       $rowCount = (int) CRM_Utils_Request::retrieveValue('rowcount', 'Integer', 20, FALSE, 'GET');
 
       // add acl clause here
-      list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+      [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
       if ($aclWhere) {
         $aclWhere = " AND $aclWhere";
       }
@@ -483,22 +483,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   public static function buildDedupeRules() {
-    $parent = CRM_Utils_Request::retrieve('parentId', 'Positive');
-
-    switch ($parent) {
-      case 1:
-        $contactType = 'Individual';
-        break;
-
-      case 2:
-        $contactType = 'Household';
-        break;
-
-      case 4:
-        $contactType = 'Organization';
-        break;
-    }
-
+    $contactType = CRM_Utils_Request::retrieve('parentId', 'String');
     $dedupeRules = CRM_Dedupe_BAO_DedupeRuleGroup::getByType($contactType);
 
     CRM_Utils_JSON::output($dedupeRules);
@@ -826,7 +811,7 @@ LIMIT {$offset}, {$rowCount}
         civicrm_api3('Exception', 'create', ['contact_id1' => $cid, 'contact_id2' => $oid]);
         return TRUE;
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         return FALSE;
       }
     }

@@ -508,6 +508,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($extra['option_context']);
     }
 
+    // Allow disabled to be a boolean
+    if (isset($attributes['disabled']) && $attributes['disabled'] === FALSE) {
+      unset($attributes['disabled']);
+    }
+
     $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
@@ -1151,7 +1156,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * If renderer is not set create one and initialize it.
    *
-   * @return object
+   * @return CRM_Core_Form_Renderer
    */
   public function &getRenderer() {
     if (!isset($this->_renderer)) {
@@ -1710,10 +1715,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   a controlled way. To convert the field the jcalendar code needs to be removed from the
    *   tpl as well. That file is intended to be EOL.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Exception
    * @return mixed
-   *   HTML_QuickForm_Element
+   *   HTML_QuickForm_element
    *   void
    */
   public function addField($name, $props = [], $required = FALSE, $legacyDate = TRUE) {
@@ -1788,7 +1793,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['data-api-field'] = $props['name'];
       }
     }
-    $props += CRM_Utils_Array::value('html', $fieldSpec, []);
+    $htmlProps = (array) ($fieldSpec['html'] ?? []);
+    CRM_Utils_Array::remove($htmlProps, 'label', 'filter');
+    $props += $htmlProps;
     if (in_array($widget, ['Select', 'Select2'])
       && !array_key_exists('placeholder', $props)
       && $placeholder = self::selectOrAnyPlaceholder($props, $required, $label)) {
@@ -1889,6 +1896,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->add('wysiwyg', $name, $label, $props, $required);
 
       case 'EntityRef':
+        // Auto-apply filters from field metadata
+        foreach ($fieldSpec['html']['filter'] ?? [] as $filter) {
+          [$k, $v] = explode('=', $filter);
+          $props['api']['params'][$k] = $v;
+        }
         return $this->addEntityRef($name, $label, $props, $required);
 
       case 'Password':
@@ -2194,6 +2206,33 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($setDefaultCurrency) {
       $this->setDefaults([$name => $defaultCurrency]);
     }
+  }
+
+  /**
+   * @param string $name
+   * @param string $label
+   * @param array $props
+   * @param bool $required
+   *
+   * @return HTML_QuickForm_Element
+   */
+  public function addAutocomplete(string $name, string $label = '', array $props = [], bool $required = FALSE) {
+    $props += [
+      'entity' => 'Contact',
+      'api' => [],
+      'select' => [],
+    ];
+    $props['api'] += [
+      'formName' => 'qf:' . get_class($this),
+      'fieldName' => $name,
+    ];
+    $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-autocomplete');
+    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
+    $props['data-select-params'] = json_encode($props['select']);
+    $props['data-api-params'] = json_encode($props['api']);
+    $props['data-api-entity'] = $props['entity'];
+    CRM_Utils_Array::remove($props, 'select', 'api', 'entity');
+    return $this->add('text', $name, $label, $props, $required);
   }
 
   /**
@@ -2606,6 +2645,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
     }
+  }
+
+  /**
+   * Push the current url to the userContext.
+   *
+   * This is like a save point :-). The next status bounce will
+   * return the browser to this url unless another is added.
+   */
+  protected function pushUrlToUserContext(): void {
+    CRM_Core_Session::singleton()
+      ->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
   }
 
   /**

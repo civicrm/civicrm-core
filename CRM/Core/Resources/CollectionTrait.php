@@ -386,7 +386,7 @@ trait CRM_Core_Resources_CollectionTrait {
     $s = &$this->findCreateSettingSnippet();
     $result = $s['settings'];
     foreach ($s['settingsFactories'] as $callable) {
-      $result = CRM_Core_Resources_CollectionAdderTrait::mergeSettings($result, $callable());
+      $result = self::mergeSettings($result, $callable());
     }
     CRM_Utils_Hook::alterResourceSettings($result);
     return $result;

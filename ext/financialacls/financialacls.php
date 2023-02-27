@@ -35,59 +35,12 @@ function financialacls_civicrm_install() {
 }
 
 /**
- * Implements hook_civicrm_postInstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
- */
-function financialacls_civicrm_postInstall() {
-  _financialacls_civix_civicrm_postInstall();
-}
-
-/**
- * Implements hook_civicrm_uninstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
- */
-function financialacls_civicrm_uninstall() {
-  _financialacls_civix_civicrm_uninstall();
-}
-
-/**
  * Implements hook_civicrm_enable().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
  */
 function financialacls_civicrm_enable() {
   _financialacls_civix_civicrm_enable();
-}
-
-/**
- * Implements hook_civicrm_disable().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
- */
-function financialacls_civicrm_disable() {
-  _financialacls_civix_civicrm_disable();
-}
-
-/**
- * Implements hook_civicrm_upgrade().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
- */
-function financialacls_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _financialacls_civix_civicrm_upgrade($op, $queue);
-}
-
-/**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function financialacls_civicrm_entityTypes(&$entityTypes) {
-  _financialacls_civix_civicrm_entityTypes($entityTypes);
 }
 
 /**
@@ -98,7 +51,6 @@ function financialacls_civicrm_entityTypes(&$entityTypes) {
  * @param int|null $id
  * @param array $params
  *
- * @throws \API_Exception
  * @throws \CRM_Core_Exception
  */
 function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
@@ -112,7 +64,7 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
       $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $params['id'], 'financial_type_id');
     }
     if (!array_key_exists($params['financial_type_id'], $types)) {
-      throw new API_Exception('You do not have permission to ' . $op . ' this line item');
+      throw new CRM_Core_Exception('You do not have permission to ' . $op . ' this line item');
     }
   }
   if ($objectName === 'FinancialType' && !empty($params['id']) && !empty($params['name'])) {
@@ -184,7 +136,7 @@ function _financialacls_civicrm_get_accounts_clause(): string {
         $clause = 'IN (' . implode(',', array_keys($accounts)) . ')';
       }
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       // We've already set it to 0 so we can quietly handle this.
     }
   }
@@ -221,7 +173,7 @@ function _financialacls_civicrm_get_accessible_financial_types(): array {
  *
  * @return string
  *
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function _financialacls_civicrm_get_membership_type_clause(): string {
   $financialTypes = _financialacls_civicrm_get_accessible_financial_types();

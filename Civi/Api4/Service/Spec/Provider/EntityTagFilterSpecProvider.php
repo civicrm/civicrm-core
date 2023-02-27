@@ -19,7 +19,11 @@ use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Utils\CoreUtil;
 
-class EntityTagFilterSpecProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
@@ -31,6 +35,7 @@ class EntityTagFilterSpecProvider implements Generic\SpecProviderInterface {
       ->setColumnName('id')
       ->setDescription(ts('Filter by tags (including child tags)'))
       ->setType('Filter')
+      ->setInputType('Select')
       ->setOperators(['IN', 'NOT IN'])
       ->addSqlFilter([__CLASS__, 'getTagFilterSql'])
       ->setSuffixes(['name', 'label', 'description', 'color'])

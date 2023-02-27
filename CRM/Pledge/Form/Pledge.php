@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\PledgePayment;
+
 /**
  * This class generates form components for processing a pledge
  */
@@ -79,9 +81,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $this->userDisplayName = $this->userEmail = NULL;
     if ($this->_contactID) {
-      list($this->userDisplayName,
-        $this->userEmail
-        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+      [$this->userDisplayName, $this->userEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
     }
 
     $this->setPageTitle(ts('Pledge'));
@@ -416,8 +416,10 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
   /**
    * Process the form submission.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function postProcess() {
+  public function postProcess(): void {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Pledge_BAO_Pledge::deletePledge($this->_id);
       return;
@@ -457,13 +459,13 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $dates = ['create_date', 'start_date', 'acknowledge_date', 'cancel_date'];
     foreach ($dates as $d) {
       if ($this->_id && (!$this->_isPending) && !empty($this->_values[$d])) {
-        if ($d == 'start_date') {
+        if ($d === 'start_date') {
           $params['scheduled_date'] = CRM_Utils_Date::processDate($this->_values[$d]);
         }
         $params[$d] = CRM_Utils_Date::processDate($this->_values[$d]);
       }
       elseif (!empty($formValues[$d]) && !CRM_Utils_System::isNull($formValues[$d])) {
-        if ($d == 'start_date') {
+        if ($d === 'start_date') {
           $params['scheduled_date'] = CRM_Utils_Date::processDate($formValues[$d]);
         }
         $params[$d] = CRM_Utils_Date::processDate($formValues[$d]);
@@ -499,10 +501,11 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     // create pledge record.
     $pledge = CRM_Pledge_BAO_Pledge::create($params);
+    $pledgeID = $pledge->id;
 
     $statusMsg = NULL;
 
-    if ($pledge->id) {
+    if ($pledgeID) {
       // set the status msg.
       if ($this->_action & CRM_Core_Action::ADD) {
         $statusMsg = ts('Pledge has been recorded and the payment schedule has been created.<br />');
@@ -513,28 +516,31 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     // handle Acknowledgment.
-    if (!empty($formValues['is_acknowledge']) && $pledge->id) {
+    if (!empty($formValues['is_acknowledge'])) {
 
       // calculate scheduled amount.
       $params['scheduled_amount'] = round($params['amount'] / $params['installments']);
       $params['total_pledge_amount'] = $params['amount'];
       // get some required pledge values in params.
-      $params['id'] = $pledge->id;
+      $params['id'] = $pledgeID;
       $params['acknowledge_date'] = $pledge->acknowledge_date;
       $params['is_test'] = $pledge->is_test;
       $params['currency'] = $pledge->currency;
       // retrieve 'from email id' for acknowledgement
       $params['from_email_id'] = $formValues['from_email_address'];
 
-      $this->paymentId = NULL;
       // send Acknowledgment mail.
       CRM_Pledge_BAO_Pledge::sendAcknowledgment($this, $params);
 
       $statusMsg .= ' ' . ts("An acknowledgment email has been sent to %1.<br />", [1 => $this->userEmail]);
-
+      // get the first valid payment id.
+      $nextPaymentID = PledgePayment::get()
+        ->addWhere('pledge_id', '=', $pledgeID)
+        ->addWhere('status_id:name', 'IN', ['Pending', 'Overdue'])
+        ->addOrderBy('scheduled_date')->setLimit(1)->execute()->first()['id'];
       // build the payment urls.
-      if ($this->paymentId) {
-        $urlParams = "reset=1&action=add&cid={$this->_contactID}&ppid={$this->paymentId}&context=pledge";
+      if ($nextPaymentID) {
+        $urlParams = "reset=1&action=add&cid={$this->_contactID}&ppid={$nextPaymentID}&context=pledge";
         $contribURL = CRM_Utils_System::url('civicrm/contact/view/contribution', $urlParams);
         $urlParams .= "&mode=live";
         $creditURL = CRM_Utils_System::url('civicrm/contact/view/contribution', $urlParams);

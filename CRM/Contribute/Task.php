@@ -186,6 +186,8 @@ class CRM_Contribute_Task extends CRM_Core_Task {
       $tasks = self::taskTitles();
     }
     else {
+      // See https://lab.civicrm.org/dev/core/-/issues/3737
+      static::tasks();
       $tasks = [
         self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
         self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],

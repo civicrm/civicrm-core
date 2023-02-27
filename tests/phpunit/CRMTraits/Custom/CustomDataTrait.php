@@ -52,7 +52,7 @@ trait CRMTraits_Custom_CustomDataTrait {
         ->execute()
         ->first()['id'];
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->fail('Could not create group ' . $e->getMessage());
     }
     return $this->ids['CustomGroup'][$identifier];
@@ -169,10 +169,19 @@ trait CRMTraits_Custom_CustomDataTrait {
    * Generally keys map to data types.
    *
    * @param string $key
+   * @param int $version
    *
    * @return string
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function getCustomFieldName(string $key): string {
+  protected function getCustomFieldName(string $key = 'text', int $version = 3): string {
+    if ($version === 4) {
+      $field = CustomField::get(FALSE)->addWhere('id', '=', $this->getCustomFieldID($key))
+        ->addSelect('name', 'custom_group_id.name')->execute()->first();
+      return $field['custom_group_id.name'] . '.' . $field['name'];
+    }
     return 'custom_' . $this->getCustomFieldID($key);
   }
 
@@ -183,7 +192,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @param array $values
    *
    * @return int
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function addOptionToCustomField(string $key, array $values): int {
     $optionGroupID = CustomField::get(FALSE)

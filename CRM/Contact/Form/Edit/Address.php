@@ -31,7 +31,7 @@ class CRM_Contact_Form_Edit_Address {
    * @param bool $inlineEdit
    *   True when edit used in inline edit.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildQuickForm(&$form, $addressBlockCount = NULL, $sharing = TRUE, $inlineEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
@@ -355,7 +355,7 @@ class CRM_Contact_Form_Edit_Address {
    */
   public static function storeRequiredCustomDataInfo(&$form, $groupTree) {
     if (in_array(CRM_Utils_System::getClassName($form), ['CRM_Contact_Form_Contact', 'CRM_Contact_Form_Inline_Address'])) {
-      $requireOmission = NULL;
+      $requireOmission = '';
       foreach ($groupTree as $csId => $csVal) {
         // only process Address entity fields
         if ($csVal['extends'] !== 'Address') {
@@ -385,7 +385,6 @@ class CRM_Contact_Form_Edit_Address {
    * @param int $blockId
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected static function addCustomDataToForm(&$form, $entityId, $blockId) {
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address', NULL, $entityId);

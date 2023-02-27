@@ -174,6 +174,7 @@ FROM civicrm_action_schedule cas
    * @param array $params
    *   An assoc array of name/value pairs.
    *
+   * @deprecated
    * @return CRM_Core_DAO_ActionSchedule
    * @throws \CRM_Core_Exception
    */
@@ -318,7 +319,6 @@ FROM civicrm_action_schedule cas
    * @param string $now
    * @param array $params
    *
-   * @throws API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function buildRecipientContacts(string $mappingID, $now, $params = []) {
@@ -347,7 +347,6 @@ FROM civicrm_action_schedule cas
    * @param string $now
    * @param array $params
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function processQueue($now = NULL, $params = []): void {
@@ -463,17 +462,10 @@ FROM civicrm_action_schedule cas
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
       'activity_type_id' => $activityTypeID,
       'source_record_id' => $entityID,
+      'case_id' => $caseID,
     ];
     // @todo use api, remove all the above wrangling
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
-
-    //file reminder on case if source activity is a case activity
-    if (!empty($caseID)) {
-      $caseActivityParams = [];
-      $caseActivityParams['case_id'] = $caseID;
-      $caseActivityParams['activity_id'] = $activity->id;
-      CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
-    }
   }
 
   /**
@@ -585,22 +577,20 @@ FROM civicrm_action_schedule cas
   }
 
   /**
+   * Send the reminder email.
+   *
    * @param \Civi\Token\TokenRow $tokenRow
    * @param CRM_Core_DAO_ActionSchedule $schedule
    * @param int $toContactID
+   *
    * @return array
    *   List of error messages.
+   * @throws \CRM_Core_Exception
    */
   protected static function sendReminderEmail($tokenRow, $schedule, $toContactID): array {
     $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID, TRUE);
     if (!$toEmail) {
-      return ["email_missing" => "Couldn't find recipient's email address."];
-    }
-
-    $body_text = $tokenRow->render('body_text');
-    $body_html = $tokenRow->render('body_html');
-    if (!$schedule->body_text) {
-      $body_text = CRM_Utils_String::htmlToText($body_html);
+      return ['email_missing' => "Couldn't find recipient's email address."];
     }
 
     // set up the parameters for CRM_Utils_Mail::send
@@ -613,19 +603,16 @@ FROM civicrm_action_schedule cas
       'entity' => 'action_schedule',
       'entity_id' => $schedule->id,
     ];
+    $body_text = $tokenRow->render('body_text');
+    $mailParams['html'] = $tokenRow->render('body_html');
+    // todo - remove these lines for body_text as there is similar handling in
+    // CRM_Utils_Mail::send()
+    if (!$schedule->body_text) {
+      $body_text = CRM_Utils_String::htmlToText($mailParams['html']);
+    }
+    // render the &amp; entities in text mode, so that the links work
+    $mailParams['text'] = str_replace('&amp;', '&', $body_text);
 
-    $preferredMailFormat = $tokenRow->render('preferred_mail_format');
-    if (!$body_html ||  $preferredMailFormat === 'Text' || $preferredMailFormat === 'Both'
-    ) {
-      // render the &amp; entities in text mode, so that the links work
-      $mailParams['text'] = str_replace('&amp;', '&', $body_text);
-    }
-    if ($body_html && ($tokenRow->context['contact']['preferred_mail_format'] === 'HTML' ||
-        $tokenRow->context['contact']['preferred_mail_format'] === 'Both'
-      )
-    ) {
-      $mailParams['html'] = $body_html;
-    }
     $result = CRM_Utils_Mail::send($mailParams);
     if (!$result) {
       return ['email_fail' => 'Failed to send message'];
@@ -644,7 +631,8 @@ FROM civicrm_action_schedule cas
       'controller' => __CLASS__,
       'actionSchedule' => $schedule,
       'actionMapping' => $mapping,
-      'smarty' => TRUE,
+      'smarty' => Civi::settings()->get('scheduled_reminder_smarty'),
+      'schema' => ['contactId'],
     ]);
     $tp->addMessage('body_text', $schedule->body_text, 'text/plain');
     $tp->addMessage('body_html', $schedule->body_html, 'text/html');

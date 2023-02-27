@@ -34,5 +34,5 @@
     campaignTrClass='' campaignTdClass=''}
 
  </table>
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+ <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 </div>

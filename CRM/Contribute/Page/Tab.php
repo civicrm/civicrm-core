@@ -118,7 +118,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    *
    * @return array|array[]
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function selfServiceRecurLinks(int $recurID): array {
     $links = [];
@@ -184,7 +183,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    *
    * @return array|array[]
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function dashboardRecurLinks(int $recurID, int $contactID): array {
     $links = [];
@@ -326,6 +324,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   private function buildRecurringContributionsArray($recurContributions) {
     $liveRecurringContributionCount = 0;
     foreach ($recurContributions as $recurId => $recurDetail) {
+      // API3 does not return "installments" if it is not set. But we need it set to avoid PHP notices on ContributionRecurSelector.tpl
+      $recurContributions[$recurId]['installments'] = $recurDetail['installments'] ?? NULL;
       // Is recurring contribution active?
       $recurContributions[$recurId]['is_active'] = !in_array(CRM_Contribute_PseudoConstant::contributionStatus($recurDetail['contribution_status_id'], 'name'), CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses());
       if ($recurContributions[$recurId]['is_active']) {
@@ -411,7 +411,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
@@ -448,7 +447,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * loads, it decides the which action has to be taken for the page.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function run() {
     $this->preProcess();

@@ -34,9 +34,9 @@ class CRM_Core_Form_RecurringEntity {
 
   /**
    * Schedule Reminder data
-   * @var array
+   * @var CRM_Core_DAO|null
    */
-  protected static $_scheduleReminderDetails = [];
+  protected static $_scheduleReminderDetails = NULL;
 
   /**
    *  Parent Entity ID
@@ -319,7 +319,7 @@ class CRM_Core_Form_RecurringEntity {
    * @param string $type
    * @param array $linkedEntities
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function postProcess($params, $type, $linkedEntities = []) {
     // Check entity_id not present in params take it from class variable

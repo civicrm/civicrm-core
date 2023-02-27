@@ -178,7 +178,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    *   Bool to see if we should check charset.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -588,7 +587,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    *
    * @dataProvider versionThreeAndFour
    */
@@ -718,6 +716,49 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'create', $params);
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
+   * Test create contact with custom checkbox with empty array
+   */
+  public function testCreateWithEmptyCustomCheckbox(): void {
+    $this->callAPISuccess('OptionGroup', 'create', [
+      'name' => 'checkbox_opts',
+      'title' => 'Checkbox Options',
+      'data_type' => 'String',
+      'is_active' => 1,
+    ]);
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'checkbox_opts',
+      'name' => 'checkbox_option_one',
+      'label' => 'Checkbox Option One',
+      'is_active' => 1,
+      'value' => 1,
+    ]);
+    $custom_group_id = $this->createCustomGroup([
+      'name' => 'checkbox_custom_group',
+      'title' => 'Checkbox Group',
+      'extends' => 'Contact',
+    ]);
+    $custom_field_id = $this->callAPISuccess('CustomField', 'create', [
+      'name' => 'a_checkbox_field',
+      'label' => 'A Checkbox Field',
+      'custom_group_id' => $custom_group_id,
+      'option_group_id' => 'checkbox_opts',
+      'html_type' => 'CheckBox',
+      'data_type' => 'String',
+      'is_active' => 1,
+    ])['id'];
+
+    $params = $this->_params;
+    $params['custom_' . $custom_field_id] = [];
+    $contact_id = $this->callAPISuccess('Contact', 'create', $params)['id'];
+
+    $result = $this->callAPISuccessGetSingle('Contact', ['id' => $contact_id, 'return' => ['custom_' . $custom_field_id]]);
+    $this->assertSame('', $result['custom_' . $custom_field_id]);
+
+    $this->customFieldDelete($custom_field_id);
+    $this->customGroupDelete($custom_group_id);
   }
 
   /**
@@ -995,7 +1036,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test the like operator works for Contact.get
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetEmailLike(): void {
     $this->individualCreate();
@@ -1230,7 +1270,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * V3 only - the "skip_greeting_processing" param is not currently in v4
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetByAddresseeID(): void {
     $individual1ID = $this->individualCreate([
@@ -1291,9 +1330,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * https://lab.civicrm.org/dev/core/issues/1025
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetWithCustomOfActivityType(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Activity']);
@@ -1331,7 +1368,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Check that address name, ID is returned if required.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetReturnAddress(): void {
     $contactID = $this->individualCreate();
@@ -1588,7 +1624,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * names and email succeeds.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CRM_Core_Exception
    */
   public function testCreateIndividualWithNameEmail(): void {
     $params = [
@@ -1671,7 +1706,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * type succeeds.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CRM_Core_Exception
    */
   public function testCreateIndividualWithNameEmailLocationType(): void {
     $params = [
@@ -1691,7 +1725,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * inactive.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateIndividualWithEmployer(): void {
     $employer = $this->organizationCreate();
@@ -1770,7 +1803,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Verify successful update of individual contact.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testUpdateIndividualWithAll(): void {
     $contactID = $this->individualCreate();
@@ -1826,9 +1858,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * CRM-20421: This test make sure that inherited memberships are deleted upon merging organization.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMergeOrganizations(): void {
@@ -1876,10 +1906,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test the function that determines if 2 contacts have conflicts.
    *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMergeGetConflicts(): void {
     [$contact1, $contact2] = $this->createDeeplyConflictedContacts();
@@ -1951,9 +1979,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetConflictsAggressiveMode(): void {
     [$contact1, $contact2] = $this->createDeeplyConflictedContacts();
@@ -2034,7 +2060,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testUpdateCreateWithID(int $version): void {
@@ -2080,7 +2105,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @param int $version
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testContactDelete(int $version): void {
@@ -2175,7 +2200,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_get() with default return properties.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContactGetRetDefault(): void {
     $contactID = $this->individualCreate();
@@ -2192,7 +2216,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_getquick() with empty name param.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContactGetQuick(): void {
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact', 'email' => 'TestContact@example.com']);
@@ -2226,7 +2249,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testContactGetOldParamsNoMatches(int $version): void {
@@ -2240,7 +2262,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_get(,true) with one match.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContactGetOldParamsOneMatch(): void {
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
@@ -2254,7 +2275,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_get(,true) with space in sort_name.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContactGetSpaceMatches(): void {
     $contactParams_1 = [
@@ -2347,7 +2367,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, $params));
 
     $result = $this->callAPISuccess('contact', 'getsingle', ['id' => $contact['id']]);
-    $this->assertEquals('Both', $result['preferred_mail_format']);
 
     $this->assertEquals('en_US', $result['preferred_language']);
     $this->assertEquals(1, $result['communication_style_id']);
@@ -2397,6 +2416,43 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['birth_date']);
+  }
+
+  /**
+   * Test the greeting fields update sensibly.
+   */
+  public function testGreetingUpdates(): void {
+    $contactID = $this->individualCreate();
+    $greetingFields = ['email_greeting_id:name', 'email_greeting_display', 'email_greeting_custom'];
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID, 'version' => 4, 'return' => $greetingFields]);
+    $this->assertEquals('Dear {contact.first_name}', $currentGreetings['email_greeting_id:name']);
+    // Change to customized greeting.
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'email_greeting_id' => 'Customized',
+      'email_greeting_custom' => 'Howdy',
+    ]);
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['version' => 4, 'id' => $contactID, 'return' => $greetingFields]);
+    $this->assertEquals('Customized', $currentGreetings['email_greeting_id:name']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_custom']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_display']);
+
+    // Change back to standard, check email_greeting_custom set to NULL.
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'email_greeting_id' => 'Dear {contact.first_name}',
+    ]);
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['id' => $contactID, 'version' => 4, 'return' => $greetingFields]);
+    $this->assertNull($currentGreetings['email_greeting_custom']);
+
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'email_greeting_custom' => 'Howdy',
+    ]);
+    $currentGreetings = $this->callAPISuccessGetSingle('Contact', ['version' => 4, 'id' => $contactID, 'return' => $greetingFields]);
+    $this->assertEquals('Customized', $currentGreetings['email_greeting_id:name']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_custom']);
+    $this->assertEquals('Howdy', $currentGreetings['email_greeting_display']);
   }
 
   /**
@@ -2482,7 +2538,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test for Contact.get id=@user:username.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContactGetByUsername(): void {
     // Setup - create contact with a uf-match.
@@ -2527,7 +2582,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test to check return works OK.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContactGetReturnValues(): void {
     $extraParams = [
@@ -2945,7 +2999,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testContactGetFormatIsSuccessTrue(int $version): void {
@@ -3007,7 +3060,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testCreateAlterSortName(int $version): void {
@@ -3046,7 +3098,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testContactGetSingleEntityArray(int $version): void {
@@ -3067,7 +3118,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testContactGetFormatCountOnly(int $version): void {
@@ -3088,7 +3138,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testContactGetFormatIDOnly(int $version): void {
@@ -3110,7 +3159,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testContactGetFormatSingleValue(int $version): void {
@@ -3229,7 +3277,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test contact proximity api.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContactProximity(): void {
     // first create a contact with a SF location with a specific
@@ -3386,7 +3433,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test that getquick returns contacts with an exact first name match first.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetQuickEmail(): void {
     $this->getQuickSearchSampleData();
@@ -3427,7 +3473,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test that getquick returns contacts with an exact first name match first.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetQuickEmailACL(): void {
     $this->getQuickSearchSampleData();
@@ -3603,7 +3648,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test that getquick applies ACLs.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetQuickFirstNameACLs(): void {
     $this->getQuickSearchSampleData();
@@ -3864,7 +3908,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testSQLOperatorsOnContactAPI(int $version): void {
@@ -3884,7 +3927,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetModifiedDateByOperators(int $version): void {
@@ -3911,7 +3953,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetCreatedDateByOperators(int $version): void {
@@ -3936,7 +3977,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * CRM-14263 check that API is not affected by search profile related bug.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testReturnCityProfile(): void {
     $contactID = $this->individualCreate();
@@ -3952,9 +3992,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-15443 - ensure getlist api does not return deleted contacts.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGetlistExcludeConditions(): void {
     $name = 'Scarabée';
@@ -3971,6 +4008,25 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals($contact, $result['values'][0]['id']);
+  }
+
+  /**
+   * Test getlist gets an organization with a number that is not a valid organization ID.
+   */
+  public function testGetlistInvalidID(): void {
+    $individualID = $this->individualCreate();
+    $organizationID = $this->organizationCreate(['organization_name' => 'Org ' . $individualID]);
+    $organizationID2 = $this->organizationCreate(['organization_name' => 'Org ' . $organizationID]);
+    $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $individualID, 'params' => ['contact_type' => 'Organization']]);
+    $this->assertEquals(1, $result['count']);
+    $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $organizationID, 'params' => ['contact_type' => 'Organization']]);
+    $this->assertEquals(2, $result['count']);
+    $this->assertEquals($organizationID, $result['values'][0]['id']);
+    $this->assertEquals($organizationID2, $result['values'][1]['id']);
+
+    $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $organizationID2, 'params' => ['contact_type' => 'Organization']]);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals($organizationID2, $result['values'][0]['id']);
   }
 
   /**
@@ -4046,7 +4102,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param string $phoneKey
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider getPhoneStrings
    *
    */
@@ -4165,7 +4220,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * This test protects that legacy.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMergeBizarreOldParams(): void {
     $this->createLoggedInUser();
@@ -4183,7 +4237,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test merging 2 contacts.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMerge(): void {
     $this->createLoggedInUser();
@@ -4221,7 +4274,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param bool $isReverse
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMergeWithBlankLocationData(bool $isReverse): void {
     $this->createLoggedInUser();
@@ -4250,9 +4302,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test merging 2 contacts with custom fields.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMergeCustomFields(): void {
@@ -4313,9 +4363,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test merging a contact that is the target of a contact reference field on another contact.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMergeContactReferenceCustomFieldTarget(): void {
     $this->createCustomGroupWithFieldOfType([], 'contact_reference');
@@ -4333,9 +4381,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test merging a contact that is the target of a contact reference field on another contact.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMergeMultiContactReferenceCustomFieldTarget(): void {
     $this->createCustomGroupWithFieldOfType([], 'contact_reference', NULL, ['serialize' => 1]);
@@ -4359,9 +4405,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test merging when a multiple record set is in use.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMergeMultipleCustomValues(): void {
@@ -4387,7 +4431,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * The goal here is to start with a contact deleted by merged and find out the contact that is the current version of them.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMergedGet(): void {
     $this->contactIDs[] = $this->individualCreate();
@@ -4422,7 +4465,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * The goal here is to start with a contact deleted by merged and find out the contact that is the current version of them.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMergedGetWithPermanentlyDeletedContact(): void {
     $this->contactIDs[] = $this->individualCreate();
@@ -4449,7 +4491,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @see https://issues.civicrm.org/jira/browse/CRM-18307
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testMergeNoTrash(): void {
     $this->createLoggedInUser();
@@ -4707,7 +4748,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * accessible via the api.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testContactGetProximity(): void {
     CRM_Core_Config::singleton()->geocodeMethod = 'CRM_Utils_MockGeocoder';
@@ -4732,7 +4772,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testLoggedInUserAPISupportToken(): void {
     $description = 'Get contact id of the current logged in user';
@@ -4781,7 +4821,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * CRM-21041 Test if 'communication style' is set if value is passed.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateCommunicationStylePassed(): void {
     $this->callAPISuccess('Contact', 'create', [
@@ -4807,7 +4846,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   * @throws \CRM_Core_Exception
    */
   public function testContactGreetingsCreate(int $version): void {
     $this->_apiversion = $version;
@@ -4837,8 +4875,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testContactGreetingsCreateWithCustomField(int $version): void {
     $this->_apiversion = $version;
@@ -4881,8 +4917,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @param int $version
    *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGreetingParseSmarty(int $version): void {
@@ -4944,7 +4978,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test the related contacts filter.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSmartGroupsForRelatedContacts(): void {
     $relationshipType1 = $this->callAPISuccess('RelationshipType', 'create', [
@@ -5013,7 +5046,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test creating a note from the contact.create API call when only passing the note as a string.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateNoteInCreate(): void {
     $loggedInContactID = $this->createLoggedInUser();
@@ -5113,9 +5145,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @return array
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function createDeeplyConflictedContacts(): array {
     $this->createCustomGroupWithFieldOfType();
@@ -5167,7 +5197,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param $expected
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionAndPrivacyOption
    */
   public function testGetContactsByPrivacyFlag(int $version, $query, $field, $expected): void {
@@ -5233,7 +5262,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int|null $contactID
    * @param array|null $criteria
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function validateContactField(string $fieldName, $expected, ?int $contactID, array $criteria = NULL): void {

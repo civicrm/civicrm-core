@@ -171,14 +171,14 @@ class CRM_Core_BAO_SchemaHandler {
 
     // Add index if field is searchable if it does not reference a foreign key
     // (skip indexing FK fields because it would be redundant to have 2 indexes)
-    if (!empty($params['searchable']) && empty($params['fk_table_name']) && substr($existingIndex, 0, 5) !== 'INDEX') {
+    if (!empty($params['searchable']) && empty($params['fk_table_name']) && substr($existingIndex ?? '', 0, 5) !== 'INDEX') {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
       $sql .= "INDEX_{$params['name']} ( {$params['name']} )";
     }
     // Drop search index if field is no longer searchable
-    elseif (empty($params['searchable']) && substr($existingIndex, 0, 5) === 'INDEX') {
+    elseif (empty($params['searchable']) && substr($existingIndex ?? '', 0, 5) === 'INDEX') {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= "DROP INDEX $existingIndex";
@@ -547,23 +547,23 @@ MODIFY      {$columnName} varchar( $length )
 
   /**
    * Check if a foreign key Exists
+   *
    * @param string $table_name
    * @param string $constraint_name
+   *
    * @return bool TRUE if FK is found
    */
-  public static function checkFKExists($table_name, $constraint_name) {
-    $dao = new CRM_Core_DAO();
+  public static function checkFKExists(string $table_name, string $constraint_name): bool {
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-      WHERE TABLE_SCHEMA = %1
-      AND TABLE_NAME = %2
-      AND CONSTRAINT_NAME = %3
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = %1
+      AND CONSTRAINT_NAME = %2
       AND CONSTRAINT_TYPE = 'FOREIGN KEY'
     ";
     $params = [
-      1 => [$dao->_database, 'String'],
-      2 => [$table_name, 'String'],
-      3 => [$constraint_name, 'String'],
+      1 => [$table_name, 'String'],
+      2 => [$constraint_name, 'String'],
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
 
@@ -737,7 +737,7 @@ MODIFY      {$columnName} varchar( $length )
           $existingIndex = $dao->Key_name;
         }
         $fkSql = self::buildForeignKeySQL($params, ",\n", "ADD ", $params['table_name']);
-        if (substr($existingIndex, 0, 2) === 'FK' && !$fkSql) {
+        if (substr(($existingIndex ?? ''), 0, 2) === 'FK' && !$fkSql) {
           $sql .= "$separator DROP FOREIGN KEY {$existingIndex},\nDROP INDEX {$existingIndex}";
           $separator = ",\n";
         }

@@ -34,7 +34,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return CRM_Financial_DAO_PaymentProcessor
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function create(array $params): CRM_Financial_DAO_PaymentProcessor {
     // If we are creating a new PaymentProcessor and have not specified the payment instrument to use, get the default from the Payment Processor Type.
@@ -72,7 +71,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
         'account_relationship' => $relationTypeId,
         'financial_account_id' => $params['financial_account_id'],
       ];
-      CRM_Financial_BAO_FinancialTypeAccount::add($values);
+      CRM_Financial_BAO_EntityFinancialAccount::add($values);
     }
 
     if (isset($params['id']) && isset($params['is_active']) && !isset($params['is_test'])) {
@@ -100,7 +99,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $processor = new CRM_Financial_DAO_PaymentProcessor();
       $processor->id = $paymentProcessorID;
       $processor->find(TRUE);
-      $cards = json_decode($processor->accepted_credit_cards, TRUE);
+      $cards = json_decode(($processor->accepted_credit_cards ?? ''), TRUE);
       return $cards;
     }
     return [];
@@ -272,7 +271,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param bool|null $isActive
    *   Do we only want active processors, only inactive (FALSE) or all processors (NULL)
    *
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    * @return array
    */
   public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $isCurrentDomainOnly = TRUE, $isActive = TRUE) {
@@ -374,7 +373,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    *   available processors
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getPaymentProcessors($capabilities = [], $ids = FALSE) {
     if (is_array($ids)) {
@@ -545,7 +544,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
       try {
         $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $ppID]);
       }
-      catch (API_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         // Unable to load the processor because this function uses an unreliable method to derive it.
         // The function looks to load the payment processor ID from the contribution page, which
         // can support multiple processors.

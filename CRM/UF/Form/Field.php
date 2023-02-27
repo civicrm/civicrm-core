@@ -78,6 +78,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   public function preProcess() {
     $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+
+    if (!$this->_gid && $this->_id) {
+      $this->_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $this->_id, 'uf_group_id');
+      $this->set('_gid', $this->_gid);
+    }
     if ($this->_gid) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
 
@@ -411,7 +416,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       ts('Visibility'),
       CRM_Core_SelectValues::ufVisibility(),
       TRUE,
-      ['onChange' => "showHideSeletorSearch(this.value);"]
+      ['onChange' => "showHideSelectorSearch(this.value);"]
     );
 
     //CRM-4363

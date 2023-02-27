@@ -26,6 +26,13 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
   public $submitOnce = TRUE;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'LocationType';
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {

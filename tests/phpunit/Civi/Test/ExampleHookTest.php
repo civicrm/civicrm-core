@@ -96,7 +96,7 @@ class ExampleHookTest extends TestCase implements HeadlessInterface, HookInterfa
   /**
    * Test getfields calls hooks.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetFields(): void {
     $this->assertEquals([], $this->tracker['civi.api.resolve']);

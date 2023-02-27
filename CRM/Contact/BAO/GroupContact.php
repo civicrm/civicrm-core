@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\SubscriptionHistory;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\HookInterface;
@@ -19,6 +20,7 @@ use Civi\Core\HookInterface;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implements HookInterface {
+  use CRM_Contact_AccessTrait;
 
   /**
    * Deprecated add function
@@ -43,10 +45,13 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
    * @noinspection UnknownInspectionInspection
    */
   public static function self_hook_civicrm_post(PostEvent $event): void {
-    if (is_object($event->object) && in_array($event->action, ['create', 'edit'], TRUE)) {
+    if (is_object($event->object) && in_array($event->action, ['create', 'edit', 'delete'], TRUE)) {
       // Lookup existing info for the sake of subscription history
       if ($event->action === 'edit') {
         $event->object->find(TRUE);
+      }
+      if ($event->action === 'delete') {
+        $event->object->status = 'Deleted';
       }
 
       try {
@@ -61,7 +66,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
           ],
         ])->execute();
       }
-      catch (API_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         // A failure to create the history might be a deadlock or similar
         // This record is not important enough to trigger a larger fail.
         Civi::log()->warning('Failed to add civicrm_subscription_history record with error :error', ['error' => $e->getMessage()]);
@@ -502,28 +507,19 @@ SELECT    *
   }
 
   /**
+   * Function that doesn't do much.
+   *
    * @param int $contactID
    * @param int $groupID
    *
+   * @deprecated
    * @return bool
    */
-  public static function isContactInGroup($contactID, $groupID) {
-    if (!CRM_Utils_Rule::positiveInteger($contactID) ||
-      !CRM_Utils_Rule::positiveInteger($groupID)
-    ) {
-      return FALSE;
-    }
-
-    $params = [
-      ['group', 'IN', [$groupID], 0, 0],
-      ['contact_id', '=', $contactID, 0, 0],
-    ];
-    [$contacts] = CRM_Contact_BAO_Query::apiQuery($params, ['contact_id']);
-
-    if (!empty($contacts)) {
-      return TRUE;
-    }
-    return FALSE;
+  public static function isContactInGroup(int $contactID, int $groupID) {
+    return (bool) Contact::get(FALSE)
+      ->addWhere('id', '=', $contactID)
+      ->addWhere('groups', 'IN', [$groupID])
+      ->selectRowCount()->execute()->count();
   }
 
   /**
@@ -691,7 +687,7 @@ AND    contact_id IN ( $contactStr )
       $presentIDs = [];
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if ($dao->fetch()) {
-        $presentIDs = explode(',', $dao->contactStr);
+        $presentIDs = explode(',', ($dao->contactStr ?? ''));
         $presentIDs = array_flip($presentIDs);
       }
 

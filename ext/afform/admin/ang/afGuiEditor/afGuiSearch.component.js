@@ -14,6 +14,7 @@
       $scope.controls = {};
       $scope.fieldList = [];
       $scope.calcFieldList = [];
+      $scope.calcFieldTitles = [];
       $scope.blockList = [];
       $scope.blockTitles = [];
       $scope.elementList = [];
@@ -29,7 +30,7 @@
           fieldGroups.push({
             text: ts('Calculated Fields'),
             children: _.transform(ctrl.display.settings.calc_fields, function(fields, el) {
-              fields.push({id: el.name, text: el.defn.label, disabled: ctrl.fieldInUse(el.name)});
+              fields.push({id: el.name, text: el.label, disabled: ctrl.fieldInUse(el.name)});
             }, [])
           });
         }
@@ -69,11 +70,28 @@
         return entity || ctrl.display.settings['saved_search_id.api_entity'];
       };
 
+      function fieldDefaults(field, prefix) {
+        var tag = {
+          "#tag": "af-field",
+          name: prefix + field.name
+        };
+        if (field.input_type === 'Select' || field.input_type === 'ChainSelect') {
+          tag.defn = {input_attrs: {multiple: true}};
+        } else if (field.input_type === 'Date') {
+          tag.defn = {input_type: 'Select', search_range: true};
+        } else if (field.options) {
+          tag.defn = {input_type: 'Select', input_attrs: {multiple: true}};
+        }
+        return tag;
+      }
+
       function buildCalcFieldList(search) {
         $scope.calcFieldList.length = 0;
+        $scope.calcFieldTitles.length = 0;
         _.each(_.cloneDeep(ctrl.display.settings.calc_fields), function(field) {
-          if (!search || _.contains(field.defn.label.toLowerCase(), search)) {
-            $scope.calcFieldList.push(field);
+          if (!search || _.contains(field.label.toLowerCase(), search)) {
+            $scope.calcFieldList.push(fieldDefaults(field, ''));
+            $scope.calcFieldTitles.push(field.label);
           }
         });
       }
@@ -101,18 +119,32 @@
             label: mainEntity.label,
             fields: mainEntity.fields
           }];
-        entityCount[mainEntity.entity] = 1;
+
+        // Increment count of entityName and return a suffix string if > 1
+        function countEntity(entityName) {
+          entityCount[entityName] = (entityCount[entityName] || 0) + 1;
+          return entityCount[entityName] > 1 ? ' ' + entityCount[entityName] : '';
+        }
+        countEntity(mainEntity.entity);
 
         _.each(ctrl.display.settings['saved_search_id.api_params'].join, function(join) {
           var joinInfo = join[0].split(' AS '),
-            entity = afGui.getEntity(joinInfo[0]);
-          entityCount[entity.entity] = (entityCount[entity.entity] || 0) + 1;
+            entity = afGui.getEntity(joinInfo[0]),
+            joinEntity = afGui.getEntity(join[2]);
           entities.push({
             name: entity.entity,
             prefix: joinInfo[1] + '.',
-            label: entity.label + (entityCount[entity.entity] > 1 ? ' ' + entityCount[entity.entity] : ''),
+            label: entity.label + countEntity(entity.entity),
             fields: entity.fields,
           });
+          if (joinEntity) {
+            entities.push({
+              name: joinEntity.entity,
+              prefix: joinInfo[1] + '.',
+              label: joinEntity.label + countEntity(joinEntity.entity),
+              fields: _.omit(joinEntity.fields, _.keys(entity.fields)),
+            });
+          }
         });
 
         return entities;
@@ -136,32 +168,17 @@
             }
           }, []);
         }
-
-        function fieldDefaults(field, prefix) {
-          var tag = {
-            "#tag": "af-field",
-            name: prefix + field.name
-          };
-          if (field.input_type === 'Select' || field.input_type === 'ChainSelect') {
-            tag.defn = {input_attrs: {multiple: true}};
-          } else if (field.input_type === 'Date') {
-            tag.defn = {input_type: 'Select', search_range: true};
-          } else if (field.options) {
-            tag.defn = {input_type: 'Select', input_attrs: {multiple: true}};
-          }
-          return tag;
-        }
       }
 
       function buildElementList(search) {
         $scope.elementList.length = 0;
         $scope.elementTitles.length = 0;
         _.each(afGui.meta.elements, function(element, name) {
-          if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
+          if (
+            (!element.afform_type || _.contains(element.afform_type, 'search')) &&
+            (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search))
+          ) {
             var node = _.cloneDeep(element.element);
-            if (name === 'fieldset') {
-              return;
-            }
             $scope.elementList.push(node);
             $scope.elementTitles.push(element.title);
           }

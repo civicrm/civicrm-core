@@ -287,7 +287,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
   /**
    * Restore the selected contact/s from the trash.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function doRestore() {

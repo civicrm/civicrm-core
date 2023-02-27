@@ -73,7 +73,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
       $eventSummary[$eventDAO->event_id][ts('End Date')] = CRM_Utils_Date::customFormat($eventDAO->end_date);
       $eventSummary[$eventDAO->event_id][ts('Event Type')] = $eventDAO->event_type;
       $eventSummary[$eventDAO->event_id][ts('Event Income')] = CRM_Utils_Money::format($eventDAO->total, $eventDAO->currency);
-      $eventSummary[$eventDAO->event_id][ts('Registered Participant')] = "{$eventDAO->participant} ({" . implode(', ', $this->getActiveParticipantStatuses()) . ")";
+      $eventSummary[$eventDAO->event_id][ts('Registered Participant')] = "{$eventDAO->participant} (" . implode(', ', $this->getActiveParticipantStatuses()) . ")";
       $currency[$eventDAO->event_id] = $eventDAO->currency;
     }
     $this->assign_by_ref('summary', $eventSummary);

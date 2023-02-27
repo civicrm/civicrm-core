@@ -97,6 +97,7 @@
     <name>mobile_provider_id</name>
     <title>Mobile Provider</title>
     <type>int unsigned</type>
+    <deprecated>true</deprecated>
     <comment>Which Mobile Provider does this phone belong to.</comment>
     <add>1.1</add>
   </field>
@@ -139,6 +140,7 @@
     <name>phone_numeric</name>
     <type>varchar</type>
     <length>32</length>
+    <readonly>true</readonly>
     <comment>Phone number stripped of all whitespace, letters, and punctuation.</comment>
     <html>
       <label>Numeric</label>

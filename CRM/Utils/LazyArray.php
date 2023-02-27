@@ -56,15 +56,16 @@ class CRM_Utils_LazyArray implements ArrayAccess, IteratorAggregate, Countable {
     return $this;
   }
 
-  public function offsetExists($offset) {
+  public function offsetExists($offset): bool {
     return isset($this->load()->cache[$offset]);
   }
 
+  #[\ReturnTypeWillChange]
   public function &offsetGet($offset) {
     return $this->load()->cache[$offset];
   }
 
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     if ($offset === NULL) {
       $this->load()->cache[] = $value;
     }
@@ -73,10 +74,11 @@ class CRM_Utils_LazyArray implements ArrayAccess, IteratorAggregate, Countable {
     }
   }
 
-  public function offsetUnset($offset) {
+  public function offsetUnset($offset): void {
     unset($this->load()->cache[$offset]);
   }
 
+  #[\ReturnTypeWillChange]
   public function getIterator() {
     return new ArrayIterator($this->load()->cache);
   }
@@ -88,7 +90,7 @@ class CRM_Utils_LazyArray implements ArrayAccess, IteratorAggregate, Countable {
     return $this->load()->cache;
   }
 
-  public function count() {
+  public function count(): int {
     return count($this->load()->cache);
   }
 

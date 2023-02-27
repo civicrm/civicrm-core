@@ -29,9 +29,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * Takes an associative array and creates a custom group object.
-   *
-   * This function is invoked from within the web form layer and also from the api layer
+   * FIXME: This function is too complex because it's trying to handle both api-style inputs and
+   * quickform inputs. Needs to be deprecated and broken up.
    *
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
@@ -40,6 +39,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @throws \Exception
    */
   public static function create(&$params) {
+    // FIXME: This is needed by the form parsing code below
+    if (empty($params['id'])) {
+      $params += ['extends' => 'Contact'];
+    }
     // create custom group dao, populate fields and then save.
     $group = new CRM_Core_DAO_CustomGroup();
     if (isset($params['title'])) {
@@ -574,7 +577,7 @@ ORDER BY civicrm_custom_group.weight,
     }
 
     if (empty($groupTree)) {
-      list($multipleFieldGroups, $groupTree) = self::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
+      [$multipleFieldGroups, $groupTree] = self::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
 
       $cache->set($cacheKey, $groupTree);
       $cache->set($multipleFieldGroupCacheKey, $multipleFieldGroups);
@@ -632,13 +635,15 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * Clean and validate the filter before it is used in a db query.
    *
+   * @internal this will be private again soon.
+   *
    * @param string $entityType
    * @param string $subType
    *
    * @return string
    * @throws \CRM_Core_Exception
    */
-  protected static function validateSubTypeByEntity($entityType, $subType) {
+  public static function validateSubTypeByEntity($entityType, $subType) {
     $subType = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
     if (is_numeric($subType)) {
       return $subType;
@@ -652,7 +657,14 @@ ORDER BY civicrm_custom_group.weight,
     }
     $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
     $subTypes = array_merge($subTypes, CRM_Event_PseudoConstant::eventType());
-    if (!array_key_exists($subType, $subTypes)) {
+    // When you create a new contact type it gets saved in mixed case in the database.
+    // Eg. "Service User" becomes "Service_User" in civicrm_contact_type.name
+    // But that field does not differentiate case (eg. you can't add Service_User and service_user because mysql will report a duplicate error)
+    // webform_civicrm and some other integrations pass in the name as lowercase to API3 Contact.duplicatecheck
+    // Since we can't actually have two strings with different cases in the database perform a case-insensitive search here:
+    $subTypes = array_change_key_case($subTypes, CASE_LOWER);
+    if (!array_key_exists(mb_strtolower($subType), $subTypes)) {
+      \Civi::log()->debug("entityType: {$entityType}; subType: {$subType}");
       throw new CRM_Core_Exception('Invalid Filter');
     }
     return $subType;
@@ -875,10 +887,10 @@ ORDER BY civicrm_custom_group.weight,
             );
             $customValue['imageURL'] = str_replace('persist/contribute', 'custom', $config->imageUploadURL) .
               $fileDAO->uri;
-            list($path) = CRM_Core_BAO_File::path($fileDAO->id, $entityId);
+            [$path] = CRM_Core_BAO_File::path($fileDAO->id, $entityId);
             if ($path && file_exists($path)) {
-              list($imageWidth, $imageHeight) = getimagesize($path);
-              list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
+              [$imageWidth, $imageHeight] = getimagesize($path);
+              [$imageThumbWidth, $imageThumbHeight] = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
               $customValue['imageThumbWidth'] = $imageThumbWidth;
               $customValue['imageThumbHeight'] = $imageThumbHeight;
             }
@@ -1546,7 +1558,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param string $prefix
    *   Prefix for custom grouptree assigned to template.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
     $form->assign_by_ref("{$prefix}groupTree", $groupTree);
@@ -1581,7 +1593,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function extractGetParams(&$form, $type) {
     if (empty($_GET)) {
@@ -1693,75 +1704,19 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * @param $table
+   * Get table name for extends.
+   *
+   * @param string $entityName
    *
    * @return string
    * @throws Exception
    */
-  public static function mapTableName($table) {
-    switch ($table) {
-      case 'Contact':
-      case 'Individual':
-      case 'Household':
-      case 'Organization':
-        return 'civicrm_contact';
-
-      case 'Activity':
-        return 'civicrm_activity';
-
-      case 'Group':
-        return 'civicrm_group';
-
-      case 'Contribution':
-        return 'civicrm_contribution';
-
-      case 'ContributionRecur':
-        return 'civicrm_contribution_recur';
-
-      case 'Relationship':
-        return 'civicrm_relationship';
-
-      case 'Event':
-        return 'civicrm_event';
-
-      case 'Membership':
-        return 'civicrm_membership';
-
-      case 'Participant':
-      case 'ParticipantRole':
-      case 'ParticipantEventName':
-      case 'ParticipantEventType':
-        return 'civicrm_participant';
-
-      case 'Grant':
-        return 'civicrm_grant';
-
-      case 'Pledge':
-        return 'civicrm_pledge';
-
-      case 'Address':
-        return 'civicrm_address';
-
-      case 'Campaign':
-        return 'civicrm_campaign';
-
-      default:
-        $query = "
-SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 0 )";
-        $qParams = [1 => [$table, 'String']];
-        $result = CRM_Core_DAO::singleValueQuery($query, $qParams);
-
-        if ($result) {
-          return 'civicrm_contact';
-        }
-        else {
-          $extendObjs = CRM_Core_OptionGroup::values('cg_extend_objects', FALSE, FALSE, FALSE, NULL, 'name');
-          if (array_key_exists($table, $extendObjs)) {
-            return $extendObjs[$table];
-          }
-          throw new CRM_Core_Exception('Unknown error');
-        }
+  public static function mapTableName($entityName) {
+    $options = array_column(self::getCustomGroupExtendsOptions(), 'table_name', 'id');
+    if (isset($options[$entityName])) {
+      return $options[$entityName];
     }
+    throw new CRM_Core_Exception('Unknown error');
   }
 
   /**
@@ -1849,7 +1804,8 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
             }
           }
         }
-        if ($value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST')) {
+        $value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST');
+        if ($value !== NULL) {
           $formValues[$properties['element_name']] = $value;
         }
         elseif (isset($submittedValues[$properties['element_name']])) {
@@ -2070,46 +2026,203 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   }
 
   /**
-   * Get the list of types for objects that a custom group extends to.
+   * Deprecated function, use APIv4 getFields instead.
    *
+   * @deprecated
    * @param array $types
    *   Var which should have the list appended.
-   *
-   * @return array
-   *   Array of types.
-   * @throws \Exception
    */
   public static function getExtendedObjectTypes(&$types = []) {
-    static $flag = FALSE, $objTypes = [];
+    $cache = Civi::cache('metadata');
+    if (!$cache->has(__FUNCTION__)) {
+      $objTypes = [];
 
-    if (!$flag) {
-      $extendObjs = [];
-      CRM_Core_OptionValue::getValues(['name' => 'cg_extend_objects'], $extendObjs, 'weight', TRUE);
+      $extendObjs = \Civi\Api4\OptionValue::get(FALSE)
+        ->addSelect('value', 'grouping')
+        ->addWhere('option_group_id:name', '=', 'cg_extend_objects')
+        ->addWhere('grouping', 'IS NOT EMPTY')
+        ->addWhere('is_active', '=', TRUE)
+        ->execute()->indexBy('value')->column('grouping');
 
-      foreach ($extendObjs as $ovId => $ovValues) {
-        if ($ovValues['description']) {
-          // description is expected to be a callback func to subtypes
-          list($callback, $args) = explode(';', trim($ovValues['description']));
-
-          if (empty($args)) {
-            $args = [];
-          }
-
-          if (!is_array($args)) {
-            throw new CRM_Core_Exception('Arg is not of type array');
-          }
-
-          list($className) = explode('::', $callback);
-          require_once str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
-
-          $objTypes[$ovValues['value']] = call_user_func_array($callback, $args);
+      foreach ($extendObjs as $entityName => $grouping) {
+        try {
+          $objTypes[$entityName] = civicrm_api4($entityName, 'getFields', [
+            'loadOptions' => TRUE,
+            'where' => [['name', '=', $grouping]],
+            'checkPermissions' => FALSE,
+            'select' => ['options'],
+          ], 0)['options'] ?? NULL;
+        }
+        catch (\Civi\API\Exception\NotImplementedException $e) {
+          // Skip if component is disabled
         }
       }
-      $flag = TRUE;
+      $cache->set(__FUNCTION__, $objTypes);
+    }
+    else {
+      $objTypes = $cache->get(__FUNCTION__);
     }
 
     $types = array_merge($types, $objTypes);
-    return $objTypes;
+  }
+
+  /**
+   * Loads pseudoconstant option values for the `extends_entity_column_value` field.
+   *
+   * @param $context
+   * @param array $params
+   * @param array $props
+   * @return array
+   */
+  public static function getExtendsEntityColumnValueOptions($context, $params, $props = []) {
+    // Requesting this option list only makes sense if the value of 'extends' is known or can be looked up
+    if (!empty($props['id']) || !empty($props['name']) || !empty($props['extends']) || !empty($props['extends_entity_column_id'])) {
+      $id = $props['id'] ?? NULL;
+      $name = $props['name'] ?? NULL;
+      $extends = $props['extends'] ?? NULL;
+      $entityColumnId = $props['extends_entity_column_id'] ?? NULL;
+
+      if (!array_key_exists('extends_entity_column_id', $props) && ($id || $name)) {
+        $entityColumnId = CRM_Core_DAO::getFieldValue(parent::class, $id ?: $name, 'extends_entity_column_id', $id ? 'id' : 'name');
+      }
+      // If there is an entityColumnId (currently only used by Participants) use grouping from that sub-type.
+      if ($entityColumnId) {
+        $pseudoSelectors = array_column(self::getExtendsEntityColumnIdOptions(), NULL, 'id');
+        $grouping = $pseudoSelectors[$entityColumnId]['grouping'];
+        $extends = $pseudoSelectors[$entityColumnId]['extends'];
+      }
+      else {
+        if (!$extends) {
+          $extends = CRM_Core_DAO::getFieldValue(parent::class, $id ?: $name, 'extends', $id ? 'id' : 'name');
+        }
+        $allTypes = array_column(self::getCustomGroupExtendsOptions(), NULL, 'id');
+        $grouping = $allTypes[$extends]['grouping'] ?? NULL;
+      }
+      if (!$grouping) {
+        return [];
+      }
+      $getFieldsValues = [];
+      // For contact types
+      if (in_array($extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
+        $getFieldsValues['contact_type'] = $extends;
+        $extends = 'Contact';
+      }
+      try {
+        $field = civicrm_api4($extends, 'getFields', [
+          'checkPermissions' => FALSE,
+          'loadOptions' => ['id', 'name', 'label'],
+          'where' => [['name', '=', $grouping]],
+          'values' => $getFieldsValues,
+        ])->first();
+        if ($field['options']) {
+          return $field['options'];
+        }
+        // This is to support the ParticipantEventName which groups by event_id, a field with no pseudoconstant
+        elseif ($field['fk_entity']) {
+          $fkFields = civicrm_api4($field['entity'], 'getFields', [
+            'checkPermissions' => FALSE,
+          ])->indexBy('name');
+          $fkIdField = \Civi\Api4\Utils\CoreUtil::getIdFieldName($field['fk_entity']);
+          $fkLabelField = \Civi\Api4\Utils\CoreUtil::getInfoItem($field['fk_entity'], 'label_field');
+          $fkNameField = isset($fkFields['name']) ? 'name' : 'id';
+          $select = [$fkIdField, $fkNameField, $fkLabelField];
+          $where = [];
+          if (isset($fkFields['is_active'])) {
+            $where[] = ['is_active', '=', TRUE];
+          }
+          $fkEntities = civicrm_api4($field['fk_entity'], 'get', [
+            'checkPermissions' => !(isset($params['check_permissions']) && !$params['check_permissions']),
+            'select' => $select,
+            'where' => $where,
+          ]);
+          $fkOptions = [];
+          foreach ($fkEntities as $item) {
+            $fkOptions[] = [
+              'id' => $item[$fkIdField],
+              'name' => $item[$fkNameField],
+              'label' => $item[$fkLabelField],
+            ];
+          }
+          return $fkOptions;
+        }
+      }
+      catch (\Civi\API\Exception\NotImplementedException $e) {
+        // Component disabled
+        return [];
+      }
+    }
+    return [];
+  }
+
+  /**
+   * Loads pseudoconstant option values for the `extends_entity_column_id` field.
+   *
+   * @param string $context
+   * @param array $params
+   * @param array $props
+   * @return array
+   */
+  public static function getExtendsEntityColumnIdOptions($context = NULL, $params = [], $props = []) {
+    $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'custom_data_type', 'id', 'name');
+    $optionValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);
+
+    // There is no explicit link between the result in the custom_data_type group and the entity
+    // they correspond to. So we rely on the convention of each option's 'name' beginning with
+    // the name of the entity.
+    $extendsEntities = array_column(self::getCustomGroupExtendsOptions(), 'id');
+    // Sort enties by strlen to ensure the correct one is matched
+    usort($extendsEntities, function($a, $b) {
+      return strlen($b) <=> strlen($a);
+    });
+    // Match the entity which is at the beginning of the 'name'. Note: at the time of this writing there
+    // are only 3 items in the option_group and they are all for "Participant". So we could just return
+    // "Participant" but that would prevent extensions from creating enties with complex custom fields.
+    $getEntityName = function($optionValueName) use ($extendsEntities) {
+      foreach ($extendsEntities as $entityName) {
+        if (strpos($optionValueName, $entityName) === 0) {
+          return $entityName;
+        }
+      }
+    };
+
+    $result = [];
+    foreach ($optionValues as $optionValue) {
+      $result[] = [
+        'id' => $optionValue['value'],
+        'name' => $optionValue['name'],
+        'label' => $optionValue['label'],
+        'grouping' => $optionValue['grouping'] ?? NULL,
+        // For internal use & filtering. Not returned by APIv4 getFields.options.
+        'extends' => $getEntityName($optionValue['name']),
+      ];
+    }
+
+    if (!empty($props['extends'])) {
+      $result = CRM_Utils_Array::findAll($result, ['extends' => $props['extends']]);
+    }
+    return $result;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = []) {
+    // This is necessary in order to pass $props to the callback function
+    if ($fieldName === 'extends_entity_column_value') {
+      $options = self::getExtendsEntityColumnValueOptions($context, [], $props);
+      return CRM_Core_PseudoConstant::formatArrayOptions($context, $options);
+    }
+    // Provides filtering by 'extends' entity
+    if ($fieldName === 'extends_entity_column_id') {
+      $options = self::getExtendsEntityColumnIdOptions($context, [], $props);
+      return CRM_Core_PseudoConstant::formatArrayOptions($context, $options);
+    }
+    // Legacy support for APIv3 which also needs the ParticipantEventName etc pseudo-selectors
+    if ($fieldName === 'extends' && ($props['version'] ?? NULL) == 3) {
+      $options = CRM_Core_SelectValues::customGroupExtends();
+      return CRM_Core_PseudoConstant::formatArrayOptions($context, $options);
+    }
+    return parent::buildOptions($fieldName, $context, $props);
   }
 
   /**
@@ -2148,6 +2261,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @return array
    */
   public static function getMultipleFieldGroup() {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     $multipleGroup = [];
     $dao = new CRM_Core_DAO_CustomGroup();
     $dao->is_multiple = 1;
@@ -2162,6 +2276,9 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   /**
    * Build the metadata tree for the custom group.
    *
+   * @internal - function is temporarily public but will be private again
+   * once separated function disentangled.
+   *
    * @param string $entityType
    * @param array $toReturn
    * @param array $subTypes
@@ -2172,7 +2289,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @return array
    * @throws \CRM_Core_Exception
    */
-  private static function buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType) {
+  public static function buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType) {
     $groupTree = $multipleFieldGroups = [];
     $crmDAO = CRM_Core_DAO::executeQuery($queryString, $params);
     $customValueTables = [];
@@ -2237,24 +2354,26 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return [$multipleFieldGroups, $groupTree];
   }
 
+  /**
+   * Use APIv4 getFields (or self::getExtendsEntityColumnValueOptions) instead of this beast.
+   * @deprecated
+   * @return array
+   */
   public static function getSubTypes(): array {
     $sel2 = [];
-    $activityType = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
+    $activityType = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'search');
 
     $eventType = CRM_Core_OptionGroup::values('event_type');
-    $grantType = CRM_Core_OptionGroup::values('grant_type');
     $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     $participantRole = CRM_Core_OptionGroup::values('participant_role');
 
     asort($activityType);
     asort($eventType);
-    asort($grantType);
     asort($membershipType);
     asort($participantRole);
 
     $sel2['Event'] = $eventType;
-    $sel2['Grant'] = $grantType;
     $sel2['Activity'] = $activityType;
     $sel2['Campaign'] = $campaignTypes;
     $sel2['Membership'] = $membershipType;
@@ -2298,6 +2417,118 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   public static function checkGroupAccess($groupId, $operation = CRM_Core_Permission::EDIT, $userId = NULL): bool {
     $allowedGroups = CRM_Core_Permission::customGroup($operation, FALSE, $userId);
     return in_array($groupId, $allowedGroups);
+  }
+
+  /**
+   * List all possible values for `CustomGroup.extends`.
+   *
+   * This includes the fake entities "Individual", "Organization", "Household"
+   * but not the extra options from `custom_data_type` used on the form ("ParticipantStatus", etc).
+   *
+   * Returns a mix of hard-coded array and `cg_extend_objects` OptionValues.
+   * The 'id' return key maps to the 'value' in `cg_extend_objects`.
+   * The 'grouping' key refers to the entity field used to select a sub-type.
+   * The 'table_name' key is for internal use (is not returned by getFields.loadOptions), and
+   * maps to the 'name' in `cg_extend_objects`. We don't return it as the 'name' in getFields because
+   * it is not always unique (since contact types are pseudo-entities in this list).
+   *
+   * @return array{id: string, label: string, grouping: string, table_name: string}[]
+   */
+  public static function getCustomGroupExtendsOptions() {
+    $options = [
+      [
+        'id' => 'Activity',
+        'label' => ts('Activities'),
+        'grouping' => 'activity_type_id',
+        'table_name' => 'civicrm_activity',
+      ],
+      [
+        'id' => 'Relationship',
+        'label' => ts('Relationships'),
+        'grouping' => 'relationship_type_id',
+        'table_name' => 'civicrm_relationship',
+      ],
+      [
+        'id' => 'Contribution',
+        'label' => ts('Contributions'),
+        'grouping' => 'financial_type_id',
+        'table_name' => 'civicrm_contribution',
+      ],
+      [
+        'id' => 'ContributionRecur',
+        'label' => ts('Recurring Contributions'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_contribution_recur',
+      ],
+      [
+        'id' => 'Group',
+        'label' => ts('Groups'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_group',
+      ],
+      [
+        'id' => 'Membership',
+        'label' => ts('Memberships'),
+        'grouping' => 'membership_type_id',
+        'table_name' => 'civicrm_membership',
+      ],
+      [
+        'id' => 'Event',
+        'label' => ts('Events'),
+        'grouping' => 'event_type_id',
+        'table_name' => 'civicrm_event',
+      ],
+      [
+        'id' => 'Participant',
+        'label' => ts('Participants'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_participant',
+      ],
+      [
+        'id' => 'Pledge',
+        'label' => ts('Pledges'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_pledge',
+      ],
+      [
+        'id' => 'Address',
+        'label' => ts('Addresses'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_address',
+      ],
+      [
+        'id' => 'Campaign',
+        'label' => ts('Campaigns'),
+        'grouping' => 'campaign_type_id',
+        'table_name' => 'civicrm_campaign',
+      ],
+      [
+        'id' => 'Contact',
+        'label' => ts('Contacts'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_contact',
+      ],
+    ];
+    // `CustomGroup.extends` stores contact type as if it were an entity.
+    foreach (CRM_Contact_BAO_ContactType::basicTypePairs(TRUE) as $contactType => $contactTypeLabel) {
+      $options[] = [
+        'id' => $contactType,
+        'label' => $contactTypeLabel,
+        'grouping' => 'contact_sub_type',
+        'table_name' => 'civicrm_contact',
+      ];
+    }
+    $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'cg_extend_objects', 'id', 'name');
+    $ogValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);
+    foreach ($ogValues as $ogValue) {
+      $options[] = [
+        'id' => $ogValue['value'],
+        'label' => $ogValue['label'],
+        'grouping' => $ogValue['grouping'] ?? NULL,
+        'table_name' => $ogValue['name'],
+      ];
+    }
+    return $options;
   }
 
 }

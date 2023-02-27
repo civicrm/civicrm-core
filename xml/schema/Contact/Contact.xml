@@ -44,6 +44,7 @@
       <table>civicrm_contact_type</table>
       <keyColumn>name</keyColumn>
       <labelColumn>label</labelColumn>
+      <iconColumn>icon</iconColumn>
       <condition>parent_id IS NULL</condition>
     </pseudoconstant>
     <html>
@@ -72,6 +73,7 @@
       <table>civicrm_contact_type</table>
       <keyColumn>name</keyColumn>
       <labelColumn>label</labelColumn>
+      <iconColumn>icon</iconColumn>
       <condition>parent_id IS NOT NULL</condition>
     </pseudoconstant>
     <html>
@@ -331,9 +333,9 @@
     <type>varchar</type>
     <length>8</length>
     <default>"Both"</default>
-    <import>true</import>
+    <import>false</import>
     <headerPattern>/^p(ref\w*\s)?m(ail\s)?f(orm\w*)$/i</headerPattern>
-    <comment>What is the preferred mode of sending an email.</comment>
+    <comment>Deprecated setting for text vs html mailings</comment>
     <add>1.1</add>
     <pseudoconstant>
       <callback>CRM_Core_SelectValues::pmf</callback>
@@ -342,6 +344,7 @@
       <type>Select</type>
       <label>Preferred Mail Format</label>
     </html>
+    <deprecated>true</deprecated>
   </field>
   <field>
     <name>hash</name>
@@ -815,6 +818,7 @@
     <type>varchar</type>
     <length>255</length>
     <import>true</import>
+    <deprecated>true</deprecated>
     <headerPattern>/^Open\s?ID|u(niq\w*)?\s?ID/i</headerPattern>
     <dataPattern>/^[\w\/\:\.]+$/</dataPattern>
     <comment>the OpenID (or OpenID-style http://username.domain/) unique identifier for this contact mainly used for logging in to CiviCRM</comment>
@@ -834,6 +838,7 @@
     <html>
       <type>EntityRef</type>
       <label>Current Employer</label>
+      <filter>contact_type=Organization</filter>
     </html>
     <contactType>Individual</contactType>
   </field>
@@ -871,6 +876,7 @@
     <required>false</required>
     <export>true</export>
     <default>NULL</default>
+    <readonly>true</readonly>
     <html>
       <label>Created Date</label>
     </html>

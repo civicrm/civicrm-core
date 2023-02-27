@@ -138,7 +138,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $this->assertTrue($message->body instanceof ezcMailMultipartAlternative);
 
-      list($textPart, $htmlPart) = $message->body->getParts();
+      [$textPart, $htmlPart] = $message->body->getParts();
 
       $this->assertEquals('html', $htmlPart->subType);
       $this->assertRegExp(
@@ -163,6 +163,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         "Sample Header for TEXT formatted content.\n" .
         //  body_html, filtered
         "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
+        "\n" .
         "\n" .
         "Links:\n" .
         "------\n" .
@@ -194,7 +195,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $this->assertTrue($message->body instanceof ezcMailMultipartAlternative);
 
-      list($textPart, $htmlPart) = $message->body->getParts();
+      [$textPart, $htmlPart] = $message->body->getParts();
 
       $this->assertEquals('html', $htmlPart->subType);
       $this->assertRegExp(
@@ -216,6 +217,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         ";" .
         //  body_html, filtered
         "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
+        "\n" .
         "\n" .
         "Links:\n" .
         "------\n" .
@@ -284,14 +286,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       ';\\[1\\] .*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*;',
       ['url_tracking' => 1],
     ];
-    $cases[6] = [
-      // FIXME: CiviMail URL tracking doesn't track tokenized links.
+    $cases['url_trackin_enabled'] = [
       '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
-      // FIXME: Legacy tracker adds extra quote after URL
-      ';<p><a href="http://example\.net/\?id=\d+""?>Foo</a></p>;',
-      ';\\[1\\] http://example\.net/\?id=\d+;',
+      ';<p><a href=[\'"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+.*&amp\\;id=\d+.*[\'"]>Foo</a></p>;',
+      ';\\[1\\] .*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*&id=\d+.*;',
       ['url_tracking' => 1],
     ];
+
     $cases[7] = [
       // It would be redundant/slow to track the action URLs?
       '<p><a href="{action.optOutUrl}">Foo</a></p>',
@@ -337,7 +338,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $this->assertTrue($message->body instanceof ezcMailMultipartAlternative);
 
-      list($textPart, $htmlPart) = $message->body->getParts();
+      [$textPart, $htmlPart] = $message->body->getParts();
 
       if ($htmlUrlRegex) {
         $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'htmlUrlRegex' => $htmlUrlRegex, 'htmlPart' => $htmlPart->text], 1);
@@ -389,13 +390,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    */
   protected function runMailingSuccess($params) {
     $mailingParams = array_merge($this->defaultParams, $params);
-    $this->callAPISuccess('mailing', 'create', $mailingParams);
+    $this->callAPISuccess('Mailing', 'create', $mailingParams);
     $this->_mut->assertRecipients([]);
     $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $this->_mut->getAllMessages('ezc');
     // There are exactly two contacts produced by setUp().
-    $this->assertEquals(2, count($allMessages));
+    $this->assertCount(2, $allMessages);
 
     return $allMessages;
   }

@@ -18,17 +18,17 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Note;
 use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class NoteTest extends UnitTestCase implements TransactionalInterface {
+class NoteTest extends Api4TestBase implements TransactionalInterface {
 
   public function testDeleteWithChildren() {
-    $c1 = $this->createEntity(['type' => 'Individual']);
+    $c1 = $this->createTestRecord('Contact');
 
     $text = uniqid(__FUNCTION__, TRUE);
 

@@ -8,17 +8,24 @@
  +--------------------------------------------------------------------+
 *}
 {if $recaptchaHTML}
-{literal}
-<script type="text/javascript">
-var RecaptchaOptions = {{/literal}{$recaptchaOptions}{literal}};
-</script>
-{/literal}
-<div class="crm-section recaptcha-section">
+  <div class="crm-section recaptcha-section" style="display:none">
     <table class="form-layout-compressed">
-        <tr>
-          <td class="recaptcha_label">&nbsp;</td>
-          <td>{$recaptchaHTML}</td>
-       </tr>
+      <tr>
+        <td class="recaptcha_label">&nbsp;</td>
+        <td>{$recaptchaHTML}</td>
+      </tr>
     </table>
-</div>
+  </div>
+{literal}
+  <script type="text/javascript">
+  (function($) {
+    document.addEventListener('DOMContentLoaded', function() {
+      var submitButtons = $('div.crm-submit-buttons').last();
+      var recaptchaSection = $('div.recaptcha-section');
+      submitButtons.before(recaptchaSection);
+      recaptchaSection.show();
+    });
+  }(CRM.$));
+  </script>
+{/literal}
 {/if}

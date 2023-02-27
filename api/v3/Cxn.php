@@ -55,11 +55,11 @@ function civicrm_api3_cxn_register($params) {
   if (!empty($params['app_meta_url'])) {
     list ($status, $json) = CRM_Utils_HttpClient::singleton()->get($params['app_meta_url']);
     if (CRM_Utils_HttpClient::STATUS_OK != $status) {
-      throw new API_Exception("Failed to download appMeta. (Bad HTTP response)");
+      throw new CRM_Core_Exception("Failed to download appMeta. (Bad HTTP response)");
     }
     $appMeta = json_decode($json, TRUE);
     if (empty($appMeta)) {
-      throw new API_Exception("Failed to download appMeta. (Malformed)");
+      throw new CRM_Core_Exception("Failed to download appMeta. (Malformed)");
     }
   }
   elseif (!empty($params['app_guid'])) {
@@ -69,7 +69,7 @@ function civicrm_api3_cxn_register($params) {
   }
 
   if (empty($appMeta) || !is_array($appMeta)) {
-    throw new API_Exception("Missing expected parameter: app_guid");
+    throw new CRM_Core_Exception("Missing expected parameter: app_guid");
   }
   \Civi\Cxn\Rpc\AppMeta::validate($appMeta);
 
@@ -134,7 +134,7 @@ function civicrm_api3_cxn_unregister($params) {
  * @return string
  *   The CxnId. (If not available, then an exception is thrown.)
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function _civicrm_api3_cxn_parseCxnId($params) {
   $cxnId = NULL;
@@ -147,11 +147,11 @@ function _civicrm_api3_cxn_parseCxnId($params) {
       1 => [$params['app_guid'], 'String'],
     ]);
     if (!$cxnId) {
-      throw new API_Exception("The app_guid does not correspond to an active connection.");
+      throw new CRM_Core_Exception("The app_guid does not correspond to an active connection.");
     }
   }
   if (!$cxnId) {
-    throw new API_Exception('Missing required parameter: cxn_guid');
+    throw new CRM_Core_Exception('Missing required parameter: cxn_guid');
   }
   return $cxnId;
 }
@@ -231,7 +231,7 @@ function civicrm_api3_cxn_getlink($params) {
   $appMeta = CRM_Cxn_BAO_Cxn::getAppMeta($cxnId);
 
   if (empty($params['page_name']) || !is_string($params['page_name'])) {
-    throw new API_Exception("Invalid page");
+    throw new CRM_Core_Exception("Invalid page");
   }
 
   /** @var \Civi\Cxn\Rpc\RegistrationClient $client */

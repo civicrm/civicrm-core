@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Address;
+use Civi\Api4\Domain;
+
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -41,11 +44,22 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
       'forPage' => 1,
     ];
 
-    $this->_individualId = $this->individualCreate();
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $contactID,
+      'street_address' => '9 Downing Street',
+      'state_province_id' => 'Maine',
+      'supplemental_address_1' => 'Back Alley',
+      'supplemental_address_2' => 'Left corner',
+      'postal_code' => 90990,
+      'city' => 'Auckland',
+      'country_id' => 'US',
+    ]);
     $contributionParams = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $contactID,
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
+      'source' => 'Donor gift',
     ];
     $result = $this->callAPISuccess('Contribution', 'create', $contributionParams);
 
@@ -72,12 +86,17 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertStringNotContainsString('Due Date', $invoiceHTML[$result['id']]);
     $this->assertStringNotContainsString('PAYMENT ADVICE', $invoiceHTML[$result['id']]);
     $this->assertStringContainsString('Mr. Anthony Anderson II', $invoiceHTML[$result['id']]);
+    $this->assertStringContainsString('Left corner ME', $invoiceHTML[$result['id']]);
+    $this->assertStringContainsString('9 Downing Street Back Alley', $invoiceHTML[$result['id']]);
+    $this->assertStringContainsString('Auckland  90990', $invoiceHTML[$result['id']]);
+    $this->assertStringContainsString('United States', $invoiceHTML[$result['id']]);
+    $this->assertStringContainsString('Donor gift', $invoiceHTML[$result['id']]);
 
     $this->assertStringContainsString('Due Date', $invoiceHTML[$contribution['id']]);
     $this->assertStringContainsString('PAYMENT ADVICE', $invoiceHTML[$contribution['id']]);
 
     $this->assertStringContainsString('AMOUNT DUE:</font></b></td>
-                <td style="text-align:right;"><b><font size="1">$92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
+        <td style="text-align:right;"><b><font size="1">$92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
   }
 
   /**
@@ -159,7 +178,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
 
     $totalAmount = $this->formatMoneyInput($order['values'][$order['id']]['total_amount']);
     $this->assertStringContainsString("TOTAL USD</font></b></td>
-                <td style=\"text-align:right;\"><font size=\"1\">$" . $totalAmount . '</font>', $invoiceHTML);
+        <td style=\"text-align:right;\"><font size=\"1\">$" . $totalAmount . '</font>', $invoiceHTML);
 
   }
 
@@ -170,7 +189,9 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
    */
   public function testThatInvoiceShowsTheActualContributionCurrencyInsteadOfTheDefaultOne(): void {
     $this->setDefaultCurrency('USD');
-
+    $contactID = Domain::get()->addSelect('contact_id')->execute()->first()['contact_id'];
+    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => 90210])->execute();
+    Civi::cache('metadata')->clear();
     $this->_individualId = $this->individualCreate();
 
     $contributionID = $this->setupContribution();
@@ -189,7 +210,10 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertStringContainsString('£100.00', $invoiceHTML);
     $this->assertStringContainsString('Amount GBP', $invoiceHTML);
     $this->assertStringContainsString('TOTAL GBP', $invoiceHTML);
-
+    $this->assertStringContainsString('California', $invoiceHTML);
+    $this->assertStringContainsString('90210', $invoiceHTML);
+    $this->assertStringContainsString('United States', $invoiceHTML);
+    $this->assertStringContainsString('Default Domain Name', $invoiceHTML);
   }
 
   /**

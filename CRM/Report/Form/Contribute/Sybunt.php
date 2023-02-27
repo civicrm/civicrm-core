@@ -503,7 +503,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    */
   public function buildChart(&$rows) {
     $graphRows = [];

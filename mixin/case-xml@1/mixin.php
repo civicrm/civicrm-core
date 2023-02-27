@@ -5,6 +5,7 @@
  *
  * @mixinName case-xml
  * @mixinVersion 1.0.0
+ * @since 5.45
  *
  * @param CRM_Extension_MixInfo $mixInfo
  *   On newer deployments, this will be an instance of MixInfo. On older deployments, Civix may polyfill with a work-a-like.
@@ -25,7 +26,7 @@ return function ($mixInfo, $bootCache) {
     }
 
     foreach ((array) glob($mixInfo->getPath('xml/case/*.xml')) as $file) {
-      $name = preg_replace('/\.xml$/', '', basename($file));
+      $name = basename($file, '.xml');
       if ($name != CRM_Case_XMLProcessor::mungeCaseType($name)) {
         $errorMessage = sprintf("Case-type file name is malformed (%s vs %s)", $name, CRM_Case_XMLProcessor::mungeCaseType($name));
         throw new CRM_Core_Exception($errorMessage);

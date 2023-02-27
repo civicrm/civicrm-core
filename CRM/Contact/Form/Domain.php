@@ -49,24 +49,16 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   protected $_locationDefaults = [];
 
   /**
-   * How many locationBlocks should we display?
-   *
-   * @var int
-   * @const
-   */
-  const LOCATION_BLOCKS = 1;
-
-  /**
    * Explicitly declare the entity api name.
    */
-  public function getDefaultEntity() {
+  public function getDefaultEntity(): string {
     return 'Domain';
   }
 
   /**
    * Explicitly declare the form context.
    */
-  public function getDefaultContext() {
+  public function getDefaultContext(): string {
     return 'create';
   }
 
@@ -121,13 +113,17 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->addField('name', ['label' => ts('Organization Name')], TRUE);
     $this->addField('description', ['label' => ts('Description'), 'size' => 30]);
 
     //build location blocks.
-    CRM_Contact_Form_Location::buildQuickForm($this);
+    CRM_Contact_Form_Edit_Address::buildQuickForm($this, 1);
+    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 1);
+    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 1);
 
     $this->addButtons([
       [

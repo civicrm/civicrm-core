@@ -167,7 +167,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
   /**
    * Test store function for multiselect int.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testStoreMultiSelectInt(): void {
     $contactID = $this->individualCreate();

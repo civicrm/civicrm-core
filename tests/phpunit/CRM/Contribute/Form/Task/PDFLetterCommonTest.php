@@ -47,7 +47,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   /**
    * Clean up after each test.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
@@ -61,7 +60,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * Test thank you send with grouping.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testGroupedThankYous(): void {
     $this->ids['Contact'][0] = $this->individualCreate();
@@ -80,7 +78,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'receive_date' => '2021-02-01 2:21',
       'currency' => 'USD',
     ])['id'];
-    /* @var CRM_Contribute_Form_Task_PDFLetter $form */
+    /** @var CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', [
       'campaign_id' => '',
       'subject' => '',
@@ -115,7 +113,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   /**
    * Test the buildContributionArray function.
    *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testBuildContributionArray(): void {
     $this->_individualId = $this->individualCreate();
@@ -193,7 +191,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * Test contribution token replacement in
    * html returned by postProcess function.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testPostProcess(): void {
@@ -208,7 +205,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       ];
 
       $contributionId = $this->createContribution();
-      /* @var $form CRM_Contribute_Form_Task_PDFLetter */
+      /** @var CRM_Contribute_Form_Task_PDFLetter $form */
       $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
       $form->setContributionIds([$contributionId]);
       $format = Civi::settings()->get('dateformatFull');
@@ -240,7 +237,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * Test that no notice or errors occur if no contribution tokens are requested.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testNoContributionTokens(): void {
     $this->createLoggedInUser();
@@ -248,7 +244,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'html_message' => '{contact.display_name}',
       'document_type' => 'pdf',
     ];
-    /* @var $form CRM_Contribute_Form_Task_PDFLetter */
+    /** @var CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds([$this->createContribution()]);
     try {
@@ -264,7 +260,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * Test all contribution tokens.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testAllContributionTokens(): void {
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
@@ -282,7 +277,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       $formValues['html_message'] .= "$token : {contribution.$token}\n";
     }
     $formValues['html_message'] .= '{emoji.favourite_emoticon}';
-    /* @var $form CRM_Contribute_Form_Task_PDFLetter */
+    /** @var CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds([$this->createContribution(array_merge(['campaign_id' => $tokens['campaign_id:label']], $tokens))]);
     try {
@@ -386,7 +381,6 @@ emo
    * arrays reflect the most recent contact rather than a total aggregate,
    * since we are using group by.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testPostProcessGroupByContact(): void {
@@ -429,7 +423,7 @@ emo
     ]);
     $contributionIDs[] = $contribution['id'];
 
-    /* @var \CRM_Contribute_Form_Task_PDFLetter $form */
+    /** @var \CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds($contributionIDs);
 
@@ -540,7 +534,7 @@ emo
   <!--
 {foreach from=$contributions item=contribution}
  {if $contribution.contact_id == $messageContactID}
- {assign var=\'date\' value=$contribution.receive_date|date_format:\'%d %B %Y\'}
+ {assign var=\'date\' value=$contribution.receive_date|crmDate:\'%d %B %Y\'}
  {assign var=contact_aggregate
 value=$contact_aggregate+$contribution.total_amount}
 -->

@@ -136,9 +136,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   /**
    * Test the submit function of the membership form.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmit(): void {
     $loggedInUserID = $this->createLoggedInUser();
@@ -186,7 +184,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test submitting with tax enabled.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitWithTax(): void {
     $this->enableTaxAndInvoicing();
@@ -205,9 +202,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * https://lab.civicrm.org/dev/core/-/issues/2024
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSubmitWithTaxOfZero(): void {
@@ -228,7 +223,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitChangeType(): void {
     $form = $this->getForm();
@@ -255,7 +249,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRecur(): void {
     $mut = new CiviMailUtils($this);
@@ -349,7 +342,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRecurCompleteInstant(): void {
     /** @var \CRM_Core_Payment_Dummy $processor */
@@ -428,9 +420,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider getThousandSeparators
    */
   public function testSubmitRecurCompleteInstantWithMail(string $thousandSeparator): void {
@@ -469,7 +459,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPayLater(): void {
     $this->createLoggedInUser();
@@ -518,7 +507,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPayLaterWithBilling(): void {
     $this->createLoggedInUser();
@@ -578,7 +566,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitComplete(): void {
     $this->createLoggedInUser();
@@ -635,10 +622,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @return \CRM_Member_Form_MembershipRenewal
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function getForm($formValues = [], $mode = 'test'): CRM_Member_Form_MembershipRenewal {
-    /* @var CRM_Member_Form_MembershipRenewal $form */
+    /** @var CRM_Member_Form_MembershipRenewal $form */
     $form = $this->getFormObject('CRM_Member_Form_MembershipRenewal', $formValues);
 
     $form->_bltID = 5;
@@ -687,7 +673,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Test renewing an expired membership.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRenewExpired(): void {
     $form = $this->getForm([], NULL);
@@ -772,7 +757,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
         ->addWhere('membership_type_id', '=', $this->membershipTypeAnnualFixedID)
         ->addSelect('id')->execute()->first()['id'];
     }
-    catch (API_Exception | CRM_Core_Exception | CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception | CRM_Core_Exception | CRM_Core_Exception $e) {
       $this->fail($e->getMessage() . "\n" . $e->getTraceAsString());
     }
   }

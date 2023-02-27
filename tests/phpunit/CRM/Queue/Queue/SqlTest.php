@@ -18,6 +18,18 @@
  */
 class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
 
+  use \Civi\Test\QueueTestTrait;
+
+  /**
+   * @var CRM_Queue_Service
+   */
+  private $queueService;
+
+  /**
+   * @var CRM_Queue_Queue
+   */
+  private $queue;
+
   /* ----------------------- Queue providers ----------------------- */
 
   /* Define a list of queue providers which should be tested */
@@ -73,12 +85,12 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
       'test-key' => 'c',
     ]);
 
-    $this->assertEquals(3, $this->queue->numberOfItems());
+    $this->assertQueueStats(3, 3, 0, $this->queue);
     $item = $this->queue->claimItem();
     $this->assertEquals('a', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
-    $this->assertEquals(2, $this->queue->numberOfItems());
+    $this->assertQueueStats(2, 2, 0, $this->queue);
     $item = $this->queue->claimItem();
     $this->assertEquals('b', $item->data['test-key']);
     $this->queue->deleteItem($item);
@@ -103,27 +115,27 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
       'test-key' => 'd',
     ]);
 
-    $this->assertEquals(4, $this->queue->numberOfItems());
+    $this->assertQueueStats(4, 4, 0, $this->queue);
     $item = $this->queue->claimItem();
     $this->assertEquals('start', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
-    $this->assertEquals(3, $this->queue->numberOfItems());
+    $this->assertQueueStats(3, 3, 0, $this->queue);
     $item = $this->queue->claimItem();
     $this->assertEquals('c', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
-    $this->assertEquals(2, $this->queue->numberOfItems());
+    $this->assertQueueStats(2, 2, 0, $this->queue);
     $item = $this->queue->claimItem();
     $this->assertEquals('d', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
-    $this->assertEquals(1, $this->queue->numberOfItems());
+    $this->assertQueueStats(1, 1, 0, $this->queue);
     $item = $this->queue->claimItem();
     $this->assertEquals('end', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
-    $this->assertEquals(0, $this->queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $this->queue);
   }
 
 }

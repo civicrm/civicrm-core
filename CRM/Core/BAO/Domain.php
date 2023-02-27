@@ -149,6 +149,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param array $params
    * @param int $id
    *
+   * @deprecated
    * @return CRM_Core_DAO_Domain
    * @throws \CRM_Core_Exception
    */
@@ -160,6 +161,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Create or update domain.
    *
+   * @deprecated
    * @param array $params
    * @return CRM_Core_DAO_Domain
    */
@@ -339,7 +341,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Return domain information / user information for the usage in receipts
    * Try default from address then fall back to using logged in user details
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getDefaultReceiptFrom() {
     $domain = civicrm_api3('domain', 'getsingle', ['id' => CRM_Core_Config::domainID()]);

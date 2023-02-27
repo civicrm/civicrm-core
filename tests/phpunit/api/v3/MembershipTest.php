@@ -148,44 +148,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test Activity creation on cancellation of membership contribution.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testActivityForCancelledContribution(): void {
-    // @todo figure out why financial validation fails with this test.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
-    $contactId = $this->ids['Contact']['order'] = $this->createLoggedInUser();
-
-    $this->createContributionAndMembershipOrder();
-    $membershipID = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'id']);
-
-    $_REQUEST['id'] = $this->ids['Contribution'][0];
-    $_REQUEST['action'] = 'update';
-    // change pending contribution to completed
-    /* @var CRM_Contribute_Form_Contribution $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
-      'total_amount' => 100,
-      'financial_type_id' => 1,
-      'contact_id' => $contactId,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
-      'contribution_status_id' => 3,
-    ]);
-    $form->buildForm();
-    $form->postProcess();
-
-    $this->callAPISuccessGetSingle('Activity', [
-      'activity_type_id' => 'Membership Signup',
-      'source_record_id' => $membershipID,
-      'subject' => 'General - Payment - Status: Pending',
-    ]);
-    $this->callAPISuccessGetSingle('Activity', [
-      'activity_type_id' => 'Change Membership Status',
-      'source_record_id' => $membershipID,
-    ]);
-  }
-
-  /**
    * Test Multiple Membership Status for same contribution id.
    */
   public function testMultipleMembershipsContribution(): void {
@@ -247,7 +209,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $_REQUEST['action'] = 'update';
     $_REQUEST['id'] = $order['id'];
     // Change Payment Status to Completed
-    /* @var CRM_Contribute_Form_Contribution $form */
+    /** @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 150,
       'financial_type_id' => '1',
@@ -760,7 +722,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * This add a test for https://issues.civicrm.org/jira/browse/CRM-4213 in the hope of removing
    * the buggy fix for that without a resurgence.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -1323,7 +1284,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * CRM-18503 - Test membership join date is correctly set for fixed memberships.
    *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMembershipJoinDateFixed() {
     $memStatus = CRM_Member_PseudoConstant::membershipStatus();

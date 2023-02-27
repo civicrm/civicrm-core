@@ -19,14 +19,15 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlExpressionTest extends UnitTestCase {
+class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
 
   public function testSelectNull() {
     Contact::create()->addValue('first_name', 'bob')->setCheckPermissions(FALSE)->execute();
@@ -78,7 +79,7 @@ class SqlExpressionTest extends UnitTestCase {
         ->addSelect('first_name AS bob')
         ->execute();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $msg = $e->getMessage();
     }
     $this->assertStringContainsString('alias', $msg);
@@ -87,7 +88,7 @@ class SqlExpressionTest extends UnitTestCase {
         ->addSelect('55 AS sort_name')
         ->execute();
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $msg = $e->getMessage();
     }
     $this->assertStringContainsString('existing field name', $msg);
@@ -112,8 +113,9 @@ class SqlExpressionTest extends UnitTestCase {
         '(illegal * stuff) AS illegal_stuff',
         // This field will be null
         '(hold_date + 5) AS null_plus_five',
+        '(1 % 2) AS one_is_odd',
       ])
-      ->addWhere('contact_id', '=', $contact['id'])
+      ->addWhere('(contact_id + 1)', '=', 1 + $contact['id'])
       ->setLimit(1)
       ->execute()
       ->first();
@@ -125,6 +127,7 @@ class SqlExpressionTest extends UnitTestCase {
     $this->assertTrue($result['is_between']);
     $this->assertArrayNotHasKey('illegal_stuff', $result);
     $this->assertEquals('5', $result['null_plus_five']);
+    $this->assertEquals('1', $result['one_is_odd']);
   }
 
 }

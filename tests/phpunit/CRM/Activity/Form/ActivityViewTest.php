@@ -24,7 +24,6 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
    * after preProcess().
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testActivityViewPreProcess(): void {
     // create activity
@@ -74,6 +73,9 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
       'modified_date' => $activityMoreInfo['modified_date'],
       'activity_modified_date' => $activityMoreInfo['modified_date'],
       'attachment' => NULL,
+      'mailingId' => NULL,
+      'campaign' => NULL,
+      'engagement_level' => NULL,
     ];
 
     $this->assertEquals($expected, $templateVar);

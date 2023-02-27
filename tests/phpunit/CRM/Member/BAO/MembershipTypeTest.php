@@ -54,7 +54,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Test add.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testAdd(): void {
     $params = [
@@ -83,7 +83,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Test retrieve().
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testRetrieve(): void {
     $params = [
@@ -110,7 +110,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Test setIsActive.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSetIsActive(): void {
     $params = [
@@ -141,7 +141,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Test delete.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testDelete(): void {
     $membershipTypeID = $this->createGeneralMembershipType();
@@ -152,7 +152,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Test convertDayFormat.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testConvertDayFormat(): void {
     $params = [
@@ -181,7 +181,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Test getMembershipTypes.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetMembershipTypes(): void {
     $params = [
@@ -218,7 +218,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Test getDatesForMembershipType.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetDatesForMembershipType(): void {
     $params = [
@@ -244,7 +244,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Test getRenewalDatesForMembershipType.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetRenewalDatesForMembershipType(): void {
     $params = [
@@ -288,7 +288,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Test getMembershipTypesByOrg.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetMembershipTypesByOrg(): void {
     $params = [
@@ -350,7 +350,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
         ->execute()
         ->first()['id'];
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->fail($e->getMessage());
       return 0;
     }

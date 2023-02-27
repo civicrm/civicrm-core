@@ -324,7 +324,7 @@ SELECT g.*
    * @param int $contactID
    * @param string $tableName
    * @param array|null $allGroups
-   * @param array|null $includedGroups
+   * @param array $includedGroups
    *
    * @return array
    */
@@ -333,9 +333,13 @@ SELECT g.*
     $contactID = NULL,
     $tableName = 'civicrm_saved_search',
     $allGroups = NULL,
-    $includedGroups = NULL
+    $includedGroups = []
   ) {
-    $userCacheKey = "{$contactID}_{$type}_{$tableName}_" . CRM_Core_Config::domainID() . '_' . md5(implode(',', array_merge((array) $allGroups, (array) $includedGroups)));
+    if (!is_array($includedGroups)) {
+      CRM_Core_Error::deprecatedWarning('pass an array for included groups');
+      $includedGroups = (array) $includedGroups;
+    }
+    $userCacheKey = "{$contactID}_{$type}_{$tableName}_" . CRM_Core_Config::domainID() . '_' . md5(implode(',', array_merge((array) $allGroups, $includedGroups)));
     if (empty(Civi::$statics[__CLASS__]['permissioned_groups'])) {
       Civi::$statics[__CLASS__]['permissioned_groups'] = [];
     }
@@ -363,9 +367,7 @@ SELECT g.*
       }
     }
 
-    if (empty($ids) && !empty($includedGroups) &&
-      is_array($includedGroups)
-    ) {
+    if (empty($ids) && !empty($includedGroups)) {
       // This is pretty alarming - we 'sometimes' include all included groups
       // seems problematic per https://lab.civicrm.org/dev/core/-/issues/1879
       $ids = $includedGroups;

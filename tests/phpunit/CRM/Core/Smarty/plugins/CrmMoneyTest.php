@@ -3,6 +3,7 @@
 /**
  * Class CRM_Core_Smarty_plugins_CrmMoneyTest
  * @group headless
+ * @group locale
  */
 class CRM_Core_Smarty_plugins_CrmMoneyTest extends CiviUnitTestCase {
 

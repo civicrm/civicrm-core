@@ -38,8 +38,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return CRM_Pledge_BAO_PledgeBlock
+   * @deprecated
+   * @return CRM_Pledge_DAO_PledgeBlock
    */
   public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -61,8 +61,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * Add or update pledgeBlock.
    *
    * @param array $params
-   *
-   * @return object
+   * @deprecated
+   * @return CRM_Pledge_DAO_PledgeBlock
    */
   public static function add($params) {
     // FIXME: This is assuming checkbox input like ['foo' => 1, 'bar' => 0, 'baz' => 1]. Not API friendly.

@@ -24,13 +24,14 @@ use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
 use Civi\Api4\Email;
 use api\v4\Traits\TableDropperTrait;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ReplaceTest extends UnitTestCase {
+class ReplaceTest extends Api4TestBase implements TransactionalInterface {
   use TableDropperTrait;
 
   /**

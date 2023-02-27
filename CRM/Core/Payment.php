@@ -677,7 +677,7 @@ abstract class CRM_Core_Payment {
    * @return array
    *   Array of payment fields appropriate to the payment processor.
    *
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public function getPaymentFormFields() {
     if ($this->_paymentProcessor['billing_mode'] == 4) {
@@ -752,7 +752,7 @@ abstract class CRM_Core_Payment {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getAllFields() {
     $paymentFields = array_intersect_key($this->getPaymentFormFieldsMetadata(), array_flip($this->getPaymentFormFields()));
@@ -1155,31 +1155,31 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Legacy. Better for a method to work on its own PropertyBag,
-   * but also, this function does not do very much.
+   * Get the submitted amount, padded to 2 decimal places, if needed.
    *
    * @param array $params
    *
    * @return string
-   * @throws \CRM_Core_Exception
    */
   protected function getAmount($params = []) {
     if (!CRM_Utils_Rule::numeric($params['amount'])) {
       CRM_Core_Error::deprecatedWarning('Passing Amount value that is not numeric is deprecated please report this in gitlab');
       return CRM_Utils_Money::formatUSLocaleNumericRounded(filter_var($params['amount'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION), 2);
     }
-    return CRM_Utils_Money::formatUSLocaleNumericRounded($params['amount'], 2);
+    // Amount is already formatted to a machine-friendly format but may NOT have
+    // decimal places - eg. it could be 1000.1 so this would return 1000.10.
+    return Civi::format()->machineMoney($params['amount']);
   }
 
   /**
    * Get url to return to after cancelled or failed transaction.
    *
    * @param string $qfKey
-   * @param int $participantID
+   * @param int|NULL $participantID
    *
    * @return string cancel url
    */
-  public function getCancelUrl($qfKey, $participantID) {
+  public function getCancelUrl($qfKey, $participantID = NULL) {
     if (isset($this->cancelUrl)) {
       return $this->cancelUrl;
     }

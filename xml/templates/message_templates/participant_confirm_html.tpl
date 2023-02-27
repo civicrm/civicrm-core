@@ -53,7 +53,7 @@
      <tr>
       <td colspan="2" {$valueStyle}>
        {$event.event_title}<br />
-       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
       </td>
      </tr>
      {if $conference_sessions}
@@ -66,9 +66,9 @@
        <td colspan="2" {$valueStyle}>
   {assign var='group_by_day' value='NA'}
   {foreach from=$conference_sessions item=session}
-   {if $session.start_date|date_format:"%Y/%m/%d" != $group_by_day|date_format:"%Y/%m/%d"}
+   {if $session.start_date|crmDate:"%Y/%m/%d" != $group_by_day|crmDate:"%Y/%m/%d"}
     {assign var='group_by_day' value=$session.start_date}
-          <em>{$group_by_day|date_format:"%m/%d/%Y"}</em><br />
+          <em>{$group_by_day|crmDate:"%m/%d/%Y"}</em><br />
    {/if}
    {$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}<br />
    {if $session.location}&nbsp;&nbsp;&nbsp;&nbsp;{$session.location}<br />{/if}
@@ -126,12 +126,18 @@
      {/if}
 
      {if $event.is_public}
-      <tr>
+     <tr>
        <td colspan="2" {$valueStyle}>
-        {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
-        <a href="{$icalFeed}">{ts}Download iCalendar File{/ts}</a>
+           {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+         <a href="{$icalFeed}">{ts}Download iCalendar entry for this event.{/ts}</a>
        </td>
-      </tr>
+     </tr>
+     <tr>
+       <td colspan="2" {$valueStyle}>
+           {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+         <a href="{$gCalendar}">{ts}Add event to Google Calendar{/ts}</a>
+       </td>
+     </tr>
      {/if}
 
      {if '{contact.email}'}

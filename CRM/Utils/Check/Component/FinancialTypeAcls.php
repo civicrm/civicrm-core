@@ -18,7 +18,7 @@ class CRM_Utils_Check_Component_FinancialTypeAcls extends CRM_Utils_Check_Compon
 
   /**
    * @return CRM_Utils_Check_Message[]
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public static function checkFinancialAclReport() {
     $messages = [];

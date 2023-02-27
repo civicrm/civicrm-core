@@ -332,7 +332,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    */
   protected function getTrxnID() {
     $string = $this->_mode;
-    $trxn_id = CRM_Core_DAO::singleValueQuery("SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE '{$string}_%'");
+    $trxn_id = CRM_Core_DAO::singleValueQuery("SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE '{$string}_%'") ?? '';
     $trxn_id = str_replace($string, '', $trxn_id);
     $trxn_id = (int) $trxn_id + 1;
     return $string . '_' . $trxn_id . '_' . uniqid();

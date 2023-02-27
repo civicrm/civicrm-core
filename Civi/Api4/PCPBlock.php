@@ -11,7 +11,9 @@
 namespace Civi\Api4;
 
 /**
- * PCP Block entity.
+ * Persoanl Campaign Page Blocks.
+ *
+ * A Personal Campaign Page Block stores admin configurable status options and rules
  *
  * @searchable secondary
  * @since 5.34

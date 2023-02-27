@@ -81,40 +81,13 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
       parent::evaluateToken($row, $entity, $realField, $prefetch);
       $row->format('text/plain')->tokens($entity, $field, $row->tokens['activity'][$realField]);
     }
-    elseif ($field === 'case_id') {
-      // An activity can be linked to multiple cases so case_id is always an array.
-      // We just return the first case ID for the token.
-      // this weird hack might exist because apiv3 is weird &
-      $caseID = CRM_Core_DAO::singleValueQuery('SELECT case_id FROM civicrm_case_activity WHERE activity_id = %1 LIMIT 1', [1 => [$activityId, 'Integer']]);
-      $row->tokens($entity, $field, $caseID ?? '');
-    }
     else {
       parent::evaluateToken($row, $entity, $field, $prefetch);
     }
   }
 
   /**
-   * Get tokens that are special or calculated for this enitty.
-   *
-   * @return array|array[]
-   */
-  protected function getBespokeTokens(): array {
-    $tokens = [];
-    if (CRM_Core_Component::isEnabled('CiviCase')) {
-      $tokens['case_id'] = [
-        'title' => ts('Activity Case ID'),
-        'name' => 'case_id',
-        'type' => 'calculated',
-        'options' => NULL,
-        'data_type' => 'Integer',
-        'audience' => 'user',
-      ];
-    }
-    return $tokens;
-  }
-
-  /**
-   * Get fields Fieldshistorically not advertised for tokens.
+   * Get fields historically not advertised for tokens.
    *
    * @return string[]
    */

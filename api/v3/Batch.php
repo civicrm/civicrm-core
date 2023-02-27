@@ -21,7 +21,7 @@
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_batch_create($params) {
@@ -65,7 +65,7 @@ function civicrm_api3_batch_get($params) {
  *
  * @return array
  *   Array of deleted values.
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_batch_delete($params) {

@@ -130,7 +130,7 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
         continue;
       }
       // parse out existing id and direction
-      list($relationshipTypeId, $direction1) = explode('_', $match);
+      [$relationshipTypeId, $direction1] = explode('_', $match);
       // we only care about ones that are b_a
       if ($direction1 === 'b') {
         // we only care about bidirectional

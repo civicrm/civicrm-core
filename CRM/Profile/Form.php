@@ -101,8 +101,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public $_ruleGroupID = NULL;
 
-  public $_isAddCaptcha = FALSE;
-
   protected $_isPermissionedChecksum = FALSE;
 
   /**
@@ -281,12 +279,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @return array
    */
   public function getUFGroupIDs() {
-    if (empty($this->_profileIds)) {
-      $dao = new CRM_Core_DAO_UFGroup();
-      $dao->id = $this->_gid;
-      $this->_profileIds = (array) $dao;
-    }
-    return $this->_profileIds;
+    return [$this->_gid];
   }
 
   /**
@@ -338,7 +331,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     $this->_duplicateButtonName = $this->getButtonName('upload', 'duplicate');
 
-    $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0));
+    $gids = explode(',', (CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0) ?? ''));
 
     if ((count($gids) > 1) && !$this->_profileIds && empty($this->_profileIds)) {
       if (!empty($gids)) {
@@ -374,13 +367,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     $this->_isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($this->_gid);
 
-    //get values for ufGroupName, captcha and dupe update.
+    //get values for ufGroupName and dupe update.
     if ($this->_gid) {
       $dao = new CRM_Core_DAO_UFGroup();
       $dao->id = $this->_gid;
       if ($dao->find(TRUE)) {
         $this->_isUpdateDupe = $dao->is_update_dupe;
-        $this->_isAddCaptcha = $dao->add_captcha;
         $this->_ufGroup = (array) $dao;
       }
 
@@ -697,8 +689,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * Build the form object.
    *
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->add('hidden', 'gid', $this->_gid);
+    $this->assign('deleteRecord', $this->isDeleteMode());
 
     switch ($this->_mode) {
       case self::MODE_CREATE:
@@ -721,12 +714,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
       return;
     }
 
-    if (($this->_multiRecord & CRM_Core_Action::DELETE)) {
+    if ($this->isDeleteMode()) {
       if (!$this->_recordExists) {
         CRM_Core_Session::setStatus(ts('The record %1 doesnot exists', [1 => $this->_recordId]), ts('Record doesnot exists'), 'alert');
-      }
-      else {
-        $this->assign('deleteRecord', TRUE);
       }
       return;
     }
@@ -794,7 +784,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     //lets have single status message,
     $this->assign('statusMessage', $statusMessage);
     if ($return) {
-      return FALSE;
+      return;
     }
 
     $this->assign('id', $this->_id);
@@ -837,7 +827,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     $this->assign('anonUser', $anonUser);
 
-    $addCaptcha = [];
     $emailPresent = FALSE;
 
     // add the form elements
@@ -855,17 +844,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
         continue;
       }
 
-      list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
+      [$prefixName, $index] = CRM_Utils_System::explode('-', $name, 2);
 
       CRM_Core_BAO_UFGroup::buildProfile($this, $field, $this->_mode);
 
       if ($field['add_to_group_id']) {
         $addToGroupId = $field['add_to_group_id'];
-      }
-
-      //build array for captcha
-      if ($field['add_captcha']) {
-        $addCaptcha[$field['group_id']] = $field['add_captcha'];
       }
 
       if (($name == 'email-Primary') || ($name == 'email-' . ($primaryLocationType ?? ""))) {
@@ -874,16 +858,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    // add captcha only for create mode.
     if ($this->_mode == self::MODE_CREATE) {
-      // suppress captcha for logged in users only
-      if ($this->_currentUserID) {
-        $this->_isAddCaptcha = FALSE;
-      }
-      elseif (!$this->_isAddCaptcha && !empty($addCaptcha)) {
-        $this->_isAddCaptcha = TRUE;
-      }
-
       if ($this->_gid) {
         $dao = new CRM_Core_DAO_UFGroup();
         $dao->id = $this->_gid;
@@ -895,14 +870,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
           }
         }
       }
-    }
-    else {
-      $this->_isAddCaptcha = FALSE;
-    }
-
-    //finally add captcha to form.
-    if ($this->_isAddCaptcha) {
-      CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
 
     if ($this->_mode != self::MODE_SEARCH) {
@@ -1039,7 +1006,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     foreach ($fields as $key => $value) {
-      list($fieldName, $locTypeId, $phoneTypeId) = CRM_Utils_System::explode('-', $key, 3);
+      [$fieldName, $locTypeId, $phoneTypeId] = CRM_Utils_System::explode('-', $key, 3);
       if ($fieldName == 'state_province' && !empty($fields["country-{$locTypeId}"])) {
         // Validate Country - State list
         $countryId = $fields["country-{$locTypeId}"];
@@ -1316,7 +1283,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     if (!empty($mailingType)) {
       // we send in the contactID so we match the same groups and are exact, rather than relying on email
       // CRM-8710
-      CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($mailingType, $result, $this->_id, 'profile');
+      CRM_Mailing_Event_BAO_MailingEventSubscribe::commonSubscribe($mailingType, $result, $this->_id, 'profile');
     }
 
     $ufGroups = [];
@@ -1399,6 +1366,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
+  }
+
+  /**
+   * @return int|string
+   */
+  private function isDeleteMode() {
+    return ($this->_multiRecord & CRM_Core_Action::DELETE);
   }
 
 }

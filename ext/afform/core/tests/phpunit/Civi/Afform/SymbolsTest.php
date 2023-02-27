@@ -51,6 +51,27 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
       ],
     ];
     $exs[] = [
+      // These are ordinary ng-if's in Angular, but libxml likes to warn about '&&' and '<'. Let's make we're still able to parse them.
+      '<div class="my-parent" ng-if="a<b"><div ng-if="c && d" class="my-child"><img ng-if="e > f" class="special" src="foo.png"/></div></div>',
+      [
+        'e' => ['div' => 2, 'img' => 1, 'body' => 1],
+        'a' => ['class' => 3, 'src' => 1, 'ng-if' => 3],
+        'c' => [
+          'my-parent' => 1,
+          'my-child' => 1,
+          'special' => 1,
+        ],
+      ],
+    ];
+    $exs[] = [
+      '<blink>aw<fulmark&up<img><img><area></amap></blink>',
+      [
+        'e' => ['body' => 1, 'blink' => 1, 'fulmark' => 1, 'img' => 1, 'area' => 1],
+        'a' => [],
+        'c' => [],
+      ],
+    ];
+    $exs[] = [
       '<div class="my-parent foo bar">a<div class="my-child whiz bang {{ghost + stuff}} last">b</div>c</div>',
       [
         'e' => ['div' => 2, 'body' => 1],
@@ -79,6 +100,24 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
         ],
       ],
     ];
+    $exs[] = [
+      '<div class="af-container af-layout-inline">
+        <af-field name="street_address" />
+        <af-field name="location_type_id" />
+        <af-field name="is_primary" />
+      </div>
+      <div class="af-container af-layout-inline">
+        <af-field name="city" />
+        <af-field name="state_province_id" />
+        <af-field name="country_id" />
+        <af-field name="postal_code" />
+      </div>',
+      [
+        'e' => ['div' => 2, 'af-field' => 7, 'body' => 1],
+        'a' => ['class' => 2, 'name' => 7],
+        'c' => ['af-container' => 2, 'af-layout-inline' => 2],
+      ],
+    ];
 
     return $exs;
   }
@@ -91,9 +130,14 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
    * @dataProvider getExamples
    */
   public function testSymbols($html, $expect): void {
+    // yes, 2
+    \phpQuery::$debug = 2;
     $expectDefaults = ['e' => [], 'a' => [], 'c' => []];
     $expect = array_merge($expectDefaults, $expect);
+    ob_start();
     $actual = Symbols::scan($html);
+    ob_end_clean();
+    \phpQuery::$debug = FALSE;
 
     $this->assertEquals($expect['e'], $actual->elements);
     $this->assertEquals($expect['a'], $actual->attributes);

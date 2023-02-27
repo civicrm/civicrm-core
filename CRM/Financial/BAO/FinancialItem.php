@@ -41,26 +41,24 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param object $contribution
    *   Contribution object.
    * @param bool $taxTrxnID
-   *
-   * @param int $trxnId
+   * @param array|null $trxnId
    *
    * @return CRM_Financial_DAO_FinancialItem
    */
   public static function add($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $itemStatus = NULL;
-    if ($contribution->contribution_status_id == array_search('Completed', $contributionStatuses)
-      || $contribution->contribution_status_id == array_search('Pending refund', $contributionStatuses)
-    ) {
+    if ($contributionStatus === 'Completed' || $contributionStatus === 'Pending refund') {
       $itemStatus = array_search('Paid', $financialItemStatus);
     }
-    elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses)
-      || $contribution->contribution_status_id == array_search('In Progress', $contributionStatuses)
+    elseif ($contributionStatus === 'Pending'
+      // In progress is no longer present on new installs unless extensions add it.
+      || $contributionStatus === 'In Progress'
     ) {
       $itemStatus = array_search('Unpaid', $financialItemStatus);
     }
-    elseif ($contribution->contribution_status_id == array_search('Partially paid', $contributionStatuses)) {
+    elseif ($contributionStatus === 'Partially paid') {
       $itemStatus = array_search('Partially paid', $financialItemStatus);
     }
     $params = [
@@ -97,8 +95,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
         $trxnId['id'] = $trxn['financialTrxnId'];
       }
     }
-    $financialItem = self::create($params, NULL, $trxnId);
-    return $financialItem;
+    return self::create($params, NULL, $trxnId);
   }
 
   /**
@@ -185,9 +182,12 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param bool $maxId
    *   To retrieve max id.
    *
+   * @deprecated
+   *
    * @return array
    */
   public static function retrieveEntityFinancialTrxn($params, $maxId = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     $financialItem = new CRM_Financial_DAO_EntityFinancialTrxn();
     $financialItem->copyValues($params);
     // retrieve last entry from civicrm_entity_financial_trxn

@@ -177,6 +177,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
 
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks($this->_eventId));
+    $this->assign('isShowICalIconsInline', TRUE);
 
     $this->freeze();
 

@@ -55,7 +55,7 @@ class CRM_Core_Form_Tag {
         $tagsetItem = $tagsetElementName . 'parentId_' . $parentId;
         $tagset[$tagsetItem]['parentID'] = $parentId;
 
-        list(, $mode) = explode('_', $entityTable);
+        [, $mode] = explode('_', $entityTable);
         if (!$tagsetElementName) {
           $tagsetElementName = $mode . "_taglist";
         }

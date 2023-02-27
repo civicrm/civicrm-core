@@ -40,7 +40,7 @@ CRM.$(function($) {
     return false;
   });
   // TODO: Why are the modes numeric? If they used the string there would be no need for this map
-  var modes = {/literal}{$component_mappings}{literal};
+  var modes = {/literal}{$component_mappings|smarty:nodefaults}{literal};
   // Handle change of results mode
   $('#component_mode').change(function() {
     // Reset task dropdown
@@ -111,7 +111,7 @@ CRM.$(function($) {
     </div>
   </div>
   {foreach from=$allPanes key=paneName item=paneValue}
-    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || !empty($openedPanes.$paneName)} {else}collapsed{/if}">
+    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || array_key_exists($paneName, $openedPanes)} {else}collapsed{/if}">
       <div class="crm-accordion-header" id="{$paneValue.id}">
         {$paneName}
       </div>

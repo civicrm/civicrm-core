@@ -74,35 +74,42 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   }
 
   /**
-   * Process the form submission.
+   * Initialize the datasource, based on the submitted values stored in the user job.
    *
-   * @param array $params
-   * @param string $db
-   * @param \CRM_Core_Form $form
-   *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function postProcess(&$params, &$db, &$form) {
-    $importJob = new CRM_Contact_Import_ImportJob(
-      CRM_Utils_Array::value('import_table_name', $params),
-      $params['sqlQuery'], TRUE
-    );
+  public function initialize(): void {
+    $table = CRM_Utils_SQL_TempTable::build()->setDurable();
+    $tableName = $table->getName();
+    try {
+      $table->createWithQuery($this->getSubmittedValue('sqlQuery'));
+    }
+    catch (PEAR_Exception $e) {
+      throw new CRM_Core_Exception($e->getMessage(), 0, ['exception' => $e]);
+    }
 
-    $form->set('importTableName', $importJob->getTableName());
-    // Get the names of the fields to be imported. Any fields starting with an
-    // underscore are considered to be internal to the import process)
+    // Get the names of the fields to be imported.
     $columnsResult = CRM_Core_DAO::executeQuery(
-      'SHOW FIELDS FROM ' . $importJob->getTableName() . "
-      WHERE Field NOT LIKE '\_%'");
+      'SHOW FIELDS FROM ' . $tableName);
 
     $columnNames = [];
     while ($columnsResult->fetch()) {
-      $columnNames[] = $columnsResult->Field;
+      if (strpos($columnsResult->Field, ' ') !== FALSE) {
+        // Remove spaces as the Database object does this
+        // $keys = str_replace(array(".", " "), "_", array_keys($array));
+        // https://lab.civicrm.org/dev/core/-/issues/1337
+        $usableColumnName = str_replace(' ', '_', $columnsResult->Field);
+        CRM_Core_DAO::executeQuery('ALTER TABLE ' . $tableName . ' CHANGE `' . $columnsResult->Field . '` ' . $usableColumnName . ' ' . $columnsResult->Type);
+        $columnNames[] = $usableColumnName;
+      }
+      else {
+        $columnNames[] = $columnsResult->Field;
+      }
     }
+
+    $this->addTrackingFieldsToTable($tableName);
     $this->updateUserJobMetadata('DataSource', [
-      'table_name' => $importJob->getTableName(),
+      'table_name' => $tableName,
       'column_headers' => $columnNames,
       'number_of_columns' => count($columnNames),
     ]);

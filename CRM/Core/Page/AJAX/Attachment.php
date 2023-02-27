@@ -54,7 +54,7 @@ class CRM_Core_Page_AJAX_Attachment {
         require_once 'api/v3/utils.php';
         $results[$key] = civicrm_api3_create_error("SECURITY ALERT: Attaching files via AJAX requires a recent, valid token.",
           [
-            'IP' => $server['REMOTE_ADDR'],
+            'IP' => CRM_Utils_System::ipAddress(),
             'level' => 'security',
             'referer' => $server['HTTP_REFERER'],
             'reason' => 'CSRF suspected',
@@ -137,6 +137,7 @@ class CRM_Core_Page_AJAX_Attachment {
   public static function angularSettings() {
     return [
       'token' => self::createToken(),
+      'maxFileSize' => Civi::settings()->get('maxFileSize'),
     ];
   }
 

@@ -143,7 +143,7 @@ trait DbTestTrait {
     $expectedValue, $message
   ) {
     $value = \CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn, TRUE);
-    $this->assertEquals(trim($expectedValue), trim($value), $message);
+    $this->assertEquals(trim($expectedValue), trim($value ?? ''), $message);
   }
 
   /**

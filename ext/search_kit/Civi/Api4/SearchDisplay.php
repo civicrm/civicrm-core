@@ -6,6 +6,7 @@ namespace Civi\Api4;
  *
  * Provided by the Search Kit extension.
  *
+ * @since 5.32
  * @searchable none
  * @package Civi\Api4
  */
@@ -51,7 +52,7 @@ class SearchDisplay extends Generic\DAOEntity {
 
   public static function permissions() {
     $permissions = parent::permissions();
-    $permissions['default'] = ['administer CiviCRM data'];
+    $permissions['default'] = [['administer CiviCRM data', 'administer search_kit']];
     // Anyone with access to CiviCRM can view search displays (but not necessarily the results)
     $permissions['get'] = $permissions['getDefault'] = ['access CiviCRM'];
     // Anyone with access to CiviCRM can do search tasks (but not necessarily all of them)

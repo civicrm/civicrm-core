@@ -18,6 +18,16 @@ class api_v3_EventTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_entity;
 
+  /**
+   * @var int[]
+   */
+  protected $_eventIds = [];
+
+  /**
+   * @var array
+   */
+  protected $_events = [];
+
   public function setUp(): void {
     parent::setUp();
     $this->_apiversion = 3;
@@ -72,8 +82,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
       ],
     ];
 
-    $this->events = [];
-    $this->eventIds = [];
+    $this->_events = [];
+    $this->_eventIds = [];
     foreach ($params as $event) {
       $result = $this->callAPISuccess('Event', 'Create', $event);
       $this->_events[] = $result;
@@ -82,9 +92,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
-    foreach ($this->eventIds as $eventId) {
-      $this->eventDelete($eventId);
-    }
     $tablesToTruncate = [
       'civicrm_participant',
       'civicrm_event',
@@ -921,6 +928,42 @@ class api_v3_EventTest extends CiviUnitTestCase {
     foreach ($templateParams as $param => $value) {
       $this->assertEquals($value, $eventResult[$param], print_r($eventResult, 1));
     }
+  }
+
+  public function testGetListLeadingZero() {
+    $this->callAPISuccess('Event', 'create', [
+      'title' => "0765",
+      'start_date' => "2022-04-04",
+      'event_type_id' => "Conference",
+    ]);
+    $result = $this->callAPISuccess('Event', 'getlist', [
+      'input' => "0765",
+    ]);
+    $this->assertEquals(1, $result['count']);
+  }
+
+  /**
+   * Test that using the API to update an Event template keeps the is_template parameter the same
+   * @dataProvider versionThreeAndFour
+   */
+  public function testUpdateEventTemplate($version): void {
+    $this->_apiversion = $version;
+    $templateParams = [
+      'summary' => 'Sign up now to learn the results of this unit test',
+      'description' => 'This event is created from a template, so all the values should be the same as the original ones.',
+      'event_type_id' => 1,
+      'is_public' => 1,
+      'end_date' => '2018-06-25 17:00:00',
+      'is_online_registration' => 1,
+      'registration_start_date' => '2017-06-25 17:00:00',
+      'registration_end_date' => '2018-06-25 17:00:00',
+      'max_participants' => 100,
+      'event_full_text' => 'Sorry! We are already full',
+    ];
+    $template = $this->callAPISuccess('Event', 'create', ['is_template' => 1, 'template_title' => 'Test tpl'] + $templateParams);
+    $this->callAPISuccess('Event', 'create', ['id' => $template['id'], 'is_public' => 0]);
+    $template = $this->callAPISuccess('Event', 'get', ['id' => $template['id']])['values'][$template['id']];
+    $this->assertEquals(1, $template['is_template']);
   }
 
 }

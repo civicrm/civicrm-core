@@ -75,6 +75,27 @@ abstract class CRM_Core_Component_Info {
   protected $keyword;
 
   /**
+   * Component Name.
+   *
+   * @var string
+   */
+  public $name;
+
+  /**
+   * Component namespace.
+   * e.g. CRM_Contribute.
+   *
+   * @var string
+   */
+  public $namespace;
+
+  /**
+   * Component ID
+   * @var int
+   */
+  public $componentID;
+
+  /**
    * @param string $name
    *   Name of the component.
    * @param string $namespace

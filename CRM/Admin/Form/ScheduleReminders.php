@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * This class generates form components for Scheduling Reminders.
  */
@@ -48,7 +50,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm(): void {
     parent::buildQuickForm();
@@ -158,7 +159,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->_freqUnits = CRM_Core_SelectValues::getRecurringFrequencyUnits();
 
     //reminder_interval
-    $this->add('number', 'start_action_offset', ts('When'), ['class' => 'six', 'min' => 0]);
+    $this->add('number', 'start_action_offset', ts('When (trigger date)'), ['class' => 'six', 'min' => 0]);
     $this->addRule('start_action_offset', ts('Value should be a positive number'), 'positiveInteger');
 
     $isActive = ts('Scheduled Reminder Active');
@@ -302,7 +303,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * @return array|bool
    *   True if no errors, else array of errors
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function formRule(array $fields, $files, $self) {
@@ -335,6 +335,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $errors['entity'] = ts('Please select entity value');
     }
 
+    if (!CRM_Utils_System::isNull($fields['absolute_date']) && !CRM_Utils_System::isNull($fields['start_action_offset'])) {
+      $errors['absolute_date'] = ts('Only an absolute date or a relative date or time can be entered, not both.');
+    }
     if (!CRM_Utils_System::isNull($fields['absolute_date'])) {
       if ($fields['absolute_date'] < date('Y-m-d')) {
         $errors['absolute_date'] = ts('Absolute date cannot be earlier than the current time.');
@@ -483,7 +486,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    *   The submitted form values.
    *
    * @return CRM_Core_DAO_ActionSchedule
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function parseActionSchedule($values) {
@@ -695,19 +698,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    *
    * @return array
    */
-  public function listTokens() {
-    $tokenProcessor = new \Civi\Token\TokenProcessor(\Civi::dispatcher(), [
-      'controller' => get_class(),
+  public function listTokens(): array {
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
       'smarty' => FALSE,
-      'schema' => ['activityId', 'participantId'],
+      'schema' => ['activityId', 'participantId', 'membershipId', 'contactId', 'eventId', 'contributionId'],
     ]);
-    $tokens = $tokenProcessor->listTokens();
-
-    $tokens = array_merge(CRM_Core_SelectValues::contactTokens(), $tokens);
-    $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
-    $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
-    $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
-    return $tokens;
+    return $tokenProcessor->listTokens();
   }
 
 }

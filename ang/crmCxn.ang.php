@@ -5,5 +5,5 @@ return [
   'js' => ['ang/crmCxn.js', 'ang/crmCxn/*.js'],
   'css' => ['ang/crmCxn.css'],
   'partials' => ['ang/crmCxn'],
-  'requires' => ['crmUtil', 'ngRoute', 'ngSanitize', 'ui.utils', 'crmUi', 'dialogService', 'crmResource'],
+  'requires' => ['crmUtil', 'ngRoute', 'ngSanitize', 'crmUi', 'dialogService', 'crmResource'],
 ];

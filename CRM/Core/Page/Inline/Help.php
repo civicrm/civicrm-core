@@ -21,9 +21,10 @@ class CRM_Core_Page_Inline_Help {
 
   public function run() {
     $args = $_REQUEST;
-    if (!empty($args['file']) && strpos($args['file'], '..') === FALSE) {
-      $file = $args['file'] . '.hlp';
-      $additionalTPLFile = $args['file'] . '.extra.hlp';
+    $file = (string) ($args['file'] ?? '');
+    if (preg_match('@^[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)*$@', $file)) {
+      $additionalTPLFile = "$file.extra.hlp";
+      $file .= '.hlp';
       $smarty = CRM_Core_Smarty::singleton();
       $smarty->assign('id', $args['id']);
       CRM_Utils_Array::remove($args, 'file', 'class_name', 'type', 'q', 'id');
@@ -41,7 +42,11 @@ class CRM_Core_Page_Inline_Help {
           $output = '';
         }
       }
-      exit($output . $extraoutput);
+      echo trim($output . $extraoutput);
+      CRM_Utils_System::civiExit();
+    }
+    else {
+      throw new CRM_Core_Exception('File name is not valid');
     }
   }
 

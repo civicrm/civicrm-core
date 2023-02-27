@@ -19,13 +19,15 @@
 
 namespace api\v4\Action;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ContactApiKeyTest extends \api\v4\UnitTestCase {
+class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGetApiKey() {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'edit api keys', 'view all contacts', 'edit all contacts'];

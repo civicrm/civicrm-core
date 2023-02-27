@@ -22,7 +22,6 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
    * Clean up after each test.
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -59,7 +58,7 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
       'text_message' => '{contribution.financial_type_id:label} {contribution.invoice_number}',
       'html_message' => '{domain.name}',
       'from_email_address' => $emailID,
-    ], [], [
+    ], NULL, [
       'radio_ts' => 'ts_sel',
       'task' => CRM_Core_Task::TASK_EMAIL,
       'mark_x_' . $contribution1 => 1,

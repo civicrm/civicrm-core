@@ -1,4 +1,7 @@
 <li>
+  <textarea class="form-control" placeholder="{{:: ts('Description (shown above default display)') }}" ng-model="$ctrl.savedSearch.description"></textarea>
+</li>
+<li>
   <crm-search-admin-tags tag-ids="$ctrl.savedSearch.tag_id" class="btn-group btn-group-sm"></crm-search-admin-tags>
 </li>
 <li role="presentation" ng-class="{active: controls.tab === 'compose'}">
@@ -12,7 +15,7 @@
     <i class="crm-i fa-users"></i>
     {{:: ts('Smart Group') }} {{ $ctrl.savedSearch.groups[0].title }}
   </a>
-  <button type="button" class="btn-xs btn-danger-outline crm-search-delete-display" ng-click="$ctrl.removeGroup()" title="{{ $ctrl.groupExists ? ts('Delete') : ts('Undelete') }}">
+  <button type="button" class="btn-xs btn-danger-outline crm-search-display-control" ng-click="$ctrl.removeGroup()" title="{{ $ctrl.groupExists ? ts('Delete') : ts('Undelete') }}">
     <i class="crm-i fa-{{ $ctrl.groupExists ? 'trash' : 'undo' }}"></i>
   </button>
 </li>
@@ -21,8 +24,11 @@
     <i class="crm-i {{ $ctrl.displayTypes[display.type].icon }}"></i>
     {{ display.label || ts('Untitled') }}
   </a>
-  <button type="button" class="btn-xs btn-danger-outline crm-search-delete-display" ng-click="$ctrl.removeDisplay($index)" title="{{ display.trashed ? ts('Undelete') : ts('Delete') }}">
+  <button type="button" class="btn btn-xs btn-danger-outline crm-search-display-control" ng-click="$ctrl.removeDisplay($index)" title="{{ display.trashed ? ts('Undelete') : ts('Delete') }}">
     <i class="crm-i fa-{{ display.trashed ? 'undo' : 'trash' }}"></i>
+  </button>
+  <button type="button" class="btn btn-xs btn-primary-outline crm-search-display-control" ng-if="!display.trashed" ng-click="$ctrl.cloneDisplay(display)" title="{{:: ts('Clone display') }}">
+    <i class="crm-i fa-copy"></i>
   </button>
 </li>
 <li role="presentation">
@@ -30,7 +36,7 @@
     <i class="crm-i fa-plus"></i> {{:: ts('Add...') }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li ng-if="!$ctrl.savedSearch.groups.length">
+    <li ng-if="!$ctrl.savedSearch.groups.length" title="{{:: ts('Smart group of contacts based on search results') }}">
       <a href ng-click="$ctrl.addGroup()">
         <i class="crm-i fa-users"></i>
         {{:: ts('Smart Group') }}
@@ -38,7 +44,7 @@
     </li>
     <li class="dropdown-header">{{:: ts('Display') }}</li>
     <li ng-repeat="type in ::$ctrl.displayTypes">
-      <a href ng-click="$ctrl.addDisplay(type.id)">
+      <a href ng-click="$ctrl.addDisplay(type.id)" title="{{:: type.description }}">
         <i class="crm-i {{:: type.icon }}"></i>
         {{:: type.label }}
       </a>

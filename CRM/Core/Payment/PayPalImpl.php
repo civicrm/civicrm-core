@@ -255,7 +255,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['desc'] = $params['description'] ?? NULL;
     $args['invnum'] = $params['invoiceID'];
     $args['returnURL'] = $this->getReturnSuccessUrl($params['qfKey']);
-    $args['cancelURL'] = $this->getCancelUrl($params['qfKey'], NULL);
+    $args['cancelURL'] = $this->getCancelUrl($params['qfKey'], $params['participantID'] ?? NULL);
     $args['version'] = '56.0';
     $args['SOLUTIONTYPE'] = 'Sole';
 
@@ -500,11 +500,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     if ($this->_paymentProcessor['billing_mode'] == 4) {
-      $this->doPaymentRedirectToPayPal($params, $component);
+      $this->doPaymentRedirectToPayPal($params);
       // redirect calls CiviExit() so execution is stopped
     }
     else {
-      $result = $this->doPaymentPayPalButton($params, $component);
+      $result = $this->doPaymentPayPalButton($params);
       if (is_array($result) && !isset($result['payment_status_id'])) {
         if (!empty($params['is_recur'])) {
           $result = $this->setStatusPaymentPending($result);
@@ -537,12 +537,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @param string $component
    * @return array
    *   the result in an nice formatted array (or an error object)
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doPaymentPayPalButton(&$params, $component = 'contribute') {
+  public function doPaymentPayPalButton(&$params) {
     $args = [];
 
     $result = $this->setStatusPaymentPending([]);
@@ -566,7 +565,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['state'] = $params['state_province'];
     $args['countryCode'] = $params['country'];
     $args['zip'] = $params['postal_code'];
-    $args['desc'] = substr(CRM_Utils_Array::value('description', $params), 0, 127);
+    $args['desc'] = substr(($params['description'] ?? ''), 0, 127);
     $args['custom'] = $params['accountingCode'] ?? NULL;
 
     // add CiviCRM BN code
@@ -590,7 +589,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['totalbillingcycles'] = $params['installments'] ?? NULL;
       $args['version'] = 56.0;
       $args['PROFILEREFERENCE'] = "" .
-        "i=" . $params['invoiceID'] . "&m=" . $component .
+        "i=" . $params['invoiceID'] . "&m=" . $this->_component .
         "&c=" . $params['contactID'] . "&r=" . $params['contributionRecurID'] .
         "&b=" . $params['contributionID'] . "&p=" . $params['contributionPageID'];
     }
@@ -773,7 +772,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * Process incoming notification.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function handlePaymentNotification() {
     $params = array_merge($_GET, $_REQUEST);
@@ -916,12 +914,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
   /**
    * @param array $params
-   * @param string $component
    *
    * @throws Exception
    */
-  public function doPaymentRedirectToPayPal(&$params, $component = 'contribute') {
-    $notifyParameters = ['module' => $component];
+  public function doPaymentRedirectToPayPal(&$params) {
+    $notifyParameters = ['module' => $this->_component];
     $notifyParameterMap = [
       'contactID' => 'contactID',
       'contributionID' => 'contributionID',
@@ -939,30 +936,15 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         $notifyParameters[$notifyName] = $params[$paramsName];
       }
     }
-    $notifyURL = $this->getNotifyUrl();
-
     $config = CRM_Core_Config::singleton();
-    $url = ($component == 'event') ? 'civicrm/event/register' : 'civicrm/contribute/transact';
-    $cancel = ($component == 'event') ? '_qf_Register_display' : '_qf_Main_display';
-
-    $cancelUrlString = "$cancel=1&cancel=1&qfKey={$params['qfKey']}";
-    if (!empty($params['is_recur'])) {
-      $cancelUrlString .= "&isRecur=1&recurId={$params['contributionRecurID']}&contribId={$params['contributionID']}";
-    }
-
-    $cancelURL = CRM_Utils_System::url(
-      $url,
-      $cancelUrlString,
-      TRUE, NULL, FALSE
-    );
 
     $paypalParams = [
       'business' => $this->_paymentProcessor['user_name'],
-      'notify_url' => $notifyURL,
+      'notify_url' => $this->getNotifyUrl(),
       'item_name' => $this->getPaymentDescription($params, 127),
       'quantity' => 1,
       'undefined_quantity' => 0,
-      'cancel_return' => $cancelURL,
+      'cancel_return' => $this->getCancelUrl($params['qfKey'], $params['participantID'] ?? NULL),
       'no_note' => 1,
       'no_shipping' => 1,
       'return' => $this->getReturnSuccessUrl($params['qfKey']),
@@ -1018,10 +1000,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         throw new CRM_Core_Exception(ts('Recurring contribution, but no database id'));
       }
 
+      // See https://developer.paypal.com/api/nvp-soap/paypal-payments-standard/integration-guide/Appx-websitestandard-htmlvariables/#link-recurringpaymentvariables
       $paypalParams += [
         'cmd' => '_xclick-subscriptions',
         'a3' => $this->getAmount($params),
-        'p3' => $params['frequency_interval'],
+        'p3' => $params['frequency_interval'] ?? 1,
         't3' => ucfirst(substr($params['frequency_unit'], 0, 1)),
         'src' => 1,
         'sra' => 1,
@@ -1096,7 +1079,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $p = [];
     foreach ($args as $n => $v) {
-      $p[] = "$n=" . urlencode($v);
+      $p[] = "$n=" . urlencode($v ?? '');
     }
 
     //NVPRequest for submitting to server

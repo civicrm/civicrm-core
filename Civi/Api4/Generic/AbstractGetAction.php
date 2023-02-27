@@ -37,7 +37,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * Note: it will skip adding field defaults when fetching records by id,
    * or if that field has already been added to the where clause.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setDefaultWhereClause() {
     if (!$this->_itemsToGet('id')) {

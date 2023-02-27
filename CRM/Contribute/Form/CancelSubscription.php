@@ -195,7 +195,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
    * Process the form submission.
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function postProcess() {
     $message = NULL;
@@ -263,7 +262,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         $sendTemplateParams
           = [
             'groupName' => $this->_mode == 'auto_renew' ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
-            'valueName' => $this->_mode == 'auto_renew' ? 'membership_autorenew_cancelled' : 'contribution_recurring_cancelled',
+            'workflow' => $this->_mode == 'auto_renew' ? 'membership_autorenew_cancelled' : 'contribution_recurring_cancelled',
             'contactId' => $this->getSubscriptionDetails()->contact_id,
             'tplParams' => $tplParams,
             'tokenContext' => ['contribution_recurId' => $this->getContributionRecurID()],
@@ -276,7 +275,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $msgType = 'error';
       $msgTitle = ts('Error');
       if ($params['send_cancel_request'] == 1) {

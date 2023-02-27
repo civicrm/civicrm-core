@@ -9,6 +9,8 @@ class CRM_Core_CodeGen_Specification {
 
   protected $classNames;
 
+  public $buildVersion;
+
   /**
    * Read and parse.
    *
@@ -245,6 +247,12 @@ class CRM_Core_CodeGen_Specification {
 
     $table['fields'] = &$fields;
 
+    // Default label field
+    if (!$table['labelField']) {
+      $possibleLabels = ['label', 'title'];
+      $table['labelField'] = CRM_Utils_Array::first(array_intersect($possibleLabels, array_keys($fields)));
+    }
+
     if ($this->value('primaryKey', $tableXML)) {
       $this->getPrimaryKey($tableXML->primaryKey, $fields, $table);
     }
@@ -362,6 +370,7 @@ class CRM_Core_CodeGen_Specification {
     $field['required'] = $this->value('required', $fieldXML);
     $field['collate'] = $this->value('collate', $fieldXML);
     $field['comment'] = $this->value('comment', $fieldXML);
+    $field['deprecated'] = $this->value('deprecated', $fieldXML, FALSE);
     $field['default'] = $this->value('default', $fieldXML);
     $field['import'] = $this->value('import', $fieldXML);
     if ($this->value('export', $fieldXML)) {
@@ -412,6 +421,9 @@ class CRM_Core_CodeGen_Specification {
           $field['html'][$htmlOption] = $this->value($htmlOption, $fieldXML->html);
         }
       }
+      if (isset($fieldXML->html->filter)) {
+        $field['html']['filter'] = (array) $fieldXML->html->filter;
+      }
     }
 
     // in multilingual context popup, we need extra information to create appropriate widget
@@ -447,6 +459,9 @@ class CRM_Core_CodeGen_Specification {
         'nameColumn',
         // Column to fetch in "abbreviate" context
         'abbrColumn',
+        // Supported by APIv4 suffixes
+        'colorColumn',
+        'iconColumn',
         // Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
         // callback function incase of static arrays
@@ -529,24 +544,23 @@ class CRM_Core_CodeGen_Specification {
    * @return string
    */
   public function composeTitle($name) {
+    $substitutions = [
+      'is_active' => 'Enabled',
+    ];
+    if (isset($substitutions[$name])) {
+      return $substitutions[$name];
+    }
     $names = explode('_', strtolower($name));
-    $title = '';
-    for ($i = 0; $i < count($names); $i++) {
-      if ($names[$i] === 'id' || $names[$i] === 'is') {
-        // id's do not get titles
-        return NULL;
-      }
-
-      if ($names[$i] === 'im') {
-        $names[$i] = 'IM';
+    $allCaps = ['im', 'id'];
+    foreach ($names as $i => $str) {
+      if (in_array($str, $allCaps, TRUE)) {
+        $names[$i] = strtoupper($str);
       }
       else {
-        $names[$i] = ucfirst(trim($names[$i]));
+        $names[$i] = ucfirst(trim($str));
       }
-
-      $title = $title . ' ' . $names[$i];
     }
-    return trim($title);
+    return trim(implode(' ', $names));
   }
 
   /**
@@ -587,7 +601,7 @@ class CRM_Core_CodeGen_Specification {
     // all fieldnames have to be defined and should exist in schema.
     foreach ($primaryKey['field'] as $fieldName) {
       if (!$fieldName) {
-        echo "Invalid field definition for index '$name' in table ${table['name']}\n";
+        echo "Invalid field definition for index '$name' in table {$table['name']}\n";
         return;
       }
       $parenOffset = strpos($fieldName, '(');
@@ -595,7 +609,7 @@ class CRM_Core_CodeGen_Specification {
         $fieldName = substr($fieldName, 0, $parenOffset);
       }
       if (!array_key_exists($fieldName, $fields)) {
-        echo "Missing definition of field '$fieldName' for index '$name' in table ${table['name']}\n";
+        echo "Missing definition of field '$fieldName' for index '$name' in table {$table['name']}\n";
         print_r($fields);
         exit();
       }
@@ -706,7 +720,7 @@ class CRM_Core_CodeGen_Specification {
     $foreignKey = [
       'idColumn' => trim($foreignXML->idColumn),
       'typeColumn' => trim($foreignXML->typeColumn),
-      'key' => trim($this->value('key', $foreignXML)),
+      'key' => trim($this->value('key', $foreignXML) ?? ''),
     ];
     $dynamicForeignKeys[] = $foreignKey;
   }

@@ -6,6 +6,16 @@
  */
 class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
 
+  /**
+   * @var string
+   */
+  protected $basedir;
+
+  /**
+   * @var \CRM_Extension_System
+   */
+  protected $system;
+
   public function setUp():void {
     parent::setUp();
     // $query = "INSERT INTO civicrm_domain ( name, version ) VALUES ( 'domain', 3 )";

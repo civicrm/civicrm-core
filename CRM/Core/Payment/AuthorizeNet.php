@@ -162,7 +162,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     foreach ($authorizeNetFields as $field => $value) {
       // CRM-7419, since double quote is used as enclosure while doing csv parsing
-      $value = ($field == 'x_description') ? str_replace('"', "'", $value) : $value;
+      $value = ($field === 'x_description') ? str_replace('"', "'", $value) : $value;
       $postFields[] = $field . '=' . urlencode($value);
     }
 
@@ -180,9 +180,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     ])->getBody();
 
     $response_fields = $this->explode_csv($response);
-
-    // fetch available contribution statuses
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     $result = [];
     // check for application errors
@@ -363,7 +360,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $fields['x_currency_code'] = $this->_getParam('currencyID');
     $fields['x_description'] = $this->_getParam('description');
     $fields['x_cust_id'] = $this->_getParam('contactID');
-    if ($this->_getParam('paymentType') == 'AIM') {
+    if ($this->_getParam('paymentType') === 'AIM') {
       $fields['x_relay_response'] = 'FALSE';
       // request response in CSV format
       $fields['x_delim_data'] = 'TRUE';
@@ -377,7 +374,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       $fields['x_exp_date'] = "$exp_month/$exp_year";
     }
 
-    if ($this->_mode != 'live') {
+    if ($this->_mode !== 'live') {
       $fields['x_test_request'] = 'TRUE';
     }
 
@@ -535,7 +532,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @return string
    */
   public function accountLoginURL() {
-    return ($this->_mode == 'test') ? 'https://test.authorize.net' : 'https://authorize.net';
+    return ($this->_mode === 'test') ? 'https://test.authorize.net' : 'https://authorize.net';
   }
 
   /**

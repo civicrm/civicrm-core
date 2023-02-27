@@ -315,7 +315,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
           'groupName' => 'msg_tpl_workflow_contribution',
-          'valueName' => 'pcp_notify',
+          'workflow' => 'pcp_notify',
           'contactId' => $contactID,
           'from' => "$domainEmailName <$domainEmailAddress>",
           'toEmail' => $to,

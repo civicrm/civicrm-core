@@ -66,6 +66,23 @@ class CRM_Contact_BAO_Query_Hook {
   }
 
   /**
+   * Get the fields that are available in the 'contact context'.
+   *
+   * For example exporting contacts should not include fields for grants etc.
+   *
+   * @return array
+   */
+  public function getContactFields(): array {
+    $extFields = [];
+    foreach ($this->getSearchQueryObjects() as $obj) {
+      // Get Fields is ambiguous about the
+      $fields = method_exists($obj, 'getContactFields') ? $obj->getContactFields() : $obj->getFields();
+      $extFields = array_merge($extFields, $fields);
+    }
+    return $extFields;
+  }
+
+  /**
    * @param $apiEntities
    * @param $fieldOptions
    */

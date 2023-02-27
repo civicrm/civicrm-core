@@ -12,6 +12,7 @@
 /**
  * Class CRM_Core_BAO_AddressTest
  * @group headless
+ * @group locale
  */
 class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
@@ -424,7 +425,6 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * ParseStreetAddress if enabled, otherwise, don't.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testParseStreetAddressIfEnabled() {
     // Turn off address standardization. Parsing should work without it.
@@ -726,7 +726,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * dev/core#1670 - Ensure that the custom fields on adresses are copied
+   * dev/dev/core#1670 - Ensure that the custom fields on adresses are copied
    * to inherited address
    * 1. test the creation of the shared address with custom field
    * 2. test the update of the custom field in the master
@@ -823,7 +823,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test core#2379 fix - geocodes shouldn't be > 14 characters.
+   * Test dev/core#2379 fix - geocodes shouldn't be > 14 characters.
    */
   public function testLongGeocodes() {
     $contactId = $this->individualCreate();

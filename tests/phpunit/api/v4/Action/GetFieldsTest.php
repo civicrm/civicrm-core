@@ -19,16 +19,18 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\EntityTag;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class GetFieldsTest extends UnitTestCase {
+class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
 
   public function testOptionsAreReturned() {
     $fields = Contact::getFields(FALSE)
@@ -45,12 +47,17 @@ class GetFieldsTest extends UnitTestCase {
     $this->assertFalse($fields['first_name']['options']);
   }
 
-  public function testTableAndColumnReturned() {
+  public function testContactGetFields() {
     $fields = Contact::getFields(FALSE)
       ->execute()
       ->indexBy('name');
+    // Ensure table & column are returned
     $this->assertEquals('civicrm_contact', $fields['display_name']['table_name']);
     $this->assertEquals('display_name', $fields['display_name']['column_name']);
+
+    // Check suffixes
+    $this->assertEquals(['name', 'label', 'icon'], $fields['contact_type']['suffixes']);
+    $this->assertEquals(['name', 'label', 'icon'], $fields['contact_sub_type']['suffixes']);
   }
 
   public function testComponentFields() {
@@ -94,15 +101,18 @@ class GetFieldsTest extends UnitTestCase {
     $this->assertEquals(['name', 'label'], $fields['campaign_id']['suffixes']);
   }
 
-  public function testRequiredAndNullable() {
+  public function testRequiredAndNullableAndDeprecated() {
     $actFields = Activity::getFields(FALSE)
       ->setAction('create')
       ->execute()->indexBy('name');
 
+    $this->assertFalse($actFields['id']['required']);
     $this->assertTrue($actFields['activity_type_id']['required']);
     $this->assertFalse($actFields['activity_type_id']['nullable']);
     $this->assertFalse($actFields['subject']['required']);
     $this->assertTrue($actFields['subject']['nullable']);
+    $this->assertFalse($actFields['subject']['deprecated']);
+    $this->assertTrue($actFields['phone_id']['deprecated']);
   }
 
   public function testGetSuffixes() {
@@ -113,6 +123,29 @@ class GetFieldsTest extends UnitTestCase {
     $this->assertEquals(['name', 'label', 'description', 'icon'], $actFields['activity_type_id']['suffixes']);
     $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['status_id']['suffixes']);
     $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['tags']['suffixes']);
+  }
+
+  public function testDynamicFks() {
+    $tagFields = EntityTag::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertEmpty($tagFields['entity_id']['fk_entity']);
+
+    $tagFields = EntityTag::getFields(FALSE)
+      ->addValue('entity_table', 'civicrm_activity')
+      ->execute()->indexBy('name');
+    $this->assertEquals('Activity', $tagFields['entity_id']['fk_entity']);
+
+    $tagFields = EntityTag::getFields(FALSE)
+      ->addValue('entity_table:name', 'Contact')
+      ->execute()->indexBy('name');
+    $this->assertEquals('Contact', $tagFields['entity_id']['fk_entity']);
+  }
+
+  public function testFiltersAreReturned(): void {
+    $field = Contact::getFields(FALSE)
+      ->addWhere('name', '=', 'employer_id')
+      ->execute()->single();
+    $this->assertEquals(['contact_type' => 'Organization'], $field['input_attrs']['filter']);
   }
 
 }

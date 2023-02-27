@@ -19,6 +19,13 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
   protected $submittableMoneyFields = ['total'];
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Batch';
+  }
+
+  /**
    * PreProcess function.
    */
   public function preProcess() {
@@ -76,7 +83,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
   /**
    * Process the form submission.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess(): void {
     if ($this->_action & CRM_Core_Action::DELETE) {

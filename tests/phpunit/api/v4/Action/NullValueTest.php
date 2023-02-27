@@ -21,17 +21,18 @@ namespace api\v4\Action;
 
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class NullValueTest extends UnitTestCase {
+class NullValueTest extends Api4TestBase implements TransactionalInterface {
 
-  public function setUpHeadless() {
+  public function setUp(): void {
     $format = '{contact.first_name}{ }{contact.last_name}';
     \Civi::settings()->set('display_name_format', $format);
-    return parent::setUpHeadless();
+    parent::setUp();
   }
 
   public function testStringNull() {

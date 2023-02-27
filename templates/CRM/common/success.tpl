@@ -48,10 +48,6 @@
         </p>
       </div>
       <p><span class="crm-status-icon success"> </span>{$message}</p>
-      {if !empty($afterUpgradeMessage)}
-        <h3>{ts}Important Notes{/ts}</h3>
-        <p>{$afterUpgradeMessage}</p>
-      {/if}
       <p><a href="{crmURL p='civicrm/dashboard' q='reset=1'}" title="{ts}CiviCRM home page{/ts}" style="text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
     </div>
 {/if}

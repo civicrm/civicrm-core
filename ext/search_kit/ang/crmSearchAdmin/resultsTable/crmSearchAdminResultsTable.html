@@ -3,6 +3,7 @@
   <div class="form-inline">
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'"></div>
     <crm-search-tasks entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" search="$ctrl.search" display="$ctrl.display" display-controller="$ctrl" refresh="$ctrl.refreshAfterTask()"></crm-search-tasks>
+    <span ng-include="'~/crmSearchDisplay/ResultCount.html'"></span>
   </div>
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
     <thead>

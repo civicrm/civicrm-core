@@ -19,6 +19,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\UserJob;
+
 require_once 'Log.php';
 require_once 'Mail.php';
 
@@ -266,12 +268,12 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   public function cleanupCaches($sessionReset = TRUE) {
     // cleanup templates_c directory
     $this->cleanup(1, FALSE);
-
+    UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
     // clear all caches
     self::clearDBCache();
     Civi::cache('session')->clear();
     Civi::cache('metadata')->clear();
-    CRM_Core_DAO_AllCoreTables::reinitializeCache();
+    CRM_Core_DAO_AllCoreTables::flush();
     CRM_Utils_System::flushCache();
 
     if ($sessionReset) {
@@ -291,7 +293,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
         CRM_Core_Permission::basicPermissions()
       );
     }
-    else {
+    elseif (get_class($this->userPermissionClass) !== 'CRM_Core_Permission_UnitTests') {
       // Cannot store permissions -- warn if any modules require them
       $modules_with_perms = [];
       foreach ($module_files as $module_file) {
@@ -300,6 +302,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
           $modules_with_perms[] = $module_file['prefix'];
         }
       }
+      // FIXME: Setting a session status message here is probably wrong.
+      // For starters we are not necessarily in the context of a user-facing form
+      // for another thing this message will show indiscriminately to non-admin users
+      // and finally, this message contains nothing actionable for the person reading it to do.
       if (!empty($modules_with_perms)) {
         CRM_Core_Session::setStatus(
           ts('Some modules define permissions, but the CMS cannot store them: %1', [1 => implode(', ', $modules_with_perms)]),
@@ -323,7 +329,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   /**
    * Clear db cache.
    */
-  public static function clearDBCache() {
+  public static function clearDBCache(): void {
     $queries = [
       'TRUNCATE TABLE civicrm_acl_cache',
       'TRUNCATE TABLE civicrm_acl_contact_cache',
@@ -356,34 +362,36 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *   Optional time interval for mysql date function.g '2 day'. This can be used to prevent
    *   tables created recently from being deleted.
    */
-  public static function clearTempTables($timeInterval = FALSE) {
-
-    $dao = new CRM_Core_DAO();
+  public static function clearTempTables($timeInterval = FALSE): void {
     $query = "
       SELECT TABLE_NAME as tableName
       FROM   INFORMATION_SCHEMA.TABLES
-      WHERE  TABLE_SCHEMA = %1
-      AND (
-        TABLE_NAME LIKE 'civicrm_import_job_%'
-        OR TABLE_NAME LIKE 'civicrm_report_temp%'
-        OR TABLE_NAME LIKE 'civicrm_tmp_d%'
-        )
+      WHERE  TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME LIKE 'civicrm_tmp_d%'
     ";
-    // NOTE: Cannot find use-cases where "civicrm_report_temp" would be durable. Could probably remove.
 
     if ($timeInterval) {
       $query .= " AND CREATE_TIME < DATE_SUB(NOW(), INTERVAL {$timeInterval})";
     }
 
-    $tableDAO = CRM_Core_DAO::executeQuery($query, [1 => [$dao->database(), 'String']]);
+    $tableDAO = CRM_Core_DAO::executeQuery($query);
     $tables = [];
     while ($tableDAO->fetch()) {
       $tables[] = $tableDAO->tableName;
     }
     if (!empty($tables)) {
       $table = implode(',', $tables);
-      // drop leftover temporary tables
-      CRM_Core_DAO::executeQuery("DROP TABLE $table");
+      // If a User Job references the table do not drop it. This is a bit quick & dirty, but we don't want to
+      // get into calling more sophisticated functions in a cache clear, and the table names are pretty unique
+      // (ex: "civicrm_tmp_d_dflt_1234abcd5678efgh"), and the "metadata" may continue to evolve for the next
+      // couple months.
+      // TODO: Circa v5.60+, consider a more precise cleanup. Discussion: https://github.com/civicrm/civicrm-core/pull/24538
+      // A separate process will reap the UserJobs but here the goal is just not to delete them during cache clearing
+      // if they are still referenced.
+      if (!CRM_Core_DAO::executeQuery("SELECT count(*) FROM civicrm_user_job WHERE metadata LIKE '%" . $tableDAO->tableName . "%'")) {
+        // drop leftover temporary tables
+        CRM_Core_DAO::executeQuery("DROP TABLE $table");
+      }
     }
   }
 

@@ -37,6 +37,11 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
   protected $_outBound_option = NULL;
 
   /**
+   * @var CiviUnitTestCase
+   */
+  protected $_ut;
+
+  /**
    * Constructor.
    *
    * @param CiviUnitTestCase $unit_test The currently running test
@@ -245,10 +250,8 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    *
    * @param int $limit
    *  How many recent messages to remove, defaults to 0 (all).
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function clearMessages($limit = 0) {
+  public function clearMessages(int $limit = 0): void {
     $sql = 'DELETE FROM civicrm_mailing_spool ORDER BY id DESC';
     if ($limit) {
       $sql .= ' LIMIT ' . $limit;

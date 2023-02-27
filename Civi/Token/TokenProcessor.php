@@ -116,7 +116,7 @@ class TokenProcessor {
   protected $next = 0;
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param \Civi\Core\CiviEventDispatcher $dispatcher
    * @param array $context
    */
   public function __construct($dispatcher, $context) {
@@ -480,7 +480,7 @@ class TokenProcessor {
           return $value->getAmount();
 
         default:
-          throw new \CRM_Core_Exception("Invalid token filter: $filter");
+          throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
       }
     }
 
@@ -494,15 +494,30 @@ class TokenProcessor {
       case 'lower':
         return mb_strtolower($value);
 
+      case 'boolean':
+        // Cast to 0 or 1 for use in text.
+        return (int) ((bool) $value);
+
       case 'crmDate':
         if ($value instanceof \DateTime) {
           // @todo cludgey.
           require_once 'CRM/Core/Smarty/plugins/modifier.crmDate.php';
           return \smarty_modifier_crmDate($value->format('Y-m-d H:i:s'), $filter[1] ?? NULL);
         }
+        if ($value === '') {
+          return $value;
+        }
+
+      case 'default':
+        if (!$value) {
+          return $filter[1];
+        }
+        else {
+          return $value;
+        }
 
       default:
-        throw new \CRM_Core_Exception("Invalid token filter: $filter");
+        throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
     }
   }
 
@@ -525,6 +540,7 @@ class TokenRowIterator extends \IteratorIterator {
     $this->tokenProcessor = $tokenProcessor;
   }
 
+  #[\ReturnTypeWillChange]
   public function current() {
     return new TokenRow($this->tokenProcessor, parent::key());
   }

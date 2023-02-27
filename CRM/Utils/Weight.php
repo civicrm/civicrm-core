@@ -233,6 +233,11 @@ class CRM_Utils_Weight {
    * @return int
    */
   public static function getMax($daoName, $fieldValues = NULL, $weightField = 'weight') {
+    if (empty($weightField)) {
+      Civi::log()->warning('Missing weight field name for ' . $daoName);
+      return 0;
+    }
+
     $selectField = "MAX(ROUND($weightField)) AS max_weight";
     $weightDAO = CRM_Utils_Weight::query('SELECT', $daoName, $fieldValues, $selectField);
     $weightDAO->fetch();

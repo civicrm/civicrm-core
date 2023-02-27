@@ -38,7 +38,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       $count = 1;
       // Query only works in 4.3+
       if (version_compare($currentVer, "4.3.0") > 0) {
-        $count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_payment_processor WHERE payment_processor_type_id IN (SELECT id FROM civicrm_payment_processor_type WHERE name = 'Moneris')");
+        // Disable i18nRewrite for multilingual because the view might not yet exist (added in 5.13.0)
+        $i18nRewrite = FALSE;
+        $count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_payment_processor WHERE payment_processor_type_id IN (SELECT id FROM civicrm_payment_processor_type WHERE name = 'Moneris')", TRUE, NULL, FALSE, $i18nRewrite);
       }
       if ($count && !function_exists('moneris_civicrm_managed')) {
         $preUpgradeMessage .= '<p>' . ts('The %1 payment processor is no longer bundled with CiviCRM. After upgrading you will need to install the extension to continue using it.', [1 => 'Moneris']) . '</p>';
@@ -457,7 +459,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     // CRM-20868 : Update invoice_numbers (in batch) with value in [invoice prefix][contribution id] format
     $contributionSettings = Civi::settings()->get('contribution_invoice_settings');
     if (!empty($contributionSettings['invoicing']) && !empty($contributionSettings['invoice_prefix'])) {
-      list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+      [$minId, $maxId] = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
       FROM civicrm_contribution ")->getDatabaseResult()->fetchRow();
       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
         $endId = $startId + self::BATCH_SIZE - 1;
@@ -820,7 +822,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     try {
       civicrm_api3('Extension', 'disable', ['key' => 'com.klangsoft.flexiblejobs']);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // just ignore if the extension isn't installed
     }
 

@@ -7,6 +7,8 @@
   <add>2.2</add>
   <log>true</log>
   <component>CiviContribute</component>
+  <labelField>title</labelField>
+  <title>Personal Campaign Page</title>
   <field>
     <name>id</name>
     <uniqueName>pcp_id</uniqueName>
@@ -185,6 +187,7 @@
     <add>2.2</add>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
   </field>
   <field>

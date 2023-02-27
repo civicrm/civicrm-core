@@ -44,16 +44,13 @@
     {include file="CRM/Form/body.tpl"}
   {/if}
   {strip}
-    {if $help_pre && $action neq 4}
-      <div class="messages help">{$help_pre}</div>
-    {/if}
 
     {include file="CRM/common/CMSUser.tpl"}
 
     {if $action eq 2 and $multiRecordFieldListing}
       <h1>{ts}Edit Details{/ts}</h1>
       <div class="crm-submit-buttons" style='float:right'>
-      {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
+      {include file="CRM/common/formButtons.tpl" location=''}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
       </div>
     {/if}
 
@@ -187,11 +184,6 @@
       {/if}{* end of main if field name if *}
     {/foreach}
 
-    {if $isCaptcha && ( $mode eq 8 || $mode eq 4 || $mode eq 1 ) }
-      {include file='CRM/common/ReCAPTCHA.tpl'}
-      <script type="text/javascript">cj('.recaptcha_label').attr('width', '140px');</script>
-    {/if}
-
     {if $field.groupHelpPost}
       <div class="messages help">{$field.groupHelpPost}</div>
     {/if}
@@ -209,7 +201,7 @@
         </div>
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
-        {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
+        {include file="CRM/common/formButtons.tpl" location=''}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
         {if $includeCancelButton}
           <a class="button cancel" href="{$cancelURL}">
             <span>
@@ -220,37 +212,15 @@
         {/if}
       </div>
     {/if}
-    {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}
   {/strip}
 
 </div> {* end crm-container div *}
 
-<script type="text/javascript">
-  {if $drupalCms}
-    {literal}
-    if ( document.getElementsByName("cms_create_account")[0].checked ) {
-      cj('#details').show();
-    }
-    else {
-      cj('#details').hide();
-    }
-    {/literal}
-  {/if}
-</script>
 {/if} {* fields array is not empty *}
 {if $multiRecordFieldListing and empty($fields)}
   {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl" showListing=true}
 {/if}
-{if $drupalCms}
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="create_account"
-trigger_value       =""
-target_element_id   ="details"
-target_element_type ="block"
-field_type          ="radio"
-invert              = 0
-}
-{elseif $statusMessage}
+{if $statusMessage}
 <div class="messages status no-popup">
   {icon icon="fa-info-circle"}{/icon}
   {$statusMessage}

@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CRM/Utils/DeprecatedUtils.php';
-
 /**
  * Test class for API utils
  *
@@ -127,14 +125,14 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    * @param bool $throws
    *   Whether we should pass any exceptions for authorization failures.
    *
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    * @throws Exception
    * @return bool
    *   TRUE or FALSE depending on the outcome of the authorization check
    */
   public function runPermissionCheck($entity, $action, $params, $throws = FALSE) {
     $params['version'] = 3;
-    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+    $dispatcher = new \Civi\Core\CiviEventDispatcher();
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $kernel = new \Civi\API\Kernel($dispatcher);
     $apiRequest = \Civi\API\Request::create($entity, $action, $params);
@@ -142,9 +140,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       $kernel->authorize(NULL, $apiRequest);
       return TRUE;
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $extra = $e->getExtraParams();
-      if (!$throws && $extra['error_code'] == API_Exception::UNAUTHORIZED) {
+      if (!$throws && $extra['error_code'] == CRM_Core_Exception::UNAUTHORIZED) {
         return FALSE;
       }
       else {
@@ -267,7 +265,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   /**
    * Test the validate function transforms dates.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Exception
    */
   public function test_civicrm_api3_validate_fields() {
@@ -427,7 +425,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   public function testBasicArrayGet($records, $params, $resultIds) {
     $params['version'] = 3;
 
-    $kernel = new \Civi\API\Kernel(new \Symfony\Component\EventDispatcher\EventDispatcher());
+    $kernel = new \Civi\API\Kernel(new \Civi\Core\CiviEventDispatcher());
 
     $provider = new \Civi\API\Provider\AdhocProvider($params['version'], 'Widget');
     $provider->addAction('get', 'access CiviCRM', function ($apiRequest) use ($records) {
@@ -462,7 +460,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       ['snack_id' => 'c', 'fruit' => 'apple', 'cheese' => 'cheddar'],
     ];
 
-    $kernel = new \Civi\API\Kernel(new \Symfony\Component\EventDispatcher\EventDispatcher());
+    $kernel = new \Civi\API\Kernel(new \Civi\Core\CiviEventDispatcher());
     $provider = new \Civi\API\Provider\AdhocProvider(3, 'Widget');
     $provider->addAction('get', 'access CiviCRM', function ($apiRequest) use ($records) {
       return _civicrm_api3_basic_array_get('Widget', $apiRequest['params'], $records, 'snack_id', ['snack_id', 'fruit', 'cheese']);
@@ -514,7 +512,6 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    * Test that the foreign key constraint test correctly interprets pseudoconstants.
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
   public function testKeyConstraintCheck() {
     $fieldInfo = $this->callAPISuccess('Contribution', 'getfields', [])['values']['financial_type_id'];
@@ -523,7 +520,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     try {
       _civicrm_api3_validate_constraint('Blah', 'financial_type_id', $fieldInfo, 'Contribution');
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->assertEquals("'Blah' is not a valid option for field financial_type_id", $e->getMessage());
       return;
     }

@@ -99,6 +99,10 @@
     <title>Option is Default?</title>
     <type>boolean</type>
     <default>0</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <comment>Is this the default option for the group?</comment>
     <add>1.5</add>
   </field>
@@ -144,6 +148,10 @@
     <title>Option Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is this option active?</comment>
     <add>1.5</add>
   </field>

@@ -53,7 +53,6 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * @return array
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function setDefaultValues() {
     $defaults = [];
@@ -99,7 +98,6 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
         'extra' => ['contact_id'],
         'params' => [
           'case_id' => ['!=' => $this->_currentCaseId],
-          'case_id.is_deleted' => 0,
           'case_id.status_id' => ['!=' => "Closed"],
           'case_id.end_date' => ['IS NULL' => 1],
         ],

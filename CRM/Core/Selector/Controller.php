@@ -158,6 +158,8 @@ class CRM_Core_Selector_Controller {
    */
   protected $_dynamicAction = FALSE;
 
+  protected $_case;
+
   /**
    * Class constructor.
    *

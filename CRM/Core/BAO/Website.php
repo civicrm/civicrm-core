@@ -26,6 +26,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    *
    * @param array $params
    *
+   * @deprecated
    * @return CRM_Core_DAO_Website
    * @throws \CRM_Core_Exception
    */
@@ -36,8 +37,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   /**
    * Create website.
    *
-   * If called in a legacy manner this, temporarily, fails back to calling the legacy function.
-   *
    * @param array $params
    *
    * @return CRM_Core_DAO_Website
@@ -46,7 +45,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    */
   public static function add($params) {
     CRM_Core_Error::deprecatedFunctionWarning('use apiv4');
-    return self::create($params);
+    return self::writeRecord($params);
   }
 
   /**
@@ -85,7 +84,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
         self::create($values);
       }
       elseif ($skipDelete && !empty($values['id'])) {
-        self::del($values['id']);
+        static::deleteRecord($values);
       }
     }
   }
@@ -96,21 +95,11 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param int $id
    *
    * @return bool
+   *
+   * @deprecated
    */
   public static function del($id) {
-    $obj = new self();
-    $obj->id = $id;
-    $obj->find();
-    if ($obj->fetch()) {
-      $params = [];
-      CRM_Utils_Hook::pre('delete', 'Website', $id, $params);
-      $obj->delete();
-    }
-    else {
-      return FALSE;
-    }
-    CRM_Utils_Hook::post('delete', 'Website', $id, $obj);
-    return TRUE;
+    return (bool) static::deleteRecord(['id' => $id]);
   }
 
   /**

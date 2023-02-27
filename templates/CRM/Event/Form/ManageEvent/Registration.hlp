@@ -61,6 +61,7 @@
 {/htxt}
 {htxt id="id-allow_same_email"}
 <p>{ts}Check this box to allow a user to register multiple participants using the same email address. Alternatively, if you want additional participants to be registered <strong>without requiring an email address to be entered for each person</strong> - check the "Register multiple participants" option, AND include a profile in this registration form which <strong>includes First Name and Last Name fields</strong>.{/ts}</p>
+<p>{ts}Checking this box will also allow the <strong>same contact to register for this event multiple times</strong>, which is otherwise not possible.{/ts}</p>
 {/htxt}
 {htxt id="id-dedupe_rule_group_id-title"}
   {ts}Duplicate Matching Rule{/ts}

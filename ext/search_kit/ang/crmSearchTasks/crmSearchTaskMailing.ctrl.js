@@ -5,6 +5,7 @@
     var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
       // Combine this controller with model properties (ids, entity, entityInfo) and searchTaskBaseTrait
       ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait),
+      mailingId,
       templateTypes;
 
     this.entityTitle = this.getEntityTitle();
@@ -27,9 +28,6 @@
     });
 
     this.submit = function() {
-      var contacts = _.transform(ctrl.ids, function(records, cid) {
-        records.push({contact_id: cid});
-      });
       ctrl.start({
         values: {
           title: 'Hidden Group ' + Date.now(),
@@ -37,10 +35,6 @@
           'group_type:name': ['Mailing List'],
         },
         chain: {
-          contacts: ['GroupContact', 'save', {
-            defaults: {group_id: '$id'},
-            records: contacts
-          }],
           mailing: ['Mailing', 'create', {
             values: {
               name: ctrl.name,
@@ -59,9 +53,17 @@
       });
     };
 
+    // After running first api call to create group & mailing,
+    // This runs a batch of api calls to add contacts to the mailing group
+    this.afterGroupCreate = function(result) {
+      mailingId = result[0].mailing.id;
+      ctrl.addContacts = {
+        defaults: {group_id: result[0].id}
+      };
+    };
 
     this.onSuccess = function(result) {
-      window.location = CRM.url('civicrm/a#/mailing/' + result[0].mailing.id);
+      window.location = CRM.url('civicrm/a#/mailing/' + mailingId);
     };
 
     this.onError = function() {

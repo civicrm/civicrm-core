@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}// http://civicrm.org/licensing
-// <script> Generated {$smarty.now|date_format:'%d %b %Y %H:%M:%S'}
+// <script> Generated {$smarty.now|crmDate:'%d %b %Y %H:%M:%S'}
 {* This file should only contain strings and settings which rarely change *}
 (function($) {ldelim}
   // Config settings
@@ -29,7 +29,7 @@
   CRM.config.entityRef = $.extend({ldelim}{rdelim}, {$entityRef|@json_encode}, CRM.config.entityRef || {ldelim}{rdelim});
 
   // Initialize CRM.url and CRM.formatMoney
-  CRM.url({ldelim}back: '{crmURL p="civicrm/placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fb=1}', front: '{crmURL p="civicrm/placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fe=1}'{rdelim});
+  CRM.url({ldelim}back: '{crmURL p="civicrm/crmajax-placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fb=1}', front: '{crmURL p="civicrm/crmajax-placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fe=1}'{rdelim});
   CRM.formatMoney('init', false, {$moneyFormat|@json_encode});
 
   // Localize select2

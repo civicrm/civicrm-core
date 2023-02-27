@@ -17,12 +17,15 @@ use Civi\Api4\Generic\AbstractAction;
 use Civi\API\Events;
 use Civi\Api4\Utils\ReflectionUtils;
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Service\AutoService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Accept $apiRequests based on \Civi\API\Action
+ *
+ * @service action_object_provider
  */
-class ActionObjectProvider implements EventSubscriberInterface, ProviderInterface {
+class ActionObjectProvider extends AutoService implements EventSubscriberInterface, ProviderInterface {
 
   /**
    * @return array
@@ -93,10 +96,10 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
    * @param $request
    * @param $row
    * @return array|\Civi\Api4\Generic\Result|null
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function runChain($request, $row) {
-    list($entity, $action, $params, $index) = $request;
+    [$entity, $action, $params, $index] = $request;
     // Swap out variables in $entity, $action & $params
     $this->resolveChainLinks($entity, $row);
     $this->resolveChainLinks($action, $row);
@@ -118,7 +121,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
     }
     elseif (is_string($val) && strlen($val) > 1 && substr($val, 0, 1) === '$') {
       $key = substr($val, 1);
-      $val = $result[$key] ?? \CRM_Utils_Array::pathGet($result, explode('.', $key));
+      $val = $result[$key] ?? \CRM_Utils_Array::pathGet($result, explode('.', $key)) ?? $val;
     }
   }
 
@@ -175,7 +178,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
     foreach ($locations as $location) {
-      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location)) . 'Civi/Api4';
+      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location ?? '')) . 'Civi/Api4';
       if (is_dir($dir)) {
         foreach (glob("$dir/*.php") as $file) {
           $className = 'Civi\Api4\\' . basename($file, '.php');

@@ -84,6 +84,31 @@ class CryptoRegistry {
         $registry->addSymmetricKey($registry->parseKey($keyExpr) + $key);
       }
     }
+    else {
+      // If you are upgrading an old site that does not have a signing key, then there is a status-check advising you to fix it.
+      // But apparently the current site hasn't fixed it yet. The UI+AssetBuilder need to work long enough for sysadmin to discover/resolve.
+      // This fallback is sufficient for short-term usage in limited scenarios (AssetBuilder=>OK; AuthX=>No).
+      // In a properly configured system, the WEAK_SIGN key is strictly unavailable - s.t. a normal site never uses WEAK_SIGN.
+      $registry->addSymmetricKey([
+        'tags' => ['WEAK_SIGN'],
+        'suite' => 'jwt-hs256',
+        'key' => hash_hkdf('sha256',
+          json_encode([
+            // DSN's and site-keys should usually be sufficient, but it's not strongly guaranteed,
+            // so we'll toss in more spaghetti. (At a minimum, this should mitigate bots/crawlers.)
+            \CRM_Utils_Constant::value('CIVICRM_DSN'),
+            \CRM_Utils_Constant::value('CIVICRM_UF_DSN'),
+            \CRM_Utils_Constant::value('CIVICRM_SITE_KEY') ?: $GLOBALS['civicrm_root'],
+            \CRM_Utils_Constant::value('CIVICRM_UF_BASEURL'),
+            \CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD'),
+            \CRM_Utils_System::getSiteID(),
+            \CRM_Utils_System::version(),
+            \CRM_Core_Config::singleton()->userSystem->getVersion(),
+            $_SERVER['HTTP_HOST'] ?? '',
+          ])
+        ),
+      ]);
+    }
 
     //if (isset($_COOKIE['CIVICRM_FORM_KEY'])) {
     //  $crypto->addSymmetricKey([
@@ -243,14 +268,15 @@ class CryptoRegistry {
   /**
    * Find all the keys that apply to a tag.
    *
-   * @param string $keyTag
+   * @param string|string[] $keyTag
    *
    * @return array
    *   List of keys, indexed by id, ordered by weight.
    */
   public function findKeysByTag($keyTag) {
+    $keyTag = (array) $keyTag;
     $keys = array_filter($this->keys, function ($key) use ($keyTag) {
-      return in_array($keyTag, $key['tags'] ?? []);
+      return !empty(array_intersect($keyTag, $key['tags'] ?? []));
     });
     uasort($keys, function($a, $b) {
       return ($a['weight'] ?? 0) - ($b['weight'] ?? 0);
@@ -287,7 +313,7 @@ class CryptoRegistry {
    * @throws CryptoException
    */
   public function parseKey($keyExpr) {
-    list($suite, $keyFunc, $keyVal) = explode(':', $keyExpr);
+    [$suite, $keyFunc, $keyVal] = explode(':', $keyExpr);
     if ($suite === '') {
       $suite = self::DEFAULT_SUITE;
     }

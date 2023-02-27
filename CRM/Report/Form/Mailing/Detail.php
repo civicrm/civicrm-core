@@ -120,11 +120,11 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
 
     // adding dao just to have alias
     $this->_columns['civicrm_mailing_event_bounce'] = [
-      'dao' => 'CRM_Mailing_Event_DAO_Bounce',
+      'dao' => 'CRM_Mailing_Event_DAO_MailingEventBounce',
     ];
 
     $this->_columns['civicrm_mailing_event_delivered'] = [
-      'dao' => 'CRM_Mailing_Event_DAO_Delivered',
+      'dao' => 'CRM_Mailing_Event_DAO_MailingEventDelivered',
       'fields' => [
         'delivery_id' => [
           'name' => 'id',
@@ -149,7 +149,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     ];
 
     $this->_columns['civicrm_mailing_event_unsubscribe'] = [
-      'dao' => 'CRM_Mailing_Event_DAO_Unsubscribe',
+      'dao' => 'CRM_Mailing_Event_DAO_MailingEventUnsubscribe',
       'fields' => [
         'unsubscribe_id' => [
           'name' => 'id',
@@ -192,7 +192,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     ];
 
     $this->_columns['civicrm_mailing_event_reply'] = [
-      'dao' => 'CRM_Mailing_Event_DAO_Reply',
+      'dao' => 'CRM_Mailing_Event_DAO_MailingEventReply',
       'fields' => [
         'reply_id' => [
           'name' => 'id',
@@ -217,7 +217,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     ];
 
     $this->_columns['civicrm_mailing_event_forward'] = [
-      'dao' => 'CRM_Mailing_Event_DAO_Forward',
+      'dao' => 'CRM_Mailing_Event_DAO_MailingEventForward',
       'fields' => [
         'forward_id' => [
           'name' => 'id',

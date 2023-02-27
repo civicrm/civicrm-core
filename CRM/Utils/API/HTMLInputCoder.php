@@ -145,7 +145,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   public function encodeValue($value) {
-    return str_replace(['<', '>'], ['&lt;', '&gt;'], $value);
+    return str_replace(['<', '>'], ['&lt;', '&gt;'], ($value ?? ''));
   }
 
   /**
@@ -192,7 +192,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   public function decodeValue($value) {
-    return str_replace(['&lt;', '&gt;'], ['<', '>'], $value);
+    return str_replace(['&lt;', '&gt;'], ['<', '>'], ($value ?? ''));
   }
 
   /**

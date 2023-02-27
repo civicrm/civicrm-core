@@ -114,13 +114,13 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $this->assign('ppTypeName', $this->_paymentProcessorDAO->name);
 
     if ($this->_id) {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor',
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor/edit',
         "reset=1&action=update&id={$this->_id}",
         FALSE, NULL, FALSE
       );
     }
     else {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor',
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor/edit',
         "reset=1&action=add",
         FALSE, NULL, FALSE
       );
@@ -217,8 +217,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       'payment_processor_type_id',
       ts('Payment Processor Type'),
       CRM_Financial_BAO_PaymentProcessor::buildOptions('payment_processor_type_id'),
-      TRUE,
-      ['onchange' => "reload(true)"]
+      TRUE
     );
 
     // Financial Account of account type asset CRM-11515
@@ -403,7 +402,6 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * Process the form submission.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function postProcess() {
@@ -451,7 +449,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param int $domainID
    * @param bool $test
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
     if ($test) {
@@ -508,7 +506,11 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $this->set('pp', $this->_paymentProcessorType);
     }
     else {
-      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, TRUE, NULL);
+      $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', array(
+        'labelColumn' => 'name',
+        'flip' => 1,
+      ));
+      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, $paymentProcessorTypes['PayPal']);
     }
   }
 

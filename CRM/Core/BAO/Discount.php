@@ -23,16 +23,21 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @param string $entityTable
    *
    * @return bool
+   *
+   * @deprecated
    */
   public static function del($entityId, $entityTable) {
     // delete all discount records with the selected discounted id
     $discount = new CRM_Core_DAO_Discount();
     $discount->entity_id = $entityId;
     $discount->entity_table = $entityTable;
-    if ($discount->delete()) {
-      return TRUE;
+    $discount->find();
+    $ret = FALSE;
+    while ($discount->fetch()) {
+      static::deleteRecord(['id' => $discount->id]);
+      $ret = TRUE;
     }
-    return FALSE;
+    return $ret;
   }
 
   /**

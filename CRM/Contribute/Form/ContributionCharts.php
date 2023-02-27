@@ -94,9 +94,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
 
     $chartData = $abbrMonthNames = [];
     if (is_array($chartInfoMonthly)) {
-      for ($i = 1; $i <= 12; $i++) {
-        $abbrMonthNames[$i] = strftime('%b', mktime(0, 0, 0, $i, 10, 1970));
-      }
+      $abbrMonthNames = CRM_Utils_Date::getAbbrMonthNames();
 
       foreach ($abbrMonthNames as $monthKey => $monthName) {
         $val = CRM_Utils_Array::value($monthKey, $chartInfoMonthly['By Month'], 0);
@@ -120,7 +118,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     $chartInfoYearly = CRM_Contribute_BAO_Contribution_Utils::contributionChartYearly();
 
     //get the years.
-    $this->_years = $chartInfoYearly['By Year'];
+    $this->_years = $chartInfoYearly['By Year'] ?? [];
     $hasContributions = FALSE;
     if (is_array($chartInfoYearly)) {
       $hasContributions = TRUE;

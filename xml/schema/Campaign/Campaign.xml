@@ -23,6 +23,7 @@
     <import>true</import>
     <html>
       <type>Number</type>
+      <label>ID</label>
     </html>
     <add>3.3</add>
   </field>
@@ -41,6 +42,7 @@
     <import>true</import>
     <html>
       <type>Text</type>
+      <label>Name</label>
     </html>
     <add>3.3</add>
   </field>
@@ -58,6 +60,7 @@
     <import>true</import>
     <html>
       <type>Text</type>
+      <label>Title</label>
     </html>
     <add>3.3</add>
   </field>
@@ -70,6 +73,7 @@
       <type>TextArea</type>
       <rows>8</rows>
       <cols>60</cols>
+      <label>Description</label>
     </html>
     <comment>Full description of Campaign.</comment>
     <add>3.3</add>
@@ -83,6 +87,7 @@
     <comment>Date and time that Campaign starts.</comment>
     <import>true</import>
     <html>
+      <label>Start Date</label>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
     </html>
@@ -97,6 +102,7 @@
     <comment>Date and time that Campaign ends.</comment>
     <import>true</import>
     <html>
+      <label>End Date</label>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
     </html>
@@ -114,6 +120,7 @@
       <optionGroupName>campaign_type</optionGroupName>
     </pseudoconstant>
     <html>
+      <label>Type</label>
       <type>Select</type>
     </html>
     <add>3.3</add>
@@ -135,6 +142,7 @@
       <optionGroupName>campaign_status</optionGroupName>
     </pseudoconstant>
     <html>
+      <label>Status</label>
       <type>Select</type>
     </html>
     <add>3.3</add>
@@ -156,6 +164,7 @@
     <import>true</import>
     <add>3.3</add>
     <html>
+      <label>External ID</label>
       <type>Text</type>
     </html>
   </field>
@@ -196,7 +205,9 @@
     <comment>Is this Campaign enabled or disabled/cancelled?</comment>
     <add>3.3</add>
     <html>
+      <label>Enabled</label>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
   </field>
 

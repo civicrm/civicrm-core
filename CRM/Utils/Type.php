@@ -421,8 +421,8 @@ class CRM_Utils_Type {
       case 'Date':
       case 'Timestamp':
         // a null timestamp is valid
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
+        if (strlen(trim($data ?? '')) == 0) {
+          return trim($data ?? '');
         }
 
         if ((preg_match('/^\d{14}$/', $data) ||
@@ -465,7 +465,9 @@ class CRM_Utils_Type {
     }
 
     if ($abort) {
-      $data = htmlentities($data);
+      // Note the string 'NULL' is just for display purposes here and to avoid
+      // passing real null to htmlentities - it's not for database queries.
+      $data = htmlentities($data ?? 'NULL');
       throw new CRM_Core_Exception("$name (value: $data) is not of the type $type");
     }
 

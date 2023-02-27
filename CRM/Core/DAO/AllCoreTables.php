@@ -24,13 +24,16 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * Initialise.
    *
-   * @param bool $fresh
+   * @param bool $fresh Deprecated parameter, use flush() to flush.
    */
-  public static function init($fresh = FALSE) {
-    static $init = FALSE;
-    if ($init && !$fresh) {
+  public static function init(bool $fresh = FALSE): void {
+    if (!empty(Civi::$statics[__CLASS__]['initialised']) && !$fresh) {
       return;
     }
+    if ($fresh) {
+      CRM_Core_Error::deprecatedWarning('Use CRM_Core_DAO_AllCoreTables::flush()');
+    }
+
     Civi::$statics[__CLASS__] = [];
 
     $file = preg_replace('/\.php$/', '.data.php', __FILE__);
@@ -50,7 +53,14 @@ class CRM_Core_DAO_AllCoreTables {
       );
     }
 
-    $init = TRUE;
+    Civi::$statics[__CLASS__]['initialised'] = TRUE;
+  }
+
+  /**
+   * Flush class cache.
+   */
+  public static function flush(): void {
+    Civi::$statics[__CLASS__]['initialised'] = FALSE;
   }
 
   /**
@@ -191,7 +201,7 @@ class CRM_Core_DAO_AllCoreTables {
    * @return string
    */
   public static function getCanonicalClassName($baoName) {
-    return str_replace('_BAO_', '_DAO_', $baoName);
+    return str_replace('_BAO_', '_DAO_', ($baoName ?? ''));
   }
 
   /**
@@ -218,12 +228,11 @@ class CRM_Core_DAO_AllCoreTables {
     // This map only applies to APIv3
     $map = [
       'acl' => 'Acl',
-      'ACL' => 'Acl',
       'im' => 'Im',
-      'IM' => 'Im',
+      'pcp' => 'Pcp',
     ];
-    if ($legacyV3 && isset($map[$name])) {
-      return $map[$name];
+    if ($legacyV3 && isset($map[strtolower($name)])) {
+      return $map[strtolower($name)];
     }
 
     $fragments = explode('_', $name);
@@ -234,9 +243,10 @@ class CRM_Core_DAO_AllCoreTables {
         $fragment = 'UF' . ucfirst(substr($fragment, 2));
       }
     }
-    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
-    if ($fragments[0] === 'Uf') {
-      $fragments[0] = 'UF';
+    // Exceptions to CamelCase: UFGroup, UFJoin, UFMatch, UFField, ACL, IM, PCP
+    $exceptions = ['Uf', 'Acl', 'Im', 'Pcp'];
+    if (in_array($fragments[0], $exceptions)) {
+      $fragments[0] = strtoupper($fragments[0]);
     }
     return implode('', $fragments);
   }
@@ -375,9 +385,11 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * Reinitialise cache.
+   *
+   * @deprecated
    */
-  public static function reinitializeCache() {
-    self::init(TRUE);
+  public static function reinitializeCache(): void {
+    self::flush();
   }
 
   /**

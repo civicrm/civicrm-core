@@ -77,6 +77,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
      *   (SQL type: {$field.sqlType})
      *   Note that values will be retrieved from the database as a string.
+{if $field.deprecated}
+     * @deprecated
+{/if}
      */
     public ${$field.name};
 
@@ -223,10 +226,13 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.uniqueTitle}
   'unique_title' => {$tsFunctionName}('{$field.uniqueTitle}'),
 {/if}
+{if $field.deprecated}
+  'deprecated' => TRUE,
+{/if}
 {if $field.html}
   'html' => array(
   {foreach from=$field.html item=val key=key}
-    '{$key}' => {if $key eq 'label'}{$tsFunctionName}("{$val}"){else}'{$val}'{/if},
+    '{$key}' => {if $key eq 'label'}{$tsFunctionName}("{$val}"){elseif is_array($val)}{$val|@print_array}{else}'{$val}'{/if},
   {/foreach}
   ),
 {/if}

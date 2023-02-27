@@ -16,6 +16,7 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
   protected $sentMessage;
   protected $_id = 0;
   static private $_singleton = [];
+  protected $provider;
 
   public function __construct($provider, $skipAuth = TRUE) {
     $this->provider = $provider;

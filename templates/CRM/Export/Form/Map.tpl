@@ -23,7 +23,7 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
   <crm-angular-js modules="exportui">
-    <div class="crm-export-field-selector-outer" ng-controller="ExportUiCtrl" ng-include="'~/exportui/export.html'"></div>
+    <crm-export-ui class="crm-export-field-selector-outer"></crm-export-ui>
   </crm-angular-js>
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

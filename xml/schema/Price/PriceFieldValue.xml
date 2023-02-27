@@ -188,10 +188,11 @@
     <comment>Is this default price field option</comment>
     <default>0</default>
     <required>true</required>
-    <add>3.3</add>
     <html>
       <type>CheckBox</type>
+      <label>Default</label>
     </html>
+    <add>3.3</add>
   </field>
   <field>
     <name>is_active</name>
@@ -200,6 +201,10 @@
     <comment>Is this price field value active</comment>
     <default>1</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>3.3</add>
   </field>
   <field>

@@ -38,6 +38,7 @@ use Civi\Api4\Utils\CoreUtil;
  * @package Civi\Api4\Generic
  */
 abstract class AbstractSaveAction extends AbstractAction {
+  use Traits\MatchParamTrait;
 
   /**
    * Array of $ENTITIES to save.
@@ -72,26 +73,12 @@ abstract class AbstractSaveAction extends AbstractAction {
   protected $reload = FALSE;
 
   /**
-   * Specify fields to match for update.
-   *
-   * Normally each record is either created or updated based on the presence of an `id`.
-   * Specifying `$match` fields will also perform an update if an existing $ENTITY matches all specified fields.
-   *
-   * Note: the fields named in this param should be without any options suffix (e.g. `my_field` not `my_field:name`).
-   * Any options suffixes in the $records will be resolved by the api prior to matching.
-   *
-   * @var array
-   * @optionsCallback getMatchFields
-   */
-  protected $match = [];
-
-  /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function validateValues() {
     $idField = CoreUtil::getIdFieldName($this->getEntityName());
-    // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of API_Exception?
+    // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of CRM_Core_Exception?
     $unmatched = [];
     foreach ($this->records as $record) {
       if (empty($record[$idField])) {
@@ -99,7 +86,7 @@ abstract class AbstractSaveAction extends AbstractAction {
       }
     }
     if ($unmatched) {
-      throw new \API_Exception("Mandatory values missing from Api4 {$this->getEntityName()}::{$this->getActionName()}: " . implode(", ", $unmatched), "mandatory_missing", ["fields" => $unmatched]);
+      throw new \CRM_Core_Exception("Mandatory values missing from Api4 {$this->getEntityName()}::{$this->getActionName()}: " . implode(", ", $unmatched), "mandatory_missing", ["fields" => $unmatched]);
     }
 
     if ($this->checkPermissions) {
@@ -141,7 +128,7 @@ abstract class AbstractSaveAction extends AbstractAction {
     if (empty($record[$primaryKey]) && !empty($this->match)) {
       $where = [];
       foreach ($record as $key => $val) {
-        if (isset($val) && in_array($key, $this->match, TRUE)) {
+        if (in_array($key, $this->match, TRUE)) {
           if ($val === '' || is_null($val)) {
             // If we want to match empty string we have to match on NULL/''
             $where[] = [$key, 'IS EMPTY'];
@@ -192,21 +179,6 @@ abstract class AbstractSaveAction extends AbstractAction {
   public function addDefault(string $fieldName, $defaultValue) {
     $this->defaults[$fieldName] = $defaultValue;
     return $this;
-  }
-
-  /**
-   * Options callback for $this->match
-   * @return array
-   */
-  protected function getMatchFields() {
-    return (array) civicrm_api4($this->getEntityName(), 'getFields', [
-      'checkPermissions' => FALSE,
-      'action' => 'get',
-      'where' => [
-        ['type', 'IN', ['Field', 'Custom']],
-        ['name', 'NOT IN', CoreUtil::getInfoItem($this->getEntityName(), 'primary_key')],
-      ],
-    ], ['name']);
   }
 
 }

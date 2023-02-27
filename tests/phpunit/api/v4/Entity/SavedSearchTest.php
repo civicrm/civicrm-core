@@ -19,17 +19,18 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SavedSearchTest extends UnitTestCase {
+class SavedSearchTest extends Api4TestBase implements TransactionalInterface {
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function testContactSmartGroup(): void {

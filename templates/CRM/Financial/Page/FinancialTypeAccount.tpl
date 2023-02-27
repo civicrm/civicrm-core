@@ -16,7 +16,7 @@
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
       {crmButton q="action=add&reset=1&aid=$aid" id="newfinancialTypeAccount"  icon="plus-circle"}{ts}Assign Account{/ts}{/crmButton}
-  {crmButton p="civicrm/admin/financial/financialType" q="action=update&id=`$aid`&reset=1" icon="pencil"}{ts}Edit Financial Type{/ts}{/crmButton}
+  {crmButton p="civicrm/admin/financial/financialType/edit" q="action=update&id=`$aid`&reset=1" icon="pencil"}{ts}Edit Financial Type{/ts}{/crmButton}
       </div>
     {/if}
     {strip}
@@ -49,7 +49,7 @@
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
       {crmButton q="action=add&reset=1&aid=$aid" id="newfinancialTypeAccount"  icon="plus-circle"}{ts}Assign Account{/ts}{/crmButton}
-  {crmButton p="civicrm/admin/financial/financialType" q="action=update&id=`$aid`&reset=1" icon="pencil"}{ts}Edit Financial Type{/ts}{/crmButton}
+  {crmButton p="civicrm/admin/financial/financialType/edit" q="action=update&id=`$aid`&reset=1" icon="pencil"}{ts}Edit Financial Type{/ts}{/crmButton}
       </div>
     {/if}
     </div>

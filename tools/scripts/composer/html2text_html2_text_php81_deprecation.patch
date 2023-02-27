@@ -1,0 +1,40 @@
+From c4d3df97f95c74cea45b452fa8bc8e153658f3f8 Mon Sep 17 00:00:00 2001
+From: Ade Attwood <ade@practically.io>
+Date: Fri, 14 Jan 2022 10:31:09 +0000
+Subject: [PATCH] Fix `html_entity_decode` deprecation warning in PHP 8.1
+
+Passing null as the second parameter is deprecated in PHP 8.1. When using the
+`legacyConstruct` function the `htmlFuncFlags` are never set and passing null
+into `html_entity_decode`.
+
+This move setting `htmlFuncFlags` above the legacy check to ensure they are
+always set to prevent passing null into `html_entity_decode`.
+---
+ src/Html2Text.php | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/Html2Text.php b/src/Html2Text.php
+index 16a6572..c3e0109 100644
+--- a/src/Html2Text.php
++++ b/src/Html2Text.php
+@@ -236,6 +236,10 @@ private function legacyConstruct($html = '', $fromFile = false, array $options =
+      */
+     public function __construct($html = '', $options = array())
+     {
++        $this->htmlFuncFlags = (PHP_VERSION_ID < 50400)
++            ? ENT_QUOTES
++            : ENT_QUOTES | ENT_HTML5;
++
+         // for backwards compatibility
+         if (!is_array($options)) {
+             return call_user_func_array(array($this, 'legacyConstruct'), func_get_args());
+@@ -247,9 +247,6 @@ public function __construct($html = '', $options = array())
+ 
+         $this->html = $html;
+         $this->options = array_merge($this->options, $options);
+-        $this->htmlFuncFlags = (PHP_VERSION_ID < 50400)
+-            ? ENT_COMPAT
+-            : ENT_COMPAT | ENT_HTML5;
+     }
+ 
+     /**

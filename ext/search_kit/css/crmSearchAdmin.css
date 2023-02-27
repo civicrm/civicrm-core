@@ -5,7 +5,7 @@
 #bootstrap-theme .crm-search-nav-tabs {
   position: relative;
 }
-#bootstrap-theme .crm-search-nav-tabs > a.btn {
+#bootstrap-theme .crm-search-nav-tabs > div.btn-group {
   position: absolute;
   right: 0;
   top: 0;
@@ -70,7 +70,7 @@
   width: auto;
   border: 0 none;
   padding: 2px 5px;
-  text-transform: capitalize;
+  text-transform: none;
 }
 #bootstrap-theme.crm-search crm-search-clause > .btn-group {
   position: absolute;
@@ -100,6 +100,7 @@
   min-height: 3.5em;
 }
 
+#bootstrap-theme.crm-search .form-control label,
 #bootstrap-theme.crm-search legend[ng-click] {
   cursor: pointer;
 }
@@ -167,10 +168,13 @@
   height: 36px;
 }
 
-#bootstrap-theme .crm-search-delete-display {
+#bootstrap-theme .crm-search-display-control {
   position: absolute;
   right: 0;
   top: 0;
+}
+#bootstrap-theme .crm-search-display-control+.crm-search-display-control {
+  right: 20px;
 }
 
 #bootstrap-theme .crm-search-admin-edit-columns {

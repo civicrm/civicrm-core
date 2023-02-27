@@ -43,8 +43,6 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
   /**
    * Build all the data structures needed to build the form.
    *
-   * @param
-   *
    * @return void
    */
   public function preProcess() {
@@ -156,7 +154,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
   /**
    * Get the rows form the search, keyed to make the token processor happy.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getRows(): array {
     if (empty($this->rows)) {

@@ -140,11 +140,11 @@ class ValidateValuesEvent extends GenericHookEvent {
   /**
    * Convert the list of errors an exception.
    *
-   * @return \API_Exception
+   * @return \CRM_Core_Exception
    */
   public function toException() {
     // We should probably have a better way to report the errors in a structured/list format.
-    return new \API_Exception(ts('Found %1 error(s) in submitted %2 record(s) of type "%3": %4', [
+    return new \CRM_Core_Exception(ts('Found %1 error(s) in submitted %2 record(s) of type "%3": %4', [
       1 => count($this->errors),
       2 => count(array_unique(array_column($this->errors, 'record'))),
       3 => $this->getEntityName(),

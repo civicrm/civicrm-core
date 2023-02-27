@@ -425,7 +425,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test get custom field id function.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetCustomFieldID() {
     $this->createCustomField();
@@ -474,7 +474,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testGetFieldsForImport() {
-    $this->entity = 'Contact';
     $this->createCustomGroupWithFieldsOfAllTypes();
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
     $expected = [

@@ -18,7 +18,7 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Test\TransactionalInterface;
@@ -28,7 +28,14 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class AddressTest extends UnitTestCase implements TransactionalInterface {
+class AddressTest extends Api4TestBase implements TransactionalInterface {
+
+  public function setUp():void {
+    \Civi\Api4\Setting::revert()
+      ->addSelect('geoProvider')
+      ->execute();
+    parent::setUp();
+  }
 
   /**
    * Check that 2 addresses for the same contact can't both be primary
@@ -57,6 +64,31 @@ class AddressTest extends UnitTestCase implements TransactionalInterface {
 
     $this->assertFalse($addresses[0]['is_primary']);
     $this->assertTrue($addresses[1]['is_primary']);
+  }
+
+  public function testSearchProximity() {
+    $cid = $this->createTestRecord('Contact')['id'];
+    $sampleData = [
+      ['geo_code_1' => 20, 'geo_code_2' => 20],
+      ['geo_code_1' => 21, 'geo_code_2' => 21],
+      ['geo_code_1' => 19, 'geo_code_2' => 19],
+      ['geo_code_1' => 15, 'geo_code_2' => 15],
+    ];
+    $addreses = $this->saveTestRecords('Address', [
+      'records' => $sampleData,
+      'defaults' => ['contact_id' => $cid],
+    ])->column('id');
+
+    $result = Address::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addWhere('proximity', '<=', ['distance' => 600, 'geo_code_1' => 20, 'geo_code_2' => 20])
+      ->execute()->column('id');
+
+    $this->assertCount(3, $result);
+    $this->assertContains($addreses[0], $result);
+    $this->assertContains($addreses[1], $result);
+    $this->assertContains($addreses[2], $result);
+    $this->assertNotContains($addreses[3], $result);
   }
 
 }

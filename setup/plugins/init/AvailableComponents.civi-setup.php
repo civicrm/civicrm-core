@@ -26,7 +26,6 @@ if (!defined('CIVI_SETUP')) {
       'CiviPledge',
       'CiviReport',
       'CiviCampaign',
-      'CiviGrant',
     );
     $m->setField('components', 'options', array_combine($comps, $comps));
 

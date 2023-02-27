@@ -48,7 +48,7 @@ class SampleTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Set up for test.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function setUp(): void {
@@ -111,7 +111,7 @@ class SampleTest extends TestCase implements HeadlessInterface, HookInterface, T
    * @param array $formValues
    * @param array $names
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testCount(array $formValues, array $names): void {
     $this->setupSampleData();
@@ -127,7 +127,7 @@ class SampleTest extends TestCase implements HeadlessInterface, HookInterface, T
    * @param array $formValues
    * @param array $names
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testAll(array $formValues, array $names): void {
     $this->setupSampleData();
@@ -166,7 +166,7 @@ class SampleTest extends TestCase implements HeadlessInterface, HookInterface, T
    * @param array $formValues
    * @param array $names
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testContactIDs(array $formValues, array $names): void {
     $this->setupSampleData();
@@ -224,9 +224,7 @@ class SampleTest extends TestCase implements HeadlessInterface, HookInterface, T
    *  Test CRM_Contact_Form_Search_Custom_Sample with saved_search_id
    *  With true argument it returns list of contact IDs
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSavedSearch(): void {
@@ -258,7 +256,7 @@ class SampleTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Set up our sample data.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setupSampleData(): void {
     $households = [
@@ -291,7 +289,7 @@ class SampleTest extends TestCase implements HeadlessInterface, HookInterface, T
    * @return array
    *   IDs of the contacts.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getContactIDs($names): array {
     return array_keys((array) Contact::get()->addWhere(

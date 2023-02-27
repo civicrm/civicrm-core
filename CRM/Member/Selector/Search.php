@@ -423,7 +423,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
 
       // Display Auto-renew status on page (0=disabled, 1=enabled, 2=enabled, but error
       if (!empty($result->membership_recur_id)) {
-        if (CRM_Member_BAO_Membership::isSubscriptionCancelled($row['membership_id'])) {
+        if (CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $row['membership_id'])) {
           $row['auto_renew'] = 2;
         }
         else {

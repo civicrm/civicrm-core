@@ -1,7 +1,7 @@
 <?php
 namespace Civi\API;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Civi\Core\CiviEventDispatcher;
 
 /**
  */
@@ -15,7 +15,7 @@ class KernelTest extends \CiviUnitTestCase {
   public $actualEventSequence;
 
   /**
-   * @var \Symfony\Component\EventDispatcher\EventDispatcher
+   * @var \Civi\Core\CiviEventDispatcher
    */
   public $dispatcher;
 
@@ -27,7 +27,7 @@ class KernelTest extends \CiviUnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->actualEventSequence = [];
-    $this->dispatcher = new EventDispatcher();
+    $this->dispatcher = new CiviEventDispatcher();
     $this->monitorEvents(Events::allEvents());
     $this->kernel = new Kernel($this->dispatcher);
   }
@@ -51,7 +51,7 @@ class KernelTest extends \CiviUnitTestCase {
   public function testResolveException() {
     $test = $this;
     $this->dispatcher->addListener('civi.api.resolve', function () {
-      throw new \API_Exception('Oh My God', 'omg', ['the' => 'badzes']);
+      throw new \CRM_Core_Exception('Oh My God', 'omg', ['the' => 'badzes']);
     }, Events::W_EARLY);
     $this->dispatcher->addListener('civi.api.exception', function (\Civi\API\Event\ExceptionEvent $event) use ($test) {
       $test->assertEquals('Oh My God', $event->getException()->getMessage());

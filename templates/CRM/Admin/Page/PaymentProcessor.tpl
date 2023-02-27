@@ -34,7 +34,7 @@
             <th></th>
         </tr>
         {foreach from=$rows item=row}
-        <tr id="payment_processor-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
+        <tr id="payment_processor-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {if NOT $row.is_active} disabled{/if}">
             <td class="crmf-id center">{$row.id}</td>
             <td class="crmf-test_id center">{$row.test_id}</td>
             <td class="crmf-name">{$row.name}</td>
@@ -52,7 +52,7 @@
 
         {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          {crmButton q="action=add&reset=1&pp=$defaultPaymentProcessorType" id="newPaymentProcessor"  icon="plus-circle"}{ts}Add Payment Processor{/ts}{/crmButton}
+          {crmButton p='civicrm/admin/paymentProcessor/edit' q="action=add&reset=1" id="newPaymentProcessor"  icon="plus-circle"}{ts}Add Payment Processor{/ts}{/crmButton}
         </div>
         {/if}
 </div>
@@ -62,7 +62,7 @@
         {ts}There are no Payment Processors entered.{/ts}
      </div>
      <div class="action-link">
-       {crmButton p='civicrm/admin/paymentProcessor' q="action=add&reset=1&pp=$defaultPaymentProcessorType" id="newPaymentProcessor"  icon="plus-circle"}{ts}Add Payment Processor{/ts}{/crmButton}
+       {crmButton p='civicrm/admin/paymentProcessor/edit' q="action=add&reset=1" id="newPaymentProcessor"  icon="plus-circle"}{ts}Add Payment Processor{/ts}{/crmButton}
      </div>
 {/if}
 </div>

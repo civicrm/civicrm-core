@@ -73,9 +73,7 @@
     // refresh setting at a duration on 5sec
     var refreshSetting = _.debounce(function() {
       $scope.$apply(function() {
-        crmApi('Setting', 'getvalue', {"name": 'auto_recipient_rebuild', "return": "value"}).then(function(response) {
-          $scope.permitRecipientRebuild = (response.result === 0);
-        });
+        $scope.permitRecipientRebuild = !$scope.$parent.crmMailingConst.autoRecipientRebuild;
       });
     }, SETTING_DEBOUNCE_MS);
     $scope.$watchCollection("permitRecipientRebuild", refreshSetting);

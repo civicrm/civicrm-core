@@ -200,6 +200,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
         }
 
         CRM_Mailing_BAO_Mailing::del($this->_mailingId);
+        CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
         CRM_Utils_System::redirect($context);
       }
       else {
@@ -243,6 +244,9 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->run();
 
+    $this->assign('unscheduled', FALSE);
+    $this->assign('archived', FALSE);
+
     $urlParams = 'reset=1';
     $urlString = 'civicrm/mailing/browse';
     if ($this->get('sms')) {
@@ -283,7 +287,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $url = CRM_Utils_System::url($urlString, $urlParams);
     $session->pushUserContext($url);
 
-    // CRM-6862 -run form cotroller after
+    // CRM-6862 -run form controller after
     // selector, since it erase $_POST
     $this->search();
 
@@ -315,11 +319,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * @return string
    */
   public function whereClause(&$params, $sortBy = TRUE) {
-    $values = [];
-
     $clauses = [];
     $title = $this->get('mailing_name');
-    // echo " name=$title  ";
     if ($title) {
       $clauses[] = 'name LIKE %1';
       if (strpos($title, '%') !== FALSE) {
@@ -336,12 +337,12 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $clauses[] = "name LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) . "%'";
     }
 
-    $campainIds = $this->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campainIds)) {
-      if (!is_array($campainIds)) {
+    $campaignIds = $this->get('campaign_id');
+    if (!CRM_Utils_System::isNull($campaignIds)) {
+      if (!is_array($campaignIds)) {
         $campaignIds = [$campaignIds];
       }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campaignIds)) . ' ) )';
     }
 
     return implode(' AND ', $clauses);

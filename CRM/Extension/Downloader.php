@@ -18,9 +18,43 @@
 class CRM_Extension_Downloader {
 
   /**
+   * @var CRM_Extension_Manager
+   */
+  private $manager;
+
+  /**
+   * @var string
+   */
+  private $containerDir;
+
+  /**
+   * @var string
+   * Local path to a temporary data directory
+   */
+  public $tmpDir;
+
+  /**
    * @var GuzzleHttp\Client
    */
   protected $guzzleClient;
+
+  /**
+   * @var CRM_Extension_Container_Basic
+   * The place where downloaded extensions are ultimately stored
+   */
+  public $container;
+
+  /**
+   * @param CRM_Extension_Manager $manager
+   * @param string $containerDir
+   *   The place to store downloaded & extracted extensions.
+   * @param string $tmpDir
+   */
+  public function __construct(CRM_Extension_Manager $manager, $containerDir, $tmpDir) {
+    $this->manager = $manager;
+    $this->containerDir = $containerDir;
+    $this->tmpDir = $tmpDir;
+  }
 
   /**
    * @return \GuzzleHttp\Client
@@ -37,33 +71,9 @@ class CRM_Extension_Downloader {
   }
 
   /**
-   * @var CRM_Extension_Container_Basic
-   * The place where downloaded extensions are ultimately stored
-   */
-  public $container;
-
-  /**
-   * @var string
-   * Local path to a temporary data directory
-   */
-  public $tmpDir;
-
-  /**
-   * @param CRM_Extension_Manager $manager
-   * @param string $containerDir
-   *   The place to store downloaded & extracted extensions.
-   * @param string $tmpDir
-   */
-  public function __construct(CRM_Extension_Manager $manager, $containerDir, $tmpDir) {
-    $this->manager = $manager;
-    $this->containerDir = $containerDir;
-    $this->tmpDir = $tmpDir;
-  }
-
-  /**
    * Determine whether downloading is supported.
    *
-   * @param \CRM_EXtension_Info $extensionInfo Optional info for (updated) extension
+   * @param \CRM_Extension_Info $extensionInfo Optional info for (updated) extension
    *
    * @return array
    *   list of error messages; empty if OK
@@ -73,7 +83,7 @@ class CRM_Extension_Downloader {
 
     if (!$this->containerDir || !is_dir($this->containerDir) || !is_writable($this->containerDir)) {
       $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
-      $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
+      $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination={$civicrmDestination}");
       $errors[] = array(
         'title' => ts('Directory Unwritable'),
         'message' => ts("Your extensions directory is not set or is not writable. Click <a href='%1'>here</a> to set the extensions directory.",
@@ -121,7 +131,6 @@ class CRM_Extension_Downloader {
    */
   public function download($key, $downloadUrl) {
     $filename = $this->tmpDir . DIRECTORY_SEPARATOR . $key . '.zip';
-    $destDir = $this->containerDir . DIRECTORY_SEPARATOR . $key;
 
     if (!$downloadUrl) {
       throw new CRM_Extension_Exception(ts('Cannot install this extension - downloadUrl is not set!'));

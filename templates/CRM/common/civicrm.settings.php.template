@@ -99,8 +99,13 @@ if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
  *
  */
 if (!defined('CIVICRM_DSN')) {
-  if (CIVICRM_UF === 'UnitTests' && isset($GLOBALS['_CV']['TEST_DB_DSN'])) {
-    define('CIVICRM_DSN', $GLOBALS['_CV']['TEST_DB_DSN']);
+  if (CIVICRM_UF === 'UnitTests') {
+    if (isset($GLOBALS['_CV']['TEST_DB_DSN'])) {
+      define('CIVICRM_DSN', $GLOBALS['_CV']['TEST_DB_DSN']);
+    }
+    else {
+      throw new \Exception('$GLOBALS["_CV"]["TEST_DB_DSN"] is not set');
+    }
   }
   else {
     define('CIVICRM_DSN', 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true%%dbSSL%%');
@@ -597,7 +602,9 @@ if (!defined('CIVICRM_CLEANURL')) {
 }
 
 // force PHP to auto-detect Mac line endings
-ini_set('auto_detect_line_endings', '1');
+if (version_compare(PHP_VERSION, '8.1') < 0) {
+  ini_set('auto_detect_line_endings', '1');
+}
 
 // make sure the memory_limit is at least 64 MB
 $memLimitString = trim(ini_get('memory_limit'));

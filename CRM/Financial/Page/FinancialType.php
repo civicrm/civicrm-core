@@ -55,7 +55,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/financial/financialType',
+          'url' => 'civicrm/admin/financial/financialType/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Financial Type'),
         ],
@@ -71,7 +71,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/financial/financialType',
+          'url' => 'civicrm/admin/financial/financialType/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Financial Type'),
         ],
@@ -100,7 +100,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       $params['entity_id'] = $dao->id;
       $params['entity_table'] = 'civicrm_financial_type';
       $null = [];
-      CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $null, $financialAccountIds);
+      CRM_Financial_BAO_EntityFinancialAccount::retrieve($params, $null, $financialAccountIds);
 
       foreach ($financialAccountIds as $key => $values) {
         if (!empty($financialAccounts[$values['financial_account_id']])) {

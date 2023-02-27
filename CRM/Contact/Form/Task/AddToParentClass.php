@@ -44,6 +44,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
     $searchRows = $this->get('searchRows');
     $searchCount = $this->get('searchCount');
+    $this->assign('searchRows', FALSE);
     if ($searchRows) {
       $checkBoxes = [];
       $chekFlag = 0;
@@ -209,7 +210,6 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     }
 
     // get the count of contact
-    $contactBAO = new CRM_Contact_BAO_Contact();
     $query = new CRM_Contact_BAO_Query($searchValues);
     $searchCount = $query->searchQuery(0, 0, NULL, TRUE);
     $form->set('searchCount', $searchCount);

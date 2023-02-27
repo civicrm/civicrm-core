@@ -51,6 +51,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
       self::$_links = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
+          'class' => 'no-popup',
           'url' => 'civicrm/admin/scheduleReminders',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Schedule Reminders'),

@@ -19,7 +19,7 @@
 namespace api\v4\Entity;
 
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\EntityTag;
 use Civi\Api4\Tag;
 use Civi\Test\TransactionalInterface;
@@ -27,9 +27,13 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class TagTest extends UnitTestCase implements TransactionalInterface {
+class TagTest extends Api4TestBase implements TransactionalInterface {
 
   public function testTagFilter() {
+    // Ensure bypassing permissions works correctly by giving none to the logged-in user
+    $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
     $conTag = Tag::create(FALSE)
       ->addValue('name', uniqid('con'))
       ->addValue('used_for', 'civicrm_contact')

@@ -1,9 +1,13 @@
 <?php
 namespace Civi\Core;
 
+use Civi\Core\Compiler\AutoServiceScannerPass;
+use Civi\Core\Compiler\EventScannerPass;
+use Civi\Core\Compiler\SpecProviderPass;
 use Civi\Core\Event\EventScanner;
 use Civi\Core\Lock\LockManager;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -63,21 +67,25 @@ class Container {
       return $containerBuilder;
     }
 
-    $envId = \CRM_Core_Config_Runtime::getId();
+    $envId = md5(implode(',', array_merge(
+      [\CRM_Core_Config_Runtime::getId()],
+      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'prefix')
+    )));
     $file = \Civi::paths()->getPath("[civicrm.compile]/CachedCiviContainer.{$envId}.php");
+    $containerCacheClass = "CachedCiviContainer_{$envId}";
     $containerConfigCache = new ConfigCache($file, $cacheMode === 'auto');
     if (!$containerConfigCache->isFresh()) {
       $containerBuilder = $this->createContainer();
       $containerBuilder->compile();
       $dumper = new PhpDumper($containerBuilder);
       $containerConfigCache->write(
-        $dumper->dump(['class' => 'CachedCiviContainer']),
+        $dumper->dump(['class' => $containerCacheClass]),
         $containerBuilder->getResources()
       );
     }
 
     require_once $file;
-    $c = new \CachedCiviContainer();
+    $c = new $containerCacheClass();
     return $c;
   }
 
@@ -90,7 +98,10 @@ class Container {
   public function createContainer() {
     $civicrm_base_path = dirname(dirname(__DIR__));
     $container = new ContainerBuilder();
-    $container->addCompilerPass(new RegisterListenersPass('dispatcher'));
+    $container->addCompilerPass(new AutoServiceScannerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1000);
+    $container->addCompilerPass(new EventScannerPass());
+    $container->addCompilerPass(new SpecProviderPass());
+    $container->addCompilerPass(new RegisterListenersPass());
     $container->addObjectResource($this);
     $container->setParameter('civicrm_base_path', $civicrm_base_path);
     //$container->set(self::SELF, $this);
@@ -132,6 +143,9 @@ class Container {
       []
     ))
       ->setFactory([new Reference(self::SELF), 'createEventDispatcher'])->setPublic(TRUE);
+    // In symfony 6 it only accepts event_dispatcher as the id, but there are
+    // several places in civi and extensions that reference dispatcher.
+    $container->setAlias('event_dispatcher', 'dispatcher')->setPublic(TRUE);
 
     $container->setDefinition('magic_function_provider', new Definition(
       'Civi\API\Provider\MagicFunctionProvider',
@@ -178,7 +192,7 @@ class Container {
       // For Caches that we don't really care about the ttl for and/or maybe accessed
       // fairly often we use the fastArrayDecorator which improves reads and writes, these
       // caches should also not have concurrency risk.
-      $fastArrayCaches = ['groups', 'navigation', 'customData', 'fields', 'contactTypes', 'metadata'];
+      $fastArrayCaches = ['groups', 'navigation', 'customData', 'fields', 'contactTypes', 'metadata', 'js_strings'];
       if (in_array($cacheSvc, $fastArrayCaches)) {
         $definitionParams['withArray'] = 'fast';
       }
@@ -200,25 +214,17 @@ class Container {
       ]
     ))->setFactory('CRM_Utils_Cache::create')->setPublic(TRUE);
 
-    $container->setDefinition('sql_triggers', new Definition(
-      'Civi\Core\SqlTriggers',
-      []
-    ))->setPublic(TRUE);
-
-    $container->setDefinition('asset_builder', new Definition(
-      'Civi\Core\AssetBuilder',
-      []
-    ))->setPublic(TRUE);
-
-    $container->setDefinition('themes', new Definition(
-      'Civi\Core\Themes',
-      []
-    ))->setPublic(TRUE);
-
-    $container->setDefinition('format', new Definition(
-      '\Civi\Core\Format',
-      []
-    ))->setPublic(TRUE);
+    // Memcache is limited to 1 MB by default, and since this is not read often
+    // it does not make much sense in Redis either.
+    $container->setDefinition('cache.extension_browser', new Definition(
+      'CRM_Utils_Cache_Interface',
+      [
+        [
+          'name' => 'extension_browser',
+          'type' => ['SqlGroup', 'ArrayCache'],
+        ],
+      ]
+    ))->setFactory('CRM_Utils_Cache::create')->setPublic(TRUE);
 
     $container->setDefinition('bundle.bootstrap3', new Definition('CRM_Core_Resources_Bundle', ['bootstrap3']))
       ->setFactory('CRM_Core_Resources_Common::createBootstrap3Bundle')->setPublic(TRUE);
@@ -357,8 +363,16 @@ class Container {
       'CRM_Contribute_RecurTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    $container->setDefinition('crm_group_tokens', new Definition(
+      'CRM_Core_GroupTokens',
+      []
+    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     $container->setDefinition('crm_domain_tokens', new Definition(
       'CRM_Core_DomainTokens',
+      []
+    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    $container->setDefinition('crm_token_tidy', new Definition(
+      '\Civi\Token\TidySubscriber',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
@@ -372,7 +386,11 @@ class Container {
       }
     }
 
-    \CRM_Api4_Services::hook_container($container);
+    // FIXME: Automatically scan BasicServices for ProviderInterface.
+    $container->getDefinition('civi_api_kernel')->addMethodCall(
+      'registerApiProvider',
+      [new Reference('action_object_provider')]
+    );
 
     \CRM_Utils_Hook::container($container);
 
@@ -387,7 +405,7 @@ class Container {
   }
 
   /**
-   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   * @return \Civi\Core\CiviEventDispatcherInterface
    */
   public function createEventDispatcher() {
     // Continue building on the original dispatcher created during bootstrap.
@@ -476,7 +494,7 @@ class Container {
   }
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @param \Civi\Core\CiviEventDispatcherInterface $dispatcher
    * @param $magicFunctionProvider
    *
    * @return \Civi\API\Kernel
@@ -585,6 +603,7 @@ class Container {
     $bootServices['paths'] = new \Civi\Core\Paths();
 
     $bootServices['dispatcher.boot'] = new CiviEventDispatcher();
+    $bootServices['dispatcher.boot']->addListener('civi.queue.runTask.start', ['CRM_Upgrade_DispatchPolicy', 'onRunTask']);
 
     // Quality control: There should be no pre-boot hooks because they make it harder to understand/support/refactor.
     // If a pre-boot hook sneaks in, we'll raise an error.
@@ -592,7 +611,6 @@ class Container {
       '/^hook_/' => 'not-ready',
       '/^civi\./' => 'run',
     ];
-    $mainDispatchPolicy = \CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::get('upgrade.main') : NULL;
     $bootServices['dispatcher.boot']->setDispatchPolicy($bootDispatchPolicy);
 
     $class = $runtime->userFrameworkClass;
@@ -618,24 +636,33 @@ class Container {
       \CRM_Extension_System::singleton()->getClassLoader()->register();
       \CRM_Extension_System::singleton()->getMixinLoader()->run();
       \CRM_Utils_Hook::singleton()->commonBuildModuleList('civicrm_boot');
-      $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
+      $bootServices['dispatcher.boot']->setDispatchPolicy(\CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::pick() : NULL);
 
       $runtime->includeCustomPath();
 
       $c = new self();
-      $container = $c->loadContainer();
-      foreach ($bootServices as $name => $obj) {
-        $container->set($name, $obj);
-      }
-      \Civi::$statics[__CLASS__]['container'] = $container;
-      // Ensure all container-based serivces have a chance to add their listeners.
-      // Without this, it's a matter of happenstance (dependent upon particular page-request/configuration/etc).
-      $container->get('dispatcher');
-
+      static::useContainer($c->loadContainer());
     }
     else {
-      $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
+      $bootServices['dispatcher.boot']->setDispatchPolicy(\CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::pick() : NULL);
     }
+  }
+
+  /**
+   * Set the active container (over-writing the current container, if defined).
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @internal Intended for bootstrap and unit-testing.
+   */
+  public static function useContainer($container): void {
+    $bootServices = \Civi::$statics[__CLASS__]['boot'];
+    foreach ($bootServices as $name => $obj) {
+      $container->set($name, $obj);
+    }
+    \Civi::$statics[__CLASS__]['container'] = $container;
+    // Ensure all container-based serivces have a chance to add their listeners.
+    // Without this, it's a matter of happenstance (dependent upon particular page-request/configuration/etc).
+    $container->get('dispatcher');
   }
 
   /**

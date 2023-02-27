@@ -58,6 +58,14 @@ trait CRMTraits_Contribute_RecurFormsTrait {
       'payment_processor_id' => $this->paymentProcessorId,
       'is_send_contribution_notification' => FALSE,
     ]);
+    $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $this->getContactID(),
+      'contribution_recur_id' => $this->getContributionRecurID(),
+      'financial_type_id' => 'Donation',
+      'total_amount' => 10,
+      'contribution_page_id' => $this->getContributionPageID(),
+      'contribution_status_id' => 'Template',
+    ]);
   }
 
   /**

@@ -19,6 +19,7 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
   /**
    * Create or update a MembershipBlock.
    *
+   * @deprecated
    * @param array $params
    * @return CRM_Member_DAO_MembershipBlock
    */

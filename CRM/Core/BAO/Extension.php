@@ -44,11 +44,11 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    *   Id of the extension to be deleted.
    *
    * @return mixed
+   *
+   * @deprecated
    */
   public static function del($id) {
-    $extension = new CRM_Core_DAO_Extension();
-    $extension->id = $id;
-    return $extension->delete();
+    return (bool) static::deleteRecord(['id' => $id]);
   }
 
   /**

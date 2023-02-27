@@ -83,7 +83,7 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
     $profile = $this->callAPISuccess('UFGroup', 'create', [
       'group_type' => 'Contact',
       'title' => "Billing fields: $name",
-      'name' => "${name}_billing",
+      'name' => "{$name}_billing",
     ]);
 
     $this->callAPISuccess('UFField', 'create', [

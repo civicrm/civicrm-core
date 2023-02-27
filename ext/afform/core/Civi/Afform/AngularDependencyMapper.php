@@ -53,7 +53,7 @@ class AngularDependencyMapper {
         \Civi::log()->warning("Missing html file for Afform: '$jFile'");
         continue;
       }
-      $jStat = stat($jFile);
+      $jStat = $jFile ? stat($jFile) : FALSE;
       $hStat = stat($hFile);
 
       if ($cacheLine === NULL) {

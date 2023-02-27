@@ -18,7 +18,7 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
 use Civi\Test\TransactionalInterface;
@@ -26,7 +26,7 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class OptionValueTest extends UnitTestCase implements TransactionalInterface {
+class OptionValueTest extends Api4TestBase implements TransactionalInterface {
 
   public function testNullDefault() {
     OptionGroup::create(FALSE)

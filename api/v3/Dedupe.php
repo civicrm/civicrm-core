@@ -21,7 +21,7 @@
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_dedupe_get($params) {
   $sql = CRM_Utils_SQL_Select::fragment();
@@ -58,7 +58,7 @@ function _civicrm_api3_dedupe_get_spec(&$params) {
  *
  * @return array
  *
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_dedupe_delete($params) {
@@ -71,7 +71,7 @@ function civicrm_api3_dedupe_delete($params) {
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_dedupe_create($params) {
@@ -84,7 +84,7 @@ function civicrm_api3_dedupe_create($params) {
  * @param array $params
  *
  * @return array
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_dedupe_getstatistics($params) {
   $stats = CRM_Dedupe_Merger::getMergeStats(CRM_Dedupe_Merger::getMergeCacheKeyString(
@@ -134,8 +134,7 @@ function _civicrm_api3_dedupe_getstatistics_spec(&$params) {
  * @param array $params
  *
  * @return array
- * @throws \CiviCRM_API3_Exception
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_dedupe_getduplicates($params) {

@@ -95,7 +95,7 @@
    <td>
     <p>{ts 1='{domain.phone}' 2='{domain.email}'}Please contact us at %1 or send email to %2 if you have questions
 or need to modify your payment schedule.{/ts}</p>
-    <p>{ts}Thank your for your generous support.{/ts}</p>
+    <p>{ts}Thank you for your generous support.{/ts}</p>
    </td>
   </tr>
 

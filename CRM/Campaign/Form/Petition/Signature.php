@@ -580,21 +580,12 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
       if ($fields) {
         $this->assign($name, $fields);
 
-        $addCaptcha = FALSE;
         foreach ($fields as $key => $field) {
           // if state or country in the profile, create map
           list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
 
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
           $this->_fields[$key] = $field;
-          // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
-          if ($field['add_captcha'] && !$this->_contactId) {
-            $addCaptcha = TRUE;
-          }
-        }
-
-        if ($addCaptcha) {
-          CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
         }
       }
     }

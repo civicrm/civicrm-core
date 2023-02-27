@@ -38,18 +38,7 @@ class Abdicator {
     if ($mailing->template_type && $mailing->template_type !== 'traditional') {
       return TRUE;
     }
-
-    switch (\Civi::settings()->get('flexmailer_traditional')) {
-      case 'bao':
-        return FALSE;
-
-      case 'auto':
-      case 'flexmailer':
-        return TRUE;
-
-      default:
-        throw new \RuntimeException("Unrecognized value for setting 'flexmailer_traditional'");
-    }
+    return TRUE;
   }
 
   /**

@@ -363,7 +363,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     }
 
     // Create timestamp
-    $timestamp = strftime('%Y%m%d%H%M%S');
+    $timestamp = date('YmdHis');
     $this->_setParam('timestamp', $timestamp);
   }
 

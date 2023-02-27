@@ -352,6 +352,7 @@
     <title>USPS Code</title>
     <type>varchar</type>
     <length>32</length>
+    <deprecated>true</deprecated>
     <comment>USPS Bulk mailing code.</comment>
     <add>1.1</add>
   </field>

@@ -233,7 +233,7 @@ class CRM_Core_IDS {
    */
   private function log($result, $reaction = 0) {
     // Include X_FORWARD_FOR ip address if set as per IDS patten.
-    $ip = $_SERVER['REMOTE_ADDR'] . (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? ' (' . $_SERVER['HTTP_X_FORWARDED_FOR'] . ')' : '');
+    $ip = CRM_Utils_System::ipAddress() . (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? ' (' . $_SERVER['HTTP_X_FORWARDED_FOR'] . ')' : '');
 
     $data = [];
     $session = CRM_Core_Session::singleton();
@@ -285,7 +285,7 @@ class CRM_Core_IDS {
       $error = civicrm_api3_create_error(
         $msg,
         [
-          'IP' => $_SERVER['REMOTE_ADDR'],
+          'IP' => CRM_Utils_System::ipAddress(),
           'error_code' => 'IDS_KICK',
           'level' => 'security',
           'referer' => $_SERVER['HTTP_REFERER'],

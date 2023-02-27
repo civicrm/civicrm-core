@@ -20,7 +20,7 @@
 
   <tr>
    <td>
-    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+    {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
     <p>{ts 1=$amount 2=$recur_frequency_interval 3=$recur_frequency_unit}Billing details for your recurring contribution of %1, every %2 %3 have been updated.{/ts}</p>
    </td>
   </tr>

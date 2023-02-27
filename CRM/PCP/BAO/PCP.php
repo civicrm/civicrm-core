@@ -455,7 +455,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    * @param CRM_Core_Form $page
    * @param array $elements
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildPcp($pcpId, &$page, &$elements = NULL) {
     $prms = ['id' => $pcpId];
@@ -642,7 +642,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    * @param string $component
    *
    * @throws Exception
-   * @return null
+   * @return bool
    */
   public static function sendStatusUpdate($pcpId, $newStatus, $isInitial = FALSE, $component = 'contribute') {
     $pcpStatusName = CRM_Core_OptionGroup::values("pcp_status", FALSE, FALSE, FALSE, NULL, 'name');
@@ -716,7 +716,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => $tplName,
+        'workflow' => $tplName,
         'contactId' => $pcpInfo['contact_id'],
         'tplParams' => $tplParams,
         'from' => $receiptFrom,
@@ -746,7 +746,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    * Get pcp block is active.
    *
    * @param int $pcpId
-   * @param $component
+   * @param string $component
    *
    * @return int
    */
@@ -768,7 +768,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    * Get pcp block is enabled for component page.
    *
    * @param int $pageId
-   * @param $component
+   * @param string $component
    *
    * @return string
    */
@@ -833,7 +833,7 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
    * @param int $pcpId
    * @param $component
    *
-   * @return int
+   * @return string
    */
   public static function getPcpPageTitle($pcpId, $component) {
     if ($component == 'contribute') {
@@ -859,9 +859,9 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
    * Get pcp block & entity id given pcp id
    *
    * @param int $pcpId
-   * @param $component
+   * @param string $component
    *
-   * @return string
+   * @return int[]
    */
   public static function getPcpBlockEntityId($pcpId, $component) {
     $entity_table = self::getPcpEntityTable($component);
@@ -884,7 +884,7 @@ WHERE pcp.id = %1";
   /**
    * Get pcp entity table given a component.
    *
-   * @param $component
+   * @param string $component
    *
    * @return string
    */
@@ -931,7 +931,7 @@ INNER JOIN civicrm_uf_group ufgroup
    * Get owner notification id.
    *
    * @param int $component_id
-   * @param $component
+   * @param string $component
    *
    * @return int
    */

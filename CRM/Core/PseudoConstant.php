@@ -373,7 +373,7 @@ class CRM_Core_PseudoConstant {
         return NULL;
       }
       // We don't have good mapping so have to do a bit of guesswork from the menu
-      list(, $parent, , $child) = explode('_', $daoName);
+      [, $parent, , $child] = explode('_', $daoName);
       $sql = "SELECT path FROM civicrm_menu
         WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
         ORDER BY page_callback
@@ -429,7 +429,7 @@ class CRM_Core_PseudoConstant {
       return $var;
     }
 
-    /* @var CRM_Core_DAO $object */
+    /** @var CRM_Core_DAO $object */
     $object = new $name();
 
     $object->selectAdd();
@@ -1492,7 +1492,7 @@ WHERE  id = %1
       return FALSE;
     }
     // Get list of fields for the option table
-    /* @var CRM_Core_DAO $dao * */
+    /** @var CRM_Core_DAO $dao * */
     $dao = new $daoName();
     $availableFields = array_keys($dao->fieldKeys());
 
@@ -1500,6 +1500,10 @@ WHERE  id = %1
     $from = 'FROM %3';
     $wheres = [];
     $order = 'ORDER BY %2';
+    if (in_array('id', $availableFields, TRUE)) {
+      // Example: 'ORDER BY abbreviation, id' because `abbreviation`s are not unique.
+      $order .= ', id';
+    }
 
     // Use machine name in certain contexts
     if ($context === 'validate' || $context === 'match') {
@@ -1598,7 +1602,7 @@ WHERE  id = %1
    *   List of options, each as a record of id+name+label.
    *   Ex: [['id' => 123, 'name' => 'foo_bar', 'label' => 'Foo Bar']]
    */
-  private static function formatArrayOptions($context, array &$options) {
+  public static function formatArrayOptions($context, array &$options) {
     // Already flat; return keys/values according to context
     if (!isset($options[0]) || !is_array($options[0])) {
       // For validate context, machine names are expected in place of labels.

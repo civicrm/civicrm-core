@@ -24,6 +24,13 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   protected $_isRedact;
 
   /**
+   * Redaction Rules.
+   *
+   * @var array
+   */
+  protected $_redactionStringRules = [];
+
+  /**
    */
   public function __construct() {
   }
@@ -192,7 +199,6 @@ AND    ac.case_id = %1
    * @return mixed
    */
   public function &getActivityInfo($clientID, $activityID, $anyActivity = FALSE, $redact = 0) {
-    static $activityInfos = [];
     if ($redact) {
       $this->_isRedact = 1;
       $this->getRedactionRules();
@@ -204,8 +210,8 @@ AND    ac.case_id = %1
       $index = $index . '_' . $clientID;
     }
 
-    if (!array_key_exists($index, $activityInfos)) {
-      $activityInfos[$index] = [];
+    if (!array_key_exists($index, \Civi::$statics[__CLASS__][__FUNCTION__]['activityInfos'] ?? [])) {
+      \Civi::$statics[__CLASS__][__FUNCTION__]['activityInfos'][$index] = [];
       $selectCaseActivity = "";
       $joinCaseActivity = "";
 
@@ -242,12 +248,12 @@ WHERE      a.id = %1
           $activityTypeInfo = $activityTypes[$dao->activity_type_id];
         }
         if ($activityTypeInfo) {
-          $activityInfos[$index] = $this->getActivity($clientID, $dao, $activityTypeInfo);
+          \Civi::$statics[__CLASS__][__FUNCTION__]['activityInfos'][$index] = $this->getActivity($clientID, $dao, $activityTypeInfo);
         }
       }
     }
 
-    return $activityInfos[$index];
+    return \Civi::$statics[__CLASS__][__FUNCTION__]['activityInfos'][$index];
   }
 
   /**
@@ -367,7 +373,7 @@ WHERE      a.id = %1
       // Is anything depending on this currently or is it just a result of
       // the see-sawing and some double-escaping that went back and forth
       // for a few years?
-      'value' => htmlspecialchars($this->redact($activityDAO->subject)),
+      'value' => htmlspecialchars($this->redact($activityDAO->subject) ?? ''),
       'type' => 'Memo',
     );
 

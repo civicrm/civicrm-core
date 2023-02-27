@@ -598,13 +598,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     if (!empty(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
-      // should call $config->userSystem->logger($message) here - but I got a situation where userSystem was not an object - not sure why
-      if ($config->userSystem->is_drupal and function_exists('watchdog')) {
-        watchdog('civicrm', '%message', ['%message' => $message], $priority ?? WATCHDOG_DEBUG);
-      }
-      elseif ($config->userSystem->is_drupal and CIVICRM_UF == 'Drupal8') {
-        \Drupal::logger('civicrm')->log($priority ?? \Drupal\Core\Logger\RfcLogLevel::DEBUG, '%message', ['%message' => $message]);
-      }
+      $config->userSystem->logger($message, $priority);
     }
 
     return $str;
@@ -660,7 +654,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // Use multiple (but stable) inputs for hash information.
     $md5inputs = [
       defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY',
-      $config->userFrameworkBaseURL,
+      CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE),
       md5($config->dsn),
       $config->dsn,
     ];
@@ -689,7 +683,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       else {
         $hash = '';
       }
-      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . 'log';
+      $fileName = $config->configAndLogDir . 'CiviCRM.' . CIVICRM_DOMAIN_ID . '_' . $prefixString . $hash . 'log';
 
       // Roll log file monthly or if greater than our threshold.
       // Size-based rotation introduced in response to filesize limits on
@@ -1068,22 +1062,30 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * Output a deprecated function warning to log file.  Deprecated class:function is automatically generated from calling function.
+   * Output a deprecated function warning to log file.
+   *
+   * Deprecated class:function is automatically generated from calling function.
    *
    * @param string $newMethod
    *   description of new method (eg. "buildOptions() method in the appropriate BAO object").
-   * @param string $oldMethod
+   * @param string|null $oldMethod
    *   optional description of old method (if not the calling method). eg. CRM_MyClass::myOldMethodToGetTheOptions()
    */
-  public static function deprecatedFunctionWarning($newMethod, $oldMethod = NULL) {
+  public static function deprecatedFunctionWarning(string $newMethod, ?string $oldMethod = NULL): void {
+    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
     if (!$oldMethod) {
-      $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-      $callerFunction = $dbt[1]['function'] ?? NULL;
-      $callerClass = $dbt[1]['class'] ?? NULL;
+      $callerFunction = $backtrace[1]['function'] ?? NULL;
+      $callerClass = $backtrace[1]['class'] ?? NULL;
       $oldMethod = "{$callerClass}::{$callerFunction}";
     }
     $message = "Deprecated function $oldMethod, use $newMethod.";
-    Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
+    // Add a mini backtrace. Just the function is too little to be meaningful but people are
+    // saying they can't track down where the deprecated calls are coming from.
+    $miniBacktrace = [];
+    foreach ($backtrace as $backtraceLine) {
+      $miniBacktrace[] = ($backtraceLine['class'] ?? '') . '::' . ($backtraceLine['function'] ?? '');
+    }
+    Civi::log()->warning($message . "\n" . implode("\n", $miniBacktrace), ['civi.tag' => 'deprecated']);
     trigger_error($message, E_USER_DEPRECATED);
   }
 

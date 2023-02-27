@@ -12,9 +12,9 @@
         afformLoad,
         fieldsForJoinGetters = {};
 
-      this.DEFAULT_AGGREGATE_FN = 'GROUP_CONCAT';
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
-      this.afformAdminEnabled = 'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
+      this.afformAdminEnabled = (CRM.checkPerm('administer CiviCRM') || CRM.checkPerm('administer afform')) &&
+        'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
       this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
@@ -51,6 +51,10 @@
               defaults[param] = [];
             }
           });
+          // Default to Individuals
+          if (this.savedSearch.api_entity === 'Contact' && CRM.crmSearchAdmin.defaultContactType) {
+            defaults.where.push(['contact_type:name', '=', CRM.crmSearchAdmin.defaultContactType]);
+          }
 
           $scope.$bindToRoute({
             param: 'params',
@@ -141,6 +145,10 @@
         return _.includes(searchMeta.getEntity(ctrl.savedSearch.api_entity).params, param);
       };
 
+      this.hasFunction = function(expr) {
+        return expr.indexOf('(') > -1;
+      };
+
       this.addDisplay = function(type) {
         var count = _.filter(ctrl.savedSearch.displays, {type: type}).length,
           searchLabel = ctrl.savedSearch.label || searchMeta.getEntity(ctrl.savedSearch.api_entity).title_plural;
@@ -177,6 +185,15 @@
           $scope.selectTab('compose');
           ctrl.savedSearch.displays.splice(index, 1);
         }
+      };
+
+      this.cloneDisplay = function(display) {
+        var newDisplay = angular.copy(display);
+        delete newDisplay.name;
+        delete newDisplay.id;
+        newDisplay.label += ts(' (copy)');
+        ctrl.savedSearch.displays.push(newDisplay);
+        $scope.selectTab('display_' + (ctrl.savedSearch.displays.length - 1));
       };
 
       this.addGroup = function() {
@@ -232,8 +249,12 @@
         function addEntityJoins(entity, stack, baseEntity) {
           return _.transform(CRM.crmSearchAdmin.joins[entity], function(joinEntities, join) {
             var num = 0;
-            // Add all joins that don't just point directly back to the original entity
-            if (!(baseEntity === join.entity && !join.multi)) {
+            if (
+              // Exclude joins that singly point back to the original entity
+              !(baseEntity === join.entity && !join.multi) &&
+              // Exclude joins to bridge tables
+              !searchMeta.getEntity(join.entity).bridge
+            ) {
               do {
                 appendJoin(joinEntities, join, ++num, stack, entity);
               } while (addNum((stack ? stack + '_' : '') + join.alias, num) in existingJoins);
@@ -251,7 +272,7 @@
               disabled: alias in existingJoins
             };
           if (alias in existingJoins) {
-            opt.children = addEntityJoins(join.entity, (stack ? stack + '_' : '') + alias, baseEntity);
+            opt.children = addEntityJoins(join.entity, alias, baseEntity);
           }
           collection.push(opt);
         }
@@ -323,7 +344,9 @@
           if (ctrl.canAggregate(col)) {
             // Ensure all non-grouped columns are aggregated if using GROUP BY
             if (!info.fn || info.fn.category !== 'aggregate') {
-              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(DISTINCT ' + fieldExpr + ') AS ' + ctrl.DEFAULT_AGGREGATE_FN + '_' + fieldExpr.replace(/[.:]/g, '_');
+              var dflFn = searchMeta.getDefaultAggregateFn(info) || 'GROUP_CONCAT',
+                flagBefore = dflFn === 'GROUP_CONCAT' ? 'DISTINCT ' : '';
+              ctrl.savedSearch.api_params.select[pos] = dflFn + '(' + flagBefore + fieldExpr + ') AS ' + dflFn + '_' + fieldExpr.replace(/[.:]/g, '_');
             }
           } else {
             // Remove aggregate functions when no grouping
@@ -457,7 +480,7 @@
       };
 
       function getFieldsForJoin(joinEntity) {
-        return {results: ctrl.getAllFields(':name', ['Field'], null, joinEntity)};
+        return {results: ctrl.getAllFields(':name', ['Field', 'Extra'], null, joinEntity)};
       }
 
       // @return {function}
@@ -488,6 +511,7 @@
 
       this.getAllFields = function(suffix, allowedTypes, disabledIf, topJoin) {
         disabledIf = disabledIf || _.noop;
+        allowedTypes = allowedTypes || ['Field', 'Custom', 'Extra', 'Filter'];
 
         function formatEntityFields(entityName, join) {
           var prefix = join ? join.alias + '.' : '',
@@ -496,7 +520,7 @@
           // Add extra searchable fields from bridge entity
           if (join && join.bridge) {
             formatFields(_.filter(searchMeta.getEntity(join.bridge).fields, function(field) {
-              return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && !field.fk_entity);
+              return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && field.fk_entity !== entityName);
             }), result, prefix);
           }
 
@@ -508,14 +532,15 @@
           prefix = typeof prefix === 'undefined' ? '' : prefix;
           _.each(fields, function(field) {
             var item = {
-              id: prefix + field.name + (field.suffixes && _.includes(field.suffixes, suffix.replace(':', '')) ? suffix : ''),
+              // Use options suffix if available.
+              id: prefix + field.name + (field.options && _.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
               text: field.label,
               description: field.description
             };
             if (disabledIf(item.id)) {
               item.disabled = true;
             }
-            if (!allowedTypes || _.includes(allowedTypes, field.type)) {
+            if (_.includes(allowedTypes, field.type)) {
               result.push(item);
             }
           });
@@ -550,7 +575,7 @@
         });
 
         // Include SearchKit's pseudo-fields if specifically requested
-        if (allowedTypes && _.includes(allowedTypes, 'Pseudo')) {
+        if (_.includes(allowedTypes, 'Pseudo')) {
           result.push({
             text: ts('Extra'),
             icon: 'fa-gear',

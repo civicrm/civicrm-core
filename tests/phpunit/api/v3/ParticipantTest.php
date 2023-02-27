@@ -607,7 +607,6 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   /**
    * Check with complete array.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testUpdate(): void {

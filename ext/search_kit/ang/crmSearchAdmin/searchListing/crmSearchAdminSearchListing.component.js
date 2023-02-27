@@ -17,7 +17,8 @@
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
-      this.afformAdminEnabled = 'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
+      this.afformAdminEnabled = (CRM.checkPerm('administer CiviCRM') || CRM.checkPerm('administer afform')) &&
+        'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -28,6 +29,7 @@
             'id',
             'name',
             'label',
+            'description',
             'api_entity',
             'api_entity:label',
             'api_params',
@@ -54,7 +56,7 @@
             ['Group AS group', 'LEFT', ['id', '=', 'group.saved_search_id']],
             ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
           ],
-          where: [['api_entity', 'IS NOT NULL']],
+          where: [['api_entity', 'IS NOT NULL'], ['is_current', '=', true]],
           groupBy: ['id']
         }
       };
@@ -71,7 +73,7 @@
         // Customize the noResultsText
         $scope.$watch('$ctrl.filters', function() {
           ctrl.settings.noResultsText = (angular.equals(['has_base'], getActiveFilters())) ?
-            ts('Welcome to Search Kit. Click the New Search button above to start composing your first search.') :
+            ts('Welcome to SearchKit. Click the New Search button above to start composing your first search.') :
             ts('No Saved Searches match filter criteria.');
         }, true);
       };
@@ -192,8 +194,13 @@
                 title: ts('Edit Label'),
                 editable: true
               }),
+              searchMeta.fieldToColumn('description', {
+                label: true,
+                title: ts('Edit Description'),
+                editable: true
+              }),
               searchMeta.fieldToColumn('api_entity:label', {
-                label: ts('For'),
+                label: true,
                 empty_value: ts('Missing'),
                 cssRules: [
                   ['font-italic', 'api_entity:label', 'IS EMPTY']

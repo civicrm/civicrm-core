@@ -473,7 +473,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
           // allow for 0 value.
           if (!empty($fields['option_amount'][$index]) ||
-            strlen($fields['option_amount'][$index]) > 0
+            strlen($fields['option_amount'][$index] ?? '') > 0
           ) {
             $noAmount = 0;
           }
@@ -638,7 +638,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * Process the form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     // store the submitted values in an array

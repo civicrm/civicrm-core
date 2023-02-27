@@ -19,12 +19,12 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
   /**
    * Test the mail sent on update.
    *
-   * @throws \CRM_Core_Exception|\API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMail(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->addContribution();
-    /* @var CRM_Contribute_Form_UpdateSubscription $form */
+    /** @var CRM_Contribute_Form_UpdateSubscription $form */
     $form = $this->getFormObject('CRM_Contribute_Form_UpdateSubscription', ['is_notify' => TRUE]);
     $form->set('crid', $this->getContributionRecurID());
     $form->buildForm();
@@ -55,6 +55,24 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
       'Recurring contribution is for $10.00, every 1 month(s) for 12 installments.',
       'If you have questions please contact us at "Bob" <bob@example.org>.',
     ];
+  }
+
+  /**
+   * Test the Additional Details pane loads for recurring contributions.
+   */
+  public function testAdditionalDetails() {
+    $this->addContribution();
+    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($this->getContributionRecurID());
+    $_GET['q'] = $_REQUEST['q'] = 'civicrm/contact/view/contribution';
+    $_GET['snippet'] = $_REQUEST['snippet'] = 4;
+    $_GET['id'] = $_REQUEST['id'] = $templateContribution['id'];
+    $_GET['formType'] = $_REQUEST['formType'] = 'AdditionalDetail';
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', []);
+    $form->buildForm();
+    unset($_GET['q'], $_REQUEST['q']);
+    unset($_GET['snippet'], $_REQUEST['snippet']);
+    unset($_GET['id'], $_REQUEST['id']);
+    unset($_GET['formType'], $_REQUEST['formType']);
   }
 
 }

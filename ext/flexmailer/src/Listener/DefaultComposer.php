@@ -57,7 +57,7 @@ class DefaultComposer extends BaseListener {
       $this->createTokenProcessorContext($e));
 
     $tpls = $this->createMessageTemplates($e);
-    $tp->addMessage('subject', $tpls['subject'], 'text/plain');
+    $tp->addMessage('subject', $tpls['subject'] ?? '', 'text/plain');
     $tp->addMessage('body_text', isset($tpls['text']) ? $tpls['text'] : '',
       'text/plain');
     $tp->addMessage('body_html', isset($tpls['html']) ? $tpls['html'] : '',

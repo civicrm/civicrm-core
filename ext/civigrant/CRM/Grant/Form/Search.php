@@ -66,7 +66,6 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     /**
@@ -113,7 +112,6 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -256,7 +254,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getEntityMetadata() {
     return CRM_Grant_BAO_Query::getSearchFieldMetadata();
@@ -265,7 +263,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
   /**
    * Set the metadata for the form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setSearchMetadata() {
     $this->addSearchFieldMetadata(['Grant' => $this->getEntityMetadata()]);

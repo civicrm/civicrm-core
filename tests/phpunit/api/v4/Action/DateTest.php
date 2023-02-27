@@ -23,12 +23,13 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\Relationship;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class DateTest extends UnitTestCase {
+class DateTest extends Api4TestBase implements TransactionalInterface {
 
   public function testRelationshipDate() {
     $c1 = Contact::create()
@@ -192,6 +193,48 @@ class DateTest extends UnitTestCase {
       ->addSelect('id', 'contribution.total_amount')
       ->setJoin([
         ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '!=', '"previous.year"']],
+      ])
+      ->addWhere('id', '=', $c1)
+      ->execute();
+    $this->assertCount(2, $contact);
+
+    // Find contributions To end of previous calendar year
+    $contact = \Civi\Api4\Contact::get()
+      ->addSelect('id', 'contribution.total_amount')
+      ->setJoin([
+        ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '=', '"earlier.year"']],
+      ])
+      ->addWhere('id', '=', $c1)
+      ->execute();
+    $this->assertCount(2, $contact);
+
+    // Find contributions not To end of previous calendar year
+    $contact = \Civi\Api4\Contact::get()
+      ->addSelect('id', 'contribution.total_amount')
+      ->setJoin([
+        ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '!=', '"earlier.year"']],
+      ])
+      ->addWhere('id', '=', $c1)
+      ->execute();
+    $this->assertCount(1, $contact);
+    $this->assertEquals(6, $contact[0]['contribution.total_amount']);
+
+    // Find contributions From start of current calendar year
+    $contact = \Civi\Api4\Contact::get()
+      ->addSelect('id', 'contribution.total_amount')
+      ->setJoin([
+        ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '=', '"greater.year"']],
+      ])
+      ->addWhere('id', '=', $c1)
+      ->execute();
+    $this->assertCount(1, $contact);
+    $this->assertEquals(6, $contact[0]['contribution.total_amount']);
+
+    // Find contributions not From start of current calendar year
+    $contact = \Civi\Api4\Contact::get()
+      ->addSelect('id', 'contribution.total_amount')
+      ->setJoin([
+        ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '!=', '"greater.year"']],
       ])
       ->addWhere('id', '=', $c1)
       ->execute();

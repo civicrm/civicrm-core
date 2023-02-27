@@ -22,7 +22,7 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
   /**
    * Setup for class.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     $this->useTransaction();

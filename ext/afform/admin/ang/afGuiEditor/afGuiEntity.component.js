@@ -8,7 +8,7 @@
       entity: '<'
     },
     require: {editor: '^^afGuiEditor'},
-    controller: function ($scope, $timeout, afGui) {
+    controller: function ($scope, $timeout, afGui, formatForSelect2) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
       var ctrl = this;
       $scope.controls = {};
@@ -24,10 +24,6 @@
 
       $scope.getMeta = function() {
         return afGui.meta.entities[ctrl.getEntityType()];
-      };
-
-      $scope.getAdminTpl = function() {
-        return $scope.getMeta().admin_tpl || '~/afGuiEditor/entityConfig/Generic.html';
       };
 
       $scope.getField = afGui.getField;
@@ -122,7 +118,9 @@
         $scope.elementList.length = 0;
         $scope.elementTitles.length = 0;
         _.each(afGui.meta.elements, function(element, name) {
-          if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
+          if (
+            (!element.afform_type || _.contains(element.afform_type, 'form')) &&
+            (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search))) {
             var node = _.cloneDeep(element.element);
             if (name === 'fieldset') {
               if (!ctrl.editor.allowEntityConfig) {
@@ -210,6 +208,12 @@
           $scope.controls.fieldSearch = '';
           ctrl.buildPaletteLists();
         });
+
+        ctrl.behaviors = _.transform(CRM.afGuiEditor.behaviors[ctrl.getEntityType()], function(behaviors, behavior) {
+          var item = _.cloneDeep(behavior);
+          item.options = formatForSelect2(item.modes, 'name', 'label', ['description', 'icon']);
+          behaviors.push(item);
+        }, []);
       };
     }
   });

@@ -110,29 +110,27 @@ class CRM_Core_OptionGroup {
    *   The values as specified by the params
    */
   public static function &values(
-    $name, $flip = FALSE, $grouping = FALSE,
+    string $name, $flip = FALSE, $grouping = FALSE,
     $localize = FALSE, $condition = NULL,
     $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE, $keyColumnName = 'value',
     $orderBy = 'weight'
   ) {
-    $cache = CRM_Utils_Cache::singleton();
+
     if (self::isDomainOptionGroup($name)) {
       $cacheKey = self::createCacheKey($name, CRM_Core_I18n::getLocale(), $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy, CRM_Core_Config::domainID());
     }
     else {
       $cacheKey = self::createCacheKey($name, CRM_Core_I18n::getLocale(), $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy);
     }
-
+    $cache = Civi::cache('metadata');
     if (!$fresh) {
-      // Fetch from static var
-      if (array_key_exists($cacheKey, self::$_cache)) {
-        return self::$_cache[$cacheKey];
+      if ($cache->has($cacheKey)) {
+        $result = $cache->get($cacheKey);
+        return $result;
       }
-      // Fetch from main cache
-      self::$_cache[$cacheKey] = $cache->get($cacheKey);
-      if (self::$_cache[$cacheKey] !== NULL) {
-        return self::$_cache[$cacheKey];
-      }
+    }
+    else {
+      CRM_Core_Error::deprecatedWarning('do not call to flush cache');
     }
 
     $query = "
@@ -144,7 +142,7 @@ WHERE  v.option_group_id = g.id
   AND  g.is_active       = 1 ";
 
     if ($onlyActive) {
-      $query .= " AND  v.is_active = 1 ";
+      $query .= ' AND  v.is_active = 1 ';
       // Only show options for enabled components
       $componentClause = ' v.component_id IS NULL ';
       $enabledComponents = CRM_Core_Config::singleton()->enableComponents;
@@ -155,7 +153,7 @@ WHERE  v.option_group_id = g.id
       $query .= " AND ($componentClause) ";
     }
     if (self::isDomainOptionGroup($name)) {
-      $query .= " AND v.domain_id = " . CRM_Core_Config::domainID();
+      $query .= ' AND v.domain_id = ' . CRM_Core_Config::domainID();
     }
 
     if ($condition) {
@@ -172,7 +170,6 @@ WHERE  v.option_group_id = g.id
     // call option value hook
     CRM_Utils_Hook::optionValues($var, $name);
 
-    self::$_cache[$cacheKey] = $var;
     $cache->set($cacheKey, $var);
 
     return $var;
@@ -476,6 +473,7 @@ WHERE  v.option_group_id = g.id
    *   the option group ID
    */
   public static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
     // @TODO: This causes a problem in multilingual
     // (https://github.com/civicrm/civicrm-core/pull/17228), but is needed in
     // order to be able to remove currencies once added.
@@ -568,8 +566,12 @@ ORDER BY v.weight
   /**
    * @param string $groupName
    * @param string $operator
+   *
+   * @deprecated
    */
   public static function deleteAssoc($groupName, $operator = "=") {
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
+
     $query = "
 DELETE g, v
   FROM civicrm_option_group g,

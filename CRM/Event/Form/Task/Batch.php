@@ -261,7 +261,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    * @param int $statusId
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function updatePendingOnlineContribution($participantId, $statusId) {
 
@@ -303,7 +302,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    * @param array $params
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    *
    * @deprecated
@@ -381,7 +379,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    * @param array $params
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function submit($params) {
     $statusClasses = CRM_Event_PseudoConstant::participantStatusClass();

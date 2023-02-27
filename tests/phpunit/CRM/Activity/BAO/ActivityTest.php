@@ -15,10 +15,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   private $someContacts = [];
 
+  protected $allowedContacts = [];
+
   /**
    * Set up for test.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setUp():void {
     parent::setUp();
@@ -30,7 +32,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Clean up after tests.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function tearDown(): void {
@@ -252,7 +254,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * deleteActivity($params) method deletes activity for given params.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDeleteActivity() {
     $contactId = $this->individualCreate();
@@ -362,7 +363,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * for given activity id.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testDeleteActivityAssignment(): void {
     $contactId = $this->individualCreate();
@@ -1077,7 +1077,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * @param $expected
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testActivityRelativeDateFilter($params, $expected): void {
     $thisYear = date('Y');
@@ -1138,7 +1137,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * CRM-20308: Test from email address when a 'copy of Activity' event occur
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testEmailAddressOfActivityCopy() {
     // Case 1: assert the 'From' Email Address of source Actvity Contact ID
@@ -1218,9 +1216,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSendEmailBasic(): void {
     $contactId = $this->getContactID();
@@ -1312,9 +1308,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * This is different from SentEmailBasic to try to help prevent code that
    * assumes an email always has tokens in it.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSendEmailBasicWithoutAnyTokens(): void {
@@ -1358,9 +1352,7 @@ $text
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSendEmailWithCampaign(): void {
     // Create a contact and contactDetails array.
@@ -1379,7 +1371,7 @@ $text
 
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
-    /* @var CRM_Activity_Form_Task_Email $form */
+    /** @var CRM_Activity_Form_Task_Email $form */
     $form = $this->getCaseEmailTaskForm($contactId, [
       'subject' => '',
       'html_message' => $html,
@@ -1415,9 +1407,7 @@ $text
   /**
    * Test that a sms does not send when a phone number is not available.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSendSmsNoPhoneNumber(): void {
@@ -1426,9 +1416,7 @@ $text
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSendSmsLandLinePhoneNumber(): void {
@@ -1439,22 +1427,20 @@ $text
   /**
    * Test successful SMS send.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSendSmsMobilePhoneNumber(): void {
     $sent = $this->createSendSmsTest(TRUE, 2);
     $this->assertEquals(TRUE, $sent[0]);
-    /* @var CiviTestSMSProvider $provider $provider['id']*/
+    /** @var CiviTestSMSProvider $providerObj */
     $providerObj = CRM_SMS_Provider::singleton(['provider_id' => $this->ids['SmsProvider'][0]]);
     $this->assertEquals('text Anthony', $providerObj->getSentMessage());
   }
 
   /**
    * Test that when a number is specified in the To Param of the SMS provider parameters that an SMS is sent
-   * @see dev/core/#273
+   * @see dev/core#273
    */
   public function testSendSMSMobileInToProviderParam(): void {
     $sent = $this->createSendSmsTest(TRUE, 2, TRUE);
@@ -1463,7 +1449,7 @@ $text
 
   /**
    * Test that when a numbe ris specified in the To Param of the SMS provider parameters that an SMS is sent
-   * @see dev/core/#273
+   * @see dev/core#273
    */
   public function testSendSMSMobileInToProviderParamWithDoNotSMS(): void {
     $sent = $this->createSendSmsTest(FALSE, 2, TRUE, ['do_not_sms' => 1]);
@@ -1481,9 +1467,7 @@ $text
    * @param array $additionalContactParams additional contact creation params
    *
    * @return array
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function createSendSmsTest(bool $expectSuccess = TRUE, int $phoneType = 0, bool $passPhoneTypeInContactDetails = FALSE, array $additionalContactParams = []): array {
@@ -1583,29 +1567,6 @@ $text
     }
   }
 
-  public function testCaseTokens() {
-    $caseTest = new CiviCaseTestCase();
-    $caseTest->setUp();
-    // Create a contact and contactDetails array.
-    $contactId = $this->individualCreate();
-
-    // create a case for this user
-    $result = $this->callAPISuccess('Case', 'create', [
-      'contact_id' => $contactId,
-      'case_type_id' => '1',
-      'subject' => "my case",
-      'status_id' => "Open",
-    ]);
-
-    $caseId = $result['id'];
-    $html_message = "<p>This is a test case with id: {case.id} and subject: {case.subject}</p>";
-    $html_message = CRM_Utils_Token::replaceCaseTokens($caseId, $html_message);
-
-    $this->assertTrue(strpos($html_message, 'id: ' . $caseId) !== 0);
-    $this->assertTrue(strpos($html_message, 'subject: my case') !== 0);
-    $caseTest->tearDown();
-  }
-
   public function testSendEmailWithCaseId() {
     $caseTest = new CiviCaseTestCase();
     $caseTest->setUp();
@@ -1661,7 +1622,7 @@ $text
     $html = __FUNCTION__ . ' html' . '{contact.display_name}';
     $text = __FUNCTION__ . ' text' . '{contact.display_name}';
 
-    /* @var CRM_Contact_Form_Task_Email $form */
+    /** @var CRM_Contact_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
       'subject' => $subject,
       'html_message' => $html,
@@ -1669,7 +1630,7 @@ $text
       'campaign_id' => $campaign_id,
       'from_email_address' => 'from@example.com',
       'to' => $contactId1 . '::email@example.com,' . $contactId2 . '::email2@example.com',
-    ], [], []);
+    ], '', []);
     $form->set('cid', $contactId1 . ',' . $contactId2);
     $form->buildForm();
     $form->postProcess();
@@ -1695,44 +1656,8 @@ $textValue
   }
 
   /**
-   * Test that smarty is rendered, if enabled.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function testSmartyEnabled(): void {
-    putenv('CIVICRM_MAIL_SMARTY=1');
-    $this->createLoggedInUser();
-    $contactID = $this->individualCreate(['last_name' => 'Red']);
-    CRM_Activity_BAO_Activity::sendEmail(
-      [
-        $contactID => [
-          'preferred_mail_format' => 'Both',
-          'contact_id' => $contactID,
-          'email' => 'a@example.com',
-        ],
-      ],
-      '{contact.first_name} {$contact.first_name}',
-      '{contact.first_name} {$contact.first_name}',
-      '{contact.first_name} {$contact.first_name}',
-      NULL,
-      NULL,
-      'mail@example.com',
-      NULL,
-      NULL,
-      NULL,
-      [$contactID]
-    );
-    $activity = $this->callAPISuccessGetValue('Activity', ['return' => 'details']);
-    putenv('CIVICRM_MAIL_SMARTY=0');
-  }
-
-  /**
    * Same as testSendEmailWillReplaceTokensUniquelyForEachContact but with
    * 3 recipients and an attachment.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testSendEmailWillReplaceTokensUniquelyForEachContact3(): void {
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
@@ -1740,7 +1665,7 @@ $textValue
     $contactId3 = $this->individualCreate(['last_name' => 'Ochre']);
 
     // create a logged in USER since the code references it for sendEmail user.
-    $loggedInUser = $this->createLoggedInUser();
+    $this->createLoggedInUser();
     $contact = $this->callAPISuccess('Contact', 'get', ['sequential' => 1, 'id' => ['IN' => [$contactId1, $contactId2, $contactId3]]]);
 
     // Add contact tokens in subject, html , text.
@@ -1754,31 +1679,28 @@ $textValue
     $fileUri = "{$filepath}/{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'aaaaaa', $fileName);
-    $attachments = [
-      'attachFile_1' =>
-      [
+
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
+      'subject' => $subject,
+      'html_message' => $html,
+      'text_message' => $text,
+      'campaign_id' => $this->getCampaignID(),
+      'from_email_address' => 'from@example.com',
+      'to' => $contactId1 . '::' . $contact['values'][0]['email'] . ','
+      . $contactId2 . '::' . $contact['values'][1]['email'] . ','
+      . $contactId3 . '::' . $contact['values'][2]['email'],
+      'attachFile_1' => [
         'uri' => $fileUri,
         'type' => 'text/plain',
         'location' => $fileUri,
+        'name' => $fileUri,
       ],
-    ];
+      'attachDesc_1' => '',
+    ], NULL, []);
+    $form->set('cid', $contactId1 . ',' . $contactId2 . ',' . $contactId3);
+    $form->buildForm();
+    $form->postProcess();
 
-    CRM_Activity_BAO_Activity::sendEmail(
-      $contact['values'],
-      $subject,
-      $text,
-      $html,
-      $contact['values'][0]['email'],
-      $loggedInUser,
-      __FUNCTION__ . '@example.com',
-      $attachments,
-      NULL,
-      NULL,
-      array_column($contact['values'], 'id'),
-      NULL,
-      NULL,
-      $this->getCampaignID()
-    );
     $result = $this->callAPISuccess('Activity', 'get', ['campaign_id' => $this->getCampaignID()]);
     // An activity created for each of the two contacts
     $this->assertEquals(3, $result['count']);
@@ -1804,7 +1726,7 @@ $textValue
   /**
    * Checks that attachments are not duplicated for activities.
    */
-  public function testSendEmailDoesNotDuplicateAttachmentFileIdsForActivitiesCreated() {
+  public function testSendEmailDoesNotDuplicateAttachmentFileIDsForActivitiesCreated(): void {
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
     $contactId2 = $this->individualCreate(['last_name' => 'Pink']);
 
@@ -1827,35 +1749,31 @@ $textValue
     $userID = $loggedInUser;
 
     $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
-    $fileName = "test_email_create.txt";
+    $fileName = 'test_email_create.txt';
     $fileUri = "{$filepath}/{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', $fileName);
-    $attachments = [
-      'attachFile_1' =>
-        [
-          'uri' => $fileUri,
-          'type' => 'text/plain',
-          'location' => $fileUri,
-        ],
-    ];
 
-    CRM_Activity_BAO_Activity::sendEmail(
-      $contact['values'],
-      $subject,
-      $text,
-      $html,
-      $contact['values'][0]['email'],
-      $userID,
-      $from = __FUNCTION__ . '@example.com',
-      $attachments,
-      $cc = NULL,
-      $bcc = NULL,
-      $contactIds = array_column($contact['values'], 'id'),
-      $additionalDetails = NULL,
-      NULL,
-      $campaign_id
-    );
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
+      'subject' => $subject,
+      'html_message' => $html,
+      'text_message' => $text,
+      'campaign_id' => $campaign_id,
+      'from_email_address' => 'from@example.com',
+      'to' => $contactId1 . '::' . $contact['values'][0]['email'] . ','
+      . $contactId2 . '::' . $contact['values'][1]['email'],
+      'attachFile_1' => [
+        'uri' => $fileUri,
+        'type' => 'text/plain',
+        'location' => $fileUri,
+        'name' => $fileUri,
+      ],
+      'attachDesc_1' => '',
+    ], NULL, []);
+    $form->set('cid', $contactId1 . ',' . $contactId2);
+    $form->buildForm();
+    $form->postProcess();
+
     $result = $this->callAPISuccess('activity', 'get', ['campaign_id' => $campaign_id]);
     // An activity created for each of the two contacts, i.e two activities.
     $this->assertEquals(2, $result['count']);
@@ -1868,6 +1786,8 @@ $textValue
 
     // Verify that the that both activities are linked to the same File Id.
     $this->assertEquals($result['values'][0]['file_id'], $result['values'][1]['file_id']);
+
+    unlink($fileUri);
   }
 
   /**
@@ -1971,7 +1891,7 @@ $textValue
    * @param array $do_first
    * @param array $do_second
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testTargetAssigneeVariations(array $do_first, array $do_second) {
     // Originally wanted to put this in setUp() but it broke other tests.
@@ -2040,7 +1960,6 @@ $textValue
    * @param array $do_second
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testTargetAssigneeVariationsWithScalars(array $do_first, array $do_second) {
     // Originally wanted to put this in setUp() but it broke other tests.
@@ -2632,63 +2551,9 @@ $textValue
   }
 
   /**
-   * Test the returned activity ids when there are multiple "To" recipients.
-   * Similar to testSendEmailWillReplaceTokensUniquelyForEachContact but we're
-   * checking the activity ids returned from sendEmail.
-   */
-  public function testSendEmailWithMultipleToRecipients(): void {
-    $contactId1 = $this->individualCreate(['first_name' => 'Aaaa', 'last_name' => 'Bbbb']);
-    $contactId2 = $this->individualCreate(['first_name' => 'Cccc', 'last_name' => 'Dddd']);
-
-    // create a logged in USER since the code references it for sendEmail user.
-    $loggedInUser = $this->createLoggedInUser();
-    $contacts = $this->callAPISuccess('Contact', 'get', [
-      'sequential' => 1,
-      'id' => ['IN' => [$contactId1, $contactId2]],
-    ]);
-
-    [$sent, $activityIds] = CRM_Activity_BAO_Activity::sendEmail(
-      $contacts['values'],
-      'a subject',
-      'here is some text',
-      '<p>here is some html</p>',
-      $contacts['values'][0]['email'],
-      $loggedInUser,
-      $from = __FUNCTION__ . '@example.com',
-      $attachments = NULL,
-      $cc = NULL,
-      $bcc = NULL,
-      array_column($contacts['values'], 'id')
-    );
-
-    // Get all activities for these contacts
-    $result = $this->callAPISuccess('activity', 'get', [
-      'sequential' => 1,
-      'return' => ['target_contact_id'],
-      'target_contact_id' => ['IN' => [$contactId1, $contactId2]],
-    ]);
-
-    // There should be one activity created for each of the two contacts
-    $this->assertEquals(2, $result['count']);
-
-    // Activity ids returned from sendEmail should match the ones returned from api call.
-    $this->assertEquals($activityIds, array_column($result['values'], 'id'));
-
-    // Is it the right contacts?
-    $this->assertEquals(
-      [0 => [0 => $contactId1], 1 => [0 => $contactId2]],
-      array_column($result['values'], 'target_contact_id')
-    );
-    $this->assertEquals(
-      [0 => [$contactId1 => 'Bbbb, Aaaa'], 1 => [$contactId2 => 'Dddd, Cccc']],
-      array_column($result['values'], 'target_contact_sort_name')
-    );
-  }
-
-  /**
    * @param $activityId
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function validateActivity($activityId): void {
@@ -2712,7 +2577,7 @@ $textValue
    * @param $contactDetails
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function createMobilePhone(int $contactId, bool $passPhoneTypeInContactDetails, $contactDetails): array {
     $phone = civicrm_api3('Phone', 'create', [
@@ -2750,7 +2615,7 @@ $textValue
   protected function getCaseEmailTaskForm(int $contactId, array $submittedValues): CRM_Case_Form_Task_Email {
     $_REQUEST['cid'] = $contactId;
     $_REQUEST['caseid'] = $this->getCaseID();
-    /* @var CRM_Case_Form_Task_Email $form */
+    /** @var CRM_Case_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Case_Form_Task_Email', array_merge([
       'to' => $contactId . '::' . 'email@example.com',
       'from_email_address' => 'from@example.com',
@@ -2767,7 +2632,7 @@ $textValue
    */
   protected function getContactEmailTaskForm(int $contactId, array $submittedValues): CRM_Contact_Form_Task_Email {
     $_REQUEST['cid'] = $contactId;
-    /* @var CRM_Contact_Form_Task_Email $form */
+    /** @var CRM_Contact_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email', array_merge([
       'to' => $contactId . '::' . 'email@example.com',
       'from_email_address' => 'from@example.com',

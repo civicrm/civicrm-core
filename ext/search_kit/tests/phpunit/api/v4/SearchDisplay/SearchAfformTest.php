@@ -45,6 +45,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
             'id',
             'display_name',
             'GROUP_CONCAT(DISTINCT Contact_Email_contact_id_01.email) AS GROUP_CONCAT_Contact_Email_contact_id_01_email',
+            'YEAR(birth_date) AS YEAR_birth_date',
           ],
           'orderBy' => [],
           'where' => [],
@@ -89,6 +90,12 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
               'dataType' => 'String',
               'type' => 'field',
             ],
+            [
+              'key' => 'YEAR_birth_date',
+              'label' => 'Contact ID',
+              'dataType' => 'Integer',
+              'type' => 'field',
+            ],
           ],
         ],
         'acl_bypass' => FALSE,
@@ -101,6 +108,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       ->addValue('first_name', 'tester')
       ->addValue('last_name', 'AfformTest')
       ->addValue('source', 'afform_test')
+      ->addValue('birth_date', '2020-01-01')
       ->addChain('emails', Email::save()
         ->addDefault('contact_id', '$id')
         ->addRecord(['email' => $email, 'location_type_id:name' => 'Home'])
@@ -112,6 +120,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       ->addValue('first_name', 'tester2')
       ->addValue('last_name', 'AfformTest')
       ->addValue('source', 'afform_test2')
+      ->addValue('birth_date', '2010-01-01')
       ->addChain('emails', Email::save()
         ->addDefault('contact_id', '$id')
         ->addRecord(['email' => 'other@test.com', 'location_type_id:name' => 'Other'])
@@ -160,6 +169,13 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
 
     // Filter by email address
     $params['filters'] = ['Contact_Email_contact_id_01.email' => $email];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+
+    // Filter by YEAR(birth_date)
+    $params['filters'] = [
+      'YEAR_birth_date' => ['>=' => 2019],
+    ];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
   }

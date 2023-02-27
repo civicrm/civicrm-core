@@ -120,6 +120,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     }
     if ($this->isMoneyField($field)) {
       $currency = $this->getCurrency($row);
+      if (empty($fieldValue) && !is_numeric($fieldValue)) {
+        $fieldValue = 0;
+      }
       if (!$currency) {
         // too hard basket for now - just do what we always did.
         return $row->format('text/plain')->tokens($entity, $field,
@@ -258,7 +261,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         // Tests fail without checkPermissions = FALSE
         $this->fieldMetadata = (array) civicrm_api4($this->getApiEntityName(), 'getfields', ['checkPermissions' => FALSE], 'name');
       }
-      catch (API_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         $this->fieldMetadata = [];
       }
     }
@@ -365,7 +368,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @todo remove this function & use the metadata that is loaded.
    *
    * @return string[]
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getBasicTokens(): array {
     $return = [];
@@ -406,7 +409,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     // 'not a real field' offered up by case - seems like an oddity
     // we should skip at the top level for now.
     $fields = ['tags'];
-    if (!CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
+    if (!CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
       $fields[] = 'campaign_id';
     }
     return $fields;
@@ -462,7 +465,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param \Civi\Token\Event\TokenValueEvent $e
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getPrefetchFields(TokenValueEvent $e): array {
     $allTokens = array_keys($this->getTokenMetadata());
@@ -608,10 +611,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param string $prefix
    */
   protected function addFieldToTokenMetadata(array &$tokensMetadata, array $field, array $exposedFields, string $prefix = ''): void {
-    if ($field['type'] !== 'Custom' && !in_array($field['name'], $exposedFields, TRUE)) {
+    $isExposed = in_array(str_replace($prefix . '.', '', $field['name']), $exposedFields, TRUE);
+    if ($field['type'] !== 'Custom' && !$isExposed) {
       return;
     }
-    $field['audience'] = 'user';
+    $field['audience'] = $field['audience'] ?? 'user';
     if ($field['name'] === 'contact_id') {
       // Since {contact.id} is almost always present don't confuse users
       // by also adding (e.g {participant.contact_id)
@@ -624,7 +628,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       // Convert to apiv3 style for now. Later we can add v4 with
       // portable naming & support for labels/ dates etc so let's leave
       // the space open for that.
-      // Not the existing quickform widget has handling for the custom field
+      // Not the existing QuickForm widget has handling for the custom field
       // format based on the title using this syntax.
       $parts = explode(': ', $field['label']);
       $field['title'] = "{$parts[1]} :: {$parts[0]}";
@@ -632,8 +636,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       $tokensMetadata[$tokenName] = $field;
       return;
     }
-    $tokenName = $prefix ? ($prefix . '.' . $field['name']) : $field['name'];
-    if (in_array($field['name'], $exposedFields, TRUE)) {
+    $tokenName = $field['name'];
+    // Presumably this line can not be reached unless isExposed = TRUE.
+    if ($isExposed) {
       if (
         ($field['options'] || !empty($field['suffixes']))
         // At the time of writing currency didn't have a label option - this may have changed.

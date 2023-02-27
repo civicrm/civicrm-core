@@ -24,7 +24,7 @@
         {include file="CRM/Event/Form/Search/Common.tpl"}
 
         <tr>
-           <td colspan="2">{include file="CRM/common/formButtons.tpl"}</td>
+           <td colspan="2">{include file="CRM/common/formButtons.tpl" location=''}</td>
         </tr>
         </table>
     {/strip}

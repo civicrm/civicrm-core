@@ -1,7 +1,6 @@
 <?php
 return [
   'civicrm_action_schedule' => [
-    'limit_to' => "DEFAULT 1 COMMENT 'Is this the recipient criteria limited to OR in addition to?'",
     'is_repeat' => "DEFAULT 0",
     'is_active' => "DEFAULT 1 COMMENT 'Is this option active?'",
     'record_activity' => "DEFAULT 0 COMMENT 'Record Activity for this reminder?'",

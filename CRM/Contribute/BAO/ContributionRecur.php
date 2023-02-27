@@ -9,15 +9,17 @@
  +--------------------------------------------------------------------+
  */
 
+use Brick\Money\Money;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
+use Civi\Api4\LineItem;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
+class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur implements Civi\Test\HookInterface {
 
   /**
    * Create recurring contribution.
@@ -92,6 +94,40 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     }
 
     return $recurring;
+  }
+
+  /**
+   * Event fired after modifying a recurring contribution.
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'edit') {
+      if (is_numeric($event->object->amount)) {
+        $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($event->object->id);
+        if (empty($templateContribution['id'])) {
+          return;
+        }
+        $lines = LineItem::get(FALSE)
+          ->addWhere('contribution_id', '=', $templateContribution['id'])
+          ->addWhere('contribution_id.is_template', '=', TRUE)
+          ->addSelect('contribution_id.total_amount')
+          ->execute();
+        if (count($lines) === 1) {
+          $contributionAmount = $lines->first()['contribution_id.total_amount'];
+          // USD here is just ensuring both are in the same format.
+          if (Money::of($contributionAmount, 'USD')->compareTo(Money::of($event->object->amount, 'USD'))) {
+            // If different then we need to update
+            // the contribution. Note that if this is being called
+            // as a result of the contribution having been updated then there will
+            // be no difference.
+            Contribution::update(FALSE)
+              ->addWhere('id', '=', $templateContribution['id'])
+              ->setValues(['total_amount' => $event->object->amount])
+              ->execute();
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -193,6 +229,8 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *
    * @param array $ids
    *   (reference ) an array of recurring contribution ids.
+   *
+   * @deprecated use the api.
    *
    * @return array
    *   an array of recurring ids count
@@ -412,8 +450,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @param int $id
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @return int|NULL the ID of the newly created template contribution.
    */
@@ -488,30 +525,29 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * Later we might merge in data stored against the contribution recur record rather than just return the contribution.
    *
    * @param int $id
-   * @param array $overrides
-   *   Parameters that should be overriden. Add unit tests if using parameters other than total_amount & financial_type_id.
+   * @param array $inputOverrides
+   *   Parameters that should be overridden. Add unit tests if using parameters other than total_amount & financial_type_id.
    *
    * @return array
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function getTemplateContribution(int $id, $overrides = []): array {
-    $recurFields = ['is_test', 'financial_type_id', 'total_amount', 'campaign_id'];
+  public static function getTemplateContribution(int $id, array $inputOverrides = []): array {
     $recurringContribution = ContributionRecur::get(FALSE)
       ->addWhere('id', '=', $id)
-      ->setSelect($recurFields)
+      ->setSelect(['is_test', 'financial_type_id', 'amount', 'campaign_id'])
       ->execute()
       ->first();
-    // If financial_type_id or total_amount are set on the
-    // recurring they are overrides, but of lower precedence
-    // than input parameters.
+
+    // Parameters passed into the function take precedences, falling back to those loaded from
+    // the recurring contribution.
     // we filter out null, '' and FALSE but not zero - I'm on the fence about zero.
-    $overrides = array_filter(array_merge(
-      // We filter recurringContribution as we only want the fields we asked for
-      // and specifically don't want 'id' added to overrides.
-      array_intersect_key($recurringContribution, array_fill_keys($recurFields, 1)),
-      $overrides
-    ), 'strlen');
+    $overrides = array_filter([
+      'is_test' => $inputOverrides['is_test'] ?? $recurringContribution['is_test'],
+      'financial_type_id' => $inputOverrides['financial_type_id'] ?? ($recurringContribution['financial_type_id'] ?? ''),
+      'campaign_id' => $inputOverrides['campaign_id'] ?? ($recurringContribution['campaign_id'] ?? ''),
+      'total_amount' => $inputOverrides['total_amount'] ?? $recurringContribution['amount'],
+    ], 'strlen');
 
     // First look for new-style template contribution with is_template=1
     $templateContributions = Contribution::get(FALSE)
@@ -546,8 +582,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       // The handling of the line items is managed in BAO_Order so this
       // is whether we should override on the contribution. Arguably the 2 should
       // be decoupled.
-      if (count($lineItems) > 1 && isset($overrides['financial_type_id'])) {
-        unset($overrides['financial_type_id']);
+      if (count($lineItems) > 1) {
+        unset($overrides['financial_type_id'], $overrides['total_amount']);
       }
       $result = array_merge($templateContribution, $overrides);
       // Line items aren't always written to a contribution, for mystery reasons.
@@ -710,7 +746,6 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function addRecurLineItems($recurId, $contribution) {
     $foundLineItems = FALSE;
@@ -729,7 +764,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
                 'is_transactional' => FALSE,
               ]);
             }
-            catch (CiviCRM_API3_Exception $e) {
+            catch (CRM_Core_Exception $e) {
               // we are catching & ignoring errors as an extra precaution since lost IPNs may be more serious that lost membership_payment data
               // this fn is unit-tested so risk of changes elsewhere breaking it are otherwise mitigated
             }
@@ -762,67 +797,44 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @param int $contributionStatusID
    * @param float $contributionAmount
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function updateRecurLinkedPledge($contributionID, $contributionRecurID, $contributionStatusID, $contributionAmount) {
     $returnProperties = ['id', 'pledge_id'];
-    $paymentDetails = $paymentIDs = [];
+    $paymentDetails = [];
 
-    if (CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $contributionID,
-      $paymentDetails, $returnProperties
-    )
-    ) {
-      foreach ($paymentDetails as $key => $value) {
-        $paymentIDs[] = $value['id'];
-        $pledgeId = $value['pledge_id'];
-      }
-    }
-    else {
-      //payment is not already linked - if it is linked with a pledge we need to create a link.
-      // return if it is not recurring contribution
-      if (!$contributionRecurID) {
-        return;
-      }
+    $relatedContributions = new CRM_Contribute_DAO_Contribution();
+    $relatedContributions->contribution_recur_id = $contributionRecurID;
+    $relatedContributions->find();
 
-      $relatedContributions = new CRM_Contribute_DAO_Contribution();
-      $relatedContributions->contribution_recur_id = $contributionRecurID;
-      $relatedContributions->find();
-
-      while ($relatedContributions->fetch()) {
-        CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $relatedContributions->id,
-          $paymentDetails, $returnProperties
-        );
-      }
-
-      if (empty($paymentDetails)) {
-        // payment is not linked with a pledge and neither are any other contributions on this
-        return;
-      }
-
-      foreach ($paymentDetails as $key => $value) {
-        $pledgeId = $value['pledge_id'];
-      }
-
-      // we have a pledge now we need to get the oldest unpaid payment
-      $paymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeId);
-      if (empty($paymentDetails['id'])) {
-        // we can assume this pledge is now completed
-        // return now so we don't create a core error & roll back
-        return;
-      }
-      $paymentDetails['contribution_id'] = $contributionID;
-      $paymentDetails['status_id'] = $contributionStatusID;
-      $paymentDetails['actual_amount'] = $contributionAmount;
-
-      // put contribution against it
-      $payment = civicrm_api3('PledgePayment', 'create', $paymentDetails);
-      $paymentIDs[] = $payment['id'];
+    while ($relatedContributions->fetch()) {
+      CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'contribution_id', $relatedContributions->id,
+        $paymentDetails, $returnProperties
+      );
     }
 
-    // update pledge and corresponding payment statuses
-    CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId, $paymentIDs, $contributionStatusID,
-      NULL, $contributionAmount
-    );
+    if (empty($paymentDetails)) {
+      // payment is not linked with a pledge and neither are any other contributions on this
+      return;
+    }
+
+    foreach ($paymentDetails as $value) {
+      $pledgeId = $value['pledge_id'];
+    }
+
+    // we have a pledge now we need to get the oldest unpaid payment
+    $paymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeId);
+    if (empty($paymentDetails['id'])) {
+      // we can assume this pledge is now completed
+      // return now so we don't create a core error & roll back
+      return;
+    }
+    $paymentDetails['contribution_id'] = $contributionID;
+    $paymentDetails['status_id'] = $contributionStatusID;
+    $paymentDetails['actual_amount'] = $contributionAmount;
+
+    // put contribution against it
+    civicrm_api3('PledgePayment', 'create', $paymentDetails);
   }
 
   /**
@@ -882,7 +894,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   /**
    * Get the metadata for fields to be included on the search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getContributionRecurSearchFieldMetadata() {
     $fields = [
@@ -928,7 +940,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *   - Failed
    * @param string $effectiveDate
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function updateOnNewPayment($recurringContributionID, $paymentStatus, string $effectiveDate = 'now') {
 
@@ -983,7 +995,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @param \CRM_Contribute_DAO_Contribution $contribution
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function updateOnTemplateUpdated(CRM_Contribute_DAO_Contribution $contribution) {
@@ -1041,7 +1053,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @param int $financial_type_id
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
     $originalContribution = civicrm_api3('Contribution', 'getsingle', [
@@ -1107,7 +1119,6 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @internal
    *
    * @return string
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function getRecurFromAddress(int $id): string {

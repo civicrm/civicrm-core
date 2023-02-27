@@ -18,17 +18,17 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class AbstractActionFunctionTest extends UnitTestCase {
+class AbstractActionFunctionTest extends Api4TestBase {
 
   public function testUndefinedParamException(): void {
-    $this->expectException('API_Exception');
-    $this->expectExceptionMessage('Unknown api parameter: getLanguage');
-    \Civi\Api4\System::flush(FALSE)->getLanguage();
+    $this->expectException('CRM_Core_Exception');
+    $this->expectExceptionMessage('Unknown api parameter: getTranslationMode');
+    \Civi\Api4\System::flush(FALSE)->getTranslationMode();
   }
 
 }

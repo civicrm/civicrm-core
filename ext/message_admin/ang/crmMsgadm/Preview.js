@@ -1,10 +1,14 @@
 (function(angular, $, _) {
 
-  angular.module('crmMsgadm').controller('MsgtpluiPreviewCtrl', function($scope, crmUiHelp, crmStatus, crmApi4, crmUiAlert, $timeout, $q, dialogService) {
+  angular.module('crmMsgadm').controller('MsgtpluiPreviewCtrl', function($scope, crmUiHelp, crmStatus, crmApi4, crmUiAlert, $timeout, $q, dialogService, $location) {
     var ts = $scope.ts = CRM.ts('crmMsgadm');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/crmMsgadm'}); // See: templates/CRM/MessageAdmin/crmMsgadm.hlp
 
     var $ctrl = this, model = $scope.model;
+    var args = $location.search();
+    if (args.lang) {
+      $ctrl.lang = args.lang;
+    }
 
     $ctrl.exampleId = parseInt(_.findKey(model.examples, {name: model.exampleName}));
     $ctrl.revisionId = parseInt(_.findKey(model.revisions, {name: model.revisionName}));
@@ -35,6 +39,7 @@
       dlgModel.refresh = function(){
         return crmApi4('ExampleData', 'get', {
           where: [["name", "=", model.examples[$ctrl.exampleId].name]],
+          language: $ctrl.lang,
           select: ['name', 'file', 'title', 'data']
         }).then(function(response){
           dlgModel.title = ts('Example: %1', {1: response[0].title || response[0].name});
@@ -64,6 +69,7 @@
     function requestStoredExample() {
       return crmApi4('ExampleData', 'get', {
         where: [["name", "=", model.examples[$ctrl.exampleId].name]],
+        language: $ctrl.lang,
         select: ['data']
       }).then(function(response) {
         return response[0].data;
@@ -82,6 +88,7 @@
       rendering.then(function(exampleData) {
         var filteredData = model.filterData ? model.filterData(exampleData) : exampleData;
         return crmApi4('WorkflowMessage', 'render', {
+          language: $ctrl.lang,
           workflow: filteredData.workflow,
           values: filteredData.modelProps,
           messageTemplate: model.revisions[$ctrl.revisionId].rec

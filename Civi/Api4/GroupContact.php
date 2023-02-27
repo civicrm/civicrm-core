@@ -71,4 +71,16 @@ class GroupContact extends Generic\DAOEntity {
     return $info;
   }
 
+  /**
+   * Returns a list of permissions needed to access the various actions in this api.
+   *
+   * @return array
+   */
+  public static function permissions() {
+    // Override CRM_Core_Permission::getEntityActionPermissions() because the v3 API is nonstandard
+    return [
+      'default' => ['access CiviCRM'],
+    ];
+  }
+
 }

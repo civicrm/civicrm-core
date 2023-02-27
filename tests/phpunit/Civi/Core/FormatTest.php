@@ -20,6 +20,7 @@ use CiviUnitTestCase;
  *
  * @package Civi\Core
  * @group headless
+ * @group locale
  */
 class FormatTest extends CiviUnitTestCase {
 
@@ -278,6 +279,18 @@ class FormatTest extends CiviUnitTestCase {
         'money_number_long' => '0.00',
         'number' => '0',
         'money_long' => '$0.00',
+      ],
+    ];
+    $cases['en_US_ZMK'] = [
+      [
+        'amount' => '1234.56',
+        'locale' => 'en_US',
+        'currency' => 'ZMK',
+        'money' => 'ZMK 1,234.56',
+        'money_number' => '1,234.56',
+        'money_number_long' => '1,234.56',
+        'number' => '1,234.56',
+        'money_long' => 'ZMK 1,234.56',
       ],
     ];
     return $cases;

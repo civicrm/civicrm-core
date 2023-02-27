@@ -36,7 +36,7 @@
     <name>source_record_id</name>
     <type>int unsigned</type>
     <title>Source Record</title>
-    <comment>Artificial FK to original transaction (e.g. contribution) IF it is not an Activity. Table can be figured out through activity_type_id, and further through component registry.</comment>
+    <comment>Artificial FK to original transaction (e.g. contribution) IF it is not an Activity. Entity table is discovered by filtering by the appropriate activity_type_id.</comment>
     <readonly>true</readonly>
     <add>2.0</add>
   </field>
@@ -138,6 +138,7 @@
     <title>Phone ID (called)</title>
     <comment>Phone ID of the number called (optional - used if an existing phone number is selected).</comment>
     <add>2.0</add>
+    <deprecated>true</deprecated>
     <html>
       <type>EntityRef</type>
       <label>Phone (called)</label>
@@ -155,6 +156,7 @@
     <title>Phone (called) Number</title>
     <type>varchar</type>
     <length>64</length>
+    <deprecated>true</deprecated>
     <comment>Phone number in case the number does not exist in the civicrm_phone table.</comment>
     <html>
       <type>Text</type>
@@ -217,7 +219,7 @@
     <name>parent_id</name>
     <title>Parent Activity ID</title>
     <type>int unsigned</type>
-    <comment>Parent meeting ID (if this is a follow-up item). This is not currently implemented</comment>
+    <comment>Parent meeting ID (if this is a follow-up item).</comment>
     <readonly>true</readonly>
     <html>
       <label>Parent Activity</label>
@@ -283,6 +285,7 @@
     <html>
       <label>Relationship</label>
     </html>
+    <deprecated>true</deprecated>
     <add>2.2</add>
   </field>
   <foreignKey>
@@ -293,12 +296,12 @@
   </foreignKey>
   <field>
     <name>is_current_revision</name>
-    <title>Is this activity a current revision in versioning chain?</title>
+    <title>Is current (unused)</title>
     <type>boolean</type>
     <default>1</default>
+    <comment>Unused deprecated column.</comment>
     <required>true</required>
-    <import>true</import>
-    <headerPattern>/(is.)?(current.)?(revision|version(ing)?)/i</headerPattern>
+    <deprecated>true</deprecated>
     <add>2.2</add>
   </field>
   <index>
@@ -309,8 +312,9 @@
   <field>
     <name>original_id</name>
     <type>int unsigned</type>
-    <title>Original Activity ID</title>
-    <comment>Activity ID of the first activity record in versioning chain.</comment>
+    <title>Original ID (unused)</title>
+    <comment>Unused deprecated column.</comment>
+    <deprecated>true</deprecated>
     <readonly>true</readonly>
     <html>
       <label>Original Activity</label>
@@ -322,7 +326,7 @@
     <table>civicrm_activity</table>
     <key>id</key>
     <add>2.2</add>
-    <onDelete>CASCADE</onDelete>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
     <name>result</name>

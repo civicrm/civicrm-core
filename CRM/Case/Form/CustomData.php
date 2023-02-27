@@ -144,7 +144,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    * @param array $params New custom field values from form
    *
    * @return string
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function formatCustomDataChangesForDetail($params) {
     $formattedDetails = [];

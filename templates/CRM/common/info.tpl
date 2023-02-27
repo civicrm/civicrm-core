@@ -8,10 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 {* Handles display of passed $infoMessage. *}
-{if $infoMessage || $infoTitle}
-  <div class="messages status {$infoType}"{if $infoOptions} data-options='{$infoOptions}'{/if}>
+{if $infoMessage|smarty:nodefaults || $infoTitle|smarty:nodefaults}
+  <div class="messages status {$infoType}"{if $infoOptions|smarty:nodefaults} data-options='{$infoOptions|smarty:nodefaults}'{/if}>
     {icon icon="fa-info-circle"}{/icon}
     <span class="msg-title">{$infoTitle}</span>
-    <span class="msg-text">{$infoMessage}</span>
+    <span class="msg-text">{$infoMessage|smarty:nodefaults|purify}</span>
   </div>
 {/if}

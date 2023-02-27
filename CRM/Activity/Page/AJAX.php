@@ -217,7 +217,7 @@ class CRM_Activity_Page_AJAX {
       }
       // email column links/icon
       if ($row['email']) {
-        $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/case/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' . ts('Send an Email') . '"><i class="crm-i fa-envelope" aria-hidden="true"></i></a>';
+        $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/case/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' . ts('Send an Email') . '">' . CRM_Core_Page::crmIcon('fa-envelope') . '</a>';
       }
 
       // view end date if set
@@ -241,17 +241,18 @@ class CRM_Activity_Page_AJAX {
           case 'caseRel':
             if (empty($row['end_date'])) {
               $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
-                '<i class="crm-i fa-pencil" aria-hidden="true"></i>' .
+                CRM_Core_Page::crmIcon('fa-pencil') .
                 '</a>' .
                 '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
-                '<span class="icon delete-icon"></span>' .
+                CRM_Core_Page::crmIcon('fa-trash') .
                 '</a>';
+
             }
             break;
 
           case 'caseRoles':
             $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_a_b" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
-              '<i class="crm-i fa-pencil" aria-hidden="true"></i>' .
+              CRM_Core_Page::crmIcon('fa-pencil') .
               '</a>';
             break;
         }

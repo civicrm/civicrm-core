@@ -22,6 +22,14 @@ class CRM_Extension_ClassLoader {
   const FEATURES = ',psr0,psr4,';
 
   /**
+   * A list of recently-activated extensions. This list is retained
+   * even if some ill-advised part of the installer does a `ClassLoader::refresh()`.
+   *
+   * @var array
+   */
+  private static $newExtensions = [];
+
+  /**
    * @var CRM_Extension_Mapper
    */
   protected $mapper;
@@ -97,6 +105,9 @@ class CRM_Extension_ClassLoader {
       }
       self::loadExtension($loader, $this->mapper->keyToInfo($key), $this->mapper->keyToBasePath($key));
     }
+    foreach (static::$newExtensions as $record) {
+      static::loadExtension($loader, $record[0], $record[1]);
+    }
 
     return $loader;
   }
@@ -130,6 +141,7 @@ class CRM_Extension_ClassLoader {
     if (file_exists($file)) {
       unlink($file);
     }
+    static::$newExtensions[] = [$info, $path];
     if ($this->loader) {
       self::loadExtension($this->loader, $info, $path);
     }
@@ -152,6 +164,11 @@ class CRM_Extension_ClassLoader {
 
           case 'psr4':
             $loader->addPsr4($mapping['prefix'], $path . '/' . $mapping['path']);
+            if (defined('CIVICRM_TEST')) {
+              if (is_dir($path . '/tests/phpunit/' . $mapping['path'])) {
+                $loader->addPsr4($mapping['prefix'], $path . '/tests/phpunit/' . $mapping['path']);
+              }
+            }
             break;
         }
       }
@@ -162,7 +179,12 @@ class CRM_Extension_ClassLoader {
    * @return string
    */
   protected function getCacheFile() {
-    $envId = \CRM_Core_Config_Runtime::getId();
+    $envId = md5(implode(',', array_merge(
+      [\CRM_Core_Config_Runtime::getId()],
+      array_column($this->mapper->getActiveModuleFiles(), 'prefix')
+      // dev/core#4055 - When toggling ext's on systems with opcode caching, you may get stale reads for a moment.
+      // New cache key ensures new data-set.
+    )));
     $file = \Civi::paths()->getPath("[civicrm.compile]/CachedExtLoader.{$envId}.php");
     return $file;
   }

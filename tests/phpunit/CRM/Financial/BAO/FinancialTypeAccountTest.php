@@ -39,21 +39,6 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method del()
-   */
-  public function testDel() {
-    list($financialAccount, $financialType, $financialAccountType) = $this->createFinancialAccount(
-      'Expenses',
-      'Expense Account is'
-    );
-
-    CRM_Financial_BAO_FinancialTypeAccount::del($financialAccountType->id);
-    $params = ['id' => $financialAccountType->id];
-    $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
-  }
-
-  /**
    * Check method retrieve()
    */
   public function testRetrieve() {
@@ -70,7 +55,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     ];
 
     $defaults = [];
-    $financialAccountType = CRM_Financial_BAO_FinancialTypeAccount::retrieve($financialParams, $defaults);
+    $financialAccountType = CRM_Financial_BAO_EntityFinancialAccount::retrieve($financialParams, $defaults);
     $this->assertEquals($financialAccountType['entity_id'], $financialType->id, 'Verify Entity Id.');
     $this->assertEquals($financialAccountType['financial_account_id'], $financialAccount->id, 'Verify Financial Account Id.');
   }
@@ -96,8 +81,8 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
       'financial_account_id' => $financialAccount->id,
     ];
 
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialParams);
-    $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($paymentInstrumentValue);
+    CRM_Financial_BAO_EntityFinancialAccount::add($financialParams);
+    $financialAccountId = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($paymentInstrumentValue);
 
     $this->assertEquals($financialAccountId, $financialAccount->id, 'Verify Payment Instrument');
   }
@@ -116,7 +101,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     $financialAccountType->account_relationship = array_search('Credit/Contra Revenue Account is', $accountRelationships);
     $financialAccountType->financial_account_id = array_search('Liability', $financialAccount);
     try {
-      CRM_Financial_BAO_FinancialTypeAccount::validateRelationship($financialAccountType);
+      CRM_Financial_BAO_EntityFinancialAccount::validateRelationship($financialAccountType);
       $this->fail("Missed expected exception");
     }
     catch (Exception $e) {
@@ -167,7 +152,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
         $financialParams['id'] = $dao->id;
       }
       $financialParams['financial_account_id'] = $financialAccount->id;
-      $financialAccountType = CRM_Financial_BAO_FinancialTypeAccount::add($financialParams);
+      $financialAccountType = CRM_Financial_BAO_EntityFinancialAccount::add($financialParams);
     }
     return [$financialAccount, $financialType, $financialAccountType];
   }

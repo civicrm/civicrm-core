@@ -19,14 +19,15 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\RecentItem;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class RecentItemsTest extends UnitTestCase {
+class RecentItemsTest extends Api4TestBase implements TransactionalInterface {
 
   public function testAddDeleteActivity(): void {
     $cid = $this->createLoggedInUser();

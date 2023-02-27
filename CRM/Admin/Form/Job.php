@@ -119,7 +119,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    * @param array $fields
    *
    * @return array|bool
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    */
   public static function formRule($fields) {
 

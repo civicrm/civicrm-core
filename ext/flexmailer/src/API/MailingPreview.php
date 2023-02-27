@@ -33,7 +33,7 @@ class MailingPreview {
       $mailing->copyValues($params);
     }
 
-    if (!Abdicator::isFlexmailPreferred($mailing)) {
+    if (!Abdicator::isFlexmailPreferred($mailing) && empty($mailing->sms_provider_id)) {
       require_once 'api/v3/Mailing.php';
       return civicrm_api3_mailing_preview($params);
     }

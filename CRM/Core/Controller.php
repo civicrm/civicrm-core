@@ -339,7 +339,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // note that this is split into two, because some versions of
     // php 5.x core dump on the triple assignment :)
     $this->_actionName = $this->getActionName();
-    list($pageName, $action) = $this->_actionName;
+    [$pageName, $action] = $this->_actionName;
 
     if ($this->isModal()) {
       if (!$this->isValid($pageName)) {
@@ -360,7 +360,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function validate() {
     $this->_actionName = $this->getActionName();
-    list($pageName, $action) = $this->_actionName;
+    [$pageName, $action] = $this->_actionName;
 
     $page = &$this->_pages[$pageName];
 
@@ -484,7 +484,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function getButtonName() {
     $data = &$this->container();
-    return $data['_qf_button_name'] ?? NULL;
+    return $data['_qf_button_name'] ?? '';
   }
 
   /**
@@ -819,7 +819,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * @param null $url
+   * @param string|null $url
    * @param bool $setToReferer
    */
   public function setDestination($url = NULL, $setToReferer = FALSE) {
@@ -842,7 +842,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function cancelAction() {
     $actionName = $this->getActionName();
-    list($pageName, $action) = $actionName;
+    [$pageName, $action] = $actionName;
     return $this->_pages[$pageName]->cancelAction();
   }
 

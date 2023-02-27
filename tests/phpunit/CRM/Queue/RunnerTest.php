@@ -16,6 +16,18 @@
  */
 class CRM_Queue_RunnerTest extends CiviUnitTestCase {
 
+  use \Civi\Test\QueueTestTrait;
+
+  /**
+   * @var CRM_Queue_Service
+   */
+  private $queueService;
+
+  /**
+   * @var CRM_Queue_Queue
+   */
+  private $queue;
+
   public function setUp(): void {
     parent::setUp();
     $this->queueService = CRM_Queue_Service::singleton(TRUE);
@@ -61,11 +73,11 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
     ]);
     $this->assertEquals(self::$_recordedValues, []);
-    $this->assertEquals(3, $this->queue->numberOfItems());
+    $this->assertQueueStats(3, 3, 0, $this->queue);
     $result = $runner->runAll();
     $this->assertEquals(TRUE, $result);
     $this->assertEquals(self::$_recordedValues, ['a', 'b', 'c']);
-    $this->assertEquals(0, $this->queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $this->queue);
   }
 
   /**
@@ -97,11 +109,11 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
     ]);
     $this->assertEquals(self::$_recordedValues, []);
-    $this->assertEquals(3, $this->queue->numberOfItems());
+    $this->assertQueueStats(3, 3, 0, $this->queue);
     $result = $runner->runAll();
     $this->assertEquals(TRUE, $result);
     $this->assertEquals(self::$_recordedValues, ['a', 1, 2, 3, 'b']);
-    $this->assertEquals(0, $this->queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $this->queue);
   }
 
   /**
@@ -132,12 +144,13 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
       'errorMode' => CRM_Queue_Runner::ERROR_CONTINUE,
     ]);
     $this->assertEquals(self::$_recordedValues, []);
-    $this->assertEquals(3, $this->queue->numberOfItems());
+    $this->assertQueueStats(3, 3, 0, $this->queue);
+
     $result = $runner->runAll();
     // FIXME useless return
     $this->assertEquals(TRUE, $result);
     $this->assertEquals(self::$_recordedValues, ['a', 'c']);
-    $this->assertEquals(0, $this->queue->numberOfItems());
+    $this->assertQueueStats(0, 0, 0, $this->queue);
   }
 
   /**
@@ -168,13 +181,14 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
     ]);
     $this->assertEquals(self::$_recordedValues, []);
-    $this->assertEquals(3, $this->queue->numberOfItems());
+    $this->assertQueueStats(3, 3, 0, $this->queue);
+
     $result = $runner->runAll();
     $this->assertEquals(1, $result['is_error']);
     // nothing from 'c'
     $this->assertEquals(self::$_recordedValues, ['a']);
     // 'b' and 'c' remain
-    $this->assertEquals(2, $this->queue->numberOfItems());
+    $this->assertQueueStats(2, 2, 0, $this->queue);
   }
 
   /**
@@ -205,13 +219,13 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
     ]);
     $this->assertEquals(self::$_recordedValues, []);
-    $this->assertEquals(3, $this->queue->numberOfItems());
+    $this->assertQueueStats(3, 3, 0, $this->queue);
     $result = $runner->runAll();
     $this->assertEquals(1, $result['is_error']);
     // nothing from 'c'
     $this->assertEquals(self::$_recordedValues, ['a']);
     // 'b' and 'c' remain
-    $this->assertEquals(2, $this->queue->numberOfItems());
+    $this->assertQueueStats(2, 2, 0, $this->queue);
   }
 
   /**

@@ -4,8 +4,15 @@
   <base>CRM/Contact</base>
   <class>RelationshipType</class>
   <name>civicrm_relationship_type</name>
+  <labelField>label_a_b</labelField>
   <comment>Relationship types s/b structured with contact_a as the 'subject/child' contact and contact_b as the 'object/parent' contact (e.g. Individual A is Employee of Org B).</comment>
   <add>1.1</add>
+  <paths>
+    <add>civicrm/admin/reltype/edit?action=add&amp;reset=1</add>
+    <view>civicrm/admin/reltype/edit?action=view&amp;id=[id]&amp;reset=1</view>
+    <update>civicrm/admin/reltype/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/reltype/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <log>true</log>
   <field>
     <name>id</name>
@@ -163,6 +170,7 @@
     <comment>Is this relationship type currently active (i.e. can be used when creating or editing relationships)?</comment>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
     <add>1.1</add>
   </field>

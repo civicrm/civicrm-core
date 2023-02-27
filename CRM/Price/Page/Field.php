@@ -232,11 +232,10 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     if ($this->_sid) {
       $usedByDefaults = [
         'civicrm_event' => FALSE,
-        'civicrm_event' => FALSE,
         'civicrm_contribution_page' => FALSE,
       ];
       $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($this->_sid);
-      $this->assign('usedBy', array_merge($usedByDefaults, $usedBy));
+      $this->assign('usedBy', array_intersect_key($usedByDefaults, $usedBy));
       $this->_isSetReserved = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
       $this->assign('isReserved', $this->_isSetReserved);
 

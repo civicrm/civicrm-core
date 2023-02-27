@@ -65,25 +65,18 @@ class CRM_Case_Page_AJAX {
     $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
     $activityParams['case_id'] = $caseId;
     $activityParams['is_auto'] = 0;
-    $activityParams['subject'] = 'Change Case Tags';
+    $activityParams['subject'] = ts('Change Case Tags');
 
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
-
-    $caseParams = [
-      'activity_id' => $activity->id,
-      'case_id' => $caseId,
-    ];
-
-    CRM_Case_BAO_Case::processCaseActivity($caseParams);
 
     echo 'true';
     CRM_Utils_System::civiExit();
   }
 
   /**
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function caseDetails() {
+  public static function caseDetails() {
     $caseId = CRM_Utils_Type::escape($_GET['caseId'], 'Positive');
 
     $case = civicrm_api3('Case', 'getsingle', [
@@ -98,7 +91,7 @@ class CRM_Case_Page_AJAX {
                                   <tr><td>" . ts('Case Type') . "</td><td>{$caseTypes[$case['case_type_id']]}</td></tr>
                                   <tr><td>" . ts('Case Status') . "</td><td>{$caseStatuses[$case['status_id']]}</td></tr>
                                   <tr><td>" . ts('Case Start Date') . "</td><td>" . CRM_Utils_Date::customFormat($case['start_date']) . "</td></tr>
-                                  <tr><td>" . ts('Case End Date') . "</td><td></td></tr>" . CRM_Utils_Date::customFormat($case['end_date']) . "</table>";
+                                  <tr><td>" . ts('Case End Date') . "</td><td>" . (isset($case['end_date']) ? CRM_Utils_Date::customFormat($case['end_date']) : '') . "</td></tr></table>";
 
     if (CRM_Utils_Array::value('snippet', $_GET) == 'json') {
       CRM_Core_Page_AJAX::returnJsonResponse($caseDetails);
@@ -111,7 +104,7 @@ class CRM_Case_Page_AJAX {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function addClient() {
+  public static function addClient() {
     $caseId = CRM_Utils_Type::escape($_POST['caseID'], 'Positive');
     $contactId = CRM_Utils_Type::escape($_POST['contactID'], 'Positive');
 
@@ -138,16 +131,9 @@ class CRM_Case_Page_AJAX {
     $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
     $activityParams['case_id'] = $caseId;
     $activityParams['is_auto'] = 0;
-    $activityParams['subject'] = 'Client Added To Case';
+    $activityParams['subject'] = ts('Client Added To Case');
 
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
-
-    $caseParams = [
-      'activity_id' => $activity->id,
-      'case_id' => $caseId,
-    ];
-
-    CRM_Case_BAO_Case::processCaseActivity($caseParams);
     CRM_Utils_JSON::output(TRUE);
   }
 
@@ -182,6 +168,10 @@ class CRM_Case_Page_AJAX {
     $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
 
     $allCases = !empty($params['all']);
+
+    if ($params['type'] === 'recent' && empty($params['sortBy'])) {
+      $params['sortBy'] = 'date DESC';
+    }
 
     $cases = CRM_Case_BAO_Case::getCases($allCases, $params);
 

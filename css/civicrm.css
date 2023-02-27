@@ -200,6 +200,7 @@ input.crm-form-checkbox + label {
   width: 15em;
 }
 .crm-container .huge,
+input.crm-form-autocomplete,
 input.crm-form-entityref {
   width: 25em;
 }
@@ -832,6 +833,10 @@ input.crm-form-entityref {
   line-height: inherit;
   padding: 0;
   margin: 0;
+}
+
+.crm-container .price-set-option-content .description {
+  font-size: 1em;
 }
 
 .crm-container .form-layout-compressed td.description,
@@ -2780,6 +2785,7 @@ tbody.scrollContent tr.alternateRow {
 }
 
 .crm-container .disabled,
+.crm-container .crm-disabled,
 .crm-container .disabled *,
 .crm-container .cancelled,
 .crm-container .cancelled td,
@@ -3141,6 +3147,7 @@ span.crm-select-item-color {
 }
 
 .crm-container.ui-dialog {
+  background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 .crm-container.ui-dialog.ui-resizable:before {
@@ -3780,7 +3787,6 @@ span.crm-status-icon {
 
 #crm-container.crm-public .price-set-row .crm-price-amount-label {
   color: #444444;
-  font-weight: bold;
 }
 
 #crm-container.crm-public .price-set-row .highlight label {

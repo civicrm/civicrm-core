@@ -129,6 +129,7 @@ input#crm-qsearch-input {
   border: 1px solid #ccc;
   margin: 4px 4px 0;
   padding: 2px 8px;
+  min-height: 0;
   height: calc($menubarHeight - 10px);
   width: 30px;
   transition: width .5s .05s, background-color .3s .05s;

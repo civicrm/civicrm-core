@@ -59,6 +59,9 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
       'Find Contacts' => [
         'civicrm/contact/search?reset=1',
       ],
+      'Find Contributions' => [
+        'civicrm/contribute/search?reset=1',
+      ],
       'Fulltext search' => [
         'civicrm/contact/search/custom?csid=15&reset=1',
       ],

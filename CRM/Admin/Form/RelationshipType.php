@@ -22,6 +22,8 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
   use CRM_Core_Form_EntityFormTrait;
 
+  protected $_BAOName = 'CRM_Contact_BAO_RelationshipType';
+
   /**
    * Fields for the entity to be assigned to the template.
    *

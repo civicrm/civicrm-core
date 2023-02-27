@@ -22,7 +22,7 @@
 
     <tr>
       <td>
-        {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+        {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
         {if $receipt_text}
           <p>{$receipt_text|htmlize}</p>
           <p>{ts}Thank you for this contribution.{/ts}</p>
@@ -87,7 +87,7 @@
                 {foreach from=$lineItem item=value key=priceset}
                   <tr>
                     <td colspan="2" {$valueStyle}>
-                      <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
+                      <table>
                         <tr>
                           <th>{ts}Item{/ts}</th>
                           <th>{ts}Fee{/ts}</th>

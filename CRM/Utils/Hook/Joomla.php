@@ -73,8 +73,11 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
         if (version_compare(JVERSION, '3.0', 'lt')) {
           $app = JCli::getInstance();
         }
-        else {
+        elseif (version_compare(JVERSION, '4.0', 'lt')) {
           $app = JApplicationCli::getInstance();
+        }
+        else {
+          $app = \Joomla\CMS\Factory::getApplication();
         }
       }
 

@@ -181,7 +181,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
     if ($fields) {
       $this->assign('fields', $fields);
-      $addCaptcha = FALSE;
       foreach ($fields as $key => $field) {
         if (isset($field['data_type']) && $field['data_type'] == 'File') {
           // ignore file upload fields
@@ -189,15 +188,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
         }
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE);
         $this->_fields[$key] = $field;
-
-        // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
-        if ($field['add_captcha'] && !$this->_contactID) {
-          $addCaptcha = TRUE;
-        }
-      }
-
-      if ($addCaptcha) {
-        CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
       }
     }
 

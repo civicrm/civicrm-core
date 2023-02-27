@@ -2,8 +2,10 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\Api4\Generic\Traits\SavedSearchInspectorTrait;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\Utils\FormattingUtil;
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Search\Display;
 use CRM_Search_ExtensionUtil as E;
 use Civi\Api4\Query\SqlEquation;
@@ -12,11 +14,12 @@ use Civi\Api4\Query\SqlField;
 use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\Query\SqlFunctionGROUP_CONCAT;
 use Civi\Api4\Utils\CoreUtil;
-use Civi\API\Exception\UnauthorizedException;
 
 /**
  * Return the default results table for a saved search.
  *
+ * @method $this setType(string $type)
+ * @method string getType()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class GetDefault extends \Civi\Api4\Generic\AbstractAction {
@@ -32,20 +35,23 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
   protected $savedSearch;
 
   /**
+   * @var string
+   * @optionsCallback getDisplayTypes
+   */
+  protected $type = 'table';
+
+  /**
    * @var array
    */
   private $_joinMap;
 
   /**
    * @param \Civi\Api4\Generic\Result $result
-   * @throws UnauthorizedException
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
-    // Only administrators can use this in unsecured "preview mode"
-    if (is_array($this->savedSearch) && $this->checkPermissions && !\CRM_Core_Permission::check('administer CiviCRM data')) {
-      throw new UnauthorizedException('Access denied');
-    }
+    // Only SearchKit admins can use this in unsecured "preview mode"
+    $this->checkPermissionToLoadSearch();
     $this->loadSavedSearch();
     $this->expandSelectClauseWildcards();
     // Use label from saved search
@@ -59,39 +65,19 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       'name' => NULL,
       'saved_search_id' => $this->savedSearch['id'] ?? NULL,
       'label' => $label,
-      'type' => 'table',
+      'type' => $this->type ?: 'table',
       'acl_bypass' => FALSE,
-      'settings' => [
-        'actions' => TRUE,
-        'limit' => \Civi::settings()->get('default_pager_size'),
-        'classes' => ['table', 'table-striped'],
-        'pager' => [
-          'show_count' => TRUE,
-          'expose_limit' => TRUE,
-        ],
-        'sort' => [],
-        'columns' => [],
-      ],
+      'settings' => [],
     ];
-    // Supply default sort if no orderBy given in api params
-    if (!empty($this->savedSearch['api_entity']) && empty($this->savedSearch['api_params']['orderBy'])) {
-      $defaultSort = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'order_by');
-      if ($defaultSort) {
-        $display['settings']['sort'][] = [$defaultSort, 'ASC'];
-      }
-    }
-    foreach ($this->getSelectClause() as $key => $clause) {
-      $display['settings']['columns'][] = $this->configureColumn($clause, $key);
-    }
-    $display['settings']['columns'][] = [
-      'label' => '',
-      'type' => 'menu',
-      'icon' => 'fa-bars',
-      'size' => 'btn-xs',
-      'style' => 'secondary-outline',
-      'alignment' => 'text-right',
-      'links' => $this->getLinksMenu(),
-    ];
+
+    // Allow the default display to be modified
+    // @see \Civi\Api4\Event\Subscriber\DefaultDisplaySubscriber
+    \Civi::dispatcher()->dispatch('civi.search.defaultDisplay', GenericHookEvent::create([
+      'savedSearch' => $this->savedSearch,
+      'display' => &$display,
+      'apiAction' => $this,
+    ]));
+
     $fields = $this->entityFields();
     // Allow implicit-join-style selection of saved search fields
     if ($this->savedSearch) {
@@ -106,7 +92,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     $results = [$display];
-    // Replace pseudoconstants
+    // Replace pseudoconstants e.g. type:icon
     FormattingUtil::formatOutputValues($results, $fields);
     $result->exchangeArray($this->selectArray($results));
   }
@@ -116,7 +102,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
    * @param string $key
    * @return array
    */
-  private function configureColumn($clause, $key) {
+  public function configureColumn($clause, $key) {
     $col = [
       'type' => 'field',
       'key' => $key,
@@ -144,7 +130,9 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
     if ($expr instanceof SqlEquation) {
       $args = [];
       foreach ($expr->getArgs() as $arg) {
-        $args[] = $this->getColumnLabel($arg['expr']);
+        if (is_array($arg) && !empty($arg['expr'])) {
+          $args[] = $this->getColumnLabel(SqlExpression::convert($arg['expr']));
+        }
       }
       return '(' . implode(',', array_filter($args)) . ')';
     }
@@ -194,7 +182,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
    */
   private function getColumnLink(&$col, $clause) {
     if ($clause['expr'] instanceof SqlField || $clause['expr'] instanceof SqlFunctionGROUP_CONCAT) {
-      $field = $clause['fields'][0] ?? NULL;
+      $field = \CRM_Utils_Array::first($clause['fields'] ?? []);
       if ($field &&
         CoreUtil::getInfoItem($field['entity'], 'label_field') === $field['name'] &&
         !empty(CoreUtil::getInfoItem($field['entity'], 'paths')['view'])
@@ -216,7 +204,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
   /**
    * return array[]
    */
-  private function getLinksMenu() {
+  public function getLinksMenu() {
     $menu = [];
     $mainEntity = $this->savedSearch['api_entity'] ?? NULL;
     if ($mainEntity && !$this->canAggregate(CoreUtil::getIdFieldName($mainEntity))) {
@@ -258,6 +246,14 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
     }
     $link = Display::getEntityLinks($entity, $entityLabel)[$action] ?? NULL;
     return $link ? $link + ['join' => $joinAlias] : NULL;
+  }
+
+  /**
+   * Options callback for $this->type
+   * @return array
+   */
+  public static function getDisplayTypes(): array {
+    return array_column(\CRM_Core_OptionValue::getValues(['name' => 'search_display_type']), 'value');
   }
 
 }

@@ -122,16 +122,16 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
       $this->addTask('Migrate SMTP password', 'migrateSmtpPasswords');
     }
 
-    $this->addTask('core-issue#365 - Add created_date to civicrm_action_schedule', 'addColumn',
+    $this->addTask('dev/core#365 - Add created_date to civicrm_action_schedule', 'addColumn',
       'civicrm_action_schedule', 'created_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When was the schedule reminder created.'");
 
-    $this->addTask('core-issue#365 - Add modified_date to civicrm_action_schedule', 'addColumn',
+    $this->addTask('dev/core#365 - Add modified_date to civicrm_action_schedule', 'addColumn',
       'civicrm_action_schedule', 'modified_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When was the schedule reminder created.'");
 
-    $this->addTask('core-issue#365 - Add effective_start_date to civicrm_action_schedule', 'addColumn',
+    $this->addTask('dev/core#365 - Add effective_start_date to civicrm_action_schedule', 'addColumn',
       'civicrm_action_schedule', 'effective_start_date', "timestamp NULL COMMENT 'Earliest date to consider start events from.'");
 
-    $this->addTask('core-issue#365 - Add effective_end_date to civicrm_action_schedule', 'addColumn',
+    $this->addTask('dev/core#365 - Add effective_end_date to civicrm_action_schedule', 'addColumn',
       'civicrm_action_schedule', 'effective_end_date', "timestamp NULL COMMENT 'Latest date to consider end events from.'");
 
     $this->addTask('Set defaults and required on financial type boolean fields', 'updateFinancialTypeTable');

@@ -1,9 +1,7 @@
 <?php
 
 require_once 'contributioncancelactions.civix.php';
-// phpcs:disable
-use CRM_Contributioncancelactions_ExtensionUtil as E;
-// phpcs:enable
+
 use Civi\Api4\LineItem;
 use Civi\Api4\Participant;
 
@@ -19,17 +17,14 @@ use Civi\Api4\Participant;
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_post
  *
- * @throws \CiviCRM_API3_Exception
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function contributioncancelactions_civicrm_post($op, $objectName, $objectId, $objectRef) {
-  if ($op === 'edit' && $objectName === 'Contribution') {
-    if (in_array(CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $objectRef->contribution_status_id),
-      ['Cancelled', 'Failed']
-    )) {
-      contributioncancelactions_cancel_related_pending_memberships((int) $objectId);
-      contributioncancelactions_cancel_related_pending_participant_records((int) $objectId);
-    }
+  if ($op === 'edit' && $objectName === 'Contribution'
+    && in_array(CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $objectRef->contribution_status_id), ['Cancelled', 'Failed'], TRUE)
+  ) {
+    contributioncancelactions_cancel_related_pending_memberships((int) $objectId);
+    contributioncancelactions_cancel_related_pending_participant_records((int) $objectId);
   }
 }
 
@@ -37,9 +32,10 @@ function contributioncancelactions_civicrm_post($op, $objectName, $objectId, $ob
  * Find and cancel any pending participant records.
  *
  * @param int $contributionID
- * @throws CiviCRM_API3_Exception
+ *
+ * @throws CRM_Core_Exception
  */
-function contributioncancelactions_cancel_related_pending_participant_records($contributionID): void {
+function contributioncancelactions_cancel_related_pending_participant_records(int $contributionID): void {
   $pendingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'");
   $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
   $cancellableParticipantRecords = civicrm_api3('ParticipantPayment', 'get', [
@@ -59,10 +55,11 @@ function contributioncancelactions_cancel_related_pending_participant_records($c
  * Find and cancel any pending memberships.
  *
  * @param int $contributionID
- * @throws API_Exception
- * @throws CiviCRM_API3_Exception
+ *
+ * @throws CRM_Core_Exception
+ * @throws CRM_Core_Exception
  */
-function contributioncancelactions_cancel_related_pending_memberships($contributionID): void {
+function contributioncancelactions_cancel_related_pending_memberships(int $contributionID): void {
   $connectedMemberships = (array) LineItem::get(FALSE)->setWhere([
     ['contribution_id', '=', $contributionID],
     ['entity_table', '=', 'civicrm_membership'],

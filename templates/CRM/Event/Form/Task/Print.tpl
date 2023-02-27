@@ -43,7 +43,7 @@
         {/if}
         <td class="crm-event-print-event_participant_fee_amount">{$row.participant_fee_amount|crmMoney}</td>
         <td class="crm-event-print-event_date">{$row.event_start_date|truncate:10:''|crmDate}
-          {if $row.event_end_date && $row.event_end_date|date_format:"%Y%m%d" NEQ $row.event_start_date|date_format:"%Y%m%d"}
+          {if $row.event_end_date && $row.event_end_date|crmDate:"%Y%m%d" NEQ $row.event_start_date|crmDate:"%Y%m%d"}
               <br/>- {$row.event_end_date|truncate:10:''|crmDate}
           {/if}
         </td>
@@ -54,7 +54,7 @@
 </table>
 
 <div class="form-item">
-     <span class="element-right">{include file="CRM/common/formButtons.tpl"}</span>
+     <span class="element-right">{include file="CRM/common/formButtons.tpl" location=''}</span>
 </div>
 
 {else}

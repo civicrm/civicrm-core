@@ -123,6 +123,7 @@
     <add>1.6</add>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
   </field>
 </table>

@@ -40,7 +40,7 @@ class CRM_Mailing_Page_Open extends CRM_Core_Page {
       exit();
     }
 
-    CRM_Mailing_Event_BAO_Opened::open($queue_id);
+    CRM_Mailing_Event_BAO_MailingEventOpened::open($queue_id);
 
     $filename = Civi::paths()->getPath('[civicrm.root]/i/tracker.gif');
 

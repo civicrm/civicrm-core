@@ -1,6 +1,6 @@
 <!-- Placeholder table rows shown during ajax loading -->
-<tr ng-repeat="num in [1,2,3,4,5] track by $index">
-  <td ng-if=":: $ctrl.settings.actions || $ctrl.settings.draggable">
+<tr ng-repeat="num in $ctrl.placeholders">
+  <td ng-if=":: $ctrl.hasExtraFirstColumn()">
     <input ng-if=":: $ctrl.settings.actions" type="checkbox" disabled>
   </td>
   <td ng-repeat="col in $ctrl.settings.columns">

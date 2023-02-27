@@ -161,7 +161,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
   /**
    * Process the form submission.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess(): void {
     $params = [
@@ -195,7 +195,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    *
    * @param array $submittedValues
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function submit($submittedValues) {
     // if payment instrument is changed then
@@ -210,7 +210,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
       $newFinancialTrxn = $submittedValues;
       unset($newFinancialTrxn['id']);
-      $newFinancialTrxn['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($submittedValues['payment_instrument_id']);
+      $newFinancialTrxn['to_financial_account_id'] = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($submittedValues['payment_instrument_id']);
       $newFinancialTrxn['total_amount'] = $this->_values['total_amount'];
       $newFinancialTrxn['currency'] = $this->_values['currency'];
       $newFinancialTrxn['contribution_id'] = $this->getContributionID();
@@ -229,7 +229,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    *
    * @param array $params
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSubmit(array $params): void {
     $this->_id = $params['id'];

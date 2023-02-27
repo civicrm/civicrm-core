@@ -41,8 +41,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->_params = $this->get('params');
     $this->_lineItem = $this->get('lineItem');
     $this->_useForMember = $this->get('useForMember');
-    $is_deductible = $this->get('is_deductible');
-    $this->assign('is_deductible', $is_deductible);
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->_values));
     $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->_values));
     $this->assign('thankyou_footer', CRM_Utils_Array::value('thankyou_footer', $this->_values));
@@ -142,15 +140,20 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     //pcp elements
     if ($this->_pcpId) {
       $qParams .= "&amp;pcpId={$this->_pcpId}";
-      $this->assign('pcpBlock', TRUE);
-      foreach ([
-        'pcp_display_in_roll',
-        'pcp_is_anonymous',
-        'pcp_roll_nickname',
-        'pcp_personal_note',
-      ] as $val) {
-        if (!empty($this->_params[$val])) {
-          $this->assign($val, $this->_params[$val]);
+      $this->assign('pcpBlock', FALSE);
+
+      // display honor roll data only if it's enabled for the PCP page
+      if (!empty($this->_pcpInfo['is_honor_roll'])) {
+        $this->assign('pcpBlock', TRUE);
+        foreach ([
+          'pcp_display_in_roll',
+          'pcp_is_anonymous',
+          'pcp_roll_nickname',
+          'pcp_personal_note',
+        ] as $val) {
+          if (!empty($this->_params[$val])) {
+            $this->assign($val, $this->_params[$val]);
+          }
         }
       }
     }
@@ -299,7 +302,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
    * @return bool
    *   Is this a separate membership payment
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL, $isTest = NULL) {
@@ -469,7 +471,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       ]);
       return TRUE;
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       return FALSE;
     }
   }

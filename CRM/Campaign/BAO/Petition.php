@@ -571,7 +571,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
           CRM_Core_BAO_MessageTemplate::sendTemplate(
             [
               'groupName' => 'msg_tpl_workflow_petition',
-              'valueName' => 'petition_sign',
+              'workflow' => 'petition_sign',
               'contactId' => $params['contactId'],
               'tplParams' => $tplParams,
               'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
@@ -588,7 +588,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
       case CRM_Campaign_Form_Petition_Signature::EMAIL_CONFIRM:
         // create mailing event subscription record for this contact
         // this will allow using a hash key to confirm email address by sending a url link
-        $se = CRM_Mailing_Event_BAO_Subscribe::subscribe($group_id,
+        $se = CRM_Mailing_Event_BAO_MailingEventSubscribe::subscribe($group_id,
           $params['email-Primary'],
           $params['contactId'],
           'profile'
@@ -628,7 +628,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
           CRM_Core_BAO_MessageTemplate::sendTemplate(
             [
               'groupName' => 'msg_tpl_workflow_petition',
-              'valueName' => 'petition_confirmation_needed',
+              'workflow' => 'petition_confirmation_needed',
               'contactId' => $params['contactId'],
               'tplParams' => $tplParams,
               'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",

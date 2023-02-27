@@ -17,6 +17,7 @@ use Civi\Api4\Generic\Result;
 /**
  * Refresh managed entities.
  *
+ * @since 5.50
  * @method $this setModules(array $modules) Set modules
  * @method array getModules() Get modules param
  */

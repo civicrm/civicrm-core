@@ -8,8 +8,8 @@ class CRM_OAuth_MailSetup {
    * @see CRM_Utils_Hook::mailSetupActions()
    */
   public static function buildSetupLinks() {
-    $clients = Civi\Api4\OAuthClient::get(0)->addWhere('is_active', '=', 1)->execute();
-    $providers = Civi\Api4\OAuthProvider::get(0)->execute()->indexBy('name');
+    $clients = Civi\Api4\OAuthClient::get(FALSE)->addWhere('is_active', '=', 1)->execute();
+    $providers = Civi\Api4\OAuthProvider::get(FALSE)->execute()->indexBy('name');
 
     $setupActions = [];
     foreach ($clients as $client) {
@@ -68,15 +68,15 @@ class CRM_OAuth_MailSetup {
       return;
     }
 
-    $client = \Civi\Api4\OAuthClient::get(0)->addWhere('id', '=', $token['client_id'])->execute()->single();
-    $provider = \Civi\Api4\OAuthProvider::get(0)->addWhere('name', '=', $client['provider'])->execute()->single();
+    $client = \Civi\Api4\OAuthClient::get(FALSE)->addWhere('id', '=', $token['client_id'])->execute()->single();
+    $provider = \Civi\Api4\OAuthProvider::get(FALSE)->addWhere('name', '=', $client['provider'])->execute()->single();
 
     $vars = ['token' => $token, 'client' => $client, 'provider' => $provider];
     $mailSettings = civicrm_api4('MailSettings', 'create', [
       'values' => self::evalArrayTemplate($provider['mailSettingsTemplate'], $vars),
     ])->single();
 
-    \Civi\Api4\OAuthSysToken::update(0)
+    \Civi\Api4\OAuthSysToken::update(FALSE)
       ->addWhere('id', '=', $token['id'])
       ->setValues(['tag' => 'MailSettings:' . $mailSettings['id']])
       ->execute();
@@ -158,8 +158,8 @@ class CRM_OAuth_MailSetup {
       return;
     }
     // Not certain if 'refresh' will complain about staleness. Doesn't hurt to double-check.
-    if (empty($token['access_token']) || $token['expires'] < CRM_Utils_Time::getTimeRaw()) {
-      throw new \OAuthException("Found invalid token for mail store #" . $mailSettings['id']);
+    if (empty($token['access_token']) || $token['expires'] < CRM_Utils_Time::time()) {
+      throw new \Civi\OAuth\OAuthException("Found invalid token for mail store #" . $mailSettings['id']);
     }
 
     $mailSettings['auth'] = 'XOAuth2';

@@ -15,12 +15,17 @@ namespace Civi\Core\DAO\Event;
  * Class PreDelete
  * @package Civi\Core\DAO\Event
  */
-class PreDelete extends \Symfony\Component\EventDispatcher\Event {
+class PreDelete extends \Civi\Core\Event\GenericHookEvent {
 
   /**
    * @var \CRM_Core_DAO
    */
   public $object;
+
+  /**
+   * @var string
+   */
+  public $eventID;
 
   /**
    * @param $object

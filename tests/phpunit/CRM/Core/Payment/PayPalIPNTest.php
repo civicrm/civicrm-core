@@ -115,9 +115,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    * The scenario is that a pending contribution exists and the first call will
    * update it to completed. The second will create a new contribution.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testIPNPaymentRecurSuccess(): void {
@@ -167,8 +165,6 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    * second contribution.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
    */
   public function testIPNPaymentMembershipRecurSuccess(): void {
     $durationUnit = 'year';

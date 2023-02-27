@@ -16,7 +16,7 @@
 {ts}Refund Details{/ts}
 
 ===============================================================================
-{ts}This Refund Amount{/ts}: {$refundAmount|crmMoney}
+{ts}This Refund Amount{/ts}: {$refundAmount|crmMoney:$currency}
 ------------------------------------------------------------------------------------
 
 {else}
@@ -25,7 +25,7 @@
 {ts}Payment Details{/ts}
 
 ===============================================================================
-{ts}This Payment Amount{/ts}: {$paymentAmount|crmMoney}
+{ts}This Payment Amount{/ts}: {$paymentAmount|crmMoney:$currency}
 ------------------------------------------------------------------------------------
 {/if}
 {if $receive_date}
@@ -47,13 +47,13 @@
 
 ===============================================================================
 {if $totalAmount}
-{ts}Total Fee{/ts}: {$totalAmount|crmMoney}
+{ts}Total Fee{/ts}: {$totalAmount|crmMoney:$currency}
 {/if}
 {if $totalPaid}
-{ts}Total Paid{/ts}: {$totalPaid|crmMoney}
+{ts}Total Paid{/ts}: {$totalPaid|crmMoney:$currency}
 {/if}
 {if $amountOwed}
-{ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
+{ts}Balance Owed{/ts}: {$amountOwed|crmMoney:$currency} {* This will be zero after final payment. *}
 {/if}
 
 
@@ -90,7 +90,7 @@
 ===============================================================================
 
 {$event.event_title}
-{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
 
 {if !empty($event.participant_role)}
 {ts}Participant Role{/ts}: {$event.participant_role}

@@ -6,6 +6,11 @@
  */
 class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    $this->useTransaction();
+    parent::setUp();
+  }
+
   public function testRow_twice() {
     $insert = CRM_Utils_SQL_Insert::into('foo')
       ->row(['first' => '1', 'second' => '2'])

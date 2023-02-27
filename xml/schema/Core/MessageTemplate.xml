@@ -6,6 +6,12 @@
   <name>civicrm_msg_template</name>
   <comment>Users will need a way to save and retrieve templates with tokens for use in recurring email communication tasks</comment>
   <add>1.6</add>
+  <paths>
+    <add>civicrm/admin/messageTemplates/add?action=add&amp;reset=1</add>
+    <view>civicrm/admin/messageTemplates/add?action=view&amp;id=[id]&amp;reset=1</view>
+    <update>civicrm/admin/messageTemplates/add?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/messageTemplates?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Message Template ID</title>
@@ -27,6 +33,9 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Descriptive title of message</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>1.6</add>
   </field>
   <field>
@@ -34,6 +43,9 @@
     <title>Message Template Subject</title>
     <type>text</type>
     <comment>Subject for email message.</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>1.6</add>
     <!-- type changed from VARCHAR(255) to TEXT in 3.1 -->
   </field>
@@ -69,6 +81,10 @@
     <type>boolean</type>
     <default>1</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>1.6</add>
   </field>
   <field>
@@ -91,6 +107,10 @@
     <type>boolean</type>
     <default>1</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <comment>is this the default message template for the workflow referenced by workflow_id?</comment>
     <add>3.1</add>
   </field>

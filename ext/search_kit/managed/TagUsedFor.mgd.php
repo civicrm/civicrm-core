@@ -1,15 +1,25 @@
 <?php
-// Adds option group for SearchDisplay.type
+use CRM_Search_ExtensionUtil as E;
 
+// Adds option value to `tag_used_for`, allowing Saved Searches to be tagged
 return [
   [
     'name' => 'SavedSearch:tag_used_for',
     'entity' => 'OptionValue',
+    'cleanup' => 'always',
+    'update' => 'always',
     'params' => [
-      'option_group_id' => 'tag_used_for',
-      'value' => 'civicrm_saved_search',
-      'name' => 'SavedSearch',
-      'label' => ts('Saved Searches'),
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'tag_used_for',
+        'value' => 'civicrm_saved_search',
+        'name' => 'SavedSearch',
+        'label' => E::ts('Saved Searches'),
+        'is_reserved' => FALSE,
+        'is_active' => TRUE,
+        'domain_id' => NULL,
+      ],
+      'match' => ['option_group_id', 'name'],
     ],
   ],
 ];

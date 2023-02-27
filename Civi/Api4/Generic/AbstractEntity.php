@@ -154,23 +154,35 @@ abstract class AbstractEntity {
       $info['label_field'] = $dao::$_labelField;
       $info['dao'] = $dao;
       $info['table_name'] = $dao::$_tableName;
+      $info['icon_field'] = (array) ($dao::fields()['icon']['name'] ?? NULL);
     }
     foreach (ReflectionUtils::getTraits(static::class) as $trait) {
       $info['type'][] = self::stripNamespace($trait);
     }
+    // Get DocBlock from APIv4 Entity class
     $reflection = new \ReflectionClass(static::class);
-    $info = array_merge($info, ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]));
+    $docBlock = ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]);
+    // Convert docblock keys to snake_case
+    foreach ($docBlock as $key => $val) {
+      $docBlock[\CRM_Utils_String::convertStringToSnakeCase($key)] = $val;
+    }
+    // Filter docblock to only declared entity fields
+    foreach (\Civi\Api4\Entity::$entityFields as $field) {
+      if (isset($docBlock[$field['name']])) {
+        $val = $docBlock[$field['name']];
+        // Convert to array if data_type == Array
+        if (isset($field['data_type']) && $field['data_type'] === 'Array' && is_string($val)) {
+          $val = \CRM_Core_DAO::unSerializeField($val, \CRM_Core_DAO::SERIALIZE_COMMA);
+        }
+        $info[$field['name']] = $val;
+      }
+    }
+
     if ($dao) {
       $info['description'] = $dao::getEntityDescription() ?? $info['description'] ?? NULL;
     }
-    unset($info['package'], $info['method']);
 
-    // Ensure all keys are snake_case
-    $keys = array_keys($info);
-    foreach ($keys as &$key) {
-      $key = \CRM_Utils_String::convertStringToSnakeCase($key);
-    }
-    return array_combine($keys, array_values($info));
+    return $info;
   }
 
   /**

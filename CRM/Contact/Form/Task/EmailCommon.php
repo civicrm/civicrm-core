@@ -28,7 +28,7 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @param CRM_Core_Form $form
    * @param bool $bounce determine if we want to throw a status bounce.
    *
-   * @throws \API_Exception|\CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function preProcessFromAddress(&$form, $bounce = TRUE) {
     $form->_emails = [];

@@ -200,7 +200,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
    *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
    */
-  public function getCiviSourceStorage() {
+  public function getCiviSourceStorage():array {
     global $civicrm_root;
 
     // Don't use $config->userFrameworkBaseURL; it has garbage on it.
@@ -286,14 +286,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if ($region) {
       echo $region->render('');
     }
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function mapConfigToSSL() {
-    global $base_url;
-    $base_url = str_replace('http://', 'https://', $base_url);
   }
 
   /**
@@ -542,6 +534,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+    /* Before we do any loading, let's start the session and write to it.
+     * We typically call authenticate only when we need to bootstrap the CMS
+     * directly via Civi and hence bypass the normal CMS auth and bootstrap
+     * process typically done in CLI and cron scripts. See: CRM-12648
+     */
+    $session = CRM_Core_Session::singleton();
+    $session->set('civicrmInitSession', TRUE);
+
     $config = CRM_Core_Config::singleton();
 
     if ($loadCMSBootstrap) {
@@ -581,15 +581,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function loadUser($user) {
     $userdata = get_user_by('login', $user);
-    if (!$userdata->data->ID) {
+    if (empty($userdata->ID)) {
       return FALSE;
     }
 
-    $uid = $userdata->data->ID;
+    $uid = $userdata->ID;
     wp_set_current_user($uid);
     $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
 
-    // lets store contact id and user id in session
+    // Lets store contact id and user id in session.
     $session = CRM_Core_Session::singleton();
     $session->set('ufID', $uid);
     $session->set('userID', $contactID);
@@ -616,10 +616,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getUfId($username) {
     $userdata = get_user_by('login', $username);
-    if (!$userdata->data->ID) {
+    if (empty($userdata->ID)) {
       return NULL;
     }
-    return $userdata->data->ID;
+    return $userdata->ID;
   }
 
   /**
@@ -873,6 +873,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       'role' => get_option('default_role'),
     ];
 
+    // The notify parameter was ignored on WordPress and default behaviour was to always notify.
+    // Preserve that behaviour but allow the "notify" parameter to be used.
+    if (!isset($params['notify'])) {
+      $params['notify'] = TRUE;
+    }
+
     // If there's a password add it, otherwise generate one.
     if (!empty($params['cms_pass'])) {
       $user_data['user_pass'] = $params['cms_pass'];
@@ -931,8 +937,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       wp_signon($creds, FALSE);
     }
 
-    // Fire the new user action. Sends notification email by default.
-    do_action('register_new_user', $uid);
+    if ($params['notify']) {
+      // Fire the new user action. Sends notification email by default.
+      do_action('register_new_user', $uid);
+    }
 
     // Restore the CiviCRM-WordPress listeners.
     $this->hooks_core_add();
@@ -964,17 +972,32 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param array $params
-   * @param array $errors
-   * @param string $emailName
+   * @inheritdoc
+   */
+  public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
+    $emailName = '';
+
+    if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
+      // this is a transaction related page
+      $emailName = 'email-' . $form->_bltID;
+    }
+    else {
+      // find the email field in a profile page
+      foreach ($fields as $name => $dontCare) {
+        if (substr($name, 0, 5) == 'email') {
+          $emailName = $name;
+          break;
+        }
+      }
+    }
+
+    return $emailName;
+  }
+
+  /**
+   * @inheritdoc
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
-    $config = CRM_Core_Config::singleton();
-
-    $dao = new CRM_Core_DAO();
-    $name = $dao->escape(CRM_Utils_Array::value('name', $params));
-    $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
-
     if (!empty($params['name'])) {
       if (!validate_username($params['name'])) {
         $errors['cms_name'] = ts("Your username contains invalid characters");
@@ -1269,6 +1292,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * Get role names
+   *
+   * @return array
+   */
+  public function getRoleNames() {
+    return wp_roles()->role_names;
+  }
+
+  /**
    * Perform any necessary actions prior to redirecting via POST.
    *
    * Redirecting via POST means that cookies need to be sent with SameSite=None.
@@ -1491,6 +1523,153 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
 
     return apply_filters('civicrm_exit_after_fatal', $ret);
+  }
+
+  /**
+   * Make sure clean URLs are properly set in settings file.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkCleanurls() {
+    $config = CRM_Core_Config::singleton();
+    $clean = 0;
+    if (defined('CIVICRM_CLEANURL')) {
+      $clean = CIVICRM_CLEANURL;
+    }
+    if ($clean == 1) {
+      //cleanURLs are enabled in CiviCRM, let's make sure the wordpress permalink settings and cache are actually correct by checking the first active contribution page
+      $contributionPages = !CRM_Core_Component::isEnabled('CiviContribute') ? [] : \Civi\Api4\ContributionPage::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('is_active', '=', TRUE)
+        ->setLimit(1)
+        ->execute();
+      if (count($contributionPages) > 0) {
+        $activePageId = $contributionPages[0]['id'];
+        $message = self::checkCleanPage('/contribute/transact/?reset=1&id=', $activePageId, $config);
+
+        return $message;
+      }
+      else {
+        //no active contribution pages, we can check an event page. This probably won't ever happen.
+        $eventPages = !CRM_Core_Component::isEnabled('CiviEvent') ? [] : \Civi\Api4\Event::get(FALSE)
+          ->addSelect('id')
+          ->addWhere('is_active', '=', TRUE)
+          ->setLimit(1)
+          ->execute();
+        if (count($eventPages) > 0) {
+          $activePageId = $eventPages[0]['id'];
+          $message = self::checkCleanPage('/event/info/?reset=1&id=', $activePageId, $config);
+
+          return $message;
+        }
+        else {
+          //If there are no active event or contribution pages, we'll skip this check for now.
+
+          return [];
+        }
+      }
+    }
+    else {
+      //cleanURLs aren't enabled or aren't defined correctly in CiviCRM, admin should check civicrm.settings.php
+      $warning = ts('Clean URLs are not enabled correctly in CiviCRM. This can lead to "valid id" errors for users registering for events or making donations. Check civicrm.settings.php and review <a %1>the documentation</a> for more information.', [1 => 'href="' . CRM_Utils_System::docURL2('sysadmin/integration/wordpress/clean-urls/', TRUE) . '"']);
+
+      return [
+        new CRM_Utils_Check_Message(
+          __FUNCTION__,
+          $warning,
+          ts('Clean URLs Not Enabled'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-wordpress'
+        ),
+      ];
+    }
+  }
+
+  private static function checkCleanPage($slug, $id, $config) {
+    $page = $config->userFrameworkBaseURL . $config->wpBasePage . $slug . $id;
+    try {
+      $client = new \GuzzleHttp\Client();
+      $res = $client->head($page, ['http_errors' => FALSE]);
+      $httpCode = $res->getStatusCode();
+    }
+    catch (Exception $e) {
+      Civi::log()->error("Could not run " . __FUNCTION__ . " on $page. GuzzleHttp\Client returned " . $e->getMessage());
+
+      return [
+        new CRM_Utils_Check_Message(
+          __FUNCTION__,
+          ts('Could not load a clean page to check'),
+          ts('Guzzle client error'),
+          \Psr\Log\LogLevel::ERROR,
+          'fa-wordpress'
+        ),
+      ];
+    }
+
+    if ($httpCode == 404) {
+      $warning = ts('<a %1>Click here to go to Settings > Permalinks, then click "Save" to refresh the cache.</a>', [1 => 'href="' . get_admin_url(NULL, 'options-permalink.php') . '"']);
+      $message = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        $warning,
+        ts('Wordpress Permalinks cache needs to be refreshed.'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-wordpress'
+      );
+
+      return [$message];
+    }
+
+    //sanity
+    return [];
+
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function canSetBasePage():bool {
+    return TRUE;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    if (!$print) {
+      if (!function_exists('is_admin')) {
+        throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
+      }
+      if (!defined('ABSPATH')) {
+        throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
+      }
+      if (is_admin()) {
+        require_once ABSPATH . 'wp-admin/admin-header.php';
+      }
+      else {
+        // FIXME: we need to figure out to replace civicrm content on the frontend pages
+      }
+    }
+
+    print $content;
+    return NULL;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getContactDetailsFromUser($uf_match):array {
+    $contactParameters = [];
+
+    $user = $uf_match['user'];
+    $contactParameters['email'] = $user->user_email;
+    if ($user->first_name) {
+      $contactParameters['first_name'] = $user->first_name;
+    }
+    if ($user->last_name) {
+      $contactParameters['last_name'] = $user->last_name;
+    }
+
+    return $contactParameters;
   }
 
 }

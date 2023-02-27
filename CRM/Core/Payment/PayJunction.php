@@ -41,7 +41,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * This function sends request and receives response from
    * PayJunction payment process
    *
-   * @param array|PropertyBag $params
+   * @param array|\Civi\Payment\PropertyBag $params
    *
    * @param string $component
    *

@@ -21,6 +21,7 @@ use Civi\Api4\UserJob;
  *
  * @package CiviCRM
  * @group headless
+ * @group import
  */
 class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
 
@@ -41,7 +42,8 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     $this->callAPISuccess('Mapping', 'create', ['name' => 'Well dressed ducks', 'mapping_type_id' => 'Import Contact']);
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource');
     $form->buildQuickForm();
-    $this->assertEquals([1 => 'Well dressed ducks'], CRM_Core_Smarty::singleton()->get_template_vars('savedMapping'));
+    $element = $form->getElement('savedMapping');
+    $this->assertEquals('Well dressed ducks', $element->_options[1]['text']);
   }
 
   /**
@@ -50,9 +52,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
    * This test mimics a scenario where the form is submitted more than once
    * and the user_job is updated to reflect the new data source.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testDataSources(): void {
     $this->createLoggedInUser();
@@ -61,7 +61,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     $sqlFormValues = [
       'dataSource' => 'CRM_Import_DataSource_SQL',
       'sqlQuery' => 'SELECT "bob" as first_name FROM civicrm_option_value LIMIT 5',
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
     ];
     $form = $this->submitDataSourceForm($sqlFormValues);
     $userJobID = $form->getUserJobID();
@@ -88,7 +88,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     $csvFormValues = [
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'skipColumnHeader' => 1,
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
       'uploadFile' => [
         'name' => __DIR__ . '/data/yogi.csv',
         'type' => 'text/csv',
@@ -121,7 +121,6 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
    * @param array $sqlFormValues
    *
    * @return CRM_Contact_Import_Form_DataSource
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   private function submitDataSourceForm(array $sqlFormValues): CRM_Contact_Import_Form_DataSource {

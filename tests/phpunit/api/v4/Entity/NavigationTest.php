@@ -18,14 +18,14 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Navigation;
 use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class NavigationTest extends UnitTestCase implements TransactionalInterface {
+class NavigationTest extends Api4TestBase implements TransactionalInterface {
 
   public function testCreate() {
     $created = Navigation::create(FALSE)

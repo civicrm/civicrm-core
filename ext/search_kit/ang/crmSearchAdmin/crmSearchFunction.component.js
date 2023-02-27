@@ -45,11 +45,20 @@
       });
 
       this.addArg = function(exprType) {
-        var param = ctrl.getParam(ctrl.args.length);
+        var param = ctrl.getParam(ctrl.args.length),
+          val = '';
+        if (exprType === 'SqlNumber') {
+          // Number: default to 0
+          val = 0;
+        } else if (exprType === 'SqlField') {
+          // Field: Default to first available field, making it easier to delete the value
+          val = ctrl.getFields().results[0].children[0].id;
+        }
         ctrl.args.push({
           type: ctrl.exprTypes[exprType].type,
-          flag_before: _.keys(param.flag_before)[0],
-          value: exprType === 'SqlNumber' ? 0 : ''
+          flag_before: _.filter(_.keys(param.flag_before))[0],
+          name: param.name,
+          value: val
         });
       };
 
@@ -62,7 +71,7 @@
           while (
             (ctrl.args.length - index < param.min_expr) &&
             // TODO: Handle named params like "ORDER BY"
-            !param.name &&
+            !(param.name && param.optional) &&
             (!param.optional || param.must_be.length === 1)
           ) {
             ctrl.addArg(param.must_be[0]);
@@ -71,7 +80,9 @@
       }
 
       this.getParam = function(index) {
-        return ctrl.fn.params[index] || _.last(ctrl.fn.params);
+        if (ctrl.fn) {
+          return ctrl.fn.params[index] || _.last(ctrl.fn.params);
+        }
       };
 
       this.canAddArg = function() {
@@ -80,8 +91,8 @@
         }
         var param = ctrl.getParam(ctrl.args.length),
           index = ctrl.fn.params.indexOf(param);
-        // TODO: Handle named params like "ORDER BY"
-        if (param.name) {
+        // TODO: Handle optional named params like "ORDER BY"
+        if (param.name && param.optional) {
           return false;
         }
         return ctrl.args.length - index < param.max_expr;
@@ -91,7 +102,7 @@
       this.getFunctions = function() {
         var allowedTypes = [], functions = [];
         if (ctrl.expr && ctrl.fieldArg) {
-          if (ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
+          if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
           } else {
             allowedTypes.push('comparison', 'string');
@@ -123,20 +134,25 @@
 
       this.selectFunction = function() {
         ctrl.fn = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fnName});
-        delete ctrl.fieldArg.flag_before;
         ctrl.args = [ctrl.fieldArg];
         if (ctrl.fn) {
           var exprType,
             pos = 0;
           // Add non-field args to the beginning if needed
           while (!_.includes(ctrl.fn.params[pos].must_be, 'SqlField')) {
-            exprType = ctrl.fn.params[pos].must_be[0];
+            exprType = _.first(ctrl.fn.params[pos].must_be);
             ctrl.args.splice(pos, 0, {
-              type: ctrl.exprTypes[exprType].type,
+              type: exprType ? ctrl.exprTypes[exprType].type : null,
+              flag_before: _.filter(_.keys(ctrl.fn.params[pos].flag_before))[0],
+              name: ctrl.fn.params[pos].name,
               value: exprType === 'SqlNumber' ? 0 : ''
             });
             ++pos;
           }
+          // Update fieldArg
+          var fieldParam = ctrl.fn.params[pos];
+          ctrl.fieldArg.flag_before = _.keys(fieldParam.flag_before)[0];
+          ctrl.fieldArg.name = fieldParam.name;
           initFunction();
         }
         ctrl.writeExpr();
@@ -160,8 +176,8 @@
       this.writeExpr = function() {
         if (ctrl.fnName) {
           var args = _.transform(ctrl.args, function(args, arg, index) {
-            if (arg.value) {
-              var prefix = arg.flag_before ? (index ? ' ' : '') + arg.flag_before + ' ' : (index ? ', ' : '');
+            if (arg.value || arg.flag_before) {
+              var prefix = arg.flag_before || arg.name ? (index ? ' ' : '') + (arg.flag_before || arg.name) + (arg.value ? ' ' : '') : (index ? ', ' : '');
               args.push(prefix + (arg.type === 'string' ? JSON.stringify(arg.value) : arg.value));
             }
           });

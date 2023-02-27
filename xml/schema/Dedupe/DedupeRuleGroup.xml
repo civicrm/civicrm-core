@@ -67,10 +67,16 @@
     <name>name</name>
     <title>Name</title>
     <type>varchar</type>
-    <length>64</length>
-    <comment>Name of the rule group</comment>
+    <length>255</length>
+    <comment>Unique name of rule group</comment>
     <add>2.1</add>
   </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>5.54</add>
+  </index>
   <field>
     <name>title</name>
     <title>Title</title>

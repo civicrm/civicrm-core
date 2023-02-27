@@ -84,15 +84,15 @@ $infoXmls = findCoreInfoXml();
 foreach ($infoXmls as $infoXml) {
   updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion) {
     // Update extension version
+    /** @var \DOMNode $tag */
     foreach ($dom->getElementsByTagName('version') as $tag) {
-      /* @var \DOMNode $tag */
       $tag->textContent = $newVersion;
     }
     // Update compatability - set to major version of core
+    /** @var \DOMNode $compat */
     foreach ($dom->getElementsByTagName('compatibility') as $compat) {
-      /* @var \DOMNode $compat */
+      /** @var \DOMNode $tag */
       foreach ($compat->getElementsByTagName('ver') as $tag) {
-        /* @var \DOMNode $tag */
         $tag->textContent = implode('.', array_slice(explode('.', $newVersion), 0, 2));
       }
     }

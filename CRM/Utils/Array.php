@@ -580,6 +580,10 @@ class CRM_Utils_Array {
       $collator = new Collator($lcMessages . '.utf8');
       $collator->asort($array);
     }
+    elseif (version_compare(PHP_VERSION, '8', '<') && class_exists('Collator')) {
+      $collator = new Collator('en_US.utf8');
+      $collator->asort($array);
+    }
     else {
       // This calls PHP's built-in asort().
       asort($array);
@@ -1077,6 +1081,9 @@ class CRM_Utils_Array {
    * @return bool
    */
   public static function pathIsset($values, $path) {
+    if ($path === []) {
+      return ($values !== NULL);
+    }
     foreach ($path as $key) {
       if (!is_array($values) || !isset($values[$key])) {
         return FALSE;
@@ -1100,6 +1107,11 @@ class CRM_Utils_Array {
    *   TRUE if anything has been removed. FALSE if no changes were required.
    */
   public static function pathUnset(&$values, $path, $cleanup = FALSE) {
+    if (count($path) === 0) {
+      $values = NULL;
+      return TRUE;
+    }
+
     if (count($path) === 1) {
       if (isset($values[$path[0]])) {
         unset($values[$path[0]]);
@@ -1131,6 +1143,10 @@ class CRM_Utils_Array {
    *   Ex: 456.
    */
   public static function pathSet(&$values, $pathParts, $value) {
+    if ($pathParts === []) {
+      $values = $value;
+      return;
+    }
     $r = &$values;
     $last = array_pop($pathParts);
     foreach ($pathParts as $part) {
@@ -1197,6 +1213,35 @@ class CRM_Utils_Array {
       static::pathSet($params, $canonPath, $filter ? $filter($v, FALSE) : $v);
       return;
     }
+  }
+
+  /**
+   * Take one well-defined item out of a single-item list.
+   *
+   * Assert that the list genuinely contains *exactly* one item.
+   *
+   * @param iterable $items
+   * @param string $recordTypeLabel
+   * @return mixed
+   *   The first (and only) item from the $items list.
+   * @throws \CRM_Core_Exception
+   */
+  public static function single(iterable $items, string $recordTypeLabel = 'record') {
+    $result = NULL;
+    foreach ($items as $values) {
+      if ($result === NULL) {
+        $result = $values;
+      }
+      else {
+        throw new \CRM_Core_Exception("Expected to find one {$recordTypeLabel}, but there were multiple.");
+      }
+    }
+
+    if ($result === NULL) {
+      throw new \CRM_Core_Exception("Expected to find one {$recordTypeLabel}, but there were zero.");
+    }
+
+    return $result;
   }
 
   /**
@@ -1343,12 +1388,29 @@ class CRM_Utils_Array {
    * @param string $prefix
    * @return array
    */
-  public static function prefixKeys(array $collection, string $prefix) {
+  public static function prefixKeys(array $collection, string $prefix): array {
     $result = [];
     foreach ($collection as $key => $value) {
       $result[$prefix . $key] = $value;
     }
     return $result;
+  }
+
+  /**
+   * Removes all items from an array whose keys have a given prefix, and returns them unprefixed.
+   *
+   * @param array $collection
+   * @param string $prefix
+   */
+  public static function filterByPrefix(array &$collection, string $prefix): array {
+    $filtered = [];
+    foreach (array_keys($collection) as $key) {
+      if (!$prefix || strpos($key, $prefix) === 0) {
+        $filtered[substr($key, strlen($prefix))] = $collection[$key];
+        unset($collection[$key]);
+      }
+    }
+    return $filtered;
   }
 
 }

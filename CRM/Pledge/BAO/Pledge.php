@@ -472,12 +472,11 @@ GROUP BY  currency
    * @param array $params
    *   An assoc array of name/value pairs.
    */
-  public static function sendAcknowledgment(&$form, $params) {
+  public static function sendAcknowledgment($form, $params) {
     //handle Acknowledgment.
     $allPayments = $payments = [];
 
     // get All Payments status types.
-    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $returnProperties = [
       'status_id',
       'scheduled_amount',
@@ -508,14 +507,6 @@ GROUP BY  currency
             'status' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
           ]
         );
-
-        // get the first valid payment id.
-        if (!isset($form->paymentId) && ($paymentStatusTypes[$values['status_id']] == 'Pending' ||
-            $paymentStatusTypes[$values['status_id']] == 'Overdue'
-          )
-        ) {
-          $form->paymentId = $values['id'];
-        }
       }
     }
 
@@ -595,7 +586,7 @@ GROUP BY  currency
     [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'groupName' => 'msg_tpl_workflow_pledge',
-        'valueName' => 'pledge_acknowledge',
+        'workflow' => 'pledge_acknowledge',
         'contactId' => $params['contact_id'],
         'from' => $receiptFrom,
         'toName' => $pledgerDisplayName,
@@ -772,22 +763,22 @@ GROUP BY  currency
    * @param array $params
    *
    * @return array
-   * @throws \API_Exception
+   *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public static function updatePledgeStatus($params): array {
+  public static function updatePledgeStatus(array $params): array {
 
     $returnMessages = [];
 
-    $sendReminders = CRM_Utils_Array::value('send_reminders', $params, FALSE);
+    $sendReminders = $params['send_reminders'] ?? FALSE;
 
-    $allStatus = array_flip(CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
-    $allPledgeStatus = CRM_Core_OptionGroup::values('pledge_status',
-      TRUE, FALSE, FALSE, NULL, 'name', TRUE
-    );
+    $allStatus = array_flip(CRM_Pledge_BAO_PledgePayment::buildOptions('status_id', 'validate'));
+    // We are left with 'Pending' & 'Overdue' - ie. payment required - should we just filter in the ones we want?
+    unset($allStatus['Completed'], $allStatus['Cancelled']);
+
+    $allPledgeStatus = array_flip(CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate'));
+    // We are left with 'Pending' & 'Overdue', 'In Progress'
     unset($allPledgeStatus['Completed'], $allPledgeStatus['Cancelled']);
-    unset($allStatus['Completed'], $allStatus['Cancelled'], $allStatus['Failed']);
 
     $statusIds = implode(',', $allStatus);
     $pledgeStatusIds = implode(',', $allPledgeStatus);
@@ -874,19 +865,13 @@ SELECT  pledge.contact_id              as contact_id,
       );
       if ($newStatus != $pledgeStatus[$pledgeId]) {
         $returnMessages[] = "- status updated to: {$allPledgeStatus[$newStatus]}";
-        $updateCnt += 1;
+        ++$updateCnt;
       }
     }
 
     if ($sendReminders) {
-      // retrieve domain tokens
-      $tokens = [
-        'domain' => ['name', 'phone', 'address', 'email'],
-        'contact' => CRM_Core_SelectValues::contactTokens(),
-      ];
 
       // retrieve contact tokens
-
       // this function does NOT return Deceased contacts since we don't want to send them email
       $contactDetails = civicrm_api3('Contact', 'get', [
         'is_deceased' => 0,
@@ -961,7 +946,7 @@ SELECT  pledge.contact_id              as contact_id,
             ] = CRM_Core_BAO_MessageTemplate::sendTemplate(
               [
                 'groupName' => 'msg_tpl_workflow_pledge',
-                'valueName' => 'pledge_reminder',
+                'workflow' => 'pledge_reminder',
                 'contactId' => $contactId,
                 'from' => $receiptFrom,
                 'toName' => $pledgerName,
@@ -990,9 +975,8 @@ SELECT  pledge.contact_id              as contact_id,
               try {
                 civicrm_api3('activity', 'create', $activityParams);
               }
-              catch (CiviCRM_API3_Exception $e) {
-                $returnMessages[] = "Failed creating Activity for Pledge Reminder: " . $e->getMessage();
-                return ['is_error' => 1, 'message' => $returnMessages];
+              catch (CRM_Core_Exception $e) {
+                throw new CRM_Core_Exception('Failed creating Activity for Pledge Reminder: ' . $e->getMessage());
               }
               $returnMessages[] = "Payment reminder sent to: {$pledgerName} - {$toEmail}";
             }
@@ -1004,7 +988,7 @@ SELECT  pledge.contact_id              as contact_id,
     // end if ( $sendReminders )
     $returnMessages[] = "{$updateCnt} records updated.";
 
-    return ['is_error' => 0, 'messages' => implode("\n\r", $returnMessages)];
+    return $returnMessages;
   }
 
   /**

@@ -66,6 +66,11 @@
      <weight>20</weight>
   </item>
   <item>
+    <path>civicrm/admin/uf/group/preview</path>
+    <title>Preview</title>
+    <page_callback>CRM_UF_Form_Preview</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/uf/group/field</path>
      <title>CiviCRM Profile Fields</title>
      <page_callback>CRM_UF_Page_Field</page_callback>
@@ -119,11 +124,21 @@
      <weight>35</weight>
   </item>
   <item>
+     <path>civicrm/admin/reltype/edit</path>
+     <title>Edit Relationship Type</title>
+     <page_callback>CRM_Admin_Form_RelationshipType</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/subtype</path>
      <title>Contact Types</title>
      <page_callback>CRM_Admin_Page_ContactType</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <weight>40</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/options/subtype/edit</path>
+     <title>Edit Contact Type</title>
+     <page_callback>CRM_Admin_Form_ContactType</page_callback>
   </item>
   <item>
      <path>civicrm/admin/options/gender</path>
@@ -156,6 +171,11 @@
      <page_callback>CRM_Admin_Page_LocationType</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <weight>60</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/locationType/edit</path>
+     <title>Edit Location Type</title>
+     <page_callback>CRM_Admin_Form_LocationType</page_callback>
   </item>
   <item>
      <path>civicrm/admin/options/website_type</path>
@@ -441,6 +461,10 @@
      <access_arguments>administer payment processors</access_arguments>
   </item>
   <item>
+     <path>civicrm/admin/paymentProcessor/edit</path>
+     <page_callback>CRM_Admin_Form_PaymentProcessor</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/setting/mapping</path>
      <title>Mapping and Geocoding</title>
      <page_callback>CRM_Admin_Form_Setting_Mapping</page_callback>
@@ -575,7 +599,7 @@
   <item>
      <path>civicrm/admin/options/grant_type</path>
      <title>Grant Types</title>
-     <desc>List of types which can be assigned to Grants. (Enable CiviGrant from Administer > Systme Settings > Enable Components if you want to track grants.)</desc>
+     <desc>List of types which can be assigned to Grants. (Enable CiviGrant from Administer > System Settings > Enable Components if you want to track grants.)</desc>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Option Lists</adminGroup>
      <weight>385</weight>

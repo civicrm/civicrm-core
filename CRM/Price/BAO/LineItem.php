@@ -28,7 +28,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    *
    * @return CRM_Price_BAO_LineItem
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Exception
    */
   public static function create(&$params) {
@@ -302,9 +302,10 @@ WHERE li.contribution_id = %1";
     }
 
     foreach ($params["price_{$fid}"] as $oid => $qty) {
-      $price = $amount_override === NULL ? $options[$oid]['amount'] : $amount_override;
+      $qty = (float) $qty;
+      $price = (float) ($amount_override === NULL ? $options[$oid]['amount'] : $amount_override);
 
-      $participantsPerField = CRM_Utils_Array::value('count', $options[$oid], 0);
+      $participantsPerField = (int) CRM_Utils_Array::value('count', $options[$oid], 0);
 
       $values[$oid] = [
         'price_field_id' => $fid,
@@ -372,7 +373,6 @@ WHERE li.contribution_id = %1";
    * @param bool $update
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function processPriceSet($entityId, $lineItems, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
     if (!$entityId || !is_array($lineItems)
@@ -614,7 +614,7 @@ WHERE li.contribution_id = %1";
    * @param $feeBlock
    * @param array $lineItems
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function changeFeeSelections(
     $params,
@@ -1120,7 +1120,7 @@ WHERE li.contribution_id = %1";
         ],
       ]);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       return [];
     }
 

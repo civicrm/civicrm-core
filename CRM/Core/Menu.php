@@ -627,7 +627,7 @@ UNION (
 
     $elements = explode(',', $pathArgs);
     foreach ($elements as $keyVal) {
-      list($key, $val) = explode('=', $keyVal, 2);
+      [$key, $val] = explode('=', $keyVal, 2);
       $arr[$key] = $val;
     }
 

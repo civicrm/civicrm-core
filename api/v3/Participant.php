@@ -24,7 +24,6 @@
  * @return array
  *   API result array
  *
- * @throws \CiviCRM_API3_Exception
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_participant_create($params) {
@@ -58,7 +57,7 @@ function civicrm_api3_participant_create($params) {
  * @param array $params
  * @param CRM_Event_BAO_Participant $participant
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_participant_createlineitem(&$params, $participant) {
   // it is possible that a fee level contains information about multiple

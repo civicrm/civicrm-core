@@ -40,7 +40,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    *   Classname of BAO.
    */
   public function getBAOName() {
-    return 'CRM_Financial_BAO_FinancialTypeAccount';
+    return 'CRM_Financial_BAO_EntityFinancialAccount';
   }
 
   /**

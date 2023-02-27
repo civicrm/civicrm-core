@@ -3,6 +3,7 @@
 /**
  * Class CRM_Utils_Migrate_ImportExportTest
  * @group headless
+ * @group import
  */
 class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
 

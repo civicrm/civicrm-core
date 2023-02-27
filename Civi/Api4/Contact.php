@@ -21,6 +21,7 @@ namespace Civi\Api4;
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/contacts/
  * @searchable primary
  * @orderBy sort_name
+ * @iconField contact_sub_type:icon,contact_type:icon
  * @since 5.19
  * @package Civi\Api4
  */
@@ -77,6 +78,24 @@ class Contact extends Generic\DAOEntity {
    */
   public static function validateChecksum($checkPermissions = TRUE) {
     return (new Action\Contact\ValidateChecksum(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Contact\GetDuplicates
+   */
+  public static function getDuplicates($checkPermissions = TRUE) {
+    return (new Action\Contact\GetDuplicates(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Contact\MergeDuplicates
+   */
+  public static function mergeDuplicates($checkPermissions = TRUE) {
+    return (new Action\Contact\MergeDuplicates(__CLASS__, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

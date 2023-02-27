@@ -51,8 +51,6 @@ class CRM_Utils_Geocode_Google {
       return FALSE;
     }
 
-    $config = CRM_Core_Config::singleton();
-
     $add = '';
 
     if (!empty($values['street_address'])) {
@@ -99,6 +97,46 @@ class CRM_Utils_Geocode_Google {
       $add .= '+' . urlencode(str_replace('', '+', $values['country']));
     }
 
+    $coord = self::makeRequest($add);
+
+    $values['geo_code_1'] = $coord['geo_code_1'] ?? 'null';
+    $values['geo_code_2'] = $coord['geo_code_2'] ?? 'null';
+
+    if (isset($coord['geo_code_error'])) {
+      $values['geo_code_error'] = $coord['geo_code_error'];
+    }
+
+    CRM_Utils_Hook::geocoderFormat('Google', $values, $coord['request_xml']);
+
+    return isset($coord['geo_code_1'], $coord['geo_code_2']);
+  }
+
+  /**
+   * @param string $address
+   *   Plain text address
+   * @return array
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public static function getCoordinates($address) {
+    return self::makeRequest(urlencode($address));
+  }
+
+  /**
+   * @param string $add
+   *   Url-encoded address
+   *
+   * @return array
+   *   An array of values with the following possible keys:
+   *     geo_code_error: String error message
+   *     geo_code_1: Float latitude
+   *     geo_code_2: Float longitude
+   *     request_xml: SimpleXMLElement parsed xml from geocoding API
+   *
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  private static function makeRequest($add) {
+    $coords = [];
+    $config = CRM_Core_Config::singleton();
     if (!empty($config->geoAPIKey)) {
       $add .= '&key=' . urlencode($config->geoAPIKey);
     }
@@ -111,11 +149,11 @@ class CRM_Utils_Geocode_Google {
 
     libxml_use_internal_errors(TRUE);
     $xml = @simplexml_load_string($string);
-    CRM_Utils_Hook::geocoderFormat('Google', $values, $xml);
+    $coords['request_xml'] = $xml;
     if ($xml === FALSE) {
       // account blocked maybe?
       CRM_Core_Error::debug_var('Geocoding failed.  Message from Google:', $string);
-      return FALSE;
+      $coords['geo_code_error'] = $string;
     }
 
     if (isset($xml->status)) {
@@ -126,23 +164,18 @@ class CRM_Utils_Geocode_Google {
       ) {
         $ret = $xml->result->geometry->location->children();
         if ($ret->lat && $ret->lng) {
-          $values['geo_code_1'] = (float) $ret->lat;
-          $values['geo_code_2'] = (float) $ret->lng;
-          return TRUE;
+          $coords['geo_code_1'] = (float) $ret->lat;
+          $coords['geo_code_2'] = (float) $ret->lng;
         }
       }
-      elseif ($xml->status == 'ZERO_RESULTS') {
-        // reset the geo code values if we did not get any good values
-        $values['geo_code_1'] = $values['geo_code_2'] = 'null';
-        return FALSE;
-      }
-      else {
+      elseif ($xml->status != 'ZERO_RESULTS') {
+        // 'ZERO_RESULTS' is a valid status, in which case we'll change nothing in $ret;
+        // but if the status is anything else, we need to note the error.
         CRM_Core_Error::debug_var("Geocoding failed. Message from Google: ({$xml->status})", (string ) $xml->error_message);
-        $values['geo_code_1'] = $values['geo_code_2'] = 'null';
-        $values['geo_code_error'] = $xml->status;
-        return FALSE;
+        $coords['geo_code_error'] = $xml->status;
       }
     }
+    return $coords;
   }
 
 }

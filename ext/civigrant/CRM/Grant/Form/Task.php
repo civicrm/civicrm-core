@@ -25,8 +25,6 @@ class CRM_Grant_Form_Task extends CRM_Core_Form_Task {
   /**
    * Build all the data structures needed to build the form.
    *
-   * @param
-   *
    * @return void
    */
   public function preProcess() {

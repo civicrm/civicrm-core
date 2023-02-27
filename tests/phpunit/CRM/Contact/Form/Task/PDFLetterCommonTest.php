@@ -52,6 +52,7 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $form = $this->getPDFForm([
       'pdf_file_name' => $pdfFileName,
       'subject' => $activitySubject,
+      'html_message' => '<p></p>',
     ], [$this->contactId], $isLiveMode);
     $fileNameAssigned = $this->submitForm($form)['fileName'];
     $this->assertEquals($expectedFilename, $fileNameAssigned);
@@ -131,7 +132,7 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   protected function getPDFForm(array $formValues, array $contactIDs, ?bool $isLiveMode = TRUE): CRM_Contact_Form_Task_PDF {
     // pretty cludgey.
     $_REQUEST['cid'] = $contactIDs[0];
-    /* @var CRM_Contact_Form_Task_PDF $form */
+    /** @var CRM_Contact_Form_Task_PDF $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_PDF', array_merge([
       'pdf_file_name' => 'pdf_file_name',
       'subject' => 'subject',

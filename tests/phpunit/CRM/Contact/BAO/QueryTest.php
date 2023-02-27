@@ -11,10 +11,164 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   use CRMTraits_Financial_PriceSetTrait;
 
   /**
-   * @return CRM_Contact_BAO_QueryTestDataProvider
+   * @return array
    */
   public function dataProvider() {
-    return new CRM_Contact_BAO_QueryTestDataProvider();
+    return [
+      //  Include static group 3
+      [
+        'fv' => ['group' => '3'],
+        'id' => [
+          '17',
+          '18',
+          '19',
+          '20',
+          '21',
+          '22',
+          '23',
+          '24',
+        ],
+      ],
+      //  Include static group 5
+      [
+        'fv' => ['group' => '5'],
+        'id' => [
+          '13',
+          '14',
+          '15',
+          '16',
+          '21',
+          '22',
+          '23',
+          '24',
+        ],
+      ],
+      //  Include static groups 3 and 5
+      [
+        'fv' => ['group' => ['3', '5']],
+        'id' => [
+          '13',
+          '14',
+          '15',
+          '16',
+          '17',
+          '18',
+          '19',
+          '20',
+          '21',
+          '22',
+          '23',
+          '24',
+        ],
+      ],
+      //  Include static groups 3 and 5 in legacy format
+      [
+        'fv' => ['group' => ['3' => 1, '5' => 1]],
+        'id' => [
+          '13',
+          '14',
+          '15',
+          '16',
+          '17',
+          '18',
+          '19',
+          '20',
+          '21',
+          '22',
+          '23',
+          '24',
+        ],
+      ],
+      //  Include tag 7
+      [
+        'fv' => ['tag' => '7'],
+        'id' => [
+          '11',
+          '12',
+          '15',
+          '16',
+          '19',
+          '20',
+          '23',
+          '24',
+        ],
+      ],
+      //  Include tag 9
+      [
+        'fv' => ['tag' => ['9' => 1]],
+        'id' => [
+          '10',
+          '12',
+          '14',
+          '16',
+          '18',
+          '20',
+          '22',
+          '24',
+          '25',
+          '26',
+        ],
+      ],
+      //  Include tags 7 and 9
+      [
+        'fv' => ['tag' => ['7', '9']],
+        'id' => [
+          '10',
+          '11',
+          '12',
+          '14',
+          '15',
+          '16',
+          '18',
+          '19',
+          '20',
+          '22',
+          '23',
+          '24',
+          '25',
+          '26',
+        ],
+      ],
+      //  Include tags 7 and 10
+      [
+        'fv' => ['tag' => ['7', '10']],
+        'id' => [
+          '11',
+          '12',
+          '15',
+          '16',
+          '19',
+          '20',
+          '23',
+          '24',
+          '25',
+          '26',
+        ],
+      ],
+      //  Include tags 10 and 11
+      [
+        'fv' => ['tag' => ['10', '11']],
+        'id' => [
+          '25',
+          '26',
+        ],
+      ],
+      // gender_id 1 = 'Female'
+      [
+        'fv' => ['gender_id' => 1],
+        'id' => ['9', '20', '22'],
+      ],
+      // prefix_id 2 = 'Ms.'
+      [
+        'fv' => ['prefix_id' => 2],
+        'id' => ['10', '13'],
+      ],
+      // suffix_id 6 = 'V'
+      [
+        'fv' => ['suffix_id' => 6],
+        'id' => ['16', '19', '20', '21'],
+      ],
+    ];
   }
 
   /**
@@ -42,13 +196,12 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @dataProvider dataProvider
    *
-   * @param $fv
-   * @param $count
+   * @param array $formValues
    * @param $ids
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearch($fv, $count, $ids) {
+  public function testSearch(array $formValues, array $ids): void {
     $this->callAPISuccess('SavedSearch', 'create', ['form_values' => 'a:9:{s:5:"qfKey";s:32:"0123456789abcdef0123456789abcdef";s:13:"includeGroups";a:1:{i:0;s:1:"3";}s:13:"excludeGroups";a:0:{}s:11:"includeTags";a:0:{}s:11:"excludeTags";a:0:{}s:4:"task";s:2:"14";s:8:"radio_ts";s:6:"ts_all";s:14:"customSearchID";s:1:"4";s:17:"customSearchClass";s:36:"CRM_Contact_Form_Search_Custom_Group";}']);
     $this->callAPISuccess('SavedSearch', 'create', ['form_values' => 'a:9:{s:5:"qfKey";s:32:"0123456789abcdef0123456789abcdef";s:13:"includeGroups";a:1:{i:0;s:1:"3";}s:13:"excludeGroups";a:0:{}s:11:"includeTags";a:0:{}s:11:"excludeTags";a:0:{}s:4:"task";s:2:"14";s:8:"radio_ts";s:6:"ts_all";s:14:"customSearchID";s:1:"4";s:17:"customSearchClass";s:36:"CRM_Contact_Form_Search_Custom_Group";}']);
 
@@ -148,28 +301,28 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     // We have migrated from a hard-coded dataset to a dynamic one but are still working with the same
     // dataprovider at this stage -> wrangle.
-    foreach ($fv as $key => $value) {
+    foreach ($formValues as $key => $value) {
       $entity = ucfirst($key);
       if (!array_key_exists($entity, $this->ids)) {
         continue;
       }
       if (is_numeric($value)) {
-        $fv[$key] = $this->ids[$entity][$value];
+        $formValues[$key] = $this->ids[$entity][$value];
       }
       elseif (!empty($value[0])) {
         foreach ($value as $index => $oldGroup) {
-          $fv[$key][$index] = $this->ids[$entity][$oldGroup];
+          $formValues[$key][$index] = $this->ids[$entity][$oldGroup];
         }
       }
       else {
         foreach (array_keys($value) as $index) {
-          unset($fv[$key][$index]);
-          $fv[$key][$this->ids[$entity][$index]] = 1;
+          unset($formValues[$key][$index]);
+          $formValues[$key][$this->ids[$entity][$index]] = 1;
         }
       }
     }
 
-    $params = CRM_Contact_BAO_Query::convertFormValues($fv);
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
     $obj = new CRM_Contact_BAO_Query($params);
 
     // let's set useGroupBy=true since we are listing contacts here who might belong to
@@ -405,7 +558,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
       $this->assertLike($expectedSQL, $queryObj->getSearchSQL());
-      list($select, $from, $where, $having) = $queryObj->query();
+      [$select, $from, $where, $having] = $queryObj->query();
       $dao = CRM_Core_DAO::executeQuery("$select $from $where $having");
       $dao->fetch();
       $this->assertEquals('Anderson, Anthony', $dao->sort_name);
@@ -500,7 +653,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       TRUE, FALSE
     );
 
-    list($select) = $query->query();
+    [$select] = $query->query();
     $this->assertEquals('SELECT contact_a.id as contact_id', $select);
   }
 
@@ -1203,7 +1356,7 @@ civicrm_relationship.is_active = 1 AND
       TRUE, FALSE
     );
 
-    list($select, $from, $where, $having) = $query->query();
+    [$select, $from, $where, $having] = $query->query();
     $this->assertEquals($expectedWhere, $where);
   }
 
@@ -1395,13 +1548,13 @@ civicrm_relationship.is_active = 1 AND
       ],
     ];
     $query = new CRM_Contact_BAO_Query($params);
-    list($select, $from, $where) = $query->query();
+    [$select, $from, $where] = $query->query();
     $this->assertStringContainsString("contact_a.sort_name LIKE '%John%Doe%'", $where);
 
     //Check for NO wildcard due to comma
     $params[0][2] = 'Doe, John';
     $query = new CRM_Contact_BAO_Query($params);
-    list($select, $from, $where) = $query->query();
+    [$select, $from, $where] = $query->query();
     $this->assertStringContainsString("contact_a.sort_name LIKE '%Doe, John%'", $where);
   }
 

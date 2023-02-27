@@ -5,11 +5,12 @@
   <class>AfformSubmission</class>
   <name>civicrm_afform_submission</name>
   <comment>Recorded form submissions</comment>
-  <title>Form Builder Submission</title>
+  <title>FormBuilder Submission</title>
   <log>true</log>
 
   <field>
     <name>id</name>
+    <title>Form Submission ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique Submission ID</comment>

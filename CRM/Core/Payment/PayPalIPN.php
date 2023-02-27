@@ -67,7 +67,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @return void
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function recur($input, $recur, $contribution, $first) {
 
@@ -169,7 +168,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return void
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function single($input, $contribution, $recur = FALSE) {
 
@@ -181,14 +179,14 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     if (!$recur) {
-      if ($contribution->total_amount != $input['amount']) {
+      if ($contribution->total_amount != $input['total_amount']) {
         Civi::log()->debug('PayPalIPN: Amount values dont match between database and IPN request. (ID: ' . $contribution->id . ').');
         echo "Failure: Amount values dont match between database and IPN request<p>";
         return;
       }
     }
     else {
-      $contribution->total_amount = $input['amount'];
+      $contribution->total_amount = $input['total_amount'];
     }
 
     // check if contribution is already completed, if so we ignore this ipn
@@ -205,8 +203,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Main function.
    *
-   * @throws \API_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function main() {
@@ -291,7 +288,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $billingID = CRM_Core_BAO_LocationType::getBilling();
     $input['paymentStatus'] = $this->retrieve('payment_status', 'String', FALSE);
     $input['invoice'] = $this->retrieve('invoice', 'String', TRUE);
-    $input['amount'] = $this->retrieve('mc_gross', 'Money', FALSE);
+    $input['total_amount'] = $this->retrieve('mc_gross', 'Money', FALSE);
     $input['reasonCode'] = $this->retrieve('ReasonCode', 'String', FALSE);
 
     $lookup = [
@@ -332,7 +329,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return int
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function getPayPalPaymentProcessorID(array $input, ?int $contributionRecurID): int {
     // First we try and retrieve from POST params

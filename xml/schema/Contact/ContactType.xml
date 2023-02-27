@@ -6,6 +6,12 @@
   <name>civicrm_contact_type</name>
   <comment>Provide type information for contacts</comment>
   <add>3.1</add>
+  <labelField>label</labelField>
+  <paths>
+    <add>civicrm/admin/options/subtype/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/options/subtype/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/options/subtype/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Contact Type ID</title>
@@ -28,6 +34,7 @@
     <comment>Internal name of Contact Type (or Subtype).</comment>
     <html>
       <label>Name</label>
+      <type>Text</type>
     </html>
     <add>3.1</add>
     <required>true</required>
@@ -44,6 +51,10 @@
     <type>varchar</type>
     <length>64</length>
     <comment>localized Name of Contact Type.</comment>
+    <html>
+      <label>Label</label>
+      <type>Text</type>
+    </html>
     <localizable>true</localizable>
     <add>3.1</add>
   </field>
@@ -90,6 +101,7 @@
     </pseudoconstant>
     <html>
       <label>Parent</label>
+      <type>Select</type>
     </html>
     <add>3.1</add>
   </field>
@@ -101,16 +113,20 @@
   </foreignKey>
   <field>
     <name>is_active</name>
-    <title>Contact Type Is Active?</title>
+    <title>Contact Type Enabled</title>
     <type>boolean</type>
     <default>1</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is this entry active?</comment>
     <add>3.1</add>
   </field>
   <field>
     <name>is_reserved</name>
-    <title>Contact Type is Reserved?</title>
+    <title>Contact Type is Reserved</title>
     <type>boolean</type>
     <default>0</default>
     <required>true</required>

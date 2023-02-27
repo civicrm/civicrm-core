@@ -60,7 +60,9 @@ function smarty_modifier_crmDate($dateString, ?string $dateFormat = NULL, bool $
       $config = CRM_Core_Config::singleton();
       $dateFormat = $config->dateformatTime;
     }
-
+    if (is_int($dateString)) {
+      return CRM_Utils_Date::customFormatTs($dateString, $dateFormat);
+    }
     return CRM_Utils_Date::customFormat($dateString, $dateFormat);
   }
   return '';

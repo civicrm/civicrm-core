@@ -33,7 +33,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
 
     foreach ($templates as $template) {
       $msg_text = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_text']);
-      $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}', $msg_text);
+      $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}', $msg_text);
       if ($msg_text !== $originalText) {
         // Reset value for future tests.
         $this->callAPISuccess('MessageTemplate', 'create', ['msg_text' => $originalText, 'id' => $template['id']]);
@@ -44,7 +44,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   /**
    * Test that a string replacement in a message template can be done.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMessageTemplateStringReplace(): void {
     MessageTemplate::update()->setValues(['msg_html' => '{$display_name}'])->addWhere(
@@ -70,7 +70,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   /**
    * Test that a $this->string replacement in a message template can be done.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testActionScheduleStringReplace(): void {
     ActionSchedule::create(FALSE)->setValues([
@@ -116,7 +116,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     foreach ($templates as $template) {
       $msg_text = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_text']);
       if ($template['is_reserved']) {
-        $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}', $msg_text);
+        $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}', $msg_text);
       }
       else {
         $this->assertEquals('great what a silly sausage you are', $msg_text);

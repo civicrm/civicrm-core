@@ -25,6 +25,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
   protected $client;
 
   public function setUp(): void {
+    $this->useTransaction();
     parent::setUp();
 
     $this->tmpFile = $this->createTempDir() . '/example.txt';
@@ -79,19 +80,19 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
   }
 
   public function testGetHttp() {
-    list($status, $data) = $this->client->get(self::VALID_HTTP_URL);
+    [$status, $data] = $this->client->get(self::VALID_HTTP_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $this->assertRegExp(self::VALID_HTTP_REGEX, $data);
   }
 
   public function testGetHttps_valid() {
-    list($status, $data) = $this->client->get(self::VALID_HTTPS_URL);
+    [$status, $data] = $this->client->get(self::VALID_HTTPS_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $this->assertRegExp(self::VALID_HTTPS_REGEX, $data);
   }
 
   public function testGetHttps_invalid_verify() {
-    list($status, $data) = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
+    [$status, $data] = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_DL_ERROR, $status);
     $this->assertEquals('', $data);
   }
@@ -103,7 +104,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
     ]);
     $this->assertAPISuccess($result);
 
-    list($status, $data) = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
+    [$status, $data] = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $this->assertRegExp(self::SELF_SIGNED_HTTPS_REGEX, $data);
   }

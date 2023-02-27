@@ -284,7 +284,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     foreach ($include_dirs as $include_dir) {
       foreach ([$camelName, 'Generic'] as $name) {
         $action_dir = implode(DIRECTORY_SEPARATOR,
-          [$include_dir, 'api', "v${version}", $name]);
+          [$include_dir, 'api', "v{$version}", $name]);
         // see note above in getEntityNames about open_basedir
         if (!\CRM_Utils_File::isDir($action_dir)) {
           continue;

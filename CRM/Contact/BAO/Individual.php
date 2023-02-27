@@ -67,8 +67,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       $params['individual_suffix'] = $suffix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'suffix_id', $suffix_id);
     }
 
-    $params['is_deceased'] = CRM_Utils_Array::value('is_deceased', $params, FALSE);
-
     $individual = NULL;
     if ($contact->id) {
       $individual = new CRM_Contact_BAO_Contact();
@@ -277,9 +275,19 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       ])) {
         $date = $date . '-01-01';
       }
-      $contact->birth_date = CRM_Utils_Date::processDate($date);
+      $processedDate = CRM_Utils_Date::processDate($date);
+      $existing = substr(str_replace('-', '', $contact->birth_date), 0, 8) . '000000';
+      // By adding this check here we can rip out this whole routine in a few
+      // months after confirming it actually does nothing, ever.
+      if ($existing !== $processedDate) {
+        CRM_Core_Error::deprecatedWarning('birth_date formatting should happen before BAO is hit');
+        $contact->birth_date = $processedDate;
+      }
     }
     elseif ($contact->birth_date) {
+      if ($contact->birth_date !== CRM_Utils_Date::isoToMysql($contact->birth_date)) {
+        CRM_Core_Error::deprecatedWarning('birth date formatting should happen before BAO is hit');
+      }
       $contact->birth_date = CRM_Utils_Date::isoToMysql($contact->birth_date);
     }
 
@@ -309,65 +317,30 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       ])) {
         $date = $date . '-01-01';
       }
-
+      $processedDate = CRM_Utils_Date::processDate($date);
+      $existing = substr(str_replace('-', '', $contact->deceased_date), 0, 8) . '000000';
+      // By adding this check here we can rip out this whole routine in a few
+      // months after confirming it actually does nothing, ever.
+      if ($existing !== $processedDate) {
+        CRM_Core_Error::deprecatedWarning('deceased formatting should happen before BAO is hit');
+      }
       $contact->deceased_date = CRM_Utils_Date::processDate($date);
     }
     elseif ($contact->deceased_date) {
+      if ($contact->deceased_date !== CRM_Utils_Date::isoToMysql($contact->deceased_date)) {
+        CRM_Core_Error::deprecatedWarning('deceased date formatting should happen before BAO is hit');
+      }
       $contact->deceased_date = CRM_Utils_Date::isoToMysql($contact->deceased_date);
     }
 
     if ($middle_name = CRM_Utils_Array::value('middle_name', $params)) {
+      if ($middle_name !== $contact->middle_name) {
+        CRM_Core_Error::deprecatedWarning('random magic is deprecated - how could this be true');
+      }
       $contact->middle_name = $middle_name;
     }
 
     return $contact;
-  }
-
-  /**
-   * Regenerates display_name for contacts with given prefixes/suffixes.
-   *
-   * @param array $ids
-   *   The array with the prefix/suffix id governing which contacts to regenerate.
-   * @param int $action
-   *   The action describing whether prefix/suffix was UPDATED or DELETED.
-   */
-  public static function updateDisplayNames(&$ids, $action) {
-    // get the proper field name (prefix_id or suffix_id) and its value
-    $fieldName = '';
-    foreach ($ids as $key => $value) {
-      switch ($key) {
-        case 'individualPrefix':
-          $fieldName = 'prefix_id';
-          $fieldValue = $value;
-          break 2;
-
-        case 'individualSuffix':
-          $fieldName = 'suffix_id';
-          $fieldValue = $value;
-          break 2;
-      }
-    }
-    if ($fieldName == '') {
-      return;
-    }
-
-    // query for the affected individuals
-    $fieldValue = CRM_Utils_Type::escape($fieldValue, 'Integer');
-    $contact = new CRM_Contact_BAO_Contact();
-    $contact->$fieldName = $fieldValue;
-    $contact->find();
-
-    // iterate through the affected individuals and rebuild their display_names
-    while ($contact->fetch()) {
-      $contact = new CRM_Contact_BAO_Contact();
-      $contact->id = $contact->contact_id;
-      if ($action == CRM_Core_Action::DELETE) {
-        $contact->$fieldName = 'NULL';
-        $contact->save();
-      }
-      $contact->display_name = $contact->displayName();
-      $contact->save();
-    }
   }
 
   /**

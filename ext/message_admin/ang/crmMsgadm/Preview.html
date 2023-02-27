@@ -91,6 +91,16 @@
           </div>
         </div>
 
+        <div class="form-group" ng-if="!$ctrl.preview.loading && model.formats[$ctrl.formatId].name === 'msg_html_raw'">
+          <div class="jumbotron well col-sm-12">
+            <!-- <textarea ng-model="$ctrl.preview.html"></textarea> -->
+            <div ng-model="$ctrl.preview.html"
+                 ng-disabled="true"
+                 crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
+            ></div>
+          </div>
+        </div>
+
       </div>
 
     </div>

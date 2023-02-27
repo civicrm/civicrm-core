@@ -194,12 +194,7 @@ AND    g.id    = v.option_group_id";
       self::updateValue($optionId, $value);
 
       // also delete this option value
-      $query = "
-DELETE
-FROM   civicrm_option_value
-WHERE  id = %1";
-      $params = [1 => [$optionId, 'Integer']];
-      CRM_Core_DAO::executeQuery($query, $params);
+      CRM_Core_BAO_OptionValue::deleteRecord(['id' => $optionId]);
     }
   }
 

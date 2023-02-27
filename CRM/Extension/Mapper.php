@@ -117,7 +117,7 @@ class CRM_Extension_Mapper {
    * Given the class, provides extension path.
    *
    *
-   * @param $clazz
+   * @param string $clazz
    *
    * @return string
    *   full path the extension .php file
@@ -355,8 +355,8 @@ class CRM_Extension_Mapper {
     // TODO optimization/caching
     $urls = [];
     $urls['civicrm'] = $this->keyToUrl('civicrm');
+    /** @var CRM_Core_Module $module */
     foreach ($this->getModules() as $module) {
-      /** @var $module CRM_Core_Module */
       if ($module->is_active) {
         try {
           $urls[$module->name] = $this->keyToUrl($module->name);

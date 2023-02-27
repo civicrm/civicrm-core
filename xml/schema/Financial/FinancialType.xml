@@ -9,6 +9,11 @@
   <log>true</log>
   <component>CiviContribute</component>
   <labelField>name</labelField>
+  <paths>
+    <add>civicrm/admin/financial/financialType/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/financial/financialType/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/financial/financialType/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Financial Type ID</title>
@@ -90,6 +95,10 @@
     <title>Financial Type Is Active?</title>
     <length>4</length>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is this property active?</comment>
     <add>1.3</add>
     <html>

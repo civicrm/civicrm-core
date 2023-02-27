@@ -1,0 +1,3 @@
+Total Amount,Receive Date,Financial Type,External identifier,Soft Credit Ext ID,Email,Email - soft credit,Soft credit contact ID
+"1,230.99",2008-09-20,Donation,ext-1,ext-2,harry@example.com,the-firm@example.com,4
+"1.230,99",2008-09-20,Donation,ext-1,ext-2,,,4

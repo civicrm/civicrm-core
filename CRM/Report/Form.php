@@ -21,7 +21,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @var string[]
    */
-  public $expectedSmartyVariables = ['pager', 'skip', 'sections', 'grandStat', 'chartEnabled'];
+  public $expectedSmartyVariables = ['pager', 'skip', 'sections', 'grandStat', 'chartEnabled', 'uniqueId', 'rows', 'group_bys_freq'];
 
   /**
    * Deprecated constant, Reports should be updated to use the getRowCount function.
@@ -265,14 +265,16 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_aliases = [];
 
   /**
+   * SQL where clause. May be altered by hook_civicrm_alterReportVar.
    * @var string
    */
-  protected $_where;
+  public $_where;
 
   /**
+   * SQL from clause. May be altered by hook_civicrm_alterReportVar.
    * @var string
    */
-  protected $_from;
+  public $_from;
 
   /**
    * SQL Limit clause
@@ -596,7 +598,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     // and addCustomDataToColumns() will allow access to all custom groups.
     $permCustomGroupIds = [];
     if (!CRM_Core_Permission::check('access all custom data')) {
-      $permCustomGroupIds = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_custom_group', $allGroups, NULL);
+      $permCustomGroupIds = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_custom_group', $allGroups);
       // do not allow custom data for reports if user doesn't have
       // permission to access custom data.
       if (!empty($this->_customGroupExtends) && empty($permCustomGroupIds)) {
@@ -626,7 +628,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     // Ensure smarty variables are assigned here since this function is called from
     // the report api and the main buildForm is not.
     self::$_template->ensureVariablesAreAssigned($this->expectedSmartyVariables);
-    $this->_dashBoardRowCount = CRM_Utils_Request::retrieve('rowCount', 'Integer');
+    $this->_dashBoardRowCount = CRM_Utils_Request::retrieve('rowCount', 'Integer') ?? CRM_Utils_Request::retrieve('crmRowCount', 'Integer');
 
     $this->_section = CRM_Utils_Request::retrieve('section', 'Integer');
 
@@ -1527,10 +1529,10 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->sqlArray[] = $sql;
     foreach ($this->sqlArray as $sql) {
       foreach (['LEFT JOIN'] as $term) {
-        $sql = str_replace($term, '<br>  ' . $term, $sql);
+        $sql = str_replace($term, '<br>  ' . $term, ($sql ?? ''));
       }
       foreach (['FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', ';'] as $term) {
-        $sql = str_replace($term, '<br><br>' . $term, $sql);
+        $sql = str_replace($term, '<br><br>' . $term, ($sql ?? ''));
       }
       $this->sqlFormattedArray[] = $sql;
       $this->assign('sql', implode(';<br><br><br><br>', $this->sqlFormattedArray));
@@ -2285,7 +2287,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $sqlOP = $this->getSQLOperator($relative);
       return "( {$fieldName} {$sqlOP} )";
     }
-    if (strlen($to) === 10) {
+    if (strlen($to ?? '') === 10) {
       // If we just have the date we assume the end of that day.
       $to .= ' 23:59:59';
     }
@@ -2507,10 +2509,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       if (!empty($value['no_display'])) {
         unset($this->_columnHeaders[$key]);
       }
-      foreach (['colspan', 'type'] as $expectedKey) {
-        if (!isset($this->_columnHeaders[$key][$expectedKey])) {
-          // Ensure it is set to prevent smarty notices.
-          $this->_columnHeaders[$key][$expectedKey] = FALSE;
+      else {
+        foreach (['colspan', 'type'] as $expectedKey) {
+          if (!isset($this->_columnHeaders[$key][$expectedKey])) {
+            // Ensure it is set to prevent smarty notices.
+            $this->_columnHeaders[$key][$expectedKey] = FALSE;
+          }
         }
       }
     }
@@ -2691,7 +2695,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $communicationMethods = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
 
     // Explode padded values.
-    $values = CRM_utils_array::explodePadded($value);
+    $values = CRM_Utils_Array::explodePadded($value);
     // Flip values, compute intersection with $communicationMethods, and implode with commas.
     $value = implode(', ', array_intersect_key($communicationMethods, array_flip($values)));
     return $value;
@@ -3012,7 +3016,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     // fields array is missing because form building etc is skipped
     // in dashboard mode for report
     //@todo - this could be done in the dashboard no we have a setter
-    if (empty($this->_params['fields']) && !$this->_noFields) {
+    if (empty($this->_params['fields']) && !$this->_noFields
+      && empty($this->_params['task'])
+    ) {
       $this->setParams($this->_formValues);
     }
 
@@ -3437,7 +3443,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             if (!empty($this->_params["{$fieldName}_relative"])) {
               [$from, $to] = CRM_Utils_Date::getFromTo($this->_params["{$fieldName}_relative"], NULL, NULL);
             }
-            if (strlen($to) === 10) {
+            if (strlen($to ?? '') === 10) {
               // If we just have the date we assume the end of that day.
               $to .= ' 23:59:59';
             }
@@ -3764,14 +3770,18 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
 
     CRM_Contact_BAO_GroupContactCache::check($smartGroups);
-
+    $aclFilter = NULL;
+    $selectWhereClauses = array_filter(CRM_Contact_BAO_Group::getSelectWhereClause('group'));
+    $aclFilter = implode(' AND ', $selectWhereClauses);
+    $aclFilter = !empty($aclFilter) ? ' AND ' . $aclFilter : '';
     $smartGroupQuery = '';
     if (!empty($smartGroups)) {
       $smartGroups = implode(',', $smartGroups);
       $smartGroupQuery = " UNION DISTINCT
                   SELECT DISTINCT smartgroup_contact.contact_id
                   FROM civicrm_group_contact_cache smartgroup_contact
-                  WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
+                  INNER JOIN `civicrm_group` AS `group` ON `group`.id = smartgroup_contact.group_id
+                  WHERE smartgroup_contact.group_id IN ({$smartGroups}) {$aclFilter}";
     }
 
     $sqlOp = $this->getSQLOperator($op);
@@ -3790,7 +3800,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     return " {$contactAlias}.id {$sqlOp} (
                           SELECT DISTINCT {$this->_aliases['civicrm_group']}.contact_id
                           FROM civicrm_group_contact {$this->_aliases['civicrm_group']}
-                          WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added'
+                          INNER JOIN `civicrm_group` AS `group` ON `group`.id = {$this->_aliases['civicrm_group']}.group_id
+                          WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added' {$aclFilter}
                           {$smartGroupQuery} ) ";
   }
 
@@ -3819,7 +3830,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    *
    * This function is called by both the api (tests) and the UI.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function buildGroupTempTable(): void {
     if (!empty($this->groupTempTable) || empty($this->_params['gid_value']) || $this->groupFilterNotOptimised) {
@@ -3943,7 +3954,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   public function buildPermissionClause() {
     $ret = [];
     foreach ($this->selectedTables() as $tableName) {
-      $baoName = str_replace('_DAO_', '_BAO_', CRM_Core_DAO_AllCoreTables::getClassForTable($tableName));
+      $baoName = str_replace('_DAO_', '_BAO_', (CRM_Core_DAO_AllCoreTables::getClassForTable($tableName) ?? ''));
+      // Do not include CiviCRM group add Select Where clause because we don't necessarily join here for reports with optimisedGroupFilters
+      if ($baoName === 'CRM_Contact_BAO_Group') {
+        continue;
+      }
       if ($baoName && class_exists($baoName) && !empty($this->_columns[$tableName]['alias'])) {
         $tableAlias = $this->_columns[$tableName]['alias'];
         $clauses = array_filter($baoName::getSelectWhereClause($tableAlias));
@@ -4942,6 +4957,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'employer_id' => [
         'title' => ts('Current Employer'),
       ],
+      'created_date' => [
+        'title' => ts('Created Date'),
+      ],
     ];
   }
 
@@ -4979,6 +4997,11 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       'contact_sub_type' => [
         'title' => ts('Contact Subtype'),
+      ],
+      'created_date' => [
+        'title' => ts('Contact Created'),
+        'operatorType' => CRM_Report_Form::OP_DATE,
+        'type' => CRM_Utils_Type::T_DATE,
       ],
       'modified_date' => [
         'title' => ts('Contact Modified'),
@@ -5128,13 +5151,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *   is that we might print a bar chart as a pdf.
    */
   protected function setOutputMode() {
-    $this->_outputMode = str_replace('report_instance.', '', CRM_Utils_Request::retrieve(
+    $this->_outputMode = str_replace('report_instance.', '', (CRM_Utils_Request::retrieve(
       'output',
       'String',
       CRM_Core_DAO::$_nullObject,
       FALSE,
       CRM_Utils_Array::value('task', $this->_params)
-    ));
+    ) ?? ''));
     // if contacts are added to group
     if (!empty($this->_params['groups']) && empty($this->_outputMode)) {
       $this->_outputMode = 'group';

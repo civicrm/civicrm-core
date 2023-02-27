@@ -106,7 +106,7 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   public function getTemplateFileName() {
     // there is only one form here, so should be quite easy
     $actionName = $this->getActionName();
-    list($pageName, $action) = $actionName;
+    [$pageName, $action] = $actionName;
 
     return $this->_pages[$pageName]->getTemplateFileName();
   }

@@ -22,17 +22,17 @@ Click this link to go to a web page where you can confirm your registration onli
 
 ===========================================================
 {$event.event_title}
-{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
 {if $conference_sessions}
 
 
 {ts}Your schedule:{/ts}
 {assign var='group_by_day' value='NA'}
 {foreach from=$conference_sessions item=session}
-{if $session.start_date|date_format:"%Y/%m/%d" != $group_by_day|date_format:"%Y/%m/%d"}
+{if $session.start_date|crmDate:"%Y/%m/%d" != $group_by_day|crmDate:"%Y/%m/%d"}
 {assign var='group_by_day' value=$session.start_date}
 
-{$group_by_day|date_format:"%m/%d/%Y"}
+{$group_by_day|crmDate:"%m/%d/%Y"}
 
 
 {/if}
@@ -64,7 +64,9 @@ Click this link to go to a web page where you can confirm your registration onli
 
 {if $event.is_public}
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
-{ts}Download iCalendar File:{/ts} {$icalFeed}
+{ts}Download iCalendar entry for this event.{/ts} {$icalFeed}
+{capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+{ts}Add event to Google Calendar{/ts} {$gCalendar}
 {/if}
 
 {if '{contact.email}'}

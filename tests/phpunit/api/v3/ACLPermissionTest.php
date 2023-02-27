@@ -38,6 +38,16 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
   protected $_entity;
 
+  /**
+   * @var int
+   */
+  protected $_permissionedGroup;
+
+  /**
+   * @var int
+   */
+  protected $_permissionedDisabledGroup;
+
   public function setUp(): void {
     parent::setUp();
     CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_Pledge', [], 1, 0);
@@ -46,7 +56,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * (non-PHPdoc)
    * @see CiviUnitTestCase::tearDown()
    */
   public function tearDown(): void {
@@ -187,7 +196,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    *
    * @param int $version
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testRelatedEntityPermissions(int $version): void {
@@ -210,6 +219,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
         'location_type_id' => 1,
       ],
     ];
+    // v3 GroupContact API is nonstandard
+    if ($version === 4) {
+      $testEntities['GroupContact'] = ['group_id' => $this->groupCreate()];
+    }
     foreach ($testEntities as $entity => $params) {
       $params += [
         'contact_id' => $disallowedContact,
@@ -378,7 +391,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       $this,
       'aclWhereOnlySecond',
     ]);
-    $fullresult = $this->callAPISuccess('contact', 'get', [
+    $fullResult = $this->callAPISuccess('contact', 'get', [
       'sequential' => 1,
     ]);
     //return doesn't work for all keys - can't fix that here so let's skip ...
@@ -395,7 +408,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'worldregion_id',
       'world_region',
     ];
-    $expectedReturnElements = array_diff(array_keys($fullresult['values'][0]), $elementsReturnDoesntSupport);
+    $expectedReturnElements = array_diff(array_keys($fullResult['values'][0]), $elementsReturnDoesntSupport);
     $result = $this->callAPISuccess('contact', 'get', [
       'check_permissions' => 1,
       'return' => $expectedReturnElements,
@@ -621,7 +634,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetActivityViewAllActivitiesDoesntCutItAnymore(int $version): void {
@@ -653,7 +665,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetActivityViewAllContactsEnoughWIthID(int $version): void {
@@ -672,7 +683,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetActivityAccessCiviCRMEnough(int $version): void {
@@ -702,7 +712,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetActivityCheckPermissionsByComponent(int $version): void {
@@ -730,7 +739,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetActivityCheckPermissionsByCaseComponent(int $version): void {
@@ -766,7 +774,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetActivityByACL(int $version): void {
@@ -792,7 +799,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * To leverage ACL permission to view an activity you must be able to see any
    * of the contacts. FIXME: Api4
    *
-   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testGetActivityByAclCannotViewAllContacts(): void {
     $activity = $this->activityCreate(['assignee_contact_id' => $this->individualCreate()]);
@@ -838,7 +845,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetActivityByAclCannotViewAnyContacts(int $version): void {
@@ -863,10 +869,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testGetActivityACLSourceContactDeleted($version): void {
+  public function testGetActivityACLSourceContactDeleted(int $version): void {
     $this->_apiversion = $version;
     $this->setPermissions(['access CiviCRM', 'delete contacts']);
     $activity = $this->activityCreate();
@@ -891,7 +896,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testActivitiesGetMultipleIdsCheckPermissions(int $version): void {
@@ -921,7 +925,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testActivitiesGetMultipleIdsCheckPermissionsLimitedACL(int $version): void {
@@ -961,7 +964,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testActivitiesGetMultipleIdsCheckPermissionsNotIN(int $version): void {
@@ -1100,7 +1102,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testApi4CustomEntityACL(): void {
     $group = 'test_group';
@@ -1131,34 +1133,34 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
 
     // Without "access deleted contacts" we won't see C2
-    $vals = CustomValue::get($group)->setDebug(TRUE)->execute();
-    $this->assertCount(1, $vals);
-    $this->assertEquals($c1, $vals[0]['entity_id']);
+    $customValues = CustomValue::get($group)->setDebug(TRUE)->execute();
+    $this->assertCount(1, $customValues);
+    $this->assertEquals($c1, $customValues[0]['entity_id']);
 
     $this->setPermissions(['access CiviCRM', 'access deleted contacts', 'view debug output', 'access all custom data']);
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
     $this->cleanupCachedPermissions();
 
-    $vals = CustomValue::get($group)->execute();
-    $this->assertCount(2, $vals);
+    $customValues = CustomValue::get($group)->execute();
+    $this->assertCount(2, $customValues);
 
     $this->allowedContactId = $c2;
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
     $this->cleanupCachedPermissions();
 
-    $vals = CustomValue::get($group)->addSelect('*', 'contact.first_name')->execute();
-    $this->assertCount(1, $vals);
-    $this->assertEquals($c2, $vals[0]['entity_id']);
-    $this->assertEquals('C2', $vals[0]['contact.first_name']);
+    $customValues = CustomValue::get($group)->addSelect('*', 'contact.first_name')->execute();
+    $this->assertCount(1, $customValues);
+    $this->assertEquals($c2, $customValues[0]['entity_id']);
+    $this->assertEquals('C2', $customValues[0]['contact.first_name']);
 
-    $vals = Contact::get()
+    $customValues = Contact::get()
       ->addJoin('Custom_' . $group . ' AS cf')
       ->addSelect('first_name', 'cf.' . $textField)
       ->addWhere('is_deleted', '=', TRUE)
       ->execute();
-    $this->assertCount(1, $vals);
-    $this->assertEquals('C2', $vals[0]['first_name']);
-    $this->assertEquals('2', $vals[0]['cf.' . $textField]);
+    $this->assertCount(1, $customValues);
+    $this->assertEquals('C2', $customValues[0]['first_name']);
+    $this->assertEquals('2', $customValues[0]['cf.' . $textField]);
   }
 
 }

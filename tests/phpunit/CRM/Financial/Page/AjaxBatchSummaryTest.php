@@ -21,7 +21,6 @@ class CRM_Financial_Page_AjaxBatchSummaryTest extends CiviUnitTestCase {
    * We want to ensure changing the method of obtaining status and payment_instrument
    * does not cause any regression.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testMakeBatchSummary(): void {

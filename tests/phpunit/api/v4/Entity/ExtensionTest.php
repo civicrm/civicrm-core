@@ -19,13 +19,14 @@
 
 namespace api\v4\Entity;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Extension;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ExtensionTest extends UnitTestCase {
+class ExtensionTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGet() {
     $moduleTest = Extension::get(FALSE)

@@ -41,14 +41,24 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
 
   public function getDomainTokens(): array {
     return [
-      'name' => ts('Domain name'),
-      'address' => ts('Domain (organization) address'),
-      'phone' => ts('Domain (organization) phone'),
-      'email' => ts('Domain (organization) email'),
+      'name' => ts('Domain Name'),
+      'address' => ts('Domain (Organization) Full Address'),
+      'street_address' => ts('Domain (Organization) Street Address'),
+      'supplemental_address_1' => ts('Domain (Organization) Supplemental Address'),
+      'supplemental_address_2' => ts('Domain (Organization) Supplemental Address 2'),
+      'supplemental_address_3' => ts('Domain (Organization) Supplemental Address 3'),
+      'city' => ts('Domain (Organization) City'),
+      'postal_code' => ts('Domain (Organization) Postal Code'),
+      'state_province_id:label' => ts('Domain (Organization) State'),
+      'country_id:label' => ts('Domain (Organization) Country'),
+      'phone' => ts('Domain (Organization) Phone'),
+      'email' => ts('Domain (Organization) Email'),
       'id' => ts('Domain ID'),
       'description' => ts('Domain Description'),
       'now' => ts('Current time/date'),
+      'base_url' => ts('Domain absolute base url'),
       'tax_term' => ts('Sales tax term (e.g VAT)'),
+      'empowered_by_civicrm_image_url' => ts('Empowered By CiviCRM Image'),
     ];
   }
 
@@ -78,6 +88,7 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
    * @throws \CRM_Core_Exception
    * @internal
    *
+   * @todo - make this non-static & protected. Remove last deprecated fn that calls it.
    */
   public static function getDomainTokenValues(?int $domainID = NULL, bool $html = TRUE): array {
     if (!$domainID) {
@@ -98,16 +109,27 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
         'description' => $domain->description ?? '',
       ];
       $loc = $domain->getLocationValues();
+
       if ($html) {
         $tokens['address'] = str_replace("\n", '<br />', ($loc['address'][1]['display'] ?? ''));
       }
       else {
         $tokens['address'] = $loc['address'][1]['display_text'] ?? '';
       }
+      $tokens['street_address'] = $loc['address'][1]['street_address'] ?? '';
+      $tokens['supplemental_address_1'] = $loc['address'][1]['supplemental_address_1'] ?? '';
+      $tokens['supplemental_address_2'] = $loc['address'][1]['supplemental_address_2'] ?? '';
+      $tokens['supplemental_address_3'] = $loc['address'][1]['supplemental_address_3'] ?? '';
+      $tokens['city'] = $loc['address'][1]['city'] ?? '';
+      $tokens['postal_code'] = $loc['address'][1]['postal_code'] ?? '';
+      $tokens['state_province_id:label'] = $loc['address'][1]['state_province'] ?? '';
+      $tokens['country_id:label'] = $loc['address'][1]['country'] ?? '';
       $phone = reset($loc['phone']);
       $email = reset($loc['email']);
       $tokens['phone'] = $phone['phone'] ?? '';
       $tokens['email'] = $email['email'] ?? '';
+      $tokens['base_url'] = Civi::paths()->getVariable('cms.root', 'url');
+      $tokens['empowered_by_civicrm_image_url'] = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'i/civi99.png';
       $tokens['tax_term'] = (string) Civi::settings()->get('tax_term');
       Civi::cache('metadata')->set($cacheKey, $tokens);
     }

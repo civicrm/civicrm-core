@@ -234,7 +234,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    *   return properties for address e.g
    *   [street_address => 1, supplemental_address_1 => 1, supplemental_address_2 => 1]
    */
-  public static function getAddressReturnProperties() {
+  public static function getAddressReturnProperties(): array {
     $mailingFormat = Civi::settings()->get('mailing_format');
 
     $addressFields = CRM_Utils_Address::sequence($mailingFormat);

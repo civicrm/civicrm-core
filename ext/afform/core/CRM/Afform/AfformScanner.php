@@ -36,9 +36,8 @@ class CRM_Afform_AfformScanner {
    * @return array
    *   Ex: ['view-individual' => ['/var/www/foo/afform/view-individual']]
    */
-  public function findFilePaths() {
-    if (!CRM_Core_Config::singleton()->debug) {
-      // FIXME: Use a separate setting. Maybe use the asset-builder cache setting?
+  public function findFilePaths(): array {
+    if ($this->isUseCachedPaths()) {
       $paths = $this->cache->get('afformAllPaths');
       if ($paths !== NULL) {
         return $paths;
@@ -61,8 +60,24 @@ class CRM_Afform_AfformScanner {
 
     $this->appendFilePaths($paths, $this->getSiteLocalPath(), '');
 
-    $this->cache->set('afformAllPaths', $paths);
+    if ($this->isUseCachedPaths()) {
+      $this->cache->set('afformAllPaths', $paths);
+    }
     return $paths;
+  }
+
+  /**
+   * Is the cache to be used.
+   *
+   * Skipping the cache helps developers moving files around & messes with developers
+   * debugging performance. It's a cruel world.
+   *
+   * FIXME: Use a separate setting. Maybe use the asset-builder cache setting?
+   *
+   * @return bool
+   */
+  private function isUseCachedPaths(): bool {
+    return !CRM_Core_Config::singleton()->debug;
   }
 
   /**

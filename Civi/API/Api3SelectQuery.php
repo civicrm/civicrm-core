@@ -76,12 +76,12 @@ class Api3SelectQuery extends SelectQuery {
         // If we check a custom field on 'IS NULL', it should also work when there is no
         // record in the custom value table, see CRM-20740.
         $side = empty($value['IS NULL']) ? 'INNER' : 'LEFT OUTER';
-        list($table_name, $column_name) = $this->addCustomField($this->apiFieldSpec['custom_' . $cf_id], $side);
+        [$table_name, $column_name] = $this->addCustomField($this->apiFieldSpec['custom_' . $cf_id], $side);
       }
       elseif (strpos($key, '.')) {
         $fkInfo = $this->addFkField($key, 'INNER');
         if ($fkInfo) {
-          list($table_name, $column_name) = $fkInfo;
+          [$table_name, $column_name] = $fkInfo;
           $this->validateNestedInput($key, $value);
         }
       }
@@ -111,7 +111,7 @@ class Api3SelectQuery extends SelectQuery {
         $orClause = [];
         foreach ($orGroup as $key) {
           if (!isset($filters[$key])) {
-            throw new \CiviCRM_API3_Exception("'$key' specified in OR group but not added to params");
+            throw new \CRM_Core_Exception("'$key' specified in OR group but not added to params");
           }
           $orClause[] = $filters[$key];
           unset($filters[$key]);

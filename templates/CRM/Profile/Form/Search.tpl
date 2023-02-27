@@ -75,7 +75,7 @@
       <tr><td colspan="2">{include file="CRM/Contact/Form/Task/ProximityCommon.tpl"}</td></tr>
     {/if}
 
-    <tr><td></td><td>{include file="CRM/common/formButtons.tpl"}</td></tr>
+    <tr><td></td><td>{include file="CRM/common/formButtons.tpl" location=''}</td></tr>
   </table>
 
   {if $groupId}

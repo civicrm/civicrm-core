@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="tests/phpunit/bootstrap.php" cacheResult="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" convertDeprecationsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="tests/phpunit/bootstrap.php" cacheResult="false">
   <testsuites>
     <testsuite name="Legacy custom searches">
       <directory>./tests/phpunit</directory>

@@ -52,7 +52,7 @@ class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
    * @param string $message
    * @param array $context
    */
-  public function log($level, $message, array $context = []) {
+  public function log($level, $message, array $context = []): void {
     // FIXME: This flattens a $context a bit prematurely. When integrating
     // with external/CMS logs, we should pass through $context.
     if (!empty($context)) {

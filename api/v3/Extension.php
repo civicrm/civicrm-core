@@ -205,18 +205,18 @@ function _civicrm_api3_extension_uninstall_spec(&$fields) {
  *   - key: string, eg "com.example.myextension"
  *   - url: string eg "http://repo.com/myextension-1.0.zip"
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  *   API result
  */
 function civicrm_api3_extension_download($params) {
   if (!array_key_exists('url', $params)) {
     if (!CRM_Extension_System::singleton()->getBrowser()->isEnabled()) {
-      throw new API_Exception('Automatic downloading is disabled. Try adding parameter "url"');
+      throw new CRM_Core_Exception('Automatic downloading is disabled. Try adding parameter "url"');
     }
     if ($reqs = CRM_Extension_System::singleton()->getBrowser()->checkRequirements()) {
       $first = array_shift($reqs);
-      throw new API_Exception($first['message']);
+      throw new CRM_Core_Exception($first['message']);
     }
     if ($info = CRM_Extension_System::singleton()->getBrowser()->getExtension($params['key'])) {
       if ($info->downloadUrl) {
@@ -226,7 +226,7 @@ function civicrm_api3_extension_download($params) {
   }
 
   if (!array_key_exists('url', $params)) {
-    throw new API_Exception('Cannot resolve download url for extension. Try adding parameter "url"');
+    throw new CRM_Core_Exception('Cannot resolve download url for extension. Try adding parameter "url"');
   }
 
   if (!isset($info)) {

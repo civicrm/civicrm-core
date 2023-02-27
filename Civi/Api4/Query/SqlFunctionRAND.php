@@ -18,6 +18,8 @@ class SqlFunctionRAND extends SqlFunction {
 
   protected static $category = self::CATEGORY_MATH;
 
+  protected static $dataType = 'Float';
+
   protected static function params(): array {
     return [
       [

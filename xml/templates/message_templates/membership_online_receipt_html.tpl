@@ -20,7 +20,7 @@
 
   <tr>
    <td>
-     {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+     {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
     {if !empty($receipt_text)}
      <p>{$receipt_text|htmlize}</p>
     {/if}
@@ -112,7 +112,7 @@
        {foreach from=$lineItem item=value key=priceset}
         <tr>
          <td colspan="2" {$valueStyle}>
-          <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
+          <table>
            <tr>
             <th>{ts}Item{/ts}</th>
             <th>{ts}Qty{/ts}</th>
@@ -153,7 +153,7 @@
        {foreach from=$lineItem item=value key=priceset}
         <tr>
          <td colspan="2" {$valueStyle}>
-          <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
+          <table>
            <tr>
             <th>{ts}Item{/ts}</th>
             <th>{ts}Fee{/ts}</th>
@@ -496,7 +496,7 @@
         </td>
        </tr>
       {/if}
-      {if !empty($is_deductible) AND !empty($price)}
+      {if $is_deductible AND !empty($price)}
         <tr>
          <td colspan="2" {$valueStyle}>
           <p>{ts 1=$price|crmMoney}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>

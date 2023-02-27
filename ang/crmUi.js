@@ -67,7 +67,7 @@
     // Simple wrapper around $.crmDatepicker.
     // example with no time input: <input crm-ui-datepicker="{time: false}" ng-model="myobj.datefield"/>
     // example with custom date format: <input crm-ui-datepicker="{date: 'm/d/y'}" ng-model="myobj.datefield"/>
-    .directive('crmUiDatepicker', function () {
+    .directive('crmUiDatepicker', function ($timeout) {
       return {
         restrict: 'AE',
         require: 'ngModel',
@@ -82,14 +82,17 @@
           element
             .crmDatepicker(scope.crmUiDatepicker)
             .on('change', function() {
-              var requiredLength = 19;
-              if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
-                requiredLength = 10;
-              }
-              if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
-                requiredLength = 8;
-              }
-              ngModel.$setValidity('incompleteDateTime', !($(this).val().length && $(this).val().length !== requiredLength));
+              // Because change gets triggered from the $render function we could be either inside or outside the $digest cycle
+              $timeout(function() {
+                var requiredLength = 19;
+                if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
+                  requiredLength = 10;
+                }
+                if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
+                  requiredLength = 8;
+                }
+                ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
+              });
             });
         }
       };
@@ -597,7 +600,7 @@
           // In cases where UI initiates update, there may be an extra
           // call to refreshUI, but it doesn't create a cycle.
 
-          if (ngModel) {
+          if (ngModel && !attrs.ngOptions) {
             ngModel.$render = function () {
               $timeout(function () {
                 // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
@@ -628,7 +631,19 @@
             }
           }
 
-          init();
+          // If using ngOptions, the above methods do not work because option values get rewritten.
+          // Skip init and do something simpler.
+          if (attrs.ngOptions) {
+            $timeout(function() {
+              element.crmSelect2(scope.crmUiSelect || {});
+              // Ensure widget is updated when model changes
+              ngModel.$render = function () {
+                element.val(ngModel.$viewValue || '').change();
+              };
+            });
+          } else {
+            init();
+          }
         }
       };
     })
@@ -696,6 +711,82 @@
       };
     })
 
+    // Render a crmAutocomplete APIv4 widget
+    // usage: <input crm-autocomplete="'Contact'" crm-autocomplete-params={savedSearch: 'mySearch', filters: {is_deceased: false}}" ng-model="myobj.field" />
+    .directive('crmAutocomplete', function () {
+      return {
+        require: {
+          crmAutocomplete: 'crmAutocomplete',
+          ngModel: '?ngModel'
+        },
+        priority: 100,
+        bindToController: {
+          entity: '<crmAutocomplete',
+          crmAutocompleteParams: '<',
+          multi: '<',
+          autoOpen: '<',
+          staticOptions: '<'
+        },
+        link: function(scope, element, attr, ctrl) {
+          // Copied from ng-list but applied conditionally if field is multi-valued
+          var parseList = function(viewValue) {
+            // If the viewValue is invalid (say required but empty) it will be `undefined`
+            if (_.isUndefined(viewValue)) return;
+
+            if (!ctrl.crmAutocomplete.multi) {
+              return viewValue;
+            }
+
+            var list = [];
+
+            if (viewValue) {
+              _.each(viewValue.split(','), function(value) {
+                if (value) {
+                  list.push(_.trim(value));
+                }
+              });
+            }
+
+            return list;
+          };
+
+          if (ctrl.ngModel) {
+            // Ensure widget is updated when model changes
+            ctrl.ngModel.$render = function() {
+              element.val(ctrl.ngModel.$viewValue || '');
+            };
+
+            // Copied from ng-list
+            ctrl.ngModel.$parsers.push(parseList);
+            ctrl.ngModel.$formatters.push(function(value) {
+              return _.isArray(value) ? value.join(',') : value;
+            });
+
+            // Copied from ng-list
+            ctrl.ngModel.$isEmpty = function(value) {
+              return !value || !value.length;
+            };
+          }
+        },
+        controller: function($element, $timeout) {
+          var ctrl = this;
+
+          // Intitialize widget, and re-render it every time params change
+          this.$onChanges = function() {
+            // Timeout is to wait for `placeholder="{{ ts(...) }}"` to be resolved
+            $timeout(function() {
+              $element.crmAutocomplete(ctrl.entity, ctrl.crmAutocompleteParams, {
+                multiple: ctrl.multi,
+                // Only auto-open if there are no static options
+                minimumInputLength: ctrl.autoOpen && _.isEmpty(ctrl.staticOptions) ? 0 : 1,
+                static: ctrl.staticOptions || [],
+              });
+            });
+          };
+        }
+      };
+    })
+
     // validate multiple email text
     // usage: <input crm-multiple-email type="text" ng-model="myobj.field" />
     .directive('crmMultipleEmail', function ($parse, $timeout) {
@@ -754,19 +845,27 @@
         restrict: 'EA',
         scope: {
           crmUiTabSet: '@',
-          tabSetOptions: '@'
+          tabSetOptions: '<'
         },
         templateUrl: '~/crmUi/tabset.html',
         transclude: true,
         controllerAs: 'crmUiTabSetCtrl',
-        controller: function($scope, $parse) {
-          var tabs = $scope.tabs = []; // array<$scope>
+        controller: function($scope, $element, $timeout) {
+          var init;
+          $scope.tabs = [];
           this.add = function(tab) {
             if (!tab.id) throw "Tab is missing 'id'";
-            tabs.push(tab);
+            $scope.tabs.push(tab);
+
+            // Init jQuery.tabs() once all tabs have been added
+            if (init) {
+              $timeout.cancel(init);
+            }
+            init = $timeout(function() {
+              $element.find('.crm-tabset').tabs($scope.tabSetOptions);
+            });
           };
-        },
-        link: function (scope, element, attrs) {}
+        }
       };
     })
 
@@ -939,12 +1038,15 @@
             // handled in crmUiTab ctrl
             return;
           }
-          if (attrs.crmIcon.substring(0,3) == 'fa-') {
-            $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '" aria-hidden="true"></i> ');
+          if (attrs.crmIcon) {
+            if (attrs.crmIcon.substring(0,3) == 'fa-') {
+              $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '" aria-hidden="true"></i> ');
+            }
+            else {
+              $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+            }
           }
-          else {
-            $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
-          }
+
           // Add crm-* class to non-bootstrap buttons
           if ($(element).is('button:not(.btn)')) {
             $(element).addClass('crm-button');
@@ -1084,21 +1186,27 @@
             $timeout(function() {
               var newPageTitle = _.trim($el.html()),
                 newDocumentTitle = scope.crmDocumentTitle || $el.text(),
-                h1Count = 0;
-              document.title = $('title').text().replace(documentTitle, newDocumentTitle);
-              // If the CMS has already added title markup to the page, use it
-              $('h1').not('.crm-container h1').each(function() {
-                if ($(this).hasClass('crm-page-title') || _.trim($(this).html()) === pageTitle) {
-                  $(this).addClass('crm-page-title').html(newPageTitle);
-                  $el.hide();
-                  ++h1Count;
+                h1Count = 0,
+                dialog = $el.closest('.ui-dialog-content');
+              if (dialog.length) {
+                dialog.dialog('option', 'title', newDocumentTitle);
+                $el.hide();
+              } else {
+                document.title = $('title').text().replace(documentTitle, newDocumentTitle);
+                // If the CMS has already added title markup to the page, use it
+                $('h1').not('.crm-container h1').each(function () {
+                  if ($(this).hasClass('crm-page-title') || _.trim($(this).html()) === pageTitle) {
+                    $(this).addClass('crm-page-title').html(newPageTitle);
+                    $el.hide();
+                    ++h1Count;
+                  }
+                });
+                if (!h1Count) {
+                  $el.show();
                 }
-              });
-              if (!h1Count) {
-                $el.show();
+                pageTitle = newPageTitle;
+                documentTitle = newDocumentTitle;
               }
-              pageTitle = newPageTitle;
-              documentTitle = newDocumentTitle;
             });
           }
 
@@ -1154,6 +1262,34 @@
 
           element.attr('contenteditable', 'true');
         }
+      };
+    })
+
+    // Adds an icon picker widget
+    // Example: `<input crm-ui-icon-picker ng-model="model.icon">`
+    .directive('crmUiIconPicker', function($timeout) {
+      return {
+        restrict: 'A',
+        controller: function($element) {
+          CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
+            $timeout(function() {
+              $element.crmIconPicker();
+            });
+          });
+        }
+      };
+    })
+
+    // Reformat an array of objects for compatibility with select2
+    .factory('formatForSelect2', function() {
+      return function(input, key, label, extra) {
+        return _.transform(input, function(result, item) {
+          var formatted = {id: item[key], text: item[label]};
+          if (extra) {
+            _.merge(formatted, _.pick(item, extra));
+          }
+          result.push(formatted);
+        }, []);
       };
     })
 

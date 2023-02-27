@@ -4,7 +4,8 @@
  * Auto-register "**.mgd.php" files.
  *
  * @mixinName mgd-php
- * @mixinVersion 1.0.0
+ * @mixinVersion 1.1.0
+ * @since 5.45
  *
  * @param CRM_Extension_MixInfo $mixInfo
  *   On newer deployments, this will be an instance of MixInfo. On older deployments, Civix may polyfill with a work-a-like.
@@ -23,6 +24,8 @@ return function ($mixInfo, $bootCache) {
       return;
     }
 
+    // Optimization: if managed entities were requested for specific module(s),
+    // check name and return early if not applicable.
     if (is_array($event->modules) && !in_array($mixInfo->longName, $event->modules, TRUE)) {
       return;
     }

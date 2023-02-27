@@ -104,8 +104,10 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       }
       $this->_single = TRUE;
 
-      $params = ['id' => $this->_id];
-      CRM_Event_BAO_Event::retrieve($params, $eventInfo);
+      $eventInfo = \Civi\Api4\Event::get(FALSE)
+        ->addWhere('id', '=', $this->_id)
+        ->execute()
+        ->first();
 
       // its an update mode, do a permission check
       if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::EDIT)) {
@@ -114,14 +116,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       $participantListingID = $eventInfo['participant_listing_id'] ?? NULL;
       //CRM_Core_DAO::getFieldValue( 'CRM_Event_DAO_Event', $this->_id, 'participant_listing_id' );
-      if ($participantListingID) {
-        $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
-          "reset=1&id={$this->_id}",
-          TRUE, NULL, TRUE, TRUE
-        );
-        $this->assign('participantListingURL', $participantListingURL);
-      }
-
+      $this->assign('participantListingID', $participantListingID);
       $this->assign('isOnlineRegistration', CRM_Utils_Array::value('is_online_registration', $eventInfo));
 
       $this->assign('id', $this->_id);
@@ -228,15 +223,15 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     $defaults = [];
+    $event = \Civi\Api4\Event::get(FALSE);
     if (isset($this->_id)) {
-      $params = ['id' => $this->_id];
-      CRM_Event_BAO_Event::retrieve($params, $defaults);
-
+      $event->addWhere('id', '=', $this->_id);
+      $defaults = $event->execute()->first();
       $this->_campaignID = $defaults['campaign_id'] ?? NULL;
     }
     elseif ($this->_templateId) {
-      $params = ['id' => $this->_templateId];
-      CRM_Event_BAO_Event::retrieve($params, $defaults);
+      $event->addWhere('id', '=', $this->_templateId);
+      $defaults = $event->execute()->first();
       $defaults['is_template'] = $this->_isTemplate;
       $defaults['template_id'] = $defaults['id'];
       unset($defaults['id']);

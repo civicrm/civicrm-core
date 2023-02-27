@@ -36,7 +36,8 @@
       // Gets the first arg of type "field"
       function getFirstArgFromExpr(expr) {
         if (!(expr in meta)) {
-          meta[expr] = _.findWhere(searchMeta.parseExpr(expr).args, {type: 'field'});
+          var args = searchMeta.parseExpr(expr).args;
+          meta[expr] = _.findWhere(args, {type: 'field'});
         }
         return meta[expr] || {};
       }
@@ -59,6 +60,10 @@
 
       this.hasFunction = function(expr) {
         return expr.indexOf('(') > -1;
+      };
+
+      this.areFunctionsAllowed = function(expr) {
+        return this.allowFunctions && ctrl.getField(expr).type !== 'Filter';
       };
 
       this.addGroup = function(op) {

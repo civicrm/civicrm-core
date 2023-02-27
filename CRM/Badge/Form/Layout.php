@@ -25,12 +25,12 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   /**
    * Build the form object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      return parent::buildQuickForm();
+      parent::buildQuickForm();
+      return;
     }
 
-    $config = CRM_Core_Config::singleton();
     $resources = CRM_Core_Resources::singleton();
     $resources->addSetting(
       [
@@ -140,8 +140,8 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    */
   public function setDefaultValues() {
     if (isset($this->_id)) {
-      $defaults = array_merge($this->_values,
-        CRM_Badge_BAO_Layout::getDecodedData(CRM_Utils_Array::value('data', $this->_values, '[]')));
+      $data = empty($this->_values['data']) ? '{}' : $this->_values['data'];
+      $defaults = array_merge($this->_values, json_decode($data, TRUE));
     }
     else {
       for ($i = 1; $i <= self::FIELD_ROWCOUNT; $i++) {

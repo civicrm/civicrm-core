@@ -28,7 +28,7 @@
       </li>
     {$navigation}
   </ul>
-{/strip}{/capture}// <script> Generated {$smarty.now|date_format:'%d %b %Y %H:%M:%S'}
+{/strip}{/capture}// <script> Generated {$smarty.now|crmDate:'%d %b %Y %H:%M:%S'}
 {literal}
 (function($) {
   var menuMarkup = {/literal}{$menuMarkup|@json_encode}{literal};

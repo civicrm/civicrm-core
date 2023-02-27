@@ -18,6 +18,8 @@ class SqlFunctionREPLACE extends SqlFunction {
 
   protected static $category = self::CATEGORY_STRING;
 
+  protected static $dataType = 'String';
+
   protected static function params(): array {
     return [
       [

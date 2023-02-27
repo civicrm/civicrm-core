@@ -19,6 +19,8 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
 
   private $providers = [];
 
+  protected $ids = [];
+
   public function setUpHeadless() {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
@@ -218,7 +220,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
     $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
     $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
-    $this->assertNull($tokenRecord['contact_id']);
+    $this->assertTrue(!isset($tokenRecord['contact_id']));
   }
 
   public function testContactToken_AnonymousUser_CreateContact() {
@@ -254,7 +256,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
     $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
     $this->assertGreaterThan($notLoggedInContactID, $tokenRecord['contact_id']);
-    $contact = \Civi\Api4\Contact::get(0)
+    $contact = \Civi\Api4\Contact::get(FALSE)
       ->addWhere('id', '=', $tokenRecord['contact_id'])
       ->addJoin('Email AS email')
       ->addSelect('email.email')
@@ -351,7 +353,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
     $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
     $this->assertGreaterThan($loggedInContactID, $tokenRecord['contact_id']);
-    $contact = \Civi\Api4\Contact::get(0)
+    $contact = \Civi\Api4\Contact::get(FALSE)
       ->addWhere('id', '=', $tokenRecord['contact_id'])
       ->addJoin('Email AS email')
       ->addSelect('email.email')
@@ -385,7 +387,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
     $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
     $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
-    $this->assertNull($tokenRecord['contact_id']);
+    $this->assertTrue(!isset($tokenRecord['contact_id']));
   }
 
 }

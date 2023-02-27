@@ -12,11 +12,13 @@
 namespace Civi\Search;
 
 use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
+use Civi\Api4\Entity;
 use Civi\Api4\Extension;
 use Civi\Api4\Query\SqlEquation;
 use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Tag;
+use Civi\Api4\Utils\CoreUtil;
 use CRM_Search_ExtensionUtil as E;
 
 /**
@@ -29,6 +31,7 @@ class Admin {
    * Returns clientside data needed for the `crmSearchAdmin` Angular module.
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getAdminSettings():array {
     $schema = self::getSchema();
@@ -43,9 +46,11 @@ class Admin {
       'functions' => self::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
-      'defaultPagerSize' => \Civi::settings()->get('default_pager_size'),
+      'defaultPagerSize' => (int) \Civi::settings()->get('default_pager_size'),
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
       'modules' => $extensions,
+      'defaultContactType' => \CRM_Contact_BAO_ContactType::basicTypeInfo()['Individual']['name'] ?? NULL,
+      'defaultDistanceUnit' => \CRM_Utils_Address::getDefaultDistanceUnit(),
       'tags' => Tag::get()
         ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
@@ -116,10 +121,11 @@ class Admin {
    * Fetch all entities the current user has permission to `get`.
    *
    * @return array[]
+   * @throws \CRM_Core_Exception
    */
   public static function getSchema(): array {
     $schema = [];
-    $entities = \Civi\Api4\Entity::get()
+    $entities = Entity::get()
       ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
       ->addWhere('searchable', '!=', 'none')
       ->addOrderBy('title_plural')
@@ -134,11 +140,21 @@ class Admin {
         if ($links) {
           $entity['links'] = array_values($links);
         }
-        $getFields = civicrm_api4($entity['name'], 'getFields', [
-          'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
-          'where' => [['name', 'NOT IN', ['api_key', 'hash']]],
-          'orderBy' => ['label'],
-        ]);
+        $paths = CoreUtil::getInfoItem($entity['name'], 'paths');
+        if (!empty($paths['add'])) {
+          $entity['addPath'] = $paths['add'];
+        }
+        try {
+          $getFields = civicrm_api4($entity['name'], 'getFields', [
+            'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
+            'where' => [['deprecated', '=', FALSE], ['name', 'NOT IN', ['api_key', 'hash']]],
+            'orderBy' => ['label'],
+          ]);
+        }
+        catch (\CRM_Core_Exception $e) {
+          \Civi::log()->warning('Entity could not be loaded', ['entity' => $entity['name']]);
+          continue;
+        }
         foreach ($getFields as $field) {
           $field['fieldName'] = $field['name'];
           // Hack for RelationshipCache to make Relationship fields editable
@@ -190,6 +206,19 @@ class Admin {
             array_splice($entity['fields'], $index, 0, [$newField]);
           }
         }
+        // Useful address fields (see ContactSchemaMapSubscriber)
+        if ($entity['name'] === 'Contact') {
+          $addressFields = ['city', 'state_province_id', 'country_id'];
+          foreach ($addressFields as $fieldName) {
+            foreach (['primary', 'billing'] as $type) {
+              $newField = \CRM_Utils_Array::findAll($schema['Address']['fields'], ['name' => $fieldName])[0];
+              $newField['name'] = "address_$type.$fieldName";
+              $arg = [1 => $newField['label']];
+              $newField['label'] = $type === 'primary' ? ts('Address (primary) %1', $arg) : ts('Address (billing) %1', $arg);
+              $entity['fields'][] = $newField;
+            }
+          }
+        }
       }
     }
     return array_values($schema);
@@ -233,7 +262,7 @@ class Admin {
       }
       // Non-custom DAO entities
       elseif (!empty($entity['dao'])) {
-        /* @var \CRM_Core_DAO $daoClass */
+        /** @var \CRM_Core_DAO $daoClass */
         $daoClass = $entity['dao'];
         $references = $daoClass::getReferenceColumns();
         $fields = array_column($entity['fields'], NULL, 'name');
@@ -388,7 +417,11 @@ class Admin {
    *
    * @param string $alias
    * @param array ...$entities
+   *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
    */
   private static function getJoinDefaults(string $alias, ...$entities):array {
     $conditions = [];

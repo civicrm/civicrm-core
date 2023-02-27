@@ -124,7 +124,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $membershipTypeID2 = $this->membershipTypeCreate(['member_of_contact_id' => $this->setupIDs['contact']]);
 
     $priceSetID = $this->callAPISuccess('PriceSet', 'create', ['title' => 'blah', 'extends' => 'CiviMember'])['id'];
-    /* @var \CRM_Price_Form_Field $form */
+    /** @var \CRM_Price_Form_Field $form */
     $form = $this->getFormObject('CRM_Price_Form_Field');
     $_REQUEST['sid'] = $priceSetID;
     $form->preProcess();

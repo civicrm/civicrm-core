@@ -7,6 +7,11 @@
   <add>3.2</add>
   <log>true</log>
   <component>CiviContribute</component>
+  <paths>
+    <add>civicrm/admin/financial/financialAccount/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/financial/financialAccount/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/financial/financialAccount/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Financial Account ID</title>
@@ -157,6 +162,10 @@
     <comment>Is this property active?</comment>
     <default>1</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>4.3</add>
   </field>
   <field>
@@ -166,6 +175,10 @@
     <comment>Is this account the default one (or default tax one) for its financial_account_type?</comment>
     <default>0</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <add>4.3</add>
   </field>
   <index>

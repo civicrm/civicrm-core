@@ -21,6 +21,13 @@
 class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'ContactType';
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {

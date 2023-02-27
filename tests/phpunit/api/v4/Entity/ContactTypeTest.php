@@ -20,7 +20,7 @@
 namespace api\v4\Entity;
 
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\ContactType;
 use Civi\Api4\Email;
 use Civi\Api4\Navigation;
@@ -29,7 +29,7 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class ContactTypeTest extends UnitTestCase implements TransactionalInterface {
+class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
 
   public function testMenuItemWillBeCreatedAndDeleted() {
     ContactType::create(FALSE)

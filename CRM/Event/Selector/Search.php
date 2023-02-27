@@ -516,7 +516,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   }
 
   /**
-   * @return string
+   * @return CRM_Contact_BAO_Query
    */
   public function &getQuery() {
     return $this->_query;

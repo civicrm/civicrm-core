@@ -8,6 +8,7 @@
   <add>2.2</add>
   <log>true</log>
   <component>CiviContribute</component>
+  <title>Personal Campaign Block</title>
   <field>
     <name>id</name>
     <title>PCP Block ID</title>
@@ -142,6 +143,10 @@
     <comment>Is Personal Campaign Page Block enabled/active?</comment>
     <default>1</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>2.2</add>
   </field>
   <field>

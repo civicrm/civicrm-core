@@ -334,9 +334,11 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
+          if (!empty($field['pseudofield'])) {
+            continue;
+          }
           if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
-
-            # for statistics
+            // For statistics
             if (!empty($field['statistics'])) {
               switch ($field['statistics']['calc']) {
                 case 'PERCENTAGE':
@@ -644,7 +646,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           $entryFound = TRUE;
         }
         if (array_key_exists('civicrm_mailing_event_opened_open_count', $row)) {
-          $rows[$rowNum]['civicrm_mailing_event_opened_open_count'] = CRM_Mailing_Event_BAO_Opened::getTotalCount($row['civicrm_mailing_id']);
+          $rows[$rowNum]['civicrm_mailing_event_opened_open_count'] = CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($row['civicrm_mailing_id']);
           $entryFound = TRUE;
         }
       }

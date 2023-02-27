@@ -127,19 +127,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Get any smarty elements that may not be present in the form.
-   *
-   * To make life simpler for smarty we ensure they are set to null
-   * rather than unset. This is done at the last minute when $this
-   * is converted to an array to be assigned to the form.
-   *
-   * @return array
-   */
-  public function getOptionalSmartyElements(): array {
-    return ['group'];
-  }
-
-  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
@@ -957,6 +944,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if (array_key_exists('CommunicationPreferences', $this->_editOptions)) {
       // this is a chekbox, so mark false if we dont get a POST value
       $params['is_opt_out'] = CRM_Utils_Array::value('is_opt_out', $params, FALSE);
+
+      CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
     }
 
     // process shared contact address.

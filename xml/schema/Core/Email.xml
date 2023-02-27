@@ -84,7 +84,7 @@
   </index>
   <field>
     <name>is_primary</name>
-    <title>Primary email</title>
+    <title>Is Primary</title>
     <type>boolean</type>
     <default>0</default>
     <required>true</required>
@@ -143,6 +143,7 @@
     <name>hold_date</name>
     <type>datetime</type>
     <comment>When the address went on bounce hold</comment>
+    <readonly>true</readonly>
     <html>
       <label>Hold Date</label>
       <type>Select Date</type>

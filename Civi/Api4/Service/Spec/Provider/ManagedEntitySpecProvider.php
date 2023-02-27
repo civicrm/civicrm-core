@@ -26,8 +26,10 @@ use Civi\Api4\Utils\ReflectionUtils;
 
 /**
  * Provides calculated fields for APIs using the `ManagedEntity` trait
+ * @service
+ * @internal
  */
-class ManagedEntitySpecProvider implements Generic\SpecProviderInterface {
+class ManagedEntitySpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec

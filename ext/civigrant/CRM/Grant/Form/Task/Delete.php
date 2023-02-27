@@ -39,7 +39,7 @@ class CRM_Grant_Form_Task_Delete extends CRM_Grant_Form_Task {
     parent::preProcess();
 
     //check permission for delete.
-    if (!CRM_Core_Permission::checkActionPermission('CiviGrant', CRM_Core_Action::DELETE)) {
+    if (!CRM_Core_Permission::check('delete in CiviGrant')) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
   }

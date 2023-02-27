@@ -20,9 +20,14 @@
  */
 class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/import/activity';
-
-  const IMPORT_ENTITY = 'Activity';
+  /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'activity_import';
+  }
 
   /**
    * @var bool
@@ -30,30 +35,15 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public $submitOnce = TRUE;
 
   /**
-   * Build the form object.
+   * @return CRM_Activity_Import_Parser_Activity
    */
-  public function buildQuickForm() {
-    parent::buildQuickForm();
-
-    // FIXME: This 'onDuplicate' form element is never used -- copy/paste error?
-    $this->addRadio('onDuplicate', ts('On duplicate entries'), [
-      CRM_Import_Parser::DUPLICATE_SKIP => ts('Skip'),
-      CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update'),
-      CRM_Import_Parser::DUPLICATE_FILL => ts('Fill'),
-    ]);
-  }
-
-  /**
-   * Process the uploaded file.
-   */
-  public function postProcess() {
-    $this->storeFormValues([
-      'onDuplicate',
-      'dateFormats',
-      'savedMapping',
-    ]);
-
-    $this->submitFileForMapping('CRM_Activity_Import_Parser_Activity');
+  protected function getParser(): CRM_Activity_Import_Parser_Activity {
+    if (!$this->parser) {
+      $this->parser = new CRM_Activity_Import_Parser_Activity();
+      $this->parser->setUserJobID($this->getUserJobID());
+      $this->parser->init();
+    }
+    return $this->parser;
   }
 
 }

@@ -2,3 +2,6 @@
   <input class="crm-form-radio" type="radio" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]" ng-value="opt.id" />
   {{:: opt.label }}
 </label>
+<a ng-if="!$ctrl.defn.required" class="crm-hover-button" title="{{:: ts('Clear') }}" ng-show="!!dataProvider.getFieldData()[$ctrl.fieldName] || dataProvider.getFieldData()[$ctrl.fieldName] === false || dataProvider.getFieldData()[$ctrl.fieldName] === 0" ng-click="dataProvider.getFieldData()[$ctrl.fieldName] = null">
+  <i class="crm-i fa-times" aria-hidden="true"></i>
+</a>

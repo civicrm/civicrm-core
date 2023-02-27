@@ -42,6 +42,7 @@ class Data {
       unset($query, $query2, $query3);
 
       \Civi\Test::schema()->setStrict(TRUE);
+      \Civi::reset();
     });
 
     civicrm_api('setting', 'create', ['installed' => 1, 'domain_id' => 'all', 'version' => 3]);

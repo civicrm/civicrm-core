@@ -11,6 +11,8 @@
 
 namespace Civi\Test;
 
+use Civi\Core\ClassScanner;
+
 class ExampleDataLoader {
 
   /**
@@ -64,7 +66,7 @@ class ExampleDataLoader {
       return NULL;
     }
 
-    $obj = $this->createObj($example['file'], $example['class']);
+    $obj = $this->createObj($example['class']);
     $obj->build($example);
     return $example;
   }
@@ -77,22 +79,15 @@ class ExampleDataLoader {
    * @throws \ReflectionException
    */
   protected function findMetas(): array {
-    $classes = array_merge(
-      // This scope of search is decidedly narrow - it should probably be expanded.
-      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/'), 'Civi/Test/ExampleData', '\\'),
-      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/'), 'CRM/*/WorkflowMessage', '_'),
-      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/'), 'Civi/*/WorkflowMessage', '\\'),
-      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/'), 'Civi/WorkflowMessage', '\\'),
-      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/tests/phpunit/'), 'CRM/*/WorkflowMessage', '_'),
-      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/tests/phpunit/'), 'Civi/*/WorkflowMessage', '\\')
-    );
+    $classes = ClassScanner::get(['interface' => ExampleDataInterface::class]);
 
     $all = [];
-    foreach ($classes as $file => $class) {
-      $obj = $this->createObj($file, $class);
+    foreach ($classes as $class) {
+      $reflClass = new \ReflectionClass($class);
+      $obj = $this->createObj($class);
       $offset = 0;
       foreach ($obj->getExamples() as $example) {
-        $example['file'] = $file;
+        $example['file'] = \CRM_Utils_File::relativize($reflClass->getFileName(), \Civi::paths()->getPath('[civicrm.root]/'));
         $example['class'] = $class;
         if (!isset($example['name'])) {
           $example['name'] = $example['class'] . '#' . $offset;
@@ -105,43 +100,9 @@ class ExampleDataLoader {
     return $all;
   }
 
-  /**
-   * @param $classRoot
-   *   Ex: Civi root dir.
-   * @param $classDir
-   *   Folder to search (within the parent).
-   * @param $classDelim
-   *   Namespace separator, eg underscore or backslash.
-   * @return array
-   *   Array(string $includeFile => string $className).
-   */
-  private function scanExampleClasses($classRoot, $classDir, $classDelim): array {
-    $civiRoot = \Civi::paths()->getPath('[civicrm.root]/');
-    $classRoot = \CRM_Utils_File::addTrailingSlash($classRoot, '/');
-    // Prefer include-paths relative to civiRoot - eg make tests/phpunit/* loadable at runtime.
-    $includeRoot = \CRM_Utils_File::isChildPath($civiRoot, $classRoot) ? $civiRoot : $classRoot;
-
-    $r = [];
-    $exDirs = (array) glob($classRoot . $classDir);
-    foreach ($exDirs as $exDir) {
-      foreach (\CRM_Utils_File::findFiles($exDir, '*.ex.php') as $file) {
-        $file = str_replace(DIRECTORY_SEPARATOR, '/', $file);
-        $includeFile = \CRM_Utils_File::relativize($file, $includeRoot);
-        $classFile = \CRM_Utils_File::relativize($file, $classRoot);
-        $class = str_replace('/', $classDelim, preg_replace('/\.ex\.php$/', '',
-          $classFile));
-        $r[$includeFile] = $class;
-      }
-    }
-    return $r;
-  }
-
-  private function createObj(?string $file, ?string $class): ExampleDataInterface {
-    if ($file) {
-      include_once $file;
-    }
+  private function createObj(?string $class): ExampleDataInterface {
     if (!class_exists($class)) {
-      throw new \CRM_Core_Exception("Failed to read example (class '{$class}' in file '{$file}')");
+      throw new \CRM_Core_Exception("Failed to read example (class '{$class}')");
     }
 
     return new $class();

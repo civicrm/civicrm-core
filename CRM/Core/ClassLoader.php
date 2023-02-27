@@ -152,7 +152,7 @@ class CRM_Core_ClassLoader {
     if (
       // Only load classes that clearly belong to CiviCRM.
       // Note: api/v3 does not use classes, but api_v3's test-suite does
-      (0 === strncmp($class, 'CRM_', 4) || 0 === strncmp($class, 'CRMTraits', 9) || 0 === strncmp($class, 'api_v3_', 7) || 0 === strncmp($class, 'WebTest_', 8) || 0 === strncmp($class, 'E2E_', 4)) &&
+      (0 === strncmp($class, 'CRM_', 4) || 0 === strncmp($class, 'CRMTraits', 9) || 0 === strncmp($class, 'api_v3_', 7) || 0 === strncmp($class, 'E2E_', 4)) &&
       // Do not load PHP 5.3 namespaced classes.
       // (in a future version, maybe)
       FALSE === strpos($class, '\\')
@@ -169,14 +169,6 @@ class CRM_Core_ClassLoader {
       $file = "tests/phpunit/CiviTest/{$class}.php";
       if (FALSE != stream_resolve_include_path($file)) {
         require_once $file;
-      }
-    }
-    elseif ($class === 'CiviSeleniumSettings') {
-      if (!empty($GLOBALS['_CV'])) {
-        require_once 'tests/phpunit/CiviTest/CiviSeleniumSettings.auto.php';
-      }
-      elseif (CRM_Utils_File::isIncludable('tests/phpunit/CiviTest/CiviSeleniumSettings.php')) {
-        require_once 'tests/phpunit/CiviTest/CiviSeleniumSettings.php';
       }
     }
   }

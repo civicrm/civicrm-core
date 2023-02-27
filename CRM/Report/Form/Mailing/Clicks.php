@@ -171,7 +171,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     ];
 
     $this->_columns['civicrm_mailing_event_trackable_url_open'] = [
-      'dao' => 'CRM_Mailing_Event_DAO_TrackableURLOpen',
+      'dao' => 'CRM_Mailing_Event_DAO_MailingEventClickThrough',
       'fields' => [
         'time_stamp' => [
           'title' => ts('Click Date'),

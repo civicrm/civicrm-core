@@ -128,6 +128,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   public $submitOnce = TRUE;
 
   /**
+   * @var array
+   */
+  public $_groupTree;
+
+  public $_entityTagValues;
+
+  /**
    * Explicitly declare the entity api name.
    *
    * @return string
@@ -610,7 +617,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * Build Quick form.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::RENEW)) {
@@ -683,7 +689,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // Add engagement level CRM-7775
     $buildEngagementLevel = FALSE;
-    if (CRM_Campaign_BAO_Campaign::isCampaignEnable() &&
+    if (CRM_Campaign_BAO_Campaign::isComponentEnabled() &&
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
       $buildEngagementLevel = TRUE;
@@ -698,7 +704,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // check for survey activity
     $this->_isSurveyActivity = FALSE;
 
-    if ($this->_activityId && CRM_Campaign_BAO_Campaign::isCampaignEnable() &&
+    if ($this->_activityId && CRM_Campaign_BAO_Campaign::isComponentEnabled() &&
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
 
@@ -886,7 +892,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @param array $params
    *
    * @return array|null
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess($params = NULL) {
     if ($this->_action & CRM_Core_Action::DELETE) {

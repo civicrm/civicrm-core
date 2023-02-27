@@ -153,8 +153,8 @@
         {/if}
         {if !empty($showContactFilter)}{* contactOptions is exposed for email/postal greeting and addressee types to set filter for contact types *}
            <tr class="crm-admin-options-form-block-contactOptions">
-             <td class="label">{$form.contactOptions.label}</td>
-             <td>{$form.contactOptions.html}</td>
+             <td class="label">{$form.contact_type_id.label}</td>
+             <td>{$form.contact_type_id.html}</td>
            </tr>
         {/if}
     </table>

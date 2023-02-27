@@ -33,7 +33,6 @@ class CRM_Upgrade_Incremental_php_FiveThirty extends CRM_Upgrade_Incremental_Bas
    *
    * @return bool
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function installFinancialAcls(CRM_Queue_TaskContext $ctx) {

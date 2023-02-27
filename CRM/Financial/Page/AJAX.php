@@ -503,7 +503,6 @@ class CRM_Financial_Page_AJAX {
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function getBatchSummary(): void {
@@ -516,7 +515,6 @@ class CRM_Financial_Page_AJAX {
    * @param $batchID
    *
    * @return array
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public static function makeBatchSummary(int $batchID): array {

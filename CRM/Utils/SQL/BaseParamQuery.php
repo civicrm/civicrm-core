@@ -125,7 +125,7 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
                 $values[$valueKey] = 'NULL';
               }
               elseif (!is_numeric($value)) {
-                //throw new API_Exception("Failed encoding non-numeric value" . var_export(array($m[0] => $values), TRUE));
+                //throw new CRM_Core_Exception("Failed encoding non-numeric value" . var_export(array($m[0] => $values), TRUE));
                 throw new CRM_Core_Exception("Failed encoding non-numeric value (" . $m[0] . ")");
               }
             }
@@ -184,7 +184,7 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
    *
    * @return bool
    */
-  public function offsetExists($offset) {
+  public function offsetExists($offset): bool {
     return isset($this->params[$offset]);
   }
 
@@ -202,6 +202,7 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
    * @see param()
    * @see ArrayAccess::offsetGet
    */
+  #[ReturnTypeWillChange]
   public function offsetGet($offset) {
     return $this->params[$offset];
   }
@@ -223,7 +224,7 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
    * @see param()
    * @see ArrayAccess::offsetSet
    */
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     $this->param($offset, $value);
   }
 
@@ -234,7 +235,7 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
    * @see param()
    * @see ArrayAccess::offsetUnset
    */
-  public function offsetUnset($offset) {
+  public function offsetUnset($offset): void {
     unset($this->params[$offset]);
   }
 

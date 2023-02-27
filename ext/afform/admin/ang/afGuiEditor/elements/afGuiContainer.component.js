@@ -17,6 +17,7 @@
     controller: function($scope, $element, crmApi4, dialogService, afGui) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
+      var genericElements = [];
 
       this.$onInit = function() {
         if (ctrl.node['#tag'] && ((ctrl.node['#tag'] in afGui.meta.blocks) || ctrl.join)) {
@@ -39,6 +40,11 @@
           }
           initializeBlockContainer();
         }
+        _.each(afGui.meta.elements, function(element) {
+          if (element.directive) {
+            genericElements.push(element.directive);
+          }
+        });
       };
 
       this.sortableOptions = {
@@ -109,7 +115,9 @@
       };
 
       $scope.isRepeatable = function() {
-        return ctrl.node['af-fieldset'] || (block.directive && afGui.meta.blocks[block.directive].repeat) || ctrl.join;
+        return ctrl.join ||
+          (block.directive && afGui.meta.blocks[block.directive].repeat) ||
+          (ctrl.node['af-fieldset'] && ctrl.editor.getEntityDefn(ctrl.editor.getEntity(ctrl.node['af-fieldset'])) !== false);
       };
 
       this.toggleRepeat = function() {
@@ -335,6 +343,9 @@
         if (node['#tag'] && (node['#tag'].slice(0, 19) === 'crm-search-display-')) {
           return 'searchDisplay';
         }
+        if (node['#tag'] && _.includes(genericElements, node['#tag'])) {
+          return 'generic';
+        }
         var classes = afGui.splitClass(node['class']),
           types = ['af-container', 'af-text', 'af-button', 'af-markup'],
           type = _.intersection(types, classes);
@@ -398,7 +409,7 @@
       };
 
       // Returns the entity type for fields within this conainer (join entity type if this is a join, else the primary entity type)
-      this.getFieldEntityType = function(fieldName) {
+      this.getFieldEntityType = function(fieldKey) {
         var entityType;
         // If entityName is declared for this fieldset, return entity-type or join-type
         if (ctrl.entityName) {
@@ -407,17 +418,22 @@
         } else {
           var searchKey = ctrl.getDataEntity(),
             searchDisplay = afGui.getSearchDisplay.apply(null, searchKey.split('.')),
-            prefix = _.includes(fieldName, '.') ? fieldName.split('.')[0] : null;
+            fieldName = fieldKey.substr(fieldKey.indexOf('.') + 1),
+            prefix = _.includes(fieldKey, '.') ? fieldKey.split('.')[0] : null;
           if (prefix) {
             _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
               var joinInfo = join[0].split(' AS ');
               if (prefix === joinInfo[1]) {
                 entityType = joinInfo[0];
+                // If entity doesn't contain field, it belongs to the bridge join
+                if (!(fieldName in afGui.getEntity(entityType).fields)) {
+                  entityType = join[2];
+                }
                 return false;
               }
             });
           }
-          if (!entityType && fieldName && afGui.getField(searchDisplay['saved_search_id.api_entity'], fieldName)) {
+          if (!entityType) {
             entityType = searchDisplay['saved_search_id.api_entity'];
           }
         }

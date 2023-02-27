@@ -15,37 +15,37 @@
  */
 class api_v3_CaseTypeTest extends CiviCaseTestCase {
 
+  const APPLICATION_WITH_DEFINITION_PARAMS = [
+    'title' => 'Application with Definition',
+    'name' => 'Application_with_Definition',
+    'is_active' => 1,
+    'weight' => 4,
+    'definition' => [
+      'activityTypes' => [
+        ['name' => 'First act'],
+      ],
+      'activitySets' => [
+        [
+          'name' => 'set1',
+          'label' => 'Label 1',
+          'timeline' => 1,
+          'activityTypes' => [
+            ['name' => 'Open Case', 'status' => 'Completed'],
+          ],
+        ],
+      ],
+      'timelineActivityTypes' => [
+        ['name' => 'Open Case', 'status' => 'Completed'],
+      ],
+      'caseRoles' => [
+        ['name' => 'First role', 'creator' => 1, 'manager' => 1],
+      ],
+    ],
+  ];
+
   public function setUp(): void {
     $this->quickCleanup(['civicrm_case_type']);
     parent::setUp();
-
-    $this->fixtures['Application_with_Definition'] = [
-      'title' => 'Application with Definition',
-      'name' => 'Application_with_Definition',
-      'is_active' => 1,
-      'weight' => 4,
-      'definition' => [
-        'activityTypes' => [
-          ['name' => 'First act'],
-        ],
-        'activitySets' => [
-          [
-            'name' => 'set1',
-            'label' => 'Label 1',
-            'timeline' => 1,
-            'activityTypes' => [
-              ['name' => 'Open Case', 'status' => 'Completed'],
-            ],
-          ],
-        ],
-        'timelineActivityTypes' => [
-          ['name' => 'Open Case', 'status' => 'Completed'],
-        ],
-        'caseRoles' => [
-          ['name' => 'First role', 'creator' => 1, 'manager' => 1],
-        ],
-      ],
-    ];
   }
 
   /**
@@ -174,7 +174,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    */
   public function testCaseTypeCreateWithDefinition() {
     // Create Case Type
-    $params = $this->fixtures['Application_with_Definition'];
+    $params = self::APPLICATION_WITH_DEFINITION_PARAMS;
     $result = $this->callAPISuccess('CaseType', 'create', $params);
     $id = $result['id'];
 
@@ -193,7 +193,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    */
   public function testCaseTypeDelete_InUse() {
     // Create Case Type
-    $params = $this->fixtures['Application_with_Definition'];
+    $params = self::APPLICATION_WITH_DEFINITION_PARAMS;
     $createCaseType = $this->callAPISuccess('CaseType', 'create', $params);
 
     $createCase = $this->callAPISuccess('Case', 'create', [
@@ -244,7 +244,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   public function testDefinitionGroups() {
     $gid1 = $this->groupCreate(['name' => 'testDefinitionGroups1', 'title' => 'testDefinitionGroups1']);
     $gid2 = $this->groupCreate(['name' => 'testDefinitionGroups2', 'title' => 'testDefinitionGroups2']);
-    $def = $this->fixtures['Application_with_Definition'];
+    $def = self::APPLICATION_WITH_DEFINITION_PARAMS;
     $def['definition']['caseRoles'][] = [
       'name' => 'Second role',
       'groups' => ['testDefinitionGroups1', 'testDefinitionGroups2'],

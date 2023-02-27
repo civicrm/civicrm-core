@@ -152,7 +152,6 @@ class CRM_Activity_BAO_Query {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
-        $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
     }
@@ -167,7 +166,7 @@ class CRM_Activity_BAO_Query {
    * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingle(&$values, &$query) {
-    list($name, $op, $value, $grouping) = $values;
+    [$name, $op, $value, $grouping] = $values;
 
     $fields = CRM_Activity_BAO_Activity::exportableFields();
     $fieldSpec = $query->getFieldSpec($name);
@@ -199,7 +198,7 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_priority':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, 'String');
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
+        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [
           1 => $fields[$name]['title'],
           2 => $op,
@@ -332,7 +331,7 @@ class CRM_Activity_BAO_Query {
       case 'source_contact_id':
         $columnName = strstr($name, '_id') ? 'id' : 'sort_name';
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("source_contact.{$columnName}", $op, $value, CRM_Utils_Type::typeToString($fields[$name]['type']));
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Contact', $columnName, $value, $op);
+        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Contact', $columnName, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [
           1 => $fields[$name]['title'],
           2 => $op,
@@ -344,8 +343,8 @@ class CRM_Activity_BAO_Query {
 
   /**
    * @param string $name
-   * @param $mode
-   * @param $side
+   * @param int $mode
+   * @param string $side
    *
    * @return null|string
    */
@@ -407,7 +406,7 @@ class CRM_Activity_BAO_Query {
   /**
    * Get the metadata for fields to be included on the activity search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @todo ideally this would be a trait included on the activity search & advanced search
    * rather than a static function.
    */
@@ -431,7 +430,6 @@ class CRM_Activity_BAO_Query {
    *
    * @param CRM_Core_Form_Search $form
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function buildSearchForm(&$form) {
@@ -500,7 +498,7 @@ class CRM_Activity_BAO_Query {
     // Add engagement level CRM-7775.
     $buildEngagementLevel = FALSE;
     $buildSurveyResult = FALSE;
-    if (CRM_Campaign_BAO_Campaign::isCampaignEnable() &&
+    if (CRM_Campaign_BAO_Campaign::isComponentEnabled() &&
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
       $buildEngagementLevel = TRUE;
@@ -626,7 +624,7 @@ class CRM_Activity_BAO_Query {
    * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingleActivityText(&$values, &$query) {
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    [$name, $op, $value, $grouping, $wildcard] = $values;
     $activityOptionValues = $query->getWhereValues('activity_option', $grouping);
     $activityOption = CRM_Utils_Array::value(2, $activityOptionValues, 6);
 
@@ -642,7 +640,7 @@ class CRM_Activity_BAO_Query {
     }
 
     $query->_where[$grouping][] = "( " . implode(' OR ', $clauses) . " )";
-    list($qillOp, $qillVal) = $query->buildQillForFieldValue(NULL, $name, $value, $op);
+    [$qillOp, $qillVal] = $query->buildQillForFieldValue(NULL, $name, $value, $op);
     $query->_qill[$grouping][] = ts("%1 %2 '%3'", [
       1 => $label,
       2 => $qillOp,

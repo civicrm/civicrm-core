@@ -20,7 +20,6 @@ class CRM_Contact_Form_Search_Criteria {
    * @param CRM_Contact_Form_Search_Advanced $form
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function basic(&$form) {
     $form->addSearchFieldMetadata(['Contact' => self::getFilteredSearchFieldMetadata('basic')]);
@@ -78,9 +77,8 @@ class CRM_Contact_Form_Search_Criteria {
       foreach ($used_for as $key => $value) {
         //check tags for every type and find if there are any defined
         $tags = CRM_Core_BAO_Tag::getTagsUsedFor($key, FALSE, TRUE, NULL);
-        // check if there are tags other than contact type, if no - keep checkbox hidden on adv search
-        // we will hide searching contact by attachments tags until it will be implemented in core
-        if (count($tags) && $key != 'civicrm_file' && $key != 'civicrm_contact') {
+        // check if there are tags for cases or activities, if no - keep checkbox hidden on adv search
+        if (count($tags) && ($key == 'civicrm_case' || $key == 'civicrm_activity')) {
           //if tags exists then add type to display in adv search form help text
           $tagsTypes[] = $value;
           $showAllTagTypes = TRUE;
@@ -244,7 +242,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * Get the metadata for fields to be included on the contact search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -291,7 +289,7 @@ class CRM_Contact_Form_Search_Criteria {
    * @param string $filter
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getFilteredSearchFieldMetadata($filter) {
     $fields = self::getSearchFieldMetadata();
@@ -308,14 +306,18 @@ class CRM_Contact_Form_Search_Criteria {
    *
    * @param CRM_Core_Form $form
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function setBasicSearchFields($form) {
     $searchFields = [];
     foreach (self::getFilteredSearchFieldMetadata('basic') as $fieldName => $field) {
       $searchFields[$fieldName] = $field;
     }
-    $form->assign('basicSearchFields', array_merge(self::getBasicSearchFields(), $searchFields));
+    $fields = array_merge(self::getBasicSearchFields(), $searchFields);
+    foreach ($fields as $index => $field) {
+      $fields[$index] = array_merge(['class' => '', 'is_custom' => FALSE, 'template' => '', 'help' => '', 'description' => ''], $field);
+    }
+    $form->assign('basicSearchFields', $fields);
   }
 
   /**
@@ -323,7 +325,6 @@ class CRM_Contact_Form_Search_Criteria {
    *
    */
   public static function getBasicSearchFields() {
-    $userFramework = CRM_Core_Config::singleton()->userFramework;
     return [
       // For now an empty array is still left in place for ordering.
       'sort_name' => [],
@@ -382,7 +383,6 @@ class CRM_Contact_Form_Search_Criteria {
       ],
       'uf_user' => [
         'name' => 'uf_user',
-        'description' => ts('Does the contact have a %1 Account?', [$userFramework]),
       ],
     ];
   }
@@ -502,7 +502,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form $form
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function changeLog(&$form) {
     $form->add('hidden', 'hidden_changeLog', 1);
@@ -522,7 +522,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form_Search $form
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function relationship(&$form) {
     $form->add('hidden', 'hidden_relationship', 1);
@@ -555,7 +555,7 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * @param CRM_Core_Form_Search $form
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function demographics(&$form) {
     $form->add('hidden', 'hidden_demographics', 1);
@@ -599,7 +599,7 @@ class CRM_Contact_Form_Search_Criteria {
    *
    * @param CRM_Contact_Form_Search $form
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function custom(&$form) {
     $form->add('hidden', 'hidden_custom', 1);

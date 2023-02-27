@@ -90,10 +90,15 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
   /**
    * Set up variables to build the form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     $this->addOptionalQuickFormElement('parents');
-    $this->addExpectedSmartyVariable('parent_groups');
+    $this->addExpectedSmartyVariables([
+      'parent_groups',
+      'editSmartGroupURL',
+    ]);
     $this->_id = $this->get('id');
     if ($this->_id) {
       $breadCrumb = array(
@@ -127,12 +132,12 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         $this->setTitle(ts('Confirm Group Delete'));
       }
       if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
-        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved group."));
+        CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to delete this reserved group.'));
       }
     }
     else {
       if ($this->_id && $this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
-        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to change settings for this reserved group."));
+        CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to change settings for this reserved group.'));
       }
       if (isset($this->_id)) {
         $groupValues = array(
@@ -140,18 +145,11 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
           'title' => $this->_title,
           'saved_search_id' => $this->_groupValues['saved_search_id'] ?? '',
         );
-        if (isset($this->_groupValues['saved_search_id'])) {
-          $this->assign('editSmartGroupURL', CRM_Contact_BAO_SavedSearch::getEditSearchUrl($this->_groupValues['saved_search_id']));
-        }
-        if (!empty($this->_groupValues['created_id'])) {
-          $groupValues['created_by'] = CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['created_id'], 'sort_name', 'id');
-        }
+        $this->assign('editSmartGroupURL', isset($this->_groupValues['saved_search_id']) ? CRM_Contact_BAO_SavedSearch::getEditSearchUrl($this->_groupValues['saved_search_id']) : NULL);
+        $groupValues['created_by'] = empty($this->_groupValues['created_id']) ? NULL : CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_groupValues['created_id'], 'sort_name', 'id');
+        $groupValues['modified_by'] = empty($this->_groupValues['modified_id']) ? NULL : CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_groupValues['modified_id'], 'sort_name', 'id');
 
-        if (!empty($this->_groupValues['modified_id'])) {
-          $groupValues['modified_by'] = CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['modified_id'], 'sort_name', 'id');
-        }
-
-        $this->assign_by_ref('group', $groupValues);
+        $this->assign('group', $groupValues);
 
         $this->setTitle(ts('Group Settings: %1', array(1 => $this->_title)));
       }
@@ -190,12 +188,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       $defaults['is_active'] = 1;
     }
 
-    if (!((CRM_Core_Permission::check('access CiviMail')) ||
-      (CRM_Mailing_Info::workflowEnabled() &&
-        CRM_Core_Permission::check('create mailings')
-      )
-    )
-    ) {
+    if (!$this->isPermitMailingGroupAccess()) {
       $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
       if ($defaults['group_type'][$groupTypes['Mailing List']] == 1) {
         $this->assign('freezeMailingList', $groupTypes['Mailing List']);
@@ -469,6 +462,15 @@ WHERE  title = %1
       $props = array('api' => array('params' => array('contact_type' => 'Organization')));
       $form->addEntityRef('organization_id', ts('Organization'), $props);
     }
+  }
+
+  /**
+   * Does the user have permissions allowing them to create groups with option_type set to mailing?
+   *
+   * @return bool
+   */
+  protected function isPermitMailingGroupAccess(): bool {
+    return CRM_Core_Permission::check('access CiviMail') || (CRM_Mailing_Info::workflowEnabled() && CRM_Core_Permission::check('create mailings'));
   }
 
 }

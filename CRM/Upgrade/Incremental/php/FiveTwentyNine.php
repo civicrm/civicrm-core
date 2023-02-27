@@ -42,7 +42,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Install eventcart extension', 'installEventCart');
 
-    list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+    [$minId, $maxId] = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
       FROM civicrm_relationship ")->getDatabaseResult()->fetchRow();
     for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
       $endId = $startId + self::BATCH_SIZE - 1;
@@ -93,7 +93,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
    *
    * @return bool
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function installEventCart(CRM_Queue_TaskContext $ctx) {

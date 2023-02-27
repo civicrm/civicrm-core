@@ -13,10 +13,10 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2021-11-11</releaseDate>
-  <version>5.50.alpha1</version>
+  <version>5.60.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.50</ver>
+    <ver>5.60</ver>
   </compatibility>
   <comments>CiviGrant was originally a core component before migrating to an extension</comments>
   <requires>
@@ -24,15 +24,19 @@
     <ext>org.civicrm.search_kit</ext>
   </requires>
   <classloader>
-    <psr0 prefix="CRM_" path=""/>
+    <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <upgrader>CRM_Grant_Upgrader</upgrader>
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
+    <mixin>afform-entity-php@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.0</mixin>
+    <mixin>entity-types-php@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Grant</namespace>
+    <format>23.02.0</format>
   </civix>
 </extension>

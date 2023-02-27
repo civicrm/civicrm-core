@@ -58,8 +58,6 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
 
   /**
    * Test that case tokens are consistently rendered.
-   *
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCaseTokenConsistency(): void {
     $this->createLoggedInUser();
@@ -67,17 +65,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Case']);
     $tokens = CRM_Core_SelectValues::caseTokens();
     $this->assertEquals($this->getCaseTokens(), $tokens);
-    $caseID = $this->getCaseID();
     $tokenString = $this->getTokenString(array_keys($this->getCaseTokens()));
-    $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseID, $tokenString, ['case' => $this->getCaseTokenKeys()]);
-    $this->assertEquals($this->getExpectedCaseTokenOutput(), $tokenHtml);
-    // Now do the same without passing in 'knownTokens'
-    $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseID, $tokenString);
-    $this->assertEquals($this->getExpectedCaseTokenOutput(), $tokenHtml);
-
-    // And check our deprecated tokens still work.
-    $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseID, '{case.case_type_id} {case.status_id}');
-    $this->assertEquals('Housing Support Ongoing', $tokenHtml);
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,
@@ -234,6 +222,8 @@ case.custom_1 :' . '
 
   /**
    * Test money format tokens can respect passed in locale.
+   *
+   * @group locale
    */
   public function testMoneyFormat(): void {
     // Our 'migration' off configured thousand separators at the moment is a define.
@@ -280,6 +270,24 @@ case.custom_1 :' . '
       '{participant.status_id}' => 'Status ID',
       '{participant.role_id}' => 'Participant Role ID',
     ];
+  }
+
+  /**
+   * Test the standard new location token format - which matches apiv4 return properties.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testLocationTokens(): void {
+    $contactID = $this->individualCreate(['email' => 'me@example.com']);
+    Address::create()->setValues([
+      'contact_id' => $contactID,
+      'is_primary' => TRUE,
+      'street_address' => 'Heartbreak Hotel',
+      'supplemental_address_1' => 'Lonely Street',
+    ])->execute();
+    $text = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address}';
+    $text = $this->renderText(['contactId' => $contactID], $text);
+    $this->assertEquals('Anthony me@example.com Heartbreak Hotel', $text);
   }
 
   /**
@@ -470,29 +478,24 @@ contribution_recur.payment_instrument_id:name :Check
   /**
    * Test that membership tokens are consistently rendered.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMembershipTokenConsistency(): void {
     $this->createLoggedInUser();
     $this->restoreMembershipTypes();
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership']);
-    $tokens = CRM_Core_SelectValues::membershipTokens();
     $expectedTokens = $this->getMembershipTokens();
-    $this->assertEquals($expectedTokens, $tokens);
+    // This get also creates...
+    $this->getMembershipID();
     $newStyleTokens = "\n{membership.status_id:label}\n{membership.membership_type_id:label}\n";
     $tokenString = $newStyleTokens . implode("\n", array_keys($this->getMembershipTokens()));
-
-    $memberships = CRM_Utils_Token::getMembershipTokenDetails([$this->getMembershipID()]);
-    $messageToken = CRM_Utils_Token::getTokens($tokenString);
-    $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $memberships[$this->getMembershipID()], $tokenString, $messageToken);
-    $this->assertEquals($this->getExpectedMembershipTokenOutput(), $tokenHtml);
 
     // Custom fields work in the processor so test it....
     $tokenString .= "\n{membership." . $this->getCustomFieldName('text') . '}';
     // Now compare with scheduled reminder
     $mut = new CiviMailUtils($this);
     CRM_Utils_Time::setTime('2007-01-22 15:00:00');
-    $this->callAPISuccess('action_schedule', 'create', [
+    $this->callAPISuccess('ActionSchedule', 'create', [
       'title' => 'job',
       'subject' => 'job',
       'entity_value' => 1,
@@ -503,7 +506,7 @@ contribution_recur.payment_instrument_id:name :Check
       'start_action_unit' => 'day',
       'body_html' => $tokenString,
     ]);
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callAPISuccess('Job', 'send_reminder', []);
     $expected = $this->getExpectedMembershipTokenOutput();
     // Unlike the legacy method custom fields are resolved by the processor.
     $expected .= "\nmy field";
@@ -573,10 +576,12 @@ contribution_recur.payment_instrument_id:name :Check
   /**
    * Get expected output from token parsing.
    *
+   * @param int|null $participantCreatedID
+   *
    * @return string
    */
-  protected function getExpectedParticipantTokenOutput(): string {
-    return 'participant.status_id :2
+  protected function getExpectedParticipantTokenOutput(int $participantCreatedID = NULL): string {
+    return "participant.status_id :2
 participant.role_id :1
 participant.register_date :February 19th, 2007
 participant.source :Wimbeldon
@@ -584,6 +589,7 @@ participant.fee_level :steep
 participant.fee_amount :$50.00
 participant.registered_by_id :
 participant.transferred_to_contact_id :
+participant.created_id :{$participantCreatedID}
 participant.role_id:label :Attendee
 participant.balance :
 participant.custom_2 :99999
@@ -595,7 +601,7 @@ participant.status_id:name :Attended
 participant.role_id:name :Attendee
 participant.is_test:label :No
 participant.must_wait :
-';
+";
   }
 
   /**
@@ -644,7 +650,7 @@ December 21st, 2007
   /**
    * Test that membership tokens are consistently rendered.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testParticipantTokenConsistency(): void {
     $this->createLoggedInUser();
@@ -663,7 +669,7 @@ December 21st, 2007
     $this->assertEquals(array_merge($tokens, $this->getEventTokens(), $this->getDomainTokens()), $tokenProcessor->listTokens());
 
     $this->callAPISuccess('job', 'send_reminder', []);
-    $expected = $this->getExpectedParticipantTokenOutput();
+    $expected = $this->getExpectedParticipantTokenOutput(3);
     $mut->checkMailLog([$expected]);
 
     $tokenProcessor->addMessage('html', $this->getTokenString(array_keys($this->getParticipantTokens())), 'text/plain');
@@ -676,7 +682,6 @@ December 21st, 2007
   /**
    * Test that membership tokens are consistently rendered.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testParticipantCustomDateToken(): void {
@@ -706,6 +711,7 @@ December 21st, 2007
       '{participant.fee_amount}' => 'Fee Amount',
       '{participant.registered_by_id}' => 'Registered By Participant ID',
       '{participant.transferred_to_contact_id}' => 'Transferred to Contact ID',
+      '{participant.created_id}' => 'Created by Contact ID',
       '{participant.role_id:label}' => 'Participant Role',
       '{participant.balance}' => 'Event Balance',
       '{participant.' . $this->getCustomFieldName('participant_int') . '}' => 'Enter integer here :: participant_Group with field int',
@@ -722,6 +728,8 @@ December 21st, 2007
 
   /**
    * Test that domain tokens are consistently rendered.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testDomainTokenConsistency(): void {
     $tokens = CRM_Core_SelectValues::domainTokens();
@@ -730,14 +738,19 @@ December 21st, 2007
       'controller' => __CLASS__,
       'smarty' => FALSE,
     ]);
-    $tokens['{domain.id}'] = 'Domain ID';
-    $tokens['{domain.description}'] = 'Domain Description';
-    $tokens['{domain.now}'] = 'Current time/date';
+    $contactID = \Civi\Api4\Domain::get()->addSelect('contact_id')->execute()->first()['contact_id'];
+    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => 90210])->execute();
     $this->assertEquals($tokens, $tokenProcessor->listTokens());
+    $tokenProcessor->addMessage('message', implode("\n", array_keys($tokens)), 'text/plain');
+    $tokenProcessor->addRow();
+    $tokenProcessor->evaluate();
+    $this->assertStringContainsString('Beverley Hills
+90210
+California
+United States', $tokenProcessor->getRow(0)->render('message'));
   }
 
   /**
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testDomainNow(): void {
@@ -783,38 +796,43 @@ December 21st, 2007
    */
   public function getDomainTokens(): array {
     return [
-      '{domain.name}' => ts('Domain name'),
-      '{domain.address}' => ts('Domain (organization) address'),
-      '{domain.phone}' => ts('Domain (organization) phone'),
-      '{domain.email}' => 'Domain (organization) email',
+      '{domain.name}' => ts('Domain Name'),
+      '{domain.address}' => ts('Domain (Organization) Full Address'),
+      '{domain.phone}' => ts('Domain (Organization) Phone'),
+      '{domain.email}' => 'Domain (Organization) Email',
       '{domain.id}' => ts('Domain ID'),
       '{domain.description}' => ts('Domain Description'),
       '{domain.now}' => 'Current time/date',
+      '{domain.base_url}' => 'Domain absolute base url',
       '{domain.tax_term}' => 'Sales tax term (e.g VAT)',
+      '{domain.street_address}' => 'Domain (Organization) Street Address',
+      '{domain.supplemental_address_1}' => 'Domain (Organization) Supplemental Address',
+      '{domain.supplemental_address_2}' => 'Domain (Organization) Supplemental Address 2',
+      '{domain.supplemental_address_3}' => 'Domain (Organization) Supplemental Address 3',
+      '{domain.city}' => 'Domain (Organization) City',
+      '{domain.postal_code}' => 'Domain (Organization) Postal Code',
+      '{domain.state_province_id:label}' => 'Domain (Organization) State',
+      '{domain.country_id:label}' => 'Domain (Organization) Country',
+      '{domain.empowered_by_civicrm_image_url}' => 'Empowered By CiviCRM Image',
     ];
   }
 
   /**
    * Test that event tokens are consistently rendered.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testEventTokenConsistency(): void {
     $mut = new CiviMailUtils($this);
     $this->setupParticipantScheduledReminder();
 
-    $tokens = CRM_Core_SelectValues::eventTokens();
-    $this->assertEquals(array_merge($this->getEventTokens()), $tokens);
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
-      'controller' => __CLASS__,
-      'smarty' => FALSE,
-      'schema' => ['eventId'],
-    ]);
+    $tokens = array_merge($this->getEventTokens());
+    $tokenProcessor = $this->getTokenProcessor(['schema' => ['eventId']]);
     $this->assertEquals(array_merge($tokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
 
     $expectedEventString = $this->getExpectedEventTokenOutput();
     $this->callAPISuccess('job', 'send_reminder', []);
-    $expectedParticipantString = $this->getExpectedParticipantTokenOutput();
+    $expectedParticipantString = $this->getExpectedParticipantTokenOutput(5);
     $toCheck = array_merge(explode("\n", $expectedEventString), explode("\n", $expectedParticipantString));
     $toCheck[] = $expectedEventString;
     $toCheck[] = $expectedParticipantString;
@@ -830,7 +848,7 @@ December 21st, 2007
   /**
    * Test that event tokens work absent participant tokens.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testEventTokenConsistencyNoParticipantTokens(): void {
     $mut = new CiviMailUtils($this);
@@ -861,7 +879,7 @@ December 21st, 2007
   /**
    * Set up scheduled reminder for participants.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function setupParticipantScheduledReminder($includeParticipant = TRUE): void {
     $this->createEventAndParticipant();
@@ -895,7 +913,7 @@ December 21st, 2007
       '{event.title}' => 'Event Title',
       '{event.start_date}' => 'Event Start Date',
       '{event.end_date}' => 'Event End Date',
-      '{event.event_type_id:label}' => 'Event Type',
+      '{event.event_type_id:label}' => 'Type',
       '{event.summary}' => 'Event Summary',
       '{event.contact_email}' => 'Event Contact Email',
       '{event.contact_phone}' => 'Event Contact Phone',
@@ -924,7 +942,7 @@ December 21st, 2007
   /**
    * Create an event with a participant.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function createEventAndParticipant(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);
@@ -956,7 +974,7 @@ December 21st, 2007
       'description' => 'event description',
       'end_date' => 20081023,
       'registration_end_date' => 20081015,
-      $this->getCustomFieldName('text') => 'my field',
+      $this->getCustomFieldName('text', 4) => 'my field',
       'loc_block_id' => $locationBlockID,
     ])['id'];
     // Create an unrelated participant record so that the ids don't match.
@@ -1016,6 +1034,38 @@ December 21st, 2007
     $rendered = CRM_Core_TokenSmarty::render($messages, $context);
 
     $this->assertEquals($expected, $rendered);
+  }
+
+  /**
+   * @param array $override
+   *
+   * @return \Civi\Token\TokenProcessor
+   */
+  protected function getTokenProcessor(array $override): TokenProcessor {
+    return new TokenProcessor(\Civi::dispatcher(), array_merge([
+      'controller' => __CLASS__,
+    ], $override));
+  }
+
+  /**
+   * Render the text via the token processor.
+   *
+   * @param array $rowContext
+   * @param string $text
+   * @param array $context
+   *
+   * @return string
+   */
+  protected function renderText(array $rowContext, string $text, array $context = []): string {
+    $context['schema'] = $context['schema'] ?? [];
+    foreach (array_keys($rowContext) as $key) {
+      $context['schema'][] = $key;
+    }
+    $tokenProcessor = $this->getTokenProcessor($context);
+    $tokenProcessor->addRow($rowContext);
+    $tokenProcessor->addMessage('text', $text, 'text/html');
+    $tokenProcessor->evaluate();
+    return $tokenProcessor->getRow(0)->render('text');
   }
 
 }

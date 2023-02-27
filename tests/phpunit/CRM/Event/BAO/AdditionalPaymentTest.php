@@ -24,6 +24,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   protected $contactID;
 
   /**
+   * Event ID.
+   *
+   * @var int
+   */
+  protected $eventID;
+
+  /**
    * Set up.
    *
    * @throws \CRM_Core_Exception
@@ -32,7 +39,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     parent::setUp();
     $this->contactID = $this->individualCreate();
     $event = $this->eventCreate();
-    $this->_eventId = $event['id'];
+    $this->eventID = $event['id'];
   }
 
   /**
@@ -41,7 +48,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->eventDelete($this->_eventId);
+    $this->eventDelete($this->eventID);
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
@@ -72,7 +79,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    */
   protected function addParticipantWithPayment($feeTotal, $actualPaidAmt, $participantParams = [], $contributionParams = []) {
     $priceSetId = $this->eventPriceSetCreate($feeTotal);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceSetId);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->eventID, $priceSetId);
     // -- processing priceSet using the BAO
     $lineItems = [];
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, FALSE);
@@ -93,13 +100,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
         'send_receipt' => 1,
         'is_test' => 0,
         'is_pay_later' => 0,
-        'event_id' => $this->_eventId,
+        'event_id' => $this->eventID,
         'register_date' => date('Y-m-d') . " 00:00:00",
         'role_id' => 1,
         'status_id' => 14,
-        'source' => 'Event_' . $this->_eventId,
+        'source' => 'Event_' . $this->eventID,
         'contact_id' => $this->contactID,
-        'note' => 'Note added for Event_' . $this->_eventId,
+        'note' => 'Note added for Event_' . $this->eventID,
         'fee_level' => 'Price_Field - 55',
       ],
       $participantParams
@@ -140,7 +147,6 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   /**
    * See https://lab.civicrm.org/dev/core/issues/153
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testPaymentWithCustomPaymentInstrument() {
@@ -218,7 +224,6 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   /**
    * Test owed/refund info is listed on view payments.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function testTransactionInfo() {

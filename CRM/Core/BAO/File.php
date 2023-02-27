@@ -133,10 +133,10 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     // to get id's
     if ($overwrite && $fileTypeID) {
-      list($sql, $params) = self::sql($entityTable, $entityID, $fileTypeID);
+      [$sql, $params] = self::sql($entityTable, $entityID, $fileTypeID);
     }
     else {
-      list($sql, $params) = self::sql($entityTable, $entityID, 0);
+      [$sql, $params] = self::sql($entityTable, $entityID, 0);
     }
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -207,7 +207,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     CRM_Utils_Hook::pre('delete', 'File', $fileID, $fileDAO);
 
     // get the table and column name
-    list($tableName, $columnName, $groupID) = CRM_Core_BAO_CustomField::getTableColumnGroup($fieldID);
+    [$tableName, $columnName, $groupID] = CRM_Core_BAO_CustomField::getTableColumnGroup($fieldID);
 
     $entityFileDAO = new CRM_Core_DAO_EntityFile();
     $entityFileDAO->file_id = $fileID;
@@ -231,7 +231,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
    * The $useWhere is used so that the signature matches the parent class
    *
    * public function delete($useWhere = FALSE) {
-   * list($fileID, $entityID, $fieldID) = func_get_args();
+   * [$fileID, $entityID, $fieldID] = func_get_args();
    *
    * self::deleteFileReferences($fileID, $entityID, $fieldID);
    * } */
@@ -255,7 +255,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     $config = CRM_Core_Config::singleton();
 
-    list($sql, $params) = self::sql($entityTable, $entityID, $fileTypeID, $fileID);
+    [$sql, $params] = self::sql($entityTable, $entityID, $fileTypeID, $fileID);
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
     $cfIDs = [];
@@ -323,7 +323,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     $config = CRM_Core_Config::singleton();
 
-    list($sql, $params) = self::sql($entityTable, $entityID, NULL);
+    [$sql, $params] = self::sql($entityTable, $entityID, NULL);
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     $results = [];
     while ($dao->fetch()) {
@@ -338,7 +338,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}&fcs={$fileHash}");
       $result['href'] = "<a href=\"{$result['url']}\">{$result['cleanName']}</a>";
       $result['tag'] = CRM_Core_BAO_EntityTag::getTag($dao->cfID, 'civicrm_file');
-      $result['icon'] = CRM_Utils_File::getIconFromMimeType($dao->mime_type);
+      $result['icon'] = CRM_Utils_File::getIconFromMimeType($dao->mime_type ?? '');
       if ($addDeleteArgs) {
         $result['deleteURLArgs'] = self::deleteURLArgs($dao->entity_table, $dao->entity_id, $dao->cfID);
       }
@@ -763,15 +763,15 @@ HEREDOC;
   /**
    * Get a reference to the file-search service (if one is available).
    *
-   * @return CRM_Core_FileSearchInterface|NULL
+   * @return CRM_Core_FileSearchInterface|null
    */
   public static function getSearchService() {
     $fileSearches = [];
     CRM_Utils_Hook::fileSearches($fileSearches);
 
     // use the first available search
+    /** @var CRM_Core_FileSearchInterface $fileSearch */
     foreach ($fileSearches as $fileSearch) {
-      /** @var $fileSearch CRM_Core_FileSearchInterface */
       return $fileSearch;
     }
     return NULL;

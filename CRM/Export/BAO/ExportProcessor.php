@@ -1088,7 +1088,6 @@ class CRM_Export_BAO_ExportProcessor {
    *
    * @return string
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $paymentDetails) {
 
@@ -1456,7 +1455,7 @@ class CRM_Export_BAO_ExportProcessor {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
           if (in_array(CRM_Utils_Array::value('data_type', $fieldSpec), ['Country', 'StateProvince', 'ContactReference'])) {
-            return "`$fieldName` varchar(255)";
+            return "`$fieldName` text";
           }
           // some of those will be exported as a (localisable) string
           // @see https://lab.civicrm.org/dev/core/-/issues/2164
@@ -1875,7 +1874,6 @@ class CRM_Export_BAO_ExportProcessor {
    * @param int $contactID
    *
    * @return array
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function replaceMergeTokens(int $contactID): array {

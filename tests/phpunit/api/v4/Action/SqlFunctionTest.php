@@ -19,15 +19,16 @@
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlFunctionTest extends UnitTestCase {
+class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGetFunctions() {
     $functions = array_column(\CRM_Api4_Page_Api4Explorer::getSqlFunctions(), NULL, 'name');
@@ -213,6 +214,36 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertEquals('q', $result['LOWER:middle_name']);
   }
 
+  public function testDateFunctions() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => '2009-11-11'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => '2010-01-01'],
+    ];
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => $sampleData,
+    ]);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('DATEDIFF("2010-01-01", birth_date) AS diff')
+      ->addSelect('YEAR(birth_date) AS year')
+      ->addSelect('MONTH(birth_date) AS month')
+      ->addSelect('EXTRACT(YEAR_MONTH FROM birth_date) AS year_month')
+      ->addWhere('last_name', '=', $lastName)
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertEquals(51, $result[0]['diff']);
+    $this->assertEquals(2009, $result[0]['year']);
+    $this->assertEquals(11, $result[0]['month']);
+    $this->assertEquals('200911', $result[0]['year_month']);
+
+    $this->assertEquals(0, $result[1]['diff']);
+    $this->assertEquals(2010, $result[1]['year']);
+    $this->assertEquals(1, $result[1]['month']);
+    $this->assertEquals('201001', $result[1]['year_month']);
+  }
+
   public function testIncorrectNumberOfArguments() {
     try {
       Activity::get(FALSE)
@@ -220,7 +251,7 @@ class SqlFunctionTest extends UnitTestCase {
         ->execute();
       $this->fail('Api should have thrown exception');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertEquals('Missing param 2 for SQL function IF', $e->getMessage());
     }
 
@@ -230,7 +261,7 @@ class SqlFunctionTest extends UnitTestCase {
         ->execute();
       $this->fail('Api should have thrown exception');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertEquals('Too many arguments given for SQL function NULLIF', $e->getMessage());
     }
 
@@ -240,9 +271,35 @@ class SqlFunctionTest extends UnitTestCase {
         ->execute();
       $this->fail('Api should have thrown exception');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertEquals('Too few arguments to param 2 for SQL function CONCAT_WS', $e->getMessage());
     }
+  }
+
+  public function testCurrentDate() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 1 year'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 10 year'],
+    ];
+    Contact::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('birth_date', '=', 'CURDATE()', TRUE)
+      ->selectRowCount()
+      ->execute();
+    $this->assertCount(1, $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('birth_date', '<', 'DATE(NOW())', TRUE)
+      ->selectRowCount()
+      ->execute();
+    $this->assertCount(2, $result);
   }
 
   public function testRandFunction() {
@@ -265,7 +322,7 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertGreaterThanOrEqual($result[4]['rand'], $result[5]['rand']);
   }
 
-  public function testYearInWhereClause() {
+  public function testDateInWhereClause() {
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
       ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => '2009-11-11'],
@@ -289,6 +346,22 @@ class SqlFunctionTest extends UnitTestCase {
       ->addWhere('last_name', '=', $lastName)
       ->addWhere('YEAR(birth_date)', '=', 2009, TRUE)
       ->selectRowCount()
+      ->execute();
+    $this->assertCount(2, $result);
+
+    // Try an expression in the value
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('MONTH(birth_date)', '=', 'MONTH("2030-11-12")', TRUE)
+      ->addSelect('birth_date')
+      ->execute()->single();
+    $this->assertEquals('2009-11-11', $result['birth_date']);
+
+    // Try in GROUP_BY
+    $result = Contact::get(FALSE)
+      ->addSelect('COUNT(id) AS counted')
+      ->addWhere('last_name', '=', $lastName)
+      ->addGroupBy('EXTRACT(YEAR FROM birth_date)')
       ->execute();
     $this->assertCount(2, $result);
   }

@@ -114,12 +114,12 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       $title = CRM_Contact_BAO_Contact::displayName($grant->contact_id) . ' - ' . ts('Grant') . ': ' . $grantTypes[$grant->grant_type_id];
 
       $recentOther = [];
-      if (CRM_Core_Permission::checkActionPermission('CiviGrant', CRM_Core_Action::UPDATE)) {
+      if (CRM_Core_Permission::check('edit grants')) {
         $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/grant',
           "action=update&reset=1&id={$grant->id}&cid={$grant->contact_id}&context=home"
         );
       }
-      if (CRM_Core_Permission::checkActionPermission('CiviGrant', CRM_Core_Action::DELETE)) {
+      if (CRM_Core_Permission::check('delete in CiviGrant')) {
         $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/grant',
           "action=delete&reset=1&id={$grant->id}&cid={$grant->contact_id}&context=home"
         );

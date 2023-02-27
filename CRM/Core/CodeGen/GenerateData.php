@@ -1135,7 +1135,7 @@ class CRM_Core_CodeGen_GenerateData {
   /**
    * This method populates the civicrm_group_contact table
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function addGroup() {
     // add the 3 groups first
@@ -1244,7 +1244,7 @@ class CRM_Core_CodeGen_GenerateData {
    *
    * It allows the members of the advisory group to edit the Summer volunteers group.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   private function addACL(): void {
     $optionValueID = OptionValue::create(FALSE)->setValues([
@@ -1295,8 +1295,11 @@ class CRM_Core_CodeGen_GenerateData {
 
   /**
    * This method populates the civicrm_activity_history table
+   *
+   * @noinspection PhpUnusedPrivateMethodInspection
+   * @throws \Exception
    */
-  private function addActivity() {
+  private function addActivity(): void {
     $contactDAO = new CRM_Contact_DAO_Contact();
     $contactDAO->contact_type = 'Individual';
     $contactDAO->selectAdd();
@@ -1304,19 +1307,37 @@ class CRM_Core_CodeGen_GenerateData {
     $contactDAO->orderBy('sort_name');
     $contactDAO->find();
 
+    $activityTypes = CRM_Core_DAO::executeQuery(
+      "
+    SELECT  label, name, value as activity_type_id
+      FROM  civicrm_option_value
+     WHERE  component_id IS NULL AND
+       -- this filter mostly gives us user-type actions like 'Phone' & 'Email'
+       -- but historically we have also included these two...
+       (filter = 0 OR name IN ('Tell A Friend', 'Pledge Acknowledgment'))
+       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = 'activity_type')
+     ")->fetchAll();
+
+    $activityTypeOptions = [];
+    $nonAssignTypes = ['Pledge Acknowledgment', 'Print PDF Letter'];
+    foreach ($activityTypes as $activityType) {
+      $activityTypeOptions[$activityType['activity_type_id']] = ['label' => $activityType['label'], 'name' => $activityType['label']];
+      $activityTypeOptions[$activityType['activity_type_id']]['is_add_targets'] = !in_array($activityType['name'], $nonAssignTypes, TRUE);
+    }
     $count = 0;
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+    $activityContacts = array_flip(CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate'));
+
     while ($contactDAO->fetch()) {
       if ($count++ > 2) {
         break;
       }
       for ($i = 0; $i < self::NUM_ACTIVITY; $i++) {
+        $activityTypeID = array_rand($activityTypeOptions);
+        $activityType = $activityTypeOptions[$activityTypeID];
         $activityDAO = new CRM_Activity_DAO_Activity();
-        $activityId = CRM_Core_OptionGroup::values('activity_type', NULL, NULL, NULL, ' AND v.name IN ("Tell A Friend", "Pledge Acknowledgment")');
-        $activityTypeID = $this->randomIndex($activityId);
-        $activity = CRM_Core_PseudoConstant::activityType();
         $activityDAO->activity_type_id = $activityTypeID;
-        $activityDAO->subject = "Subject for $activity[$activityTypeID]";
+        $activityDAO->subject = "Subject for {$activityType['label']}";
+        $activityDAO->duration = random_int(1, 6);
         $activityDAO->activity_date_time = $this->randomDate();
         $activityDAO->status_id = 2;
         $this->_insert($activityDAO);
@@ -1324,14 +1345,14 @@ class CRM_Core_CodeGen_GenerateData {
         $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
         $activityContactDAO->activity_id = $activityDAO->id;
         $activityContactDAO->contact_id = $contactDAO->id;
-        $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        $activityContactDAO->record_type_id = $activityContacts['Activity Source'];
         $this->_insert($activityContactDAO);
 
-        if ($activityTypeID == 9) {
+        if ($activityType['is_add_targets']) {
           $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
           $activityContactDAO->activity_id = $activityDAO->id;
           $activityContactDAO->contact_id = $this->randomInt(1, 101);
-          $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+          $activityContactDAO->record_type_id = $activityContacts['Activity Targets'];
           $this->_insert($activityContactDAO);
         }
       }
@@ -2160,7 +2181,7 @@ ORDER BY cc.id; ";
     $select = 'SELECT contribution.id contribution_id, cli.id as line_item_id, contribution.contact_id, contribution.receive_date, contribution.total_amount, contribution.currency, cli.label,
       cli.financial_type_id,  cefa.financial_account_id, contribution.payment_instrument_id, contribution.check_number, contribution.trxn_id';
     $where = 'WHERE cefa.account_relationship = 1';
-    $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(4);
+    $financialAccountId = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount(4);
     foreach ($components as $component) {
       if ($component == 'contribution') {
         $from = 'FROM `civicrm_contribution` contribution';

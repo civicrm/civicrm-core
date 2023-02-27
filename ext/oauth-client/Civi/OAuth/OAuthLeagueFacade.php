@@ -25,7 +25,7 @@ class OAuthLeagueFacade {
    */
   public function createProviderOptions($clientDef) {
     $clientDef = $this->resolveSingleRef('OAuthClient', $clientDef, ['id', 'provider'], ['secret', 'guid']);
-    $providerDef = \Civi\Api4\OAuthProvider::get(0)
+    $providerDef = \Civi\Api4\OAuthProvider::get(FALSE)
       ->addWhere('name', '=', $clientDef['provider'])
       ->execute()
       ->single();
@@ -34,14 +34,14 @@ class OAuthLeagueFacade {
 
     $localOptions = [];
     $localOptions['clientId'] = $clientDef['guid'];
+    $localOptions['tenant'] = !empty($clientDef['tenant']) ? $clientDef['tenant'] : '';
     $localOptions['clientSecret'] = $clientDef['secret'];
-    // NOTE: If we ever have frontend users, this may need to change.
-    $localOptions['redirectUri'] = \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
     $options = array_merge(
       $providerDef['options'] ?? [],
       $clientDef['options'] ?? [],
       $localOptions
     );
+    $options['redirectUri'] = $options['redirectUri'] ?? \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
 
     return [$class, $options];
   }

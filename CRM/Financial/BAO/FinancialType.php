@@ -68,23 +68,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @param array $params
    *
    * @return \CRM_Financial_DAO_FinancialType
+   * @deprecated
    */
   public static function create(array $params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'FinancialType', $params['id'] ?? NULL, $params);
-    $financialType = self::add($params);
-    CRM_Utils_Hook::post($hook, 'FinancialType', $financialType->id, $financialType);
-    return $financialType;
+    return self::writeRecord($params);
   }
 
   /**
    * Add the financial types.
    *
-   * Note that add functions are being deprecated in favour of create.
-   * The steps here are to remove direct calls to this function from
-   * core & then move the innids of the function to the create function.
-   * This function would remain for 6 months or so as a wrapper of create with
-   * a deprecation notice.
+   * Note that $ids isn't passed anywhere except tests, which pass an empty array.
    *
    * @param array $params
    *   Values from the database object.
@@ -92,18 +85,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    *   Array that we wish to deprecate and remove.
    *
    * @return object
+   * @deprecated
    */
   public static function add(array $params, $ids = []) {
-    // @todo deprecate this function, move the code to create & call create from add.
-    $financialType = new CRM_Financial_DAO_FinancialType();
-    $financialType->copyValues($params);
-    $financialType->save();
-    // CRM-12470
-    if (empty($ids['financialType']) && empty($params['id'])) {
-      $titles = CRM_Financial_BAO_FinancialTypeAccount::createDefaultFinancialAccounts($financialType);
-      $financialType->titles = $titles;
-    }
-    return $financialType;
+    return self::writeRecord($params);
   }
 
   /**
@@ -158,6 +143,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'create') {
+      $titles = CRM_Financial_BAO_EntityFinancialAccount::createDefaultFinancialAccounts($event->object);
+      $event->object->titles = $titles;
+    }
     if ($event->action === 'delete') {
       \Civi\Api4\EntityFinancialAccount::delete(FALSE)
         ->addWhere('entity_id', '=', $event->id)
@@ -172,7 +161,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @return array
    *   all financial type with income account is relationship
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getIncomeFinancialType($checkPermissions = TRUE): array {
     // Realistically tests are the only place where logged in contact can
@@ -194,6 +183,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
           '=',
           'financial_type.id',
         ])
+        ->addWhere('financial_type.is_active', '=', '1')
         ->execute()->indexBy('entity_id');
       Civi::$statics[__CLASS__][$key] = [];
       foreach ($types as $type) {

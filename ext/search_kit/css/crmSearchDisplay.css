@@ -26,7 +26,7 @@
   width: 80%;
   position: relative;
   overflow: hidden;
-  background-color: rgba(0,0,0,.04);
+  background-color: rgba(0,0,0,.03);
   display: inline-block;
 }
 #bootstrap-theme .crm-search-loading-placeholder::before {
@@ -37,7 +37,7 @@
   top: 0;
   height: 100%;
   width: 150px;
-  background: linear-gradient(to right, transparent 0%, rgba(0,0,0,.1) 50%, transparent 100%);
+  background: linear-gradient(to right, transparent 0%, rgba(0,0,0,.05) 50%, transparent 100%);
   animation: searchKitLoadingAnimation 1s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
 }
 @keyframes searchKitLoadingAnimation {

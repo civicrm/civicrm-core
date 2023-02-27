@@ -69,10 +69,14 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param int $rowcount
    * @param null $sort
    * @param bool $returnSQL
+   *   Deprecated parameter
    *
    * @return string
    */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+    if ($returnSQL) {
+      CRM_Core_Error::deprecatedWarning('do not pass returnSQL');
+    }
     $sql = $this->sql(
       'contact_a.id as contact_id',
       $offset,
@@ -80,12 +84,7 @@ class CRM_Contact_Form_Search_Custom_Base {
       $sort
     );
     $this->validateUserSQL($sql);
-
-    if ($returnSQL) {
-      return $sql;
-    }
-
-    return CRM_Core_DAO::composeQuery($sql);
+    return $sql;
   }
 
   /**
