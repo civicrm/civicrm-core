@@ -1608,11 +1608,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // handle custom fields
     $mainTree = self::getTree($main['contact_type'], $mainId,
-      CRM_Utils_Array::value('contact_sub_type', $main),
+      $main['contact_sub_type'] ?? NULL,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
     $otherTree = self::getTree($main['contact_type'], $otherId,
-      CRM_Utils_Array::value('contact_sub_type', $other),
+      $other['contact_sub_type'] ?? NULL,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
 
@@ -1709,7 +1709,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $entityType,
     $entityID = NULL,
     $subTypes = [],
-
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
     $toReturn = NULL;
@@ -1718,10 +1717,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $subName = NULL;
     $onlySubType = NULL;
     $returnAll = TRUE;
-    if ($checkPermission === TRUE) {
-      CRM_Core_Error::deprecatedWarning('Unexpected TRUE passed to CustomGroup::getTree $checkPermission param.');
-      $checkPermission = CRM_Core_Permission::EDIT;
-    }
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
     }
