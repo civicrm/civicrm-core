@@ -1115,4 +1115,21 @@ abstract class CRM_Utils_System_Base {
     return FALSE;
   }
 
+  /**
+   * Get Contact details from User
+   *   The contact parameters here will be used to create a Contact
+   *   record to match the user record.
+   *
+   * @param array $uf_match
+   *   Array of user object, unique ID.
+   * @return array
+   *   Array of contact parameters.
+   */
+  public function getContactDetailsFromUser($uf_match):array {
+    $contactParameters = [];
+    $contactParameters['email'] = $uf_match['user']->email;
+
+    return $contactParameters;
+  }
+
 }
