@@ -1687,7 +1687,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Of the contact whose contact type is needed.
    * @param int $entityID
    * @param array $subTypes
-   *   Only return specified subtype or return specified subtype + unrestricted fields.
    * @param bool|int $checkPermission
    *   Either a CRM_Core_Permission constant or FALSE to disable checks
    *
@@ -1695,7 +1694,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Custom field 'tree'.
    *
    *   The returned array is keyed by group id and has the custom group table fields
-   *   and a subkey 'fields' holding the specific custom fields.
+   *   and a sub-key 'fields' holding the specific custom fields.
    *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
    *   if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
    *
@@ -1707,9 +1706,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   private static function getTree(
     $entityType,
-    $entityID = NULL,
-    $subTypes = [],
-    $checkPermission = CRM_Core_Permission::EDIT
+    $entityID,
+    $subTypes,
+    $checkPermission
   ) {
     $toReturn = NULL;
     $groupID = -1;
