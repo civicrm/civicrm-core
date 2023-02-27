@@ -17,5 +17,5 @@
         {/if}
       </div>
 <div class="form-item">
-    {include file="CRM/common/formButtons.tpl"}
+    {include file="CRM/common/formButtons.tpl" location=''}
 </div>
