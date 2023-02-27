@@ -503,7 +503,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'UFJoin',
       'Relationship',
       'RelationshipType',
-      'Note',
       'Membership',
       'Group',
       'File',
