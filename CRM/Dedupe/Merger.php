@@ -1607,12 +1607,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // handle custom fields
-    $mainTree = self::getTree($main['contact_type'], NULL, $mainId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE, NULL, TRUE,
+    $mainTree = self::getTree($main['contact_type'], $mainId,
+      CRM_Utils_Array::value('contact_sub_type', $main),
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
-    $otherTree = self::getTree($main['contact_type'], NULL, $otherId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE, NULL, TRUE,
+    $otherTree = self::getTree($main['contact_type'], $otherId,
+      CRM_Utils_Array::value('contact_sub_type', $other),
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
 
@@ -1685,18 +1685,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param string $entityType
    *   Of the contact whose contact type is needed.
-   * @param array $toReturn
-   *   What data should be returned. ['custom_group' => ['id', 'name', etc.], 'custom_field' => ['id', 'label', etc.]]
    * @param int $entityID
-   * @param int $groupID
    * @param array $subTypes
-   * @param string $subName
-   * @param bool $fromCache
-   * @param bool $onlySubType
    *   Only return specified subtype or return specified subtype + unrestricted fields.
-   * @param bool $returnAll
-   *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
-   *   api - through which it is properly tested - so can be refactored with some comfort.)
    * @param bool|int $checkPermission
    *   Either a CRM_Core_Permission constant or FALSE to disable checks
    *
@@ -1716,16 +1707,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   private static function getTree(
     $entityType,
-    $toReturn = [],
     $entityID = NULL,
-    $groupID = NULL,
     $subTypes = [],
-    $subName = NULL,
-    $fromCache = TRUE,
-    $onlySubType = NULL,
-    $returnAll = FALSE,
+
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
+    $toReturn = NULL;
+    $groupID = -1;
+    $fromCache = TRUE;
+    $subName = NULL;
+    $onlySubType = NULL;
+    $returnAll = TRUE;
     if ($checkPermission === TRUE) {
       CRM_Core_Error::deprecatedWarning('Unexpected TRUE passed to CustomGroup::getTree $checkPermission param.');
       $checkPermission = CRM_Core_Permission::EDIT;
