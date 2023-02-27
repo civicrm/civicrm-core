@@ -44,7 +44,7 @@ class CRM_Utils_Mail_Logger {
    * @param string[] $headers
    * @param string $message
    */
-  public static function log($to, $headers, $message) {
+  private static function log($to, $headers, $message) {
     if (is_array($to)) {
       $toString = implode(', ', $to);
       $fileName = $to[0];
