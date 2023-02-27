@@ -276,7 +276,7 @@ class CRM_Case_Form_Activity_OpenCase {
           'case_id' => $params['case_id'],
           'contact_id' => $cliId,
         ];
-        CRM_Case_BAO_CaseContact::create($contactParams);
+        CRM_Case_BAO_CaseContact::writeRecord($contactParams);
       }
     }
     else {
@@ -284,7 +284,7 @@ class CRM_Case_Form_Activity_OpenCase {
         'case_id' => $params['case_id'],
         'contact_id' => $form->_currentlyViewedContactId,
       ];
-      CRM_Case_BAO_CaseContact::create($contactParams);
+      CRM_Case_BAO_CaseContact::writeRecord($contactParams);
     }
 
     // 2. initiate xml processor
