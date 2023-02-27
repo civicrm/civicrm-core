@@ -61,21 +61,11 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Array contains the id (deprecated).
    *
    * @return \CRM_Member_DAO_MembershipType
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params, $ids = []) {
-    // DEPRECATED Check if membershipType ID was passed in via $ids
-    if (empty($params['id'])) {
-      if (isset($ids['membershipType'])) {
-        Civi::log()->warning('Deprecated: Passing membershipType by $ids array in CRM_Member_BAO_MembershipType::add');
-      }
-      $params['id'] = $ids['membershipType'] ?? NULL;
-    }
-
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'MembershipType', CRM_Utils_Array::value('id', $params), $params);
 
