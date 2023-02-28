@@ -557,18 +557,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * @param int $contactTypeId
-   *
-   * @throws Exception
-   */
-  public function contactTypeDelete($contactTypeId) {
-    $result = CRM_Contact_BAO_ContactType::del($contactTypeId);
-    if (!$result) {
-      throw new Exception('Could not delete contact type');
-    }
-  }
-
-  /**
    * @param array $params
    *
    * @return int
