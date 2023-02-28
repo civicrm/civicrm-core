@@ -268,6 +268,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     }
 
     $is_pay_later = 0;
+    $isQuickConfig = CRM_Price_BAO_PriceSet::isQuickConfig($field->price_set_id);
     if (isset($qf->_mode) && empty($qf->_mode)) {
       $is_pay_later = 1;
     }
@@ -324,13 +325,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         ]);
 
         $extra = [];
-        if (!empty($qf->_membershipBlock) && !empty($qf->_quickConfig) && $field->name == 'other_amount' && empty($qf->_contributionAmount)) {
+        if (!empty($qf->_membershipBlock) && $isQuickConfig && $field->name == 'other_amount' && empty($qf->_contributionAmount)) {
           $useRequired = 0;
         }
         elseif (!empty($fieldOptions[$optionKey]['label'])) {
           //check for label.
           $label = $fieldOptions[$optionKey]['label'];
-          if (!empty($qf->_quickConfig) && !empty($qf->_contributionAmount) && strtolower($fieldOptions[$optionKey]['name']) == 'other_amount') {
+          if ($isQuickConfig && !empty($qf->_contributionAmount) && strtolower($fieldOptions[$optionKey]['name']) == 'other_amount') {
             $label .= '  ' . $currencySymbol;
             $qf->assign('priceset', $elementName);
             $extra = [
@@ -361,7 +362,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
 
         //CRM-10117
-        if (!empty($qf->_quickConfig)) {
+        if ($isQuickConfig) {
           $message = ts('Please enter a valid amount.');
           $type = 'money';
         }
@@ -376,7 +377,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       case 'Radio':
         $choice = [];
 
-        if (!empty($qf->_quickConfig) && !empty($qf->_contributionAmount)) {
+        if ($isQuickConfig && !empty($qf->_contributionAmount)) {
           $qf->assign('contriPriceset', $elementName);
         }
 
@@ -418,7 +419,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             'data-price-field-values' => json_encode($customOption),
             'visibility' => $visibility_id,
           ];
-          if (!empty($qf->_quickConfig) && $field->name == 'contribution_amount') {
+          if ($isQuickConfig && $field->name == 'contribution_amount') {
             $extra += ['onclick' => 'clearAmountOther();'];
           }
           if ($field->name == 'membership_amount') {
