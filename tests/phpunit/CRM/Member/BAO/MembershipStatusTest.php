@@ -105,7 +105,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $params = ['name' => 'testStatus', 'is_active' => 1];
 
     $membershipID = $this->callAPISuccess('MembershipStatus', 'create', $params)['id'];
-    CRM_Member_BAO_MembershipStatus::del($membershipID);
+    CRM_Member_BAO_MembershipStatus::deleteRecord(['id' => $membershipID]);
     $defaults = [];
     $result = CRM_Member_BAO_MembershipStatus::retrieve($params, $defaults);
     $this->assertEquals($result === NULL, TRUE, 'Verify membership status record deletion.');

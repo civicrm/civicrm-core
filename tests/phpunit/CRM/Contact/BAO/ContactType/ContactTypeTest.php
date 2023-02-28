@@ -353,7 +353,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals($result->name, $params['name']);
     $this->assertEquals($result->parent_id, $params['parent_id']);
     $this->assertEquals($result->is_active, $params['is_active']);
-    CRM_Contact_BAO_ContactType::del($result->id);
+    CRM_Contact_BAO_ContactType::deleteRecord(['id' => $result->id]);
 
     $params = [
       'label' => 'householdSubType',
@@ -366,7 +366,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals($result->name, $params['name']);
     $this->assertEquals($result->parent_id, $params['parent_id']);
     $this->assertEquals($result->is_active, $params['is_active']);
-    CRM_Contact_BAO_ContactType::del($result->id);
+    CRM_Contact_BAO_ContactType::deleteRecord(['id' => $result->id]);
   }
 
   /**
@@ -427,14 +427,6 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
 
     $result = CRM_Contact_BAO_ContactType::subTypes();
     $this->assertEquals(FALSE, in_array($subtype->name, $result, TRUE));
-  }
-
-  /**
-   * Test del() with invalid data
-   */
-  public function testDelInvalid() {
-    $del = CRM_Contact_BAO_ContactType::del(NULL);
-    $this->assertEquals($del, FALSE);
   }
 
 }
