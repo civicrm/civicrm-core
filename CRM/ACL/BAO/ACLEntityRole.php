@@ -39,6 +39,7 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
    * @return CRM_ACL_BAO_ACLEntityRole
    */
   public static function create(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -82,6 +83,7 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
    * @deprecated
    */
   public static function del($entityRoleId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return self::deleteRecord(['id' => $entityRoleId]);
   }
 
