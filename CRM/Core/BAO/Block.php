@@ -264,7 +264,7 @@ class CRM_Core_BAO_Block {
       // $updateBlankLocInfo will help take appropriate decision. CRM-5969
       if (!empty($value['id']) && !$dataExists && $updateBlankLocInfo) {
         //delete the existing record
-        $baoString::del($value['id']);
+        $baoString::deleteRecord($value);
         continue;
       }
       elseif (!$dataExists) {
@@ -307,7 +307,7 @@ class CRM_Core_BAO_Block {
     }
 
     $baoString = 'CRM_Core_BAO_' . $name;
-    $baoString::del($params['id']);
+    $baoString::deleteRecord($params);
   }
 
   /**
