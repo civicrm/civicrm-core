@@ -33,12 +33,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @return array|NULL|self
    *   array of created address
    */
-  public static function create(&$params, $fixAddress = TRUE) {
-    if (!isset($params['address']) || !is_array($params['address'])) {
-      return self::add($params, $fixAddress);
-    }
-    CRM_Core_Error::deprecatedFunctionWarning('Use legacyCreate if not doing a single crud action');
-    return self::legacyCreate($params, $fixAddress);
+  public static function create(array &$params, $fixAddress = TRUE) {
+    return self::add($params, $fixAddress);
   }
 
   /**
