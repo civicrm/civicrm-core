@@ -52,6 +52,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB implements \Ci
    * @deprecated
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     static::deleteRecord(['id' => $id]);
   }
 

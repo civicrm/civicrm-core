@@ -2405,6 +2405,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @deprecated
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     static::deleteRecord(['id' => $id]);
   }
 
@@ -2436,7 +2437,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
     CRM_Core_Error::deprecatedWarning('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead');
 
-    CRM_Mailing_BAO_MailingJob::del($id);
+    CRM_Mailing_BAO_MailingJob::deleteRecord(['id' => $id]);
   }
 
   /**
