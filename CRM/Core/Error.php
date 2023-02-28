@@ -566,6 +566,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Provided the user has the 'view debug output' the output should be displayed. In all
    * cases it should be logged.
    *
+   * @deprecated see https://docs.civicrm.org/dev/en/latest/framework/logging/
+   *
+   * Use (e.g) `Civi::log()->error()` (priority dependent).
+   *
    * @param string $message
    * @param bool $out
    *   Should we log or return the output.
