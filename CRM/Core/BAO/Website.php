@@ -31,6 +31,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @throws \CRM_Core_Exception
    */
   public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -81,7 +82,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
       }
       if (!empty($values['url'])) {
         $values['contact_id'] = $contactID;
-        self::create($values);
+        self::writeRecord($values);
       }
       elseif ($skipDelete && !empty($values['id'])) {
         static::deleteRecord($values);
@@ -99,6 +100,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @deprecated
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) static::deleteRecord(['id' => $id]);
   }
 

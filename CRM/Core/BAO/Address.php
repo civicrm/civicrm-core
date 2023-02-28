@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Address;
+
 /**
  * This is class to handle address related functions.
  */
@@ -1208,6 +1210,7 @@ SELECT is_primary,
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 
@@ -1358,8 +1361,7 @@ SELECT is_primary,
       // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
       // $updateBlankLocInfo will help take appropriate decision. CRM-5969
       if (isset($value['id']) && !$addressExists && $updateBlankLocInfo) {
-        //delete the existing record
-        CRM_Core_BAO_Block::blockDelete('Address', ['id' => $value['id']]);
+        Address::delete(FALSE)->addWhere('id', '=', $value['id'])->execute();
         continue;
       }
       elseif (!$addressExists) {
