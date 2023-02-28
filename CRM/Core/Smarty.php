@@ -485,7 +485,7 @@ class CRM_Core_Smarty extends Smarty {
 
     $value = smarty_modifier_escape($string, $esc_type, $char_set);
     if ($value !== $string) {
-      Civi::log()->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
+      Civi::log('smarty')->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
         'original' => $string,
         'escaped' => $value,
         'type' => $esc_type,
