@@ -33,6 +33,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
    * @deprecated
    */
   public static function add(array $params): CRM_Contact_DAO_GroupContact {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -503,7 +504,7 @@ SELECT    *
     // As of Aug 2020 it's not called from anywhere so we can remove the below code after some time
 
     CRM_Core_Error::deprecatedFunctionWarning('Use the GroupContact API');
-    return self::add($params);
+    return self::writeRecord($params);
   }
 
   /**
