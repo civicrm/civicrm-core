@@ -116,18 +116,27 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         }
 
         $isUpdateBilling = FALSE;
-        // It would be better to determine if there is a recurring contribution &
-        // is so get the entity for the recurring contribution (& skip if not).
-        $paymentObject = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity(
-          $membership[$dao->id]['membership_id'], 'membership', 'obj');
-        if (!empty($paymentObject)) {
-          $isUpdateBilling = $paymentObject->supports('updateSubscriptionBillingInfo');
-        }
+        $isCancelSupported = FALSE;
+        // It would be better to determine if there is a recurring
+        // contribution & is so get the entity for the recurring
+        // contribution (& skip if not), however this work around
+        // catches when there is a null value set and allows the tab
+        // to be loaded.
+        try {
+          $paymentObject = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity(
+            $membership[$dao->id]['membership_id'], 'membership', 'obj');
+          if (!empty($paymentObject)) {
+            $isUpdateBilling = $paymentObject->supports('updateSubscriptionBillingInfo');
+          }
 
-        // @todo - get this working with syntax style $paymentObject->supports(array
-        //('CancelSubscriptionSupported'));
-        $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported(
-          $membership[$dao->id]['membership_id']);
+
+          // @todo - get this working with syntax style $paymentObject->supports(array
+          //('CancelSubscriptionSupported'));
+          $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported(
+            $membership[$dao->id]['membership_id']);
+        } catch (CRM_Core_Exception $e) {
+          // We probably have a membership which has a reference to a payment processor that has been removed.
+        }
         $links = self::links('all',
             FALSE,
             FALSE,
