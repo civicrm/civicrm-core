@@ -535,10 +535,10 @@ emo
     $emptyLines = preg_grep('/:$/', $oneByOne);
     $this->assertEquals([
       'contact.address_primary.county_id:label:',
-      'contact.contact_is_deleted',
-      'contact.county',
-      'contact.custom_6',
-      'contact.do_not_phone'
+      'contact.contact_is_deleted:',
+      'contact.county:',
+      'contact.custom_6:',
+      'contact.do_not_phone:'
     ], array_values($emptyLines), 'Most tokens should have data.');
   }
 
