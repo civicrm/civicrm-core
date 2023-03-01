@@ -37,6 +37,9 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
    */
   public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
+    if (!CRM_Core_Component::isEnabled('CiviEvent')) {
+      return;
+    }
     $registrations->register(CRM_Event_ActionMapping::create([
       'id' => CRM_Event_ActionMapping::EVENT_TYPE_MAPPING_ID,
       'entity' => 'civicrm_participant',
