@@ -425,8 +425,8 @@ London, 90210
    */
   public function testContactTokens(): void {
     // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
-    putenv('TIME_FUNC=frozen');
-    CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
+    $restoreTime = $this->useFrozenTime();
+
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hookTokens']);
 
@@ -483,10 +483,6 @@ emo
     $this->assertEquals($expected_parts[0], $returned_parts[0]);
     $this->assertApproxEquals($expected_parts[1], $returned_parts[1], 2);
     $this->assertEquals($expected_parts[2], $returned_parts[2]);
-
-    // reset time
-    putenv('TIME_FUNC');
-    CRM_Utils_Time::resetTime();
   }
 
   /**
@@ -866,6 +862,21 @@ primary_website:https://civicrm.org
 primary_openid:OpenID
 primary_phone:123-456
 ', $messageHtml);
+  }
+
+  /**
+   * Temporarily freeze time, as perceived through `CRM_Utils_Time`.
+   *
+   * @return \CRM_Utils_AutoClean
+   */
+  protected function useFrozenTime(): CRM_Utils_AutoClean {
+    $oldTimeFunc = getenv('TIME_FUNC');
+    putenv('TIME_FUNC=frozen');
+    CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
+    return CRM_Utils_AutoClean::with(function () use ($oldTimeFunc) {
+      putenv($oldTimeFunc === NULL ? 'TIME_FUNC' : "TIME_FUNC=$oldTimeFunc");
+      CRM_Utils_Time::resetTime();
+    });
   }
 
   /**
