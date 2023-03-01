@@ -92,6 +92,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @deprecated
    */
   public static function del($printLabelId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $printLabelId]);
   }
 
