@@ -491,6 +491,7 @@ emo
    */
   public function testTokensIndividually() {
     // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
+    /** @noinspection PhpUnusedLocalVariableInspection */
     $restoreTime = $this->useFrozenTime();
 
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
