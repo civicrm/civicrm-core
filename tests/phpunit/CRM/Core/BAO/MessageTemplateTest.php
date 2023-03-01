@@ -539,7 +539,7 @@ emo
       'contact.county',
       'contact.custom_6',
       'contact.do_not_phone'
-    ], $emptyLines, 'Most tokens should have data.');
+    ], array_values($emptyLines), 'Most tokens should have data.');
   }
 
   /**
