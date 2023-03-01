@@ -459,7 +459,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $fieldValues = ['option_group_id' => $this->_gid];
       CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
 
-      if (CRM_Core_BAO_OptionValue::del($this->_id)) {
+      if (CRM_Core_BAO_OptionValue::deleteRecord(['id' => $this->_id])) {
         if ($this->_gName == 'phone_type') {
           CRM_Core_BAO_Phone::setOptionToNull(CRM_Utils_Array::value('value', $this->_defaultValues));
         }

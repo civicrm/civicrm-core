@@ -122,7 +122,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
       $fieldValues = ['option_group_id' => $this->_gid];
       $wt = CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
 
-      if (CRM_Core_BAO_OptionValue::del($this->_id)) {
+      if (CRM_Core_BAO_OptionValue::deleteRecord(['id' => $this->_id])) {
         CRM_Core_Session::setStatus(ts('Selected Survey type has been deleted.'), ts('Record Deleted'), 'success');
       }
     }
