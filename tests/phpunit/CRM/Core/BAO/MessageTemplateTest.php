@@ -538,7 +538,7 @@ emo
       'contact.contact_is_deleted:',
       'contact.county:',
       'contact.custom_6:',
-      'contact.do_not_phone:'
+      'contact.do_not_phone:',
     ], array_values($emptyLines), 'Most tokens should have data.');
   }
 
