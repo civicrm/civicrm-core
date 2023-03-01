@@ -52,18 +52,14 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
    * Add the Option Group.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Reference array contains the id.
    *
    * @deprecated
    * @return CRM_Core_DAO_OptionGroup
    */
-  public static function add(&$params, $ids = []) {
-    if (empty($params['id']) && !empty($ids['optionGroup'])) {
-      CRM_Core_Error::deprecatedFunctionWarning('no $ids array');
-      $params['id'] = $ids['optionGroup'];
-    }
+  public static function add($params) {
+    // This is very similar to CRM_Core_DAO::makeNameFromLabel which would be
+    // called automatically via `self::writeRecord()`
+    // TODO: Check if the differences matter, then deprecate this function and switch to writeRecord.
     if (empty($params['name']) && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar(strtolower($params['title']));
     }
