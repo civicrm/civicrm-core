@@ -654,7 +654,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       ],
       'address_primary.country_id.region_id:name' => [
         'title' => ts('World Region'),
-        'name' => 'country_id.region_id.name',
+        'name' => 'address_primary.country_id.region_id:name',
         'type' => 'mapped',
         'api_v3' => 'world_region',
         'options' => NULL,
