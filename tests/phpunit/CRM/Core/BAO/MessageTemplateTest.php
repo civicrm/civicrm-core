@@ -486,6 +486,8 @@ emo
   }
 
   /**
+   * Test tokens resolve when parsed one at a time.
+   *
    * Assuming that `testContactTokens()` has asserted tokens work en masse, we have another
    * question -- do the tokens work the same when evaluated en-masse and individually?
    */
