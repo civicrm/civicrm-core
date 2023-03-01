@@ -489,8 +489,10 @@ emo
    * Assuming that `testContactTokens()` has asserted tokens work en masse, we have another
    * question -- do the tokens work the same when evaluated en-masse and individually?
    */
-  public function testTokensIndividually() {
+  public function testTokensIndividually(): void {
     // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
+    // This variable releases the time on destruct so needs to be assigned for the
+    // duration of the test.
     /** @noinspection PhpUnusedLocalVariableInspection */
     $restoreTime = $this->useFrozenTime();
 
@@ -502,12 +504,12 @@ emo
     $this->setupContactFromTokeData($tokenData);
 
     $ctx = ['contactId' => $tokenData['contact_id']];
-    $render = function (string $templateText) use ($ctx, $tokenData) {
+    $render = static function (string $templateText) use ($ctx, $tokenData) {
       try {
         return CRM_Core_TokenSmarty::render(['text' => $templateText], $ctx)['text'];
       }
       catch (\Throwable $t) {
-        return "EXCEPTION:" . $t->getMessage();
+        return 'EXCEPTION:' . $t->getMessage();
       }
     };
 
@@ -529,7 +531,7 @@ emo
     $this->assertEquals($allAtOnce, implode("\n", $oneByOne));
 
     $emptyLines = preg_grep('/:$/', $oneByOne);
-    $this->assertEquals([], $emptyLines, "All tokens should have data.");
+    $this->assertEquals([], $emptyLines, 'All tokens should have data.');
   }
 
   /**
@@ -764,8 +766,7 @@ emo
    * Note it will render additional custom fields if they exist.
    *
    * @return array
-   *
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpDocMissingThrowsInspection
    */
   public function getOldContactTokens(): array {
     return [
