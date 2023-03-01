@@ -505,10 +505,10 @@ emo
     $tokenData = $this->getOldContactTokens();
     $this->setupContactFromTokeData($tokenData);
 
-    $ctx = ['contactId' => $tokenData['contact_id']];
-    $render = static function (string $templateText) use ($ctx, $tokenData) {
+    $context = ['contactId' => $tokenData['contact_id']];
+    $render = static function (string $templateText) use ($context, $tokenData) {
       try {
-        return CRM_Core_TokenSmarty::render(['text' => $templateText], $ctx)['text'];
+        return CRM_Core_TokenSmarty::render(['text' => $templateText], $context)['text'];
       }
       catch (\Throwable $t) {
         return 'EXCEPTION:' . $t->getMessage();
