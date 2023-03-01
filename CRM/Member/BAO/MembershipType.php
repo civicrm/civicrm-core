@@ -123,6 +123,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    * @return bool
    */
   public static function del($membershipTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     try {
       static::deleteRecord(['id' => $membershipTypeId]);
       return TRUE;

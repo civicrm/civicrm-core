@@ -150,7 +150,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
-        CRM_Member_BAO_MembershipStatus::del($this->_id);
+        CRM_Member_BAO_MembershipStatus::deleteRecord(['id' => $this->_id]);
       }
       catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce($e->getMessage(), NULL, ts('Delete Failed'));

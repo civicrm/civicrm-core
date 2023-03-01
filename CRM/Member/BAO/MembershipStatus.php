@@ -151,6 +151,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus im
    * @throws CRM_Core_Exception
    */
   public static function del($membershipStatusId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     static::deleteRecord(['id' => $membershipStatusId]);
   }
 
