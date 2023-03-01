@@ -1148,36 +1148,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * Function to set is_delete true or restore deleted contact.
-   *
-   * @param CRM_Contact_DAO_Contact $contact
-   *   Contact DAO object.
-   * @param bool $restore
-   *   True to set the is_delete = 1 else false to restore deleted contact,
-   *   i.e. is_delete = 0
-   *
-   * @deprecated
-   *
-   * @return bool
-   * @throws \CRM_Core_Exception
-   */
-  public static function contactTrashRestore($contact, $restore = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use the api');
-
-    if ($restore) {
-      CRM_Core_Error::deprecatedFunctionWarning('Use contact.create to restore - this does nothing much');
-      // @todo deprecate calling contactDelete with the intention to restore.
-      $updateParams = [
-        'id' => $contact->id,
-        'is_deleted' => FALSE,
-      ];
-      self::create($updateParams);
-      return TRUE;
-    }
-    return self::contactTrash($contact);
-  }
-
-  /**
    * Get contact type for a contact.
    *
    * @param int $id
