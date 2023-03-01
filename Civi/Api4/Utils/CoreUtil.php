@@ -74,7 +74,7 @@ class CoreUtil {
    *
    * @return string
    */
-  public static function getTableName($entityName) {
+  public static function getTableName(string $entityName) {
     return self::getInfoItem($entityName, 'table_name');
   }
 

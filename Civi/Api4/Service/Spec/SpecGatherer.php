@@ -32,7 +32,6 @@ class SpecGatherer extends AutoService {
   /**
    * Returns a RequestSpec with all the fields available. Uses spec providers
    * to add or modify field specifications.
-   * @see \Civi\Api4\Service\Spec\Provider\CustomFieldCreationSpecProvider
    *
    * @param string $entity
    * @param string $action
@@ -40,8 +39,11 @@ class SpecGatherer extends AutoService {
    * @param array $values
    *
    * @return \Civi\Api4\Service\Spec\RequestSpec
+   * @throws \CRM_Core_Exception
+   * @see \Civi\Api4\Service\Spec\Provider\CustomFieldCreationSpecProvider
+   *
    */
-  public function getSpec($entity, $action, $includeCustom, $values = []) {
+  public function getSpec(string $entity, string $action, bool $includeCustom, array $values = []): RequestSpec {
     $specification = new RequestSpec($entity, $action, $values);
 
     // Real entities
