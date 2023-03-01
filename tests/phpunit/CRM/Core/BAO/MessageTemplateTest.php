@@ -486,6 +486,52 @@ emo
   }
 
   /**
+   * Assuming that `testContactTokens()` has asserted tokens work en masse, we have another
+   * question -- do the tokens work the same when evaluated en-masse and individually?
+   */
+  public function testTokensIndividually() {
+    // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
+    $restoreTime = $this->useFrozenTime();
+
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hookTokens']);
+
+    $this->createCustomGroupWithFieldsOfAllTypes([]);
+    $tokenData = $this->getOldContactTokens();
+    $this->setupContactFromTokeData($tokenData);
+
+    $ctx = ['contactId' => $tokenData['contact_id']];
+    $render = function (string $templateText) use ($ctx, $tokenData) {
+      try {
+        return CRM_Core_TokenSmarty::render(['text' => $templateText], $ctx)['text'];
+      }
+      catch (\Throwable $t) {
+        return "EXCEPTION:" . $t->getMessage();
+      }
+    };
+
+    // Build $tokenLines, a list of expressions like 'contact.display_name:{contact.display_name}'
+    $tokenLines = [];
+    $tokenNames = array_keys($this->getAdvertisedTokens());
+    foreach ($tokenNames as $tokenName) {
+      $tokenLines[] = trim($tokenName, '{}') . ':' . $tokenName;
+    }
+    foreach (array_keys($tokenData) as $key) {
+      $tokenLines[] .= "contact.$key:{contact.$key}";
+    }
+    $tokenLines = array_unique($tokenLines);
+    sort($tokenLines);
+
+    // Evaluate all these token lines
+    $oneByOne = array_map($render, $tokenLines);
+    $allAtOnce = $render(implode("\n", $tokenLines));
+    $this->assertEquals($allAtOnce, implode("\n", $oneByOne));
+
+    $emptyLines = preg_grep('/:$/', $oneByOne);
+    $this->assertEquals([], $emptyLines, "All tokens should have data.");
+  }
+
+  /**
    * Test that old contact tokens still work, as we add new-style support.
    *
    * @throws \CRM_Core_Exception
