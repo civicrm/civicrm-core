@@ -487,7 +487,12 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function numeric($value) {
-    return is_numeric($value);
+    if (!is_numeric($value)) {
+      return FALSE;
+    }
+
+    // Don't allow all the variations that PHP does (e.g. scientific notation)
+    return (bool) preg_match('/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/', $value);
   }
 
   /**
