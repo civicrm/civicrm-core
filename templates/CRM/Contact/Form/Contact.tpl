@@ -356,27 +356,6 @@
         .html(dupeTpl(data));
     }
 
-    // Ajaxify the "Check for Matching Contact(s)" button
-    $('#_qf_Contact_refresh_dedupe').click(function(e) {
-      var placeholder = {{/literal}
-        title: "{ts escape='js'}Fetching Matches{/ts}",
-        info: "{ts escape='js'}Checking for similar contacts...{/ts}",
-        contacts: []
-      {literal}};
-      openDupeAlert(placeholder, 'crm-msg-loading');
-      checkMatches('Supervised').done(function(data) {
-        var params = {
-          title: data.count ? {/literal}"{ts escape='js'}Similar Contact Found{/ts}" : "{ts escape='js'}None Found{/ts}"{literal},
-          info: data.count ?
-            "{/literal}{ts escape='js'}If the contact you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:" :
-            "{/literal}{ts escape='js'}No matches found using the default Supervised deduping rule.{/ts}{literal}",
-          contacts: data.values,
-          cid: cid
-        };
-        updateDupeAlert(params, data.count ? 'alert' : 'success');
-      });
-      e.preventDefault();
-    });
     {/literal}{/if}{literal}
   });
 </script>
