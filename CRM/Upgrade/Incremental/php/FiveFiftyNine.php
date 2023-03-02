@@ -1,4 +1,4 @@
-<?php
+c<?php
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -41,4 +41,10 @@ class CRM_Upgrade_Incremental_php_FiveFiftyNine extends CRM_Upgrade_Incremental_
     $this->addTask('Drop column civicrm_custom_field.mask', 'dropColumn', 'civicrm_custom_field', 'mask');
   }
 
+  public function upgrade_5_59_1(string $rev) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
+    }
+  }
 }
