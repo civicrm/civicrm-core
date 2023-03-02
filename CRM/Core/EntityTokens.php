@@ -290,10 +290,19 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   protected function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
     $bao = CRM_Core_DAO_AllCoreTables::getFullName($this->getMetadataForField($realField)['entity']);
     if ($pseudoKey === 'name') {
+      // There is a theoretical possibility fieldValue could be an array but
+      // specifically for preferred communication type - but real world usage
+      // hitting this is unlikely & the unexpectation is unclear so commenting,
+      // rather than adding handling.
       $fieldValue = (string) CRM_Core_PseudoConstant::getName($bao, $realField, $fieldValue);
     }
     if ($pseudoKey === 'label') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($bao, $realField, $fieldValue);
+      $newValue = [];
+      // Preferred communication method is an array that would resolve to (e.g) 'Phone, Email'
+      foreach ((array) $fieldValue as $individualValue) {
+        $newValue[] = CRM_Core_PseudoConstant::getLabel($bao, $realField, $individualValue);
+      }
+      $fieldValue = implode(', ', $newValue);
     }
     if ($pseudoKey === 'abbr' && $realField === 'state_province_id') {
       // hack alert - currently only supported for state.

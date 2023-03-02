@@ -415,7 +415,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     // Manually add in the abbreviated state province as that maps to
     // what has traditionally been delivered.
     $tokensMetadata['address_primary.state_province_id:abbr'] = $tokensMetadata['address_primary.state_province_id:label'];
-    $tokensMetadata['address_primary.state_province_id:abbr']['name'] = 'state_province_id:abbr';
+    $tokensMetadata['address_primary.state_province_id:abbr']['name'] = 'address_primary.state_province_id:abbr';
     $tokensMetadata['address_primary.state_province_id:abbr']['audience'] = 'user';
     // Hide the label for now because we are not sure if there are paths
     // where legacy token resolution is in play where this could not be resolved.
@@ -654,7 +654,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       ],
       'address_primary.country_id.region_id:name' => [
         'title' => ts('World Region'),
-        'name' => 'country_id.region_id.name',
+        'name' => 'address_primary.country_id.region_id:name',
         'type' => 'mapped',
         'api_v3' => 'world_region',
         'options' => NULL,
