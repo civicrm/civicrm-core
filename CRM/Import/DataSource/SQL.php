@@ -81,12 +81,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   public function initialize(): void {
     $table = CRM_Utils_SQL_TempTable::build()->setDurable();
     $tableName = $table->getName();
-    try {
-      $table->createWithQuery($this->getSubmittedValue('sqlQuery'));
-    }
-    catch (PEAR_Exception $e) {
-      throw new CRM_Core_Exception($e->getMessage(), 0, ['exception' => $e]);
-    }
+    $table->createWithQuery($this->getSubmittedValue('sqlQuery'));
 
     // Get the names of the fields to be imported.
     $columnsResult = CRM_Core_DAO::executeQuery(
