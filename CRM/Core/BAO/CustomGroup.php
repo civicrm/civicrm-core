@@ -1432,7 +1432,12 @@ ORDER BY civicrm_custom_group.weight,
           }
           else {
             if ($field['data_type'] == "Float") {
-              $defaults[$elementName] = (float) $value;
+              if ($field['html_type'] == 'Text') {
+                $defaults[$elementName] = CRM_Utils_Number::formatLocaleNumeric($value);
+              }
+              else {
+                $defaults[$elementName] = (float) $value;
+              }
             }
             elseif ($field['data_type'] == 'Money' &&
               $field['html_type'] == 'Text'

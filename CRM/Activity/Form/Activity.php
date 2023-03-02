@@ -928,7 +928,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // store the submitted values in an array
     if (!$params) {
-      $params = $this->controller->exportValues($this->_name);
+      $params = [];
+      $this->exportedValues = $this->controller->exportValues($this->_name);
+      foreach ($this->exportedValues as $fieldName => $value) {
+        $params[$fieldName] = $this->getSubmittedValue($fieldName);
+      }
     }
 
     // Set activity type id.

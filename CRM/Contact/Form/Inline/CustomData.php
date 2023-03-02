@@ -72,7 +72,11 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   public function postProcess() {
     // Process / save custom data
     // Get the form values and groupTree
-    $params = $this->controller->exportValues($this->_name);
+    $params = [];
+    $this->exportedValues = $this->controller->exportValues($this->_name);
+    foreach ($this->exportedValues as $fieldName => $value) {
+      $params[$fieldName] = $this->getSubmittedValue($fieldName);
+    }
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',
       $this->_contactId,

@@ -394,6 +394,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'autocomplete',
       'validContact',
       'email',
+      'localeNumeric',
     ];
 
     foreach ($rules as $rule) {
@@ -2887,6 +2888,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $value = $this->exportedValues[$fieldName] ?? NULL;
     if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
       return CRM_Utils_Rule::cleanMoney($value);
+    }
+    else {
+      $fieldRules = $this->_rules[$fieldName] ?? [];
+      foreach ($fieldRules as $rule) {
+        if ('localeNumeric' === $rule['type']) {
+          $parsedNumber = \CRM_Utils_Number::parseLocaleNumeric($value);
+          return $parsedNumber;
+        }
+      }
     }
     return $value;
   }

@@ -487,12 +487,16 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function numeric($value) {
-    // lets use a php gatekeeper to ensure this is numeric
-    if (!is_numeric($value)) {
-      return FALSE;
-    }
+    return is_numeric($value);
+  }
 
-    return (bool) preg_match('/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/', $value);
+  /**
+   * @param mixed $value
+   *
+   * @return bool
+   */
+  public static function localeNumeric($value) {
+    return CRM_Utils_Number::parseLocaleNumeric($value) !== FALSE;
   }
 
   /**

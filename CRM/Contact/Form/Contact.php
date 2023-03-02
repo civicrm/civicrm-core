@@ -870,7 +870,12 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     //get the submitted values in an array
-    $params = $this->controller->exportValues($this->_name);
+    $params = [];
+    $this->exportedValues = $this->controller->exportValues($this->_name);
+    foreach ($this->exportedValues as $fieldName => $value) {
+      $params[$fieldName] = $this->getSubmittedValue($fieldName);
+    }
+
     if (!isset($params['preferred_communication_method'])) {
       // If this field is empty QF will trim it so we have to add it in.
       $params['preferred_communication_method'] = 'null';

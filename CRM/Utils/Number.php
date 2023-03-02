@@ -128,4 +128,24 @@ class CRM_Utils_Number {
     return $formatter->format($amount);
   }
 
+  /**
+   * Parse a string into a floating-point number according to the current or supplied locale.
+   *
+   * @param string $amount
+   * @param string $locale
+   *
+   * @return float|bool
+   */
+  public static function parseLocaleNumeric(string $amount, string $locale = NULL) {
+    if ($amount === "") {
+      CRM_Core_Error::deprecatedWarning('Passing an empty string for amount is deprecated.');
+      return NULL;
+    }
+
+    $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
+    $formatter->setSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryDecimalPoint);
+    $formatter->setSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryThousandSeparator);
+    return $formatter->parse($amount);
+  }
+
 }
