@@ -4771,12 +4771,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test Repeat Transaction Contribution with Tax amount.
    *
    * https://lab.civicrm.org/dev/core/issues/806
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testRepeatContributionWithTaxAmount(): void {
     $this->enableTaxAndInvoicing();
-    $financialType = $this->callAPISuccess('financial_type', 'create', [
+    $financialType = $this->callAPISuccess('FinancialType', 'create', [
       'name' => 'Test taxable financial Type',
       'is_reserved' => 0,
       'is_active' => 1,
@@ -4789,7 +4787,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'financial_type_id' => $financialType['id'],
       ]
     );
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $contribution['id'],
       'contribution_status_id' => 'Completed',
       'trxn_id' => 'test',
@@ -4807,9 +4805,21 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       $this->assertEquals($lineItem['line_total'], $taxExclusiveAmount);
     }
     $this->callAPISuccessGetCount('Contribution', [], 2);
+    $this->callAPISuccess('ContributionRecur', 'create', [
+      'id' => $contribution['contribution_recur_id'],
+      'amount' => 200,
+    ]);
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'original_contribution_id' => $contribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'test-2',
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['sequential' => 1, 'trxn_id' => 'test-2', 'return' => ['total_amount', 'tax_amount']]);
+    $this->assertEquals(200, $contribution['total_amount']);
+    $this->assertEquals(18.18, $contribution['tax_amount']);
   }
 
-  public function testGetCurrencyOptions() {
+  public function testGetCurrencyOptions(): void {
     $result = $this->callAPISuccess('Contribution', 'getoptions', [
       'field' => 'currency',
     ]);
