@@ -19,6 +19,6 @@ namespace Civi\Api4;
  * @since 5.59
  * @package Civi\Api4
  */
-class Worldregion extends Generic\DAOEntity {
+class WorldRegion extends Generic\DAOEntity {
 
 }
