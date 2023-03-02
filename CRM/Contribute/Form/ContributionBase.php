@@ -220,10 +220,35 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Is the price set quick config.
+   *
    * @return bool
    */
-  public function isQuickConfig() {
-    return self::$_quickConfig ?? FALSE;
+  public function isQuickConfig(): bool {
+    return $this->getPriceSetID() && CRM_Price_BAO_PriceSet::isQuickConfig($this->getPriceSetID());
+  }
+
+  /**
+   * Get the price set for the contribution page.
+   *
+   * Note that we use the `get` from the form as a legacy method but
+   * ideally we would just load from the BAO method & not pass using the
+   * form. It does not confer meaningful performance benefits & adds confusion.
+   *
+   * Out of caution we still allow `get`, `set` to take precedence.
+   *
+   * @return int|null
+   */
+  public function getPriceSetID(): ?int {
+    if ($this->_priceSetId === NULL) {
+      if ($this->get('priceSetId')) {
+        $this->_priceSetId = $this->get('priceSetId');
+      }
+      else {
+        $this->_priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id);
+      }
+      $this->set('priceSetId', $this->_priceSetId);
+    }
+    return $this->_priceSetId ?: NULL;
   }
 
   /**
@@ -307,7 +332,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_bltID = $this->get('bltID');
     $this->_paymentProcessor = $this->get('paymentProcessor');
 
-    $this->_priceSetId = $this->get('priceSetId');
+    // This get will ensure it is set for later. Once we are sure all places
+    // access via the get & not directly, it can go.
+    $this->getPriceSetID();
     $this->_priceSet = $this->get('priceSet');
 
     if (!$this->_values) {
@@ -360,7 +387,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       ));
 
       $this->assignPaymentProcessor($isPayLater);
-
+      $this->assign('quickConfig', $this->isQuickConfig());
       // get price info
       // CRM-5095
       $this->initSet($this);
@@ -431,7 +458,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // @todo - move this check to `getMembershipBlock`
     if (!$this->isFormSupportsNonMembershipContributions() &&
       !$this->_membershipBlock['is_active'] &&
-      !$this->_priceSetId
+      !$this->getPriceSetID()
     ) {
       CRM_Core_Error::statusBounce(ts('The requested online contribution page is missing a required Contribution Amount section or Membership section or Price Set. Please check with the site administrator for assistance.'));
     }
@@ -488,13 +515,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @todo - removed unneeded code from previously-shared function
    */
   private function initSet($form) {
-    $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id);
-    //check if price set is is_config
-    if (is_numeric($priceSetId)) {
-      if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config') && $form->getVar('_name') != 'Participant') {
-        $form->assign('quickConfig', 1);
-      }
-    }
+    $priceSetId = $this->getPriceSetID();
     // get price info
     if ($priceSetId) {
       if ($form->_action & CRM_Core_Action::UPDATE) {
@@ -505,12 +526,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         $required = TRUE;
       }
 
-      $form->_priceSetId = $priceSetId;
       $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, $required);
       $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
       $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
-
-      $form->set('priceSetId', $form->_priceSetId);
       $form->set('priceSet', $form->_priceSet);
     }
   }
@@ -1131,7 +1149,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // Check if membership the selected membership is automatically opted into auto renew or give user the option.
     // In the 2nd case we check that the user has in deed opted in (auto renew as at June 22 is the field name for the membership auto renew checkbox)
     // Also check that the payment Processor used can support recurring contributions.
-    $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->_priceSetId);
+    $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->getPriceSetID());
     if (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
       || (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']) &&
         !empty($this->_params['auto_renew']))
