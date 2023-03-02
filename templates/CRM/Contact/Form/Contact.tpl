@@ -305,7 +305,12 @@
           match[fieldName] = ruleField.filter(':checked').val();
         } else if (ruleField.is('input[type=text]')) {
           if (ruleField.val().length > 2) {
-            match[fieldName] = ruleField.val() + (rule ? '' : '%');
+            if (rule) {
+              match[fieldName] = ruleField.val();
+            } else {
+              //unlike first_name or last_name, email requires operator for partial match.
+              match[fieldName] = {'LIKE': ruleField.val() + '%'};
+            }
           }
         } else {
           match[fieldName] = ruleField.val();
