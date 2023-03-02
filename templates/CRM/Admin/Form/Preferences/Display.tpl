@@ -99,7 +99,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       {capture assign=dedupeRules}href="{crmURL p='civicrm/contact/deduperules' q='reset=1'}"{/capture}
-      <td class="description">{ts 1=$dedupeRules}When enabled, checks for possible matches on the "New Contact" form using the Supervised <a %1>matching rule specified in your system</a>.{/ts}
+      <td class="description">{ts 1=$dedupeRules}Enable/disable checks for possible matches on the "New Contact" and "Edit Contact" forms.  <ul><li>While Typing searches for matches on the following fields when they are changed on the "New Contact" form ('first_name', 'last_name', 'nick_name', 'household_name', 'organization_name', 'email').  <li>If While Typing or When Saving is chosen then the Supervised <a %1>matching rule specified in your system</a> will be used for finding duplicates when a Contact is added or updated or when the "Check Duplicate Contacts" is pressed.  <li>Never means no duplicate checking is performed.</ul>{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification">

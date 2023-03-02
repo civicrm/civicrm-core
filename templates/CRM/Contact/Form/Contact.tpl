@@ -242,11 +242,16 @@
     });
 
     {/literal}{* Ajax check for matching contacts *}
-    {assign var='defaultRuleFields' value=','|explode:"first_name,last_name,nick_name,household_name,organization_name,email"}
-    {assign var='ruleFields' value=$ruleFields|default:$defaultRuleFields}
     {if $checkSimilar == 1}
     var contactType = {$contactType|@json_encode},
-      rules = {$ruleFields|@json_encode},{literal}
+      rules = {*$ruleFields|@json_encode*}{literal}[
+        'first_name',
+        'last_name',
+        'nick_name',
+        'household_name',
+        'organization_name',
+        'email'
+      ],
       ruleFields = {},
       $ruleElements = $(),
       matchMessage,
