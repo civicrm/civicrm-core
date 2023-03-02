@@ -208,7 +208,7 @@ class Admin {
         }
         // Useful address fields (see ContactSchemaMapSubscriber)
         if ($entity['name'] === 'Contact') {
-          $addressFields = ['city', 'state_province_id', 'country_id'];
+          $addressFields = ['city', 'state_province_id', 'country_id', 'street_address', 'postal_code', 'supplemental_address_1'];
           foreach ($addressFields as $fieldName) {
             foreach (['primary', 'billing'] as $type) {
               $newField = \CRM_Utils_Array::findAll($schema['Address']['fields'], ['name' => $fieldName])[0];
