@@ -75,6 +75,10 @@ class Kernel {
    * @throws \CRM_Core_Exception
    */
   public function runSafe($entity, $action, $params) {
+    if (\CRM_Core_Config::isUpgradeMode() && \CRM_Upgrade_Form::isDatabaseStillBroken()) {
+      throw new \API_Exception("Don't put API calls in the upgrader.");
+    }
+
     $apiRequest = [];
     try {
       $apiRequest = Request::create($entity, $action, $params);
