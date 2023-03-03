@@ -254,6 +254,7 @@
       ],
       ruleFields = {},
       $ruleElements = $(),
+      dismissed_matches = [],
       matchMessage,
       dupeTpl = _.template($('#duplicates-msg-tpl').html()),
       runningCheck = 0;
@@ -331,6 +332,14 @@
         if (checkNum < runningCheck) {
           response.reject();
         } else {
+          $.each(data['values'], function(cid, result) {
+            if ( $.inArray(cid, dismissed_matches) == -1 ) {
+              dismissed_matches.push(cid);
+            } else {
+              delete data.values[cid];
+              data.count--;
+            }
+          });
           response.resolve(data);
         }
       });
