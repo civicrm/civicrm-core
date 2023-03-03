@@ -3,7 +3,7 @@
 namespace Civi\Token;
 
 /**
- * This class is a collection of CiviMail filter functions. For example, consider this message:
+ * This class is a collection of token filter functions. For example, consider this message:
  *
  * "Hello {contact.first_name|upper}!"
  *
@@ -21,9 +21,13 @@ class StandardFilters {
    *   The list of filter criteria, as requested in this template.
    * @param string $format
    *   The format of the active template ('text/plain' or 'text/html').
-   * @return mixed
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnusedParameterInspection
    */
-  public static function upper($value, array $filter, string $format) {
+  public static function upper($value, array $filter, string $format): string {
     switch ($format) {
       case 'text/plain':
         return mb_strtoupper($value);
@@ -36,7 +40,19 @@ class StandardFilters {
     }
   }
 
-  public static function lower($value, array $filter, string $format) {
+  /**
+   * Convert to lowercase.
+   *
+   * @param string $value
+   * @param array $filter
+   * @param string $format
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public static function lower($value, array $filter, string $format): string {
     switch ($format) {
       case 'text/plain':
         return mb_strtolower($value);
@@ -49,7 +65,17 @@ class StandardFilters {
     }
   }
 
-  public static function boolean($value, array $filter, string $format) {
+  /**
+   * Convert to boolean.
+   *
+   * @param string $value
+   * @param array $filter
+   * @param string $format
+   *
+   * @return int
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public static function boolean($value, array $filter, string $format): int {
     return (int) ((bool) $value);
   }
 
@@ -68,13 +94,21 @@ class StandardFilters {
     return static::default($value, $filter, $format);
   }
 
+  /**
+   * Return value, falling back to default.
+   *
+   * @param $value
+   * @param array $filter
+   * @param string $format
+   *
+   * @return mixed
+   * @noinspection PhpUnusedParameterInspection
+   */
   public static function default($value, array $filter, string $format) {
     if (!$value) {
       return $filter[1];
     }
-    else {
-      return $value;
-    }
+    return $value;
   }
 
 }
