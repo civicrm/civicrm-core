@@ -99,7 +99,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
     ];
 
     $product = CRM_Contribute_BAO_Product::create($params);
-    CRM_Contribute_BAO_Product::del($product->id);
+    CRM_Contribute_BAO_Product::deleteRecord(['id' => $product->id]);
 
     $params = ['id' => $product->id];
     $defaults = [];

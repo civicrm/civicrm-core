@@ -163,6 +163,7 @@ ORDER BY cim.is_primary DESC, im_id ASC ";
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 

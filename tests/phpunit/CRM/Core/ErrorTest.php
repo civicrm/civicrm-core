@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Exception\DBQueryException;
+
 /**
  * Tests for linking to resource files
  * @group headless
@@ -63,24 +65,24 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
    *
    * This tests a theory about what caused CRM-10766.
    */
-  public function testMixLog() {
-    CRM_Core_Error::debug_log_message("static-1");
+  public function testMixLog(): void {
+    CRM_Core_Error::debug_log_message('static-1');
     $logger = CRM_Core_Error::createDebugLogger();
-    CRM_Core_Error::debug_log_message("static-2");
+    CRM_Core_Error::debug_log_message('static-2');
     $logger->info('obj-1');
-    CRM_Core_Error::debug_log_message("static-3");
+    CRM_Core_Error::debug_log_message('static-3');
     $logger->info('obj-2');
-    CRM_Core_Error::debug_log_message("static-4");
+    CRM_Core_Error::debug_log_message('static-4');
     $logger2 = CRM_Core_Error::createDebugLogger();
     $logger2->info('obj-3');
-    CRM_Core_Error::debug_log_message("static-5");
+    CRM_Core_Error::debug_log_message('static-5');
     $this->assertLogRegexp('/static-1.*static-2.*obj-1.*static-3.*obj-2.*static-4.*obj-3.*static-5/s');
   }
 
   /**
    * @param $pattern
    */
-  public function assertLogRegexp($pattern) {
+  public function assertLogRegexp($pattern): void {
     $config = CRM_Core_Config::singleton();
     $logFiles = glob($config->configAndLogDir . '/CiviCRM*.log');
     $this->assertEquals(1, count($logFiles), 'Expect to find 1 file matching: ' . $config->configAndLogDir . '/CiviCRM*log*/');
@@ -94,7 +96,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
    *
    * Do some basic content checks.
    */
-  public function testDebugLoggerFormat() {
+  public function testDebugLoggerFormat(): void {
     $log = CRM_Core_Error::createDebugLogger('my-test');
     $log->log('Mary had a little lamb');
     $log->log('Little lamb');
@@ -105,6 +107,68 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     // there are chars for the date at the start.
     $this->assertTrue(strpos($fileContents, '[info] Mary had a little lamb') > 10);
     $this->assertStringContainsString('[info] Little lamb', $fileContents);
+  }
+
+  /**
+   * Test the contents of the exception thrown for invalid sql.
+   *
+   * @dataProvider getErrorSQL
+   *
+   * @param array $testData
+   */
+  public function testDBError(array $testData): void {
+    try {
+      CRM_Core_DAO::executeQuery($testData['sql']);
+    }
+    catch (DBQueryException $e) {
+      $this->assertEquals(0, $e->getCode());
+      $this->assertInstanceOf('DB_Error', $e->getCause());
+      $this->assertEquals($testData['message'], $e->getMessage());
+      $this->assertEquals($testData['error_code'], $e->getErrorCode());
+      $this->assertEquals($testData['sql_error_code'], $e->getSQLErrorCode());
+      $this->assertStringStartsWith($testData['sql'] . ' [nativecode=' . $testData['sql_error_code'], $e->getDebugInfo());
+      $this->assertEquals($testData['sql'], $e->getSQL());
+      $this->assertStringStartsWith($testData['user_message'], $e->getUserMessage());
+      return;
+    }
+    $this->fail();
+  }
+
+  /**
+   * Data provider for sql error testing.
+   *
+   * @return array[]
+   */
+  public function getErrorSQL(): array {
+    return [
+      'invalid_table' => [
+        [
+          'sql' => 'SELECT a FROM b',
+          'message' => 'DB Error: no such table',
+          'error_code' => -18,
+          'user_message' => 'Invalid Query no such table',
+          'sql_error_code' => 1146,
+        ],
+      ],
+      'invalid_field' => [
+        [
+          'sql' => 'SELECT a FROM civicrm_contact',
+          'message' => 'DB Error: no such field',
+          'error_code' => -19,
+          'user_message' => "Invalid Query no such field Unknown column 'a' in 'field list'",
+          'sql_error_code' => 1054,
+        ],
+      ],
+      'invalid_syntax' => [
+        [
+          'sql' => 'FROM civicrm_contact',
+          'message' => 'DB Error: syntax error',
+          'error_code' => -2,
+          'user_message' => 'Invalid Query syntax error You have an error in your SQL syntax; check the manual that corresponds to your',
+          'sql_error_code' => 1064,
+        ],
+      ],
+    ];
   }
 
 }

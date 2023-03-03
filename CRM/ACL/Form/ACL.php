@@ -247,7 +247,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     CRM_Core_BAO_Cache::resetCaches();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_ACL_BAO_ACL::del($this->_id);
+      CRM_ACL_BAO_ACL::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected ACL has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {

@@ -2485,7 +2485,7 @@ WHERE  option_group_id = {$optionGroupId}";
 
     if ($count < 2) {
       //delete the option group
-      CRM_Core_BAO_OptionGroup::del($optionGroupId);
+      CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $optionGroupId]);
     }
   }
 

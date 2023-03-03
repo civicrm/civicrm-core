@@ -223,44 +223,6 @@ WHERE e.id = %1";
   }
 
   /**
-   * Delete all the block associated with the location.
-   *
-   * Note a universe search on 1 Oct 2020 found no calls to this function.
-   *
-   * @deprecated
-   *
-   * @param int $contactId
-   *   Contact id.
-   * @param int $locationTypeId
-   *   Id of the location to delete.
-   * @throws CRM_Core_Exception
-   */
-  public static function deleteLocationBlocks($contactId, $locationTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use v4 api');
-    // ensure that contactId has a value
-    if (empty($contactId) ||
-      !CRM_Utils_Rule::positiveInteger($contactId)
-    ) {
-      throw new CRM_Core_Exception('Incorrect contact id parameter passed to deleteLocationBlocks');
-    }
-
-    if (empty($locationTypeId) ||
-      !CRM_Utils_Rule::positiveInteger($locationTypeId)
-    ) {
-      // so we only delete the blocks which DO NOT have a location type Id
-      // CRM-3581
-      $locationTypeId = 'null';
-    }
-
-    static $blocks = ['Address', 'Phone', 'IM', 'OpenID', 'Email'];
-
-    $params = ['contact_id' => $contactId, 'location_type_id' => $locationTypeId];
-    foreach ($blocks as $name) {
-      CRM_Core_BAO_Block::blockDelete($name, $params);
-    }
-  }
-
-  /**
    * Make sure contact should have only one primary block, CRM-5051.
    *
    * @param int $contactId

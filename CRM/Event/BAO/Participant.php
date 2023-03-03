@@ -553,23 +553,6 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
   }
 
   /**
-   * Get the empty spaces for event those we can allocate
-   * to pending participant to become confirm.
-   *
-   * @deprecated
-   *
-   * @param int $eventId
-   *   Event id.
-   *
-   * @return int
-   *   $spaces  Number of Empty Seats/null.
-   */
-  public static function pendingToConfirmSpaces($eventId) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Event_BAO_Participant::eventFull');
-    return CRM_Event_BAO_Participant::eventFull($eventId, TRUE, FALSE, TRUE, FALSE, TRUE);
-  }
-
-  /**
    * Combine all the importable fields from the lower levels object.
    *
    * @param string $contactType

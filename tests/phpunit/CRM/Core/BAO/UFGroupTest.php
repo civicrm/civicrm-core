@@ -61,7 +61,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     ];
     $ufGroup = CRM_Core_BAO_UFGroup::add($params);
     $ufGroupID = $ufGroup->id;
-    $ufGroup = CRM_Core_BAO_UFGroup::del($ufGroupID);
+    $ufGroup = CRM_Core_BAO_UFGroup::deleteRecord(['id' => $ufGroupID]);
 
     // Assert that pre hook implemntation was called for delete op.
     $systemLogCount = $this->callAPISuccess('SystemLog', 'getcount', [
@@ -95,7 +95,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     ];
     $ufGroup = CRM_Core_BAO_UFGroup::add($params);
     $ufGroupID = $ufGroup->id;
-    $ufGroup = CRM_Core_BAO_UFGroup::del($ufGroupID);
+    $ufGroup = CRM_Core_BAO_UFGroup::deleteRecord(['id' => $ufGroupID]);
 
     // Assert that pre hook implemntation was called for delete op.
     $systemLogCount = $this->callAPISuccess('SystemLog', 'getcount', [

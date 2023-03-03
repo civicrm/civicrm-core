@@ -11,6 +11,7 @@
 
 use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
+use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
@@ -1700,8 +1701,7 @@ WHERE      $condition
     $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
-      $params = ['id' => $dao->id];
-      CRM_Core_BAO_Block::blockDelete('Address', $params);
+      Address::delete(FALSE)->addWhere('id', '=', $dao->id)->execute();
     }
   }
 
@@ -2162,12 +2162,21 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * Gaps in the above (
    *
    * @param array $input
-   *    Keys are all optional, if not supplied the template contribution's values are used.
-   *    The template contribution is either the actual template or the latest added contribution
-   *    for the ContributionRecur specified in $contributionParams['contribution_recur_id'].
    *    - total_amount
    *    - financial_type_id
    *    - campaign_id
+   *
+   *    These keys are all optional, and are combined with the values from the contribution_recur
+   *    record to override values from the template contribution. Overrides are
+   *    subject to the following limitations
+   *    1) the campaign id & is_test always apply (is_test is available on the recurring but not as input)
+   *    2) the total amount & financial type ID overrides ONLY apply if the contribution has
+   *    only one line item.
+   *
+   *    The template contribution is derived from a contribution linked to
+   *    the recurring contribution record. A true template contribution is only used
+   *    as a template and is_template is set to TRUE. If this cannot be found the latest added contribution
+   *    is used.
    *
    * @param array $contributionParams
    *
@@ -2175,7 +2184,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @todo
-   *  1) many processors still call repeattransaction with contribution_status_id = Completed
+   *
    *  2) repeattransaction code is current munged into completeTransaction code for historical bad coding reasons
    *  3) Repeat transaction duplicates rather than calls Order.create
    *  4) Use of payment.create still limited - completetransaction is more common.
@@ -2192,7 +2201,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $contributionParams['line_item'] = $templateContribution['line_item'];
     $contributionParams['status_id'] = 'Pending';
 
-    foreach (['contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount'] as $fieldName) {
+    foreach (['contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'contribution_page_id', 'total_amount'] as $fieldName) {
       if (isset($templateContribution[$fieldName])) {
         $contributionParams[$fieldName] = $templateContribution[$fieldName];
       }

@@ -164,7 +164,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Badge_BAO_Layout::del($this->_id);
+      CRM_Badge_BAO_Layout::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected badge layout has been deleted.'), ts('Record Deleted'), 'success');
       return;
     }

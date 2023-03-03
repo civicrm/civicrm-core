@@ -236,6 +236,7 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 
