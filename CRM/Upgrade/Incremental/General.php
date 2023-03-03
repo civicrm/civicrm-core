@@ -134,7 +134,7 @@ class CRM_Upgrade_Incremental_General {
     }
 
     $ftAclSetting = Civi::settings()->get('acl_financial_type');
-    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'biz.jmaconsulting.financialaclreport', 'sequential' => 1]);
+    $financialAclExtension = CRM_Extension_System::singleton()->getMapper()->isActiveModule('financialaclreport');
     if ($ftAclSetting && (($financialAclExtension['count'] == 1 && $financialAclExtension['values'][0]['status'] != 'Installed') || $financialAclExtension['count'] !== 1)) {
       $preUpgradeMessage .= '<br />' . ts('CiviCRM will in the future require the extension %1 for CiviCRM Reports to work correctly with the Financial Type ACLs. The extension can be downloaded <a href="%2">here</a>', [
         1 => 'biz.jmaconsulting.financialaclreport',
