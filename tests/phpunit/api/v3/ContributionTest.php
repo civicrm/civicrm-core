@@ -462,8 +462,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateWithCustom(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -486,8 +484,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other
    * entities and / or moved to the automated test suite
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateGetFieldsWithCustom(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate('ContributionCustomFields', __FILE__);
@@ -503,8 +499,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test creating a contribution without skipLineItems.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionNoLineItems(): void {
     // Turn off this validation as this test results in invalid
@@ -540,8 +534,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test checks that passing in line items suppresses the create mechanism.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionChainedLineItems(): void {
     $params = [
@@ -626,8 +618,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test create with valid payment instrument.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionWithPaymentInstrument(): void {
     $params = $this->_params + ['payment_instrument' => 'EFT'];
@@ -848,7 +838,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Create test with unique field name on source.
    */
-  public function testCreateContributionSource() {
+  public function testCreateContributionSource(): void {
 
     $params = [
       'contact_id' => $this->individualID,
@@ -3236,7 +3226,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Complete the transaction using the template with all the possible.
    */
-  public function testCompleteTransactionContributionPageFromAddress() {
+  public function testCompleteTransactionContributionPageFromAddress(): void {
     $contributionPage = $this->callAPISuccess('ContributionPage', 'create', [
       'receipt_from_name' => 'Mickey Mouse',
       'receipt_from_email' => 'mickey@mouse.com',
@@ -4781,7 +4771,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $this->addTaxAccountToFinancialType($financialType['id']);
     $contribution = $this->setUpRepeatTransaction(
-      [],
+      ['amount' => 100],
       'single',
       [
         'financial_type_id' => $financialType['id'],
