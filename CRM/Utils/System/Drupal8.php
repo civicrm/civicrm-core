@@ -542,6 +542,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function logger($message, $priority = NULL) {
     if (CRM_Core_Config::singleton()->userFrameworkLogging) {
+      // dev/core#3438 Prevent cv fatal if logging before CMS bootstrap
+      if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
+        return;
+      }
       \Drupal::logger('civicrm')->log($priority ?? \Drupal\Core\Logger\RfcLogLevel::DEBUG, '%message', ['%message' => $message]);
     }
   }
