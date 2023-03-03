@@ -1132,4 +1132,21 @@ abstract class CRM_Utils_System_Base {
     return $contactParameters;
   }
 
+  /**
+   * Modify standalone profile
+   *
+   * @param string $profile
+   * @param array $params
+   *
+   * @return string
+   */
+  public function modifyStandaloneProfile($profile, $params):string {
+    // Not sure how to circumvent our own navigation system to generate the
+    // right form url.
+    $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $params['gid'] . '&amp;reset=1';
+    $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
+
+    return $profile;
+  }
+
 }

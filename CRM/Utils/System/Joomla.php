@@ -1031,4 +1031,17 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return $contactParameters;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function modifyStandaloneProfile($profile, $params):string {
+    $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $params['gid'] . '&amp;reset=1';
+    $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
+
+    // FIXME: (CRM-3587) hack to make standalone profile work
+    // in Joomla without administrator login.
+    $profile = str_replace('/administrator/', '/index.php', $profile);
+    return $profile;
+  }
+
 }

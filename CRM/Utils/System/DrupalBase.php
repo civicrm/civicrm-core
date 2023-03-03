@@ -824,4 +824,18 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return $contactParameters;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function modifyStandaloneProfile($profile, $params):string {
+    $config = CRM_Core_Config::singleton();
+    $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $params['gid'] . '&amp;reset=1';
+    if ($config->cleanURL) {
+      $urlReplaceWith = 'civicrm/profile/create?gid=' . $params['gid'] . '&amp;reset=1';
+    }
+    $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
+
+    return $profile;
+  }
+
 }
