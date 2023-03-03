@@ -891,4 +891,22 @@ SET    version = '$version'
     }
   }
 
+  /**
+   * Has the condition of the database reached parity with the codebase?
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function isDatabaseStillBroken(): bool {
+    // Have we run CRM_Upgrade_Form::doCoreFinish() for this version?
+    $codeVer = CRM_Utils_System::version();
+    $isCoreCurrent = CRM_Core_DAO::singleValueQuery('
+        SELECT count(*) as count
+        FROM civicrm_log
+        WHERE entity_table = "civicrm_domain"
+        AND data LIKE %1
+        ', [1 => ['upgrade:%->' . $codeVer, 'String']]);
+    return $isCoreCurrent < 1;
+  }
+
 }
