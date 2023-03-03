@@ -24,11 +24,29 @@ class StandardFilters {
    * @return mixed
    */
   public static function upper($value, array $filter, string $format) {
-    return mb_strtoupper($value);
+    switch ($format) {
+      case 'text/plain':
+        return mb_strtoupper($value);
+
+      case 'text/html':
+        return \CRM_Utils_XML::filterMarkupText((string) $value, 'mb_strtoupper');
+
+      default:
+        throw new \CRM_Core_Exception(sprintf('Filter %s does not support format %s', __FUNCTION__, $format));
+    }
   }
 
   public static function lower($value, array $filter, string $format) {
-    return mb_strtolower($value);
+    switch ($format) {
+      case 'text/plain':
+        return mb_strtolower($value);
+
+      case 'text/html':
+        return \CRM_Utils_XML::filterMarkupText((string) $value, 'mb_strtolower');
+
+      default:
+        throw new \CRM_Core_Exception(sprintf('Filter %s does not support format %s', __FUNCTION__, $format));
+    }
   }
 
   public static function boolean($value, array $filter, string $format) {
