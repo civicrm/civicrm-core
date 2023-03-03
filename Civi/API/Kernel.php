@@ -75,8 +75,10 @@ class Kernel {
    * @throws \CRM_Core_Exception
    */
   public function runSafe($entity, $action, $params) {
-    if (\CRM_Core_Config::isUpgradeMode() && \CRM_Upgrade_Form::isDatabaseStillBroken()) {
+    if (\CRM_Core_Config::isUpgradeMode() && \CRM_Upgrade_Form::isDatabaseStillBroken() && !\CRM_Upgrade_Form::isPreExistingEvil()) {
       throw new \API_Exception("Don't put API calls in the upgrader.");
+      // This ^^ sometimes gets swallowed by API callers. For a more certain audit, use `die()`.
+      // debug_print_backtrace(); die("Don't put API calls in the upgrader.");
     }
 
     $apiRequest = [];

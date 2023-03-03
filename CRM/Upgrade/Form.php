@@ -909,4 +909,64 @@ SET    version = '$version'
     return $isCoreCurrent < 1;
   }
 
+  /**
+   * We want to stop new API calls from getting into the upgrader. There are a couple already in
+   * there, and it's annoying to understand+replace after-the-fact, so this function is just a
+   * list of grandfathered methods.
+   *
+   * @return bool
+   */
+  public static function isPreExistingEvil(): bool {
+    $functions = [];
+    $stackFrames = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT);
+    foreach ($stackFrames as $stackFrame) {
+      $functions[] = ($stackFrame['class'] ?? '') . '::' . ($stackFrame['function'] ?? '');
+      if (($stackFrame['class'] ?? NULL) === CRM_Queue_Task::class) {
+        // Some upgrade functions are inherited, yielding two identities (e.g.
+        // 'CRM_Upgrade_Incremental_php_Base::updateSmartGroups' and
+        // 'CRM_Upgrade_Incremental_php_FiveFifteen::updateSmartGroups').
+        // The latter is better for grandfathering exceptions.
+        $task = $stackFrame['object'];
+        $functions[] = implode('::', (array) $task->callback);
+      }
+    }
+    $evilShallNotBeAllowedToGrow = [
+      'CRM_Upgrade_Incremental_php_FourSeven::disableFlexibleJobsExtension',
+      'CRM_Upgrade_Incremental_php_FourSeven::removePaymentProcessorType',
+      'CRM_Upgrade_Incremental_php_FourSeven::updateWysiwyg',
+      'CRM_Upgrade_Incremental_php_FourSeven::addDeletedByMergeActivityType',
+      'CRM_Upgrade_Incremental_php_FourSeven::addRefundAndChargeBackAccountsIfNotExist',
+      'CRM_Upgrade_Incremental_php_FourSeven::addWysiwygPresets',
+      'CRM_Upgrade_Incremental_php_FourSeven::addChangeCaseSubjectActivityType',
+      'CRM_Upgrade_Incremental_php_FourSeven::pickActivityRevisionPolicy',
+      'CRM_Upgrade_Incremental_php_FourSeven::removeContributionLoggingReports',
+      'CRM_Upgrade_Incremental_php_FiveFour::addActivityDefaultAssigneeOptions',
+      'CRM_Upgrade_Incremental_php_FiveEleven::updateSmartGroups',
+      'CRM_Upgrade_Incremental_php_FiveTwelve::updateSmartGroups',
+      'CRM_Upgrade_Incremental_php_FiveFifteen::updateSmartGroups',
+      'CRM_Upgrade_Incremental_php_FiveFifteen::updateContributeSettings',
+      'CRM_Upgrade_Incremental_php_FiveSixteen::updateSmartGroups',
+      'CRM_Upgrade_Incremental_php_FiveSeventeen::updateSmartGroups',
+      'CRM_Upgrade_Incremental_php_FiveSeventeen::updateFileTypes',
+      'CRM_Upgrade_Incremental_php_FiveEighteen::updateSmartGroups',
+      'CRM_Upgrade_Incremental_php_FiveEighteen::joinDateReportUpdate',
+      'CRM_Upgrade_Incremental_php_FiveNineteen::api4Menu',
+      'CRM_Upgrade_Incremental_php_FiveTwenty::templateStatus',
+      'CRM_Upgrade_Incremental_php_FiveTwentyThree::addXoauth2ProtocolOption',
+      'CRM_Upgrade_Incremental_php_FiveTwentyFive::convertReportsJcalendarToDatePicker',
+      'CRM_Upgrade_Incremental_php_FiveTwentySix::addNLBEOptionValue',
+      'CRM_Upgrade_Incremental_php_FiveThirtyNine::updateSmartGroups',
+      'CRM_Upgrade_Incremental_php_FiveForty::addGroupOptionList',
+      'CRM_Upgrade_Incremental_php_FiveForty::updateCkeditorOptionLabel',
+      'CRM_Upgrade_Incremental_php_FiveFortyTwo::addOptionGroup',
+      'CRM_Upgrade_Incremental_php_FiveFortySix::addImportCustomMenu',
+      'CRM_Upgrade_Incremental_php_FiveFifty::convertMappingFieldLabelsToNames',
+      'CRM_Upgrade_Incremental_php_FiveFiftyOne::convertMappingFieldLabelsToNames',
+      'CRM_Upgrade_Incremental_php_FiveFiftyThree::addInvoicePDFFormat',
+      'CRM_Upgrade_Incremental_php_FiveFiftyThree::addRecentItemsProviders',
+      'CRM_Upgrade_Incremental_php_FiveSixty::addScheduledReminderSmartySetting',
+    ];
+    return !empty(array_intersect($functions, $evilShallNotBeAllowedToGrow));
+  }
+
 }
