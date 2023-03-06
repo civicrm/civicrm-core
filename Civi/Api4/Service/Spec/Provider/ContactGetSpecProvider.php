@@ -40,8 +40,9 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
       ->setOptionsCallback([__CLASS__, 'getGroupList']);
     $spec->addFieldSpec($field);
 
-    // Age field
+    // Fields specific to Individuals
     if (!$spec->getValue('contact_type') || $spec->getValue('contact_type') === 'Individual') {
+      // Age field
       $field = new FieldSpec('age_years', 'Contact', 'Integer');
       $field->setLabel(ts('Age (years)'))
         ->setTitle(ts('Age (years)'))
@@ -52,6 +53,20 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
         ->setReadonly(TRUE)
         ->setSqlRenderer([__CLASS__, 'calculateAge']);
       $spec->addFieldSpec($field);
+
+      // Birthday field
+      if (!$spec->getValue('contact_type') || $spec->getValue('contact_type') === 'Individual') {
+        $field = new FieldSpec('next_birthday', 'Contact', 'Integer');
+        $field->setLabel(ts('Next Birthday in (days)'))
+          ->setTitle(ts('Next Birthday in (days)'))
+          ->setColumnName('birth_date')
+          ->setInputType('Number')
+          ->setDescription(ts('Number of days until next birthday'))
+          ->setType('Extra')
+          ->setReadonly(TRUE)
+          ->setSqlRenderer([__CLASS__, 'calculateBirthday']);
+        $spec->addFieldSpec($field);
+      }
     }
 
     // Address, Email, Phone, IM primary/billing virtual fields
@@ -181,6 +196,25 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    */
   public static function calculateAge(array $field): string {
     return "TIMESTAMPDIFF(YEAR, {$field['sql_name']}, CURDATE())";
+  }
+
+  /**
+   * Generate SQL for upcoming birthday field
+   *
+   * Calculates the number of days until the next birthday
+   *
+   * @param array $field
+   * @return string
+   */
+  public static function calculateBirthday(array $field): string {
+    return "DATEDIFF(
+        IF(
+            DATE(CONCAT(YEAR(CURDATE()), '-', MONTH({$field['sql_name']}), '-', DAY({$field['sql_name']}))) < CURDATE(),
+            CONCAT(YEAR(CURDATE()) + 1, '-', MONTH({$field['sql_name']}), '-', DAY({$field['sql_name']})),
+            CONCAT(YEAR(CURDATE()), '-', MONTH({$field['sql_name']}), '-', DAY({$field['sql_name']}))
+        ),
+        CURDATE()
+    )";
   }
 
 }
