@@ -12,7 +12,14 @@
 namespace Civi\Api4\Query;
 
 /**
- * Base class for all Sql functions.
+ * Base class for all APIv4 Sql function definitions.
+ *
+ * SqlFunction classes don't actually process data, SQL itself does the real work.
+ * The role of each SqlFunction class is to:
+ *
+ * 1. Whitelist the SQL function for use by APIv4 (it doesn't allow any that don't have a SQLFunction class).
+ * 2. Document what the function does and what arguments it accepts.
+ * 3. Tell APIv4 how to treat the inputs and how to format the outputs.
  *
  * @package Civi\Api4\Query
  */
@@ -197,6 +204,19 @@ abstract class SqlFunction extends SqlExpression {
    */
   public static function getCategory(): string {
     return static::$category;
+  }
+
+  /**
+   * For functions which output a finite set of values,
+   * this allows the API to treat it as pseudoconstant options.
+   *
+   * e.g. MONTH() only returns integers 1-12, which can be formatted like
+   * [1 => January, 2 => February, etc.]
+   *
+   * @return array|null
+   */
+  public static function getOptions(): ?array {
+    return NULL;
   }
 
   /**
