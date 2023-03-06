@@ -14,7 +14,6 @@ namespace Civi\Api4\Service\Spec;
 
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
-use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class SpecFormatter {
 
@@ -97,7 +96,7 @@ class SpecFormatter {
     $fkAPIName = $data['FKApiName'] ?? NULL;
     $fkClassName = $data['FKClassName'] ?? NULL;
     if ($fkAPIName || $fkClassName) {
-      $field->setFkEntity($fkAPIName ?: AllCoreTables::getBriefName($fkClassName));
+      $field->setFkEntity($fkAPIName ?: CoreUtil::getApiNameFromBAO($fkClassName));
     }
 
     return $field;
