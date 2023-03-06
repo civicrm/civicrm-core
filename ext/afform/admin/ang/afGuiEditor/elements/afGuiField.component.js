@@ -89,8 +89,8 @@
       this.getDefn = function() {
         var defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name);
         // Calc fields are specific to a search display, not part of the schema
-        if (!defn && ctrl.container.getSearchDisplay(ctrl.container.node)) {
-          var searchDisplay = ctrl.container.getSearchDisplay(ctrl.container.node);
+        if (!defn && ctrl.container.getSearchDisplay()) {
+          var searchDisplay = ctrl.container.getSearchDisplay();
           defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.node.name});
         }
         defn = defn || {
