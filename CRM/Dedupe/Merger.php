@@ -1710,10 +1710,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $subTypes,
     $checkPermission
   ) {
-    $toReturn = NULL;
+
     $groupID = -1;
     $fromCache = TRUE;
-    $subName = NULL;
     $onlySubType = NULL;
     $returnAll = TRUE;
     if ($entityID) {
@@ -1783,19 +1782,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     if ($serialize_version) {
       $tableData['custom_field'][] = 'serialize';
     }
-    if (!$toReturn || !is_array($toReturn)) {
-      $toReturn = $tableData;
-    }
-    else {
-      // Supply defaults and remove unknown array keys
-      $toReturn = array_intersect_key(array_filter($toReturn) + $tableData, $tableData);
-      // Merge in required fields that we must have
-      $toReturn['custom_field'] = array_unique(array_merge($toReturn['custom_field'], ['id', 'column_name', 'data_type']));
-      $toReturn['custom_group'] = array_unique(array_merge($toReturn['custom_group'], ['id', 'is_multiple', 'table_name', 'name']));
-      // Validate return fields
-      $toReturn['custom_field'] = array_intersect($toReturn['custom_field'], array_keys(CRM_Core_DAO_CustomField::fieldKeys()));
-      $toReturn['custom_group'] = array_intersect($toReturn['custom_group'], array_keys(CRM_Core_DAO_CustomGroup::fieldKeys()));
-    }
+
+    $toReturn = $tableData;
 
     // create select
     $select = [];
@@ -1845,11 +1833,6 @@ WHERE civicrm_custom_group.is_active = 1
   AND civicrm_custom_group.extends IN ($in)
   AND $subTypeClause
 ";
-      if ($subName) {
-        $strWhere .= " AND civicrm_custom_group.extends_entity_column_id = %{$sqlParamKey}";
-        $params[$sqlParamKey] = [$subName, 'String'];
-        $sqlParamKey = $sqlParamKey + 1;
-      }
     }
     else {
       $strWhere = "
