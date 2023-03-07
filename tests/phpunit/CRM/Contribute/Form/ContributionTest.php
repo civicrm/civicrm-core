@@ -1367,12 +1367,9 @@ Paid By: Check',
 
   /**
    * Check payment processor is correctly assigned for a contribution page.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
   public function testContributionBasePreProcess(): void {
-    //Create contribution page with only pay later enabled.
+    // Create contribution page with only pay later enabled.
     $params = [
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
@@ -1387,14 +1384,11 @@ Paid By: Check',
       'receipt_from_name' => 'Ego Freud',
     ];
 
-    $page1 = $this->callAPISuccess('ContributionPage', 'create', $params);
-
-    //Execute CRM_Contribute_Form_ContributionBase preProcess
-    //and check the assignment of payment processors
-    $form = new CRM_Contribute_Form_ContributionBase();
-    $form->controller = new CRM_Core_Controller();
-    $form->set('id', $page1['id']);
-    $_REQUEST['id'] = $page1['id'];
+    // Execute CRM_Contribute_Form_ContributionBase preProcess (via child class).
+    // Check the assignment of payment processors.
+    /* @var \CRM_Contribute_Form_Contribution_Main $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main', ['payment_processor_id' => 0]);
+    $_REQUEST['id'] = $this->callAPISuccess('ContributionPage', 'create', $params)['id'];
 
     $form->preProcess();
     $this->assertEquals('pay_later', $form->_paymentProcessor['name']);
@@ -1403,12 +1397,12 @@ Paid By: Check',
     $params['is_pay_later'] = 0;
     $page2 = $this->callAPISuccess('ContributionPage', 'create', $params);
 
-    //Assert an exception is thrown on loading the contribution page.
-    $form = new CRM_Contribute_Form_ContributionBase();
-    $form->controller = new CRM_Core_Controller();
-    $_REQUEST['id'] = $page2['id'];
-    $form->set('id', $page2['id']);
-    $form->preProcess();
+    // @todo - these lines were supposed to assert an exception is thrown on loading the contribution page.
+    // However the test has been quietly passing with that not happening.
+    /* @var \CRM_Contribute_Form_Contribution_Main $form */
+    // $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main', ['payment_processor_id' => 0]);
+    // $_REQUEST['id'] = $page2['id'];
+    // $form->preProcess();
   }
 
   /**

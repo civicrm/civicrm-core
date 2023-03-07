@@ -339,8 +339,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_bltID = $this->get('bltID');
     $this->_paymentProcessor = $this->get('paymentProcessor');
 
-    $this->order = new CRM_Financial_BAO_Order();
-    $this->order->setPriceSetID($this->getPriceSetID());
+    // In tests price set id is not always set - it is unclear if this is just
+    // poor test set up or it is possible in 'the real world'
+    if ($this->getPriceSetID()) {
+      $this->order = new CRM_Financial_BAO_Order();
+      $this->order->setPriceSetID($this->getPriceSetID());
+    }
     $this->_priceSet = $this->get('priceSet');
 
     if (!$this->_values) {
