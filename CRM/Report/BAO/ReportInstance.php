@@ -223,6 +223,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
    * @return mixed
    */
   public static function del($id = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $id]);
     return 1;
   }
@@ -325,7 +326,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       CRM_Core_Error::statusBounce($statusMessage, $bounceTo);
     }
 
-    CRM_Report_BAO_ReportInstance::del($instanceId);
+    CRM_Report_BAO_ReportInstance::deleteRecord(['id' => $instanceId]);
 
     CRM_Core_Session::setStatus(ts('Selected report has been deleted.'), ts('Deleted'), 'success');
     if ($successRedirect) {

@@ -459,6 +459,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    * @return bool
    */
   public static function del($contactTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     if (!$contactTypeId) {
       return FALSE;
     }

@@ -364,7 +364,7 @@ class CRM_Core_Form_RecurringEntity {
             'name'
           );
           if ($optionGroupIdExists) {
-            CRM_Core_BAO_OptionGroup::del($optionGroupIdExists);
+            CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $optionGroupIdExists]);
           }
           $optionGroupParams = [
             'name' => $type . '_repeat_exclude_dates_' . $actionScheduleObj->entity_value,
