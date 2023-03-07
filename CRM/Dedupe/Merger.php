@@ -1711,10 +1711,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $checkPermission
   ) {
 
-    $groupID = -1;
-    $fromCache = TRUE;
-    $onlySubType = NULL;
-    $returnAll = TRUE;
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
     }
@@ -1823,9 +1819,7 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
         $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", CRM_Core_BAO_CustomGroup::validateSubTypeByEntity($entityType, $subType));
       }
       $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
-      if (!$onlySubType) {
-        $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
-      }
+      $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
 
       $strWhere = "
 WHERE civicrm_custom_group.is_active = 1
@@ -1840,20 +1834,8 @@ WHERE civicrm_custom_group.is_active = 1
   AND civicrm_custom_field.is_active = 1
   AND civicrm_custom_group.extends IN ($in)
 ";
-      if (!$returnAll) {
-        $strWhere .= "AND civicrm_custom_group.extends_entity_column_value IS NULL";
-      }
     }
 
-    if ($groupID > 0) {
-      // since we want a specific group id we add it to the where clause
-      $strWhere .= " AND civicrm_custom_group.id = %{$sqlParamKey}";
-      $params[$sqlParamKey] = [$groupID, 'Integer'];
-    }
-    elseif (!$groupID) {
-      // since groupID is false we need to show all Inline groups
-      $strWhere .= " AND civicrm_custom_group.style = 'Inline'";
-    }
     if ($checkPermission) {
       // ensure that the user has access to these custom groups
       $strWhere .= " AND " .
@@ -1873,21 +1855,13 @@ ORDER BY civicrm_custom_group.weight,
     $queryString = "$strSelect $strFrom $strWhere $orderBy";
 
     // lets see if we can retrieve the groupTree from cache
-    $cacheString = $queryString;
-    if ($groupID > 0) {
-      $cacheString .= "_{$groupID}";
-    }
-    else {
-      $cacheString .= "_Inline";
-    }
+    $cacheString = $queryString . '_Inline';;
 
     $cacheKey = "CRM_Core_DAO_CustomGroup_Query " . md5($cacheString);
     $multipleFieldGroupCacheKey = "CRM_Core_DAO_CustomGroup_QueryMultipleFields " . md5($cacheString);
     $cache = CRM_Utils_Cache::singleton();
-    if ($fromCache) {
-      $groupTree = $cache->get($cacheKey);
-      $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
-    }
+    $groupTree = $cache->get($cacheKey);
+    $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
 
     if (empty($groupTree)) {
       [$multipleFieldGroups, $groupTree] = CRM_Core_BAO_CustomGroup::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
