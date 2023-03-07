@@ -285,8 +285,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected function setUp(): void {
     CRM_Core_I18n::clearLocale();
     parent::setUp();
-    $session = CRM_Core_Session::singleton();
-    $session->set('userID', NULL);
+    CRM_Core_Session::singleton()->set('userID');
 
     $this->_apiversion = 3;
 
@@ -311,7 +310,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
-
     // reset all the caches
     CRM_Utils_System::flushCache();
 
@@ -457,10 +455,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->resetLabels();
 
     error_reporting(E_ALL & ~E_NOTICE);
-    CRM_Utils_Hook::singleton()->reset();
-    if ($this->hookClass) {
-      $this->hookClass->reset();
-    }
+    $this->resetHooks();
     CRM_Core_Session::singleton()->reset(1);
 
     if ($this->tx) {
@@ -988,11 +983,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'source' => 'SSF',
-      'contribution_status_id' => 1,
+      'contribution_status_id' => 'Completed',
     ], $params);
 
-    $result = $this->callAPISuccess('contribution', 'create', $params);
-    return $result['id'];
+    return $this->callAPISuccess('Contribution', 'create', $params)['id'];
   }
 
   /**
@@ -1798,6 +1792,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   /**
    * Clean up financial entities after financial tests (so we remember to get all the tables :-))
+   *
+   * @noinspection PhpUnhandledExceptionInspection
    */
   public function quickCleanUpFinancialEntities(): void {
     $tablesToTruncate = [
@@ -1852,6 +1848,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     catch (CRM_Core_Exception $e) {
       $this->fail('failed to cleanup financial types ' . $e->getMessage());
     }
+    $this->organizeOptionValues();
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
     // @fixme this parameter is leaking - it should not be defined as a class static
@@ -3923,6 +3920,46 @@ WHERE table_schema = DATABASE()");
     }
     else {
       return NULL;
+    }
+  }
+
+  /**
+   * Disorganize our option values to ensure we are not relying on luck.
+   *
+   * For example our contributions and recurring contributions use different
+   * option groups for contribution_status_id but by happy co-incidence (ahem)
+   * both have 1 for completed by default. This upsets that co-incidence for more
+   * robust testing. Ideally we would do this for all tests & for a range of values
+   * but there is too much hard-coding to roll that out right now.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  protected function disorganizeOptionValues(): void {
+    OptionValue::update(FALSE)->setValues(['value' => 20])
+      ->addWhere('name', '=', 'Completed')
+      ->addWhere('option_group_id:name', '=', 'contribution_status')
+      ->execute();
+  }
+
+  /**
+   * This undoes the `disorganizeOptionValues` function.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  protected function organizeOptionValues(): void {
+    OptionValue::update(FALSE)->setValues(['value' => 1])
+      ->addWhere('name', '=', 'Completed')
+      ->addWhere('option_group_id:name', '=', 'contribution_status')
+      ->execute();
+  }
+
+  /**
+   * Reset any registered hooks.
+   */
+  protected function resetHooks(): void {
+    CRM_Utils_Hook::singleton()->reset();
+    if ($this->hookClass) {
+      $this->hookClass->reset();
     }
   }
 
