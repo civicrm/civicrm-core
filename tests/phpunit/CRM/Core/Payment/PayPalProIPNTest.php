@@ -23,12 +23,6 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   protected $_contributionRecurID;
   protected $_contributionPageID;
   protected $_paymentProcessorID;
-  /**
-   * IDs of entities created to support the tests.
-   *
-   * @var array
-   */
-  protected $ids = [];
 
   /**
    * Set up function.
@@ -77,6 +71,16 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $this->assertEquals('8XA571746W2698126', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertEquals('Online Contribution:', substr($contribution['source'], 0, 20));
+
+    // Re-try the IPN and confirm that a second contribution is not
+    // created (this relies on the trxn_id being the same).
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
+    $paypalIPN->main();
+    $contributions = Contribution::get()->addWhere('contribution_recur_id', '=', $this->_contributionRecurID)
+      ->addSelect('contribution_status_id:name', 'trxn_id', 'source')
+      ->execute();
+    $this->assertCount(1, $contributions);
+    // source gets set by processor
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
@@ -182,7 +186,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    *
    * So, the point of this test is simply to ensure it fails in a known way
    */
-  public function testIPNPaymentExpressNoError() {
+  public function testIPNPaymentExpressNoError(): void {
     $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalExpressTransactionIPN());
     $paypalIPN->main();
