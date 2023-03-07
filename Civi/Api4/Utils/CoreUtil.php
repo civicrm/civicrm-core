@@ -35,6 +35,19 @@ class CoreUtil {
   }
 
   /**
+   * Returns API entity name given an BAO/DAO class name
+   *
+   * Returns null if the API has not been implemented
+   *
+   * @param $baoClassName
+   * @return string|null
+   */
+  public static function getApiNameFromBAO($baoClassName) {
+    $briefName = AllCoreTables::getBriefName($baoClassName);
+    return $briefName && self::getApiClass($briefName) ? $briefName : NULL;
+  }
+
+  /**
    * @param $entityName
    * @return string|\Civi\Api4\Generic\AbstractEntity
    */
