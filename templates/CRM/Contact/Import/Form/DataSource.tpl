@@ -53,10 +53,6 @@
           <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='id-dedupe_rule'}</td>
         </tr>
       {/if}
-      <tr class="crm-import-datasource-form-block-fieldSeparator">
-        <td class="label">{$form.fieldSeparator.label}</td>
-        <td>{$form.fieldSeparator.html} {help id='id-fieldSeparator'}</td>
-      </tr>
       <tr>{include file="CRM/Core/Date.tpl"}</tr>
       <tr>
         <td></td><td class="description">{ts}Select the format that is used for date fields in your import data.{/ts}</td>
