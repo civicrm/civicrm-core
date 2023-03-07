@@ -458,7 +458,7 @@ class Admin {
    * @return array
    */
   private static function getSqlFunctions():array {
-    $functions = \CRM_Api4_Page_Api4Explorer::getSqlFunctions();
+    $functions = CoreUtil::getSqlFunctions();
     // Add faux function "e" for SqlEquations
     $functions[] = [
       'name' => 'e',
@@ -466,6 +466,7 @@ class Admin {
       'description' => ts('Add, subtract, multiply, divide'),
       'category' => SqlFunction::CATEGORY_MATH,
       'data_type' => 'Number',
+      'options' => FALSE,
       'params' => [
         [
           'label' => ts('Value'),

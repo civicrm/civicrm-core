@@ -70,12 +70,18 @@ class Meta {
           $dataType = $field['data_type'] ?? 'String';
           $inputType = $field['input_type'] ?? $dataTypeToInputType[$dataType] ?? 'Text';
         }
+        $options = FALSE;
+        if ($expr->getType() === 'SqlFunction' && $expr::getOptions()) {
+          $inputType = 'Select';
+          $options = CoreUtil::formatOptionList($expr::getOptions(), ['id', 'label']);
+        }
 
         $calcFields[] = [
           'name' => $expr->getAlias(),
           'label' => $label,
           'input_type' => $inputType,
           'data_type' => $dataType,
+          'options' => $options,
         ];
       }
     }

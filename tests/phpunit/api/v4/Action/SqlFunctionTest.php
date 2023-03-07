@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -31,12 +32,15 @@ use Civi\Test\TransactionalInterface;
 class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGetFunctions() {
-    $functions = array_column(\CRM_Api4_Page_Api4Explorer::getSqlFunctions(), NULL, 'name');
+    $functions = array_column(CoreUtil::getSqlFunctions(), NULL, 'name');
     $this->assertArrayHasKey('SUM', $functions);
     $this->assertArrayNotHasKey('', $functions);
     $this->assertArrayNotHasKey('SqlFunction', $functions);
     $this->assertEquals(1, $functions['MAX']['params'][0]['min_expr']);
     $this->assertEquals(1, $functions['MAX']['params'][0]['max_expr']);
+    $this->assertFalse($functions['YEAR']['options']);
+    $this->assertEquals(1, $functions['MONTH']['options'][0]['id']);
+    $this->assertEquals(12, $functions['MONTH']['options'][11]['id']);
   }
 
   public function testGroupAggregates() {
