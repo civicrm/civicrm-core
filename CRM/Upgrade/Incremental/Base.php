@@ -527,6 +527,10 @@ class CRM_Upgrade_Incremental_Base {
     if ($schema->isEnabled()) {
       $schema->fixSchemaDifferencesFor($table);
     }
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
+    }
     return TRUE;
   }
 
@@ -612,6 +616,9 @@ class CRM_Upgrade_Incremental_Base {
     $schema = new CRM_Logging_Schema();
     if ($schema->isEnabled()) {
       $schema->fixSchemaDifferencesFor($table);
+    }
+    if ($locales) {
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
     }
     return TRUE;
   }

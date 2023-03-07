@@ -83,7 +83,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
       'source' => 'SSF',
-      'contribution_status_id' => 1,
+      'contribution_status_id' => 'Completed',
     ];
     $this->_processorParams = [
       'domain_id' => 1,
