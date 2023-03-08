@@ -29,6 +29,7 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact implements \Civi
    * @return CRM_Case_BAO_CaseContact
    */
   public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
