@@ -161,7 +161,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Contact_BAO_RelationshipType::del($this->_id);
+      CRM_Contact_BAO_RelationshipType::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected Relationship type has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {

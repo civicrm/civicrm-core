@@ -98,12 +98,8 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    * @return mixed
    */
   public static function del($relationshipTypeId) {
-    // make sure relationshipTypeId is an integer
-    // @todo review this as most delete functions rely on the api & form layer for this
-    // or do a find first & throw error if no find
-    if (!CRM_Utils_Rule::positiveInteger($relationshipTypeId)) {
-      throw new CRM_Core_Exception(ts('Invalid relationship type'));
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+
     return static::deleteRecord(['id' => $relationshipTypeId]);
   }
 
