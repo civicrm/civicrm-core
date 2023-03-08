@@ -47,14 +47,8 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    *
    * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
-
-    $this->assign('urlPath', 'civicrm/import/datasource');
-    $this->assign('urlPathVar', 'snippet=4&user_job_id=' . $this->get('user_job_id'));
-
-    $this->add('select', 'dataSource', ts('Data Source'), $this->getDataSources(), TRUE,
-      ['onchange' => 'buildDataSourceFormBlock(this.value);']
-    );
+  public function buildQuickForm(): void {
+    parent::buildQuickForm();
 
     // duplicate handling options
     $this->addRadio('onDuplicate', ts('For Duplicate Contacts'), [
@@ -63,9 +57,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       CRM_Import_Parser::DUPLICATE_FILL => ts('Fill'),
       CRM_Import_Parser::DUPLICATE_NOCHECK => ts('No Duplicate Checking'),
     ]);
-
-    $mappingArray = CRM_Core_BAO_Mapping::getMappings('Import Contact');
-    $this->addElement('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
     $js = ['onClick' => "buildSubTypes();buildDedupeRules();"];
     // contact types option
@@ -87,8 +78,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     $this->addElement('select', 'contactSubType', ts('Subtype'));
     $this->addElement('select', 'dedupe_rule_id', ts('Dedupe Rule'));
 
-    CRM_Core_Form_Date::buildAllowedDateFormats($this);
-
     if (CRM_Utils_GeocodeProvider::getUsableClassName()) {
       $this->addElement('checkbox', 'doGeocodeAddress', ts('Geocode addresses during import?'));
     }
@@ -96,20 +85,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     if (Civi::settings()->get('address_standardization_provider') === 'USPS') {
       $this->addElement('checkbox', 'disableUSPS', ts('Disable USPS address validation during import?'));
     }
-    $this->buildDataSourceFields();
-
-    $this->addButtons([
-      [
-        'type' => 'upload',
-        'name' => ts('Continue'),
-        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        'isDefault' => TRUE,
-      ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ],
-    ]);
   }
 
   /**
