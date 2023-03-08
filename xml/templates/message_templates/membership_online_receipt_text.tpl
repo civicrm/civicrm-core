@@ -17,7 +17,7 @@
 {ts}Membership Type{/ts}: {$membership_name}
 {if $mem_start_date}{ts}Membership Start Date{/ts}: {$mem_start_date|crmDate}
 {/if}
-{if $mem_end_date}{ts}Membership End Date{/ts}: {$mem_end_date|crmDate}
+{if $mem_end_date}{ts}Membership Expiration Date{/ts}: {$mem_end_date|crmDate}
 {/if}
 
 {/if}
@@ -60,7 +60,7 @@
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
 {/if}
 {capture assign=ts_start_date}{ts}Membership Start Date{/ts}{/capture}
-{capture assign=ts_end_date}{ts}Membership End Date{/ts}{/capture}
+{capture assign=ts_end_date}{ts}Membership Expiration Date{/ts}{/capture}
 {$ts_item|string_format:"%-30s"} {$ts_total|string_format:"%10s"} {if !empty($dataArray)} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {$ts_total|string_format:"%10s"} {/if} {$ts_start_date|string_format:"%20s"} {$ts_end_date|string_format:"%20s"}
 --------------------------------------------------------------------------------------------------
 

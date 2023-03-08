@@ -61,7 +61,7 @@
       {if $mem_end_date}
        <tr>
         <td {$labelStyle}>
-         {ts}Membership End Date{/ts}
+         {ts}Membership Expiration Date{/ts}
         </td>
         <td {$valueStyle}>
           {$mem_end_date|crmDate}
@@ -164,7 +164,7 @@
               <th>{ts}Total{/ts}</th>
             {/if}
       <th>{ts}Membership Start Date{/ts}</th>
-      <th>{ts}Membership End Date{/ts}</th>
+      <th>{ts}Membership Expiration Date{/ts}</th>
            </tr>
            {foreach from=$value item=line}
             <tr>

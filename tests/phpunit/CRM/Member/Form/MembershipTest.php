@@ -571,7 +571,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->mut->stop();
     $this->assertEquals([
       [
-        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new membership End Date is December 31st, ' . $membershipEndYear . '. A membership confirmation and receipt has been sent to anthony_anderson@civicrm.org.',
+        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new Membership Expiration Date is December 31st, ' . $membershipEndYear . '. A membership confirmation and receipt has been sent to anthony_anderson@civicrm.org.',
         'title' => 'Complete',
         'type' => 'success',
         'options' => NULL,
@@ -841,7 +841,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     ], 1);
     $this->assertEquals([
       [
-        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new membership End Date is ' . date('F jS, Y', strtotime('last day of this month')) . '.',
+        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new Membership Expiration Date is ' . date('F jS, Y', strtotime('last day of this month')) . '.',
         'title' => 'Complete',
         'type' => 'success',
         'options' => NULL,
@@ -1553,7 +1553,7 @@ Expires: ',
     $endDate = (new DateTime(date('Y-m-d')))->modify('+3 years')->modify('-1 day');
     $endDate = $endDate->format("Y-m-d");
 
-    $this->assertEquals($endDate, $membership['end_date'], 'Membership end date should be ' . $endDate);
+    $this->assertEquals($endDate, $membership['end_date'], 'Membership Expiration Date should be ' . $endDate);
     $this->assertEquals(1, count($contribution['values']), 'Pending contribution should be created.');
     $contribution = $contribution['values'][$contribution['id']];
     $additionalPaymentForm = new CRM_Contribute_Form_AdditionalPayment();
@@ -1576,7 +1576,7 @@ Expires: ',
       'contact_id' => $this->_individualId,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
     ]);
-    $this->assertEquals($endDate, $membership['end_date'], 'Membership end date should be same (' . $endDate . ') after payment');
+    $this->assertEquals($endDate, $membership['end_date'], 'Membership Expiration Date should be same (' . $endDate . ') after payment');
     $this->assertCount(1, $contribution['values'], 'Completed contribution should be fetched.');
   }
 
