@@ -77,6 +77,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * @return bool|int
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     try {
       self::deleteRecord(['id' => $id]);
     }

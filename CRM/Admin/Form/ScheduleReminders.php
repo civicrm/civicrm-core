@@ -439,7 +439,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       // delete reminder
-      CRM_Core_BAO_ActionSchedule::del($this->_id);
+      CRM_Core_BAO_ActionSchedule::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected Reminder has been deleted.'), ts('Record Deleted'), 'success');
       if ($this->getContext() === 'event' && $this->getComponentID()) {
         $url = CRM_Utils_System::url('civicrm/event/manage/reminder',

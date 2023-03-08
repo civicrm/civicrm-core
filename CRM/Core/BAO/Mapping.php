@@ -42,6 +42,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) static::deleteRecord(['id' => $id]);
   }
 

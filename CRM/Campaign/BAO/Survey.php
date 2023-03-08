@@ -363,6 +363,7 @@ SELECT  survey.id    as id,
    * @return mixed|null
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     if (!$id) {
       return NULL;
     }
