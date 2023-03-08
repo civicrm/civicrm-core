@@ -61,7 +61,6 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    */
   public function buildQuickForm() {
     $this->assign('errorMessage', $this->getErrorMessage());
-    $config = CRM_Core_Config::singleton();
 
     $this->assign('urlPath', 'civicrm/import/datasource');
     $this->assign('urlPathVar', 'snippet=4&user_job_id=' . $this->get('user_job_id'));
