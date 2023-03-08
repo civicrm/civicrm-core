@@ -205,7 +205,7 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
         'account_type_code' => 'INC',
         'is_active' => 1,
       ];
-      $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
+      $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
     }
     else {
       $existingFinancialAccount[$dao->financial_account_type_id] = $dao->id;
