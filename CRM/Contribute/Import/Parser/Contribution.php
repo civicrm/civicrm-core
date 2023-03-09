@@ -810,6 +810,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    */
   protected function processNote(int $contributionID, int $contactID, array $noteParams): void {
+    if (!$noteParams['note']) {
+      return;
+    }
     $noteParams = array_merge([
       'entity_table' => 'civicrm_contribution',
       'entity_id' => $contributionID,
