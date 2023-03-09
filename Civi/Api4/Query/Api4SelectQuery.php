@@ -633,6 +633,10 @@ class Api4SelectQuery {
       return sprintf('%s %s "%s"', $fieldAlias, $operator, \CRM_Core_DAO::escapeString($value));
     }
 
+    if (!$value && ($operator === 'IN' || $operator === 'NOT IN')) {
+      $value[] = FALSE;
+    }
+
     if (is_bool($value)) {
       $value = (int) $value;
     }
