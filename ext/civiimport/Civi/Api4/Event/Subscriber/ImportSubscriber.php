@@ -19,6 +19,7 @@ use Civi\Api4\UserJob;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Event\PreEvent;
 use Civi\Core\Service\AutoService;
 use CRM_Core_DAO_AllCoreTables;
 use Civi\Api4\Import;
@@ -41,6 +42,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
   public static function getSubscribedEvents(): array {
     return [
       'hook_civicrm_post' => 'on_hook_civicrm_post',
+      'hook_civicrm_pre' => 'on_hook_civicrm_pre',
       'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
       'civi.api.authorize' => [['onApiAuthorize', Events::W_EARLY]],
       'civi.afform.get' => 'on_civi_afform_get',
@@ -52,6 +54,8 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
    * Register each valid import as an entity
    *
    * @param \Civi\Core\Event\GenericHookEvent $event
+   *
+   * @noinspection PhpUnused
    */
   public static function on_civi_api4_entityTypes(GenericHookEvent $event): void {
     $importEntities = Civi\BAO\Import::getImportTables();
@@ -97,27 +101,63 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
   }
 
   /**
+   * Callback for hook_civicrm_pre().
+   *
+   * @noinspection PhpUnused
+   */
+  public function on_hook_civicrm_pre(PreEvent $event): void {
+    if ($event->entity === 'UserJob' && $event->action === 'edit') {
+      if ($this->isTableChange($event)) {
+        $this->flushEntityMetadata();
+      }
+    }
+  }
+
+  /**
+   * Get the import table from event data.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   *
+   * @return string|null
+   */
+  private function getImportTableFromEvent(GenericHookEvent $event): ?string {
+    if (isset($event->object)) {
+      $metadata = json_decode($event->object->metadata, TRUE);
+      if (!is_array($metadata)) {
+        return NULL;
+      }
+      return $metadata['DataSource']['table_name'] ?: NULL;
+    }
+    return $event->params['metadata']['DataSource']['table_name'] ?: NULL;
+  }
+
+  /**
    * Callback for hook_civicrm_post().
    */
   public function on_hook_civicrm_post(PostEvent $event): void {
     if ($event->entity === 'UserJob') {
-      try {
-        $exists = Entity::get(FALSE)->addWhere('name', '=', 'Import_' . $event->id)->selectRowCount()->execute()->count();
-        if (!$exists || $event->action === 'delete') {
-          // Flush entities cache key so our new Import will load as an entity.
-          unset(Civi::$statics['civiimport_tables']);
-          Civi::cache('metadata')->delete('api4.entities.info');
-          Civi::cache('metadata')->delete('civiimport_tables');
-          CRM_Core_DAO_AllCoreTables::flush();
-          Managed::reconcile(FALSE)->setModules(['civiimport'])->execute();
-        }
-      }
-      catch (\CRM_Core_Exception $e) {
-        // Log & move on.
-        \Civi::log()->warning('Failed to flush cache on UserJob clear', ['exception' => $e]);
-        return;
+      if ($event->action === 'delete' || ($this->getImportTableFromEvent($event) && !$this->ImportEntityExists($event))) {
+        $this->flushEntityMetadata();
       }
     }
+  }
+
+  /**
+   * Is the update changing the associated temp table.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   *
+   * @return bool
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  private function isTableChange(GenericHookEvent $event): bool {
+    $newTable = $this->getImportTableFromEvent($event);
+    $userJob = UserJob::get(FALSE)
+      ->addWhere('id', '=', $event->id)
+      ->addSelect('metadata')->execute()->first();
+    $savedTable = $userJob['metadata']['DataSource']['table_name'] ?? NULL;
+    return $newTable !== $savedTable;
   }
 
   /**
@@ -126,6 +166,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
    *
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
+   * @noinspection PhpUnused
    */
   public function onApiAuthorize(AuthorizeEvent $event): void {
     $apiRequest = $event->getApiRequest();
@@ -148,7 +189,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
    * @noinspection PhpUnused
    */
   public static function on_civi_afform_get(GenericHookEvent $event): void {
-    // We're only providing afforms of type 'search'
+    // We're only providing form builder forms of type 'search'
     if ($event->getTypes && !in_array('search', $event->getTypes, TRUE)) {
       return;
     }
@@ -201,6 +242,41 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
     }
     \Civi::cache('metadata')->set($cacheKey, $forms);
     return $forms;
+  }
+
+  /**
+   * Flush entities cache key so our new Import will load as an entity.
+   */
+  protected function flushEntityMetadata(): void {
+    try {
+      unset(Civi::$statics['civiimport_tables']);
+      Civi::cache('metadata')->delete('api4.entities.info');
+      Civi::cache('metadata')->delete('civiimport_tables');
+      CRM_Core_DAO_AllCoreTables::flush();
+      Managed::reconcile(FALSE)->setModules(['civiimport'])->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      // Log & move on.
+      \Civi::log()->warning('Failed to flush cache on UserJob clear', ['exception' => $e]);
+      return;
+    }
+  }
+
+  /**
+   * Does the pseudo-entity for the import exist yet.
+   *
+   * @param \Civi\Core\Event\PostEvent $event
+   *
+   * @return int
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  protected function ImportEntityExists(PostEvent $event): int {
+    return Entity::get(FALSE)
+      ->addWhere('name', '=', 'Import_' . $event->id)
+      ->selectRowCount()
+      ->execute()
+      ->count();
   }
 
 }
