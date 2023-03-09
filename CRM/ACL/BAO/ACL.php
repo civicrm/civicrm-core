@@ -447,6 +447,7 @@ SELECT g.*
    * @deprecated
    */
   public static function del($aclId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $aclId]);
   }
 

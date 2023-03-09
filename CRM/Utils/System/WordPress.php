@@ -200,7 +200,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
    *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
    */
-  public function getCiviSourceStorage() {
+  public function getCiviSourceStorage():array {
     global $civicrm_root;
 
     // Don't use $config->userFrameworkBaseURL; it has garbage on it.
@@ -1652,6 +1652,46 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     print $content;
     return NULL;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getContactDetailsFromUser($uf_match):array {
+    $contactParameters = [];
+
+    $user = $uf_match['user'];
+    $contactParameters['email'] = $user->user_email;
+    if ($user->first_name) {
+      $contactParameters['first_name'] = $user->first_name;
+    }
+    if ($user->last_name) {
+      $contactParameters['last_name'] = $user->last_name;
+    }
+
+    return $contactParameters;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function modifyStandaloneProfile($profile, $params):string {
+    $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $params['gid'] . '&amp;reset=1';
+    $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
+
+    //@todo remove this part when it is OK to deprecate CIVICRM_UF_WP_BASEPAGE-CRM-15933
+    $config = CRM_Core_Config::singleton();
+    if (defined('CIVICRM_UF_WP_BASEPAGE')) {
+      $wpbase = CIVICRM_UF_WP_BASEPAGE;
+    }
+    elseif (!empty($config->wpBasePage)) {
+      $wpbase = $config->wpBasePage;
+    }
+    else {
+      $wpbase = 'index.php';
+    }
+    $profile = str_replace('/wp-admin/admin.php', '/' . $wpbase . '/', $profile);
+    return $profile;
   }
 
 }

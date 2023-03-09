@@ -34,6 +34,7 @@ use Civi\Api4\Event;
 use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
+use Civi\Api4\MembershipBlock;
 use Civi\Api4\MembershipType;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\Phone;
@@ -195,6 +196,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   public $setupIDs = [];
 
   /**
+   * Form controller being used.
+   *
+   * We need to re-use this for multi-part forms.
+   *
+   * @var \CRM_Event_Controller_Registration
+   */
+  protected $formController;
+
+  /**
    *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
@@ -275,8 +285,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected function setUp(): void {
     CRM_Core_I18n::clearLocale();
     parent::setUp();
-    $session = CRM_Core_Session::singleton();
-    $session->set('userID', NULL);
+    CRM_Core_Session::singleton()->set('userID');
 
     $this->_apiversion = 3;
 
@@ -301,7 +310,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
-
     // reset all the caches
     CRM_Utils_System::flushCache();
 
@@ -447,10 +455,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->resetLabels();
 
     error_reporting(E_ALL & ~E_NOTICE);
-    CRM_Utils_Hook::singleton()->reset();
-    if ($this->hookClass) {
-      $this->hookClass->reset();
-    }
+    $this->resetHooks();
     CRM_Core_Session::singleton()->reset(1);
 
     if ($this->tx) {
@@ -544,18 +549,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public function createTestEntity() {
     return $entity = $this->callAPISuccess($this->entity, 'create', $this->params);
-  }
-
-  /**
-   * @param int $contactTypeId
-   *
-   * @throws Exception
-   */
-  public function contactTypeDelete($contactTypeId) {
-    $result = CRM_Contact_BAO_ContactType::del($contactTypeId);
-    if (!$result) {
-      throw new Exception('Could not delete contact type');
-    }
   }
 
   /**
@@ -990,11 +983,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'source' => 'SSF',
-      'contribution_status_id' => 1,
+      'contribution_status_id' => 'Completed',
     ], $params);
 
-    $result = $this->callAPISuccess('contribution', 'create', $params);
-    return $result['id'];
+    return $this->callAPISuccess('Contribution', 'create', $params)['id'];
   }
 
   /**
@@ -1800,6 +1792,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   /**
    * Clean up financial entities after financial tests (so we remember to get all the tables :-))
+   *
+   * @noinspection PhpUnhandledExceptionInspection
    */
   public function quickCleanUpFinancialEntities(): void {
     $tablesToTruncate = [
@@ -1854,6 +1848,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     catch (CRM_Core_Exception $e) {
       $this->fail('failed to cleanup financial types ' . $e->getMessage());
     }
+    $this->organizeOptionValues();
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
     // @fixme this parameter is leaking - it should not be defined as a class static
@@ -2995,7 +2990,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public function createPriceSetWithPage($entity = NULL, $params = []) {
     $membershipTypeID = $this->membershipTypeCreate(['name' => 'Special']);
-    $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', [
+    $contributionPageID = $this->callAPISuccess('contribution_page', 'create', [
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'NZD',
@@ -3003,7 +2998,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_pay_later' => 1,
       'is_monetary' => TRUE,
       'is_email_receipt' => FALSE,
-    ]);
+    ])['id'];
     $priceSet = $this->callAPISuccess('price_set', 'create', [
       'is_quick_config' => 0,
       'extends' => 'CiviMember',
@@ -3012,7 +3007,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ]);
     $priceSetID = $priceSet['id'];
 
-    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageID, $priceSetID);
     $priceField = $this->callAPISuccess('price_field', 'create', [
       'price_set_id' => $priceSetID,
       'label' => 'Goat Breed',
@@ -3046,10 +3041,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'amount' => 10,
       'financial_type_id' => 'Donation',
     ]);
+    MembershipBlock::create(FALSE)->setValues([
+      'entity_id' => $contributionPageID,
+      'entity_table' => 'civicrm_contribution_page',
+      'is_separate_payment' => FALSE,
+    ])->execute();
     $this->_ids['price_field_value']['cont'] = $priceFieldValue['id'];
 
     $this->_ids['price_set'] = $priceSetID;
-    $this->_ids['contribution_page'] = $contributionPageResult['id'];
+    $this->_ids['contribution_page'] = $contributionPageID;
     $this->_ids['price_field'] = [$priceField['id']];
 
     $this->_ids['membership_type'] = $membershipTypeID;
@@ -3119,7 +3119,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $formValues
    *
-   * @param string $pageName
+   * @param string|null $pageName
    *
    * @param array $searchFormValues
    *   Values for the search form if the form is a task eg.
@@ -3130,10 +3130,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *      'mark_x_6' => 1,
    *      'mark_x_8' => 1,
    *   ]
+   * @param \HTML_QuickForm_Controller|null $controller
    *
-   * @return \CRM_Core_Form
+   * @return \CRM_Core_Form|CRM_Event_Form_Registration_Register
+   *
+   * @noinspection PhpReturnDocTypeMismatchInspection
    */
-  public function getFormObject($class, $formValues = [], $pageName = '', $searchFormValues = []) {
+  public function getFormObject(string $class, array $formValues = [], ?string $pageName = '', array $searchFormValues = [], $controller = NULL) {
     $_POST = $formValues;
     /** @var CRM_Core_Form $form */
     $form = new $class();
@@ -3144,9 +3147,27 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         $form->controller = new CRM_Event_Cart_Controller_Checkout();
         break;
 
-      case 'CRM_Event_Form_Registration_Confirm':
-        $form->controller = new CRM_Event_Controller_Registration();
+      case 'CRM_Event_Form_Registration_Register':
+        $form->controller = $this->formController = new CRM_Event_Controller_Registration();
         break;
+
+      case 'CRM_Event_Form_Registration_Confirm':
+      case 'CRM_Event_Form_Registration_AdditionalParticipant':
+        if ($this->formController) {
+          // Add to the existing form controller.
+          $form->controller = $this->formController;
+        }
+        else {
+          $form->controller = $this->formController = new CRM_Event_Controller_Registration();
+        }
+        break;
+
+      case 'CRM_Contribute_Form_Contribution_Confirm':
+        $form->controller = new CRM_Contribute_Controller_Contribution();
+        $form->controller->setStateMachine(new CRM_Contribute_StateMachine_Contribution($form->controller));
+        // The submitted values are on the Main form.
+        $_SESSION['_' . $form->controller->_name . '_container']['values']['Main'] = $formValues;
+        return $form;
 
       case 'CRM_Contact_Import_Form_DataSource':
       case 'CRM_Contact_Import_Form_MapField':
@@ -3899,6 +3920,46 @@ WHERE table_schema = DATABASE()");
     }
     else {
       return NULL;
+    }
+  }
+
+  /**
+   * Disorganize our option values to ensure we are not relying on luck.
+   *
+   * For example our contributions and recurring contributions use different
+   * option groups for contribution_status_id but by happy co-incidence (ahem)
+   * both have 1 for completed by default. This upsets that co-incidence for more
+   * robust testing. Ideally we would do this for all tests & for a range of values
+   * but there is too much hard-coding to roll that out right now.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  protected function disorganizeOptionValues(): void {
+    OptionValue::update(FALSE)->setValues(['value' => 20])
+      ->addWhere('name', '=', 'Completed')
+      ->addWhere('option_group_id:name', '=', 'contribution_status')
+      ->execute();
+  }
+
+  /**
+   * This undoes the `disorganizeOptionValues` function.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  protected function organizeOptionValues(): void {
+    OptionValue::update(FALSE)->setValues(['value' => 1])
+      ->addWhere('name', '=', 'Completed')
+      ->addWhere('option_group_id:name', '=', 'contribution_status')
+      ->execute();
+  }
+
+  /**
+   * Reset any registered hooks.
+   */
+  protected function resetHooks(): void {
+    CRM_Utils_Hook::singleton()->reset();
+    if ($this->hookClass) {
+      $this->hookClass->reset();
     }
   }
 

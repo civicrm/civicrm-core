@@ -208,7 +208,7 @@ class Admin {
         }
         // Useful address fields (see ContactSchemaMapSubscriber)
         if ($entity['name'] === 'Contact') {
-          $addressFields = ['city', 'state_province_id', 'country_id'];
+          $addressFields = ['city', 'state_province_id', 'country_id', 'street_address', 'postal_code', 'supplemental_address_1'];
           foreach ($addressFields as $fieldName) {
             foreach (['primary', 'billing'] as $type) {
               $newField = \CRM_Utils_Array::findAll($schema['Address']['fields'], ['name' => $fieldName])[0];
@@ -458,7 +458,7 @@ class Admin {
    * @return array
    */
   private static function getSqlFunctions():array {
-    $functions = \CRM_Api4_Page_Api4Explorer::getSqlFunctions();
+    $functions = CoreUtil::getSqlFunctions();
     // Add faux function "e" for SqlEquations
     $functions[] = [
       'name' => 'e',
@@ -466,6 +466,7 @@ class Admin {
       'description' => ts('Add, subtract, multiply, divide'),
       'category' => SqlFunction::CATEGORY_MATH,
       'data_type' => 'Number',
+      'options' => FALSE,
       'params' => [
         [
           'label' => ts('Value'),

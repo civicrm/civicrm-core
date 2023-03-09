@@ -60,44 +60,6 @@ class CRM_Contact_BAO_Contact_Location {
   }
 
   /**
-   * @deprecated Not used anywhere, use the Phone API instead
-   * Get the sms number and display name of a contact.
-   *
-   * @param int $id
-   *   Id of the contact.
-   * @param string|null $type
-   *
-   * @return array
-   *   tuple of display_name and sms if found, or (null,null)
-   */
-  public static function getPhoneDetails($id, $type = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('Phone.get API instead');
-    if (!$id) {
-      return [NULL, NULL];
-    }
-
-    $cond = NULL;
-    if ($type) {
-      $cond = " AND civicrm_phone.phone_type_id = '$type'";
-    }
-
-    $sql = "
-   SELECT civicrm_contact.display_name, civicrm_phone.phone, civicrm_contact.do_not_sms
-     FROM civicrm_contact
-LEFT JOIN civicrm_phone ON ( civicrm_phone.contact_id = civicrm_contact.id )
-    WHERE civicrm_phone.is_primary = 1
-          $cond
-      AND civicrm_contact.id = %1";
-
-    $params = [1 => [$id, 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($sql, $params);
-    if ($dao->fetch()) {
-      return [$dao->display_name, $dao->phone, $dao->do_not_sms];
-    }
-    return [NULL, NULL, NULL];
-  }
-
-  /**
    * Get the information to map a contact.
    *
    * @param array $ids

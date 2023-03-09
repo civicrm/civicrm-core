@@ -1896,7 +1896,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $modifiedDate = $this->callAPISuccess('Contact', 'getvalue', ['id' => $contact['id'], 'return' => 'modified_date']);
     $actionSchedule = $this->createScheduleFromFixtures('sched_contact_mod_anniversary');
     $actionSchedule['effective_start_date'] = date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['modified_date']));
-    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::writeRecord($actionSchedule);
     $this->assertCronRuns([
       [
         // On some random day, no email.
@@ -2020,7 +2020,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $actionScheduleAfter['effective_end_date'] = '2012-06-16 02:00:00';
     $actionScheduleBefore['entity_value'] = $actionScheduleOn['entity_value'] = $actionScheduleAfter['entity_value'] = $membership['membership_type_id'];
     foreach (['actionScheduleBefore', 'actionScheduleOn', 'actionScheduleAfter'] as $value) {
-      $$value = CRM_Core_BAO_ActionSchedule::add($$value);
+      $$value = CRM_Core_BAO_ActionSchedule::writeRecord($$value);
     }
 
     $this->assertCronRuns(
@@ -2546,7 +2546,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       $actionScheduleParams['entity_value'] = $membershipType->id;
       $actionScheduleParams['repetition_frequency_unit'] = $interval_unit;
       $actionScheduleParams['repetition_frequency_interval'] = 2;
-      $actionSchedule = CRM_Core_BAO_ActionSchedule::add($actionScheduleParams);
+      $actionSchedule = CRM_Core_BAO_ActionSchedule::writeRecord($actionScheduleParams);
       $beforeEndDate = $this->createModifiedDateTime($membershipEndDate, '-1 day');
       $beforeFirstUnit = $this->createModifiedDateTime($membershipEndDate, "+1 $interval_unit");
       $afterFirstUnit = $this->createModifiedDateTime($membershipEndDate, "+2 $interval_unit");

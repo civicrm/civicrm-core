@@ -164,6 +164,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 
@@ -319,7 +320,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     $ufField->find();
     while ($ufField->fetch()) {
       //enable/ disable profile
-      CRM_Core_BAO_UFField::del($ufField->id);
+      CRM_Core_BAO_UFField::deleteRecord(['id' => $ufField->id]);
     }
   }
 

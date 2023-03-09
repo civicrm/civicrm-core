@@ -482,7 +482,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $fieldValues = ['uf_group_id' => $this->_gid];
       CRM_Utils_Weight::delWeight('CRM_Core_DAO_UFField', $this->_id, $fieldValues);
-      $deleted = CRM_Core_BAO_UFField::del($this->_id);
+      $deleted = CRM_Core_BAO_UFField::deleteRecord(['id' => $this->_id]);
 
       //update group_type every time. CRM-3608
       if ($this->_gid && $deleted) {

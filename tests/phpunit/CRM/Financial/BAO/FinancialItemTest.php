@@ -185,7 +185,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     ];
 
     $amount = 200;
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($fParams);
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($fParams);
     $financialTrxn = new CRM_Financial_DAO_FinancialTrxn();
     $financialTrxn->to_financial_account_id = $financialAccount->id;
     $financialTrxn->total_amount = $amount;

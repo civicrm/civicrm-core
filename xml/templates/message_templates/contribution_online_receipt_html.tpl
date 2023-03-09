@@ -391,7 +391,7 @@
         </td>
        </tr>
       {/if}
-      {if !empty($is_deductible) AND !empty($price)}
+      {if $is_deductible AND !empty($price)}
         <tr>
          <td colspan="2" {$valueStyle}>
           <p>{ts 1=$price|crmMoney:$currency}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>

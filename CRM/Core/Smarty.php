@@ -131,7 +131,6 @@ class CRM_Core_Smarty extends Smarty {
       $this->assign('langSwitch', CRM_Core_I18n::uiLanguages());
     }
 
-    $this->register_function('crmURL', ['CRM_Utils_System', 'crmURL']);
     if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
       // When default escape is enabled if the core escape is called before
       // any custom escaping is done the modifier_escape function is not
@@ -144,6 +143,7 @@ class CRM_Core_Smarty extends Smarty {
       $this->default_modifiers[] = 'escape:"htmlall"';
     }
     $this->load_filter('pre', 'resetExtScope');
+    $this->load_filter('pre', 'htxtFilter');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
@@ -301,16 +301,28 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * @param $path
+   * Add template directory(s).
+   *
+   * @param string|array $template_dir directory(s) of template sources
+   * @param string $key (Smarty3+) of the array element to assign the template dir to
+   * @param bool $isConfig (Smarty3+) true for config_dir
+   *
+   * @return Smarty          current Smarty instance for chaining
    */
-  public function addTemplateDir($path) {
+  public function addTemplateDir($template_dir, $key = NULL, $isConfig = FALSE) {
+    if (method_exists('parent', 'addTemplateDir')) {
+      // More recent versions of Smarty have this method.
+      return parent::addTemplateDir($template_dir, $key, $isConfig);
+    }
     if (is_array($this->template_dir)) {
-      array_unshift($this->template_dir, $path);
+      if (!in_array($template_dir, $this->template_dir)) {
+        array_unshift($this->template_dir, $template_dir);
+      }
     }
     else {
-      $this->template_dir = [$path, $this->template_dir];
+      $this->template_dir = [$template_dir, $this->template_dir];
     }
-
+    return $this;
   }
 
   /**
@@ -473,7 +485,7 @@ class CRM_Core_Smarty extends Smarty {
 
     $value = smarty_modifier_escape($string, $esc_type, $char_set);
     if ($value !== $string) {
-      Civi::log()->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
+      Civi::log('smarty')->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
         'original' => $string,
         'escaped' => $value,
         'type' => $esc_type,

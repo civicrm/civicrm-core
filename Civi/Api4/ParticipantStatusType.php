@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,13 +8,19 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-namespace Civi\Api4\Action\EntityTag;
+namespace Civi\Api4;
 
 /**
- * @inheritDoc
+ * Configurable event participant statuses.
+ *
+ * @see \Civi\Api4\Participant
+ *
+ * @orderBy weight
+ * @since 5.61
+ * @package Civi\Api4
  */
-class Update extends \Civi\Api4\Generic\DAOUpdateAction {
-  use EntityTagSaveTrait;
+class ParticipantStatusType extends Generic\DAOEntity {
+  use Generic\Traits\ManagedEntity;
+  use Generic\Traits\SortableEntity;
 
 }

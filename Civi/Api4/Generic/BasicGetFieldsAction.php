@@ -175,37 +175,7 @@ class BasicGetFieldsAction extends BasicGetAction {
         throw new \CRM_Core_Exception('Unsupported pseudoconstant type for field "' . $field['name'] . '"');
       }
     }
-    if (!$field['options'] || !is_array($field['options'])) {
-      return;
-    }
-
-    $formatted = [];
-    $first = reset($field['options']);
-    // Flat array requested
-    if ($this->loadOptions === TRUE) {
-      // Convert non-associative to flat array
-      if (is_array($first) && isset($first['id'])) {
-        foreach ($field['options'] as $option) {
-          $formatted[$option['id']] = $option['label'] ?? $option['name'] ?? $option['id'];
-        }
-        $field['options'] = $formatted;
-      }
-    }
-    // Non-associative array of multiple properties requested
-    else {
-      foreach ($field['options'] as $id => $option) {
-        // Transform a flat list
-        if (!is_array($option)) {
-          $option = [
-            'id' => $id,
-            'name' => $id,
-            'label' => $option,
-          ];
-        }
-        $formatted[] = array_intersect_key($option, array_flip($this->loadOptions));
-      }
-      $field['options'] = $formatted;
-    }
+    $field['options'] = CoreUtil::formatOptionList($field['options'], $this->loadOptions);
   }
 
   /**

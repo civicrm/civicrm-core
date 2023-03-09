@@ -61,7 +61,7 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
 
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Mailing_BAO_Mailing::del($this->_mailingId);
+      CRM_Mailing_BAO_Mailing::deleteRecord(['id' => $this->_mailingId]);
       CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
     }
     elseif ($this->_action & CRM_Core_Action::DISABLE) {

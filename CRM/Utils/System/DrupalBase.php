@@ -322,6 +322,44 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritdoc
+   */
+  public function getCiviSourceStorage():array {
+    global $civicrm_root;
+    $config = CRM_Core_Config::singleton();
+
+    // Don't use $config->userFrameworkBaseURL; it has garbage on it.
+    // More generally, w shouldn't be using $config here.
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+    $baseURL = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
+    if (CRM_Utils_System::isSSL()) {
+      $baseURL = str_replace('http://', 'https://', $baseURL);
+    }
+
+    // Check and see if we are installed in sites/all (for D5 and above).
+    // We dont use checkURL since drupal generates an error page and throws
+    // the system for a loop on lobo's macosx box
+    // or in modules.
+    $cmsPath = $config->userSystem->cmsRootPath();
+    $userFrameworkResourceURL = $baseURL . str_replace("$cmsPath/", '',
+        str_replace('\\', '/', $civicrm_root)
+      );
+
+    $siteName = $config->userSystem->parseDrupalSiteNameFromRoot($civicrm_root);
+    if ($siteName) {
+      $civicrmDirName = trim(basename($civicrm_root));
+      $userFrameworkResourceURL = $baseURL . "sites/$siteName/modules/$civicrmDirName/";
+    }
+
+    return [
+      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    ];
+  }
+
+  /**
    * @inheritDoc
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
@@ -774,6 +812,30 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     $enableWorkflow = Civi::settings()->get('civimail_workflow');
 
     return (bool) $enableWorkflow;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getContactDetailsFromUser($uf_match):array {
+    $contactParameters = [];
+    $contactParameters['email'] = $uf_match['uniqId'];
+
+    return $contactParameters;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function modifyStandaloneProfile($profile, $params):string {
+    $config = CRM_Core_Config::singleton();
+    $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $params['gid'] . '&amp;reset=1';
+    if ($config->cleanURL) {
+      $urlReplaceWith = 'civicrm/profile/create?gid=' . $params['gid'] . '&amp;reset=1';
+    }
+    $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
+
+    return $profile;
   }
 
 }

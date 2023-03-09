@@ -53,7 +53,7 @@ return [
     'table' => 'civicrm_translation',
   ],
   'CRM_Core_DAO_Worldregion' => [
-    'name' => 'Worldregion',
+    'name' => 'WorldRegion',
     'class' => 'CRM_Core_DAO_Worldregion',
     'table' => 'civicrm_worldregion',
   ],

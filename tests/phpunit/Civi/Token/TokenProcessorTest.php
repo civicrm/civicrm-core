@@ -384,20 +384,79 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $this->counts['onEvalTokens']);
   }
 
-  public function testFilter(): void {
-    $exampleTokens['foo_bar']['whiz_bang'] = 'Some Text';
-    $exampleTokens['foo_bar']['whiz_bop'] = '';
-    $exampleMessages = [
-      'This is {foo_bar.whiz_bang}.' => 'This is Some Text.',
-      'This is {foo_bar.whiz_bang|lower}...' => 'This is some text...',
-      'This is {foo_bar.whiz_bang|upper}!' => 'This is SOME TEXT!',
-      'This is {foo_bar.whiz_bang|boolean}!' => 'This is 1!',
-      'This is {foo_bar.whiz_bop|boolean}!' => 'This is 0!',
-      'This is {foo_bar.whiz_bang|default:"bang"}.' => 'This is Some Text.',
-      'This is {foo_bar.whiz_bop|default:"bop"}.' => 'This is bop.',
+  public function getFilterExamples() {
+    $exampleTokens = [
+      // All the "{my_text.*}" tokens will be treated as plain-text ("text/plain").
+      'my_text' => [
+        'whiz_bang' => 'Some Text',
+        'empty_string' => '',
+        'emotive' => 'The Test :>',
+      ],
+      // All the "{my_rich_text.*}" tokens will be treated as markup ("text/html").
+      'my_rich_text' => [
+        'whiz_bang' => '<b>Some &ldquo;Text&rdquo;</b>',
+        'empty_string' => '',
+        'and_such' => '<strong>testing &amp; such</strong>',
+      ],
     ];
-    // We expect 7 messages to be parsed 2 times each - ie 14 times.
-    $expectExampleCount = 14;
+
+    $testCases = [];
+    $testCases['TextMessages with TextData'] = [
+      'text/plain',
+      [
+        'This is {my_text.whiz_bang}.' => 'This is Some Text.',
+        'This is {my_text.whiz_bang|lower}...' => 'This is some text...',
+        'This is {my_text.whiz_bang|upper}!' => 'This is SOME TEXT!',
+        'This is {my_text.whiz_bang|boolean}!' => 'This is 1!',
+        'This is {my_text.empty_string|boolean}!' => 'This is 0!',
+        'This is {my_text.whiz_bang|default:"bang"}.' => 'This is Some Text.',
+        'This is {my_text.empty_string|default:"bop"}.' => 'This is bop.',
+      ],
+      $exampleTokens,
+    ];
+    $testCases['HtmlMessages with HtmlData'] = [
+      'text/html',
+      [
+        'This is {my_rich_text.whiz_bang}.' => 'This is <b>Some &ldquo;Text&rdquo;</b>.',
+        'This is {my_rich_text.whiz_bang|lower}...' => 'This is <b>some &ldquo;text&rdquo;</b>...',
+        'This is {my_rich_text.whiz_bang|upper}!' => 'This is <b>SOME &ldquo;TEXT&rdquo;</b>!',
+        'This is {my_rich_text.whiz_bang|boolean}!' => 'This is 1!',
+        'This is {my_rich_text.empty_string|boolean}!' => 'This is 0!',
+        'This is {my_rich_text.whiz_bang|default:"bang"}.' => 'This is <b>Some &ldquo;Text&rdquo;</b>.',
+        'This is {my_rich_text.empty_string|default:"bop"}.' => 'This is bop.',
+      ],
+      $exampleTokens,
+    ];
+    $testCases['HtmlMessages with TextData'] = [
+      'text/html',
+      [
+        'This is {my_text.emotive}...' => 'This is The Test :&gt;...',
+        'This is {my_text.emotive|lower}...' => 'This is the test :&gt;...',
+        'This is {my_text.emotive|upper}!' => 'This is THE TEST :&gt;!',
+      ],
+      $exampleTokens,
+    ];
+    $testCases['TextMessages with HtmlData'] = [
+      'text/plain',
+      [
+        'This is {my_rich_text.and_such}...' => 'This is testing & such...',
+        'This is {my_rich_text.and_such|lower}...' => 'This is testing & such...',
+        'This is {my_rich_text.and_such|upper}!' => 'This is TESTING & SUCH!',
+      ],
+      $exampleTokens,
+    ];
+    return $testCases;
+  }
+
+  /**
+   * @param string $messageFormat
+   * @param array $exampleMessages
+   * @param array $exampleTokens
+   * @return void
+   * @dataProvider getFilterExamples
+   */
+  public function testFilters(string $messageFormat, array $exampleMessages, array $exampleTokens): void {
+    $expectExampleCount = 2 * count($exampleMessages);
     $actualExampleCount = 0;
 
     foreach ($exampleMessages as $inputMessage => $expectOutput) {
@@ -406,9 +465,10 @@ class TokenProcessorTest extends \CiviUnitTestCase {
           'controller' => __CLASS__,
           'smarty' => $useSmarty,
         ]);
-        $p->addMessage('example', $inputMessage, 'text/plain');
+        $p->addMessage('example', $inputMessage, $messageFormat);
         $p->addRow()
-          ->format('text/plain')->tokens($exampleTokens);
+          ->format('text/plain')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_text']))
+          ->format('text/html')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_rich_text']));
         foreach ($p->evaluate()->getRows() as $row) {
           $this->assertEquals($expectOutput, $row->render('example'));
           $actualExampleCount++;

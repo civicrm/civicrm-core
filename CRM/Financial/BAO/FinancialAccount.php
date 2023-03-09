@@ -57,6 +57,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @return CRM_Financial_DAO_FinancialAccount
    */
   public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 

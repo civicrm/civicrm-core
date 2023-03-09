@@ -255,6 +255,14 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ],
           'grouping' => 'contri-fields',
         ],
+        'civicrm_pledge_payment' => [
+          'dao' => 'CRM_Pledge_DAO_PledgePayment',
+          'filters' => [
+            'contribution_id' => [
+              'title' => ts('Contribution is a pledge payment'),
+            ],
+          ],
+        ],
         'civicrm_contribution_soft' => [
           'dao' => 'CRM_Contribute_DAO_ContributionSoft',
           'fields' => [
@@ -985,6 +993,13 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
     $this->joinPhoneFromContact();
     $this->joinAddressFromContact();
     $this->joinEmailFromContact();
+
+    //for pledge payment
+    if ($this->isTableSelected('civicrm_pledge_payment')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_pledge_payment {$this->_aliases['civicrm_pledge_payment']} ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_pledge_payment']}.contribution_id
+      ";
+    }
 
     // include contribution note
     if (!empty($this->_params['fields']['contribution_note']) ||

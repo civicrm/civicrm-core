@@ -132,6 +132,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   public function parsePrefixData(): array {
     $cases = [];
     $cases[] = ['administer CiviCRM', NULL, [NULL, 'administer CiviCRM']];
+    $cases[] = ['create contributions of type Event Fee: Canada', NULL, [NULL, 'create contributions of type Event Fee: Canada']];
     $cases[] = ['administer CiviCRM', 'com_civicrm', ['com_civicrm', 'administer CiviCRM']];
     $cases[] = ['Drupal:access user profiles', NULL, ['Drupal', 'access user profiles']];
     $cases[] = ['Joomla:component:perm', NULL, ['Joomla', 'component:perm']];

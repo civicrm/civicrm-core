@@ -11,7 +11,7 @@
   {include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}
   {if !$suppressPaymentFormButtons}
     <div class="crm-submit-buttons">
-       {include file="CRM/common/formButtons.tpl"}
+       {include file="CRM/common/formButtons.tpl" location=''}
     </div>
   {/if}
 {else}
@@ -39,7 +39,7 @@
     {/if}
   {/if}
   <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl"}
+    {include file="CRM/common/formButtons.tpl" location=''}
   </div>
   <table class="form-layout-compressed">
     <tr>

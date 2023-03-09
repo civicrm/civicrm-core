@@ -445,13 +445,14 @@ class CRM_Utils_System {
   }
 
   /**
-   * Called from a template to compose a url.
+   * Compose a URL. This is a wrapper for `url()` which is optimized for use in Smarty.
    *
+   * @see \smarty_function_crmURL()
    * @param array $params
-   *   List of parameters.
-   *
+   *   URL properties. Keys are abbreviated ("p"<=>"path").
+   *   See Smarty doc for full details.
    * @return string
-   *   url
+   *   URL
    */
   public static function crmURL($params) {
     $p = $params['p'] ?? NULL;
@@ -1101,7 +1102,7 @@ class CRM_Utils_System {
    * Encode url.
    *
    * @param string $url
-   *
+   * @deprecated
    * @return null|string
    */
   public static function urlEncode($url) {
@@ -1595,7 +1596,7 @@ class CRM_Utils_System {
    * Given a URL, return a relative URL if possible.
    *
    * @param string $url
-   *
+   * @deprecated
    * @return string
    */
   public static function relativeURL($url) {

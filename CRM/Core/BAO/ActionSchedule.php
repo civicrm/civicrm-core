@@ -179,6 +179,7 @@ FROM civicrm_action_schedule cas
    * @throws \CRM_Core_Exception
    */
   public static function add(array $params): CRM_Core_DAO_ActionSchedule {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -210,6 +211,7 @@ FROM civicrm_action_schedule cas
    * @throws CRM_Core_Exception
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $id]);
   }
 

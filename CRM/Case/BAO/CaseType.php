@@ -439,6 +439,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
    * @return CRM_Case_DAO_CaseType
    */
   public static function del($caseTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return static::deleteRecord(['id' => $caseTypeId]);
   }
 

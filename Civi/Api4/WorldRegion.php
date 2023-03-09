@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,13 +8,17 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-namespace Civi\Api4\Action\EntityTag;
+namespace Civi\Api4;
 
 /**
- * @inheritDoc
+ * WordRegion entity.
+ *
+ * This entity stores world regions.
+ *
+ * @searchable none
+ * @since 5.59
+ * @package Civi\Api4
  */
-class Create extends \Civi\Api4\Generic\DAOCreateAction {
-  use EntityTagSaveTrait;
+class WorldRegion extends Generic\DAOEntity {
 
 }

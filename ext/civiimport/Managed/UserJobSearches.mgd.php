@@ -37,6 +37,11 @@ return [
               '=',
               FALSE,
             ],
+            [
+              'is_current',
+              '=',
+              TRUE,
+            ],
           ],
           'groupBy' => [],
           'join' => [],

@@ -65,7 +65,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           ],
           'membership_end_date' => [
             'name' => 'end_date',
-            'title' => ts('Membership End Date'),
+            'title' => ts('Membership Expiration Date'),
             'type' => CRM_Utils_Type::T_DATE,
             'operatorType' => CRM_Report_Form::OP_DATE,
           ],

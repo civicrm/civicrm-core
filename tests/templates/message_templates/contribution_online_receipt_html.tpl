@@ -97,7 +97,7 @@
   start_date:::{$start_date}
   end_date:::{$end_date}
   {/if}
-  {if !empty($is_deductible)}
+  {if $is_deductible}
   is_deductible:::{$is_deductible}
   {/if}
   {if !empty($contact_email)}

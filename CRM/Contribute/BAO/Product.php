@@ -110,6 +110,7 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
    * @throws \CRM_Core_Exception
    */
   public static function del($productID) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     static::deleteRecord(['id' => $productID]);
   }
 

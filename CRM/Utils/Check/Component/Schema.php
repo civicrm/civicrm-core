@@ -249,7 +249,33 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       );
       $msg->addAction(
         ts('Rebuild triggers (also re-builds the phone number function)'),
-        ts('Create missing function now? This may take few minutes.'),
+        ts('Create missing function now? This may take a few minutes.'),
+        'api3',
+        ['System', 'flush', ['triggers' => TRUE]]
+      );
+      return [$msg];
+    }
+    return [];
+  }
+
+  /**
+   * Check the function to populate phone_numeric exists.
+   *
+   * @return array|\CRM_Utils_Check_Message[]
+   */
+  public function checkRelationshipCacheTriggers():array {
+    $dao = CRM_Core_DAO::executeQuery("SHOW TRIGGERS WHERE (`Table` = 'civicrm_relationship' OR `Table` = 'civicrm_relationship_type') AND `Statement` LIKE '%civicrm_relationship_cache%';");
+    if ($dao->N !== 3) {
+      $msg = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts("Your database is missing functionality to populate the relationship cache."),
+        ts('Missing Relationship Cache Trigger'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+      $msg->addAction(
+        ts('Rebuild triggers'),
+        ts('Create missing triggers now? This may take a few minutes.'),
         'api3',
         ['System', 'flush', ['triggers' => TRUE]]
       );

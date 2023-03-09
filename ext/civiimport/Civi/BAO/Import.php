@@ -12,6 +12,7 @@
 namespace Civi\BAO;
 
 use Civi\Api4\UserJob;
+use Civi\Core\Exception\DBQueryException;
 use CRM_Civiimport_ExtensionUtil as E;
 use CRM_Core_BAO_CustomValueTable;
 use CRM_Core_DAO;
@@ -206,8 +207,11 @@ class Import extends CRM_Core_DAO {
     try {
       $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
     }
-    catch (\PEAR_Exception $e) {
-      throw new CRM_Core_Exception('Import table no longer exists');
+    catch (DBQueryException $e) {
+      if ($e->getSQLErrorCode() === 1146) {
+        throw new CRM_Core_Exception('Import table no longer exists');
+      }
+      throw $e;
     }
     $userFieldIndex = 0;
     while ($result->fetch()) {

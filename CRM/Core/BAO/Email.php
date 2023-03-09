@@ -355,6 +355,7 @@ AND    reset_date IS NULL
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 

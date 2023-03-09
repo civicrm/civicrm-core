@@ -98,7 +98,7 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
  * @deprecated use OptionValue api
  */
 function civicrm_api3_activity_type_delete($params) {
-  $result = CRM_Core_BAO_OptionValue::del($params['id']);
+  $result = CRM_Core_BAO_OptionValue::deleteRecord($params);
   if ($result) {
     return civicrm_api3_create_success(TRUE, $params);
   }

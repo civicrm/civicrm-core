@@ -1499,7 +1499,7 @@ DESC limit 1");
     $statusMsg = ts('Membership for %1 has been updated.', [1 => $this->_memberDisplayName]);
     if ($endDate) {
       $endDate = CRM_Utils_Date::customFormat($endDate);
-      $statusMsg .= ' ' . ts('The membership End Date is %1.', [1 => $endDate]);
+      $statusMsg .= ' ' . ts('The Membership Expiration Date is %1.', [1 => $endDate]);
     }
     return $statusMsg;
   }
@@ -1521,7 +1521,7 @@ DESC limit 1");
 
       if ($memEndDate) {
         $memEndDate = CRM_Utils_Date::formatDateOnlyLong($memEndDate);
-        $statusMsg[$membership['membership_type_id']] .= ' ' . ts('The new membership End Date is %1.', [1 => $memEndDate]);
+        $statusMsg[$membership['membership_type_id']] .= ' ' . ts('The new Membership Expiration Date is %1.', [1 => $memEndDate]);
       }
     }
     $statusMsg = implode('<br/>', $statusMsg);

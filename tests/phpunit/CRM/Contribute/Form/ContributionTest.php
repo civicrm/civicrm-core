@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipBlock;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceSet;
 
@@ -1635,6 +1636,11 @@ Paid By: Check',
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $contribPage1,
     ]);
+    MembershipBlock::create(FALSE)->setValues([
+      'entity_id' => $contribPage1,
+      'entity_table' => 'civicrm_contribution_page',
+      'is_separate_payment' => FALSE,
+    ])->execute();
 
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_params = [
@@ -1672,9 +1678,9 @@ Paid By: Check',
 
   /**
    * Test non-membership donation on a contribution page
-   * using membership priceset.
+   * using membership PriceSet.
    */
-  public function testDonationOnMembershipPagePriceset() {
+  public function testDonationOnMembershipPagePriceSet(): void {
     $contactID = $this->individualCreate();
     $this->createPriceSetWithPage();
     $form = new CRM_Contribute_Form_Contribution_Confirm();
@@ -1697,7 +1703,6 @@ Paid By: Check',
       'amount' => 10,
       'tax_amount' => NULL,
       'is_pay_later' => 1,
-      'is_quick_config' => 1,
     ];
     $form->submit($form->_params);
 

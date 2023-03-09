@@ -1576,6 +1576,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       $relTables[$name]['main_url'] = str_replace('$cid', $mainId, $relTables[$name]['url']);
       $relTables[$name]['other_url'] = str_replace('$cid', $otherId, $relTables[$name]['url']);
+      $relTables[$name]['has_operation'] = 0;
+
       if ($name === 'rel_table_users') {
         // @todo - this user url stuff is only needed for the form layer - move to CRM_Contact_Form_Merge
         $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($mainId), $relTables[$name]['url']);
@@ -1599,6 +1601,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $attributes,
         ];
         $migrationInfo["operation"]["move_{$name}"]['add'] = 1;
+        $relTables[$name]['has_operation'] = 1;
       }
     }
     foreach ($relTables as $name => $null) {
@@ -1607,12 +1610,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // handle custom fields
-    $mainTree = self::getTree($main['contact_type'], NULL, $mainId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE, NULL, TRUE,
+    $mainTree = self::getTree($main['contact_type'], $mainId,
+      $main['contact_sub_type'] ?? NULL,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
-    $otherTree = self::getTree($main['contact_type'], NULL, $otherId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE, NULL, TRUE,
+    $otherTree = self::getTree($main['contact_type'], $otherId,
+      $other['contact_sub_type'] ?? NULL,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
 
@@ -1685,18 +1688,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param string $entityType
    *   Of the contact whose contact type is needed.
-   * @param array $toReturn
-   *   What data should be returned. ['custom_group' => ['id', 'name', etc.], 'custom_field' => ['id', 'label', etc.]]
    * @param int $entityID
-   * @param int $groupID
    * @param array $subTypes
-   * @param string $subName
-   * @param bool $fromCache
-   * @param bool $onlySubType
-   *   Only return specified subtype or return specified subtype + unrestricted fields.
-   * @param bool $returnAll
-   *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
-   *   api - through which it is properly tested - so can be refactored with some comfort.)
    * @param bool|int $checkPermission
    *   Either a CRM_Core_Permission constant or FALSE to disable checks
    *
@@ -1704,7 +1697,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Custom field 'tree'.
    *
    *   The returned array is keyed by group id and has the custom group table fields
-   *   and a subkey 'fields' holding the specific custom fields.
+   *   and a sub-key 'fields' holding the specific custom fields.
    *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
    *   if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
    *
@@ -1716,22 +1709,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   private static function getTree(
     $entityType,
-    $toReturn = [],
-    $entityID = NULL,
-    $groupID = NULL,
-    $subTypes = [],
-    $subName = NULL,
-    $fromCache = TRUE,
-    $onlySubType = NULL,
-    $returnAll = FALSE,
-    $checkPermission = CRM_Core_Permission::EDIT
+    $entityID,
+    $subTypes,
+    $checkPermission
   ) {
-    $singleRecord = NULL;
-    $showPublicOnly = FALSE;
-    if ($checkPermission === TRUE) {
-      CRM_Core_Error::deprecatedWarning('Unexpected TRUE passed to CustomGroup::getTree $checkPermission param.');
-      $checkPermission = CRM_Core_Permission::EDIT;
-    }
+
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
     }
@@ -1799,19 +1781,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     if ($serialize_version) {
       $tableData['custom_field'][] = 'serialize';
     }
-    if (!$toReturn || !is_array($toReturn)) {
-      $toReturn = $tableData;
-    }
-    else {
-      // Supply defaults and remove unknown array keys
-      $toReturn = array_intersect_key(array_filter($toReturn) + $tableData, $tableData);
-      // Merge in required fields that we must have
-      $toReturn['custom_field'] = array_unique(array_merge($toReturn['custom_field'], ['id', 'column_name', 'data_type']));
-      $toReturn['custom_group'] = array_unique(array_merge($toReturn['custom_group'], ['id', 'is_multiple', 'table_name', 'name']));
-      // Validate return fields
-      $toReturn['custom_field'] = array_intersect($toReturn['custom_field'], array_keys(CRM_Core_DAO_CustomField::fieldKeys()));
-      $toReturn['custom_group'] = array_intersect($toReturn['custom_group'], array_keys(CRM_Core_DAO_CustomGroup::fieldKeys()));
-    }
+
+    $toReturn = $tableData;
 
     // create select
     $select = [];
@@ -1851,9 +1822,7 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
         $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", CRM_Core_BAO_CustomGroup::validateSubTypeByEntity($entityType, $subType));
       }
       $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
-      if (!$onlySubType) {
-        $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
-      }
+      $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
 
       $strWhere = "
 WHERE civicrm_custom_group.is_active = 1
@@ -1861,11 +1830,6 @@ WHERE civicrm_custom_group.is_active = 1
   AND civicrm_custom_group.extends IN ($in)
   AND $subTypeClause
 ";
-      if ($subName) {
-        $strWhere .= " AND civicrm_custom_group.extends_entity_column_id = %{$sqlParamKey}";
-        $params[$sqlParamKey] = [$subName, 'String'];
-        $sqlParamKey = $sqlParamKey + 1;
-      }
     }
     else {
       $strWhere = "
@@ -1873,20 +1837,8 @@ WHERE civicrm_custom_group.is_active = 1
   AND civicrm_custom_field.is_active = 1
   AND civicrm_custom_group.extends IN ($in)
 ";
-      if (!$returnAll) {
-        $strWhere .= "AND civicrm_custom_group.extends_entity_column_value IS NULL";
-      }
     }
 
-    if ($groupID > 0) {
-      // since we want a specific group id we add it to the where clause
-      $strWhere .= " AND civicrm_custom_group.id = %{$sqlParamKey}";
-      $params[$sqlParamKey] = [$groupID, 'Integer'];
-    }
-    elseif (!$groupID) {
-      // since groupID is false we need to show all Inline groups
-      $strWhere .= " AND civicrm_custom_group.style = 'Inline'";
-    }
     if ($checkPermission) {
       // ensure that the user has access to these custom groups
       $strWhere .= " AND " .
@@ -1906,21 +1858,13 @@ ORDER BY civicrm_custom_group.weight,
     $queryString = "$strSelect $strFrom $strWhere $orderBy";
 
     // lets see if we can retrieve the groupTree from cache
-    $cacheString = $queryString;
-    if ($groupID > 0) {
-      $cacheString .= "_{$groupID}";
-    }
-    else {
-      $cacheString .= "_Inline";
-    }
+    $cacheString = $queryString . '_Inline';;
 
     $cacheKey = "CRM_Core_DAO_CustomGroup_Query " . md5($cacheString);
     $multipleFieldGroupCacheKey = "CRM_Core_DAO_CustomGroup_QueryMultipleFields " . md5($cacheString);
     $cache = CRM_Utils_Cache::singleton();
-    if ($fromCache) {
-      $groupTree = $cache->get($cacheKey);
-      $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
-    }
+    $groupTree = $cache->get($cacheKey);
+    $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
 
     if (empty($groupTree)) {
       [$multipleFieldGroups, $groupTree] = CRM_Core_BAO_CustomGroup::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
@@ -2962,9 +2906,6 @@ ORDER BY civicrm_custom_group.weight,
    */
   protected static function getLocksOnContacts($contacts):array {
     $locks = [];
-    if (!CRM_Utils_SQL::supportsMultipleLocks()) {
-      return $locks;
-    }
     foreach ($contacts as $contactID) {
       $lock = Civi::lockManager()->acquire("data.core.contact.{$contactID}");
       if ($lock->isAcquired()) {

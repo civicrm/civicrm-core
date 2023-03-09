@@ -105,16 +105,13 @@ function civicrm_api3_membership_status_update($params) {
  * This API is used for deleting a membership status
  *
  * @param array $params
+ *
  * @return array
  * @throws CRM_Core_Exception
- * @throws CRM_Core_Exception
+ * @noinspection PhpUnused
  */
-function civicrm_api3_membership_status_delete($params) {
-
-  $memberStatusDelete = CRM_Member_BAO_MembershipStatus::del($params['id'], TRUE);
-  if ($memberStatusDelete) {
-    throw new CRM_Core_Exception($memberStatusDelete['error_message']);
-  }
+function civicrm_api3_membership_status_delete(array $params): array {
+  CRM_Member_BAO_MembershipStatus::deleteRecord($params);
   return civicrm_api3_create_success();
 }
 

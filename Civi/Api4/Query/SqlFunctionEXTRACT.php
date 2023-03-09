@@ -60,7 +60,7 @@ class SqlFunctionEXTRACT extends SqlFunction {
    * @return string
    */
   public static function getDescription(): string {
-    return ts('The numeric month (1-12) of a date.');
+    return ts('Extract part(s) of a date (e.g. the day, year, etc.)');
   }
 
 }

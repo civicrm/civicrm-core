@@ -74,16 +74,20 @@ trait Api3TestTrait {
    *   Api result.
    * @param string $prefix
    *   Extra test to add to message.
-   * @param null $expectedError
+   * @param string|null $expectedError
    */
-  public function assertAPIFailure($apiResult, $prefix = '', $expectedError = NULL) {
+  public function assertAPIFailure(array $apiResult, string $prefix = '', ?string $expectedError = NULL): void {
     if (!empty($prefix)) {
       $prefix .= ': ';
     }
     if ($expectedError && !empty($apiResult['is_error'])) {
       $this->assertStringContainsString($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix);
     }
-    $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
+    if (!$apiResult['is_error']) {
+      // This section only called when it is going to fail - that means we don't have to parse the print_r in the message
+      // if it is not going to be used anyway. It's really helpful for debugging when needed, but potentially expensive otherwise.
+      $this->fail('api call should have failed but it succeeded ' . $prefix . (print_r($apiResult, TRUE)));
+    }
     $this->assertNotEmpty($apiResult['error_message']);
   }
 

@@ -34,8 +34,7 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
       'is_deductible' => 0,
       'is_active' => 1,
     ];
-    $ids = [];
-    $contributionType = CRM_Financial_BAO_FinancialType::add($params, $ids);
+    $contributionType = CRM_Financial_BAO_FinancialType::writeRecord($params);
 
     $result = $this->assertDBNotNull('CRM_Financial_BAO_FinancialType', $contributionType->id,
       'name', 'id',
@@ -54,8 +53,7 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
       'is_deductible' => 0,
       'is_active' => 1,
     ];
-    $ids = [];
-    $contributionType = CRM_Financial_BAO_FinancialType::add($params, $ids);
+    $contributionType = CRM_Financial_BAO_FinancialType::writeRecord($params);
     $result = CRM_Financial_BAO_FinancialType::setIsActive($contributionType->id, 0);
     $this->assertEquals($result, TRUE, 'Verify financial type record updation for is_active.');
 

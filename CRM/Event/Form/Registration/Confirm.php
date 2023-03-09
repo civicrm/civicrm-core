@@ -1156,7 +1156,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    *
    * @param CRM_Event_Form_Registration_Confirm $form
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public static function assignProfiles($form) {
     $participantParams = $form->_params;

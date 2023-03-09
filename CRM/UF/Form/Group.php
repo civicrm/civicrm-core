@@ -350,7 +350,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $title = CRM_Core_BAO_UFGroup::getTitle($this->_id);
-      CRM_Core_BAO_UFGroup::del($this->_id);
+      CRM_Core_BAO_UFGroup::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been deleted.", [1 => $title]), ts('Profile Deleted'), 'success');
     }
     elseif ($this->_action & CRM_Core_Action::DISABLE) {

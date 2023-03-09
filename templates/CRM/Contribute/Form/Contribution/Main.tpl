@@ -287,7 +287,7 @@
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
     </div>
 
-    {if $is_monetary and $form.bank_account_number}
+    {if $is_monetary && array_key_exists('bank_account_number', $form)}
       <div id="payment_notice">
         <fieldset class="crm-public-form-item crm-group payment_notice-group">
           <legend>{ts}Agreement{/ts}</legend>

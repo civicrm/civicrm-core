@@ -83,7 +83,7 @@
 {/if}
 {if ($action eq 8)}
 <div class=status>{ts 1=$notes.$id.note}Are you sure you want to delete the note '%1'?{/ts}</div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 
 {/if}
 

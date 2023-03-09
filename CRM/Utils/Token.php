@@ -723,6 +723,7 @@ class CRM_Utils_Token {
    * @deprecated
    */
   public static function parseThroughSmarty($tokenHtml, $entity, $entityType = 'contact') {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the tokens to the template

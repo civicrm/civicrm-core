@@ -57,6 +57,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Cleanup after test.
    */
   public function tearDown(): void {
+    $this->resetHooks();
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone', 'civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule', 'civicrm_group', 'civicrm_group_contact'], TRUE);
     $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone'], TRUE);
@@ -124,6 +125,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * e.g {if {contact.first_name|boolean}
    *
    * @dataProvider dataProviderNamesAndGreetings
+   * @throws \CRM_Core_Exception
    */
   public function testUpdateGreetingBooleanToken($params, $expectedEmailGreeting): void {
     $this->setEmailGreetingTemplateToConditional();
@@ -287,7 +289,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'return' => 'id',
       'name_a_b' => 'Employee of',
     ]);
-    $result = $this->callAPISuccess('relationship', 'create', [
+    $result = $this->callAPISuccess('Relationship', 'create', [
       'relationship_type_id' => $relationshipTypeID,
       'contact_id_a' => $individualID,
       'contact_id_b' => $orgID,
@@ -451,8 +453,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Check that the merge carries across various related entities.
    *
    * Note the group combinations & expected results:
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeWithAssets(): void {
     $contactID = $this->individualCreate();

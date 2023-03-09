@@ -383,7 +383,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
-        CRM_Member_BAO_MembershipType::del($this->_id);
+        CRM_Member_BAO_MembershipType::deleteRecord(['id' => $this->_id]);
       }
       catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce($e->getMessage(), NULL, ts('Membership Type Not Deleted'));
