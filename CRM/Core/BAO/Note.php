@@ -276,7 +276,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
    * @return int
    */
   public static function del($id) {
-    // CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $id]);
 
     return 1;

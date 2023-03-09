@@ -230,6 +230,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
    * @deprecated
    */
   public static function del($optionValueId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) static::deleteRecord(['id' => $optionValueId]);
   }
 

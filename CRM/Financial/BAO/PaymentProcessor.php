@@ -180,9 +180,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @deprecated
    */
   public static function del($paymentProcessorID) {
-    if (!$paymentProcessorID) {
-      throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     static::deleteRecord(['id' => $paymentProcessorID]);
   }
 
