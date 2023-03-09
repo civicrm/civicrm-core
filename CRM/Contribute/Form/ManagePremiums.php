@@ -259,7 +259,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     // If deleting, then only delete and skip the rest of the post-processing
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
-        CRM_Contribute_BAO_Product::del($this->_id);
+        CRM_Contribute_BAO_Product::deleteRecord(['id' => $this->_id]);
       }
       catch (CRM_Core_Exception $e) {
         $message = ts("This Premium is linked to an <a href='%1'>Online Contribution page</a>. Please remove it before deleting this Premium.", [1 => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1')]);

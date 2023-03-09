@@ -117,9 +117,11 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $errors = CRM_Financial_BAO_FinancialType::del($this->_id);
-      if (is_array($errors) && !empty($errors)) {
-        CRM_Core_Error::statusBounce($errors['error_message'], CRM_Utils_System::url('civicrm/admin/financial/financialType', "reset=1&action=browse"), ts('Cannot Delete'));
+      try {
+        CRM_Financial_BAO_FinancialType::deleteRecord(['id' => $this->_id]);
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Core_Error::statusBounce($e->getMessage(), CRM_Utils_System::url('civicrm/admin/financial/financialType', "reset=1&action=browse"), ts('Cannot Delete'));
       }
       CRM_Core_Session::setStatus(ts('Selected financial type has been deleted.'), ts('Record Deleted'), 'success');
     }

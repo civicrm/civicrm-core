@@ -71,6 +71,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @deprecated
    */
   public static function create(array $params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -88,6 +89,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @deprecated
    */
   public static function add(array $params, $ids = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return self::writeRecord($params);
   }
 
@@ -99,6 +101,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @return array|bool
    */
   public static function del($financialTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     try {
       static::deleteRecord(['id' => $financialTypeId]);
       return TRUE;
