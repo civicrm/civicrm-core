@@ -18,8 +18,6 @@ require_once 'api/Wrapper.php';
  * @group headless
  */
 class api_v3_APIWrapperTest extends CiviUnitTestCase {
-  public $DBResetRequired = FALSE;
-
 
   protected $_apiversion = 3;
 

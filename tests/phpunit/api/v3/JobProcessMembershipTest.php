@@ -26,7 +26,6 @@
 class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-  public $DBResetRequired = FALSE;
   public $_entity = 'Job';
 
   /**

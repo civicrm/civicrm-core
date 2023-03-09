@@ -27,7 +27,6 @@
 abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-  public $DBResetRequired = FALSE;
   public $defaultParams = [];
   private $_groupID;
 

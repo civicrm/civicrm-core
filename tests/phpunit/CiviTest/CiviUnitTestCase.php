@@ -79,13 +79,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   use \Civi\Test\LocaleTestTrait;
 
   /**
-   *  Database has been initialized.
-   *
-   * @var bool
-   */
-  private static $dbInit = FALSE;
-
-  /**
    * API version in use.
    *
    * @var int
@@ -104,16 +97,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Array of temporary directory names
    */
   protected $tempDirs;
-
-  /**
-   * DBResetRequired allows skipping DB reset
-   * in specific test case. If you still need
-   * to reset single test (method) of such case, call
-   * $this->cleanDB() in the first line of this
-   * test (method).
-   * @var bool
-   */
-  public $DBResetRequired = TRUE;
 
   /**
    * @var CRM_Core_Transaction|null
@@ -264,6 +247,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   final public static function buildEnvironment(): \Civi\Test\CiviEnvBuilder {
     // Ideally: return Civi\Test::headless();
     $b = new \Civi\Test\CiviEnvBuilder();
+    $b->callback(function () {
+      fprintf(STDERR, "\nInstalling %s database\n", \Civi\Test::dsn('database'));
+    });
     $b->callback([\Civi\Test::data(), 'populate']);
     return $b;
   }
@@ -294,12 +280,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if ($GLOBALS['stdin'] === FALSE) {
       echo "Couldn't open temporary file\n";
       exit(1);
-    }
-
-    if (!self::$dbInit) {
-      fprintf(STDERR, "\nInstalling %s database\n", \Civi\Test::dsn('database'));
-      \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
-      self::$dbInit = TRUE;
     }
 
     // "initialize" CiviCRM to avoid problems when running single tests

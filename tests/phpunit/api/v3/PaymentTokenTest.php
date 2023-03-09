@@ -17,8 +17,6 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
   protected $params;
   protected $id;
 
-  public $DBResetRequired = FALSE;
-
   /**
    * Setup for class.
    *
