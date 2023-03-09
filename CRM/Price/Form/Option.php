@@ -320,14 +320,12 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         'label', 'id'
       );
 
-      if (CRM_Price_BAO_PriceFieldValue::del($this->_oid)) {
-        CRM_Core_Session::setStatus(ts('%1 option has been deleted.', [1 => $label]), ts('Record Deleted'), 'success');
-      }
+      CRM_Price_BAO_PriceFieldValue::deleteRecord(['id' => $this->_oid]);
+      CRM_Core_Session::setStatus(ts('%1 option has been deleted.', [1 => $label]), ts('Record Deleted'), 'success');
       return NULL;
     }
     else {
       $params = $this->controller->exportValues('Option');
-      $fieldLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'label');
 
       foreach ($this->_moneyFields as $field) {
         $params[$field] = CRM_Utils_Rule::cleanMoney(trim($params[$field]));
