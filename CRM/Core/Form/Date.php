@@ -50,48 +50,6 @@ class CRM_Core_Form_Date {
   }
 
   /**
-   * Retrieve the date range - relative or absolute and assign it to the form.
-   *
-   * @deprecated
-   *
-   * @param CRM_Core_Form $form
-   *   The form the dates should be added to.
-   * @param string $fieldName
-   * @param int $count
-   * @param string $from
-   * @param string $to
-   * @param string $fromLabel
-   * @param bool $required
-   * @param array $operators
-   *   Additional value pairs to add.
-   * @param string $dateFormat
-   * @param bool|string $displayTime
-   * @param array $attributes
-   */
-  public static function buildDateRange(
-    &$form, $fieldName, $count = 1,
-    $from = '_from', $to = '_to', $fromLabel = 'From:',
-    $required = FALSE, $operators = [],
-    $dateFormat = 'searchDate', $displayTime = FALSE,
-    $attributes = ['class' => 'crm-select2']
-  ) {
-    CRM_Core_Error::deprecatedFunctionWarning('function will be removed');
-    $selector
-      = CRM_Core_Form_Date::returnDateRangeSelector(
-        $form, $fieldName, $count,
-        $from, $to, $fromLabel,
-        $required, $operators,
-        $dateFormat, $displayTime
-      );
-    CRM_Core_Form_Date::addDateRangeToForm(
-      $form, $fieldName, $selector,
-      $from, $to, $fromLabel,
-      $required, $dateFormat, $displayTime,
-      $attributes
-    );
-  }
-
-  /**
    * Build the date range array that will provide the form option values.
    *
    * @deprecated
