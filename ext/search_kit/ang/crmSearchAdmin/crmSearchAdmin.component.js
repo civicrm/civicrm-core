@@ -114,6 +114,7 @@
         if (params.tag_id && params.tag_id.length) {
           chain.tag_id = ['EntityTag', 'replace', {
             where: [['entity_id', '=', '$id'], ['entity_table', '=', 'civicrm_saved_search']],
+            match: ['entity_id', 'entity_table', 'tag_id'],
             records: _.transform(params.tag_id, function(records, id) {records.push({tag_id: id});})
           }];
         } else if (params.id) {
