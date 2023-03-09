@@ -350,6 +350,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) static::deleteRecord(['id' => $id]);
   }
 

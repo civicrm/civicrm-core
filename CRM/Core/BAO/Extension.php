@@ -48,6 +48,7 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    * @deprecated
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) static::deleteRecord(['id' => $id]);
   }
 

@@ -76,6 +76,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @throws CRM_Core_Exception
    */
   public static function del($jobID) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $jobID]);
     return TRUE;
   }
