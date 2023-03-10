@@ -284,11 +284,9 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         ],
       ];
 
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-
       foreach ($this->_fields as $name => $field) {
         // skip pseudo fields
-        if (substr($name, 0, 9) == 'phone_ext') {
+        if (substr($name, 0, 9) === 'phone_ext') {
           continue;
         }
 
@@ -303,11 +301,11 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
             $type = $value[2] ?? NULL;
 
             if (!in_array($fieldName, $multipleFields)) {
-              if ($lType == 'Primary') {
+              if ($lType === 'Primary') {
                 $locationTypeName = 1;
               }
               else {
-                $locationTypeName = $locationTypes[$lType];
+                $locationTypeName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $lType);
               }
 
               if (in_array($fieldName, [
