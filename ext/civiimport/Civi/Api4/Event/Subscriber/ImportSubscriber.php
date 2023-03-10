@@ -11,9 +11,12 @@ use Civi;
 use Civi\API\Event\AuthorizeEvent;
 use Civi\API\Events;
 use Civi\Api4\Entity;
+use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Managed;
 use Civi\Api4\SearchDisplay;
+use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\UserJob;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
@@ -41,6 +44,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
       'civi.api.authorize' => [['onApiAuthorize', Events::W_EARLY]],
       'civi.afform.get' => 'on_civi_afform_get',
+      'api.schema_map.build' => 'on_schema_map_build',
     ];
   }
 
@@ -67,6 +71,28 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
         'class' => Import::class,
         'icon' => 'fa-upload',
       ];
+    }
+  }
+
+  /**
+   * Register FK join from import table to entity being imported
+   *
+   * @param \Civi\Api4\Event\SchemaMapBuildEvent $event
+   */
+  public static function on_schema_map_build(SchemaMapBuildEvent $event): void {
+    $schema = $event->getSchemaMap();
+    $importEntities = Civi\BAO\Import::getImportTables();
+    $jobTypes = array_column(\CRM_Core_BAO_UserJob::getTypes(), 'entity', 'id');
+    foreach ($importEntities as $importEntity) {
+      $fkEntity = $jobTypes[$importEntity['job_type']] ?? NULL;
+      $fkTable = $fkEntity ? CoreUtil::getTableName($fkEntity) : NULL;
+      if ($fkEntity && $fkTable) {
+        $table = $schema->getTableByName($importEntity['table_name']);
+        $link = new Civi\Api4\Service\Schema\Joinable\Joinable($fkTable, 'id', '_entity_id');
+        $link->setBaseTable($importEntity['table_name']);
+        $link->setJoinType(Joinable::JOIN_TYPE_ONE_TO_MANY);
+        $table->addTableLink('_entity_id', $link);
+      }
     }
   }
 
