@@ -263,7 +263,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
           $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
           $dao = CRM_Core_DAO::executeQuery($query);
 
-          // FIXME: we need to be more acurate with affected rows, especially for insert vs duplicate insert.
+          // FIXME: we need to be more accurate with affected rows, especially for insert vs duplicate insert.
           // And that will help optimize further.
           $affectedRows = $dao->affectedRows();
 
@@ -337,28 +337,31 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
   }
 
   /**
-   * sort queries by number of records for the table associated with them.
-   * @param $tableQueries
+   * Sort queries by number of records for the table associated with them.
+   *
+   * @param array $tableQueries
    */
-  public static function orderByTableCount(&$tableQueries) {
-    static $tableCount = [];
+  public static function orderByTableCount(array &$tableQueries): void {
+    uksort($tableQueries, 'self::isTableBigger');
+  }
 
-    $tempArray = [];
-    foreach ($tableQueries as $key => $query) {
-      $table = explode(".", $key);
-      $table = $table[0];
-      if (!array_key_exists($table, $tableCount)) {
-        $query = "SELECT COUNT(*) FROM {$table}";
-        $tableCount[$table] = CRM_Core_DAO::singleValueQuery($query);
-      }
-      $tempArray[$key] = $tableCount[$table];
+  /**
+   * Is the table extracted from the first string larger than the second string.
+   *
+   * @param string $a
+   *   e.g civicrm_contact.first_name
+   * @param string $b
+   *   e.g civicrm_address.street_address
+   *
+   * @return int
+   */
+  private static function isTableBigger(string $a, string $b): int {
+    $tableA = explode('.', $a)[0];
+    $tableB = explode('.', $b)[0];
+    if ($tableA === $tableB) {
+      return 0;
     }
-
-    asort($tempArray);
-    foreach ($tempArray as $key => $count) {
-      $tempArray[$key] = $tableQueries[$key];
-    }
-    $tableQueries = $tempArray;
+    return CRM_Core_BAO_SchemaHandler::getRowCountForTable($tableA) <=> CRM_Core_BAO_SchemaHandler::getRowCountForTable($tableB);
   }
 
   /**
