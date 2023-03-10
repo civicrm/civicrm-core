@@ -13,7 +13,6 @@
 namespace Civi\Api4\Service\Schema;
 
 use Civi\Api4\Entity;
-use Civi\Api4\Event\Events;
 use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
@@ -52,7 +51,7 @@ class SchemaMapBuilder extends AutoService {
     $this->loadTables($map);
 
     $event = new SchemaMapBuildEvent($map);
-    $this->dispatcher->dispatch(Events::SCHEMA_MAP_BUILD, $event);
+    $this->dispatcher->dispatch('api.schema_map.build', $event);
 
     return $map;
   }
