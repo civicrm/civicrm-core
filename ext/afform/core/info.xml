@@ -13,7 +13,7 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2020-01-09</releaseDate>
-  <version>5.59.1</version>
+  <version>5.59.2</version>
   <develStage>beta</develStage>
   <compatibility>
     <ver>5.59</ver>
