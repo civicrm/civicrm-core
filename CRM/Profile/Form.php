@@ -247,7 +247,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
           // The button 'Save Matching Contact' is added in buildForm
           // but we only decide here whether ot not to show it - ie
           // if validation failed due to there being duplicates.
-          CRM_Core_Smarty::singleton()->assign('isDuplicate', 1);
+          CRM_Core_Smarty::singleton()->assign('showSaveDuplicateButton', 1);
         }
         else {
           $errors['_qf_default'] = ts('A record already exists with the same information.');
@@ -904,10 +904,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $this->freeze();
     }
 
+    // Assign FALSE, here - this is overwritten during form validation
+    // if duplicates are found during submit.
+    CRM_Core_Smarty::singleton()->assign('showSaveDuplicateButton', FALSE);
+
     if ($this->isEntityReferenceContactCreateMode()) {
-      // Assign FALSE, here - this is overwritten during form validation
-      // if duplicates are found during submit.
-      CRM_Core_Smarty::singleton()->assign('isDuplicate', FALSE);
       $this->addElement(
         'xbutton',
         $this->getButtonName('upload', 'duplicate'),
