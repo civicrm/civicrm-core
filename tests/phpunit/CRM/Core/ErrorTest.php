@@ -17,6 +17,11 @@ use Civi\Core\Exception\DBQueryException;
  */
 class CRM_Core_ErrorTest extends CiviUnitTestCase {
 
+  /**
+   * @var string
+   */
+  private $oldConfigAndLogDir;
+
   public function setUp(): void {
     parent::setUp();
     $config = CRM_Core_Config::singleton();
