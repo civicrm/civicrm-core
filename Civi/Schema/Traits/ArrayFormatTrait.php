@@ -66,7 +66,7 @@ trait ArrayFormatTrait {
       if (is_callable([$this, $setter])) {
         $this->{$setter}($value);
       }
-      else {
+      elseif (!$strict || property_exists($this, $field)) {
         $this->{$field} = $value;
       }
     }
