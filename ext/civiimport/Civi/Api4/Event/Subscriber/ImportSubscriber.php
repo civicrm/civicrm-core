@@ -126,9 +126,9 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       if (!is_array($metadata)) {
         return NULL;
       }
-      return $metadata['DataSource']['table_name'] ?: NULL;
+      return $metadata['DataSource']['table_name'] ?? NULL;
     }
-    return $event->params['metadata']['DataSource']['table_name'] ?: NULL;
+    return $event->params['metadata']['DataSource']['table_name'] ?? NULL;
   }
 
   /**

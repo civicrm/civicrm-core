@@ -23,7 +23,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *
    * @var string[]
    */
-  protected $submittableFields = ['skipColumnHeader', 'uploadField', 'fieldSeparator'];
+  protected $submittableFields = ['skipColumnHeader', 'uploadFile', 'fieldSeparator'];
 
   /**
    * Provides information about the data source.
