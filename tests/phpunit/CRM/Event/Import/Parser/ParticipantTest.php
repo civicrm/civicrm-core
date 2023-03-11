@@ -18,6 +18,11 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   protected $entity = 'Participant';
 
   /**
+   * @var int
+   */
+  protected $userJobID;
+
+  /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    */
