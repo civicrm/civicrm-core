@@ -35,7 +35,7 @@
   <div id="crm-container" class="crm-container crm-public" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
   {/if}
 
-  {if $isDuplicate and ( ($action eq 1 and $mode eq 4 ) or ($action eq 2) or ($action eq 8192) ) }
+  {if $showSaveDuplicateButton}
     <div class="crm-submit-buttons">
       {$form._qf_Edit_upload_duplicate.html}
     </div>
@@ -50,7 +50,7 @@
     {if $action eq 2 and $multiRecordFieldListing}
       <h1>{ts}Edit Details{/ts}</h1>
       <div class="crm-submit-buttons" style='float:right'>
-      {include file="CRM/common/formButtons.tpl" location=''}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
+      {include file="CRM/common/formButtons.tpl" location=''}{if $showSaveDuplicateButton}{$form._qf_Edit_upload_duplicate.html}{/if}
       </div>
     {/if}
 
@@ -94,7 +94,7 @@
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
-        {if $field.options_per_line}
+        {if array_key_exists('options_per_line', $field) && $field.options_per_line}
           <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
             <div class="label">{$form.$n.label}</div>
             <div class="content edit-value">
@@ -201,7 +201,7 @@
         </div>
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
-        {include file="CRM/common/formButtons.tpl" location=''}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
+        {include file="CRM/common/formButtons.tpl" location=''}{if $showSaveDuplicateButton}{$form._qf_Edit_upload_duplicate.html}{/if}
         {if $includeCancelButton}
           <a class="button cancel" href="{$cancelURL}">
             <span>
