@@ -342,7 +342,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @param array $tableQueries
    */
   public static function orderByTableCount(array &$tableQueries): void {
-    uksort($tableQueries, 'self::isTableBigger');
+    uksort($tableQueries, [__CLASS__, 'isTableBigger']);
   }
 
   /**
