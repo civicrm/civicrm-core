@@ -60,6 +60,9 @@ if ($doSql === TRUE || ($doSql === 'auto' && preg_match(';alpha;', $newVersion))
     return "{* file to handle db changes in $newVersion during upgrade *}\n";
   });
 }
+else {
+  $sqlFile = NULL;
+}
 
 updateFile("xml/version.xml", function ($content) use ($newVersion, $oldVersion) {
   return str_replace($oldVersion, $newVersion, $content);
@@ -101,8 +104,10 @@ foreach ($infoXmls as $infoXml) {
 
 if ($doCommit) {
   $files = array_filter(
-    array_merge(['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, @$sqlFile], $infoXmls),
-    'file_exists'
+    array_merge(['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile], $infoXmls),
+    function($file) {
+      return $file && file_exists($file);
+    }
   );
   $filesEsc = implode(' ', array_map('escapeshellarg', $files));
   passthru("git add $filesEsc");
