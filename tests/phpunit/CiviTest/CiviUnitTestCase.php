@@ -1849,7 +1849,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Recreate default membership types.
    *
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnhandledExceptionInspection
    */
   public function restoreMembershipTypes(): void {
     MembershipType::delete(FALSE)->addWhere('id', '>', 0)->execute();
@@ -2330,7 +2330,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->ids['campaign'][0] = $this->callAPISuccess('Campaign', 'create', ['title' => 'get the money'])['id'];
     $contributionParams = array_merge([
       'total_amount' => '200',
-      'invoice_id' => $this->_invoiceID,
+      'invoice_id' => 'xyz',
       'financial_type_id' => 'Donation',
       'contact_id' => $this->_contactID,
       'contribution_page_id' => $this->_contributionPageID,
@@ -2348,8 +2348,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'installments' => 5,
       'frequency_unit' => 'Month',
       'frequency_interval' => 1,
-      'invoice_id' => $this->_invoiceID,
       'contribution_status_id' => 2,
+      'invoice_id' => $contributionParams['invoice_id'],
       'payment_processor_id' => $this->_paymentProcessorID,
       // processor provided ID - use contact ID as proxy.
       'processor_id' => $this->_contactID,
@@ -2364,10 +2364,12 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * We don't have a good way to set up a recurring contribution with a membership so let's just do one then alter it
    *
    * @param array $params Optionally modify params for membership/recur (duration_unit/frequency_unit)
+   * @param array $contributionParams Parameters to pass to contribution create.
    *
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
-  public function setupMembershipRecurringPaymentProcessorTransaction($params = []): void {
+  public function setupMembershipRecurringPaymentProcessorTransaction(array $params = [], array $contributionParams = []): void {
     $membershipParams = $recurParams = [];
     if (!empty($params['duration_unit'])) {
       $membershipParams['duration_unit'] = $params['duration_unit'];
@@ -2389,7 +2391,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       ]);
     }
 
-    $this->setupRecurringPaymentProcessorTransaction($recurParams, [
+    $this->setupRecurringPaymentProcessorTransaction($recurParams, array_merge($contributionParams, [
       'line_items' => [
         [
           'line_item' => [
@@ -2409,7 +2411,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
           ],
         ],
       ],
-    ]);
+    ]));
     $this->ids['membership'] = LineItem::get()
       ->addWhere('contribution_id', '=', $this->ids['Contribution'][0])
       ->addWhere('entity_table', '=', 'civicrm_membership')

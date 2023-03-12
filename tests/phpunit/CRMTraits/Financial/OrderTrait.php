@@ -36,7 +36,7 @@ trait CRMTraits_Financial_OrderTrait {
       'installments' => 5,
       'frequency_unit' => 'Month',
       'frequency_interval' => 1,
-      'invoice_id' => $this->_invoiceID,
+      'invoice_id' => 'xyz',
       'contribution_status_id' => 2,
       'payment_processor_id' => $this->_paymentProcessorID,
       // processor provided ID - use contact ID as proxy.
