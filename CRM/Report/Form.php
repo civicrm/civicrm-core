@@ -248,9 +248,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_add2groupSupported = TRUE;
   protected $_groups = NULL;
   protected $_grandFlag = FALSE;
-  protected $_rowsFound = NULL;
+  protected $_rowsFound;
+
+  /**
+   * @var array
+   */
   protected $_selectAliases = [];
-  protected $_rollup = NULL;
+  protected $_rollup;
 
   /**
    * Table containing list of contact IDs within the group filter.
@@ -522,9 +526,8 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * The sql in the report is stored in this variable in order to be returned to api & test calls.
    *
-   * @var string
+   * @var array
    */
-
   protected $sqlArray;
 
   /**
@@ -686,7 +689,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
       $this->setOutputMode();
 
-      if ($this->_outputMode == 'copy') {
+      if ($this->_outputMode === 'copy') {
         $this->_createNew = TRUE;
         $this->_params = $this->_formValues;
         $this->_params['view_mode'] = 'criteria';
@@ -1510,7 +1513,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @param string $sql
    */
-  public function addToDeveloperTab($sql) {
+  public function addToDeveloperTab(string $sql): void {
     if (!CRM_Core_Permission::check('view report sql')) {
       return;
     }
@@ -1525,7 +1528,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     ];
 
     $this->assignTabs();
-    $this->sqlFormattedArray = [];
+    $sqlFormattedArray = [];
     $this->sqlArray[] = $sql;
     foreach ($this->sqlArray as $sql) {
       foreach (['LEFT JOIN'] as $term) {
@@ -1534,8 +1537,8 @@ class CRM_Report_Form extends CRM_Core_Form {
       foreach (['FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', ';'] as $term) {
         $sql = str_replace($term, '<br><br>' . $term, ($sql ?? ''));
       }
-      $this->sqlFormattedArray[] = $sql;
-      $this->assign('sql', implode(';<br><br><br><br>', $this->sqlFormattedArray));
+      $sqlFormattedArray[] = $sql;
+      $this->assign('sql', implode(';<br><br><br><br>', $sqlFormattedArray));
     }
     $this->assign('sqlModes', $sqlModes = CRM_Utils_SQL::getSqlModes());
 
@@ -3699,7 +3702,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         $this->_limit = " LIMIT {$this->_offsetValue}, {$this->_limitValue} ";
       }
       else {
-        $this->_limit = " LIMIT " . $this->_limitValue;
+        $this->_limit = ' LIMIT ' . $this->_limitValue;
       }
     }
   }
@@ -3990,8 +3993,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
     $customGroupWhere = '';
     if (!empty($permCustomGroupIds)) {
-      $customGroupWhere = "cg.id IN (" . implode(',', $permCustomGroupIds) .
-        ") AND";
+      $customGroupWhere = 'cg.id IN (' . implode(',', $permCustomGroupIds) .
+        ') AND';
     }
     $sql = "
 SELECT cg.table_name, cg.title, cg.extends, cf.id as cf_id, cf.label,
@@ -5359,7 +5362,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param string $tableName
    * @param string $fieldName
    * @param array $field
-   * @param string $select
+   * @param array $select
    * @return array
    */
   protected function addBasicFieldToSelect($tableName, $fieldName, $field, $select) {
