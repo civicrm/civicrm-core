@@ -38,7 +38,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   protected $entity = 'Contribution';
   protected $_params;
   protected $_ids = [];
-  protected $_pageParams = [];
+  protected $pageParams = [];
 
   /**
    * Payment processor ID (dummy processor).
@@ -97,7 +97,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'billing_mode' => 1,
     ];
     $this->paymentProcessorID = $this->processorCreate();
-    $this->_pageParams = [
+    $this->pageParams = [
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'USD',
@@ -1072,7 +1072,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testContributionCreateExample() {
     //make sure at least on page exists since there is a truncate in tear down
-    $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
+    $this->callAPISuccess('contribution_page', 'create', $this->pageParams);
     require_once 'api/v3/examples/Contribution/Create.ex.php';
     $result = contribution_create_example();
     $id = $result['id'];
@@ -1136,7 +1136,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCreateContributionOnline(): void {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
-    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
+    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->pageParams);
     $this->assertAPISuccess($contributionPage);
     $params = [
       'contact_id' => $this->individualID,
@@ -1201,8 +1201,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateContributionPayLaterOnline(): void {
-    $this->_pageParams['is_pay_later'] = 1;
-    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
+    $this->pageParams['is_pay_later'] = 1;
+    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->pageParams);
     $this->assertAPISuccess($contributionPage);
     $params = [
       'contact_id' => $this->individualID,
@@ -1235,7 +1235,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCreateContributionPendingOnline() {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
-    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
+    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->pageParams);
     $this->assertAPISuccess($contributionPage);
     $params = [
       'contact_id' => $this->individualID,

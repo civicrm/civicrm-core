@@ -829,7 +829,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *   Array of contribution page
    */
   public function contributionPageCreate($params = []) {
-    $this->_pageParams = array_merge([
+    $pageParams = array_merge([
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'USD',
@@ -839,7 +839,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'min_amount' => 10,
       'max_amount' => 1000,
     ], $params);
-    return $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
+    return $this->callAPISuccess('contribution_page', 'create', $pageParams);
   }
 
   /**

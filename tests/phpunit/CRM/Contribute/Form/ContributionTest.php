@@ -29,7 +29,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $_entity = 'Contribution';
   protected $_params;
   protected $_ids = [];
-  protected $_pageParams = [];
   protected $_userId;
 
   /**
