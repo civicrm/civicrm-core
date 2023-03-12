@@ -141,6 +141,12 @@ WHERE li.contribution_id = %1";
    * Given a participant id/contribution id,
    * return contribution/fee line items
    *
+   * Try to use the `BAO_Order` in internal code rather than accessing this
+   * directly (external code should use the api). We aim to deprecate this
+   * over time.
+   *
+   * @internal
+   *
    * @param int $entityId
    *   participant/contribution id.
    * @param string $entity
@@ -190,8 +196,8 @@ WHERE li.contribution_id = %1";
     $orderByClause = " ORDER BY pf.weight, pfv.weight";
 
     if ($isQuick) {
-      $fromClause .= " LEFT JOIN civicrm_price_set cps on cps.id = pf.price_set_id ";
-      $whereClause .= " and cps.is_quick_config = 0";
+      $fromClause .= ' LEFT JOIN civicrm_price_set cps on cps.id = pf.price_set_id ';
+      $whereClause .= ' and cps.is_quick_config = 0';
     }
 
     if (!$isQtyZero) {
