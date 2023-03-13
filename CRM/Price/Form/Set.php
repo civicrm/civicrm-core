@@ -77,13 +77,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   }
 
   /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
-
-  /**
    * Set the delete message.
    *
    * We do this from the constructor in order to do a translation.
