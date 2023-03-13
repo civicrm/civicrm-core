@@ -14,7 +14,7 @@
  *
  * @group e2e
  */
-abstract class E2E_Cache_CacheTestCase extends \Cache\IntegrationTests\SimpleCacheTest implements \Civi\Test\EndToEndInterface {
+abstract class E2E_Cache_CacheTestCase extends CiviSimpleCacheTest implements \Civi\Test\EndToEndInterface {
 
   const MAX_KEY = 255;
 
