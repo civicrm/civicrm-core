@@ -19,7 +19,7 @@ use Civi\Core\HookInterface;
  * @service
  * @internal
  */
-class ContributionAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
+class ContributionRecurAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
 
   /**
    * Provide default SavedSearch for Contribution autocompletes
@@ -27,7 +27,7 @@ class ContributionAutocompleteProvider extends \Civi\Core\Service\AutoService im
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
   public static function on_civi_search_autocompleteDefault(GenericHookEvent $e) {
-    if (!is_array($e->savedSearch) || $e->savedSearch['api_entity'] !== 'Contribution') {
+    if (!is_array($e->savedSearch) || $e->savedSearch['api_entity'] !== 'ContributionRecur') {
       return;
     }
     $e->savedSearch['api_params'] = [
@@ -35,8 +35,10 @@ class ContributionAutocompleteProvider extends \Civi\Core\Service\AutoService im
       'select' => [
         'id',
         'contact_id.display_name',
-        'total_amount',
-        'receive_date',
+        'frequency_unit:label',
+        'frequency_interval',
+        'amount',
+        'start_date',
         'financial_type_id:label',
         'contribution_status_id:label',
       ],
@@ -54,20 +56,20 @@ class ContributionAutocompleteProvider extends \Civi\Core\Service\AutoService im
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
-    if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || $e->savedSearch['api_entity'] !== 'Contribution') {
+    if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || $e->savedSearch['api_entity'] !== 'ContributionRecur') {
       return;
     }
     $e->display['settings'] = [
       'sort' => [
         ['contact_id.sort_name', 'ASC'],
-        ['total_amount', 'ASC'],
-        ['receive_date', 'DESC'],
+        ['amount', 'ASC'],
+        ['start_date', 'DESC'],
       ],
       'columns' => [
         [
           'type' => 'field',
           'key' => 'contact_id.display_name',
-          'rewrite' => '[contact_id.display_name] - [total_amount]',
+          'rewrite' => '[contact_id.display_name] - [amount]',
         ],
         [
           'type' => 'field',
@@ -76,8 +78,8 @@ class ContributionAutocompleteProvider extends \Civi\Core\Service\AutoService im
         ],
         [
           'type' => 'field',
-          'key' => 'receive_date',
-          'rewrite' => '[contribution_status_id:label] [receive_date]',
+          'key' => 'frequency_unit:label',
+          'rewrite' => ts('Every %1 %2 since %3', [1 => '[frequency_interval]', 2 => '[frequency_unit:label]', '[start_date]']),
         ],
       ],
     ];
