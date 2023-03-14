@@ -27,6 +27,16 @@
   <div id="choose-data-source" class="form-item">
     <h3>{ts}Choose Data Source{/ts}</h3>
     <table class="form-layout">
+      {if array_key_exists('use_existing_upload', $form)}
+        <tr class="crm-import-datasource-form-block-use_existing_upload">
+          <td class="label">{$form.use_existing_upload.label}</td>
+          <td>{$form.use_existing_upload.html}</td>
+          {* If the there is already an uploaded file then check the box when the form loads. This will
+          cause it be checked regardless of whether they checked it last time (we assume they want
+          to re-use) and also triggers the hide script for the dataSource field *}
+          {literal}<script type="text/javascript">CRM.$('#use_existing_upload').prop('checked',true).change();</script>{/literal}
+        </tr>
+      {/if}
       <tr class="crm-import-datasource-form-block-dataSource">
         <td class="label">{$form.dataSource.label}</td>
         <td>{$form.dataSource.html} {help id='data-source-selection'}</td>
@@ -191,5 +201,11 @@
     }
   </script>
 {/literal}
+  {if array_key_exists('use_existing_upload', $form)}
+    {* If the there is already an uploaded file then check the box when the form loads. This will
+    cause it be checked regardless of whether they checked it last time (we assume they want
+    to re-use) and also triggers the hide script for the dataSource field *}
+    {literal}<script type="text/javascript">CRM.$('#use_existing_upload').prop('checked',true).change();</script>{/literal}
+  {/if}
 </div>
 

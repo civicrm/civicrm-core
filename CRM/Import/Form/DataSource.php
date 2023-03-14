@@ -64,6 +64,13 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
     $this->assign('urlPath', 'civicrm/import/datasource');
     $this->assign('urlPathVar', 'snippet=4&user_job_id=' . $this->get('user_job_id'));
+    if ($this->isImportDataUploaded()) {
+      $this->add('checkbox', 'use_existing_upload', ts('Use data already uploaded'), NULL, FALSE, [
+        'onChange' => "
+          CRM.$('.crm-import-datasource-form-block-dataSource').toggle();
+          CRM.$('#data-source-form-block').toggle()",
+      ]);
+    }
 
     $this->add('select', 'dataSource', ts('Data Source'), $this->getDataSources(), TRUE,
       ['onchange' => 'buildDataSourceFormBlock(this.value);']
@@ -78,9 +85,16 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
     //build date formats
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
-
-    $this->buildDataSourceFields();
-
+    // When we call buildDataSourceFields we add them to the form both for purposes of
+    // initial display, but also so they are available during `postProcess`. Hence
+    // we need to add them to the form when first displaying it, or when a csv has been
+    // uploaded or csv described but NOT when the existing file is used. We have
+    // to check `_POST` for this because we want them to be not-added BEFORE validation
+    // as `buildDataSourceFields` also adds rules, which will run before `use_existing_upload`
+    // is treated as submitted.
+    if (empty($_POST['use_existing_upload'])) {
+      $this->buildDataSourceFields();
+    }
     $this->addButtons([
         [
           'type' => 'upload',
@@ -169,15 +183,28 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   protected function processDatasource(): void {
-    if (!$this->getUserJobID()) {
-      $this->createUserJob();
-    }
-    else {
-      $this->flushDataSource();
-      $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
-    }
     try {
-      $this->instantiateDataSource();
+      if (!$this->getUserJobID()) {
+        $this->createUserJob();
+        $this->instantiateDataSource();
+      }
+      else {
+        $submittedValues = $this->getSubmittedValues();
+        $fieldsToCopyOver = array_keys(array_diff_key($submittedValues, $this->submittableFields));
+        if ($submittedValues['use_existing_upload']) {
+          // Use the already saved value.
+          $fieldsToCopyOver[] = 'dataSource';
+          foreach ($fieldsToCopyOver as $field) {
+            $submittedValues[$field] = $this->getUserJobSubmittedValues()[$field];
+          }
+          $this->updateUserJobMetadata('submitted_values', $submittedValues);
+        }
+        else {
+          $this->flushDataSource();
+          $this->updateUserJobMetadata('submitted_values', $submittedValues);
+          $this->instantiateDataSource();
+        }
+      }
     }
     catch (CRM_Core_Exception $e) {
       CRM_Core_Error::statusBounce($e->getUserMessage());

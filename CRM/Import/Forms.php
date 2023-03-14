@@ -113,17 +113,12 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @var string[]
    */
   protected $submittableFields = [
-    // Skip column header is actually a field that would be added from the
-    // datasource - but currently only in contact, it is always there for
-    // other imports, ditto uploadFile.
-    'skipColumnHeader' => 'DataSource',
-    'fieldSeparator' => 'DataSource',
-    'uploadFile' => 'DataSource',
     'contactType' => 'DataSource',
     'contactSubType' => 'DataSource',
     'dateFormats' => 'DataSource',
     'savedMapping' => 'DataSource',
     'dataSource' => 'DataSource',
+    'use_existing_upload' => 'DataSource',
     'dedupe_rule_id' => 'DataSource',
     'onDuplicate' => 'DataSource',
     'disableUSPS' => 'DataSource',
@@ -285,6 +280,19 @@ class CRM_Import_Forms extends CRM_Core_Form {
     $oldDataSourceObject = new $oldDataSource($this->getUserJobID());
     $newParams = $this->getSubmittedValue('dataSource') === $oldDataSource ? $this->getSubmittedValues() : [];
     $oldDataSourceObject->purge($newParams);
+    $this->updateUserJobMetadata('DataSource', []);
+  }
+
+  /**
+   * Is the data already uploaded.
+   *
+   * This would be true on the DataSource screen when using the back button
+   * and ideally we can re-use that data rather than make them upload anew.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function isImportDataUploaded(): bool {
+    return $this->getUserJobID() && !empty($this->getUserJob()['metadata']['DataSource']['table_name']);
   }
 
   /**
