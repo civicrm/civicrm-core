@@ -445,7 +445,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     if (!$contribution->find(TRUE)) {
       throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: "]);
     }
-    if ($contribution->contact_id !== $this->getContactID()) {
+    if ((int) $contribution->contact_id !== $this->getContactID()) {
       CRM_Core_Error::debug_log_message("Contact ID in IPN not found but contact_id found in contribution.");
     }
     return $contribution;
