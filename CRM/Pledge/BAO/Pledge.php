@@ -251,6 +251,36 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     }
   }
 
+  public static function getPledgeTokenValues($id, $messageToken) {
+    if (empty($id)) {
+      return [];
+    }
+    $result = civicrm_api3('Pledge', 'get', ['id' => $id]);
+    if (!empty($messageToken)) {
+      foreach ($result['values'][$id] as $fieldName => $fieldValue) {
+        if (strpos($fieldName, 'custom_') === 0 && array_search($fieldName, $messageToken['pledge']) !== FALSE) {
+          $result['values'][$id][$fieldName] = CRM_Core_BAO_CustomField::displayValue($result['values'][$id][$fieldName], $fieldName);
+        }
+      }
+    }
+    return $result;
+  }
+
+  public static function getPledgeTokenValues($id, $messageToken) {
+    if (empty($id)) {
+      return [];
+    }
+    $result = civicrm_api3('Pledge', 'get', ['id' => $id]);
+    if (!empty($messageToken)) {
+      foreach ($result['values'][$id] as $fieldName => $fieldValue) {
+        if (strpos($fieldName, 'custom_') === 0 && array_search($fieldName, $messageToken['pledge']) !== FALSE) {
+          $result['values'][$id][$fieldName] = CRM_Core_BAO_CustomField::displayValue($result['values'][$id][$fieldName], $fieldName);
+        }
+      }
+    }
+    return $result;
+  }
+
   /**
    * Delete the pledge.
    *
