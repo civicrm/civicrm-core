@@ -5651,16 +5651,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       $spec = array_merge($spec, $individualFields);
     }
 
-    if (!empty($options['custom_fields'])) {
-      $this->_customGroupExtended[$options['prefix'] . 'civicrm_contact'] = [
-        'extends' => $options['custom_fields'],
-        'title' => $options['prefix_label'],
-        'filters' => $options['filters'],
-        'prefix' => $options['prefix'],
-        'prefix_label' => $options['prefix_label'],
-      ];
-    }
-
     return $this->buildColumns($spec, $options['prefix'] . 'civicrm_contact', 'CRM_Contact_DAO_Contact', $tableAlias, $this->getDefaultsFromOptions($options), $options);
   }
 
