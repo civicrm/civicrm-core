@@ -264,6 +264,10 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
    * @return array|\CRM_Utils_Check_Message[]
    */
   public function checkRelationshipCacheTriggers():array {
+    if (\Civi::settings()->get('logging_no_trigger_permission')) {
+      // The mysql user does not have permission to view whether the trigger exists.
+      return [];
+    }
     $dao = CRM_Core_DAO::executeQuery("SHOW TRIGGERS WHERE (`Table` = 'civicrm_relationship' OR `Table` = 'civicrm_relationship_type') AND `Statement` LIKE '%civicrm_relationship_cache%';");
     if ($dao->N !== 3) {
       $msg = new CRM_Utils_Check_Message(
