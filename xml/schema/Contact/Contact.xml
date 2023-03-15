@@ -878,6 +878,8 @@
     <default>NULL</default>
     <readonly>true</readonly>
     <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
       <label>Created Date</label>
     </html>
     <add>4.3</add>
@@ -895,6 +897,8 @@
     <export>true</export>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
       <label>Modified Date</label>
     </html>
     <readonly>true</readonly>
