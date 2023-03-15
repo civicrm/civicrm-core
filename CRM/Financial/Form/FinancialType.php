@@ -32,13 +32,6 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
   protected $entityFields = [];
 
   /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
-
-  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception

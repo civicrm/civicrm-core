@@ -122,13 +122,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   }
 
   /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
-
-  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {

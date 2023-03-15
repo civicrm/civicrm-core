@@ -66,7 +66,7 @@
     {if $action eq 8}
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
-      {$deleteMessage}
+      {$deleteMessage|smarty:nodefaults}
     </div>
     {else}
       <table class="form-layout-compressed">
