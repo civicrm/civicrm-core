@@ -107,8 +107,7 @@
     "ext-fileinfo": "*"
   },
   "require-dev": {
-    "cache/integration-tests": "~0.17.0",
-    "yoast/phpunit-polyfills": "^1.0"
+    "cache/integration-tests": "~0.17.0"
   },
   "scripts": {
     "post-install-cmd": [
