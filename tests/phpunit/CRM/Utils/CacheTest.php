@@ -10,7 +10,7 @@ class CRM_Utils_CacheTest extends CiviUnitTestCase {
     $values = [];
     for ($i = 0; $i < 5; $i++) {
       $nack = CRM_Utils_Cache::nack();
-      $this->assertRegExp('/^NACK:[a-z0-9]+$/', $nack);
+      $this->assertMatchesRegularExpression('/^NACK:[a-z0-9]+$/', $nack);
       $values[] = $nack;
     }
     sort($values);

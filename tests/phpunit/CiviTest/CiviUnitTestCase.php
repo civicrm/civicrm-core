@@ -487,6 +487,17 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * Temporary pseudo-poly-fill for php8 to php9 transition.
+   *
+   * @param string $pattern
+   * @param string $string
+   * @param string $message
+   */
+  protected function assertMatchesRegularExpression(string $pattern, string $string, string $message = '') {
+    $this->assertTrue(\preg_match($pattern, $string) > 0, $message);
+  }
+
+  /**
    * Create a batch of external API calls which can
    * be executed concurrently.
    *
