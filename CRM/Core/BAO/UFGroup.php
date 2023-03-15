@@ -2175,7 +2175,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       if (CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
         $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value($contactId,
           $form->_componentCampaigns
-        ));
+        ), NULL, TRUE, FALSE);
         $form->add('select', $name, $title,
           $campaigns, $required,
           [
