@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\CustomGroup;
 
 /**
@@ -685,7 +686,18 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // This parameter causes blank fields to be be emptied out.
     // We can probably remove.
     $params['updateBlankLocInfo'] = TRUE;
+    if (empty($params['contact_type']) || ($params['contact_type'] === 'Organization' && empty($params['organization_name']))) {
+      // Ensuring this is set addresses https://lab.civicrm.org/dev/core/-/issues/4156
+      // but not that RM_Dedupe_MergerTest::testMergeWithEmployer covers this scenario
+      // so refactoring of this is safe.
+      $contact = Contact::get(FALSE)->addWhere('id', '=', $contactID)->addSelect('organization_name', 'contact_type')->execute()->first();
+      $params['contact_type'] = $contact['contact_type'];
+      if (empty($params['organization_name']) && $params['contact_type'] === 'Organization') {
+        $params['organization_name'] = $contact['organization_name'];
+      }
+    }
     $data = self::formatProfileContactParams($params, $contactID);
+
     CRM_Contact_BAO_Contact::create($data);
   }
 
@@ -707,13 +719,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     int $contactID
   ) {
 
-    $data = $contactDetails = [];
+    $data = ['contact_type' => $params['contact_type']];
 
     // get the contact details (hier)
     $details = CRM_Contact_BAO_Contact::getHierContactDetails($contactID, []);
 
     $contactDetails = $details[$contactID];
-    $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
     $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
 
     //fix contact sub type CRM-5125
@@ -991,10 +1002,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
         }
       }
-    }
-
-    if (!isset($data['contact_type'])) {
-      $data['contact_type'] = 'Individual';
     }
 
     return $data;
