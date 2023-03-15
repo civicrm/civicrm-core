@@ -238,7 +238,12 @@ function civiimport_civicrm_buildForm(string $formName, $form) {
     }
   }
 
-  if ($formName === 'CRM_Contact_Import_Form_Summary') {
+  //@todo - do for all Preview forms - just need to fix each Preview.tpl to
+  // not open in new tab as they are not yet consolidated into one file.
+  // (Or consolidate them now).
+  if ($formName === 'CRM_Contact_Import_Form_Summary' || $formName === 'CRM_Contribute_Import_Form_Preview') {
+    $form->assign('isOpenResultsInNewTab', TRUE);
     $form->assign('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=ERROR', FALSE));
+    $form->assign('allRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID(), FALSE));
   }
 }
