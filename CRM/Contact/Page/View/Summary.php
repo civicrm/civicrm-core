@@ -208,12 +208,12 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $defaults['privacy_values'] = CRM_Core_SelectValues::privacy();
 
     //Show blocks only if they are visible in edit form
-    $this->_editOptions = CRM_Core_BAO_Setting::valueOptions(
+    $editOptions = CRM_Core_BAO_Setting::valueOptions(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'contact_edit_options'
     );
 
-    foreach ($this->_editOptions as $blockName => $value) {
+    foreach ($editOptions as $blockName => $value) {
       $varName = '_show' . $blockName;
       $this->$varName = $value;
       $this->assign(substr($varName, 1), $this->$varName);
