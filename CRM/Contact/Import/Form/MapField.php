@@ -111,8 +111,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   public function buildQuickForm(): void {
     $this->addSavedMappingFields();
 
-    $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'formRule']);
-
     //-------- end of saved mapping stuff ---------
 
     $defaults = [];
@@ -304,24 +302,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   *
-   * @return bool
-   *   list of errors to be posted back to the form
-   */
-  public static function formRule(array $fields): bool {
-    if (!empty($fields['saveMapping'])) {
-      // todo - this is nonsensical - sane js is better. PR to fix got stale but
-      // is here https://github.com/civicrm/civicrm-core/pull/23950
-      CRM_Core_Smarty::singleton()->assign('isCheked', TRUE);
-    }
-    return TRUE;
-  }
-
-  /**
    * Process the mapped fields and map it into the uploaded file.
    *
    * @throws \CRM_Core_Exception
@@ -381,7 +361,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     //Updating Mapping Records
     if (!empty($params['updateMapping'])) {
       foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $this->saveMappingField($params['mappingId'], $i, TRUE);
+        $this->saveMappingField($this->getSavedMappingID(), $i, TRUE);
       }
     }
 
@@ -394,6 +374,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       ];
 
       $saveMapping = civicrm_api3('Mapping', 'create', $mappingParams);
+      $this->updateUserJobMetadata('MapField', ['mapping_id' => $saveMapping['id']]);
 
       foreach (array_keys($this->getColumnHeaders()) as $i) {
         $this->saveMappingField($saveMapping['id'], $i);
