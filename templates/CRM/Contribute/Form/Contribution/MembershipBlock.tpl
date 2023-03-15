@@ -215,7 +215,7 @@
   {/strip}
 {/if}
 {* Include JS for auto renew membership if priceset is Quick Config*}
-{if $membershipBlock}
+{if $membershipBlock AND $is_quick_config}
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
