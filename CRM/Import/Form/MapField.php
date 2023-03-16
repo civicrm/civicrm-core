@@ -80,8 +80,11 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function postProcess() {
-    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+    // This savedMappingID is the one selected on DataSource. It will be overwritten in saveMapping if any
+    // action was taken on it.
+    $this->savedMappingID = $this->getSubmittedValue('savedMapping') ?: NULL;
     $this->saveMapping();
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     $parser = $this->getParser();
     $parser->init();
     $parser->validate();
@@ -154,9 +157,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       // @todo we should stop doing this - the passed in value should be fine, confirmed OK in contact import.
       $savedMapping = $this->get('savedMapping');
       $mappingName = (string) civicrm_api3('Mapping', 'getvalue', ['id' => $savedMappingID, 'return' => 'name']);
-      // @todo - this should go too - used when going back to the DataSource form but it should
-      // access the job.
-      $this->set('loadedMapping', $savedMapping);
       $this->add('hidden', 'mappingId', $savedMapping);
 
       $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
@@ -252,10 +252,12 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   protected function saveMapping(): void {
     //Updating Mapping Records
     if ($this->getSubmittedValue('updateMapping')) {
+      $savedMappingID = (int) $this->getSubmittedValue('mappingId');
       foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $this->saveMappingField((int) $this->getSubmittedValue('mappingId'), $i, TRUE);
+        $this->saveMappingField($savedMappingID, $i, TRUE);
       }
-      $this->updateUserJobMetadata('mapping', ['id' => (int) $this->getSubmittedValue('mappingId')]);
+      $this->setSavedMappingID($savedMappingID);
+      $this->updateUserJobMetadata('Template', ['mapping_id' => (int) $this->getSubmittedValue('mappingId')]);
     }
     //Saving Mapping Details and Records
     if ($this->getSubmittedValue('saveMapping')) {
@@ -264,7 +266,8 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         'description' => $this->getSubmittedValue('saveMappingDesc'),
         'mapping_type_id:name' => $this->getMappingTypeName(),
       ])->execute()->first()['id'];
-      $this->updateUserJobMetadata('MapField', ['mapping_id' => $savedMappingID]);
+      $this->setSavedMappingID($savedMappingID);
+      $this->updateUserJobMetadata('Template', ['mapping_id' => $savedMappingID]);
       foreach (array_keys($this->getColumnHeaders()) as $i) {
         $this->saveMappingField($savedMappingID, $i, FALSE);
       }
@@ -379,20 +382,14 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       $this->add('text', 'saveMappingDesc', ts('Description'));
     }
     else {
-      // @todo we should stop doing this - the passed in value should be fine, confirmed OK in contact import.
-      $savedMapping = $this->get('savedMapping');
-      $mappingName = (string) civicrm_api3('Mapping', 'getvalue', ['id' => $savedMappingID, 'return' => 'name']);
-      // @todo - this should go too - used when going back to the DataSource form but it should
-      // access the job.
-      $this->set('loadedMapping', $savedMapping);
-      $this->add('hidden', 'mappingId', $savedMapping);
+      $this->add('hidden', 'mappingId', $savedMappingID);
 
       $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
       $saveDetailsName = ts('Save as a new field mapping');
       $this->add('text', 'saveMappingName', ts('Name'));
       $this->add('text', 'saveMappingDesc', ts('Description'));
     }
-    $this->assign('savedMappingName', $mappingName ?? NULL);
+    $this->assign('savedMappingName', $this->getMappingName());
     $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
     $this->addFormRule(['CRM_Import_Form_MapField', 'mappingRule']);
   }
@@ -494,14 +491,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     }
     // Infer the default from the column names if we have them
     return $this->defaultFromHeader($columnHeader, $headerPatterns);
-  }
-
-  /**
-   * @return int
-   */
-  protected function getSavedMappingID(): int {
-    $savedMappingID = (int) ($this->getUserJob()['metadata']['MapField']['mapping_id'] ?? $this->getSubmittedValue('savedMapping'));
-    return $savedMappingID;
   }
 
 }

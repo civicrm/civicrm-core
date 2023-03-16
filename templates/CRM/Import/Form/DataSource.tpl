@@ -116,7 +116,7 @@
          <tr class="crm-import-uploadfile-form-block-savedMapping">
            <td class="label"><label for="savedMapping">{$form.savedMapping.label}</label></td>
            <td>{$form.savedMapping.html}<br />
-             <span class="description">{ts}If you want to use a previously saved import field mapping - select it here.{/ts}</span>
+             {if !$form.savedMapping.frozen}<span class="description">{ts}If you want to use a previously saved import field mapping - select it here.{/ts}</span>{/if}
            </td>
          </tr>
        {/if}
