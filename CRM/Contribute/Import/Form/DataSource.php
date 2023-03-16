@@ -39,12 +39,6 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       CRM_Import_Parser::DUPLICATE_SKIP => ts('Insert new contributions'),
       CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update existing contributions'),
     ]);
-
-    $this->addElement('xbutton', 'loadMapping', ts('Load Mapping'), [
-      'type' => 'submit',
-      'onclick' => 'checkSelect()',
-    ]);
-
     $this->addContactTypeSelector();
   }
 
