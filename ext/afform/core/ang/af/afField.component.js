@@ -109,7 +109,7 @@
           }
           // Set default value from url with fieldName only
           else if (urlArgs && urlArgs[ctrl.fieldName]) {
-            $scope.dataProvider.getFieldData()[ctrl.fieldName] = urlArgs[ctrl.fieldName];
+            setValue(urlArgs[ctrl.fieldName]);
           }
           // Set default value based on field defn
           else if (ctrl.defn.afform_default) {
@@ -159,6 +159,11 @@
             '>=': ('' + value).split('-')[0],
             '<=': ('' + value).split('-')[1] || '',
           };
+        }
+        else if (!_.isArray(value) &&
+          ((['Select', 'EntityRef'].includes(ctrl.defn.input_type) && ctrl.defn.input_attrs.multiple) || ctrl.defn.input_type === 'CheckBox')
+        ) {
+          value =  value.split(',');
         }
         $scope.dataProvider.getFieldData()[ctrl.fieldName] = value;
       }
