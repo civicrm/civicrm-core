@@ -136,6 +136,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   protected function buildSavedMappingFields($savedMappingID) {
+    CRM_Core_Error::deprecatedFunctionWarning('addSavedMappingFields');
     //to save the current mappings
     if (!$savedMappingID) {
       $saveDetailsName = ts('Save this field mapping');
@@ -364,7 +365,29 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    */
   protected function addSavedMappingFields(): void {
     $savedMappingID = $this->getSavedMappingID();
-    $this->buildSavedMappingFields($savedMappingID);
+    //to save the current mappings
+    if (!$savedMappingID) {
+      $saveDetailsName = ts('Save this field mapping');
+      $this->applyFilter('saveMappingName', 'trim');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    else {
+      // @todo we should stop doing this - the passed in value should be fine, confirmed OK in contact import.
+      $savedMapping = $this->get('savedMapping');
+      $mappingName = (string) civicrm_api3('Mapping', 'getvalue', ['id' => $savedMappingID, 'return' => 'name']);
+      // @todo - this should go too - used when going back to the DataSource form but it should
+      // access the job.
+      $this->set('loadedMapping', $savedMapping);
+      $this->add('hidden', 'mappingId', $savedMapping);
+
+      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
+      $saveDetailsName = ts('Save as a new field mapping');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    $this->assign('savedMappingName', $mappingName ?? NULL);
+    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
     $this->addFormRule(['CRM_Import_Form_MapField', 'mappingRule']);
   }
 
