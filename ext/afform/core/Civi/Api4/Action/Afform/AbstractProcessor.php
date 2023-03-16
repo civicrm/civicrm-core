@@ -112,7 +112,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
 
     $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
     $idField = CoreUtil::getIdFieldName($entity['type']);
-    if ($ids && !empty($entity['fields'][$idField]['saved_search'])) {
+    if ($ids && !empty($entity['fields'][$idField]['defn']['saved_search'])) {
       $ids = $this->validateBySavedSearch($entity, $ids);
     }
     if (!$ids) {
@@ -144,6 +144,14 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
   }
 
+  /**
+   * Validate that given id(s) are actually returned by the Autocomplete API
+   *
+   * @param $entity
+   * @param array $ids
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
   private function validateBySavedSearch($entity, array $ids) {
     $idField = CoreUtil::getIdFieldName($entity['type']);
     $fetched = civicrm_api4($entity['type'], 'autocomplete', [
