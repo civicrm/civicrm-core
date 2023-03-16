@@ -200,7 +200,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
-      return TRUE;
+      return [];
     }
     $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
     $defaults = $className::setDefaultValues($this);
