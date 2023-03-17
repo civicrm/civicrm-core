@@ -505,7 +505,7 @@ class CRM_Core_Page {
 
     $standardAttribs = ['aria-hidden' => 'true'];
     if ($text === NULL || $text === '') {
-      $title = $sr = '';
+      $sr = '';
     }
     else {
       $standardAttribs['title'] = $text;
