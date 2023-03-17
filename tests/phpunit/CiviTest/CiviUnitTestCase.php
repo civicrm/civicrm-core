@@ -269,6 +269,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *  Common setup functions for all unit tests.
    */
   protected function setUp(): void {
+    if ($this->tx !== NULL) {
+      throw new \RuntimeException("CiviUnitTestCase requires that parent::setUp() run before useTransaction()");
+    }
+
     CRM_Core_I18n::clearLocale();
     parent::setUp();
     CRM_Core_Session::singleton()->set('userID');
