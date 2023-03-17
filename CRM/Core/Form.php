@@ -694,7 +694,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->buildQuickForm();
 
     $defaults = $this->setDefaultValues();
-    unset($defaults['qfKey']);
+    if (isset($defaults['qfKey'])) {
+      unset($defaults['qfKey']);
+    }
 
     if (!empty($defaults)) {
       $this->setDefaults($defaults);
