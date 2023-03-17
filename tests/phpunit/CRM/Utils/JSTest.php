@@ -19,8 +19,8 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
    * Set up for tests.
    */
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**

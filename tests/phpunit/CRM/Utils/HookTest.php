@@ -27,8 +27,8 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
   public $hook;
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
     $this->fakeModules = [
       'hooktesta',
       'hooktestb',

@@ -30,8 +30,8 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * Set up for tests.
    */
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
