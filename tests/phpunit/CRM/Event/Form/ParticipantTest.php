@@ -21,8 +21,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   protected $fromEmailAddressOptions = [];
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**

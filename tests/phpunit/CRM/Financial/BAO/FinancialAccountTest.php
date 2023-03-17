@@ -19,8 +19,8 @@ use Civi\Api4\FinancialType;
 class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->organizationCreate();
   }
 
