@@ -16,8 +16,8 @@
 class CRM_Utils_SignerTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   public function testSignValidate() {
