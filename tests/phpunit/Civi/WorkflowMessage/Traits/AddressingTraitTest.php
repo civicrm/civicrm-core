@@ -16,8 +16,8 @@ use Civi\WorkflowMessage\GenericWorkflowMessage;
 class AddressingTraitTest extends \CiviUnitTestCase {
 
   protected function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
