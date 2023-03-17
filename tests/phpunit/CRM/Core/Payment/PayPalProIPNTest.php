@@ -200,10 +200,10 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    * @return array
    *   array representing a Paypal IPN POST
    */
-  public function getPaypalExpressTransactionIPN() {
+  public function getPaypalExpressTransactionIPN(): array {
     return [
       'mc_gross' => '200.00',
-      'invoice' => $this->_invoiceID,
+      'invoice' => 'xyz',
       'protection_eligibility' => 'Eligible',
       'address_status' => 'confirmer',
       'payer_id' => 'ZYXHBZSULPQE3',
@@ -267,7 +267,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'payment_status' => 'Completed',
       'product_name' => '5 Per 1 month',
       'charset' => 'windows-1252',
-      'rp_invoice_id' => 'i=' . $this->_invoiceID . '&m=&c=&r=&b=&p=' . $this->_contributionPageID,
+      'rp_invoice_id' => 'i=xyz&m=&c=&r=&b=&p=' . $this->_contributionPageID,
       'recurring_payment_id' => 'I-3EEUC094KYQW',
       'address_zip' => '90210',
       'first_name' => 'Alanna',
@@ -308,7 +308,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   /**
    * Get IPN style details for an incoming recurring transaction.
    */
-  public function getPaypalProRecurTransaction() {
+  public function getPaypalProRecurTransaction(): array {
     return [
       'amount' => '15.00',
       'initial_payment_amount' => '0.00',
@@ -337,7 +337,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'amount_per_cycle' => '15.00',
       'mc_gross' => '15.00',
       'payment_date' => '03:59:05 Jul 14, 2013 PDT',
-      'rp_invoice_id' => 'i=' . $this->_invoiceID . '&m=contribute&c=' . $this->_contactID . '&r=' . $this->_contributionRecurID . '&b=' . $this->_contributionID . '&p=null',
+      'rp_invoice_id' => 'i=xyz&m=contribute&c=' . $this->_contactID . '&r=' . $this->_contributionRecurID . '&b=' . $this->_contributionID . '&p=null',
       'payment_status' => 'Completed',
       'business' => 'nowhere@civicrm.org',
       'last_name' => 'Roberty',
@@ -367,7 +367,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response update for a paypal express profile creation confirmation.
    */
-  public function testIPNPaymentExpressRecurSuccess() {
+  public function testIPNPaymentExpressRecurSuccess(): void {
     $this->setupRecurringPaymentProcessorTransaction(['processor_id' => '']);
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalExpressRecurSubscriptionConfirmation());
     $paypalIPN->main();
@@ -388,7 +388,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'next_payment_date' => '03:00:00 May 09, 2018 PDT',
       'residence_country' => 'GB',
       'initial_payment_amount' => '0.00',
-      'rp_invoice_id' => 'i=' . $this->_invoiceID
+      'rp_invoice_id' => 'i=xyz'
       . '&m=&c=' . $this->_contributionID
       . '&r=' . $this->_contributionRecurID
       . '&b=' . $this->_contactID

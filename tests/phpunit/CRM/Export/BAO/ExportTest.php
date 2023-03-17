@@ -425,7 +425,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->contactMembershipCreate(['contact_id' => $this->contactIDs[0]]);
 
     $this->_contactID = $this->contactIDs[0];
-    $this->_invoiceID = 1234;
     $this->_contributionPageID = NULL;
     $this->_paymentProcessorID = $this->paymentProcessorCreate();
     $this->setupMembershipRecurringPaymentProcessorTransaction();
