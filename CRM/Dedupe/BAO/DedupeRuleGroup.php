@@ -142,8 +142,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *   array of importable Fields
    */
   private static function importableFields($contactType): array {
-    $showAll = FALSE;
-    $withMultiCustomFields = FALSE;
 
     $cacheKeyString = 'importableFields ' . $contactType . '_0_0_0_1';
     $cacheKeyString .= '_' . CRM_Core_Config::domainID() . '_';
@@ -194,11 +192,11 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
       $fields = array_merge($fields,
         CRM_Core_BAO_CustomField::getFieldsForImport($contactType,
-          $showAll,
+          FALSE,
           TRUE,
           FALSE,
           FALSE,
-          $withMultiCustomFields
+          FALSE
         )
       );
       // Unset the fields which are not related to their contact type.
