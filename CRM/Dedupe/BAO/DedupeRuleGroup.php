@@ -88,7 +88,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
       foreach (CRM_Contact_BAO_ContactType::basicTypes() as $ctype) {
         // take the table.field pairs and their titles from importableFields() if the table is supported
-        foreach (CRM_Contact_BAO_Contact::importableFields($ctype) as $iField) {
+        foreach (self::importableFields($ctype) as $iField) {
           if (isset($iField['where'])) {
             $where = $iField['where'];
             if (isset($replacements[$where])) {
@@ -126,6 +126,153 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
     return Civi::$statics[__CLASS__]['supportedFields'][$requestedType] ?? [];
 
+  }
+
+  /**
+   * Combine all the importable fields from the lower levels object.
+   *
+   * @deprecated - copy of importableFields to unravel.
+   *
+   * The ordering is important, since currently we do not have a weight
+   * scheme. Adding weight is super important
+   *
+   * @param int|string $contactType contact Type
+   *
+   * @return array
+   *   array of importable Fields
+   */
+  private static function importableFields($contactType) {
+    $status = FALSE;
+    $showAll = FALSE;
+    $isProfile = FALSE;
+    $checkPermission = TRUE;
+    $withMultiCustomFields = FALSE;
+    if (empty($contactType)) {
+      $contactType = 'All';
+    }
+
+    $cacheKeyString = "importableFields $contactType";
+    $cacheKeyString .= $status ? '_1' : '_0';
+    $cacheKeyString .= $showAll ? '_1' : '_0';
+    $cacheKeyString .= $isProfile ? '_1' : '_0';
+    $cacheKeyString .= $checkPermission ? '_1' : '_0';
+    $cacheKeyString .= '_' . CRM_Core_Config::domainID() . '_';
+
+    $fields = Civi::cache('fields')->get($cacheKeyString);
+
+    if (!$fields) {
+      $fields = CRM_Contact_DAO_Contact::import();
+
+      // get the fields thar are meant for contact types
+      if (in_array($contactType, [
+        'Individual',
+        'Household',
+        'Organization',
+        'All',
+      ])) {
+        $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
+      }
+
+      $locationFields = array_merge(CRM_Core_DAO_Address::import(),
+        CRM_Core_DAO_Phone::import(),
+        CRM_Core_DAO_Email::import(),
+        CRM_Core_DAO_IM::import(TRUE),
+        CRM_Core_DAO_OpenID::import()
+      );
+
+      $locationFields = array_merge($locationFields,
+        CRM_Core_BAO_CustomField::getFieldsForImport('Address',
+          FALSE,
+          FALSE,
+          FALSE,
+          FALSE
+        )
+      );
+
+      foreach ($locationFields as $key => $field) {
+        $locationFields[$key]['hasLocationType'] = TRUE;
+      }
+
+      $fields = array_merge($fields, $locationFields);
+
+      $fields = array_merge($fields, CRM_Contact_DAO_Contact::import());
+      $fields = array_merge($fields, CRM_Core_DAO_Note::import());
+
+      //website fields
+      $fields = array_merge($fields, CRM_Core_DAO_Website::import());
+      $fields['url']['hasWebsiteType'] = TRUE;
+
+      if ($contactType != 'All') {
+        $fields = array_merge($fields,
+          CRM_Core_BAO_CustomField::getFieldsForImport($contactType,
+            $showAll,
+            TRUE,
+            FALSE,
+            FALSE,
+            $withMultiCustomFields
+          )
+        );
+        // Unset the fields which are not related to their contact type.
+        foreach (CRM_Contact_DAO_Contact::import() as $name => $value) {
+          if (!empty($value['contactType']) && $value['contactType'] !== $contactType) {
+            unset($fields[$name]);
+          }
+        }
+      }
+      else {
+        foreach (CRM_Contact_BAO_ContactType::basicTypes() as $type) {
+          $fields = array_merge($fields,
+            CRM_Core_BAO_CustomField::getFieldsForImport($type,
+              $showAll,
+              FALSE,
+              FALSE,
+              FALSE,
+              $withMultiCustomFields
+            )
+          );
+        }
+      }
+
+      if ($isProfile) {
+        $fields = array_merge($fields, [
+          'group' => [
+            'title' => ts('Group(s)'),
+            'name' => 'group',
+          ],
+          'tag' => [
+            'title' => ts('Tag(s)'),
+            'name' => 'tag',
+          ],
+          'note' => [
+            'title' => ts('Note'),
+            'name' => 'note',
+          ],
+          'communication_style_id' => [
+            'title' => ts('Communication Style'),
+            'name' => 'communication_style_id',
+          ],
+        ]);
+      }
+
+      //Sorting fields in alphabetical order(CRM-1507)
+      $fields = CRM_Utils_Array::crmArraySortByField($fields, 'title');
+
+      Civi::cache('fields')->set($cacheKeyString, $fields);
+    }
+
+    if (!$isProfile) {
+      if (!$status) {
+        $fields = array_merge(['do_not_import' => ['title' => ts('- do not import -')]],
+          $fields
+        );
+      }
+      else {
+        $fields = array_merge(['' => ['title' => ts('- Contact Fields -')]],
+          $fields
+        );
+      }
+    }
+    return $fields;
   }
 
   /**
