@@ -143,68 +143,65 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    */
   private static function importableFields($contactType): array {
 
-    if (TRUE) {
-      $fields = CRM_Contact_DAO_Contact::import();
+    $fields = CRM_Contact_DAO_Contact::import();
 
-      // get the fields thar are meant for contact types
-      if (in_array($contactType, [
-        'Individual',
-        'Household',
-        'Organization',
-        'All',
-      ])) {
-        $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
-      }
-
-      $locationFields = array_merge(CRM_Core_DAO_Address::import(),
-        CRM_Core_DAO_Phone::import(),
-        CRM_Core_DAO_Email::import(),
-        CRM_Core_DAO_IM::import(TRUE),
-        CRM_Core_DAO_OpenID::import()
-      );
-
-      $locationFields = array_merge($locationFields,
-        CRM_Core_BAO_CustomField::getFieldsForImport('Address',
-          FALSE,
-          FALSE,
-          FALSE,
-          FALSE
-        )
-      );
-
-      foreach ($locationFields as $key => $field) {
-        $locationFields[$key]['hasLocationType'] = TRUE;
-      }
-
-      $fields = array_merge($fields, $locationFields);
-
-      $fields = array_merge($fields, CRM_Contact_DAO_Contact::import());
-      $fields = array_merge($fields, CRM_Core_DAO_Note::import());
-
-      //website fields
-      $fields = array_merge($fields, CRM_Core_DAO_Website::import());
-      $fields['url']['hasWebsiteType'] = TRUE;
-
-      $fields = array_merge($fields,
-        CRM_Core_BAO_CustomField::getFieldsForImport($contactType,
-          FALSE,
-          TRUE,
-          FALSE,
-          FALSE,
-          FALSE
-        )
-      );
-      // Unset the fields which are not related to their contact type.
-      foreach (CRM_Contact_DAO_Contact::import() as $name => $value) {
-        if (!empty($value['contactType']) && $value['contactType'] !== $contactType) {
-          unset($fields[$name]);
-        }
-      }
-
-      //Sorting fields in alphabetical order(CRM-1507)
-      $fields = CRM_Utils_Array::crmArraySortByField($fields, 'title');
+    // get the fields thar are meant for contact types
+    if (in_array($contactType, [
+      'Individual',
+      'Household',
+      'Organization',
+      'All',
+    ])) {
+      $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
     }
-    return $fields;
+
+    $locationFields = array_merge(CRM_Core_DAO_Address::import(),
+      CRM_Core_DAO_Phone::import(),
+      CRM_Core_DAO_Email::import(),
+      CRM_Core_DAO_IM::import(TRUE),
+      CRM_Core_DAO_OpenID::import()
+    );
+
+    $locationFields = array_merge($locationFields,
+      CRM_Core_BAO_CustomField::getFieldsForImport('Address',
+        FALSE,
+        FALSE,
+        FALSE,
+        FALSE
+      )
+    );
+
+    foreach ($locationFields as $key => $field) {
+      $locationFields[$key]['hasLocationType'] = TRUE;
+    }
+
+    $fields = array_merge($fields, $locationFields);
+
+    $fields = array_merge($fields, CRM_Contact_DAO_Contact::import());
+    $fields = array_merge($fields, CRM_Core_DAO_Note::import());
+
+    //website fields
+    $fields = array_merge($fields, CRM_Core_DAO_Website::import());
+    $fields['url']['hasWebsiteType'] = TRUE;
+
+    $fields = array_merge($fields,
+      CRM_Core_BAO_CustomField::getFieldsForImport($contactType,
+        FALSE,
+        TRUE,
+        FALSE,
+        FALSE,
+        FALSE
+      )
+    );
+    // Unset the fields which are not related to their contact type.
+    foreach (CRM_Contact_DAO_Contact::import() as $name => $value) {
+      if (!empty($value['contactType']) && $value['contactType'] !== $contactType) {
+        unset($fields[$name]);
+      }
+    }
+
+    //Sorting fields in alphabetical order(CRM-1507)
+    return CRM_Utils_Array::crmArraySortByField($fields, 'title');
   }
 
   /**
