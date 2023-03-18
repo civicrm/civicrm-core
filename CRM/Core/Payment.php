@@ -619,6 +619,19 @@ abstract class CRM_Core_Payment {
         }
         return '';
 
+      case 'directDebitAgreement':
+        if ($this->getPaymentTypeName() !== 'direct_debit') {
+          return '';
+        }
+        return '<div class="crm-group debit_agreement-group">
+              <div class="header-dark">
+                {ts}Agreement{/ts}
+              </div>
+              <div class="display-block">
+                {ts}Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.{/ts}
+              </div>
+            </div>';
+
     }
     CRM_Core_Error::deprecatedFunctionWarning('Calls to getText must use a supported method');
     return '';

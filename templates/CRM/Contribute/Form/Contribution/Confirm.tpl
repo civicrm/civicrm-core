@@ -250,16 +250,7 @@
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br/>
             {ts}Bank Name{/ts}: {$bank_name}<br/>
           </div>
-          {if $contributeMode eq 'direct'}
-            <div class="crm-group debit_agreement-group">
-              <div class="header-dark">
-                {ts}Agreement{/ts}
-              </div>
-              <div class="display-block">
-                {ts}Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.{/ts}
-              </div>
-            </div>
-          {/if}
+          {$directDebitAgreement}
         {/if}
         {if in_array('credit_card_number', $form)}
           <div class="crm-section no-label credit_card_details-section">

@@ -301,6 +301,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // want to ensure we set this after that function has been called.
       CRM_Core_Payment_Form::mapParams($this->_bltID, $preApprovalParams, $this->_params, FALSE);
     }
+    $this->assign('directDebitAgreement', empty($this->_paymentProcessor) ? '' : $this->_paymentProcessor['object']->getText('directDebitAgreement'));
 
     $this->_params['is_pay_later'] = $this->get('is_pay_later');
     $this->assign('is_pay_later', $this->_params['is_pay_later']);

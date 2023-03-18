@@ -78,6 +78,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $this->_paymentProcessors = $this->get('paymentProcessors');
     $this->preProcessPaymentOptions();
+    $this->assign('directDebitAgreement', empty($this->_paymentProcessor) ? '' : $this->_paymentProcessor['object']->getText('directDebitAgreement'));
 
     $this->assignFormVariablesByContributionID();
 
