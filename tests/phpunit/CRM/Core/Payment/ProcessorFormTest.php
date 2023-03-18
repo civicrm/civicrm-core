@@ -15,52 +15,82 @@
  */
 class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
 
+  /**
+   * @var array
+   */
+  protected $standardProfile;
+
+  /**
+   * @var array
+   */
+  protected $customProfile;
+
+  /**
+   * @var int
+   */
+  protected $standardProcessorTypeID;
+
+  /**
+   * @var int
+   */
+  protected $customProcessorTypeID;
+
+  /**
+   * @var int
+   */
+  protected $standardProcessorID;
+
+  /**
+   * @var int
+   */
+  protected $customProcessorID;
+
   public function setUp(): void {
     parent::setUp();
 
     $this->standardProfile = $this->createStandardBillingProfile();
     $this->customProfile = $this->createCustomBillingProfile();
 
-    $this->standardProcessorType = $this->paymentProcessorTypeCreate([
+    $this->standardProcessorTypeID = $this->paymentProcessorTypeCreate([
       'class_name' => 'PaymentProcessorWithStandardBillingRequirements',
       'name' => 'StandardBillingType',
     ]);
 
-    $this->customProcessorType = $this->paymentProcessorTypeCreate([
+    $this->customProcessorTypeID = $this->paymentProcessorTypeCreate([
       'class_name' => 'PaymentProcessorWithCustomBillingRequirements',
       'name' => 'CustomBillingType',
     ]);
 
-    $this->standardProcessor = $this->paymentProcessorCreate([
+    $this->standardProcessorID = $this->paymentProcessorCreate([
       'name' => 'StandardBilling',
       'class_name' => 'PaymentProcessorWithStandardBillingRequirements',
-      'payment_processor_type_id' => $this->standardProcessorType,
+      'payment_processor_type_id' => $this->standardProcessorTypeID,
       'is_test' => 0,
     ]);
 
-    $this->customProcessor = $this->paymentProcessorCreate([
+    $this->customProcessorID = $this->paymentProcessorCreate([
       'name' => 'CustomBilling',
       'class_name' => 'PaymentProcessorWithCustomBillingRequirements',
-      'payment_processor_type_id' => $this->customProcessorType,
+      'payment_processor_type_id' => $this->customProcessorTypeID,
       'is_test' => 0,
     ]);
   }
 
   public function tearDown(): void {
     $this->callAPISuccess('PaymentProcessor', 'delete', [
-      'id' => $this->standardProcessor,
+      'id' => $this->standardProcessorID,
     ]);
 
     $this->callAPISuccess('PaymentProcessor', 'delete', [
-      'id' => $this->customProcessor,
+      'id' => $this->customProcessorID,
     ]);
 
     $this->callAPISuccess('PaymentProcessorType', 'delete', [
-      'id' => $this->standardProcessorType,
+      'id' => $this->standardProcessorTypeID,
     ]);
 
     $this->callAPISuccess('PaymentProcessorType', 'delete', [
-      'id' => $this->customProcessorType,
+      'id' => $this->customProcessorTypeID,
     ]);
 
     $this->quickCleanUpFinancialEntities();
@@ -69,15 +99,15 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function createStandardBillingProfile() {
+  public function createStandardBillingProfile(): array {
     return $this->createTestableBillingProfile('standard', TRUE);
   }
 
-  public function createCustomBillingProfile() {
+  public function createCustomBillingProfile(): array {
     return $this->createTestableBillingProfile('custom', FALSE);
   }
 
-  public function createTestableBillingProfile($name, $withState) {
+  public function createTestableBillingProfile($name, $withState): array {
     $billingId = CRM_Core_BAO_LocationType::getBilling();
 
     $profile = $this->callAPISuccess('UFGroup', 'create', [
@@ -143,7 +173,7 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
    * indicates whether the billing block can be hidden, or not.
    */
   public function checkPaymentProcessorWithProfile($processorClass, $case) {
-    $whichProcessor = $case . "Processor";
+    $whichProcessor = $case . "ProcessorID";
     $whichProfile = $case . "Profile";
 
     $processor = new $processorClass();
