@@ -139,7 +139,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * Return a set of SQL queries whose cummulative weights will mark matched
    * records for the RuleGroup::threasholdQuery() to retrieve.
    */
-  public function tableQuery() {
+  private function tableQuery() {
     // make sure we've got a fetched dbrecord, not sure if this is enforced
     if (!$this->name == NULL || $this->is_reserved == NULL) {
       $this->find(TRUE);
