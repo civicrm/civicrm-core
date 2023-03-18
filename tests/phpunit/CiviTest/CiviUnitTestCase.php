@@ -3432,19 +3432,24 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Get parameters to set up a multi-line participant order.
    *
+   * @param null|int $eventId
+   *   Optional event ID. A new event will be created if no event ID is given.
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function getParticipantOrderParams(): array {
-    $event = $this->eventCreate();
-    $this->_eventId = $event['id'];
+  protected function getParticipantOrderParams($eventId = NULL): array {
+    if (!$eventId) {
+      $event = $this->eventCreate();
+      $eventId = $event['id'];
+    }
+
     $eventParams = [
-      'id' => $this->_eventId,
+      'id' => $eventId,
       'financial_type_id' => 4,
       'is_monetary' => 1,
     ];
     $this->callAPISuccess('event', 'create', $eventParams);
-    $priceFields = $this->createPriceSet('event', $this->_eventId);
+    $priceFields = $this->createPriceSet('event', $eventId);
     $orderParams = [
       'total_amount' => 300,
       'currency' => 'USD',
@@ -3469,7 +3474,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         ],
         'params' => [
           'financial_type_id' => 4,
-          'event_id' => $this->_eventId,
+          'event_id' => $eventId,
           'role_id' => 1,
           'status_id' => 14,
           'fee_currency' => 'USD',

@@ -57,13 +57,14 @@
 class CRM_Contact_Form_Search_Custom_PriceSetTest extends CiviUnitTestCase {
 
   public function testRunSearch() {
-    $order = $this->callAPISuccess('Order', 'create', $this->getParticipantOrderParams());
+    $event = $this->eventCreate();
+    $order = $this->callAPISuccess('Order', 'create', $this->getParticipantOrderParams($event['id']));
     $this->callAPISuccess('Payment', 'create', [
       'order_id' => $order['id'],
       'total_amount' => 50,
     ]);
     $this->validateAllPayments();
-    $formValues = ['event_id' => $this->_eventId];
+    $formValues = ['event_id' => $event['id']];
     $form = new CRM_Contact_Form_Search_Custom_PriceSet($formValues);
     $sql = $form->all();
     // Assert that we have created a standard temp table
