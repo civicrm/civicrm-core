@@ -528,6 +528,37 @@ contribution_recur.payment_instrument_id:name :Check
 
   }
 
+  public function testPledgeTokens(): void {
+    $pledgeID = $this->pledgeCreate(['contact_id' => $this->individualCreate(), 'create_date' => '2022-04-07', 'start_date' => '2022-04-07']);
+    $tokenProcessor = $this->getTokenProcessor(['schema' => ['pledgeId']]);
+    $list = $tokenProcessor->listTokens();
+    $this->assertEquals(array_merge($this->getPledgeTokens(), $this->getDomainTokens()), $list);
+    $tokenString = implode(', ', array_keys($this->getPledgeTokens()));
+    $tokenProcessor->addMessage('text', $tokenString, 'text/plain');
+    $tokenProcessor->addRow(['pledgeId' => $pledgeID]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals($this->getExpectedPledgeTokenOutput(), $tokenProcessor->getRow(0)->render('text'));
+  }
+
+  public function getExpectedPledgeTokenOutput(): string {
+    return '$100.00, US Dollar, year, 5, 15, 5, April 7th, 2022, April 7th, 2022, , ';
+  }
+
+  public function getPledgeTokens(): array {
+    return [
+      '{pledge.amount}' => 'Total Pledged',
+      '{pledge.currency:label}' => 'Pledge Currency',
+      '{pledge.frequency_unit:label}' => 'Pledge Frequency Unit',
+      '{pledge.frequency_interval}' => 'Pledge Frequency Interval',
+      '{pledge.frequency_day}' => 'Pledge day',
+      '{pledge.installments}' => 'Pledge Number of Installments',
+      '{pledge.start_date}' => 'Pledge Start Date',
+      '{pledge.create_date}' => 'Pledge Made',
+      '{pledge.cancel_date}' => 'Pledge Cancelled Date',
+      '{pledge.end_date}' => 'Pledge End Date',
+    ];
+  }
+
   /**
    * Get the advertised tokens the legacy function doesn't know about.
    *
