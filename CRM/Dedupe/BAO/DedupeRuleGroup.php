@@ -143,12 +143,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    */
   private static function importableFields($contactType): array {
 
-    $cacheKeyString = 'importableFields ' . $contactType . '_0_0_0_1';
-    $cacheKeyString .= '_' . CRM_Core_Config::domainID() . '_';
-
-    $fields = Civi::cache('fields')->get($cacheKeyString);
-
-    if (!$fields) {
+    if (TRUE) {
       $fields = CRM_Contact_DAO_Contact::import();
 
       // get the fields thar are meant for contact types
@@ -208,8 +203,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
       //Sorting fields in alphabetical order(CRM-1507)
       $fields = CRM_Utils_Array::crmArraySortByField($fields, 'title');
-
-      Civi::cache('fields')->set($cacheKeyString, $fields);
     }
     return $fields;
   }
