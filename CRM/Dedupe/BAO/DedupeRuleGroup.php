@@ -147,9 +147,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     $isProfile = FALSE;
     $checkPermission = TRUE;
     $withMultiCustomFields = FALSE;
-    if (empty($contactType)) {
-      $contactType = 'All';
-    }
 
     $cacheKeyString = "importableFields $contactType";
     $cacheKeyString .= $status ? '_1' : '_0';
@@ -202,34 +199,19 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       $fields = array_merge($fields, CRM_Core_DAO_Website::import());
       $fields['url']['hasWebsiteType'] = TRUE;
 
-      if ($contactType != 'All') {
-        $fields = array_merge($fields,
-          CRM_Core_BAO_CustomField::getFieldsForImport($contactType,
-            $showAll,
-            TRUE,
-            FALSE,
-            FALSE,
-            $withMultiCustomFields
-          )
-        );
-        // Unset the fields which are not related to their contact type.
-        foreach (CRM_Contact_DAO_Contact::import() as $name => $value) {
-          if (!empty($value['contactType']) && $value['contactType'] !== $contactType) {
-            unset($fields[$name]);
-          }
-        }
-      }
-      else {
-        foreach (CRM_Contact_BAO_ContactType::basicTypes() as $type) {
-          $fields = array_merge($fields,
-            CRM_Core_BAO_CustomField::getFieldsForImport($type,
-              $showAll,
-              FALSE,
-              FALSE,
-              FALSE,
-              $withMultiCustomFields
-            )
-          );
+      $fields = array_merge($fields,
+        CRM_Core_BAO_CustomField::getFieldsForImport($contactType,
+          $showAll,
+          TRUE,
+          FALSE,
+          FALSE,
+          $withMultiCustomFields
+        )
+      );
+      // Unset the fields which are not related to their contact type.
+      foreach (CRM_Contact_DAO_Contact::import() as $name => $value) {
+        if (!empty($value['contactType']) && $value['contactType'] !== $contactType) {
+          unset($fields[$name]);
         }
       }
 
