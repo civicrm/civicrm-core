@@ -141,18 +141,11 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @return array
    *   array of importable Fields
    */
-  private static function importableFields($contactType) {
-    $status = FALSE;
+  private static function importableFields($contactType): array {
     $showAll = FALSE;
-    $isProfile = FALSE;
-    $checkPermission = TRUE;
     $withMultiCustomFields = FALSE;
 
-    $cacheKeyString = "importableFields $contactType";
-    $cacheKeyString .= $status ? '_1' : '_0';
-    $cacheKeyString .= $showAll ? '_1' : '_0';
-    $cacheKeyString .= $isProfile ? '_1' : '_0';
-    $cacheKeyString .= $checkPermission ? '_1' : '_0';
+    $cacheKeyString = 'importableFields ' . $contactType . '_0_0_0_1';
     $cacheKeyString .= '_' . CRM_Core_Config::domainID() . '_';
 
     $fields = Civi::cache('fields')->get($cacheKeyString);
