@@ -241,19 +241,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
       Civi::cache('fields')->set($cacheKeyString, $fields);
     }
-
-    if (!$isProfile) {
-      if (!$status) {
-        $fields = array_merge(['do_not_import' => ['title' => ts('- do not import -')]],
-          $fields
-        );
-      }
-      else {
-        $fields = array_merge(['' => ['title' => ts('- Contact Fields -')]],
-          $fields
-        );
-      }
-    }
     return $fields;
   }
 
