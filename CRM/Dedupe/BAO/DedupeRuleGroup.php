@@ -215,27 +215,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         }
       }
 
-      if ($isProfile) {
-        $fields = array_merge($fields, [
-          'group' => [
-            'title' => ts('Group(s)'),
-            'name' => 'group',
-          ],
-          'tag' => [
-            'title' => ts('Tag(s)'),
-            'name' => 'tag',
-          ],
-          'note' => [
-            'title' => ts('Note'),
-            'name' => 'note',
-          ],
-          'communication_style_id' => [
-            'title' => ts('Communication Style'),
-            'name' => 'communication_style_id',
-          ],
-        ]);
-      }
-
       //Sorting fields in alphabetical order(CRM-1507)
       $fields = CRM_Utils_Array::crmArraySortByField($fields, 'title');
 
