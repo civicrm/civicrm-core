@@ -526,67 +526,54 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *   pairs to insert in new contact.
    * @param array $values
    *   The reformatted properties that we can use internally.
-   * @param bool $create
    *
    * @throws \CRM_Core_Exception
    */
-  private function deprecatedFormatParams($params, &$values, $create = FALSE): void {
+  private function deprecatedFormatParams($params, &$values): void {
     // copy all the contribution fields as is
-    require_once 'api/v3/utils.php';
+    if (empty($params['pledge_id'])) {
+      return;
+    }
+    // get total amount of from import fields
+    $totalAmount = $params['total_amount'] ?? NULL;
+    $contributionContactID = $params['contact_id'];
+    // we need to get contact id $contributionContactID to
+    // retrieve pledge details as well as to validate pledge ID
 
-    foreach ($params as $key => $value) {
-      // ignore empty values or empty arrays etc
-      if (CRM_Utils_System::isNull($value)) {
-        continue;
+    // first need to check for update mode
+    if (!empty($params['id'])) {
+      $contribution = new CRM_Contribute_DAO_Contribution();
+      if ($params['id']) {
+        $contribution->id = $params['id'];
       }
 
-      switch ($key) {
-
-        case 'pledge_id':
-          // get total amount of from import fields
-          $totalAmount = $params['total_amount'] ?? NULL;
-          $contributionContactID = $params['contact_id'];
-          // we need to get contact id $contributionContactID to
-          // retrieve pledge details as well as to validate pledge ID
-
-          // first need to check for update mode
-          if (!empty($params['id'])) {
-            $contribution = new CRM_Contribute_DAO_Contribution();
-            if ($params['id']) {
-              $contribution->id = $params['id'];
-            }
-
-            if ($contribution->find(TRUE)) {
-              if (!$totalAmount) {
-                $totalAmount = $contribution->total_amount;
-              }
-            }
-            else {
-              throw new CRM_Core_Exception('No match found for specified contact in pledge payment data. Row was skipped.', CRM_Import_Parser::ERROR);
-            }
-          }
-
-          if (!empty($params['pledge_id'])) {
-            if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $contributionContactID) {
-              throw new CRM_Core_Exception('Invalid Pledge ID provided. Contribution row was skipped.', CRM_Import_Parser::ERROR);
-            }
-            $values['pledge_id'] = $params['pledge_id'];
-          }
-
-          // we need to check if oldest payment amount equal to contribution amount
-          require_once 'CRM/Pledge/BAO/PledgePayment.php';
-          $pledgePaymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($values['pledge_id']);
-
-          if ($pledgePaymentDetails['amount'] == $totalAmount) {
-            $values['pledge_payment_id'] = $pledgePaymentDetails['id'];
-          }
-          else {
-            throw new CRM_Core_Exception('Contribution and Pledge Payment amount mismatch for this record. Contribution row was skipped.', CRM_Import_Parser::ERROR);
-          }
-          break;
-
+      if ($contribution->find(TRUE)) {
+        if (!$totalAmount) {
+          $totalAmount = $contribution->total_amount;
+        }
+      }
+      else {
+        throw new CRM_Core_Exception('No match found for specified contact in pledge payment data. Row was skipped.', CRM_Import_Parser::ERROR);
       }
     }
+
+    if (!empty($params['pledge_id'])) {
+      if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $contributionContactID) {
+        throw new CRM_Core_Exception('Invalid Pledge ID provided. Contribution row was skipped.', CRM_Import_Parser::ERROR);
+      }
+      $values['pledge_id'] = $params['pledge_id'];
+    }
+
+    // we need to check if oldest payment amount equal to contribution amount
+    $pledgePaymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($values['pledge_id']);
+
+    if ($pledgePaymentDetails['amount'] == $totalAmount) {
+      $values['pledge_payment_id'] = $pledgePaymentDetails['id'];
+    }
+    else {
+      throw new CRM_Core_Exception('Contribution and Pledge Payment amount mismatch for this record. Contribution row was skipped.', CRM_Import_Parser::ERROR);
+    }
+
   }
 
   /**
