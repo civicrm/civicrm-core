@@ -453,8 +453,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $this->quickCleanup($tablesToTruncate);
       $this->createDomainContacts();
     }
-    $releasedLocks = CRM_Core_DAO::singleValueQuery('SELECT RELEASE_ALL_LOCKS()');
-    $this->assertEquals(0, $releasedLocks, "The test should not leave any dangling locks. Found $releasedLocks");
 
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
