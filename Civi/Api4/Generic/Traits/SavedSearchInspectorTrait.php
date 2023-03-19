@@ -46,13 +46,14 @@ trait SavedSearchInspectorTrait {
 
   /**
    * If SavedSearch is supplied as a string, this will load it as an array
+   * @param int|null $id
+   * @throws UnauthorizedException
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function loadSavedSearch() {
-    if (is_string($this->savedSearch)) {
+  protected function loadSavedSearch(int $id = NULL) {
+    if ($id || is_string($this->savedSearch)) {
       $this->savedSearch = SavedSearch::get(FALSE)
-        ->addWhere('name', '=', $this->savedSearch)
+        ->addWhere($id ? 'id' : 'name', '=', $id ?: $this->savedSearch)
         ->execute()->single();
     }
     if (is_array($this->savedSearch)) {
@@ -64,6 +65,8 @@ trait SavedSearchInspectorTrait {
       ];
       $this->savedSearch['api_params'] += ['version' => 4, 'select' => [], 'where' => []];
     }
+    // Reset internal cached metadata
+    $this->_selectQuery = $this->_selectClause = $this->_searchEntityFields = NULL;
     $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
   }
 
