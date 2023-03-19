@@ -73,6 +73,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'domain_id' => 1,
       'payment_processor_type_id' => 'Dummy',
       'name' => $pp_name,
+      'title' => $pp_name,
       'user_name' => $pp_name,
       'class_name' => 'Payment_Dummy',
       'url_site' => 'https://test.com/',

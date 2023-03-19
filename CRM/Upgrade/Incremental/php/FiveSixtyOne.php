@@ -48,7 +48,16 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
    *   The version number matching this function name
    */
   public function upgrade_5_61_alpha1($rev): void {
+    // First add `frontend_title` column *without* NOT NULL constraint
+    $this->addTask('Add frontend_title to civicrm_payment_processor', 'addColumn',
+      'civicrm_payment_processor', 'frontend_title', "varchar(255) COMMENT 'Name of processor when shown to users making a payment.'", TRUE, '5.61.alpha1'
+    );
+    // Sql contains updates to fill paymentProcessor title & frontend_title
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Make PaymentProcessor.name required', 'alterColumn', 'civicrm_payment_processor', 'name', "varchar(64) NOT NULL COMMENT 'Payment Processor Name.'");
+    $this->addTask('Make PaymentProcessor.title required', 'alterColumn', 'civicrm_payment_processor', 'title', "varchar(255) NOT NULL COMMENT 'Name of processor when shown to CiviCRM administrators.'", TRUE);
+    $this->addTask('Make PaymentProcessor.frontend_title required', 'alterColumn', 'civicrm_payment_processor', 'frontend_title', "varchar(255) NOT NULL COMMENT 'Name of processor when shown to users making a payment.'", TRUE);
+
     $this->addTask(ts('Dedupe cache table'), 'dedupeCache');
     $this->addTask(ts('Drop index %1', [1 => 'civicrm_cache.UI_group_path_date']), 'dropIndex', 'civicrm_cache', 'UI_group_path_date');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.UI_group_name_path']), 'addIndex', 'civicrm_cache', [['group_name', 'path']], 'UI');

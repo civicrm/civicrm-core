@@ -974,7 +974,7 @@ class CRM_Core_DAO extends DB_DataObject {
       CRM_Core_BAO_CustomValueTable::store($record['custom'], static::$_tableName, $instance->$idField, $op);
     }
 
-    \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance);
+    \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance, $record);
 
     return $instance;
   }
@@ -1026,7 +1026,7 @@ class CRM_Core_DAO extends DB_DataObject {
     // For other operations this hook is passed an incomplete object and hook listeners can load if needed.
     // But that's not possible with delete because it's gone from the database by the time this hook is called.
     // So in this case the object has been pre-loaded so hook listeners have access to the complete record.
-    CRM_Utils_Hook::post('delete', $entityName, $record[$idField], $instance);
+    CRM_Utils_Hook::post('delete', $entityName, $record[$idField], $instance, $record);
 
     return $instance;
   }
