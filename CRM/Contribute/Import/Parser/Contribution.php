@@ -526,13 +526,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    *   pairs to insert in new contact.
    * @param array $values
    *   The reformatted properties that we can use internally.
-   * @param bool $create
    *
    * @throws \CRM_Core_Exception
    */
-  private function deprecatedFormatParams($params, &$values, $create = FALSE): void {
+  private function deprecatedFormatParams($params, &$values): void {
     // copy all the contribution fields as is
-    require_once 'api/v3/utils.php';
     if (empty($params['pledge_id'])) {
       return;
     }
@@ -567,7 +565,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     }
 
     // we need to check if oldest payment amount equal to contribution amount
-    require_once 'CRM/Pledge/BAO/PledgePayment.php';
     $pledgePaymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($values['pledge_id']);
 
     if ($pledgePaymentDetails['amount'] == $totalAmount) {

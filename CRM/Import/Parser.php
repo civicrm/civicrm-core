@@ -1055,7 +1055,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
 
     // first add core contact values since for other Civi modules they are not added
-    require_once 'CRM/Contact/BAO/Contact.php';
     $contactFields = CRM_Contact_DAO_Contact::fields();
     _civicrm_api3_store_values($contactFields, $values, $params);
 
