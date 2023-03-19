@@ -69,54 +69,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   protected $_separator;
 
   /**
-   * Running total number of valid soft credit rows
-   * @var int
-   */
-  protected $_validSoftCreditRowCount;
-
-  /**
-   * Running total number of invalid soft credit rows
-   * @var int
-   */
-  protected $_invalidSoftCreditRowCount;
-
-  /**
-   * Running total number of valid pledge payment rows
-   * @var int
-   */
-  protected $_validPledgePaymentRowCount;
-
-  /**
-   * Running total number of invalid pledge payment rows
-   * @var int
-   */
-  protected $_invalidPledgePaymentRowCount;
-
-  /**
    * Array of pledge payment error lines, bounded by MAX_ERROR
    * @var array
    */
   protected $_pledgePaymentErrors;
-
-  /**
-   * Array of pledge payment error lines, bounded by MAX_ERROR
-   * @var array
-   */
-  protected $_softCreditErrors;
-
-  /**
-   * Filename of pledge payment error data
-   *
-   * @var string
-   */
-  protected $_pledgePaymentErrorsFileName;
-
-  /**
-   * Filename of soft credit error data
-   *
-   * @var string
-   */
-  protected $_softCreditErrorsFileName;
 
   /**
    * Get the field mappings for the import.
@@ -559,15 +515,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       return TRUE;
     }
     return FALSE;
-  }
-
-  /**
-   * Get the array of successfully imported contribution id's
-   *
-   * @return array
-   */
-  public function &getImportedContributions() {
-    return $this->_newContributions;
   }
 
   /**
