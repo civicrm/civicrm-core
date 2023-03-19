@@ -57,9 +57,15 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
 
   /**
    * Shared preProcess code.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $this->assignMapFieldVariables();
+    $this->addExpectedSmartyVariables(['highlightedRelFields', 'initHideBoxes']);
+    $this->assign('columnNames', $this->getColumnHeaders());
+    $this->assign('showColumnNames', $this->getSubmittedValue('skipColumnHeader') || $this->getSubmittedValue('dataSource') !== 'CRM_Import_DataSource');
+    $this->assign('highlightedFields', $this->getHighlightedFields());
+    $this->assign('dataValues', array_values($this->getDataRows([], 2)));
     $this->_mapperFields = $this->getAvailableFields();
     asort($this->_mapperFields);
     parent::preProcess();

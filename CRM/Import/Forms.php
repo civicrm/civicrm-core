@@ -680,19 +680,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
-   * Assign variables required for the MapField form.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function assignMapFieldVariables(): void {
-    $this->addExpectedSmartyVariables(['highlightedRelFields', 'initHideBoxes']);
-    $this->assign('columnNames', $this->getColumnHeaders());
-    $this->assign('showColumnNames', $this->getSubmittedValue('skipColumnHeader') || $this->getSubmittedValue('dataSource') !== 'CRM_Import_DataSource');
-    $this->assign('highlightedFields', $this->getHighlightedFields());
-    $this->assign('dataValues', array_values($this->getDataRows([], 2)));
-  }
-
-  /**
    * Get the fields to be highlighted in the UI.
    *
    * The highlighted fields are those used to match
