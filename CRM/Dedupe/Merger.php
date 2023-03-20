@@ -736,6 +736,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     elseif (array_key_exists('contact_sub_type_hidden', $params) &&
       !empty($params['contact_sub_type_hidden'])
     ) {
+      CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
       // if profile was used, and had any subtype, we obtain it from there
       //CRM-13596 - add to existing contact types, rather than overwriting
       if (empty($data['contact_sub_type'])) {
@@ -770,6 +771,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (array_key_exists($blk, $params) &&
         !is_array($params[$blk])
       ) {
+        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
         unset($params[$blk]);
       }
     }
@@ -780,6 +782,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
 
       if ($locTypeId == 'Primary') {
+        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
         if (in_array($fieldName, $blocks)) {
           $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, $fieldName);
         }
@@ -793,6 +796,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         !in_array($fieldName, $multiplFields) &&
         substr($fieldName, 0, 7) != 'custom_'
       ) {
+        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
         $index = $locTypeId;
 
         if (is_numeric($typeId)) {
@@ -905,11 +909,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
       else {
         if (substr($key, 0, 4) === 'url-') {
+          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
           $websiteField = explode('-', $key);
           $data['website'][$websiteField[1]]['website_type_id'] = $websiteField[1];
           $data['website'][$websiteField[1]]['url'] = $value;
         }
         elseif (in_array($key, CRM_Contact_BAO_Contact::$_greetingTypes, TRUE)) {
+          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
           //save email/postal greeting and addressee values if any, CRM-4575
           $data[$key . '_id'] = $value;
         }
@@ -933,6 +939,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           $valueId = NULL;
           if (!empty($params['customRecordValues'])) {
+            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
             if (is_array($params['customRecordValues']) && !empty($params['customRecordValues'])) {
               foreach ($params['customRecordValues'] as $recId => $customFields) {
                 if (is_array($customFields) && !empty($customFields)) {
@@ -949,6 +956,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           //CRM-13596 - check for contact_sub_type_hidden first
           if (array_key_exists('contact_sub_type_hidden', $params)) {
+            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
             $type = $params['contact_sub_type_hidden'];
           }
           else {
@@ -969,10 +977,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           );
         }
         elseif ($key === 'edit') {
+          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
           continue;
         }
         else {
           if ($key === 'location') {
+            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
             foreach ($value as $locationTypeId => $field) {
               foreach ($field as $block => $val) {
                 if ($block === 'address' && array_key_exists('address_name', $val)) {
@@ -982,6 +992,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             }
           }
           if ($key === 'phone' && isset($params['phone_ext'])) {
+            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
             $data[$key] = $value;
             foreach ($value as $cnt => $phoneBlock) {
               if ($params[$key][$cnt]['location_type_id'] == $params['phone_ext'][$cnt]['location_type_id']) {
