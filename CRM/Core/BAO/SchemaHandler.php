@@ -268,13 +268,13 @@ ALTER TABLE {$tableName}
   }
 
   /**
-   * Delete a CiviCRM-table.
+   * Drop a table if it exists.
    *
    * @param string $tableName
-   *   Name of the table to be created.
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function dropTable($tableName) {
-    $sql = "DROP TABLE $tableName";
+  public static function dropTable(string $tableName): void {
+    $sql = "DROP TABLE IF EXISTS $tableName";
     CRM_Core_DAO::executeQuery($sql);
   }
 
