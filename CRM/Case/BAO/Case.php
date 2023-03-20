@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Activity;
 
 /**
  * This class contains the functions for Case Management.
@@ -1738,44 +1739,34 @@ HERESQL;
       // The assignee is not the client.
       if ($dao->rel_contact_id != $contactId) {
         $caseRelationship = $dao->relation_a_b;
-        $assigneContactName = $dao->clientName;
-        $assigneContactIds[$dao->rel_contact_id] = $dao->rel_contact_id;
+        $assigneeContactName = $dao->clientName;
+        $assigneeContactIds[$dao->rel_contact_id] = $dao->rel_contact_id;
       }
       else {
         $caseRelationship = $dao->relation_b_a;
-        $assigneContactName = $dao->assigneeContactName;
-        $assigneContactIds[$dao->assign_contact_id] = $dao->assign_contact_id;
+        $assigneeContactName = $dao->assigneeContactName;
+        $assigneeContactIds[$dao->assign_contact_id] = $dao->assign_contact_id;
       }
     }
 
-    $session = CRM_Core_Session::singleton();
-    $activityParams = [
-      'source_contact_id' => $session->get('userID'),
-      'subject' => $caseRelationship . ' : ' . $assigneContactName,
-      'activity_date_time' => date('YmdHis'),
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
-    ];
+    $assignCaseRoleActivity = Activity::create(FALSE)
+      ->addValue('source_contact_id', 'user_contact_id')
+      ->addValue('subject', $caseRelationship . ' : ' . $assigneeContactName)
+      ->addValue('activity_date_time', 'now')
+      ->addValue('status_id:name', 'Completed')
+      ->addValue('case_id', $caseId);
 
     //if $relContactId is passed, role is added or modified.
     if (!empty($relContactId)) {
-      $activityParams['assignee_contact_id'] = $assigneContactIds;
-      $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Assign Case Role');
+      $assignCaseRoleActivity
+        ->addValue('assignee_contact_id', $assigneeContactIds)
+        ->addValue('activity_type_id:name', 'Assign Case Role');
     }
     else {
-      $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Remove Case Role');
+      $assignCaseRoleActivity->addValue('activity_type_id:name', 'Remove Case Role');
     }
 
-    $activityParams['activity_type_id'] = $activityTypeID;
-
-    $activity = CRM_Activity_BAO_Activity::create($activityParams);
-
-    //create case_activity record.
-    $caseParams = [
-      'activity_id' => $activity->id,
-      'case_id' => $caseId,
-    ];
-
-    CRM_Case_BAO_Case::processCaseActivity($caseParams);
+    $assignCaseRoleActivity->execute();
   }
 
   /**
