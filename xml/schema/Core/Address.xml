@@ -13,6 +13,11 @@
     <uniqueName>address_id</uniqueName>
     <type>int unsigned</type>
     <export>true</export>
+    <usage>
+      <import>false</import>
+      <export>true</export>
+      <duplicate_matching>false</duplicate_matching>
+    </usage>
     <title>Address ID</title>
     <required>true</required>
     <comment>Unique Address ID</comment>
