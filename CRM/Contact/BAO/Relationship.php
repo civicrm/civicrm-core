@@ -618,8 +618,25 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
         ];
       }
       $contact_id_a = empty($params['contact_id_a']) ? $relationship->contact_id_a : $params['contact_id_a'];
-      // calling relatedMemberships to delete/add the memberships of
-      // related contacts.
+
+      // Check if relationship can be used for related memberships
+      $membershipTypes = \Civi\Api4\MembershipType::get(FALSE)
+        ->addSelect('relationship_type_id')
+        ->addGroupBy('relationship_type_id')
+        ->addWhere('relationship_type_id', 'IS NOT EMPTY')
+        ->execute();
+      foreach ($membershipTypes as $membershipType) {
+        // We have to loop through them because relationship_type_id is an array and we can't filter by a single
+        // relationship id using API.
+        if (in_array($relationship->relationship_type_id, $membershipType['relationship_type_id'])) {
+          $relationshipIsUsedForRelatedMemberships = TRUE;
+        }
+      }
+      if (empty($relationshipIsUsedForRelatedMemberships)) {
+        // This relationship is not configured for any related membership types
+        return;
+      }
+      // Call relatedMemberships to delete/add the memberships of related contacts.
       if ($action & CRM_Core_Action::DISABLE) {
         // @todo this could call a subset of the function that just relates to
         // cleaning up no-longer-inherited relationships
