@@ -928,7 +928,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // store the submitted values in an array
     if (!$params) {
-      $params = $this->controller->exportValues($this->_name);
+      $params = $this->getSubmittedValues();
+    }
+    else {
+      CRM_Core_Error::deprecatedWarning('passing params into postProcess is deprecated. Match parent function');
     }
 
     // Set activity type id.
