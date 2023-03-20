@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Report\OutputHandlerFactory;
+
 /**
  * Class CRM_Report_Form
  */
@@ -549,6 +551,11 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @var string[]
    */
   protected $_charts = [];
+
+  /**
+   * @var \Civi\Report\OutputHandlerInterface
+   */
+  private $outputHandler;
 
   /**
    * Get the number of rows to show
@@ -6065,8 +6072,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * If there is no suitable output handler, e.g. if outputMode is "copy",
    * then this sets it to NULL.
    */
-  public function setOutputHandler() {
-    $this->outputHandler = \Civi\Report\OutputHandlerFactory::singleton()->create($this);
+  public function setOutputHandler(): void {
+    $this->outputHandler = OutputHandlerFactory::singleton()->create($this);
   }
 
   /**
@@ -6105,10 +6112,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     // since it shouldn't have any outputMode-related `if` statements in it.
     // Someday could remove the param from the function call.
     if (CRM_Report_Utils_Report::mailReport($mailBody, $this->_id, $this->_outputMode, $attachments)) {
-      CRM_Core_Session::setStatus(ts("Report mail has been sent."), ts('Sent'), 'success');
+      CRM_Core_Session::setStatus(ts('Report mail has been sent.'), ts('Sent'), 'success');
     }
     else {
-      CRM_Core_Session::setStatus(ts("Report mail could not be sent."), ts('Mail Error'), 'error');
+      CRM_Core_Session::setStatus(ts('Report mail could not be sent.'), ts('Mail Error'), 'error');
     }
   }
 
