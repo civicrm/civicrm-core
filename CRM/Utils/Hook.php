@@ -1611,6 +1611,8 @@ abstract class CRM_Utils_Hook {
    * This hook is called after a row has been processed and the
    * record (and associated records imported
    *
+   * @deprecated
+   *
    * @param string $object
    *   Object being imported (for now Contact only, later Contribution, Activity,.
    *                               Participant and Member)
@@ -1633,6 +1635,31 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(['object', 'usage', 'objectRef', 'params'], $object, $usage, $objectRef, $params,
       $null, $null,
       'civicrm_import'
+    );
+  }
+
+  /**
+   * Alter import mappings.
+   *
+   * @param string $importType This corresponds to the value in `civicrm_user_job.job_type`.
+   * @param string $context import or validate.
+   *   In validate context only 'cheap' lookups should be done (e.g. using cached information).
+   *   Validate is intended to quickly process a whole file for errors. You should focus on
+   *   setting or unsetting key values to or from `'invalid_import_value'`.
+   *
+   *   During import mode heavier lookups can be done (e.g using custom logic to find the
+   *   relevant contact) as this is then passed to the api functions. If a row is invalid during
+   *   import mode you should throw an exception.
+   * @param array $mappedRow (reference) The rows that have been mapped to an array of params.
+   * @param array $rowValues The row from the data source (non-associative array)
+   * @param int $userJobID id from civicrm_user_job
+   *
+   * @return mixed
+   */
+  public static function importAlterMappedRow(string $importType, string $context, array &$mappedRow, array $rowValues, int $userJobID) {
+    $null = NULL;
+    return self::singleton()->invoke(['importType', 'context', 'mappedRow', 'rowValues', 'userJobID', 'fieldMappings'], $context, $importType, $mappedRow, $rowValues, $userJobID, $null,
+      'civicrm_importAlterMappedRow'
     );
   }
 

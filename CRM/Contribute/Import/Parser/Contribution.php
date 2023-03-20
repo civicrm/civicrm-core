@@ -205,6 +205,25 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
   }
 
   /**
+   * Validate the import values.
+   *
+   * This overrides the parent to call the hook - cos the other imports are not
+   * yet stable enough to add the hook to. If we add the hook to them now and then
+   * later switch them to APIv4 style keys we will have to worry about hook consumers.
+   *
+   * The values array represents a row in the datasource.
+   *
+   * @param array $values
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function validateValues(array $values): void {
+    $params = $this->getMappedRow($values);
+    CRM_Utils_Hook::importAlterMappedRow('validate', 'contribution_import', $params, $values, $this->getUserJobID());
+    $this->validateParams($params);
+  }
+
+  /**
    * Override parent to cope with params being separated by entity already.
    *
    * @todo - make this the parent method...
@@ -397,6 +416,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
+      CRM_Utils_Hook::importAlterMappedRow('import', 'contribution_import', $params, $values, $this->getUserJobID());
+
       $contributionParams = $params['Contribution'];
       //CRM-10994
       if (isset($contributionParams['total_amount']) && $contributionParams['total_amount'] == 0) {
