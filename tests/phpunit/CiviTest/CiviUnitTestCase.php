@@ -453,8 +453,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $this->quickCleanup($tablesToTruncate);
       $this->createDomainContacts();
     }
-    $releasedLocks = CRM_Core_DAO::singleValueQuery('SELECT RELEASE_ALL_LOCKS()');
-    $this->assertEquals(0, $releasedLocks, "The test should not leave any dangling locks. Found $releasedLocks");
+
+    // If a test leaks an extraneous hold on a lock, then we want that test to fail (rather than
+    // proceeding and causing spooky effects on other tests).
+    $dbVer = CRM_Utils_SQL::getDatabaseVersion();
+    if (!preg_match('/maria/i', $dbVer) || version_compare($dbVer, '10.5.2', '>=')) {
+      // Supported by MySQL 5.7+ or MariaDB 10.5.2+. These provide some herd immunity.
+      $releasedLocks = CRM_Core_DAO::singleValueQuery('SELECT RELEASE_ALL_LOCKS()');
+      $this->assertEquals(0, $releasedLocks, "The test should not leave any dangling locks. Found $releasedLocks");
+    }
 
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
