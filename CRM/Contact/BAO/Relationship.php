@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Relationship;
+
 /**
  * Class CRM_Contact_BAO_Relationship.
  */
@@ -2171,13 +2173,14 @@ AND cc.sort_name LIKE '%$name%'";
    */
   private static function isContactHasValidRelationshipToInheritMembershipType(int $contactID, int $membershipTypeID, int $parentMembershipID): bool {
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
-    $existingRelationships = civicrm_api3('Relationship', 'get', [
-      'contact_id_a' => $contactID,
-      'contact_id_b' => $contactID,
-      'relationship_type_id' => ['IN' => $membershipType['relationship_type_id']],
-      'options' => ['or' => [['contact_id_a', 'contact_id_b']], 'limit' => 0],
-      'is_active' => 1,
-    ])['values'];
+
+    $existingRelationships = Relationship::get(FALSE)
+      ->addWhere('relationship_type_id', 'IN', $membershipType['relationship_type_id'])
+      ->addClause('OR', ['contact_id_a', '=', $contactID], ['contact_id_b', '=', $contactID])
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->indexBy('id')
+      ->getArrayCopy();
 
     if (empty($existingRelationships)) {
       return FALSE;
