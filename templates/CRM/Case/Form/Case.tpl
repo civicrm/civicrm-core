@@ -105,9 +105,11 @@
     </td>
 </tr>
 
+{if $isTagset}
 <tr class="crm-case-form-block-tag_set">
     {include file="CRM/common/Tagset.tpl" tagsetType='case' tableLayout=true}
 </tr>
+{/if}
 
 </table>
 {/if}
