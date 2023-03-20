@@ -156,19 +156,6 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
-   * Get values submitted on any form in the multi-page import flow.
-   *
-   * @return array
-   */
-  public function getSubmittedValues(): array {
-    $values = [];
-    foreach (array_keys($this->getSubmittableFields()) as $key) {
-      $values[$key] = $this->getSubmittedValue($key);
-    }
-    return $values;
-  }
-
-  /**
    * Get the available datasource.
    *
    * Permission dependent, this will look like
@@ -206,7 +193,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * 2) User changes the source to SQL - the ajax updates the html but the
    * form was built with the expectation that the csv-specific fields would be
    * required.
-   * 3) When the user submits Quickform calls preProcess and buildForm and THEN
+   * 3) When the user submits QuickForm calls preProcess and buildForm and THEN
    * retrieves the submitted values based on what has been added in buildForm.
    * Only the submitted values for fields added in buildForm are available - but
    * these have to be added BEFORE the submitted values are determined. Hence
@@ -316,6 +303,8 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * This is called as a snippet in DataSourceConfig and
    * also from DataSource::buildForm to add the fields such
    * that quick form picks them up.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function getDataSourceFields(): array {
     $className = $this->getDataSourceClassName();

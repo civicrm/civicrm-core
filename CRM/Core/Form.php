@@ -206,6 +206,40 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Get values submitted by the user.
+   *
+   * Compared with $this->controller->exportValues this has a couple of changes
+   * 1) any fields declared in $this->submittableMoneyFields will be de-formatted first.
+   * 2) it is possible to store access fields from related forms if they
+   * are declared in `getSubmittableFields()`. This is notably used in imports
+   * to combine fields from the various screens & save the resulting 'submitted_values'
+   * to the UserJob.
+   *
+   * @return array
+   */
+  public function getSubmittedValues(): array {
+    $values = [];
+    foreach (array_keys($this->getSubmittableFields()) as $key) {
+      $values[$key] = $this->getSubmittedValue($key);
+    }
+    return $values;
+  }
+
+  /**
+   * Get the fields that can be submitted in this form flow.
+   *
+   * To make fields in related forms (ie within the same wizard like
+   * Contribution_Main and Contribution_Confirm) accessible you can override
+   * this function as CRM_Import_Forms does.
+   *
+   * @return string[]
+   */
+  protected function getSubmittableFields(): array {
+    $fieldNames = array_keys($this->controller->exportValues($this->_name));
+    return array_fill_keys($fieldNames, $this->_name);
+  }
+
+  /**
    * Set context variable.
    */
   public function setContext() {
