@@ -1398,10 +1398,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @throws \CRM_Core_Exception
    */
   public static function relatedMemberships($contactId, $params, $ids, $action = CRM_Core_Action::ADD, $active = TRUE) {
-    // Check the end date and set the status of the relationship
-    // accordingly.
+    // Check the end date and set the status of the relationship accordingly.
     $status = self::CURRENT;
-    $targetContact = $targetContact = CRM_Utils_Array::value('contact_check', $params, []);
+    $targetContact = $params['contact_check'] ?? [];
     $today = date('Ymd');
 
     // If a relationship hasn't yet started, just return for now
@@ -1451,8 +1450,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     // Build the 'values' array for
     // 1. ContactA
     // 2. ContactB
-    // This will allow us to check if either of the contacts in
-    // relationship have active memberships.
+    // This will allow us to check if either of the contacts in relationship have active memberships.
 
     $values = [];
 
@@ -1511,8 +1509,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           ($status & self::PAST) &&
           ($membershipValues['owner_membership_id'])
         ) {
-          // If relationship is PAST and action is UPDATE
-          // then delete the RELATED membership
+          // If relationship is PAST and action is UPDATE then delete the RELATED membership
           CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'],
             $membershipValues['contact_id']
           );
@@ -1538,9 +1535,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         }
         $relTypeDir = $details['relationshipTypeId'] . $details['relationshipTypeDirection'];
         if (in_array($relTypeDir, $relTypeDirs)) {
-          // Check if relationship being created/updated is
-          // similar to that of membership type's
-          // relationship.
+          // Check if relationship being created/updated is similar to that of membership type's relationship.
 
           $membershipValues['owner_membership_id'] = $membershipId;
           unset($membershipValues['id']);
@@ -1563,11 +1558,10 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
                 continue;
               }
 
-              //delete the membership record for related
-              //contact before creating new membership record.
+              // delete the membership record for related contact before creating new membership record.
               CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId, $relatedContactId);
             }
-            //skip status calculation for pay later memberships.
+            // skip status calculation for pay later memberships.
             if ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipValues['status_id'])) {
               $membershipValues['skipStatusCal'] = TRUE;
             }
