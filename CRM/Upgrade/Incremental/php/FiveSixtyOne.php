@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+use Civi\Api4\MappingField;
+
 /**
  * Upgrade logic for the 5.61.x series.
  *
@@ -50,6 +53,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
     $this->addTask(ts('Drop index %1', [1 => 'civicrm_cache.UI_group_path_date']), 'dropIndex', 'civicrm_cache', 'UI_group_path_date');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.UI_group_name_path']), 'addIndex', 'civicrm_cache', [['group_name', 'path']], 'UI');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.index_expired_date']), 'addIndex', 'civicrm_cache', [['expired_date']], 'index');
+    $this->addTask(ts('Update Saved Mapping for contribution import', [1 => $rev]), 'convertMappingFieldsToApi4StyleNames', $rev);
   }
 
   /**
@@ -67,7 +71,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
   public static function dedupeCache($ctx): bool {
     $duplicates = CRM_Core_DAO::executeQuery('
       SELECT c.id FROM civicrm_cache c
-      LEFT JOIN (SELECT group_name, path, max(created_date) newest FROM civicrm_cache GROUP BY group_name, path) recent
+      LEFT JOIN (SELECT group_name, path, MAX(created_date) newest FROM civicrm_cache GROUP BY group_name, path) recent
         ON (c.group_name=recent.group_name AND c.path=recent.path AND c.created_date=recent.newest)
       WHERE recent.newest IS NULL')
       ->fetchMap('id', 'id');
@@ -77,7 +81,39 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
         ->param('IDS', $duplicates)
         ->execute();
     }
+    return TRUE;
+  }
 
+  /**
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnused
+   */
+  public static function convertMappingFieldsToApi4StyleNames(): bool {
+    $mappings = MappingField::get(FALSE)
+      ->setSelect(['id', 'name'])
+      ->addWhere('mapping_id.mapping_type_id:name', '=', 'Import Contribution')
+      ->execute();
+
+    $fieldMap = [
+      'contribution_cancel_date' => 'cancel_date',
+      'contribution_check_number' => 'check_number',
+      'contribution_campaign_id' => 'campaign_id',
+    ];
+    $apiv4 = Contribution::getFields(FALSE)->addWhere('custom_field_id', '>', 0)->execute();
+    foreach ($apiv4 as $apiv4Field) {
+      $fieldMap['custom_' . $apiv4Field['id']] = $apiv4Field['name'];
+    }
+
+    // Update the mapped fields.
+    foreach ($mappings as $mapping) {
+      if (!empty($fieldMap[$mapping['name']])) {
+        MappingField::update(FALSE)
+          ->addWhere('id', '=', $mapping['id'])
+          ->addValue('name', $fieldMap[$mapping['name']])
+          ->execute();
+      }
+    }
     return TRUE;
   }
 

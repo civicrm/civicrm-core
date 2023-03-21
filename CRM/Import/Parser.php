@@ -1594,20 +1594,34 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       return CRM_Utils_Rule::email($importedValue) ? $importedValue : 'invalid_import_value';
     }
 
-    if ($fieldMetadata['type'] === CRM_Utils_Type::T_FLOAT) {
+    // DataType is defined on apiv4 metadata - ie what we are moving to.
+    $typeMap = [
+      CRM_Utils_Type::T_FLOAT => 'Float',
+      CRM_Utils_Type::T_MONEY => 'Money',
+      CRM_Utils_Type::T_BOOLEAN => 'Boolean',
+      CRM_Utils_Type::T_DATE => 'Date',
+      (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME) => 'Timestamp',
+      CRM_Utils_Type::T_TIMESTAMP => 'Timestamp',
+      CRM_Utils_Type::T_INT => 'Integer',
+      CRM_Utils_Type::T_TEXT => 'String',
+      CRM_Utils_Type::T_STRING => 'String',
+    ];
+    $dataType = $fieldMetadata['data_type'] ?? $typeMap[$fieldMetadata['type']];
+
+    if ($dataType === 'Float') {
       return CRM_Utils_Rule::numeric($importedValue) ? $importedValue : 'invalid_import_value';
     }
-    if ($fieldMetadata['type'] === CRM_Utils_Type::T_MONEY) {
+    if ($dataType === 'Money') {
       return CRM_Utils_Rule::money($importedValue, TRUE) ? CRM_Utils_Rule::cleanMoney($importedValue) : 'invalid_import_value';
     }
-    if ($fieldMetadata['type'] === CRM_Utils_Type::T_BOOLEAN) {
+    if ($dataType === 'Boolean') {
       $value = CRM_Utils_String::strtoboolstr($importedValue);
       if ($value !== FALSE) {
         return (bool) $value;
       }
       return 'invalid_import_value';
     }
-    if ($fieldMetadata['type'] === CRM_Utils_Type::T_DATE || $fieldMetadata['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME) || $fieldMetadata['type'] === CRM_Utils_Type::T_TIMESTAMP) {
+    if (in_array($dataType, ['Date', 'Timestamp'], TRUE)) {
       $value = CRM_Utils_Date::formatDate($importedValue, (int) $this->getSubmittedValue('dateFormats'));
       return $value ?: 'invalid_import_value';
     }
@@ -1640,7 +1654,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?? 'invalid_import_value';
       }
     }
-    if ($fieldMetadata['type'] === CRM_Utils_Type::T_INT) {
+    if ($dataType === 'Integer') {
       // We have resolved the options now so any remaining ones should be integers.
       return CRM_Utils_Rule::numeric($importedValue) ? $importedValue : 'invalid_import_value';
     }
@@ -1685,7 +1699,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
 
     $fieldMetadata = $this->getImportableFieldsMetadata()[$fieldMapName];
-    if ($loadOptions && !isset($fieldMetadata['options'])) {
+    if ($loadOptions && (!isset($fieldMetadata['options']) || $fieldMetadata['options'] === TRUE)) {
       if (($fieldMetadata['data_type'] ?? '') === 'StateProvince') {
         // Probably already loaded and also supports abbreviations - eg. NSW.
         // Supporting for core AND custom state fields is more consistent.

@@ -270,7 +270,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       // Note that default_value is supported via the parser and the angular form
       // but there is no way to enter it on the quick form.
       ['name' => 'financial_type_id', 'default_value' => 'Donation'],
-      ['name' => 'contribution_source'],
+      ['name' => 'source'],
       ['name' => 'receive_date'],
       ['name' => 'external_identifier'],
       ['name' => 'soft_credit.contact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
@@ -336,7 +336,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
       ['name' => 'external_identifier'],
-      ['name' => $this->getCustomFieldName('date')],
+      ['name' => $this->getCustomFieldName('date', 4)],
     ];
     $this->importCSV('contributions_date_validate.csv', $mapping, ['dateFormats' => 32]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
@@ -355,7 +355,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contact_id' => $contactID]);
     $this->createCustomGroupWithFieldOfType([], 'radio');
     $values['contribution_id'] = $contribution['id'];
-    $values[$this->getCustomFieldName('radio')] = 'Red Testing';
+    $values[$this->getCustomFieldName('radio', 4)] = 'Red Testing';
     unset(Civi::$statics['CRM_Core_BAO_OptionGroup']);
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
     $contribution = $this->callAPISuccess('Contribution', 'get', ['contact_id' => $contactID, $this->getCustomFieldName('radio') => 'Red Testing']);
@@ -391,11 +391,11 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function testPhoneMatchOnContact(): void {
     // Update existing unsupervised rule, change to general.
-    $unsupervisedRuleGroup = $this->callApiSuccess('RuleGroup', 'getsingle', [
+    $unsupervisedRuleGroup = $this->callAPISuccess('RuleGroup', 'getsingle', [
       'used' => 'Unsupervised',
       'contact_type' => 'Individual',
     ]);
-    $this->callApiSuccess('RuleGroup', 'create', [
+    $this->callAPISuccess('RuleGroup', 'create', [
       'id' => $unsupervisedRuleGroup['id'],
       'used' => 'General',
     ]);
@@ -419,7 +419,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $parser->setUserJobID($this->getUserJobID());
     $fields = $parser->getFieldsMetadata();
     $this->assertArrayHasKey('phone_primary.phone', $fields);
-    $this->callApiSuccess('RuleGroup', 'create', [
+    $this->callAPISuccess('RuleGroup', 'create', [
       'id' => $unsupervisedRuleGroup['id'],
       'used' => 'Unsupervised',
     ]);
@@ -434,11 +434,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function testCustomSerializedCheckBox(): void {
     $this->createCustomGroupWithFieldOfType([], 'checkbox');
-    $customField = $this->getCustomFieldName('checkbox');
+    $customField = $this->getCustomFieldName('checkbox', 4);
     $contactID = $this->individualCreate();
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', $customField => 'L,V'];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
-    $initialContribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
+    $initialContribution = Contribution::get()->addWhere('contact_id', '=', $contactID)
+      ->addSelect($customField)
+      ->execute()->first();
     $this->assertContains('L', $initialContribution[$customField], 'Contribution Duplicate Skip Import contains L');
     $this->assertContains('V', $initialContribution[$customField], 'Contribution Duplicate Skip Import contains V');
 
@@ -447,7 +449,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $values[$customField] = 'V';
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
 
-    $updatedContribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $initialContribution['id']]);
+    $updatedContribution = Contribution::get()->addWhere('id', '=', $initialContribution['id'])
+      ->addSelect($customField)
+      ->execute()->first();
+
     $this->assertNotContains('L', $updatedContribution[$customField], 'Contribution Duplicate Update Import does not contain L');
     $this->assertContains('V', $updatedContribution[$customField], 'Contribution Duplicate Update Import contains V');
 
@@ -596,7 +601,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => ''],
       ['name' => 'trxn_id'],
-      ['name' => 'contribution_campaign_id'],
+      ['name' => 'campaign_id'],
       ['name' => 'contribution_contact_id'],
     ];
     // First we try to create without total_amount mapped.
@@ -629,9 +634,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => ''],
       ['name' => ''],
-      ['name' => 'contribution_source'],
+      ['name' => 'source'],
       ['name' => 'trxn_id'],
-      ['name' => 'contribution_campaign_id'],
+      ['name' => 'campaign_id'],
     ];
     $this->importCSV('contributions.csv', $fieldMappings, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
 
@@ -719,7 +724,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'mapper' => $mapper,
     ]));
     $parser->init();
-    $parser->import($values);
+    try {
+      $parser->validateValues($values);
+      $parser->import($values);
+    }
+    catch (CRM_Core_Exception $e) {
+      // Validation failed.
+    }
   }
 
   /**
@@ -776,7 +787,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'total_amount'],
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
-      ['name' => 'contribution_source'],
+      ['name' => 'source'],
       ['name' => ''],
     ];
     $this->importCSV('contributions_update.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
@@ -863,7 +874,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
       ['name' => 'email_primary.email'],
-      ['name' => 'contribution_source'],
+      ['name' => 'source'],
       ['name' => 'note'],
       ['name' => 'trxn_id'],
     ], $submittedValues);
