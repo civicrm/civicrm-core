@@ -46,6 +46,39 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
    */
   public function upgrade_5_61_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask(ts('Dedupe cache table'), 'dedupeCache');
+    $this->addTask(ts('Drop index %1', [1 => 'civicrm_cache.UI_group_path_date']), 'dropIndex', 'civicrm_cache', 'UI_group_path_date');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.UI_group_name_path']), 'addIndex', 'civicrm_cache', [['group_name', 'path']], 'UI');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.index_expired_date']), 'addIndex', 'civicrm_cache', [['expired_date']], 'index');
+  }
+
+  /**
+   * Remove extraneous/duplicate records from `civicrm_cache`.
+   *
+   * Formally, the cache table allowed multiple (key,value) pairs if created at different times.
+   * In practice, this cleanup should generally do nothing -- the `SqlGroup::set()` has had duplicate
+   * prevention, and the cache will flush at the end of the upgrade anyway. Never-the-less, if
+   * duplicates are somehow in there, then we should cleanly remove them rather than let the upgrade fail.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function dedupeCache($ctx): bool {
+    $duplicates = CRM_Core_DAO::executeQuery('
+      SELECT c.id FROM civicrm_cache c
+      LEFT JOIN (SELECT group_name, path, max(created_date) newest FROM civicrm_cache GROUP BY group_name, path) recent
+        ON (c.group_name=recent.group_name AND c.path=recent.path AND c.created_date=recent.newest)
+      WHERE recent.newest IS NULL')
+      ->fetchMap('id', 'id');
+    if ($duplicates) {
+      CRM_Utils_SQL_Delete::from('civicrm_cache')
+        ->where('id in (@IDS)')
+        ->param('IDS', $duplicates)
+        ->execute();
+    }
+
+    return TRUE;
   }
 
 }
