@@ -21,12 +21,6 @@
 class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
   /**
-   * Indicate if this form should warn users of unsaved changes
-   * @var bool
-   */
-  protected $unsavedChangesWarn = FALSE;
-
-  /**
    * Dedupe rule group ID
    * @var int
    */
