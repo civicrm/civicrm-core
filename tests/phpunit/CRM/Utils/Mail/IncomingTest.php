@@ -32,8 +32,8 @@ class CRM_Utils_Mail_IncomingTest extends CiviUnitTestCase {
   protected $name;
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
 
     $rand = rand(0, 1000);
     $this->email = "test{$rand}@example.com";

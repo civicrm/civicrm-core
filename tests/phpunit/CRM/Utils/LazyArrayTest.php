@@ -7,8 +7,8 @@
 class CRM_Utils_LazyArrayTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   public function testAssoc() {

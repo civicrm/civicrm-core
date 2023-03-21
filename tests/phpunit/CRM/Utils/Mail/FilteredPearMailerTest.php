@@ -7,8 +7,8 @@
 class CRM_Utils_Mail_FilteredPearMailerTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   public function testFilter() {

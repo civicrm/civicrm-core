@@ -20,8 +20,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   protected $counts;
 
   protected function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->dispatcher = new CiviEventDispatcher();
     $this->dispatcher->addListener('civi.token.list', [$this, 'onListTokens']);
     $this->dispatcher->addListener('civi.token.eval', [$this, 'onEvalTokens']);

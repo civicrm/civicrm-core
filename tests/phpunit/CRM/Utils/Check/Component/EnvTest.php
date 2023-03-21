@@ -9,8 +9,8 @@
 class CRM_Utils_Check_Component_EnvTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**

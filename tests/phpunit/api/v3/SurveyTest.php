@@ -33,6 +33,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   protected $entity = 'survey';
 
   public function setUp(): void {
+    parent::setUp();
     $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', [
       'label' => 'PhoneBank',
       'return' => 'value',
@@ -45,7 +46,6 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
       'max_number_of_contacts' => 12,
       'instructions' => "Call people, ask for money",
     ];
-    parent::setUp();
   }
 
   /**

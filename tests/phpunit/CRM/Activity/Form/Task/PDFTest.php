@@ -12,8 +12,8 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
    * Set up for tests.
    */
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**

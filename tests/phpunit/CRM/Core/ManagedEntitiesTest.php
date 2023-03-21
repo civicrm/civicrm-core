@@ -23,8 +23,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   protected $fixtures;
 
   public function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->modules = [
       'one' => new CRM_Core_Module('com.example.one', TRUE),
       'two' => new CRM_Core_Module('com.example.two', TRUE),

@@ -7,8 +7,8 @@
 class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   public function testRow_twice() {
