@@ -147,6 +147,7 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
         'action' => 'create',
         'loadOptions' => $action->getLoadOptions(),
         'where' => [['name', 'NOT IN', $ignore], ['type', 'IN', ['Field', 'Custom']]],
+        'checkPermissions' => FALSE,
       ]);
       if ($entity !== 'Contact') {
         $prefix = strtolower($entity) . '_primary.';
