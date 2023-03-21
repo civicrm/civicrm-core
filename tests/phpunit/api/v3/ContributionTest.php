@@ -4324,7 +4324,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'sort_name' => 'McTesterson, Testy',
       'display_name' => 'Testy McTesterson',
       'preferred_language' => 'en_US',
-      'preferred_mail_format' => 'Both',
       'first_name' => 'Testy',
       'last_name' => 'McTesterson',
       'contact_is_deleted' => '0',

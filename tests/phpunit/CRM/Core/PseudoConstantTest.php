@@ -694,10 +694,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'max' => 250,
         ],
         [
-          'fieldName' => 'preferred_mail_format',
-          'sample' => 'Text',
-        ],
-        [
           'fieldName' => 'communication_style_id',
           'sample' => 'Formal',
         ],

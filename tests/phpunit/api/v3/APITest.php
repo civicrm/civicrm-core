@@ -166,7 +166,7 @@ class api_v3_APITest extends CiviUnitTestCase {
 
     $this->assertTrue(is_numeric($contact['id']));
     $this->assertNotEmpty($contact['title']);
-    // preferred_mail_format preferred_communication_method preferred_language gender_id
+    // preferred_communication_method preferred_language gender_id
     // currency
     $this->assertNotEmpty($contact['currency']);
 

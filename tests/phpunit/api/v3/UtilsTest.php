@@ -329,14 +329,13 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('values', $result);
   }
 
-  public function testGetFields_AllOptions() {
-    $result = $this->callAPISuccess('contact', 'getfields', [
+  public function testGetFieldsAllOptions(): void {
+    $result = $this->callAPISuccess('Contact', 'getfields', [
       'options' => [
         'get_options' => 'all',
       ],
     ]);
     $this->assertEquals('Household', $result['values']['contact_type']['options']['Household']);
-    $this->assertEquals('HTML', $result['values']['preferred_mail_format']['options']['HTML']);
   }
 
   public function basicArrayCases() {

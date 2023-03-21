@@ -1229,7 +1229,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'sort_name' => '',
       'display_name' => '',
       'do_not_email' => '',
-      'preferred_mail_format' => '',
       'is_deceased' => '',
       'email' => '',
       'on_hold' => '',
