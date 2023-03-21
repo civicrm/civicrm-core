@@ -46,6 +46,8 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
    */
   public function upgrade_5_61_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask(ts('Drop index %1', [1 => 'civicrm_cache.UI_group_path_date']), 'dropIndex', 'civicrm_cache', 'UI_group_path_date');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.UI_group_name_path']), 'addIndex', 'civicrm_cache', [['group_name', 'path']], 'UI');
   }
 
 }
