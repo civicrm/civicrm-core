@@ -156,7 +156,6 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'image_URL',
       'preferred_communication_method',
       'preferred_language',
-      'preferred_mail_format',
       'hash',
       'source',
       'first_name',

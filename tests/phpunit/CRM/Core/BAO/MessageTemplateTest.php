@@ -691,7 +691,6 @@ emo
       '{contact.image_URL}' => 'Image Url',
       '{contact.preferred_communication_method:label}' => 'Preferred Communication Method',
       '{contact.preferred_language:label}' => 'Preferred Language',
-      '{contact.preferred_mail_format:label}' => 'Preferred Mail Format',
       '{contact.hash}' => 'Contact Hash',
       '{contact.source}' => 'Contact Source',
       '{contact.first_name}' => 'First Name',
@@ -792,7 +791,6 @@ emo
       'image_URL' => 'https://example.com',
       'preferred_communication_method' => 'Phone',
       'preferred_language' => 'fr_CA',
-      'preferred_mail_format' => 'Both',
       'hash' => 'xyz',
       'contact_source' => 'Contact Source',
       'first_name' => 'Robert',
@@ -987,7 +985,6 @@ nick_name:Bob
 image_URL:https://example.com
 preferred_communication_method:Phone
 preferred_language:fr_CA
-preferred_mail_format:Both
 hash:xyz
 contact_source:Contact Source
 first_name:Robert
@@ -1087,7 +1084,6 @@ nick_name |Bob
 image_URL |https://example.com
 preferred_communication_method:label |Phone
 preferred_language:label |French (Canada)
-preferred_mail_format:label |Both
 hash |xyz
 source |Contact Source
 first_name |Robert
