@@ -640,10 +640,8 @@ FROM civicrm_action_schedule cas
     $tp->addMessage('body_html', $schedule->body_html, 'text/html');
     $tp->addMessage('sms_body_text', $schedule->sms_body_text, 'text/plain');
     $tp->addMessage('subject', $schedule->subject, 'text/plain');
-    // These 2 are not 'real' tokens - but it tells the processor to load them.
+    // These is not a 'real' token - but it tells the processor to load them.
     $tp->addMessage('toName', '{contact.display_name}', 'text/plain');
-    $tp->addMessage('preferred_mail_format', '{contact.preferred_mail_format}', 'text/plain');
-
     return $tp;
   }
 
