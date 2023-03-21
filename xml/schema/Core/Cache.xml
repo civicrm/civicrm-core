@@ -100,4 +100,9 @@
     <comment>When should the cache item expire</comment>
     <add>2.1</add>
   </field>
+  <index>
+    <name>index_expired_date</name>
+    <fieldName>expired_date</fieldName>
+    <add>5.61</add>
+  </index>
 </table>

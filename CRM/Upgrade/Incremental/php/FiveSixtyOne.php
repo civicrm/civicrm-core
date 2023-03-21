@@ -49,6 +49,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
     $this->addTask(ts('Dedupe cache table'), 'dedupeCache');
     $this->addTask(ts('Drop index %1', [1 => 'civicrm_cache.UI_group_path_date']), 'dropIndex', 'civicrm_cache', 'UI_group_path_date');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.UI_group_name_path']), 'addIndex', 'civicrm_cache', [['group_name', 'path']], 'UI');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.index_expired_date']), 'addIndex', 'civicrm_cache', [['expired_date']], 'index');
   }
 
   /**
