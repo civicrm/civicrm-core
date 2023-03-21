@@ -33,6 +33,16 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  public function testAPiv4Validates() {
+    $this->expectExceptionMessage("fail");
+    Contribution::create()->setValues([
+      'total_amount' => 5,
+      'contact_id' => $this->individualCreate(),
+      'financial_type_id' => 1,
+      'contribution_status_id' => 'I made up some rubbish'
+    ])->execute();
+
+  }
   /**
    * Test create method (create and update modes).
    */
