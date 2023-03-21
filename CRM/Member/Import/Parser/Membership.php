@@ -65,6 +65,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         'name' => 'membership_import',
         'label' => ts('Membership Import'),
         'entity' => 'Membership',
+        'url' => 'civicrm/import/membership',
+
       ],
     ];
   }

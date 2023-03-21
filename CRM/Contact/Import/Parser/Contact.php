@@ -91,6 +91,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         'name' => 'contact_import',
         'label' => ts('Contact Import'),
         'entity' => 'Contact',
+        'url' => 'civicrm/import/contact',
       ],
     ];
   }

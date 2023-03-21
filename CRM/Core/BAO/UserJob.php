@@ -144,6 +144,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
    *   -label
    *   -class
    *   -entity
+   *   -url
    *
    * @return array
    */
