@@ -1179,7 +1179,6 @@ civicrm_relationship.is_active = 1 AND
       'is_deceased' => 1,
       'on_hold' => 1,
       'display_name' => 1,
-      'preferred_mail_format' => 1,
     ];
     $numberOfContacts = 2;
 

@@ -859,7 +859,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       ],
       'contact_source' => 'test contact',
       'external_identifier' => 111222333,
-      'preferred_mail_format' => 'Both',
       'is_opt_out' => 0,
       'legal_identifier' => '123123123123',
       'image_URL' => 'http://imageupdate.com',
