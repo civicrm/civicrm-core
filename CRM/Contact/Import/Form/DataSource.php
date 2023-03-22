@@ -111,15 +111,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     // Once the mentioned forms no longer call $this->get() all this 'setting'
     // is obsolete.
     $storeParams = [
-      'dateFormats' => $this->getSubmittedValue('dateFormats'),
       'savedMapping' => $this->getSubmittedValue('savedMapping'),
     ];
 
     foreach ($storeParams as $storeName => $value) {
       $this->set($storeName, $value);
     }
-    CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
-
   }
 
   /**

@@ -301,20 +301,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
     $customFields = $customFields + $addressCustomFields;
 
-    //format date first
-    $session = CRM_Core_Session::singleton();
-    $dateType = $session->get("dateTypes");
     foreach ($params as $key => $val) {
       $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
       if ($customFieldID &&
         !array_key_exists($customFieldID, $addressCustomFields)
       ) {
-        //we should not update Date to null, CRM-4062
-        if ($val && ($customFields[$customFieldID]['data_type'] == 'Date')) {
-          //CRM-21267
-          $this->formatCustomDate($params, $formatted, $dateType, $key);
-        }
-        elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
+        if ($customFields[$customFieldID]['data_type'] == 'Boolean') {
           if (empty($val) && !is_numeric($val) && $this->isFillDuplicates()) {
             //retain earlier value when Import mode is `Fill`
             unset($params[$key]);
