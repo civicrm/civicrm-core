@@ -43,20 +43,20 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * These extensions are inactive at the start. They may be activated during the test. They should be deactivated at the end.
    *
    * For the moment, the test is simply hard-coded to cleanup in a specific order. It's tempting to auto-detect and auto-uninstall these.
-   * However, the shape of their dependencies makes it tricky to auto-uninstall (e.g. some exts have managed-entities that rely on other
-   * exts -- you need to fully disable+uninstall the downstream managed-entity-ext before disabling or uninstalling the upstream
+   * However, the shape of their dependencies makes it tricky to auto-uninstall (e.g. some extensions have managed-entities that rely on other
+   * extensions -- you need to fully disable+uninstall the downstream managed-entity-ext before disabling or uninstalling the upstream
    * entity-provider-ext).
    *
-   * You may need to edit `$toggleExts` whenever the dependency-graph changes.
+   * You may need to edit `$toggleExtensions` whenever the dependency-graph changes.
    *
    * @var string[]
    */
-  protected $toggleExts = ['civiimport', 'org.civicrm.afform', 'authx'];
+  protected $toggleExtensions = ['civiimport', 'org.civicrm.afform', 'authx'];
 
   protected function setUp(): void {
     parent::setUp();
     $originalExtensions = array_column(CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'fullName');
-    $this->assertEquals([], array_intersect($originalExtensions, $this->toggleExts), 'These extensions may be enabled and disabled during the test. The start-state and end-state should be the same. It appears that we have an unexpected start-state. Perhaps another test left us with a weird start-state?');
+    $this->assertEquals([], array_intersect($originalExtensions, $this->toggleExtensions), 'These extensions may be enabled and disabled during the test. The start-state and end-state should be the same. It appears that we have an unexpected start-state. Perhaps another test left us with a weird start-state?');
     $this->enableBackgroundQueueOriginalValue = Civi::settings()->get('enableBackgroundQueue');
   }
 
@@ -72,7 +72,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     DedupeRule::delete()
       ->addWhere('rule_table', '!=', 'civicrm_email')
       ->addWhere('dedupe_rule_group_id.name', '=', 'IndividualUnsupervised')->execute();
-    foreach ($this->toggleExts as $ext) {
+    foreach ($this->toggleExtensions as $ext) {
       CRM_Extension_System::singleton()->getManager()->disable([$ext]);
       CRM_Extension_System::singleton()->getManager()->uninstall([$ext]);
     }
@@ -423,8 +423,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'id' => $unsupervisedRuleGroup['id'],
       'used' => 'Unsupervised',
     ]);
-    Civi\Api4\DedupeRule::delete()->addWhere('dedupe_rule_group_id', '=', $ruleGroup['id'])->execute();
-    Civi\Api4\DedupeRuleGroup::delete()->addWhere('id', '=', $ruleGroup['id'])->execute();
+    DedupeRule::delete()->addWhere('dedupe_rule_group_id', '=', $ruleGroup['id'])->execute();
+    DedupeRuleGroup::delete()->addWhere('id', '=', $ruleGroup['id'])->execute();
   }
 
   /**
@@ -634,7 +634,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => ''],
       ['name' => ''],
-      ['name' => 'source'],
+      ['name' => 'contribution_source'],
       ['name' => 'trxn_id'],
       ['name' => 'campaign_id'],
     ];
@@ -874,7 +874,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
       ['name' => 'email_primary.email'],
-      ['name' => 'source'],
+      ['name' => 'contribution_source'],
       ['name' => 'note'],
       ['name' => 'trxn_id'],
     ], $submittedValues);
@@ -914,7 +914,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the Import api works from the extension when the extension is enabled after the import.
+   * Test the Import api works from the extension when the extension is enabled
+   * after the import.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testEnableExtension(): void {
     $this->importContributionsDotCSV();
