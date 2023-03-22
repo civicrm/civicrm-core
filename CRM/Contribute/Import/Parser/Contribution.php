@@ -232,7 +232,19 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $params[$entity][$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $fieldValue);
       }
     }
-    return $params;
+    return $this->removeEmptyValues($params);
+  }
+
+  protected function removeEmptyValues($array) {
+    foreach ($array as $key => $value) {
+      if (is_array($value)) {
+        $array[$key] = $this->removeEmptyValues($value);
+      }
+      elseif ($value === '') {
+        unset($array[$key]);
+      }
+    }
+    return $array;
   }
 
   /**
