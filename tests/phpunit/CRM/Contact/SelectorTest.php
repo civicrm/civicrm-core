@@ -27,13 +27,15 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the query from the selector class is consistent with the dataset expectation.
+   * Test the query from the selector class is consistent with the dataset
+   * expectation.
    *
    * @param array $dataSet
-   *   The data set to be tested. Note that when adding new datasets often only form_values and expected where
-   *   clause will need changing.
+   *   The data set to be tested. Note that when adding new datasets often only
+   *   form_values and expected where clause will need changing.
    *
    * @dataProvider querySets
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function testSelectorQuery(array $dataSet): void {
     $tag = $this->callAPISuccess('Tag', 'create', [
