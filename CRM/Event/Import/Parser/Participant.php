@@ -77,6 +77,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         'name' => 'participant_import',
         'label' => ts('Participant Import'),
         'entity' => 'Participant',
+        'url' => 'civicrm/import/participant',
       ],
     ];
   }
