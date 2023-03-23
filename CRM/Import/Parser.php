@@ -2140,26 +2140,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * Convert any given date string to default date array.
-   *
-   * @param array $params
-   *   Has given date-format.
-   * @param array $formatted
-   *   Store formatted date in this array.
-   * @param int $dateType
-   *   Type of date.
-   * @param string $dateParam
-   *   Index of params.
-   *
-   * @deprecated
-   */
-  public static function formatCustomDate(&$params, &$formatted, $dateType, $dateParam) {
-    //fix for CRM-2687
-    CRM_Utils_Date::convertToDefaultDate($params, $dateType, $dateParam);
-    $formatted[$dateParam] = CRM_Utils_Date::processDate($params[$dateParam]);
-  }
-
-  /**
    * Get the value to use for option comparison purposes.
    *
    * We do a case-insensitive comparison, also swapping ’ for '
