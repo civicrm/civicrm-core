@@ -314,7 +314,6 @@ class CRM_Contact_Form_Task_SMSCommon {
    */
   public static function postProcess(&$form) {
 
-    // check and ensure that
     $thisValues = $form->controller->exportValues($form->getName());
 
     $fromSmsProviderId = $thisValues['sms_provider_id'];
