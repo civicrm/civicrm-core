@@ -105,7 +105,7 @@ VALUES
     ( @domainID, 'civicrm/contribute/add?reset=1&action=add&context=standalone', '{ts escape="sql" skip="true"}New Contribution{/ts}',  'New Contribution',       'access CiviContribute,edit contributions', 'AND', @contributionlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/contribute/search?reset=1',                       '{ts escape="sql" skip="true"}Find Contributions{/ts}',     'Find Contributions',     'access CiviContribute', '', @contributionlastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/report/list?compid=2&reset=1',                    '{ts escape="sql" skip="true"}Contribution Reports{/ts}',   'Contribution Reports',     'access CiviContribute', '', @contributionlastID, '1', 1,    4 ),
-    ( @domainID, 'civicrm/contribute/import?reset=1',                       '{ts escape="sql" skip="true"}Import Contributions{/ts}',   'Import Contributions',   'access CiviContribute,edit contributions', 'AND', @contributionlastID, '1', '1',  5 ),
+    ( @domainID, 'civicrm/import/contribution?reset=1',                       '{ts escape="sql" skip="true"}Import Contributions{/ts}',   'Import Contributions',   'access CiviContribute,edit contributions', 'AND', @contributionlastID, '1', '1',  5 ),
     ( @domainID, 'civicrm/batch?reset=1',                                   '{ts escape="sql" skip="true"}Batch Data Entry{/ts}',        'Batch Data Entry',           'access CiviContribute', '', @contributionlastID, '1', NULL, 7 );
 
 INSERT INTO civicrm_navigation
