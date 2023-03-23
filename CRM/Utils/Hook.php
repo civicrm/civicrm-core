@@ -50,7 +50,7 @@ abstract class CRM_Utils_Hook {
    *
    * @var CRM_Utils_Hook
    */
-  static private $_singleton = NULL;
+  static private $_singleton;
 
   /**
    * @var bool
@@ -75,7 +75,7 @@ abstract class CRM_Utils_Hook {
    * @return CRM_Utils_Hook
    *   An instance of $config->userHookClass
    */
-  public static function singleton($fresh = FALSE) {
+  public static function singleton($fresh = FALSE): CRM_Utils_Hook {
     if (self::$_singleton == NULL || $fresh) {
       $config = CRM_Core_Config::singleton();
       $class = $config->userHookClass;
@@ -87,7 +87,7 @@ abstract class CRM_Utils_Hook {
   /**
    * CRM_Utils_Hook constructor.
    *
-   * @throws \CRM_Core_Exception
+   * @throws CRM_Core_Exception
    */
   public function __construct() {
     $this->cache = CRM_Utils_Cache::create([
@@ -165,7 +165,7 @@ abstract class CRM_Utils_Hook {
       $names,
       [&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6]
     );
-    \Civi::dispatcher()->dispatch('hook_' . $fnSuffix, $event);
+    Civi::dispatcher()->dispatch('hook_' . $fnSuffix, $event);
     return $event->getReturnValues();
   }
 
@@ -181,6 +181,7 @@ abstract class CRM_Utils_Hook {
    * @param $fnPrefix
    *
    * @return array|bool
+   * @throws CRM_Core_Exception
    */
   public function commonInvoke(
     $numParams,
@@ -262,7 +263,6 @@ abstract class CRM_Utils_Hook {
     }
 
     foreach ($fnNames as $fnName) {
-      $fResult = [];
       switch ($numParams) {
         case 0:
           $fResult = $fnName();
@@ -296,9 +296,7 @@ abstract class CRM_Utils_Hook {
           throw new CRM_Core_Exception(ts('Invalid hook invocation'));
       }
 
-      if (!empty($fResult) &&
-        is_array($fResult)
-      ) {
+      if (!empty($fResult) && is_array($fResult)) {
         $result = array_merge($result, $fResult);
       }
     }
@@ -346,7 +344,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function pre($op, $objectName, $id, &$params = []) {
     $event = new \Civi\Core\Event\PreEvent($op, $objectName, $id, $params);
-    \Civi::dispatcher()->dispatch('hook_civicrm_pre', $event);
+    Civi::dispatcher()->dispatch('hook_civicrm_pre', $event);
     return $event->getReturnValues();
   }
 
@@ -368,7 +366,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function post($op, $objectName, $objectId, &$objectRef = NULL) {
     $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
-    \Civi::dispatcher()->dispatch('hook_civicrm_post', $event);
+    Civi::dispatcher()->dispatch('hook_civicrm_post', $event);
     return $event->getReturnValues();
   }
 
@@ -398,7 +396,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function postCommit($op, $objectName, $objectId, $objectRef = NULL) {
     $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
-    \Civi::dispatcher()->dispatch('hook_civicrm_postCommit', $event);
+    Civi::dispatcher()->dispatch('hook_civicrm_postCommit', $event);
     return $event->getReturnValues();
   }
 
@@ -423,7 +421,6 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function links($op, $objectName, &$objectId, &$links, &$mask = NULL, &$values = []) {
-    $null = NULL;
     return self::singleton()->invoke(['op', 'objectName', 'objectId', 'links', 'mask', 'values'], $op, $objectName, $objectId, $links, $mask, $values, 'civicrm_links');
   }
 
@@ -1032,13 +1029,10 @@ abstract class CRM_Utils_Hook {
    *   Only add/edit/remove the specific field options you intend to affect.
    * @param bool $detailedFormat
    *   If true, the options are in an ID => array ( 'id' => ID, 'label' => label, 'value' => value ) format
-   * @param array $selectAttributes
-   *   Contain select attribute(s) if any.
    *
    * @return mixed
    */
-  public static function customFieldOptions($customFieldID, &$options, $detailedFormat = FALSE, $selectAttributes = []) {
-    // Weird: $selectAttributes is inputted but not outputted.
+  public static function customFieldOptions($customFieldID, &$options, $detailedFormat = FALSE) {
     $null = NULL;
     return self::singleton()->invoke(['customFieldID', 'options', 'detailedFormat'], $customFieldID, $options, $detailedFormat,
       $null, $null, $null,
@@ -1964,7 +1958,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function install() {
     // Actually invoke via CRM_Extension_Manager_Module::callHook
-    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
+    throw new RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
 
   /**
@@ -1982,7 +1976,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function postInstall() {
     // Actually invoke via CRM_Extension_Manager_Module::callHook
-    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
+    throw new RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
 
   /**
@@ -1992,7 +1986,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function uninstall() {
     // Actually invoke via CRM_Extension_Manager_Module::callHook
-    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
+    throw new RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
 
   /**
@@ -2002,7 +1996,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function enable() {
     // Actually invoke via CRM_Extension_Manager_Module::callHook
-    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
+    throw new RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
 
   /**
@@ -2012,7 +2006,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function disable() {
     // Actually invoke via CRM_Extension_Manager_Module::callHook
-    throw new \RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
+    throw new RuntimeException(sprintf("The method %s::%s is just a documentation stub and should not be invoked directly.", __CLASS__, __FUNCTION__));
   }
 
   /**
@@ -2057,7 +2051,7 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $op
    *   The type of operation being performed; 'check' or 'enqueue'.
-   * @param CRM_Queue_Queue $queue
+   * @param CRM_Queue_Queue|null $queue
    *   (for 'enqueue') the modifiable list of pending up upgrade tasks.
    *
    * @return bool|null
@@ -2288,13 +2282,11 @@ abstract class CRM_Utils_Hook {
 
   /**
    * @param CRM_Core_Exception $exception
-   * @param mixed $request
-   *   Reserved for future use.
    */
-  public static function unhandledException($exception, $request = NULL) {
+  public static function unhandledException($exception) {
     $null = NULL;
     $event = new \Civi\Core\Event\UnhandledExceptionEvent($exception, $null);
-    \Civi::dispatcher()->dispatch('hook_civicrm_unhandled_exception', $event);
+    Civi::dispatcher()->dispatch('hook_civicrm_unhandled_exception', $event);
   }
 
   /**
@@ -2672,7 +2664,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function caseChange(\Civi\CCase\Analyzer $analyzer) {
     $event = new \Civi\CCase\Event\CaseChangeEvent($analyzer);
-    \Civi::dispatcher()->dispatch('hook_civicrm_caseChange', $event);
+    Civi::dispatcher()->dispatch('hook_civicrm_caseChange', $event);
   }
 
   /**
@@ -2892,6 +2884,8 @@ abstract class CRM_Utils_Hook {
    * @param array $outcomes
    *   The outcomes of each task. One of 'ok', 'retry', 'fail'.
    *   Keys should match the keys in $items.
+   * @return mixed
+   * @throws CRM_Core_Exception
    */
   public static function queueRun(CRM_Queue_Queue $queue, array $items, &$outcomes) {
     $runner = $queue->getSpec('runner');
@@ -2941,6 +2935,7 @@ abstract class CRM_Utils_Hook {
    *   The default outcome for task-errors is determined by the queue settings (`civicrm_queue.error`).
    * @param \Throwable|null $exception
    *   If the task failed, this is the cause of the failure.
+   * @return mixed
    */
   public static function queueTaskError(CRM_Queue_Queue $queue, $item, &$outcome, ?Throwable $exception) {
     $null = NULL;
@@ -3007,7 +3002,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * ALlow Extensions to custom process IPN hook data such as sending Google Analyitcs information based on the IPN
+   * Allow Extensions to custom process IPN hook data such as sending Google Analytics information based on the IPN
    * @param array $IPNData - Array of IPN Data
    * @return mixed
    */
