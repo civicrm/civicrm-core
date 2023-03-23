@@ -214,7 +214,8 @@ VALUES
    ('contribution_recur_status'     , '{ts escape="sql"}Recurring Contribution Status{/ts}'      , NULL,      1, 1, 1, 'name,label,description', NULL),
    ('environment'                   , '{ts escape="sql"}Environment{/ts}'                        , NULL,      1, 1, 0, 'name,label,description', NULL),
    ('activity_default_assignee'     , '{ts escape="sql"}Activity default assignee{/ts}'          , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('entity_batch_extends'          , '{ts escape="sql"}Entity Batch Extends{/ts}'               , NULL,      1, 1, 0, 'name,label,description', NULL);
+   ('entity_batch_extends'          , '{ts escape="sql"}Entity Batch Extends{/ts}'               , NULL,      1, 1, 0, 'name,label,description', NULL),
+   ('file_type'                     , '{ts escape="sql"}File Type{/ts}'                          , 'Integer', 1, 1, 0, 'name,label,description', NULL);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
