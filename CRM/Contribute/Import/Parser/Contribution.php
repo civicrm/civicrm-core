@@ -52,7 +52,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'name' => 'contribution_import',
         'label' => ts('Contribution Import'),
         'entity' => 'Contribution',
-        'url' => 'civicrm/import/contribution',
+        'url' => 'civicrm/contribute/import',
       ],
     ];
   }
