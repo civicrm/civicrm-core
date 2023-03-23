@@ -1403,6 +1403,38 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test boolean field handling.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportBooleanFields(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Address', 'name' => 'Address'], 'boolean', 'address_');
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Contact', 'name' => 'Contact'], 'boolean', 'contact_');
+    $this->importCSV('individual_boolean.csv', [
+      ['first_name'],
+      ['last_name'],
+      ['street_address', 1],
+      ['do_not_email'],
+      [$this->getCustomFieldName('address_boolean'), 1],
+      [$this->getCustomFieldName('contact_boolean')],
+    ]);
+    $contacts = Address::get()->addWhere('contact_id.first_name', 'IN', ['Joe', 'Betty'])->setSelect([
+      'contact_id.first_name',
+      'contact_id.do_not_email',
+      $this->getCustomFieldName('address_boolean', 4),
+      'contact_id.' . $this->getCustomFieldName('contact_boolean', 4),
+    ])->execute();
+
+    foreach ($contacts as $contact) {
+      $boolean = !($contact['contact_id.first_name'] === 'Joe');
+      $this->assertSame($boolean, $contact['contact_id.do_not_email']);
+      $this->assertSame($boolean, $contact[$this->getCustomFieldName('address_boolean', 4)]);
+      $this->assertSame($boolean, $contact['contact_id.' . $this->getCustomFieldName('contact_boolean', 4)]);
+    }
+
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function testImportContactSubTypes(): void {
