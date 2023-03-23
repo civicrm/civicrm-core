@@ -295,8 +295,13 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
-
-    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
+    $ufGroupID = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
+    $addToGroupId = \Civi\Api4\UFGroup::get(FALSE)
+      ->addSelect('add_to_group_id')
+      ->addWhere('id', '=', $ufGroupID)
+      ->execute()
+      ->first()['add_to_group_id'] ?? NULL;
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID, $addToGroupId);
     $this->set('contactID', $contactID);
 
     if (!empty($params['email'])) {
