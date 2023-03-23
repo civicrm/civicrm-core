@@ -32,6 +32,8 @@ use Civi\Api4\Utils\CoreUtil;
  */
 class BasicGetFieldsAction extends BasicGetAction {
 
+  use Traits\GetSetValueTrait;
+
   /**
    * Fetch option lists for fields?
    *
@@ -204,17 +206,6 @@ class BasicGetFieldsAction extends BasicGetAction {
       'replace' => 'create',
     ];
     return $sub[$this->action] ?? $this->action;
-  }
-
-  /**
-   * Add an item to the values array
-   * @param string $fieldName
-   * @param mixed $value
-   * @return $this
-   */
-  public function addValue(string $fieldName, $value) {
-    $this->values[$fieldName] = $value;
-    return $this;
   }
 
   /**
