@@ -833,7 +833,12 @@ class Api4SelectQuery {
         return FALSE;
       }
       foreach ([$sideA, $sideB] as $expr) {
+        // Check for explicit link to FK entity
         if ($expr === "$alias.id" || !empty($joinEntityFields[str_replace("$alias.", '', $expr)]['fk_entity'])) {
+          return TRUE;
+        }
+        // Check for dynamic FK
+        if ($expr === "$alias.entity_id") {
           return TRUE;
         }
       }

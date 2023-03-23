@@ -3079,9 +3079,11 @@ SELECT contact_id
   public function addSelectWhereClause() {
     $clauses = [];
     $fields = $this->fields();
+    // Notes should check permissions on the entity_id field, not the contact_id field
+    $skipContactCheckFor = ['Note'];
     foreach ($fields as $fieldName => $field) {
       // Clause for contact-related entities like Email, Relationship, etc.
-      if (strpos($field['name'], 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
+      if (strpos($field['name'], 'contact_id') === 0 && !in_array($field['entity'], $skipContactCheckFor) && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
         $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
         if (!empty($contactClause)) {
           $clauses[$field['name']] = $contactClause;
