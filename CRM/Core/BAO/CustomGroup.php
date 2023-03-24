@@ -1431,11 +1431,17 @@ ORDER BY civicrm_custom_group.weight,
             }
           }
           else {
-            if ($field['data_type'] == "Float") {
-              $defaults[$elementName] = (float) $value;
+            if ($field['data_type'] === 'Float') {
+              if ($field['html_type'] === 'Text') {
+                $defaults[$elementName] = CRM_Utils_Number::formatLocaleNumeric($value);
+              }
+              else {
+                // This casting came in from svn & may not be right.
+                $defaults[$elementName] = (float) $value;
+              }
             }
-            elseif ($field['data_type'] == 'Money' &&
-              $field['html_type'] == 'Text'
+            elseif ($field['data_type'] === 'Money' &&
+              $field['html_type'] === 'Text'
             ) {
               $defaults[$elementName] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($value);
             }
