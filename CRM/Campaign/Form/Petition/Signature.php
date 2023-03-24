@@ -117,6 +117,13 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   protected $_image_URL;
 
   /**
+   * If the request lacks a sid, or the petition is disabled or for any
+   * other reason we should short circuit the display of the petition,
+   * set this variable to FALSE.
+   */
+  private $_petitionDisplayable = TRUE;
+
+  /**
    */
   public function __construct() {
     parent::__construct();
@@ -181,8 +188,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     $this->_surveyId = CRM_Utils_Request::retrieve('sid', 'Positive', $this);
 
     //some sanity checks
+    $session = CRM_Core_Session::singleton();
     if (!$this->_surveyId) {
-      CRM_Core_Error::statusBounce(ts('Petition id is not valid. (it needs a "sid" in the url).'));
+      $session->setStatus(ts('Petition id is not valid. (it needs a "sid" in the url).'));
+      $this->_petitionDisplayable = FALSE;
       return;
     }
     //check petition is valid and active
@@ -190,14 +199,17 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     $this->petition = [];
     CRM_Campaign_BAO_Survey::retrieve($params, $this->petition);
     if (empty($this->petition)) {
-      CRM_Core_Error::statusBounce(ts('Petition doesn\'t exist.'));
+      $session->setStatus(ts('Petition doesn\'t exist.'));
+      $this->_petitionDisplayable = FALSE;
+      return;
     }
     if ($this->petition['is_active'] == 0) {
-      CRM_Core_Error::statusBounce(ts('Petition is no longer active.'));
+      $session->setStatus(ts('Petition is no longer active.'));
+      $this->_petitionDisplayable = FALSE;
+      return;
     }
 
     //get userID from session
-    $session = CRM_Core_Session::singleton();
 
     //get the contact id for this user if logged in
     $this->_contactId = $this->getContactId();
@@ -283,6 +295,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
+    if ($this->_petitionDisplayable != TRUE) {
+      return;
+    }
     $this->assign('survey_id', $this->_surveyId);
     $this->assign('petitionTitle', $this->petition['title']);
     if (isset($_COOKIE['signed_' . $this->_surveyId])) {
