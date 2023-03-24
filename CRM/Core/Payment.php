@@ -1511,7 +1511,7 @@ abstract class CRM_Core_Payment {
    * @return string
    *   the error message if any
    */
-  abstract protected function checkConfig();
+  abstract public function checkConfig();
 
   /**
    * Redirect for paypal.
