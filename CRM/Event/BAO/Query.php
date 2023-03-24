@@ -639,6 +639,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->addRule('participant_fee_amount_low', ts('Please enter a valid money value.'), 'money');
     $form->addRule('participant_fee_amount_high', ts('Please enter a valid money value.'), 'money');
+    $form->add('number', 'participant_id', ts('Participant ID'), ['class' => 'four', 'min' => 1]);
 
     self::addCustomFormFields($form, ['Participant', 'Event']);
 
