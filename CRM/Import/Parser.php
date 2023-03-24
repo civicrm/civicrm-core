@@ -1603,7 +1603,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     if ($fieldMetadata['type'] === CRM_Utils_Type::T_BOOLEAN) {
       $value = CRM_Utils_String::strtoboolstr($importedValue);
       if ($value !== FALSE) {
-        return (bool) $value;
+        return (int) $value;
       }
       return 'invalid_import_value';
     }

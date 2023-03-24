@@ -311,9 +311,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
             //retain earlier value when Import mode is `Fill`
             unset($params[$key]);
           }
-          else {
-            $params[$key] = CRM_Utils_String::strtoboolstr($val);
-          }
         }
       }
     }
@@ -1028,24 +1025,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
       _civicrm_api3_store_values($fields[$values['contact_type']], $values, $params);
       return TRUE;
-    }
-
-    // Check for custom field values
-    $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $values),
-      FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE
-    );
-
-    foreach ($values as $key => $value) {
-      if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        // check if it's a valid custom field id
-
-        if (!array_key_exists($customFieldID, $customFields)) {
-          return civicrm_api3_create_error('Invalid custom field ID');
-        }
-        else {
-          $params[$key] = $value;
-        }
-      }
     }
     return TRUE;
   }
