@@ -597,6 +597,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => 'trxn_id'],
       ['name' => 'contribution_campaign_id'],
+      ['name' => 'contribution_contact_id'],
     ];
     // First we try to create without total_amount mapped.
     // It will fail in create mode as total_amount is required for create.
@@ -616,7 +617,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->importCSV('contributions.csv', $fieldMappings, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
     $row = $this->getDataSource()->getRows()[0];
-    $this->assertEquals('IMPORTED', $row[10]);
+    $this->assertEquals('IMPORTED', $row[11]);
     $contribution = Contribution::get()->addSelect('source', 'id')->execute()->first();
     $this->assertEmpty($contribution['source']);
 
@@ -635,7 +636,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->importCSV('contributions.csv', $fieldMappings, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
 
     $row = $this->getDataSource()->getRows()[0];
-    $this->assertEquals('IMPORTED', $row[10]);
+    $this->assertEquals('IMPORTED', $row[11]);
     $contribution = Contribution::get()->addSelect('source', 'id')->execute()->first();
     $this->assertEquals('Call him back', $contribution['source']);
   }
