@@ -287,15 +287,6 @@
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
     </div>
 
-    {if $is_monetary && array_key_exists('bank_account_number', $form)}
-      <div id="payment_notice">
-        <fieldset class="crm-public-form-item crm-group payment_notice-group">
-          <legend>{ts}Agreement{/ts}</legend>
-          {ts}Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.{/ts}
-        </fieldset>
-      </div>
-    {/if}
-
     <div id="crm-submit-buttons" class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
