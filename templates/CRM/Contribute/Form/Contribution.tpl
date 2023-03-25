@@ -284,7 +284,7 @@
     <!-- end of soft credit -->
 
     <!-- start of PCP -->
-    {if $siteHasPCPs && !$payNow}
+    {if array_key_exists('pcp_made_through_id', $form) && !$payNow}
       <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noPCP}collapsed{/if}" id="softCredit">
         <div class="crm-accordion-header">
           {ts}Personal Campaign Page{/ts}&nbsp;{help id="id-pcp"}
