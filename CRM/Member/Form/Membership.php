@@ -29,71 +29,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   protected $ids = [];
 
-  protected $_memType = NULL;
-
-  public $_mode;
-
-  public $_contributeMode = 'direct';
-
-  protected $_recurMembershipTypes;
-
   protected $_memTypeSelected;
-
-  /**
-   * Display name of the member.
-   *
-   * @var string
-   */
-  protected $_memberDisplayName = NULL;
-
-  /**
-   * email of the person paying for the membership (used for receipts)
-   * @var string
-   */
-  protected $_memberEmail = NULL;
-
-  /**
-   * Contact ID of the member.
-   *
-   * @var int
-   */
-  public $_contactID = NULL;
-
-  /**
-   * Display name of the person paying for the membership (used for receipts)
-   *
-   * @var string
-   */
-  protected $_contributorDisplayName = NULL;
-
-  /**
-   * Email of the person paying for the membership (used for receipts).
-   *
-   * @var string
-   */
-  protected $_contributorEmail;
-
-  /**
-   * email of the person paying for the membership (used for receipts)
-   *
-   * @var int
-   */
-  protected $_contributorContactID = NULL;
-
-  /**
-   * ID of the person the receipt is to go to.
-   *
-   * @var int
-   */
-  protected $_receiptContactId = NULL;
-
-  /**
-   * Keep a class variable for ALL membership IDs so
-   * postProcess hook function can do something with it
-   *
-   * @var array
-   */
-  protected $_membershipIDs = [];
 
   /**
    * Membership created or edited on this form.
