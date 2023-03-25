@@ -857,7 +857,8 @@ DESC limit 1");
    *   & needs rationalising.
    *
    */
-  protected function emailReceipt($form, &$formValues) {
+  protected function emailReceipt(&$formValues) {
+    $form = $this;
     $membership = $this->getMembership();
     // retrieve 'from email id' for acknowledgement
     $receiptFrom = $formValues['from_email_address'] ?? NULL;
@@ -1536,7 +1537,7 @@ DESC limit 1");
     $formValues['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
       $this->getFinancialTypeID()
     );
-    return $this->emailReceipt($this, $formValues);
+    return $this->emailReceipt($formValues);
   }
 
   /**
