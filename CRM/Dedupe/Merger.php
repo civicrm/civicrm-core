@@ -2122,9 +2122,9 @@ ORDER BY civicrm_custom_group.weight,
       if (strpos($key, 'custom_') === 0) {
         $fieldID = (int) substr($key, 7);
         if (empty($cFields[$fieldID])) {
-          $htmlType = $cFields[$fieldID]['attributes']['html_type'];
+          $htmlType = (string) $cFields[$fieldID]['attributes']['html_type'];
           $isSerialized = CRM_Core_BAO_CustomField::isSerialized($cFields[$fieldID]['attributes']);
-          $isView = $cFields[$fieldID]['attributes']['is_view'];
+          $isView = (bool) $cFields[$fieldID]['attributes']['is_view'];
           $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
 
         }
