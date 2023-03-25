@@ -40,7 +40,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
       $includeCustom = strpos(implode('', $fieldsToGet), '.') !== FALSE;
     }
     $this->formatValues();
-    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $includeCustom, $this->values);
+    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $includeCustom, $this->values, $this->checkPermissions);
     $fields = $this->specToArray($spec->getFields($fieldsToGet));
     foreach ($fieldsToGet ?? [] as $fieldName) {
       if (empty($fields[$fieldName]) && strpos($fieldName, '.') !== FALSE) {
