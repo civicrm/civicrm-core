@@ -619,6 +619,22 @@ abstract class CRM_Core_Payment {
         }
         return '';
 
+      case 'agreementTitle':
+        if ($this->getPaymentTypeName() !== 'direct_debit' || $this->_paymentProcessor['billing_mode'] != 1) {
+          return '';
+        }
+        // @todo - 'encourage' processors to override...
+        // CRM_Core_Error::deprecatedWarning('Payment processors should override getText for agreement text');
+        return ts('Agreement');
+
+      case 'agreementText':
+        if ($this->getPaymentTypeName() !== 'direct_debit' || $this->_paymentProcessor['billing_mode'] != 1) {
+          return '';
+        }
+        // @todo - 'encourage' processors to override...
+        // CRM_Core_Error::deprecatedWarning('Payment processors should override getText for agreement text');
+        return ts('Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.');
+
     }
     CRM_Core_Error::deprecatedFunctionWarning('Calls to getText must use a supported method');
     return '';
