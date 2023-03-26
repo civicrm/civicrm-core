@@ -25,13 +25,6 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
   protected $_BAOName = 'CRM_Financial_BAO_FinancialType';
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * @var array
-   */
-  protected $entityFields = [];
-
-  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception

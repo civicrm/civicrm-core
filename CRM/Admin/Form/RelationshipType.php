@@ -25,25 +25,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
   protected $_BAOName = 'CRM_Contact_BAO_RelationshipType';
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *     Auto-added by setEntityFieldsMetadata unless specified here (use description => '' to hide)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   *  - required
-   *  - is_freeze (field should be frozen).
-   *
-   * @var array
-   */
-  protected $entityFields = [];
-
-  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
