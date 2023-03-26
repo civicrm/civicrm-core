@@ -935,7 +935,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test membership with soft credits.
    */
   public function testMembershipSoftCredit() {
-    $this->_softIndividualId = $this->individualCreate();
+    $softIndividualId = $this->individualCreate();
 
     $form = $this->getForm();
     $form->preProcess();
@@ -948,7 +948,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'name' => "Gift",
       'option_group_id' => "soft_credit_type",
     ]);
-    $params['soft_credit_contact_id'] = $this->_softIndividualId;
+    $params['soft_credit_contact_id'] = $softIndividualId;
     $form->_contactID = $this->_individualId;
     // $form->_mode = 'test';
     $form->testSubmit($params);
@@ -957,7 +957,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Verify is main contribution is created on soft contact.
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'contact_id' => $this->_softIndividualId,
+      'contact_id' => $softIndividualId,
     ]);
     $this->assertEquals($contribution['soft_credit'][1]['contact_id'], $this->_individualId);
 
