@@ -3157,6 +3157,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         }
         break;
 
+      case 'CRM_Contribute_Form_Contribution_Main':
+        $form->controller = new CRM_Contribute_Controller_Contribution();
+        break;
+
       case 'CRM_Contribute_Form_Contribution_Confirm':
         $form->controller = new CRM_Contribute_Controller_Contribution();
         $form->controller->setStateMachine(new CRM_Contribute_StateMachine_Contribution($form->controller));

@@ -60,6 +60,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_paymentObject = NULL;
 
   /**
+   * Order object, used to calculate amounts, line items etc.
+   *
+   * @var \CRM_Financial_BAO_Order
+   */
+  protected $order;
+
+  /**
    * The membership block for this page
    *
    * @var array
@@ -339,9 +346,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_bltID = $this->get('bltID');
     $this->_paymentProcessor = $this->get('paymentProcessor');
 
-    // This get will ensure it is set for later. Once we are sure all places
-    // access via the get & not directly, it can go.
-    $this->getPriceSetID();
+    // In tests price set id is not always set - it is unclear if this is just
+    // poor test set up or it is possible in 'the real world'
+    if ($this->getPriceSetID()) {
+      $this->order = new CRM_Financial_BAO_Order();
+      $this->order->setPriceSetID($this->getPriceSetID());
+    }
     $this->_priceSet = $this->get('priceSet');
 
     if (!$this->_values) {
@@ -1285,6 +1295,26 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
     return $this->_membershipBlock;
+  }
+
+  /**
+   * Is a (non-quick-config) membership price set in use.
+   *
+   * @return bool
+   */
+  protected function isMembershipPriceSet(): bool {
+    if ($this->_useForMember === NULL) {
+      if (CRM_Core_Component::isEnabled('CiviMember') &&
+        (!$this->isQuickConfig() || !empty($this->_ccid)) &&
+        CRM_Core_Component::getComponentID('CiviMember') === (int) $this->order->getPriceSetMetadata()['extends']) {
+        $this->_useForMember = 1;
+      }
+      else {
+        $this->_useForMember = 0;
+      }
+      $this->set('useForMember', $this->_useForMember);
+    }
+    return (bool) $this->_useForMember;
   }
 
   /**
