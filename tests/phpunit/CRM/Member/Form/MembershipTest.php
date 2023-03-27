@@ -19,6 +19,7 @@
 
 use Civi\Api4\FinancialType;
 use Civi\Api4\MembershipType;
+use Civi\Api4\PriceFieldValue;
 
 /**
  *  Test CRM_Member_Form_Membership functions.
@@ -222,6 +223,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has an end date before the start date and a rolling
    *  membership type
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testFormRuleRollingEarlyEnd(): void {
     $unixYesterday = time() - (24 * 60 * 60);
@@ -1428,21 +1431,15 @@ Expires: ',
    * @throws \CRM_Core_Exception
    */
   public function testLineItemAmountOnSalesTax(): void {
+    $mailUtil = new CiviMailUtils($this, TRUE);
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType(2);
-    $form = $this->getForm();
-    $form->preProcess();
-    $this->mut = new CiviMailUtils($this, TRUE);
-    $this->createLoggedInUser();
     $priceSet = $this->callAPISuccess('PriceSet', 'Get', ['extends' => 'CiviMember']);
-    $form->set('priceSetId', $priceSet['id']);
     // we are simulating the creation of a Price Set in Administer -> CiviContribute -> Manage Price Sets so set is_quick_config = 0
     $this->callAPISuccess('PriceSet', 'Create', ['id' => $priceSet['id'], 'is_quick_config' => 0]);
+    $fieldOption = PriceFieldValue::get()->addWhere('amount', '=', 50)->addSelect('id', 'price_field_id')->execute()->indexBy('id')->first();
     // clean the price options static variable to repopulate the options, in order to fetch tax information
     \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
-    CRM_Price_BAO_PriceSet::buildPriceSet($form);
-    // rebuild the price set form variable to include the tax information against each price options
-    $form->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSet['id']));
     $params = [
       'cid' => $this->_individualId,
       'join_date' => date('Y-m-d'),
@@ -1451,6 +1448,7 @@ Expires: ',
       // This format reflects the first number being the organisation & the second being the type.
       'membership_type_id' => [$this->ids['contact']['organization'], $this->ids['membership_type']['AnnualFixed']],
       'record_contribution' => 1,
+      'price_' . $fieldOption['price_field_id'] => $fieldOption['id'],
       'total_amount' => 55,
       'receive_date' => date('Y-m-d') . ' 20:36:00',
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments, TRUE),
@@ -1458,9 +1456,17 @@ Expires: ',
       //Member dues, see data.xml
       'financial_type_id' => 2,
       'payment_processor_id' => $this->_paymentProcessorID,
+      'send_receipt' => 1,
+      'from_email_address' => 'bob@example.com',
     ];
-    $form->_contactID = $this->_individualId;
-    $form->testSubmit($params);
+
+    $form = $this->getForm($params);
+    $this->createLoggedInUser();
+    $form->postProcess();
+    $email = preg_replace('/\s+/', ' ', $mailUtil->getMostRecentEmail());
+    foreach ($this->getExpectedEmailStrings() as $string) {
+      $this->assertStringContainsString($string, $email);
+    }
 
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership']);
@@ -1504,6 +1510,28 @@ Expires: ',
       $financialItems_sum += $financialItem['amount'];
     }
     $this->assertEquals($contribution['total_amount'], $financialItems_sum);
+  }
+
+  /**
+   * Get the expected output from mail.
+   *
+   * @return string[]
+   */
+  private function getExpectedEmailStrings(): array {
+    return [
+      '<table id="crm-membership_receipt"',
+      'Membership Fee',
+      'Financial Type',
+      'Member Dues </td>',
+      '<tr> <td colspan="2" style="padding: 4px; border-bottom: 1px solid #999;"> <table> <tr> <th>Item</th> <th>Fee</th> <th>SubTotal</th> <th>Tax Rate</th> <th>Tax Amount</th> <th>Total</th> <th>Membership Start Date</th> <th>Membership Expiration Date</th> </tr> <tr> <td> Membership Amount - AnnualFixed </td>',
+      '<td> $50.00 </td> <td> $50.00 </td> <td> 10.00% </td> <td> $5.00 </td> <td> $55.00 </td> <td>',
+      'Amount Before Tax: </td>',
+      '<td style="padding: 4px; border-bottom: 1px solid #999;"> $50.00 </td>',
+      '<td>&nbsp;Sales Tax 10.00%</td> <td>&nbsp;$5.00</td>',
+      'Total Tax Amount </td> <td style="padding: 4px; border-bottom: 1px solid #999;"> $5.00 </td>',
+      'Amount </td> <td style="padding: 4px; border-bottom: 1px solid #999;"> $55.00 </td>',
+      'Paid By </td> <td style="padding: 4px; border-bottom: 1px solid #999;"> Check </td>',
+    ];
   }
 
   /**

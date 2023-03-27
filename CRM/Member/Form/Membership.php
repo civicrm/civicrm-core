@@ -1336,30 +1336,21 @@ DESC limit 1");
     $receiptSend = FALSE;
     $contributionId = $this->ids['Contribution'] ?? CRM_Member_BAO_Membership::getMembershipContributionId($this->getMembershipID());
     $membershipIds = $this->_membershipIDs;
-    if ($contributionId && !empty($membershipIds)) {
+    if ($this->getSubmittedValue('send_receipt') && $contributionId && !empty($membershipIds)) {
       $contributionDetails = CRM_Contribute_BAO_Contribution::getContributionDetails(
         CRM_Export_Form_Select::MEMBER_EXPORT, $this->_membershipIDs);
       if ($contributionDetails[$this->getMembershipID()]['contribution_status'] === 'Completed') {
-        $receiptSend = TRUE;
+        $formValues['contact_id'] = $this->_contactID;
+        $formValues['contribution_id'] = $contributionId;
+        // receipt_text_signup is no longer used in receipts from 5.47
+        // but may linger in some sites that have not updated their
+        // templates.
+        $formValues['receipt_text_signup'] = $this->getSubmittedValue('receipt_text');
+        // send email receipt
+        $this->assignBillingName();
+        $this->emailMembershipReceipt($formValues);
+        $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', [1 => $this->_contributorEmail]));
       }
-    }
-
-    $receiptSent = FALSE;
-    if ($this->getSubmittedValue('send_receipt') && $receiptSend) {
-      $formValues['contact_id'] = $this->_contactID;
-      $formValues['contribution_id'] = $contributionId;
-      // receipt_text_signup is no longer used in receipts from 5.47
-      // but may linger in some sites that have not updated their
-      // templates.
-      $formValues['receipt_text_signup'] = $formValues['receipt_text'];
-      // send email receipt
-      $this->assignBillingName();
-      $mailSend = $this->emailMembershipReceipt($formValues);
-      $receiptSent = TRUE;
-    }
-
-    if ($receiptSent && $mailSend) {
-      $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', [1 => $this->_contributorEmail]));
     }
 
     CRM_Core_Session::setStatus($this->getStatusMessage(), ts('Complete'), 'success');
