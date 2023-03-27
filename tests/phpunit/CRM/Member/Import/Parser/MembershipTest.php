@@ -370,8 +370,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test importing to a custom field.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testImportCustomData(): void {
     $donaldDuckID = $this->individualCreate(['first_name' => 'Donald', 'last_name' => 'Duck']);
