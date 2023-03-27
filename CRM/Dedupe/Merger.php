@@ -2115,9 +2115,9 @@ ORDER BY civicrm_custom_group.weight,
         $fieldID = (int) substr($key, 7);
         $fieldMetadata = CRM_Core_BAO_CustomField::getCustomFieldsForContactType($contactType, FALSE)[$fieldID] ?? NULL;
         if ($fieldMetadata) {
-          $htmlType = $fieldMetadata['html_type'];
+          $htmlType = (string) $fieldMetadata['html_type'];
           $isSerialized = CRM_Core_BAO_CustomField::isSerialized($fieldMetadata);
-          $isView = $fieldMetadata['is_view'];
+          $isView = (bool) $fieldMetadata['is_view'];
           if ($isView) {
             $viewOnlyCustomFields[$key] = $value;
           }
