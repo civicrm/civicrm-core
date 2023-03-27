@@ -247,14 +247,27 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
       $note = CRM_Core_DAO_Note::import();
       $tmpFields = CRM_Contribute_DAO_Contribution::import();
+      // Unravel the unique fields - once more metadata work is done on apiv4 we
+      // will use that instead to get them.
+      foreach (['contribution_cancel_date', 'contribution_check_number', 'contribution_campaign_id'] as $uniqueField) {
+        $realField = substr($uniqueField, 13);
+        $tmpFields[$realField] = $tmpFields[$uniqueField];
+        unset($tmpFields[$uniqueField]);
+      }
       $tmpContactField = $this->getContactFields($this->getContactType());
+      // I haven't un-done this unique field yet cos it's more complex.
       $tmpFields['contribution_contact_id']['title'] = $tmpFields['contribution_contact_id']['html']['label'] = $tmpFields['contribution_contact_id']['title'] . ' ' . ts('(match to contact)');
       $tmpFields['contribution_contact_id']['contact_type'] = ['Individual' => 'Individual', 'Household' => 'Household', 'Organization' => 'Organization'];
       $tmpFields['contribution_contact_id']['match_rule'] = '*';
       $fields = array_merge($fields, $tmpContactField);
       $fields = array_merge($fields, $tmpFields);
       $fields = array_merge($fields, $note);
-      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Contribution'));
+      $apiv4 = Contribution::getFields(TRUE)->addWhere('custom_field_id', '>', 0)->execute();
+      $customFields = [];
+      foreach ($apiv4 as $apiv4Field) {
+        $customFields[$apiv4Field['name']] = $apiv4Field;
+      }
+      $fields = array_merge($fields, $customFields);
 
       $fields['soft_credit.contact.id'] = [
         'title' => ts('Soft Credit Contact ID'),
@@ -384,7 +397,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
-      $contributionParams = array_merge(['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => TRUE], $params['Contribution']);
+      $contributionParams = $params['Contribution'];
       //CRM-10994
       if (isset($contributionParams['total_amount']) && $contributionParams['total_amount'] == 0) {
         $contributionParams['total_amount'] = '0.00';
@@ -424,7 +437,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         $this->deleteExistingSoftCredit($contributionParams['id']);
       }
 
-      $contributionID = civicrm_api3('contribution', 'create', $contributionParams)['id'];
+      if ($contributionParams['id']) {
+        $contributionID = Contribution::update()->setValues($contributionParams)->execute()->first()['id'];
+      }
+      else {
+        $contributionID = Contribution::create()->setValues($contributionParams)->execute()->first()['id'];
+      }
 
       if (!empty($softCreditParams)) {
         if (empty($contributionParams['total_amount']) || empty($contributionParams['currency'])) {
@@ -732,7 +750,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @return string[]
    */
   protected function getOddlyMappedMetadataFields(): array {
-    $uniqueNames = ['contribution_id', 'contribution_contact_id', 'contribution_cancel_date', 'contribution_source', 'contribution_check_number'];
+    $uniqueNames = ['contribution_id', 'contribution_contact_id', 'contribution_source'];
     $fields = [];
     foreach ($uniqueNames as $name) {
       $fields[$this->importableFieldsMetadata[$name]['name']] = $name;
