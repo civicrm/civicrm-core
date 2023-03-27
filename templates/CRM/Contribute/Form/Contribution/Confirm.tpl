@@ -243,25 +243,25 @@
             {$paymentFieldsetLabel}
           </div>
         {/if}
-        {if in_array('bank_account_number', $form)}
+        {if in_array('bank_account_number', $form) && $bank_account_number}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br/>
             {ts}Bank Account Number{/ts}: {$bank_account_number}<br/>
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br/>
             {ts}Bank Name{/ts}: {$bank_name}<br/>
           </div>
-          {if $contributeMode eq 'direct'}
+          {if $paymentAgreementText}
             <div class="crm-group debit_agreement-group">
               <div class="header-dark">
-                {ts}Agreement{/ts}
+                {$paymentAgreementTitle}
               </div>
               <div class="display-block">
-                {ts}Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.{/ts}
+                {$paymentAgreementText}
               </div>
             </div>
           {/if}
         {/if}
-        {if in_array('credit_card_number', $form)}
+        {if in_array('credit_card_number', $form) && $credit_card_number}
           <div class="crm-section no-label credit_card_details-section">
             <div class="content">{$credit_card_type}</div>
             <div class="content">{$credit_card_number}</div>
