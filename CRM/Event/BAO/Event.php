@@ -108,7 +108,12 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
       if (!empty($params['template_id'])) {
         $copy = self::copy($params['template_id']);
         $params['id'] = $copy->id;
+
         unset($params['template_id']);
+        // unless we are explicitly trying to create a new template
+        // we want to set the `is_template` flag on the clone to false
+        // so that the copy is a new event rather than a new template
+        $params['is_template'] = $params['is_template'] ?? 0;
 
         //fix for api from template creation bug
         civicrm_api4('ActionSchedule', 'update', [
