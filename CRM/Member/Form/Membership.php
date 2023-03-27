@@ -983,7 +983,7 @@ DESC limit 1");
           'receiptText' => $this->getSubmittedValue('receipt_text'),
           'contributionId' => $formValues['contribution_id'],
           'contactId' => $this->_receiptContactId,
-          'membershipId' => $this->getMembershipID(),
+          'membershipID' => $this->getMembershipID(),
         ],
       ]
     );

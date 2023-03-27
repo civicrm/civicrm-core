@@ -968,7 +968,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         'modelProps' => [
           'contributionId' => $this->getCurrentRowContributionID(),
           'contactId' => $form->_receiptContactId,
-          'membershipId' => $this->getCurrentRowMembershipID(),
+          'membershipID' => $this->getCurrentRowMembershipID(),
         ],
       ]
     );
