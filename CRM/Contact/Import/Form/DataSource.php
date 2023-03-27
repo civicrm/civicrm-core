@@ -80,58 +80,11 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    * @return array
    *   reference to the array of default values
    */
-  public function setDefaultValues() {
-    $defaults = parent::setDefaultValues();
-    $defaults['contactType'] = 'Individual';
-    $defaults['disableUSPS'] = TRUE;
-
-    if ($this->get('loadedMapping')) {
-      $defaults['savedMapping'] = $this->get('loadedMapping');
-    }
-
-    return $defaults;
-  }
-
-  /**
-   * Call the DataSource's postProcess method.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function postProcess() {
-    $this->controller->resetPage('MapField');
-    $this->processDatasource();
-    // @todo - this params are being set here because they were / possibly still
-    // are in some places being accessed by forms later in the flow
-    // ie CRM_Contact_Import_Form_MapField, CRM_Contact_Import_Form_Preview
-    // which was the old way of saving values submitted on this form such that
-    // the other forms could access them. Now they should use
-    // `getSubmittedValue` or simply not get them if the only
-    // reason is to pass to the Parser which can itself
-    // call 'getSubmittedValue'
-    // Once the mentioned forms no longer call $this->get() all this 'setting'
-    // is obsolete.
-    $storeParams = [
-      'savedMapping' => $this->getSubmittedValue('savedMapping'),
-    ];
-
-    foreach ($storeParams as $storeName => $value) {
-      $this->set($storeName, $value);
-    }
-  }
-
-  /**
-   * General function for handling invalid configuration.
-   *
-   * I was going to statusBounce them all but when I tested I was 'bouncing' to weird places
-   * whereas throwing an exception gave no behaviour change. So, I decided to centralise
-   * and we can 'flip the switch' later.
-   *
-   * @param $message
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function invalidConfig($message) {
-    throw new CRM_Core_Exception($message);
+  public function setDefaultValues(): array {
+    return array_merge([
+      'contactType' => 'Individual',
+      'disableUSPS' => TRUE,
+    ], parent::setDefaultValues());
   }
 
   /**

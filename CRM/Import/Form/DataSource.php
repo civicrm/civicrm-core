@@ -14,12 +14,23 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Mapping;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\UserJob;
 
 /**
  * Base class for upload-only import forms (all but Contact import).
  */
 abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
+
+  /**
+   * Values loaded from a saved UserJob template.
+   *
+   * Within Civi-Import it is possible to save a UserJob with is_template = 1.
+   *
+   * @var array
+   */
+  protected $templateValues = [];
 
   /**
    * Set variables up before form is built.
@@ -41,6 +52,16 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    */
   protected function getTranslatedEntity(): string {
     return (string) CoreUtil::getInfoItem($this->getBaseEntity(), 'title');
+  }
+
+  /**
+   * Get the mapping ID that is being loaded.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getSavedMappingID(): ?int {
+    return $this->getSubmittedValue('savedMapping') ?: NULL;
   }
 
   /**
@@ -71,16 +92,19 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
           CRM.$('#data-source-form-block').toggle()",
       ]);
     }
+    if ($this->getTemplateID()) {
+      $this->setTemplateDefaults();
+    }
 
     $this->add('select', 'dataSource', ts('Data Source'), $this->getDataSources(), TRUE,
       ['onchange' => 'buildDataSourceFormBlock(this.value);']
     );
 
     $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . $this->getBaseEntity());
-    $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
 
-    if ($loadedMapping = $this->get('loadedMapping')) {
-      $this->setDefaults(['savedMapping' => $loadedMapping]);
+    $savedMappingElement = $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
+    if ($this->getTemplateID()) {
+      $savedMappingElement->freeze();
     }
 
     //build date formats
@@ -113,8 +137,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
     return array_merge($this->dataSourceDefaults, [
       'dataSource' => $this->getDefaultDataSource(),
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
-    ]);
-
+    ], $this->templateValues);
   }
 
   /**
@@ -153,7 +176,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    *
    * @param array $names
    */
-  protected function storeFormValues($names) {
+  protected function storeFormValues(array $names): void {
     foreach ($names as $name) {
       $this->set($name, $this->controller->exportValue($this->_name, $name));
     }
@@ -178,9 +201,36 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
   }
 
   /**
-   * Process the datasource submission - setting up the job and data source.
+   * Load default values from the relevant template if one is passed in via the url.
    *
-   * @throws \CRM_Core_Exception
+   * We need to create and UserJob at this point as the relevant values
+   * go beyond the first DataSource screen.
+   *
+   * @return array
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public function setTemplateDefaults(): array {
+    $templateID = $this->getTemplateID();
+    if ($templateID && !$this->getUserJobID()) {
+      $userJob = UserJob::get(FALSE)->addWhere('id', '=', $templateID)->execute()->first();
+      $userJobName = $userJob['name'];
+      // Strip off import_ prefix from UserJob.name
+      $mappingName = substr($userJobName, 7);
+      $mappingID = Mapping::get(FALSE)->addWhere('name', '=', $mappingName)->addSelect('id')->execute()->first()['id'];
+      // Unset fields that should not be copied over.
+      unset($userJob['id'], $userJob['name'], $userJob['created_id'], $userJob['created_date'], $userJob['expires_date'], $userJob['is_template'], $userJob['queue_id'], $userJob['start_date'], $userJob['end_date']);
+      $userJob['metadata']['template_id'] = $templateID;
+      $userJobID = UserJob::create(FALSE)->setValues($userJob)->execute()->first()['id'];
+      $this->set('user_job_id', $userJobID);
+      $userJob['metadata']['submitted_values']['savedMapping'] = $mappingID;
+      $this->templateValues = $userJob['metadata']['submitted_values'];
+    }
+    return [];
+  }
+
+  /**
+   * Process the datasource submission - setting up the job and data source.
    */
   protected function processDatasource(): void {
     try {

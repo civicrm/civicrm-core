@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Mapping;
 use Civi\Api4\UserJob;
 use League\Csv\Writer;
 
@@ -22,6 +23,12 @@ use League\Csv\Writer;
  * This class helps the forms within the import flow access submitted & parsed values.
  */
 class CRM_Import_Forms extends CRM_Core_Form {
+
+
+  /**
+   * @var int
+   */
+  protected $templateID;
 
   /**
    * User job id.
@@ -32,6 +39,46 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @var int
    */
   protected $userJobID;
+
+  /**
+   * Name of the import mapping (civicrm_mapping).
+   *
+   * @var string
+   */
+  protected $mappingName;
+
+  /**
+   * The id of the saved mapping being updated.
+   *
+   * Note this may not be the same as the saved mapping being used to
+   * load data. Use the `getSavedMappingID` function to access & any
+   * extra logic can be added in there.
+   *
+   * @var int
+   */
+  protected $savedMappingID;
+
+  /**
+   * @param int $savedMappingID
+   *
+   * @return CRM_Import_Forms
+   */
+  public function setSavedMappingID(int $savedMappingID): CRM_Import_Forms {
+    $this->savedMappingID = $savedMappingID;
+    return $this;
+  }
+
+  /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * This should be overridden.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    CRM_Core_Error::deprecatedWarning('this function should be overridden');
+    return '';
+  }
 
   /**
    * @return int|null
@@ -137,6 +184,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @param string $fieldName
    *
    * @return mixed|null
+   * @throws \CRM_Core_Exception
    */
   public function getSubmittedValue(string $fieldName) {
     if ($fieldName === 'dataSource') {
@@ -153,6 +201,57 @@ class CRM_Import_Forms extends CRM_Core_Form {
     }
     return parent::getSubmittedValue($fieldName);
 
+  }
+
+  /**
+   * Get the template ID from the url, if available.
+   *
+   * Otherwise there are other possibilities...
+   *  - it could already be saved to our UserJob.
+   *  - on the DataSource form we could determine if from the savedMapping field
+   *  (which will hold an ID that can be used to load it). We want to check this is
+   *  coming from the POST (ie fresh)
+   *  - on the MapField form it could be derived from the new mapping created from
+   *   saveMapping + saveMappingName.
+   *
+   * @return int|null
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public function getTemplateID(): ?int {
+    if ($this->templateID === NULL) {
+      $this->templateID = CRM_Utils_Request::retrieve('template_id', 'Int', $this);
+      if ($this->templateID && $this->getTemplateJob()) {
+        return $this->templateID;
+      }
+      if ($this->getUserJobID()) {
+        $this->templateID = $this->getUserJob()['metadata']['template_id'] ?? NULL;
+      }
+      elseif (!empty($this->getSubmittedValue('savedMapping'))) {
+        if (!$this->getTemplateJob()) {
+          $this->createTemplateJob();
+        }
+      }
+    }
+    return $this->templateID ?? NULL;
+  }
+
+  /**
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMappingName(): string {
+    if ($this->mappingName === NULL) {
+      $savedMappingID = $this->getSavedMappingID();
+      if ($savedMappingID) {
+        $this->mappingName = Mapping::get(FALSE)
+          ->addWhere('id', '=', $savedMappingID)
+          ->execute()
+          ->first()['name'];
+      }
+    }
+    return $this->mappingName ?? '';
   }
 
   /**
@@ -263,10 +362,14 @@ class CRM_Import_Forms extends CRM_Core_Form {
     // We give the datasource a chance to clean up any tables it might have
     // created. If we are still using the same type of datasource (e.g still
     // an sql query
-    $oldDataSource = $this->getUserJobSubmittedValues()['dataSource'];
-    $oldDataSourceObject = new $oldDataSource($this->getUserJobID());
-    $newParams = $this->getSubmittedValue('dataSource') === $oldDataSource ? $this->getSubmittedValues() : [];
-    $oldDataSourceObject->purge($newParams);
+    $oldDataSource = $this->getUserJobSubmittedValues()['dataSource'] ?? NULL;
+    if ($oldDataSource) {
+      // Absence of an old data source likely means a template has been used (hence
+      // the user job exists) - but templates don't have data sources - so nothing to flush.
+      $oldDataSourceObject = new $oldDataSource($this->getUserJobID());
+      $newParams = $this->getSubmittedValue('dataSource') === $oldDataSource ? $this->getSubmittedValues() : [];
+      $oldDataSourceObject->purge($newParams);
+    }
     $this->updateUserJobMetadata('DataSource', []);
   }
 
@@ -332,6 +435,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * all forms.
    *
    * @return string[]
+   * @throws \CRM_Core_Exception
    */
   protected function getSubmittableFields(): array {
     $dataSourceFields = array_fill_keys($this->getDataSourceFields(), 'DataSource');
@@ -379,12 +483,30 @@ class CRM_Import_Forms extends CRM_Core_Form {
         'expires_date' => '+ 1 week',
         'metadata' => [
           'submitted_values' => $this->getSubmittedValues(),
+          'template_id' => $this->getTemplateID(),
+          'Template' => ['mapping_id' => $this->getSavedMappingID()],
         ],
       ])
       ->execute()
       ->first()['id'];
     $this->setUserJobID($id);
     return $id;
+  }
+
+  protected function createTemplateJob(): void {
+    if (!$this->getUserJobType()) {
+      // This could be hit in extensions while they transition.
+      CRM_Core_Error::deprecatedWarning('Classes should implement getUserJobType');
+      return;
+    }
+    $this->templateID = UserJob::create(FALSE)->setValues([
+      'is_template' => 1,
+      'created_id' => CRM_Core_Session::getLoggedInContactID(),
+      'job_type' => $this->getUserJobType(),
+      'status_id:name' => 'draft',
+      'name' => 'import_' . $this->getMappingName(),
+      'metadata' => ['submitted_values' => $this->getSubmittedValues()],
+    ])->execute()->first()['id'];
   }
 
   /**
@@ -399,11 +521,30 @@ class CRM_Import_Forms extends CRM_Core_Form {
       $this->getUserJob()['metadata'],
       [$key => $data]
     );
+    $this->getUserJob()['metadata'] = $metaData;
+    if ($this->isUpdateTemplateJob()) {
+      $this->updateTemplateUserJob($metaData);
+    }
+    // We likely don't need the empty check. A precaution against nulling it out by accident.
+    if (empty($metaData['template_id'])) {
+      $metaData['template_id'] = $this->templateID;
+    }
     UserJob::update(FALSE)
       ->addWhere('id', '=', $this->getUserJobID())
       ->setValues(['metadata' => $metaData])
       ->execute();
     $this->userJob['metadata'] = $metaData;
+  }
+
+  /**
+   * Is the user wanting to update the template / mapping.
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function isUpdateTemplateJob(): bool {
+    return $this->getSubmittedValue('updateMapping') || $this->getSubmittedValue('saveMapping');
   }
 
   /**
@@ -566,6 +707,18 @@ class CRM_Import_Forms extends CRM_Core_Form {
   }
 
   /**
+   * Get information about the user job parser.
+   *
+   * This is as per `CRM_Core_BAO_UserJob::getTypes()`
+   *
+   * @return array
+   */
+  protected function getUserJobInfo(): array {
+    $importInformation = $this->getParser()->getUserJobInfo();
+    return reset($importInformation);
+  }
+
+  /**
    * Get the fields available for import selection.
    *
    * @return array
@@ -631,6 +784,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * Get an instance of the parser class.
    *
    * @return \CRM_Contact_Import_Parser_Contact|\CRM_Contribute_Import_Parser_Contribution
+   * @throws \CRM_Core_Exception
    */
   protected function getParser() {
     foreach (CRM_Core_BAO_UserJob::getTypes() as $jobType) {
@@ -775,6 +929,58 @@ class CRM_Import_Forms extends CRM_Core_Form {
       'dedupeRules' => $parser->getAllDedupeRules(),
       'userJob' => $this->getUserJob(),
     ]);
+  }
+
+  /**
+   * Get the UserJob Template, if it exists.
+   *
+   * @return array|null
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getTemplateJob(): ?array {
+    $mappingName = $this->getMappingName();
+    if (!$mappingName) {
+      return NULL;
+    }
+    $templateJob = UserJob::get(FALSE)
+      ->addWhere('name', '=', 'import_' . $mappingName)
+      ->addWhere('is_template', '=', TRUE)
+      ->execute()->first();
+    $this->templateID = $templateJob['id'];
+    return $templateJob ?? NULL;
+  }
+
+  /**
+   * @param array $metaData
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function updateTemplateUserJob(array $metaData): void {
+    if ($this->getTemplateID()) {
+      UserJob::update(FALSE)
+        ->addWhere('id', '=', $this->getTemplateID())
+        ->setValues(['metadata' => $metaData, 'is_template' => TRUE])
+        ->execute();
+    }
+    elseif ($this->getMappingName()) {
+      $this->createTemplateJob();
+    }
+  }
+
+  /**
+   * Get the saved mapping ID being updated.
+   *
+   * @return int|null
+   */
+  public function getSavedMappingID(): ?int {
+    if (!$this->savedMappingID) {
+      if (!empty($this->getUserJob()['metadata']['Template']['mapping_id'])) {
+        $this->savedMappingID = $this->getUserJob()['metadata']['Template']['mapping_id'];
+      }
+    }
+    return $this->savedMappingID;
   }
 
 }

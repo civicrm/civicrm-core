@@ -122,7 +122,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
    */
   private function getImportTableFromEvent(GenericHookEvent $event): ?string {
     if (isset($event->object)) {
-      $metadata = json_decode($event->object->metadata, TRUE);
+      $metadata = json_decode((string) $event->object->metadata, TRUE);
       if (!is_array($metadata)) {
         return NULL;
       }

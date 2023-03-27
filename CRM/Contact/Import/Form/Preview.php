@@ -24,6 +24,15 @@ use Civi\Api4\Tag;
 class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'contact_import';
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm(): void {
