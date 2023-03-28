@@ -106,9 +106,6 @@
     "psr/container": "~1.0 || ~2.0",
     "ext-fileinfo": "*"
   },
-  "require-dev": {
-    "cache/integration-tests": "~0.17.0"
-  },
   "scripts": {
     "post-install-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",
