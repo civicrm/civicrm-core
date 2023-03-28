@@ -66,7 +66,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *
    * @var CRM_Core_Config
    */
-  private static $_singleton = NULL;
+  private static $_singleton;
 
   /**
    * Singleton function used to manage this object.
