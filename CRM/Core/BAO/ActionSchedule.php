@@ -252,6 +252,10 @@ FROM civicrm_action_schedule cas
         [1 => [$actionSchedule->id, 'Integer']]
       );
 
+      if ($dao->N > 0) {
+        Civi::log()->info("Sending Scheduled Reminder {$actionSchedule->id} to {$dao->N} recipients");
+      }
+
       $multilingual = CRM_Core_I18n::isMultilingual();
       $tokenProcessor = self::createTokenProcessor($actionSchedule, $mapping);
       while ($dao->fetch()) {
