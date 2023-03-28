@@ -124,9 +124,9 @@ class ContactDuplicatesTest extends CustomTestBase {
       ->execute()->column('id');
 
     $this->assertCount(3, $found);
-    $this->assertContains($testContacts[0], $found);
-    $this->assertContains($testContacts[1], $found);
-    $this->assertContains($testContacts[3], $found);
+    $this->assertContainsEquals($testContacts[0], $found);
+    $this->assertContainsEquals($testContacts[1], $found);
+    $this->assertContainsEquals($testContacts[3], $found);
 
     $found = Contact::getDuplicates(FALSE)
       ->setDedupeRule('customRule')
@@ -136,8 +136,8 @@ class ContactDuplicatesTest extends CustomTestBase {
       ->execute()->column('id');
 
     $this->assertCount(2, $found);
-    $this->assertContains($testContacts[2], $found);
-    $this->assertContains($testContacts[4], $found);
+    $this->assertContainsEquals($testContacts[2], $found);
+    $this->assertContainsEquals($testContacts[4], $found);
   }
 
   public function testMergeDuplicates():void {

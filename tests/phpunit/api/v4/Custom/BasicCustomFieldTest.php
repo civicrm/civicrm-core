@@ -589,7 +589,7 @@ class BasicCustomFieldTest extends CustomTestBase {
         ->addValue('html_type', 'Text')
       )
       ->execute()->single();
-    $this->assertContains($financialType['id'], $contributionGroup['extends_entity_column_value']);
+    $this->assertContainsEquals($financialType['id'], $contributionGroup['extends_entity_column_value']);
 
     $getFieldsWithTestType = Contribution::getFields(FALSE)
       ->addValue('financial_type_id:name', 'Test_Type')
