@@ -102,7 +102,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
     ];
     $apiv4 = Contribution::getFields(FALSE)->addWhere('custom_field_id', '>', 0)->execute();
     foreach ($apiv4 as $apiv4Field) {
-      $fieldMap['custom_' . $apiv4Field['id']] = $apiv4Field['name'];
+      $fieldMap['custom_' . $apiv4Field['custom_field_id']] = $apiv4Field['name'];
     }
 
     // Update the mapped fields.
