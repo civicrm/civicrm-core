@@ -133,17 +133,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
   /**
    * Callback for hook_civicrm_pre().
+   *
    * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
     if ($event->action === 'create') {
-      // If we are creating a new PaymentProcessor and have not specified the payment instrument to use, get the default from the Payment Processor Type.
-      if (empty($event->params['payment_instrument_id'])) {
-        $event->params['payment_instrument_id'] = civicrm_api3('PaymentProcessorType', 'getvalue', [
-          'id' => $event->params['payment_processor_type_id'],
-          'return' => 'payment_instrument_id',
-        ]);
-      }
       // Supply defaults for `title` and `frontend_title`
       if (!isset($event->params['title'])) {
         $event->params['title'] = $event->params['name'];
@@ -153,15 +149,19 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       }
 
       // also copy meta fields from the ppType DAO
-      $ppTypeDAO = new CRM_Financial_DAO_PaymentProcessorType();
-      $ppTypeDAO->id = $event->params['payment_processor_type_id'];
-      if (!$ppTypeDAO->find(TRUE)) {
+      $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
+      $paymentProcessorType->id = $event->params['payment_processor_type_id'];
+      if (!$paymentProcessorType->find(TRUE)) {
         throw new CRM_Core_Exception(ts('Could not find payment processor meta information'));
       }
-      $event->params['is_recur'] = $ppTypeDAO->is_recur;
-      $event->params['billing_mode'] = $ppTypeDAO->billing_mode;
-      $event->params['class_name'] = $ppTypeDAO->class_name;
-      $event->params['payment_type'] = $ppTypeDAO->payment_type;
+      // If we are creating a new PaymentProcessor and have not specified the payment instrument to use, get the default from the Payment Processor Type.
+      if (empty($event->params['payment_instrument_id'])) {
+        $event->params['payment_instrument_id'] = $paymentProcessorType->payment_instrument_id;
+      }
+      $event->params['is_recur'] = $paymentProcessorType->is_recur;
+      $event->params['billing_mode'] = $paymentProcessorType->billing_mode;
+      $event->params['class_name'] = $paymentProcessorType->class_name;
+      $event->params['payment_type'] = $paymentProcessorType->payment_type;
     }
   }
 
