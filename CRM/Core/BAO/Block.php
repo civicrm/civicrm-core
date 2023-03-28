@@ -282,7 +282,10 @@ class CRM_Core_BAO_Block {
       }
 
       $blockFields = array_merge($value, $contactFields);
-      $blocks[] = $baoString::create($blockFields);
+      if ($baoString === 'CRM_Core_BAO_Address') {
+        CRM_Core_BAO_Address::fixAddress($blockFields);
+      }
+      $blocks[] = $baoString::writeRecord($blockFields);
     }
 
     return $blocks;

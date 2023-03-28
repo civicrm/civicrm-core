@@ -20,96 +20,70 @@ use Civi\Api4\Address;
 /**
  * This is class to handle address related functions.
  */
-class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
+class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\HookInterface {
   use CRM_Contact_AccessTrait;
 
   /**
-   * Takes an associative array and creates a address.
+   * @deprecated
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param bool $fixAddress
-   *   True if you need to fix (format) address values.
-   *                               before inserting in db
-   *
-   * @return array|NULL|self
-   *   array of created address
+   * @return CRM_Core_BAO_Address
+   * @throws CRM_Core_Exception
    */
   public static function create(array &$params, $fixAddress = TRUE) {
-    return self::add($params, $fixAddress);
-  }
-
-  /**
-   * Takes an associative array and adds address.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param bool $fixAddress
-   *   True if you need to fix (format) address values.
-   *                               before inserting in db
-   *
-   * @return CRM_Core_BAO_Address|null
-   */
-  public static function add(&$params, $fixAddress = FALSE) {
-
-    $address = new CRM_Core_DAO_Address();
-    $checkPermissions = $params['check_permissions'] ?? TRUE;
-
-    // fixAddress mode to be done
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if ($fixAddress) {
       CRM_Core_BAO_Address::fixAddress($params);
     }
+    return self::writeRecord($params);
+  }
 
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Address', CRM_Utils_Array::value('id', $params), $params);
+  /**
+   * @deprecated
+   *
+   * @param array $params
+   * @param bool $fixAddress
+   * @return CRM_Core_BAO_Address
+   * @throws CRM_Core_Exception
+   */
+  public static function add(&$params, $fixAddress = FALSE) {
+    return self::create($params, $fixAddress);
+  }
 
-    CRM_Core_BAO_Block::handlePrimary($params, get_class());
-    CRM_Core_BAO_Block::handleBilling($params, get_class());
+  /**
+   * Event fired before modifying an Address.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (in_array($event->action, ['create', 'edit'])) {
+      CRM_Core_BAO_Block::handlePrimary($event->params, __CLASS__);
+      CRM_Core_BAO_Block::handleBilling($event->params, __CLASS__);
 
-    // (prevent chaining 1 and 3) CRM-21214
-    if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
-      self::fixSharedAddress($params);
+      // (prevent chaining 1 and 3) CRM-21214
+      if (isset($event->params['master_id']) && !CRM_Utils_System::isNull($event->params['master_id'])) {
+        self::fixSharedAddress($event->params);
+      }
     }
+  }
 
-    $address->copyValues($params);
-    $address->save();
-
-    if ($address->id) {
-      // first get custom field from master address if any
-      if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
-        $address->copyCustomFields($params['master_id'], $address->id, $hook);
+  /**
+   * Event fired after modifying an Address.
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    // Copy custom data from master address if not supplied
+    if ($event->action === 'create' && !isset($event->params['custom'])) {
+      if (isset($event->params['master_id']) && !CRM_Utils_System::isNull($event->params['master_id'])) {
+        $event->object->copyCustomFields($event->params['master_id'], $event->id, $event->action);
       }
-
-      if (isset($params['custom'])) {
-        $addressCustom = $params['custom'];
-      }
-      else {
-        $customFields = CRM_Core_BAO_CustomField::getFields('Address', FALSE, TRUE, NULL, NULL,
-          FALSE, FALSE, $checkPermissions ? CRM_Core_Permission::EDIT : FALSE);
-
-        if (!empty($customFields)) {
-          $addressCustom = CRM_Core_BAO_CustomField::postProcess($params,
-            $address->id,
-            'Address',
-            FALSE,
-            $checkPermissions
-          );
-        }
-      }
-      if (!empty($addressCustom)) {
-        CRM_Core_BAO_CustomValueTable::store($addressCustom, 'civicrm_address', $address->id, $hook);
-      }
-
+    }
+    if (in_array($event->action, ['create', 'edit'])) {
       // call the function to sync shared address and create relationships
       // if address is already shared, share master_id with all children and update relationships accordingly
       // (prevent chaining 2) CRM-21214
-      self::processSharedAddress($address->id, $params, $hook);
-
-      // lets call the post hook only after we've done all the follow on processing
-      CRM_Utils_Hook::post($hook, 'Address', $address->id, $address);
+      self::processSharedAddress($event->id, $event->params, $event->action);
     }
-
-    return $address;
   }
 
   /**
@@ -1336,7 +1310,6 @@ SELECT is_primary,
       return NULL;
     }
     CRM_Core_BAO_Block::sortPrimaryFirst($params['address']);
-    $contactId = NULL;
 
     $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
     $contactId = $params['contact_id'];
@@ -1386,7 +1359,17 @@ SELECT is_primary,
         $value['manual_geo_code'] = 0;
       }
       $value['contact_id'] = $contactId;
-      $blocks[] = self::add($value, $fixAddress);
+
+      if ($fixAddress) {
+        self::fixAddress($value);
+      }
+
+      // Format custom data
+      if (!isset($value['custom'])) {
+        $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value, $value['id'] ?? NULL, 'Address');
+      }
+
+      $blocks[] = self::writeRecord($value);
     }
     return $blocks;
   }

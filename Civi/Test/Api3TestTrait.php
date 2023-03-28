@@ -428,6 +428,11 @@ trait Api3TestTrait {
           if ($v4Entity != 'Setting' && !in_array('id', $v4Params['select'])) {
             $v4Params['select'][] = 'id';
           }
+          // Convert 'custom' to 'custom.*'
+          $selectCustom = array_search('custom', $v4Params['select']);
+          if ($selectCustom !== FALSE) {
+            $v4Params['select'][$selectCustom] = 'custom.*';
+          }
         }
         if ($options['limit'] && $v4Entity != 'Setting') {
           $v4Params['limit'] = $options['limit'];
