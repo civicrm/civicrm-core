@@ -2288,7 +2288,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public function paymentProcessorCreate($params = []) {
     $params = array_merge([
-      'name' => 'demo',
+      'title' => $params['name'] ?? 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
       'payment_processor_type_id' => 'PayPal',
       'is_active' => 1,

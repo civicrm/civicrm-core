@@ -13,6 +13,7 @@
 function payment_processor_create_example() {
   $params = [
     'name' => 'API Test PP',
+    'title' => 'API Test PP',
     'payment_processor_type_id' => 1,
     'class_name' => 'CRM_Core_Payment_APITest',
     'is_recur' => 0,

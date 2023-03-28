@@ -12665,10 +12665,10 @@ DROP TABLE IF EXISTS `civicrm_value_donor_information_3`;
 CREATE TABLE IF NOT EXISTS `civicrm_value_donor_information_3` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Default MySQL primary key',  `entity_id` int(10) unsigned NOT NULL COMMENT 'Table that this extends', `known_areas_of_interest_5` text COLLATE utf8mb4_unicode_ci, `how_long_have_you_been_a_donor_6` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL, PRIMARY KEY (`id`), UNIQUE KEY `unique_entity_id` (`entity_id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 SELECT @pptype := id FROM civicrm_payment_processor_type WHERE name='Dummy';
 
-INSERT INTO `civicrm_payment_processor` (`domain_id`, `name`, `description`, `payment_processor_type_id`, `is_active`, `is_default`, `is_test`, `user_name`, `password`, `signature`, `url_site`, `url_api`, `url_recur`, `url_button`, `subject`, `class_name`, `billing_mode`, `is_recur`, `payment_type`) VALUES
- (1, 'Test Processor', '', @pptype, 1, 1, 0, 'dummy', NULL, NULL, 'http://dummy.com', NULL, 'http://dummyrecur.com', NULL, NULL, 'Payment_Dummy', 1, 1, 1);
-INSERT INTO `civicrm_payment_processor` (`domain_id`, `name`, `description`, `payment_processor_type_id`, `is_active`, `is_default`, `is_test`, `user_name`, `password`, `signature`, `url_site`, `url_api`, `url_recur`, `url_button`, `subject`, `class_name`, `billing_mode`, `is_recur`, `payment_type`) VALUES
- (1, 'Test Processor', '', @pptype, 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Payment_Dummy', 1, 1, 1);
+INSERT INTO `civicrm_payment_processor` (`domain_id`, `name`, `title`, `frontend_title`, `description`, `payment_processor_type_id`, `is_active`, `is_default`, `is_test`, `user_name`, `password`, `signature`, `url_site`, `url_api`, `url_recur`, `url_button`, `subject`, `class_name`, `billing_mode`, `is_recur`, `payment_type`) VALUES
+ (1, 'Test Processor', 'Test Processor', 'Test Processor', '', @pptype, 1, 1, 0, 'dummy', NULL, NULL, 'http://dummy.com', NULL, 'http://dummyrecur.com', NULL, NULL, 'Payment_Dummy', 1, 1, 1);
+INSERT INTO `civicrm_payment_processor` (`domain_id`, `name`, `title`, `frontend_title`, `description`, `payment_processor_type_id`, `is_active`, `is_default`, `is_test`, `user_name`, `password`, `signature`, `url_site`, `url_api`, `url_recur`, `url_button`, `subject`, `class_name`, `billing_mode`, `is_recur`, `payment_type`) VALUES
+ (1, 'Test Processor', 'Test Processor', 'Test Processor', '', @pptype, 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Payment_Dummy', 1, 1, 1);
 
 SELECT @dp            := max(id) from civicrm_payment_processor where name = 'Test Processor' AND is_test = 0;
 SELECT @dpTest        := max(id) from civicrm_payment_processor where name = 'Test Processor' AND is_test = 1;
