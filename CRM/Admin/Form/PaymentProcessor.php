@@ -40,6 +40,11 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_paymentProcessorType;
 
   /**
+   * @var array|array[]
+   */
+  private $_fields;
+
+  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields(): void {
@@ -157,6 +162,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * Build the form object.
    *
    * @param bool $check
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm($check = FALSE) {
     $this->buildQuickEntityForm();
