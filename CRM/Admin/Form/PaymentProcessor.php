@@ -89,34 +89,14 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    */
   public function preProcess() {
     parent::preProcess();
+    CRM_Core_Session::singleton()->pushUserContext('civicrm/admin/paymentProcessor?reset=1');
 
     $this->setPaymentProcessorTypeID();
     $this->setPaymentProcessor();
     $this->assign('ppType', $this->_paymentProcessorType);
     $this->assign('ppTypeName', $this->_paymentProcessorDAO->name);
 
-    if ($this->_id) {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor/edit',
-        "reset=1&action=update&id={$this->_id}",
-        FALSE, NULL, FALSE
-      );
-    }
-    else {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor/edit',
-        'reset=1&action=add',
-        FALSE, NULL, FALSE
-      );
-    }
-
-    //CRM-4129
-    $destination = CRM_Utils_Request::retrieve('civicrmDestination', 'String', $this);
-    if ($destination) {
-      $destination = urlencode($destination);
-      $refreshURL .= "&civicrmDestination=$destination";
-    }
-
-    $this->refreshURL = $refreshURL;
-    $this->assign('refreshURL', $refreshURL);
+    $this->assign('refreshURL', $this->getRefreshURL());
 
     $this->assign('is_recur', $this->_paymentProcessorDAO->is_recur);
 
@@ -404,12 +384,14 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     }
     $this->updatePaymentProcessor($values, $domainID, TRUE);
     $paymentProcessorID = $this->updatePaymentProcessor($values, $domainID, FALSE);
+    // Set the ID so that if it fails checkConfig the refreshUrl takes it into account.
+    $this->_id = $paymentProcessorID;
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
     $errors = $processor->checkConfig();
     if ($errors) {
       CRM_Core_Session::setStatus($errors, ts('Payment processor configuration invalid'), 'error');
       Civi::log()->error('Payment processor configuration invalid: ' . $errors);
-      CRM_Core_Session::singleton()->pushUserContext($this->refreshURL);
+      CRM_Core_Session::singleton()->pushUserContext($this->getRefreshURL());
     }
     else {
       CRM_Core_Session::setStatus(ts('Payment processor %1 has been saved.', [1 => "<em>{$values['title']}</em>"]), ts('Saved'), 'success');
@@ -504,6 +486,33 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $this->_paymentProcessorDAO = new CRM_Financial_DAO_PaymentProcessorType();
     $this->_paymentProcessorDAO->id = $this->getPaymentProcessorTypeID();
     $this->_paymentProcessorDAO->find(TRUE);
+  }
+
+  /**
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private function getRefreshURL(): string {
+    if ($this->_id) {
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor/edit',
+        "reset=1&action=update&id={$this->_id}",
+        FALSE, NULL, FALSE
+      );
+    }
+    else {
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor/edit',
+        'reset=1&action=add',
+        FALSE, NULL, FALSE
+      );
+    }
+
+    //CRM-4129
+    $destination = CRM_Utils_Request::retrieve('civicrmDestination', 'String', $this);
+    if ($destination) {
+      $destination = urlencode($destination);
+      $refreshURL .= "&civicrmDestination=$destination";
+    }
+    return $refreshURL;
   }
 
 }
