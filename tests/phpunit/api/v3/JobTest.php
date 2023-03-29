@@ -602,7 +602,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     foreach ($groupResult['values'] as $groupValues) {
       $this->assertEquals($contactID, $groupValues['contact_id']);
       $this->assertEquals('Added', $groupValues['status']);
-      $this->assertContains($groupValues['group_id'], $expectedGroups);
+      $this->assertContainsEquals($groupValues['group_id'], $expectedGroups);
 
     }
   }
