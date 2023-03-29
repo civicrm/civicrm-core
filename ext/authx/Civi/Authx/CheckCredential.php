@@ -11,13 +11,16 @@
 
 namespace Civi\Authx;
 
+use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This class is a small collection of common/default credential checkers.
+ *
+ * @service authx.credentials
  */
-class CheckCredential implements EventSubscriberInterface {
+class CheckCredential extends AutoService implements EventSubscriberInterface {
 
   /**
    * Listener priority for handling credential format of 'Basic' with

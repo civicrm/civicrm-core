@@ -5,13 +5,6 @@ require_once 'authx.civix.php';
 use CRM_Authx_ExtensionUtil as E;
 // phpcs:enable
 
-
-function authx_civicrm_container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
-  $container->register('authx_credentials', '\Civi\Authx\CheckCredential')
-    ->addTag('kernel.event_subscriber')
-    ->setPublic(TRUE);
-}
-
 /**
  * Perform a system login.
  *
