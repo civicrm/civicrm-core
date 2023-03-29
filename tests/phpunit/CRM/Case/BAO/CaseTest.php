@@ -1378,4 +1378,29 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test that if there's only recently performed activities in the system
+   * and no future ones then it still shows on dashboard.
+   */
+  public function testOnlyRecent() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate([], 0, TRUE);
+    // old start date so there's no upcoming
+    $caseObj = $this->createCase($clientId, $loggedInUserId, ['start_date' => date('Y-m-d', strtotime('-2 years'))]);
+    // quickie hack to make them all completed
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_case_activity ca INNER JOIN civicrm_activity a ON a.id = ca.activity_id SET a.status_id = 2 WHERE ca.case_id = %1", [1 => [$caseObj->id, 'Integer']]);
+    // Add a recent one
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $loggedInUserId,
+      'target_contact_id' => $clientId,
+      'activity_type_id' => 'Follow up',
+      'status_id' => 'Completed',
+      'activity_date_time' => date('Y-m-d H:i:s', strtotime('-2 days')),
+      'subject' => 'backdated',
+      'case_id' => $caseObj->id,
+    ]);
+    $this->assertEquals(0, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'upcoming'], 'dashboard', TRUE));
+    $this->assertEquals(1, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'recent'], 'dashboard', TRUE));
+  }
+
 }
