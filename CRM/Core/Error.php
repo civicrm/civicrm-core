@@ -950,8 +950,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws PEAR_Exception
    */
   public static function exceptionHandler($pearError) {
-    CRM_Core_Error::debug_var('Fatal Error Details', self::getErrorDetails($pearError), TRUE, TRUE, '', PEAR_LOG_ERR);
-    CRM_Core_Error::backtrace('backTrace', TRUE);
     if ($pearError instanceof DB_Error) {
       throw new DBQueryException($pearError->getMessage(), $pearError->getCode(), ['exception' => $pearError]);
     }
