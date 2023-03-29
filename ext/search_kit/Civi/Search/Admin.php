@@ -191,9 +191,10 @@ class Admin {
         foreach (array_reverse($entity['fields'], TRUE) as $index => $field) {
           if (!empty($field['fk_entity']) && !$field['options'] && !empty($schema[$field['fk_entity']]['label_field'])) {
             $isCustom = strpos($field['name'], '.');
-            // Custom fields: append "Contact ID" to original field label
+            // Custom fields: append "Contact ID" etc. to original field label
             if ($isCustom) {
-              $entity['fields'][$index]['label'] .= ' ' . E::ts('Contact ID');
+              $idField = array_column($schema[$field['fk_entity']]['fields'], NULL, 'name')['id'];
+              $entity['fields'][$index]['label'] .= ' ' . $idField['title'];
             }
             // DAO fields: use title instead of label since it represents the id (title usually ends in ID but label does not)
             else {
