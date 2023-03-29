@@ -57,16 +57,18 @@ class CRM_Upgrade_Incremental_php_FiveSixty extends CRM_Upgrade_Incremental_Base
 
     // Set job_id = NULL for any that don't have matching jobs (ie. job was deleted).
     $updateQuery = 'UPDATE civicrm_job_log job_log LEFT JOIN civicrm_job job ON job.id = job_log.id SET job_id = NULL WHERE job.id IS NULL';
-
     CRM_Core_DAO::executeQuery($updateQuery);
+
     // Add the foreign key
-    $sql = CRM_Core_BAO_SchemaHandler::buildForeignKeySQL([
-      'fk_table_name' => 'civicrm_job',
-      'fk_field_name' => 'id',
-      'name' => 'job_id',
-      'fk_attributes' => ' ON DELETE SET NULL',
-    ], "\n", " ADD ", 'civicrm_job_log');
-    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_job_log " . $sql, [], TRUE, NULL, FALSE, FALSE);
+    if (!CRM_Core_BAO_SchemaHandler::checkFKExists('civicrm_job_log', 'FK_civicrm_job_log_job_id')) {
+      $sql = CRM_Core_BAO_SchemaHandler::buildForeignKeySQL([
+        'fk_table_name' => 'civicrm_job',
+        'fk_field_name' => 'id',
+        'name' => 'job_id',
+        'fk_attributes' => ' ON DELETE SET NULL',
+      ], "\n", " ADD ", 'civicrm_job_log');
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_job_log " . $sql, [], TRUE, NULL, FALSE, FALSE);
+    }
     return TRUE;
   }
 
