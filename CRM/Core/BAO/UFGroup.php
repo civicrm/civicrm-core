@@ -1932,8 +1932,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         // we only have one org - so we should default to it. Not sure about defaulting to first type
         // as it could be missed - so adding a select
         // however, possibly that is more similar to the membership form
-        if (count($types[1]) > 1) {
-          $types[1] = $select + $types[1];
+        $orgId = array_key_first($orgInfo);
+        if (!empty($types[$orgId])) {
+          $types[$orgId] = $select + $types[$orgId];
         }
       }
       else {
