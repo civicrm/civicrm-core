@@ -262,7 +262,7 @@ class SpecFormatter {
     $inputType = $data['html']['type'] ?? $data['html_type'] ?? NULL;
     $inputAttrs = $data['html'] ?? [];
     unset($inputAttrs['type']);
-    // Custom field contact ref filters
+    // Custom field EntityRef or ContactRef filters
     if (is_string($data['filter'] ?? NULL) && strpos($data['filter'], '=')) {
       $filters = explode('&', $data['filter']);
       $inputAttrs['filter'] = $filters;
@@ -315,7 +315,8 @@ class SpecFormatter {
         $filters = [];
         foreach ($val as $filter) {
           [$k, $v] = explode('=', $filter);
-          $filters[$k] = $v;
+          // Explode comma-separated values
+          $filters[$k] = strpos($v, ',') ? explode(',', $v) : $v;
         }
         // Legacy APIv3 custom field stuff
         if ($dataTypeName === 'ContactReference') {

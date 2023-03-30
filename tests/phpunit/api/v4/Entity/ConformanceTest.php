@@ -102,7 +102,8 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    * @return array
    */
   public function getEntitiesLotech(): array {
-    $manual['add'] = [];
+    // TODO: Auto-scan required core extensions like search_kit
+    $manual['add'] = ['SearchDisplay', 'SearchSegment'];
     $manual['remove'] = ['CustomValue'];
     $manual['transform'] = ['CiviCase' => 'Case'];
 
