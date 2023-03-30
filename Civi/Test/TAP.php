@@ -15,6 +15,9 @@ namespace Civi\Test;
 if (version_compare(\PHPUnit\Runner\Version::id(), '7.0.0', '<')) {
   class_alias('Civi\Test\TAPLegacy', 'Civi\Test\TAP');
 }
-else {
+elseif (version_compare(\PHPUnit\Runner\Version::id(), '9.0.0', '<')) {
   class_alias('Civi\Test\TAP7', 'Civi\Test\TAP');
+}
+else {
+  class_alias('Civi\Test\TAP9', 'Civi\Test\TAP');
 }
