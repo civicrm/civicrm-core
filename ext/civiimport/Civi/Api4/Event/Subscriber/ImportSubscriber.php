@@ -251,6 +251,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
     try {
       unset(Civi::$statics['civiimport_tables']);
       Civi::cache('metadata')->delete('api4.entities.info');
+      Civi::cache('metadata')->delete('api4.schema.map');
       Civi::cache('metadata')->delete('civiimport_tables');
       CRM_Core_DAO_AllCoreTables::flush();
       Managed::reconcile(FALSE)->setModules(['civiimport'])->execute();
