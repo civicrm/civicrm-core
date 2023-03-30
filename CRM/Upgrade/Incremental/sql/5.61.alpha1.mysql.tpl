@@ -6,3 +6,5 @@ UPDATE civicrm_payment_processor
 
 UPDATE civicrm_payment_processor
   SET {localize field="title"}title = name{/localize};
+
+UPDATE civicrm_navigation SET url = 'civicrm/import/contribution?reset=1' WHERE url = 'civicrm/contribute/import?reset=1';
