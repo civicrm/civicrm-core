@@ -227,6 +227,12 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $form->preProcess();
     $form->buildQuickForm();
     $form->postProcess();
+    $financialTrxnId = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_id' => $form->_contributionID, 'entity_table' => 'civicrm_contribution', 'sequential' => 1])['values'][0]['financial_trxn_id'];
+    $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', [
+      'id' => $financialTrxnId,
+    ])['values'][$financialTrxnId];
+    $this->assertEquals('1111', $financialTrxn['pan_truncation']);
+    $this->assertEquals(1, $financialTrxn['card_type_id']);
     $assignedVariables = $form->get_template_vars();
     $this->assertTrue($assignedVariables['is_separate_payment']);
   }
