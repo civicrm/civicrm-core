@@ -58,6 +58,9 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
     $this->addTask('Make PaymentProcessor.title required', 'alterColumn', 'civicrm_payment_processor', 'title', "varchar(255) NOT NULL COMMENT 'Name of processor when shown to CiviCRM administrators.'", TRUE);
     $this->addTask('Make PaymentProcessor.frontend_title required', 'alterColumn', 'civicrm_payment_processor', 'frontend_title', "varchar(255) NOT NULL COMMENT 'Name of processor when shown to users making a payment.'", TRUE);
 
+    // Drop unused column
+    $this->addTask('Drop column civicrm_custom_field.javascript', 'dropColumn', 'civicrm_custom_field', 'javascript');
+
     $this->addTask(ts('Dedupe cache table'), 'dedupeCache');
     $this->addTask(ts('Drop index %1', [1 => 'civicrm_cache.UI_group_path_date']), 'dropIndex', 'civicrm_cache', 'UI_group_path_date');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.UI_group_name_path']), 'addIndex', 'civicrm_cache', [['group_name', 'path']], 'UI');

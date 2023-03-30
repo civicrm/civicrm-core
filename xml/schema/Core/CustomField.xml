@@ -169,7 +169,7 @@
     <type>varchar</type>
     <title>Custom Field Formatting</title>
     <length>64</length>
-    <comment>Optional format instructions for specific field types, like date types.</comment>
+    <comment>Unused</comment>
     <add>1.1</add>
     <drop>5.59</drop>
   </field>
@@ -186,8 +186,9 @@
     <type>varchar</type>
     <title>Custom Field Javascript</title>
     <length>255</length>
-    <comment>Optional scripting attributes for field.</comment>
+    <comment>Unused</comment>
     <add>1.1</add>
+    <drop>5.61</drop>
   </field>
   <field>
     <name>is_active</name>
