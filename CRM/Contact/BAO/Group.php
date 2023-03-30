@@ -493,9 +493,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     $recentOther = [];
     if (CRM_Core_Permission::check('edit groups')) {
-      $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/group', 'reset=1&action=update&id=' . $group->id);
+      $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/group/edit', 'reset=1&action=update&id=' . $group->id);
       // currently same permission we are using for delete a group
-      $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/group', 'reset=1&action=delete&id=' . $group->id);
+      $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/group/edit', 'reset=1&action=delete&id=' . $group->id);
     }
 
     // add the recently added group (unless hidden: CRM-6432)
@@ -1304,7 +1304,7 @@ WHERE {$whereClause}";
       ],
       CRM_Core_Action::UPDATE => [
         'name' => ts('Settings'),
-        'url' => 'civicrm/group',
+        'url' => 'civicrm/group/edit',
         'qs' => 'reset=1&action=update&id=%%id%%',
         'title' => ts('Edit Group'),
       ],
@@ -1320,7 +1320,7 @@ WHERE {$whereClause}";
       ],
       CRM_Core_Action::DELETE => [
         'name' => ts('Delete'),
-        'url' => 'civicrm/group',
+        'url' => 'civicrm/group/edit',
         'qs' => 'reset=1&action=delete&id=%%id%%',
         'title' => ts('Delete Group'),
       ],

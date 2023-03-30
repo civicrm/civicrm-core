@@ -24,6 +24,12 @@
      <page_callback>CRM_Group_Controller</page_callback>
   </item>
   <item>
+    <path>civicrm/group/edit</path>
+    <title>Edit Group</title>
+    <access_arguments>edit groups</access_arguments>
+    <page_callback>CRM_Group_Form_Edit</page_callback>
+  </item>
+  <item>
      <path>civicrm/ajax/grouplist</path>
      <page_callback>CRM_Group_Page_AJAX::getGroupList</page_callback>
      <access_arguments>access CiviCRM</access_arguments>

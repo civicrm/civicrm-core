@@ -23,10 +23,8 @@
 {include file="CRM/Group/Form/Search.tpl"}
 {/if}
 
-{if $action eq 1 or $action eq 2}
+{if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Group/Form/Edit.tpl"}
-{elseif $action eq 8}
-   {include file="CRM/Group/Form/Delete.tpl"}
 {/if}
 
 {if $action ne 1 and $action ne 2 and $action ne 8 and $groupPermission eq 1}

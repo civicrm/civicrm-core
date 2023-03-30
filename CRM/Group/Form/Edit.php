@@ -99,7 +99,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       'parent_groups',
       'editSmartGroupURL',
     ]);
-    $this->_id = $this->get('id');
+    // current set id
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     if ($this->_id) {
       $breadCrumb = array(
         array(
@@ -156,6 +157,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/group', 'reset=1'));
     }
+    $this->addExpectedSmartyVariables(['freezeMailingList', 'hideMailingList']);
 
     //build custom data
     CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Group', $this->_id);
