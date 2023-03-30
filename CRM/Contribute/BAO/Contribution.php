@@ -1663,7 +1663,7 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   public static function createAddress($params, $billingLocationTypeID) {
     [$hasBillingField, $addressParams] = self::getBillingAddressParams($params, $billingLocationTypeID);
     if ($hasBillingField) {
-      $address = CRM_Core_BAO_Address::add($addressParams, FALSE);
+      $address = CRM_Core_BAO_Address::writeRecord($addressParams);
       return $address->id;
     }
     return NULL;

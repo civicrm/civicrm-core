@@ -25,13 +25,15 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email implements Civi\Core\HookInt
 
   /**
    * @deprecated
+   *
    * @param array $params
    * @return CRM_Core_BAO_Email
+   * @throws CRM_Core_Exception
    */
   public static function create($params) {
     // FIXME: switch CRM_Core_BAO_Block::create to call writeRecord (once Address, IM, Phone create functions go through it)
     // then this can be uncommented:
-    // CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -41,7 +43,7 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email implements Civi\Core\HookInt
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if (in_array($event->action, ['create', 'edit'])) {
-      CRM_Core_BAO_Block::handlePrimary($event->params, get_class());
+      CRM_Core_BAO_Block::handlePrimary($event->params, __CLASS__);
 
       if (!empty($event->params['email'])) {
         // lower case email field to optimize queries
@@ -96,8 +98,10 @@ WHERE  contact_id = {$event->params['contact_id']}
 
   /**
    * @deprecated
+   *
    * @param array $params
    * @return CRM_Core_BAO_Email
+   * @throws CRM_Core_Exception
    */
   public static function add($params) {
     CRM_Core_Error::deprecatedFunctionWarning('writeRecord');

@@ -13,7 +13,6 @@ use Civi\Api4\Event;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Email;
 use Civi\Api4\Phone;
-use Civi\Api4\Address;
 
 /**
  *
@@ -331,8 +330,15 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
     }
 
-    // Update the Blocks.
-    $addresses = empty($params['address']) ? [] : Address::save(FALSE)->setRecords($params['address'])->execute();
+    // Update location Blocks.
+    $addresses = [];
+    // Don't use APIv4 for address because it doesn't handle custom fields in the format used by this form (custom_xx)
+    foreach ($params['address'] ?? [] as $address) {
+      CRM_Core_BAO_Address::fixAddress($address);
+      $address['custom'] = CRM_Core_BAO_CustomField::postProcess($address, $address['id'] ?? NULL, 'Address');
+      $addresses[] = (array) CRM_Core_BAO_Address::writeRecord($address);
+    }
+    // Using APIv4 for email & phone, the form doesn't support custom data for them anyway
     $emails = empty($params['email']) ? [] : Email::save(FALSE)->setRecords($params['email'])->execute();
     $phones = empty($params['phone']) ? [] : Phone::save(FALSE)->setRecords($params['phone'])->execute();
 

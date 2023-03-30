@@ -1373,7 +1373,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
           'location_type_id' => 1,
           'contact_id' => $contactId,
         ];
-        CRM_Core_BAO_Phone::create($params);
+        CRM_Core_BAO_Phone::writeRecord($params);
         $test->assertDBQuery('202-555-1000',
           'SELECT phone FROM civicrm_phone WHERE contact_id = %1 ORDER BY id DESC LIMIT 1',
           [1 => [$contactId, 'Integer']]
@@ -1565,7 +1565,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'is_billing' => 1,
       'state_province_id' => '3934',
     ];
-    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+    $addAddressA = CRM_Core_BAO_Address::writeRecord($addressParamsA);
 
     $addressParamsB[1] = [
       'contact_id' => $contactIdB,
@@ -1574,7 +1574,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     ];
 
     CRM_Contact_BAO_Contact_Utils::processSharedAddress($addressParamsB);
-    $addAddressB = CRM_Core_BAO_Address::add($addressParamsB[1], FALSE);
+    $addAddressB = CRM_Core_BAO_Address::writeRecord($addressParamsB[1]);
 
     foreach ($addAddressA as $key => $value) {
       if (!in_array($key, ['id', 'contact_id', 'master_id', 'is_primary', 'is_billing', 'location_type_id', 'manual_geo_code'])) {
