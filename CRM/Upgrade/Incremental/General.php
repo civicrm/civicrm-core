@@ -178,10 +178,9 @@ class CRM_Upgrade_Incremental_General {
       return sprintf("<li><em>%s</em> - %s</li>", htmlentities($k), htmlentities($v));
     }, array_keys($messages), $messages);
 
-    $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", [
-      1 => 'https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates',
-      2 => '<ul>' . implode('', $messagesHtml) . '</ul>',
-    ]);
+    $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a %1>View detailed instructions</a>.", [
+      1 => 'href="https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates" target="_blank"',
+    ]) . '<ul>' . implode('', $messagesHtml) . '</ul>';
 
     $messageObj->updateTemplates();
   }
