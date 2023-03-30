@@ -12,8 +12,8 @@
   <paths>
     <add>civicrm/group/add?reset=1</add>
     <view>civicrm/group/search?force=1&amp;context=smog&amp;gid=[id]&amp;component_mode=1</view>
-    <update>civicrm/group?reset=1&amp;action=update&amp;id=[id]</update>
-    <delete>civicrm/group?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <update>civicrm/group/edit?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/group/edit?reset=1&amp;action=delete&amp;id=[id]</delete>
   </paths>
   <field>
     <name>id</name>
