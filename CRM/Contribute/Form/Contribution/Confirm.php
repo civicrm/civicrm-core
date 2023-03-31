@@ -1728,8 +1728,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
                 'is_transactional' => FALSE,
                 'fee_amount' => $result['result']['fee_amount'] ?? NULL,
                 'receive_date' => $result['result']['receive_date'] ?? NULL,
-                'card_type_id' => $result['result']['card_type_id'] ?? NULL,
-                'pan_truncation' => $result['result']['pan_truncation'] ?? NULL,
+                'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
+                'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
               ]);
             }
             catch (CRM_Core_Exception $e) {
@@ -2407,8 +2407,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
               'is_transactional' => FALSE,
               'fee_amount' => $result['fee_amount'] ?? NULL,
               'receive_date' => $result['receive_date'] ?? NULL,
-              'card_type_id' => $result['card_type_id'] ?? NULL,
-              'pan_truncation' => $result['pan_truncation'] ?? NULL,
+              'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
+              'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
             ]);
           }
           catch (CRM_Core_Exception $e) {
