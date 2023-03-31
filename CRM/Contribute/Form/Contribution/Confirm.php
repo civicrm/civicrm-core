@@ -280,10 +280,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->setFormAmountFields($this->_params['priceSetId']);
     }
 
-    if (!empty($this->get('tax_amount'))) {
-      CRM_Core_Error::deprecatedWarning('tax_amount should be not passed in');
-      $this->_params['tax_amount'] = $this->get('tax_amount');
-    }
     $this->_useForMember = $this->get('useForMember');
 
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
