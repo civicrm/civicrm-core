@@ -20,12 +20,6 @@ $phpunitCmd = pickPhpunitCommand();
 $phpunitPath = findCommand($phpunitCmd);
 switch ($phpunitCmd) {
   case 'phpunit9':
-    $argFilters[] = function ($argv) {
-      // WISHLIST: Update TAP adapter for phpunit9. It's easier to search logs for problems.
-      return preg_replace('/--tap/', '--debug', $argv);
-    };
-    break;
-
   case 'phpunit8':
   case 'phpunit7':
   case 'phpunit6':
