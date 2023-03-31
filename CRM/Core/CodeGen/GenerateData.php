@@ -199,7 +199,7 @@ class CRM_Core_CodeGen_GenerateData {
    */
   private $suffix = [1 => 'Jr.', 2 => 'Sr.', 3 => 'II', 4 => 'III'];
 
-  private $gender = [1 => 'female', 2 => 'male'];
+  private $gender = [1 => 'Female', 2 => 'Male',  3 => 'Non-binary'];
 
   /**
    * store domain id's

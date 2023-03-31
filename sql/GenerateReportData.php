@@ -142,7 +142,7 @@ class CRM_GCD {
    */
   private $prefix = array(1 => 'Mrs', 2 => 'Ms', 3 => 'Mr', 4 => 'Dr');
   private $suffix = array(1 => 'Jr', 2 => 'Sr');
-  private $gender = array(1 => 'Female', 2 => 'Male');
+  private $gender = array(1 => 'Female', 2 => 'Male', 3 => 'Non-binary');
   private $greetingType = array(1 => 'Dear [first]', 2 => 'Dear [prefix] [first] [last]', 3 => 'Dear [prefix] [last]');
 
   /**

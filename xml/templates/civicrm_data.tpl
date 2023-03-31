@@ -125,7 +125,7 @@ VALUES
    ('activity_type'                 , '{ts escape="sql"}Activity Type{/ts}'                      , 'Integer', 1, 1, 0, 'name,label,description,icon',
      '{ts escape="sql"}Activities track interactions with contacts. Some activity types are reserved for use by automated processes, others can be freely configured.{/ts}'),
    ('gender'                        , '{ts escape="sql"}Gender{/ts}'                             , 'Integer', 1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}CiviCRM is pre-configured with standard options for individual gender (Male, Female, Other). Modify these options as needed for your installation.{/ts}'),
+     '{ts escape="sql"}CiviCRM is pre-configured with standard options for individual gender (Male, Female, Non-binary). Modify these options as needed for your installation.{/ts}'),
    ('instant_messenger_service'     , '{ts escape="sql"}Instant Messenger (IM) screen-names{/ts}', NULL,      1, 1, 0, 'name,label,description',
      '{ts escape="sql"}Commonly-used messaging apps are listed here. Administrators may define as many additional providers as needed.{/ts}'),
    ('mobile_provider'               , '{ts escape="sql"}Mobile Phone Providers{/ts}'             , NULL,      1, 1, 0, 'name,label,description',
@@ -397,7 +397,7 @@ VALUES
 
    (@option_group_id_gender, '{ts escape="sql"}Female{/ts}', 1, 'Female', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Male{/ts}',   2, 'Male',   NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_gender, '{ts escape="sql"}Other{/ts}',  3, 'Other',  NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_gender, '{ts escape="sql"}Non-binary{/ts}',  3, 'Non-binary',  NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
 
    (@option_group_id_IMProvider, 'Yahoo', 1, 'Yahoo', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_IMProvider, 'MSN',   2, 'Msn',   NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
