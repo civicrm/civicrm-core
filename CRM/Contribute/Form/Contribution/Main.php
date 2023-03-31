@@ -1415,7 +1415,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     if ($taxAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'tax_amount')) {
-      $this->set('tax_amount', $taxAmount);
       $this->assign('taxAmount', $taxAmount);
     }
 
