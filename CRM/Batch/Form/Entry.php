@@ -543,7 +543,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       'total' => $params['actualBatchTotal'],
     ];
 
-    CRM_Batch_BAO_Batch::create($paramValues);
+    CRM_Batch_BAO_Batch::writeRecord($paramValues);
 
     // set success status
     CRM_Core_Session::setStatus("", ts("Batch Processed."), "success");
