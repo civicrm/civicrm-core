@@ -868,7 +868,9 @@ AND    option_group_id = %2";
         $filter = 'action=lookup&group=' . implode(',', $params['group_id']);
       }
     }
-    $params['filter'] = $filter;
+    if ($params['data_type'] !== 'EntityReference') {
+      $params['filter'] = $filter;
+    }
 
     // fix for CRM-316
     $oldWeight = NULL;
