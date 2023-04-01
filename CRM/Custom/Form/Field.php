@@ -621,7 +621,7 @@ SELECT count(*)
       }
     }
 
-    if ($dataType === 'EntityReference') {
+    if ($dataType === 'EntityReference' && $self->_action == CRM_Core_Action::ADD) {
       if (empty($fields['fk_entity'])) {
         $errors['fk_entity'] = ts('Selecting an entity is required');
       }
@@ -813,7 +813,8 @@ AND    option_group_id = %2";
     }
 
     // If switching to a new option list, validate existing data
-    if (empty($errors) && $self->_id && in_array($htmlType, self::$htmlTypesWithOptions)) {
+    if (empty($errors) && $self->_id && in_array($htmlType, self::$htmlTypesWithOptions) &&
+      !in_array($dataType, ['Boolean', 'Country', 'StateProvince', 'ContactReference', 'EntityReference'])) {
       $oldHtmlType = $self->_values['html_type'];
       $oldOptionGroup = $self->_values['option_group_id'];
       if ($oldHtmlType === 'Text' || $oldOptionGroup != $fields['option_group_id'] || $fields['option_type'] == 1) {
