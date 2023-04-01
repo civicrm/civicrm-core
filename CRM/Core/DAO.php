@@ -134,11 +134,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @var array
    */
   public static $_testEntitiesToSkip = [];
-  /**
-   * The factory class for this application.
-   * @var object
-   */
-  public static $_factory = NULL;
 
   /**
    * https://issues.civicrm.org/jira/browse/CRM-17748
@@ -231,8 +226,6 @@ class CRM_Core_DAO extends DB_DataObject {
     if (defined('CIVICRM_DAO_DEBUG')) {
       self::DebugLevel(CIVICRM_DAO_DEBUG);
     }
-    $factory = new CRM_Contact_DAO_Factory();
-    CRM_Core_DAO::setFactory($factory);
     CRM_Core_DAO::executeQuery('SET NAMES utf8mb4');
     CRM_Core_DAO::executeQuery('SET @uniqueID = %1', [1 => [CRM_Utils_Request::id(), 'String']]);
   }
@@ -495,30 +488,6 @@ class CRM_Core_DAO extends DB_DataObject {
 
     $this->_setDBOptions($orig_options);
     return $ret;
-  }
-
-  /**
-   * Static function to set the factory instance for this class.
-   *
-   * @param object $factory
-   *   The factory application object.
-   */
-  public static function setFactory(&$factory) {
-    self::$_factory = &$factory;
-  }
-
-  /**
-   * Factory method to instantiate a new object from a table name.
-   *
-   * @param string $table
-   * @return \DataObject|\PEAR_Error
-   */
-  public function factory($table = '') {
-    if (!isset(self::$_factory)) {
-      return parent::factory($table);
-    }
-
-    return self::$_factory->create($table);
   }
 
   /**
