@@ -283,7 +283,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
         $params['id'] = $this->_id;
       }
 
-      CRM_ACL_BAO_ACL::create($params);
+      CRM_ACL_BAO_ACL::writeRecord($params);
     }
   }
 

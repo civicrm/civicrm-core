@@ -146,15 +146,13 @@ SELECT acl.*
   }
 
   /**
+   * @deprecated
    * @param array $params
-   *
    * @return CRM_ACL_DAO_ACL
    */
   public static function create($params) {
-    $dao = new CRM_ACL_DAO_ACL();
-    $dao->copyValues($params);
-    $dao->save();
-    return $dao;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**

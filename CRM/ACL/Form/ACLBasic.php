@@ -132,7 +132,7 @@ DELETE
         $newParams = $params;
         unset($newParams['object_table']);
         $newParams['object_table'] = $object_table;
-        CRM_ACL_BAO_ACL::create($newParams);
+        CRM_ACL_BAO_ACL::writeRecord($newParams);
       }
     }
   }
