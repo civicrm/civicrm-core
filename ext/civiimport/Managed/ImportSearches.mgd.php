@@ -7,7 +7,7 @@ $managedEntities = [];
 $importEntities = Import::getImportTables();
 foreach ($importEntities as $importEntity) {
   try {
-    $fields = array_merge(['_id' => TRUE, '_status' => TRUE, '_status_message' => TRUE, '_entity_id' => TRUE], Import::getFieldsForUserJobID($importEntity['user_job_id'], FALSE));
+    $fields = array_merge(['_id' => TRUE, '_status' => TRUE, '_entity_id' => TRUE, '_status_message' => TRUE], Import::getFieldsForUserJobID($importEntity['user_job_id'], FALSE));
   }
   catch (CRM_Core_Exception $e) {
     continue;
