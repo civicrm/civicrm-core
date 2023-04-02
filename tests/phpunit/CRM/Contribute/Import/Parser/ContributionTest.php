@@ -112,7 +112,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'financial_type_id'],
       ['name' => 'external_identifier'],
       ['name' => 'soft_credit.contact.external_identifier', 'soft_credit_type_id' => 1],
-      ['name' => ''],
+      ['name' => 'note'],
     ];
     $this->importCSV('contributions_amount_validate.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
