@@ -44,24 +44,4 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
     $this->assertEquals($result, 'Donations', 'Verify financial type name.');
   }
 
-  /**
-   * Check method setIsActive()
-   */
-  public function testSetIsActive() {
-    $params = [
-      'name' => 'Donations',
-      'is_deductible' => 0,
-      'is_active' => 1,
-    ];
-    $contributionType = CRM_Financial_BAO_FinancialType::writeRecord($params);
-    $result = CRM_Financial_BAO_FinancialType::setIsActive($contributionType->id, 0);
-    $this->assertEquals($result, TRUE, 'Verify financial type record updation for is_active.');
-
-    $isActive = $this->assertDBNotNull('CRM_Financial_BAO_FinancialType', $contributionType->id,
-      'is_active', 'id',
-      'Database check on updated for financial type is_active.'
-    );
-    $this->assertEquals($isActive, 0, 'Verify financial types is_active.');
-  }
-
 }

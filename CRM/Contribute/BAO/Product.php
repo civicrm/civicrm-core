@@ -44,16 +44,13 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (!$is_active) {
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->product_id = $id;
