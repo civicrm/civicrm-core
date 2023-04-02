@@ -471,7 +471,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
       if (!empty($softCreditParams)) {
         if (empty($contributionParams['total_amount']) || empty($contributionParams['currency'])) {
-          $contributionParams = Contribution::get()->addSelect('total_amount', 'currency')->addWhere('id', '=', $contributionID)->execute()->first();
+          $contributionParams = array_merge($contributionParams, Contribution::get()->addSelect('total_amount', 'currency')->addWhere('id', '=', $contributionID)->execute()->first());
         }
         foreach ($softCreditParams as $softCreditParam) {
           $softCreditParam['contribution_id'] = $contributionID;
