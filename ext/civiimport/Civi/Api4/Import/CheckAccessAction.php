@@ -12,8 +12,6 @@
 
 namespace Civi\Api4\Import;
 
-use Civi\API\Exception\UnauthorizedException;
-use Civi\API\Request;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Generic\Traits\GetSetValueTrait;
