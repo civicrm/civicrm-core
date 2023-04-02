@@ -338,12 +338,16 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    */
   public function getImportEntities() : array {
-    $softCreditTypes = ContributionSoft::getFields()
-      ->setLoadOptions(['id', 'name', 'label', 'description'])
+    $softCreditTypes = ContributionSoft::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'label', 'description', 'is_default'])
       ->addWhere('name', '=', 'soft_credit_type_id')
       ->selectRowCount()
       ->addSelect('options')->execute()->first()['options'];
+    $defaultSoftCreditTypeID = NULL;
     foreach ($softCreditTypes as &$softCreditType) {
+      if (empty($defaultSoftCreditTypeID) || $softCreditType['is_default']) {
+        $defaultSoftCreditTypeID = $softCreditType['id'];
+      }
       $softCreditType['text'] = $softCreditType['label'];
     }
 
@@ -389,7 +393,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         'is_contact' => TRUE,
         'is_required' => FALSE,
         'actions' => array_merge([['id' => 'ignore', 'text' => ts('Do not import')]], $this->getActions(['select', 'update', 'save'])),
-        'selected' => ['contact_type' => '', 'soft_credit_type_id' => reset($softCreditTypes)['id'], 'action' => 'ignore'],
+        'selected' => [
+          'contact_type' => 'Individual',
+          'soft_credit_type_id' => $defaultSoftCreditTypeID,
+          'action' => 'ignore',
+          'dedupe_rule' => $this->getDedupeRule('Individual')['name'],
+        ],
         'default_action' => 'ignore',
         'entity_name' => 'SoftCreditContact',
         'entity_field_prefix' => 'soft_credit.contact.',
