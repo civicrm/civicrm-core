@@ -64,29 +64,6 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method setIsActive()
-   */
-  public function testSetIsActive() {
-    $params = [
-      'name' => 'Donations',
-      'is_deductible' => 0,
-      'is_active' => 1,
-    ];
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
-    $result = CRM_Financial_BAO_FinancialAccount::setIsActive($financialAccount->id, 0);
-    $this->assertEquals($result, TRUE, 'Verify financial account record updation for is_active.');
-
-    $isActive = $this->assertDBNotNull(
-      'CRM_Financial_BAO_FinancialAccount',
-      $financialAccount->id,
-      'is_active',
-      'id',
-      'Database check on updated for financial account is_active.'
-    );
-    $this->assertEquals($isActive, 0, 'Verify financial account is_active.');
-  }
-
-  /**
    * Check method del()
    *
    * @throws \CRM_Core_Exception

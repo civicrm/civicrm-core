@@ -72,24 +72,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals($result, 'Changed Status', 'Verify updated membership status label From PseudoConstant.');
   }
 
-  public function testSetIsActive() {
-
-    $params = [
-      'name' => 'added',
-      'is_active' => 1,
-    ];
-
-    $this->ids['MembershipStatus'][0] = $this->callAPISuccess('MembershipStatus', 'create', $params)['id'];
-    $result = CRM_Member_BAO_MembershipStatus::setIsActive($this->ids['MembershipStatus'][0], 0);
-    $this->assertEquals($result, TRUE, 'Verify membership status record updated.');
-
-    $isActive = $this->assertDBNotNull('CRM_Member_BAO_MembershipStatus', $this->ids['MembershipStatus'][0],
-      'is_active', 'id',
-      'Database check on updated membership status record.'
-    );
-    $this->assertEquals($isActive, 0, 'Verify membership status is_active.');
-  }
-
   public function testGetMembershipStatus() {
     $params = [
       'name' => 'added',
