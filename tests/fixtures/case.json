@@ -3,7 +3,9 @@
         {
             "id": 1,
             "case_type_id": 1,
-            "status_id": 1
+            "status_id": 1,
+            "start_date": "2023-01-02",
+            "subject": "test case"
         }
     ]
 }
