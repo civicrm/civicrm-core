@@ -45,7 +45,7 @@
             <tr><td class="label">{ts}Max related{/ts}</td><td>{$max_related}</td></tr>
         {/if}
         <tr><td class="label">{ts}Status{/ts}</td><td>{$status} {if $is_override}({ts}Overridden{/ts}){/if}</td></tr>
-        <tr><td class="label">{ts}Source{/ts}</td><td>{$source}</td></tr>
+        <tr><td class="label">{ts}Membership Source{/ts}</td><td>{$source}</td></tr>
   {if $campaign}<tr><td class="label">{ts}Campaign{/ts}</td><td>{$campaign}</td></tr>{/if}
         <tr><td class="label">{ts}Member Since{/ts}</td><td>{$join_date|crmDate}</td></tr>
         <tr><td class="label">{ts}Membership Start Date{/ts}</td><td>{$start_date|crmDate}</td></tr>

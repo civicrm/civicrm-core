@@ -410,7 +410,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
         'membership_source' => [
           'name' => 'source',
           'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Source'),
+          'title' => ts('Membership Source'),
           'maxlength' => 128,
           'size' => CRM_Utils_Type::HUGE,
           'usage' => [

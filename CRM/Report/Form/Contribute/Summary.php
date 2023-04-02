@@ -117,7 +117,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
           ],
-          'contribution_source' => ['title' => ts('Source')],
+          'contribution_source' => ['title' => ts('Contribution Source')],
           'currency' => [
             'required' => TRUE,
             'no_display' => TRUE,

@@ -83,7 +83,7 @@
   </tr>
     {if $source}
         <tr class="crm-event-participantview-form-block-event_source">
-        <td class="label">{ts}Event Source{/ts}</td><td>{$source}&nbsp;</td>
+        <td class="label">{ts}Participant Source{/ts}</td><td>{$source}&nbsp;</td>
       </tr>
     {/if}
     {if $participantId and $hasPayment}
