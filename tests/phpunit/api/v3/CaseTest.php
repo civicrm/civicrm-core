@@ -134,6 +134,25 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     //Only 1 case should be returned.
     $this->assertEquals(count($result['values']), 1);
     $this->assertEquals($result['values'][0]['id'], $case1['id']);
+
+    // For this next part to work we need to make sure we don't have a ton of cases in total.
+    // We expect cases to have ids 1, 2, 3 etc, so the 'input' param below should match one and only one.
+    $this->assertLessThan(10, $this->callAPISuccess('Case', 'getcount'));
+    // These are the same params as the file-on-case widget
+    $getParams = [
+      'input' => '2',
+      'extra' => ['contact_id'],
+      'params' => [
+        'version' => 3,
+        'case_id' => ['!=' => NULL],
+        'case_id.is_deleted' => 0,
+        'case_id.status_id' => ['!=' => "Closed"],
+        'case_id.end_date' => ['IS NULL' => 1],
+      ],
+    ];
+    $result = $this->callAPISuccess('case', 'getlist', $getParams);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals(2, $result['values'][0]['id']);
   }
 
   /**
