@@ -12,39 +12,23 @@
 
 namespace Civi\Api4\Import;
 
-use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
-use Civi\Api4\Generic\Traits\GetSetValueTrait;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
- * Check if current user is authorized to perform specified action on a given $ENTITY.
+ * Check if current user is authorized to perform specified action on the given import.
  *
- * @method $this setAction(string $action)
- * @method string getAction()
- * @method $this setValues(array $values)
- * @method array getValues()
+ * This is overridden to implement a permission on editing imported rows, mostly
+ * to make it less confusing as there is no meaning to importing edited rows.
  */
-class CheckAccessAction extends AbstractAction {
-
-  use GetSetValueTrait;
-
-  /**
-   * @var string
-   * @required
-   */
-  protected $action;
-
-  /**
-   * @var array
-   * @required
-   */
-  protected $values = [];
+class CheckAccessAction extends \Civi\Api4\Generic\CheckAccessAction {
 
   /**
    * @param \Civi\Api4\Generic\Result $result
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function _run(Result $result) {
+  public function _run(Result $result): void {
     // Prevent circular checks
     $action = $this->action;
     $entity = $this->getEntityName();
@@ -65,15 +49,6 @@ class CheckAccessAction extends AbstractAction {
       $granted = \Civi::$statics[__CLASS__ . $entity][$action][$userID] = CoreUtil::checkAccessDelegated($entity, $action, $this->values, $userID);
     }
     $result->exchangeArray([['access' => $granted]]);
-  }
-
-  /**
-   * This action is always allowed
-   *
-   * @return bool
-   */
-  public function isAuthorized(): bool {
-    return TRUE;
   }
 
 }
