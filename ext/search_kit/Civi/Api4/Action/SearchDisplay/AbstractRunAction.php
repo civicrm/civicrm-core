@@ -612,12 +612,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if ($missingRequiredFields->count() || count($vals) === 1) {
         return NULL;
       }
+      $entityValues = $editable['record'];
     }
     // Ensure current user has access
     if ($editable['record']) {
       $access = civicrm_api4($editable['entity'], 'checkAccess', [
         'action' => $editable['action'],
-        'values' => $editable['record'],
+        'values' => $entityValues,
       ], 0)['access'];
       if ($access) {
         // Remove info that's for internal use only
