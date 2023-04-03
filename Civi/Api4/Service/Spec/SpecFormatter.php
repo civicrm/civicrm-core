@@ -98,6 +98,10 @@ class SpecFormatter {
     if ($fkAPIName || $fkClassName) {
       $field->setFkEntity($fkAPIName ?: CoreUtil::getApiNameFromBAO($fkClassName));
     }
+    // For pseudo-fk fields like `civicrm_group.parents`
+    elseif (($data['html']['type'] ?? NULL) === 'EntityRef' && !empty($data['pseudoconstant']['table'])) {
+      $field->setFkEntity(CoreUtil::getApiNameFromTableName($data['pseudoconstant']['table']));
+    }
 
     return $field;
   }

@@ -799,11 +799,6 @@ WHERE  id = %1";
    *   array reference of all groups.
    */
   public static function allGroup($groupType = NULL, $excludeHidden = TRUE) {
-    if ($groupType === 'validate') {
-      // validate gets passed through from getoptions. Handle in the deprecated
-      // fn rather than change the new pattern.
-      $groupType = NULL;
-    }
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
     $groupKey = ($groupType ? $groupType : 'null') . !empty($excludeHidden);
 
