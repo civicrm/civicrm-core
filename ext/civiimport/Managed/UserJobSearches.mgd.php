@@ -132,7 +132,7 @@ return [
               'label' => E::ts('Import Name'),
               'sortable' => TRUE,
               'link' => [
-                'path' => 'civicrm/contribute/import?reset=1&template_id=[id]',
+                'path' => 'civicrm/import/contribution?reset=1&template_id=[id]',
                 'entity' => '',
                 'action' => '',
                 'join' => '',
