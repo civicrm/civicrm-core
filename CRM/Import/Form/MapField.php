@@ -224,8 +224,19 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   protected function saveMappingField(int $mappingID, int $columnNumber, bool $isUpdate = FALSE): void {
-    $fieldMapping = (array) $this->getSubmittedValue('mapper')[$columnNumber];
-    $mappedField = $this->getMappedField($fieldMapping, $mappingID, $columnNumber);
+    if (!empty($this->userJob['metadata']['import_mappings'])) {
+      // In this case Civi-Import has already saved the mapping to civicrm_user_job.metadata
+      // and the code here is just keeping civicrm_mapping_field in sync.
+      // Eventually we hope to phase out the use of the civicrm_mapping data &
+      // just use UserJob and Import Templates (UserJob records with 'is_template' = 1
+      $mappedFieldData = $this->userJob['metadata']['import_mappings'][$columnNumber];
+      $mappedField = array_intersect_key(array_fill_keys(['name', 'column_number', 'entity_data'], TRUE), $mappedFieldData);
+      $mappedField['mapping_id'] = $mappingID;
+    }
+    else {
+      $fieldMapping = (array) $this->getSubmittedValue('mapper')[$columnNumber];
+      $mappedField = $this->getMappedField($fieldMapping, $mappingID, $columnNumber);
+    }
     if (empty($mappedField['name'])) {
       $mappedField['name'] = 'do_not_import';
     }
