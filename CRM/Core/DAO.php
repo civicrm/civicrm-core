@@ -944,6 +944,12 @@ class CRM_Core_DAO extends DB_DataObject {
     if (empty($values[$idField]) && array_key_exists('name', $fields) && empty($values['name'])) {
       $instance->makeNameFromLabel();
     }
+    if (empty($values[$idField]) && array_key_exists('frontend_title', $fields) && empty($values['frontend_title'])) {
+      $instance->frontend_title = $instance->title;
+    }
+    if (empty($values[$idField]) && array_key_exists('title', $fields) && empty($values['title']) && !empty($values['frontend_title'])) {
+      $instance->title = $instance->frontend_title;
+    }
     $instance->save();
 
     if (!empty($record['custom']) && is_array($record['custom'])) {
@@ -1866,7 +1872,7 @@ LIKE %1
 
       $localizableFields = FALSE;
       foreach ($fields as $name => $value) {
-        if ($name == 'id' || $value['name'] == 'id') {
+        if ($name === 'id' || $value['name'] === 'id') {
           // copy everything but the id!
           continue;
         }
@@ -1884,7 +1890,7 @@ LIKE %1
           $newObject->$dbName = $fieldsToReplace[$dbName];
         }
 
-        if ($type == 'Timestamp' || $type == 'Date') {
+        if ($type === 'Timestamp' || $type === 'Date') {
           $newObject->$dbName = CRM_Utils_Date::isoToMysql($newObject->$dbName);
         }
 
@@ -1895,6 +1901,9 @@ LIKE %1
         if ($newData) {
           $newObject->copyValues($newData);
         }
+      }
+      if (!empty($fields['name'])) {
+        $newObject->makeNameFromLabel();
       }
       $newObject->save();
 

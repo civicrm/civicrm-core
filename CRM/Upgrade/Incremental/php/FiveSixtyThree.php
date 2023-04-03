@@ -26,13 +26,21 @@ class CRM_Upgrade_Incremental_php_FiveSixtyThree extends CRM_Upgrade_Incremental
    *
    * @param string $rev
    *   The version number matching this function name
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function upgrade_5_63_alpha1($rev): void {
+  public function upgrade_5_63_alpha1(string $rev): void {
+    $this->addTask('Add name column  to civicrm_contribution_page', 'addColumn', 'civicrm_contribution_page',
+      'name', "varchar(255) NULL COMMENT 'Unique name for identifying contribution page'");
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
     $enabledComponents = Civi::settings()->get('enable_components');
     $extensions = array_map(['CRM_Utils_String', 'convertStringToSnakeCase'], $enabledComponents);
     $this->addExtensionTask('Enable component extensions', $extensions);
+
+    $this->addTask('Make ContributionPage.name required', 'alterColumn', 'civicrm_contribution_page', 'name', "varchar(255) NOT NULL COMMENT 'Unique name for identifying contribution page'");
+    $this->addTask('Make ContributionPage.title required', 'alterColumn', 'civicrm_contribution_page', 'title', "varchar(255) NOT NULL COMMENT 'Contribution Page title. For top of page display'", TRUE);
+    $this->addTask('Make ContributionPage.frontend_title required', 'alterColumn', 'civicrm_contribution_page', 'frontend_title', "varchar(255) NOT NULL COMMENT 'Contribution Page Public title'", TRUE);
   }
 
 }
