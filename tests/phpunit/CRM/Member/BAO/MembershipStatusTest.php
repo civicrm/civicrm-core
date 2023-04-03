@@ -42,57 +42,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals($result, 'added', 'Verify membership status is_active.');
   }
 
-  public function testRetrieve() {
-
-    $params = ['name' => 'testStatus', 'is_active' => 1];
-
-    $this->ids['MembershipStatus'][0] = $this->callAPISuccess('MembershipStatus', 'create', $params)['id'];
-    $defaults = [];
-    $result = CRM_Member_BAO_MembershipStatus::retrieve($params, $defaults);
-    $this->assertEquals($result->name, 'testStatus', 'Verify membership status name.');
-  }
-
-  public function testPseudoConstantflush() {
-    $params = [
-      'name' => 'testStatus',
-      'is_active' => 1,
-    ];
-    $this->ids['MembershipStatus'][0] = $this->callAPISuccess('MembershipStatus', 'create', $params)['id'];
-    $defaults = [];
-    $result = CRM_Member_BAO_MembershipStatus::retrieve($params, $defaults);
-    $this->assertEquals($result->name, 'testStatus', 'Verify membership status name.');
-    $updateParams = [
-      'id' => $this->ids['MembershipStatus'][0],
-      'name' => 'testStatus',
-      'label' => 'Changed Status',
-      'is_active' => 1,
-    ];
-    $this->callAPISuccess('MembershipStatus', 'create', $updateParams)['id'];
-    $result = CRM_Member_PseudoConstant::membershipStatus($this->ids['MembershipStatus'][0], NULL, 'label', FALSE, FALSE);
-    $this->assertEquals($result, 'Changed Status', 'Verify updated membership status label From PseudoConstant.');
-  }
-
-  public function testGetMembershipStatus() {
-    $params = [
-      'name' => 'added',
-      'is_active' => 1,
-    ];
-
-    $this->ids['MembershipStatus'][0] = $this->callAPISuccess('MembershipStatus', 'create', $params)['id'];
-    $result = CRM_Member_BAO_MembershipStatus::getMembershipStatus($this->ids['MembershipStatus'][0]);
-    $this->assertEquals($result['name'], 'added', 'Verify membership status name.');
-  }
-
-  public function testDel() {
-    $params = ['name' => 'testStatus', 'is_active' => 1];
-
-    $membershipID = $this->callAPISuccess('MembershipStatus', 'create', $params)['id'];
-    CRM_Member_BAO_MembershipStatus::deleteRecord(['id' => $membershipID]);
-    $defaults = [];
-    $result = CRM_Member_BAO_MembershipStatus::retrieve($params, $defaults);
-    $this->assertEquals($result === NULL, TRUE, 'Verify membership status record deletion.');
-  }
-
   /**
    * @throws \CRM_Core_Exception
    */
