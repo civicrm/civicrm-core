@@ -36,6 +36,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
    */
   public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()
+      ->install('org.civicrm.search_kit')
       ->installMe(__DIR__)
       ->apply();
   }
