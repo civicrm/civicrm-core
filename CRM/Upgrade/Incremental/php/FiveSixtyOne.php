@@ -66,6 +66,9 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
     $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.UI_group_name_path']), 'addIndex', 'civicrm_cache', [['group_name', 'path']], 'UI');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_cache.index_expired_date']), 'addIndex', 'civicrm_cache', [['expired_date']], 'index');
     $this->addTask(ts('Update Saved Mapping for contribution import', [1 => $rev]), 'convertMappingFieldsToApi4StyleNames', $rev);
+
+    $this->addTask(ts('Drop index %1', [1 => 'civicrm_campaign.UI_campaign_name']), 'dropIndex', 'civicrm_campaign', 'UI_campaign_name');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_campaign.UI_name']), 'addIndex', 'civicrm_campaign', 'name', 'UI');
   }
 
   /**
