@@ -664,7 +664,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => ''],
       ['name' => 'trxn_id'],
-      ['name' => 'contribution_campaign_id'],
+      ['name' => 'campaign_id'],
     ];
     // First we try to create without total_amount mapped.
     // It will fail in create mode as total_amount is required for create.
