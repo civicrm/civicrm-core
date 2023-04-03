@@ -158,6 +158,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_campaign']);
     $this->relationshipTypeDelete($this->relationshipTypeID);
     if ($this->callAPISuccessGetCount('membership', ['id' => $this->membershipTypeID])) {
       $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
