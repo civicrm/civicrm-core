@@ -143,6 +143,8 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    */
   public function testImportParticipant() :void {
     $this->eventCreate(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'checkbox');
+    $cfName = $this->getCustomFieldName('checkbox');
     $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
     $this->importCSV('participant_with_ext_id.csv', [
       ['name' => 'event_id'],
@@ -157,6 +159,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'status_id'],
       ['name' => 'register_date'],
       ['name' => 'do_not_import'],
+      ['name' => $cfName],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
@@ -172,6 +175,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals('2022-12-07 00:00:00', $result['participant_register_date']);
     $this->assertEquals(['Attendee', 'Volunteer'], $result['participant_role']);
     $this->assertEquals(0, $result['participant_is_pay_later']);
+    $this->assertEquals(['P', 'M'], array_keys($result[$cfName]));
   }
 
   /**
