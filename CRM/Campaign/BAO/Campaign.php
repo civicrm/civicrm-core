@@ -14,54 +14,33 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
+class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign implements \Civi\Core\HookInterface {
 
   /**
-   * Takes an associative array and creates a campaign object.
-   *
-   * the function extract all the params it needs to initialize the create a
-   * contact object. the params array could contain additional unused name/value
-   * pairs
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
    * @return CRM_Campaign_DAO_Campaign
    * @throws \CRM_Core_Exception
    */
   public static function create(&$params) {
-    if (empty($params)) {
-      return NULL;
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
+  }
 
-    if (empty($params['id'])) {
-      if (empty($params['created_id'])) {
-        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
+  /**
+   * Event fired before an action is taken on a Campaign record.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'create') {
+      if (empty($event->params['created_id'])) {
+        $event->params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
 
-      if (empty($params['created_date'])) {
-        $params['created_date'] = date('YmdHis');
+      if (empty($event->params['created_date'])) {
+        $event->params['created_date'] = date('YmdHis');
       }
     }
-
-    /** @var \CRM_Campaign_DAO_Campaign $campaign */
-    $campaign = self::writeRecord($params);
-
-    /* Create the campaign group record */
-    $groupTableName = CRM_Contact_BAO_Group::getTableName();
-
-    if (isset($params['groups']) && !empty($params['groups']['include']) && is_array($params['groups']['include'])) {
-      foreach ($params['groups']['include'] as $entityId) {
-        $dao = new CRM_Campaign_DAO_CampaignGroup();
-        $dao->campaign_id = $campaign->id;
-        $dao->entity_table = $groupTableName;
-        $dao->entity_id = $entityId;
-        $dao->group_type = 'Include';
-        $dao->save();
-      }
-    }
-
-    return $campaign;
   }
 
   /**

@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\CampaignGroup;
+
 /**
  * This class generates form components for processing a campaign.
  */
@@ -319,36 +321,39 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @param array $params
+   * @param CRM_Campaign_Form_Campaign $form
+   * @return array
+   * @throws CRM_Core_Exception
+   */
   public static function submit($params, $form) {
-    $groups = [];
-    if (!empty($params['includeGroups']) && is_array($params['includeGroups'])) {
-      foreach ($params['includeGroups'] as $key => $id) {
-        if ($id) {
-          $groups['include'][] = $id;
-        }
-      }
-    }
-    $params['groups'] = $groups;
-
-    // delete previous includes/excludes, if campaign already existed
-    $groupTableName = CRM_Contact_BAO_Group::getTableName();
-    $dao = new CRM_Campaign_DAO_CampaignGroup();
-    $dao->campaign_id = $form->_campaignId;
-    $dao->entity_table = $groupTableName;
-    $dao->find();
-    while ($dao->fetch()) {
-      $dao->delete();
-    }
-
-    //process custom data.
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $form->_campaignId,
-      'Campaign'
-    );
-
     // dev/core#1067 Clean Money before passing onto BAO to do the create.
     $params['goal_revenue'] = CRM_Utils_Rule::cleanMoney($params['goal_revenue']);
     $result = civicrm_api3('Campaign', 'create', $params);
+
+    // Update campaign groups
+    $includeGroups = [];
+    foreach (array_filter($params['includeGroups'] ?? []) as $id) {
+      $includeGroups[] = ['entity_id' => $id];
+    }
+    if ($includeGroups) {
+      CampaignGroup::replace(FALSE)
+        ->addWhere('campaign_id', '=', $result['id'])
+        ->setDefaults([
+          'entity_table' => CRM_Contact_BAO_Group::getTableName(),
+          'group_type' => 'Include',
+        ])
+        ->setMatch(['entity_id', 'campaign_id'])
+        ->setRecords($includeGroups)
+        ->execute();
+    }
+    elseif ($form->_campaignId) {
+      CampaignGroup::delete(FALSE)
+        ->addWhere('campaign_id', '=', $result['id'])
+        ->execute();
+    }
+
     return $result;
   }
 

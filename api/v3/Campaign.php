@@ -29,7 +29,20 @@
  * @return array
  */
 function civicrm_api3_campaign_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Campaign');
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Campaign');
+
+  // Create CampaignGroup records (deprecated, use the CampaignGroup api directly instead of this secret param)
+  if (!empty($params['groups']['include']) && is_array($params['groups']['include'])) {
+    foreach ($params['groups']['include'] as $entityId) {
+      $dao = new CRM_Campaign_DAO_CampaignGroup();
+      $dao->campaign_id = $result['id'];
+      $dao->entity_table = CRM_Contact_BAO_Group::getTableName();
+      $dao->entity_id = $entityId;
+      $dao->group_type = 'Include';
+      $dao->save();
+    }
+  }
+  return $result;
 }
 
 /**
