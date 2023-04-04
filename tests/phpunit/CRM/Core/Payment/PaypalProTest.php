@@ -29,6 +29,7 @@ class CRM_Core_Payment_PaypalProTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_campaign']);
     parent::tearDown();
   }
 

@@ -23,7 +23,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_contact'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_campaign'], TRUE);
     parent::tearDown();
   }
 
