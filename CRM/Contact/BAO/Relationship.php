@@ -57,10 +57,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
     }
     $params = $extendedParams;
     // Check if this is a "simple" disable relationship. If it is don't check the relationshipType
-    if (!empty($params['id']) && array_key_exists('is_active', $params) && empty($params['is_active'])) {
-      $disableRelationship = TRUE;
-    }
-    if (empty($disableRelationship) && !CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'], $params['relationship_type_id'])) {
+    $disableRelationship = !empty($params['id']) && array_key_exists('is_active', $params) && empty($params['is_active']);
+    if (!$disableRelationship && !CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'], $params['relationship_type_id'])) {
       throw new CRM_Core_Exception('Invalid Relationship');
     }
     $relationship = self::add($params);
