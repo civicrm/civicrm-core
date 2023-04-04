@@ -54,7 +54,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       0 => [
         13 => [
           'price_field_id' => $this->getPriceFieldID(),
-          'price_field_value_id' => $this->_ids['price_field_value'][0],
+          'price_field_value_id' => $this->ids['PriceFieldValue']['price_field'],
           'label' => 'Tiny-tots (ages 5-8)',
           'field_title' => 'Tournament Fees',
           'description' => NULL,
@@ -81,7 +81,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'role_id' => 1,
       'event_id' => $form->_eventId,
       'priceSetId' => $this->getPriceSetID('event'),
-      $this->getPriceFieldKey() => $this->_ids['price_field_value'][0],
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['price_field'],
       'is_pay_later' => 1,
       'amount_level' => 'Too much',
       'fee_amount' => 55,
@@ -212,7 +212,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'line_total' => 1550.55,
       'participant_count' => 0,
       'price_field_id' => $this->getPriceFieldID(),
-      'price_field_value_id' => $this->_ids['price_field_value'][1],
+      'price_field_value_id' => $this->ids['PriceFieldValue']['big'],
       'tax_amount' => 0,
       // Interestingly the financial_type_id set in this test is ignored but currently locking in what is happening with this test so setting to 'actual'
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'),
@@ -768,7 +768,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @return int
    */
   protected function getPriceFieldValueID(): int {
-    return (int) $this->_ids['price_field_value'][1];
+    return (int) $this->ids['PriceFieldValue']['big'];
   }
 
   /**

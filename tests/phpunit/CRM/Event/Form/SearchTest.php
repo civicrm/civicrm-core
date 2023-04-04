@@ -19,7 +19,7 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
     parent::setUp();
     $this->individualID = $this->individualCreate();
     $event = $this->eventCreate();
-    $priceFieldValues = $this->createPriceSet('event', $event, [
+    $priceFieldValues = $this->createPriceSet('event', $event['id'], [
       'html_type'    => 'Radio',
       'option_label' => ['1' => 'Radio Label A (inc. GST)', '2' => 'Radio Label B (inc. GST)'],
       'option_name'  => ['1' => 'Radio Label A', '2' => 'Radio Label B'],

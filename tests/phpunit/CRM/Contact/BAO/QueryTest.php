@@ -1364,7 +1364,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @return array
    */
-  public function relativeDateFilters() {
+  public function relativeDateFilters(): array {
     $dataProvider[] = ['this.year', "WHERE  ( contact_a.created_date BETWEEN 'date0' AND 'date1' )  AND (contact_a.is_deleted = 0)"];
     $dataProvider[] = ['greater.day', "WHERE  ( contact_a.created_date >= 'date0' )  AND (contact_a.is_deleted = 0)"];
     $dataProvider[] = ['earlier.week', "WHERE  ( contact_a.created_date <= 'date1' )  AND (contact_a.is_deleted = 0)"];
@@ -1382,10 +1382,8 @@ civicrm_relationship.is_active = 1 AND
    * Donation           |NULL                | 300.00     |SSF         | Donation,Donation         | 2                | 200.00,100.00
    * Donation           |2019-02-13 00:00:00 | 50.00      |SSF         | Donation                  | 1                | 50.00
    * Member Dues        |2019-02-13 00:00:00 | 50.00      |SSF         | Member Dues               | 1                | 50.00
-   *
-   * @throws \CRM_Core_Exception
    */
-  protected function createContributionsForSummaryQueryTests() {
+  protected function createContributionsForSummaryQueryTests(): void {
     $contactID = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID]);
     $this->contributionCreate([
@@ -1398,15 +1396,15 @@ civicrm_relationship.is_active = 1 AND
     $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF'], [
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
       $eventFeeType,
-    ]);
+    ], 'event_fee');
     $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF'], [
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
-    ]);
+    ], 'two_donations');
     $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF', 'financial_type_id' => $eventFeeType], [
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
-    ]);
+    ], 'two_more_donations');
     $this->contributionCreate([
       'contact_id' => $contactID,
       'total_amount' => 50,
@@ -1438,7 +1436,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGenericWhereHandling() {
+  public function testGenericWhereHandling(): void {
     $query = new CRM_Contact_BAO_Query([['suffix_id', '=', 2, 0]]);
     $this->assertEquals('contact_a.suffix_id = 2', $query->_where[0][0]);
     $this->assertEquals('Individual Suffix = Sr.', $query->_qill[0][0]);

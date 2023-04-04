@@ -364,15 +364,4 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('INSERT INTO bar (name, first, second) SELECT foo.name, concat(foo.one, " and on and on"), foo.two FROM foo WHERE (foo.whiz = 100) ON DUPLICATE KEY UPDATE first = concat(foo.one, " and on and on"), second = foo.two', $select->toSQL());
   }
 
-  /**
-   * @param $expected
-   * @param $actual
-   * @param string $message
-   */
-  public function assertLike($expected, $actual, $message = '') {
-    $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expected)));
-    $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actual)));
-    $this->assertEquals($expected, $actual, $message);
-  }
-
 }
