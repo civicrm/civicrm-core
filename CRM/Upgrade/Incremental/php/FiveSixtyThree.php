@@ -30,6 +30,13 @@ class CRM_Upgrade_Incremental_php_FiveSixtyThree extends CRM_Upgrade_Incremental
   public function upgrade_5_63_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
+    // Campaign indexes
+    $this->addTask(ts('Drop index %1', [1 => 'civicrm_campaign.UI_campaign_type_id']), 'dropIndex', 'civicrm_campaign', 'UI_campaign_type_id');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_campaign.index_campaign_type_id']), 'addIndex', 'civicrm_campaign', 'campaign_type_id', 'index');
+    $this->addTask(ts('Drop index %1', [1 => 'civicrm_campaign.UI_campaign_status_id']), 'dropIndex', 'civicrm_campaign', 'UI_campaign_status_id');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_campaign.index_status_id']), 'addIndex', 'civicrm_campaign', 'status_id', 'index');
+    $this->addTask('Add default value to civicrm_campaign.created_date', 'alterColumn', 'civicrm_campaign', 'created_date', "datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Date and time that Campaign was created.'");
+
     $enabledComponents = Civi::settings()->get('enable_components');
     $extensions = array_map(['CRM_Utils_String', 'convertStringToSnakeCase'], $enabledComponents);
     $this->addExtensionTask('Enable component extensions', $extensions);
