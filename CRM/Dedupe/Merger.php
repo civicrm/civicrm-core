@@ -1483,9 +1483,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * A function to build an array of information required by merge function and the merge UI.
    *
-   * @param int $mainId
+   * @param int $mainID
    *   Main contact with whom merge has to happen.
-   * @param int $otherId
+   * @param int $otherID
    *   Duplicate contact which would be deleted after merge operation.
    * @param bool $checkPermissions
    *   Should the logged in user's permissions be ignore. Setting this to false is
@@ -1523,13 +1523,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *     though the form had been submitted with those options.
    *
    * @throws \CRM_Core_Exception
+   * @todo review permissions issue!
+   *
    */
-  public static function getRowsElementsAndInfo($mainId, $otherId, $checkPermissions = TRUE) {
+  public static function getRowsElementsAndInfo(int $mainID, int $otherID, bool $checkPermissions = TRUE) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
     $fields = self::getMergeFieldsMetadata();
 
-    $main = self::getMergeContactDetails($mainId);
-    $other = self::getMergeContactDetails($otherId);
+    $main = self::getMergeContactDetails($mainID);
+    $other = self::getMergeContactDetails($otherID);
 
     $compareFields = self::retrieveFields($main, $other);
 
@@ -1583,30 +1585,30 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $locations = ['main' => [], 'other' => []];
 
     foreach ($locationBlocks as $blockName => $blockInfo) {
-      [$locations, $rows, $elements, $migrationInfo] = self::addLocationFieldInfo($mainId, $otherId, $blockInfo, $blockName, $locations, $rows, $elements, $migrationInfo);
+      [$locations, $rows, $elements, $migrationInfo] = self::addLocationFieldInfo($mainID, $otherID, $blockInfo, $blockName, $locations, $rows, $elements, $migrationInfo);
     } // End loop through each location block entity
 
     // add the related tables and unset the ones that don't sport any of the duplicate contact's info
-    $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);
+    $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainID, (int) $otherID);
     $relTables = $mergeHandler->getTablesRelatedToTheMergePair();
     foreach ($relTables as $name => $null) {
       $migrationInfo["move_$name"] = 1;
 
-      $relTables[$name]['main_url'] = str_replace('$cid', $mainId, $relTables[$name]['url']);
-      $relTables[$name]['other_url'] = str_replace('$cid', $otherId, $relTables[$name]['url']);
+      $relTables[$name]['main_url'] = str_replace('$cid', $mainID, $relTables[$name]['url']);
+      $relTables[$name]['other_url'] = str_replace('$cid', $otherID, $relTables[$name]['url']);
       $relTables[$name]['has_operation'] = 0;
 
       if ($name === 'rel_table_users') {
         // @todo - this user url stuff is only needed for the form layer - move to CRM_Contact_Form_Merge
-        $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($mainId), $relTables[$name]['url']);
-        $relTables[$name]['other_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherId), $relTables[$name]['url']);
+        $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($mainID), $relTables[$name]['url']);
+        $relTables[$name]['other_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherID), $relTables[$name]['url']);
       }
       if ($name === 'rel_table_memberships') {
         //Enable 'add new' checkbox if main contact does not contain any membership similar to duplicate contact.
         $attributes = ['checked' => 'checked'];
-        $otherContactMemberships = CRM_Member_BAO_Membership::getAllContactMembership($otherId);
+        $otherContactMemberships = CRM_Member_BAO_Membership::getAllContactMembership($otherID);
         foreach ($otherContactMemberships as $membership) {
-          $mainMembership = CRM_Member_BAO_Membership::getContactMembership($mainId, $membership['membership_type_id'], FALSE);
+          $mainMembership = CRM_Member_BAO_Membership::getContactMembership($mainID, $membership['membership_type_id'], FALSE);
           if ($mainMembership) {
             $attributes = [];
           }
@@ -1628,11 +1630,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // handle custom fields
-    $mainTree = self::getTree($main['contact_type'], $mainId,
+    $mainTree = self::getTree($main['contact_type'], $mainID,
       $main['contact_sub_type'] ?? NULL,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
-    $otherTree = self::getTree($main['contact_type'], $otherId,
+    $otherTree = self::getTree($main['contact_type'], $otherID,
       $other['contact_sub_type'] ?? NULL,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
@@ -1727,14 +1729,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   private static function getTree(
     $entityType,
-    $entityID,
+    int $entityID,
     $subTypes,
     $checkPermission
   ) {
 
-    if ($entityID) {
-      $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
-    }
     if (!is_array($subTypes)) {
       if (empty($subTypes)) {
         $subTypes = [];
@@ -2585,7 +2584,7 @@ ORDER BY civicrm_custom_group.weight,
     $conflicts = [];
     // Generate var $migrationInfo. The variable structure is exactly same as
     // $formValues submitted during a UI merge for a pair of contacts.
-    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId, FALSE);
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo((int) $mainId, (int) $otherId, FALSE);
     // add additional details that we might need to resolve conflicts
     $migrationInfo = $rowsElementsAndInfo['migration_info'];
     $migrationInfo['main_details'] = &$rowsElementsAndInfo['main_details'];
