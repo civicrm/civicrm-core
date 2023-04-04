@@ -180,8 +180,10 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Create a contribution record for Alice with type "Member Dues".
    */
   public function addAliceDues(): void {
-    $this->enableCiviCampaign();
-    $campaignID = $this->campaignCreate();
+    $campaignID = $this->campaignCreate([
+      'title' => 'Campaign',
+      'name' => 'big_campaign',
+    ]);
     $this->ids['Contribution']['alice'] = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['alice']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),

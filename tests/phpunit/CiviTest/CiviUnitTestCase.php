@@ -1358,8 +1358,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   public function campaignCreate($params = [], $reloadConfig = TRUE) {
     $this->enableCiviCampaign($reloadConfig);
     $campaign = $this->callAPISuccess('campaign', 'create', array_merge([
-      'name' => 'big_campaign',
-      'title' => 'Campaign',
+      'title' => 'big campaign',
     ], $params));
     return $campaign['id'];
   }
