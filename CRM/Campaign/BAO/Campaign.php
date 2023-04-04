@@ -36,10 +36,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign implements \Ci
       if (empty($event->params['created_id'])) {
         $event->params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
-
-      if (empty($event->params['created_date'])) {
-        $event->params['created_date'] = date('YmdHis');
-      }
     }
   }
 
