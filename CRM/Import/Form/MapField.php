@@ -457,7 +457,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         continue;
       }
       $childField = [
-        'text' => $field['html']['label'] ?? $field['title'],
+        'text' => $field['label'] ?? ($field['html']['label'] ?? $field['title']),
         'id' => $fieldName,
         'has_location' => !empty($field['hasLocationType']),
         'default_value' => $field['default_value'] ?? '',
