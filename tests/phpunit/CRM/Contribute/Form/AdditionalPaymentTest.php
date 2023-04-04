@@ -179,8 +179,8 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'return' => ['target_contact_id', 'assignee_contact_id', 'subject'],
     ])['values'];
     $this->assertCount(3, $activities);
-    $this->assertEquals('$ 50.00 - Offline Payment for Contribution', $activities[1]['subject']);
-    $this->assertEquals('$ 20.00 - Offline Payment for Contribution', $activities[2]['subject']);
+    $this->assertEquals('$ 50.00 - Payment for Contribution', $activities[1]['subject']);
+    $this->assertEquals('$ 20.00 - Payment for Contribution', $activities[2]['subject']);
     $this->assertEquals(CRM_Core_Session::singleton()->getLoggedInContactID(), $activities[0]['source_contact_id']);
     $this->assertEquals([$this->_individualId], $activities[0]['target_contact_id']);
     $this->assertEquals([], $activities[0]['assignee_contact_id']);
