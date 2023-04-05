@@ -746,13 +746,11 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * Test allowUpdateRevenueRecognitionDate.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testAllowUpdateRevenueRecognitionDate() {
-    $contactId = $this->individualCreate();
+  public function testAllowUpdateRevenueRecognitionDate(): void {
+    $contactID = $this->individualCreate();
     $params = [
-      'contact_id' => $contactId,
+      'contact_id' => $contactID,
       'receive_date' => '2010-01-20',
       'total_amount' => 100,
       'financial_type_id' => 4,
@@ -764,10 +762,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     $event = $this->eventCreate();
     $params = [
-      'contact_id' => $contactId,
+      'contact_id' => $contactID,
       'receive_date' => '2010-01-20',
       'total_amount' => 300,
-      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Price_BAO_PriceSet', 'financial_type_id', 'Event Fee'),
       'contribution_status_id' => 'Pending',
     ];
     $priceFields = $this->createPriceSet('event', $event['id']);
@@ -787,7 +785,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $params['line_items'][] = [
       'line_item' => $lineItems,
       'params' => [
-        'contact_id' => $contactId,
+        'contact_id' => $contactID,
         'event_id' => $event['id'],
         'status_id' => 1,
         'role_id' => 1,
@@ -800,14 +798,14 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertFalse($allowUpdate);
 
     $params = [
-      'contact_id' => $contactId,
+      'contact_id' => $contactID,
       'receive_date' => '2010-01-20',
       'total_amount' => 200,
       'financial_type_id' => $this->getFinancialTypeId('Member Dues'),
       'contribution_status_id' => 'Pending',
     ];
     $membershipType = $this->membershipTypeCreate();
-    $priceFields = $this->createPriceSet();
+    $priceFields = $this->createPriceSet('contribution_page', NULL, [], 'membership');
     $lineItems = [];
     foreach ($priceFields['values'] as $key => $priceField) {
       $lineItems[$key] = [
@@ -826,7 +824,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $params['line_items'][] = [
       'line_item' => [array_pop($lineItems)],
       'params' => [
-        'contact_id' => $contactId,
+        'contact_id' => $contactID,
         'membership_type_id' => $membershipType,
         'join_date' => '2006-01-21',
         'start_date' => '2006-01-21',
@@ -843,10 +841,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * Test recording of amount with comma separator.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testCommaSeparatorAmount() {
+  public function testCommaSeparatorAmount(): void {
     $contactId = $this->individualCreate();
 
     $params = [

@@ -2470,15 +2470,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param bool $exists
    * @param array $apiResult
    */
-  protected function assertAttachmentExistence($exists, $apiResult) {
-    $fileId = $apiResult['id'];
-    $this->assertTrue(is_numeric($fileId));
-    $this->assertEquals($exists, file_exists($apiResult['values'][$fileId]['path']));
+  protected function assertAttachmentExistence(bool $exists, array $apiResult): void {
+    $this->assertIsNumeric($apiResult['id']);
+    $this->assertEquals($exists, file_exists($apiResult['values'][$apiResult['id']]['path']));
     $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_file WHERE id = %1', [
-      1 => [$fileId, 'Int'],
+      1 => [$apiResult['id'], 'Int'],
     ]);
     $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', [
-      1 => [$fileId, 'Int'],
+      1 => [$apiResult['id'], 'Int'],
     ]);
   }
 
@@ -2489,7 +2488,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param string $actualSQL
    * @param string $message
    */
-  protected function assertLike($expectedSQL, $actualSQL, $message = 'different sql') {
+  protected function assertLike(string $expectedSQL, string $actualSQL, string $message = 'different sql'): void {
     $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expectedSQL)));
     $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actualSQL)));
     $this->assertEquals($expected, $actual, $message);
@@ -2498,8 +2497,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Create a price set for an event.
    *
-   * @param int $feeTotal
-   * @param int $minAmt
+   * @param float $feeTotal
+   * @param float $minAmt
    * @param string $type
    *
    * @param array $options
@@ -2507,8 +2506,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return int
    *   Price Set ID.
    * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
-  protected function eventPriceSetCreate($feeTotal, $minAmt = 0, string $type = 'Text', array $options = [['name' => 'hundred', 'amount' => 100]]): int {
+  protected function eventPriceSetCreate(float $feeTotal, float $minAmt = 0, string $type = 'Text', array $options = [['name' => 'hundred', 'amount' => 100]]): int {
     $paramsSet['title'] = 'Price Set';
     $paramsSet['name'] = 'price_set';
     $paramsSet['is_active'] = FALSE;
@@ -2546,12 +2546,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     }
     $priceFieldID = $this->callAPISuccess('PriceField', 'create', $paramsField)['id'];
     $this->ids['PriceField']['event_' . strtolower($type)] = $priceFieldID;
-    $this->_ids['price_field'] = [$priceFieldID];
     $fieldValues = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceFieldID])['values'];
     foreach ($fieldValues as $priceFieldValue) {
       $this->ids['PriceFieldValue'][strtolower($priceFieldValue['name'])] = $priceFieldValue['id'];
     }
-    $this->_ids['price_field_value'] = array_keys($fieldValues);
     return $priceSetID;
   }
 
@@ -2593,24 +2591,25 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Create price set that includes one price field with two option values.
    *
    * @param string $component
-   * @param int $componentId
+   * @param int|null $componentID
    * @param array $priceFieldOptions
+   * @param string $identifier
    *
    * @return array - the result of API3 PriceFieldValue.get for the new PriceField
    */
-  protected function createPriceSet($component = 'contribution_page', $componentId = NULL, $priceFieldOptions = []) {
-    $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 7);
-    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
+  protected function createPriceSet(string $component = 'contribution_page', ?int $componentID = NULL, array $priceFieldOptions = [], $identifier = 'price_set_test'): array {
+    $paramsSet['title'] = 'Price Set' . $identifier;
+    $paramsSet['name'] = $identifier;
     $paramsSet['is_active'] = TRUE;
     $paramsSet['financial_type_id'] = 'Event Fee';
     $paramsSet['extends'] = 1;
-    $priceSet = $this->callAPISuccess('price_set', 'create', $paramsSet);
-    if ($componentId) {
-      CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentId, $priceSet['id']);
+    $priceSet = $this->callAPISuccess('PriceSet', 'create', $paramsSet);
+    if ($componentID) {
+      CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentID, $priceSet['id']);
     }
     $paramsField = array_merge([
       'label' => 'Price Field',
-      'name' => CRM_Utils_String::titleToVar('Price Field'),
+      'name' => 'Price_Field',
       'html_type' => 'CheckBox',
       'option_label' => ['1' => 'Price Field 1', '2' => 'Price Field 2'],
       'option_value' => ['1' => 100, '2' => 200],
@@ -2623,11 +2622,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_active' => ['1' => 1, '2' => 1],
       'price_set_id' => $priceSet['id'],
       'is_enter_qty' => 1,
-      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Price_BAO_PriceSet', 'financial_type_id', 'Event Fee'),
     ], $priceFieldOptions);
 
-    $priceField = CRM_Price_BAO_PriceField::create($paramsField);
-    return $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField->id]);
+    $priceField = $this->callAPISuccess('PriceField', 'create', $paramsField);
+    return $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField['id']]);
   }
 
   /**
@@ -2636,6 +2635,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param string $templateName
    * @param string $input
    * @param string $type
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
   protected function swapMessageTemplateForInput(string $templateName, string $input, string $type = 'html'): void {
     CRM_Core_DAO::executeQuery(
@@ -2651,6 +2653,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param string $templateName
    * @param string $type
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
   protected function swapMessageTemplateForTestTemplate($templateName = 'contribution_online_receipt', $type = 'html'): void {
     $testTemplate = file_get_contents(__DIR__ . '/../../templates/message_templates/' . $templateName . '_' . $type . '.tpl');
@@ -2667,8 +2672,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param string $templateName
    * @param string $type
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
-  protected function revertTemplateToReservedTemplate($templateName = 'contribution_online_receipt', $type = 'html') {
+  protected function revertTemplateToReservedTemplate(string $templateName = 'contribution_online_receipt', string $type = 'html'): void {
     CRM_Core_DAO::executeQuery(
       "UPDATE civicrm_option_group og
       LEFT JOIN civicrm_option_value ov ON ov.option_group_id = og.id
@@ -2683,8 +2691,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   /**
    * Flush statics relating to financial type.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
-  protected function flushFinancialTypeStatics() {
+  protected function flushFinancialTypeStatics(): void {
     if (isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'])) {
       unset(\Civi::$statics['CRM_Financial_BAO_FinancialType']);
     }
@@ -2704,7 +2715,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $permissions
    */
-  protected function setPermissions($permissions) {
+  protected function setPermissions(array $permissions): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
     $this->flushFinancialTypeStatics();
   }

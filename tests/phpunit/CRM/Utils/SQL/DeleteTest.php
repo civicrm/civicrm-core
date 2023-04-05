@@ -39,15 +39,4 @@ class CRM_Utils_SQL_DeleteTest extends CiviUnitTestCase {
     $this->assertLike('DELETE FROM foo WHERE (foo IS NULL) AND (nonexistent IS @nonexistent) AND (morenonexistent IS @nonexistent) AND (bar IS "null")', $del->toSQL());
   }
 
-  /**
-   * @param $expected
-   * @param $actual
-   * @param string $message
-   */
-  public function assertLike($expected, $actual, $message = '') {
-    $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expected)));
-    $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actual)));
-    $this->assertEquals($expected, $actual, $message);
-  }
-
 }

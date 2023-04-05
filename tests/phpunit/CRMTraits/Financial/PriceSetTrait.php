@@ -36,12 +36,14 @@ trait CRMTraits_Financial_PriceSetTrait {
    *
    * This works for quick config pages with only one option.
    *
+   * @param int $contributionPageID
+   *
    * @return string
    *
    * @noinspection PhpUnhandledExceptionInspection
    * @noinspection PhpDocMissingThrowsInspection
    */
-  protected function getPriceFieldLabelForContributionPage($contributionPageID): string {
+  protected function getPriceFieldLabelForContributionPage(int $contributionPageID): string {
     $this->ids['PriceSet']['contribution_page' . $contributionPageID] = (int) PriceSetEntity::get(FALSE)
       ->addWhere('entity_id', '=', $contributionPageID)
       ->addWhere('entity_table', '=', 'civicrm_contribution_page')
@@ -70,14 +72,16 @@ trait CRMTraits_Financial_PriceSetTrait {
    * @param $params
    * @param array $lineItemFinancialTypes
    *   Financial Types, if an override is intended.
+   * @param string $identifier
+   *   Name to to identify price set.
    */
-  protected function createContributionWithTwoLineItemsAgainstPriceSet($params, array $lineItemFinancialTypes = []): void {
+  protected function createContributionWithTwoLineItemsAgainstPriceSet($params, array $lineItemFinancialTypes = [], string $identifier = 'Donation'): void {
     $params = (array) array_merge([
       'total_amount' => 300,
       'financial_type_id' => 'Donation',
       'contribution_status_id' => 'Pending',
     ], $params);
-    $priceFields = $this->createPriceSet('contribution');
+    $priceFields = $this->createPriceSet('contribution', NULL, [], $identifier);
     foreach ($priceFields['values'] as $key => $priceField) {
       $financialTypeID = (!empty($lineItemFinancialTypes) ? array_shift($lineItemFinancialTypes) : $priceField['financial_type_id']);
       $params['line_items'][]['line_item'][$key] = [
