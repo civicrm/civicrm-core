@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\EntityFinancialAccount;
+
 /**
  * Class CRM_Event_BAO_AdditionalPaymentTest
  *
@@ -198,6 +200,36 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals('Completed', $contribution['contribution_status'], 'Contribution status is not correct');
 
     $this->callAPISuccess('OptionValue', 'delete', ['id' => $paymentInstrumentID]);
+  }
+
+  /**
+   * Create Payment Instrument.
+   *
+   * @param array $params
+   * @param string $financialAccountName
+   *
+   * @return int
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function createPaymentInstrument(array $params = [], string $financialAccountName = 'Donation'): int {
+    $params = array_merge([
+      'label' => 'Payment Instrument - new',
+      'option_group_id' => 'payment_instrument',
+      'is_active' => 1,
+    ], $params);
+    $newPaymentInstrument = $this->callAPISuccess('OptionValue', 'create', $params)['id'];
+
+    $relationTypeID = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
+
+    $financialAccountParams = [
+      'entity_table' => 'civicrm_option_value',
+      'entity_id' => $newPaymentInstrument,
+      'account_relationship' => $relationTypeID,
+      'financial_account_id' => $this->callAPISuccess('FinancialAccount', 'getValue', ['name' => $financialAccountName, 'return' => 'id']),
+    ];
+    EntityFinancialAccount::create()->setValues($financialAccountParams)->execute();
+
+    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $params['label']);
   }
 
   /**
