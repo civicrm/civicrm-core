@@ -120,7 +120,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Individual',
       'contact_sub_type_b' => $this->parent,
     ];
-    $result = CRM_Contact_BAO_RelationshipType::add($params);
+    $result = CRM_Contact_BAO_RelationshipType::writeRecord($params);
     $this->assertEquals($result->name_a_b, 'indivToparent');
     $this->assertEquals($result->contact_type_a, 'Individual');
     $this->assertEquals($result->contact_type_b, 'Individual');
@@ -137,7 +137,7 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_a' => $this->sponsor,
       'contact_type_b' => 'Individual',
     ];
-    $result = CRM_Contact_BAO_RelationshipType::add($params);
+    $result = CRM_Contact_BAO_RelationshipType::writeRecord($params);
     $this->assertEquals($result->name_a_b, 'SponsorToIndiv');
     $this->assertEquals($result->contact_type_a, 'Organization');
     $this->assertEquals($result->contact_sub_type_a, $this->sponsor);
@@ -155,7 +155,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Organization',
       'contact_sub_type_b' => $this->sponsor,
     ];
-    $result = CRM_Contact_BAO_RelationshipType::add($params);
+    $result = CRM_Contact_BAO_RelationshipType::writeRecord($params);
     $this->assertEquals($result->name_a_b, 'StudentToSponser');
     $this->assertEquals($result->contact_type_a, 'Individual');
     $this->assertEquals($result->contact_sub_type_a, $this->student);
@@ -172,7 +172,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_a' => '',
       'contact_type_b' => '',
     ];
-    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams);
+    $relType = CRM_Contact_BAO_RelationshipType::writeRecord($relTypeParams);
     $indTypes = CRM_Contact_BAO_Relationship::getRelationType('Individual');
     $orgTypes = CRM_Contact_BAO_Relationship::getRelationType('Organization');
 
