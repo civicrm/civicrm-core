@@ -1751,7 +1751,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // create a new tree
 
     // legacy hardcoded list of data to return
-    $tableData = [
+    $toReturn = [
       'custom_field' => [
         'id',
         'name',
@@ -1772,6 +1772,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         'time_format',
         'option_group_id',
         'in_selector',
+        'serialize',
       ],
       'custom_group' => [
         'id',
@@ -1787,19 +1788,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         'extends_entity_column_id',
         'extends_entity_column_value',
         'max_multiple',
+        'is_public',
       ],
     ];
-    $current_db_version = CRM_Core_BAO_Domain::version();
-    $is_public_version = version_compare($current_db_version, '4.7.19', '>=');
-    $serialize_version = version_compare($current_db_version, '5.27.alpha1', '>=');
-    if ($is_public_version) {
-      $tableData['custom_group'][] = 'is_public';
-    }
-    if ($serialize_version) {
-      $tableData['custom_field'][] = 'serialize';
-    }
-
-    $toReturn = $tableData;
 
     // create select
     $select = [];
@@ -1808,17 +1799,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $select[] = "civicrm_{$tableName}.{$columnName} as civicrm_{$tableName}_{$columnName}";
       }
     }
-    $strSelect = "SELECT " . implode(', ', $select);
+    $strSelect = 'SELECT ' . implode(', ', $select);
 
     // from, where, order by
-    $strFrom = "
+    $strFrom = '
 FROM     civicrm_custom_group
 LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicrm_custom_group.id)
-";
+';
 
     // if entity is either individual, organization or household pls get custom groups for 'contact' too.
-    if ($entityType == "Individual" || $entityType == 'Organization' ||
-      $entityType == 'Household'
+    if ($entityType === 'Individual' || $entityType === 'Organization' ||
+      $entityType === 'Household'
     ) {
       $in = "'$entityType', 'Contact'";
     }
