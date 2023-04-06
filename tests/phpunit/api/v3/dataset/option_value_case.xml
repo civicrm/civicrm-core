@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--  $Id: option_value_case.xml 36085 2011-09-09 13:15:49Z daved $  -->
 <dataset>
   <table name="civicrm_option_value">
     <column>id</column>

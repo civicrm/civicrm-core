@@ -9,7 +9,6 @@
  * @copyright Copyright CiviCRM LLC (C) 2009
  * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- * @version   $Id: ActivityTest.php 31254 2010-12-15 10:09:29Z eileen $
  * @package   CiviCRM
  *
  *   This file is part of CiviCRM
