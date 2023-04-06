@@ -35,7 +35,7 @@ class PostEvent extends GenericHookEvent {
   public $id;
 
   /**
-   * @var CRM_Core_DAO
+   * @var \CRM_Core_DAO
    */
   public $object;
 
