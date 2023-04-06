@@ -96,6 +96,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
         }
       }
     }
+    if ($e->entity === 'RelationshipType') {
+      CRM_Case_XMLProcessor::flushStaticCaches();
+    }
   }
 
   /**

@@ -49,53 +49,23 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
   }
 
   /**
-   * Add the relationship type in the db.
-   *
+   * @deprecated
    * @param array $params
-   *
    * @return CRM_Contact_DAO_RelationshipType
    */
   public static function add($params) {
-    if (empty($params['id'])) {
-      // Set name to label if not set
-      if (empty($params['label_a_b']) && !empty($params['name_a_b'])) {
-        $params['label_a_b'] = $params['name_a_b'];
-      }
-      if (empty($params['label_b_a']) && !empty($params['name_b_a'])) {
-        $params['label_b_a'] = $params['name_b_a'];
-      }
-
-      // set label to name if it's not set
-      if (empty($params['name_a_b']) && !empty($params['label_a_b'])) {
-        $params['name_a_b'] = $params['label_a_b'];
-      }
-      if (empty($params['name_b_a']) && !empty($params['label_b_a'])) {
-        $params['name_b_a'] = $params['label_b_a'];
-      }
-    }
-
-    // action is taken depending upon the mode
-    $relationshipType = self::writeRecord($params);
-
-    CRM_Core_PseudoConstant::relationshipType('label', TRUE);
-    CRM_Core_PseudoConstant::relationshipType('name', TRUE);
-    CRM_Core_PseudoConstant::flush();
-    CRM_Case_XMLProcessor::flushStaticCaches();
-    return $relationshipType;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
-   * Delete Relationship Types.
-   *
-   * @param int $relationshipTypeId
-   *
    * @deprecated
+   * @param int $relationshipTypeId
    * @throws CRM_Core_Exception
    * @return mixed
    */
   public static function del($relationshipTypeId) {
     CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-
     return static::deleteRecord(['id' => $relationshipTypeId]);
   }
 
@@ -103,17 +73,42 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    * Callback for hook_civicrm_pre().
    *
    * @param \Civi\Core\Event\PreEvent $event
-   *
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function self_hook_civicrm_pre(PreEvent $event): void {
+    if ($event->action === 'create') {
+      // Set name to label if not set
+      if (empty($event->params['label_a_b']) && !empty($event->params['name_a_b'])) {
+        $event->params['label_a_b'] = $event->params['name_a_b'];
+      }
+      if (empty($event->params['label_b_a']) && !empty($event->params['name_b_a'])) {
+        $event->params['label_b_a'] = $event->params['name_b_a'];
+      }
+
+      // set label to name if it's not set
+      if (empty($event->params['name_a_b']) && !empty($event->params['label_a_b'])) {
+        $event->params['name_a_b'] = $event->params['label_a_b'];
+      }
+      if (empty($event->params['name_b_a']) && !empty($event->params['label_b_a'])) {
+        $event->params['name_b_a'] = $event->params['label_b_a'];
+      }
+    }
     if ($event->action === 'delete') {
-      // need to delete all option value field before deleting group
+      // Delete all existing relationships with this type
       Relationship::delete(FALSE)
         ->addWhere('relationship_type_id', '=', $event->id)
         ->execute();
     }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    CRM_Core_PseudoConstant::relationshipType('label', TRUE);
+    CRM_Core_PseudoConstant::relationshipType('name', TRUE);
+    CRM_Core_PseudoConstant::flush();
   }
 
   /**
