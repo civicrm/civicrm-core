@@ -95,7 +95,6 @@ function contact_create_expectedresult() {
         'image_URL' => '',
         'preferred_communication_method' => '',
         'preferred_language' => 'en_US',
-        'preferred_mail_format' => 'Both',
         'hash' => '67eac7789eaee00',
         'api_key' => '',
         'first_name' => 'abc3',

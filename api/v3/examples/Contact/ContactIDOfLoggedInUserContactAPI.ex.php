@@ -69,7 +69,6 @@ function contact_get_expectedresult() {
         'image_URL' => '',
         'preferred_communication_method' => '',
         'preferred_language' => 'en_US',
-        'preferred_mail_format' => 'Both',
         'first_name' => 'Logged In',
         'middle_name' => 'J.',
         'last_name' => 'User 707727958',
