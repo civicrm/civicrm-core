@@ -195,8 +195,8 @@ class CRM_Core_BAO_CustomQuery {
         // fix $value here to escape sql injection attacks
         $qillValue = NULL;
         if (!is_array($value)) {
-          $value = CRM_Core_DAO::escapeString(trim($value));
-          $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
+          $escapedValue = CRM_Core_DAO::escapeString(trim($value));
+          $qillValue = CRM_Core_BAO_CustomField::displayValue($escapedValue, $id);
         }
         elseif (count($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
@@ -273,7 +273,7 @@ class CRM_Core_BAO_CustomQuery {
               }
               else {
                 //FIX for custom data query fired against no value(NULL/NOT NULL)
-                $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+                $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String', TRUE);
               }
               $this->_qill[$grouping][] = $field['label'] . " $qillOp $qillValue";
             }
