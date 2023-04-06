@@ -10,7 +10,7 @@
 <xi:include href="MailingEventReply.xml"            parse="xml" />
 <xi:include href="MailingEventSubscribe.xml"        parse="xml" />
 <xi:include href="MailingEventConfirm.xml"          parse="xml" />
-<xi:include href="MailingEventClickThrough.xml" parse="xml" />
+<xi:include href="MailingEventTrackableURLOpen.xml" parse="xml" />
 <xi:include href="MailingEventUnsubscribe.xml"      parse="xml" />
 
 </tables>

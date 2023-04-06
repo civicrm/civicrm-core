@@ -2,8 +2,10 @@
 
 <table>
   <base>CRM/Mailing/Event</base>
-  <class>MailingEventClickThrough</class>
+  <class>MailingEventTrackableURLOpen</class>
   <name>civicrm_mailing_event_trackable_url_open</name>
+  <title>Mailing Link Clickthrough</title>
+  <titlePlural>Mailing Link Clickthroughs</titlePlural>
   <comment>Tracks when a TrackableURL is clicked by a recipient.</comment>
   <archive>true</archive>
   <component>CiviMail</component>
@@ -29,6 +31,7 @@
     <comment>FK to EventQueue</comment>
     <html>
       <label>Recipient</label>
+      <type>EntityRef</type>
     </html>
   </field>
   <foreignKey>
@@ -44,7 +47,8 @@
     <required>true</required>
     <comment>FK to TrackableURL</comment>
     <html>
-      <label>Trackable Url</label>
+      <label>Mailing Link</label>
+      <type>EntityRef</type>
     </html>
   </field>
   <foreignKey>
@@ -59,6 +63,10 @@
     <type>timestamp</type>
     <default>CURRENT_TIMESTAMP</default>
     <required>true</required>
+    <html>
+      <label>Opened Date</label>
+      <type>Date</type>
+    </html>
     <comment>When this trackable URL open occurred.</comment>
   </field>
 </table>

@@ -2,8 +2,10 @@
 
 <table>
   <base>CRM/Mailing</base>
-  <class>TrackableURL</class>
+  <class>MailingTrackableURL</class>
   <name>civicrm_mailing_trackable_url</name>
+  <title>Mailing Link</title>
+  <titlePlural>Mailing Links</titlePlural>
   <comment>Stores URLs for which we should track click-throughs from mailings</comment>
   <archive>true</archive>
   <component>CiviMail</component>
@@ -34,6 +36,7 @@
     <required>true</required>
     <html>
       <label>Mailing</label>
+      <type>EntityRef</type>
     </html>
     <comment>FK to the mailing</comment>
   </field>

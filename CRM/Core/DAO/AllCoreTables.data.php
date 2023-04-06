@@ -592,9 +592,9 @@ return [
     'class' => 'CRM_Mailing_DAO_MailingGroup',
     'table' => 'civicrm_mailing_group',
   ],
-  'CRM_Mailing_DAO_TrackableURL' => [
-    'name' => 'TrackableURL',
-    'class' => 'CRM_Mailing_DAO_TrackableURL',
+  'CRM_Mailing_DAO_MailingTrackableURL' => [
+    'name' => 'MailingTrackableURL',
+    'class' => 'CRM_Mailing_DAO_MailingTrackableURL',
     'table' => 'civicrm_mailing_trackable_url',
   ],
   'CRM_Mailing_DAO_MailingJob' => [
@@ -642,9 +642,9 @@ return [
     'class' => 'CRM_Mailing_Event_DAO_MailingEventReply',
     'table' => 'civicrm_mailing_event_reply',
   ],
-  'CRM_Mailing_Event_DAO_MailingEventClickThrough' => [
-    'name' => 'MailingEventClickThrough',
-    'class' => 'CRM_Mailing_Event_DAO_MailingEventClickThrough',
+  'CRM_Mailing_Event_DAO_MailingEventTrackableURLOpen' => [
+    'name' => 'MailingEventTrackableURLOpen',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventTrackableURLOpen',
     'table' => 'civicrm_mailing_event_trackable_url_open',
   ],
   'CRM_Mailing_Event_DAO_MailingEventUnsubscribe' => [

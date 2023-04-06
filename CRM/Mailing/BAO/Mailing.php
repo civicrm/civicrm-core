@@ -1366,7 +1366,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       if ($this->url_tracking && !empty($this->id)) {
         // ensure that Google CSS and any .css files are not tracked.
         if (!(strpos($token, 'css?family') || strpos($token, '.css'))) {
-          $data = CRM_Mailing_BAO_TrackableURL::getTrackerURL($token, $this->id, $event_queue_id);
+          $data = CRM_Mailing_BAO_MailingTrackableURL::getTrackerURL($token, $this->id, $event_queue_id);
           if (!empty($html)) {
             $data = htmlentities($data, ENT_NOQUOTES);
           }
@@ -1754,8 +1754,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'unsubscribe' => CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName(),
       'bounce' => CRM_Mailing_Event_BAO_MailingEventBounce::getTableName(),
       'forward' => CRM_Mailing_Event_BAO_MailingEventForward::getTableName(),
-      'url' => CRM_Mailing_BAO_TrackableURL::getTableName(),
-      'urlopen' => CRM_Mailing_Event_BAO_MailingEventClickThrough::getTableName(),
+      'url' => CRM_Mailing_BAO_MailingTrackableURL::getTableName(),
+      'urlopen' => CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTableName(),
       'component' => CRM_Mailing_BAO_MailingComponent::getTableName(),
       'spool' => CRM_Mailing_BAO_Spool::getTableName(),
     ];
@@ -2821,7 +2821,7 @@ ORDER BY civicrm_mailing.name";
     //CRM-12814
     if (!empty($mailings)) {
       $openCounts = CRM_Mailing_Event_BAO_MailingEventOpened::getMailingContactCount(array_keys($mailings), $params['contact_id']);
-      $clickCounts = CRM_Mailing_Event_BAO_MailingEventClickThrough::getMailingContactCount(array_keys($mailings), $params['contact_id']);
+      $clickCounts = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getMailingContactCount(array_keys($mailings), $params['contact_id']);
     }
 
     // format params and add links

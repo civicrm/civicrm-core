@@ -217,7 +217,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           break;
 
         case 'click':
-          $dateSort = CRM_Mailing_Event_BAO_MailingEventClickThrough::getTableName() . '.time_stamp';
+          $dateSort = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders, [
             [
               'name' => ts('URL'),
@@ -315,7 +315,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return $result;
 
       case 'click':
-        $event = new CRM_Mailing_Event_BAO_MailingEventClickThrough();
+        $event = new CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen();
         $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct,
@@ -403,7 +403,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         return $rows;
 
       case 'click':
-        $rows = CRM_Mailing_Event_BAO_MailingEventClickThrough::getRows(
+        $rows = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getRows(
           $this->_mailing_id, $this->_job_id,
           $this->_is_distinct, $this->_url_id,
           $offset, $rowCount, $sort
