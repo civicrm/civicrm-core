@@ -1199,7 +1199,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $contactId = $contact->id;
 
     //get DisplayAndImage.
-    list($displayName, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($contactId);
+    [$displayName, $image] = CRM_Contact_BAO_Contact::getDisplayAndImage($contactId);
 
     $checkImage = CRM_Contact_BAO_Contact_Utils::getImage($params['contact_type'], FALSE, $contactId);
 
