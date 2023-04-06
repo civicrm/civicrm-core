@@ -26,21 +26,24 @@ class CustomValueSpecProvider extends \Civi\Core\Service\AutoService implements 
    */
   public function modifySpec(RequestSpec $spec) {
     $action = $spec->getAction();
-    if ($action !== 'create') {
-      $idField = new FieldSpec('id', $spec->getEntity(), 'Integer');
-      $idField->setType('Field');
-      $idField->setColumnName('id');
-      $idField->setTitle(ts('Custom Value ID'));
-      $idField->setReadonly(TRUE);
-      $spec->addFieldSpec($idField);
-    }
+
+    $idField = new FieldSpec('id', $spec->getEntity(), 'Integer');
+    $idField->setType('Field');
+    $idField->setInputType('Number');
+    $idField->setColumnName('id');
+    $idField->setTitle(ts('Custom Value ID'));
+    $idField->setReadonly(TRUE);
+    $spec->addFieldSpec($idField);
+
     $entityField = new FieldSpec('entity_id', $spec->getEntity(), 'Integer');
     $entityField->setType('Field');
     $entityField->setColumnName('entity_id');
     $entityField->setTitle(ts('Entity ID'));
+    $entityField->setLabel(ts('Contact'));
     $entityField->setRequired($action === 'create');
     $entityField->setFkEntity('Contact');
     $entityField->setReadonly(TRUE);
+    $entityField->setInputType('EntityRef');
     $spec->addFieldSpec($entityField);
   }
 
