@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_Event_BAO_MailingEventClickThrough extends CRM_Mailing_Event_DAO_MailingEventClickThrough {
+class CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen extends CRM_Mailing_Event_DAO_MailingEventTrackableURLOpen {
 
   /**
    * Track a click-through and return the URL to redirect.
@@ -34,7 +34,7 @@ class CRM_Mailing_Event_BAO_MailingEventClickThrough extends CRM_Mailing_Event_D
     // prevents foreign key violations.
     $job = CRM_Utils_Type::escape(CRM_Mailing_BAO_MailingJob::getTableName(), 'MysqlColumnNameOrAlias');
     $eq = CRM_Utils_Type::escape(CRM_Mailing_Event_BAO_MailingEventQueue::getTableName(), 'MysqlColumnNameOrAlias');
-    $turl = CRM_Utils_Type::escape(CRM_Mailing_BAO_TrackableURL::getTableName(), 'MysqlColumnNameOrAlias');
+    $turl = CRM_Utils_Type::escape(CRM_Mailing_BAO_MailingTrackableURL::getTableName(), 'MysqlColumnNameOrAlias');
 
     if (!$queue_id) {
       $search = CRM_Core_DAO::executeQuery(
@@ -84,7 +84,7 @@ class CRM_Mailing_Event_BAO_MailingEventClickThrough extends CRM_Mailing_Event_D
       return $search->url;
     }
 
-    $open = new CRM_Mailing_Event_BAO_MailingEventClickThrough();
+    $open = new CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen();
     $open->event_queue_id = $queue_id;
     $open->trackable_url_id = $url_id;
     $open->time_stamp = date('YmdHis');
@@ -272,7 +272,7 @@ class CRM_Mailing_Event_BAO_MailingEventClickThrough extends CRM_Mailing_Event_D
     $dao = new CRM_Core_DAO();
 
     $click = self::getTableName();
-    $url = CRM_Mailing_BAO_TrackableURL::getTableName();
+    $url = CRM_Mailing_BAO_MailingTrackableURL::getTableName();
     $queue = CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $job = CRM_Mailing_BAO_MailingJob::getTableName();
