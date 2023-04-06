@@ -75,6 +75,33 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
   public $contact_type;
 
   /**
+   * Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.
+   *
+   * @var string|null
+   *   (SQL type: varchar(64))
+   *   Note that values will be retrieved from the database as a string.
+   */
+  public $external_identifier;
+
+  /**
+   * Formatted name representing preferred format for display/print/other output.
+   *
+   * @var string|null
+   *   (SQL type: varchar(128))
+   *   Note that values will be retrieved from the database as a string.
+   */
+  public $display_name;
+
+  /**
+   * Organization Name.
+   *
+   * @var string|null
+   *   (SQL type: varchar(128))
+   *   Note that values will be retrieved from the database as a string.
+   */
+  public $organization_name;
+
+  /**
    * May be used to over-ride contact view and edit templates.
    *
    * @var string|null
@@ -82,6 +109,33 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
    *   Note that values will be retrieved from the database as a string.
    */
   public $contact_sub_type;
+
+  /**
+   * First Name.
+   *
+   * @var string|null
+   *   (SQL type: varchar(64))
+   *   Note that values will be retrieved from the database as a string.
+   */
+  public $first_name;
+
+  /**
+   * Middle Name.
+   *
+   * @var string|null
+   *   (SQL type: varchar(64))
+   *   Note that values will be retrieved from the database as a string.
+   */
+  public $middle_name;
+
+  /**
+   * Last Name.
+   *
+   * @var string|null
+   *   (SQL type: varchar(64))
+   *   Note that values will be retrieved from the database as a string.
+   */
+  public $last_name;
 
   /**
    * @var bool|string
@@ -137,15 +191,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
   public $legal_identifier;
 
   /**
-   * Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.
-   *
-   * @var string|null
-   *   (SQL type: varchar(64))
-   *   Note that values will be retrieved from the database as a string.
-   */
-  public $external_identifier;
-
-  /**
    * Name used for sorting different contact types
    *
    * @var string|null
@@ -153,15 +198,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
    *   Note that values will be retrieved from the database as a string.
    */
   public $sort_name;
-
-  /**
-   * Formatted name representing preferred format for display/print/other output.
-   *
-   * @var string|null
-   *   (SQL type: varchar(128))
-   *   Note that values will be retrieved from the database as a string.
-   */
-  public $display_name;
 
   /**
    * Nickname.
@@ -209,16 +245,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
   public $preferred_language;
 
   /**
-   * Deprecated setting for text vs html mailings
-   *
-   * @var string|null
-   *   (SQL type: varchar(8))
-   *   Note that values will be retrieved from the database as a string.
-   * @deprecated
-   */
-  public $preferred_mail_format;
-
-  /**
    * Key for validating requests related to this contact.
    *
    * @var string|null
@@ -244,33 +270,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
    *   Note that values will be retrieved from the database as a string.
    */
   public $source;
-
-  /**
-   * First Name.
-   *
-   * @var string|null
-   *   (SQL type: varchar(64))
-   *   Note that values will be retrieved from the database as a string.
-   */
-  public $first_name;
-
-  /**
-   * Middle Name.
-   *
-   * @var string|null
-   *   (SQL type: varchar(64))
-   *   Note that values will be retrieved from the database as a string.
-   */
-  public $middle_name;
-
-  /**
-   * Last Name.
-   *
-   * @var string|null
-   *   (SQL type: varchar(64))
-   *   Note that values will be retrieved from the database as a string.
-   */
-  public $last_name;
 
   /**
    * Prefix or Title for name (Ms, Mr...). FK to prefix ID
@@ -451,15 +450,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
   public $primary_contact_id;
 
   /**
-   * Organization Name.
-   *
-   * @var string|null
-   *   (SQL type: varchar(128))
-   *   Note that values will be retrieved from the database as a string.
-   */
-  public $organization_name;
-
-  /**
    * Standard Industry Classification Code.
    *
    * @var string|null
@@ -511,6 +501,16 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
    *   Note that values will be retrieved from the database as a string.
    */
   public $modified_date;
+
+  /**
+   * Deprecated setting for text vs html mailings
+   *
+   * @var string|null
+   *   (SQL type: varchar(8))
+   *   Note that values will be retrieved from the database as a string.
+   * @deprecated
+   */
+  public $preferred_mail_format;
 
   /**
    * Class constructor.
@@ -622,6 +622,88 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'readonly' => TRUE,
           'add' => '1.1',
         ],
+        'external_identifier' => [
+          'name' => 'external_identifier',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('External Identifier'),
+          'description' => ts('Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.'),
+          'maxlength' => 64,
+          'size' => 8,
+          'usage' => [
+            'import' => TRUE,
+            'export' => TRUE,
+            'duplicate_matching' => TRUE,
+            'token' => FALSE,
+          ],
+          'import' => TRUE,
+          'where' => 'civicrm_contact.external_identifier',
+          'headerPattern' => '/external\s?id/i',
+          'dataPattern' => '/^\d{11,}$/',
+          'export' => TRUE,
+          'table_name' => 'civicrm_contact',
+          'entity' => 'Contact',
+          'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
+          'html' => [
+            'type' => 'Text',
+            'label' => ts("External Identifier"),
+          ],
+          'add' => '1.1',
+        ],
+        'display_name' => [
+          'name' => 'display_name',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Display Name'),
+          'description' => ts('Formatted name representing preferred format for display/print/other output.'),
+          'maxlength' => 128,
+          'size' => 30,
+          'usage' => [
+            'import' => FALSE,
+            'export' => TRUE,
+            'duplicate_matching' => FALSE,
+            'token' => FALSE,
+          ],
+          'where' => 'civicrm_contact.display_name',
+          'export' => TRUE,
+          'table_name' => 'civicrm_contact',
+          'entity' => 'Contact',
+          'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
+          'html' => [
+            'type' => 'Text',
+          ],
+          'readonly' => TRUE,
+          'add' => '1.1',
+        ],
+        'organization_name' => [
+          'name' => 'organization_name',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Organization Name'),
+          'description' => ts('Organization Name.'),
+          'maxlength' => 128,
+          'size' => 30,
+          'usage' => [
+            'import' => TRUE,
+            'export' => TRUE,
+            'duplicate_matching' => TRUE,
+            'token' => FALSE,
+          ],
+          'import' => TRUE,
+          'where' => 'civicrm_contact.organization_name',
+          'headerPattern' => '/^organization|(o(rganization\s)?name)$/i',
+          'dataPattern' => '/^\w+$/',
+          'export' => TRUE,
+          'contactType' => 'Organization',
+          'table_name' => 'civicrm_contact',
+          'entity' => 'Contact',
+          'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
+          'html' => [
+            'type' => 'Text',
+            'label' => ts("Organization Name"),
+          ],
+          'add' => '1.1',
+        ],
         'contact_sub_type' => [
           'name' => 'contact_sub_type',
           'type' => CRM_Utils_Type::T_STRING,
@@ -655,6 +737,93 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
             'condition' => 'parent_id IS NOT NULL',
           ],
           'add' => '1.5',
+        ],
+        'first_name' => [
+          'name' => 'first_name',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('First Name'),
+          'description' => ts('First Name.'),
+          'maxlength' => 64,
+          'size' => 30,
+          'usage' => [
+            'import' => TRUE,
+            'export' => TRUE,
+            'duplicate_matching' => TRUE,
+            'token' => FALSE,
+          ],
+          'import' => TRUE,
+          'where' => 'civicrm_contact.first_name',
+          'headerPattern' => '/^first|(f(irst\s)?name)$/i',
+          'dataPattern' => '/^\w+$/',
+          'export' => TRUE,
+          'contactType' => 'Individual',
+          'table_name' => 'civicrm_contact',
+          'entity' => 'Contact',
+          'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
+          'html' => [
+            'type' => 'Text',
+            'label' => ts("First Name"),
+          ],
+          'add' => '1.1',
+        ],
+        'middle_name' => [
+          'name' => 'middle_name',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Middle Name'),
+          'description' => ts('Middle Name.'),
+          'maxlength' => 64,
+          'size' => 30,
+          'usage' => [
+            'import' => TRUE,
+            'export' => TRUE,
+            'duplicate_matching' => TRUE,
+            'token' => FALSE,
+          ],
+          'import' => TRUE,
+          'where' => 'civicrm_contact.middle_name',
+          'headerPattern' => '/^middle|(m(iddle\s)?name)$/i',
+          'dataPattern' => '/^\w+$/',
+          'export' => TRUE,
+          'contactType' => 'Individual',
+          'table_name' => 'civicrm_contact',
+          'entity' => 'Contact',
+          'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
+          'html' => [
+            'type' => 'Text',
+            'label' => ts("Middle Name"),
+          ],
+          'add' => '1.1',
+        ],
+        'last_name' => [
+          'name' => 'last_name',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Last Name'),
+          'description' => ts('Last Name.'),
+          'maxlength' => 64,
+          'size' => 30,
+          'usage' => [
+            'import' => TRUE,
+            'export' => TRUE,
+            'duplicate_matching' => TRUE,
+            'token' => FALSE,
+          ],
+          'import' => TRUE,
+          'where' => 'civicrm_contact.last_name',
+          'headerPattern' => '/^last|(l(ast\s)?name)$/i',
+          'dataPattern' => '/^\w+(\s\w+)?+$/',
+          'export' => TRUE,
+          'contactType' => 'Individual',
+          'table_name' => 'civicrm_contact',
+          'entity' => 'Contact',
+          'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
+          'html' => [
+            'type' => 'Text',
+            'label' => ts("Last Name"),
+          ],
+          'add' => '1.1',
         ],
         'do_not_email' => [
           'name' => 'do_not_email',
@@ -845,34 +1014,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           ],
           'add' => '1.1',
         ],
-        'external_identifier' => [
-          'name' => 'external_identifier',
-          'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('External Identifier'),
-          'description' => ts('Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.'),
-          'maxlength' => 64,
-          'size' => 8,
-          'usage' => [
-            'import' => TRUE,
-            'export' => TRUE,
-            'duplicate_matching' => TRUE,
-            'token' => FALSE,
-          ],
-          'import' => TRUE,
-          'where' => 'civicrm_contact.external_identifier',
-          'headerPattern' => '/external\s?id/i',
-          'dataPattern' => '/^\d{11,}$/',
-          'export' => TRUE,
-          'table_name' => 'civicrm_contact',
-          'entity' => 'Contact',
-          'bao' => 'CRM_Contact_BAO_Contact',
-          'localizable' => 0,
-          'html' => [
-            'type' => 'Text',
-            'label' => ts("External Identifier"),
-          ],
-          'add' => '1.1',
-        ],
         'sort_name' => [
           'name' => 'sort_name',
           'type' => CRM_Utils_Type::T_STRING,
@@ -887,31 +1028,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
             'token' => FALSE,
           ],
           'where' => 'civicrm_contact.sort_name',
-          'export' => TRUE,
-          'table_name' => 'civicrm_contact',
-          'entity' => 'Contact',
-          'bao' => 'CRM_Contact_BAO_Contact',
-          'localizable' => 0,
-          'html' => [
-            'type' => 'Text',
-          ],
-          'readonly' => TRUE,
-          'add' => '1.1',
-        ],
-        'display_name' => [
-          'name' => 'display_name',
-          'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Display Name'),
-          'description' => ts('Formatted name representing preferred format for display/print/other output.'),
-          'maxlength' => 128,
-          'size' => 30,
-          'usage' => [
-            'import' => FALSE,
-            'export' => TRUE,
-            'duplicate_matching' => FALSE,
-            'token' => FALSE,
-          ],
-          'where' => 'civicrm_contact.display_name',
           'export' => TRUE,
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
@@ -1065,36 +1181,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           ],
           'add' => '3.2',
         ],
-        'preferred_mail_format' => [
-          'name' => 'preferred_mail_format',
-          'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Preferred Mail Format'),
-          'description' => ts('Deprecated setting for text vs html mailings'),
-          'maxlength' => 8,
-          'size' => CRM_Utils_Type::EIGHT,
-          'usage' => [
-            'import' => FALSE,
-            'export' => FALSE,
-            'duplicate_matching' => FALSE,
-            'token' => FALSE,
-          ],
-          'where' => 'civicrm_contact.preferred_mail_format',
-          'headerPattern' => '/^p(ref\w*\s)?m(ail\s)?f(orm\w*)$/i',
-          'default' => 'Both',
-          'table_name' => 'civicrm_contact',
-          'entity' => 'Contact',
-          'bao' => 'CRM_Contact_BAO_Contact',
-          'localizable' => 0,
-          'deprecated' => TRUE,
-          'html' => [
-            'type' => 'Select',
-            'label' => ts("Preferred Mail Format"),
-          ],
-          'pseudoconstant' => [
-            'callback' => 'CRM_Core_SelectValues::pmf',
-          ],
-          'add' => '1.1',
-        ],
         'hash' => [
           'name' => 'hash',
           'type' => CRM_Utils_Type::T_STRING,
@@ -1170,93 +1256,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Text',
-          ],
-          'add' => '1.1',
-        ],
-        'first_name' => [
-          'name' => 'first_name',
-          'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('First Name'),
-          'description' => ts('First Name.'),
-          'maxlength' => 64,
-          'size' => 30,
-          'usage' => [
-            'import' => TRUE,
-            'export' => TRUE,
-            'duplicate_matching' => TRUE,
-            'token' => FALSE,
-          ],
-          'import' => TRUE,
-          'where' => 'civicrm_contact.first_name',
-          'headerPattern' => '/^first|(f(irst\s)?name)$/i',
-          'dataPattern' => '/^\w+$/',
-          'export' => TRUE,
-          'contactType' => 'Individual',
-          'table_name' => 'civicrm_contact',
-          'entity' => 'Contact',
-          'bao' => 'CRM_Contact_BAO_Contact',
-          'localizable' => 0,
-          'html' => [
-            'type' => 'Text',
-            'label' => ts("First Name"),
-          ],
-          'add' => '1.1',
-        ],
-        'middle_name' => [
-          'name' => 'middle_name',
-          'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Middle Name'),
-          'description' => ts('Middle Name.'),
-          'maxlength' => 64,
-          'size' => 30,
-          'usage' => [
-            'import' => TRUE,
-            'export' => TRUE,
-            'duplicate_matching' => TRUE,
-            'token' => FALSE,
-          ],
-          'import' => TRUE,
-          'where' => 'civicrm_contact.middle_name',
-          'headerPattern' => '/^middle|(m(iddle\s)?name)$/i',
-          'dataPattern' => '/^\w+$/',
-          'export' => TRUE,
-          'contactType' => 'Individual',
-          'table_name' => 'civicrm_contact',
-          'entity' => 'Contact',
-          'bao' => 'CRM_Contact_BAO_Contact',
-          'localizable' => 0,
-          'html' => [
-            'type' => 'Text',
-            'label' => ts("Middle Name"),
-          ],
-          'add' => '1.1',
-        ],
-        'last_name' => [
-          'name' => 'last_name',
-          'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Last Name'),
-          'description' => ts('Last Name.'),
-          'maxlength' => 64,
-          'size' => 30,
-          'usage' => [
-            'import' => TRUE,
-            'export' => TRUE,
-            'duplicate_matching' => TRUE,
-            'token' => FALSE,
-          ],
-          'import' => TRUE,
-          'where' => 'civicrm_contact.last_name',
-          'headerPattern' => '/^last|(l(ast\s)?name)$/i',
-          'dataPattern' => '/^\w+(\s\w+)?+$/',
-          'export' => TRUE,
-          'contactType' => 'Individual',
-          'table_name' => 'civicrm_contact',
-          'entity' => 'Contact',
-          'bao' => 'CRM_Contact_BAO_Contact',
-          'localizable' => 0,
-          'html' => [
-            'type' => 'Text',
-            'label' => ts("Last Name"),
           ],
           'add' => '1.1',
         ],
@@ -1789,35 +1788,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'readonly' => TRUE,
           'add' => '1.1',
         ],
-        'organization_name' => [
-          'name' => 'organization_name',
-          'type' => CRM_Utils_Type::T_STRING,
-          'title' => ts('Organization Name'),
-          'description' => ts('Organization Name.'),
-          'maxlength' => 128,
-          'size' => 30,
-          'usage' => [
-            'import' => TRUE,
-            'export' => TRUE,
-            'duplicate_matching' => TRUE,
-            'token' => FALSE,
-          ],
-          'import' => TRUE,
-          'where' => 'civicrm_contact.organization_name',
-          'headerPattern' => '/^organization|(o(rganization\s)?name)$/i',
-          'dataPattern' => '/^\w+$/',
-          'export' => TRUE,
-          'contactType' => 'Organization',
-          'table_name' => 'civicrm_contact',
-          'entity' => 'Contact',
-          'bao' => 'CRM_Contact_BAO_Contact',
-          'localizable' => 0,
-          'html' => [
-            'type' => 'Text',
-            'label' => ts("Organization Name"),
-          ],
-          'add' => '1.1',
-        ],
         'sic_code' => [
           'name' => 'sic_code',
           'type' => CRM_Utils_Type::T_STRING,
@@ -1980,6 +1950,36 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'readonly' => TRUE,
           'add' => '4.3',
         ],
+        'preferred_mail_format' => [
+          'name' => 'preferred_mail_format',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Preferred Mail Format'),
+          'description' => ts('Deprecated setting for text vs html mailings'),
+          'maxlength' => 8,
+          'size' => CRM_Utils_Type::EIGHT,
+          'usage' => [
+            'import' => FALSE,
+            'export' => FALSE,
+            'duplicate_matching' => FALSE,
+            'token' => FALSE,
+          ],
+          'where' => 'civicrm_contact.preferred_mail_format',
+          'headerPattern' => '/^p(ref\w*\s)?m(ail\s)?f(orm\w*)$/i',
+          'default' => 'Both',
+          'table_name' => 'civicrm_contact',
+          'entity' => 'Contact',
+          'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
+          'deprecated' => TRUE,
+          'html' => [
+            'type' => 'Select',
+            'label' => ts("Preferred Mail Format"),
+          ],
+          'pseudoconstant' => [
+            'callback' => 'CRM_Core_SelectValues::pmf',
+          ],
+          'add' => '1.1',
+        ],
       ];
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
     }
@@ -2058,14 +2058,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
         'localizable' => FALSE,
         'sig' => 'civicrm_contact::0::contact_type',
       ],
-      'index_contact_sub_type' => [
-        'name' => 'index_contact_sub_type',
-        'field' => [
-          0 => 'contact_sub_type',
-        ],
-        'localizable' => FALSE,
-        'sig' => 'civicrm_contact::0::contact_sub_type',
-      ],
       'UI_external_identifier' => [
         'name' => 'UI_external_identifier',
         'field' => [
@@ -2074,6 +2066,38 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
         'localizable' => FALSE,
         'unique' => TRUE,
         'sig' => 'civicrm_contact::1::external_identifier',
+      ],
+      'index_organization_name' => [
+        'name' => 'index_organization_name',
+        'field' => [
+          0 => 'organization_name',
+        ],
+        'localizable' => FALSE,
+        'sig' => 'civicrm_contact::0::organization_name',
+      ],
+      'index_contact_sub_type' => [
+        'name' => 'index_contact_sub_type',
+        'field' => [
+          0 => 'contact_sub_type',
+        ],
+        'localizable' => FALSE,
+        'sig' => 'civicrm_contact::0::contact_sub_type',
+      ],
+      'index_first_name' => [
+        'name' => 'index_first_name',
+        'field' => [
+          0 => 'first_name',
+        ],
+        'localizable' => FALSE,
+        'sig' => 'civicrm_contact::0::first_name',
+      ],
+      'index_last_name' => [
+        'name' => 'index_last_name',
+        'field' => [
+          0 => 'last_name',
+        ],
+        'localizable' => FALSE,
+        'sig' => 'civicrm_contact::0::last_name',
       ],
       'index_sort_name' => [
         'name' => 'index_sort_name',
@@ -2106,22 +2130,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
         ],
         'localizable' => FALSE,
         'sig' => 'civicrm_contact::0::api_key',
-      ],
-      'index_first_name' => [
-        'name' => 'index_first_name',
-        'field' => [
-          0 => 'first_name',
-        ],
-        'localizable' => FALSE,
-        'sig' => 'civicrm_contact::0::first_name',
-      ],
-      'index_last_name' => [
-        'name' => 'index_last_name',
-        'field' => [
-          0 => 'last_name',
-        ],
-        'localizable' => FALSE,
-        'sig' => 'civicrm_contact::0::last_name',
       ],
       'UI_prefix' => [
         'name' => 'UI_prefix',
@@ -2170,14 +2178,6 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
         ],
         'localizable' => FALSE,
         'sig' => 'civicrm_contact::0::household_name',
-      ],
-      'index_organization_name' => [
-        'name' => 'index_organization_name',
-        'field' => [
-          0 => 'organization_name',
-        ],
-        'localizable' => FALSE,
-        'sig' => 'civicrm_contact::0::organization_name',
       ],
       'index_is_deleted_sort_name' => [
         'name' => 'index_is_deleted_sort_name',
