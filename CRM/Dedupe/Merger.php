@@ -2778,8 +2778,12 @@ ORDER BY civicrm_custom_group.weight,
         'id',
         'modified_date',
         'primary_contact_id',
-        'sort_name',
         'user_unique_id',
+        // These are effectively cached / calculated fields
+        'sort_name',
+        'email_greeting_display',
+        'postal_greeting_display',
+        'addressee_display',
       ],
     ];
     return $keysToIgnore[$type];
