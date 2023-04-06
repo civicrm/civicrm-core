@@ -2426,10 +2426,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected function assertAttachmentExistence(bool $exists, array $apiResult): void {
     $this->assertIsNumeric($apiResult['id']);
     $this->assertEquals($exists, file_exists($apiResult['values'][$apiResult['id']]['path']));
-    $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_file WHERE id = %1', [
+    $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_file WHERE id = %1', [
       1 => [$apiResult['id'], 'Int'],
     ]);
-    $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', [
+    $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', [
       1 => [$apiResult['id'], 'Int'],
     ]);
   }
