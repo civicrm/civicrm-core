@@ -168,8 +168,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $this->assign('contact_type', $main['contact_type']);
       $this->assign('main_name', $main['display_name']);
       $this->assign('other_name', $other['display_name']);
-      $this->assign('main_cid', $main['contact_id']);
-      $this->assign('other_cid', $other['contact_id']);
+      $this->assign('main_cid', $main['id']);
+      $this->assign('other_cid', $other['id']);
       $this->assign('rgid', $this->_rgid);
       $this->assignSummaryRowsToTemplate($contacts);
 
