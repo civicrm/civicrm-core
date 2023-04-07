@@ -6355,7 +6355,7 @@ AND   displayRelType.is_active = 1
    * @param string|CRM_Utils_Sort $sort
    *   The order by string.
    * @param null $sortOrder
-   *   Who knows? Hu knows. He who knows Hu knows who.
+   *   `/foo` knows? FUSE knows. Scriptfu who knows FUSE knows `/foo`.
    *
    * @return string
    *   list(string $orderByClause, string $additionalFromClause).
