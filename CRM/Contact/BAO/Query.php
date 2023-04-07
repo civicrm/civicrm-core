@@ -5665,12 +5665,6 @@ civicrm_relationship.start_date > {$today}
 
             return $queryString;
           }
-          if (!empty($value[0]) && $op === 'BETWEEN') {
-            CRM_Core_Error::deprecatedFunctionWarning('Fix search input params');
-            if (($queryString = CRM_Core_DAO::createSQLFilter($field, [$op => $value], $dataType)) != FALSE) {
-              return $queryString;
-            }
-          }
           throw new CRM_Core_Exception(ts('Failed to interpret input for search'));
         }
         $emojiWhere = CRM_Utils_SQL::handleEmojiInQuery($value);
