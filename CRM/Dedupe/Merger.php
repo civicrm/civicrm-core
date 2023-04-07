@@ -1551,10 +1551,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       $value = self::getFieldValueAndLabel($field, $other)['value'];
       //CRM-14334
-      if ($value === NULL || $value == '') {
+      if ($value === NULL || $value === '') {
         $value = 'null';
       }
-      if ($value === 0 or $value === '0') {
+      if ($value === 0 || $value === '0' || $value === FALSE) {
+        // We swap out the value for the form to a weird string in order to
+        // swap it back later. This QuickForm wrangling should be left to the form layer.
         $value = $qfZeroBug;
       }
       if (is_array($value) && empty($value[1])) {
@@ -2559,24 +2561,25 @@ ORDER BY civicrm_custom_group.weight,
     // go ahead with merge if there is no conflict
     $originalMigrationInfo = $migrationInfo;
     foreach ($migrationInfo as $key => $val) {
-      if ($val === "null") {
+      if ($val === 'null') {
         // Rule: Never overwrite with an empty value (in any mode)
+        // This is probably unreachable.
         unset($migrationInfo[$key]);
         continue;
       }
-      elseif ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) or
+      elseif ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) ||
           strpos($key, 'move_custom_') === 0
         ) and $val !== NULL
       ) {
         // Rule: If both main-contact, and other-contact have a field with a
         // different value, then let $mode decide if to merge it or not
         if (
-          (!empty($migrationInfo['rows'][$key]['main'])
+          ((!empty($migrationInfo['rows'][$key]['main'])
+              // Since we now load with v4 then FALSE would be right for a boolean.
+            || $migrationInfo['rows'][$key]['main'] === FALSE)
             // For custom fields a 0 (e.g in an int field) could be a true conflict. This
-            // is probably true for other fields too - e.g. 'do_not_email' but
-            // leaving that investigation as a @todo - until tests can be written.
-            // Note the handling of this has test coverage - although the data-typing
-            // of '0' feels flakey we have insurance.
+            // is probably true for other fields too - e.g. 'do_not_email'.
+            // There should be pretty solid test cover here now.
             || ($migrationInfo['rows'][$key]['main'] === '0' && substr($key, 0, 12) === 'move_custom_')
           )
           && $migrationInfo['rows'][$key]['main'] != $migrationInfo['rows'][$key]['other']

@@ -1389,7 +1389,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
           ],
         ],
       ],
-      [
+      'deceased_no_merge' => [
         [
           'mode' => 'safe',
           'contacts' => [
