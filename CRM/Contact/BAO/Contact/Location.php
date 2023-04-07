@@ -29,15 +29,15 @@ class CRM_Contact_BAO_Contact_Location {
    *   Array of display_name, email, location type and location id if found, or (null,null,null, null)
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
-    $params = array(
+    $params = [
       'contact_id' => $id,
-      'return' => array('display_name', 'email.email'),
-      'api.Email.get' => array(
+      'return' => ['display_name', 'email.email'],
+      'api.Email.get' => [
         'location_type_id' => $locationTypeID,
         'sequential' => 0,
-        'return' => array('email', 'location_type_id', 'id'),
-      ),
-    );
+        'return' => ['email', 'location_type_id', 'id'],
+      ],
+    ];
     if ($isPrimary) {
       $params['api.Email.get']['is_primary'] = 1;
     }
@@ -49,12 +49,12 @@ class CRM_Contact_BAO_Contact_Location {
         $email = reset($contact['api.Email.get']['values']);
       }
     }
-    $returnParams = array(
+    $returnParams = [
       (isset($contact['display_name'])) ? $contact['display_name'] : NULL,
       (isset($email['email'])) ? $email['email'] : NULL,
       (isset($email['location_type_id'])) ? $email['location_type_id'] : NULL,
       (isset($email['id'])) ? $email['id'] : NULL,
-    );
+    ];
 
     return $returnParams;
   }
@@ -102,10 +102,10 @@ AND civicrm_contact.id IN $idString ";
 
     $params = [];
     if (!$locationTypeID) {
-      $sql .= " AND civicrm_address.is_primary = 1";
+      $sql .= ' AND civicrm_address.is_primary = 1';
     }
     else {
-      $sql .= " AND civicrm_address.location_type_id = %1";
+      $sql .= ' AND civicrm_address.location_type_id = %1';
       $params[1] = [$locationTypeID, 'Integer'];
     }
 
