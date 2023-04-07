@@ -95,7 +95,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
             $tagList[$val] = 1;
           }
           else {
-            list($label, $tagID) = explode(',', $val);
+            [, $tagID] = explode(',', $val);
             $tagList[$tagID] = 1;
           }
         }
@@ -113,7 +113,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
     foreach ($allTags as $key => $dnc) {
       $this->_name[] = $this->_tags[$key];
 
-      list($total, $removed, $notRemoved) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_activityHolderIds,
+      [, $removed, $notRemoved] = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_activityHolderIds,
         $key, 'civicrm_activity', FALSE);
 
       $status = [

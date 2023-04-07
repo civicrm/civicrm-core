@@ -427,7 +427,7 @@ class CRM_Contact_Form_Search_Criteria {
     $parseStreetAddress = $addressOptions['street_address_parsing'] ?? 0;
     $form->assign('parseStreetAddress', $parseStreetAddress);
     foreach ($elements as $name => $v) {
-      list($title, $attributes, $select, $multiSelect) = $v;
+      [$title, $attributes, $select, $multiSelect] = $v;
 
       if (in_array($name,
         ['street_number', 'street_name', 'street_unit']
