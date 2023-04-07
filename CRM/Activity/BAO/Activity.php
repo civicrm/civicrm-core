@@ -255,11 +255,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array $params
    *   Associated array of the submitted values.
    *
+   * @return CRM_Activity_DAO_Activity
    * @throws CRM_Core_Exception
-   *
-   * @return CRM_Activity_BAO_Activity|null|object
    */
-  public static function create(&$params) {
+  public static function create(array &$params) {
     // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
     unset($params['created_date']);
     unset($params['modified_date']);
@@ -317,13 +316,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     // start transaction
     $transaction = new CRM_Core_Transaction();
-
     $result = $activity->save();
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $result;
-    }
 
     $activityId = $activity->id;
     $activityRecordTypes = [
