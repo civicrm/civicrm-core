@@ -399,24 +399,28 @@
         require: '?ngModel',
         link: function (scope, elm, attr, ngModel) {
 
-          var editor = CRM.wysiwyg.create(elm);
-          if (!ngModel) {
-            return;
-          }
+          // Wait for #id to stabilize so the wysiwyg doesn't init with an id like `cke_{{:: fieldId }}`
+          $timeout(function() {
+            var editor = CRM.wysiwyg.create(elm);
 
-          if (attr.ngBlur) {
-            $(elm).on('blur', function() {
-              $timeout(function() {
-                scope.$eval(attr.ngBlur);
+            if (!ngModel) {
+              return;
+            }
+
+            if (attr.ngBlur) {
+              $(elm).on('blur', function() {
+                $timeout(function() {
+                  scope.$eval(attr.ngBlur);
+                });
               });
-            });
-          }
+            }
 
-          ngModel.$render = function(value) {
-            editor.done(function() {
-              CRM.wysiwyg.setVal(elm, ngModel.$viewValue || '');
-            });
-          };
+            ngModel.$render = function(value) {
+              editor.done(function() {
+                CRM.wysiwyg.setVal(elm, ngModel.$viewValue || '');
+              });
+            };
+          });
         }
       };
     })
