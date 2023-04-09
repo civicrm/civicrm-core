@@ -30,14 +30,11 @@ class CRM_Core_Component {
    * @return CRM_Core_Component_Info[]
    */
   private static function &_info($force = FALSE) {
-    if (!isset(Civi::$statics[__CLASS__]['info'])|| $force) {
+    if (!isset(Civi::$statics[__CLASS__]['info']) || $force) {
       Civi::$statics[__CLASS__]['info'] = [];
 
-      $config = CRM_Core_Config::singleton();
-      $c = self::getComponents();
-
-      foreach ($c as $name => $comp) {
-        if (in_array($name, $config->enableComponents)) {
+      foreach (self::getComponents() as $name => $comp) {
+        if (self::isEnabled($name)) {
           Civi::$statics[__CLASS__]['info'][$name] = $comp;
         }
       }
@@ -53,7 +50,7 @@ class CRM_Core_Component {
    * @return mixed
    */
   public static function get($name, $attribute = NULL) {
-    $comp = CRM_Utils_Array::value($name, self::_info());
+    $comp = self::_info()[$name] ?? NULL;
     if ($attribute) {
       return $comp->info[$attribute] ?? NULL;
     }
@@ -153,12 +150,11 @@ class CRM_Core_Component {
    */
   public static function invoke(&$args, $type) {
     $info = self::_info();
-    $config = CRM_Core_Config::singleton();
 
-    $firstArg = CRM_Utils_Array::value(1, $args, '');
-    $secondArg = CRM_Utils_Array::value(2, $args, '');
+    $firstArg = $args[1] ?? '';
+    $secondArg = $args[2] ?? '';
     foreach ($info as $name => $comp) {
-      if (in_array($name, $config->enableComponents) &&
+      if (self::isEnabled($name) &&
         (($comp->info['url'] === $firstArg && $type == 'main') ||
           ($comp->info['url'] === $secondArg && $type == 'admin')
         )
@@ -170,10 +166,6 @@ class CRM_Core_Component {
           if (!empty($comp->info[$name]['formTpl'])) {
             $template->assign('formTpl', $comp->info[$name]['formTpl']);
           }
-          if (!empty($comp->info[$name]['css'])) {
-            $styleSheets = '<style type="text/css">@import url(' . "{$config->resourceBase}css/{$comp->info[$name]['css']});</style>";
-            CRM_Utils_System::addHTMLHead($styleSheet);
-          }
         }
         $inv = $comp->getInvokeObject();
         $inv->$type($args);
@@ -184,18 +176,15 @@ class CRM_Core_Component {
   }
 
   /**
+   * Get menu files from all components
    * @return array
    */
   public static function xmlMenu() {
-
-    // lets build the menu for all components
     $info = self::getComponents(TRUE);
 
     $files = [];
-    foreach ($info as $name => $comp) {
-      $files = array_merge($files,
-        $comp->menuFiles()
-      );
+    foreach ($info as $comp) {
+      $files = array_merge($files, $comp->menuFiles());
     }
 
     return $files;
@@ -238,7 +227,7 @@ class CRM_Core_Component {
   public static function &getQueryFields($checkPermission = TRUE) {
     $info = self::_info();
     $fields = [];
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $flds = $bqr->getFields($checkPermission);
@@ -255,7 +244,7 @@ class CRM_Core_Component {
   public static function alterQuery(&$query, $fnName) {
     $info = self::_info();
 
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $bqr->$fnName($query);
@@ -274,7 +263,7 @@ class CRM_Core_Component {
     $info = self::_info();
 
     $from = NULL;
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $from = $bqr->from($fieldName, $mode, $side);
@@ -320,7 +309,7 @@ class CRM_Core_Component {
   public static function &buildSearchForm(&$form) {
     $info = self::_info();
 
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $bqr->buildSearchForm($form);
@@ -335,7 +324,7 @@ class CRM_Core_Component {
   public static function searchAction(&$row, $id) {
     $info = self::_info();
 
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $bqr->searchAction($row, $id);
@@ -386,7 +375,7 @@ class CRM_Core_Component {
   public static function tableNames(&$tables) {
     $info = self::_info();
 
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $bqr->tableNames($tables);
