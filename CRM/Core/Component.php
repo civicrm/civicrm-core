@@ -89,10 +89,12 @@ class CRM_Core_Component {
   }
 
   /**
+   * @deprecated
    * @return array
    *   Array(string $name => int $id).
    */
   public static function &getComponentIDs() {
+    CRM_Core_Error::deprecatedFunctionWarning('getComponents');
     $componentIDs = [];
 
     $cr = new CRM_Core_DAO_Component();
@@ -193,32 +195,28 @@ class CRM_Core_Component {
   /**
    * @param string $componentName
    *
-   * @return mixed
+   * @return int|null
    */
   public static function getComponentID($componentName) {
-    $info = self::_info();
+    $info = self::getComponents();
     if (!empty($info[$componentName])) {
       return $info[$componentName]->componentID;
     }
+    return NULL;
   }
 
   /**
    * @param int $componentID
    *
-   * @return int|null|string
+   * @return string|null
    */
   public static function getComponentName($componentID) {
-    $info = self::_info();
-
-    $componentName = NULL;
-    foreach ($info as $compName => $component) {
+    foreach (self::getComponents() as $compName => $component) {
       if ($component->componentID == $componentID) {
-        $componentName = $compName;
-        break;
+        return $compName;
       }
     }
-
-    return $componentName;
+    return NULL;
   }
 
   /**

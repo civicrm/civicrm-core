@@ -527,7 +527,7 @@ class CRM_Core_Permission {
     // if component_id is present, ensure it is enabled
     if (!empty($item['component_id'])) {
       $componentName = CRM_Core_Component::getComponentName($item['component_id']);
-      if (!CRM_Core_Component::isEnabled($componentName)) {
+      if (!$componentName || !CRM_Core_Component::isEnabled($componentName)) {
         return FALSE;
       }
     }
