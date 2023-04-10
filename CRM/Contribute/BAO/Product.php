@@ -23,24 +23,17 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
   public static $_defaultContributionType = NULL;
 
   /**
-   * Fetch object based on array of properties.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return CRM_Contribute_BAO_Product
+   * @return self|null
    */
   public static function retrieve(&$params, &$defaults) {
-    $premium = new CRM_Contribute_DAO_Product();
-    $premium->copyValues($params);
-    if ($premium->find(TRUE)) {
+    $premium = self::commonRetrieve(self::class, $params, $defaults);
+    if ($premium) {
       $premium->product_name = $premium->name;
-      CRM_Core_DAO::storeValues($premium, $defaults);
-      return $premium;
     }
-    return NULL;
+    return $premium;
   }
 
   /**
