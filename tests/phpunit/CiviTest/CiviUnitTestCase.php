@@ -622,9 +622,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * @param string $name
    *
-   * @return mixed
+   * @return int
    */
-  public function membershipStatusCreate($name = 'test member status') {
+  public function membershipStatusCreate($name = 'test member status'): int {
     $params['name'] = $name;
     $params['start_event'] = 'start_date';
     $params['end_event'] = 'end_date';

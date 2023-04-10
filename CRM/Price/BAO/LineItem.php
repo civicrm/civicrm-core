@@ -812,7 +812,7 @@ WHERE li.contribution_id = %1";
 
   /**
    * Helper function to return sum of financial item's amount related to a line-item
-   * @param array $lineItemID
+   * @param int $lineItemID
    *
    * @return float $financialItem
    */
