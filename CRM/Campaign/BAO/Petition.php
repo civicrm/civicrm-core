@@ -17,6 +17,13 @@
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
 
   /**
+   * Length of the cookie's created by this class
+   *
+   * @var int
+   */
+  protected $cookieExpire;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
