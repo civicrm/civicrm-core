@@ -150,7 +150,7 @@ abstract class CRM_Core_Payment {
    * Note:
    * We normally SHOULD be returning the payment instrument of the payment processor.
    * However there is an outstanding case where this needs overriding, which is
-   * when using CRM_Core_Payment_Manual which uses the pseudoprocessor (id = 0).
+   * when using CRM_Core_Payment_Manual which uses the pseudo-processor (id = 0).
    *
    * i.e. If you're writing a Payment Processor you should NOT be using
    * setPaymentInstrumentID() at all.

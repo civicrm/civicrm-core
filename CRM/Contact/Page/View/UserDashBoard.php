@@ -73,14 +73,17 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * Heart of the viewing process.
    *
-   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
+   * The runner gets all the meta data for the contact and calls the
+   * appropriate type of page to view.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     if (!$this->_contactId) {
       throw new CRM_Core_Exception(ts('You must be logged in to view this page.'));
     }
 
-    list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_contactId);
+    [$displayName, $contactImage] = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_contactId);
 
     $this->set('displayName', $displayName);
     $this->set('contactImage', $contactImage);
