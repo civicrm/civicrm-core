@@ -6359,8 +6359,8 @@ AND   displayRelType.is_active = 1
    *
    * @param string|CRM_Utils_Sort $sort
    *   The order by string.
-   * @param null $sortOrder
-   *   Who knows? Hu knows. He who knows Hu knows who.
+   * @param string|null $sortOrder
+   *   ASC or DESC
    *
    * @return string
    *   list(string $orderByClause, string $additionalFromClause).
@@ -6368,7 +6368,6 @@ AND   displayRelType.is_active = 1
    * @throws \CRM_Core_Exception
    */
   protected function prepareOrderBy($sort, $sortOrder) {
-    $orderByArray = [];
     $orderBy = '';
 
     if (CRM_Core_Config::singleton()->includeOrderByClause ||
