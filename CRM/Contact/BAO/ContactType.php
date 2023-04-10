@@ -240,17 +240,20 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
 
   /**
    * Get a list of elements for select box.
-   * Note that this used to default to using the hex(01) character - which results in an invalid character being used in form fields
-   * which was not handled well be anything that loaded & resaved the html (outside core)
-   * The use of this separator is now explicit in the calling functions as a step towards it's removal
+   * Note that this used to default to using the hex(01) character - which
+   * results in an invalid character being used in form fields which was not
+   * handled well be anything that loaded & resaved the html (outside core) The
+   * use of this separator is now explicit in the calling functions as a step
+   * towards it's removal
    *
    * @param bool $all
    * @param bool $isSeparator
    * @param string $separator
    *
    * @return mixed
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public  static function getSelectElements(
+  public static function getSelectElements(
     $all = FALSE,
     $isSeparator = TRUE,
     $separator = '__'
@@ -743,7 +746,7 @@ WHERE extends = %1 AND ' . implode(" OR ", $subTypeClause);
    *
    * @todo what does this function do?
    */
-  public  static function deleteCustomSetForSubtypeMigration(
+  public static function deleteCustomSetForSubtypeMigration(
     $contactID,
     $contactType,
     $oldSubtypeSet = [],

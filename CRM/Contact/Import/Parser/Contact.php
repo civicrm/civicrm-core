@@ -1558,7 +1558,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         throw new CRM_Core_Exception('Mismatched contact SubTypes :', CRM_Import_Parser::NO_MATCH);
       }
     }
-    return array($formatted, $params);
+    return [$formatted, $params];
   }
 
   /**
