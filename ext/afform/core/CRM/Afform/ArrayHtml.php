@@ -371,7 +371,7 @@ class CRM_Afform_ArrayHtml {
    * @return string
    */
   public function replaceUnicodeChars($markup) {
-    return mb_convert_encoding($markup, 'HTML-ENTITIES', 'UTF-8');
+    return htmlspecialchars_decode(htmlentities($markup, ENT_COMPAT, 'utf-8', FALSE));
   }
 
   /**
