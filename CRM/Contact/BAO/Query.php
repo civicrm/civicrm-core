@@ -5621,12 +5621,18 @@ civicrm_relationship.start_date > {$today}
    *   Value.
    * @param string $dataType
    *   Data type of the field.
+   * @param bool $isAlreadyEscaped
+   *   Ideally we would be consistent about whether we escape
+   *   before calling this or after, but the code is a fearsome beast
+   *   and poking the sleeping dragon could throw a cat among the
+   *   can of worms. Hence we just schmooze this parameter in
+   *   to prevent double escaping where it is known to occur.
    *
    * @return string
    *   Where clause for the query.
    * @throws \CRM_Core_Exception
    */
-  public static function buildClause($field, $op, $value = NULL, $dataType = NULL) {
+  public static function buildClause($field, $op, $value = NULL, $dataType = 'String', $isAlreadyEscaped = FALSE): string {
     $op = trim($op);
     $clause = "$field $op";
 
@@ -5636,12 +5642,11 @@ civicrm_relationship.start_date > {$today}
         return $clause;
 
       case 'IS EMPTY':
-        $clause = ($dataType == 'Date') ? " $field IS NULL " : " (NULLIF($field, '') IS NULL) ";
+        $clause = ($dataType === 'Date') ? " $field IS NULL " : " (NULLIF($field, '') IS NULL) ";
         return $clause;
 
       case 'IS NOT EMPTY':
-        $clause = ($dataType == 'Date') ? " $field IS NOT NULL " : " (NULLIF($field, '') IS NOT NULL) ";
-        return $clause;
+        return ($dataType === 'Date') ? " $field IS NOT NULL " : " (NULLIF($field, '') IS NOT NULL) ";
 
       case 'RLIKE':
         return " CAST({$field} AS BINARY) RLIKE BINARY '{$value}' ";
@@ -5671,9 +5676,9 @@ civicrm_relationship.start_date > {$today}
         if ($emojiWhere === '0 = 1') {
           $value = $emojiWhere;
         }
-        $value = CRM_Utils_Type::escape($value, $dataType);
+        $value = $isAlreadyEscaped ? $value : CRM_Utils_Type::escape($value, $dataType);
         // if we don't have a dataType we should assume
-        if ($dataType == 'String' || $dataType == 'Text') {
+        if ($dataType === 'String' || $dataType === 'Text') {
           $value = "'" . $value . "'";
         }
         return "$clause $value";
