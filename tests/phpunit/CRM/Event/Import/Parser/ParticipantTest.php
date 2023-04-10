@@ -139,6 +139,42 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that imports work generally.
+   */
+  public function testImportParticipant() :void {
+    $this->eventCreate(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
+    $this->importCSV('participant_with_ext_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'external_identifier'],
+      ['name' => 'fee_amount'],
+      ['name' => 'fee_currency'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $result = $this->callAPISuccess('Participant', 'get', [
+      'contact_id' => $contactID,
+      'sequential' => TRUE,
+    ])['values'][0];
+
+    $this->assertEquals($row['event_title'], $result['event_title']);
+    $this->assertEquals($row['fee_amount'], $result['participant_fee_amount']);
+    $this->assertEquals($row['participant_source'], $result['participant_source']);
+    $this->assertEquals($row['participant_status'], $result['participant_status']);
+    $this->assertEquals('2022-12-07 00:00:00', $result['participant_register_date']);
+    $this->assertEquals(['Attendee', 'Volunteer'], $result['participant_role']);
+    $this->assertEquals(0, $result['participant_is_pay_later']);
+  }
+
+  /**
    * @param array $submittedValues
    *
    * @return int

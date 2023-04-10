@@ -108,18 +108,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
 
-      if (!(!empty($params['participant_role_id']) || !empty($params['participant_role']))) {
-        if (!empty($params['event_id'])) {
-          $params['participant_role_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'default_role_id');
-        }
-        else {
-          $eventTitle = $params['event_title'];
-          $params['participant_role_id'] = CRM_Core_DAO::singleValueQuery('SELECT default_role_id FROM civicrm_event WHERE title = %1', [
-            1 => [$eventTitle, 'String'],
-          ]);
-        }
-      }
-
       $formatValues = [];
       foreach ($params as $key => $field) {
         if ($field == NULL || $field === '') {
