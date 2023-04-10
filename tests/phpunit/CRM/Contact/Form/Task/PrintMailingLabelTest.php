@@ -59,7 +59,7 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
       }
     }
 
-    /* @var CRM_Contact_Form_Task_Label $fom */
+    /** @var CRM_Contact_Form_Task_Label $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Label', [
       'label_name' => 3475,
       'location_type_id' => NULL,
