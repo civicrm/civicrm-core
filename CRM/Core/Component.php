@@ -424,4 +424,38 @@ class CRM_Core_Component {
     return in_array($component, Civi::settings()->get('enable_components'), TRUE);
   }
 
+  /**
+   * Callback for the "enable_components" setting
+   *
+   * When a component is enabled or disabled, ensure the corresponding module-extension is also enabled/disabled.
+   *
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   *
+   * @throws \CRM_Core_Exception.
+   */
+  public static function onToggleComponents($oldValue, $newValue): void {
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $toEnable = $toDisable = [];
+    foreach (self::getComponents() as $component) {
+      $componentEnabled = in_array($component->name, $newValue);
+      $extName = $component->getExtensionName();
+      $extensionEnabled = $manager->getStatus($extName) === $manager::STATUS_INSTALLED;
+      if ($componentEnabled && !$extensionEnabled) {
+        $toEnable[] = $extName;
+      }
+      elseif (!$componentEnabled && $extensionEnabled) {
+        $toDisable[] = $extName;
+      }
+    }
+    if ($toEnable) {
+      CRM_Extension_System::singleton()->getManager()->install($toEnable);
+    }
+    if ($toDisable) {
+      CRM_Extension_System::singleton()->getManager()->disable($toDisable);
+    }
+  }
+
 }

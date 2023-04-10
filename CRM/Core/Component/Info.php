@@ -63,7 +63,7 @@ abstract class CRM_Core_Component_Info {
   /**
    * Component settings as key/value pairs.
    *
-   * @var array
+   * @var array{name: string, translatedName: string, title: string, search: bool, showActivitiesInCore: bool, url: string}
    */
   public $info;
 
@@ -119,6 +119,14 @@ abstract class CRM_Core_Component_Info {
    */
   public function getAngularModules() {
     return [];
+  }
+
+  /**
+   * Name of the module-extension coupled with this component
+   * @return string
+   */
+  public function getExtensionName(): string {
+    return CRM_Utils_String::convertStringToSnakeCase($this->name);
   }
 
   /**

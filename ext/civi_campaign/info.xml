@@ -19,6 +19,7 @@
     <ver>5.62</ver>
   </compatibility>
   <comments>Core Component</comments>
+  <upgrader>CRM_Extension_Upgrader_Component</upgrader>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
