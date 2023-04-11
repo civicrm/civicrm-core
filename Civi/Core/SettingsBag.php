@@ -324,11 +324,11 @@ class SettingsBag {
   protected function createQuery() {
     $select = \CRM_Utils_SQL_Select::from('civicrm_setting')
       ->select('id, name, value, domain_id, contact_id, is_domain, component_id, created_date, created_id')
-      ->where('domain_id = #id', [
+      ->where('(domain_id IS NULL OR domain_id = #id)', [
         'id' => $this->domainId,
       ]);
     if ($this->contactId === NULL) {
-      $select->where('is_domain = 1');
+      $select->where('contact_id IS NULL');
     }
     else {
       $select->where('contact_id = #id', [
@@ -380,13 +380,16 @@ class SettingsBag {
 
     $dao = new \CRM_Core_DAO_Setting();
     $dao->name = $name;
-    $dao->domain_id = $this->domainId;
+    $dao->is_domain = 0;
+    // Contact-specific settings
     if ($this->contactId) {
       $dao->contact_id = $this->contactId;
-      $dao->is_domain = 0;
+      $dao->domain_id = $this->domainId;
     }
-    else {
+    // Domain-specific settings. For legacy support this is assumed to be TRUE if not set
+    elseif ($metadata['is_domain'] ?? TRUE) {
       $dao->is_domain = 1;
+      $dao->domain_id = $this->domainId;
     }
     $dao->find(TRUE);
 
