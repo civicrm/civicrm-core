@@ -136,6 +136,7 @@ ORDER BY entity_id
       $acl[$dao->id]['object_table'] = $dao->object_table;
       $acl[$dao->id]['object_id'] = $dao->object_id;
       $acl[$dao->id]['is_active'] = $dao->is_active;
+      $acl[$dao->id]['deny'] = $dao->deny;
 
       if ($acl[$dao->id]['entity_id']) {
         $acl[$dao->id]['entity'] = $roles[$acl[$dao->id]['entity_id']] ?? NULL;

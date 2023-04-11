@@ -236,6 +236,7 @@ SELECT   a.operation, a.object_id
    AND   a.is_active    =  1
    AND   a.object_table = 'civicrm_saved_search'
    AND   a.id        IN ( $aclKeys )
+   AND   a.deny         = 0
 ORDER BY a.object_id
 ";
 
@@ -253,6 +254,21 @@ ORDER BY a.object_id
           }
           $ids[] = $dao->object_id;
         }
+      }
+      $denyQuery = "SELECT   a.operation, a.object_id
+  FROM   civicrm_acl_cache c, civicrm_acl a
+ WHERE   c.acl_id       =  a.id
+   AND   a.is_active    =  1
+   AND   a.object_table = 'civicrm_saved_search'
+   AND   a.id        IN ( $aclKeys )
+   AND   a.deny         = 1
+   AND   a.object_id IN (%1)
+ORDER BY a.object_id
+";
+      $denyDao = CRM_Core_DAO::executeQuery($denyQuery, [1 => [implode(',', $ids), 'CommaSeparatedIntegers']]);
+      while ($denyDao->fetch()) {
+        $key = array_search($denyDao->object_id, $ids);
+        unset($ids[$key]);
       }
 
       if (!empty($ids)) {
@@ -347,6 +363,8 @@ SELECT g.*
       $ids = $cache->get($cacheKey);
       if (!is_array($ids)) {
         $ids = self::loadPermittedIDs((int) $contactID, $tableName, $type, $allGroups);
+        $denyIds = self::loadDenyIDs((int) $contactID, $tableName, $type, $allGroups);
+        $ids = array_diff($ids, $denyIds);
         $cache->set($cacheKey, $ids);
       }
     }
@@ -468,6 +486,7 @@ SELECT   a.operation, a.object_id
    AND   a.is_active    =  1
    AND   a.object_table = %1
    AND   a.id        IN ( $aclKeys )
+   AND   a.deny         = 0
 GROUP BY a.operation,a.object_id
 ORDER BY a.object_id
 ";
@@ -488,6 +507,44 @@ ORDER BY a.object_id
           }
         }
         break;
+      }
+    }
+    return $ids;
+  }
+
+  /**
+   * Load deny acl IDs
+   *
+   * @param int $contactID
+   * @param string $tableName
+   * @param int $type
+   * @param array $allGroups
+   *
+   * @return array
+   */
+  private static function loadDenyIDs(int $contactID, string $tableName, int $type, $allGroups): array {
+    $ids = [];
+    $acls = CRM_ACL_BAO_Cache::build($contactID);
+    $aclKeys = array_keys($acls);
+    $aclKeys = implode(',', $aclKeys);
+    $query = "
+SELECT   a.operation, a.object_id
+  FROM   civicrm_acl_cache c, civicrm_acl a
+ WHERE   c.acl_id       =  a.id
+   AND   a.is_active    =  1
+   AND   a.object_table = %1
+   AND   a.id        IN ( $aclKeys )
+   AND   a.deny         = 1
+GROUP BY a.operation,a.object_id
+ORDER BY a.object_id
+";
+    $params = [1 => [$tableName, 'String']];
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    while ($dao->fetch()) {
+      if ($dao->object_id) {
+        if (self::matchType($type, $dao->operation)) {
+          $ids[] = $dao->object_id;
+        }
       }
     }
     return $ids;

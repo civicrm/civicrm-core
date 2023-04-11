@@ -32,7 +32,7 @@
      <tr class="crm-acl-form-block-operation">
          <td class="label">{$form.operation.label}</td>
          <td>{$form.operation.html}<br />
-            <span class="description">{ts}What type of operation (action) is being permitted?{/ts}</span>
+            <span class="description">{ts}What type of operation (action) is being referenced?{/ts}</span>
          </td>
      </tr>
      <tr class="crm-acl-form-block-object_type">
@@ -44,6 +44,10 @@
         {if $config->userSystem->is_drupal EQ '1'}
            <div class="status description">{ts}IMPORTANT: The Drupal permissions for 'access all custom data' and 'profile listings and forms' override and disable specific ACL settings for custom field groups and profiles respectively. Do not enable those Drupal permissions for a Drupal role if you want to use CiviCRM ACL's to control access.{/ts}</div></td>
         {/if}
+     </tr>
+     <tr class="crm-acl-form-block-deny">
+       <td class="label">{$form.deny.label}</td>
+       <td>{$form.deny.html}</td>
      </tr>
   </table>
   <div id="id-group-acl">
