@@ -3,8 +3,10 @@
 namespace api\v4\Authx;
 
 use Civi\Api4\AuthxCredential;
+use Civi\Authx\AuthxException;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
+use Firebase\JWT\JWT;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -62,29 +64,18 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
     $this->assertEquals('jwt', $validate[0]['credType']);
     $this->assertEquals($contactRecord['id'], $validate[0]['contactId']);
     $this->assertEquals('cid:' . $contactRecord['id'], $validate[0]['jwt']['sub']);
-  }
 
-  /**
-   * Test that the AuthxCredential does not validate if expired
-   */
-  public function testExpiredValidation(): void {
-    $this->expectException(\Civi\Authx\AuthxException::class);
-    $this->expectExceptionMessage('Expired token');
-    $this->_apiversion = 4;
-    $contactRecord = $this->createTestRecord('Contact', ['contact_type' => 'Individual']);
-    $this->createLoggedInUser();
-    $this->setPermissions([
-      'access CiviCRM',
-      'generate any authx credential',
-    ]);
-    $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->setTtl(5)->execute();
-    sleep(10);
-
-    $this->setPermissions([
-      'access CiviCRM',
-      'validate any authx credential',
-    ]);
-    $validate = AuthxCredential::validate()->setCred($jwt[0]['cred'])->execute();
+    try {
+      JWT::$timestamp = time() + 360;
+      AuthxCredential::validate()->setCred($jwt[0]['cred'])->execute();
+      $this->fail('Expected exception for expired token');
+    }
+    catch (AuthxException $e) {
+      $this->assertEquals('Expired token', $e->getMessage());
+    }
+    finally {
+      JWT::$timestamp = NULL;
+    }
   }
 
   /**
