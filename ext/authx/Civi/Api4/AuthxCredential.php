@@ -52,7 +52,7 @@ class AuthxCredential extends Generic\AbstractEntity {
     return [
       'meta' => ['access CiviCRM'],
       'default' => ['administer CiviCRM'],
-      'create' => ['generate JWT'],
+      'create' => ['generate any authx credential'],
       'validate' => [],
     ];
   }

@@ -38,7 +38,7 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
     }
     $this->setPermissions([
       'access CiviCRM',
-      'generate JWT',
+      'generate any authx credential',
     ]);
     $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->execute();
     $this->assertNotEmpty($jwt[0]['token']);
@@ -50,7 +50,7 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
     $this->createLoggedInUser();
     $this->setPermissions([
       'access CiviCRM',
-      'generate JWT',
+      'generate any authx credential',
     ]);
     $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->execute();
     $validate = AuthxCredential::validate()->setToken($jwt[0]['token'])->execute();
@@ -70,7 +70,7 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
     $this->createLoggedInUser();
     $this->setPermissions([
       'access CiviCRM',
-      'generate JWT',
+      'generate any authx credential',
     ]);
     $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->setTtl(5)->execute();
     sleep(10);
