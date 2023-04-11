@@ -19,12 +19,11 @@ use Civi\Api4\Generic\Result;
  *
  * @method int getContactId() Get contact ID param (required)
  * @method $this setContactId(int $contactId) Set the Contact Id
- * @method $this setTtl(string $ttl) Set TTL param
- * @method string getTtl() get the TTL param;
- * @method $this setScope(string $scope) Set the JWT Scope
- * @method string getScope() get the JWT scopes
+ * @method $this setTtl(int $ttl) Set TTL param
+ * @method int getTtl() get the TTL param;
  */
 class Create extends \Civi\Api4\Generic\AbstractAction {
+
   /**
    * ID of contact
    *
@@ -38,31 +37,20 @@ class Create extends \Civi\Api4\Generic\AbstractAction {
    *
    * @var int
    */
-  protected $ttl = NULL;
-
-
-  /**
-   * Scopes for the JWT
-   *
-   * @var string
-   */
-  protected $scope = NULL;
+  protected $ttl = 300;
 
   /**
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    $ttl = $this->ttl ?: 300;
-    $scope = $this->scope ?: 'authx';
-
     $token = \Civi::service('crypto.jwt')->encode([
-      'exp' => time() + $ttl,
+      'exp' => time() + $this->ttl,
       'sub' => 'cid:' . $this->contactId,
-      'scope' => $scope,
+      'scope' => 'authx',
     ]);
 
     $result[] = [
-      'token' => $token,
+      'cred' => 'Bearer ' . $token,
     ];
   }
 
