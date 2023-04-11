@@ -1866,10 +1866,10 @@ ORDER BY civicrm_custom_group.weight,
     $queryString = "$strSelect $strFrom $strWhere $orderBy";
 
     // lets see if we can retrieve the groupTree from cache
-    $cacheString = $queryString . '_Inline';;
+    $cacheString = $queryString . '_Inline';
 
-    $cacheKey = "CRM_Core_DAO_CustomGroup_Query " . md5($cacheString);
-    $multipleFieldGroupCacheKey = "CRM_Core_DAO_CustomGroup_QueryMultipleFields " . md5($cacheString);
+    $cacheKey = 'CRM_Core_DAO_CustomGroup_Query ' . md5($cacheString);
+    $multipleFieldGroupCacheKey = 'CRM_Core_DAO_CustomGroup_QueryMultipleFields ' . md5($cacheString);
     $cache = CRM_Utils_Cache::singleton();
     $groupTree = $cache->get($cacheKey);
     $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
@@ -1891,7 +1891,6 @@ ORDER BY civicrm_custom_group.weight,
     if (isset($groupTree['info']) && !empty($groupTree['info']) &&
       !empty($groupTree['info']['tables'])
     ) {
-      $select = $from = $where = [];
       $groupTree['info']['where'] = NULL;
 
       foreach ($groupTree['info']['tables'] as $table => $fields) {
@@ -1937,8 +1936,10 @@ ORDER BY civicrm_custom_group.weight,
    * @param string $column
    * @param string $value
    * @param string $delimiter
+   *
    * @return string
    *   SQL condition.
+   * @throws \CRM_Core_Exception
    */
   private static function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
     // ?
