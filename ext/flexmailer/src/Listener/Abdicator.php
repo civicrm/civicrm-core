@@ -76,7 +76,7 @@ class Abdicator {
     $errors = \CRM_Mailing_BAO_Mailing::checkSendable($e->getMailing());
     if (is_array($errors)) {
       foreach ($errors as $key => $message) {
-        $e->setError($key, $message);;
+        $e->setError($key, $message);
       }
     }
   }

@@ -884,7 +884,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $user_data['user_pass'] = $params['cms_pass'];
     }
     else {
-      $user_data['user_pass'] = wp_generate_password(12, FALSE);;
+      $user_data['user_pass'] = wp_generate_password(12, FALSE);
     }
 
     // Assign WordPress User "name" field(s).

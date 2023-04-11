@@ -625,7 +625,7 @@ class CRM_Import_ImportProcessor {
       $processor = new CRM_Import_ImportProcessor();
       $processor->setMappingID($mapping['id']);
       $processor->setMetadata(CRM_Contact_BAO_Contact::importableFields('All'));
-      $processor->legacyLoadSavedMapping();;
+      $processor->legacyLoadSavedMapping();
       foreach ($processor->getMappingFields() as $field) {
         // The if is mostly precautionary against running this more than once
         // - which is common in dev if not live...
