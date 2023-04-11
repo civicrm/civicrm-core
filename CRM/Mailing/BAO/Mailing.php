@@ -2468,7 +2468,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     }
 
     $returnProperties = [];
-    $returnProperties['display_name'] = $returnProperties['contact_id'] = $returnProperties['preferred_mail_format'] = $returnProperties['hash'] = 1;
+    $returnProperties['display_name'] = $returnProperties['contact_id'] = $returnProperties['hash'] = 1;
 
     foreach ($properties as $p) {
       $returnProperties[$p] = 1;

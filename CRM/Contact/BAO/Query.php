@@ -4467,7 +4467,6 @@ civicrm_relationship.start_date > {$today}
           'contact_sub_type' => 1,
           'sort_name' => 1,
           'display_name' => 1,
-          'preferred_mail_format' => 1,
           'nick_name' => 1,
           'first_name' => 1,
           'middle_name' => 1,
