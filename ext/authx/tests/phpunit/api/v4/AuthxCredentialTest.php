@@ -2,16 +2,16 @@
 
 namespace api\v4\Authx;
 
-use Civi\Api4\JWT;
+use Civi\Api4\AuthxCredential;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Test JWT API methods
+ * Test AuthxCredential API methods
  * @group headless
  */
-class JwtApiTest extends TestCase implements HeadlessInterface, TransactionalInterface {
+class AuthxCredentialTest extends TestCase implements HeadlessInterface, TransactionalInterface {
 
   use \Civi\Test\Api4TestTrait;
   use \Civi\Test\Api3TestTrait;
@@ -23,7 +23,7 @@ class JwtApiTest extends TestCase implements HeadlessInterface, TransactionalInt
       ->apply();
   }
 
-  public function testJWTGenrateToken(): void {
+  public function testGenerateToken(): void {
     $this->_apiversion = 4;
     $contactRecord = $this->createTestRecord('Contact', ['contact_type' => 'Individual']);
     $this->createLoggedInUser();
@@ -31,8 +31,8 @@ class JwtApiTest extends TestCase implements HeadlessInterface, TransactionalInt
       'access CiviCRM',
     ]);
     try {
-      JWT::create()->setContactId($contactRecord['id'])->execute();
-      $this->fail('JWT Should not be created as permission is not granted');
+      AuthxCredential::create()->setContactId($contactRecord['id'])->execute();
+      $this->fail('AuthxCredential Should not be created as permission is not granted');
     }
     catch (\Exception $e) {
     }
@@ -40,11 +40,11 @@ class JwtApiTest extends TestCase implements HeadlessInterface, TransactionalInt
       'access CiviCRM',
       'generate JWT',
     ]);
-    $jwt = JWT::create()->setContactId($contactRecord['id'])->execute();
+    $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->execute();
     $this->assertNotEmpty($jwt[0]['token']);
   }
 
-  public function testJWTValidation(): void {
+  public function testValidation(): void {
     $this->_apiversion = 4;
     $contactRecord = $this->createTestRecord('Contact', ['contact_type' => 'Individual']);
     $this->createLoggedInUser();
@@ -52,17 +52,17 @@ class JwtApiTest extends TestCase implements HeadlessInterface, TransactionalInt
       'access CiviCRM',
       'generate JWT',
     ]);
-    $jwt = JWT::create()->setContactId($contactRecord['id'])->execute();
-    $validate = JWT::validate()->setToken($jwt[0]['token'])->execute();
+    $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->execute();
+    $validate = AuthxCredential::validate()->setToken($jwt[0]['token'])->execute();
     $this->assertEquals('jwt', $validate[0]['credType']);
     $this->assertEquals($contactRecord['id'], $validate[0]['contactId']);
     $this->assertEquals('cid:' . $contactRecord['id'], $validate[0]['jwt']['sub']);
   }
 
   /**
-   * Test that the JWT does not validate if expired
+   * Test that the AuthxCredential does not validate if expired
    */
-  public function testExpiredJWTValidation(): void {
+  public function testExpiredValidation(): void {
     $this->expectException(\Civi\Authx\AuthxException::class);
     $this->expectExceptionMessage('Expired token');
     $this->_apiversion = 4;
@@ -72,9 +72,9 @@ class JwtApiTest extends TestCase implements HeadlessInterface, TransactionalInt
       'access CiviCRM',
       'generate JWT',
     ]);
-    $jwt = JWT::create()->setContactId($contactRecord['id'])->setTtl(5)->execute();
+    $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->setTtl(5)->execute();
     sleep(10);
-    $validate = JWT::validate()->setToken($jwt[0]['token'])->execute();
+    $validate = AuthxCredential::validate()->setToken($jwt[0]['token'])->execute();
   }
 
   /**

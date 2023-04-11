@@ -10,7 +10,7 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Action\JWT;
+namespace Civi\Api4\Action\AuthxCredential;
 
 use Civi\Api4\Generic\Result;
 

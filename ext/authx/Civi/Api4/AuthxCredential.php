@@ -12,29 +12,29 @@
 namespace Civi\Api4;
 
 /**
- * Methods of handling JWTs
+ * Methods of handling (JWT) authx credentialss
  *
  * @searchable none
  * @since 5.62
  * @package Authx
  */
-class JWT extends Generic\AbstractEntity {
+class AuthxCredential extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
-   * @return Action\JWT\create
+   * @return Action\AuthxCredential\create
    */
   public static function create($checkPermissions = TRUE) {
-    return (new Action\JWT\Create(__CLASS__, __FUNCTION__))
+    return (new Action\AuthxCredential\Create(__CLASS__, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param bool $checkPermissions
-   * @return Action\JWT\validate
+   * @return Action\AuthxCredential\validate
    */
   public static function validate($checkPermissions = TRUE) {
-    return (new Action\JWT\Validate(__CLASS__, __FUNCTION__))
+    return (new Action\AuthxCredential\Validate(__CLASS__, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
