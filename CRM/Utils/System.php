@@ -545,7 +545,9 @@ class CRM_Utils_System {
     $url = str_replace('&amp;', '&', $url);
 
     $context['output'] = $_GET['snippet'] ?? NULL;
-
+    if ($context['noindex'] ?? FALSE) {
+      self::setHttpHeader('X-Robots-Tag', 'noindex');
+    }
     $parsedUrl = CRM_Utils_Url::parseUrl($url);
     CRM_Utils_Hook::alterRedirect($parsedUrl, $context);
     $url = CRM_Utils_Url::unparseUrl($parsedUrl);
