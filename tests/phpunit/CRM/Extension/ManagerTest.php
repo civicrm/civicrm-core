@@ -467,6 +467,18 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->assertDBQuery('newextension', 'SELECT file FROM civicrm_extension WHERE full_name ="test.whiz.bang"');
   }
 
+  public function testComponentExtensionSync() {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    $this->assertEquals(CRM_Extension_Manager::STATUS_INSTALLED, CRM_Extension_System::singleton()->getManager()->getStatus('civi_campaign'));
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviCampaign');
+    $this->assertEquals(CRM_Extension_Manager::STATUS_DISABLED, CRM_Extension_System::singleton()->getManager()->getStatus('civi_campaign'));
+    $this->assertFalse(CRM_Core_Component::isEnabled('CiviCampaign'));
+    CRM_Extension_System::singleton()->getManager()->install('civi_campaign');
+    $this->assertTrue(CRM_Core_Component::isEnabled('CiviCampaign'));
+    CRM_Extension_System::singleton()->getManager()->disable('civi_campaign');
+    $this->assertFalse(CRM_Core_Component::isEnabled('CiviCampaign'));
+  }
+
   /**
    * Install a module and then delete (leaving stale DB info); restore
    * the module by downloading new code.
