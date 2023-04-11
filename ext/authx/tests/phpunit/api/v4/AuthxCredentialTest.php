@@ -53,6 +53,11 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
       'generate any authx credential',
     ]);
     $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->execute();
+
+    $this->setPermissions([
+      'access CiviCRM',
+      'validate any authx credential',
+    ]);
     $validate = AuthxCredential::validate()->setCred($jwt[0]['cred'])->execute();
     $this->assertEquals('jwt', $validate[0]['credType']);
     $this->assertEquals($contactRecord['id'], $validate[0]['contactId']);
@@ -74,6 +79,11 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
     ]);
     $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->setTtl(5)->execute();
     sleep(10);
+
+    $this->setPermissions([
+      'access CiviCRM',
+      'validate any authx credential',
+    ]);
     $validate = AuthxCredential::validate()->setCred($jwt[0]['cred'])->execute();
   }
 

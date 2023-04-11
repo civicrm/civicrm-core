@@ -53,7 +53,7 @@ class AuthxCredential extends Generic\AbstractEntity {
       'meta' => ['access CiviCRM'],
       'default' => ['administer CiviCRM'],
       'create' => ['generate any authx credential'],
-      'validate' => [],
+      'validate' => ['validate any authx credential'],
     ];
   }
 
