@@ -41,7 +41,7 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
       'generate any authx credential',
     ]);
     $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->execute();
-    $this->assertNotEmpty($jwt[0]['token']);
+    $this->assertNotEmpty($jwt[0]['cred']);
   }
 
   public function testValidation(): void {
@@ -53,7 +53,7 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
       'generate any authx credential',
     ]);
     $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->execute();
-    $validate = AuthxCredential::validate()->setToken($jwt[0]['token'])->execute();
+    $validate = AuthxCredential::validate()->setCred($jwt[0]['cred'])->execute();
     $this->assertEquals('jwt', $validate[0]['credType']);
     $this->assertEquals($contactRecord['id'], $validate[0]['contactId']);
     $this->assertEquals('cid:' . $contactRecord['id'], $validate[0]['jwt']['sub']);
@@ -74,7 +74,7 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
     ]);
     $jwt = AuthxCredential::create()->setContactId($contactRecord['id'])->setTtl(5)->execute();
     sleep(10);
-    $validate = AuthxCredential::validate()->setToken($jwt[0]['token'])->execute();
+    $validate = AuthxCredential::validate()->setCred($jwt[0]['cred'])->execute();
   }
 
   /**
