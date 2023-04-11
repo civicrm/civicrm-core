@@ -13,43 +13,45 @@
 namespace Civi\Api4\Action\AuthxCredential;
 
 use Civi\Api4\Generic\Result;
-use Civi\Authx\AuthxException;
-use Civi\Authx\AuthenticatorTarget;
-use Civi\Authx\CheckCredentialEvent;
 
 /**
- * Validate that a JWT is still valid and can be used in CiviCRM.
+ * Validate that a credential is still valid and can be used in CiviCRM.
  *
- * @method int getToken() Get Token to validate (required)
- * @method setToken(string $token) Get contact ID param (required)
+ * @method string getCred() Get Token to validate (required)
+ * @method Validate setCred(string $token) Get contact ID param (required)
  */
 class Validate extends \Civi\Api4\Generic\AbstractAction {
+
   /**
-   * Token to validate
+   * Identify the login-flow. Used for policy enforcement.
    *
    * @var string
+   */
+  protected $flow = 'script';
+
+  /**
+   * Credential to validate
+   *
+   * @var string
+   *   Ex: 'Bearer ABCD1234'
    * @required
    */
-  protected $token;
+  protected $cred;
 
   /**
    * @param \Civi\Api4\Generic\Result $result
+   * @throws \Civi\Authx\AuthxException
    */
   public function _run(Result $result) {
-    $tgt = AuthenticatorTarget::create([
-      'flow' => 'script',
-      'cred' => 'Bearer ' . $this->token,
-      'siteKey' => NULL,
+    $details = [
+      'flow' => $this->flow,
+      'cred' => $this->cred,
+      'siteKey' => NULL, /* Old school. Hopefully, we don't need to expose this. */
       'useSession' => FALSE,
-    ]);
-    $checkEvent = new CheckCredentialEvent($tgt->cred);
-    \Civi::dispatcher()->dispatch('civi.authx.checkCredential', $checkEvent);
-
-    if ($checkEvent->getRejection()) {
-      throw new AuthxException($checkEvent->getRejection());
-    }
-
-    $result[] = $checkEvent->getPrincipal();
+    ];
+    $auth = new \Civi\Authx\Authenticator();
+    $auth->setRejectMode('exception');
+    $result[] = $auth->validate($details);
   }
 
 }
