@@ -188,7 +188,7 @@ class Admin {
   private static function addImplicitFKFields(array $schema):array {
     foreach ($schema as &$entity) {
       if ($entity['searchable'] !== 'bridge') {
-        foreach (array_reverse($entity['fields'], TRUE) as $index => $field) {
+        foreach (array_reverse($entity['fields'] ?? [], TRUE) as $index => $field) {
           if (!empty($field['fk_entity']) && !$field['options'] && !empty($schema[$field['fk_entity']]['label_field'])) {
             $isCustom = strpos($field['name'], '.');
             // Custom fields: append "Contact ID" etc. to original field label
