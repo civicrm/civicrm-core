@@ -33,7 +33,7 @@ class CRM_Mailing_Page_Open extends CRM_Core_Page {
     $queue_id = CRM_Utils_Request::retrieveValue('qid', 'Positive', NULL, FALSE, 'GET');
     if (!$queue_id) {
       // Deprecated: "?q=" is problematic in Drupal integrations, but we'll accept if igiven
-      $queue_id = CRM_Utils_Request::retrieveValue('q', 'Positive', NULL, FALSE, 'GET');;
+      $queue_id = CRM_Utils_Request::retrieveValue('q', 'Positive', NULL, FALSE, 'GET');
     }
     if (!$queue_id) {
       echo "Missing input parameters\n";
