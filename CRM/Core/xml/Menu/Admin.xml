@@ -588,6 +588,24 @@
      <weight>1370</weight>
   </item>
   <item>
+     <path>civicrm/admin/job/add</path>
+     <title>Add Scheduled Job</title>
+     <desc>Add a periodially running task.</desc>
+     <page_callback>CRM_Admin_Page_Job</page_callback>
+     <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
+     <adminGroup>System Settings</adminGroup>
+     <weight>1371</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/job/edit</path>
+     <title>Edit Scheduled Job</title>
+     <desc>Edit a periodially running task.</desc>
+     <page_callback>CRM_Admin_Page_Job</page_callback>
+     <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
+     <adminGroup>System Settings</adminGroup>
+     <weight>1372</weight>
+  </item>
+  <item>
      <path>civicrm/admin/joblog</path>
      <title>Scheduled Jobs Log</title>
      <desc>Browsing the log of periodially running tasks.</desc>
