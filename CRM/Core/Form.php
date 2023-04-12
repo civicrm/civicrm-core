@@ -2260,8 +2260,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     ];
     $props['api'] += [
       'formName' => 'qf:' . get_class($this),
-      'fieldName' => $name,
     ];
+    // If fieldName is missing and no default entity is set for the form, this will throw an excption.
+    // In that case, you should explicitly supply api.fieldName in the format `EntityName.field_name`
+    // because without it autocompleteSubscribers can't do their job.
+    if (empty($props['api']['fieldName'])) {
+      $props['api']['fieldName'] = $this->getDefaultEntity() . '.' . $name;
+    }
     $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-autocomplete');
     $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
     $props['data-select-params'] = json_encode($props['select']);

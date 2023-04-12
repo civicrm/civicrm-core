@@ -1058,6 +1058,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
         elseif ($field->data_type == 'EntityReference') {
           $fieldAttributes['entity'] = $field->fk_entity;
+          $fieldAttributes['api']['fieldName'] = $field->getEntity() . '.' . $groupName . '.' . $field->name;
           $element = $qf->addAutocomplete($elementName, $label, $fieldAttributes, $useRequired && !$search);
         }
         else {
