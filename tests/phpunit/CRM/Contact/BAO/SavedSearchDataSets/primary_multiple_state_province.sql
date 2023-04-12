@@ -1,5 +1,5 @@
 INSERT INTO civicrm_mapping (id,name,description,mapping_type_id) Values
-(114, NULL, NULL, NULL);
+(114, 'test_114', NULL, NULL);
 INSERT INTO `civicrm_mapping_field` (`id`, `mapping_id`, `name`, `contact_type`, `column_number`, `location_type_id`, `phone_type_id`, `im_provider_id`, `relationship_type_id`, `relationship_direction`, `grouping`, `operator`, `value`, `website_type_id`) VALUES
 (2846, 114, 'state_province', 'Contact', 0, NULL, NULL, NULL, NULL, NULL, 1, 'IN', '1501,2704', NULL);
 INSERT INTO `civicrm_saved_search` (`id`, `form_values`, `mapping_id`, `search_custom_id`) VALUES

@@ -41,24 +41,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
   }
 
   /**
-   * Takes an associative array and creates a contact object.
-   *
-   * The function extract all the params it needs to initialize the create a
-   * contact object. the params array could contain additional unused name/value
-   * pairs
+   * @deprecated
    *
    * @param array $params
-   *   An array of name/value pairs.
-   *
-   * @return object
-   *   CRM_Core_DAO_Mapper object on success, otherwise NULL
+   * @return CRM_Core_DAO_Mapping
    */
   public static function add($params) {
-    $mapping = new CRM_Core_DAO_Mapping();
-    $mapping->copyValues($params);
-    $mapping->save();
-
-    return $mapping;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
@@ -794,6 +784,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
       \Civi\Api4\MappingField::delete(FALSE)
         ->addWhere('relationship_type_id', '=', $event->id)
         ->execute();
+    }
+    if ($event->action === 'create' && $event->entity === 'Mapping') {
+      if (CRM_Utils_System::isNull($event->params['name'] ?? NULL)) {
+        CRM_Core_Error::deprecatedWarning('Creating a mapping with no name is deprecated.');
+        $id = 1 + CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mapping');
+        $event->params['name'] = "mapping_$id";
+      }
     }
   }
 

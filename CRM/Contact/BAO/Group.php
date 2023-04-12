@@ -656,9 +656,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       if (!$ssId) {
         //save record in mapping table
         $mappingParams = [
+          'name' => 'search_builder_' . $ssId,
           'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Search Builder'),
         ];
-        $mapping = CRM_Core_BAO_Mapping::add($mappingParams);
+        $mapping = CRM_Core_BAO_Mapping::writeRecord($mappingParams);
         $mappingId = $mapping->id;
       }
       else {
@@ -714,7 +715,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         'description' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $smartGroupId, 'description', 'id'),
         'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Search Builder'),
       ];
-      CRM_Core_BAO_Mapping::add($mappingParams);
+      CRM_Core_BAO_Mapping::writeRecord($mappingParams);
     }
 
     return [$smartGroupId, $ssId];
