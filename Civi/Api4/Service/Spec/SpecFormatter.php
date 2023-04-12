@@ -66,6 +66,7 @@ class SpecFormatter {
       $field->setRequired(!empty($data['required']) && empty($data['default']));
       $field->setTitle($data['title'] ?? NULL);
       $field->setLabel($data['html']['label'] ?? NULL);
+      $field->setLocalizable($data['localizable'] ?? FALSE);
       if (!empty($data['pseudoconstant'])) {
         // Do not load options if 'prefetch' is explicitly FALSE
         if (!isset($data['pseudoconstant']['prefetch']) || $data['pseudoconstant']['prefetch'] === FALSE) {

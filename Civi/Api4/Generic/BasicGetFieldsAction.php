@@ -347,6 +347,11 @@ class BasicGetFieldsAction extends BasicGetAction {
         'data_type' => 'String',
       ],
       [
+        'name' => 'localizable',
+        'data_type' => 'Boolean',
+        'default_value' => FALSE,
+      ],
+      [
         'name' => 'readonly',
         'data_type' => 'Boolean',
         'description' => 'True for auto-increment, calculated, or otherwise non-editable fields.',
