@@ -36,7 +36,7 @@ SET FOREIGN_KEY_CHECKS=1;
 CREATE TABLE `civicrm_grant` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Grant id',
   `contact_id` int unsigned NOT NULL COMMENT 'Contact ID of contact record given grant belongs to.',
-  `application_received_date` date COMMENT 'Date on which grant application was received by donor.',
+  `application_received_date` dateCOMMENT 'Date on which grant application was received by donor.',
   `decision_date` date COMMENT 'Date on which grant decision was made.',
   `money_transfer_date` date COMMENT 'Date on which grant money transfer was made.',
   `grant_due_date` date COMMENT 'Date on which grant report is due.',
