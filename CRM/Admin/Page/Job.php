@@ -54,13 +54,13 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/job',
+          'url' => 'civicrm/admin/job/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Scheduled Job'),
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('Execute Now'),
-          'url' => 'civicrm/admin/job',
+          'url' => 'civicrm/admin/job/edit',
           'qs' => 'action=view&id=%%id%%&reset=1',
           'title' => ts('Execute Scheduled Job Now'),
         ],
@@ -76,13 +76,13 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/job',
+          'url' => 'civicrm/admin/job/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Scheduled Job'),
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
-          'url' => 'civicrm/admin/job',
+          'url' => 'civicrm/admin/job/edit',
           'qs' => 'action=copy&id=%%id%%',
           'title' => ts('Copy Scheduled Job'),
         ],

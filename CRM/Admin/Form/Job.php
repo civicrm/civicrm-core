@@ -34,19 +34,26 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $this->setTitle(ts('Manage - Scheduled Jobs'));
 
     if ($this->_id) {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/job',
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/job/edit',
         "reset=1&action=update&id={$this->_id}",
         FALSE, NULL, FALSE
       );
     }
     else {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/job',
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/job/add',
         "reset=1&action=add",
         FALSE, NULL, FALSE
       );
     }
 
     $this->assign('refreshURL', $refreshURL);
+  }
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Job';
   }
 
   /**
