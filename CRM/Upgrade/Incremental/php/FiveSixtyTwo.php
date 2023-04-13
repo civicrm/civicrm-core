@@ -21,6 +21,19 @@
  */
 class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    if ($rev == '5.62.alpha1') {
+      $distinctComponentLists = CRM_Core_DAO::executeQuery('SELECT value, count(*) c FROM civicrm_setting WHERE name = "enable_components" GROUP BY value')
+        ->fetchMap('value', 'c');
+      if (count($distinctComponentLists) > 1) {
+        $message = ts('This site has multiple "Domains". The list of active "Components" is being consolidated across all "Domains". If you need different behavior in each "Domain", then consider updating the roles or permissions.');
+        // If you're investigating this - then maybe you should implement hook_permission_check() to dynamically adjust feature visibility?
+        // See also: https://lab.civicrm.org/dev/core/-/issues/3961
+        $preUpgradeMessage .= "<p>{$message}</p>";
+      }
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
@@ -29,7 +42,43 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
    */
   public function upgrade_5_62_alpha1($rev): void {
     $this->addTask('Make civicrm_setting.domain_id optional', 'alterColumn', 'civicrm_setting', 'domain_id', "int unsigned DEFAULT NULL COMMENT 'Which Domain does this setting belong to'");
+    $this->addTask('Consolidate the list of components', 'consolidateComponents');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
+  public static function consolidateComponents($ctx): bool {
+    $final = static::findAllEnabledComponents();
+    $lowestDomainId = CRM_Core_DAO::singleValueQuery('SELECT min(domain_id) FROM civicrm_setting WHERE name = "enable_components"');
+    if (!is_numeric($lowestDomainId)) {
+      return TRUE;
+    }
+
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET domain_id = NULL, value = %3 WHERE domain_id = %1 AND name = %2', [
+      1 => [$lowestDomainId, 'Positive'],
+      2 => ['enable_components', 'String'],
+      3 => [serialize($final), 'String'],
+    ]);
+
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE domain_id > %1 AND name = %2', [
+      1 => [$lowestDomainId, 'Positive'],
+      2 => ['enable_components', 'String'],
+    ]);
+
+    return TRUE;
+  }
+
+  /**
+   * @return array
+   *   Ex: ['CiviEvent', 'CiviMail']
+   */
+  public static function findAllEnabledComponents(): array {
+    $raw = CRM_Core_DAO::executeQuery('SELECT domain_id, value FROM civicrm_setting WHERE name = "enable_components"')
+      ->fetchMap('domain_id', 'value');
+    $all = [];
+    foreach ($raw as $value) {
+      $all = array_unique(array_merge($all, \CRM_Utils_String::unserialize($value)));
+    }
+    return array_values($all);
   }
 
 }
