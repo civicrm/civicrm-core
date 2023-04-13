@@ -35,6 +35,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_group_contact',
       'civicrm_group',
       'civicrm_prevnext_cache',
+      'civicrm_relationship',
     ]);
     if ($this->hookClass) {
       // Do this here to flush the entityTables cache on teardown.
