@@ -2026,34 +2026,6 @@ ORDER BY civicrm_custom_group.weight,
       $removeTables = [];
     }
 
-    // FIXME: fix gender, prefix and postfix, so they're edible by createProfileContact()
-    $names['gender'] = ['newName' => 'gender_id', 'groupName' => 'gender'];
-    $names['individual_prefix'] = [
-      'newName' => 'prefix_id',
-      'groupName' => 'individual_prefix',
-    ];
-    $names['individual_suffix'] = [
-      'newName' => 'suffix_id',
-      'groupName' => 'individual_suffix',
-    ];
-    $names['communication_style'] = [
-      'newName' => 'communication_style_id',
-      'groupName' => 'communication_style',
-    ];
-    $names['addressee'] = [
-      'newName' => 'addressee_id',
-      'groupName' => 'addressee',
-    ];
-    $names['email_greeting'] = [
-      'newName' => 'email_greeting_id',
-      'groupName' => 'email_greeting',
-    ];
-    $names['postal_greeting'] = [
-      'newName' => 'postal_greeting_id',
-      'groupName' => 'postal_greeting',
-    ];
-    CRM_Core_OptionGroup::lookupValues($submitted, $names, TRUE);
-
     if (!isset($submitted)) {
       $submitted = [];
     }

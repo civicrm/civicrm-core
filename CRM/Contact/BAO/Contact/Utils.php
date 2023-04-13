@@ -291,7 +291,7 @@ WHERE  id IN ( $idString )
 
     if (!empty($existingRelationship)) {
       if ($existingRelationship['is_active']) {
-        if ($existingRelationship['contact_id_a.organization_name'] !== $existingRelationship['contact_id_b.organization_name']){
+        if ($existingRelationship['contact_id_a.organization_name'] !== $existingRelationship['contact_id_b.organization_name']) {
           self::setCurrentEmployer([$contactID => $employerID]);
         }
         // My work here is done.
