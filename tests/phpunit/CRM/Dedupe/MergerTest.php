@@ -1469,6 +1469,27 @@ WHERE
   public function testMergeWithEmployer(): void {
     $organizationToRemoveID = $this->organizationCreate(['organization_name' => 'remove']);
     $organizationToKeepID = $this->organizationCreate(['organization_name' => 'keep']);
+    $individualToKeepID = $this->createContactWithEmployerRelationship([
+      'contact_id_b' => $organizationToRemoveID,
+    ]);
+    $individualToRemoveID = $this->createContactWithEmployerRelationship([
+      'contact_id_b' => $organizationToKeepID,
+    ]);
+    $employerName = Contact::get()->addSelect('organization_name')->addWhere('id', '=', $individualToKeepID)->execute()->first()['organization_name'];
+    $this->assertEquals('remove', $employerName);
+    $this->mergeContacts($individualToKeepID, $individualToRemoveID, ['move_employer_id' => $organizationToKeepID, 'move_rel_table_relationships' => TRUE]);
+    $employerName = Contact::get()->addSelect('organization_name')->addWhere('id', '=', $individualToKeepID)->execute()->first()['organization_name'];
+    $this->assertEquals('keep', $employerName);
+  }
+
+  /**
+   * Test that organization name is updated for employees of merged organizations..
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMergeWithEmployee(): void {
+    $organizationToRemoveID = $this->organizationCreate(['organization_name' => 'remove']);
+    $organizationToKeepID = $this->organizationCreate(['organization_name' => 'keep']);
     $individualID = $this->createContactWithEmployerRelationship([
       'contact_id_b' => $organizationToRemoveID,
     ]);
