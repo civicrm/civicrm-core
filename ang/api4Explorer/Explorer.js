@@ -988,7 +988,11 @@
           break;
 
         case 'php':
-          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2)) + ';', 'php', 1));
+          // Fields marked 'localizable' in the schema should get wrapped in ts() for the php format
+          var localizable = _.pluck(_.filter(_.findWhere(getEntity().actions, {name: $scope.action}).fields, {localizable: true}), 'name') || [];
+          // More field names that probably should be translated
+          localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
+          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable)) + ';', 'php', 1));
           break;
       }
     };
@@ -1002,7 +1006,7 @@
     /**
      * Format value to look like php code
      */
-    function phpFormat(val, indent, indentChildren) {
+    function phpFormat(val, indent, indentChildren, localizable) {
       if (typeof val === 'undefined') {
         return '';
       }
@@ -1020,7 +1024,8 @@
           return '[]';
         }
         $.each(val, function(k, v) {
-          ret += (ret ? ', ' : '') + newLine + indent + "'" + k + "' => " + phpFormat(v, indentChild, indentChildren);
+          var ts = localizable && localizable.includes(k) && _.isString(v) ? 'E::ts(' : '';
+          ret += (ret ? ', ' : '') + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizable) + (ts ? ')' : '');
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
@@ -1029,7 +1034,7 @@
           return '[]';
         }
         $.each(val, function(k, v) {
-          ret += (ret ? ', ' : '') + newLine + indent + phpFormat(v, indentChild, indentChildren);
+          ret += (ret ? ', ' : '') + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable);
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
