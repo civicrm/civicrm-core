@@ -17,7 +17,7 @@ namespace Civi\Api4\Query;
  * SqlFunction classes don't actually process data, SQL itself does the real work.
  * The role of each SqlFunction class is to:
  *
- * 1. Whitelist the SQL function for use by APIv4 (it doesn't allow any that don't have a SQLFunction class).
+ * 1. Whitelist a standard SQL function, or define a custom one, for use by APIv4 (it doesn't allow any that don't have a SQLFunction class).
  * 2. Document what the function does and what arguments it accepts.
  * 3. Tell APIv4 how to treat the inputs and how to format the outputs.
  *
@@ -124,6 +124,16 @@ abstract class SqlFunction extends SqlExpression {
         $output .= (strlen($output) ? ' ' : '') . $rendered;
       }
     }
+    return $this->renderExpression($output);
+  }
+
+  /**
+   * Render the final expression
+   *
+   * @param string $output
+   * @return string
+   */
+  protected function renderExpression($output): string {
     return $this->getName() . '(' . $output . ')';
   }
 
