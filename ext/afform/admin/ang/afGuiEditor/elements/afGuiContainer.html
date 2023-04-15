@@ -46,3 +46,11 @@
     <span crm-ui-editable ng-model="$ctrl.node['af-repeat']">{{ $ctrl.node['af-repeat'] }}</span>
   </button>
 </div>
+<div ng-if="$ctrl.node['af-copy'] || $ctrl.node['af-copy'] === ''" class="af-gui-button">
+  <button type="button" class="btn btn-xs btn-primary disabled">
+    <span class="crm-editable-enabled" ng-click="pickCopyIcon()" >
+      <i class="crm-i {{ $ctrl.node['copy-icon'] || 'fa-copy' }}"></i>
+    </span>
+    <span crm-ui-editable ng-model="$ctrl.node['af-copy']">{{ $ctrl.node['af-copy'] }}</span>
+  </button>
+</div>

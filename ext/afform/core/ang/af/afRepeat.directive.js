@@ -10,7 +10,9 @@
           min: '=',
           max: '=',
           addLabel: '@afRepeat',
-          addIcon: '@'
+          addIcon: '@',
+          copyLabel: '@afCopy',
+          copyIcon: '@'
         },
         templateUrl: '~/af/afRepeat.html',
         link: function($scope, $el, $attr, ctrls) {
@@ -38,6 +40,12 @@
 
           $scope.addItem = function() {
             $scope.getItems().push(getRepeatType() === 'join' ? {} : {fields: {}});
+          };
+
+          $scope.copyItem = function() {
+            var data = $scope.getItems();
+            var last = data[data.length-1];
+            data.push(getRepeatType() === 'join' ? angular.copy(last) : {fields: angular.copy(last.fields)});
           };
 
           $scope.removeItem = function(index) {
