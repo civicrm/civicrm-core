@@ -792,7 +792,7 @@ return [
     'default' => NULL,
     'add' => '4.4',
     'title' => ts('Enable Components'),
-    'is_domain' => '1',
+    'is_domain' => 0,
     'is_contact' => 0,
     'description' => NULL,
     'help_text' => NULL,
