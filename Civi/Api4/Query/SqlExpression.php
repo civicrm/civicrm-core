@@ -88,7 +88,7 @@ abstract class SqlExpression {
       $className = 'SqlEquation';
     }
     // If there are brackets but not the first character, we have a function
-    elseif ($bracketPos && $lastChar === ')') {
+    elseif ($bracketPos && preg_match('/^\w+\(.*\)(:[a-z]+)?$/', $expr)) {
       $fnName = substr($expr, 0, $bracketPos);
       if ($fnName !== strtoupper($fnName)) {
         throw new \CRM_Core_Exception('Sql function must be uppercase.');
