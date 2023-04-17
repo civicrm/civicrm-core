@@ -535,7 +535,7 @@
           _.each(fields, function(field) {
             var item = {
               // Use options suffix if available.
-              id: prefix + field.name + (field.options && _.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
+              id: prefix + field.name + (_.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
               text: field.label,
               description: field.description
             };
