@@ -1234,7 +1234,7 @@
           var ts = CRM.ts();
 
           function read() {
-            var htmlVal = element.html();
+            var htmlVal = element.text();
             if (!htmlVal) {
               htmlVal = scope.defaultValue || '';
               element.text(htmlVal);
