@@ -205,6 +205,10 @@ class CRM_Core_BAO_CustomValueTable {
 
             case 'EntityReference':
               $type = 'Integer';
+              if ($value == NULL || $value === '') {
+                $type = 'Timestamp';
+                $value = NULL;
+              }
               break;
 
             case 'RichTextEditor':
