@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
+class CRM_Utils_Cache_APCucache implements CRM_Utils_Cache_Interface {
 
   // TODO Consider native implementation.
   use CRM_Utils_Cache_NaiveMultipleTrait;
@@ -48,7 +48,7 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
    * @param array $config
    *   An array of configuration params.
    *
-   * @return \CRM_Utils_Cache_APCcache
+   * @return \CRM_Utils_Cache_APCucache
    */
   public function __construct(&$config) {
     if (isset($config['timeout'])) {
@@ -74,7 +74,7 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
 
     $ttl = CRM_Utils_Date::convertCacheTtl($ttl, $this->_timeout);
     $expires = time() + $ttl;
-    if (!apc_store($this->_prefix . $key, ['e' => $expires, 'v' => $value], $ttl)) {
+    if (!apcu_store($this->_prefix . $key, ['e' => $expires, 'v' => $value], $ttl)) {
       return FALSE;
     }
     return TRUE;
@@ -88,7 +88,7 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
    */
   public function get($key, $default = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
-    $result = apc_fetch($this->_prefix . $key, $success);
+    $result = apcu_fetch($this->_prefix . $key, $success);
     if ($success && isset($result['e']) && $result['e'] > time()) {
       return $this->reobjectify($result['v']);
     }
@@ -102,12 +102,12 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
    */
   public function delete($key) {
     CRM_Utils_Cache::assertValidKey($key);
-    apc_delete($this->_prefix . $key);
+    apcu_delete($this->_prefix . $key);
     return TRUE;
   }
 
   public function flush() {
-    $allinfo = apc_cache_info('user');
+    $allinfo = apcu_cache_info();
     $keys = $allinfo['cache_list'];
     // Our keys follows this pattern: ([A-Za-z0-9_]+)?CRM_[A-Za-z0-9_]+
     $prefix = $this->_prefix;
@@ -118,7 +118,7 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
       $name = $key['info'];
       if ($prefix == substr($name, 0, $lp)) {
         // Ours?
-        apc_delete($name);
+        apcu_delete($name);
       }
     }
     return TRUE;
