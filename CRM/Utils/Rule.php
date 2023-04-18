@@ -878,12 +878,14 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * @deprecated
    * @param mixed $value
    * @param mixed $actualElementValue
    *
    * @return bool
    */
   public static function validContact($value, $actualElementValue = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('positiveInteger');
     if ($actualElementValue) {
       $value = $actualElementValue;
     }
