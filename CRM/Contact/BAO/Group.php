@@ -429,19 +429,20 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_group', $group->id);
     }
 
-    // make the group, child of domain/site group by default.
-    $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
-    if (CRM_Utils_Array::value('no_parent', $params) !== 1) {
-      if (empty($params['parents']) &&
+    // Secret `no_parent` param is used by the multisite extension to prevent default behavior.
+    if (empty($params['no_parent'])) {
+      $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
+      // If multi-site is_enabled, no parent selected and the group doesn't already have any parents,
+      // set parent to the domain group
+      if (Civi::settings()->get('is_enabled') &&
+        empty($params['parents']) &&
         $domainGroupID != $group->id &&
-        Civi::settings()->get('is_enabled') &&
         !CRM_Contact_BAO_GroupNesting::hasParentGroups($group->id)
       ) {
-        // if no parent present and the group doesn't already have any parents,
-        // make sure site group goes as parent
         $params['parents'] = [$domainGroupID];
       }
 
+      // FIXME: Only allows adding parents, cannot remove them
       if (!CRM_Utils_System::isNull($params['parents'])) {
         foreach ($params['parents'] as $parentId) {
           if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
