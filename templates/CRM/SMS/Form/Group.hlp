@@ -47,10 +47,10 @@
 <p>{ts}If you have sent other Mass SMS - you can additionally Include (or Exclude) contacts who received those Mass SMS. CiviCRM will eliminate any duplications so that contacts who are in an Included Group AND were recipients of an Included Mailing will only be sent one copy of this SMS.{/ts}</p>
 {/htxt}
 
-{htxt id ="id-sms_provider-title"}
+{htxt id="id-sms_provider-title"}
   {ts}SMS Provider{/ts}
 {/htxt}
-{htxt id ="id-sms_provider"}
+{htxt id="id-sms_provider"}
 <p>{ts}Select the SMS provider for this mass message from the dropdown list.{/ts}</p>
 {if $params.isAdmin}
     {capture assign="fromConfig"}{crmURL p="civicrm/admin/sms/provider" q="reset=1"}{/capture}
