@@ -62,6 +62,7 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
       'for' => 'civicrm/mailing/url',
       'queue_id' => $queue_id,
       'url_id' => $url_id,
+      'noindex' => TRUE,
     ]);
   }
 
