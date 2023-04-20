@@ -126,6 +126,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         $this->assign('title', $this->_title);
         try {
           $this->assign('count', CRM_Contact_BAO_Group::memberCount($this->_id));
+          $smartGroupsUsingThisGroup = CRM_Contact_BAO_Group::getSmartGroupsUsingGroup($this->_id);
+          $this->assign('smartGroupsUsingThisGroup', $smartGroupsUsingThisGroup);
         }
         catch (CRM_Core_Exception $e) {
           // If the group is borked the query might fail but delete should be possible.
