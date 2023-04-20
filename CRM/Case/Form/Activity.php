@@ -493,7 +493,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $newActParams['original_id'] = $this->_defaults['original_id'];
       }
       else {
-        $newActParams['original_id'] = $this->_activityId;
+        $newActParams['original_id'] = NULL;
       }
 
       // add attachments if any
