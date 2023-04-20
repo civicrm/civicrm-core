@@ -17,6 +17,15 @@
     {if $count !== NULL}
         {ts count=$count plural='This group currently has %count members in it.'}This group currently has one member in it.{/ts}
     {/if}
+
+    {if $smartGroupsUsingThisGroup}
+    <p>Deleting this group will mean the following Smart Groups will no longer restrict based on membership in this group - as they do currently. Please edit and resave these smart groups to remove reference to this group before deleting.</p>
+    <ul>
+    {foreach from=$smartGroupsUsingThisGroup item=v key=k}
+         <li>{$v} <a href='civicrm/group/search?force=1&context=smog&gid={$k}&component_mode=1'>Edit Group</a></li>
+    {/foreach}
+    </ul>
+    {/if}
     {ts}Deleting this group will NOT delete the member contact records. However, all contact subscription information and history for this group will be deleted.{/ts} {ts}If this group is used in CiviCRM profiles, those fields will be reset.{/ts} {ts}This action cannot be undone.{/ts}
     </div>
 

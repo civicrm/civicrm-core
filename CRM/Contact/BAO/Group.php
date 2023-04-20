@@ -1443,6 +1443,39 @@ WHERE {$whereClause}";
   }
 
   /**
+   * Gets all smart groups that filter based on groupID.
+   *
+   * @param int $groupID
+   *     Group Id to search for.
+   * @return array
+   */
+  public static function getSmartGroupsUsingGroup(int $groupID) {
+    $savedSearches = Group::get(FALSE)
+      ->addSelect('id', 'title', 'saved_search_id', 'saved_search_id.form_values')
+      ->addWhere('saved_search_id', 'IS NOT NULL')
+      ->setLimit(0)
+      ->execute();
+    $failingSmartGroups = [];
+    foreach ($savedSearches as $savedSearch) {
+      // Filter out arrays in Form Values which are group searchs.
+      $groupSearches = array_filter(
+        $savedSearch['saved_search_id.form_values'],
+        function($v) {
+          return ($v[0] == 'group');
+        }
+      );
+      // Check each group search for valid groups.
+      $failingGroups = [];
+      foreach ($groupSearches as $groupSearch) {
+        if (!empty($groupSearch[2]['IN']) && in_array($groupID, $groupSearch[2]['IN'])) {
+          $failingSmartGroups[$savedSearch['id']] = $savedSearch['title'];
+        }
+      }
+    }
+    return $failingSmartGroups;
+  }
+
+  /**
    * Check write access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
