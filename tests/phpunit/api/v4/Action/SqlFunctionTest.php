@@ -236,6 +236,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('MONTH(birth_date):label AS month_name')
       ->addSelect('MONTH(birth_date):label')
       ->addSelect('EXTRACT(YEAR_MONTH FROM birth_date) AS year_month')
+      ->addSelect('DAYOFWEEK(birth_date) AS day_number')
+      ->addSelect('DAYOFWEEK(birth_date):label AS day_name')
       ->addWhere('last_name', '=', $lastName)
       ->addOrderBy('id')
       ->execute();
@@ -247,6 +249,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('November', $result[0]['month_name']);
     $this->assertEquals('November', $result[0]['MONTH:birth_date:label']);
     $this->assertEquals('200911', $result[0]['year_month']);
+    $this->assertEquals(4, $result[0]['day_number']);
+    $this->assertEquals('Wednesday', $result[0]['day_name']);
 
     $this->assertEquals(0, $result[1]['diff']);
     $this->assertEquals(2010, $result[1]['year']);
@@ -255,6 +259,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('January', $result[1]['month_name']);
     $this->assertEquals('January', $result[1]['MONTH:birth_date:label']);
     $this->assertEquals('201001', $result[1]['year_month']);
+    $this->assertEquals(6, $result[1]['day_number']);
+    $this->assertEquals('Friday', $result[1]['day_name']);
   }
 
   public function testIncorrectNumberOfArguments() {
