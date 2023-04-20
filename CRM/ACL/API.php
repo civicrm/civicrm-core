@@ -183,7 +183,7 @@ class CRM_ACL_API {
     $contactID = NULL,
     $tableName = 'civicrm_saved_search',
     $allGroups = NULL,
-    $includedGroups = NULL
+    $includedGroups = []
   ) {
 
     if (!isset(Civi::$statics[__CLASS__]) || !isset(Civi::$statics[__CLASS__]['group_permission'])) {
