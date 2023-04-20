@@ -54,8 +54,58 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
         'data_type' => 'Integer',
         'is_reserved' => 1,
       ],
-      []
+      [
+        [
+          'value' => 1,
+          'name' => 'contact_image',
+          'label' => ts('Contact Image'),
+          'description' => ts('Image as shown on contact summary screen'),
+          'is_reserved' => 1,
+        ],
+      ],
     );
+    [$minId, $maxId] = CRM_Core_DAO::executeQuery("SELECT COALESCE(MIN(id),0), COALESCE(MAX(id),0)
+      FROM civicrm_contact WHERE image_URL IS NOT NULL")->getDatabaseResult()->fetchRow();
+    for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
+      $endId = $startId + self::BATCH_SIZE - 1;
+      $title = ts("Update contact images (%1 => %2)", [
+        1 => $startId,
+        2 => $endId,
+      ]);
+      $this->addTask($title, 'updateContactImage', $startId, $endId);
+    }
+  }
+
+  public static function updateContactImage($ctx, $startId, $endId): bool {
+    $dir = Civi::settings()->get('customFileUploadDir');
+    $query = CRM_Utils_SQL_Select::from('civicrm_contact')
+      ->select(['id', 'image_url'])
+      ->where('rel.id >= #START AND rel.id <= #END', [
+        '#START' => $startId,
+        '#END' => $endId,
+      ])
+      ->having('image_url LIKE "%civicrm%contact%imagefile%photo=%"');
+    $result = $query->execute();
+    while ($result->fetch()) {
+      $url = parse_url(CRM_Utils_String::unstupifyUrl($result->image_url));
+      if ($url && strpos($url['query'], 'photo=') !== FALSE) {
+        parse_str($url['query'], $args);
+        $params = [1 => $result->id];
+        if (file_exists($dir . $args['photo'])) {
+          $newUrl = CRM_Utils_System::url('civicrm/contact/imagefile', [
+            'cid' => $result->id,
+            'photo' => $args['photo']
+          ], TRUE, NULL, FALSE, TRUE);
+          $params[2] = [$newUrl, 'String'];
+        }
+        else {
+          // If file doesn't exist, url is invalid so set null
+          $params[2] = ['', 'Date'];
+        }
+        CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET image_URL = %2 WHERE id = %1', $params);
+      }
+    }
+    return TRUE;
   }
 
   public static function consolidateComponents($ctx): bool {
