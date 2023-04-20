@@ -196,7 +196,7 @@ class CRM_ACL_API {
 
     $key = "{$tableName}_{$type}_{$contactID}";
     if (!array_key_exists($key, Civi::$statics[__CLASS__]['group_permission'])) {
-      Civi::$statics[__CLASS__]['group_permission'][$key] = self::group($type, $contactID, $tableName, $allGroups, $includedGroups);
+      Civi::$statics[__CLASS__]['group_permission'][$key] = self::group($type, $contactID, $tableName, $allGroups, $includedGroups ?? []);
     }
 
     return in_array($groupID, Civi::$statics[__CLASS__]['group_permission'][$key]);
