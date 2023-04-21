@@ -344,6 +344,23 @@
         $scope.editingOptions = val;
       };
 
+      this.searchOperators = {
+        '': ts('Auto'),
+        '=': '=',
+        '!=': '≠',
+        '>': '>',
+        '<': '<',
+        '>=': '≥',
+        '<=': '≤',
+        'CONTAINS': ts('Contains'),
+        'IN': ts('Is One Of'),
+        'NOT IN': ts('Not One Of'),
+        'LIKE': ts('Is Like'),
+        'NOT LIKE': ts('Not Like'),
+        'REGEXP': ts('Matches Pattern'),
+        'NOT REGEXP': ts("Doesn't Match Pattern"),
+      };
+
       // Returns a reference to a path n-levels deep within an object
       function drillDown(parent, path) {
         var container = parent;

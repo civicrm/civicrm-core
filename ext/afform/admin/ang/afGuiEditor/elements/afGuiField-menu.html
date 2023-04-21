@@ -75,6 +75,14 @@
     {{:: ts('Search by range') }}
   </a>
 </li>
+<li ng-if="$ctrl.isSearch()">
+  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label>{{:: ts('Operator:') }}</label>
+    <select class="form-control" ng-model="getSet('search_operator')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">
+      <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
+    </select>
+  </div>
+</li>
 <li role="separator" class="divider" ng-if="hasOptions()"></li>
 <li ng-if="hasOptions()" ng-click="$event.stopPropagation()">
   <a href ng-click="resetOptions()" title="{{:: ts('Reset the option list for this field') }}">
