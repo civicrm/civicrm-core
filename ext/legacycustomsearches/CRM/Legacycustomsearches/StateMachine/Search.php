@@ -73,7 +73,9 @@ class CRM_Legacycustomsearches_StateMachine_Search extends CRM_Core_StateMachine
       $value = $this->_controller->get('task');
     }
     $this->_controller->set('task', $value);
-
+    if ((int) $value === CRM_Core_Task::TASK_EXPORT) {
+      return ['CRM_Contact_Form_Search_Action_Export', FALSE];
+    }
     $componentMode = $this->_controller->get('component_mode');
     $modeValue = CRM_Contact_Form_Search::getModeValue($componentMode);
     $taskClassName = $modeValue['taskClassName'];

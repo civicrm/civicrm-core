@@ -54,7 +54,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    * @var int
    */
   protected $_membershipStatusID;
-  public $DBResetRequired = FALSE;
 
   /**
    * Setup function.

@@ -35,25 +35,25 @@
       <tr class="crm-membership-status-form-block-start_event">
         <td class="label">{$form.start_event.label}</td>
         <td class="html-adjust">{$form.start_event.html}<br />
-           <span class="description">{ts}When does this status begin? EXAMPLE: <strong>New</strong> status begins at the membership 'join date'.{/ts}</span>
+           <span class="description">{ts}When does this status begin? EXAMPLE: <strong>New</strong> status begins at the Member Since.{/ts}</span>
         </td>
       </tr>
       <tr class="crm-membership-status-form-block-start_event_unit_interval">
         <td class="label">{$form.start_event_adjust_unit.label}</td>
         <td class="html-adjust">&nbsp;{$form.start_event_adjust_interval.html}&nbsp;&nbsp;{$form.start_event_adjust_unit.html}<br />
-           <span class="description">{ts}Optional adjustment period added or subtracted from the Start Event. EXAMPLE: <strong>Current</strong> status might begin at 'join date' PLUS 3 months (to distinguish Current from New members).{/ts}</span>
+           <span class="description">{ts}Optional adjustment period added or subtracted from the Start Event. EXAMPLE: <strong>Current</strong> status might begin at Member Since PLUS 3 months (to distinguish Current from New members).{/ts}</span>
         </td>
       </tr>
       <tr class="crm-membership-status-form-block-end_event">
         <td class="label">{$form.end_event.label}</td>
         <td class="html-adjust">{$form.end_event.html}<br />
-           <span class="description">{ts}When does this status end? EXAMPLE: <strong>Current</strong> status ends at the membership 'end date'.{/ts}</span>
+           <span class="description">{ts}When does this status end? EXAMPLE: <strong>Current</strong> status ends at the Membership Expiration Date.{/ts}</span>
         </td>
       </tr>
       <tr class="crm-membership-status-form-block-end_event_unit_interval">
         <td class="label">{$form.end_event_adjust_unit.label}</td>
         <td class="html-adjust">&nbsp;{$form.end_event_adjust_interval.html}&nbsp;{$form.end_event_adjust_unit.html}<br />
-           <span class="description">{ts}Optional adjustment period added or subtracted from the End Event. EXAMPLE: <strong>Grace</strong> status might end at 'end date' PLUS 1 month.{/ts}</span>
+           <span class="description">{ts}Optional adjustment period added or subtracted from the End Event. EXAMPLE: <strong>Grace</strong> status might end at the Membership Expiration Date PLUS 1 month.{/ts}</span>
         </td>
       </tr>
       <tr class="crm-membership-status-form-block-is_current_member">

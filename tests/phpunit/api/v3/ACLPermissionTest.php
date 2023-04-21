@@ -35,7 +35,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   protected $isValidateFinancialsOnPostAssert = FALSE;
 
-  public $DBResetRequired = FALSE;
   protected $_entity;
 
   /**

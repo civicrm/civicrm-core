@@ -1020,13 +1020,13 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $this->assertTrue($dao->fetch());
 
-    $url = CRM_Mailing_Event_BAO_MailingEventClickThrough::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString('https://civicrm.org', $url);
 
     // Now delete the event queue hashes and see if the tracking still works.
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_event_queue');
 
-    $url = CRM_Mailing_Event_BAO_MailingEventClickThrough::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString('https://civicrm.org', $url);
 
     // Ensure that Google CSS link is not tracked.
@@ -1056,13 +1056,13 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $this->assertTrue($dao->fetch());
 
-    $url = CRM_Mailing_Event_BAO_MailingEventClickThrough::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString($unicodeURL, $url);
 
     // Now delete the event queue hashes and see if the tracking still works.
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_event_queue');
 
-    $url = CRM_Mailing_Event_BAO_MailingEventClickThrough::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString($unicodeURL, $url);
   }
 

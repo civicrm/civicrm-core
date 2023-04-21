@@ -47,6 +47,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('context', $context);
 
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks($this->_id));
+    $this->assign('isShowICalIconsInline', TRUE);
 
     // Sometimes we want to suppress the Event Full msg
     $noFullMsg = CRM_Utils_Request::retrieve('noFullMsg', 'String', $this, FALSE, 'false');

@@ -82,7 +82,7 @@ trait CRMTraits_Financial_FinancialACLTrait {
    * @param array $permissions
    *   Array of permissions e.g ['access CiviCRM','access CiviContribute'],
    */
-  protected function setPermissions($permissions) {
+  protected function setPermissions(array $permissions): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
     if (isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'])) {
       unset(\Civi::$statics['CRM_Financial_BAO_FinancialType']);

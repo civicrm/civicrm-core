@@ -50,7 +50,7 @@ class CRM_Upgrade_Incremental_Base {
     $revList = [];
 
     $sqlGlob = implode(DIRECTORY_SEPARATOR, [dirname(__FILE__), 'sql', $this->getMajorMinor() . '.*.mysql.tpl']);
-    $sqlFiles = glob($sqlGlob);;
+    $sqlFiles = glob($sqlGlob);
     foreach ($sqlFiles as $file) {
       $revList[] = basename($file, '.mysql.tpl');
     }
@@ -76,7 +76,6 @@ class CRM_Upgrade_Incremental_Base {
    * This method will be invoked multiple times. Implementations MUST consult the `$rev`
    * before deciding what messages to add. See the examples linked below.
    *
-   * @see \CRM_Upgrade_Incremental_php_FourSeven::setPreUpgradeMessage()
    * @see \CRM_Upgrade_Incremental_php_FiveTwenty::setPreUpgradeMessage()
    *
    * @param string $preUpgradeMessage
@@ -101,7 +100,6 @@ class CRM_Upgrade_Incremental_Base {
    * This method will be invoked multiple times. Implementations MUST consult the `$rev`
    * before deciding what messages to add. See the examples linked below.
    *
-   * @see \CRM_Upgrade_Incremental_php_FourSeven::setPostUpgradeMessage()
    * @see \CRM_Upgrade_Incremental_php_FiveTwentyOne::setPostUpgradeMessage()
    *
    * @param string $postUpgradeMessage
@@ -225,7 +223,9 @@ class CRM_Upgrade_Incremental_Base {
     // Hrm, `enable()` normally does these things... but not during upgrade...
     // Note: A good test-scenario is to install 5.45; enable logging and CiviGrant; disable searchkit+afform; then upgrade to 5.47.
     $schema = new CRM_Logging_Schema();
-    $schema->fixSchemaDifferences();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferences();
+    }
 
     CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
@@ -298,6 +298,10 @@ class CRM_Upgrade_Incremental_Base {
       }
       foreach ($queries as $query) {
         CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+      }
+      $schema = new CRM_Logging_Schema();
+      if ($schema->isEnabled()) {
+        $schema->fixSchemaDifferencesFor($table);
       }
     }
     if ($locales && $triggerRebuild) {
@@ -517,6 +521,14 @@ class CRM_Upgrade_Incremental_Base {
       CRM_Core_DAO::executeQuery("ALTER TABLE `$table` DROP COLUMN `$column`",
         [], TRUE, NULL, FALSE, FALSE);
     }
+    $schema = new CRM_Logging_Schema();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferencesFor($table);
+    }
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
+    }
     return TRUE;
   }
 
@@ -598,6 +610,13 @@ class CRM_Upgrade_Incremental_Base {
     }
     foreach ($queries as $query) {
       CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+    }
+    $schema = new CRM_Logging_Schema();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferencesFor($table);
+    }
+    if ($locales) {
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
     }
     return TRUE;
   }

@@ -42,8 +42,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
-  public $DBResetRequired = FALSE;
-
   protected $_entity;
 
   protected $_params;
@@ -216,7 +214,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @param int $version
    *
-   * @throws \CRM_Core_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testAddCreateIndividualWithPreferredLanguage(int $version): void {
@@ -240,7 +237,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @param int $version
    *
-   * @throws \CRM_Core_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testIndividualSubType(int $version): void {
@@ -278,7 +274,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @param int $version
    *
-   * @throws \CRM_Core_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testGetMultipleContactSubTypes(int $version): void {
@@ -682,7 +677,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @param int $version
    *
-   * @throws \CRM_Core_Exception
    * @dataProvider versionThreeAndFour
    */
   public function testCreateWithCustom(int $version): void {
@@ -4429,34 +4423,32 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test retrieving merged contacts.
    *
    * The goal here is to start with a contact deleted by merged and find out the contact that is the current version of them.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testMergedGet(): void {
-    $this->contactIDs[] = $this->individualCreate();
-    $this->contactIDs[] = $this->individualCreate();
-    $this->contactIDs[] = $this->individualCreate();
-    $this->contactIDs[] = $this->individualCreate();
+    $contactIDs[0] = $this->individualCreate();
+    $contactIDs[1] = $this->individualCreate();
+    $contactIDs[2] = $this->individualCreate();
+    $contactIDs[3] = $this->individualCreate();
 
     // First do an 'unnatural merge' - they 'like to merge into the lowest but this will mean that contact 0 merged to contact [3].
     // When the batch merge runs.... the new lowest contact is contact[1]. All contacts will merge into that contact,
     // including contact[3], resulting in only 3 existing at the end. For each contact the correct answer to 'who did I eventually
     // wind up being should be [1]
-    $this->callAPISuccess('Contact', 'merge', ['to_remove_id' => $this->contactIDs[0], 'to_keep_id' => $this->contactIDs[3]]);
+    $this->callAPISuccess('Contact', 'merge', ['to_remove_id' => $contactIDs[0], 'to_keep_id' => $contactIDs[3]]);
 
     $this->callAPISuccess('Job', 'process_batch_merge', []);
-    foreach ($this->contactIDs as $contactID) {
-      if ($contactID === $this->contactIDs[1]) {
+    foreach ($contactIDs as $contactID) {
+      if ($contactID === $contactIDs[1]) {
         continue;
       }
-      $result = $this->callAPIAndDocument('Contact', 'getmergedto', ['sequential' => 1, 'contact_id' => $contactID], __FUNCTION__, __FILE__);
+      $result = $this->callAPISuccess('Contact', 'getmergedto', ['sequential' => 1, 'contact_id' => $contactID]);
       $this->assertEquals(1, $result['count']);
-      $this->assertEquals($this->contactIDs[1], $result['values'][0]['id']);
+      $this->assertEquals($contactIDs[1], $result['values'][0]['id']);
     }
 
-    $result = $this->callAPIAndDocument('Contact', 'getmergedfrom', ['contact_id' => $this->contactIDs[1]], __FUNCTION__, __FILE__)['values'];
-    $mergedContactIds = array_merge(array_diff($this->contactIDs, [$this->contactIDs[1]]));
-    $this->assertEquals($mergedContactIds, array_keys($result));
+    $result = $this->callAPIAndDocument('Contact', 'getmergedfrom', ['contact_id' => $contactIDs[1]], __FUNCTION__, __FILE__)['values'];
+    $mergedContactIDs = array_merge(array_diff($contactIDs, [$contactIDs[1]]));
+    $this->assertEquals($mergedContactIDs, array_keys($result));
   }
 
   /**
@@ -4467,19 +4459,19 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testMergedGetWithPermanentlyDeletedContact(): void {
-    $this->contactIDs[] = $this->individualCreate();
-    $this->contactIDs[] = $this->individualCreate();
-    $this->contactIDs[] = $this->individualCreate();
-    $this->contactIDs[] = $this->individualCreate();
+    $this->ids['Contact'][] = $this->individualCreate();
+    $this->ids['Contact'][] = $this->individualCreate();
+    $this->ids['Contact'][] = $this->individualCreate();
+    $this->ids['Contact'][] = $this->individualCreate();
 
     // First do an 'unnatural merge' - they 'like to merge into the lowest but this will mean that contact 0 merged to contact [3].
     // When the batch merge runs.... the new lowest contact is contact[1]. All contacts will merge into that contact,
     // including contact[3], resulting in only 3 existing at the end. For each contact the correct answer to 'who did I eventually
     // wind up being should be [1]
-    $this->callAPISuccess('Contact', 'merge', ['to_remove_id' => $this->contactIDs[0], 'to_keep_id' => $this->contactIDs[3]]);
-    $this->callAPISuccess('Contact', 'delete', ['id' => $this->contactIDs[3], 'skip_undelete' => TRUE]);
-    $this->callAPIFailure('Contact', 'getmergedto', ['sequential' => 1, 'contact_id' => $this->contactIDs[0]]);
-    $title = CRM_Contact_Page_View::setTitle($this->contactIDs[0], TRUE);
+    $this->callAPISuccess('Contact', 'merge', ['to_remove_id' => $this->ids['Contact'][0], 'to_keep_id' => $this->ids['Contact'][3]]);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $this->ids['Contact'][3], 'skip_undelete' => TRUE]);
+    $this->callAPIFailure('Contact', 'getmergedto', ['sequential' => 1, 'contact_id' => $this->ids['Contact'][0]]);
+    $title = CRM_Contact_Page_View::setTitle($this->ids['Contact'][0], TRUE);
     $this->assertStringContainsString('civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4', $title);
   }
 
@@ -4561,7 +4553,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // Ensure they are shown as being in each created group.
     $contact_group_ids = explode(',', $contact_get['values'][$created_contact_id]['groups']);
     foreach ($created_group_ids as $created_group_id) {
-      $this->assertContains($created_group_id, $contact_group_ids);
+      $this->assertContainsEquals($created_group_id, $contact_group_ids);
     }
   }
 
@@ -4688,7 +4680,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'last_name' => 'Group member',
       'email' => 'test@example.org',
     ];
-    $create_contact = $this->callApiSuccess('Contact', 'create', $contact_params);
+    $create_contact = $this->callAPISuccess('Contact', 'create', $contact_params);
     $created_contact_id = $create_contact['id'];
     $createdGroupsIds = [];
     // Set up multiple groups, add the contact to the groups.
@@ -4698,7 +4690,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'title' => $title,
         'created_id' => $created_contact_id,
       ];
-      $create_group = $this->callApiSuccess('Group', 'create', $group_params);
+      $create_group = $this->callAPISuccess('Group', 'create', $group_params);
       $createdGroupsIds[] = $create_group['id'];
       $createdGroupTitles[] = $title;
       // Add contact to the new group.
@@ -4706,7 +4698,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'contact_id' => $created_contact_id,
         'group_id' => $create_group['id'],
       ];
-      $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
+      $this->callAPISuccess('GroupContact', 'create', $group_contact_params);
     }
     unset(Civi::$statics['CRM_Core_Permission_Base']);
     $contact_get = $this->callAPISuccess('contact', 'get', ['group' => [$createdGroupTitles[0] => 1], 'return' => 'group']);
@@ -4747,7 +4739,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * This is primarily testing functionality in the BAO_Query object that 'happens to be'
    * accessible via the api.
    *
-   * @throws \CRM_Core_Exception
    */
   public function testContactGetProximity(): void {
     CRM_Core_Config::singleton()->geocodeMethod = 'CRM_Utils_MockGeocoder';
@@ -5084,7 +5075,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testContactGetWithTag(): void {
-    $contact = $this->callApiSuccess('Contact', 'create', [
+    $contact = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'Test',
       'last_name' => 'Tagged',
@@ -5092,13 +5083,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
     $tags = [];
     foreach (['Tag A', 'Tag B'] as $name) {
-      $tags[] = $this->callApiSuccess('Tag', 'create', [
+      $tags[] = $this->callAPISuccess('Tag', 'create', [
         'name' => $name,
       ]);
     }
 
     // assign contact to "Tag B"
-    $this->callApiSuccess('EntityTag', 'create', [
+    $this->callAPISuccess('EntityTag', 'create', [
       'entity_table' => 'civicrm_contact',
       'entity_id' => $contact['id'],
       'tag_id' => $tags[1]['id'],
@@ -5274,6 +5265,61 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $api->addWhere('id', '=', $contactID);
     }
     $this->assertEquals($expected, $api->execute()->first()[$fieldName]);
+  }
+
+  /**
+   * Test fetching custom field value that needs to be escaped.
+   */
+  public function testGetEscapedCustomField(): void {
+    $testValues = [
+      'test-value',
+      // This value will be escaped.
+      "test-'value",
+    ];
+
+    // Create a custom contact field group + field.
+    $customGroupId = $this->customGroupCreate([
+      'title' => 'testGetEscapedCustomField',
+    ])['id'];
+    $customFieldId = $this->customFieldCreate([
+      'custom_group_id' => $customGroupId,
+      'label' => 'testGetEscapedCustomField',
+    ])['id'];
+    $customFieldParam = 'custom_' . $customFieldId;
+
+    // Create and fetch contacts using the test values.
+    foreach ($testValues as $value) {
+      // Create a new contact and insert the test value into the custom field.
+      $contactId = $this->callAPISuccess('Contact', 'create', [
+        'contact_type' => 'Individual',
+        'first_name' => 'Test',
+        'last_name' => 'Contact',
+        $customFieldParam => $value,
+      ])['id'];
+
+      // Verify the test value was inserted correctly.
+      $contactData = $this->callAPISuccess('Contact', 'getsingle', [
+        'id' => $contactId,
+        'return' => [$customFieldParam],
+      ]);
+      $this->assertEquals($value, $contactData[$customFieldParam]);
+
+      // All of these comparison operators should return a result.
+      $comparisonQueries = [
+        ['LIKE' => $value],
+        ['IN' => [$value]],
+        // Equals.
+        $value,
+      ];
+
+      // Fetch the new contact using different comparison operators.
+      foreach ($comparisonQueries as $query) {
+        $this->callAPISuccess('Contact', 'getsingle', [
+          'id' => $contactId,
+          $customFieldParam => $query,
+        ]);
+      }
+    }
   }
 
 }

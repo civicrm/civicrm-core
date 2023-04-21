@@ -1147,7 +1147,6 @@ class CRM_Export_BAO_ExportProcessor {
 
           case 'gender':
           case 'preferred_communication_method':
-          case 'preferred_mail_format':
           case 'communication_style':
             return $i18n->crm_translate($fieldValue);
 
@@ -1463,16 +1462,7 @@ class CRM_Export_BAO_ExportProcessor {
 
         case CRM_Utils_Type::T_STRING:
           if (isset($fieldSpec['maxlength'])) {
-            // A localized string for the preferred_mail_format does not fit
-            // into the varchar(8) field.
-            // @see https://lab.civicrm.org/dev/core/-/issues/2645
-            switch ($fieldName) {
-              case 'preferred_mail_format':
-                return "`$fieldName` text(16)";
-
-              default:
-                return "`$fieldName` varchar({$fieldSpec['maxlength']})";
-            }
+            return "`$fieldName` varchar({$fieldSpec['maxlength']})";
           }
           $dataType = $fieldSpec['data_type'] ?? '';
           // set the sql columns for custom data

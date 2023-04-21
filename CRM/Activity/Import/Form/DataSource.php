@@ -20,10 +20,6 @@
  */
 class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/import/activity';
-
-  const IMPORT_ENTITY = 'Activity';
-
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
    *
@@ -37,13 +33,6 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    * @var bool
    */
   public $submitOnce = TRUE;
-
-  /**
-   * Build the form object.
-   */
-  public function buildQuickForm() {
-    parent::buildQuickForm();
-  }
 
   /**
    * @return CRM_Activity_Import_Parser_Activity

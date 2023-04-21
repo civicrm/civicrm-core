@@ -151,7 +151,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       //CRM-15573
       if (!empty($params['id'])) {
         $params['membership_types'] = serialize($membershipRequired);
-        CRM_Member_BAO_MembershipBlock::create($params);
+        CRM_Member_BAO_MembershipBlock::writeRecord($params);
       }
       $this->add('hidden', "mem_price_field_id", '', ['id' => "mem_price_field_id"]);
       $this->assign('is_recur', $isRecur);

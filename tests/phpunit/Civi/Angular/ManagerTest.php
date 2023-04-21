@@ -30,8 +30,8 @@ class ManagerTest extends \CiviUnitTestCase {
    * @inheritDoc
    */
   protected function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->createLoggedInUser();
     $this->res = \CRM_Core_Resources::singleton();
     $this->angular = new Manager($this->res);

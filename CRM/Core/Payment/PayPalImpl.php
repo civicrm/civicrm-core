@@ -544,7 +544,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   public function doPaymentPayPalButton(&$params) {
     $args = [];
 
-    $result = $this->setStatusPaymentPending([]);
+    $result = [];
 
     $this->initialize($args, 'DoDirectPayment');
 
@@ -606,7 +606,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     /* Success */
-    $result = $this->setStatusPaymentCompleted($result);
     $doQueryParams = [
       'gross_amount' => $apiResult['amt'] ?? NULL,
       'trxn_id' => $apiResult['transactionid'] ?? NULL,

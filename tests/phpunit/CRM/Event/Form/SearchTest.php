@@ -5,26 +5,36 @@
  */
 class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
 
+  /**
+   * @var int
+   */
+  private $individualID;
+
+  /**
+   * @var array
+   */
+  private $participantPrice;
+
   public function setUp(): void {
     parent::setUp();
     $this->individualID = $this->individualCreate();
-    $this->event = $this->eventCreate();
-    $this->priceFieldValues = $this->createPriceSet('event', $this->event, [
+    $event = $this->eventCreate();
+    $priceFieldValues = $this->createPriceSet('event', $event['id'], [
       'html_type'    => 'Radio',
       'option_label' => ['1' => 'Radio Label A (inc. GST)', '2' => 'Radio Label B (inc. GST)'],
       'option_name'  => ['1' => 'Radio Label A', '2' => 'Radio Label B'],
     ]);
 
-    $this->priceFieldValues = $this->priceFieldValues['values'];
+    $priceFieldValues = $priceFieldValues['values'];
     $this->participantPrice = NULL;
-    foreach ($this->priceFieldValues as $priceFieldValue) {
+    foreach ($priceFieldValues as $priceFieldValue) {
       $this->participantPrice = $priceFieldValue;
       break;
     }
 
     $today = new DateTime();
-    $this->participant = $this->participantCreate([
-      'event_id'  => $this->event['id'],
+    $this->participantCreate([
+      'event_id'  => $event['id'],
       'contact_id' => $this->individualID,
       'status_id' => 1,
       'fee_level' => $this->participantPrice['label'],

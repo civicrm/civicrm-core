@@ -39,10 +39,9 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   /**
    * Build all the data structures needed to build the form.
    *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $this->skipOnHold = $this->skipDeceased = FALSE;
     parent::preProcess();
     $this->setContactIDs();
     $this->preProcessPDF();
@@ -66,21 +65,17 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    *
    *
    * @return void
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
-    // TODO: rewrite using contribution token and one letter by contribution
     $this->setContactIDs();
-    $skipOnHold = $this->skipOnHold ?? FALSE;
-    $skipDeceased = $this->skipDeceased ?? TRUE;
-    $this->postProcessMembers($this->_memberIds, $skipOnHold, $skipDeceased, $this->_contactIds);
+    $this->postProcessMembers($this->_memberIds, $this->_contactIds);
   }
 
   /**
    * Process the form after the input has been submitted and validated.
    *
    * @param $membershipIDs
-   * @param $skipOnHold
-   * @param $skipDeceased
    * @param $contactIDs
    *
    * @throws \CRM_Core_Exception
@@ -88,10 +83,10 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * in fixing the existing pdfLetter classes to be suitably generic
    *
    */
-  public function postProcessMembers($membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
+  public function postProcessMembers($membershipIDs, $contactIDs) {
     $form = $this;
     $formValues = $form->controller->exportValues($form->getName());
-    [$formValues, $html_message, $messageToken, $returnProperties] = $this->processMessageTemplate($formValues);
+    [$formValues, $html_message, $messageToken] = $this->processMessageTemplate($formValues);
 
     $html
       = $this->generateHTML(

@@ -16,7 +16,7 @@
  */
 class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
 
-  public $_summary = NULL;
+  public $_summary;
 
   protected $_emailField = FALSE;
 

@@ -182,7 +182,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    */
   public function createPaymentProcessor(array $params = []): int {
     $params = array_merge([
-      'name' => 'demo',
+      'title' => $params['name'] ?? 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
       'payment_processor_type_id' => 'PayPal',
       'is_active' => 1,

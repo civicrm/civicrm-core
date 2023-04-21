@@ -20,5 +20,5 @@
     <tr class="crm-mailing-component-form-block-is_active"><td class="label">{$form.is_active.label}</td><td>{$form.is_active.html}</td>
   </table>
 </fieldset>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 </div>

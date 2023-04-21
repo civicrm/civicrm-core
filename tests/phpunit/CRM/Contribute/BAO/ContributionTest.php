@@ -219,94 +219,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create honor-contact method.
-   */
-  public function testCreateAndGetHonorContact() {
-    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
-    $email = "{$firstName}.{$lastName}@example.com";
-
-    //Get profile id of name honoree_individual used to create profileContact
-    $honoreeProfileId = NULL;
-    $ufGroupDAO = new CRM_Core_DAO_UFGroup();
-    $ufGroupDAO->name = 'honoree_individual';
-    if ($ufGroupDAO->find(TRUE)) {
-      $honoreeProfileId = $ufGroupDAO->id;
-    }
-
-    $params = [
-      'prefix_id' => 3,
-      'first_name' => $firstName,
-      'last_name' => $lastName,
-      'email-1' => $email,
-    ];
-    $softParam = ['soft_credit_type_id' => 1];
-
-    $null = [];
-    $honoreeContactId = CRM_Contact_BAO_Contact::createProfileContact($params, $null,
-      NULL, NULL, $honoreeProfileId
-    );
-
-    $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $honoreeContactId, 'first_name', 'id', $firstName,
-      'Database check for created honor contact record.'
-    );
-    //create contribution on behalf of honary.
-
-    $contactId = $this->individualCreate(['first_name' => 'John', 'last_name' => 'Doe']);
-
-    $param = [
-      'contact_id' => $contactId,
-      'currency' => 'USD',
-      'financial_type_id' => 4,
-      'contribution_status_id' => 1,
-      'receive_date' => date('Ymd'),
-      'total_amount' => 66,
-      'sequential' => 1,
-    ];
-
-    $contribution = $this->callAPISuccess('Contribution', 'create', $param)['values'][0];
-    $id = $contribution['id'];
-    $softParam['contact_id'] = $honoreeContactId;
-    $softParam['contribution_id'] = $id;
-    $softParam['currency'] = $contribution['currency'];
-    $softParam['amount'] = $contribution['total_amount'];
-
-    //Create Soft Contribution for honoree contact
-    CRM_Contribute_BAO_ContributionSoft::add($softParam);
-
-    $this->assertDBCompareValue('CRM_Contribute_DAO_ContributionSoft', $id, 'contact_id',
-      'contribution_id', $honoreeContactId, 'Check DB for honor contact of the contribution'
-    );
-    //get honorary information
-    $getHonorContact = CRM_Contribute_BAO_Contribution::getHonorContacts($honoreeContactId);
-    $this->assertEquals([
-      $id => [
-        'honor_type' => 'In Honor of',
-        'honorId' => $contactId,
-        'display_name' => 'Mr. John Doe II',
-        'type' => 'Event Fee',
-        'type_id' => '4',
-        'amount' => '$ 66.00',
-        'source' => NULL,
-        'receive_date' => date('Y-m-d 00:00:00'),
-        'contribution_status' => 'Completed',
-      ],
-    ], $getHonorContact);
-
-    $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $honoreeContactId, 'first_name', 'id', $firstName,
-      'Database check for created honor contact record.'
-    );
-
-    //get annual contribution information
-    $annual = CRM_Contribute_BAO_Contribution::annual($contactId);
-
-    $currencySymbol = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', CRM_Core_Config::singleton()->defaultCurrency, 'symbol', 'name');
-    $this->assertDBCompareValue('CRM_Contribute_DAO_Contribution', $id, 'total_amount',
-      'id', ltrim($annual[2], $currencySymbol), 'Check DB for total amount of the contribution'
-    );
-  }
-
-  /**
    * Test that financial type data is not added to the annual query if acls not enabled.
    */
   public function testAnnualQueryWithFinancialACLsEnabled(): void {
@@ -485,7 +397,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contributionProduct->product_id, $premium->id, 'Check for Product id .');
 
     //Delete Product
-    CRM_Contribute_BAO_Product::del($premium->id);
+    CRM_Contribute_BAO_Product::deleteRecord(['id' => $premium->id]);
     $this->assertDBNull('CRM_Contribute_DAO_Product', $premium->name,
       'id', 'name', 'Database check for deleted Product.'
     );
@@ -834,13 +746,11 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * Test allowUpdateRevenueRecognitionDate.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testAllowUpdateRevenueRecognitionDate() {
-    $contactId = $this->individualCreate();
+  public function testAllowUpdateRevenueRecognitionDate(): void {
+    $contactID = $this->individualCreate();
     $params = [
-      'contact_id' => $contactId,
+      'contact_id' => $contactID,
       'receive_date' => '2010-01-20',
       'total_amount' => 100,
       'financial_type_id' => 4,
@@ -852,10 +762,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     $event = $this->eventCreate();
     $params = [
-      'contact_id' => $contactId,
+      'contact_id' => $contactID,
       'receive_date' => '2010-01-20',
       'total_amount' => 300,
-      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Price_BAO_PriceSet', 'financial_type_id', 'Event Fee'),
       'contribution_status_id' => 'Pending',
     ];
     $priceFields = $this->createPriceSet('event', $event['id']);
@@ -875,7 +785,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $params['line_items'][] = [
       'line_item' => $lineItems,
       'params' => [
-        'contact_id' => $contactId,
+        'contact_id' => $contactID,
         'event_id' => $event['id'],
         'status_id' => 1,
         'role_id' => 1,
@@ -888,14 +798,14 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertFalse($allowUpdate);
 
     $params = [
-      'contact_id' => $contactId,
+      'contact_id' => $contactID,
       'receive_date' => '2010-01-20',
       'total_amount' => 200,
       'financial_type_id' => $this->getFinancialTypeId('Member Dues'),
       'contribution_status_id' => 'Pending',
     ];
     $membershipType = $this->membershipTypeCreate();
-    $priceFields = $this->createPriceSet();
+    $priceFields = $this->createPriceSet('contribution_page', NULL, [], 'membership');
     $lineItems = [];
     foreach ($priceFields['values'] as $key => $priceField) {
       $lineItems[$key] = [
@@ -914,7 +824,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $params['line_items'][] = [
       'line_item' => [array_pop($lineItems)],
       'params' => [
-        'contact_id' => $contactId,
+        'contact_id' => $contactID,
         'membership_type_id' => $membershipType,
         'join_date' => '2006-01-21',
         'start_date' => '2006-01-21',
@@ -931,10 +841,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * Test recording of amount with comma separator.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testCommaSeparatorAmount() {
+  public function testCommaSeparatorAmount(): void {
     $contactId = $this->individualCreate();
 
     $params = [

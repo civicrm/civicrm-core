@@ -26,9 +26,10 @@ class GenericHookEventTest extends \CiviUnitTestCase {
   }
 
   public function testConstructOrdered() {
+    $null = NULL;
     $event = GenericHookEvent::createOrdered(
       ['alpha', 'beta', 'nothingNull', 'nothingZero'],
-      [456, ['whiz' => 'bang'], NULL, 0, \CRM_Utils_Hook::$_nullObject]
+      [456, ['whiz' => 'bang'], NULL, 0, $null]
     );
     $this->assertEquals(456, $event->alpha);
     $this->assertEquals('bang', $event->beta['whiz']);

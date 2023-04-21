@@ -143,13 +143,13 @@
 {literal}
 <script type="text/javascript">
 
-{/literal}{if $invalidGroupName}{literal}
-cj("#new-group.collapsed").crmAccordionToggle();
-{/literal}{/if}{literal}
+if (cj("#newGroupName").val()) {
+  cj("#new-group.collapsed").crmAccordionToggle();
+}
 
-{/literal}{if $invalidTagName}{literal}
-cj("#new-tag.collapsed").crmAccordionToggle();
-{/literal}{/if}{literal}
+if (cj("#newTagName").val()) {
+  cj("#new-tag.collapsed").crmAccordionToggle();
+}
 
 </script>
 {/literal}

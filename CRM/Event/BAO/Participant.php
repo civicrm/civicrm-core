@@ -181,7 +181,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
     ) {
       // Default status if not specified
       $participant->status_id = $participant->status_id ?: self::fields()['participant_status_id']['default'];
-      CRM_Activity_BAO_Activity::addActivity($participant, 'Event Registration');
+      CRM_Activity_BAO_Activity::addActivity($participant, 'Event Registration', $participant->contact_id);
     }
 
     //CRM-5403
@@ -550,23 +550,6 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
     }
 
     return $optionsCount;
-  }
-
-  /**
-   * Get the empty spaces for event those we can allocate
-   * to pending participant to become confirm.
-   *
-   * @deprecated
-   *
-   * @param int $eventId
-   *   Event id.
-   *
-   * @return int
-   *   $spaces  Number of Empty Seats/null.
-   */
-  public static function pendingToConfirmSpaces($eventId) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Event_BAO_Participant::eventFull');
-    return CRM_Event_BAO_Participant::eventFull($eventId, TRUE, FALSE, TRUE, FALSE, TRUE);
   }
 
   /**
@@ -1910,6 +1893,17 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    // Set the default role ID on create.
+    if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['role_id'])) {
+      if (!empty($event->params['event_id'])) {
+        $event->params['role_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->params['event_id'], 'default_role_id');
+      }
+      else {
+        $params['role_id'] = CRM_Core_DAO::singleValueQuery('SELECT default_role_id FROM civicrm_event WHERE id = %1', [
+          1 => [$event->params['event_id'], 'Integer'],
+        ]);
+      }
+    }
     if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['created_id'])) {
       // Set the "created_id" field if not already set.
       // The created_id should always be the person that actually did the registration.

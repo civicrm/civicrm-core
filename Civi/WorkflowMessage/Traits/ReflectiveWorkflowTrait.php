@@ -63,7 +63,7 @@ trait ReflectiveWorkflowTrait {
         /** @var \ReflectionProperty $property */
         $parsed = ReflectionUtils::getCodeDocs($property, 'Property');
         $field = new \Civi\WorkflowMessage\FieldSpec();
-        $field->setName($property->getName())->loadArray($parsed);
+        $field->setName($property->getName())->loadArray($parsed, TRUE);
         $cache[$field->getName()] = $field;
       }
     }

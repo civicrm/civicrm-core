@@ -38,12 +38,11 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'title' => 'Test Profile',
     ]);
     $this->_ufGroupId = $ufGroup['id'];
-    $ufMatch = $this->callAPISuccess('uf_match', 'create', [
+    $this->callAPISuccess('uf_match', 'create', [
       'contact_id' => $this->_contactId,
       'uf_id' => 42,
       'uf_name' => 'email@mail.com',
     ]);
-    $this->_ufMatchId = $ufMatch['id'];
     $this->params = [
       'add_captcha' => 1,
       'add_contact_to_group' => $this->_groupId,

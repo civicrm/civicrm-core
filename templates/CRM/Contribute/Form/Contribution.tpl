@@ -56,7 +56,7 @@
       </div>
     {/if}
       <div class="crm-submit-buttons">
-        {include file="CRM/common/formButtons.tpl"}
+        {include file="CRM/common/formButtons.tpl" location=''}
       </div>
       {if !empty($isOnline)}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
       <table class="form-layout-compressed">
@@ -66,7 +66,7 @@
         </tr>
         <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
           <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
-            {if !empty($is_test)}
+            {if $is_test}
               {ts}(test){/ts}
             {/if} {help id="id-financial_type"}
           </td>
@@ -284,7 +284,7 @@
     <!-- end of soft credit -->
 
     <!-- start of PCP -->
-    {if $siteHasPCPs && !$payNow}
+    {if array_key_exists('pcp_made_through_id', $form) && !$payNow}
       <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noPCP}collapsed{/if}" id="softCredit">
         <div class="crm-accordion-header">
           {ts}Personal Campaign Page{/ts}&nbsp;{help id="id-pcp"}

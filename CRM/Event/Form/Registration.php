@@ -586,7 +586,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     else {
       $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID);
     }
-    self::initSet($form, 'civicrm_event', $doNotIncludeExpiredFields, $priceSetId);
+    self::initSet($form, $doNotIncludeExpiredFields, $priceSetId);
 
     if (property_exists($form, '_context') && ($form->_context == 'standalone'
         || $form->_context == 'participant')
@@ -643,15 +643,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @param CRM_Core_Form $form
    *   Form entity id.
-   * @param string $entityTable
    * @param bool $doNotIncludeExpiredFields
    * @param int $priceSetId
    *   Price Set ID
    *
    * @todo - removed unneeded code from previously-shared function
    */
-  private static function initSet(&$form, $entityTable = 'civicrm_event', $doNotIncludeExpiredFields = FALSE, $priceSetId = NULL) {
-
+  private static function initSet($form, $doNotIncludeExpiredFields = FALSE, $priceSetId = NULL) {
     //check if price set is is_config
     if (is_numeric($priceSetId)) {
       if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config') && $form->getVar('_name') != 'Participant') {
@@ -661,28 +659,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     // get price info
     if ($priceSetId) {
       if ($form->_action & CRM_Core_Action::UPDATE) {
-        $entityId = $entity = NULL;
-
-        switch ($entityTable) {
-          case 'civicrm_event':
-            $entity = 'participant';
-            if (in_array(CRM_Utils_System::getClassName($form), ['CRM_Event_Form_Participant', 'CRM_Event_Form_Task_Register'])) {
-              $entityId = $form->_id;
-            }
-            else {
-              $entityId = $form->_participantId;
-            }
-            break;
-
-          case 'civicrm_contribution_page':
-          case 'civicrm_contribution':
-            $entity = 'contribution';
-            $entityId = $form->_id;
-            break;
+        if (in_array(CRM_Utils_System::getClassName($form), ['CRM_Event_Form_Participant', 'CRM_Event_Form_Task_Register'])) {
+          $form->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($form->_id, 'participant');
         }
-
-        if ($entityId && $entity) {
-          $form->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($entityId, $entity);
+        else {
+          $form->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($form->_participantId, 'participant');
         }
         $required = FALSE;
       }
@@ -696,41 +677,40 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
 
       //get the price set fields participant count.
-      if ($entityTable == 'civicrm_event') {
-        //get option count info.
-        $form->_priceSet['optionsCountTotal'] = CRM_Price_BAO_PriceSet::getPricesetCount($priceSetId);
-        if ($form->_priceSet['optionsCountTotal']) {
-          $optionsCountDetails = [];
-          if (!empty($form->_priceSet['fields'])) {
-            foreach ($form->_priceSet['fields'] as $field) {
-              foreach ($field['options'] as $option) {
-                $count = CRM_Utils_Array::value('count', $option, 0);
-                $optionsCountDetails['fields'][$field['id']]['options'][$option['id']] = $count;
-              }
-            }
-          }
-          $form->_priceSet['optionsCountDetails'] = $optionsCountDetails;
-        }
-
-        //get option max value info.
-        $optionsMaxValueTotal = 0;
-        $optionsMaxValueDetails = [];
-
+      //get option count info.
+      $form->_priceSet['optionsCountTotal'] = CRM_Price_BAO_PriceSet::getPricesetCount($priceSetId);
+      if ($form->_priceSet['optionsCountTotal']) {
+        $optionsCountDetails = [];
         if (!empty($form->_priceSet['fields'])) {
           foreach ($form->_priceSet['fields'] as $field) {
             foreach ($field['options'] as $option) {
-              $maxVal = CRM_Utils_Array::value('max_value', $option, 0);
-              $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
-              $optionsMaxValueTotal += $maxVal;
+              $count = CRM_Utils_Array::value('count', $option, 0);
+              $optionsCountDetails['fields'][$field['id']]['options'][$option['id']] = $count;
             }
           }
         }
+        $form->_priceSet['optionsCountDetails'] = $optionsCountDetails;
+      }
 
-        $form->_priceSet['optionsMaxValueTotal'] = $optionsMaxValueTotal;
-        if ($optionsMaxValueTotal) {
-          $form->_priceSet['optionsMaxValueDetails'] = $optionsMaxValueDetails;
+      //get option max value info.
+      $optionsMaxValueTotal = 0;
+      $optionsMaxValueDetails = [];
+
+      if (!empty($form->_priceSet['fields'])) {
+        foreach ($form->_priceSet['fields'] as $field) {
+          foreach ($field['options'] as $option) {
+            $maxVal = CRM_Utils_Array::value('max_value', $option, 0);
+            $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
+            $optionsMaxValueTotal += $maxVal;
+          }
         }
       }
+
+      $form->_priceSet['optionsMaxValueTotal'] = $optionsMaxValueTotal;
+      if ($optionsMaxValueTotal) {
+        $form->_priceSet['optionsMaxValueDetails'] = $optionsMaxValueDetails;
+      }
+
       $form->set('priceSetId', $form->_priceSetId);
       $form->set('priceSet', $form->_priceSet);
     }

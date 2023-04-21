@@ -21,38 +21,12 @@
 class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
-   * Set variables up before form is built.
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
    */
-  public function preProcess() {
-    parent::preProcess();
-
-    $highlightedFields = ['financial_type_id', 'total_amount'];
-    //CRM-2219 removing other required fields since for updation only
-    //invoice id or trxn id or contribution id is required.
-    if ($this->isUpdateExisting()) {
-      //modify field title only for update mode. CRM-3245
-      foreach ([
-        'contribution_id',
-        'invoice_id',
-        'trxn_id',
-      ] as $key) {
-        $highlightedFields[] = $key;
-      }
-    }
-    elseif ($this->isSkipExisting()) {
-      $highlightedFieldsArray = [
-        'contribution_contact_id',
-        'email',
-        'first_name',
-        'last_name',
-        'external_identifier',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-
-    $this->assign('highlightedFields', $highlightedFields);
+  public function getUserJobType(): string {
+    return 'contribution_import';
   }
 
   /**
@@ -265,6 +239,34 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       return $rule['rule_message'];
     }
     return NULL;
+  }
+
+  /**
+   * @return string[]
+   */
+  protected function getHighlightedFields(): array {
+    $highlightedFields = ['financial_type_id', 'total_amount'];
+    //CRM-2219 removing other required fields since for updating only
+    //invoice id or trxn id or contribution id is required.
+    if ($this->isUpdateExisting()) {
+      //modify field title only for update mode. CRM-3245
+      foreach (['contribution_id', 'invoice_id', 'trxn_id'] as $key) {
+        $highlightedFields[] = $key;
+      }
+    }
+    elseif ($this->isSkipExisting()) {
+      $highlightedFieldsArray = [
+        'contribution_contact_id',
+        'email',
+        'first_name',
+        'last_name',
+        'external_identifier',
+      ];
+      foreach ($highlightedFieldsArray as $name) {
+        $highlightedFields[] = $name;
+      }
+    }
+    return $highlightedFields;
   }
 
 }

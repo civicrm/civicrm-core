@@ -40,6 +40,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'name' => 'activity_import',
         'label' => ts('Activity Import'),
         'entity' => 'Activity',
+        'url' => 'civicrm/import/activity',
       ],
     ];
   }

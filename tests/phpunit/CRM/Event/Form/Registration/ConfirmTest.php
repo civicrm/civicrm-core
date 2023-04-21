@@ -8,65 +8,23 @@
  */
 class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
 
+  use CRMTraits_Financial_PriceSetTrait;
   use CRMTraits_Profile_ProfileTrait;
 
   public function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
    * Initial test of submit function.
    */
   public function testSubmit(): void {
-    $event = $this->eventCreate();
     $mut = new CiviMailUtils($this, TRUE);
-    $this->submitForm($event['id'], [
-      'first_name' => 'k',
-      'last_name' => 'p',
-      'email-Primary' => 'demo@example.com',
-      'hidden_processor' => '1',
-      'credit_card_number' => '4111111111111111',
-      'cvv2' => '123',
-      'credit_card_exp_date' => [
-        'M' => '1',
-        'Y' => '2019',
-      ],
-      'credit_card_type' => 'Visa',
-      'billing_first_name' => 'p',
-      'billing_middle_name' => '',
-      'billing_last_name' => 'p',
-      'billing_street_address-5' => 'p',
-      'billing_city-5' => 'p',
-      'billing_state_province_id-5' => '1061',
-      'billing_postal_code-5' => '7',
-      'billing_country_id-5' => '1228',
-      'priceSetId' => '6',
-      'price_7' => [
-        13 => 1,
-      ],
-      'payment_processor_id' => '1',
-      'bypass_payment' => '',
-      'is_primary' => 1,
-      'is_pay_later' => 0,
-      'campaign_id' => NULL,
-      'defaultRole' => 1,
-      'participant_role_id' => '1',
-      'currencyID' => 'USD',
-      'amount_level' => 'Tiny-tots (ages 5-8) - 1',
-      'amount' => '800.00',
-      'tax_amount' => NULL,
-      'year' => '2019',
-      'month' => '1',
-      'ip_address' => '127.0.0.1',
-      'invoiceID' => '57adc34957a29171948e8643ce906332',
-      'button' => '_qf_Register_upload',
-      'billing_state_province-5' => 'AP',
-      'billing_country-5' => 'US',
-    ]);
+    $this->submitPaidEvent();
 
     $mut->checkMailLog([
-      'Dear Logged In,  Thank you for your registration.  This is a confirmation that your registration has been received and your status has been updated to Registered.',
+      'Dear Kim,  Thank you for your registration.  This is a confirmation that your registration has been received and your status has been updated to Registered.',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -162,9 +120,9 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         'return' => ['payment_processor_id', 'card_type_id.label', 'pan_truncation'],
       ]
     );
-    $this->assertEquals(CRM_Utils_Array::value('payment_processor_id', $financialTrxn), $paymentProcessorID);
-    $this->assertEquals(CRM_Utils_Array::value('card_type_id.label', $financialTrxn), 'Visa');
-    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), 1111);
+    $this->assertEquals($paymentProcessorID, $financialTrxn['payment_processor_id']);
+    $this->assertEquals('Visa', $financialTrxn['card_type_id.label']);
+    $this->assertEquals(1111, $financialTrxn['pan_truncation']);
 
     // This looks like it's missing an item for the main contribution - but just locking in current behaviour.
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', [
@@ -211,7 +169,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testWaitlistRegistrationContactIdParam() {
+  public function testWaitlistRegistrationContactIDParam(): void {
     // @todo - figure out why this doesn't pass validate financials
     $this->isValidateFinancialsOnPostAssert = FALSE;
     $paymentProcessorID = $this->processorCreate();
@@ -289,8 +247,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $waitlistContact   = $this->callAPISuccess('Contact', 'getsingle', ['id' => $waitlistContactId]);
     $waitlistParticipantId = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContactId, 'status_id' => 'On waitlist']);
 
-    $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantId, 'return' => ["participant_status"]]);
-    $this->assertEquals($waitlistParticipant['participant_status'], 'On waitlist', 'Invalid participant status. Expecting: On waitlist');
+    $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantId, 'return' => ['participant_status']]);
+    $this->assertEquals('On waitlist', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: On waitlist');
 
     $form = CRM_Event_Form_Registration_Confirm::testSubmit([
       'id' => $event['id'],
@@ -350,8 +308,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccessGetCount('Participant', [], 2);
 
-    $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantId, 'return' => ["participant_status"]]);
-    $this->assertEquals($waitlistParticipant['participant_status'], 'Registered', 'Invalid participant status. Expecting: Registered');
+    $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantId, 'return' => ['participant_status']]);
+    $this->assertEquals('Registered', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: Registered');
 
     $value = $form->get('value');
     $this->assertArrayHasKey('contactID', $value, 'contactID missing in waitlist registration $value array');
@@ -379,8 +337,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'event' => $event,
       'params' => [
         [
-          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
-          'entryURL' => "http://dmaster.local/civicrm/event/register?reset=1&amp;id={$event['id']}",
           'first_name' => 'Participant1',
           'last_name' => 'LastName',
           'email-Primary' => 'participant1@example.com',
@@ -522,7 +478,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * Test form profile assignment.
    *
    * @throws \CRM_Core_Exception
-   * @throws \Exception
    */
   public function testAssignProfiles(): void {
     $event = $this->eventCreate();
@@ -550,13 +505,12 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
-   * Submit event registration with a note field
+   * Submit (unpaid) event registration with a note field
    *
    * @param array $event
    * @param int|null $contact_id
    *
    * @return array
-   * @throws \Exception
    */
   private function submitWithNote(array $event, ?int $contact_id): array {
     if ($contact_id === NULL) {
@@ -565,47 +519,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $this->submitForm($event['id'], [
       [
-        'first_name' => 'k',
-        'last_name' => 'p',
         'email-Primary' => 'demo@example.com',
-        'hidden_processor' => '1',
-        'credit_card_number' => '4111111111111111',
-        'cvv2' => '123',
-        'credit_card_exp_date' => [
-          'M' => '1',
-          'Y' => '2019',
-        ],
-        'credit_card_type' => 'Visa',
-        'billing_first_name' => 'p',
-        'billing_middle_name' => '',
-        'billing_last_name' => 'p',
-        'billing_street_address-5' => 'p',
-        'billing_city-5' => 'p',
-        'billing_state_province_id-5' => '1061',
-        'billing_postal_code-5' => '7',
-        'billing_country_id-5' => '1228',
-        'priceSetId' => '6',
-        'price_7' => [
-          13 => 1,
-        ],
-        'payment_processor_id' => '1',
-        'bypass_payment' => '',
-        'is_primary' => 1,
-        'is_pay_later' => 0,
-        'campaign_id' => NULL,
-        'defaultRole' => 1,
-        'participant_role_id' => '1',
-        'currencyID' => 'USD',
-        'amount_level' => 'Tiny-tots (ages 5-8) - 1',
-        'amount' => '800.00',
-        'tax_amount' => NULL,
-        'year' => '2019',
-        'month' => '1',
-        'ip_address' => '127.0.0.1',
-        'invoiceID' => '57adc34957a29171948e8643ce906332',
-        'button' => '_qf_Register_upload',
-        'billing_state_province-5' => 'AP',
-        'billing_country-5' => 'US',
         'note' => $event['note'],
       ],
     ]);
@@ -626,18 +540,12 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     if (empty($event)) {
       $event = $this->eventCreate();
       $this->createJoinedProfile(['entity_table' => 'civicrm_event', 'entity_id' => $event['id']]);
-      $this->uf_field_add($this->ids['UFGroup']['our profile'], 'note', 'Contact', 'Comment');
+      $this->addUFField($this->ids['UFGroup']['our profile'], 'note', 'Contact', 'Comment');
     }
 
     $_REQUEST['id'] = $event['id'];
     /** @var \CRM_Event_Form_Registration_Confirm $form */
     $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
-    $form->set('params', [[]]);
-    $form->set('values', [
-      'event' => $event,
-      'location' => [],
-      'custom_pre_id' => $this->ids['UFGroup']['our profile'],
-    ]);
     $form->preProcess();
 
     CRM_Event_Form_Registration_Confirm::assignProfiles($form);
@@ -654,25 +562,24 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Add a field to the specified profile
    *
-   * @param int $uf_group_id
-   * @param string $field_name
-   * @param string $field_type
-   * @param string $field_label
+   * @param int $ufGroupID
+   * @param string $fieldName
+   * @param string $fieldType
+   * @param string $fieldLabel
    *
    * @return array
    *   API result array
-   * @throws \CRM_Core_Exception
    */
-  private function uf_field_add($uf_group_id, $field_name, $field_type, $field_label) {
+  private function addUFField(int $ufGroupID, string $fieldName, string $fieldType, string $fieldLabel): array {
     $params = [
-      'field_name' => $field_name,
-      'field_type' => $field_type,
+      'field_name' => $fieldName,
+      'field_type' => $fieldType,
       'visibility' => 'Public Pages and Listings',
       'weight' => 1,
-      'label' => $field_label,
+      'label' => $fieldLabel,
       'is_searchable' => 1,
       'is_active' => 1,
-      'uf_group_id' => $uf_group_id,
+      'uf_group_id' => $ufGroupID,
     ];
     return $this->callAPISuccess('UFField', 'create', $params);
   }
@@ -686,11 +593,12 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testNoteSubmission(): void {
-    //create an event with an attached profile containing a note
+    // Create an event with an attached profile containing a note
     $event = $this->creatEventWithProfile(NULL);
     $event['custom_pre_id'] = $this->ids['UFGroup']['our profile'];
     $event['note'] = 'This is note 1';
     [$contact_id, $participant_id] = $this->submitWithNote($event, NULL);
+
     civicrm_api3('Participant', 'delete', ['id' => $participant_id]);
 
     //now that the contact has one note, register this contact again with a different note
@@ -768,25 +676,57 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Submit the confirm form.
    *
+   * Note that historically the passed parameters were 'set' on the form and
+   * thus needed to mimic the form's internal workings. The form now
+   * treats the `$submittedValues` as if they were submitted by the user, which
+   * more robustly tests the form processing.
+   *
    * @param int $eventID
-   * @param array $params
-   *   Array that would be stored in the form as params at this point.
-   *   (ideally we will move to submitted rather than processed values
-   *   in time).
+   * @param array $submittedValues Submitted Values
    */
-  protected function submitForm(int $eventID, array $params): void {
+  protected function submitForm(int $eventID, array $submittedValues): void {
     $_REQUEST['id'] = $eventID;
-    $form = $this->getFormObject('CRM_Event_Form_Registration_Register', $params);
+    $form = $this->getFormObject('CRM_Event_Form_Registration_Register', $submittedValues[0] ?? $submittedValues);
     $form->buildForm();
     $form->postProcess();
-    $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm', []);
-    if (!isset($params[0])) {
-      $params = [$params];
-    }
-    $form->set('params', $params);
-    $form->set('registerByID', $this->createLoggedInUser());
+    $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
+    $form->preProcess();
     $form->buildForm();
     $form->postProcess();
+    // This allows us to rinse & repeat form submission in the same test, without leakage.
+    $this->formController = NULL;
+  }
+
+  /**
+   * Submit a paid event with some default values.
+   *
+   * @param array $submitValues
+   */
+  protected function submitPaidEvent(array $submitValues = []): void {
+    $this->dummyProcessorCreate();
+    $event = $this->eventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']]]);
+    $this->submitForm($event['id'], array_merge([
+      'email-Primary' => 'demo@example.com',
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '123',
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'Kim',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'Reality',
+      'billing_street_address-5' => 'p',
+      'billing_city-5' => 'p',
+      'billing_state_province_id-5' => '1061',
+      'billing_postal_code-5' => '7',
+      'billing_country_id-5' => '1228',
+      'priceSetId' => $this->ids['PriceSet']['event'],
+      $this->getPriceFieldFormLabel('event_radio') => $this->ids['PriceFieldValue']['hundred'],
+      'payment_processor_id' => '1',
+      'year' => '2019',
+      'month' => '1',
+      'button' => '_qf_Register_upload',
+      'billing_state_province-5' => 'AP',
+      'billing_country-5' => 'US',
+    ], $submitValues));
   }
 
 }

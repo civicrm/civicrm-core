@@ -6,6 +6,11 @@
  */
 class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   public function testGetDefault() {
     $select = CRM_Utils_SQL_Select::from('foo bar');
     $this->assertLike('SELECT * FROM foo bar', $select->toSQL());
@@ -357,17 +362,6 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       ])
       ->param(['@suffix' => ' and on and on']);
     $this->assertLike('INSERT INTO bar (name, first, second) SELECT foo.name, concat(foo.one, " and on and on"), foo.two FROM foo WHERE (foo.whiz = 100) ON DUPLICATE KEY UPDATE first = concat(foo.one, " and on and on"), second = foo.two', $select->toSQL());
-  }
-
-  /**
-   * @param $expected
-   * @param $actual
-   * @param string $message
-   */
-  public function assertLike($expected, $actual, $message = '') {
-    $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expected)));
-    $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actual)));
-    $this->assertEquals($expected, $actual, $message);
   }
 
 }

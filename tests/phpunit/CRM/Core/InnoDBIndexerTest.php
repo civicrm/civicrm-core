@@ -90,12 +90,14 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
 
   /**
    * Assert that all indices have been removed.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function assertFullTextIndexesNotPresent(): void {
     $this->assertEmpty(CRM_Core_DAO::singleValueQuery("
   SELECT GROUP_CONCAT(CONCAT(table_name, ' ', index_name))
   FROM information_Schema.STATISTICS
-  WHERE table_schema = '" . CRM_Core_DAO::getDatabaseName() . "'
+  WHERE table_schema = DATABASE()
     AND index_type = 'FULLTEXT'"), 'Full text indices should have been removed');
   }
 

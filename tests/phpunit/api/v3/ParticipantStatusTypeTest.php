@@ -18,8 +18,6 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   protected $params;
   protected $id;
 
-  public $DBResetRequired = FALSE;
-
   public function setUp(): void {
     $this->_apiversion = 3;
     $this->params = [

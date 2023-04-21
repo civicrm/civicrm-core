@@ -4,7 +4,6 @@
  * Test that page hooks only get invoked once per page run.
  */
 class CRM_Core_Page_HookTest extends CiviUnitTestCase {
-  public $DBResetRequired = TRUE;
 
   /**
    * The list of classes extending CRM_Core_Page_Basic: the ones to try the

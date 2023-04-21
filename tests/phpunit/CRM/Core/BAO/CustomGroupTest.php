@@ -23,7 +23,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_contact'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_campaign'], TRUE);
     parent::tearDown();
   }
 
@@ -188,35 +188,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroup = $this->customGroupCreate($groupParams);
 
     $this->getAndCheck($groupParams, $customGroup['id'], 'CustomGroup');
-  }
-
-  /**
-   * Test setIsActive()
-   */
-  public function testSetIsActive() {
-    $customGroupTitle = 'My Custom Group';
-    $groupParams = [
-      'title' => $customGroupTitle,
-      'name' => 'my_custom_group',
-      'style' => 'Tab',
-      'extends' => 'Individual',
-      'is_active' => 0,
-    ];
-
-    $customGroup = $this->customGroupCreate($groupParams);
-    $customGroupId = $customGroup['id'];
-
-    //update is_active
-    $result = CRM_Core_BAO_CustomGroup::setIsActive($customGroupId, TRUE);
-
-    //check for object update
-    $this->assertEquals(TRUE, $result);
-    //check for is_active
-    $this->assertDBCompareValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'is_active', 'id', 1,
-      'Database check for custom group is_active field.'
-    );
-
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**

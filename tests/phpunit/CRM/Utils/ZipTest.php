@@ -23,6 +23,7 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
+    $this->useTransaction();
     $this->file = FALSE;
   }
 

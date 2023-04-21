@@ -135,4 +135,108 @@ class CRM_Utils_XML {
     return $arr;
   }
 
+  /**
+   * Apply a filter to the textual parts of the markup.
+   *
+   * @param string $markup
+   *   Ex: '<b>Hello world &amp; universe</b>'
+   * @param callable $filter
+   *   Ex: 'mb_strtoupper'
+   * @return string
+   *   Ex: '<b>HELLO WORLD &amp; UNIVERSE</b>'
+   */
+  public static function filterMarkupText(string $markup, callable $filter): string {
+    $tokens = static::tokenizeMarkupText($markup);
+    foreach ($tokens as &$tokenRec) {
+      if ($tokenRec[0] === 'text') {
+        $tokenRec[1] = htmlentities($filter(html_entity_decode($tokenRec[1])));
+      }
+    }
+    return implode('', array_column($tokens, 1));
+  }
+
+  /**
+   * Split marked-up text into markup and text.
+   *
+   * @param string $markup
+   *   Ex: '<a href="#foo">link</a>'
+   * @return array
+   *   Ex: [
+   *     ['node', '<a href="#foo">'],
+   *     ['text', 'link'],
+   *     ['node', '</a>'],
+   *   ]
+   */
+  protected static function tokenizeMarkupText(string $markup): array {
+    $modes = []; /* text, node, (') quoted attr, (") quoted attr */
+    $tokens = [];
+    $buf = '';
+
+    $startToken = function (string $type) use (&$modes) {
+      array_unshift($modes, $type);
+    };
+
+    $finishToken = function () use (&$tokens, &$buf, &$modes) {
+      $type = array_shift($modes);
+      if ($buf !== '') {
+        $tokens[] = [$type, $buf];
+        $buf = '';
+      }
+    };
+
+    $startToken('text');
+    for ($i = 0; $i < mb_strlen($markup); $i++) {
+      $ch = $markup[$i];
+      switch ($modes[0] . ' ' . $ch) {
+        // Aside: Our style guide makes this harder to read. It's better with 1-case-per-line.
+        case 'text <':
+          $finishToken();
+          $startToken('node');
+          $buf .= $ch;
+          break;
+
+        case 'node >':
+          $buf .= $ch;
+          $finishToken();
+          $startToken('text');
+          break;
+
+        case "node '":
+          $buf .= $ch;
+          array_unshift($modes, "attr'");
+          break;
+
+        case 'node "':
+          $buf .= $ch;
+          array_unshift($modes, 'attr"');
+          break;
+
+        case "attr' '":
+          $buf .= $ch;
+          array_shift($modes);
+          break;
+
+        case 'attr" "':
+          $buf .= $ch;
+          array_shift($modes);
+          break;
+
+        case "attr' \\":
+          $buf .= $markup[$i] . $markup[++$i];
+          break;
+
+        case 'attr" \\':
+          $buf .= $markup[$i] . $markup[++$i];
+          break;
+
+        default:
+          $buf .= $ch;
+          break;
+      }
+    }
+    $finishToken();
+
+    return $tokens;
+  }
+
 }

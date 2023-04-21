@@ -415,7 +415,7 @@ return [
     'name' => 'partial_locales',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
-    'default' => '0',
+    'default' => '1',
     'add' => '5.54',
     'title' => ts('Partial Locales'),
     'is_domain' => 1,

@@ -80,7 +80,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
     if ($jid) {
       $jobName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $jid);
       $this->assign('jobName', $jobName);
-      $jobRunUrl = CRM_Utils_System::url('civicrm/admin/job', 'action=view&reset=1&context=joblog&id=' . $jid);
+      $jobRunUrl = CRM_Utils_System::url('civicrm/admin/job/edit', 'action=view&reset=1&context=joblog&id=' . $jid);
       $this->assign('jobRunUrl', $jobRunUrl);
     }
     else {

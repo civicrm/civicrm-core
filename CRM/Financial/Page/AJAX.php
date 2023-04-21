@@ -35,7 +35,7 @@ class CRM_Financial_Page_AJAX {
       CRM_Utils_System::civiExit();
     }
     $defaultId = NULL;
-    if ($_GET['_value'] == 'select') {
+    if ($_GET['_value'] === 'select') {
       $result = CRM_Contribute_PseudoConstant::financialAccount();
     }
     else {
@@ -78,7 +78,7 @@ class CRM_Financial_Page_AJAX {
       CRM_Utils_System::civiExit();
     }
 
-    if ($_GET['_value'] != 'select') {
+    if ($_GET['_value'] !== 'select') {
       $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations(TRUE);
       $financialAccountId = CRM_Utils_Request::retrieve('_value', 'Positive');
       $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountId, 'financial_account_type_id');
@@ -201,7 +201,7 @@ class CRM_Financial_Page_AJAX {
 
         if (method_exists($recordBAO, $methods[$op]) & !empty($params)) {
           try {
-            $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params));
+            $updated = call_user_func_array([$recordBAO, $methods[$op]], [&$params]);
           }
           catch (\CRM_Core_Exception $e) {
             $errorMessage = $e->getMessage();

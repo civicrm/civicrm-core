@@ -62,11 +62,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
   public $_grid;
 
   /**
-   * Name of button for saving matching contacts.
-   * @var string
-   */
-  protected $_duplicateButtonName;
-  /**
    * The title of the category we are editing.
    *
    * @var string
@@ -206,7 +201,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $form->_id = $ids[0];
       }
       else {
-        if ($form->_context == 'dialog') {
+        if ($form->isEntityReferenceContactCreateMode()) {
           $contactLinks = CRM_Contact_BAO_Contact_Utils::formatContactIDSToLinks($ids, TRUE, TRUE);
 
           $duplicateContactsLinks = '<div class="matching-contacts-found">';
@@ -249,9 +244,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
           $errors['_qf_default'] = $duplicateContactsLinks;
 
-          // let smarty know that there are duplicates
-          $template = CRM_Core_Smarty::singleton();
-          $template->assign('isDuplicate', 1);
+          // The button 'Save Matching Contact' is added in buildForm
+          // but we only decide here whether ot not to show it - ie
+          // if validation failed due to there being duplicates.
+          CRM_Core_Smarty::singleton()->assign('showSaveDuplicateButton', 1);
         }
         else {
           $errors['_qf_default'] = ts('A record already exists with the same information.');
@@ -259,6 +255,18 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
     return $errors;
+  }
+
+  /**
+   * Is this being called from an entity reference field.
+   *
+   * E.g clicking on 'New Organization' from the employer field
+   * would create a link with the context = 'dialog' in the url.
+   *
+   * @return bool
+   */
+  public function isEntityReferenceContactCreateMode(): bool {
+    return $this->_context === 'dialog';
   }
 
   /**
@@ -329,7 +337,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('Proper action not specified for this custom value record profile'));
       }
     }
-    $this->_duplicateButtonName = $this->getButtonName('upload', 'duplicate');
 
     $gids = explode(',', (CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0) ?? ''));
 
@@ -897,10 +904,14 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $this->freeze();
     }
 
-    if ($this->_context == 'dialog') {
+    // Assign FALSE, here - this is overwritten during form validation
+    // if duplicates are found during submit.
+    CRM_Core_Smarty::singleton()->assign('showSaveDuplicateButton', FALSE);
+
+    if ($this->isEntityReferenceContactCreateMode()) {
       $this->addElement(
         'xbutton',
-        $this->_duplicateButtonName,
+        $this->getButtonName('upload', 'duplicate'),
         ts('Save Matching Contact'),
         [
           'type' => 'submit',

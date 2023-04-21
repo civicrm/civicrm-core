@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -31,12 +32,15 @@ use Civi\Test\TransactionalInterface;
 class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
 
   public function testGetFunctions() {
-    $functions = array_column(\CRM_Api4_Page_Api4Explorer::getSqlFunctions(), NULL, 'name');
+    $functions = array_column(CoreUtil::getSqlFunctions(), NULL, 'name');
     $this->assertArrayHasKey('SUM', $functions);
     $this->assertArrayNotHasKey('', $functions);
     $this->assertArrayNotHasKey('SqlFunction', $functions);
     $this->assertEquals(1, $functions['MAX']['params'][0]['min_expr']);
     $this->assertEquals(1, $functions['MAX']['params'][0]['max_expr']);
+    $this->assertFalse($functions['YEAR']['options']);
+    $this->assertEquals(1, $functions['MONTH']['options'][0]['id']);
+    $this->assertEquals(12, $functions['MONTH']['options'][11]['id']);
   }
 
   public function testGroupAggregates() {
@@ -227,21 +231,36 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $result = Contact::get(FALSE)
       ->addSelect('DATEDIFF("2010-01-01", birth_date) AS diff')
       ->addSelect('YEAR(birth_date) AS year')
+      ->addSelect('QUARTER(birth_date) AS quarter')
       ->addSelect('MONTH(birth_date) AS month')
+      ->addSelect('MONTH(birth_date):label AS month_name')
+      ->addSelect('MONTH(birth_date):label')
       ->addSelect('EXTRACT(YEAR_MONTH FROM birth_date) AS year_month')
+      ->addSelect('DAYOFWEEK(birth_date) AS day_number')
+      ->addSelect('DAYOFWEEK(birth_date):label AS day_name')
       ->addWhere('last_name', '=', $lastName)
       ->addOrderBy('id')
       ->execute();
 
     $this->assertEquals(51, $result[0]['diff']);
     $this->assertEquals(2009, $result[0]['year']);
+    $this->assertEquals(4, $result[0]['quarter']);
     $this->assertEquals(11, $result[0]['month']);
+    $this->assertEquals('November', $result[0]['month_name']);
+    $this->assertEquals('November', $result[0]['MONTH:birth_date:label']);
     $this->assertEquals('200911', $result[0]['year_month']);
+    $this->assertEquals(4, $result[0]['day_number']);
+    $this->assertEquals('Wednesday', $result[0]['day_name']);
 
     $this->assertEquals(0, $result[1]['diff']);
     $this->assertEquals(2010, $result[1]['year']);
+    $this->assertEquals(1, $result[1]['quarter']);
     $this->assertEquals(1, $result[1]['month']);
+    $this->assertEquals('January', $result[1]['month_name']);
+    $this->assertEquals('January', $result[1]['MONTH:birth_date:label']);
     $this->assertEquals('201001', $result[1]['year_month']);
+    $this->assertEquals(6, $result[1]['day_number']);
+    $this->assertEquals('Friday', $result[1]['day_name']);
   }
 
   public function testIncorrectNumberOfArguments() {

@@ -33,8 +33,13 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     ];
 
     $admin = user_access('administer users');
+    $user_register_conf = config_get('system.core', 'user_register');
+    if (!$admin && $user_register_conf == 'admin_only') {
+      return FALSE;
+    }
+
     if (!config_get('system.core', 'user_email_verification') || $admin) {
-      $form_state['input']['pass'] = ['pass1' => $params['cms_pass'], 'pass2' => $params['cms_pass']];
+      $form_state['input']['pass'] = $params['cms_pass'];
     }
 
     if (!empty($params['notify'])) {
@@ -87,20 +92,13 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the Backdrop db.
-   *
-   * @param array $params
-   *   Array of name and mail values.
-   * @param array $errors
-   *   Array of errors.
-   * @param string $emailName
-   *   Field label for the 'email'.
+   * @inheritdoc
    */
-  public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
-    $errors = form_get_errors();
-    if ($errors) {
+  public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+    if ($backdrop_errors = form_get_errors()) {
       // unset Backdrop messages to avoid twice display of errors
       unset($_SESSION['messages']);
+      $errors = array_merge($errors, $backdrop_errors);
     }
 
     if (!empty($params['name'])) {
@@ -417,6 +415,44 @@ AND    u.status = 1
       return FALSE;
     }
     return TRUE;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function verifyPassword($params, &$errors) {
+    if ($backdrop_errors = form_get_errors()) {
+      // unset Backdrop messages to avoid twice display of errors
+      unset($_SESSION['messages']);
+      $errors = array_merge($errors, $backdrop_errors);
+    }
+
+    $password = trim($params['pass']);
+    $username = $params['name'];
+    $email = $params['mail'];
+
+    module_load_include('password.inc', 'user', 'user');
+    $reject_weak = user_password_reject_weak($username);
+    if (!$reject_weak) {
+      return;
+    }
+
+    $strength = _user_password_evaluate_strength($password, $username, $email);
+
+    if ($strength < config('system.core')->get('user_password_strength_threshold')) {
+      $password_errors[] = ts('The password is too weak. Please consider making your password longer or more complex: that it contains a number of lower- and uppercase letters, digits and punctuation.');
+    }
+
+    if (backdrop_strtolower($password) == backdrop_strtolower($username)) {
+      $password_errors[] = ts('The password cannot be the same as the username.');
+    }
+    if (backdrop_strtolower($password) == backdrop_strtolower($email)) {
+      $password_errors[] = ts('The password cannot be the same as the email.');
+    }
+
+    if (!empty($password_errors)) {
+      $errors['cms_pass'] = ts('Weak passwords are rejected. Please note the following issues: %1', [1 => implode(' ', $password_errors)]);
+    }
   }
 
   /**
@@ -1078,6 +1114,86 @@ AND    u.status = 1
       'User Registration' => ts('Backdrop User Registration'),
       'User Account' => ts('View/Edit Backdrop User Account'),
     ];
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function viewsIntegration(): string {
+    global $databases;
+    $config = CRM_Core_Config::singleton();
+    $text = '';
+    $backdrop_prefix = '';
+    if (isset($databases['default']['default']['prefix'])) {
+      if (is_array($databases['default']['default']['prefix'])) {
+        $backdrop_prefix = $databases['default']['default']['prefix']['default'];
+      }
+      else {
+        $backdrop_prefix = $databases['default']['default']['prefix'];
+      }
+    }
+
+    if ($this->viewsExists() &&
+      (
+        $config->dsn != $config->userFrameworkDSN || !empty($backdrop_prefix)
+      )
+    ) {
+      $text = '<div>' . ts('To enable CiviCRM Views integration, add or update the following item in the <code>settings.php</code> file:') . '</div>';
+
+      $tableNames = CRM_Core_DAO::getTableNames();
+      asort($tableNames);
+
+      $text .= '<pre>$database_prefix = [';
+
+      // Add default prefix.
+      $text .= "\n  'default' => '$backdrop_prefix',";
+      $prefix = $this->getCRMDatabasePrefix();
+      foreach ($tableNames as $tableName) {
+        $text .= "\n  '" . str_pad($tableName . "'", 41) . " => '{$prefix}',";
+      }
+      $text .= "\n];</pre>";
+    }
+
+    return $text;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    $ret = FALSE;
+
+    if (!$print) {
+      if ($maintenance) {
+        backdrop_set_breadcrumb('');
+        backdrop_maintenance_theme();
+        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+          CRM_Utils_System::addHTMLHead($region->render(''));
+        }
+        print theme('maintenance_page', ['content' => $content]);
+        exit();
+      }
+      $ret = TRUE;
+    }
+    $out = $content;
+
+    if ($ret) {
+      return $out;
+    }
+    else {
+      print $out;
+      return NULL;
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function ipAddress():?string {
+    // Backdrop function handles the server being behind a proxy securely. We
+    // still have legacy ipn methods that reach this point without bootstrapping
+    // hence the check that the fn exists.
+    return function_exists('ip_address') ? ip_address() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
   }
 
 }

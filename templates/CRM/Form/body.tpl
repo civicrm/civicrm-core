@@ -15,7 +15,7 @@
   <div>{$form.hidden}</div>
 {/if}
 
-{if ($snippet !== 'json') and !$suppressForm and count($form.errors) gt 0}
+{if ($snippet !== 'json') and !$suppressForm and $form.errors}
    <div class="messages crm-error">
        <i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>
      {ts}Please correct the following errors in the form fields below:{/ts}

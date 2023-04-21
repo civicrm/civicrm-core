@@ -65,7 +65,6 @@ function contact_getsingle_expectedresult() {
     'image_URL' => '',
     'preferred_communication_method' => '',
     'preferred_language' => 'en_US',
-    'preferred_mail_format' => 'Both',
     'first_name' => 'Test',
     'middle_name' => 'J.',
     'last_name' => 'Contact',

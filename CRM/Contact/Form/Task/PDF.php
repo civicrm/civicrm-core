@@ -39,8 +39,6 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-
-    $this->skipOnHold = $this->skipDeceased = FALSE;
     $this->preProcessPDF();
 
     // store case id if present

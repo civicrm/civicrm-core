@@ -25,7 +25,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  public static $_links = NULL;
+  public static $_links;
 
   /**
    * Get BAO Name.
@@ -45,48 +45,48 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::FOLLOWUP => array(
+      self::$_links = [
+        CRM_Core_Action::FOLLOWUP => [
           'name' => ts('View Job Log'),
           'url' => 'civicrm/admin/joblog',
           'qs' => 'jid=%%id%%&reset=1',
           'title' => ts('See log entries for this Scheduled Job'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/job',
+          'url' => 'civicrm/admin/job/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Scheduled Job'),
-        ),
-        CRM_Core_Action::VIEW => array(
+        ],
+        CRM_Core_Action::VIEW => [
           'name' => ts('Execute Now'),
-          'url' => 'civicrm/admin/job',
+          'url' => 'civicrm/admin/job/edit',
           'qs' => 'action=view&id=%%id%%&reset=1',
           'title' => ts('Execute Scheduled Job Now'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Scheduled Job'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Scheduled Job'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/job',
+          'url' => 'civicrm/admin/job/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Scheduled Job'),
-        ),
-        CRM_Core_Action::COPY => array(
+        ],
+        CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
-          'url' => 'civicrm/admin/job',
+          'url' => 'civicrm/admin/job/edit',
           'qs' => 'action=copy&id=%%id%%',
           'title' => ts('Copy Scheduled Job'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -101,14 +101,14 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
   public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Scheduled Jobs'));
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Scheduled Jobs'),
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'String',
@@ -123,7 +123,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
 
     if (($this->_action & CRM_Core_Action::COPY) && (!empty($this->_id))) {
       try {
-        $jobResult = civicrm_api3('Job', 'clone', array('id' => $this->_id));
+        $jobResult = civicrm_api3('Job', 'clone', ['id' => $this->_id]);
         if ($jobResult['count'] > 0) {
           CRM_Core_Session::setStatus($jobResult['values'][$jobResult['id']]['name'], ts('Job copied successfully'), 'success');
         }
@@ -143,7 +143,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
   public function browse() {
     // check if non-prod mode is enabled.
     if (CRM_Core_Config::environment() != 'Production') {
-      CRM_Core_Session::setStatus(ts('Execution of scheduled jobs has been turned off by default since this is a non-production environment. You can override this for particular jobs by adding runInNonProductionEnvironment=TRUE as a parameter. This will ignore email settings for this job and will send actual emails if this job is sending mails!'), ts("Non-production Environment"), "warning", array('expires' => 0));
+      CRM_Core_Session::setStatus(ts('Execution of scheduled jobs has been turned off by default since this is a non-production environment. You can override this for particular jobs by adding runInNonProductionEnvironment=TRUE as a parameter. This will ignore email settings for this job and will send actual emails if this job is sending mails!'), ts('Non-production Environment'), 'warning', ['expires' => 0]);
     }
     else {
       $cronError = Civi\Api4\System::check(FALSE)

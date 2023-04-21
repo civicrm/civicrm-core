@@ -18,35 +18,39 @@
 /**
  * This class contains function for Open Id
  */
-class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
+class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID implements Civi\Core\HookInterface {
   use CRM_Contact_AccessTrait;
 
   /**
-   * Create or update OpenID record.
+   * @deprecated
    *
    * @param array $params
-   *
    * @return CRM_Core_DAO_OpenID
-   *
-   * @throws \CRM_Core_Exception
+   * @throws CRM_Core_Exception
    */
   public static function create($params) {
-    CRM_Core_BAO_Block::handlePrimary($params, __CLASS__);
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
   /**
-   * Create or update OpenID record.
-   *
+   * Event fired before modifying an OpenID.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (in_array($event->action, ['create', 'edit'])) {
+      CRM_Core_BAO_Block::handlePrimary($event->params, __CLASS__);
+    }
+  }
+
+  /**
    * @deprecated
    *
    * @param array $params
-   *
-   * @return \CRM_Core_DAO|\CRM_Core_DAO_IM
-   * @throws \CRM_Core_Exception
+   * @return CRM_Core_DAO_OpenID
+   * @throws CRM_Core_Exception
    */
   public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the v4 api');
     return self::create($params);
   }
 
@@ -126,6 +130,7 @@ ORDER BY
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 

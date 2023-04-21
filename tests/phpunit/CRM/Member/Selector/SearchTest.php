@@ -23,7 +23,6 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
    */
   public function testSelectorGetRows(): void {
     $this->_contactID = $this->individualCreate();
-    $this->_invoiceID = 1234;
     $this->_contributionPageID = NULL;
     $this->_paymentProcessorID = $this->paymentProcessorCreate();
     $this->setupMembershipRecurringPaymentProcessorTransaction();

@@ -24,7 +24,6 @@ trait CRMTraits_PCP_PCPTestTrait {
    *
    * Create the necessary initial objects for a pcpBlock, then return the
    * params needed to create the pcpBlock.
-   *
    */
   public function pcpBlockParams() {
     $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');

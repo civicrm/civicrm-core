@@ -273,6 +273,24 @@ case.custom_1 :' . '
   }
 
   /**
+   * Test the standard new location token format - which matches apiv4 return properties.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testLocationTokens(): void {
+    $contactID = $this->individualCreate(['email' => 'me@example.com']);
+    Address::create()->setValues([
+      'contact_id' => $contactID,
+      'is_primary' => TRUE,
+      'street_address' => 'Heartbreak Hotel',
+      'supplemental_address_1' => 'Lonely Street',
+    ])->execute();
+    $text = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address}';
+    $text = $this->renderText(['contactId' => $contactID], $text);
+    $this->assertEquals('Anthony me@example.com Heartbreak Hotel', $text);
+  }
+
+  /**
    * Test tokens in 2 ways to ensure consistent handling.
    *
    * 1) as part of the greeting processing
@@ -466,23 +484,18 @@ contribution_recur.payment_instrument_id:name :Check
     $this->createLoggedInUser();
     $this->restoreMembershipTypes();
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership']);
-    $tokens = CRM_Core_SelectValues::membershipTokens();
     $expectedTokens = $this->getMembershipTokens();
-    $this->assertEquals($expectedTokens, $tokens);
+    // This get also creates...
+    $this->getMembershipID();
     $newStyleTokens = "\n{membership.status_id:label}\n{membership.membership_type_id:label}\n";
     $tokenString = $newStyleTokens . implode("\n", array_keys($this->getMembershipTokens()));
-
-    $memberships = CRM_Utils_Token::getMembershipTokenDetails([$this->getMembershipID()]);
-    $messageToken = CRM_Utils_Token::getTokens($tokenString);
-    $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $memberships[$this->getMembershipID()], $tokenString, $messageToken);
-    $this->assertEquals($this->getExpectedMembershipTokenOutput(), $tokenHtml);
 
     // Custom fields work in the processor so test it....
     $tokenString .= "\n{membership." . $this->getCustomFieldName('text') . '}';
     // Now compare with scheduled reminder
     $mut = new CiviMailUtils($this);
     CRM_Utils_Time::setTime('2007-01-22 15:00:00');
-    $this->callAPISuccess('action_schedule', 'create', [
+    $this->callAPISuccess('ActionSchedule', 'create', [
       'title' => 'job',
       'subject' => 'job',
       'entity_value' => 1,
@@ -493,7 +506,7 @@ contribution_recur.payment_instrument_id:name :Check
       'start_action_unit' => 'day',
       'body_html' => $tokenString,
     ]);
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callAPISuccess('Job', 'send_reminder', []);
     $expected = $this->getExpectedMembershipTokenOutput();
     // Unlike the legacy method custom fields are resolved by the processor.
     $expected .= "\nmy field";
@@ -513,6 +526,37 @@ contribution_recur.payment_instrument_id:name :Check
     $tokenProcessor->evaluate();
     $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
 
+  }
+
+  public function testPledgeTokens(): void {
+    $pledgeID = $this->pledgeCreate(['contact_id' => $this->individualCreate(), 'create_date' => '2022-04-07', 'start_date' => '2022-04-07']);
+    $tokenProcessor = $this->getTokenProcessor(['schema' => ['pledgeId']]);
+    $list = $tokenProcessor->listTokens();
+    $this->assertEquals(array_merge($this->getPledgeTokens(), $this->getDomainTokens()), $list);
+    $tokenString = implode(', ', array_keys($this->getPledgeTokens()));
+    $tokenProcessor->addMessage('text', $tokenString, 'text/plain');
+    $tokenProcessor->addRow(['pledgeId' => $pledgeID]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals($this->getExpectedPledgeTokenOutput(), $tokenProcessor->getRow(0)->render('text'));
+  }
+
+  public function getExpectedPledgeTokenOutput(): string {
+    return '$100.00, US Dollar, year, 5, 15, 5, April 7th, 2022, April 7th, 2022, , ';
+  }
+
+  public function getPledgeTokens(): array {
+    return [
+      '{pledge.amount}' => 'Total Pledged',
+      '{pledge.currency:label}' => 'Pledge Currency',
+      '{pledge.frequency_unit:label}' => 'Pledge Frequency Unit',
+      '{pledge.frequency_interval}' => 'Pledge Frequency Interval',
+      '{pledge.frequency_day}' => 'Pledge day',
+      '{pledge.installments}' => 'Pledge Number of Installments',
+      '{pledge.start_date}' => 'Pledge Start Date',
+      '{pledge.create_date}' => 'Pledge Made',
+      '{pledge.cancel_date}' => 'Pledge Cancelled Date',
+      '{pledge.end_date}' => 'Pledge End Date',
+    ];
   }
 
   /**
@@ -562,6 +606,8 @@ contribution_recur.payment_instrument_id:name :Check
 
   /**
    * Get expected output from token parsing.
+   *
+   * @param int|null $participantCreatedID
    *
    * @return string
    */
@@ -811,13 +857,8 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $mut = new CiviMailUtils($this);
     $this->setupParticipantScheduledReminder();
 
-    $tokens = CRM_Core_SelectValues::eventTokens();
-    $this->assertEquals(array_merge($this->getEventTokens()), $tokens);
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
-      'controller' => __CLASS__,
-      'smarty' => FALSE,
-      'schema' => ['eventId'],
-    ]);
+    $tokens = array_merge($this->getEventTokens());
+    $tokenProcessor = $this->getTokenProcessor(['schema' => ['eventId']]);
     $this->assertEquals(array_merge($tokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
 
     $expectedEventString = $this->getExpectedEventTokenOutput();
@@ -1024,6 +1065,38 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $rendered = CRM_Core_TokenSmarty::render($messages, $context);
 
     $this->assertEquals($expected, $rendered);
+  }
+
+  /**
+   * @param array $override
+   *
+   * @return \Civi\Token\TokenProcessor
+   */
+  protected function getTokenProcessor(array $override): TokenProcessor {
+    return new TokenProcessor(\Civi::dispatcher(), array_merge([
+      'controller' => __CLASS__,
+    ], $override));
+  }
+
+  /**
+   * Render the text via the token processor.
+   *
+   * @param array $rowContext
+   * @param string $text
+   * @param array $context
+   *
+   * @return string
+   */
+  protected function renderText(array $rowContext, string $text, array $context = []): string {
+    $context['schema'] = $context['schema'] ?? [];
+    foreach (array_keys($rowContext) as $key) {
+      $context['schema'][] = $key;
+    }
+    $tokenProcessor = $this->getTokenProcessor($context);
+    $tokenProcessor->addRow($rowContext);
+    $tokenProcessor->addMessage('text', $text, 'text/html');
+    $tokenProcessor->evaluate();
+    return $tokenProcessor->getRow(0)->render('text');
   }
 
 }

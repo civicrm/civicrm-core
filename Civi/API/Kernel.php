@@ -336,6 +336,13 @@ class Kernel {
    */
   public function formatApiException($e, $apiRequest) {
     $data = $e->getExtraParams();
+    $errorCode = $e->getCode();
+    if (($data['exception'] ?? NULL) instanceof \DB_Error) {
+      $errorCode = $e->getDBErrorMessage();
+      $data['sql'] = $e->getSQL();
+      $data['debug_info'] = $e->getUserInfo();
+    }
+    unset($data['exception']);
     $data['entity'] = $apiRequest['entity'] ?? NULL;
     $data['action'] = $apiRequest['action'] ?? NULL;
 
@@ -346,7 +353,7 @@ class Kernel {
       $data['trace'] = $e->getTraceAsString();
     }
 
-    return $this->createError($e->getMessage(), $data, $apiRequest, $e->getCode());
+    return $this->createError($e->getMessage(), $data, $apiRequest, $errorCode);
   }
 
   /**

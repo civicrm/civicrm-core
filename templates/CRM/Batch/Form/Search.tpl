@@ -17,7 +17,7 @@
         {ts}Complete OR partial batch name.{/ts}
         </span>
       </td>
-      <td>{include file="CRM/common/formButtons.tpl"}</td>
+      <td>{include file="CRM/common/formButtons.tpl" location=''}</td>
     </tr>
   </table>
 </div>

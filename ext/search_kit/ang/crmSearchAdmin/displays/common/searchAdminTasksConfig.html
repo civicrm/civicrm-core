@@ -1,0 +1,26 @@
+<div class="checkbox-inline form-control">
+  <label>
+    <input type="checkbox" ng-checked="$ctrl.display.settings.actions" ng-click="$ctrl.toggleActions()">
+    <span>{{:: ts('Actions Menu') }}</span>
+  </label>
+</div>
+<div class="input-group" ng-if="$ctrl.display.settings.actions">
+  <div class="input-group-btn">
+    <button type="button" ng-click="$ctrl.menuOpen = true" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span ng-if="$ctrl.display.settings.actions === true">{{:: ts('All Enabled') }}</span>
+      <span ng-if="$ctrl.display.settings.actions !== true">{{ ts('%1 Enabled', {1: $ctrl.display.settings.actions.length}) }}</span>
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" ng-if="$ctrl.menuOpen">
+      <li ng-if="!$ctrl.allTasks" class="disabled">
+        <a href><i class="crm-i fa-spinner fa-spin"></i></a>
+      </li>
+      <li ng-repeat="task in $ctrl.allTasks">
+        <a href ng-click="$ctrl.toggleTask(task.name); $event.stopPropagation()">
+          <input type="checkbox" ng-checked="$ctrl.isEnabled(task.name)">
+          {{:: task.title }}
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -17,6 +17,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Core\Exception\DBQueryException;
+
 require_once 'PEAR/ErrorStack.php';
 require_once 'PEAR/Exception.php';
 require_once 'CRM/Core/Exception.php';
@@ -566,6 +568,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Provided the user has the 'view debug output' the output should be displayed. In all
    * cases it should be logged.
    *
+   * @deprecated see https://docs.civicrm.org/dev/en/latest/framework/logging/
+   *
+   * Use (e.g) `Civi::log()->error()` (priority dependent).
+   *
    * @param string $message
    * @param bool $out
    *   Should we log or return the output.
@@ -598,13 +604,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     if (!empty(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
-      // should call $config->userSystem->logger($message) here - but I got a situation where userSystem was not an object - not sure why
-      if ($config->userSystem->is_drupal and function_exists('watchdog')) {
-        watchdog('civicrm', '%message', ['%message' => $message], $priority ?? WATCHDOG_DEBUG);
-      }
-      elseif ($config->userSystem->is_drupal and CIVICRM_UF == 'Drupal8') {
-        \Drupal::logger('civicrm')->log($priority ?? \Drupal\Core\Logger\RfcLogLevel::DEBUG, '%message', ['%message' => $message]);
-      }
+      $config->userSystem->logger($message, $priority);
     }
 
     return $str;
@@ -950,9 +950,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws PEAR_Exception
    */
   public static function exceptionHandler($pearError) {
-    CRM_Core_Error::debug_var('Fatal Error Details', self::getErrorDetails($pearError), TRUE, TRUE, '', PEAR_LOG_ERR);
-    CRM_Core_Error::backtrace('backTrace', TRUE);
-    throw new PEAR_Exception($pearError->getMessage(), $pearError);
+    if ($pearError instanceof DB_Error) {
+      throw new DBQueryException($pearError->getMessage(), $pearError->getCode(), ['exception' => $pearError]);
+    }
+    throw new CRM_Core_Exception($pearError->getMessage(), $pearError->getCode(), ['exception' => $pearError]);
   }
 
   /**

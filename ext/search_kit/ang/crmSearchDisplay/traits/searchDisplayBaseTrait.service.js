@@ -27,11 +27,14 @@
           this.placeholders.push({});
         }
 
-        this.getResults = _.debounce(function() {
+        // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 300ms
+        this.getResultsPronto = _.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});
+        // _.debounce used here to schedule a search if nothing else happens for 600ms: useful for auto-searching on typing
+        this.getResultsSoon = _.debounce(function() {
           $scope.$apply(function() {
             ctrl.runSearch();
           });
-        }, 800);
+        }, 600);
 
         // Update totalCount variable if used.
         // Integrations can pass in `total-count="somevar" to keep track of the number of results returned
@@ -53,7 +56,7 @@
         // Popup forms in this display or surrounding Afform trigger a refresh
         $element.closest('form').on('crmPopupFormSuccess', function() {
           ctrl.rowCount = null;
-          ctrl.getResults();
+          ctrl.getResultsPronto();
         });
 
         function onChangeFilters() {
@@ -63,7 +66,7 @@
             callback.call(ctrl);
           });
           if (!ctrl.settings.button) {
-            ctrl.getResults();
+            ctrl.getResultsSoon();
           }
         }
 
@@ -71,7 +74,7 @@
           ctrl.page = 1;
           // Only refresh if search has already been run
           if (ctrl.results) {
-            ctrl.getResults();
+            ctrl.getResultsSoon();
           }
         }
 
@@ -131,7 +134,7 @@
       onClickSearchButton: function() {
         this.rowCount = null;
         this.page = 1;
-        this.getResults();
+        this.getResultsPronto();
       },
 
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount

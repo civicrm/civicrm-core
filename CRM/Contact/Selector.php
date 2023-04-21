@@ -864,7 +864,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *
    * @return string
    */
-  public function buildPrevNextCache($sort) {
+  private function buildPrevNextCache($sort) {
     $cacheKey = 'civicrm search ' . $this->_key;
 
     // We should clear the cache in following conditions:
@@ -1025,20 +1025,17 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param int $start
    * @param int $end
    *
+   * @todo - use test cover in CRM_Contact_Form_Search_BasicTest to
+   * to remove the extraneous logging that happens in the tested
+   * scenario (It does the catch & then write to the log - I was
+   * going to fix but got stalled on getting https://github.com/civicrm/civicrm-core/pull/25392
+   * merged - this comment won't conflict with that PR :-)
+   *
    * @throws \CRM_Core_Exception
    */
-  public function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = self::CACHE_SIZE) {
-    $coreSearch = TRUE;
-    // For custom searches, use the contactIDs method
-    if (is_a($this, 'CRM_Contact_Selector_Custom')) {
-      $sql = $this->_search->contactIDs($start, $end, $sort, TRUE);
-      $coreSearch = FALSE;
-    }
-    // For core searches use the searchQuery method
-    else {
-      $sql = $this->_query->getSearchSQL($start, $end, $sort, FALSE, $this->_query->_includeContactIds,
+  private function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = self::CACHE_SIZE) {
+    $sql = $this->_query->getSearchSQL($start, $end, $sort, FALSE, $this->_query->_includeContactIds,
         FALSE, TRUE);
-    }
 
     // CRM-9096
     // due to limitations in our search query writer, the above query does not work
@@ -1049,7 +1046,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // the other alternative of running the FULL query will just be incredibly inefficient
     // and slow things down way too much on large data sets / complex queries
 
-    $selectSQL = CRM_Core_DAO::composeQuery("SELECT DISTINCT %1, contact_a.id, contact_a.sort_name", [1 => [$cacheKey, 'String']]);
+    $selectSQL = CRM_Core_DAO::composeQuery('SELECT DISTINCT %1, contact_a.id, contact_a.sort_name', [1 => [$cacheKey, 'String']]);
 
     $sql = str_ireplace(['SELECT contact_a.id as contact_id', 'SELECT contact_a.id as id'], $selectSQL, $sql);
     $sql = str_ireplace('ORDER BY `contact_id`', 'ORDER BY `id`', $sql, $sql);
@@ -1058,19 +1055,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       Civi::service('prevnext')->fillWithSql($cacheKey, $sql);
     }
     catch (\Exception $e) {
-      if ($coreSearch) {
-        // in the case of error, try rebuilding cache using full sql which is used for search selector display
-        // this fixes the bugs reported in CRM-13996 & CRM-14438
-        $this->rebuildPreNextCache($start, $end, $sort, $cacheKey);
-      }
-      else {
-        CRM_Core_Error::deprecatedFunctionWarning('Custom searches should return sql capable of filling the prevnext cache.');
-        // This will always show for CiviRules :-( as a) it orders by 'rule_label'
-        // which is not available in the query & b) it uses contact not contact_a
-        // as an alias.
-        // CRM_Core_Session::setStatus(ts('Query Failed'));
-        return;
-      }
+      // in the case of error, try rebuilding cache using full sql which is used for search selector display
+      // this fixes the bugs reported in CRM-13996 & CRM-14438
+      $this->rebuildPreNextCache($start, $end, $sort, $cacheKey);
     }
 
     if (Civi::service('prevnext') instanceof CRM_Core_PrevNextCache_Sql) {
@@ -1091,7 +1078,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param string $cacheKey
    *   Cache key.
    */
-  public function rebuildPreNextCache($start, $end, $sort, $cacheKey) {
+  private function rebuildPreNextCache($start, $end, $sort, $cacheKey): void {
     // generate full SQL
     $sql = $this->_query->searchQuery($start, $end, $sort, FALSE, $this->_query->_includeContactIds,
       FALSE, FALSE, TRUE);

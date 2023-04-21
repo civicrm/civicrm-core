@@ -21,19 +21,13 @@
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implements \Civi\Core\HookInterface {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
@@ -65,6 +59,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implemen
    * @return array
    */
   public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (array_key_exists("domain_id", $params) === FALSE) {
       $params["domain_id"] = CRM_Core_Config::domainID();
     }
@@ -85,6 +80,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implemen
    * @return CRM_Core_DAO_WordReplacement
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return static::deleteRecord(['id' => $id]);
   }
 

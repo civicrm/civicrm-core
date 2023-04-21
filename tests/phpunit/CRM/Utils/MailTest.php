@@ -6,6 +6,11 @@
  */
 class CRM_Utils_MailTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * Test case for add( )
    * test with empty params.

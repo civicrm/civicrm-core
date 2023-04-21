@@ -19,8 +19,8 @@ use Civi\Api4\FinancialType;
 class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->organizationCreate();
   }
 
@@ -33,8 +33,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'is_deductible' => 0,
       'is_active' => 1,
     ];
-    $ids = [];
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
 
     $result = $this->assertDBNotNull(
       'CRM_Financial_BAO_FinancialAccount',
@@ -56,36 +55,12 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'is_deductible' => 0,
       'is_active' => 1,
     ];
-    $ids = $defaults = [];
-    CRM_Financial_BAO_FinancialAccount::add($params);
+    $defaults = [];
+    CRM_Financial_BAO_FinancialAccount::writeRecord($params);
 
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
 
     $this->assertEquals($result->name, 'Donations', 'Verify financial account name.');
-  }
-
-  /**
-   * Check method setIsActive()
-   */
-  public function testSetIsActive() {
-    $params = [
-      'name' => 'Donations',
-      'is_deductible' => 0,
-      'is_active' => 1,
-    ];
-    $ids = [];
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
-    $result = CRM_Financial_BAO_FinancialAccount::setIsActive($financialAccount->id, 0);
-    $this->assertEquals($result, TRUE, 'Verify financial account record updation for is_active.');
-
-    $isActive = $this->assertDBNotNull(
-      'CRM_Financial_BAO_FinancialAccount',
-      $financialAccount->id,
-      'is_active',
-      'id',
-      'Database check on updated for financial account is_active.'
-    );
-    $this->assertEquals($isActive, 0, 'Verify financial account is_active.');
   }
 
   /**
@@ -99,7 +74,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'is_deductible' => 0,
       'is_active' => 1,
     ];
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
 
     CRM_Financial_BAO_FinancialAccount::del($financialAccount->id);
     $params = ['id' => $financialAccount->id];
@@ -149,8 +124,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'is_reserved' => 0,
     ];
 
-    $ids = [];
-    $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
+    $financialType = CRM_Financial_BAO_FinancialType::writeRecord($params);
     $financialAccountid = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', 'Donations', 'id', 'name');
     CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountid, 'accounting_code', '4800');
     $accountingCode = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialType->id);

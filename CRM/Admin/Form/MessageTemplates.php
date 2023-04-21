@@ -272,7 +272,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_BAO_MessageTemplate::del($this->_id);
+      CRM_Core_BAO_MessageTemplate::deleteRecord(['id' => $this->_id]);
+      CRM_Core_Session::setStatus(ts('Selected message template has been deleted.'), ts('Deleted'), 'success');
 
       $this->postProcessHook();
     }

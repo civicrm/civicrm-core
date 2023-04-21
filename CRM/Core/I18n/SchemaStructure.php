@@ -117,7 +117,8 @@ class CRM_Core_I18n_SchemaStructure {
           'options' => "text COMMENT 'Store comma-delimited list of color, size, etc. options for the product.'",
         ],
         'civicrm_payment_processor' => [
-          'title' => "varchar(127) COMMENT 'Payment Processor Descriptive Name.'",
+          'title' => "varchar(255) NOT NULL COMMENT 'Name of processor when shown to CiviCRM administrators.'",
+          'frontend_title' => "varchar(255) NOT NULL COMMENT 'Name of processor when shown to users making a payment.'",
         ],
         'civicrm_membership_type' => [
           'name' => "varchar(128) NOT NULL COMMENT 'Name of Membership Type'",
@@ -490,7 +491,14 @@ class CRM_Core_I18n_SchemaStructure {
         ],
         'civicrm_payment_processor' => [
           'title' => [
+            'label' => "Backend Title",
             'type' => "Text",
+            'required' => "true",
+          ],
+          'frontend_title' => [
+            'label' => "Frontend Title",
+            'type' => "Text",
+            'required' => "true",
           ],
         ],
         'civicrm_membership_type' => [

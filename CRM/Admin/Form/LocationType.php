@@ -85,7 +85,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
     CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_BAO_LocationType::del($this->_id);
+      CRM_Core_BAO_LocationType::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected Location type has been deleted.'), ts('Record Deleted'), 'success');
       return;
     }

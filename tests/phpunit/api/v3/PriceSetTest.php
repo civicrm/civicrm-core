@@ -20,8 +20,6 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   protected $contactIds = [];
   protected $_entity = 'price_set';
 
-  public $DBResetRequired = TRUE;
-
   /**
    * Set up for class.
    */

@@ -68,6 +68,8 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
       'listLimit' => defined('MAIL_BATCH_SIZE') ? MAIL_BATCH_SIZE : 1000,
       'ssl' => $ssl,
       'uidReferencing' => TRUE,
+      // A timeout of 15 prevents the fetch_bounces job from failing if the response is a bit slow.
+      'timeout' => 15,
     ];
     $this->_transport = new ezcMailImapTransport($host, NULL, $options);
     if ($useXOAUTH2) {
