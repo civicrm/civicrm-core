@@ -92,7 +92,7 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
         $params['id'] = $this->_id;
       }
 
-      CRM_Core_BAO_Mapping::add($params);
+      CRM_Core_BAO_Mapping::writeRecord($params);
     }
   }
 

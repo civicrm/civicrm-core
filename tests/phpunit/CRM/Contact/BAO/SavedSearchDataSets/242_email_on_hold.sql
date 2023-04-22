@@ -1,4 +1,4 @@
-INSERT INTO `civicrm_mapping` (`id`, `name`, `description`, `mapping_type_id`) VALUES (149, NULL, NULL, NULL);
+INSERT INTO `civicrm_mapping` (`id`, `name`, `description`, `mapping_type_id`) VALUES (149, 'test_149', NULL, NULL);
 
 INSERT INTO `civicrm_mapping_field` (`id`, `mapping_id`, `name`, `contact_type`, `column_number`, `location_type_id`, `phone_type_id`, `im_provider_id`, `relationship_type_id`, `relationship_direction`, `grouping`, `operator`, `value`, `website_type_id`) VALUES (3538, 149, 'email', 'Individual', 0, NULL, NULL, NULL, NULL, NULL, 1, '', '', NULL);
 INSERT INTO `civicrm_mapping_field` (`id`, `mapping_id`, `name`, `contact_type`, `column_number`, `location_type_id`, `phone_type_id`, `im_provider_id`, `relationship_type_id`, `relationship_direction`, `grouping`, `operator`, `value`, `website_type_id`) VALUES (3539, 149, 'on_hold', 'Individual', 1, NULL, NULL, NULL, NULL, NULL, 1, '=', '1', NULL);
