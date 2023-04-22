@@ -400,12 +400,14 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertEquals($customFieldLabel, $dbCustomFieldLabel);
 
     //check the custom field type.
-    $params = ['Individual'];
-    $usedFor = CRM_Core_BAO_CustomGroup::checkCustomField($customFieldId, $params);
+    $usedFor = CRM_Core_BAO_CustomGroup::checkCustomField(
+      $customFieldId, ['Individual']
+    );
     $this->assertEquals(FALSE, $usedFor);
 
-    $params = ['Contribution', 'Membership', 'Participant'];
-    $usedFor = CRM_Core_BAO_CustomGroup::checkCustomField($customFieldId, $params);
+    $usedFor = CRM_Core_BAO_CustomGroup::checkCustomField(
+      $customFieldId, ['Contribution', 'Membership', 'Participant']
+    );
     $this->assertEquals(TRUE, $usedFor);
 
     $this->customFieldDelete($customField['id']);
