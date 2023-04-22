@@ -1676,7 +1676,7 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @throws \CRM_Core_Exception
    */
-  public static function checkCustomField($customFieldId, &$removeCustomFieldTypes) {
+  public static function checkCustomField($customFieldId, $removeCustomFieldTypes) {
     $query = 'SELECT cg.extends as extends
                   FROM civicrm_custom_group as cg, civicrm_custom_field as cf
                   WHERE cg.id = cf.custom_group_id
