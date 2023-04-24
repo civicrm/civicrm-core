@@ -7,6 +7,11 @@
  */
 class CRM_Utils_SystemTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   public function testUrlQueryString() {
     $config = CRM_Core_Config::singleton();
     $this->assertTrue($config->userSystem instanceof CRM_Utils_System_UnitTests);

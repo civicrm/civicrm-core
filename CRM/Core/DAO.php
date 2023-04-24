@@ -134,11 +134,6 @@ class CRM_Core_DAO extends DB_DataObject {
    * @var array
    */
   public static $_testEntitiesToSkip = [];
-  /**
-   * The factory class for this application.
-   * @var object
-   */
-  public static $_factory = NULL;
 
   /**
    * https://issues.civicrm.org/jira/browse/CRM-17748
@@ -231,8 +226,6 @@ class CRM_Core_DAO extends DB_DataObject {
     if (defined('CIVICRM_DAO_DEBUG')) {
       self::DebugLevel(CIVICRM_DAO_DEBUG);
     }
-    $factory = new CRM_Contact_DAO_Factory();
-    CRM_Core_DAO::setFactory($factory);
     CRM_Core_DAO::executeQuery('SET NAMES utf8mb4');
     CRM_Core_DAO::executeQuery('SET @uniqueID = %1', [1 => [CRM_Utils_Request::id(), 'String']]);
   }
@@ -495,30 +488,6 @@ class CRM_Core_DAO extends DB_DataObject {
 
     $this->_setDBOptions($orig_options);
     return $ret;
-  }
-
-  /**
-   * Static function to set the factory instance for this class.
-   *
-   * @param object $factory
-   *   The factory application object.
-   */
-  public static function setFactory(&$factory) {
-    self::$_factory = &$factory;
-  }
-
-  /**
-   * Factory method to instantiate a new object from a table name.
-   *
-   * @param string $table
-   * @return \DataObject|\PEAR_Error
-   */
-  public function factory($table = '') {
-    if (!isset(self::$_factory)) {
-      return parent::factory($table);
-    }
-
-    return self::$_factory->create($table);
   }
 
   /**
@@ -974,7 +943,7 @@ class CRM_Core_DAO extends DB_DataObject {
       CRM_Core_BAO_CustomValueTable::store($record['custom'], static::$_tableName, $instance->$idField, $op);
     }
 
-    \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance);
+    \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance, $record);
 
     return $instance;
   }
@@ -1026,7 +995,7 @@ class CRM_Core_DAO extends DB_DataObject {
     // For other operations this hook is passed an incomplete object and hook listeners can load if needed.
     // But that's not possible with delete because it's gone from the database by the time this hook is called.
     // So in this case the object has been pre-loaded so hook listeners have access to the complete record.
-    CRM_Utils_Hook::post('delete', $entityName, $record[$idField], $instance);
+    CRM_Utils_Hook::post('delete', $entityName, $record[$idField], $instance, $record);
 
     return $instance;
   }
@@ -1081,34 +1050,17 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Check if there is a given column in a specific table.
-   *
-   * @deprecated
-   * @see CRM_Core_BAO_SchemaHandler::checkIfFieldExists
-   *
-   * @param string $tableName
-   * @param string $columnName
-   * @param bool $i18nRewrite
-   *   Whether to rewrite the query on multilingual setups.
-   *
-   * @return bool
-   *   true if exists, else false
-   */
-  public static function checkFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_SchemaHandler::checkIfFieldExists');
-    return CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $columnName, $i18nRewrite);
-  }
-
-  /**
-   * Scans all the tables using a slow query and table name.
+   * Gets the names of all the tables in the schema.
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function getTableNames(): array {
     $dao = CRM_Core_DAO::executeQuery(
       "SELECT TABLE_NAME
        FROM information_schema.TABLES
-       WHERE TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
+       WHERE TABLE_SCHEMA = DATABASE()
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE '%_tmp%'
       ");
@@ -1130,7 +1082,7 @@ class CRM_Core_DAO extends DB_DataObject {
       "SELECT count(*)
        FROM information_schema.TABLES
        WHERE ENGINE = 'MyISAM'
-         AND TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
+         AND TABLE_SCHEMA = DATABASE()
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_tmp_%'
       ");
@@ -1139,11 +1091,12 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Get the name of the CiviCRM database.
    *
+   * @deprecated use mysql DATABASE() within the query.
+   *
    * @return string
    */
-  public static function getDatabaseName() {
-    $daoObj = new CRM_Core_DAO();
-    return $daoObj->database();
+  public static function getDatabaseName(): string {
+    return (new CRM_Core_DAO())->database();
   }
 
   /**
@@ -1643,6 +1596,8 @@ LIKE %1
    *   object that holds the results of the query
    *   NB - if this is defined as just returning a DAO phpstorm keeps pointing
    *   out all the properties that are not part of the DAO
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public static function &executeQuery(
     $query,
@@ -1726,9 +1681,11 @@ LIKE %1
    * @param array $params
    * @param bool $abort
    * @param bool $i18nRewrite
+   *
    * @return string|null
    *   the result of the query if any
    *
+   * @throws \CRM_Core_Exception
    */
   public static function &singleValueQuery(
     $query,
@@ -2439,30 +2396,6 @@ SELECT contact_id
   }
 
   /**
-   * @param string $prefix
-   * @param bool $addRandomString
-   * @param null $string
-   *
-   * @return string
-   * @deprecated
-   * @see CRM_Utils_SQL_TempTable
-   */
-  public static function createTempTableName($prefix = 'civicrm', $addRandomString = TRUE, $string = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use CRM_Utils_SQL_TempTable interface to create temporary tables');
-    $tableName = $prefix . "_temp";
-
-    if ($addRandomString) {
-      if ($string) {
-        $tableName .= "_" . $string;
-      }
-      else {
-        $tableName .= "_" . md5(uniqid('', TRUE));
-      }
-    }
-    return $tableName;
-  }
-
-  /**
    * @param bool $view
    * @param bool $trigger
    *
@@ -3115,9 +3048,11 @@ SELECT contact_id
   public function addSelectWhereClause() {
     $clauses = [];
     $fields = $this->fields();
+    // Notes should check permissions on the entity_id field, not the contact_id field
+    $skipContactCheckFor = ['Note'];
     foreach ($fields as $fieldName => $field) {
       // Clause for contact-related entities like Email, Relationship, etc.
-      if (strpos($field['name'], 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
+      if (strpos($field['name'], 'contact_id') === 0 && !in_array($field['entity'], $skipContactCheckFor) && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
         $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
         if (!empty($contactClause)) {
           $clauses[$field['name']] = $contactClause;

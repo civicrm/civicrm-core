@@ -209,7 +209,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       ] as $field) {
         $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
       }
-      $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
+      $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
       CRM_Core_Session::setStatus(ts('The Financial Account \'%1\' has been saved.', [1 => $financialAccount->name]), ts('Saved'), 'success');
     }
   }

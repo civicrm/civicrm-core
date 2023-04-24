@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\Test\CiviEnvBuilder;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -27,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ContactIsDeletedTest extends Api4TestBase implements TransactionalInterface {
 
-  public function setUpHeadless() {
+  public function setUpHeadless(): CiviEnvBuilder {
     $relatedTables = [
       'civicrm_address',
       'civicrm_email',

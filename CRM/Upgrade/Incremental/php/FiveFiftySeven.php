@@ -21,10 +21,26 @@
  */
 class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental_Base {
 
+  /**
+   * How many activities before the queries used here are slow. Guessing.
+   */
+  const ACTIVITY_THRESHOLD = 1000000;
+
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev === '5.57.alpha1') {
-      if (CRM_Core_DAO::singleValueQuery('SELECT COUNT(id) FROM civicrm_activity WHERE is_current_revision = 0')) {
-        $preUpgradeMessage .= '<p>' . ts('Your database contains CiviCase activity revisions which are deprecated and will begin to appear as duplicates in SearchKit/api4/etc.<ul><li>For further instructions see this <a %1>Lab Snippet</a>.</li></ul>', [1 => 'target="_blank" href="https://lab.civicrm.org/-/snippets/85"']) . '</p>';
+      $docUrl = 'https://civicrm.org/redirect/activities-5.57';
+      $docAnchor = 'target="_blank" href="' . htmlentities($docUrl) . '"';
+
+      // The query on is_current_revision is slow if there's a lot of activities. So limit when it gets run.
+      $activityCount = CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_activity');
+      if ($activityCount < self::ACTIVITY_THRESHOLD && CRM_Core_DAO::singleValueQuery('SELECT COUNT(id) FROM civicrm_activity WHERE is_current_revision = 0')) {
+        $preUpgradeMessage .= '<p>' . ts('Your database contains CiviCase activity revisions which are deprecated and will begin to appear as duplicates in SearchKit/api4/etc.<ul><li>For further instructions see this <a %1>Lab Snippet</a>.</li></ul>', [1 => $docAnchor]) . '</p>';
+      }
+      // Similarly the original_id ON DELETE drop+recreate is slow, so if we
+      // don't add the task farther down below, then tell people what to do at
+      // their convenience.
+      elseif ($activityCount >= self::ACTIVITY_THRESHOLD) {
+        $preUpgradeMessage .= '<p>' . ts('The activity table <strong>will not update automatically</strong> because it contains too many records. You will need to apply a <strong>manual update</strong>. Please read about <a %1>how to clean data from the defunct "Embedded Activity Revisions" setting</a>.', [1 => $docAnchor]) . '</p>';
       }
     }
   }
@@ -37,7 +53,9 @@ class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_57_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-    $this->addTask('Fix dangerous delete cascade', 'fixDeleteCascade');
+    if (CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_activity') < self::ACTIVITY_THRESHOLD) {
+      $this->addTask('Fix dangerous delete cascade', 'fixDeleteCascade');
+    }
     $this->addExtensionTask('Enable SearchKit extension', ['org.civicrm.search_kit'], 1100);
     $this->addExtensionTask('Enable Flexmailer extension', ['org.civicrm.flexmailer']);
   }

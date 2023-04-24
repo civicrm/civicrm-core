@@ -21,7 +21,13 @@ require_once 'CiviTest/CiviTestSMSProvider.php';
 class CRM_SMS_ProviderTest extends CiviUnitTestCase {
 
   /**
-   * Set Up Funtion
+   * ID of option_value record created in setUp
+   * @var int
+   */
+  private $option_value;
+
+  /**
+   * Set Up Function
    */
   public function setUp(): void {
     parent::setUp();
@@ -42,7 +48,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
    * CRM-20238 Add test of the processInbound function for SMSs
    */
   public function testProcessInbound() {
-    $testSourceContact = $this->individualCreate(['phone' => [1 => ['phone_type_id' => 'Phone', 'location_type_id' => 'Home', 'phone' => '+61487654321']]]);
+    $this->individualCreate(['phone' => [1 => ['phone_type_id' => 'Phone', 'location_type_id' => 'Home', 'phone' => '+61487654321']]]);
     $provider = new CiviTestSMSProvider('CiviTestSMSProvider');
     $result = $provider->processInbound('+61412345678', 'This is a test message', '+61487654321');
     $this->assertEquals('This is a test message', $result->details);

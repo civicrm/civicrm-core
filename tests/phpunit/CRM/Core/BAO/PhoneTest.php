@@ -21,7 +21,6 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
   public function testAdd() {
     $contactId = $this->individualCreate();
 
-    $params = [];
     $params = [
       'phone' => '(415) 222-1011 x 221',
       'is_primary' => 1,
@@ -30,7 +29,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    CRM_Core_BAO_Phone::create($params);
+    CRM_Core_BAO_Phone::writeRecord($params);
 
     $phoneId = $this->assertDBNotNull('CRM_Core_DAO_Phone', $contactId, 'id', 'contact_id',
       'Database check for created phone record.'
@@ -48,7 +47,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
       'phone' => '(415) 222-5432',
     ];
 
-    CRM_Core_BAO_Phone::create($params);
+    CRM_Core_BAO_Phone::writeRecord($params);
 
     $this->assertDBCompareValue('CRM_Core_DAO_Phone', $phoneId, 'phone', 'id', '(415) 222-5432',
       "Check if phone field has expected value in updated record ( civicrm_phone.id={$phoneId} )."
@@ -82,13 +81,6 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
     $this->assertEquals(1, $firstPhoneValue[0]['is_primary'], 'Confirm first Phone is primary.');
 
     $this->contactDelete($contactId);
-  }
-
-  /**
-   * AllEntityPhones() method - get all Phones for a location block, with primary Phone first
-   * @todo FIXME: Fixing this test requires add helper functions in CiviTest to create location block and phone and link them to an event. Punting to 3.1 cycle. DGG
-   */
-  public function SKIPPED_testAllEntityPhones() {
   }
 
 }

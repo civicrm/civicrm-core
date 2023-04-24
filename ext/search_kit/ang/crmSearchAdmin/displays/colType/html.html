@@ -17,6 +17,7 @@
     <input type="checkbox" ng-checked="col.empty_value" ng-click="$ctrl.parent.toggleEmptyVal(col)" >
     {{:: ts('Empty placeholder') }}
   </label>
+  <a crm-ui-help="hs({id: 'empty', title: ts('Empty placeholder')})"></a>
   <textarea rows="2" class="form-control crm-flex-1" ng-if="col.empty_value" ng-model="col.empty_value" ng-model-options="{updateOn: 'blur'}"></textarea>
   <crm-search-admin-token-select ng-if="col.empty_value" model="col" field="empty_value" suffix=":label"></crm-search-admin-token-select>
 </div>
@@ -25,6 +26,7 @@
     <input type="checkbox" ng-checked="col.rewrite" ng-click="$ctrl.parent.toggleRewrite(col)" >
     {{:: ts('Rewrite HTML') }}
   </label>
+  <a crm-ui-help="hs({id: 'rewrite', title: ts('Rewrite HTML')})"></a>
   <textarea rows="2" class="form-control crm-flex-1" ng-if="col.rewrite" ng-model="col.rewrite" ng-model-options="{updateOn: 'blur'}"></textarea>
   <crm-search-admin-token-select ng-if="col.rewrite" model="col" field="rewrite" suffix=":label"></crm-search-admin-token-select>
 </div>

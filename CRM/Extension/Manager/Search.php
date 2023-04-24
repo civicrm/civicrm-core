@@ -77,7 +77,7 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
 
     $cs = $this->getCustomSearchesById();
     $id = $cs[$customSearchesByName[$info->key]];
-    CRM_Core_BAO_OptionValue::del($id);
+    CRM_Core_BAO_OptionValue::deleteRecord(['id' => $id]);
 
     return TRUE;
   }

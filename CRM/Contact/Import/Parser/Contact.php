@@ -29,7 +29,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   use CRM_Contact_Import_MetadataTrait;
 
-  protected $_allExternalIdentifiers = [];
+  private $externalIdentifiers = [];
 
   /**
    * Array of successfully imported contact id's
@@ -37,13 +37,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @var array
    */
   protected $_newContacts = [];
-
-  /**
-   * Line count id.
-   *
-   * @var int
-   */
-  protected $_lineCount;
 
   protected $_tableName;
 
@@ -98,6 +91,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         'name' => 'contact_import',
         'label' => ts('Contact Import'),
         'entity' => 'Contact',
+        'url' => 'civicrm/import/contact',
       ],
     ];
   }
@@ -307,26 +301,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
     $customFields = $customFields + $addressCustomFields;
 
-    //format date first
-    $session = CRM_Core_Session::singleton();
-    $dateType = $session->get("dateTypes");
     foreach ($params as $key => $val) {
       $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
       if ($customFieldID &&
         !array_key_exists($customFieldID, $addressCustomFields)
       ) {
-        //we should not update Date to null, CRM-4062
-        if ($val && ($customFields[$customFieldID]['data_type'] == 'Date')) {
-          //CRM-21267
-          $this->formatCustomDate($params, $formatted, $dateType, $key);
-        }
-        elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
+        if ($customFields[$customFieldID]['data_type'] == 'Boolean') {
           if (empty($val) && !is_numeric($val) && $this->isFillDuplicates()) {
             //retain earlier value when Import mode is `Fill`
             unset($params[$key]);
-          }
-          else {
-            $params[$key] = CRM_Utils_String::strtoboolstr($val);
           }
         }
       }
@@ -420,12 +403,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
                 (strtolower($v2['value']) == strtolower(trim($v1)))
               ) {
-                if ($htmlType == 'CheckBox') {
-                  $params[$key][$v2['value']] = $formatted[$key][$v2['value']] = 1;
-                }
-                else {
-                  $params[$key][] = $formatted[$key][] = $v2['value'];
-                }
+                $params[$key][] = $formatted[$key][] = $v2['value'];
               }
             }
           }
@@ -514,19 +492,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
     }
-
-    //check for duplicate external Identifier
-    $externalID = $params['external_identifier'] ?? NULL;
-    if ($externalID) {
-      /* If it's a dupe,external Identifier  */
-
-      if ($externalDupe = CRM_Utils_Array::value($externalID, $this->_allExternalIdentifiers)) {
-        $errorMessage = ts('External ID conflicts with record %1', [1 => $externalDupe]);
-        throw new CRM_Core_Exception($errorMessage);
-      }
-      //otherwise, count it and move on
-      $this->_allExternalIdentifiers[$externalID] = $this->_lineCount;
-    }
+    $this->checkForDuplicateExternalIdentifiers($params['external_identifier'] ?? '');
 
     //date-format part ends
 
@@ -1060,24 +1026,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       _civicrm_api3_store_values($fields[$values['contact_type']], $values, $params);
       return TRUE;
     }
-
-    // Check for custom field values
-    $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $values),
-      FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE
-    );
-
-    foreach ($values as $key => $value) {
-      if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        // check if it's a valid custom field id
-
-        if (!array_key_exists($customFieldID, $customFields)) {
-          return civicrm_api3_create_error('Invalid custom field ID');
-        }
-        else {
-          $params[$key] = $value;
-        }
-      }
-    }
     return TRUE;
   }
 
@@ -1610,7 +1558,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         throw new CRM_Core_Exception('Mismatched contact SubTypes :', CRM_Import_Parser::NO_MATCH);
       }
     }
-    return array($formatted, $params);
+    return [$formatted, $params];
   }
 
   /**
@@ -1737,6 +1685,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       CRM_Import_Parser::ERROR => 'ERROR',
       CRM_Import_Parser::NO_MATCH => 'invalid_no_match',
     ][$outcome] ?? 'ERROR';
+  }
+
+  /**
+   * Return an error if the csv has more than one row with the same external identifier.
+   *
+   * @param string $externalIdentifier
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function checkForDuplicateExternalIdentifiers(string $externalIdentifier): void {
+    if ($externalIdentifier) {
+      $existingRow = array_search($externalIdentifier, $this->externalIdentifiers, TRUE);
+      if ($existingRow !== FALSE) {
+        throw new CRM_Core_Exception(ts('External ID conflicts with record %1', [1 => $existingRow + 1]));
+      }
+      $this->externalIdentifiers[] = $externalIdentifier;
+    }
   }
 
 }

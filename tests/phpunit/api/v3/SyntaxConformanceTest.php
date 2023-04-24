@@ -40,12 +40,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   protected $deletableTestObjects;
 
-  /**
-   * This test case doesn't require DB reset.
-   * @var bool
-   */
-  public $DBResetRequired = FALSE;
-
   protected $_entity;
 
   /**
@@ -503,7 +497,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'UFJoin',
       'Relationship',
       'RelationshipType',
-      'Note',
       'Membership',
       'Group',
       'File',

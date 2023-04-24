@@ -41,7 +41,7 @@ function civicrm_api3_generic_getList($apiRequest) {
 
   $searchResult = _civicrm_api3_generic_getlist_get_result($request, $entity, $meta, $apiRequest);
   $foundIDCount = 0;
-  if ($forceIdSearch && !empty($result['values'])) {
+  if ($forceIdSearch && !empty($result['values']) && isset($idRequest['id'])) {
     $contactSearchID = $idRequest['id'];
     $foundIDCount = 1;
     // Merge id fetch into search result.
@@ -205,7 +205,7 @@ function _civicrm_api3_generic_getList_defaults(string $entity, array &$request,
       // Adding one extra result allows us to see if there are any more
       'limit' => $resultsPerPage + 1,
       // Because sql is zero-based
-      'offset' => ($request['page_num'] - 1) * $resultsPerPage,
+      'offset' => ($request['page_num'] > 1) ? (($request['page_num'] - 1) * $resultsPerPage) : 0,
     ];
   }
 }

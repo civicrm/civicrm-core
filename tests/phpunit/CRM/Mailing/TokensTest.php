@@ -6,8 +6,8 @@
 class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
 
   protected function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
     $this->callAPISuccess('mail_settings', 'get',
       ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
   }

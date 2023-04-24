@@ -770,7 +770,7 @@ function civicrm_api3_contact_getquick($params) {
     if ($field_name == 'contact_id') {
       $field_name = 'id';
     }
-    // core#1420 : trim non-numeric character from phone search string
+    // dev/core#1420 : trim non-numeric character from phone search string
     elseif ($field_name == 'phone_numeric') {
       $name = preg_replace('/[^\d]/', '', $name);
     }

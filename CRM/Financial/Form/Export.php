@@ -166,7 +166,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       $batchParams['id'] = $batchId;
       // Update totals
       $batchParams = array_merge($batchParams, $totals[$batchId]);
-      CRM_Batch_BAO_Batch::create($batchParams);
+      CRM_Batch_BAO_Batch::writeRecord($batchParams);
     }
 
     CRM_Batch_BAO_Batch::exportFinancialBatch($batchIds, $this->_exportFormat, $this->_downloadFile);

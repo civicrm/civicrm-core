@@ -81,7 +81,7 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
       ), ts('Deletion Error'), 'error');
       return;
     }
-    CRM_Event_BAO_Event::del($this->_id);
+    CRM_Event_BAO_Event::deleteRecord(['id' => $this->_id]);
     if ($this->_isTemplate) {
       CRM_Core_Session::setStatus(ts("'%1' has been deleted.", [1 => $this->_title]), ts('Template Deleted'), 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'));

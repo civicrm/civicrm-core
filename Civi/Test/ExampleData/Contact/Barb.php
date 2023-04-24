@@ -32,7 +32,6 @@ class Barb extends EntityExample {
       'image_URL' => NULL,
       'preferred_communication_method' => NULL,
       'preferred_language' => NULL,
-      'preferred_mail_format' => 'Both',
       'first_name' => 'Barbara',
       'middle_name' => '',
       'last_name' => 'Johnson',

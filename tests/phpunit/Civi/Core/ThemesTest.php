@@ -10,8 +10,8 @@ namespace Civi\Core;
 class ThemesTest extends \CiviUnitTestCase {
 
   protected function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   public function getThemeExamples() {

@@ -290,10 +290,19 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   protected function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
     $bao = CRM_Core_DAO_AllCoreTables::getFullName($this->getMetadataForField($realField)['entity']);
     if ($pseudoKey === 'name') {
+      // There is a theoretical possibility fieldValue could be an array but
+      // specifically for preferred communication type - but real world usage
+      // hitting this is unlikely & the unexpectation is unclear so commenting,
+      // rather than adding handling.
       $fieldValue = (string) CRM_Core_PseudoConstant::getName($bao, $realField, $fieldValue);
     }
     if ($pseudoKey === 'label') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($bao, $realField, $fieldValue);
+      $newValue = [];
+      // Preferred communication method is an array that would resolve to (e.g) 'Phone, Email'
+      foreach ((array) $fieldValue as $individualValue) {
+        $newValue[] = CRM_Core_PseudoConstant::getLabel($bao, $realField, $individualValue);
+      }
+      $fieldValue = implode(', ', $newValue);
     }
     if ($pseudoKey === 'abbr' && $realField === 'state_province_id') {
       // hack alert - currently only supported for state.
@@ -611,7 +620,8 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param string $prefix
    */
   protected function addFieldToTokenMetadata(array &$tokensMetadata, array $field, array $exposedFields, string $prefix = ''): void {
-    if ($field['type'] !== 'Custom' && !in_array($field['name'], $exposedFields, TRUE)) {
+    $isExposed = in_array(str_replace($prefix . '.', '', $field['name']), $exposedFields, TRUE);
+    if ($field['type'] !== 'Custom' && !$isExposed) {
       return;
     }
     $field['audience'] = $field['audience'] ?? 'user';
@@ -635,8 +645,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       $tokensMetadata[$tokenName] = $field;
       return;
     }
-    $tokenName = $prefix ? ($prefix . '.' . $field['name']) : $field['name'];
-    if (in_array($field['name'], $exposedFields, TRUE)) {
+    $tokenName = $field['name'];
+    // Presumably this line can not be reached unless isExposed = TRUE.
+    if ($isExposed) {
       if (
         ($field['options'] || !empty($field['suffixes']))
         // At the time of writing currency didn't have a label option - this may have changed.

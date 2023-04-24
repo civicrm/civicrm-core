@@ -327,17 +327,23 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
   public function testAge(): void {
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
-      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now - 1 year - 1 month'],
+      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now - 2 year + 3 day'],
       ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 21 year - 6 month'],
+      ['first_name' => 'ghi', 'last_name' => $lastName, 'birth_date' => 'now'],
     ];
     $this->saveTestRecords('Contact', ['records' => $sampleData]);
 
     $result = Contact::get(FALSE)
       ->addWhere('last_name', '=', $lastName)
-      ->addSelect('first_name', 'age_years')
+      ->addSelect('first_name', 'age_years', 'next_birthday', 'DAYSTOANNIV(birth_date)')
       ->execute()->indexBy('first_name');
     $this->assertEquals(1, $result['abc']['age_years']);
+    $this->assertEquals(3, $result['abc']['next_birthday']);
+    $this->assertEquals(3, $result['abc']['DAYSTOANNIV:birth_date']);
     $this->assertEquals(21, $result['def']['age_years']);
+    $this->assertEquals(0, $result['ghi']['age_years']);
+    $this->assertEquals(0, $result['ghi']['next_birthday']);
+    $this->assertEquals(0, $result['ghi']['DAYSTOANNIV:birth_date']);
 
     Contact::get(FALSE)
       ->addWhere('age_years', '=', 21)
@@ -422,6 +428,19 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
     $result = Contact::get()->execute();
     $this->assertCount(0, $result);
+  }
+
+  public function testInvalidPseudoConstantWithIN(): void {
+    $this->createTestRecord('Contact', [
+      'first_name' => uniqid(),
+      'last_name' => uniqid(),
+      'prefix_id:name' => 'Ms.',
+    ]);
+    $resultCount = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('prefix_id:name', 'IN', ['Msssss.'])
+      ->execute();
+    $this->assertCount(0, $resultCount);
   }
 
 }

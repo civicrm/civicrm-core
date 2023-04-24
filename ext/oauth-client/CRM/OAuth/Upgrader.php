@@ -4,7 +4,7 @@ use CRM_OAuth_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_OAuth_Upgrader extends CRM_OAuth_Upgrader_Base {
+class CRM_OAuth_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * @see CRM_Utils_Hook::install()

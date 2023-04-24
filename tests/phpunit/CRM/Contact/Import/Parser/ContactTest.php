@@ -1367,41 +1367,71 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testValidateDateData(string $csv, int $dateType): void {
-    $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
-    $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
-    $addressCustomFieldID = $this->createDateCustomField(['custom_group_id' => $addressCustomGroupID])['id'];
-    $contactCustomFieldID = $this->createDateCustomField(['custom_group_id' => $contactCustomGroupID])['id'];
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Address', 'name' => 'Address'], 'date', 'address_');
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Contact', 'name' => 'Contact'], 'date', 'contact_');
     $mapper = [
       ['first_name'],
       ['last_name'],
       ['birth_date'],
       ['deceased_date'],
-      ['custom_' . $contactCustomFieldID],
-      ['custom_' . $addressCustomFieldID, 1],
+      [$this->getCustomFieldName('contact_date')],
+      [$this->getCustomFieldName('address_date'), 1],
       ['street_address', 1],
       ['do_not_import'],
+      ['do_not_import'],
     ];
-    // Date types should be picked up from submitted values but still some clean up to do.
-    CRM_Core_Session::singleton()->set('dateTypes', $dateType);
     $this->validateMultiRowCsv($csv, $mapper, 'custom_date_one', ['dateFormats' => $dateType]);
+    $this->importCSV($csv, $mapper);
     $fields = [
       'contact_id.birth_date',
       'contact_id.deceased_date',
       'contact_id.is_deceased',
-      'contact_id.custom_' . $contactCustomFieldID,
-      $addressCustomFieldID,
+      'contact_id.' . $this->getCustomFieldName('contact_date', 4),
+      $this->getCustomFieldName('address_date', 4),
     ];
     $contacts = Address::get()->addWhere('contact_id.first_name', '=', 'Joe')->setSelect($fields)->execute();
     foreach ($contacts as $contact) {
       foreach ($fields as $field) {
-        if ($field === 'contact_is_deceased') {
+        if ($field === 'contact_id.is_deceased') {
           $this->assertTrue($contact[$field]);
         }
         else {
-          $this->assertEquals('2008-09-01', $contact[$field]);
+          $this->assertEquals('2008-09-01', substr($contact[$field], 0, 10), $field);
         }
       }
     }
+  }
+
+  /**
+   * Test boolean field handling.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportBooleanFields(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Address', 'name' => 'Address'], 'boolean', 'address_');
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Contact', 'name' => 'Contact'], 'boolean', 'contact_');
+    $this->importCSV('individual_boolean.csv', [
+      ['first_name'],
+      ['last_name'],
+      ['street_address', 1],
+      ['do_not_email'],
+      [$this->getCustomFieldName('address_boolean'), 1],
+      [$this->getCustomFieldName('contact_boolean')],
+    ]);
+    $contacts = Address::get()->addWhere('contact_id.first_name', 'IN', ['Joe', 'Betty'])->setSelect([
+      'contact_id.first_name',
+      'contact_id.do_not_email',
+      $this->getCustomFieldName('address_boolean', 4),
+      'contact_id.' . $this->getCustomFieldName('contact_boolean', 4),
+    ])->execute();
+
+    foreach ($contacts as $contact) {
+      $boolean = !($contact['contact_id.first_name'] === 'Joe');
+      $this->assertSame($boolean, $contact['contact_id.do_not_email']);
+      $this->assertSame($boolean, $contact[$this->getCustomFieldName('address_boolean', 4)]);
+      $this->assertSame($boolean, $contact['contact_id.' . $this->getCustomFieldName('contact_boolean', 4)]);
+    }
+
   }
 
   /**
@@ -1794,7 +1824,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->userJobID = $this->getUserJobID(['mapper' => $mapper, 'onDuplicate' => $onDuplicateAction, 'dedupe_rule_id' => $ruleGroupId]);
     $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($this->userJobID);
-    $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->init();
 
     $parser->import($values);

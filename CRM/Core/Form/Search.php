@@ -121,8 +121,8 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $this->handleForcedSearch();
     }
     $this->_formValues = $this->getFormValues();
-    // For searchResultsTasks.tpl.
-    $this->addExpectedSmartyVariables(['savedSearch', 'selectorLabel']);
+    // For searchResultsTasks.tpl & displaySearchCriteria.tpl
+    $this->addExpectedSmartyVariables(['savedSearch', 'selectorLabel', 'operator']);
   }
 
   /**

@@ -13,7 +13,6 @@
 namespace Civi\Api4\Service\Schema;
 
 use Civi\Api4\Entity;
-use Civi\Api4\Event\Events;
 use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
@@ -52,7 +51,7 @@ class SchemaMapBuilder extends AutoService {
     $this->loadTables($map);
 
     $event = new SchemaMapBuildEvent($map);
-    $this->dispatcher->dispatch(Events::SCHEMA_MAP_BUILD, $event);
+    $this->dispatcher->dispatch('api.schema_map.build', $event);
 
     return $map;
   }
@@ -105,9 +104,15 @@ class SchemaMapBuilder extends AutoService {
     if (!$customInfo) {
       return;
     }
+    $select = ['f.name', 'f.data_type', 'f.label', 'f.column_name', 'f.option_group_id', 'f.serialize', 'f.fk_entity'];
+    // Prevent errors during upgrade by only selecting fields supported by the current version
+    $supportedFields = \CRM_Utils_Array::prefixKeys(\CRM_Core_BAO_CustomField::getSupportedFields(), 'f.');
+    $select = array_intersect($select, array_keys($supportedFields));
+    // Also select fields from the custom_group table (these fields are so old we don't have to worry about upgrade issues)
+    $select = array_merge(['g.name as custom_group_name', 'g.table_name', 'g.is_multiple'], $select);
     $fieldData = \CRM_Utils_SQL_Select::from('civicrm_custom_field f')
       ->join('custom_group', 'INNER JOIN civicrm_custom_group g ON g.id = f.custom_group_id')
-      ->select(['g.name as custom_group_name', 'g.table_name', 'g.is_multiple', 'f.name', 'f.data_type', 'label', 'column_name', 'option_group_id', 'serialize'])
+      ->select($select)
       ->where('g.extends IN (@entity)', ['@entity' => $customInfo['extends']])
       ->where('g.is_active')
       ->where('f.is_active')
@@ -134,6 +139,12 @@ class SchemaMapBuilder extends AutoService {
       if (!empty($fieldData->is_multiple)) {
         $joinable = new Joinable($baseTable->getName(), $customInfo['column'], AllCoreTables::convertEntityNameToLower($entityName));
         $customTable->addTableLink('entity_id', $joinable);
+      }
+
+      if ($fieldData->data_type === 'EntityReference' && isset($fieldData->fk_entity)) {
+        $targetTable = AllCoreTables::getTableForEntityName($fieldData->fk_entity);
+        $joinable = new Joinable($targetTable, 'id', $fieldData->name);
+        $customTable->addTableLink($fieldData->column_name, $joinable);
       }
 
       if ($fieldData->data_type === 'ContactReference') {

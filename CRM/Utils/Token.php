@@ -683,6 +683,7 @@ class CRM_Utils_Token {
     $html = FALSE,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (!$categories) {
       $categories = self::getTokenCategories();
     }
@@ -722,6 +723,7 @@ class CRM_Utils_Token {
    * @deprecated
    */
   public static function parseThroughSmarty($tokenHtml, $entity, $entityType = 'contact') {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the tokens to the template
@@ -1197,6 +1199,7 @@ class CRM_Utils_Token {
    * @deprecated
    */
   public static function getMembershipTokenDetails($membershipIDs) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $memberships = civicrm_api3('membership', 'get', [
       'options' => ['limit' => 0],
       'membership_id' => ['IN' => (array) $membershipIDs],
@@ -1389,6 +1392,7 @@ class CRM_Utils_Token {
    *   string with replacements made
    */
   public static function replaceEntityTokens($entity, $entityArray, $str, $knownTokens = [], $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (!$knownTokens || empty($knownTokens[$entity])) {
       return $str;
     }
@@ -1720,12 +1724,15 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
    * @param $value
    * @param $token
    *
    * @return bool|int|mixed|string|null
    */
   protected static function convertPseudoConstantsUsingMetadata($value, $token) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     // Convert pseudoconstants using metadata
     if ($value && is_numeric($value)) {
       $allFields = CRM_Contact_BAO_Contact::exportableFields('All');

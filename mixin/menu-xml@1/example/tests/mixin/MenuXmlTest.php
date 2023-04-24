@@ -18,11 +18,11 @@ class MenuXmlTest extends \PHPUnit\Framework\Assert {
    */
   protected $url;
 
-  public function testPreConditions($cv) {
+  public function testPreConditions($cv): void {
     $this->assertFileExists(static::getPath('/xml/Menu/shimmy.xml'), 'The shimmy extension must have a Menu XML file.');
   }
 
-  public function testInstalled($cv) {
+  public function testInstalled($cv): void {
     // The menu item is registered...
     $items = $cv->api4('Route', 'get', ['where' => [['path', '=', 'civicrm/shimmy/foobar']]]);
     $this->assertEquals('CRM_Shimmy_Page_FooBar', $items[0]['page_callback']);
@@ -34,7 +34,7 @@ class MenuXmlTest extends \PHPUnit\Framework\Assert {
     $this->assertRegExp(';hello world;', $response);
   }
 
-  public function testDisabled($cv) {
+  public function testDisabled($cv): void {
     $items = $cv->api4('Route', 'get', ['where' => [['path', '=', 'civicrm/shimmy/foobar']]]);
     $this->assertEmpty($items);
 
@@ -44,7 +44,7 @@ class MenuXmlTest extends \PHPUnit\Framework\Assert {
     $this->assertNotRegExp(';HTTP.*200.*;', $http_response_header[0]);
   }
 
-  public function testUninstalled($cv) {
+  public function testUninstalled($cv): void {
     // Same as disabled.
     $this->testDisabled($cv);
   }

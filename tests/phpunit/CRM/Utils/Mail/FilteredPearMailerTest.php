@@ -6,6 +6,11 @@
  */
 class CRM_Utils_Mail_FilteredPearMailerTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   public function testFilter() {
     $mock = new class() extends \Mail {
       public $buf = [];

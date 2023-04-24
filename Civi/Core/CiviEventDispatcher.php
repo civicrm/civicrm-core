@@ -296,30 +296,31 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
     $hooks = \CRM_Utils_Hook::singleton();
     $params = $event->getHookValues();
     $count = count($params);
+    $null = NULL;
 
     switch ($count) {
       case 0:
-        $fResult = $hooks->invokeViaUF($count, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $null, $null, $null, $null, $null, $null, $hookName);
         break;
 
       case 1:
-        $fResult = $hooks->invokeViaUF($count, $params[0], \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $params[0], $null, $null, $null, $null, $null, $hookName);
         break;
 
       case 2:
-        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $null, $null, $null, $null, $hookName);
         break;
 
       case 3:
-        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], $null, $null, $null, $hookName);
         break;
 
       case 4:
-        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], $params[3], \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], $params[3], $null, $null, $hookName);
         break;
 
       case 5:
-        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], $params[3], $params[4], \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], $params[3], $params[4], $null, $hookName);
         break;
 
       case 6:

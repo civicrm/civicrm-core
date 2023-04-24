@@ -244,14 +244,13 @@ AND    {$this->_componentClause}";
     $pdfElements = [];
     $pdfElements['details'] = self::getDetails(implode(',', $contribIds));
     $excludeContactIds = [];
+    $suppressedEmails = 0;
     if (!$isCreatePDF) {
       $contactDetails = civicrm_api3('Contact', 'get', [
         'return' => ['email', 'do_not_email', 'is_deceased', 'on_hold'],
         'id' => ['IN' => $contactIds],
         'options' => ['limit' => 0],
       ])['values'];
-      $pdfElements['suppressedEmails'] = 0;
-      $suppressedEmails = 0;
       foreach ($contactDetails as $id => $values) {
         if (empty($values['email']) ||
           (empty($params['override_privacy']) && !empty($values['do_not_email']))
@@ -259,11 +258,11 @@ AND    {$this->_componentClause}";
           || !empty($values['on_hold'])
         ) {
           $suppressedEmails++;
-          $pdfElements['suppressedEmails'] = $suppressedEmails;
           $excludeContactIds[] = $values['contact_id'];
         }
       }
     }
+    $pdfElements['suppressedEmails'] = $suppressedEmails;
     $pdfElements['excludeContactIds'] = $excludeContactIds;
 
     return $pdfElements;

@@ -6,11 +6,12 @@
       savedSearch: '<'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdmin.html',
-    controller: function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta) {
+    controller: function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta, crmUiHelp) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
         afformLoad,
         fieldsForJoinGetters = {};
+      $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Compose'});
 
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
       this.afformAdminEnabled = (CRM.checkPerm('administer CiviCRM') || CRM.checkPerm('administer afform')) &&
@@ -114,6 +115,7 @@
         if (params.tag_id && params.tag_id.length) {
           chain.tag_id = ['EntityTag', 'replace', {
             where: [['entity_id', '=', '$id'], ['entity_table', '=', 'civicrm_saved_search']],
+            match: ['entity_id', 'entity_table', 'tag_id'],
             records: _.transform(params.tag_id, function(records, id) {records.push({tag_id: id});})
           }];
         } else if (params.id) {
@@ -533,7 +535,7 @@
           _.each(fields, function(field) {
             var item = {
               // Use options suffix if available.
-              id: prefix + field.name + (field.options && _.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
+              id: prefix + field.name + (_.includes(field.suffixes || [], suffix.replace(':', '')) ? suffix : ''),
               text: field.label,
               description: field.description
             };

@@ -114,7 +114,7 @@
           </td>
 
           <td style='white-space: nowrap'>
-             {if $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}
+             {if array_key_exists($field, $form) && $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}
           </td>
 
           {* For location blocks *}
@@ -219,7 +219,7 @@
       </tr>
       {else}
       <tr class="{cycle values="even-row,odd-row"}">
-        <td><strong>{ts}Move related...{/ts}</strong></td><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
+        <td><strong>{ts}Move related...{/ts}</strong></td><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $params.has_operation}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
          <td>({ts}migrate{/ts})</td>
       </tr>
       {/if}

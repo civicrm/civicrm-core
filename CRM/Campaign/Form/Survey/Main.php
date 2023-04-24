@@ -187,7 +187,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
       );
       // delete option group if no any survey is using it.
       if (!$countSurvey) {
-        CRM_Core_BAO_OptionGroup::del($this->_values['result_id']);
+        CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $this->_values['result_id']]);
       }
     }
 

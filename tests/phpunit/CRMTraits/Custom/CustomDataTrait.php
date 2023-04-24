@@ -94,7 +94,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    */
   public function createCustomGroupWithFieldOfType(array $groupParams = [], string $customFieldType = 'text', ?string $identifier = NULL, array $fieldParams = []): void {
-    $supported = ['text', 'select', 'date', 'checkbox', 'int', 'contact_reference', 'radio', 'multi_country'];
+    $supported = ['text', 'select', 'date', 'checkbox', 'int', 'contact_reference', 'radio', 'multi_country', 'boolean'];
     if (!in_array($customFieldType, $supported, TRUE)) {
       $this->fail('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
@@ -136,6 +136,9 @@ trait CRMTraits_Custom_CustomDataTrait {
         $reference = $this->createMultiCountryCustomField($fieldParams)['id'];
         return;
 
+      case 'boolean':
+        $reference = $this->createBooleanCustomField($fieldParams)['id'];
+        return;
     }
   }
 

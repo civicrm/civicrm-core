@@ -229,7 +229,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    *
    * Test with missing params.
    */
-  public function testCreateWithEmptyParams() {
+  public function testCreateWithEmptyParams(): void {
     $params = [
       'first_name' => 'Bill',
       'last_name' => 'Adams',
@@ -246,7 +246,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * Test with all params.
    * ( create and update modes ).
    */
-  public function testCreateWithAll() {
+  public function testCreateWithAll(): void {
     //take the common contact params
     $params = $this->contactParams();
     $params['note'] = 'test note';
@@ -703,7 +703,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'supplemental_address_3-Primary' => 'My Town',
       'user_unique_id' => '123456789',
       'is_bulkmail' => '1',
-      'world_region' => 'India',
       'tag' => [
         '3' => '1',
         '4' => '1',
@@ -860,7 +859,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       ],
       'contact_source' => 'test contact',
       'external_identifier' => 111222333,
-      'preferred_mail_format' => 'Both',
       'is_opt_out' => 0,
       'legal_identifier' => '123123123123',
       'image_URL' => 'http://imageupdate.com',
@@ -901,7 +899,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'supplemental_address_3-Primary' => 'Anywhere',
       'user_unique_id' => '1122334455',
       'is_bulkmail' => '1',
-      'world_region' => 'India',
       'tag' => [
         '2' => '1',
         '5' => '1',
@@ -1103,7 +1100,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test case for getPrimaryEmail.
    */
-  public function testGetPrimaryEmail() {
+  public function testGetPrimaryEmail(): void {
     //get the contact params
     $params = $this->contactParams();
     $params['email'][2] = $params['email'][1];
@@ -1202,7 +1199,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $contactId = $contact->id;
 
     //get DisplayAndImage.
-    list($displayName, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($contactId);
+    [$displayName, $image] = CRM_Contact_BAO_Contact::getDisplayAndImage($contactId);
 
     $checkImage = CRM_Contact_BAO_Contact_Utils::getImage($params['contact_type'], FALSE, $contactId);
 
@@ -1376,7 +1373,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
           'location_type_id' => 1,
           'contact_id' => $contactId,
         ];
-        CRM_Core_BAO_Phone::create($params);
+        CRM_Core_BAO_Phone::writeRecord($params);
         $test->assertDBQuery('202-555-1000',
           'SELECT phone FROM civicrm_phone WHERE contact_id = %1 ORDER BY id DESC LIMIT 1',
           [1 => [$contactId, 'Integer']]
@@ -1594,7 +1591,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'is_billing' => 1,
       'state_province_id' => '3934',
     ];
-    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+    $addAddressA = CRM_Core_BAO_Address::writeRecord($addressParamsA);
 
     $addressParamsB[1] = [
       'contact_id' => $contactIdB,
@@ -1603,7 +1600,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     ];
 
     CRM_Contact_BAO_Contact_Utils::processSharedAddress($addressParamsB);
-    $addAddressB = CRM_Core_BAO_Address::add($addressParamsB[1], FALSE);
+    $addAddressB = CRM_Core_BAO_Address::writeRecord($addressParamsB[1]);
 
     foreach ($addAddressA as $key => $value) {
       if (!in_array($key, ['id', 'contact_id', 'master_id', 'is_primary', 'is_billing', 'location_type_id', 'manual_geo_code'])) {
@@ -1748,7 +1745,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Show age of contact on Deceased date
    */
-  public function testAgeOfDeceasedContact() {
+  public function testAgeOfDeceasedContact(): void {
     $birthDate = '1961-06-06';
     $deceasedDate = '1991-07-07';
     $age = CRM_Utils_Date::calculateAge($birthDate, $deceasedDate);
@@ -1758,7 +1755,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Show age of Contact with current date
    */
-  public function testAgeOfNormalContact() {
+  public function testAgeOfNormalContact(): void {
     $birthDate = '1961-06-06';
     $age = CRM_Utils_Date::calculateAge($birthDate);
     $this->assertGreaterThanOrEqual('59', $age['years']);
@@ -1767,7 +1764,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test invalidateChecksum hook.
    */
-  public function testInvalidateChecksumHook() {
+  public function testInvalidateChecksumHook(): void {
     $contact_id = $this->individualCreate();
     $checksum = CRM_Contact_BAO_Contact_Utils::generateChecksum($contact_id);
     // without the hook it's valid
@@ -1784,7 +1781,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    * @param string $inputCheck
    * @param bool $invalid
    */
-  public function hookForInvalidateChecksum(int $contactID, string $inputCheck, bool &$invalid) {
+  public function hookForInvalidateChecksum(int $contactID, string $inputCheck, bool &$invalid): void {
     // invalidate all checksums
     $invalid = TRUE;
   }

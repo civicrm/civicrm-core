@@ -88,7 +88,7 @@ class E2E_Shimmy_LifecycleTest extends \PHPUnit\Framework\TestCase implements \C
     return dirname(__DIR__, 4) . $suffix;
   }
 
-  protected function runMethods(string $method, ...$args) {
+  protected function runMethods(string $method, ...$args): void {
     if (empty($this->mixinTests)) {
       $this->fail('Cannot run methods. No mixin tests found.');
     }
@@ -99,6 +99,10 @@ class E2E_Shimmy_LifecycleTest extends \PHPUnit\Framework\TestCase implements \C
 
   protected function createCvWithLocalFunctions() {
     return new class {
+
+      public function isLocal(): bool {
+        return TRUE;
+      }
 
       public function api3($entity, $action, $params) {
         return civicrm_api3($entity, $action, $params);
@@ -123,6 +127,10 @@ class E2E_Shimmy_LifecycleTest extends \PHPUnit\Framework\TestCase implements \C
 
   protected function createCvWithSubprocesses() {
     return new class {
+
+      public function isLocal(): bool {
+        return FALSE;
+      }
 
       public function api3($entity, $action, $params) {
         return $this->cv('api3 --in=json ' . escapeshellarg("$entity.$action"), json_encode($params));

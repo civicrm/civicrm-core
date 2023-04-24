@@ -144,65 +144,47 @@ class CRM_Core_BAO_CMSUser {
 
     $config = CRM_Core_Config::singleton();
 
-    $isDrupal = $config->userSystem->is_drupal;
-    $isJoomla = ucfirst($config->userFramework) == 'Joomla';
-    $isWordPress = $config->userFramework == 'WordPress';
-
     $errors = [];
-    if ($isDrupal || $isJoomla || $isWordPress) {
-      $emailName = NULL;
-      if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
-        // this is a transaction related page
-        $emailName = 'email-' . $form->_bltID;
-      }
-      else {
-        // find the email field in a profile page
-        foreach ($fields as $name => $dontCare) {
-          if (substr($name, 0, 5) == 'email') {
-            $emailName = $name;
-            break;
-          }
-        }
-      }
 
-      if ($emailName == NULL) {
-        $errors['_qf_default'] = ts('Could not find an email address.');
-        return $errors;
-      }
+    $emailName = $config->userSystem->getEmailFieldName($form, $fields);
 
-      if (empty($fields['cms_name'])) {
-        $errors['cms_name'] = ts('Please specify a username.');
-      }
+    $params = [
+      'name' => $fields['cms_name'],
+      'mail' => isset($fields[$emailName]) ? $fields[$emailName] : '',
+      'pass' => isset($fields['cms_pass']) ? $fields['cms_pass'] : '',
+    ];
 
-      if (empty($fields[$emailName])) {
-        $errors[$emailName] = ts('Please specify a valid email address.');
-      }
-
-      if ($config->userSystem->isPasswordUserGenerated()) {
-        if (empty($fields['cms_pass']) ||
-          empty($fields['cms_confirm_pass'])
-        ) {
-          $errors['cms_pass'] = ts('Please enter a password.');
-        }
-        if ($fields['cms_pass'] != $fields['cms_confirm_pass']) {
-          $errors['cms_pass'] = ts('Password and Confirm Password values are not the same.');
-        }
-      }
-
-      if (!empty($errors)) {
-        return $errors;
-      }
-
-      // now check that the cms db does not have the user name and/or email
-      if ($isDrupal or $isJoomla or $isWordPress) {
-        $params = [
-          'name' => $fields['cms_name'],
-          'mail' => $fields[$emailName],
-        ];
-      }
-
-      $config->userSystem->checkUserNameEmailExists($params, $errors, $emailName);
+    // Verify the password.
+    if ($config->userSystem->isPasswordUserGenerated()) {
+      $config->userSystem->verifyPassword($params, $errors);
     }
+
+    // Set generic errors messages.
+    if ($emailName == '') {
+      $errors['_qf_default'] = ts('Could not find an email address.');
+    }
+
+    if (empty($params['name'])) {
+      $errors['cms_name'] = ts('Please specify a username.');
+    }
+
+    if (empty($params['mail'])) {
+      $errors[$emailName] = ts('Please specify a valid email address.');
+    }
+
+    if ($config->userSystem->isPasswordUserGenerated()) {
+      if (empty($fields['cms_pass']) ||
+        empty($fields['cms_confirm_pass'])
+      ) {
+        $errors['cms_pass'] = ts('Please enter a password.');
+      }
+      if ($fields['cms_pass'] != $fields['cms_confirm_pass']) {
+        $errors['cms_pass'] = ts('Password and Confirm Password values are not the same.');
+      }
+    }
+
+    $config->userSystem->checkUserNameEmailExists($params, $errors, $emailName);
+
     return (!empty($errors)) ? $errors : TRUE;
   }
 

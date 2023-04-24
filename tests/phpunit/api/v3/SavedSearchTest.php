@@ -37,7 +37,6 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
   protected $params;
   protected $id;
   protected $_entity;
-  public $DBResetRequired = FALSE;
 
   public function setUp(): void {
     parent::setUp();

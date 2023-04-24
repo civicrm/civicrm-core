@@ -373,7 +373,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     $activityTypeDescription = NULL;
     if ($this->_activityTypeId) {
-      list($this->_activityTypeName, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($this->_activityTypeId);
+      [$this->_activityTypeName, $activityTypeDescription] = CRM_Core_BAO_OptionValue::getActivityTypeDetails($this->_activityTypeId);
     }
 
     // Set activity type name and description to template.
@@ -928,7 +928,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // store the submitted values in an array
     if (!$params) {
-      $params = $this->controller->exportValues($this->_name);
+      $params = $this->getSubmittedValues();
+    }
+    else {
+      CRM_Core_Error::deprecatedWarning('passing params into postProcess is deprecated. Match parent function');
     }
 
     // Set activity type id.

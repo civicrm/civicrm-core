@@ -87,7 +87,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       "start_action_condition" => "monday,tuesday,wednesday,thursday,friday,saturday",
       "start_action_offset" => "2",
     ];
-    $actionScheduleObj = CRM_Core_BAO_ActionSchedule::add($params);
+    $actionScheduleObj = CRM_Core_BAO_ActionSchedule::writeRecord($params);
     return $actionScheduleObj;
   }
 

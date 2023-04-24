@@ -84,4 +84,29 @@ class GroupTest extends Api4TestBase {
       ->execute();
   }
 
+  public function testGetParents() {
+    $parent1 = Group::create(FALSE)
+      ->addValue('title', uniqid())
+      ->execute()->single();
+    $parent2 = Group::create(FALSE)
+      ->addValue('title', uniqid())
+      ->execute()->single();
+    $child = Group::create(FALSE)
+      ->addValue('title', uniqid())
+      ->addValue('parents', [$parent1['id'], $parent2['id']])
+      ->execute()->single();
+
+    $get = Group::get(FALSE)
+      ->addWhere('id', '=', $child['id'])
+      ->addSelect('parents')
+      ->execute()->single();
+    $this->assertEquals([$parent1['id'], $parent2['id']], $get['parents']);
+
+    $get = Group::get(FALSE)
+      ->addWhere('id', '=', $child['id'])
+      ->addSelect('parents:label')
+      ->execute()->single();
+    $this->assertEquals([$parent1['title'], $parent2['title']], $get['parents:label']);
+  }
+
 }

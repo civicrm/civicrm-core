@@ -165,7 +165,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       $deleted = 0;
       $tag = civicrm_api3('tag', 'getsingle', ['id' => $this->_id[0]]);
       foreach ($this->_id as $id) {
-        if (CRM_Core_BAO_Tag::del($id)) {
+        if (CRM_Core_BAO_Tag::deleteRecord(['id' => $id])) {
           $deleted++;
         }
       }

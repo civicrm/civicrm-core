@@ -352,8 +352,7 @@ class CRM_Utils_File {
    * @return bool
    */
   public static function isExtensionSafe($ext) {
-    static $extensions = NULL;
-    if (!$extensions) {
+    if (!isset(Civi::$statics[__CLASS__]['file_extensions'])) {
       $extensions = CRM_Core_OptionGroup::values('safe_file_extension', TRUE);
 
       // make extensions to lowercase
@@ -370,9 +369,11 @@ class CRM_Utils_File {
         unset($extensions['html']);
         unset($extensions['htm']);
       }
+      Civi::$statics[__CLASS__]['file_extensions'] = $extensions;
     }
+    $restricted = CRM_Utils_Constant::value('CIVICRM_RESTRICTED_UPLOADS', '/(php|php\d|phtml|phar|pl|py|cgi|asp|js|sh|exe|pcgi\d)/i');
     // support lower and uppercase file extensions
-    return (bool) isset($extensions[strtolower($ext)]);
+    return (bool) isset(Civi::$statics[__CLASS__]['file_extensions'][strtolower($ext)]) && !preg_match($restricted, strtolower($ext));
   }
 
   /**

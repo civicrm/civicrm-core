@@ -25,34 +25,23 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   public static $_membershipTypeInfo = [];
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipType', $id, 'is_active', $is_active);
   }
 
@@ -61,50 +50,38 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Array contains the id (deprecated).
    *
    * @return \CRM_Member_DAO_MembershipType
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params, $ids = []) {
-    // DEPRECATED Check if membershipType ID was passed in via $ids
-    if (empty($params['id'])) {
-      if (isset($ids['membershipType'])) {
-        Civi::log()->warning('Deprecated: Passing membershipType by $ids array in CRM_Member_BAO_MembershipType::add');
-      }
-      $params['id'] = $ids['membershipType'] ?? NULL;
-    }
-
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'MembershipType', CRM_Utils_Array::value('id', $params), $params);
+    $membershipTypeID = $params['id'] ?? NULL;
+    CRM_Utils_Hook::pre($hook, 'MembershipType', $membershipTypeID, $params);
 
-    $membershipTypeId = $params['id'] ?? NULL;
-
-    if (!$membershipTypeId && !isset($params['domain_id'])) {
+    if (!$membershipTypeID && !isset($params['domain_id'])) {
       $params['domain_id'] = CRM_Core_Config::domainID();
     }
 
     // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an organization is changed.
     $previousID = NULL;
-    if ($membershipTypeId) {
-      $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipTypeId, 'member_of_contact_id');
+    if ($membershipTypeID) {
+      $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipTypeID, 'member_of_contact_id');
     }
 
-    // action is taken depending upon the mode
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->copyValues($params);
     $membershipType->save();
 
-    if ($membershipTypeId) {
+    if ($membershipTypeID) {
       // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
       // name etc - the presence of previous id tells us this is an update
       $params = array_merge(civicrm_api3('membership_type', 'getsingle', ['id' => $membershipType->id]), $params);
     }
     self::createMembershipPriceField($params, $previousID, $membershipType->id);
     // update all price field value for quick config when membership type is set CRM-11718
-    if ($membershipTypeId) {
-      self::updateAllPriceFieldValue($membershipTypeId, $params);
+    if ($membershipTypeID) {
+      self::updateAllPriceFieldValue($membershipTypeID, $params);
     }
 
     CRM_Utils_Hook::post($hook, 'MembershipType', $membershipType->id, $membershipType);
@@ -135,6 +112,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    * @return bool
    */
   public static function del($membershipTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     try {
       static::deleteRecord(['id' => $membershipTypeId]);
       return TRUE;

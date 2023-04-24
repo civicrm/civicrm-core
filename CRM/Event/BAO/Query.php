@@ -335,6 +335,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
           $labels[] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
         }
         $query->_where[$grouping][] = "civicrm_line_item.price_field_value_id IN (" . implode(', ', $value) . ")";
+        $query->_where[$grouping][] = "civicrm_line_item.qty > 0";
         $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $labels);
         $query->_tables['civicrm_participant'] = $query->_tables['civicrm_line_item'] = $query->_whereTables['civicrm_line_item'] = 1;
         return;
@@ -639,6 +640,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->addRule('participant_fee_amount_low', ts('Please enter a valid money value.'), 'money');
     $form->addRule('participant_fee_amount_high', ts('Please enter a valid money value.'), 'money');
+    $form->add('number', 'participant_id', ts('Participant ID'), ['class' => 'four', 'min' => 1]);
 
     self::addCustomFormFields($form, ['Participant', 'Event']);
 

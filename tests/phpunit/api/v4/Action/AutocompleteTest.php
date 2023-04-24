@@ -54,11 +54,6 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     }
   }
 
-  public function setUpHeadless() {
-    // TODO: search_kit should probably be part of the 'headless()' baseline.
-    return \Civi\Test::headless()->install(['org.civicrm.search_kit'])->apply();
-  }
-
   public function setUp(): void {
     $this->hookCallback = NULL;
     // Ensure MockBasicEntity gets added via above listener
@@ -234,7 +229,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
   }
 
   public function testAutocompleteWithDifferentKey() {
-    $label = $this->randomLetters();
+    $label = \CRM_Utils_String::createRandom(10, implode('', range('a', 'z')));
     $sample = $this->saveTestRecords('SavedSearch', [
       'records' => [
         ['name' => 'c', 'label' => "C $label"],
@@ -272,8 +267,8 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals($sample['c']['id'], $result2[2]['id']);
   }
 
-  public function testContactAutocompleteById() {
-    $firstName = $this->randomLetters();
+  public function testContactAutocompleteById(): void {
+    $firstName = \CRM_Utils_String::createRandom(10, implode('', range('a', 'z')));
 
     $contacts = $this->saveTestRecords('Contact', [
       'records' => array_fill(0, 15, ['first_name' => $firstName]),

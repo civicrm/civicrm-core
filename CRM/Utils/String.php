@@ -692,18 +692,22 @@ class CRM_Utils_String {
    * @param string $string
    *   E.g. "view all contacts". Syntax: "[prefix:]name".
    * @param string|null $defaultPrefix
+   * @param string $validPrefixPattern
+   *   A regular expression used to determine if a prefix is valid.
+   *   To wit: Prefixes MUST be strictly alphanumeric.
    *
    * @return array
    *   (0 => string|NULL $prefix, 1 => string $value)
    */
-  public static function parsePrefix($delim, $string, $defaultPrefix = NULL) {
+  public static function parsePrefix($delim, $string, $defaultPrefix = NULL, $validPrefixPattern = '/^[A-Za-z0-9]+$/') {
     $pos = strpos($string, $delim);
     if ($pos === FALSE) {
       return [$defaultPrefix, $string];
     }
-    else {
-      return [substr($string, 0, $pos), substr($string, 1 + $pos)];
-    }
+
+    $lhs = substr($string, 0, $pos);
+    $rhs = substr($string, 1 + $pos);
+    return preg_match($validPrefixPattern, $lhs) ? [$lhs, $rhs] : [$defaultPrefix, $string];
   }
 
   /**
@@ -1026,6 +1030,10 @@ class CRM_Utils_String {
    * @param string $templateString
    *
    * @return string
+   *
+   * @noinspection PhpDocRedundantThrowsInspection
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function parseOneOffStringThroughSmarty($templateString) {
     if (!CRM_Utils_String::stringContainsTokens($templateString)) {
@@ -1034,13 +1042,15 @@ class CRM_Utils_String {
     }
     $smarty = CRM_Core_Smarty::singleton();
     $cachingValue = $smarty->caching;
+    set_error_handler([$smarty, 'handleSmartyError'], E_USER_ERROR);
     $smarty->caching = 0;
     $smarty->assign('smartySingleUseString', $templateString);
     // Do not escape the smartySingleUseString as that is our smarty template
     // and is likely to contain html.
     $templateString = (string) $smarty->fetch('string:{eval var=$smartySingleUseString|smarty:nodefaults}');
     $smarty->caching = $cachingValue;
-    $smarty->assign('smartySingleUseString', NULL);
+    $smarty->assign('smartySingleUseString');
+    restore_error_handler();
     return $templateString;
   }
 

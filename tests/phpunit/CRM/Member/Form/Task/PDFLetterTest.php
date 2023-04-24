@@ -109,9 +109,9 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
       'Test Fee' => 'fee',
       'Test Type' => 'membership_type_id:label',
       'Test Status' => 'status_id:label',
-      'Test Join Date' => 'join_date',
-      'Test Start Date' => 'start_date',
-      'Test End Date' => 'end_date',
+      'Test Member Since' => 'join_date',
+      'Test Membership Start Date' => 'start_date',
+      'Test Membership Expiration Date' => 'end_date',
     ];
 
     $html = '';

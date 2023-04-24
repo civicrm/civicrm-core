@@ -23,31 +23,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   use CRM_Core_Form_EntityFormTrait;
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   *  - required
-   *  - is_freeze (field should be frozen).
-   *
-   * @var array
-   */
-  protected $entityFields = [];
-
-  /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
-
-  /**
    * @var bool
    */
   public $submitOnce = TRUE;
@@ -350,7 +325,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $title = CRM_Core_BAO_UFGroup::getTitle($this->_id);
-      CRM_Core_BAO_UFGroup::del($this->_id);
+      CRM_Core_BAO_UFGroup::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been deleted.", [1 => $title]), ts('Profile Deleted'), 'success');
     }
     elseif ($this->_action & CRM_Core_Action::DISABLE) {

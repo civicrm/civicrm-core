@@ -60,7 +60,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
 
     // Send activity type description to template.
-    list(, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($defaults['activity_type_id']);
+    [, $activityTypeDescription] = CRM_Core_BAO_OptionValue::getActivityTypeDetails($defaults['activity_type_id']);
     $this->assign('activityTypeDescription', $activityTypeDescription);
 
     if (!empty($defaults['mailingId'])) {
@@ -73,7 +73,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
         $this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, $cid);
       $this->assign('openreport', $full_open_report);
 
-      $click_thru_report = CRM_Mailing_Event_BAO_MailingEventClickThrough::getRows($this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, NULL, $cid);
+      $click_thru_report = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getRows($this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, NULL, $cid);
       $this->assign('clickreport', $click_thru_report);
     }
 

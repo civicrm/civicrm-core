@@ -29,7 +29,12 @@
 class CRM_Utils_FakeObject {
 
   /**
-   * @param $array
+   * @var array
+   */
+  protected $array;
+
+  /**
+   * @param array $array
    */
   public function __construct($array) {
     $this->array = $array;

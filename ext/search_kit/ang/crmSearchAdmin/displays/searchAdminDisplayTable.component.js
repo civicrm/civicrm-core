@@ -11,9 +11,10 @@
       parent: '^crmSearchAdminDisplay'
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayTable.html',
-    controller: function($scope, searchMeta, formatForSelect2) {
+    controller: function($scope, searchMeta, formatForSelect2, crmUiHelp) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+      $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Display'});
 
       this.tableClasses = [
         {name: 'table', label: ts('Row Borders')},

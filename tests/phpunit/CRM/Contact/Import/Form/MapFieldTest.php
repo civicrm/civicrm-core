@@ -40,7 +40,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * Delete any saved mapping config.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field'], TRUE);
+    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field', 'civicrm_user_job', 'civicrm_queue'], TRUE);
     parent::tearDown();
   }
 

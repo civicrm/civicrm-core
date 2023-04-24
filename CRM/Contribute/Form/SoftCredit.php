@@ -108,16 +108,15 @@ class CRM_Contribute_Form_SoftCredit {
   /**
    * Add PCP fields for the new contribution form and others.
    *
-   * @param CRM_Core_Form &$form
+   * @param CRM_Core_Form $form
    *   The form being built.
    * @param string $suffix
    *   A suffix to add to field names.
    */
-  public static function addPCPFields(&$form, $suffix = '') {
+  public static function addPCPFields($form, $suffix = '') {
     // CRM-7368 allow user to set or edit PCP link for contributions
     $siteHasPCPs = CRM_Contribute_PseudoConstant::pcPage();
     if (!CRM_Utils_Array::crmIsEmptyArray($siteHasPCPs)) {
-      $form->assign('siteHasPCPs', 1);
       // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
       $form->add('text', "pcp_made_through_id$suffix", ts('Credit to a Personal Campaign Page'), ['class' => 'twenty', 'placeholder' => ts('- select -')]);
       // stores the label

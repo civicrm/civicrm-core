@@ -17,26 +17,46 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
 
   use Civi\Test\ACLPermissionTrait;
 
+  /**
+   * @var int
+   */
+  private $contactID;
+
+  /**
+   * @var int
+   */
+  private $otherContactID;
+
+  /**
+   * @var int
+   */
+  private $ownEventID;
+
+  /**
+   * @var int
+   */
+  private $otherEventID;
+
   public function setUp(): void {
     parent::setUp();
-    $this->_contactId = $this->createLoggedInUser();
+    $this->contactID = $this->createLoggedInUser();
     $this->createOwnEvent();
     $this->createOtherEvent();
   }
 
   public function createOwnEvent() {
     $event = $this->eventCreate([
-      'created_id' => $this->_contactId,
+      'created_id' => $this->contactID,
     ]);
-    $this->_ownEventId = $event['id'];
+    $this->ownEventID = $event['id'];
   }
 
   public function createOtherEvent() {
-    $this->_otherContactId = $this->_contactId + 1;
+    $this->otherContactID = $this->contactID + 1;
     $event = $this->eventCreate([
-      'created_id' => $this->_otherContactId,
+      'created_id' => $this->otherContactID,
     ]);
-    $this->_otherEventId = $event['id'];
+    $this->otherEventID = $event['id'];
   }
 
   private function setViewOwnEventPermissions() {
@@ -58,19 +78,18 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
   public function testViewOwnEvent() {
     $this->setViewOwnEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
-    $permissions = CRM_Event_BAO_Event::checkPermission($this->_ownEventId, CRM_Core_Permission::VIEW);
+    $permissions = CRM_Event_BAO_Event::checkPermission($this->ownEventID, CRM_Core_Permission::VIEW);
     $this->assertTrue($permissions);
     // Now check that caching is actually working
-    \Civi::$statics['CRM_Event_BAO_Event']['permission']['view'][$this->_ownEventId] = FALSE;
-    $permissions = CRM_Event_BAO_Event::checkPermission($this->_ownEventId, CRM_Core_Permission::VIEW);
+    \Civi::$statics['CRM_Event_BAO_Event']['permission']['view'][$this->ownEventID] = FALSE;
+    $permissions = CRM_Event_BAO_Event::checkPermission($this->ownEventID, CRM_Core_Permission::VIEW);
     $this->assertFalse($permissions);
   }
 
   public function testEditOwnEvent() {
     $this->setViewOwnEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
-    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
-    $permissions = CRM_Event_BAO_Event::checkPermission($this->_ownEventId, CRM_Core_Permission::EDIT);
+    $permissions = CRM_Event_BAO_Event::checkPermission($this->ownEventID, CRM_Core_Permission::EDIT);
     $this->assertTrue($permissions);
   }
 
@@ -81,23 +100,21 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
     // Check that you can't delete your own event without "Delete in CiviEvent" permission
     $this->setViewOwnEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
-    $permissions = CRM_Event_BAO_Event::checkPermission($this->_ownEventId, CRM_Core_Permission::DELETE);
+    $permissions = CRM_Event_BAO_Event::checkPermission($this->ownEventID, CRM_Core_Permission::DELETE);
     $this->assertFalse($permissions);
   }
 
   public function testViewOtherEventDenied() {
-    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
     self::setViewOwnEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
-    $permissions = CRM_Event_BAO_Event::checkPermission($this->_otherEventId, CRM_Core_Permission::VIEW);
+    $permissions = CRM_Event_BAO_Event::checkPermission($this->otherEventID, CRM_Core_Permission::VIEW);
     $this->assertFalse($permissions);
   }
 
   public function testViewOtherEventAllowed() {
-    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
     self::setViewAllEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
-    $permissions = CRM_Event_BAO_Event::checkPermission($this->_otherEventId, CRM_Core_Permission::VIEW);
+    $permissions = CRM_Event_BAO_Event::checkPermission($this->otherEventID, CRM_Core_Permission::VIEW);
     $this->assertTrue($permissions);
   }
 
@@ -111,25 +128,23 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
   }
 
   public function testEditOtherEventDenied() {
-    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
     $this->setViewAllEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
-    $permissions = CRM_Event_BAO_Event::checkPermission($this->_otherEventId, CRM_Core_Permission::EDIT);
+    $permissions = CRM_Event_BAO_Event::checkPermission($this->otherEventID, CRM_Core_Permission::EDIT);
     $this->assertFalse($permissions);
   }
 
   public function testEditOtherEventAllowed() {
-    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
     self::setEditAllEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
-    $permissions = CRM_Event_BAO_Event::checkPermission($this->_otherEventId, CRM_Core_Permission::EDIT);
+    $permissions = CRM_Event_BAO_Event::checkPermission($this->otherEventID, CRM_Core_Permission::EDIT);
     $this->assertTrue($permissions);
   }
 
   public function testDeleteOtherEventAllowed() {
     self::setDeleteAllEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
-    $permissions = CRM_Event_BAO_Event::checkPermission($this->_otherEventId, CRM_Core_Permission::DELETE);
+    $permissions = CRM_Event_BAO_Event::checkPermission($this->otherEventID, CRM_Core_Permission::DELETE);
     $this->assertTrue($permissions);
   }
 
@@ -137,7 +152,7 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
     // FIXME: This test could be improved, but for now it checks that we can't delete if we don't have "Delete in CiviEvent"
     $this->setEditAllEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
-    $permissions = CRM_Event_BAO_Event::checkPermission($this->_otherEventId, CRM_Core_Permission::DELETE);
+    $permissions = CRM_Event_BAO_Event::checkPermission($this->otherEventID, CRM_Core_Permission::DELETE);
     $this->assertFalse($permissions);
   }
 

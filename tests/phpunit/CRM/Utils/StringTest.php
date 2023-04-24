@@ -6,6 +6,14 @@
  */
 class CRM_Utils_StringTest extends CiviUnitTestCase {
 
+  /**
+   * Set up for tests.
+   */
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   public function testBase64Url(): void {
     $examples = [
       'a' => 'YQ',
@@ -124,6 +132,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   public function parsePrefixData(): array {
     $cases = [];
     $cases[] = ['administer CiviCRM', NULL, [NULL, 'administer CiviCRM']];
+    $cases[] = ['create contributions of type Event Fee: Canada', NULL, [NULL, 'create contributions of type Event Fee: Canada']];
     $cases[] = ['administer CiviCRM', 'com_civicrm', ['com_civicrm', 'administer CiviCRM']];
     $cases[] = ['Drupal:access user profiles', NULL, ['Drupal', 'access user profiles']];
     $cases[] = ['Joomla:component:perm', NULL, ['Joomla', 'component:perm']];
@@ -432,6 +441,20 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    */
   public function testBadSerializeExamples(string $str): void {
     $this->assertFalse(CRM_Utils_String::unserialize($str));
+  }
+
+  /**
+   * Test that we get a meaningful error if Smarty syntax is wrong.
+   */
+  public function testSmartyExceptionHandling(): void {
+    try {
+      CRM_Utils_String::parseOneOffStringThroughSmarty('{if}');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringStartsWith('Message was not parsed due to invalid smarty syntax', $e->getMessage());
+      return;
+    }
+    $this->fail('Exception expected');
   }
 
 }

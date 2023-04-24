@@ -908,12 +908,8 @@ DESC limit 1");
   /**
    * Send email receipt.
    *
-   * @param CRM_Core_Form $form
-   *   Form object.
    * @param array $formValues
    *
-   * @return bool
-   *   true if mail was sent successfully
    * @throws \CRM_Core_Exception
    *
    * @deprecated
@@ -921,7 +917,7 @@ DESC limit 1");
    *   & needs rationalising.
    *
    */
-  protected function emailReceipt($form, &$formValues) {
+  protected function emailReceipt($formValues) {
     $membership = $this->getMembership();
     // retrieve 'from email id' for acknowledgement
     $receiptFrom = $formValues['from_email_address'] ?? NULL;
@@ -932,45 +928,45 @@ DESC limit 1");
       $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
     }
 
-    $form->assign('module', 'Membership');
+    $this->assign('module', 'Membership');
 
     if (!empty($formValues['contribution_id'])) {
-      $form->assign('currency', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $formValues['contribution_id'], 'currency'));
+      $this->assign('currency', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $formValues['contribution_id'], 'currency'));
     }
     else {
-      $form->assign('currency', CRM_Core_Config::singleton()->defaultCurrency);
+      $this->assign('currency', CRM_Core_Config::singleton()->defaultCurrency);
     }
 
     if (!empty($formValues['contribution_status_id'])) {
-      $form->assign('contributionStatusID', $formValues['contribution_status_id']);
-      $form->assign('contributionStatus', CRM_Contribute_PseudoConstant::contributionStatus($formValues['contribution_status_id'], 'name'));
+      $this->assign('contributionStatusID', $formValues['contribution_status_id']);
+      $this->assign('contributionStatus', CRM_Contribute_PseudoConstant::contributionStatus($formValues['contribution_status_id'], 'name'));
     }
 
     if (!empty($formValues['is_renew'])) {
-      $form->assign('receiptType', 'membership renewal');
+      $this->assign('receiptType', 'membership renewal');
     }
     else {
-      $form->assign('receiptType', 'membership signup');
+      $this->assign('receiptType', 'membership signup');
     }
-    $form->assign('receive_date', CRM_Utils_Array::value('receive_date', $formValues));
-    $form->assign('formValues', $formValues);
+    $this->assign('receive_date', CRM_Utils_Array::value('receive_date', $formValues));
+    $this->assign('formValues', $formValues);
 
-    $form->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership['start_date']));
+    $this->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership['start_date']));
     if (!CRM_Utils_System::isNull($membership['end_date'])) {
-      $form->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership['end_date']));
+      $this->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership['end_date']));
     }
-    $form->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership['membership_type_id']));
+    $this->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership['membership_type_id']));
 
-    if ((empty($form->_contributorDisplayName) || empty($form->_contributorEmail))) {
+    if ((empty($this->_contributorDisplayName) || empty($this->_contributorEmail))) {
       // in this case the form is being called statically from the batch editing screen
       // having one class in the form layer call another statically is not greate
       // & we should aim to move this function to the BAO layer in future.
       // however, we can assume that the contact_id passed in by the batch
       // function will be the recipient
-      [$form->_contributorDisplayName, $form->_contributorEmail]
+      [$this->_contributorDisplayName, $this->_contributorEmail]
         = CRM_Contact_BAO_Contact_Location::getEmailDetails($formValues['contact_id']);
-      if (empty($form->_receiptContactId)) {
-        $form->_receiptContactId = $formValues['contact_id'];
+      if (empty($this->_receiptContactId)) {
+        $this->_receiptContactId = $formValues['contact_id'];
       }
     }
 
@@ -978,21 +974,19 @@ DESC limit 1");
       [
         'workflow' => 'membership_offline_receipt',
         'from' => $receiptFrom,
-        'toName' => $form->_contributorDisplayName,
-        'toEmail' => $form->_contributorEmail,
+        'toName' => $this->_contributorDisplayName,
+        'toEmail' => $this->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
-        'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
+        'isTest' => (bool) ($this->_action & CRM_Core_Action::PREVIEW),
         'modelProps' => [
           'receiptText' => $this->getSubmittedValue('receipt_text'),
           'contributionId' => $formValues['contribution_id'],
-          'contactId' => $form->_receiptContactId,
+          'contactId' => $this->_receiptContactId,
           'membershipId' => $this->getMembershipID(),
         ],
       ]
     );
-
-    return TRUE;
   }
 
   /**
@@ -1342,30 +1336,21 @@ DESC limit 1");
     $receiptSend = FALSE;
     $contributionId = $this->ids['Contribution'] ?? CRM_Member_BAO_Membership::getMembershipContributionId($this->getMembershipID());
     $membershipIds = $this->_membershipIDs;
-    if ($contributionId && !empty($membershipIds)) {
+    if ($this->getSubmittedValue('send_receipt') && $contributionId && !empty($membershipIds)) {
       $contributionDetails = CRM_Contribute_BAO_Contribution::getContributionDetails(
         CRM_Export_Form_Select::MEMBER_EXPORT, $this->_membershipIDs);
       if ($contributionDetails[$this->getMembershipID()]['contribution_status'] === 'Completed') {
-        $receiptSend = TRUE;
+        $formValues['contact_id'] = $this->_contactID;
+        $formValues['contribution_id'] = $contributionId;
+        // receipt_text_signup is no longer used in receipts from 5.47
+        // but may linger in some sites that have not updated their
+        // templates.
+        $formValues['receipt_text_signup'] = $this->getSubmittedValue('receipt_text');
+        // send email receipt
+        $this->assignBillingName();
+        $this->emailMembershipReceipt($formValues);
+        $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', [1 => $this->_contributorEmail]));
       }
-    }
-
-    $receiptSent = FALSE;
-    if ($this->getSubmittedValue('send_receipt') && $receiptSend) {
-      $formValues['contact_id'] = $this->_contactID;
-      $formValues['contribution_id'] = $contributionId;
-      // receipt_text_signup is no longer used in receipts from 5.47
-      // but may linger in some sites that have not updated their
-      // templates.
-      $formValues['receipt_text_signup'] = $formValues['receipt_text'];
-      // send email receipt
-      $this->assignBillingName();
-      $mailSend = $this->emailMembershipReceipt($formValues);
-      $receiptSent = TRUE;
-    }
-
-    if ($receiptSent && $mailSend) {
-      $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', [1 => $this->_contributorEmail]));
     }
 
     CRM_Core_Session::setStatus($this->getStatusMessage(), ts('Complete'), 'success');
@@ -1499,7 +1484,7 @@ DESC limit 1");
     $statusMsg = ts('Membership for %1 has been updated.', [1 => $this->_memberDisplayName]);
     if ($endDate) {
       $endDate = CRM_Utils_Date::customFormat($endDate);
-      $statusMsg .= ' ' . ts('The membership End Date is %1.', [1 => $endDate]);
+      $statusMsg .= ' ' . ts('The Membership Expiration Date is %1.', [1 => $endDate]);
     }
     return $statusMsg;
   }
@@ -1521,7 +1506,7 @@ DESC limit 1");
 
       if ($memEndDate) {
         $memEndDate = CRM_Utils_Date::formatDateOnlyLong($memEndDate);
-        $statusMsg[$membership['membership_type_id']] .= ' ' . ts('The new membership End Date is %1.', [1 => $memEndDate]);
+        $statusMsg[$membership['membership_type_id']] .= ' ' . ts('The new Membership Expiration Date is %1.', [1 => $memEndDate]);
       }
     }
     $statusMsg = implode('<br/>', $statusMsg);
@@ -1600,7 +1585,8 @@ DESC limit 1");
     $formValues['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
       $this->getFinancialTypeID()
     );
-    return $this->emailReceipt($this, $formValues);
+    $this->emailReceipt($formValues);
+    return TRUE;
   }
 
   /**

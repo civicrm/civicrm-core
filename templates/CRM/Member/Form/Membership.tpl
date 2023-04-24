@@ -66,7 +66,7 @@
     {if $action eq 8}
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
-      {$deleteMessage}
+      {$deleteMessage|smarty:nodefaults}
     </div>
     {else}
       <table class="form-layout-compressed">
@@ -109,7 +109,7 @@
           <tr id="num_terms_row" class="crm-membership-form-block-num_terms">
             <td class="label">{$form.num_terms.label}</td>
             <td>&nbsp;{$form.num_terms.html}<br />
-              <span class="description">{ts}Set the membership end date this many membership periods from now. Make sure the appropriate corresponding fee is entered below.{/ts}</span>
+              <span class="description">{ts}Set the Membership Expiration Date this many membership periods from now. Make sure the appropriate corresponding fee is entered below.{/ts}</span>
             </td>
           </tr>
         {/if}

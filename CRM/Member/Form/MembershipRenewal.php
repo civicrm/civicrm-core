@@ -431,7 +431,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // We process both the dates before comparison using CRM utils so that they are in same date format
     if (isset($params['renewal_date'])) {
       if ($params['renewal_date'] < $joinDate) {
-        $errors['renewal_date'] = ts('Renewal date must be the same or later than Member since (Join Date).');
+        $errors['renewal_date'] = ts('Renewal date must be the same or later than Member Since.');
       }
     }
 

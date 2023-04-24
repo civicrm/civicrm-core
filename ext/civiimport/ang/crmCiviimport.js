@@ -265,7 +265,7 @@
               // For now we just hard-code this - mapping to soft_credit a bit undefined - but
               // we are mimicking getMappingFieldFromMapperInput on the php layer.
               // Could get it from entity_data but .... later.
-              entityConfig = {'soft_credit': $scope.userJob.metadata.entity_configuration[selectedEntity].entity.entity_data};
+              entityConfig = {'soft_credit': $scope.userJob.metadata.entity_configuration[selectedEntity]};
             }
 
             $scope.userJob.metadata.import_mappings.push({

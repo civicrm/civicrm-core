@@ -14,7 +14,6 @@ namespace Civi\Api4\Service\Spec;
 
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
-use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class SpecFormatter {
 
@@ -37,6 +36,9 @@ class SpecFormatter {
         $field->setType('Field');
         $field->setTableName($data['custom_group_id.table_name']);
       }
+      if ($dataTypeName === 'EntityReference') {
+        $field->setFkEntity($data['fk_entity']);
+      }
       $field->setColumnName($data['column_name']);
       $field->setNullable(empty($data['is_required']));
       $field->setCustomFieldId($data['id'] ?? NULL);
@@ -45,7 +47,7 @@ class SpecFormatter {
       $field->setLabel($data['custom_group_id.title'] . ': ' . $data['label']);
       $field->setHelpPre($data['help_pre'] ?? NULL);
       $field->setHelpPost($data['help_post'] ?? NULL);
-      if (self::customFieldHasOptions($data)) {
+      if (\CRM_Core_BAO_CustomField::hasOptions($data)) {
         $field->setOptionsCallback([__CLASS__, 'getOptions']);
         $suffixes = ['label'];
         if (!empty($data['option_group_id'])) {
@@ -64,6 +66,7 @@ class SpecFormatter {
       $field->setRequired(!empty($data['required']) && empty($data['default']));
       $field->setTitle($data['title'] ?? NULL);
       $field->setLabel($data['html']['label'] ?? NULL);
+      $field->setLocalizable($data['localizable'] ?? FALSE);
       if (!empty($data['pseudoconstant'])) {
         // Do not load options if 'prefetch' is explicitly FALSE
         if (!isset($data['pseudoconstant']['prefetch']) || $data['pseudoconstant']['prefetch'] === FALSE) {
@@ -94,32 +97,14 @@ class SpecFormatter {
     $fkAPIName = $data['FKApiName'] ?? NULL;
     $fkClassName = $data['FKClassName'] ?? NULL;
     if ($fkAPIName || $fkClassName) {
-      $field->setFkEntity($fkAPIName ?: AllCoreTables::getBriefName($fkClassName));
+      $field->setFkEntity($fkAPIName ?: CoreUtil::getApiNameFromBAO($fkClassName));
+    }
+    // For pseudo-fk fields like `civicrm_group.parents`
+    elseif (($data['html']['type'] ?? NULL) === 'EntityRef' && !empty($data['pseudoconstant']['table'])) {
+      $field->setFkEntity(CoreUtil::getApiNameFromTableName($data['pseudoconstant']['table']));
     }
 
     return $field;
-  }
-
-  /**
-   * Does this custom field have options
-   *
-   * @param array $field
-   * @return bool
-   */
-  private static function customFieldHasOptions($field) {
-    // This will include boolean fields with Yes/No options.
-    if (in_array($field['html_type'], ['Radio', 'CheckBox'])) {
-      return TRUE;
-    }
-    // Do this before the "Select" string search because date fields have a "Select Date" html_type
-    // and contactRef fields have an "Autocomplete-Select" html_type - contacts are an FK not an option list.
-    if (in_array($field['data_type'], ['ContactReference', 'Date'])) {
-      return FALSE;
-    }
-    if (strpos($field['html_type'], 'Select') !== FALSE) {
-      return TRUE;
-    }
-    return !empty($field['option_group_id']);
   }
 
   /**
@@ -282,7 +267,7 @@ class SpecFormatter {
     $inputType = $data['html']['type'] ?? $data['html_type'] ?? NULL;
     $inputAttrs = $data['html'] ?? [];
     unset($inputAttrs['type']);
-    // Custom field contact ref filters
+    // Custom field EntityRef or ContactRef filters
     if (is_string($data['filter'] ?? NULL) && strpos($data['filter'], '=')) {
       $filters = explode('&', $data['filter']);
       $inputAttrs['filter'] = $filters;
@@ -293,7 +278,7 @@ class SpecFormatter {
       'Link' => 'Url',
     ];
     $inputType = $map[$inputType] ?? $inputType;
-    if ($dataTypeName === 'ContactReference') {
+    if ($dataTypeName === 'ContactReference' || $dataTypeName === 'EntityReference') {
       $inputType = 'EntityRef';
     }
     if (in_array($inputType, ['Select', 'EntityRef'], TRUE) && !empty($data['serialize'])) {
@@ -335,7 +320,8 @@ class SpecFormatter {
         $filters = [];
         foreach ($val as $filter) {
           [$k, $v] = explode('=', $filter);
-          $filters[$k] = $v;
+          // Explode comma-separated values
+          $filters[$k] = strpos($v, ',') ? explode(',', $v) : $v;
         }
         // Legacy APIv3 custom field stuff
         if ($dataTypeName === 'ContactReference') {

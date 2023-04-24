@@ -193,7 +193,6 @@ class CRM_Utils_REST {
       if ((count($args) != 3) && ($args[1] != 'ping')) {
         return self::error('Unknown function invocation.');
       }
-      $store = NULL;
 
       if ($args[1] == 'ping') {
         return self::ping();
@@ -222,7 +221,7 @@ class CRM_Utils_REST {
     // At this point we know we are not calling ping which does not require authentication.
     // Therefore we now need a valid server key and API key.
     // Check and see if a valid secret API key is provided.
-    $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+    $api_key = CRM_Utils_Request::retrieve('api_key', 'String');
     if (!$api_key || strtolower($api_key) == 'null') {
       return self::error("FATAL: mandatory param 'api_key' (user key) missing");
     }

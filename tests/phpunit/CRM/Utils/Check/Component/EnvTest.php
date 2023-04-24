@@ -8,6 +8,11 @@
  */
 class CRM_Utils_Check_Component_EnvTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * File check test should fail if reached maximum timeout.
    * @throws \GuzzleHttp\Exception\GuzzleException

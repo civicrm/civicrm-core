@@ -612,12 +612,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if ($missingRequiredFields->count() || count($vals) === 1) {
         return NULL;
       }
+      $entityValues = $editable['record'];
     }
     // Ensure current user has access
     if ($editable['record']) {
       $access = civicrm_api4($editable['entity'], 'checkAccess', [
         'action' => $editable['action'],
-        'values' => $editable['record'],
+        'values' => $entityValues,
       ], 0)['access'];
       if ($access) {
         // Remove info that's for internal use only
@@ -806,7 +807,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!$filters) {
       return;
     }
-
+    // Parse comma-separated values from filters passed through afform variables
+    // These values may have come from the url and should be transformed into arrays
+    foreach ($directiveFilters as $key) {
+      if (!empty($filters[$key]) && is_string($filters[$key]) && strpos($filters[$key], ',')) {
+        $filters[$key] = explode(',', $filters[$key]);
+      }
+    }
     // Add all filters to the WHERE or HAVING clause
     foreach ($filters as $key => $value) {
       $fieldNames = explode(',', $key);

@@ -132,11 +132,11 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
       'is_reserved' => 0,
       'financial_account_type_id' => array_search($financialAccountType, $financialAccountTypes),
     ];
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
     $financialType = $financialAccountType = NULL;
     if ($relationType) {
       $params['name'] = 'test_financialType1';
-      $financialType = CRM_Financial_BAO_FinancialType::add($params);
+      $financialType = CRM_Financial_BAO_FinancialType::writeRecord($params);
       $financialParams = [
         'entity_table' => 'civicrm_financial_type',
         'entity_id' => $financialType->id,

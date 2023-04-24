@@ -156,9 +156,9 @@ class CRM_Core_SelectValues {
    */
   public static function eventDate() {
     return [
-      'start_date' => ts('start date'),
-      'end_date' => ts('end date'),
-      'join_date' => ts('member since'),
+      'start_date' => ts('Membership Start Date'),
+      'end_date' => ts('Membership Expiration Date'),
+      'join_date' => ts('Member Since'),
     ];
   }
 
@@ -540,9 +540,12 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Membership Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
   public static function membershipTokens(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     return [
       '{membership.id}' => ts('Membership ID'),
       '{membership.status_id:label}' => ts('Status'),
@@ -562,6 +565,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function eventTokens(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['eventId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
@@ -580,6 +584,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function contributionTokens(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contributionId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {

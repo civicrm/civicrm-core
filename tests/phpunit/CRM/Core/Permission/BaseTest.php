@@ -16,6 +16,7 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
     $cases = [];
 
     $cases[] = ['administer CiviCRM', 'administer CiviCRM'];
+    $cases[] = ['create contributions of type Event Fee: Canada', 'create contributions of type Event Fee: Canada'];
     $cases[] = ['cms:universal name', 'local name'];
     $cases[] = ['cms:universal name2', 'local name2'];
     $cases[] = ['cms:unknown universal name', CRM_Core_Permission::ALWAYS_DENY_PERMISSION];

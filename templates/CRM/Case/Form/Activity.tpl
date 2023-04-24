@@ -241,7 +241,9 @@
       </td>
     </tr>
     {/if}
+{if $isTagset}
   <tr class="crm-case-activity-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td></tr>
+{/if}
   </table>
 
   {/if}

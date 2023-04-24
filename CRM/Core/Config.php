@@ -66,7 +66,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *
    * @var CRM_Core_Config
    */
-  private static $_singleton = NULL;
+  private static $_singleton;
 
   /**
    * Singleton function used to manage this object.
@@ -363,12 +363,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *   tables created recently from being deleted.
    */
   public static function clearTempTables($timeInterval = FALSE): void {
-
-    $dao = new CRM_Core_DAO();
     $query = "
       SELECT TABLE_NAME as tableName
       FROM   INFORMATION_SCHEMA.TABLES
-      WHERE  TABLE_SCHEMA = %1
+      WHERE  TABLE_SCHEMA = DATABASE()
       AND TABLE_NAME LIKE 'civicrm_tmp_d%'
     ";
 
@@ -376,7 +374,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $query .= " AND CREATE_TIME < DATE_SUB(NOW(), INTERVAL {$timeInterval})";
     }
 
-    $tableDAO = CRM_Core_DAO::executeQuery($query, [1 => [$dao->database(), 'String']]);
+    $tableDAO = CRM_Core_DAO::executeQuery($query);
     $tables = [];
     while ($tableDAO->fetch()) {
       $tables[] = $tableDAO->tableName;

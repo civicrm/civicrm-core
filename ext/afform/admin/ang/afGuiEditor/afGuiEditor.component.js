@@ -330,7 +330,7 @@
 
       this.toggleContactSummary = function() {
         if (editor.afform.contact_summary) {
-          editor.afform.contact_summary = false;
+          editor.afform.contact_summary = null;
           _.each(editor.searchDisplays, function(searchDisplay) {
             delete searchDisplay.element.filters;
           });

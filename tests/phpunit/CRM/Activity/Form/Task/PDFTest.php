@@ -12,8 +12,8 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
    * Set up for tests.
    */
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
@@ -23,7 +23,6 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
    */
   public function testCreateDocumentBasicTokens(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-    $this->enableCiviCampaign();
     $case = $this->createCase($this->individualCreate());
 
     $activity = $this->activityCreate([

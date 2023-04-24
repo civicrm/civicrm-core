@@ -15,9 +15,10 @@
  */
 class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
+  const FINANCIAL_TYPE_ID = 1;
+
   public function setUp(): void {
     parent::setUp();
-    $this->_financialTypeID = 1;
   }
 
   /**
@@ -28,7 +29,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $params = [
       'qfkey' => '9a3ef3c08879ad4c8c109b21c583400e',
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_financialTypeID,
+      'financial_type_id' => self::FINANCIAL_TYPE_ID,
       'intro_text' => '',
       'footer_text' => 'Thanks',
       'is_for_organization' => 0,
@@ -52,32 +53,13 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   *  test setIsActive() method
-   */
-  public function testsetIsActive() {
-
-    $params = [
-      'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_financialTypeID,
-      'is_active' => 1,
-    ];
-
-    $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
-    $id = $contributionpage->id;
-    $is_active = 1;
-    $pageActive = CRM_Contribute_BAO_ContributionPage::setIsActive($id, $is_active);
-    $this->assertEquals($pageActive, TRUE, 'Verify financial types record deletion.');
-    $this->callAPISuccess('ContributionPage', 'delete', ['id' => $contributionpage->id]);
-  }
-
-  /**
    * Test setValues() method
    */
   public function testSetValues() {
 
     $params = [
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_financialTypeID,
+      'financial_type_id' => self::FINANCIAL_TYPE_ID,
       'is_active' => 1,
     ];
 
@@ -88,7 +70,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     CRM_Contribute_BAO_ContributionPage::setValues($id, $values);
 
     $this->assertEquals($params['title'], $values['title'], 'Verify contribution title.');
-    $this->assertEquals($this->_financialTypeID, $values['financial_type_id'], 'Verify financial types id.');
+    $this->assertEquals(self::FINANCIAL_TYPE_ID, $values['financial_type_id'], 'Verify financial types id.');
     $this->assertEquals(1, $values['is_active'], 'Verify contribution is_active value.');
     $this->callAPISuccess('ContributionPage', 'delete', ['id' => $contributionPage->id]);
   }
@@ -100,7 +82,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $params = [
       'qfkey' => '9a3ef3c08879ad4c8c109b21c583400e',
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_financialTypeID,
+      'financial_type_id' => self::FINANCIAL_TYPE_ID,
       'intro_text' => '',
       'footer_text' => 'Thanks',
       'is_for_organization' => 0,
@@ -118,7 +100,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
     $contributionPage = CRM_Contribute_BAO_ContributionPage::create($params);
     $copyContributionPage = CRM_Contribute_BAO_ContributionPage::copy($contributionPage->id);
-    $this->assertEquals($copyContributionPage->financial_type_id, $this->_financialTypeID, 'Check for Financial type id.');
+    $this->assertEquals($copyContributionPage->financial_type_id, self::FINANCIAL_TYPE_ID, 'Check for Financial type id.');
     $this->assertEquals($copyContributionPage->goal_amount, 400, 'Check for goal amount.');
     $this->callAPISuccess('ContributionPage', 'delete', ['id' => $contributionPage->id]);
     $this->callAPISuccess('ContributionPage', 'delete', ['id' => $copyContributionPage->id]);

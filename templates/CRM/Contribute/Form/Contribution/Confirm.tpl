@@ -207,9 +207,7 @@
     </div>
   {/if}
 
-  {if ( $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
-    {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) }
-      {if $billingName or $address}
+    {if $billingName or $address}
         <div class="crm-group billing_name_address-group">
           <div class="header-dark">
             {ts}Billing Name and Address{/ts}
@@ -224,8 +222,7 @@
           </div>
         </div>
       {/if}
-    {/if}
-    {if !$emailExists}
+    {if $email && !$emailExists}
       <div class="crm-group contributor_email-group">
         <div class="header-dark">
           {ts}Your Email{/ts}
@@ -236,36 +233,35 @@
         </div>
       </div>
     {/if}
-  {/if}
 
   {* Show credit or debit card section for 'direct' mode, except for PayPal Express (detected because credit card number is empty) *}
-  {if $contributeMode eq 'direct' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 )}
     {crmRegion name="contribution-confirm-billing-block"}
-    {if ($credit_card_number or $bank_account_number)}
+    {if in_array('credit_card_number', $form) || in_array('bank_account_number', $form)}
       <div class="crm-group credit_card-group">
         {if $paymentFieldsetLabel}
           <div class="header-dark">
             {$paymentFieldsetLabel}
           </div>
         {/if}
-        {if $paymentProcessor.payment_type == 2}
+        {if in_array('bank_account_number', $form) && $bank_account_number}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br/>
             {ts}Bank Account Number{/ts}: {$bank_account_number}<br/>
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br/>
             {ts}Bank Name{/ts}: {$bank_name}<br/>
           </div>
-          {if $contributeMode eq 'direct'}
+          {if $paymentAgreementText}
             <div class="crm-group debit_agreement-group">
               <div class="header-dark">
-                {ts}Agreement{/ts}
+                {$paymentAgreementTitle}
               </div>
               <div class="display-block">
-                {ts}Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.{/ts}
+                {$paymentAgreementText}
               </div>
             </div>
           {/if}
-        {else}
+        {/if}
+        {if in_array('credit_card_number', $form) && $credit_card_number}
           <div class="crm-section no-label credit_card_details-section">
             <div class="content">{$credit_card_type}</div>
             <div class="content">{$credit_card_number}</div>
@@ -276,7 +272,6 @@
       </div>
     {/if}
     {/crmRegion}
-  {/if}
 
   {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="confirmContribution"}
 

@@ -227,7 +227,7 @@ abstract class AbstractAction implements \ArrayAccess {
           return $this->$param;
 
         case 'set':
-          $this->$param = $arguments[0];
+          $this->$param = ReflectionUtils::castTypeSoftly($arguments[0], $this->getParamInfo()[$param] ?? []);
           return $this;
       }
     }
