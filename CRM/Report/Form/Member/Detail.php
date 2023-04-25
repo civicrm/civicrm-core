@@ -296,7 +296,8 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     if ($this->isTableSelected('civicrm_contribution')) {
       $this->_from .= "
              LEFT JOIN civicrm_membership_payment cmp
-                 ON {$this->_aliases['civicrm_membership']}.id = cmp.membership_id
+                 ON ({$this->_aliases['civicrm_membership']}.id = cmp.membership_id
+                 AND cmp.id = (SELECT MAX(id) FROM civicrm_membership_payment WHERE civicrm_membership_payment.membership_id = {$this->_aliases['civicrm_membership']}.id))
              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                  ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id\n";
     }
