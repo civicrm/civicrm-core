@@ -34,8 +34,18 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $provider = \Civi::service('action_object_provider');
     return array_filter($provider->getEntities(), function($entity) {
       // Only include DAO entities from enabled components
-      $daoName = $entity['dao'] ?? NULL;
-      return (!$daoName || $daoName::isComponentEnabled());
+      if (!empty($entity['dao']) && !$entity['dao']::isComponentEnabled()) {
+        return FALSE;
+      }
+      // Check custom group permissions
+      if ($this->checkPermissions && in_array('CustomValue', $entity['type']) && !\CRM_Core_Permission::customGroupAdmin()) {
+        // Hack to get the id from the "view" url. If that url changes tests should catch it and we'll think of a better way to get that id
+        $params = [];
+        parse_str(parse_url($entity['paths']['view'])['query'], $params);
+        $gid = $params['gid'];
+        return in_array($gid, \CRM_Core_Permission::customGroup());
+      }
+      return TRUE;
     });
   }
 
