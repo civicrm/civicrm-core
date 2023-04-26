@@ -181,10 +181,12 @@
         return {field: field, join: join};
       }
       function parseFnArgs(info, expr) {
-        var fnName = expr.split('(')[0],
-          argString = expr.substr(fnName.length + 1, expr.length - fnName.length - 2);
+        var matches = /([_A-Z]+)\((.*)\)(:[a-z]+)?$/.exec(expr),
+          fnName = matches[1],
+          argString = matches[2];
         info.fn = _.find(CRM.crmSearchAdmin.functions, {name: fnName || 'e'});
         info.data_type = (info.fn && info.fn.data_type) || null;
+        info.suffix = matches[3];
 
         function getKeyword(whitelist) {
           var keyword;
@@ -398,7 +400,10 @@
               entity.optionsLoaded = false;
               entitiesToLoad[entityName] = [entityName, 'getFields', {
                 loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
-                where: [['options', '!=', false]],
+                // For fields with both an FK and an option list, prefer the FK
+                // because it's more efficient to render an autocomplete than to
+                // pre-load potentially thousands of options into a select dropdown.
+                where: [['options', '!=', false], ['suffixes', 'CONTAINS', 'name']],
                 select: ['options']
               }, {name: 'options'}];
             }
@@ -408,7 +413,10 @@
               _.each(results, function(fields, entityName) {
                 var entity = getEntity(entityName);
                 _.each(fields, function(options, fieldName) {
-                  _.find(entity.fields, {name: fieldName}).options = options;
+                  var field = _.find(entity.fields, {name: fieldName});
+                  if (field) {
+                    field.options = options;
+                  }
                 });
                 entity.optionsLoaded = true;
               });

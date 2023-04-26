@@ -78,7 +78,7 @@
                 {$row.status}</td>
             {/if}
             <td>{$row.contact_type}</td>
-            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`&context=`$context`"}">{if !empty($row.is_deleted)}<del>{/if}{$row.sort_name}{if !empty($row.is_deleted)}</del>{/if}</a></td>
+            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`&context=`$context`"}">{if $row.contact_is_deleted}<del>{/if}{$row.sort_name}{if $row.contact_is_deleted}</del>{/if}</a></td>
             {if $action eq 512 or $action eq 256}
               {if !empty($columnHeaders.street_address)}
           <td><span title="{$row.street_address|escape}">{$row.street_address|mb_truncate:22:"...":true}{privacyFlag field=do_not_mail condition=$row.do_not_mail}</span></td>

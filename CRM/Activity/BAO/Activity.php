@@ -255,11 +255,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array $params
    *   Associated array of the submitted values.
    *
+   * @return CRM_Activity_DAO_Activity
    * @throws CRM_Core_Exception
-   *
-   * @return CRM_Activity_BAO_Activity|null|object
    */
-  public static function create(&$params) {
+  public static function create(array &$params) {
     // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
     unset($params['created_date']);
     unset($params['modified_date']);
@@ -317,13 +316,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     // start transaction
     $transaction = new CRM_Core_Transaction();
-
     $result = $activity->save();
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $result;
-    }
 
     $activityId = $activity->id;
     $activityRecordTypes = [
@@ -1434,6 +1427,7 @@ WHERE entity_id =%1 AND entity_table = %2";
    *   array of importable Fields
    */
   public static function &importableFields($status = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     if (empty(Civi::$statics[__CLASS__][__FUNCTION__])) {
       Civi::$statics[__CLASS__][__FUNCTION__] = [];
       if (!$status) {
@@ -1628,6 +1622,7 @@ WHERE      activity.id IN ($activityIds)";
     //CRM-4027
     if ($targetContactID) {
       $activityParams['target_contact_id'][] = $targetContactID;
+      $activityParams['target_contact_id'] = array_unique($activityParams['target_contact_id'], SORT_NUMERIC);
     }
     // @todo - use api - remove lots of wrangling above. Remove deprecated fatal & let form layer
     // deal with any exceptions.

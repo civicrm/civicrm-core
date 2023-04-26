@@ -93,7 +93,7 @@ class GetActions extends BasicGetAction {
               if (strpos($method->getDocComment(), '@inheritDoc') !== FALSE && !empty($methodDocs['comment']) && !empty($actionDocs['comment'])) {
                 $methodDocs['comment'] .= "\n\n" . $actionDocs['comment'];
               }
-              $actionDocs = array_filter($methodDocs) + $actionDocs;
+              $actionDocs = array_filter($methodDocs) + $actionDocs + ['deprecated' => FALSE];
             }
             $this->_actions[$actionName] += $actionDocs;
           }
@@ -130,6 +130,10 @@ class GetActions extends BasicGetAction {
         'name' => 'params',
         'description' => 'List of all accepted parameters',
         'data_type' => 'Array',
+      ],
+      [
+        'name' => 'deprecated',
+        'data_type' => 'Boolean',
       ],
     ];
   }

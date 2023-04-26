@@ -268,13 +268,13 @@ ALTER TABLE {$tableName}
   }
 
   /**
-   * Delete a CiviCRM-table.
+   * Drop a table if it exists.
    *
    * @param string $tableName
-   *   Name of the table to be created.
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function dropTable($tableName) {
-    $sql = "DROP TABLE $tableName";
+  public static function dropTable(string $tableName): void {
+    $sql = "DROP TABLE IF EXISTS $tableName";
     CRM_Core_DAO::executeQuery($sql);
   }
 
@@ -547,23 +547,23 @@ MODIFY      {$columnName} varchar( $length )
 
   /**
    * Check if a foreign key Exists
+   *
    * @param string $table_name
    * @param string $constraint_name
+   *
    * @return bool TRUE if FK is found
    */
-  public static function checkFKExists($table_name, $constraint_name) {
-    $dao = new CRM_Core_DAO();
+  public static function checkFKExists(string $table_name, string $constraint_name): bool {
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-      WHERE TABLE_SCHEMA = %1
-      AND TABLE_NAME = %2
-      AND CONSTRAINT_NAME = %3
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = %1
+      AND CONSTRAINT_NAME = %2
       AND CONSTRAINT_TYPE = 'FOREIGN KEY'
     ";
     $params = [
-      1 => [$dao->_database, 'String'],
-      2 => [$table_name, 'String'],
-      3 => [$constraint_name, 'String'],
+      1 => [$table_name, 'String'],
+      2 => [$constraint_name, 'String'],
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
 
@@ -904,6 +904,49 @@ MODIFY      {$columnName} varchar( $length )
       \Civi::$statics[__CLASS__][__FUNCTION__] = $dao->Collation;
     }
     return \Civi::$statics[__CLASS__][__FUNCTION__];
+  }
+
+  /**
+   * Get estimated number of rows in the given tables.
+   *
+   * Note that this query is less precise than SELECT(*) - especially on
+   * larger tables but performs significantly better.
+   * See https://dba.stackexchange.com/questions/184685/why-is-count-slow-when-explain-knows-the-answer
+   *
+   * @param array $tables
+   *   e.g ['civicrm_contact', 'civicrm_activity']
+   *
+   * @return array
+   *   e.g ['civicrm_contact' => 200000, 'civicrm_activity' => 100000]
+   */
+  public static function getRowCountForTables(array $tables): array {
+    $cachedResults = Civi::$statics[__CLASS__][__FUNCTION__] ?? [];
+    // Compile list of tables not already cached.
+    $tablesToCheck = array_keys(array_diff_key(array_flip($tables), $cachedResults));
+    $result = CRM_Core_DAO::executeQuery('
+      SELECT TABLE_ROWS as row_count, TABLE_NAME as table_name FROM information_schema.TABLES WHERE
+      TABLE_NAME IN("' . implode('","', $tablesToCheck) . '")
+      AND TABLE_SCHEMA = DATABASE()'
+    );
+    while ($result->fetch()) {
+      $cachedResults[$result->table_name] = (int) $result->row_count;
+    }
+    Civi::$statics[__CLASS__][__FUNCTION__] = $cachedResults;
+    return array_intersect_key($cachedResults, array_fill_keys($tables, TRUE));
+  }
+
+  /**
+   * Get estimated number of rows in the given table.
+   *
+   * @see self::getRowCountForTables
+   *
+   * @param string $tableName
+   *
+   * @return int
+   *   The approximate number of rows in the table. This is also 0 if the table does not exist.
+   */
+  public static function getRowCountForTable(string $tableName): int {
+    return self::getRowCountForTables([$tableName])[$tableName] ?? 0;
   }
 
   /**

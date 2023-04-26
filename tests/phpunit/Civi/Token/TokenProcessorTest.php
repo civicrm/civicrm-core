@@ -1,14 +1,15 @@
 <?php
 namespace Civi\Token;
 
+use Civi\Api4\Website;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Civi\Core\CiviEventDispatcher;
 
 class TokenProcessorTest extends \CiviUnitTestCase {
 
   /**
-   * @var \Symfony\Component\EventDispatcher\EventDispatcher
+   * @var \Civi\Core\CiviEventDispatcher
    */
   protected $dispatcher;
 
@@ -19,9 +20,9 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   protected $counts;
 
   protected function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
-    $this->dispatcher = new EventDispatcher();
+    $this->useTransaction(TRUE);
+    $this->dispatcher = new CiviEventDispatcher();
     $this->dispatcher->addListener('civi.token.list', [$this, 'onListTokens']);
     $this->dispatcher->addListener('civi.token.eval', [$this, 'onEvalTokens']);
     $this->counts = [
@@ -187,9 +188,12 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   /**
    * @group locale
    * @dataProvider getPartialNonPartial
+   *
    * @param array $settings
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRenderLocalizedSmarty(array $settings) {
+  public function testRenderLocalizedSmarty(array $settings): void {
     $cleanup = \CRM_Utils_AutoClean::swapSettings($settings);
     \CRM_Utils_Time::setTime('2022-04-08 16:32:04');
     $resetTime = \CRM_Utils_AutoClean::with(['CRM_Utils_Time', 'resetTime']);
@@ -208,7 +212,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $expectText = [
       'Yes No April',
       'Oui Non avril',
-      'Sí No Abril',
+      'Sí No abril',
     ];
 
     $rowCount = 0;
@@ -258,39 +262,81 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $rowCount = 0;
     foreach ($tokenProcessor->evaluate()->getRows() as $key => $row) {
       /** @var TokenRow */
-      $this->assertTrue($row instanceof TokenRow);
+      $this->assertInstanceOf(TokenRow::class, $row);
       $this->assertEquals($expectText[$key], $row->render('text'));
       $rowCount++;
     }
     $this->assertEquals(3, $rowCount);
   }
 
-  public function testGetMessageTokens() {
-    $p = new TokenProcessor($this->dispatcher, [
-      'controller' => __CLASS__,
-    ]);
-    $p->addMessage('greeting_html', 'Good morning, <p>{contact.display_name}</p>. {custom.foobar}!', 'text/html');
-    $p->addMessage('greeting_text', 'Good morning, {contact.display_name}. {custom.whizbang}, {contact.first_name}!', 'text/plain');
-    $expected = [
-      'contact' => ['display_name', 'first_name'],
-      'custom' => ['foobar', 'whizbang'],
-    ];
-    $this->assertEquals($expected, $p->getMessageTokens());
+  /**
+   * Test that double urls created by https:// followed by a token are cleaned up.
+   *
+   * The ckeditor UI makes it easy to put https:// in the html when adding links,
+   * but they in the website url already.
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @noinspection HttpUrlsUsage
+   */
+  public function testRenderDoubleUrl(): void {
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
+    $this->dispatcher->addSubscriber(new TidySubscriber());
+    $contactID = $this->individualCreate();
+    $websiteID = Website::create()->setValues(['contact_id' => $contactID, 'url' => 'https://example.com'])->execute()->first()['id'];
+    $row = $this->renderUrlMessage($contactID);
+    $this->assertEquals('<a href="https://example.com">blah</a>', $row->render('one'));
+    $this->assertEquals('<a href="https://example.com">blah</a>', $row->render('two'));
+
+    Website::update()->setValues(['url' => 'http://example.com'])->addWhere('id', '=', $websiteID)->execute();
+    $row = $this->renderUrlMessage($contactID);
+    $this->assertEquals('<a href="http://example.com">blah</a>', $row->render('one'));
+    $this->assertEquals('<a href="http://example.com">blah</a>', $row->render('two'));
   }
 
+  /**
+   * Render a message with double url potential.
+   *
+   * @param int $contactID
+   *
+   * @return \Civi\Token\TokenRow
+   *
+   * @noinspection HttpUrlsUsage
+   */
+  protected function renderUrlMessage(int $contactID): TokenRow {
+    $tokenProcessor = $this->getTokenProcessor(['schema' => ['contactId']]);
+    $tokenProcessor->addRow(['contactId' => $contactID]);
+    $tokenProcessor->addMessage('one', '<a href="https://{contact.website_first.url}">blah</a>', 'text/html');
+    $tokenProcessor->addMessage('two', '<a href="http://{contact.website_first.url}">blah</a>', 'text/html');
+    return $tokenProcessor->evaluate()->getRow(0);
+  }
+
+  public function testGetMessageTokens(): void {
+    $tokenProcessor = $this->getTokenProcessor();
+    $tokenProcessor->addMessage('greeting_html', 'Good morning, <p>{contact.display_name}</p>. {custom.foobar}!', 'text/html');
+    $tokenProcessor->addMessage('greeting_text', 'Good morning, {contact.display_name}. {custom.whiz_bang}, {contact.first_name}!', 'text/plain');
+
+    $expected = [
+      'contact' => ['display_name', 'first_name'],
+      'custom' => ['foobar', 'whiz_bang'],
+    ];
+    $this->assertEquals($expected, $tokenProcessor->getMessageTokens());
+  }
+
+  /**
+   * Test getting available tokens.
+   */
   public function testListTokens(): void {
-    $p = new TokenProcessor($this->dispatcher, [
-      'controller' => __CLASS__,
-    ]);
-    $p->addToken(['entity' => 'MyEntity', 'field' => 'myField', 'label' => 'My Label']);
-    $this->assertEquals(['{MyEntity.myField}' => 'My Label'], $p->listTokens());
+    $tokenProcessor = $this->getTokenProcessor();
+    $tokenProcessor->addToken(['entity' => 'MyEntity', 'field' => 'myField', 'label' => 'My Label']);
+    $this->assertEquals(['{MyEntity.myField}' => 'My Label'], $tokenProcessor->listTokens());
   }
 
   /**
    * Perform a full mail-merge, substituting multiple tokens for multiple
    * contacts in multiple messages.
    */
-  public function testFull() {
+  public function testFull(): void {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
     ]);
@@ -338,14 +384,79 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $this->counts['onEvalTokens']);
   }
 
-  public function testFilter() {
-    $exampleTokens['foo_bar']['whiz_bang'] = 'Some Text';
-    $exampleMessages = [
-      'This is {foo_bar.whiz_bang}.' => 'This is Some Text.',
-      'This is {foo_bar.whiz_bang|lower}...' => 'This is some text...',
-      'This is {foo_bar.whiz_bang|upper}!' => 'This is SOME TEXT!',
+  public function getFilterExamples() {
+    $exampleTokens = [
+      // All the "{my_text.*}" tokens will be treated as plain-text ("text/plain").
+      'my_text' => [
+        'whiz_bang' => 'Some Text',
+        'empty_string' => '',
+        'emotive' => 'The Test :>',
+      ],
+      // All the "{my_rich_text.*}" tokens will be treated as markup ("text/html").
+      'my_rich_text' => [
+        'whiz_bang' => '<b>Some &ldquo;Text&rdquo;</b>',
+        'empty_string' => '',
+        'and_such' => '<strong>testing &amp; such</strong>',
+      ],
     ];
-    $expectExampleCount = /* {#msgs} x {smarty:on,off} */ 6;
+
+    $testCases = [];
+    $testCases['TextMessages with TextData'] = [
+      'text/plain',
+      [
+        'This is {my_text.whiz_bang}.' => 'This is Some Text.',
+        'This is {my_text.whiz_bang|lower}...' => 'This is some text...',
+        'This is {my_text.whiz_bang|upper}!' => 'This is SOME TEXT!',
+        'This is {my_text.whiz_bang|boolean}!' => 'This is 1!',
+        'This is {my_text.empty_string|boolean}!' => 'This is 0!',
+        'This is {my_text.whiz_bang|default:"bang"}.' => 'This is Some Text.',
+        'This is {my_text.empty_string|default:"bop"}.' => 'This is bop.',
+      ],
+      $exampleTokens,
+    ];
+    $testCases['HtmlMessages with HtmlData'] = [
+      'text/html',
+      [
+        'This is {my_rich_text.whiz_bang}.' => 'This is <b>Some &ldquo;Text&rdquo;</b>.',
+        'This is {my_rich_text.whiz_bang|lower}...' => 'This is <b>some &ldquo;text&rdquo;</b>...',
+        'This is {my_rich_text.whiz_bang|upper}!' => 'This is <b>SOME &ldquo;TEXT&rdquo;</b>!',
+        'This is {my_rich_text.whiz_bang|boolean}!' => 'This is 1!',
+        'This is {my_rich_text.empty_string|boolean}!' => 'This is 0!',
+        'This is {my_rich_text.whiz_bang|default:"bang"}.' => 'This is <b>Some &ldquo;Text&rdquo;</b>.',
+        'This is {my_rich_text.empty_string|default:"bop"}.' => 'This is bop.',
+      ],
+      $exampleTokens,
+    ];
+    $testCases['HtmlMessages with TextData'] = [
+      'text/html',
+      [
+        'This is {my_text.emotive}...' => 'This is The Test :&gt;...',
+        'This is {my_text.emotive|lower}...' => 'This is the test :&gt;...',
+        'This is {my_text.emotive|upper}!' => 'This is THE TEST :&gt;!',
+      ],
+      $exampleTokens,
+    ];
+    $testCases['TextMessages with HtmlData'] = [
+      'text/plain',
+      [
+        'This is {my_rich_text.and_such}...' => 'This is testing & such...',
+        'This is {my_rich_text.and_such|lower}...' => 'This is testing & such...',
+        'This is {my_rich_text.and_such|upper}!' => 'This is TESTING & SUCH!',
+      ],
+      $exampleTokens,
+    ];
+    return $testCases;
+  }
+
+  /**
+   * @param string $messageFormat
+   * @param array $exampleMessages
+   * @param array $exampleTokens
+   * @return void
+   * @dataProvider getFilterExamples
+   */
+  public function testFilters(string $messageFormat, array $exampleMessages, array $exampleTokens): void {
+    $expectExampleCount = 2 * count($exampleMessages);
     $actualExampleCount = 0;
 
     foreach ($exampleMessages as $inputMessage => $expectOutput) {
@@ -354,10 +465,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
           'controller' => __CLASS__,
           'smarty' => $useSmarty,
         ]);
-        $p->addMessage('example', $inputMessage, 'text/plain');
+        $p->addMessage('example', $inputMessage, $messageFormat);
         $p->addRow()
-          ->format('text/plain')->tokens($exampleTokens);
-        foreach ($p->evaluate()->getRows() as $key => $row) {
+          ->format('text/plain')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_text']))
+          ->format('text/html')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_rich_text']));
+        foreach ($p->evaluate()->getRows() as $row) {
           $this->assertEquals($expectOutput, $row->render('example'));
           $actualExampleCount++;
         }
@@ -367,14 +479,14 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals($expectExampleCount, $actualExampleCount);
   }
 
-  public function onListTokens(TokenRegisterEvent $e) {
+  public function onListTokens(TokenRegisterEvent $e): void {
     $this->counts[__FUNCTION__]++;
     $e->register('custom', [
       'foobar' => 'A special message about foobar',
     ]);
   }
 
-  public function onEvalTokens(TokenValueEvent $e) {
+  public function onEvalTokens(TokenValueEvent $e): void {
     $this->counts[__FUNCTION__]++;
     foreach ($e->getRows() as $row) {
       /** @var TokenRow $row */
@@ -396,7 +508,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
    *
    * @link https://lab.civicrm.org/dev/core/-/issues/2673
    */
-  public function testHookTokenDiagonal() {
+  public function testHookTokenDiagonal(): void {
     $cid = $this->individualCreate();
 
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
@@ -627,6 +739,19 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     }
     $this->assertEquals('Invoice #100!', $outputs[0]);
     $this->assertEquals('Invoice #200!', $outputs[1]);
+  }
+
+  /**
+   * Get a token processor instance.
+   *
+   * @param array $context
+   *
+   * @return \Civi\Token\TokenProcessor
+   */
+  protected function getTokenProcessor(array $context = []): TokenProcessor {
+    return new TokenProcessor($this->dispatcher, array_merge([
+      'controller' => __CLASS__,
+    ], $context));
   }
 
   ///**

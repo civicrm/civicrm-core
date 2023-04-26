@@ -22,8 +22,6 @@ class api_v3_UserTest extends CiviUnitTestCase {
   protected $_entity = 'User';
   protected $contactID;
 
-  public $DBResetRequired = FALSE;
-
   public function setUp(): void {
     parent::setUp();
     $this->contactID = $this->createLoggedInUser();

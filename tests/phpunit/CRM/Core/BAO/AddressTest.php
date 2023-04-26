@@ -112,7 +112,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    $addAddress = CRM_Core_BAO_Address::add($fixParams, $fixAddress = TRUE);
+    CRM_Core_BAO_Address::fixAddress($fixParams);
+    $addAddress = CRM_Core_BAO_Address::writeRecord($fixParams);
 
     $addParams = $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
       'Database check for created contact address.'
@@ -216,7 +217,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    CRM_Core_BAO_Address::add($params['address']['1'], $fixAddress = TRUE);
+    CRM_Core_BAO_Address::fixAddress($params['address']['1']);
+    CRM_Core_BAO_Address::writeRecord($params['address']['1']);
 
     // Add address 2
     $params['address']['2'] = [
@@ -236,7 +238,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    CRM_Core_BAO_Address::add($params['address']['2'], $fixAddress = TRUE);
+    CRM_Core_BAO_Address::fixAddress($params['address']['2']);
+    CRM_Core_BAO_Address::writeRecord($params['address']['2']);
 
     $addresses = CRM_Core_BAO_Address::getValues($entityBlock);
 
@@ -281,7 +284,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    CRM_Core_BAO_Address::add($fixParams, $fixAddress = TRUE);
+    CRM_Core_BAO_Address::fixAddress($fixParams);
+    CRM_Core_BAO_Address::writeRecord($fixParams);
 
     $addParams = $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
       'Database check for created contact address.'
@@ -304,7 +308,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    CRM_Core_BAO_Address::add($fixParams, $fixAddress = TRUE);
+    CRM_Core_BAO_Address::fixAddress($fixParams);
+    CRM_Core_BAO_Address::writeRecord($fixParams);
 
     $addParams = $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
       'Database check for created contact address.'
@@ -341,7 +346,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    CRM_Core_BAO_Address::add($fixParams, $fixAddress = TRUE);
+    CRM_Core_BAO_Address::fixAddress($fixParams);
+    CRM_Core_BAO_Address::writeRecord($fixParams);
 
     $addParams = $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
       'Database check for created contact address.'
@@ -585,7 +591,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'is_primary' => '1',
       'contact_id' => $contactIdA,
     ];
-    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+    $addAddressA = CRM_Core_BAO_Address::writeRecord($addressParamsA);
 
     $addressParamsB = [
       'street_address' => '123 Fake St.',
@@ -594,7 +600,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'master_id' => $addAddressA->id,
       'contact_id' => $contactIdB,
     ];
-    $addAddressB = CRM_Core_BAO_Address::add($addressParamsB, FALSE);
+    $addAddressB = CRM_Core_BAO_Address::writeRecord($addressParamsB);
 
     $addressParamsC = [
       'street_address' => '123 Fake St.',
@@ -603,7 +609,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'master_id' => $addAddressB->id,
       'contact_id' => $contactIdC,
     ];
-    $addAddressC = CRM_Core_BAO_Address::add($addressParamsC, FALSE);
+    $addAddressC = CRM_Core_BAO_Address::writeRecord($addressParamsC);
 
     $updatedAddressParamsA = [
       'id' => $addAddressA->id,
@@ -612,7 +618,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'is_primary' => '1',
       'contact_id' => $contactIdA,
     ];
-    $updatedAddressA = CRM_Core_BAO_Address::add($updatedAddressParamsA, FALSE);
+    $updatedAddressA = CRM_Core_BAO_Address::writeRecord($updatedAddressParamsA);
 
     // CRM-21214 - Has Address C been updated with Address A's new values?
     $newAddressC = new CRM_Core_DAO_Address();
@@ -645,7 +651,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'is_primary' => '1',
       'contact_id' => $contactIdA,
     ];
-    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+    $addAddressA = CRM_Core_BAO_Address::writeRecord($addressParamsA);
 
     $addressParamsB = [
       'street_address' => '123 Fake St.',
@@ -653,7 +659,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'is_primary' => '1',
       'contact_id' => $contactIdB,
     ];
-    $addAddressB = CRM_Core_BAO_Address::add($addressParamsB, FALSE);
+    $addAddressB = CRM_Core_BAO_Address::writeRecord($addressParamsB);
 
     $addressParamsC = [
       'street_address' => '123 Fake St.',
@@ -662,7 +668,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'master_id' => $addAddressA->id,
       'contact_id' => $contactIdC,
     ];
-    $addAddressC = CRM_Core_BAO_Address::add($addressParamsC, FALSE);
+    $addAddressC = CRM_Core_BAO_Address::writeRecord($addressParamsC);
 
     $updatedAddressParamsA = [
       'id' => $addAddressA->id,
@@ -672,7 +678,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'master_id' => $addAddressB->id,
       'contact_id' => $contactIdA,
     ];
-    $updatedAddressA = CRM_Core_BAO_Address::add($updatedAddressParamsA, FALSE);
+    $updatedAddressA = CRM_Core_BAO_Address::writeRecord($updatedAddressParamsA);
 
     $updatedAddressParamsB = [
       'id' => $addAddressB->id,
@@ -681,7 +687,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'is_primary' => '1',
       'contact_id' => $contactIdB,
     ];
-    $updatedAddressB = CRM_Core_BAO_Address::add($updatedAddressParamsB, FALSE);
+    $updatedAddressB = CRM_Core_BAO_Address::writeRecord($updatedAddressParamsB);
 
     // CRM-21214 - Has Address C been updated with Address B's new values?
     $newAddressC = new CRM_Core_DAO_Address();
@@ -709,7 +715,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'is_primary' => '1',
       'contact_id' => $contactIdA,
     ];
-    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+    $addAddressA = CRM_Core_BAO_Address::writeRecord($addressParamsA);
 
     $updatedAddressParamsA = [
       'id' => $addAddressA->id,
@@ -719,14 +725,14 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'master_id' => $addAddressA->id,
       'contact_id' => $contactIdA,
     ];
-    $updatedAddressA = CRM_Core_BAO_Address::add($updatedAddressParamsA, FALSE);
+    $updatedAddressA = CRM_Core_BAO_Address::writeRecord($updatedAddressParamsA);
 
     // CRM-21214 - AdressA shouldn't be master of itself.
     $this->assertEmpty($updatedAddressA->master_id);
   }
 
   /**
-   * dev/core#1670 - Ensure that the custom fields on adresses are copied
+   * dev/dev/core#1670 - Ensure that the custom fields on adresses are copied
    * to inherited address
    * 1. test the creation of the shared address with custom field
    * 2. test the update of the custom field in the master
@@ -746,8 +752,9 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'contact_id' => $contactIdA,
       $customField => 'this is a custom text field',
     ];
+    $addressParamsA['custom'] = CRM_Core_BAO_CustomField::postProcess($addressParamsA, NULL, 'Address');
 
-    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+    $addAddressA = CRM_Core_BAO_Address::writeRecord($addressParamsA);
 
     // without having the custom field, we should still copy the values from master
     $addressParamsB = [
@@ -757,7 +764,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'master_id' => $addAddressA->id,
       'contact_id' => $contactIdB,
     ];
-    $addAddressB = CRM_Core_BAO_Address::add($addressParamsB, FALSE);
+    $addAddressB = CRM_Core_BAO_Address::writeRecord($addressParamsB);
 
     // 1. check if the custom fields values have been copied from master to shared address
     $address = $this->callAPISuccessGetSingle('Address', ['id' => $addAddressB->id, 'return' => $this->getCustomFieldName('text')]);
@@ -766,7 +773,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     // 2. now, we update addressA custom field to see if it goes into addressB
     $addressParamsA['id'] = $addAddressA->id;
     $addressParamsA[$customField] = 'updated custom text field';
-    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+    $addressParamsA['custom'] = CRM_Core_BAO_CustomField::postProcess($addressParamsA, NULL, 'Address');
+    CRM_Core_BAO_Address::writeRecord($addressParamsA);
 
     $address = $this->callAPISuccessGetSingle('Address', ['id' => $addAddressB->id, 'return' => $this->getCustomFieldName('text')]);
     $this->assertEquals($addressParamsA[$customField], $address[$customField]);
@@ -823,7 +831,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test core#2379 fix - geocodes shouldn't be > 14 characters.
+   * Test dev/core#2379 fix - geocodes shouldn't be > 14 characters.
    */
   public function testLongGeocodes() {
     $contactId = $this->individualCreate();
@@ -846,7 +854,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    $addAddress = CRM_Core_BAO_Address::add($fixParams, TRUE);
+    CRM_Core_BAO_Address::fixAddress($fixParams);
+    $addAddress = CRM_Core_BAO_Address::writeRecord($fixParams);
 
     $addParams = $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
       'Database check for created contact address.'

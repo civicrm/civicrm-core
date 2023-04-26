@@ -21,6 +21,27 @@
 class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
 
   /**
+   * Path to a local directory to store ignored emails
+   *
+   * @var string
+   */
+  private $_ignored;
+
+  /**
+   * Path to a local directory to store ignored emails
+   *
+   * @var string
+   */
+  private $_processed;
+
+  /**
+   * Count of messages left to process
+   *
+   * @var int
+   */
+  private $_leftToProcess;
+
+  /**
    * Connect to and lock the supplied file and make sure the two mail dirs exist.
    *
    * @param string $file

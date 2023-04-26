@@ -171,6 +171,7 @@
     <add>1.8</add>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
   </field>
   <field>

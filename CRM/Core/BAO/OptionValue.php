@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
+class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi\Core\HookInterface {
 
   /**
    * Create option value.
@@ -90,32 +90,20 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionValue', $id, 'is_active', $is_active);
@@ -126,18 +114,13 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   deprecated Reference array contains the id.
    *
    * @return \CRM_Core_DAO_OptionValue
    *
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params, $ids = []) {
-    if (!empty($ids['optionValue']) && empty($params['id'])) {
-      CRM_Core_Error::deprecatedFunctionWarning('$params[\'id\'] should be set, $ids is deprecated');
-    }
-    $id = $params['id'] ?? $ids['optionValue'] ?? NULL;
+  public static function add(&$params) {
+    $id = $params['id'] ?? NULL;
 
     // Update custom field data to reflect the new value
     if ($id && isset($params['value'])) {
@@ -167,36 +150,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $optionValue->domain_id = CRM_Core_Config::domainID();
     }
 
-    // When setting a default option, unset other options in this group as default
-    // FIXME: The extra CRM_Utils_System::isNull is because the API will pass the string 'null'
-    // FIXME: It would help to make this column NOT NULL DEFAULT 0
-    if (!empty($params['is_default']) && !CRM_Utils_System::isNull($params['is_default'])) {
-      $query = 'UPDATE civicrm_option_value SET is_default = 0 WHERE  option_group_id = %1';
-
-      // tweak default reset, and allow multiple default within group.
-      if ($resetDefaultFor = CRM_Utils_Array::value('reset_default_for', $params)) {
-        if (is_array($resetDefaultFor)) {
-          $colName = key($resetDefaultFor);
-          $colVal = $resetDefaultFor[$colName];
-          $query .= " AND ( $colName IN (  $colVal ) )";
-        }
-      }
-
-      $p = [1 => [$params['option_group_id'], 'Integer']];
-
-      // Limit update by domain of option
-      $domain = CRM_Utils_System::isNull($optionValue->domain_id) ? NULL : $optionValue->domain_id;
-      if (!$domain && $id && $isDomainOptionGroup) {
-        $domain = CRM_Core_DAO::getFieldValue(__CLASS__, $id, 'domain_id');
-      }
-      if ($domain) {
-        $query .= ' AND domain_id = %2';
-        $p[2] = [$domain, 'Integer'];
-      }
-
-      CRM_Core_DAO::executeQuery($query, $p);
-    }
-
     $groupsSupportingDuplicateValues = ['languages'];
     if (!$id && !empty($params['value'])) {
       $dao = new CRM_Core_DAO_OptionValue();
@@ -218,6 +171,14 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
     $optionValue->id = $id;
     $optionValue->save();
+    $id = $optionValue->id;
+    // When setting a default option, unset other options in this group as default
+    // FIXME: The extra CRM_Utils_System::isNull is because the API will pass the string 'null'
+    // FIXME: It would help to make this column NOT NULL DEFAULT 0
+    if (!CRM_Utils_System::isNull($params['is_default'] ?? NULL)) {
+      $optionValue->find(TRUE);
+      self::updateOptionDefaults($params['option_group_id'], $optionValue->id, $optionValue, $groupName);
+    }
     Civi::cache('metadata')->flush();
     CRM_Core_PseudoConstant::flush();
 
@@ -242,7 +203,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
           'account_relationship' => $relationTypeId,
           'financial_account_id' => $params['financial_account_id'],
         ];
-        CRM_Financial_BAO_FinancialTypeAccount::add($params);
+        CRM_Financial_BAO_EntityFinancialAccount::add($params);
       }
     }
     return $optionValue;
@@ -254,24 +215,25 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param int $optionValueId
    *
    * @return bool
-   *
+   * @deprecated
    */
   public static function del($optionValueId) {
-    $optionValue = new CRM_Core_DAO_OptionValue();
-    $optionValue->id = $optionValueId;
-    if (!$optionValue->find()) {
-      return FALSE;
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return (bool) static::deleteRecord(['id' => $optionValueId]);
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      if (self::updateRecords($event->id, CRM_Core_Action::DELETE)) {
+        Civi::cache('metadata')->flush();
+        CRM_Core_PseudoConstant::flush();
+      }
     }
-    $hookParams = ['id' => $optionValueId];
-    CRM_Utils_Hook::pre('delete', 'OptionValue', $optionValueId, $hookParams);
-    if (self::updateRecords($optionValueId, CRM_Core_Action::DELETE)) {
-      Civi::cache('metadata')->flush();
-      CRM_Core_PseudoConstant::flush();
-      $optionValue->delete();
-      CRM_Utils_Hook::post('delete', 'OptionValue', $optionValueId, $optionValue);
-      return TRUE;
-    }
-    return FALSE;
   }
 
   /**
@@ -569,6 +531,32 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     }
 
     return CRM_Utils_Array::first($result['values']);
+  }
+
+  /**
+   * Update the default values of other options in the group when the new value is set to is_default.
+   *
+   * @param int $optionGroupID
+   * @param int $id
+   * @param \CRM_Core_DAO_OptionValue $optionValue
+   * @param string $groupName
+   */
+  private static function updateOptionDefaults(int $optionGroupID, int $id, CRM_Core_DAO_OptionValue $optionValue, string $groupName): void {
+    $query = 'UPDATE civicrm_option_value SET is_default = 0 WHERE option_group_id = %1 AND id <> %2';
+    $queryParams = [1 => [$optionGroupID, 'Integer'], 2 => [$id, 'Integer']];
+
+    // Limit update by domain of option. This is loaded if it is a domain option group.
+    if (!empty($optionValue->domain_id)) {
+      $query .= ' AND domain_id = %3';
+      $queryParams[3] = [(int) $optionValue->domain_id, 'Integer'];
+    }
+    if (in_array($groupName, ['email_greeting', 'postal_greeting', 'addressee'], TRUE)) {
+      $variableNumber = count($queryParams) + 1;
+      $query .= ' AND filter = %' . $variableNumber;
+      $queryParams[$variableNumber] = [(int) $optionValue->filter, 'Integer'];
+    }
+
+    CRM_Core_DAO::executeQuery($query, $queryParams);
   }
 
 }

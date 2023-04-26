@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Generic\Result;
@@ -77,7 +78,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Load all entities
    */
   protected function loadEntities() {
-    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
+    $sorter = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
+    \Civi::dispatcher()->dispatch('civi.afform.sort.prefill', $sorter);
+    $sortedEntities = $sorter->getSortedEnties();
+    foreach ($sortedEntities as $entityName) {
+      $entity = $this->_formDataModel->getEntity($entityName);
       $this->_entityIds[$entityName] = [];
       $idField = CoreUtil::getIdFieldName($entity['type']);
       if (!empty($entity['actions']['update'])) {
@@ -86,8 +91,6 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           (!empty($entity['url-autofill']) || isset($entity['fields'][$idField]))
         ) {
           $ids = (array) $this->args[$entityName];
-          // Limit number of records to 1 unless using af-repeat
-          $ids = array_slice($ids, 0, !empty($entity['af-repeat']) ? $entity['max'] ?? NULL : 1);
           $this->loadEntity($entity, $ids);
         }
       }
@@ -103,18 +106,21 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param array $ids
    */
   public function loadEntity(array $entity, array $ids) {
+    // Limit number of records based on af-repeat settings
+    // If 'min' is set then it is repeatable, and max will either be a number or NULL for unlimited.
+    $ids = array_slice($ids, 0, isset($entity['min']) ? $entity['max'] : 1);
+
     $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
     $idField = CoreUtil::getIdFieldName($entity['type']);
-    if (!empty($entity['fields'][$idField]['saved_search'])) {
+    if ($ids && !empty($entity['fields'][$idField]['defn']['saved_search'])) {
       $ids = $this->validateBySavedSearch($entity, $ids);
     }
     if (!$ids) {
       return;
     }
-    $result = $api4($entity['type'], 'get', [
+    $result = $this->apiGet($api4, $entity['type'], $entity['fields'], [
       'where' => [['id', 'IN', $ids]],
-      'select' => array_keys($entity['fields']),
-    ])->indexBy($idField);
+    ]);
     foreach ($ids as $index => $id) {
       $this->_entityIds[$entity['name']][$index] = [
         $idField => isset($result[$id]) ? $id : NULL,
@@ -124,12 +130,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         $data = ['fields' => $result[$id]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
           $joinIdField = CoreUtil::getIdFieldName($joinEntity);
-          $data['joins'][$joinEntity] = (array) $api4($joinEntity, 'get', [
+          $data['joins'][$joinEntity] = array_values($this->apiGet($api4, $joinEntity, $join['fields'], [
             'where' => self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $id),
             'limit' => !empty($join['af-repeat']) ? $join['max'] ?? 0 : 1,
-            'select' => array_unique(array_merge([$joinIdField], array_keys($join['fields']))),
             'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
-          ]);
+          ]));
           $this->_entityIds[$entity['name']][$index]['_joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($data['joins'][$joinEntity], [$joinIdField]);
         }
         $this->_entityValues[$entity['name']][$index] = $data;
@@ -137,6 +142,51 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
   }
 
+  /**
+   * Delegated by loadEntity to call API.get and fill in additioal info
+   *
+   * @param $api4
+   * @param $entityName
+   * @param $entityFields
+   * @param $params
+   * @return array
+   */
+  private function apiGet($api4, $entityName, $entityFields, $params) {
+    $idField = CoreUtil::getIdFieldName($entityName);
+    $params['select'] = array_unique(array_merge([$idField], array_keys($entityFields)));
+    $result = (array) $api4($entityName, 'get', $params)->indexBy($idField);
+    // Check for file fields
+    $fieldInfo = civicrm_api4($entityName, 'getFields', [
+      'checkPermissions' => FALSE,
+      'action' => 'create',
+      'select' => ['name', 'fk_entity'],
+      'where' => [['name', 'IN', array_keys($entityFields)]],
+    ])->indexBy('name');
+    // Fill additional info about file fields
+    foreach ($fieldInfo as $fieldName => $fieldDefn) {
+      if ($fieldDefn['fk_entity'] === 'File') {
+        foreach ($result as &$item) {
+          if (!empty($item[$fieldName])) {
+            // Fall back on APIv3 until we have an attachment API for v4.
+            $fileInfo = \CRM_Utils_Array::filterColumns(civicrm_api3('Attachment', 'get', [
+              'id' => $item[$fieldName],
+            ])['values'], ['name', 'icon']);
+            $item[$fieldName] = \CRM_Utils_Array::first($fileInfo);
+          }
+        }
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Validate that given id(s) are actually returned by the Autocomplete API
+   *
+   * @param $entity
+   * @param array $ids
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
   private function validateBySavedSearch($entity, array $ids) {
     $idField = CoreUtil::getIdFieldName($entity['type']);
     $fetched = civicrm_api4($entity['type'], 'autocomplete', [

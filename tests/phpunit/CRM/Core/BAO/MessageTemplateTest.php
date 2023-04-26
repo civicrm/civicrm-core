@@ -4,7 +4,9 @@ use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\MessageTemplate;
 use Civi\Api4\Translation;
+use Civi\Test\Invasive;
 use Civi\Token\TokenProcessor;
+use Civi\WorkflowMessage\WorkflowMessage;
 
 /**
  * Class CRM_Core_BAO_MessageTemplateTest
@@ -24,10 +26,15 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     unset($GLOBALS['tsLocale'], $GLOBALS['dbLocale'], $GLOBALS['civicrmLocale']);
   }
 
+  /**
+   * Test rendering the template.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testRenderTemplate(): void {
     $contactId = $this->individualCreate([
       'first_name' => 'Abba',
-      'last_name' => 'Baab',
+      'last_name' => 'Baa',
       'prefix_id' => NULL,
       'suffix_id' => NULL,
     ]);
@@ -42,29 +49,30 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         'msg_html' => '<p>Hello testRenderTemplate {contact.display_name}!</p>',
       ],
     ]);
-    $this->assertEquals('Hello testRenderTemplate Abba Baab!', $rendered['subject']);
-    $this->assertEquals('Hello testRenderTemplate Abba Baab!', $rendered['text']);
-    $this->assertStringContainsString('<p>Hello testRenderTemplate Abba Baab!</p>', $rendered['html']);
+    $this->assertEquals('Hello testRenderTemplate Abba Baa!', $rendered['subject']);
+    $this->assertEquals('Hello testRenderTemplate Abba Baa!', $rendered['text']);
+    $this->assertStringContainsString('<p>Hello testRenderTemplate Abba Baa!</p>', $rendered['html']);
   }
 
+  /**
+   * Data provider for locale configurations to test.
+   *
+   * @return array
+   */
   public function getLocaleConfigurations(): array {
     $yesPartials = ['partial_locales' => TRUE, 'uiLanguages' => ['en_US']];
     $noPartials = ['partial_locales' => FALSE, 'uiLanguages' => ['en_US'], 'format_locale' => 'en_US'];
 
     $allTemplates = [];
-    $allTemplates['*'] = ['subject' => 'Hello', 'html' => 'Looky there!', 'text' => '{contribution.total_amount}'];
+    $allTemplates['*'] = ['subject' => 'Hello', 'html' => 'Look there!', 'text' => '{contribution.total_amount}'];
     $allTemplates['fr_FR'] = ['subject' => 'Bonjour', 'html' => 'Voila!', 'text' => '{contribution.total_amount}'];
     $allTemplates['fr_CA'] = ['subject' => 'Bonjour Canada', 'html' => 'Voila! Canada', 'text' => '{contribution.total_amount}'];
     $allTemplates['es_PR'] = ['subject' => 'Buenos dias', 'html' => 'Listo', 'text' => '{contribution.total_amount}'];
     $allTemplates['th_TH'] = ['subject' => 'สวัสดี', 'html' => 'ดังนั้น', 'text' => '{contribution.total_amount}'];
 
-    $onlyTemplates = function(array $locales) use ($allTemplates) {
-      return CRM_Utils_Array::subset($allTemplates, $locales);
-    };
-
     $rendered = [];
-    // $rendered['*'] = ['subject' => 'Hello', 'html' => 'Looky there!', 'text' => '$ 100.00'];
-    $rendered['*'] = ['subject' => 'Hello', 'html' => 'Looky there!', 'text' => '$100.00'];
+    // $rendered['*'] = ['subject' => 'Hello', 'html' => 'Look there!', 'text' => '$ 100.00'];
+    $rendered['*'] = ['subject' => 'Hello', 'html' => 'Look there!', 'text' => '$100.00'];
     $rendered['fr_FR'] = ['subject' => 'Bonjour', 'html' => 'Voila!', 'text' => '100,00 $US'];
     $rendered['fr_CA'] = ['subject' => 'Bonjour Canada', 'html' => 'Voila! Canada', 'text' => '100,00 $ US'];
     $rendered['es_PR'] = ['subject' => 'Buenos dias', 'html' => 'Listo', 'text' => '100.00 $US'];
@@ -74,21 +82,33 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
     $result['fr_FR matches fr_FR (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'fr_FR', $rendered['fr_FR']];
     $result['fr_FR matches fr_FR (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'fr_FR', $rendered['fr_FR']];
-    $result['fr_FR falls back to fr_CA (ltd-tpls; yes-partials)'] = [$yesPartials, $onlyTemplates(['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
-    $result['fr_FR falls back to fr_CA (ltd-tpls; no-partials)'] = [$noPartials, $onlyTemplates(['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
+    $result['fr_FR falls back to fr_CA (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
+    $result['fr_FR falls back to fr_CA (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
 
     $result['fr_CA matches fr_CA (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'fr_CA', $rendered['fr_CA']];
     $result['fr_CA matches fr_CA (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'fr_CA', $rendered['fr_CA']];
-    $result['fr_CA falls back to fr_FR (ltd-tpls; yes-partials)'] = [$yesPartials, $onlyTemplates(['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
-    $result['fr_CA falls back to fr_FR (ltd-tpls; no-partials)'] = [$noPartials, $onlyTemplates(['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
+    $result['fr_CA falls back to fr_FR (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
+    $result['fr_CA falls back to fr_FR (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
 
     $result['th_TH matches th_TH (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'th_TH', $rendered['th_TH']];
     $result['th_TH falls back to system default (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'th_TH', $rendered['*']];
     // ^^ The essence of the `partial_locales` setting -- whether partially-supported locales (th_TH) use mixed-mode or fallback to completely diff locale.
-    $result['th_TH falls back to system default (ltd-tpls; yes-partials)'] = [$yesPartials, $onlyTemplates(['*']), 'th_TH', $rendered['*']];
-    $result['th_TH falls back to system default (ltd-tpls; no-partials)'] = [$noPartials, $onlyTemplates(['*']), 'th_TH', $rendered['*']];
+    $result['th_TH falls back to system default (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
+    $result['th_TH falls back to system default (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
 
     return $result;
+  }
+
+  /**
+   * Filter allTemplates to get the subset for the locales required.
+   *
+   * @param array $allTemplates
+   * @param array $locales
+   *
+   * @return array
+   */
+  public function getLocaleTemplates(array $allTemplates, array $locales): array {
+    return CRM_Utils_Array::subset($allTemplates, $locales);
   }
 
   /**
@@ -103,7 +123,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    * @dataProvider getLocaleConfigurations
    */
   public function testRenderTranslatedTemplate($settings, $templates, $preferredLanguage, $expectRendered): void {
-    if (empty($settings['partial_locales']) && count(\CRM_Core_I18n::languages(FALSE)) <= 1) {
+    if (empty($settings['partial_locales']) && count(CRM_Core_I18n::languages(FALSE)) <= 1) {
       $this->markTestIncomplete('Full testing of localization requires l10n data.');
     }
     $cleanup = \CRM_Utils_AutoClean::swapSettings($settings);
@@ -165,6 +185,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       CRM_Utils_Array::subset($expectRendered, ['subject', 'html', 'text']),
       CRM_Utils_Array::subset($rendered, ['subject', 'html', 'text'])
     );
+    // Explicitly unset & initiate __destruct so it is clear there is a reason to set it.
+    unset($cleanup);
   }
 
   /**
@@ -173,7 +195,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   public function testSendTemplate_RenderMode_OpenTemplate(): void {
     $contactId = $this->individualCreate([
       'first_name' => 'Abba',
-      'last_name' => 'Baab',
+      'last_name' => 'Baa',
       'prefix_id' => NULL,
       'suffix_id' => NULL,
     ]);
@@ -192,9 +214,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ]
     );
     $this->assertEquals(FALSE, $sent);
-    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!', $subject);
-    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!', $messageText);
-    $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!</p>', $messageHtml);
+    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!', $subject);
+    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!', $messageText);
+    $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!</p>', $messageHtml);
   }
 
   public function testSendTemplate_RenderMode_DefaultTpl(): void {
@@ -213,7 +235,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
       $contactId = $this->individualCreate([
         'first_name' => 'Abba',
-        'last_name' => 'Baab',
+        'last_name' => 'Baa',
         'prefix_id' => NULL,
         'suffix_id' => NULL,
       ]);
@@ -228,9 +250,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         ]
       );
       $this->assertEquals(FALSE, $sent);
-      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baab!', $subject);
-      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baab!', $messageText);
-      $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_Default Abba Baab!</p>', $messageHtml);
+      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baa!', $subject);
+      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baa!', $messageText);
+      $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_Default Abba Baa!</p>', $messageHtml);
     });
   }
 
@@ -250,7 +272,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
       $contactId = $this->individualCreate([
         'first_name' => 'Abba',
-        'last_name' => 'Baab',
+        'last_name' => 'Baa',
         'prefix_id' => NULL,
         'suffix_id' => NULL,
       ]);
@@ -269,9 +291,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         ]
       );
       $this->assertEquals(FALSE, $sent);
-      $this->assertEquals('Hello Abba Baab about Something Something!', $subject);
-      $this->assertEquals('Hello Abba Baab about Something Something!', $messageText);
-      $this->assertStringContainsString('<p>Hello Abba Baab about Something Something!</p>', $messageHtml);
+      $this->assertEquals('Hello Abba Baa about Something Something!', $subject);
+      $this->assertEquals('Hello Abba Baa about Something Something!', $messageText);
+      $this->assertStringContainsString('<p>Hello Abba Baa about Something Something!</p>', $messageHtml);
     });
   }
 
@@ -284,7 +306,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $client_id = $this->individualCreate();
     $contact_id = $this->individualCreate();
 
-    $msg = \Civi\WorkflowMessage\WorkflowMessage::create('case_activity', [
+    $msg = WorkflowMessage::create('case_activity', [
       'modelProps' => [
         'contactId' => $contact_id,
         'contact' => ['role' => 'Sand grain counter'],
@@ -304,7 +326,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals([], \Civi\Test\Invasive::get([$msg, '_extras']));
+    $this->assertEquals([], Invasive::get([$msg, '_extras']));
 
     [, $subject, $message] = $msg->sendTemplate([
       'workflow' => 'case_activity',
@@ -376,6 +398,7 @@ London, 90210
   /**
    * Test rendering of smarty tokens.
    *
+   * @throws \CRM_Core_Exception
    */
   public function testRenderTemplateIgnoreSmarty(): void {
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
@@ -402,8 +425,8 @@ London, 90210
    */
   public function testContactTokens(): void {
     // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
-    putenv('TIME_FUNC=frozen');
-    CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
+    $restoreTime = $this->useFrozenTime();
+
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hookTokens']);
 
@@ -413,7 +436,7 @@ London, 90210
     $advertisedTokens = CRM_Core_SelectValues::contactTokens();
     $this->assertEquals($this->getAdvertisedTokens(), $advertisedTokens);
 
-    CRM_Core_Smarty::singleton()->assign('pre_assigned_smarty', 'wee');
+    CRM_Core_Smarty::singleton()->assign('pre_assigned_smarty', 'woo');
     // This string contains the 4 types of possible replaces just to be sure they
     // work in combination.
     $tokenString = '{$pre_assigned_smarty}{$passed_smarty}
@@ -421,7 +444,7 @@ London, 90210
 {important_stuff.favourite_emoticon}
 ';
     foreach (array_keys($tokenData) as $key) {
-      $tokenString .= "{$key}:{contact.{$key}}\n";
+      $tokenString .= "$key:{contact.$key}\n";
     }
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
       'workflow' => 'dummy',
@@ -432,9 +455,9 @@ London, 90210
         'msg_text' => $tokenString,
       ],
       'tokenContext' => ['contactId' => $tokenData['contact_id']],
-      'tplParams' => ['passed_smarty' => 'whoa'],
+      'tplParams' => ['passed_smarty' => 'hoo'],
     ]);
-    $expected = 'weewhoa
+    $expected = 'woohoo
 Default Domain Name
 emo
 ';
@@ -443,7 +466,7 @@ emo
     $textDifferences = [
       '<p>',
       '</p>',
-      '<a href="http://civicrm.org" ',
+      '<a href="https://civicrm.org" ',
       'target="_blank">',
       '</a>',
     ];
@@ -452,7 +475,7 @@ emo
     }
     $this->assertEquals($expected, $messageContent['text']);
     $checksum_position = strpos($messageContent['subject'], 'cs=');
-    $this->assertTrue($checksum_position !== FALSE);
+    $this->assertNotFalse($checksum_position);
     $fixedExpected = rtrim(str_replace("\n", ' ', $expected));
     $this->assertEquals(substr($fixedExpected, 0, $checksum_position), substr($messageContent['subject'], 0, $checksum_position));
     $returned_parts = explode('_', substr($messageContent['subject'], $checksum_position));
@@ -460,14 +483,69 @@ emo
     $this->assertEquals($expected_parts[0], $returned_parts[0]);
     $this->assertApproxEquals($expected_parts[1], $returned_parts[1], 2);
     $this->assertEquals($expected_parts[2], $returned_parts[2]);
+  }
 
-    // reset time
-    putenv('TIME_FUNC');
-    CRM_Utils_Time::resetTime();
+  /**
+   * Test tokens resolve when parsed one at a time.
+   *
+   * Assuming that `testContactTokens()` has asserted tokens work en masse, we have another
+   * question -- do the tokens work the same when evaluated en-masse and individually?
+   */
+  public function testTokensIndividually(): void {
+    // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
+    // This variable releases the time on destruct so needs to be assigned for the
+    // duration of the test.
+    /** @noinspection PhpUnusedLocalVariableInspection */
+    $restoreTime = $this->useFrozenTime();
+
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hookTokens']);
+
+    $this->createCustomGroupWithFieldsOfAllTypes([]);
+    $tokenData = $this->getOldContactTokens();
+    $this->setupContactFromTokeData($tokenData);
+
+    $context = ['contactId' => $tokenData['contact_id']];
+    $render = static function (string $templateText) use ($context, $tokenData) {
+      try {
+        return CRM_Core_TokenSmarty::render(['text' => $templateText], $context)['text'];
+      }
+      catch (\Throwable $t) {
+        return 'EXCEPTION:' . $t->getMessage();
+      }
+    };
+
+    // Build $tokenLines, a list of expressions like 'contact.display_name:{contact.display_name}'
+    $tokenLines = [];
+    $tokenNames = array_keys($this->getAdvertisedTokens());
+    foreach ($tokenNames as $tokenName) {
+      $tokenLines[] = trim($tokenName, '{}') . ':' . $tokenName;
+    }
+    foreach (array_keys($tokenData) as $key) {
+      $tokenLines[] .= "contact.$key:{contact.$key}";
+    }
+    $tokenLines = array_unique($tokenLines);
+    sort($tokenLines);
+
+    // Evaluate all these token lines
+    $oneByOne = array_map($render, $tokenLines);
+    $allAtOnce = $render(implode("\n", $tokenLines));
+    $this->assertEquals($allAtOnce, implode("\n", $oneByOne));
+
+    $emptyLines = preg_grep('/:$/', $oneByOne);
+    $this->assertEquals([
+      'contact.address_primary.county_id:label:',
+      'contact.contact_is_deleted:',
+      'contact.county:',
+      'contact.custom_6:',
+      'contact.do_not_phone:',
+    ], array_values($emptyLines), 'Most tokens should have data.');
   }
 
   /**
    * Test that old contact tokens still work, as we add new-style support.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testLegacyTokens(): void {
     $contactID = $this->individualCreate(['gender_id' => 'Female', 'communication_style' => 1, 'preferred_communication_method' => 'Phone']);
@@ -543,7 +621,7 @@ emo
     $address = $this->setupContactFromTokeData($tokenData);
     $tokenString = '';
     foreach (array_keys($tokenData) as $key) {
-      $tokenString .= "{$key}:{contact.{$key}}\n";
+      $tokenString .= "$key:{contact.$key}\n";
     }
     $newStyleTokenString = '';
     foreach (array_keys($this->getAdvertisedTokens()) as $key) {
@@ -555,9 +633,9 @@ emo
 
     $tokenProcessor->addRow(['contactId' => $tokenData['contact_id']]);
     $tokenProcessor->evaluate();
-    $rendered = '';
+    $rendered = $newStyleRendered = '';
     foreach ($tokenProcessor->getRows() as $row) {
-      $rendered = (string) $row->render('html');
+      $rendered = $row->render('html');
       $newStyleRendered = $row->render('new');
     }
     $expected = $this->getExpectedContactOutput($address['id'], $tokenData, $rendered);
@@ -613,7 +691,6 @@ emo
       '{contact.image_URL}' => 'Image Url',
       '{contact.preferred_communication_method:label}' => 'Preferred Communication Method',
       '{contact.preferred_language:label}' => 'Preferred Language',
-      '{contact.preferred_mail_format:label}' => 'Preferred Mail Format',
       '{contact.hash}' => 'Contact Hash',
       '{contact.source}' => 'Contact Source',
       '{contact.first_name}' => 'First Name',
@@ -633,39 +710,38 @@ emo
       '{contact.addressee_display}' => 'Addressee',
       '{contact.email_greeting_display}' => 'Email Greeting',
       '{contact.postal_greeting_display}' => 'Postal Greeting',
-      '{contact.current_employer}' => 'Current Employer',
-      '{contact.location_type_id:label}' => 'Address Location Type',
-      '{contact.address_id}' => 'Address ID',
-      '{contact.street_address}' => 'Street Address',
-      '{contact.street_number}' => 'Street Number',
-      '{contact.street_number_suffix}' => 'Street Number Suffix',
-      '{contact.street_name}' => 'Street Name',
-      '{contact.street_unit}' => 'Street Unit',
-      '{contact.supplemental_address_1}' => 'Supplemental Address 1',
-      '{contact.supplemental_address_2}' => 'Supplemental Address 2',
-      '{contact.supplemental_address_3}' => 'Supplemental Address 3',
-      '{contact.city}' => 'City',
-      '{contact.postal_code_suffix}' => 'Postal Code Suffix',
-      '{contact.postal_code}' => 'Postal Code',
-      '{contact.geo_code_1}' => 'Latitude',
-      '{contact.geo_code_2}' => 'Longitude',
-      '{contact.address_name}' => 'Address Name',
-      '{contact.master_id}' => 'Master Address ID',
-      '{contact.county}' => 'County',
-      '{contact.state_province}' => 'State/Province',
-      '{contact.country}' => 'Country',
-      '{contact.phone}' => 'Phone',
-      '{contact.phone_ext}' => 'Phone Extension',
-      '{contact.phone_type}' => 'Phone Type',
-      '{contact.email}' => 'Email',
-      '{contact.on_hold:label}' => 'On Hold',
-      '{contact.signature_text}' => 'Signature Text',
-      '{contact.signature_html}' => 'Signature Html',
-      '{contact.provider_id:label}' => 'IM Provider',
-      '{contact.im}' => 'IM Screen Name',
-      '{contact.openid}' => 'OpenID',
-      '{contact.world_region}' => 'World Region',
-      '{contact.url}' => 'Website',
+      '{contact.employer_id.display_name}' => 'Current Employer',
+      '{contact.address_primary.location_type_id:label}' => 'Address Location Type',
+      '{contact.address_primary.id}' => 'Address ID',
+      '{contact.address_primary.street_address}' => 'Street Address',
+      '{contact.address_primary.street_number}' => 'Street Number',
+      '{contact.address_primary.street_number_suffix}' => 'Street Number Suffix',
+      '{contact.address_primary.street_name}' => 'Street Name',
+      '{contact.address_primary.street_unit}' => 'Street Unit',
+      '{contact.address_primary.supplemental_address_1}' => 'Supplemental Address 1',
+      '{contact.address_primary.supplemental_address_2}' => 'Supplemental Address 2',
+      '{contact.address_primary.supplemental_address_3}' => 'Supplemental Address 3',
+      '{contact.address_primary.city}' => 'City',
+      '{contact.address_primary.postal_code_suffix}' => 'Postal Code Suffix',
+      '{contact.address_primary.postal_code}' => 'Postal Code',
+      '{contact.address_primary.geo_code_1}' => 'Latitude',
+      '{contact.address_primary.geo_code_2}' => 'Longitude',
+      '{contact.address_primary.name}' => 'Address Name',
+      '{contact.address_primary.master_id}' => 'Master Address ID',
+      '{contact.address_primary.county_id:label}' => 'County',
+      '{contact.address_primary.state_province_id:abbr}' => 'State/Province',
+      '{contact.address_primary.country_id:label}' => 'Country',
+      '{contact.phone_primary.phone}' => 'Phone',
+      '{contact.phone_primary.phone_ext}' => 'Phone Extension',
+      '{contact.phone_primary.phone_type_id:label}' => 'Phone Type',
+      '{contact.email_primary.email}' => 'Email',
+      '{contact.email_primary.on_hold:label}' => 'On Hold',
+      '{contact.email_primary.signature_text}' => 'Signature Text',
+      '{contact.email_primary.signature_html}' => 'Signature Html',
+      '{contact.im_primary.provider_id:label}' => 'IM Provider',
+      '{contact.im_primary.name}' => 'IM Screen Name',
+      '{contact.address_primary.country_id.region_id:name}' => 'World Region',
+      '{contact.website_first.url}' => 'Website',
       '{contact.custom_9}' => 'Contact reference field :: Custom Group',
       '{contact.custom_7}' => 'Country :: Custom Group',
       '{contact.custom_8}' => 'Country-multi :: Custom Group',
@@ -697,7 +773,7 @@ emo
    * Note it will render additional custom fields if they exist.
    *
    * @return array
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpDocMissingThrowsInspection
    */
   public function getOldContactTokens(): array {
     return [
@@ -715,7 +791,6 @@ emo
       'image_URL' => 'https://example.com',
       'preferred_communication_method' => 'Phone',
       'preferred_language' => 'fr_CA',
-      'preferred_mail_format' => 'Both',
       'hash' => 'xyz',
       'contact_source' => 'Contact Source',
       'first_name' => 'Robert',
@@ -783,12 +858,12 @@ emo
       'im' => 'IM Screen Name',
       'openid' => 'OpenID',
       'world_region' => 'World Region',
-      'url' => 'http://civicrm.org',
-      $this->getCustomFieldName('text') => 'Bobsled',
+      'url' => 'https://civicrm.org',
+      $this->getCustomFieldName() => 'Bobsled',
       $this->getCustomFieldName('select_string') => 'R',
       $this->getCustomFieldName('select_date') => '2021-01-20',
       $this->getCustomFieldName('int') => 999,
-      $this->getCustomFieldName('link') => 'http://civicrm.org',
+      $this->getCustomFieldName('link') => 'https://civicrm.org',
       $this->getCustomFieldName('file') => '',
       $this->getCustomFieldName('country') => 'New Zealand',
       $this->getCustomFieldName('multi_country') => ['France', 'Canada'],
@@ -804,10 +879,64 @@ emo
   }
 
   /**
+   * Test tokens that we briefly introduced before changing our minds....
+   *
+   * The style I thought we were going to go with looked like
+   *
+   * {contact.primary_address.street_address} but.... we went with
+   * {contact.address_primary.street_address} at the apiv4 level - which is what
+   * we are trying to mirror. It's likely no-one ever used these as we didn't
+   * advertise them and the old 'random' v3 style tokens continued to work.
+   *
+   * But, we should support them for a bit - which means testing them...
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testBrieflyPopularTokens(): void {
+    $this->createCustomGroupWithFieldsOfAllTypes([]);
+    $tokenData = $this->getOldContactTokens();
+    $this->setupContactFromTokeData($tokenData);
+    // One token from each entity....
+    $tokenString = "primary_email:{contact.primary_email.email}\n"
+      . "primary_address:{contact.primary_address.street_address}\n"
+      . "primary_im:{contact.primary_im.name}\n"
+      . "primary_website:{contact.primary_website.url}\n"
+      . "primary_openid:{contact.primary_openid.openid}\n"
+      . "primary_phone:{contact.primary_phone.phone}\n";
+
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), []);
+    $tokenProcessor->addMessage('html', $tokenString, 'text/html');
+    $tokenProcessor->addRow(['contactId' => $tokenData['contact_id']]);
+    $tokenProcessor->evaluate();
+    $messageHtml = $tokenProcessor->getRow(0)->render('html');
+    $this->assertEquals('primary_email:anthony_anderson@civicrm.org
+primary_address:Street Address
+primary_im:IM Screen Name
+primary_website:https://civicrm.org
+primary_openid:OpenID
+primary_phone:123-456
+', $messageHtml);
+  }
+
+  /**
+   * Temporarily freeze time, as perceived through `CRM_Utils_Time`.
+   *
+   * @return \CRM_Utils_AutoClean
+   */
+  protected function useFrozenTime(): CRM_Utils_AutoClean {
+    $oldTimeFunc = getenv('TIME_FUNC');
+    putenv('TIME_FUNC=frozen');
+    CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
+    return CRM_Utils_AutoClean::with(function () use ($oldTimeFunc) {
+      putenv($oldTimeFunc === NULL ? 'TIME_FUNC' : "TIME_FUNC=$oldTimeFunc");
+      CRM_Utils_Time::resetTime();
+    });
+  }
+
+  /**
    * @param array $tokenData
    *
    * @return array|int
-   * @throws \CRM_Core_Exception
    */
   protected function setupContactFromTokeData(array $tokenData) {
     $this->callAPISuccess('Contact', 'create', $tokenData);
@@ -839,10 +968,10 @@ emo
    * @return string
    * @throws \CRM_Core_Exception
    */
-  protected function getExpectedContactOutput($id, array $tokenData, string $actualOutput): string {
+  protected function getExpectedContactOutput(int $id, array $tokenData, string $actualOutput): string {
     $checksum = substr($actualOutput, (strpos($actualOutput, 'cs=') + 3), 47);
     $contact = Contact::get(FALSE)->addWhere('id', '=', $tokenData['contact_id'])->setSelect(['modified_date', 'employer_id'])->execute()->first();
-    $expected = 'contact_type:Individual
+    return 'contact_type:Individual
 do_not_email:1
 do_not_phone:
 do_not_mail:1
@@ -856,7 +985,6 @@ nick_name:Bob
 image_URL:https://example.com
 preferred_communication_method:Phone
 preferred_language:fr_CA
-preferred_mail_format:Both
 hash:xyz
 contact_source:Contact Source
 first_name:Robert
@@ -903,19 +1031,19 @@ phone_ext:77
 phone_type_id:2
 phone_type:Mobile
 email:anthony_anderson@civicrm.org
-on_hold:0
+on_hold:No
 signature_text:Yours sincerely
 signature_html:<p>Yours</p>
-im_provider:1
+im_provider:Yahoo
 im:IM Screen Name
 openid:OpenID
 world_region:America South, Central, North and Caribbean
-url:http://civicrm.org
+url:https://civicrm.org
 custom_1:Bobsled
 custom_2:Red
 custom_3:01/20/2021 12:00AM
 custom_4:999
-custom_5:<a href="http://civicrm.org" target="_blank">http://civicrm.org</a>
+custom_5:<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
 custom_6:
 custom_7:New Zealand
 custom_8:France, Canada
@@ -927,7 +1055,6 @@ custom_13:Purple
 checksum:cs=' . $checksum . '
 contact_id:' . $tokenData['contact_id'] . '
 ';
-    return $expected;
   }
 
   /**
@@ -940,10 +1067,10 @@ contact_id:' . $tokenData['contact_id'] . '
    * @return string
    * @throws \CRM_Core_Exception
    */
-  protected function getExpectedContactOutputNewStyle($id, array $tokenData, string $actualOutput): string {
+  protected function getExpectedContactOutputNewStyle(int $id, array $tokenData, string $actualOutput): string {
     $checksum = substr($actualOutput, (strpos($actualOutput, 'cs=') + 3), 47);
     $contact = Contact::get(FALSE)->addWhere('id', '=', $tokenData['contact_id'])->setSelect(['modified_date', 'employer_id'])->execute()->first();
-    $expected = 'contact_type:label |Individual
+    return 'contact_type:label |Individual
 do_not_email:label |Yes
 do_not_phone:label |No
 do_not_mail:label |Yes
@@ -957,7 +1084,6 @@ nick_name |Bob
 image_URL |https://example.com
 preferred_communication_method:label |Phone
 preferred_language:label |French (Canada)
-preferred_mail_format:label |Both
 hash |xyz
 source |Contact Source
 first_name |Robert
@@ -977,39 +1103,38 @@ modified_date |' . CRM_Utils_Date::customFormat($contact['modified_date']) . '
 addressee_display |Mr. Robert Frank Smith II
 email_greeting_display |Dear Robert
 postal_greeting_display |Dear Robert
-current_employer |Unit Test Organization
-location_type_id:label |Home
-address_id |' . $id . '
-street_address |Street Address
-street_number |123
-street_number_suffix |S
-street_name |Main St
-street_unit |45B
-supplemental_address_1 |Round the corner
-supplemental_address_2 |Up the road
-supplemental_address_3 |By the big tree
-city |New York
-postal_code_suffix |4578
-postal_code |90210
-geo_code_1 |48.858093
-geo_code_2 |2.294694
-address_name |The white house
-master_id |' . $tokenData['master_id'] . '
-county |
-state_province |TX
-country |United States
-phone |123-456
-phone_ext |77
-phone_type |Mobile
-email |anthony_anderson@civicrm.org
-on_hold:label |No
-signature_text |Yours sincerely
-signature_html |<p>Yours</p>
-provider_id:label |Yahoo
-im |IM Screen Name
-openid |OpenID
-world_region |America South, Central, North and Caribbean
-url |http://civicrm.org
+employer_id.display_name |Unit Test Organization
+address_primary.location_type_id:label |Home
+address_primary.id |' . $id . '
+address_primary.street_address |Street Address
+address_primary.street_number |123
+address_primary.street_number_suffix |S
+address_primary.street_name |Main St
+address_primary.street_unit |45B
+address_primary.supplemental_address_1 |Round the corner
+address_primary.supplemental_address_2 |Up the road
+address_primary.supplemental_address_3 |By the big tree
+address_primary.city |New York
+address_primary.postal_code_suffix |4578
+address_primary.postal_code |90210
+address_primary.geo_code_1 |48.858093
+address_primary.geo_code_2 |2.294694
+address_primary.name |The white house
+address_primary.master_id |' . $tokenData['master_id'] . '
+address_primary.county_id:label |
+address_primary.state_province_id:abbr |TX
+address_primary.country_id:label |United States
+phone_primary.phone |123-456
+phone_primary.phone_ext |77
+phone_primary.phone_type_id:label |Mobile
+email_primary.email |anthony_anderson@civicrm.org
+email_primary.on_hold:label |No
+email_primary.signature_text |Yours sincerely
+email_primary.signature_html |&lt;p&gt;Yours&lt;/p&gt;
+im_primary.provider_id:label |Yahoo
+im_primary.name |IM Screen Name
+address_primary.country_id.region_id:name |America South, Central, North and Caribbean
+website_first.url |https://civicrm.org
 custom_9 |Mr. Spider Man II
 custom_7 |New Zealand
 custom_8 |France, Canada
@@ -1020,14 +1145,13 @@ custom_2 |Red
 custom_13 |Purple
 custom_10 |Queensland
 custom_11 |Victoria, New South Wales
-custom_5 |<a href="http://civicrm.org" target="_blank">http://civicrm.org</a>
+custom_5 |<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
 custom_12 |Yes
 custom_3 |01/20/2021 12:00AM
 checksum |cs=' . $checksum . '
 id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
 ';
-    return $expected;
   }
 
 }

@@ -19,6 +19,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   protected $_params;
   protected $_noteID;
   protected $_note;
+  protected $_createdDate;
 
   public function setUp(): void {
 
@@ -41,6 +42,26 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     ];
     $this->_note = $this->noteCreate($this->_contactID);
     $this->_noteID = $this->_note['id'];
+  }
+
+  /**
+   * Create note.
+   *
+   * @param int $contactID
+   *
+   * @return array
+   */
+  public function noteCreate(int $contactID): array {
+    $params = [
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $contactID,
+      'note' => 'hello I am testing Note',
+      'contact_id' => $contactID,
+      'modified_date' => date('Ymd'),
+      'subject' => 'Test Note',
+    ];
+
+    return $this->callAPISuccess('Note', 'create', $params);
   }
 
   ///////////////// civicrm_note_get methods
@@ -301,22 +322,12 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->assertEquals('Hello join', $result['note']);
     // This should return no results by restricting contact_type
     $result = $this->callAPISuccess('Note', 'get', [
-      'return' => ["entity_id.organization_name"],
+      'return' => ['entity_id.organization_name'],
       'entity_id' => $org['id'],
-      'entity_table' => "civicrm_contact",
-      'entity_id.contact_type' => "Individual",
+      'entity_table' => 'civicrm_contact',
+      'entity_id.contact_type' => 'Individual',
     ]);
     $this->assertEquals(0, $result['count']);
   }
 
-}
-
-/**
- * Test civicrm note create() using example code.
- */
-function testNoteCreateExample() {
-  require_once 'api/v3/examples/Note/Create.ex.php';
-  $result = Note_get_example();
-  $expectedResult = Note_get_expectedresult();
-  $this->assertEquals($result, $expectedResult);
 }

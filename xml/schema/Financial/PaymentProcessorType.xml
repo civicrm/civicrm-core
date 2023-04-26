@@ -54,6 +54,10 @@
     <default>1</default>
     <required>true</required>
     <comment>Is this processor active?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>1.8</add>
   </field>
   <field>
@@ -62,6 +66,10 @@
     <type>boolean</type>
     <default>0</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <comment>Is this processor the default?</comment>
     <add>1.8</add>
   </field>

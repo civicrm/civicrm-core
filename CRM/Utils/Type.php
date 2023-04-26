@@ -236,6 +236,7 @@ class CRM_Utils_Type {
       case 'Date':
       case 'Timestamp':
       case 'ContactReference':
+      case 'EntityReference':
       case 'MysqlOrderByDirection':
         $validatedData = self::validate($data, $type, $abort);
         if (isset($validatedData)) {
@@ -380,6 +381,7 @@ class CRM_Utils_Type {
       'Date',
       'Timestamp',
       'ContactReference',
+      'EntityReference',
       'MysqlColumnNameOrAlias',
       'MysqlOrderByDirection',
       'MysqlOrderBy',
@@ -435,12 +437,13 @@ class CRM_Utils_Type {
         break;
 
       case 'ContactReference':
+      case 'EntityReference':
         // null is valid
         if (strlen(trim($data)) == 0) {
           return trim($data);
         }
 
-        if (CRM_Utils_Rule::validContact($data)) {
+        if (CRM_Utils_Rule::positiveInteger($data)) {
           return (int) $data;
         }
         break;
@@ -465,7 +468,9 @@ class CRM_Utils_Type {
     }
 
     if ($abort) {
-      $data = htmlentities($data);
+      // Note the string 'NULL' is just for display purposes here and to avoid
+      // passing real null to htmlentities - it's not for database queries.
+      $data = htmlentities($data ?? 'NULL');
       throw new CRM_Core_Exception("$name (value: $data) is not of the type $type");
     }
 

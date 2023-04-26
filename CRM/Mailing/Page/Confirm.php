@@ -34,7 +34,7 @@ class CRM_Mailing_Page_Confirm extends CRM_Core_Page {
       throw new CRM_Core_Exception(ts("Missing input parameters"));
     }
 
-    $result = CRM_Mailing_Event_BAO_Confirm::confirm($contact_id, $subscribe_id, $hash);
+    $result = CRM_Mailing_Event_BAO_MailingEventConfirm::confirm($contact_id, $subscribe_id, $hash);
     if ($result === FALSE) {
       $this->assign('success', $result);
     }

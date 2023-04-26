@@ -499,6 +499,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * Demonstrate it is modified showing the query now breaks.
    */
   public function testModifyAndBreakQuery() {
+    $dbNameString = stripos(CRM_Utils_SQL::getDatabaseVersion(), 'mariadb') !== FALSE ? 'MariaDB' : 'MySQL';
     /**
      * @param \Civi\Core\Event\QueryEvent $e
      */
@@ -511,7 +512,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
     catch (PEAR_Exception $e) {
       $this->assertEquals(
-        "SELECT * FROM civicrm_domain [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '/* Forgot trailing comment markerSELECT * FROM civicrm_domain' at line 1]",
+        "SELECT * FROM civicrm_domain [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your $dbNameString server version for the right syntax to use near '/* Forgot trailing comment markerSELECT * FROM civicrm_domain' at line 1]",
         $e->getCause()->getUserInfo()
       );
       Civi::dispatcher()->removeListener('civi.db.query', $listener);

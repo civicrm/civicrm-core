@@ -14,37 +14,26 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
+class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\HookInterface {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $id, 'is_active', $is_active);
   }
 
@@ -95,9 +84,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
-    if (empty($params['is_template'])) {
-      $params['is_template'] = 0;
-    }
     // check if new event, if so set the created_id (if not set)
     // and always set created_date to now
     if (empty($params['id'])) {
@@ -111,7 +97,12 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
       if (!empty($params['template_id'])) {
         $copy = self::copy($params['template_id']);
         $params['id'] = $copy->id;
+
         unset($params['template_id']);
+        // unless we are explicitly trying to create a new template
+        // we want to set the `is_template` flag on the clone to false
+        // so that the copy is a new event rather than a new template
+        $params['is_template'] = $params['is_template'] ?? 0;
 
         //fix for api from template creation bug
         civicrm_api4('ActionSchedule', 'update', [
@@ -171,57 +162,59 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *   Event id.
    *
    * @return mixed|null
+   *
+   * @deprecated
    */
   public static function del($id) {
-    if (!$id) {
-      return NULL;
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return (bool) static::deleteRecord(['id' => $id]);
+  }
 
-    CRM_Utils_Hook::pre('delete', 'Event', $id);
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
 
-    $extends = ['event'];
-    $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
-    foreach ($groupTree as $values) {
-      $query = "DELETE FROM %1 WHERE entity_id = %2";
-      CRM_Core_DAO::executeQuery($query, [
-        1 => [$values['table_name'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
-        2 => [$id, 'Integer'],
-      ]);
-    }
-
-    // Clean up references to profiles used by the event (CRM-20935)
-    $ufJoinParams = [
-      'module' => 'CiviEvent',
-      'entity_table' => 'civicrm_event',
-      'entity_id' => $id,
-    ];
-    CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
-    $ufJoinParams = [
-      'module' => 'CiviEvent_Additional',
-      'entity_table' => 'civicrm_event',
-      'entity_id' => $id,
-    ];
-    CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
-
-    // price set cleanup, CRM-5527
-    CRM_Price_BAO_PriceSet::removeFrom('civicrm_event', $id);
-
-    $event = new CRM_Event_DAO_Event();
-    $event->id = $id;
-
-    if ($event->find(TRUE)) {
-      $locBlockId = $event->loc_block_id;
-      $result = $event->delete();
-
-      if (!is_null($locBlockId)) {
-        self::deleteEventLocBlock($locBlockId, $id);
+      $extends = ['event'];
+      $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+      foreach ($groupTree as $values) {
+        $query = "DELETE FROM %1 WHERE entity_id = %2";
+        CRM_Core_DAO::executeQuery($query, [
+          1 => [$values['table_name'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
+          2 => [$event->id, 'Integer'],
+        ]);
       }
 
-      CRM_Utils_Hook::post('delete', 'Event', $id, $event);
-      return $result;
-    }
+      // Clean up references to profiles used by the event (CRM-20935)
+      $ufJoinParams = [
+        'module' => 'CiviEvent',
+        'entity_table' => 'civicrm_event',
+        'entity_id' => $event->id,
+      ];
+      CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
+      $ufJoinParams = [
+        'module' => 'CiviEvent_Additional',
+        'entity_table' => 'civicrm_event',
+        'entity_id' => $event->id,
+      ];
+      CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
 
-    return NULL;
+      // price set cleanup, CRM-5527
+      CRM_Price_BAO_PriceSet::removeFrom('civicrm_event', $event->id);
+
+      $eventDAO = new CRM_Event_DAO_Event();
+      $eventDAO->id = $event->id;
+
+      if ($eventDAO->find(TRUE)) {
+        $locBlockId = $eventDAO->loc_block_id;
+        if (!is_null($locBlockId)) {
+          self::deleteEventLocBlock($locBlockId, $event->id);
+        }
+      }
+    }
   }
 
   /**
@@ -721,13 +714,13 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
   /**
    * Get the complete information for one or more events.
    *
-   * @param date $start
+   * @param Date $start
    *   Get events with start date >= this date.
    * @param int $type Get events on the a specific event type (by event_type_id).
    *   Get events on the a specific event type (by event_type_id).
    * @param int $eventId Return a single event - by event id.
    *   Return a single event - by event id.
-   * @param date $end
+   * @param Date $end
    *   Also get events with end date >= this date.
    * @param bool $onlyPublic Include public events only, default TRUE.
    *   Include public events only, default TRUE.

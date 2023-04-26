@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_User_defined_Profiles',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -55,7 +55,7 @@ return [
   [
     'name' => 'SavedSearch_User_defined_Profiles_SearchDisplay_User_defined_Profiles',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,

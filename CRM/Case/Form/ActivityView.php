@@ -90,6 +90,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
       $this->assign('latestRevisionID', $latestRevisionID);
     }
     else {
+      $this->assign('revs', 0);
       if (count($viewPriorActivities) > 1) {
         $this->assign('activityID', $activityID);
       }
@@ -100,9 +101,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
     }
 
     $parentID = CRM_Activity_BAO_Activity::getParentActivity($activityID);
-    if ($parentID) {
-      $this->assign('parentID', $parentID);
-    }
+    $this->assign('parentID', $parentID ?? NULL);
 
     //viewing activity should get diplayed in recent list.CRM-4670
     $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityID, 'activity_type_id');

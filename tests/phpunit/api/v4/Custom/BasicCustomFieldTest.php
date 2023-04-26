@@ -419,6 +419,36 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertEquals($optionGroupCount, OptionGroup::get(FALSE)->selectRowCount()->execute()->count());
   }
 
+  /**
+   * Pseudoconstant lookups that are passed an empty string return NULL, not an empty string.
+   * @throws \CRM_Core_Exception
+   */
+  public function testPseudoConstantCreate(): void {
+    $optionGroupId = $this->createTestRecord('OptionGroup')['id'];
+    $this->createTestRecord('OptionValue', ['option_group_id' => $optionGroupId]);
+
+    $customGroup = CustomGroup::create(FALSE)
+      ->addValue('title', 'MyIndividualFields')
+      ->addValue('extends', 'Individual')
+      ->execute()
+      ->first();
+
+    CustomField::create(FALSE)
+      ->addValue('label', 'FavMovie')
+      ->addValue('custom_group_id', $customGroup['id'])
+      ->addValue('html_type', 'Select')
+      ->addValue('data_type', 'String')
+      ->addValue('option_group_id', $optionGroupId)
+      ->execute();
+
+    Contact::create(FALSE)
+      ->addValue('first_name', 'Johann')
+      ->addValue('last_name', 'Tester')
+      ->addValue('contact_type', 'Individual')
+      ->addValue('MyIndividualFields.FavMovie:label', '')
+      ->execute();
+  }
+
   public function testUpdateWeights() {
     $getValues = function($groupName) {
       return CustomField::get(FALSE)
@@ -589,7 +619,7 @@ class BasicCustomFieldTest extends CustomTestBase {
         ->addValue('html_type', 'Text')
       )
       ->execute()->single();
-    $this->assertContains($financialType['id'], $contributionGroup['extends_entity_column_value']);
+    $this->assertContainsEquals($financialType['id'], $contributionGroup['extends_entity_column_value']);
 
     $getFieldsWithTestType = Contribution::getFields(FALSE)
       ->addValue('financial_type_id:name', 'Test_Type')

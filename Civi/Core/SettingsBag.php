@@ -115,22 +115,9 @@ class SettingsBag {
     $this->values = [];
     $this->combined = NULL;
 
-    // Ordinarily, we just load values from `civicrm_setting`. But upgrades require care.
-    // In v4.0 and earlier, all values were stored in `civicrm_domain.config_backend`.
-    // In v4.1-v4.6, values were split between `civicrm_domain` and `civicrm_setting`.
-    // In v4.7+, all values are stored in `civicrm_setting`.
-    // Whenever a value is available in civicrm_setting, it will take precedence.
-
     $isUpgradeMode = \CRM_Core_Config::isUpgradeMode();
 
-    if ($isUpgradeMode && empty($this->contactId) && \CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend', FALSE)) {
-      $config_backend = \CRM_Core_DAO::singleValueQuery('SELECT config_backend FROM civicrm_domain WHERE id = %1',
-        [1 => [$this->domainId, 'Positive']]);
-      $oldSettings = \CRM_Upgrade_Incremental_php_FourSeven::convertBackendToSettings($this->domainId, $config_backend);
-      \CRM_Utils_Array::extend($this->values, $oldSettings);
-    }
-
-    // Normal case. Aside: Short-circuit prevents unnecessary query.
+    // Only query table if it exists.
     if (!$isUpgradeMode || \CRM_Core_DAO::checkTableExists('civicrm_setting')) {
       $dao = \CRM_Core_DAO::executeQuery($this->createQuery()->toSQL());
       while ($dao->fetch()) {
@@ -324,11 +311,11 @@ class SettingsBag {
   protected function createQuery() {
     $select = \CRM_Utils_SQL_Select::from('civicrm_setting')
       ->select('id, name, value, domain_id, contact_id, is_domain, component_id, created_date, created_id')
-      ->where('domain_id = #id', [
+      ->where('(domain_id IS NULL OR domain_id = #id)', [
         'id' => $this->domainId,
       ]);
     if ($this->contactId === NULL) {
-      $select->where('is_domain = 1');
+      $select->where('contact_id IS NULL');
     }
     else {
       $select->where('contact_id = #id', [
@@ -380,13 +367,16 @@ class SettingsBag {
 
     $dao = new \CRM_Core_DAO_Setting();
     $dao->name = $name;
-    $dao->domain_id = $this->domainId;
+    $dao->is_domain = 0;
+    // Contact-specific settings
     if ($this->contactId) {
       $dao->contact_id = $this->contactId;
-      $dao->is_domain = 0;
+      $dao->domain_id = $this->domainId;
     }
-    else {
+    // Domain-specific settings. For legacy support this is assumed to be TRUE if not set
+    elseif ($metadata['is_domain'] ?? TRUE) {
       $dao->is_domain = 1;
+      $dao->domain_id = $this->domainId;
     }
     $dao->find(TRUE);
 

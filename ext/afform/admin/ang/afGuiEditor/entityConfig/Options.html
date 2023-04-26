@@ -1,11 +1,8 @@
 <div class="form-group">
-  <label class="control-label" for="{{:: $ctrl.entity.name + '_security' }}">
+  <label class="control-label" for="entity_security">
     {{:: ts('Security') }}
   </label>
-  <select id="{{:: $ctrl.entity.name + '_security' }}" ng-model="$ctrl.entity.security" class="form-control">
-    <option value="RBAC">{{:: ts('Role-Based') }}</option>
-    <option value="FBAC">{{:: ts('Form-Based') }}</option>
-  </select>
+  <input crm-ui-select="{data: $ctrl.editor.securityModes}" id="entity_security" ng-model="$ctrl.entity.security" class="form-control">
 </div>
 <div class="form-group">
   <label>

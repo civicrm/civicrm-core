@@ -7,7 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{* this template is used for adding/editing group (name and description only)  *}
+{* this template is used for adding/editing/deleting a group *}
+{if $action eq 8}
+  {include file="CRM/Group/Form/Delete.tpl"}
+{else}
 <div class="crm-block crm-form-block crm-group-form-block">
   <div class="help">
     {if $action eq 2}
@@ -115,3 +118,4 @@
   </script>
   {/literal}
 </div>
+{/if}

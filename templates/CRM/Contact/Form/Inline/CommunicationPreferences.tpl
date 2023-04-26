@@ -13,7 +13,7 @@
 
  <div class="crm-inline-edit-form">
     <div class="crm-inline-button">
-      {include file="CRM/common/formButtons.tpl"}
+      {include file="CRM/common/formButtons.tpl" location=''}
     </div>
     <div class="crm-clear">
       {foreach key=key item=item from=$commPreference}
@@ -44,18 +44,6 @@
           {$form.preferred_language.html}
         </div>
       </div>
-
-      {if !empty($form.preferred_mail_format)}
-      <div class="crm-summary-row">
-        <div class="crm-label">
-          {$form.preferred_mail_format.label}
-          {help id="id-emailFormat" file="CRM/Contact/Form/Contact.hlp"}
-        </div>
-        <div class="crm-content">
-          {$form.preferred_mail_format.html}
-        </div>
-      </div>
-      {/if}
 
       {if !empty($form.communication_style_id)}
       <div class="crm-summary-row">

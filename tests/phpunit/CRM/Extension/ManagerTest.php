@@ -17,9 +17,24 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   const TESTING_TYPE = 'report';
   const OTHER_TESTING_TYPE = 'module';
 
+  /**
+   * @var string
+   */
+  protected $basedir;
+
+  /**
+   * @var CRM_Extension_Container_Basic
+   */
+  protected $container;
+
+  /**
+   * @var CRM_Extension_Mapper
+   */
+  protected $mapper;
+
   public function setUp(): void {
     parent::setUp();
-    list ($this->basedir, $this->container) = $this->_createContainer();
+    list($this->basedir, $this->container) = $this->createContainer();
     $this->mapper = new CRM_Extension_Mapper($this->container);
   }
 
@@ -368,7 +383,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals('unknown', $manager->getStatus('test.newextension'));
 
-    $this->download = $this->_createDownload('test.newextension', 'newextension');
+    $download = $this->createDownload('test.newextension', 'newextension');
 
     $testingTypeManager
     // no data to replace
@@ -378,7 +393,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     // no data to replace
       ->expects($this->never())
       ->method('onPostReplace');
-    $manager->replace($this->download);
+    $manager->replace($download);
     $this->assertEquals('uninstalled', $manager->getStatus('test.newextension'));
     $this->assertTrue(file_exists("{$this->basedir}/test.newextension/info.xml"));
     $this->assertTrue(file_exists("{$this->basedir}/test.newextension/newextension.php"));
@@ -397,7 +412,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
     $this->assertEquals('oddball', $this->mapper->keyToInfo('test.whiz.bang')->file);
 
-    $this->download = $this->_createDownload('test.whiz.bang', 'newextension');
+    $download = $this->createDownload('test.whiz.bang', 'newextension');
 
     $testingTypeManager
     // no data to replace
@@ -407,7 +422,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     // no data to replace
       ->expects($this->never())
       ->method('onPostReplace');
-    $manager->replace($this->download);
+    $manager->replace($download);
     $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/info.xml"));
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/newextension.php"));
@@ -435,7 +450,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->assertEquals('oddball', $this->mapper->keyToInfo('test.whiz.bang')->file);
     $this->assertDBQuery('oddball', 'SELECT file FROM civicrm_extension WHERE full_name ="test.whiz.bang"');
 
-    $this->download = $this->_createDownload('test.whiz.bang', 'newextension');
+    $download = $this->createDownload('test.whiz.bang', 'newextension');
 
     $testingTypeManager
       ->expects($this->once())
@@ -443,7 +458,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $testingTypeManager
       ->expects($this->once())
       ->method('onPostReplace');
-    $manager->replace($this->download);
+    $manager->replace($download);
     $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/info.xml"));
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/newextension.php"));
@@ -478,7 +493,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->assertEquals('installed-missing', $manager->getStatus('test.whiz.bang'));
 
     // download and reinstall
-    $this->download = $this->_createDownload('test.whiz.bang', 'newextension');
+    $download = $this->createDownload('test.whiz.bang', 'newextension');
 
     $testingTypeManager
       ->expects($this->once())
@@ -486,7 +501,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $testingTypeManager
       ->expects($this->once())
       ->method('onPostReplace');
-    $manager->replace($this->download);
+    $manager->replace($download);
     $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
     $this->assertTrue(file_exists("{$this->basedir}/test.whiz.bang/info.xml"));
     $this->assertTrue(file_exists("{$this->basedir}/test.whiz.bang/newextension.php"));
@@ -500,18 +515,13 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * @return CRM_Extension_Manager
    */
   public function _createManager($typeManagers) {
-    //list ($basedir, $c) = $this->_createContainer();
-    $mapper = new CRM_Extension_Mapper($this->container);
     return new CRM_Extension_Manager($this->container, $this->container, $this->mapper, $typeManagers);
   }
 
   /**
-   * @param CRM_Utils_Cache_Interface $cache
-   * @param null $cacheKey
-   *
    * @return array
    */
-  public function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
+  private function createContainer() {
     $basedir = $this->createTempDir('ext-');
     mkdir("$basedir/weird");
     mkdir("$basedir/weird/foobar");
@@ -523,17 +533,17 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     mkdir("$basedir/weird/downstream");
     file_put_contents("$basedir/weird/downstream/info.xml", "<extension key='test.foo.downstream' type='" . self::TESTING_TYPE . "'><file>oddball</file><requires><ext>test.foo.bar</ext></requires></extension>");
     // not needed for now // file_put_contents("$basedir/weird/downstream/oddball.php", "<?php\n");
-    $c = new CRM_Extension_Container_Basic($basedir, 'http://example/basedir', $cache, $cacheKey);
+    $c = new CRM_Extension_Container_Basic($basedir, 'http://example/basedir', NULL, NULL);
     return [$basedir, $c];
   }
 
   /**
-   * @param $key
-   * @param $file
+   * @param string $key
+   * @param string $file
    *
    * @return string
    */
-  public function _createDownload($key, $file) {
+  private function createDownload($key, $file) {
     $basedir = $this->createTempDir('ext-dl-');
     file_put_contents("$basedir/info.xml", "<extension key='$key' type='" . self::TESTING_TYPE . "'><file>$file</file></extension>");
     file_put_contents("$basedir/$file.php", "<?php\n");

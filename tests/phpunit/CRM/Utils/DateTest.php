@@ -27,6 +27,14 @@
 class CRM_Utils_DateTest extends CiviUnitTestCase {
 
   /**
+   * Set up for tests.
+   */
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
+  /**
    * Used by testGetFromTo
    */
   private function fromToData() {
@@ -2617,7 +2625,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   public function testLocalizeConsts() {
     $expect['en_US'] = ['Jan', 'Tue', 'March', 'Thursday'];
     $expect['fr_FR'] = ['janv.', 'mar.', 'mars', 'jeudi'];
-    $expect['es_MX'] = ['ene.', 'mar.', 'Marzo', 'jueves'];
+    $expect['es_MX'] = ['ene.', 'mar.', 'marzo', 'jueves'];
 
     foreach ($expect as $lang => $expectNames) {
       $useLocale = CRM_Utils_AutoClean::swapLocale($lang);

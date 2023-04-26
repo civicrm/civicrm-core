@@ -92,6 +92,10 @@
 - github      : andyburnsco
   name        : Andy Burns
 
+- github      : anemirovsky
+  name        : Anthony Nemirovsky
+  organization: Giant Rabbit
+
 - github      : amsharma9
   name        : Amal Sharma
   organization: Abhikalak Consultants
@@ -198,6 +202,9 @@
 - github      : bjendres
   name        : Björn Endres
   organization: SYSTOPIA Organisationsberatung
+
+- github      : BeccaTregenna
+  name        : Becca Tregenna
 
 - name        : Ben Jarlett
 
@@ -380,6 +387,10 @@
 
 - github      : don-alejandro-z
 
+- github      : dontub
+  name        : Dominic Tubach
+  organization: Systopia
+
 - github      : dptarrant
   name        : Dave T
 
@@ -484,9 +495,6 @@
 
 - name        : Evan Summers
   organization: National Democratic Institute
-
-- name        : Fabian Schuttenberg
-  organization: Systopia
 
 - name        : Fabian Schuttenberg
   organization: Systopia
@@ -664,6 +672,10 @@
   name        : Jack Aponte
   organization: Palante Technology Cooperative
 
+- github      : jackgleeson
+  name        : Jack Gleeson
+  organization: Wikimedia Foundation
+
 - github      : jackrabbithanna
   name        : Mark Hanna
   organization: Skvare
@@ -721,6 +733,8 @@
   name        : Jitendra Purohit
   organization: Fuzion
 
+- github      : jmacarthur98
+
 - github      : jmcclelland
   name        : Jamie McClelland
   organization: Progressive Technology Project
@@ -739,6 +753,10 @@
 - github      : johntwyman
   name        : John Twyman
   organization: Australian Greens
+
+- github      : jofranz
+  organization: Systopia
+  name        : Johannes
 
 - github      : jorich-2000
   name        : Jonathan Richardson
@@ -1103,6 +1121,10 @@
   name        : Nicolas Ganivet
   organization: CiviDesk
 
+- github      : NicolasdRa
+  name        : Nicolás di Rago
+  organization: Supertemplates UG
+
 - github      : nielosz
   name        : Niels Heinemann
   organization: Kompetenzzentrum Technik-Diversity-Chancengleichheit
@@ -1319,6 +1341,8 @@
   name        : Samuel Vanhove
   organization: Coop SymbioTIC
 
+- github      : sebalis
+
 - github      : simonjohnparker
   name        : Simon John Parker
 
@@ -1351,9 +1375,13 @@
   name        : Sean Madsen
   organization: Left Join Labs
 
+- github      : sebalis
+  name        : Sebastian Lisken
+  organization: civiservice.de
+
 - github      : semseysandor
   name        : Sandor Semsey
-  organization: ES-Progress
+  organization: Reflexive Communications
 
 - name        : Shailesh Lende
 
@@ -1610,12 +1638,20 @@
   name        : Wenjun Fan
   organization: Wikimedia Foundation
 
-- github      : damilare1 
+- github      : damilare1
   name        : Damilare Adedoyin
   organization: Wikimedia Foundation
 
 - github      : YesusHDS
-  
-- github      : Toby-fz 
+
+- github      : Toby-fz
   name        : Toby Messerli
   organization: Fuzion
+
+- github      : gellweiler
+  name        : Sebastian Gellweiler
+  organization: craft-coders.de
+
+- github      : jofranz
+  name        : Johannes Franz
+  organization: SYSTOPIA

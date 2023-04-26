@@ -13,7 +13,7 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
   private $formName = 'abc_123_test';
 
   public function setUpHeadless() {
-    return \Civi\Test::headless()->installMe(__DIR__)->apply();
+    return \Civi\Test::headless()->installMe(__DIR__)->install('org.civicrm.search_kit')->apply();
   }
 
   public function tearDown(): void {

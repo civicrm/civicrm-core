@@ -17,7 +17,6 @@
  */
 class api_v3_UtilsTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  public $DBResetRequired = FALSE;
 
   public $_contactID = 1;
 
@@ -132,7 +131,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    */
   public function runPermissionCheck($entity, $action, $params, $throws = FALSE) {
     $params['version'] = 3;
-    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+    $dispatcher = new \Civi\Core\CiviEventDispatcher();
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $kernel = new \Civi\API\Kernel($dispatcher);
     $apiRequest = \Civi\API\Request::create($entity, $action, $params);
@@ -330,14 +329,13 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('values', $result);
   }
 
-  public function testGetFields_AllOptions() {
-    $result = $this->callAPISuccess('contact', 'getfields', [
+  public function testGetFieldsAllOptions(): void {
+    $result = $this->callAPISuccess('Contact', 'getfields', [
       'options' => [
         'get_options' => 'all',
       ],
     ]);
     $this->assertEquals('Household', $result['values']['contact_type']['options']['Household']);
-    $this->assertEquals('HTML', $result['values']['preferred_mail_format']['options']['HTML']);
   }
 
   public function basicArrayCases() {
@@ -425,7 +423,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   public function testBasicArrayGet($records, $params, $resultIds) {
     $params['version'] = 3;
 
-    $kernel = new \Civi\API\Kernel(new \Symfony\Component\EventDispatcher\EventDispatcher());
+    $kernel = new \Civi\API\Kernel(new \Civi\Core\CiviEventDispatcher());
 
     $provider = new \Civi\API\Provider\AdhocProvider($params['version'], 'Widget');
     $provider->addAction('get', 'access CiviCRM', function ($apiRequest) use ($records) {
@@ -460,7 +458,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       ['snack_id' => 'c', 'fruit' => 'apple', 'cheese' => 'cheddar'],
     ];
 
-    $kernel = new \Civi\API\Kernel(new \Symfony\Component\EventDispatcher\EventDispatcher());
+    $kernel = new \Civi\API\Kernel(new \Civi\Core\CiviEventDispatcher());
     $provider = new \Civi\API\Provider\AdhocProvider(3, 'Widget');
     $provider->addAction('get', 'access CiviCRM', function ($apiRequest) use ($records) {
       return _civicrm_api3_basic_array_get('Widget', $apiRequest['params'], $records, 'snack_id', ['snack_id', 'fruit', 'cheese']);

@@ -19,7 +19,6 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
 
   public function setUp(): void {
     parent::setUp();
-    $this->_financialTypeID = 1;
     $this->enableMultilingual(['en_US' => 'fr_FR']);
   }
 
@@ -39,7 +38,7 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
 
     $params = [
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_financialTypeID,
+      'financial_type_id' => 1,
       'is_for_organization' => 0,
       'for_organization' => ' I am contributing on behalf of an organization',
       'goal_amount' => '400',

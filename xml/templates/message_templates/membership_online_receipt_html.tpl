@@ -61,7 +61,7 @@
       {if $mem_end_date}
        <tr>
         <td {$labelStyle}>
-         {ts}Membership End Date{/ts}
+         {ts}Membership Expiration Date{/ts}
         </td>
         <td {$valueStyle}>
           {$mem_end_date|crmDate}
@@ -164,7 +164,7 @@
               <th>{ts}Total{/ts}</th>
             {/if}
       <th>{ts}Membership Start Date{/ts}</th>
-      <th>{ts}Membership End Date{/ts}</th>
+      <th>{ts}Membership Expiration Date{/ts}</th>
            </tr>
            {foreach from=$value item=line}
             <tr>
@@ -496,7 +496,7 @@
         </td>
        </tr>
       {/if}
-      {if !empty($is_deductible) AND !empty($price)}
+      {if $is_deductible AND !empty($price)}
         <tr>
          <td colspan="2" {$valueStyle}>
           <p>{ts 1=$price|crmMoney}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>

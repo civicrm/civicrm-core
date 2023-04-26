@@ -28,6 +28,12 @@ class CiviCaseTestCase extends CiviUnitTestCase {
 
   protected $_loggedInUser;
 
+  /**
+   * Tables to truncate as part of cleanup
+   * @var array
+   */
+  protected $tablesToTruncate;
+
   public function setUp(): void {
     parent::setUp();
 
@@ -90,7 +96,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     $enableResult = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $this->assertTrue($enableResult, 'Cannot enable CiviCase in line ' . __LINE__);
 
-    /** @var $hooks \CRM_Utils_Hook_UnitTests */
+    /** @var \CRM_Utils_Hook_UnitTests $hooks  */
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_caseTypes', array($this, 'hook_caseTypes'));
     \CRM_Case_XMLRepository::singleton(TRUE);

@@ -543,7 +543,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       'total' => $params['actualBatchTotal'],
     ];
 
-    CRM_Batch_BAO_Batch::create($paramValues);
+    CRM_Batch_BAO_Batch::writeRecord($paramValues);
 
     // set success status
     CRM_Core_Session::setStatus("", ts("Batch Processed."), "success");
@@ -927,7 +927,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected function emailReceipt($form, &$formValues): bool {
     $membership = new CRM_Member_BAO_Membership();
     $membership->id = $this->getCurrentRowMembershipID();
-    $membership->fetch();
+    $membership->find(TRUE);
     // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
     if (!empty($formValues['payment_instrument_id'])) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();

@@ -232,21 +232,16 @@ class CRM_Utils_Date {
   public static function &getAbbrMonthNames($month = FALSE) {
     $key = 'abbrMonthNames_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
-      $intl_formatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, NULL, IntlDateFormatter::GREGORIAN, 'MMM');
-      \Civi::$statics[__CLASS__][$key] = [
-        1 => $intl_formatter->format(strtotime('1 January')),
-        2 => $intl_formatter->format(strtotime('1 February')),
-        3 => $intl_formatter->format(strtotime('1 March')),
-        4 => $intl_formatter->format(strtotime('1 April')),
-        5 => $intl_formatter->format(strtotime('1 May')),
-        6 => $intl_formatter->format(strtotime('1 June')),
-        7 => $intl_formatter->format(strtotime('1 July')),
-        8 => $intl_formatter->format(strtotime('1 August')),
-        9 => $intl_formatter->format(strtotime('1 September')),
-        10 => $intl_formatter->format(strtotime('1 October')),
-        11 => $intl_formatter->format(strtotime('1 November')),
-        12 => $intl_formatter->format(strtotime('1 December')),
-      ];
+      // Note: IntlDateFormatter provides even more strings than `strftime()` or `l10n/*/civicrm.mo`.
+      // Note: Consistently use UTC for all requests in resolving these names. Avoid edge-cases where TZ support is inconsistent.
+      $intlFormatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, 'UTC', IntlDateFormatter::GREGORIAN, 'MMM');
+      $monthNums = range(1, 12);
+      \Civi::$statics[__CLASS__][$key] = array_combine($monthNums, array_map(
+        function(int $monthNum) use ($intlFormatter) {
+          return $intlFormatter->format(gmmktime(0, 0, 0, $monthNum, 1));
+        },
+        $monthNums
+      ));
     }
     if ($month) {
       return \Civi::$statics[__CLASS__][$key][$month];
@@ -264,23 +259,16 @@ class CRM_Utils_Date {
   public static function &getFullMonthNames() {
     $key = 'fullMonthNames_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
-      // Not relying on strftime because it depends on the operating system
-      // and most people will not have a non-US locale configured out of the box
-      // Ignoring other date names for now, since less visible by default
-      \Civi::$statics[__CLASS__][$key] = [
-        1 => ts('January'),
-        2 => ts('February'),
-        3 => ts('March'),
-        4 => ts('April'),
-        5 => ts('May'),
-        6 => ts('June'),
-        7 => ts('July'),
-        8 => ts('August'),
-        9 => ts('September'),
-        10 => ts('October'),
-        11 => ts('November'),
-        12 => ts('December'),
-      ];
+      // Note: IntlDateFormatter provides even more strings than `strftime()` or `l10n/*/civicrm.mo`.
+      // Note: Consistently use UTC for all requests in resolving these names. Avoid edge-cases where TZ support is inconsistent.
+      $intlFormatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, 'UTC', IntlDateFormatter::GREGORIAN, 'MMMM');
+      $monthNums = range(1, 12);
+      \Civi::$statics[__CLASS__][$key] = array_combine($monthNums, array_map(
+        function(int $monthNum) use ($intlFormatter) {
+          return $intlFormatter->format(gmmktime(0, 0, 0, $monthNum, 1));
+        },
+        $monthNums
+      ));
     }
 
     return \Civi::$statics[__CLASS__][$key];
@@ -862,9 +850,9 @@ class CRM_Utils_Date {
    * Find whether today's date lies in
    * the given range
    *
-   * @param date $startDate
+   * @param Date $startDate
    *   Start date for the range.
-   * @param date $endDate
+   * @param Date $endDate
    *   End date for the range.
    *
    * @return bool
@@ -927,9 +915,9 @@ class CRM_Utils_Date {
   /**
    * Calculate Age in Years if greater than one year else in months.
    *
-   * @param date $birthDate
+   * @param Date $birthDate
    *   Birth Date.
-   * @param date $targetDate
+   * @param Date $targetDate
    *   Target Date. (show age on specific date)
    *
    * @return array
@@ -2243,7 +2231,7 @@ class CRM_Utils_Date {
   /**
    * Print out a date object in specified format in local timezone
    *
-   * @param DateTimeObject $dateObject
+   * @param DateTimeInterface $dateObject
    * @param string $format
    * @return string
    */

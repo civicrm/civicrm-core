@@ -221,9 +221,40 @@ class CRM_Utils_Recent {
     }
     $paths = (array) CoreUtil::getInfoItem($entityType, 'paths');
     if (!empty($paths[$action])) {
-      return CRM_Utils_System::url(str_replace('[id]', $entityId, $paths[$action]));
+      // Find tokens used in the path
+      $tokens = self::getTokens($paths[$action]) ?: ['id' => '[id]'];
+      // If the only token is id, no lookup needed
+      if ($tokens === ['id' => '[id]']) {
+        $record = ['id' => $entityId];
+      }
+      else {
+        // Lookup values needed for tokens
+        $record = civicrm_api4($entityType, 'get', [
+          'checkPermissions' => FALSE,
+          'select' => array_keys($tokens),
+          'where' => [['id', '=', $entityId]],
+        ])->first() ?: [];
+      }
+      ksort($tokens);
+      ksort($record);
+      return CRM_Utils_System::url(str_replace($tokens, $record, $paths[$action]));
     }
     return NULL;
+  }
+
+  /**
+   * Get a list of square-bracket tokens from a path string
+   *
+   * @param string $str
+   * @return array
+   */
+  private static function getTokens($str):array {
+    $matches = $tokens = [];
+    preg_match_all('/\\[([^]]+)\\]/', $str, $matches);
+    foreach ($matches[1] as $match) {
+      $tokens[$match] = '[' . $match . ']';
+    }
+    return $tokens;
   }
 
   /**

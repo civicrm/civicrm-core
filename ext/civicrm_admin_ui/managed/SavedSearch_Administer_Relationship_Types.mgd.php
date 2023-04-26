@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_Administer_Relationship_Types',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -39,7 +39,7 @@ return [
   [
     'name' => 'SavedSearch_Administer_Relationship_Types_SearchDisplay_Administer_Relationship_Types_Table_1',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,

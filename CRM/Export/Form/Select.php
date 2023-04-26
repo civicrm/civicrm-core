@@ -64,22 +64,10 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
   /**
    * Build all the data structures needed to build the form.
    *
-   * @param
-   *
    * @return void
    */
   public function preProcess() {
     $this->preventAjaxSubmit();
-
-    //special case for custom search, directly give option to download csv file
-    $customSearchID = $this->get('customSearchID');
-    if ($customSearchID) {
-      CRM_Export_BAO_Export::exportCustom($this->get('customSearchClass'),
-        $this->get('formValues'),
-        $this->get(CRM_Utils_Sort::SORT_ORDER)
-      );
-    }
-
     $this->_selectAll = FALSE;
     $this->_exportMode = self::CONTACT_EXPORT;
     $this->_componentIds = [];
@@ -428,7 +416,7 @@ FROM   {$this->_componentTable}
   /**
    * Get the name of the component.
    *
-   * @return array
+   * @return string
    */
   protected function getComponentName(): string {
     // CRM_Export_Controller_Standalone has this method

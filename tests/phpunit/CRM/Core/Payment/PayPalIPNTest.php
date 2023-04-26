@@ -17,7 +17,6 @@ use Civi\Api4\ContributionRecur;
  */
 class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   protected $_contributionID;
-  protected $_invoiceID = 'c2r9c15f7be20b4f3fef1f77e4c37424';
   protected $_financialTypeID = 1;
   protected $_contactID;
   protected $_contributionRecurID;
@@ -56,6 +55,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_campaign']);
     parent::tearDown();
   }
 
@@ -76,7 +76,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->_paymentProcessorID,
       'contact_id' => $this->_contactID,
       'trxn_id' => NULL,
-      'invoice_id' => $this->_invoiceID,
+      'invoice_id' => 'xyz',
       'contribution_status_id' => $pendingStatusID,
       'is_email_receipt' => TRUE,
     ];
@@ -119,7 +119,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testIPNPaymentRecurSuccess(): void {
-    $this->setupRecurringPaymentProcessorTransaction([], ['total_amount' => '15.00']);
+    $this->setupRecurringPaymentProcessorTransaction([], ['total_amount' => '15.00', 'contribution_page_id' => $this->_contributionPageID]);
     $mut = new CiviMailUtils($this, TRUE);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
     $paypalIPN->main();
@@ -204,11 +204,11 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   /**
    * Get IPN style details for an incoming recurring transaction.
    */
-  public function getPaypalRecurTransaction() {
+  public function getPaypalRecurTransaction(): array {
     return [
       'contactID' => $this->_contactID,
       'contributionID' => $this->_contributionID,
-      'invoice' => $this->_invoiceID,
+      'invoice' => 'xyz',
       'contributionRecurID' => $this->_contributionRecurID,
       'mc_gross' => '15.00',
       'module' => 'contribute',
@@ -216,7 +216,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'payment_status' => 'Completed',
       'receiver_email' => 'sunil._1183377782_biz_api1.webaccess.co.in',
       'txn_type' => 'subscr_payment',
-      'last_name' => 'Roberty',
+      'last_name' => 'Roberts',
       'payment_fee' => '0.63',
       'first_name' => 'Robert',
       'txn_id' => '8XA571746W2698126',
@@ -231,7 +231,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     return [
       'contactID' => $this->_contactID,
       'contributionID' => $this->_contributionID,
-      'invoice' => $this->_invoiceID,
+      'invoice' => 'xyz',
       'mc_gross' => '100.00',
       'mc_fee' => '5.00',
       'settle_amount' => '95.00',
@@ -272,7 +272,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->_paymentProcessorID,
       'contact_id' => $this->_contactID,
       'trxn_id' => NULL,
-      'invoice_id' => $this->_invoiceID,
+      'invoice_id' => 'xyz',
       'contribution_status_id' => $pendingStatusID,
       'is_email_receipt' => TRUE,
     ];
@@ -307,7 +307,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->_paymentProcessorID,
       'contact_id' => $this->_contactID,
       'trxn_id' => NULL,
-      'invoice_id' => $this->_invoiceID,
+      'invoice_id' => 'xyz',
       'contribution_status_id' => $pendingStatusID,
       'is_email_receipt' => TRUE,
     ];

@@ -2,7 +2,9 @@
 
 namespace Civi\Test\ExampleData\Contact;
 
-class Barb extends \Civi\Test\EntityExample {
+use Civi\Test\EntityExample;
+
+class Barb extends EntityExample {
 
   public function getExamples(): iterable {
     yield [
@@ -12,7 +14,7 @@ class Barb extends \Civi\Test\EntityExample {
 
   public function build(array &$example): void {
     $example['data'] = [
-      'contact_id' => '100',
+      'contact_id' => 0,
       'contact_type' => 'Individual',
       'contact_sub_type' => NULL,
       'sort_name' => 'Johnson, Barbara',
@@ -30,7 +32,6 @@ class Barb extends \Civi\Test\EntityExample {
       'image_URL' => NULL,
       'preferred_communication_method' => NULL,
       'preferred_language' => NULL,
-      'preferred_mail_format' => 'Both',
       'first_name' => 'Barbara',
       'middle_name' => '',
       'last_name' => 'Johnson',

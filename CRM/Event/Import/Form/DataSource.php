@@ -20,10 +20,6 @@
  */
 class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/event/import';
-
-  const IMPORT_ENTITY = 'Participant';
-
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
    *
@@ -46,7 +42,6 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update'),
       CRM_Import_Parser::DUPLICATE_NOCHECK => ts('No Duplicate Checking'),
     ]);
-    $this->setDefaults(['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
     $this->addContactTypeSelector();
   }

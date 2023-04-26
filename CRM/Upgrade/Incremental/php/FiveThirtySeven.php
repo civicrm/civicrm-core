@@ -43,13 +43,13 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
    */
   public function upgrade_5_37_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-    $this->addTask('core-issue#1845 - Alter Foreign key on civicrm_group to delete when the associated group when the saved search is deleted', 'alterSavedSearchFK');
-    $this->addTask('core-issue#2243 - Add note_date to civicrm_note', 'addColumn',
+    $this->addTask('dev/core#1845 - Alter Foreign key on civicrm_group to delete when the associated group when the saved search is deleted', 'alterSavedSearchFK');
+    $this->addTask('dev/core#2243 - Add note_date to civicrm_note', 'addColumn',
      'civicrm_note', 'note_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'Date attached to the note'");
-    $this->addTask('core-issue#2243 - Add created_date to civicrm_note', 'addColumn',
+    $this->addTask('dev/core#2243 - Add created_date to civicrm_note', 'addColumn',
      'civicrm_note', 'created_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When the note was created'");
-    $this->addTask('core-issue#2243 - Update existing note_date and created_date', 'updateNoteDates');
-    $this->addTask('core-issue#2487 Add / alter defaults for civicrm_contribution_recur', 'updateDBDefaultsForContributionRecur');
+    $this->addTask('dev/core#2243 - Update existing note_date and created_date', 'updateNoteDates');
+    $this->addTask('dev/core#2487 Add / alter defaults for civicrm_contribution_recur', 'updateDBDefaultsForContributionRecur');
     $this->addTask('Install reCAPTCHA extension', 'installReCaptchaExtension');
   }
 

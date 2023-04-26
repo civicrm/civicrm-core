@@ -4,7 +4,7 @@ use CRM_Search_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
+class CRM_Search_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Upgrade 1000 - install schema

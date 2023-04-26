@@ -54,7 +54,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    * @var int
    */
   protected $_membershipStatusID;
-  public $DBResetRequired = FALSE;
 
   /**
    * Setup function.
@@ -106,7 +105,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->find(TRUE);
     $contribution->_component = 'contribute';
     $ids = array_merge(CRM_Contribute_BAO_Contribution::getComponentDetails($this->_contributionId), $this->ids);
-    $contribution->loadRelatedObjects($this->input, $ids);
+
+    $contribution->loadRelatedObjects($this->_processorId, $ids);
     $this->assertNotEmpty($contribution->_relatedObjects['membership']);
     $this->assertArrayHasKey($this->_membershipId . '_' . $this->_membershipTypeID, $contribution->_relatedObjects['membership']);
     $this->assertTrue(is_a($contribution->_relatedObjects['membership'][$this->_membershipId . '_' . $this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
@@ -185,7 +185,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpParticipantObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $contribution->loadRelatedObjects($this->input, $this->ids);
+    $contribution->loadRelatedObjects($this->_processorId, $this->ids);
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertStringContainsString('registration has been received and your status has been updated to Attended.', $msg['body']);
     $this->assertStringContainsString('Annual CiviCRM meet', $msg['html']);

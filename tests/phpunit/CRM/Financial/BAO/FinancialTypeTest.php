@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\FinancialType;
 use Civi\Api4\MembershipType;
 
 /**
@@ -16,11 +17,6 @@ use Civi\Api4\MembershipType;
  * @group headless
  */
 class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
-
-  public function setUp(): void {
-    parent::setUp();
-    $this->_orgContactID = $this->organizationCreate();
-  }
 
   public function tearDown(): void {
     global $dbLocale;
@@ -32,110 +28,31 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method add().
-   */
-  public function testAdd() {
-    $params = [
-      'name' => 'Donations',
-      'is_active' => 1,
-      'is_deductible' => 1,
-      'is_reserved' => 1,
-    ];
-    $ids = [];
-    $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
-    $result = $this->assertDBNotNull(
-      'CRM_Financial_DAO_FinancialType',
-      $financialType->id,
-      'name',
-      'id',
-      'Database check on added financial type record.'
-    );
-    $this->assertEquals($result, 'Donations', 'Verify Name for Financial Type');
-  }
-
-  /**
-   * Check method retrieve().
-   */
-  public function testRetrieve() {
-    $params = [
-      'name' => 'Donations',
-      'is_active' => 1,
-      'is_deductible' => 1,
-      'is_reserved' => 1,
-    ];
-
-    $ids = [];
-    CRM_Financial_BAO_FinancialType::add($params, $ids);
-
-    $defaults = [];
-    $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-    $this->assertEquals($result->name, 'Donations', 'Verify Name for Financial Type');
-  }
-
-  /**
-   * Check method setIsActive()
-   */
-  public function testSetIsActive() {
-    $params = [
-      'name' => 'Donations',
-      'is_deductible' => 0,
-      'is_active' => 1,
-    ];
-    $ids = [];
-    $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
-    $result = CRM_Financial_BAO_FinancialType::setIsActive($financialType->id, 0);
-    $this->assertEquals($result, TRUE, 'Verify financial type record updation for is_active.');
-    $isActive = $this->assertDBNotNull(
-      'CRM_Financial_DAO_FinancialType',
-      $financialType->id,
-      'is_active',
-      'id',
-      'Database check on updated for financial type is_active.'
-    );
-    $this->assertEquals($isActive, 0, 'Verify financial types is_active.');
-  }
-
-  /**
-   * Data provider for testGitLabIssue1108
+   * Delete test for testGitLabIssue1108.
    *
-   * First we run it without multiLingual mode, then with.
-   *
-   * This is because we test table names, which may have been translated in a
-   * multiLingual context.
-   *
-   */
-  public function multiLingual() {
-    return [[0], [1]];
-  }
-
-  /**
-   * Check method del()
-   *
-   * @dataProvider multiLingual
+   * @dataProvider getBooleanDataProvider
    * @group locale
+   * @throws \CRM_Core_Exception
    */
-  public function testDel($isMultiLingual) {
+  public function testDelete(bool $isMultiLingual): void {
     if ($isMultiLingual) {
       $this->enableMultilingual(['en_US' => 'fr_FR']);
     }
-    $params = [
+    $financialTypeID = FinancialType::create()->setValues([
       'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
-    ];
-    $ids = [];
-    $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
+    ])->execute()->first()['id'];
 
     if ($isMultiLingual) {
       global $dbLocale;
       $dbLocale = '_fr_FR';
     }
-    CRM_Financial_BAO_FinancialType::del($financialType->id);
-    $params = ['id' => $financialType->id];
-    $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
-    $results = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_entity_financial_account WHERE entity_id = %1", [1 => [$financialType->id, 'Positive']])->fetchAll();
-    $this->assertEquals(empty($results), TRUE, 'Assert related entity financial account has been deleted as well');
+    FinancialType::delete()->addWhere('id', '=', $financialTypeID)->execute();
+    $result = FinancialType::get()->addWhere('id', '=', $financialTypeID)->execute();
+    $this->assertCount(0, $result, 'Verify financial types record deletion.');
+    $results = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_entity_financial_account WHERE entity_id = %1', [1 => [$financialTypeID, 'Positive']])->fetchAll();
+    $this->assertEquals(TRUE, empty($results), 'Assert related entity financial account has been deleted as well');
     if ($isMultiLingual) {
       global $dbLocale;
       $dbLocale = '_en_US';
@@ -145,14 +62,14 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   /**
    * Set ACLs for Financial Types()
    */
-  public function setACL() {
+  public function setACL(): void {
     Civi::settings()->set('acl_financial_type', 1);
   }
 
   /**
    * Check method testGetAvailableFinancialTypes()
    */
-  public function testGetAvailableFinancialTypes() {
+  public function testGetAvailableFinancialTypes(): void {
     $this->setACL();
     $this->setPermissions([
       'view contributions of type Donation',
@@ -186,7 +103,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       'domain_id' => 1,
       'minimum_fee' => 10,
       'duration_unit' => 'year',
-      'member_of_contact_id' => $this->_orgContactID,
+      'member_of_contact_id' => $this->organizationCreate(),
       'period_type' => 'fixed',
       'duration_interval' => 1,
       'financial_type_id' => 1,
@@ -207,8 +124,8 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     ]);
     CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($types);
     $expectedResult = [
-      1 => "Type One",
-      2 => "Type Two",
+      1 => 'Type One',
+      2 => 'Type Two',
     ];
     $this->assertEquals($expectedResult, $types, 'Verify that only certain membership types can be retrieved');
     $this->setPermissions([
@@ -220,24 +137,24 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method testcheckPermissionedLineItems()
+   * Check method testCheckPermissionedLineItems()
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCheckPermissionedLineItems() {
+  public function testCheckPermissionedLineItems(): void {
     $contactId = $this->individualCreate();
-    $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 4);
+    $paramsSet['title'] = 'Price Set_test';
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
     $paramsSet['financial_type_id'] = 1;
     $paramsSet['extends'] = 1;
 
-    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
-    $priceSetId = $priceset->id;
+    $priceSet = CRM_Price_BAO_PriceSet::create($paramsSet);
+    $priceSetId = $priceSet->id;
 
-    //Checking for priceset added in the table.
+    //Checking for price set added in the table.
     $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
-      'id', $paramsSet['title'], 'Check DB for created priceset'
+      'id', $paramsSet['title'], 'Check DB for created price set'
     );
     $paramsField = [
       'label' => 'Price Field',
@@ -252,7 +169,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       'weight' => 1,
       'options_per_line' => 1,
       'is_active' => ['1' => 1, '2' => 1],
-      'price_set_id' => $priceset->id,
+      'price_set_id' => $priceSet->id,
       'is_enter_qty' => 1,
       'financial_type_id' => 1,
     ];
@@ -300,7 +217,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       'view contributions of type Donation',
     ]);
     $perm = CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
-    $this->assertEquals($perm, TRUE, 'Verify that lineitems now have permission.');
+    $this->assertEquals(TRUE, $perm, 'Verify that line items now have permission.');
   }
 
 }

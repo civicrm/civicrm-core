@@ -2366,6 +2366,9 @@ WHERE {$whereClause}";
    * @return array
    */
   public static function getAllContactMembership($contactID, $isTest = FALSE, $onlyLifeTime = FALSE) : array {
+    if (!\CRM_Core_Component::isEnabled('CiviMember')) {
+      return [];
+    }
     $contactMembershipType = [];
     if (!$contactID) {
       return $contactMembershipType;
@@ -2647,7 +2650,7 @@ WHERE {$whereClause}";
             'now',
             FALSE,
             $newMembershipId,
-            $newMembership
+            (array) $newMembership
           );
 
           if (!empty($status['id']) and $status['id'] != $newMembership->status_id) {

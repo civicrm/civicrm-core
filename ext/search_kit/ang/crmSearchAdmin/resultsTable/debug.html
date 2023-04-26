@@ -9,9 +9,8 @@
       <strong>API:</strong>
     </div>
     <pre>{{ $ctrl.debug.apiParams }}</pre>
-    <div ng-if="$ctrl.debug.sql">
-      <strong>SQL:</strong>
-    </div>
+    <strong>SQL:</strong>
+    <pre ng-if="!$ctrl.debug.sql">{{:: ts('Run search to view SQL') }}</pre>
     <pre ng-repeat="query in $ctrl.debug.sql">{{ query }}</pre>
   </div>
 </fieldset>

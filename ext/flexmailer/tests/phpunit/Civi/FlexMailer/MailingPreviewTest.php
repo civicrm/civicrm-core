@@ -10,8 +10,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
 
   protected $_groupID;
   protected $_email;
-  protected $_apiversion = 3;
-  protected $_params = array();
+  protected $_params = [];
   protected $_entity = 'Mailing';
   protected $_contactID;
 
@@ -29,8 +28,6 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     }
 
     parent::setUp();
-
-    \Civi::settings()->set('flexmailer_traditional', 'flexmailer');
 
     $this->useTransaction();
     // DGW

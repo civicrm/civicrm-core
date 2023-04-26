@@ -100,25 +100,13 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the drupal db.
-   *
-   * @param array $params
-   *   Array of name and mail values.
-   * @param array $errors
-   *   Array of errors.
-   * @param string $emailName
-   *   Field label for the 'email'.
+   * @inheritdoc
    */
-  public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
-    $config = CRM_Core_Config::singleton();
-
-    $dao = new CRM_Core_DAO();
-    $name = $dao->escape(CRM_Utils_Array::value('name', $params));
-    $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
-    $errors = form_get_errors();
-    if ($errors) {
-      // unset drupal messages to avoid twice display of errors
+  public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+    if ($drupal_errors = form_get_errors()) {
+      // unset Drupal messages to avoid twice display of errors
       unset($_SESSION['messages']);
+      $errors = array_merge($errors, $drupal_errors);
     }
 
     if (!empty($params['name'])) {
@@ -862,6 +850,85 @@ AND    u.status = 1
         drupal_session_commit();
       }
     }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function viewsIntegration(): string {
+    global $databases;
+    $config = CRM_Core_Config::singleton();
+    $text = '';
+    $drupal_prefix = '';
+    if (isset($databases['default']['default']['prefix'])) {
+      if (is_array($databases['default']['default']['prefix'])) {
+        $drupal_prefix = $databases['default']['default']['prefix']['default'];
+      }
+      else {
+        $drupal_prefix = $databases['default']['default']['prefix'];
+      }
+    }
+
+    if ($this->viewsExists() &&
+      (
+        $config->dsn != $config->userFrameworkDSN || !empty($drupal_prefix)
+      )
+    ) {
+      $text = '<div>' . ts('To enable CiviCRM Views integration, add or update the following item in the <code>settings.php</code> file:') . '</div>';
+
+      $tableNames = CRM_Core_DAO::getTableNames();
+      asort($tableNames);
+      $text .= '<pre>$databases[\'default\'][\'default\'][\'prefix\']= [';
+
+      // Add default prefix.
+      $text .= "\n  'default' => '$drupal_prefix',";
+      $prefix = $this->getCRMDatabasePrefix();
+      foreach ($tableNames as $tableName) {
+        $text .= "\n  '" . str_pad($tableName . "'", 41) . " => '{$prefix}',";
+      }
+      $text .= "\n];</pre>";
+    }
+
+    return $text;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    $ret = FALSE;
+
+    if (!$print) {
+      if ($maintenance) {
+        drupal_set_breadcrumb('');
+        drupal_maintenance_theme();
+        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+          CRM_Utils_System::addHTMLHead($region->render(''));
+        }
+        print theme('maintenance_page', ['content' => $content]);
+        exit();
+      }
+      $ret = TRUE;
+    }
+    $out = $content;
+
+    if ($ret) {
+      return $out;
+    }
+    else {
+      print $out;
+      return NULL;
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function ipAddress():?string {
+    // Drupal function handles the server being behind a proxy securely. We
+    // still have legacy ipn methods that reach this point without bootstrapping
+    // hence the check that the fn exists.
+    return function_exists('ip_address') ? ip_address() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
   }
 
 }

@@ -34,7 +34,7 @@ class CRM_Core_I18n_SchemaStructure {
         ],
         'civicrm_option_group' => [
           'title' => "varchar(255) COMMENT 'Option Group title.'",
-          'description' => "varchar(255) COMMENT 'Option group description.'",
+          'description' => "text COMMENT 'Option group description.'",
         ],
         'civicrm_relationship_type' => [
           'label_a_b' => "varchar(64) COMMENT 'label for relationship of contact_a to contact_b.'",
@@ -117,7 +117,8 @@ class CRM_Core_I18n_SchemaStructure {
           'options' => "text COMMENT 'Store comma-delimited list of color, size, etc. options for the product.'",
         ],
         'civicrm_payment_processor' => [
-          'title' => "varchar(127) COMMENT 'Payment Processor Descriptive Name.'",
+          'title' => "varchar(255) NOT NULL COMMENT 'Name of processor when shown to CiviCRM administrators.'",
+          'frontend_title' => "varchar(255) NOT NULL COMMENT 'Name of processor when shown to users making a payment.'",
         ],
         'civicrm_membership_type' => [
           'name' => "varchar(128) NOT NULL COMMENT 'Name of Membership Type'",
@@ -288,6 +289,7 @@ class CRM_Core_I18n_SchemaStructure {
         ],
         'civicrm_contact_type' => [
           'label' => [
+            'label' => "Label",
             'type' => "Text",
           ],
           'description' => [
@@ -489,7 +491,14 @@ class CRM_Core_I18n_SchemaStructure {
         ],
         'civicrm_payment_processor' => [
           'title' => [
+            'label' => "Backend Title",
             'type' => "Text",
+            'required' => "true",
+          ],
+          'frontend_title' => [
+            'label' => "Frontend Title",
+            'type' => "Text",
+            'required' => "true",
           ],
         ],
         'civicrm_membership_type' => [
@@ -624,14 +633,17 @@ class CRM_Core_I18n_SchemaStructure {
         ],
         'civicrm_event' => [
           'title' => [
+            'label' => "Title",
             'type' => "Text",
           ],
           'summary' => [
+            'label' => "Summary",
             'type' => "TextArea",
             'rows' => "4",
             'cols' => "60",
           ],
           'description' => [
+            'label' => "Description",
             'type' => "RichTextEditor",
             'rows' => "8",
             'cols' => "60",
@@ -640,6 +652,7 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "Text",
           ],
           'event_full_text' => [
+            'label' => "Event Full Message",
             'type' => "TextArea",
             'rows' => "4",
             'cols' => "60",

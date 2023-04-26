@@ -15,6 +15,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   private $someContacts = [];
 
+  protected $allowedContacts = [];
+
   /**
    * Set up for test.
    *
@@ -1227,7 +1229,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'sort_name' => '',
       'display_name' => '',
       'do_not_email' => '',
-      'preferred_mail_format' => '',
       'is_deceased' => '',
       'email' => '',
       'on_hold' => '',
@@ -1438,7 +1439,7 @@ $text
 
   /**
    * Test that when a number is specified in the To Param of the SMS provider parameters that an SMS is sent
-   * @see dev/core/#273
+   * @see dev/core#273
    */
   public function testSendSMSMobileInToProviderParam(): void {
     $sent = $this->createSendSmsTest(TRUE, 2, TRUE);
@@ -1447,7 +1448,7 @@ $text
 
   /**
    * Test that when a numbe ris specified in the To Param of the SMS provider parameters that an SMS is sent
-   * @see dev/core/#273
+   * @see dev/core#273
    */
   public function testSendSMSMobileInToProviderParamWithDoNotSMS(): void {
     $sent = $this->createSendSmsTest(FALSE, 2, TRUE, ['do_not_sms' => 1]);
@@ -1565,29 +1566,6 @@ $text
     }
   }
 
-  public function testCaseTokens() {
-    $caseTest = new CiviCaseTestCase();
-    $caseTest->setUp();
-    // Create a contact and contactDetails array.
-    $contactId = $this->individualCreate();
-
-    // create a case for this user
-    $result = $this->callAPISuccess('Case', 'create', [
-      'contact_id' => $contactId,
-      'case_type_id' => '1',
-      'subject' => "my case",
-      'status_id' => "Open",
-    ]);
-
-    $caseId = $result['id'];
-    $html_message = "<p>This is a test case with id: {case.id} and subject: {case.subject}</p>";
-    $html_message = CRM_Utils_Token::replaceCaseTokens($caseId, $html_message);
-
-    $this->assertTrue(strpos($html_message, 'id: ' . $caseId) !== 0);
-    $this->assertTrue(strpos($html_message, 'subject: my case') !== 0);
-    $caseTest->tearDown();
-  }
-
   public function testSendEmailWithCaseId() {
     $caseTest = new CiviCaseTestCase();
     $caseTest->setUp();
@@ -1651,7 +1629,7 @@ $text
       'campaign_id' => $campaign_id,
       'from_email_address' => 'from@example.com',
       'to' => $contactId1 . '::email@example.com,' . $contactId2 . '::email2@example.com',
-    ], [], []);
+    ], '', []);
     $form->set('cid', $contactId1 . ',' . $contactId2);
     $form->buildForm();
     $form->postProcess();
@@ -1679,8 +1657,6 @@ $textValue
   /**
    * Same as testSendEmailWillReplaceTokensUniquelyForEachContact but with
    * 3 recipients and an attachment.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSendEmailWillReplaceTokensUniquelyForEachContact3(): void {
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
@@ -1719,7 +1695,7 @@ $textValue
         'name' => $fileUri,
       ],
       'attachDesc_1' => '',
-    ], [], []);
+    ], NULL, []);
     $form->set('cid', $contactId1 . ',' . $contactId2 . ',' . $contactId3);
     $form->buildForm();
     $form->postProcess();
@@ -1749,7 +1725,7 @@ $textValue
   /**
    * Checks that attachments are not duplicated for activities.
    */
-  public function testSendEmailDoesNotDuplicateAttachmentFileIdsForActivitiesCreated() {
+  public function testSendEmailDoesNotDuplicateAttachmentFileIDsForActivitiesCreated(): void {
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
     $contactId2 = $this->individualCreate(['last_name' => 'Pink']);
 
@@ -1772,7 +1748,7 @@ $textValue
     $userID = $loggedInUser;
 
     $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
-    $fileName = "test_email_create.txt";
+    $fileName = 'test_email_create.txt';
     $fileUri = "{$filepath}/{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', $fileName);
@@ -1792,7 +1768,7 @@ $textValue
         'name' => $fileUri,
       ],
       'attachDesc_1' => '',
-    ], [], []);
+    ], NULL, []);
     $form->set('cid', $contactId1 . ',' . $contactId2);
     $form->buildForm();
     $form->postProcess();

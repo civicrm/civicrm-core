@@ -516,7 +516,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->assign('participant_is_pay_later', TRUE);
       }
 
-      $this->assign('participant_status_id', $defaults[$this->_id]['participant_status_id']);
       $eventID = $defaults[$this->_id]['event_id'];
 
       $this->_eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventID, 'event_type_id', 'id');
@@ -980,9 +979,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if (!empty($params['contact_id'])) {
       $this->_contactID = $this->_contactId = $params['contact_id'];
     }
-    if (!$this->_priceSetId && $this->_isPaidEvent) {
-      CRM_Core_Error::deprecatedFunctionWarning('this should never be true, handling to be removed');
-    }
     if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $this->_quickConfig = $isQuickConfig;
     }
@@ -1025,6 +1021,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $this->_params['participant_status_id'] = $params['status_id'];
     $this->_params['participant_role_id'] = is_array($params['role_id']) ? $params['role_id'] : explode(',', $params['role_id']);
     $roleIdWithSeparator = implode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_params['participant_role_id']);
+    $this->assign('participant_status_id', $params['status_id']);
 
     $now = date('YmdHis');
 
@@ -1797,10 +1794,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       //re-enter the values for UPDATE mode
       $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
       $params['fee_amount'] = $this->getParticipantValue('fee_amount');
-      if (isset($params['priceSetId'])) {
-        CRM_Core_Error::deprecatedFunctionWarning('It seems this line is never hit & can go.');
-        $lineItem[0] = CRM_Price_BAO_LineItem::getLineItems($this->_id);
-      }
+
       //also add additional participant's fee level/priceset
       if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
         $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id);

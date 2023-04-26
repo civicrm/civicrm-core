@@ -287,7 +287,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
     if (!empty($params['id'])) {
       if ($this->_action & CRM_Core_Action::DELETE) {
-        CRM_Campaign_BAO_Campaign::del($params['id']);
+        CRM_Campaign_BAO_Campaign::deleteRecord(['id' => $params['id']]);
         CRM_Core_Session::setStatus(ts('Campaign has been deleted.'), ts('Record Deleted'), 'success');
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
         return;

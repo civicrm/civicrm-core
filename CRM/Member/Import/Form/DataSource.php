@@ -20,10 +20,6 @@
  */
 class CRM_Member_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/member/import';
-
-  const IMPORT_ENTITY = 'Membership';
-
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
    *
@@ -44,9 +40,6 @@ class CRM_Member_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     $this->addRadio('onDuplicate', ts('Import mode'), [
       CRM_Import_Parser::DUPLICATE_SKIP => ts('Insert new Membership'),
       CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update existing Membership'),
-    ]);
-    $this->setDefaults([
-      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
     ]);
 
     $this->addContactTypeSelector();

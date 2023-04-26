@@ -46,13 +46,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   protected $_separator;
 
   /**
-   * Total number of lines in file.
-   *
-   * @var int
-   */
-  protected $_lineCount;
-
-  /**
    * Whether the file has a column header or not
    *
    * @var bool
@@ -84,6 +77,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         'name' => 'participant_import',
         'label' => ts('Participant Import'),
         'entity' => 'Participant',
+        'url' => 'civicrm/import/participant',
       ],
     ];
   }
@@ -113,18 +107,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       $formatted = $params;
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
-
-      if (!(!empty($params['participant_role_id']) || !empty($params['participant_role']))) {
-        if (!empty($params['event_id'])) {
-          $params['participant_role_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'default_role_id');
-        }
-        else {
-          $eventTitle = $params['event_title'];
-          $params['participant_role_id'] = CRM_Core_DAO::singleValueQuery('SELECT default_role_id FROM civicrm_event WHERE title = %1', [
-            1 => [$eventTitle, 'String'],
-          ]);
-        }
-      }
 
       $formatValues = [];
       foreach ($params as $key => $field) {
@@ -187,7 +169,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       if (empty($params['contact_id'])) {
         $error = $this->checkContactDuplicate($formatValues);
 
-        if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
+        if (CRM_Core_Error::isAPIError($error, CRM_Core_Error::DUPLICATE_CONTACT)) {
           $matchedIDs = (array) $error['error_message']['params'];
           if (count($matchedIDs) >= 1) {
             foreach ($matchedIDs as $contactId) {

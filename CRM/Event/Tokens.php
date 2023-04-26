@@ -17,13 +17,6 @@ use Civi\Token\TokenRow;
  * Class CRM_Event_Tokens
  *
  * Generate "event.*" tokens.
- *
- * This TokenSubscriber was produced by refactoring the code from the
- * scheduled-reminder system with the goal of making that system
- * more flexible. The current implementation is still coupled to
- * scheduled-reminders. It would be good to figure out a more generic
- * implementation which is not tied to scheduled reminders, although
- * that is outside the current scope.
  */
 class CRM_Event_Tokens extends CRM_Core_EntityTokens {
 

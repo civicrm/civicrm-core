@@ -23,7 +23,7 @@ class CRM_Batch_Page_AJAX {
   /**
    * Save record.
    */
-  public function batchSave() {
+  public static function batchSave() {
     // save the entered information in 'data' column
     $batchId = CRM_Utils_Type::escape($_POST['batch_id'], 'Positive');
 

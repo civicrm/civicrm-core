@@ -348,8 +348,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
    *
-   * @param
-   *
    * @return void
    * @throws \CRM_Core_Exception
    */

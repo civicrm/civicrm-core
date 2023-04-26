@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Generic\Traits;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
 use Civi\Api4\Query\SqlExpression;
 use Civi\Api4\SavedSearch;
@@ -55,10 +56,45 @@ trait SavedSearchInspectorTrait {
         ->execute()->single();
     }
     if (is_array($this->savedSearch)) {
-      $this->savedSearch += ['api_params' => []];
+      // Ensure array keys are always defined even for unsaved "preview" mode
+      $this->savedSearch += [
+        'id' => NULL,
+        'name' => NULL,
+        'api_params' => [],
+      ];
       $this->savedSearch['api_params'] += ['version' => 4, 'select' => [], 'where' => []];
     }
     $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
+  }
+
+  /**
+   * Loads display if not already an array
+   */
+  protected function loadSearchDisplay(): void {
+    // Display name given
+    if (is_string($this->display)) {
+      $this->display = \Civi\Api4\SearchDisplay::get(FALSE)
+        ->setSelect(['*', 'type:name'])
+        ->addWhere('name', '=', $this->display)
+        ->addWhere('saved_search_id', '=', $this->savedSearch['id'])
+        ->execute()->single();
+    }
+    // Null given - use default display
+    elseif (is_null($this->display)) {
+      $this->display = \Civi\Api4\SearchDisplay::getDefault(FALSE)
+        ->addSelect('*', 'type:name')
+        ->setSavedSearch($this->savedSearch)
+        // Set by AutocompleteAction
+        ->setType($this->_displayType ?? 'table')
+        ->execute()->first();
+    }
+    if (is_array($this->display)) {
+      // Ensure array keys are always defined even for unsaved "preview" mode
+      $this->display += [
+        'id' => NULL,
+        'name' => NULL,
+      ];
+    }
   }
 
   /**
@@ -122,7 +158,7 @@ trait SavedSearchInspectorTrait {
    *
    * @return array{fields: array, expr: SqlExpression, dataType: string}[]
    */
-  protected function getSelectClause() {
+  public function getSelectClause() {
     if (!isset($this->_selectClause)) {
       $this->_selectClause = [];
       foreach ($this->_apiParams['select'] as $selectExpr) {
@@ -218,6 +254,7 @@ trait SavedSearchInspectorTrait {
     foreach ($fieldNames as $fieldName) {
       $field = $this->getField($fieldName);
       $dataType = $field['data_type'] ?? NULL;
+      $operators = ($field['operators'] ?? []) ?: CoreUtil::getOperators();
       // Array is either associative `OP => VAL` or sequential `IN (...)`
       if (is_array($value)) {
         $value = array_filter($value, [$this, 'hasValue']);
@@ -245,17 +282,23 @@ trait SavedSearchInspectorTrait {
           $filterClauses[] = ['AND', $andGroup];
         }
       }
-      elseif (!empty($field['serialize'])) {
+      elseif (!empty($field['serialize']) && in_array('CONTAINS', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, 'CONTAINS', $value];
       }
-      elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
+      elseif ((!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) && in_array('=', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, '=', $value];
       }
-      elseif ($prefixWithWildcard) {
+      elseif ($prefixWithWildcard && in_array('CONTAINS', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, 'CONTAINS', $value];
       }
-      else {
+      elseif (in_array('LIKE', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, 'LIKE', $value . '%'];
+      }
+      elseif (in_array('IN', $operators, TRUE)) {
+        $filterClauses[] = [$fieldName, 'IN', (array) $value];
+      }
+      else {
+        $filterClauses[] = [$fieldName, '=', $value];
       }
     }
     // Single field
@@ -278,6 +321,32 @@ trait SavedSearchInspectorTrait {
    */
   protected function hasValue($value) {
     return $value !== '' && $value !== NULL && (!is_array($value) || array_filter($value, [$this, 'hasValue']));
+  }
+
+  /**
+   * Search a string for all square bracket tokens and return their contents (without the brackets)
+   *
+   * @param string $str
+   * @return array
+   */
+  protected function getTokens(string $str): array {
+    $tokens = [];
+    preg_match_all('/\\[([^]]+)\\]/', $str, $tokens);
+    return array_unique($tokens[1]);
+  }
+
+  /**
+   * Only SearchKit admins can use unsecured "preview mode" and pass an array for savedSearch or display
+   *
+   * @throws UnauthorizedException
+   */
+  protected function checkPermissionToLoadSearch() {
+    if (
+      (is_array($this->savedSearch) || (isset($this->display) && is_array($this->display))) && $this->checkPermissions &&
+      !\CRM_Core_Permission::check([['administer CiviCRM data', 'administer search_kit']])
+    ) {
+      throw new UnauthorizedException('Access denied');
+    }
   }
 
 }

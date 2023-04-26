@@ -66,7 +66,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *
    * @var CRM_Core_Config
    */
-  private static $_singleton = NULL;
+  private static $_singleton;
 
   /**
    * Singleton function used to manage this object.
@@ -293,7 +293,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
         CRM_Core_Permission::basicPermissions()
       );
     }
-    else {
+    elseif (get_class($this->userPermissionClass) !== 'CRM_Core_Permission_UnitTests') {
       // Cannot store permissions -- warn if any modules require them
       $modules_with_perms = [];
       foreach ($module_files as $module_file) {
@@ -302,6 +302,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
           $modules_with_perms[] = $module_file['prefix'];
         }
       }
+      // FIXME: Setting a session status message here is probably wrong.
+      // For starters we are not necessarily in the context of a user-facing form
+      // for another thing this message will show indiscriminately to non-admin users
+      // and finally, this message contains nothing actionable for the person reading it to do.
       if (!empty($modules_with_perms)) {
         CRM_Core_Session::setStatus(
           ts('Some modules define permissions, but the CMS cannot store them: %1', [1 => implode(', ', $modules_with_perms)]),
@@ -359,12 +363,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *   tables created recently from being deleted.
    */
   public static function clearTempTables($timeInterval = FALSE): void {
-
-    $dao = new CRM_Core_DAO();
     $query = "
       SELECT TABLE_NAME as tableName
       FROM   INFORMATION_SCHEMA.TABLES
-      WHERE  TABLE_SCHEMA = %1
+      WHERE  TABLE_SCHEMA = DATABASE()
       AND TABLE_NAME LIKE 'civicrm_tmp_d%'
     ";
 
@@ -372,7 +374,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $query .= " AND CREATE_TIME < DATE_SUB(NOW(), INTERVAL {$timeInterval})";
     }
 
-    $tableDAO = CRM_Core_DAO::executeQuery($query, [1 => [$dao->database(), 'String']]);
+    $tableDAO = CRM_Core_DAO::executeQuery($query);
     $tables = [];
     while ($tableDAO->fetch()) {
       $tables[] = $tableDAO->tableName;

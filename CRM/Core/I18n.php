@@ -180,7 +180,7 @@ class CRM_Core_I18n {
 
     if (!$all) {
       $optionValues = [];
-      // Use `getValues`, not `buildOptions` to bypass hook_civicrm_fieldOptions.  See core#1132.
+      // Use `getValues`, not `buildOptions` to bypass hook_civicrm_fieldOptions.  See dev/core#1132.
       CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'weight', TRUE);
       $all = array_column($optionValues, 'label', 'name');
 
@@ -565,19 +565,25 @@ class CRM_Core_I18n {
     // It's only necessary to find/bind once
     if (!isset($this->_extensioncache[$key])) {
       try {
+        $path = CRM_Core_I18n::getResourceDir();
         $mapper = CRM_Extension_System::singleton()->getMapper();
-        $path = $mapper->keyToBasePath($key);
         $info = $mapper->keyToInfo($key);
         $domain = $info->file;
 
+        // Support extension .mo files outside the CiviCRM codebase (relates to dev/translation#52)
+        if (!file_exists(CRM_Core_I18n::getResourceDir() . $this->locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo')) {
+          // Extensions that are not on Transifed might have their .po/mo files in their git repo
+          $path = $mapper->keyToBasePath($key) . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR;
+        }
+
         if ($this->_nativegettext) {
-          bindtextdomain($domain, $path . DIRECTORY_SEPARATOR . 'l10n');
+          bindtextdomain($domain, $path);
           bind_textdomain_codeset($domain, 'UTF-8');
           $this->_extensioncache[$key] = $domain;
         }
         else {
           // phpgettext
-          $mo_file = $path . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR . $this->locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo';
+          $mo_file = $path . $this->locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo';
           $streamer = new FileReader($mo_file);
           $this->_extensioncache[$key] = $streamer->length() ? new gettext_reader($streamer) : NULL;
         }

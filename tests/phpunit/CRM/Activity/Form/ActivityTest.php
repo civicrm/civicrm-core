@@ -8,6 +8,11 @@ use Civi\Test\Invasive;
  */
 class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
+  protected $assignee1;
+  protected $assignee2;
+  protected $target;
+  protected $source;
+
   public function setUp():void {
     parent::setUp();
     $this->assignee1 = $this->individualCreate([
@@ -101,7 +106,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
       'repetition_frequency_interval' => 1,
       'start_action_offset' => $numberOfRepeatingActivitiesToCreate - 1,
     ];
-    $actionScheduleBao = CRM_Core_BAO_ActionSchedule::add($actionScheduleParams);
+    $actionScheduleBao = CRM_Core_BAO_ActionSchedule::writeRecord($actionScheduleParams);
 
     // Create the activity's repeats.
     $recurringEntityBao = new CRM_Core_BAO_RecurringEntity();

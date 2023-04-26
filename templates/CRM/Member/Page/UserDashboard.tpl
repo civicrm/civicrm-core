@@ -18,13 +18,13 @@
         <tr class="columnheader">
             <th>{ts}Membership{/ts}</th>
             <th>{ts}Member Since{/ts}</th>
-            <th>{ts}Start Date{/ts}</th>
-            <th>{ts}End Date{/ts}</th>
+            <th>{ts}Membership Start Date{/ts}</th>
+            <th>{ts}Membership Expiration Date{/ts}</th>
             <th>{ts}Status{/ts}</th>
             <th></th>
         </tr>
         {foreach from=$activeMembers item=activeMember}
-        <tr id="row_{$activeMember.id}" class="{cycle values="odd-row,even-row"} {$activeMember.class}">
+        <tr id="row_{$activeMember.id}" class="{cycle values="odd-row,even-row"}">
           <td class="crm-active-membership-membership_type">{$activeMember.membership_type}</td>
           <td class="crm-active-membership-join_date">{$activeMember.join_date|crmDate}</td>
           <td class="crm-active-membership-start_date">{$activeMember.start_date|crmDate}</td>
@@ -49,8 +49,8 @@
         <table>
         <tr class="columnheader">
             <th>{ts}Membership{/ts}</th>
-            <th>{ts}Start Date{/ts}</th>
-            <th>{ts}End Date{/ts}</th>
+            <th>{ts}Membership Start Date{/ts}</th>
+            <th>{ts}Membership Expiration Date{/ts}</th>
             <th>{ts}Status{/ts}</th>
             <th></th>
         </tr>

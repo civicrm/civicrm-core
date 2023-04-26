@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\CustomGroup;
 
 /**
@@ -685,7 +686,18 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // This parameter causes blank fields to be be emptied out.
     // We can probably remove.
     $params['updateBlankLocInfo'] = TRUE;
+    if (empty($params['contact_type']) || ($params['contact_type'] === 'Organization' && empty($params['organization_name']))) {
+      // Ensuring this is set addresses https://lab.civicrm.org/dev/core/-/issues/4156
+      // but not that RM_Dedupe_MergerTest::testMergeWithEmployer covers this scenario
+      // so refactoring of this is safe.
+      $contact = Contact::get(FALSE)->addWhere('id', '=', $contactID)->addSelect('organization_name', 'contact_type')->execute()->first();
+      $params['contact_type'] = $contact['contact_type'];
+      if (empty($params['organization_name']) && $params['contact_type'] === 'Organization') {
+        $params['organization_name'] = $contact['organization_name'];
+      }
+    }
     $data = self::formatProfileContactParams($params, $contactID);
+
     CRM_Contact_BAO_Contact::create($data);
   }
 
@@ -707,13 +719,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     int $contactID
   ) {
 
-    $data = $contactDetails = [];
+    $data = ['contact_type' => $params['contact_type']];
 
     // get the contact details (hier)
     $details = CRM_Contact_BAO_Contact::getHierContactDetails($contactID, []);
 
     $contactDetails = $details[$contactID];
-    $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
     $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
 
     //fix contact sub type CRM-5125
@@ -725,6 +736,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     elseif (array_key_exists('contact_sub_type_hidden', $params) &&
       !empty($params['contact_sub_type_hidden'])
     ) {
+      CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
       // if profile was used, and had any subtype, we obtain it from there
       //CRM-13596 - add to existing contact types, rather than overwriting
       if (empty($data['contact_sub_type'])) {
@@ -759,6 +771,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (array_key_exists($blk, $params) &&
         !is_array($params[$blk])
       ) {
+        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
         unset($params[$blk]);
       }
     }
@@ -769,6 +782,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
 
       if ($locTypeId == 'Primary') {
+        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
         if (in_array($fieldName, $blocks)) {
           $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, $fieldName);
         }
@@ -782,6 +796,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         !in_array($fieldName, $multiplFields) &&
         substr($fieldName, 0, 7) != 'custom_'
       ) {
+        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
         $index = $locTypeId;
 
         if (is_numeric($typeId)) {
@@ -894,11 +909,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
       else {
         if (substr($key, 0, 4) === 'url-') {
+          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
           $websiteField = explode('-', $key);
           $data['website'][$websiteField[1]]['website_type_id'] = $websiteField[1];
           $data['website'][$websiteField[1]]['url'] = $value;
         }
         elseif (in_array($key, CRM_Contact_BAO_Contact::$_greetingTypes, TRUE)) {
+          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
           //save email/postal greeting and addressee values if any, CRM-4575
           $data[$key . '_id'] = $value;
         }
@@ -922,6 +939,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           $valueId = NULL;
           if (!empty($params['customRecordValues'])) {
+            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
             if (is_array($params['customRecordValues']) && !empty($params['customRecordValues'])) {
               foreach ($params['customRecordValues'] as $recId => $customFields) {
                 if (is_array($customFields) && !empty($customFields)) {
@@ -938,6 +956,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           //CRM-13596 - check for contact_sub_type_hidden first
           if (array_key_exists('contact_sub_type_hidden', $params)) {
+            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
             $type = $params['contact_sub_type_hidden'];
           }
           else {
@@ -958,10 +977,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           );
         }
         elseif ($key === 'edit') {
+          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
           continue;
         }
         else {
           if ($key === 'location') {
+            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
             foreach ($value as $locationTypeId => $field) {
               foreach ($field as $block => $val) {
                 if ($block === 'address' && array_key_exists('address_name', $val)) {
@@ -971,6 +992,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             }
           }
           if ($key === 'phone' && isset($params['phone_ext'])) {
+            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
             $data[$key] = $value;
             foreach ($value as $cnt => $phoneBlock) {
               if ($params[$key][$cnt]['location_type_id'] == $params['phone_ext'][$cnt]['location_type_id']) {
@@ -991,10 +1013,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
         }
       }
-    }
-
-    if (!isset($data['contact_type'])) {
-      $data['contact_type'] = 'Individual';
     }
 
     return $data;
@@ -1465,9 +1483,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * A function to build an array of information required by merge function and the merge UI.
    *
-   * @param int $mainId
+   * @param int $mainID
    *   Main contact with whom merge has to happen.
-   * @param int $otherId
+   * @param int $otherID
    *   Duplicate contact which would be deleted after merge operation.
    * @param bool $checkPermissions
    *   Should the logged in user's permissions be ignore. Setting this to false is
@@ -1505,13 +1523,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *     though the form had been submitted with those options.
    *
    * @throws \CRM_Core_Exception
+   * @todo review permissions issue!
+   *
    */
-  public static function getRowsElementsAndInfo($mainId, $otherId, $checkPermissions = TRUE) {
+  public static function getRowsElementsAndInfo(int $mainID, int $otherID, bool $checkPermissions = TRUE) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
     $fields = self::getMergeFieldsMetadata();
 
-    $main = self::getMergeContactDetails($mainId);
-    $other = self::getMergeContactDetails($otherId);
+    $main = self::getMergeContactDetails($mainID);
+    $other = self::getMergeContactDetails($otherID);
 
     $compareFields = self::retrieveFields($main, $other);
 
@@ -1565,28 +1585,30 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $locations = ['main' => [], 'other' => []];
 
     foreach ($locationBlocks as $blockName => $blockInfo) {
-      [$locations, $rows, $elements, $migrationInfo] = self::addLocationFieldInfo($mainId, $otherId, $blockInfo, $blockName, $locations, $rows, $elements, $migrationInfo);
+      [$locations, $rows, $elements, $migrationInfo] = self::addLocationFieldInfo($mainID, $otherID, $blockInfo, $blockName, $locations, $rows, $elements, $migrationInfo);
     } // End loop through each location block entity
 
     // add the related tables and unset the ones that don't sport any of the duplicate contact's info
-    $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);
+    $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainID, (int) $otherID);
     $relTables = $mergeHandler->getTablesRelatedToTheMergePair();
     foreach ($relTables as $name => $null) {
       $migrationInfo["move_$name"] = 1;
 
-      $relTables[$name]['main_url'] = str_replace('$cid', $mainId, $relTables[$name]['url']);
-      $relTables[$name]['other_url'] = str_replace('$cid', $otherId, $relTables[$name]['url']);
+      $relTables[$name]['main_url'] = str_replace('$cid', $mainID, $relTables[$name]['url']);
+      $relTables[$name]['other_url'] = str_replace('$cid', $otherID, $relTables[$name]['url']);
+      $relTables[$name]['has_operation'] = 0;
+
       if ($name === 'rel_table_users') {
         // @todo - this user url stuff is only needed for the form layer - move to CRM_Contact_Form_Merge
-        $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($mainId), $relTables[$name]['url']);
-        $relTables[$name]['other_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherId), $relTables[$name]['url']);
+        $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($mainID), $relTables[$name]['url']);
+        $relTables[$name]['other_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherID), $relTables[$name]['url']);
       }
       if ($name === 'rel_table_memberships') {
         //Enable 'add new' checkbox if main contact does not contain any membership similar to duplicate contact.
         $attributes = ['checked' => 'checked'];
-        $otherContactMemberships = CRM_Member_BAO_Membership::getAllContactMembership($otherId);
+        $otherContactMemberships = CRM_Member_BAO_Membership::getAllContactMembership($otherID);
         foreach ($otherContactMemberships as $membership) {
-          $mainMembership = CRM_Member_BAO_Membership::getContactMembership($mainId, $membership['membership_type_id'], FALSE);
+          $mainMembership = CRM_Member_BAO_Membership::getContactMembership($mainID, $membership['membership_type_id'], FALSE);
           if ($mainMembership) {
             $attributes = [];
           }
@@ -1599,6 +1621,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $attributes,
         ];
         $migrationInfo["operation"]["move_{$name}"]['add'] = 1;
+        $relTables[$name]['has_operation'] = 1;
       }
     }
     foreach ($relTables as $name => $null) {
@@ -1607,12 +1630,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // handle custom fields
-    $mainTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], NULL, $mainId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE, NULL, TRUE,
+    $mainTree = self::getTree($main['contact_type'], $mainID,
+      $main['contact_sub_type'] ?? NULL,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
-    $otherTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], NULL, $otherId, -1,
-      CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE, NULL, TRUE,
+    $otherTree = self::getTree($main['contact_type'], $otherID,
+      $other['contact_sub_type'] ?? NULL,
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
 
@@ -1671,6 +1694,258 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $result['other_details']['location_blocks'] = $locations['other'];
 
     return $result;
+  }
+
+  /**
+   * Function is separated from shared function & can likely be distilled to an api call.
+   *
+   * @todo clean up post split.
+   *
+   * Get custom groups/fields data for type of entity in a tree structure representing group->field hierarchy
+   * This may also include entity specific data values.
+   *
+   * An array containing all custom groups and their custom fields is returned.
+   *
+   * @param string $entityType
+   *   Of the contact whose contact type is needed.
+   * @param int $entityID
+   * @param array $subTypes
+   * @param bool|int $checkPermission
+   *   Either a CRM_Core_Permission constant or FALSE to disable checks
+   *
+   * @return array
+   *   Custom field 'tree'.
+   *
+   *   The returned array is keyed by group id and has the custom group table fields
+   *   and a sub-key 'fields' holding the specific custom fields.
+   *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
+   *   if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
+   *
+   * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
+   *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
+   *   With caching the performance impact would be small & the function would be cleaner
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private static function getTree(
+    $entityType,
+    int $entityID,
+    $subTypes,
+    $checkPermission
+  ) {
+
+    if (!is_array($subTypes)) {
+      if (empty($subTypes)) {
+        $subTypes = [];
+      }
+      else {
+        if (stristr($subTypes, ',')) {
+          $subTypes = explode(',', $subTypes);
+        }
+        else {
+          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
+        }
+      }
+    }
+
+    // create a new tree
+
+    // legacy hardcoded list of data to return
+    $toReturn = [
+      'custom_field' => [
+        'id',
+        'name',
+        'label',
+        'column_name',
+        'data_type',
+        'html_type',
+        'default_value',
+        'attributes',
+        'is_required',
+        'is_view',
+        'help_pre',
+        'help_post',
+        'options_per_line',
+        'start_date_years',
+        'end_date_years',
+        'date_format',
+        'time_format',
+        'option_group_id',
+        'in_selector',
+        'serialize',
+      ],
+      'custom_group' => [
+        'id',
+        'name',
+        'table_name',
+        'title',
+        'help_pre',
+        'help_post',
+        'collapse_display',
+        'style',
+        'is_multiple',
+        'extends',
+        'extends_entity_column_id',
+        'extends_entity_column_value',
+        'max_multiple',
+        'is_public',
+      ],
+    ];
+
+    // create select
+    $select = [];
+    foreach ($toReturn as $tableName => $tableColumn) {
+      foreach ($tableColumn as $columnName) {
+        $select[] = "civicrm_{$tableName}.{$columnName} as civicrm_{$tableName}_{$columnName}";
+      }
+    }
+    $strSelect = 'SELECT ' . implode(', ', $select);
+
+    // from, where, order by
+    $strFrom = '
+FROM     civicrm_custom_group
+LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicrm_custom_group.id)
+';
+
+    // if entity is either individual, organization or household pls get custom groups for 'contact' too.
+    if ($entityType === 'Individual' || $entityType === 'Organization' ||
+      $entityType === 'Household'
+    ) {
+      $in = "'$entityType', 'Contact'";
+    }
+    elseif (strpos($entityType, "'") !== FALSE) {
+      // this allows the calling function to send in multiple entity types
+      $in = $entityType;
+    }
+    else {
+      // quote it
+      $in = "'$entityType'";
+    }
+
+    $params = [];
+    $sqlParamKey = 1;
+    $subType = '';
+    if (!empty($subTypes)) {
+      foreach ($subTypes as $key => $subType) {
+        $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", CRM_Core_BAO_CustomGroup::validateSubTypeByEntity($entityType, $subType));
+      }
+      $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
+      $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
+
+      $strWhere = "
+WHERE civicrm_custom_group.is_active = 1
+  AND civicrm_custom_field.is_active = 1
+  AND civicrm_custom_group.extends IN ($in)
+  AND $subTypeClause
+";
+    }
+    else {
+      $strWhere = "
+WHERE civicrm_custom_group.is_active = 1
+  AND civicrm_custom_field.is_active = 1
+  AND civicrm_custom_group.extends IN ($in)
+";
+    }
+
+    if ($checkPermission) {
+      // ensure that the user has access to these custom groups
+      $strWhere .= " AND " .
+        CRM_Core_Permission::customGroupClause($checkPermission,
+          'civicrm_custom_group.'
+        );
+    }
+
+    $orderBy = "
+ORDER BY civicrm_custom_group.weight,
+         civicrm_custom_group.title,
+         civicrm_custom_field.weight,
+         civicrm_custom_field.label
+";
+
+    // final query string
+    $queryString = "$strSelect $strFrom $strWhere $orderBy";
+
+    // lets see if we can retrieve the groupTree from cache
+    $cacheString = $queryString . '_Inline';
+
+    $cacheKey = 'CRM_Core_DAO_CustomGroup_Query ' . md5($cacheString);
+    $multipleFieldGroupCacheKey = 'CRM_Core_DAO_CustomGroup_QueryMultipleFields ' . md5($cacheString);
+    $cache = CRM_Utils_Cache::singleton();
+    $groupTree = $cache->get($cacheKey);
+    $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
+
+    if (empty($groupTree)) {
+      [$multipleFieldGroups, $groupTree] = CRM_Core_BAO_CustomGroup::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
+
+      $cache->set($cacheKey, $groupTree);
+      $cache->set($multipleFieldGroupCacheKey, $multipleFieldGroups);
+    }
+    // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
+    // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
+    $entitySingleSelectClauses = $entityMultipleSelectClauses = $groupTree['info']['select'] = [];
+    $singleFieldTables = [];
+    // now that we have all the groups and fields, lets get the values
+    // since we need to know the table and field names
+    // add info to groupTree
+
+    if (isset($groupTree['info']) && !empty($groupTree['info']) &&
+      !empty($groupTree['info']['tables'])
+    ) {
+      $groupTree['info']['where'] = NULL;
+
+      foreach ($groupTree['info']['tables'] as $table => $fields) {
+        $groupTree['info']['from'][] = $table;
+        $select = [
+          "{$table}.id as {$table}_id",
+          "{$table}.entity_id as {$table}_entity_id",
+        ];
+        foreach ($fields as $column => $dontCare) {
+          $select[] = "{$table}.{$column} as {$table}_{$column}";
+        }
+        $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
+        if ($entityID) {
+          $groupTree['info']['where'][] = "{$table}.entity_id = $entityID";
+          if (in_array($table, $multipleFieldGroups) &&
+            CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($entityID, $table)
+          ) {
+            $entityMultipleSelectClauses[$table] = $select;
+          }
+          else {
+            $singleFieldTables[] = $table;
+            $entitySingleSelectClauses = array_merge($entitySingleSelectClauses, $select);
+          }
+
+        }
+      }
+      if ($entityID && !empty($singleFieldTables)) {
+        CRM_Core_BAO_CustomGroup::buildEntityTreeSingleFields($groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTables);
+      }
+      $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
+      if (!empty($multipleFieldTablesWithEntityData)) {
+        CRM_Core_BAO_CustomGroup::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData);
+      }
+
+    }
+    return $groupTree;
+  }
+
+  /**
+   * Suppose you have a SQL column, $column, which includes a delimited list, and you want
+   * a WHERE condition for rows that include $value. Use whereListHas().
+   *
+   * @param string $column
+   * @param string $value
+   * @param string $delimiter
+   *
+   * @return string
+   *   SQL condition.
+   * @throws \CRM_Core_Exception
+   */
+  private static function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
+    // ?
+    $bareValue = trim($value, $delimiter);
+    $escapedValue = CRM_Utils_Type::escape("%{$delimiter}{$bareValue}{$delimiter}%", 'String', FALSE);
+    return "($column LIKE \"$escapedValue\")";
   }
 
   /**
@@ -1776,25 +2051,29 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'groupName' => 'postal_greeting',
     ];
     CRM_Core_OptionGroup::lookupValues($submitted, $names, TRUE);
-    // fix custom fields so they're edible by createProfileContact()
-    $cFields = self::getCustomFieldMetadata($contactType);
 
     if (!isset($submitted)) {
       $submitted = [];
     }
-    foreach ($submitted as $key => $value) {
-      [$cFields, $submitted] = self::processCustomFields($mainId, $key, $cFields, $submitted, $value);
-    }
 
-    // move view only custom fields CRM-5362
+    // Move view only custom fields CRM-5362
     $viewOnlyCustomFields = [];
     foreach ($submitted as $key => $value) {
-      $fid = CRM_Core_BAO_CustomField::getKeyID($key);
-      if ($fid && array_key_exists($fid, $cFields) && !empty($cFields[$fid]['attributes']['is_view'])
-      ) {
-        $viewOnlyCustomFields[$key] = $value;
+      if (strpos($key, 'custom_') === 0) {
+        $fieldID = (int) substr($key, 7);
+        $fieldMetadata = CRM_Core_BAO_CustomField::getCustomFieldsForContactType($contactType, FALSE)[$fieldID] ?? NULL;
+        if ($fieldMetadata) {
+          $htmlType = (string) $fieldMetadata['html_type'];
+          $isSerialized = CRM_Core_BAO_CustomField::isSerialized($fieldMetadata);
+          $isView = (bool) $fieldMetadata['is_view'];
+          if ($isView) {
+            $viewOnlyCustomFields[$key] = $value;
+          }
+          $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
+        }
       }
     }
+
     // special case to set values for view only, CRM-5362
     if (!empty($viewOnlyCustomFields)) {
       $viewOnlyCustomFields['entityID'] = $mainId;
@@ -1811,7 +2090,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'return' => ['created_date'],
     ])['created_date'];
     if ($otherCreatedDate < $mainCreatedDate && !empty($otherCreatedDate)) {
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_contact SET created_date = %1 WHERE id = %2", [
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET created_date = %1 WHERE id = %2', [
         1 => [$otherCreatedDate, 'String'],
         2 => [$mainId, 'Positive'],
       ]);
@@ -2195,126 +2474,83 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param int $mainId
    * @param string $key
-   * @param array $cFields
    * @param array $submitted
    * @param mixed $value
+   * @param int $fieldID
+   * @param bool $isView
+   * @param string $htmlType
+   * @param bool $isSerialized
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function processCustomFields($mainId, $key, $cFields, $submitted, $value) {
-    if (substr($key, 0, 7) === 'custom_') {
-      $fid = (int) substr($key, 7);
-      if (empty($cFields[$fid])) {
-        return [$cFields, $submitted];
+  protected static function processCustomFields(int $mainId, string $key, array $submitted, $value, int $fieldID, bool $isView, string $htmlType, bool $isSerialized): array {
+    if ($htmlType === 'File') {
+      // Handled in CustomField->move(). Tested in testMergeCustomFields.
+      unset($submitted["custom_$fieldID"]);
+    }
+    elseif (!$isSerialized && ($htmlType === 'Select Country' || $htmlType === 'Select State/Province')) {
+      // @todo Test in testMergeCustomFields disabled as this does not work, Handle in CustomField->move().
+      $submitted[$key] = CRM_Core_BAO_CustomField::displayValue($value, $fieldID);
+    }
+    elseif ($htmlType === 'Select Date') {
+      if ($isView) {
+        $submitted[$key] = date('YmdHis', strtotime($submitted[$key]));
       }
-      $htmlType = $cFields[$fid]['attributes']['html_type'];
-      $isSerialized = CRM_Core_BAO_CustomField::isSerialized($cFields[$fid]['attributes']);
-
-      if ($htmlType === 'File') {
-        // Handled in CustomField->move(). Tested in testMergeCustomFields.
-        unset($submitted["custom_$fid"]);
-      }
-      elseif (!$isSerialized && ($htmlType === 'Select Country' || $htmlType === 'Select State/Province')) {
-        // @todo Test in testMergeCustomFields disabled as this does not work, Handle in CustomField->move().
-        $submitted[$key] = CRM_Core_BAO_CustomField::displayValue($value, $fid);
-      }
-      elseif ($htmlType === 'Select Date') {
-        if ($cFields[$fid]['attributes']['is_view']) {
-          $submitted[$key] = date('YmdHis', strtotime($submitted[$key]));
-        }
-      }
-      elseif ($isSerialized) {
-        // Merge values from both contacts for multivalue fields, CRM-4385
-        // get the existing custom values from db.
-        $customParams = ['entityID' => $mainId, $key => TRUE];
-        $customfieldValues = CRM_Core_BAO_CustomValueTable::getValues($customParams);
-        if (!empty($customfieldValues[$key])) {
-          $existingValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $customfieldValues[$key]);
-          if (is_array($existingValue) && !empty($existingValue)) {
-            $mergeValue = $submittedCustomFields = [];
-            if ($value === 'null') {
-              // CRM-19074 if someone has deliberately chosen to overwrite with 'null', respect it.
-              $submitted[$key] = $value;
-            }
-            else {
-              if ($value) {
-                $submittedCustomFields = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-              }
-
-              // CRM-19653: overwrite or add the existing custom field value with dupicate contact's
-              // custom field value stored at $submittedCustomValue.
-              foreach ($submittedCustomFields as $k => $v) {
-                if ($v != '' && !in_array($v, $mergeValue)) {
-                  $mergeValue[] = $v;
-                }
-              }
-
-              //keep state and country as array format.
-              //for checkbox and m-select format w/ VALUE_SEPARATOR
-              if (in_array($htmlType, ['CheckBox', 'Select'])) {
-                $submitted[$key] = CRM_Utils_Array::implodePadded($mergeValue);
-              }
-              else {
-                $submitted[$key] = $mergeValue;
-              }
-            }
+    }
+    elseif ($isSerialized) {
+      // Merge values from both contacts for multivalue fields, CRM-4385
+      // get the existing custom values from db.
+      $customParams = ['entityID' => $mainId, $key => TRUE];
+      $customfieldValues = CRM_Core_BAO_CustomValueTable::getValues($customParams);
+      if (!empty($customfieldValues[$key])) {
+        $existingValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $customfieldValues[$key]);
+        if (is_array($existingValue) && !empty($existingValue)) {
+          $mergeValue = $submittedCustomFields = [];
+          if ($value === 'null') {
+            // CRM-19074 if someone has deliberately chosen to overwrite with 'null', respect it.
+            $submitted[$key] = $value;
           }
-        }
-        elseif (in_array($htmlType, ['Select Country', 'Select State/Province'])) {
-          //we require submitted values should be in array format
-          if ($value) {
-            $mergeValueArray = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-            //hack to remove null values from array.
-            $mergeValue = [];
-            foreach ($mergeValueArray as $k => $v) {
-              if ($v != '') {
+          else {
+            if ($value) {
+              $submittedCustomFields = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+            }
+
+            // CRM-19653: overwrite or add the existing custom field value with dupicate contact's
+            // custom field value stored at $submittedCustomValue.
+            foreach ($submittedCustomFields as $k => $v) {
+              if ($v != '' && !in_array($v, $mergeValue)) {
                 $mergeValue[] = $v;
               }
             }
-            $submitted[$key] = $mergeValue;
+
+            //keep state and country as array format.
+            //for checkbox and m-select format w/ VALUE_SEPARATOR
+            if (in_array($htmlType, ['CheckBox', 'Select'])) {
+              $submitted[$key] = CRM_Utils_Array::implodePadded($mergeValue);
+            }
+            else {
+              $submitted[$key] = $mergeValue;
+            }
           }
         }
       }
-    }
-    return [$cFields, $submitted];
-  }
-
-  /**
-   * Get metadata for the custom fields for the merge.
-   *
-   * @param string $contactType
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  protected static function getCustomFieldMetadata($contactType) {
-    $treeCache = [];
-    if (!array_key_exists($contactType, $treeCache)) {
-      $treeCache[$contactType] = CRM_Core_BAO_CustomGroup::getTree(
-        $contactType,
-        NULL,
-        NULL,
-        -1,
-        [],
-        NULL,
-        TRUE,
-        NULL,
-        FALSE,
-        FALSE
-      );
-    }
-
-    $cFields = [];
-    foreach ($treeCache[$contactType] as $key => $group) {
-      if (!isset($group['fields'])) {
-        continue;
-      }
-      foreach ($group['fields'] as $fid => $field) {
-        $cFields[$fid]['attributes'] = $field;
+      elseif (in_array($htmlType, ['Select Country', 'Select State/Province'])) {
+        //we require submitted values should be in array format
+        if ($value) {
+          $mergeValueArray = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+          //hack to remove null values from array.
+          $mergeValue = [];
+          foreach ($mergeValueArray as $k => $v) {
+            if ($v != '') {
+              $mergeValue[] = $v;
+            }
+          }
+          $submitted[$key] = $mergeValue;
+        }
       }
     }
-    return $cFields;
+    return $submitted;
   }
 
   /**
@@ -2340,7 +2576,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $conflicts = [];
     // Generate var $migrationInfo. The variable structure is exactly same as
     // $formValues submitted during a UI merge for a pair of contacts.
-    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId, FALSE);
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo((int) $mainId, (int) $otherId, FALSE);
     // add additional details that we might need to resolve conflicts
     $migrationInfo = $rowsElementsAndInfo['migration_info'];
     $migrationInfo['main_details'] = &$rowsElementsAndInfo['main_details'];
@@ -2679,9 +2915,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   protected static function getLocksOnContacts($contacts):array {
     $locks = [];
-    if (!CRM_Utils_SQL::supportsMultipleLocks()) {
-      return $locks;
-    }
     foreach ($contacts as $contactID) {
       $lock = Civi::lockManager()->acquire("data.core.contact.{$contactID}");
       if ($lock->isAcquired()) {

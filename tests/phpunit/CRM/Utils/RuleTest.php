@@ -7,6 +7,14 @@
 class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
   /**
+   * Set up for tests.
+   */
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
+  /**
    * @dataProvider integerDataProvider
    * @param $inputData
    * @param $expectedResult

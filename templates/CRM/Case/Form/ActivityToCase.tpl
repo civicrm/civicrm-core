@@ -73,7 +73,7 @@
             var caseUrl = destUrl + selectedCaseId + '&cid=' + contactId + context;
 
             var statusMsg = {/literal}'{ts escape='js' 1='%1'}Activity has been filed to %1 case.{/ts}'{literal};
-            CRM.alert(ts(statusMsg, {1: '<a href="' + caseUrl + '">' + CRM._.escape(caseTitle) + '</a>'}), '{/literal}{ts escape="js"}Saved{/ts}{literal}', 'success');
+            CRM.alert(ts(statusMsg, {1: '<a href="' + caseUrl + '">' + CRM._.escape(caseTitle) + '</a>'}), '{/literal}{ts escape="js"}Saved{/ts}{literal}', 'success', {expires: 10000});
             CRM.refreshParent(a);
           }
         }

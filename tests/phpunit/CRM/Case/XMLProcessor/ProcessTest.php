@@ -7,10 +7,43 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
 
+  /**
+   * @var array
+   */
+  private $defaultAssigneeOptionsValues = [];
+
+  /**
+   * @var array
+   */
+  private $contacts = [];
+
+  /**
+   * @var array
+   */
+  private $relationships = [];
+
+  /**
+   * @var array
+   */
+  private $moreRelationshipTypes = [];
+
+  /**
+   * @var SimpleXMLElement
+   */
+  private $activityTypeXml;
+
+  /**
+   * @var array
+   */
+  private $activityParams = [];
+
+  /**
+   * @var CRM_Case_XMLProcessor_Process
+   */
+  private $process;
+
   public function setUp(): void {
     parent::setUp();
-
-    $this->defaultAssigneeOptionsValues = [];
 
     $this->setupContacts();
     $this->setupDefaultAssigneeOptions();

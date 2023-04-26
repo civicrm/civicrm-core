@@ -111,31 +111,4 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
     }
   }
 
-  /**
-   * SetIsActive() method of participant status type
-   */
-  public function testSetIsActiveStatusType() {
-
-    $params = [
-      'name' => 'testStatus',
-      'label' => 'testParticipant',
-      'class' => 'Positive',
-      'is_active' => 0,
-      'is_counted' => 1,
-      'weight' => 15,
-      'visibility_id' => 1,
-    ];
-
-    $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
-    $isActive = 1;
-
-    // set participant status type active
-    CRM_Event_BAO_ParticipantStatusType::setIsActive($statusType->id, $isActive);
-
-    // compare expected value in db
-    $this->assertDBCompareValue('CRM_Event_DAO_ParticipantStatusType', $statusType->id, 'is_Active',
-      'id', $isActive, 'Check DB for is_Active value'
-    );
-  }
-
 }

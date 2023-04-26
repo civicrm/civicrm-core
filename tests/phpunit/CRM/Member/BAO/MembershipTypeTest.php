@@ -108,37 +108,6 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test setIsActive.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSetIsActive(): void {
-    $params = [
-      'name' => 'General',
-      'description' => NULL,
-      'domain_id' => 1,
-      'minimum_fee' => 100,
-      'duration_unit' => 'year',
-      'period_type' => 'fixed',
-      'duration_interval' => 1,
-      'member_of_contact_id' => $this->ids['Contact']['organization'],
-      'financial_type_id:name' => 'Donation',
-      'relationship_type_id' => $this->ids['RelationshipType'][0],
-      'visibility' => 'Public',
-      'is_active' => 1,
-    ];
-    $membershipID = MembershipType::create()->setValues($params)->execute()->first()['id'];
-
-    CRM_Member_BAO_MembershipType::setIsActive($membershipID, 0);
-
-    $isActive = $this->assertDBNotNull('CRM_Member_BAO_MembershipType', $membershipID,
-      'is_active', 'id',
-      'Database check on membership type status.'
-    );
-    $this->assertEquals(0, $isActive, 'Verify membership type status.');
-  }
-
-  /**
    * Test delete.
    *
    * @throws \CRM_Core_Exception

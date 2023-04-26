@@ -60,6 +60,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_paymentObject = NULL;
 
   /**
+   * Order object, used to calculate amounts, line items etc.
+   *
+   * @var \CRM_Financial_BAO_Order
+   */
+  protected $order;
+
+  /**
    * The membership block for this page
    *
    * @var array
@@ -68,7 +75,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Does this form support a separate membership payment
+   *
    * @var bool
+   *
+   * @deprecated use $this->isSeparateMembershipPayment() function.
    */
   protected $_separateMembershipPayment;
 
@@ -216,11 +226,43 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_ccid;
 
   /**
+   * ID of a membership to be renewed (pass in by url)
+   *
+   * @var int
+   */
+  protected $renewalMembershipID;
+
+  /**
    * Is the price set quick config.
+   *
    * @return bool
    */
-  public function isQuickConfig() {
-    return self::$_quickConfig ?? FALSE;
+  public function isQuickConfig(): bool {
+    return $this->getPriceSetID() && CRM_Price_BAO_PriceSet::isQuickConfig($this->getPriceSetID());
+  }
+
+  /**
+   * Get the price set for the contribution page.
+   *
+   * Note that we use the `get` from the form as a legacy method but
+   * ideally we would just load from the BAO method & not pass using the
+   * form. It does not confer meaningful performance benefits & adds confusion.
+   *
+   * Out of caution we still allow `get`, `set` to take precedence.
+   *
+   * @return int|null
+   */
+  public function getPriceSetID(): ?int {
+    if ($this->_priceSetId === NULL) {
+      if ($this->get('priceSetId')) {
+        $this->_priceSetId = $this->get('priceSetId');
+      }
+      else {
+        $this->_priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id);
+      }
+      $this->set('priceSetId', $this->_priceSetId);
+    }
+    return $this->_priceSetId ?: NULL;
   }
 
   /**
@@ -245,48 +287,48 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_userID = CRM_Core_Session::getLoggedInContactID();
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
-    $this->_mid = NULL;
-    if ($this->_contactID) {
-      $this->_mid = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
-      if ($this->_mid) {
-        $membership = new CRM_Member_DAO_Membership();
-        $membership->id = $this->_mid;
+    $this->getRenewalMembershipID();
 
-        if ($membership->find(TRUE)) {
-          $this->_defaultMemTypeId = $membership->membership_type_id;
-          if ($membership->contact_id != $this->_contactID) {
-            $validMembership = FALSE;
-            $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, NULL, NULL, 'Organization');
-            if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
-              $this->_membershipContactID = $membership->contact_id;
-              $this->assign('membershipContactID', $this->_membershipContactID);
-              $this->assign('membershipContactName', $organizations[$this->_membershipContactID]['name']);
-              $validMembership = TRUE;
-            }
-            else {
-              $membershipType = new CRM_Member_BAO_MembershipType();
-              $membershipType->id = $membership->membership_type_id;
-              if ($membershipType->find(TRUE)) {
-                // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
-                // Convert to comma separated list.
-                $inheritedRelTypes = implode(CRM_Utils_Array::explodePadded($membershipType->relationship_type_id), ',');
-                $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, $membershipType->relationship_type_id);
-                if (array_key_exists($membership->contact_id, $permContacts)) {
-                  $this->_membershipContactID = $membership->contact_id;
-                  $validMembership = TRUE;
-                }
+    // @todo - this mid needs to go - just making sure references are updated first.
+    $this->_mid = $this->getRenewalMembershipID();
+    if ($this->getRenewalMembershipID()) {
+      $membership = new CRM_Member_DAO_Membership();
+      $membership->id = $this->getRenewalMembershipID();
+
+      if ($membership->find(TRUE)) {
+        $this->_defaultMemTypeId = $membership->membership_type_id;
+        if ($membership->contact_id != $this->_contactID) {
+          $validMembership = FALSE;
+          $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, NULL, NULL, 'Organization');
+          if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
+            $this->_membershipContactID = $membership->contact_id;
+            $this->assign('membershipContactID', $this->_membershipContactID);
+            $this->assign('membershipContactName', $organizations[$this->_membershipContactID]['name']);
+            $validMembership = TRUE;
+          }
+          else {
+            $membershipType = new CRM_Member_BAO_MembershipType();
+            $membershipType->id = $membership->membership_type_id;
+            if ($membershipType->find(TRUE)) {
+              // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
+              // Convert to comma separated list.
+              $inheritedRelTypes = implode(CRM_Utils_Array::explodePadded($membershipType->relationship_type_id), ',');
+              $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, $membershipType->relationship_type_id);
+              if (array_key_exists($membership->contact_id, $permContacts)) {
+                $this->_membershipContactID = $membership->contact_id;
+                $validMembership = TRUE;
               }
             }
-            if (!$validMembership) {
-              CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
-            }
+          }
+          if (!$validMembership) {
+            CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
           }
         }
-        else {
-          CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
-        }
-        unset($membership);
       }
+      else {
+        CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+      }
+      unset($membership);
     }
 
     // we do not want to display recently viewed items, so turn off
@@ -304,7 +346,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_bltID = $this->get('bltID');
     $this->_paymentProcessor = $this->get('paymentProcessor');
 
-    $this->_priceSetId = $this->get('priceSetId');
+    // In tests price set id is not always set - it is unclear if this is just
+    // poor test set up or it is possible in 'the real world'
+    if ($this->getPriceSetID()) {
+      $this->order = new CRM_Financial_BAO_Order();
+      $this->order->setPriceSetID($this->getPriceSetID());
+    }
     $this->_priceSet = $this->get('priceSet');
 
     if (!$this->_values) {
@@ -357,11 +404,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       ));
 
       $this->assignPaymentProcessor($isPayLater);
-
+      $this->assign('quickConfig', $this->isQuickConfig());
       // get price info
       // CRM-5095
-      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id);
-      CRM_Price_BAO_PriceSet::initSet($this, 'civicrm_contribution_page', FALSE, $priceSetId);
+      $this->initSet($this);
 
       // this avoids getting E_NOTICE errors in php
       $setNullFields = [
@@ -372,27 +418,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         if (!isset($this->_values[$f])) {
           $this->_values[$f] = NULL;
         }
-      }
-
-      //check if Membership Block is enabled, if Membership Fields are included in profile
-      //get membership section for this contribution page
-      $this->_membershipBlock = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
-      $this->set('membershipBlock', $this->_membershipBlock);
-
-      if (!empty($this->_values['custom_pre_id'])) {
-        $preProfileType = CRM_Core_BAO_UFField::getProfileType($this->_values['custom_pre_id']);
-      }
-
-      if (!empty($this->_values['custom_post_id'])) {
-        $postProfileType = CRM_Core_BAO_UFField::getProfileType($this->_values['custom_post_id']);
-      }
-
-      if (((isset($postProfileType) && $postProfileType === 'Membership') ||
-          (isset($preProfileType) && $preProfileType === 'Membership')
-        ) &&
-        !$this->_membershipBlock['is_active']
-      ) {
-        CRM_Core_Error::statusBounce(ts('This page includes a Profile with Membership fields - but the Membership Block is NOT enabled. Please notify the site administrator.'));
       }
 
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
@@ -415,12 +440,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             $pledgeId,
             'campaign_id'
           );
-          self::authenticatePledgeUser();
+          $this->authenticatePledgeUser();
         }
       }
       $this->set('values', $this->_values);
       $this->set('fields', $this->_fields);
     }
+    $this->set('membershipBlock', $this->getMembershipBlock());
 
     // Handle PCP
     $pcpId = CRM_Utils_Request::retrieve('pcpId', 'Positive', $this);
@@ -446,12 +472,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->assign('pledgeBlock', TRUE);
     }
 
-    // check if one of the (amount , membership)  blocks is active or not.
-    $this->_membershipBlock = $this->get('membershipBlock');
-
+    // @todo - move this check to `getMembershipBlock`
     if (!$this->isFormSupportsNonMembershipContributions() &&
       !$this->_membershipBlock['is_active'] &&
-      !$this->_priceSetId
+      !$this->getPriceSetID()
     ) {
       CRM_Core_Error::statusBounce(ts('The requested online contribution page is missing a required Contribution Amount section or Membership section or Price Set. Please check with the site administrator for assistance.'));
     }
@@ -490,15 +514,39 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_values['campaign_id'] = $campID;
     }
 
-    //do check for cancel recurring and clean db, CRM-7696
-    if (CRM_Utils_Request::retrieve('cancel', 'Boolean')) {
-      self::cancelRecurring();
-    }
-
     // check if billing block is required for pay later
     if (!empty($this->_values['is_pay_later'])) {
       $this->_isBillingAddressRequiredForPayLater = $this->_values['is_billing_required'] ?? NULL;
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
+    }
+  }
+
+  /**
+   * Initiate price set such that various non-BAO things are set on the form.
+   *
+   * This function is not really a BAO function so the location is misleading.
+   *
+   * @param CRM_Core_Form $form
+   *   Form entity id.
+   *
+   * @todo - removed unneeded code from previously-shared function
+   */
+  private function initSet($form) {
+    $priceSetId = $this->getPriceSetID();
+    // get price info
+    if ($priceSetId) {
+      if ($form->_action & CRM_Core_Action::UPDATE) {
+        $form->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($form->_id, 'contribution');
+        $required = FALSE;
+      }
+      else {
+        $required = TRUE;
+      }
+
+      $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, $required);
+      $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
+      $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
+      $form->set('priceSet', $form->_priceSet);
     }
   }
 
@@ -769,10 +817,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // The concept of contributeMode is deprecated.
     // The payment processor object can provide info about the fields it shows.
-    if ($isMonetary && is_a($this->_paymentProcessor['object'], 'CRM_Core_Payment')) {
-      /** @var  \CRM_Core_Payment $paymentProcessorObject */
+    if ($isMonetary && $this->_paymentProcessor['object'] instanceof \CRM_Core_Payment) {
       $paymentProcessorObject = $this->_paymentProcessor['object'];
-
+      $this->assign('paymentAgreementTitle', $paymentProcessorObject->getText('agreementTitle', []));
+      $this->assign('paymentAgreementText', $paymentProcessorObject->getText('agreementText', []));
       $paymentFields = $paymentProcessorObject->getPaymentFormFields();
       foreach ($paymentFields as $index => $paymentField) {
         if (!isset($this->_params[$paymentField])) {
@@ -1042,7 +1090,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  public function authenticatePledgeUser() {
+  private function authenticatePledgeUser(): void {
     //get the userChecksum and contact id
     $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -1089,31 +1137,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Cancel recurring contributions.
-   *
-   * In case user cancel recurring contribution,
-   * When we get the control back from payment gate way
-   * lets delete the recurring and related contribution.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function cancelRecurring() {
-    $isCancel = CRM_Utils_Request::retrieve('cancel', 'Boolean');
-    if ($isCancel) {
-      $isRecur = CRM_Utils_Request::retrieve('isRecur', 'Boolean');
-      $recurId = CRM_Utils_Request::retrieve('recurId', 'Positive');
-      //clean db for recurring contribution.
-      if ($isRecur && $recurId) {
-        CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($recurId);
-      }
-      $contribId = CRM_Utils_Request::retrieve('contribId', 'Positive');
-      if ($contribId) {
-        CRM_Contribute_BAO_Contribution::deleteContribution($contribId);
-      }
-    }
-  }
-
-  /**
    * Determine if recurring parameters need to be added to the form parameters.
    *
    *  - is_recur
@@ -1143,7 +1166,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // Check if membership the selected membership is automatically opted into auto renew or give user the option.
     // In the 2nd case we check that the user has in deed opted in (auto renew as at June 22 is the field name for the membership auto renew checkbox)
     // Also check that the payment Processor used can support recurring contributions.
-    $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->_priceSetId);
+    $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->getPriceSetID());
     if (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
       || (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']) &&
         !empty($this->_params['auto_renew']))
@@ -1247,6 +1270,78 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public function isFormSupportsNonMembershipContributions(): bool {
     return (bool) ($this->_values['amount_block_is_active'] ?? FALSE);
+  }
+
+  /**
+   * Get the membership block configured for the page, fetching if needed.
+   *
+   * The membership block is configured memberships are available to purchase via
+   * a quick-config price set.
+   *
+   * @return array|false
+   */
+  protected function getMembershipBlock() {
+    if (!isset($this->_membershipBlock)) {
+      //check if Membership Block is enabled, if Membership Fields are included in profile
+      //get membership section for this contribution page
+      $this->_membershipBlock = CRM_Member_BAO_Membership::getMembershipBlock($this->_id) ?? FALSE;
+      $preProfileType = empty($this->_values['custom_pre_id']) ? NULL : CRM_Core_BAO_UFField::getProfileType($this->_values['custom_pre_id']);
+      $postProfileType = empty($this->_values['custom_post_id']) ? NULL : CRM_Core_BAO_UFField::getProfileType($this->_values['custom_post_id']);
+
+      if ((($postProfileType === 'Membership') || ($preProfileType === 'Membership')) &&
+        !$this->_membershipBlock['is_active']
+      ) {
+        CRM_Core_Error::statusBounce(ts('This page includes a Profile with Membership fields - but the Membership Block is NOT enabled. Please notify the site administrator.'));
+      }
+    }
+    return $this->_membershipBlock;
+  }
+
+  /**
+   * Is a (non-quick-config) membership price set in use.
+   *
+   * @return bool
+   */
+  protected function isMembershipPriceSet(): bool {
+    if ($this->_useForMember === NULL) {
+      if (CRM_Core_Component::isEnabled('CiviMember') &&
+        (!$this->isQuickConfig() || !empty($this->_ccid)) &&
+        CRM_Core_Component::getComponentID('CiviMember') === (int) $this->order->getPriceSetMetadata()['extends']) {
+        $this->_useForMember = 1;
+      }
+      else {
+        $this->_useForMember = 0;
+      }
+      $this->set('useForMember', $this->_useForMember);
+    }
+    return (bool) $this->_useForMember;
+  }
+
+  /**
+   * Is the contribution page configured for 2 payments, one being membership & one not.
+   *
+   * @return bool
+   */
+  protected function isSeparateMembershipPayment(): bool {
+    return $this->getMembershipBlock() && $this->getMembershipBlock()['is_separate_payment'];
+  }
+
+  /**
+   * Get the id of the membership the contact is trying to renew.
+   *
+   * @return bool|int
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRenewalMembershipID() {
+    if ($this->renewalMembershipID === NULL) {
+      if (!$this->getContactID()) {
+        $this->renewalMembershipID = FALSE;
+      }
+      else {
+        $this->renewalMembershipID = CRM_Utils_Request::retrieve('mid', 'Positive', $this) ?: FALSE;
+      }
+    }
+    return $this->renewalMembershipID ?: FALSE;
   }
 
 }

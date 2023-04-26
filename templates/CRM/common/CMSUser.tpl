@@ -9,9 +9,14 @@
 *}
 {if $showCMS }{*true if is_cms_user field is set *}
    <fieldset class="crm-group crm_user-group">
+      <legend>{ts}Account{/ts}</legend>
       <div class="messages help cms_user_help-section">
    {if !$isCMS}
-      {ts}If you would like to create an account on this site, check the box below and enter a Username{/ts}{if !empty($form.cms_pass)} {ts}and a password{/ts}.{/if}
+     {if array_key_exists('cms_pass', $form)}
+       {ts}If you would like to create an account on this site, check the box below and enter a Username and Password.{/ts}
+     {else}
+       {ts}If you would like to create an account on this site, check the box below and enter a Username.{/ts}
+     {/if}
    {else}
       {ts}Please enter a Username to create an account.{/ts}
    {/if}

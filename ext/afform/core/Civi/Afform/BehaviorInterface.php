@@ -31,6 +31,13 @@ interface BehaviorInterface {
   public static function getDescription():? string;
 
   /**
+   * Optional template for configuring the behavior in the AfformGuiEditor
+   *
+   * @return string|null
+   */
+  public static function getTemplate(): ?string;
+
+  /**
    * Dashed name, name of entity attribute for selected mode
    * @return string
    */

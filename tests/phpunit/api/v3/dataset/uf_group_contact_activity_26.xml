@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--  $Id: uf_group_contact_activity_26.xml 2011-05-31 11:36:36IST rajan $  -->
-<!--  @todo:add custom fields, currently we can't not create tables here that belongs to the custom field -->
 <dataset>
   <civicrm_uf_group
      id="26"

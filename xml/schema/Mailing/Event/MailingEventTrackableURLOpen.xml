@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing/Event</base>
+  <class>MailingEventTrackableURLOpen</class>
+  <name>civicrm_mailing_event_trackable_url_open</name>
+  <title>Mailing Link Clickthrough</title>
+  <titlePlural>Mailing Link Clickthroughs</titlePlural>
+  <comment>Tracks when a TrackableURL is clicked by a recipient.</comment>
+  <archive>true</archive>
+  <component>CiviMail</component>
+  <field>
+    <name>id</name>
+    <title>Trackable URL Open ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <html>
+      <label>ID</label>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>event_queue_id</name>
+    <title>Event Queue ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to EventQueue</comment>
+    <html>
+      <label>Recipient</label>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>event_queue_id</name>
+    <table>civicrm_mailing_event_queue</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>trackable_url_id</name>
+    <title>Trackable Url ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to TrackableURL</comment>
+    <html>
+      <label>Mailing Link</label>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>trackable_url_id</name>
+    <table>civicrm_mailing_trackable_url</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>time_stamp</name>
+    <title>Timestamp</title>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <required>true</required>
+    <html>
+      <label>Opened Date</label>
+      <type>Date</type>
+    </html>
+    <comment>When this trackable URL open occurred.</comment>
+  </field>
+</table>

@@ -29,7 +29,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       ];
       Civi::log()->debug("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api4().",
         [
-          'IP' => $_SERVER['REMOTE_ADDR'],
+          'IP' => CRM_Utils_System::ipAddress(),
           'level' => 'security',
           'referer' => $_SERVER['HTTP_REFERER'],
           'reason' => 'CSRF suspected',
@@ -48,7 +48,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       ];
       Civi::log()->debug("SECURITY: All requests that modify the database must be http POST, not GET.",
         [
-          'IP' => $_SERVER['REMOTE_ADDR'],
+          'IP' => CRM_Utils_System::ipAddress(),
           'level' => 'security',
           'referer' => $_SERVER['HTTP_REFERER'],
           'reason' => 'Destructive HTTP GET',

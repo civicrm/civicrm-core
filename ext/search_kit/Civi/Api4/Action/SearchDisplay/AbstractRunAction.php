@@ -4,7 +4,6 @@ namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Query\SqlField;
-use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 
@@ -90,13 +89,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @throws \CRM_Core_Exception
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
-    // Only SearchKit admins can use this in unsecured "preview mode"
-    if (
-      (is_array($this->savedSearch) || is_array($this->display)) && $this->checkPermissions &&
-      !\CRM_Core_Permission::check([['administer CiviCRM data', 'administer search_kit']])
-    ) {
-      throw new UnauthorizedException('Access denied');
-    }
+    $this->checkPermissionToLoadSearch();
     $this->loadSavedSearch();
     $this->loadSearchDisplay();
 
@@ -119,10 +112,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Transforms each row into an array of raw data and an array of formatted columns
    *
-   * @param \Civi\Api4\Generic\Result $result
+   * @param iterable $result
    * @return array{data: array, columns: array}[]
    */
-  protected function formatResult(\Civi\Api4\Generic\Result $result): array {
+  protected function formatResult(iterable $result): array {
     $rows = [];
     $keyName = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
     foreach ($result as $index => $record) {
@@ -619,12 +612,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if ($missingRequiredFields->count() || count($vals) === 1) {
         return NULL;
       }
+      $entityValues = $editable['record'];
     }
     // Ensure current user has access
     if ($editable['record']) {
       $access = civicrm_api4($editable['entity'], 'checkAccess', [
         'action' => $editable['action'],
-        'values' => $editable['record'],
+        'values' => $entityValues,
       ], 0)['access'];
       if ($access) {
         // Remove info that's for internal use only
@@ -813,7 +807,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!$filters) {
       return;
     }
-
+    // Parse comma-separated values from filters passed through afform variables
+    // These values may have come from the url and should be transformed into arrays
+    foreach ($directiveFilters as $key) {
+      if (!empty($filters[$key]) && is_string($filters[$key]) && strpos($filters[$key], ',')) {
+        $filters[$key] = explode(',', $filters[$key]);
+      }
+    }
     // Add all filters to the WHERE or HAVING clause
     foreach ($filters as $key => $value) {
       $fieldNames = explode(',', $key);
@@ -838,7 +838,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $result = [];
     $selectAliases = array_map(function($select) {
       return array_slice(explode(' AS ', $select), -1)[0];
-    }, $this->savedSearch['api_params']['select']);
+    }, $this->_apiParams['select']);
     foreach ($selectAliases as $alias) {
       [$alias] = explode(':', $alias);
       $result[] = $alias;
@@ -893,9 +893,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $apiParams
    */
   protected function augmentSelectClause(&$apiParams): void {
-    $existing = array_map(function($item) {
-      return explode(' AS ', $item)[1] ?? $item;
-    }, $apiParams['select']);
     // Add primary key field if actions are enabled
     // (only needed for non-dao entities, as Api4SelectQuery will auto-add the id)
     if (!in_array('DAOEntity', CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'type')) &&
@@ -1018,15 +1015,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // Force-reset cache so it gets rebuilt with the new select param
       $this->_selectClause = NULL;
     }
-  }
-
-  /**
-   * @param string $str
-   */
-  private function getTokens($str) {
-    $tokens = [];
-    preg_match_all('/\\[([^]]+)\\]/', $str, $tokens);
-    return array_unique($tokens[1]);
   }
 
   /**
@@ -1254,27 +1242,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $values;
-  }
-
-  /**
-   * Loads display if not already an array
-   */
-  private function loadSearchDisplay(): void {
-    // Display name given
-    if (is_string($this->display)) {
-      $this->display = SearchDisplay::get(FALSE)
-        ->setSelect(['*', 'type:name'])
-        ->addWhere('name', '=', $this->display)
-        ->addWhere('saved_search_id', '=', $this->savedSearch['id'])
-        ->execute()->single();
-    }
-    // Null given - use default display
-    elseif (is_null($this->display)) {
-      $this->display = SearchDisplay::getDefault(FALSE)
-        ->addSelect('*', 'type:name')
-        ->setSavedSearch($this->savedSearch)
-        ->execute()->first();
-    }
   }
 
 }

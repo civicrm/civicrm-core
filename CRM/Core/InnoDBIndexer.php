@@ -163,7 +163,7 @@ class CRM_Core_InnoDBIndexer {
     $dao = CRM_Core_DAO::executeQuery("
   SELECT index_name as index_name
   FROM information_Schema.STATISTICS
-  WHERE table_schema = '" . CRM_Core_DAO::getDatabaseName() . "'
+  WHERE table_schema = DATABASE()
     AND table_name = '$table'
     AND index_type = 'FULLTEXT'
   GROUP BY index_name

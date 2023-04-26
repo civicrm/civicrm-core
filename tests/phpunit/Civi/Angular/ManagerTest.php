@@ -30,8 +30,8 @@ class ManagerTest extends \CiviUnitTestCase {
    * @inheritDoc
    */
   protected function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->createLoggedInUser();
     $this->res = \CRM_Core_Resources::singleton();
     $this->angular = new Manager($this->res);
@@ -57,14 +57,14 @@ class ManagerTest extends \CiviUnitTestCase {
       if (isset($module['js'])) {
         $this->assertTrue(is_array($module['js']));
         foreach ($module['js'] as $file) {
-          $this->assertTrue(file_exists($this->res->getPath($module['ext'], $file)));
+          $this->assertTrue(file_exists($this->res->getPath($module['ext'], $file)), "File '$file' not found for " . $module['ext']);
           $counts['js']++;
         }
       }
       if (isset($module['css'])) {
         $this->assertTrue(is_array($module['css']));
         foreach ($module['css'] as $file) {
-          $this->assertTrue(file_exists($this->res->getPath($module['ext'], $file)));
+          $this->assertTrue(file_exists($this->res->getPath($module['ext'], $file)), "File '$file' not found for " . $module['ext']);
           $counts['css']++;
         }
       }

@@ -19,8 +19,6 @@ class api_v3_EntityBatchTest extends CiviUnitTestCase {
   protected $id;
   protected $_entity;
 
-  public $DBResetRequired = FALSE;
-
   /**
    * @throws \CRM_Core_Exception
    */

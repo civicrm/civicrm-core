@@ -71,7 +71,7 @@ trait DataTypeSpecTrait {
     }
 
     if (!in_array($dataType, $this->getValidDataTypes())) {
-      throw new \CRM_Core_Exception(sprintf('Invalid data type "%s', $dataType));
+      throw new \CRM_Core_Exception(sprintf('Invalid data type "%s"', $dataType));
     }
 
     $this->dataType = $dataType;

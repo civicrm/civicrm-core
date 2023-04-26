@@ -34,7 +34,7 @@
           {if !empty($membershipTypes)}
             {foreach from=$membershipTypes item=row}
               {if array_key_exists( 'current_membership', $row )}
-                <div id='help'>
+                <div class='help'>
                   {* Lifetime memberships have no end-date so current_membership array key exists but is NULL *}
                   {if $row.current_membership}
                     {if $row.current_membership|crmDate:"%Y%m%d" LT $smarty.now|crmDate:"%Y%m%d"}

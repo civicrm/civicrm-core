@@ -1,4 +1,4 @@
-INSERT IGNORE INTO `civicrm_mapping` (`id`, `name`, `description`, `mapping_type_id`) VALUES (315, NULL, NULL, NULL);
+INSERT IGNORE INTO `civicrm_mapping` (`id`, `name`, `description`, `mapping_type_id`) VALUES (315, 'test_315', NULL, NULL);
 
 INSERT IGNORE INTO `civicrm_mapping_field` (`id`, `mapping_id`, `name`, `contact_type`, `column_number`, `location_type_id`, `phone_type_id`, `im_provider_id`, `relationship_type_id`, `relationship_direction`, `grouping`, `operator`, `value`, `website_type_id`) VALUES (7455, 315, 'email', 'Individual', 0, 5, NULL, NULL, NULL, NULL, 1, 'IS NOT EMPTY', '', NULL);
 INSERT IGNORE INTO `civicrm_mapping_field` (`id`, `mapping_id`, `name`, `contact_type`, `column_number`, `location_type_id`, `phone_type_id`, `im_provider_id`, `relationship_type_id`, `relationship_direction`, `grouping`, `operator`, `value`, `website_type_id`) VALUES (7456, 315, 'do_not_email', 'Individual', 1, NULL, NULL, NULL, NULL, NULL, 1, '=', '0', NULL);

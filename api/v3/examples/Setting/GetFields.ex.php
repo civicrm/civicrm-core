@@ -3256,31 +3256,6 @@ function setting_getfields_expectedresult() {
           '0' => 'financialacls_toggle',
         ],
       ],
-      'flexmailer_traditional' => [
-        'group_name' => 'Flexmailer Preferences',
-        'group' => 'flexmailer',
-        'name' => 'flexmailer_traditional',
-        'type' => 'String',
-        'html_type' => 'select',
-        'html_attributes' => [
-          'class' => 'crm-select2',
-        ],
-        'pseudoconstant' => [
-          'callback' => '_flexmailer_traditional_options',
-        ],
-        'default' => 'auto',
-        'add' => '5.13',
-        'title' => 'Traditional Mailing Handler',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'For greater backward-compatibility, process \"<code>traditional</code>\" mailings with the CiviMail\'s hard-coded BAO.<br/>For greater forward-compatibility, process \"<code>traditional</code>\" mailings with Flexmailer\'s extensible pipeline.',
-        'help_text' => '',
-        'settings_pages' => [
-          'flexmailer' => [
-            'weight' => 5,
-          ],
-        ],
-      ],
       'recaptchaPublicKey' => [
         'group_name' => 'CiviCRM Preferences',
         'group' => 'core',
@@ -3343,30 +3318,6 @@ function setting_getfields_expectedresult() {
         'default' => 0,
         'title' => 'Force reCAPTCHA on Contribution pages',
         'description' => 'If enabled, reCAPTCHA will show on all contribution pages.',
-        'settings_pages' => [
-          'recaptcha' => [
-            'weight' => 10,
-          ],
-        ],
-      ],
-      'recaptchaOptions' => [
-        'group_name' => 'CiviCRM Preferences',
-        'group' => 'core',
-        'name' => 'recaptchaOptions',
-        'type' => 'String',
-        'quick_form_type' => 'Element',
-        'html_attributes' => [
-          'size' => 64,
-          'maxlength' => 64,
-        ],
-        'html_type' => 'text',
-        'default' => '',
-        'add' => '4.3',
-        'title' => 'reCAPTCHA Options',
-        'is_domain' => 1,
-        'is_contact' => 0,
-        'description' => 'You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:\'blackglass\', lang : \'fr\' ). Check the available options at <a href=\"https://developers.google.com/recaptcha/docs/display#config\">Customizing the Look and Feel of reCAPTCHA</a>.',
-        'help_text' => '',
         'settings_pages' => [
           'recaptcha' => [
             'weight' => 10,

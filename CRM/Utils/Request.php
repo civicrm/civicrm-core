@@ -69,7 +69,7 @@ class CRM_Utils_Request {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
+  public static function retrieve($name, $type, $store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
 
     $value = NULL;
     switch ($method) {
@@ -130,7 +130,7 @@ class CRM_Utils_Request {
       return $method[$name];
     }
     // CRM-18384 - decode incorrect keys generated when &amp; is present in url
-    foreach ($method as $key => $value) {
+    foreach (($method ?? []) as $key => $value) {
       if (strpos($key, 'amp;') !== FALSE) {
         $method[str_replace('amp;', '', $key)] = $method[$key];
         if (isset($method[$name])) {

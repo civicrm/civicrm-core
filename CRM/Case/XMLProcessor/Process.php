@@ -78,7 +78,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param $xml
+   * @param SimpleXMLElement $xml
    * @param array $params
    *
    * @throws Exception

@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\Api4\Generic\Traits\SavedSearchInspectorTrait;
 use CRM_Search_ExtensionUtil as E;
 use Civi\Api4\Entity;
 
@@ -11,6 +12,14 @@ use Civi\Api4\Entity;
  * @package Civi\Api4\Action\SearchDisplay
  */
 class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
+
+  use SavedSearchInspectorTrait;
+
+  /**
+   * An array containing the searchDisplay definition
+   * @var string|array
+   */
+  protected $display;
 
   /**
    * Name of entity
@@ -27,12 +36,19 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     // Adding checkPermissions filters out actions the user is not allowed to perform
     $entity = Entity::get($this->checkPermissions)->addWhere('name', '=', $this->entity)
       ->addSelect('name', 'title_plural')
-      ->setChain(['actions' => ['$name', 'getActions', ['where' => [['name', 'IN', ['update', 'delete']]]], 'name']])
+      ->setChain([
+        'actions' => ['$name', 'getActions', ['where' => [['name', 'IN', ['update', 'delete']]]], 'name'],
+        'fields' => ['$name', 'getFields', ['where' => [['deprecated', '=', FALSE], ['type', '=', 'Field']]], 'name'],
+      ])
       ->execute()->first();
 
     if (!$entity) {
       return;
     }
+
+    $this->loadSavedSearch();
+    $this->loadSearchDisplay();
+
     $tasks = [$entity['name'] => []];
 
     if (array_key_exists($entity['name'], \CRM_Export_BAO_Export::getComponents())) {
@@ -64,6 +80,33 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'icon' => 'fa-save',
         'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskUpdate.html'],
       ];
+
+      // Enable/disable are basically shortcut update actions
+      if (isset($entity['fields']['is_active'])) {
+        $tasks[$entity['name']]['enable'] = [
+          'title' => E::ts('Enable %1', [1 => $entity['title_plural']]),
+          'icon' => 'fa-toggle-on',
+          'apiBatch' => [
+            'action' => 'update',
+            'params' => ['values' => ['is_active' => TRUE]],
+            'runMsg' => E::ts('Enabling %1 %2...'),
+            'successMsg' => E::ts('Successfully enabled %1 %2.'),
+            'errorMsg' => E::ts('An error occurred while attempting to enable %1 %2.'),
+          ],
+        ];
+        $tasks[$entity['name']]['disable'] = [
+          'title' => E::ts('Disable %1', [1 => $entity['title_plural']]),
+          'icon' => 'fa-toggle-off',
+          'apiBatch' => [
+            'action' => 'update',
+            'params' => ['values' => ['is_active' => FALSE]],
+            'confirmMsg' => E::ts('Are you sure you want to disable %1 %2?'),
+            'runMsg' => E::ts('Disabling %1 %2...'),
+            'successMsg' => E::ts('Successfully disabled %1 %2.'),
+            'errorMsg' => E::ts('An error occurred while attempting to disable %1 %2.'),
+          ],
+        ];
+      }
 
       $taggable = \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
       if (in_array($entity['name'], $taggable, TRUE)) {
@@ -108,10 +151,14 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
             $task['title'] = E::ts('Profile Update');
           }
           $key = \CRM_Core_Key::get(\CRM_Utils_Array::first((array) $task['class']), TRUE);
+
+          // Print Labels action does not support popups, open full-screen
+          $actionType = $id == \CRM_Core_Task::LABEL_CONTACTS ? 'redirect' : 'crmPopup';
+
           $tasks[$entity['name']]['contact.' . $id] = [
             'title' => $task['title'],
             'icon' => $task['icon'] ?? 'fa-gear',
-            'crmPopup' => [
+            $actionType => [
               'path' => "'{$task['url']}'",
               'query' => "{reset: 1}",
               'data' => "{cids: ids.join(','), qfKey: '$key'}",
@@ -159,19 +206,21 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       }
     }
 
-    // Call `hook_civicrm_searchKitTasks`.
-    // Note - this hook serves 2 purposes, both to augment this list of tasks AND to
-    // get a full list of Angular modules which provide tasks. That's why this hook needs
-    // the base-level array and not just the array of tasks for `$this->entity`.
-    // Although it may seem wasteful to have extensions add tasks for all possible entities and then
-    // discard most of it (all but the ones relevant to `$this->entity`), it's necessary to do it this way
-    // so that they can be declared as angular dependencies - see search_kit_civicrm_angularModules().
+    // Call `hook_civicrm_searchKitTasks` which serves 3 purposes:
+    // 1. For extensions to augment this list of tasks
+    // 2. To allow tasks to be added/removed per search display
+    //    Note: Use Events::W_LATE to do so after the tasks are filtered per search-display settings.
+    // 3. To get a full list of Angular modules which provide tasks.
+    //    Note: That's why this hook needs the base-level array and not just the array of tasks for `$this->entity`.
+    //    Although it may seem wasteful to have extensions add tasks for all possible entities and then
+    //    discard most of it (all but the ones relevant to `$this->entity`), it's necessary to do it this way
+    //    so that they can be declared as angular dependencies - see search_kit_civicrm_angularModules().
     $null = NULL;
     $checkPermissions = $this->checkPermissions;
     $userId = $this->checkPermissions ? \CRM_Core_Session::getLoggedInContactID() : NULL;
-    \CRM_Utils_Hook::singleton()->invoke(['tasks', 'checkPermissions', 'userId'],
+    \CRM_Utils_Hook::singleton()->invoke(['tasks', 'checkPermissions', 'userId', 'search', 'display'],
       $tasks, $checkPermissions, $userId,
-      $null, $null, $null, 'civicrm_searchKitTasks'
+      $this->savedSearch, $this->display, $null, 'civicrm_searchKitTasks'
     );
 
     foreach ($tasks[$entity['name']] as $name => &$task) {
@@ -187,7 +236,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     $result->exchangeArray($tasks[$entity['name']]);
   }
 
-  public static function fields() {
+  public static function fields(): array {
     return [
       [
         'name' => 'name',

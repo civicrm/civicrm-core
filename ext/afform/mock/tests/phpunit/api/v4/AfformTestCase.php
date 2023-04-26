@@ -14,8 +14,7 @@ abstract class api_v4_AfformTestCase extends \PHPUnit\Framework\TestCase impleme
    */
   public function setUpHeadless() {
     return \Civi\Test::headless()
-      ->install(version_compare(CRM_Utils_System::version(), '5.19.alpha1', '<') ? ['org.civicrm.api4'] : [])
-      ->install(['org.civicrm.afform', 'org.civicrm.afform-mock'])
+      ->install(['org.civicrm.search_kit', 'org.civicrm.afform', 'org.civicrm.afform-mock'])
       ->apply();
   }
 

@@ -7,6 +7,11 @@
 class CRM_Extension_Manager_ModuleUpgTest extends CiviUnitTestCase {
 
   /**
+   * @var string
+   */
+  protected $basedir;
+
+  /**
    * @var \CRM_Extension_System
    */
   protected $system;

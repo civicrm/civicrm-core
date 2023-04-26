@@ -93,7 +93,6 @@ function mailing_gettokens_expectedresult() {
       '{contact.image_URL}' => 'Image Url',
       '{contact.preferred_communication_method:label}' => 'Preferred Communication Method',
       '{contact.preferred_language:label}' => 'Preferred Language',
-      '{contact.preferred_mail_format:label}' => 'Preferred Mail Format',
       '{contact.hash}' => 'Contact Hash',
       '{contact.source}' => 'Contact Source',
       '{contact.first_name}' => 'First Name',

@@ -280,4 +280,21 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertArrayHasKey('always.on', $participant3Fields);
   }
 
+  public function testFiltersAreReturnedForContactRefFields(): void {
+    $grp = CustomGroup::create(FALSE)
+      ->addValue('extends', 'Activity')
+      ->addValue('title', 'act_test_grp2')
+      ->execute()->single();
+    $field = $this->createTestRecord('CustomField', [
+      'data_type' => 'ContactReference',
+      'html_type' => 'Autocomplete-Select',
+      'custom_group_id' => $grp['id'],
+      'filter' => 'action=get&contact_type=Household&group=2',
+    ]);
+    $getField = Activity::getFields(FALSE)
+      ->addWhere('custom_field_id', '=', $field['id'])
+      ->execute()->single();
+    $this->assertEquals(['contact_type' => 'Household', 'groups' => 2], $getField['input_attrs']['filter']);
+  }
+
 }

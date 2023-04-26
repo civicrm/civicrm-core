@@ -62,7 +62,8 @@ class AfformMetadataInjector {
           // If this fieldset is standalone (not linked to an af-entity) it is for get rather than create
           if ($apiEntities) {
             $action = 'get';
-            $entityType = self::getFieldEntityType($afField->getAttribute('name'), \CRM_Utils_JS::decode($apiEntities));
+            $entityList = \CRM_Utils_JS::decode(htmlspecialchars_decode($apiEntities));
+            $entityType = self::getFieldEntityType($afField->getAttribute('name'), $entityList);
           }
           else {
             $entityName = pq($fieldset)->attr('af-fieldset');
@@ -124,7 +125,7 @@ class AfformMetadataInjector {
     if ($inputType === 'Select' || $inputType === 'ChainSelect') {
       $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');
     }
-    elseif ($inputType === 'EntityRef') {
+    elseif ($inputType === 'EntityRef' && empty($field['is_id'])) {
       $info = civicrm_api4('Entity', 'get', [
         'where' => [['name', '=', $fieldInfo['fk_entity']]],
         'checkPermissions' => FALSE,
@@ -156,7 +157,7 @@ class AfformMetadataInjector {
         $fieldDefn[$name] = \CRM_Utils_JS::encode($prop);
       }
     }
-    pq($afField)->attr('defn', htmlspecialchars(\CRM_Utils_JS::writeObject($fieldDefn)));
+    pq($afField)->attr('defn', htmlspecialchars(\CRM_Utils_JS::writeObject($fieldDefn), ENT_COMPAT));
   }
 
   /**

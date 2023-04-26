@@ -21,8 +21,8 @@ use Civi\Test\Invasive;
 class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
 
   protected function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**

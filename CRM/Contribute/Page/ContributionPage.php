@@ -694,7 +694,7 @@ ORDER BY UPPER(LEFT(title, 1))
         if (isset($link['class'])) {
           $classes = $link['class'];
         }
-        $link['class'] = array_merge($classes, array('disabled'));
+        $link['class'] = array_merge($classes, array('crm-disabled'));
       }
     }
 

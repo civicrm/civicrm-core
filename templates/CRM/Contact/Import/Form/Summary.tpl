@@ -14,11 +14,18 @@
 
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
-<div class="help">
-    <p>
-      <strong>{ts}Import has completed successfully.{/ts}</strong>
-    {if $outputUnavailable}{ts}Detailed information is no longer available.{/ts}{else}{ts}The information below summarizes the results.{/ts}{/if}
-    </p>
+ <div class="help">
+   <p>
+     {if $unprocessedRowCount}
+       <strong>{ts}The import is still processing.{/ts}</strong>
+     {else}
+       <strong>{ts}Import has completed successfully.{/ts}</strong>
+     {/if}
+   </p>
+   {if $templateURL}
+     <p>
+       {ts 1=$templateURL|smarty:nodefaults}You can re-use this import configuration <a href="%1">here</a>{/ts}</p>
+   {/if}
 
    {if $unMatchCount}
         <p class="error">
@@ -34,7 +41,7 @@
         {ts count=$invalidRowCount plural='CiviCRM has detected invalid data and/or formatting errors in %count records. These records have not been imported.'}CiviCRM has detected invalid data and/or formatting errors in one record. This record has not been imported.{/ts}
         </p>
         <p class="error">
-        {ts 1=$downloadErrorRecordsUrl|smarty:nodefaults}You can <a href='%1'>Download Errors</a>. You may then correct them, and import the new file with the corrected data.{/ts}
+        {ts 1=$downloadErrorRecordsUrl|smarty:nodefaults}You can <a href='%1'>See the errors</a>. You may then correct them, and re-import with the corrected data.{/ts}
         </p>
     {/if}
 
@@ -58,15 +65,21 @@
   {* Summary of Import Results (record counts) *}
   <table id="summary-counts" class="report">
     <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
-      <td class="data">{$totalRowCount}</td>
+      <td class="data">{if $allRowsUrl} <a href="{$allRowsUrl}" target="_blank" rel="noopener noreferrer">{$totalRowCount}</a>{else}{$totalRowCount}{/if}</td>
       <td class="explanation">{ts}Total number of rows in the imported data.{/ts}</td>
     </tr>
+    {if $unprocessedRowCount}
+      <tr><td class="label crm-grid-cell">{ts}Rows Still processing{/ts}</td>
+        <td class="data">{$unprocessedRowCount}</td>
+        <td class="explanation">{ts}Rows still being processed.{/ts}</td>
+      </tr>
+    {/if}
 
     {if $invalidRowCount}
       <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields (for example, invalid email address formatting). These rows will be skipped (not imported).{/ts}
-          <div class="action-link"><a href="{$downloadErrorRecordsUrl|smarty:nodefaults}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
+          <div class="action-link"><a href="{$downloadErrorRecordsUrl|smarty:nodefaults}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}See Errors{/ts}</a></div>
         </td>
       </tr>
     {/if}
@@ -91,7 +104,7 @@
 
     <tr>
       <td class="label crm-grid-cell">{ts}Total Rows Imported{/ts}</td>
-      <td class="data">{$validRowCount}</td>
+      <td class="data">{if $importedRowsUrl} <a href="{$importedRowsUrl}" target="_blank" rel="noopener noreferrer">{$importedRowCount}</a>{else}{$importedRowCount}{/if}</td>
       <td class="explanation">{ts}Total number of primary records created or modified during the import.{/ts}</td>
     </tr>
     {foreach from=$trackingSummary item="summaryRow"}

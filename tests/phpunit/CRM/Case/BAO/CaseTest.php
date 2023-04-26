@@ -6,28 +6,28 @@
  */
 class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
+  const TABLES_TO_TRUNCATE = [
+    'civicrm_activity',
+    'civicrm_group_contact',
+    'civicrm_contact',
+    'civicrm_custom_group',
+    'civicrm_custom_field',
+    'civicrm_case',
+    'civicrm_case_contact',
+    'civicrm_case_activity',
+    'civicrm_case_type',
+    'civicrm_file',
+    'civicrm_entity_file',
+    'civicrm_activity_contact',
+    'civicrm_managed',
+    'civicrm_relationship',
+    'civicrm_relationship_type',
+  ];
+
   public function setUp(): void {
     parent::setUp();
 
-    $this->tablesToTruncate = [
-      'civicrm_activity',
-      'civicrm_group_contact',
-      'civicrm_contact',
-      'civicrm_custom_group',
-      'civicrm_custom_field',
-      'civicrm_case',
-      'civicrm_case_contact',
-      'civicrm_case_activity',
-      'civicrm_case_type',
-      'civicrm_file',
-      'civicrm_entity_file',
-      'civicrm_activity_contact',
-      'civicrm_managed',
-      'civicrm_relationship',
-      'civicrm_relationship_type',
-    ];
-
-    $this->quickCleanup($this->tablesToTruncate);
+    $this->quickCleanup(self::TABLES_TO_TRUNCATE);
 
     $this->loadAllFixtures();
 
@@ -60,16 +60,17 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   }
 
   protected function tearDown(): void {
-    $this->quickCleanup($this->tablesToTruncate, TRUE);
+    $this->quickCleanup(self::TABLES_TO_TRUNCATE, TRUE);
     parent::tearDown();
   }
 
   public function testAddCaseToContact() {
+    $this->createLoggedInUser();
     $params = [
       'case_id' => 1,
       'contact_id' => 17,
     ];
-    CRM_Case_BAO_CaseContact::create($params);
+    CRM_Case_BAO_CaseContact::writeRecord($params);
 
     $recent = CRM_Utils_Recent::get();
     $this->assertEquals('Test Contact - Housing Support', $recent[0]['title']);
@@ -1375,6 +1376,31 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
         $this->fail("Contact id {$contacts[$i]['id']} not found in list");
       }
     }
+  }
+
+  /**
+   * Test that if there's only recently performed activities in the system
+   * and no future ones then it still shows on dashboard.
+   */
+  public function testOnlyRecent() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate([], 0, TRUE);
+    // old start date so there's no upcoming
+    $caseObj = $this->createCase($clientId, $loggedInUserId, ['start_date' => date('Y-m-d', strtotime('-2 years'))]);
+    // quickie hack to make them all completed
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_case_activity ca INNER JOIN civicrm_activity a ON a.id = ca.activity_id SET a.status_id = 2 WHERE ca.case_id = %1", [1 => [$caseObj->id, 'Integer']]);
+    // Add a recent one
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $loggedInUserId,
+      'target_contact_id' => $clientId,
+      'activity_type_id' => 'Follow up',
+      'status_id' => 'Completed',
+      'activity_date_time' => date('Y-m-d H:i:s', strtotime('-2 days')),
+      'subject' => 'backdated',
+      'case_id' => $caseObj->id,
+    ]);
+    $this->assertEquals(0, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'upcoming'], 'dashboard', TRUE));
+    $this->assertEquals(1, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'recent'], 'dashboard', TRUE));
   }
 
 }

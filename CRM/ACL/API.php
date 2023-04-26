@@ -140,7 +140,7 @@ class CRM_ACL_API {
    *
    * @param string $tableName
    * @param array|null $allGroups
-   * @param array|null $includedGroups
+   * @param array $includedGroups
    *
    * @return array
    *   the ids of the groups for which the user has permissions
@@ -150,8 +150,12 @@ class CRM_ACL_API {
     $contactID = NULL,
     $tableName = 'civicrm_saved_search',
     $allGroups = NULL,
-    $includedGroups = NULL
+    $includedGroups = []
   ) {
+    if (!is_array($includedGroups)) {
+      CRM_Core_Error::deprecatedWarning('pass an array for included groups');
+      $includedGroups = (array) $includedGroups;
+    }
     if ($contactID == NULL) {
       $contactID = CRM_Core_Session::getLoggedInContactID();
     }
@@ -192,7 +196,7 @@ class CRM_ACL_API {
 
     $key = "{$tableName}_{$type}_{$contactID}";
     if (!array_key_exists($key, Civi::$statics[__CLASS__]['group_permission'])) {
-      Civi::$statics[__CLASS__]['group_permission'][$key] = self::group($type, $contactID, $tableName, $allGroups, $includedGroups);
+      Civi::$statics[__CLASS__]['group_permission'][$key] = self::group($type, $contactID, $tableName, $allGroups, $includedGroups ?? []);
     }
 
     return in_array($groupID, Civi::$statics[__CLASS__]['group_permission'][$key]);

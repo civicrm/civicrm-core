@@ -20,8 +20,6 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   protected $params;
   protected $_entity = 'ContributionRecur';
 
-  public $DBResetRequired = FALSE;
-
   /**
    * @throws \CRM_Core_Exception
    */

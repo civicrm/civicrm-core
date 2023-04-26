@@ -46,7 +46,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    *
    * @var string
    */
-  protected $_permission;
+  public $_permission;
 
   /**
    * Heart of the viewing process.

@@ -32,6 +32,8 @@ use Civi\Api4\Utils\CoreUtil;
  */
 class BasicGetFieldsAction extends BasicGetAction {
 
+  use Traits\GetSetValueTrait;
+
   /**
    * Fetch option lists for fields?
    *
@@ -175,37 +177,7 @@ class BasicGetFieldsAction extends BasicGetAction {
         throw new \CRM_Core_Exception('Unsupported pseudoconstant type for field "' . $field['name'] . '"');
       }
     }
-    if (!$field['options'] || !is_array($field['options'])) {
-      return;
-    }
-
-    $formatted = [];
-    $first = reset($field['options']);
-    // Flat array requested
-    if ($this->loadOptions === TRUE) {
-      // Convert non-associative to flat array
-      if (is_array($first) && isset($first['id'])) {
-        foreach ($field['options'] as $option) {
-          $formatted[$option['id']] = $option['label'] ?? $option['name'] ?? $option['id'];
-        }
-        $field['options'] = $formatted;
-      }
-    }
-    // Non-associative array of multiple properties requested
-    else {
-      foreach ($field['options'] as $id => $option) {
-        // Transform a flat list
-        if (!is_array($option)) {
-          $option = [
-            'id' => $id,
-            'name' => $id,
-            'label' => $option,
-          ];
-        }
-        $formatted[] = array_intersect_key($option, array_flip($this->loadOptions));
-      }
-      $field['options'] = $formatted;
-    }
+    $field['options'] = CoreUtil::formatOptionList($field['options'], $this->loadOptions);
   }
 
   /**
@@ -234,17 +206,6 @@ class BasicGetFieldsAction extends BasicGetAction {
       'replace' => 'create',
     ];
     return $sub[$this->action] ?? $this->action;
-  }
-
-  /**
-   * Add an item to the values array
-   * @param string $fieldName
-   * @param mixed $value
-   * @return $this
-   */
-  public function addValue(string $fieldName, $value) {
-    $this->values[$fieldName] = $value;
-    return $this;
   }
 
   /**
@@ -386,9 +347,19 @@ class BasicGetFieldsAction extends BasicGetAction {
         'data_type' => 'String',
       ],
       [
+        'name' => 'localizable',
+        'data_type' => 'Boolean',
+        'default_value' => FALSE,
+      ],
+      [
         'name' => 'readonly',
         'data_type' => 'Boolean',
         'description' => 'True for auto-increment, calculated, or otherwise non-editable fields.',
+        'default_value' => FALSE,
+      ],
+      [
+        'name' => 'deprecated',
+        'data_type' => 'Boolean',
         'default_value' => FALSE,
       ],
       [

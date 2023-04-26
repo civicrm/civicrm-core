@@ -1,5 +1,5 @@
 <?php
-namespace Civi\Afform\behavior;
+namespace Civi\Afform\Behavior;
 
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformSubmitEvent;

@@ -120,10 +120,23 @@
           {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
-              {if $frequency_interval > 1}
-                <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
+              {if $installments > 1}
+                {if $frequency_interval > 1}
+                  <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
+                {else}
+                  <strong>{ts 1=$frequency_unit}This membership will be renewed automatically every %1.{/ts}</strong>
+                {/if}
               {else}
-                <strong>{ts 1=$frequency_unit}This membership will be renewed automatically every %1.{/ts}</strong>
+                  {* dev/translation#80 All 'every %1' strings are incorrectly using ts, but focusing on the most important one until we find a better fix. *}
+                  {if $frequency_unit eq 'day'}
+                    <strong>{ts}This membership will be renewed automatically every day.{/ts}</strong>
+                  {elseif $frequency_unit eq 'week'}
+                    <strong>{ts}This membership will be renewed automatically every week.{/ts}</strong>
+                  {elseif $frequency_unit eq 'month'}
+                    <strong>{ts}This membership will be renewed automatically every month.{/ts}</strong>
+                  {elseif $frequency_unit eq 'year'}
+                    <strong>{ts}This membership will be renewed automatically every year.{/ts}</strong>
+                  {/if}
               {/if}
               <div class="description crm-auto-renew-cancel-info">({ts}You will receive an email receipt which includes information about how to cancel the auto-renewal option.{/ts})</div>
             {/crmRegion}
@@ -268,7 +281,7 @@
     {/if}
   {/if}
 
-  {if $contributeMode eq 'direct' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 )}
+  {if in_array('credit_card_number', $form) || in_array('bank_account_number', $form) && ($amount GT 0 OR $minimum_fee GT 0)}
     {crmRegion name="contribution-thankyou-billing-block"}
       <div class="crm-group credit_card-group">
         {if $paymentFieldsetLabel}
@@ -276,7 +289,7 @@
             {$paymentFieldsetLabel}
           </div>
         {/if}
-        {if $paymentProcessor.payment_type == 2}
+          {if in_array('bank_account_number', $form) && $bank_account_number}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br />
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br />

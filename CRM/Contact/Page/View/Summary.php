@@ -208,12 +208,12 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $defaults['privacy_values'] = CRM_Core_SelectValues::privacy();
 
     //Show blocks only if they are visible in edit form
-    $this->_editOptions = CRM_Core_BAO_Setting::valueOptions(
+    $editOptions = CRM_Core_BAO_Setting::valueOptions(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'contact_edit_options'
     );
 
-    foreach ($this->_editOptions as $blockName => $value) {
+    foreach ($editOptions as $blockName => $value) {
       $varName = '_show' . $blockName;
       $this->$varName = $value;
       $this->assign(substr($varName, 1), $this->$varName);
@@ -250,7 +250,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $changeLog = $this->_viewOptions['log'];
     $this->assign_by_ref('changeLog', $changeLog);
 
-    $this->assign('allTabs', $this->getTabs());
+    $this->assign('allTabs', $this->getTabs($defaults));
 
     // hook for contact summary
     // ignored but needed to prevent warnings
@@ -342,7 +342,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function getTabs() {
+  public function getTabs(array $contact) {
     $allTabs = [];
     $getCountParams = [];
     $weight = 10;
@@ -418,8 +418,20 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     // Allow other modules to add or remove tabs
-    $context = ['contact_id' => $this->_contactId];
+    $context = [
+      'contact_id' => $contact['id'],
+      'contact_type' => $contact['contact_type'],
+      'contact_sub_type' => CRM_Utils_Array::explodePadded($contact['contact_sub_type'] ?? NULL),
+    ];
     CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
+
+    // Remove any tabs that don't apply to this contact type
+    foreach (array_keys($allTabs) as $key) {
+      $tabContactType = (array) ($allTabs[$key]['contact_type'] ?? []);
+      if ($tabContactType && !in_array($contact['contact_type'], $tabContactType, TRUE)) {
+        unset($allTabs[$key]);
+      }
+    }
 
     $expectedKeys = ['count', 'class', 'template', 'hideCount', 'icon'];
 

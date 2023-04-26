@@ -16,10 +16,18 @@
  */
 class CRM_Mailing_MailStore {
   /**
-   * flag to decide whether to print debug messages
+   * Flag to decide whether to print debug messages
+   *
    * @var bool
    */
   public $_debug = FALSE;
+
+  /**
+   * Holds the underlying mailbox transport implementation
+   *
+   * @var ezcMailImapTransport|ezcMailMboxTransport|ezcMailPop3Transport|null
+   */
+  protected $_transport;
 
   /**
    * Return the proper mail store implementation, based on config settings.

@@ -34,7 +34,7 @@ function civicrm_api3_mailing_event_queue_create($params) {
     ['job_id', 'contact_id'],
     FALSE
   );
-  return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params, 'MailingEventQueue');
+  return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_MailingEventQueue', $params, 'MailingEventQueue');
 }
 
 /**
@@ -45,7 +45,7 @@ function civicrm_api3_mailing_event_queue_create($params) {
  * @return array
  */
 function civicrm_api3_mailing_event_queue_get($params) {
-  return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_Queue', $params);
+  return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_MailingEventQueue', $params);
 }
 
 /**
@@ -57,7 +57,7 @@ function civicrm_api3_mailing_event_queue_get($params) {
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_mailing_event_queue_delete($params) {
-  return _civicrm_api3_basic_delete('CRM_Mailing_Event_BAO_Queue', $params);
+  return _civicrm_api3_basic_delete('CRM_Mailing_Event_BAO_MailingEventQueue', $params);
 }
 
 /**

@@ -35,7 +35,7 @@
   <div id="crm-container" class="crm-container crm-public" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
   {/if}
 
-  {if $isDuplicate and ( ($action eq 1 and $mode eq 4 ) or ($action eq 2) or ($action eq 8192) ) }
+  {if $showSaveDuplicateButton}
     <div class="crm-submit-buttons">
       {$form._qf_Edit_upload_duplicate.html}
     </div>
@@ -44,16 +44,13 @@
     {include file="CRM/Form/body.tpl"}
   {/if}
   {strip}
-    {if $help_pre && $action neq 4}
-      <div class="messages help">{$help_pre}</div>
-    {/if}
 
     {include file="CRM/common/CMSUser.tpl"}
 
     {if $action eq 2 and $multiRecordFieldListing}
       <h1>{ts}Edit Details{/ts}</h1>
       <div class="crm-submit-buttons" style='float:right'>
-      {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
+      {include file="CRM/common/formButtons.tpl" location=''}{if $showSaveDuplicateButton}{$form._qf_Edit_upload_duplicate.html}{/if}
       </div>
     {/if}
 
@@ -97,7 +94,7 @@
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
-        {if $field.options_per_line}
+        {if array_key_exists('options_per_line', $field) && $field.options_per_line}
           <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
             <div class="label">{$form.$n.label}</div>
             <div class="content edit-value">
@@ -204,7 +201,7 @@
         </div>
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
-        {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
+        {include file="CRM/common/formButtons.tpl" location=''}{if $showSaveDuplicateButton}{$form._qf_Edit_upload_duplicate.html}{/if}
         {if $includeCancelButton}
           <a class="button cancel" href="{$cancelURL}">
             <span>
@@ -215,37 +212,15 @@
         {/if}
       </div>
     {/if}
-    {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}
   {/strip}
 
 </div> {* end crm-container div *}
 
-<script type="text/javascript">
-  {if $drupalCms}
-    {literal}
-    if ( document.getElementsByName("cms_create_account")[0].checked ) {
-      cj('#details').show();
-    }
-    else {
-      cj('#details').hide();
-    }
-    {/literal}
-  {/if}
-</script>
 {/if} {* fields array is not empty *}
 {if $multiRecordFieldListing and empty($fields)}
   {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl" showListing=true}
 {/if}
-{if $drupalCms}
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="create_account"
-trigger_value       =""
-target_element_id   ="details"
-target_element_type ="block"
-field_type          ="radio"
-invert              = 0
-}
-{elseif $statusMessage}
+{if $statusMessage}
 <div class="messages status no-popup">
   {icon icon="fa-info-circle"}{/icon}
   {$statusMessage}

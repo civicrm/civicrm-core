@@ -340,6 +340,7 @@ class CRM_Extension_System {
       $extensionRow['path'] = '';
     }
     $extensionRow['status'] = $manager->getStatus($obj->key);
+    $requiredExtensions = $mapper->getKeysByTag('mgmt:required');
 
     switch ($extensionRow['status']) {
       case CRM_Extension_Manager::STATUS_UNINSTALLED:
@@ -370,6 +371,9 @@ class CRM_Extension_System {
     }
     if ($manager->isIncompatible($obj->key)) {
       $extensionRow['statusLabel'] = ts('Obsolete') . ($extensionRow['statusLabel'] ? (' - ' . $extensionRow['statusLabel']) : '');
+    }
+    elseif (in_array($obj->key, $requiredExtensions)) {
+      $extensionRow['statusLabel'] = ts('Required');
     }
     return $extensionRow;
   }

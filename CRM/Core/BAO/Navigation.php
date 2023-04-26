@@ -56,17 +56,13 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_Navigation', $id, 'is_active', $is_active);
   }
 
@@ -320,7 +316,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       if (!isset($b['attributes']['weight'])) {
         $b['attributes']['weight'] = 1000;
       }
-      return $a['attributes']['weight'] - $b['attributes']['weight'];
+      return (int) $a['attributes']['weight'] - (int) $b['attributes']['weight'];
     });
 
     // If any of the $navigations have children, recurse
@@ -898,7 +894,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
         $item['child'] = [
           [
             'attributes' => [
-              'label' => 'CiviCRM Home',
+              'label' => ts('CiviCRM Home'),
               'name' => 'CiviCRM Home',
               'url' => 'civicrm/dashboard?reset=1',
               'weight' => 1,
@@ -906,7 +902,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
           ],
           [
             'attributes' => [
-              'label' => 'Hide Menu',
+              'label' => ts('Hide Menu'),
               'name' => 'Hide Menu',
               'url' => '#hidemenu',
               'weight' => 2,
@@ -914,7 +910,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
           ],
           [
             'attributes' => [
-              'label' => 'Log out',
+              'label' => ts('Log out'),
               'name' => 'Log out',
               'url' => 'civicrm/logout?reset=1',
               'weight' => 3,

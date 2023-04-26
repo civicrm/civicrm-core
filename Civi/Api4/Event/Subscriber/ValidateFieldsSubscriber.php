@@ -21,6 +21,17 @@ use Civi\API\Event\PrepareEvent;
 class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
 
   /**
+   * @return array
+   */
+  public static function getSubscribedEvents() {
+    return [
+      // Validating between W_EARLY and W_MIDDLE allows other event subscribers to
+      // alter params without constraint (only params added W_EARLY will be validated).
+      'civi.api.prepare' => [['onApiPrepare', 50]],
+    ];
+  }
+
+  /**
    * @param \Civi\API\Event\PrepareEvent $event
    * @throws \Exception
    */

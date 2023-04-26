@@ -45,6 +45,21 @@ class CRM_Extension_Browser {
   protected $guzzleClient;
 
   /**
+   * @var string
+   */
+  public $repoUrl;
+
+  /**
+   * @var string
+   */
+  public $indexPath;
+
+  /**
+   * @var array
+   */
+  protected $_remotesDiscovered;
+
+  /**
    * @return \GuzzleHttp\Client
    */
   public function getGuzzleClient(): \GuzzleHttp\Client {

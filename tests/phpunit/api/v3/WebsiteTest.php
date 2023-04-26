@@ -22,8 +22,6 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
   protected $id;
   protected $_entity;
 
-  public $DBResetRequired = FALSE;
-
   public function setUp(): void {
     parent::setUp();
     $this->useTransaction();

@@ -17,7 +17,6 @@
         var rendered = false,
           field = this.field || {};
         ctrl.dateRanges = CRM.crmSearchTasks.dateRanges;
-        ctrl.entity = field.fk_entity || field.entity;
 
         this.ngModel.$render = function() {
           ctrl.value = ctrl.ngModel.$viewValue;
@@ -44,6 +43,19 @@
             ctrl.dateType = 'fixed';
           }
         }
+      };
+
+      this.getFkEntity = function() {
+        return ctrl.field ? ctrl.field.fk_entity || ctrl.field.entity : null;
+      };
+
+      var autocompleteStaticOptions = {
+        Contact: ['user_contact_id'],
+        '': []
+      };
+
+      this.getAutocompleteStaticOptions = function() {
+        return autocompleteStaticOptions[ctrl.getFkEntity() || ''] || autocompleteStaticOptions[''];
       };
 
       this.isMulti = function() {
@@ -130,12 +142,14 @@
           return '~/crmSearchTasks/crmSearchInput/boolean.html';
         }
 
-        if (field.options) {
-          return '~/crmSearchTasks/crmSearchInput/select.html';
-        }
-
-        if ((field.fk_entity || field.name === 'id') && !_.includes(['>', '<', '>=', '<='], ctrl.op)) {
-          return '~/crmSearchTasks/crmSearchInput/entityRef.html';
+        if (!_.includes(['>', '<', '>=', '<='], ctrl.op)) {
+          // Only use option list if the field has a "name" suffix
+          if (field.options && (!field.suffixes || field.suffixes.includes('name'))) {
+            return '~/crmSearchTasks/crmSearchInput/select.html';
+          }
+          if (field.fk_entity || field.name === 'id') {
+            return '~/crmSearchTasks/crmSearchInput/entityRef.html';
+          }
         }
 
         if (field.data_type === 'Integer') {

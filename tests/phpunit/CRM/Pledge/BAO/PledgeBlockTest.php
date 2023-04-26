@@ -18,13 +18,18 @@
 class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 
   /**
+   * @var int
+   */
+  private $contributionPageID;
+
+  /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    */
   protected function setUp(): void {
     parent::setUp();
     $contributionPage = $this->contributionPageCreate();
-    $this->_contributionPageId = $contributionPage['id'];
+    $this->contributionPageID = $contributionPage['id'];
   }
 
   /**
@@ -39,7 +44,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
     ];
 
     $params = [
-      'entity_id' => $this->_contributionPageId,
+      'entity_id' => $this->contributionPageID,
       'entity_table' => 'civicrm_contribution_page',
       'pledge_frequency_unit' => $pledgeFrequencyUnit,
       'max_reminders' => 2,
@@ -73,7 +78,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
     $pledgeFrequencySerialized = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys(array_filter($pledgeFrequencyUnit)));
 
     $params = [
-      'entity_id' => $this->_contributionPageId,
+      'entity_id' => $this->contributionPageID,
       'entity_table' => 'civicrm_contribution_page',
       'pledge_frequency_unit' => $pledgeFrequencyUnit,
       'max_reminders' => 2,
@@ -91,7 +96,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 
     $params = [
       'id' => $pledgeBlock->id,
-      'entity_id' => $this->_contributionPageId,
+      'entity_id' => $this->contributionPageID,
       'entity_table' => 'civicrm_contribution_page',
       'pledge_frequency_unit' => $pledgeFrequencyUnit,
       'max_reminders' => 3,
@@ -122,7 +127,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
     $pledgeFrequencySerialized = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys(array_filter($pledgeFrequencyUnit)));
 
     $params = [
-      'entity_id' => $this->_contributionPageId,
+      'entity_id' => $this->contributionPageID,
       'entity_table' => 'civicrm_contribution_page',
       'pledge_frequency_unit' => $pledgeFrequencyUnit,
       'max_reminders' => 2,
@@ -134,14 +139,14 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 
     // use retrieve() method
     $retrieveParams = [
-      'entity_id' => $this->_contributionPageId,
+      'entity_id' => $this->contributionPageID,
       'entity_table' => 'civicrm_contribution_page',
     ];
     $default = [];
     $retrievePledgeBlock = CRM_Pledge_BAO_PledgeBlock::retrieve($retrieveParams, $default);
 
     // use getPledgeBlock() method
-    $getPledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_contributionPageId);
+    $getPledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->contributionPageID);
 
     // This param is expected to get serialized
     $params['pledge_frequency_unit'] = $pledgeFrequencySerialized;

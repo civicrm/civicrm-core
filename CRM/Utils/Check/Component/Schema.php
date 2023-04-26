@@ -154,7 +154,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
           }
         }
         $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria', ['escape' => 'js']) . '"> <i class="crm-i fa-pencil" aria-hidden="true"></i> </a>';
-        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group', "reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings', ['escape' => 'js']) . '"> <i class="crm-i fa-gear" aria-hidden="true"></i> </a>';
+        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group/edit', "reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings', ['escape' => 'js']) . '"> <i class="crm-i fa-gear" aria-hidden="true"></i> </a>';
         $html .= "<tr><td>{$id} - {$field['title']} </td><td>{$groupEdit} {$groupConfig}</td><td class='disabled'>{$fieldName}</td>";
       }
 
@@ -173,6 +173,41 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       );
       $messages[] = $msg;
     }
+    return $messages;
+  }
+
+  /**
+   * The column 'civicrm_activity.original_id' should not have 'ON DELETE CASCADE'.
+   * It is OK to have 'ON DELETE SET NULL' or to have no constraint.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkOldAcitvityCascade(): array {
+    $messages = [];
+
+    $sql = "SELECT CONSTRAINT_NAME, DELETE_RULE
+      FROM information_schema.referential_constraints
+      WHERE CONSTRAINT_SCHEMA=database() AND TABLE_NAME='civicrm_activity' AND CONSTRAINT_NAME='FK_civicrm_activity_original_id'
+    ";
+    $cascades = CRM_Core_DAO::executeQuery($sql, [], FALSE, NULL, FALSE, FALSE)
+      ->fetchMap('CONSTRAINT_NAME', 'DELETE_RULE');
+    $cascade = $cascades['FK_civicrm_activity_original_id'] ?? NULL;
+    if ($cascade === 'CASCADE') {
+      $docUrl = 'https://civicrm.org/redirect/activities-5.57';
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts(
+          '<p>The table <code>%1</code> includes an incorrect constraint. <a %2>Learn how to fix this.</a>', [
+            1 => 'civicrm_activity',
+            2 => 'target="_blank" href="' . htmlentities($docUrl) . '"',
+          ]
+        ),
+        ts('Schema Error'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+
     return $messages;
   }
 
@@ -214,7 +249,37 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       );
       $msg->addAction(
         ts('Rebuild triggers (also re-builds the phone number function)'),
-        ts('Create missing function now? This may take few minutes.'),
+        ts('Create missing function now? This may take a few minutes.'),
+        'api3',
+        ['System', 'flush', ['triggers' => TRUE]]
+      );
+      return [$msg];
+    }
+    return [];
+  }
+
+  /**
+   * Check the function to populate phone_numeric exists.
+   *
+   * @return array|\CRM_Utils_Check_Message[]
+   */
+  public function checkRelationshipCacheTriggers():array {
+    if (\Civi::settings()->get('logging_no_trigger_permission')) {
+      // The mysql user does not have permission to view whether the trigger exists.
+      return [];
+    }
+    $dao = CRM_Core_DAO::executeQuery("SHOW TRIGGERS WHERE (`Table` = 'civicrm_relationship' OR `Table` = 'civicrm_relationship_type') AND `Statement` LIKE '%civicrm_relationship_cache%';");
+    if ($dao->N !== 3) {
+      $msg = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts("Your database is missing functionality to populate the relationship cache."),
+        ts('Missing Relationship Cache Trigger'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+      $msg->addAction(
+        ts('Rebuild triggers'),
+        ts('Create missing triggers now? This may take a few minutes.'),
         'api3',
         ['System', 'flush', ['triggers' => TRUE]]
       );

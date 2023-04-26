@@ -101,7 +101,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['name', 'label'], $fields['campaign_id']['suffixes']);
   }
 
-  public function testRequiredAndNullable() {
+  public function testRequiredAndNullableAndDeprecated() {
     $actFields = Activity::getFields(FALSE)
       ->setAction('create')
       ->execute()->indexBy('name');
@@ -111,6 +111,8 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertFalse($actFields['activity_type_id']['nullable']);
     $this->assertFalse($actFields['subject']['required']);
     $this->assertTrue($actFields['subject']['nullable']);
+    $this->assertFalse($actFields['subject']['deprecated']);
+    $this->assertTrue($actFields['phone_id']['deprecated']);
   }
 
   public function testGetSuffixes() {
@@ -137,6 +139,13 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('entity_table:name', 'Contact')
       ->execute()->indexBy('name');
     $this->assertEquals('Contact', $tagFields['entity_id']['fk_entity']);
+  }
+
+  public function testFiltersAreReturned(): void {
+    $field = Contact::getFields(FALSE)
+      ->addWhere('name', '=', 'employer_id')
+      ->execute()->single();
+    $this->assertEquals(['contact_type' => 'Organization'], $field['input_attrs']['filter']);
   }
 
 }

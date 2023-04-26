@@ -798,6 +798,9 @@
                     code.short += ' +l ' + (params.limit || '0') + (params.offset ? ('@' + params.offset) : '');
                   }
                   break;
+                case (typeof param === 'boolean'):
+                  code.short += ' ' + key + '=' + (param ? 1 : 0);
+                  break;
                 default:
                   code.short += ' ' + key + '=' + (typeof param === 'string' ? cliFormat(param) : cliFormat(JSON.stringify(param)));
               }
@@ -985,7 +988,11 @@
           break;
 
         case 'php':
-          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2)) + ';', 'php', 1));
+          // Fields marked 'localizable' in the schema should get wrapped in ts() for the php format
+          var localizable = _.pluck(_.filter(_.findWhere(getEntity().actions, {name: $scope.action}).fields, {localizable: true}), 'name') || [];
+          // More field names that probably should be translated
+          localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
+          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable)) + ';', 'php', 1));
           break;
       }
     };
@@ -999,7 +1006,7 @@
     /**
      * Format value to look like php code
      */
-    function phpFormat(val, indent, indentChildren) {
+    function phpFormat(val, indent, indentChildren, localizable) {
       if (typeof val === 'undefined') {
         return '';
       }
@@ -1017,7 +1024,8 @@
           return '[]';
         }
         $.each(val, function(k, v) {
-          ret += (ret ? ', ' : '') + newLine + indent + "'" + k + "' => " + phpFormat(v, indentChild, indentChildren);
+          var ts = localizable && localizable.includes(k) && _.isString(v) ? 'E::ts(' : '';
+          ret += (ret ? ', ' : '') + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizable) + (ts ? ')' : '');
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
@@ -1026,7 +1034,7 @@
           return '[]';
         }
         $.each(val, function(k, v) {
-          ret += (ret ? ', ' : '') + newLine + indent + phpFormat(v, indentChild, indentChildren);
+          ret += (ret ? ', ' : '') + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable);
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
@@ -1226,7 +1234,7 @@
             $el.crmDatepicker('destroy');
           }
           if ($el.is('.select2-container + input')) {
-            $el.crmEntityRef('destroy');
+            $el.crmAutocomplete('destroy');
           }
           $(element).removeData().removeAttr('type').removeAttr('placeholder').show();
         }
@@ -1259,8 +1267,11 @@
                 $el.removeClass('loading').crmSelect2({data: options, multiple: multi});
               });
             } else if (field.fk_entity) {
-              var apiParams = field.id_field ? {id_field: field.id_field} : {};
-              $el.crmEntityRef({entity: field.fk_entity, api: apiParams, select: {multiple: multi}, static: field.fk_entity === 'Contact' ? ['user_contact_id'] : []});
+              $el.crmAutocomplete(field.fk_entity, {fieldName: field.entity + '.' + field.name, key: field.id_field || null}, {
+                multiple: multi,
+                static: field.fk_entity === 'Contact' ? ['user_contact_id'] : [],
+                minimumInputLength: field.fk_entity === 'Contact' ? 1 : 0
+              });
             } else if (dataType === 'Boolean') {
               $el.attr('placeholder', ts('- select -')).crmSelect2({allowClear: false, multiple: multi, placeholder: ts('- select -'), data: [
                 {id: 'true', text: ts('Yes')},
@@ -1444,7 +1455,7 @@
     if (field && suffix) {
       field.pseudoconstant = suffix;
     }
-    // When joining to a 'name' field, value fields should render an appropriate entityRef
+    // When joining to a 'name' field, value fields should render an appropriate autocomplete
     if (field && field.type === 'Field' && field.name === 'name' && _.includes(fieldName, '.')) {
       field.fk_entity = field.entity;
       field.id_field = 'name';

@@ -73,12 +73,20 @@
     <title>Location Type is Active?</title>
     <type>boolean</type>
     <comment>Is this property active?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>1.1</add>
   </field>
   <field>
     <name>is_default</name>
     <title>Default Location Type?</title>
     <type>boolean</type>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <comment>Is this location type the default?</comment>
     <add>1.1</add>
   </field>

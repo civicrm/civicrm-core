@@ -749,18 +749,18 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     //CRM-20431 - Delete group id that matches first mailing id.
     $this->callAPISuccess('Group', 'delete', ['id' => $this->_groupID]);
     $jobId = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingJob', $mail2['id'], 'id', 'mailing_id');
-    $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_Queue', $jobId, 'hash', 'job_id');
-    $queueId = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_Queue', $jobId, 'id', 'job_id');
+    $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_MailingEventQueue', $jobId, 'hash', 'job_id');
+    $queueId = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_MailingEventQueue', $jobId, 'id', 'job_id');
     // This gets the list of groups to unsubscribe but does NOT actually unsubcribe from groups (because return=TRUE)
-    $beforeUnsubscribeGroups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    $beforeUnsubscribeGroups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
     // Assert that there are two groups in the unsubscribe list.
     $this->assertCount(2, $beforeUnsubscribeGroups);
     $this->assertArrayHasKey($groupID3, $beforeUnsubscribeGroups);
     $this->assertArrayHasKey($groupID4, $beforeUnsubscribeGroups);
     // Do the actual unsubscribe
-    CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, FALSE);
+    CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash, FALSE);
     // Assert that there are now no groups in the unsubscribe list.
-    $afterUnsubscribeGroups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    $afterUnsubscribeGroups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
     $this->assertCount(0, $afterUnsubscribeGroups);
   }
 
@@ -1020,13 +1020,13 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $this->assertTrue($dao->fetch());
 
-    $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString('https://civicrm.org', $url);
 
     // Now delete the event queue hashes and see if the tracking still works.
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_event_queue');
 
-    $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString('https://civicrm.org', $url);
 
     // Ensure that Google CSS link is not tracked.
@@ -1056,13 +1056,13 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $this->assertTrue($dao->fetch());
 
-    $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString($unicodeURL, $url);
 
     // Now delete the event queue hashes and see if the tracking still works.
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_event_queue');
 
-    $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString($unicodeURL, $url);
   }
 

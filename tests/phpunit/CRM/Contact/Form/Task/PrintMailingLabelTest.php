@@ -30,9 +30,9 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
     Civi::settings()->set('searchPrimaryDetailsOnly', '0');
 
     $addresses = [];
-    // create non-primary and primary addresses of each contact
+    // Create non-primary and primary addresses of each contact.
     foreach ($contactIDs as $contactID) {
-      // create the non-primary address first
+      // Create the non-primary address first.
       foreach (['non-primary', 'primary'] as $flag) {
         // @TODO: bug - this doesn't affect as if its the first and only address created for a contact then it always consider it as primary
         $isPrimary = ($flag === 'primary');
@@ -59,15 +59,15 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
       }
     }
 
-    $form = new CRM_Contact_Form_Task_Label();
-    $form->_contactIds = $contactIDs;
-    $params = [
+    /** @var CRM_Contact_Form_Task_Label $form */
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Label', [
       'label_name' => 3475,
       'location_type_id' => NULL,
       'do_not_mail' => 1,
-    ];
+    ]);
+    $form->_contactIds = $contactIDs;
     try {
-      $rows = $form->postProcess($params);
+      $rows = $form->postProcess();
       $this->fail('PrematureExitException expected');
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {

@@ -76,18 +76,22 @@ class SqlEquation extends SqlExpression {
   /**
    * Render the expression for insertion into the sql query
    *
-   * @param Civi\Api4\Query\Api4SelectQuery $query
+   * @param \Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
   public function render(Api4SelectQuery $query): string {
     $output = [];
-    foreach ($this->args as $arg) {
+    foreach ($this->args as $i => $arg) {
       // Just an operator
-      if (is_string($arg)) {
+      if ($this->getOperatorType($arg)) {
         $output[] = $arg;
       }
-      // Surround fields with COALESCE to handle null values
-      elseif (is_a($arg, SqlField::class)) {
+      // Surround fields with COALESCE to prevent null values when using arithmetic operators
+      elseif (is_a($arg, SqlField::class) && (
+          $this->getOperatorType($this->args[$i - 1] ?? NULL) === 'arithmetic' ||
+          $this->getOperatorType($this->args[$i + 1] ?? NULL) === 'arithmetic'
+        )
+      ) {
         $output[] = 'COALESCE(' . $arg->render($query) . ', 0)';
       }
       else {
@@ -104,6 +108,25 @@ class SqlEquation extends SqlExpression {
    */
   public function getAlias(): string {
     return $this->alias ?? \CRM_Utils_String::munge(trim($this->expr, ' ()'), '_', 256);
+  }
+
+  /**
+   * Check if an item is an operator and if so what category it belongs to
+   *
+   * @param $item
+   * @return string|null
+   */
+  protected function getOperatorType($item): ?string {
+    if (!is_string($item)) {
+      return NULL;
+    }
+    if (in_array($item, self::$arithmeticOperators, TRUE)) {
+      return 'arithmetic';
+    }
+    if (in_array($item, self::$comparisonOperators, TRUE)) {
+      return 'comparison';
+    }
+    return NULL;
   }
 
   /**

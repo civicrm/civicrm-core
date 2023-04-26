@@ -371,7 +371,7 @@ class CRM_Contact_Page_AJAX {
 SELECT sort_name name, ce.email, cc.id
 FROM   civicrm_email ce INNER JOIN civicrm_contact cc ON cc.id = ce.contact_id
        {$aclFrom}
-WHERE  ce.on_hold = 0 AND cc.is_deceased = 0 AND cc.do_not_email = 0 AND {$queryString}
+WHERE  ce.on_hold = 0 AND cc.is_deceased = 0 AND cc.do_not_email = 0 AND cc.is_deleted = 0 AND {$queryString}
        {$aclWhere}
 LIMIT {$rowCount}
 )";
@@ -483,7 +483,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   public static function buildDedupeRules() {
-    $contactType = CRM_Utils_Request::retrieve('parentId', 'Positive');
+    $contactType = CRM_Utils_Request::retrieve('parentId', 'String');
     $dedupeRules = CRM_Dedupe_BAO_DedupeRuleGroup::getByType($contactType);
 
     CRM_Utils_JSON::output($dedupeRules);

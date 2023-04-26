@@ -49,7 +49,8 @@ function afform_civicrm_config(&$config) {
   Civi::$statics[__FUNCTION__] = 1;
 
   $dispatcher = Civi::dispatcher();
-  $dispatcher->addListener('civi.afform.validate', ['\Civi\Api4\Action\Afform\Submit', 'validateRequiredFields'], 10);
+  $dispatcher->addListener('civi.afform.validate', ['\Civi\Api4\Action\Afform\Submit', 'validateRequiredFields'], 50);
+  $dispatcher->addListener('civi.afform.validate', ['\Civi\Api4\Action\Afform\Submit', 'validateEntityRefFields'], 45);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'processGenericEntity'], 0);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'preprocessContact'], 10);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'processRelationships'], 1);
@@ -57,9 +58,6 @@ function afform_civicrm_config(&$config) {
   $dispatcher->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
   $dispatcher->addListener('hook_civicrm_check', ['\Civi\Afform\StatusChecks', 'hook_civicrm_check']);
   $dispatcher->addListener('civi.afform.get', ['\Civi\Api4\Action\Afform\Get', 'getCustomGroupBlocks']);
-  $dispatcher->addSubscriber(new \Civi\Api4\Subscriber\AutocompleteSubscriber());
-  $dispatcher->addSubscriber(new \Civi\Afform\Behavior\ContactAutofill());
-  $dispatcher->addSubscriber(new \Civi\Afform\Behavior\ContactDedupe());
 
   // Register support for email tokens
   if (CRM_Extension_System::singleton()->getMapper()->isActiveModule('authx')) {
@@ -79,48 +77,12 @@ function afform_civicrm_install() {
 }
 
 /**
- * Implements hook_civicrm_postInstall().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_postInstall
- */
-function afform_civicrm_postInstall() {
-  _afform_civix_civicrm_postInstall();
-}
-
-/**
- * Implements hook_civicrm_uninstall().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
- */
-function afform_civicrm_uninstall() {
-  _afform_civix_civicrm_uninstall();
-}
-
-/**
  * Implements hook_civicrm_enable().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
 function afform_civicrm_enable() {
   _afform_civix_civicrm_enable();
-}
-
-/**
- * Implements hook_civicrm_disable().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_disable
- */
-function afform_civicrm_disable() {
-  _afform_civix_civicrm_disable();
-}
-
-/**
- * Implements hook_civicrm_upgrade().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_upgrade
- */
-function afform_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _afform_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
@@ -216,25 +178,31 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   if ($tabsetName !== 'civicrm/contact/view') {
     return;
   }
+  $contactTypes = array_merge([$context['contact_type']] ?? [], $context['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get(FALSE)
+    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
     ->addWhere('contact_summary', '=', 'tab')
-    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name')
+    ->addOrderBy('title')
     ->execute();
   $weight = 111;
   foreach ($afforms as $afform) {
-    $tabs[] = [
-      'id' => $afform['name'],
-      'title' => $afform['title'],
-      'weight' => $weight++,
-      'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
-      'is_active' => TRUE,
-      'template' => 'afform/contactSummary/AfformTab.tpl',
-      'module' => $afform['module_name'],
-      'directive' => $afform['directive_name'],
-    ];
-    // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module.
-    if (empty($context['caller'])) {
-      Civi::service('angularjs.loader')->addModules($afform['module_name']);
+    $summaryContactType = $afform['summary_contact_type'] ?? [];
+    if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
+      $tabs[] = [
+        'id' => $afform['name'],
+        'title' => $afform['title'],
+        'weight' => $weight++,
+        'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
+        'is_active' => TRUE,
+        'contact_type' => _afform_get_contact_types($summaryContactType) ?: NULL,
+        'template' => 'afform/contactSummary/AfformTab.tpl',
+        'module' => $afform['module_name'],
+        'directive' => $afform['directive_name'],
+      ];
+      // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module.
+      if (empty($context['caller'])) {
+        Civi::service('angularjs.loader')->addModules($afform['module_name']);
+      }
     }
   }
 }
@@ -248,24 +216,40 @@ function afform_civicrm_pageRun(&$page) {
   if (!in_array(get_class($page), ['CRM_Contact_Page_View_Summary', 'CRM_Contact_Page_View_Print'])) {
     return;
   }
-  $scanner = \Civi::service('afform_scanner');
+  $afforms = Civi\Api4\Afform::get(FALSE)
+    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
+    ->addWhere('contact_summary', '=', 'block')
+    ->addOrderBy('title')
+    ->execute();
   $cid = $page->get('cid');
+  $contact = NULL;
   $side = 'left';
-  foreach ($scanner->getMetas() as $afform) {
-    if (!empty($afform['contact_summary']) && $afform['contact_summary'] === 'block') {
-      $module = _afform_angular_module_name($afform['name']);
-      $block = [
-        'module' => $module,
-        'directive' => _afform_angular_module_name($afform['name'], 'dash'),
-      ];
-      $content = CRM_Core_Smarty::singleton()->fetchWith('afform/contactSummary/AfformBlock.tpl', ['contactId' => $cid, 'block' => $block]);
-      CRM_Core_Region::instance("contact-basic-info-$side")->add([
-        'markup' => '<div class="crm-summary-block">' . $content . '</div>',
-        'weight' => 1,
-      ]);
-      Civi::service('angularjs.loader')->addModules($module);
-      $side = $side === 'left' ? 'right' : 'left';
+  $weight = ['left' => 1, 'right' => 1];
+  foreach ($afforms as $afform) {
+    // If Afform specifies a contact type, lookup the contact and compare
+    if (!empty($afform['summary_contact_type'])) {
+      // Contact.get only needs to happen once
+      $contact = $contact ?? civicrm_api4('Contact', 'get', [
+        'select' => ['contact_type', 'contact_sub_type'],
+        'where' => [['id', '=', $cid]],
+      ])->first();
+      $contactTypes = array_merge([$contact['contact_type']], $contact['contact_sub_type'] ?? []);
+      if (!array_intersect($afform['summary_contact_type'], $contactTypes)) {
+        continue;
+      }
     }
+    $block = [
+      'module' => $afform['module_name'],
+      'directive' => _afform_angular_module_name($afform['name'], 'dash'),
+    ];
+    $content = CRM_Core_Smarty::singleton()->fetchWith('afform/contactSummary/AfformBlock.tpl', ['contactId' => $cid, 'block' => $block]);
+    CRM_Core_Region::instance("contact-basic-info-$side")->add([
+      'markup' => '<div class="crm-summary-block">' . $content . '</div>',
+      'name' => 'afform:' . $afform['name'],
+      'weight' => $weight[$side]++,
+    ]);
+    Civi::service('angularjs.loader')->addModules($afform['module_name']);
+    $side = $side === 'left' ? 'right' : 'left';
   }
 }
 
@@ -276,8 +260,9 @@ function afform_civicrm_pageRun(&$page) {
  */
 function afform_civicrm_contactSummaryBlocks(&$blocks) {
   $afforms = \Civi\Api4\Afform::get(FALSE)
-    ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label'])
+    ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label', 'summary_contact_type'])
     ->addWhere('contact_summary', '=', 'block')
+    ->addOrderBy('title')
     ->execute();
   foreach ($afforms as $index => $afform) {
     // Create a group per afform type
@@ -288,8 +273,12 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
         'blocks' => [],
       ],
     ];
+    // If the form specifies contact types, resolve them to just the parent types (Individual, Organization, Household)
+    // because ContactLayout doesn't care about sub-types
+    $contactType = _afform_get_contact_types($afform['summary_contact_type'] ?? []);
     $blocks["afform_{$afform['type']}"]['blocks'][$afform['name']] = [
       'title' => $afform['title'],
+      'contact_type' => $contactType ?: NULL,
       'tpl_file' => 'afform/contactSummary/AfformBlock.tpl',
       'module' => $afform['module_name'],
       'directive' => $afform['directive_name'],
@@ -300,6 +289,23 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
       'system_default' => [0, $index % 2],
     ];
   }
+}
+
+/**
+ * Resolve a mixed list of contact types and sub-types into just top-level contact types (Individual, Organization, Household)
+ *
+ * @param array $mixedTypes
+ * @return array
+ * @throws CRM_Core_Exception
+ */
+function _afform_get_contact_types(array $mixedTypes): array {
+  $allContactTypes = \CRM_Contact_BAO_ContactType::getAllContactTypes();
+  $contactTypes = [];
+  foreach ($mixedTypes as $name) {
+    $parent = $allContactTypes[$name]['parent'] ?? $name;
+    $contactTypes[$parent] = $parent;
+  }
+  return array_values($contactTypes);
 }
 
 /**
@@ -352,17 +358,6 @@ function _afform_get_partials($moduleName, $module) {
   return [
     "~/$moduleName/$moduleName.aff.html" => $afform['layout'],
   ];
-}
-
-/**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_entityTypes
- */
-function afform_civicrm_entityTypes(&$entityTypes) {
-  _afform_civix_civicrm_entityTypes($entityTypes);
 }
 
 /**

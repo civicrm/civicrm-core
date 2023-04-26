@@ -34,14 +34,14 @@ class OAuthLeagueFacade {
 
     $localOptions = [];
     $localOptions['clientId'] = $clientDef['guid'];
+    $localOptions['tenant'] = !empty($clientDef['tenant']) ? $clientDef['tenant'] : '';
     $localOptions['clientSecret'] = $clientDef['secret'];
-    // NOTE: If we ever have frontend users, this may need to change.
-    $localOptions['redirectUri'] = \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
     $options = array_merge(
       $providerDef['options'] ?? [],
       $clientDef['options'] ?? [],
       $localOptions
     );
+    $options['redirectUri'] = $options['redirectUri'] ?? \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
 
     return [$class, $options];
   }

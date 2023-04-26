@@ -18,7 +18,7 @@
 /**
  * Business object for Saved searches.
  */
-class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
+class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements \Civi\Core\HookInterface {
 
   /**
    * Retrieve DB object and copy to defaults array.
@@ -263,28 +263,38 @@ WHERE  $where";
   }
 
   /**
-   * Create or update SavedSearch record.
-   *
+   * @deprecated
    * @param array $params
-   *
-   * @return \CRM_Contact_DAO_SavedSearch
+   * @return CRM_Contact_DAO_SavedSearch
    */
   public static function create(&$params) {
-    $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
-    if ($loggedInContactID) {
-      if (empty($params['id'])) {
-        $params['created_id'] = $loggedInContactID;
-      }
-      $params['modified_id'] = $loggedInContactID;
-    }
-    // Set by mysql
-    unset($params['modified_date']);
-
-    // Flush angular caches to refresh search displays
-    if (isset($params['api_params'])) {
-      Civi::container()->get('angular')->clear();
-    }
     return self::writeRecord($params);
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   *
+   * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
+    if ($event->action === 'create' || $event->action === 'edit') {
+      $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
+      if ($loggedInContactID) {
+        if ($event->action === 'create') {
+          $event->params['created_id'] = $event->params['created_id'] ?? $loggedInContactID;
+        }
+        $event->params['modified_id'] = $event->params['modified_id'] ?? $loggedInContactID;
+      }
+      // Set by mysql
+      unset($event->params['modified_date']);
+
+      // Flush angular caches to refresh search displays
+      if (isset($event->params['api_params'])) {
+        Civi::container()->get('angular')->clear();
+      }
+    }
   }
 
   /**

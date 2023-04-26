@@ -18,7 +18,6 @@
 
 namespace api\v4\Entity;
 
-use api\v4\Api4TestBase;
 use Civi\Api4\Domain;
 use Civi\Api4\Group;
 use Civi\Api4\Managed;
@@ -26,16 +25,23 @@ use Civi\Api4\Navigation;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
 use Civi\Api4\SavedSearch;
+use Civi\Test;
+use Civi\Test\CiviEnvBuilder;
+use Civi\Test\HeadlessInterface;
 use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
 use CRM_Core_ManagedEntities;
 use CRM_Core_Module;
 use CRM_Utils_System;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group headless
  */
-class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, HookInterface {
+class ManagedEntityTest extends TestCase implements HeadlessInterface, TransactionalInterface, HookInterface {
+
+  use Test\Api4TestTrait;
+
   /**
    * @var array[]
    */
@@ -44,6 +50,10 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
   public function setUp(): void {
     $this->_managedEntities = [];
     parent::setUp();
+  }
+
+  public function setUpHeadless(): CiviEnvBuilder {
+    return Test::headless()->apply();
   }
 
   public function hook_civicrm_managed(array &$entities): void {
@@ -517,6 +527,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       // managed entities & the test will fail if we pretend it doesn't exist
       // here but still let it declare entities.
       new CRM_Core_Module('legacycustomsearches', TRUE),
+      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     (new CRM_Core_ManagedEntities($allModules))->reconcile();
 
@@ -565,6 +576,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       // managed entities & the test will fail if we pretend it doesn't exist
       // here but still let it declare entities.
       new CRM_Core_Module('legacycustomsearches', TRUE),
+      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     // If module is disabled it will not run hook_civicrm_managed.
     $this->_managedEntities = [];
@@ -592,6 +604,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       // managed entities & the test will fail if we pretend it doesn't exist
       // here but still let it declare entities.
       new CRM_Core_Module('legacycustomsearches', TRUE),
+      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     $this->_managedEntities = $managedEntities;
     (new CRM_Core_ManagedEntities($allModules))->reconcile();

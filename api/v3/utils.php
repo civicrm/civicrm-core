@@ -311,15 +311,6 @@ function _civicrm_api3_get_DAO($name) {
 
   // hack to deal with incorrectly named BAO/DAO - see CRM-10859
 
-  // FIXME: DAO should be renamed CRM_Mailing_DAO_MailingEventQueue
-  if ($name === 'MailingEventQueue') {
-    return 'CRM_Mailing_Event_DAO_Queue';
-  }
-  // FIXME: DAO should be renamed CRM_Mailing_DAO_MailingRecipients
-  // but am not confident mailing_recipients is tested so have not tackled.
-  if ($name === 'MailingRecipients') {
-    return 'CRM_Mailing_DAO_Recipients';
-  }
   if ($name === 'AclRole' || $name === 'ACLRole') {
     return 'CRM_ACL_DAO_ACLEntityRole';
   }
@@ -464,25 +455,6 @@ function _civicrm_api3_store_values(array $fields, array $params, &$values): boo
     }
   }
   return $valueFound;
-}
-
-/**
- * Returns field names of the given entity fields.
- *
- * @deprecated
- * @param array $fields
- *   Fields array to retrieve the field names for.
- * @return array
- */
-function _civicrm_api3_field_names($fields) {
-  CRM_Core_Error::deprecatedFunctionWarning('array_column');
-  $result = [];
-  foreach ($fields as $key => $value) {
-    if (!empty($value['name'])) {
-      $result[] = $value['name'];
-    }
-  }
-  return $result;
 }
 
 /**
@@ -1109,7 +1081,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
   foreach ($params as $key => $value) {
     [$customFieldID, $customValueID] = CRM_Core_BAO_CustomField::getKeyID($key, TRUE);
     if ($customFieldID && (!is_null($value))) {
-      if ($checkCheckBoxField && !empty($fields['custom_' . $customFieldID]) && $fields['custom_' . $customFieldID]['html_type'] == 'CheckBox') {
+      if ($checkCheckBoxField && isset($fields['custom_' . $customFieldID]) && $fields['custom_' . $customFieldID]['html_type'] == 'CheckBox') {
         formatCheckBoxField($value, 'custom_' . $customFieldID, $entity);
       }
 
@@ -1179,6 +1151,10 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
     return;
   }
 
+  if (is_array($checkboxFieldValue) && empty($checkboxFieldValue)) {
+    $checkboxFieldValue = '';
+    return;
+  }
   $options = $options['values'];
   $validValue = TRUE;
   if (is_array($checkboxFieldValue)) {
@@ -1395,7 +1371,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, $params) {
 function _civicrm_api3_basic_delete($bao_name, &$params) {
   civicrm_api3_verify_mandatory($params, NULL, ['id']);
   _civicrm_api3_check_edit_permissions($bao_name, ['id' => $params['id']]);
-  if (method_exists($bao_name, 'del')) {
+  if (method_exists($bao_name, 'del') && !\Civi\Api4\Utils\ReflectionUtils::isMethodDeprecated($bao_name, 'del')) {
     $args = [&$params['id']];
     $dao = new $bao_name();
     $dao->id = $params['id'];
@@ -1441,7 +1417,7 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
     NULL,
     $entity_id,
     $groupID,
-    NULL,
+    $subType,
     $subName,
     TRUE,
     NULL,

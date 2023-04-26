@@ -25,7 +25,6 @@ class ValidatorTest extends \CiviUnitTestCase {
     }
 
     parent::setUp();
-    \Civi::settings()->set('flexmailer_traditional', 'flexmailer');
   }
 
   public function getExamples() {

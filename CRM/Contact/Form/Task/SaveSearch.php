@@ -145,7 +145,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
         $mappingParams = [
           'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Search Builder'),
         ];
-        $mapping = CRM_Core_BAO_Mapping::add($mappingParams);
+        $mapping = CRM_Core_BAO_Mapping::writeRecord($mappingParams);
         $mappingId = $mapping->id;
       }
       else {
@@ -220,7 +220,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
         'description' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $group->id, 'description', 'id'),
         'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Search Builder'),
       ];
-      CRM_Core_BAO_Mapping::add($mappingParams);
+      CRM_Core_BAO_Mapping::writeRecord($mappingParams);
     }
 
     // CRM-9464

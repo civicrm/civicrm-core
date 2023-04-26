@@ -838,7 +838,10 @@ class CRM_Financial_BAO_Order {
       // Set the price set ID from the first line item (we need to set this here
       // to prevent a loop later when we retrieve the price field metadata to
       // set the 'title' (as accessed from workflow message templates).
-      $this->setPriceSetID($lineItems[0]['price_field_id.price_set_id']);
+      // Contributions *should* all have line items, but historically, imports did not create them.
+      if ($lineItems) {
+        $this->setPriceSetID($lineItems[0]['price_field_id.price_set_id']);
+      }
     }
     else {
       foreach ($this->getPriceOptions() as $fieldID => $valueID) {
@@ -1122,7 +1125,7 @@ class CRM_Financial_BAO_Order {
   /**
    * Get the line items from a template.
    *
-   * @return \Civi\Api4\Generic\Result
+   * @return array
    *
    * @throws \CRM_Core_Exception
    */
@@ -1243,7 +1246,7 @@ class CRM_Financial_BAO_Order {
         $lineItemTitle .= ' ' . CRM_Utils_String::ellipsify($description, 30);
       }
     }
-    return $lineItemTitle;
+    return $lineItemTitle ?? '';
   }
 
 }

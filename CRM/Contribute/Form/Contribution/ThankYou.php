@@ -41,8 +41,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->_params = $this->get('params');
     $this->_lineItem = $this->get('lineItem');
     $this->_useForMember = $this->get('useForMember');
-    $is_deductible = $this->get('is_deductible');
-    $this->assign('is_deductible', $is_deductible);
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->_values));
     $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->_values));
     $this->assign('thankyou_footer', CRM_Utils_Array::value('thankyou_footer', $this->_values));
@@ -337,9 +335,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
       if (!empty($membershipTypeIds)) {
         //set status message if wrong membershipType is included in membershipBlock
-        if (isset($this->_mid) && !$membershipPriceset) {
+        if ($this->getRenewalMembershipID() && !$membershipPriceset) {
           $membershipTypeID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-            $this->_mid,
+            $this->getRenewalMembershipID(),
             'membership_type_id'
           );
           if (!in_array($membershipTypeID, $membershipTypeIds)) {

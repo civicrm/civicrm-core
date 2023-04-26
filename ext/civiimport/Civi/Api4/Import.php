@@ -10,7 +10,7 @@
  */
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\CheckAccessAction;
+use Civi\Api4\Import\CheckAccessAction;
 use Civi\Api4\Generic\DAOGetAction;
 use Civi\Api4\Generic\DAOGetFieldsAction;
 use Civi\Api4\Action\GetActions;

@@ -38,7 +38,7 @@
  * @method static array synchronizeUsers() Create CRM contacts for all existing CMS users.
  * @method static void appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
  * @method static void alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
- * @method static exitAfterFatal() Should the current execution exit after a fatal error?
+ * @method static bool shouldExitAfterFatal() Should the current execution exit after a fatal error?
  */
 class CRM_Utils_System {
 
@@ -445,13 +445,14 @@ class CRM_Utils_System {
   }
 
   /**
-   * Called from a template to compose a url.
+   * Compose a URL. This is a wrapper for `url()` which is optimized for use in Smarty.
    *
+   * @see \smarty_function_crmURL()
    * @param array $params
-   *   List of parameters.
-   *
+   *   URL properties. Keys are abbreviated ("p"<=>"path").
+   *   See Smarty doc for full details.
    * @return string
-   *   url
+   *   URL
    */
   public static function crmURL($params) {
     $p = $params['p'] ?? NULL;
@@ -544,7 +545,9 @@ class CRM_Utils_System {
     $url = str_replace('&amp;', '&', $url);
 
     $context['output'] = $_GET['snippet'] ?? NULL;
-
+    if ($context['noindex'] ?? FALSE) {
+      self::setHttpHeader('X-Robots-Tag', 'noindex');
+    }
     $parsedUrl = CRM_Utils_Url::parseUrl($url);
     CRM_Utils_Hook::alterRedirect($parsedUrl, $context);
     $url = CRM_Utils_Url::unparseUrl($parsedUrl);
@@ -1101,7 +1104,7 @@ class CRM_Utils_System {
    * Encode url.
    *
    * @param string $url
-   *
+   * @deprecated
    * @return null|string
    */
   public static function urlEncode($url) {
@@ -1272,7 +1275,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Get logged in user's IP address.
+   * Get the client's IP address.
    *
    * Get IP address from HTTP REMOTE_ADDR header. If the CMS is Drupal then use
    * the Drupal function as this also handles reverse proxies (based on proper
@@ -1285,14 +1288,8 @@ class CRM_Utils_System {
    *   IP address of logged in user.
    */
   public static function ipAddress($strictIPV4 = TRUE) {
-    $address = $_SERVER['REMOTE_ADDR'] ?? NULL;
-
     $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal && function_exists('ip_address')) {
-      // drupal function handles the server being behind a proxy securely. We still have legacy ipn methods
-      // that reach this point without bootstrapping hence the check that the fn exists
-      $address = ip_address();
-    }
+    $address = $config->userSystem->ipAddress();
 
     // hack for safari
     if ($address == '::1') {
@@ -1601,7 +1598,7 @@ class CRM_Utils_System {
    * Given a URL, return a relative URL if possible.
    *
    * @param string $url
-   *
+   * @deprecated
    * @return string
    */
   public static function relativeURL($url) {

@@ -21,6 +21,7 @@
     <required>true</required>
     <comment>Event</comment>
     <html>
+      <label>ID</label>
       <type>Number</type>
     </html>
     <add>1.7</add>
@@ -40,6 +41,7 @@
     <localizable>true</localizable>
     <comment>Event Title (e.g. Fall Fundraiser Dinner)</comment>
     <html>
+      <label>Title</label>
       <type>Text</type>
     </html>
     <add>1.7</add>
@@ -49,6 +51,7 @@
     <type>text</type>
     <title>Event Summary</title>
     <html>
+      <label>Summary</label>
       <type>TextArea</type>
       <rows>4</rows>
       <cols>60</cols>
@@ -63,6 +66,7 @@
     <uniqueName>event_description</uniqueName>
     <title>Event Description</title>
     <html>
+      <label>Description</label>
       <type>RichTextEditor</type>
       <rows>8</rows>
       <cols>60</cols>
@@ -81,6 +85,7 @@
       <optionGroupName>event_type</optionGroupName>
     </pseudoconstant>
     <html>
+      <label>Type</label>
       <type>Select</type>
     </html>
     <comment>Event Type ID.Implicit FK to civicrm_option_value where option_group = event_type.</comment>
@@ -120,6 +125,7 @@
     <comment>Public events will be included in the iCal feeds. Access to private event information may be limited using ACLs.</comment>
     <add>1.7</add>
     <html>
+      <label>Public</label>
       <type>CheckBox</type>
     </html>
   </field>
@@ -133,6 +139,7 @@
     <comment>Date and time that event starts.</comment>
     <add>1.7</add>
     <html>
+      <label>Start Date</label>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
     </html>
@@ -147,6 +154,7 @@
     <comment>Date and time that event ends. May be NULL if no defined end date/time</comment>
     <add>1.7</add>
     <html>
+      <label>End Date</label>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
     </html>
@@ -160,6 +168,7 @@
     <comment>If true, include registration link on Event Info page.</comment>
     <add>1.7</add>
     <html>
+      <label>Online Registration</label>
       <type>CheckBox</type>
     </html>
   </field>
@@ -213,6 +222,7 @@
     <type>text</type>
     <title>Event Information</title>
     <html>
+      <label>Event Full Message</label>
       <type>TextArea</type>
       <rows>4</rows>
       <cols>60</cols>
@@ -230,6 +240,7 @@
     <comment>If true, one or more fee amounts must be set and a Payment Processor must be configured for Online Event Registration.</comment>
     <add>1.7</add>
     <html>
+      <label>Paid Event</label>
       <type>CheckBox</type>
     </html>
   </field>
@@ -287,7 +298,9 @@
     <comment>Is this Event enabled or disabled/cancelled?</comment>
     <add>1.7</add>
     <html>
+      <label>Enabled</label>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
   </field>
   <field>

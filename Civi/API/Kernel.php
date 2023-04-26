@@ -23,7 +23,7 @@ use Civi\API\Event\RespondEvent;
 class Kernel {
 
   /**
-   * @var \Symfony\Component\EventDispatcher\EventDispatcher
+   * @var \Civi\Core\CiviEventDispatcherInterface
    */
   protected $dispatcher;
 
@@ -33,7 +33,7 @@ class Kernel {
   protected $apiProviders;
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @param \Civi\Core\CiviEventDispatcherInterface $dispatcher
    *   The event dispatcher which receives kernel events.
    * @param array $apiProviders
    *   Array of ProviderInterface.
@@ -144,7 +144,16 @@ class Kernel {
     $this->boot($apiRequest);
 
     [$apiProvider, $apiRequest] = $this->resolve($apiRequest);
-    $this->authorize($apiProvider, $apiRequest);
+
+    try {
+      $this->authorize($apiProvider, $apiRequest);
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      // We catch and re-throw to log for visibility
+      \CRM_Core_Error::backtrace('API Request Authorization failed', TRUE);
+      throw $e;
+    }
+
     [$apiProvider, $apiRequest] = $this->prepare($apiProvider, $apiRequest);
     $result = $apiProvider->invoke($apiRequest);
 
@@ -327,6 +336,13 @@ class Kernel {
    */
   public function formatApiException($e, $apiRequest) {
     $data = $e->getExtraParams();
+    $errorCode = $e->getCode();
+    if (($data['exception'] ?? NULL) instanceof \DB_Error) {
+      $errorCode = $e->getDBErrorMessage();
+      $data['sql'] = $e->getSQL();
+      $data['debug_info'] = $e->getUserInfo();
+    }
+    unset($data['exception']);
     $data['entity'] = $apiRequest['entity'] ?? NULL;
     $data['action'] = $apiRequest['action'] ?? NULL;
 
@@ -337,7 +353,7 @@ class Kernel {
       $data['trace'] = $e->getTraceAsString();
     }
 
-    return $this->createError($e->getMessage(), $data, $apiRequest, $e->getCode());
+    return $this->createError($e->getMessage(), $data, $apiRequest, $errorCode);
   }
 
   /**
@@ -462,14 +478,14 @@ class Kernel {
   }
 
   /**
-   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   * @return \Civi\Core\CiviEventDispatcherInterface
    */
   public function getDispatcher() {
     return $this->dispatcher;
   }
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @param \Civi\Core\CiviEventDispatcherInterface $dispatcher
    *   The event dispatcher which receives kernel events.
    * @return Kernel
    */

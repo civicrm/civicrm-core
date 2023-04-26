@@ -127,7 +127,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_JSON::output($result);
   }
 
-  public function voterList() {
+  public static function voterList() {
     //get the search criteria params.
     $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);

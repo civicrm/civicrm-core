@@ -39,8 +39,13 @@ class CRM_Core_Exception extends PEAR_Exception {
    *   A previous exception which caused this new exception.
    */
   public function __construct($message, $error_code = 0, $errorData = [], $previous = NULL) {
-    // Using int for error code "old way") ?
-    if (is_numeric($error_code)) {
+
+    if (($errorData['exception'] ?? NULL) instanceof DB_Error) {
+      // Pass the exception to the PEAR_Exception parent as the code for it to handle.
+      $code = $errorData['exception'];
+    }
+    elseif (is_numeric($error_code)) {
+      // Using int for error code "old way") ?
       $code = $error_code;
     }
     else {
@@ -97,6 +102,15 @@ class CRM_Core_Exception extends PEAR_Exception {
    */
   public function getExtraParams() {
     return $this->errorData;
+  }
+
+  /**
+   * Get a message suitable to be presented to the user.
+   *
+   * @return string
+   */
+  public function getUserMessage(): string {
+    return $this->getMessage();
   }
 
   /**

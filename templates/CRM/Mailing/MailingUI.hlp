@@ -15,7 +15,7 @@
 </p>
 {/htxt}
 
-{htxt id ="from_email"}
+{htxt id="from_email"}
   <p>{ts}Select the "FROM" Email Address for this mailing from the dropdown list. Available email addresses are configurable by users with Administer CiviCRM permission. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
 {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
   {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}

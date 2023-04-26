@@ -100,6 +100,7 @@
   min-height: 3.5em;
 }
 
+#bootstrap-theme.crm-search .form-control label,
 #bootstrap-theme.crm-search legend[ng-click] {
   cursor: pointer;
 }
@@ -167,10 +168,13 @@
   height: 36px;
 }
 
-#bootstrap-theme .crm-search-delete-display {
+#bootstrap-theme .crm-search-display-control {
   position: absolute;
   right: 0;
   top: 0;
+}
+#bootstrap-theme .crm-search-display-control+.crm-search-display-control {
+  right: 20px;
 }
 
 #bootstrap-theme .crm-search-admin-edit-columns {

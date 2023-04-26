@@ -73,7 +73,7 @@ class CRM_Extension_Downloader {
   /**
    * Determine whether downloading is supported.
    *
-   * @param \CRM_EXtension_Info $extensionInfo Optional info for (updated) extension
+   * @param \CRM_Extension_Info $extensionInfo Optional info for (updated) extension
    *
    * @return array
    *   list of error messages; empty if OK

@@ -477,12 +477,12 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'direction' => CRM_Utils_Sort::DESCENDING,
         ],
         [
-          'name' => ts('Start Date'),
+          'name' => ts('Membership Start Date'),
           'sort' => 'membership_start_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         [
-          'name' => ts('End Date'),
+          'name' => ts('Membership Expiration Date'),
           'sort' => 'membership_end_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],

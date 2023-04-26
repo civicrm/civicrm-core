@@ -34,12 +34,11 @@
         </table>
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 <div class="spacer"></div>
-{if $tablePrefixes}
+{if $viewsIntegration}
 <div class="form-item">
 <fieldset>
     <legend>{ts}Views integration settings{/ts}</legend>
-    <div>{ts}To enable CiviCRM Views integration, add or update the following item in the <code>settings.php</code> file:{/ts}</div>
-    <pre>{$tablePrefixes}</pre>
+    <div>{$viewsIntegration}</div>
 </fieldset>
 </div>
 {/if}

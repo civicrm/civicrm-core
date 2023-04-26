@@ -41,7 +41,7 @@
   "include-path": ["vendor/tecnickcom"],
   "config": {
     "platform": {
-      "php": "7.2.5"
+      "php": "7.3.0"
     },
     "allow-plugins": {
       "civicrm/composer-compile-plugin": true,
@@ -50,24 +50,23 @@
     }
   },
   "require": {
-    "php": "~7.2.5 || ~7.3 || ~8",
+    "php": "~7.3 || ~8",
     "composer-runtime-api": "~2.0",
-    "cache/integration-tests": "~0.17.0",
-    "dompdf/dompdf" : "~2.0.1",
+    "dompdf/dompdf" : "~2.0.2",
     "firebase/php-jwt": ">=3 <6",
     "rubobaquero/phpquery": "^0.9.15",
-    "symfony/config": "~4.4",
+    "symfony/config": "~4.4 || ~6.0",
     "symfony/polyfill-iconv": "~1.0",
-    "symfony/dependency-injection": "~4.4",
-    "symfony/event-dispatcher": "~4.4",
-    "symfony/filesystem": "~4.4",
-    "symfony/process": "~4.4",
-    "symfony/var-dumper": "~3.0 || ~4.4 || ~5.1",
-    "symfony/service-contracts": "~2.2",
+    "symfony/dependency-injection": "~4.4 || ~6.0",
+    "symfony/event-dispatcher": "~4.4 || ~6.0",
+    "symfony/filesystem": "~4.4 || ~6.0",
+    "symfony/process": "~4.4 || ~6.0",
+    "symfony/var-dumper": "~4.4 || ~5.1 || ~6.0",
+    "symfony/service-contracts": "~2.2 || ~3.1",
     "psr/log": "~1.0 || ~2.0 || ~3.0",
-    "symfony/finder": "~4.4",
+    "symfony/finder": "~4.4 || ~6.0",
     "tecnickcom/tcpdf" : "6.4.*",
-    "totten/ca-config": "~22.05",
+    "totten/ca-config": "~22.11",
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "~1.9.4",
     "marcj/topsort": "~1.1",
@@ -77,7 +76,7 @@
     "pear/auth_sasl": "1.1.0",
     "pear/net_smtp": "1.10.*",
     "pear/net_socket": "1.0.*",
-    "pear/mail": "^1.4",
+    "pear/mail": "^1.5",
     "guzzlehttp/guzzle": "^6.3 || ^7.3",
     "psr/simple-cache": "~1.0.1",
     "cweagans/composer-patches": "~1.0",
@@ -104,7 +103,8 @@
     "symfony/polyfill-php81": "^1.0",
     "symfony/polyfill-php82": "^1.0",
     "html2text/html2text": "^4.3.1",
-    "psr/container": "~1.0"
+    "psr/container": "~1.0 || ~2.0",
+    "ext-fileinfo": "*"
   },
   "scripts": {
     "post-install-cmd": [
@@ -278,9 +278,6 @@
       },
       "html2text/html2text": {
         "Fix deprecation warning in php8.1 on html_entity_decode": "https://raw.githubusercontent.com/civicrm/civicrm-core/e758d20e9f613ca6c4cf652c23d2cd7e5d3af3ce/tools/scripts/composer/html2text_html2_text_php81_deprecation.patch"
-      },
-      "pear/pear-core-minimal": {
-        "Apply patch to fix creation of dynamic properties in PEAR_Error class": "https://patch-diff.githubusercontent.com/raw/pear/pear-core-minimal/pull/11.patch"
       },
       "pear/db": {
         "Apply patch to ensure that MySQLI reporting remains the same in php8.1": "https://patch-diff.githubusercontent.com/raw/pear/DB/pull/13.patch",

@@ -29,7 +29,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   use CRM_Contact_Import_MetadataTrait;
 
-  protected $_allExternalIdentifiers = [];
+  private $externalIdentifiers = [];
 
   /**
    * Array of successfully imported contact id's
@@ -37,13 +37,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @var array
    */
   protected $_newContacts = [];
-
-  /**
-   * Line count id.
-   *
-   * @var int
-   */
-  protected $_lineCount;
 
   protected $_tableName;
 
@@ -98,6 +91,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         'name' => 'contact_import',
         'label' => ts('Contact Import'),
         'entity' => 'Contact',
+        'url' => 'civicrm/import/contact',
       ],
     ];
   }
@@ -266,9 +260,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     if (
       CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
         $contactFields,
-        $contactID,
+        (int) $contactID,
         // step 2
-        $relatedContactID
+        (int) $relatedContactID
       )
     ) {
       return [0, 1];
@@ -307,26 +301,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $addressCustomFields = CRM_Core_BAO_CustomField::getFields('Address');
     $customFields = $customFields + $addressCustomFields;
 
-    //format date first
-    $session = CRM_Core_Session::singleton();
-    $dateType = $session->get("dateTypes");
     foreach ($params as $key => $val) {
       $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
       if ($customFieldID &&
         !array_key_exists($customFieldID, $addressCustomFields)
       ) {
-        //we should not update Date to null, CRM-4062
-        if ($val && ($customFields[$customFieldID]['data_type'] == 'Date')) {
-          //CRM-21267
-          $this->formatCustomDate($params, $formatted, $dateType, $key);
-        }
-        elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
+        if ($customFields[$customFieldID]['data_type'] == 'Boolean') {
           if (empty($val) && !is_numeric($val) && $this->isFillDuplicates()) {
             //retain earlier value when Import mode is `Fill`
             unset($params[$key]);
-          }
-          else {
-            $params[$key] = CRM_Utils_String::strtoboolstr($val);
           }
         }
       }
@@ -420,12 +403,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
               if ((strtolower($v2['label']) == strtolower(trim($v1))) ||
                 (strtolower($v2['value']) == strtolower(trim($v1)))
               ) {
-                if ($htmlType == 'CheckBox') {
-                  $params[$key][$v2['value']] = $formatted[$key][$v2['value']] = 1;
-                }
-                else {
-                  $params[$key][] = $formatted[$key][] = $v2['value'];
-                }
+                $params[$key][] = $formatted[$key][] = $v2['value'];
               }
             }
           }
@@ -514,19 +492,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
     }
-
-    //check for duplicate external Identifier
-    $externalID = $params['external_identifier'] ?? NULL;
-    if ($externalID) {
-      /* If it's a dupe,external Identifier  */
-
-      if ($externalDupe = CRM_Utils_Array::value($externalID, $this->_allExternalIdentifiers)) {
-        $errorMessage = ts('External ID conflicts with record %1', [1 => $externalDupe]);
-        throw new CRM_Core_Exception($errorMessage);
-      }
-      //otherwise, count it and move on
-      $this->_allExternalIdentifiers[$externalID] = $this->_lineCount;
-    }
+    $this->checkForDuplicateExternalIdentifiers($params['external_identifier'] ?? '');
 
     //date-format part ends
 
@@ -812,59 +778,56 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           $data[$blockName][$loc]['is_primary'] = 1;
         }
 
-        if (1) {
-          if ($fieldName === 'state_province') {
-            // CRM-3393
-            if (is_numeric($value) && ((int ) $value) >= 1000) {
-              $data['address'][$loc]['state_province_id'] = $value;
-            }
-            elseif (empty($value)) {
-              $data['address'][$loc]['state_province_id'] = '';
-            }
-            else {
-              $data['address'][$loc]['state_province'] = $value;
-            }
+        if ($fieldName === 'state_province') {
+          // CRM-3393
+          if (is_numeric($value) && ((int ) $value) >= 1000) {
+            $data['address'][$loc]['state_province_id'] = $value;
           }
-          elseif ($fieldName === 'country_id') {
-            $data['address'][$loc]['country_id'] = $value;
-          }
-          elseif ($fieldName === 'county') {
-            $data['address'][$loc]['county_id'] = $value;
-          }
-          elseif ($fieldName == 'address_name') {
-            $data['address'][$loc]['name'] = $value;
-          }
-          elseif (substr($fieldName, 0, 14) === 'address_custom') {
-            $data['address'][$loc][substr($fieldName, 8)] = $value;
+          elseif (empty($value)) {
+            $data['address'][$loc]['state_province_id'] = '';
           }
           else {
-            $data[$blockName][$loc][$fieldName] = $value;
+            $data['address'][$loc]['state_province'] = $value;
           }
         }
+        elseif ($fieldName === 'country_id') {
+          $data['address'][$loc]['country_id'] = $value;
+        }
+        elseif ($fieldName === 'county') {
+          $data['address'][$loc]['county_id'] = $value;
+        }
+        elseif ($fieldName == 'address_name') {
+          $data['address'][$loc]['name'] = $value;
+        }
+        elseif (substr($fieldName, 0, 14) === 'address_custom') {
+          $data['address'][$loc][substr($fieldName, 8)] = $value;
+        }
+        else {
+          $data[$blockName][$loc][$fieldName] = $value;
+        }
       }
-      if (TRUE) {
-        // @todo - meaningless IF - left to keep whitespace clean in PR.
-        if ($key === 'location') {
-          foreach ($value as $locationTypeId => $field) {
-            foreach ($field as $block => $val) {
-              if ($block === 'address' && array_key_exists('address_name', $val)) {
-                $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
-              }
+
+      if ($key === 'location') {
+        foreach ($value as $locationTypeId => $field) {
+          foreach ($field as $block => $val) {
+            if ($block === 'address' && array_key_exists('address_name', $val)) {
+              $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
             }
           }
         }
-        if (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
-          && ($value == '' || !isset($value)) &&
-          ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
-          ($key === 'current_employer' && empty($params['current_employer']))) {
-          // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
-          // to avoid update with empty values
-          continue;
-        }
-        else {
-          $data[$key] = $value;
-        }
       }
+      if (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
+        && ($value == '' || !isset($value)) &&
+        ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
+        ($key === 'current_employer' && empty($params['current_employer']))) {
+        // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
+        // to avoid update with empty values
+        continue;
+      }
+      else {
+        $data[$key] = $value;
+      }
+
     }
 
     if (!isset($data['contact_type'])) {
@@ -900,7 +863,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @param int $cid
    *   contact id.
    */
-  public function formatParams(&$params, $cid) {
+  private function formatParams(&$params, $cid) {
     if ($this->isSkipDuplicates()) {
       return;
     }
@@ -917,18 +880,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($params['contact_type'], NULL, $cid, 0, NULL);
     CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults, FALSE, FALSE);
 
-    $locationFields = [
-      'address' => 'address',
-    ];
-
     $contact = get_object_vars($contactObj);
 
     foreach ($params as $key => $value) {
-      if ($key == 'id' || $key == 'contact_type') {
-        continue;
-      }
-
-      if (array_key_exists($key, $locationFields)) {
+      if ($key === 'id' || $key === 'contact_type' || $key === 'address') {
         continue;
       }
 
@@ -953,24 +908,22 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
     }
 
-    foreach ($locationFields as $locKeys) {
-      if (isset($params[$locKeys]) && is_array($params[$locKeys])) {
-        foreach ($params[$locKeys] as $key => $value) {
-          if ($modeFill) {
-            $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $locKeys);
+    if (isset($params['address']) && is_array($params['address'])) {
+      foreach ($params['address'] as $key => $value) {
+        if ($modeFill) {
+          $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, 'address');
 
-            if (isset($getValue)) {
-              foreach ($getValue as $cnt => $values) {
-                if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$locKeys][$key]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$locKeys][$key]['location_type_id']) {
-                  unset($params[$locKeys][$key]);
-                }
+          if (isset($getValue)) {
+            foreach ($getValue as $cnt => $values) {
+              if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params['address'][$key]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params['address'][$key]['location_type_id']) {
+                unset($params['address'][$key]);
               }
             }
           }
         }
-        if (count($params[$locKeys]) == 0) {
-          unset($params[$locKeys]);
-        }
+      }
+      if (count($params['address']) == 0) {
+        unset($params['address']);
       }
     }
   }
@@ -1072,24 +1025,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
       _civicrm_api3_store_values($fields[$values['contact_type']], $values, $params);
       return TRUE;
-    }
-
-    // Check for custom field values
-    $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $values),
-      FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE
-    );
-
-    foreach ($values as $key => $value) {
-      if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        // check if it's a valid custom field id
-
-        if (!array_key_exists($customFieldID, $customFields)) {
-          return civicrm_api3_create_error('Invalid custom field ID');
-        }
-        else {
-          $params[$key] = $value;
-        }
-      }
     }
     return TRUE;
   }
@@ -1623,7 +1558,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         throw new CRM_Core_Exception('Mismatched contact SubTypes :', CRM_Import_Parser::NO_MATCH);
       }
     }
-    return array($formatted, $params);
+    return [$formatted, $params];
   }
 
   /**
@@ -1750,6 +1685,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       CRM_Import_Parser::ERROR => 'ERROR',
       CRM_Import_Parser::NO_MATCH => 'invalid_no_match',
     ][$outcome] ?? 'ERROR';
+  }
+
+  /**
+   * Return an error if the csv has more than one row with the same external identifier.
+   *
+   * @param string $externalIdentifier
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function checkForDuplicateExternalIdentifiers(string $externalIdentifier): void {
+    if ($externalIdentifier) {
+      $existingRow = array_search($externalIdentifier, $this->externalIdentifiers, TRUE);
+      if ($existingRow !== FALSE) {
+        throw new CRM_Core_Exception(ts('External ID conflicts with record %1', [1 => $existingRow + 1]));
+      }
+      $this->externalIdentifiers[] = $externalIdentifier;
+    }
   }
 
 }

@@ -37,17 +37,13 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Premium', $id, 'premiums_active ', $is_active);
   }
 
@@ -55,11 +51,12 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * Delete financial Types.
    *
    * @param int $premiumID
+   *
+   * @deprecated
    */
   public static function del($premiumID) {
-    $premium = new CRM_Contribute_DAO_Premium();
-    $premium->id = $premiumID;
-    $premium->delete();
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return static::deleteRecord(['id' => $premiumID]);
   }
 
   /**

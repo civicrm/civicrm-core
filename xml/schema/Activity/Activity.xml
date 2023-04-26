@@ -138,6 +138,7 @@
     <title>Phone ID (called)</title>
     <comment>Phone ID of the number called (optional - used if an existing phone number is selected).</comment>
     <add>2.0</add>
+    <deprecated>true</deprecated>
     <html>
       <type>EntityRef</type>
       <label>Phone (called)</label>
@@ -155,6 +156,7 @@
     <title>Phone (called) Number</title>
     <type>varchar</type>
     <length>64</length>
+    <deprecated>true</deprecated>
     <comment>Phone number in case the number does not exist in the civicrm_phone table.</comment>
     <html>
       <type>Text</type>
@@ -283,6 +285,7 @@
     <html>
       <label>Relationship</label>
     </html>
+    <deprecated>true</deprecated>
     <add>2.2</add>
   </field>
   <foreignKey>
@@ -323,7 +326,7 @@
     <table>civicrm_activity</table>
     <key>id</key>
     <add>2.2</add>
-    <onDelete>CASCADE</onDelete>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
     <name>result</name>

@@ -18,8 +18,8 @@ use Civi\Api4\Utils\CoreUtil;
 class Run extends AbstractRunAction {
 
   /**
-   * Should this api call return a page of results or the row_count or the ids
-   * E.g. "page:1" or "row_count" or "id"
+   * Should this api call return a page/scroll of results or the row_count or the ids
+   * E.g. "page:1" or "scroll:2" or "row_count" or "id"
    * @var string
    */
   protected $return;
@@ -40,6 +40,11 @@ class Run extends AbstractRunAction {
     $settings = $this->display['settings'];
     $page = $index = NULL;
     $key = $this->return;
+    // Pager can operate in "page" mode for traditional pager, or "scroll" mode for infinite scrolling
+    $pagerMode = NULL;
+
+    $this->augmentSelectClause($apiParams);
+    $this->applyFilters();
 
     switch ($this->return) {
       case 'id':
@@ -56,7 +61,6 @@ class Run extends AbstractRunAction {
         break;
 
       case 'tally':
-        $this->applyFilters();
         unset($apiParams['orderBy'], $apiParams['limit']);
         $api = Request::create($entityName, 'get', $apiParams);
         $query = new Api4SelectQuery($api);
@@ -84,18 +88,21 @@ class Run extends AbstractRunAction {
         return;
 
       default:
-        if (($settings['pager'] ?? FALSE) !== FALSE && preg_match('/^page:\d+$/', $key)) {
-          $page = explode(':', $key)[1];
+        // Pager mode: `page:n`
+        // AJAX scroll mode: `scroll:n`
+        // Or NULL for unlimited results
+        if (($settings['pager'] ?? FALSE) !== FALSE && preg_match('/^(page|scroll):\d+$/', $key)) {
+          [$pagerMode, $page] = explode(':', $key);
         }
         $limit = !empty($settings['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
         $apiParams['debug'] = $this->debug;
         $apiParams['limit'] = $limit ?? $settings['limit'] ?? NULL;
         $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
+        if ($apiParams['limit'] && $pagerMode === 'scroll') {
+          $apiParams['limit']++;
+        }
         $apiParams['orderBy'] = $this->getOrderByFromSort();
-        $this->augmentSelectClause($apiParams);
     }
-
-    $this->applyFilters();
 
     $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
     // Copy over meta properties to this result
@@ -106,6 +113,11 @@ class Run extends AbstractRunAction {
       $result->exchangeArray($apiResult->getArrayCopy());
     }
     else {
+      if ($pagerMode === 'scroll') {
+        // Remove the extra result appended for the sake of infinite scrolling
+        $result->setCountMatched($apiResult->countFetched());
+        $apiResult = array_slice((array) $apiResult, 0, $apiParams['limit'] - 1);
+      }
       $result->exchangeArray($this->formatResult($apiResult));
       $result->labels = $this->filterLabels;
     }

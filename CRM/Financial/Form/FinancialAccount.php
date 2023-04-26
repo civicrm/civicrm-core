@@ -159,7 +159,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
           'financial_account_id' => $self->_id,
           'account_relationship' => $relationshipId,
         ];
-        $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
+        $result = CRM_Financial_BAO_EntityFinancialAccount::retrieve($params, $defaults);
         if ($result) {
           $errorMsg['is_tax'] = ts('Is Tax? must be set for this financial account');
         }
@@ -209,7 +209,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       ] as $field) {
         $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
       }
-      $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
+      $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
       CRM_Core_Session::setStatus(ts('The Financial Account \'%1\' has been saved.', [1 => $financialAccount->name]), ts('Saved'), 'success');
     }
   }

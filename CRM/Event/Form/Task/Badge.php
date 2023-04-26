@@ -37,8 +37,6 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
   /**
    * Build all the data structures needed to build the form.
    *
-   * @param
-   *
    * @return void
    */
   public function preProcess() {

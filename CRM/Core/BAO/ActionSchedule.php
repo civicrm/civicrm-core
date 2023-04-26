@@ -179,6 +179,7 @@ FROM civicrm_action_schedule cas
    * @throws \CRM_Core_Exception
    */
   public static function add(array $params): CRM_Core_DAO_ActionSchedule {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -210,21 +211,18 @@ FROM civicrm_action_schedule cas
    * @throws CRM_Core_Exception
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $id]);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_ActionSchedule', $id, 'is_active', $is_active);
   }
 
@@ -249,6 +247,10 @@ FROM civicrm_action_schedule cas
       $dao = CRM_Core_DAO::executeQuery($query,
         [1 => [$actionSchedule->id, 'Integer']]
       );
+
+      if ($dao->N > 0) {
+        Civi::log()->info("Sending Scheduled Reminder {$actionSchedule->id} to {$dao->N} recipients");
+      }
 
       $multilingual = CRM_Core_I18n::isMultilingual();
       $tokenProcessor = self::createTokenProcessor($actionSchedule, $mapping);
@@ -631,17 +633,15 @@ FROM civicrm_action_schedule cas
       'controller' => __CLASS__,
       'actionSchedule' => $schedule,
       'actionMapping' => $mapping,
-      'smarty' => TRUE,
+      'smarty' => Civi::settings()->get('scheduled_reminder_smarty'),
       'schema' => ['contactId'],
     ]);
     $tp->addMessage('body_text', $schedule->body_text, 'text/plain');
     $tp->addMessage('body_html', $schedule->body_html, 'text/html');
     $tp->addMessage('sms_body_text', $schedule->sms_body_text, 'text/plain');
     $tp->addMessage('subject', $schedule->subject, 'text/plain');
-    // These 2 are not 'real' tokens - but it tells the processor to load them.
+    // These is not a 'real' token - but it tells the processor to load them.
     $tp->addMessage('toName', '{contact.display_name}', 'text/plain');
-    $tp->addMessage('preferred_mail_format', '{contact.preferred_mail_format}', 'text/plain');
-
     return $tp;
   }
 

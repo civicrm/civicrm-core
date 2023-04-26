@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>MailingRecipients</class>
+  <name>civicrm_mailing_recipients</name>
+  <comment>Stores information about the recipients of a mailing.</comment>
+  <archive>true</archive>
+  <component>CiviMail</component>
+  <title>Mailing Recipient</title>
+  <titlePlural>Mailing Recipients</titlePlural>
+  <field>
+    <name>id</name>
+    <title>Mailing Recipients ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>mailing_id</name>
+    <title>Mailing ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <html>
+      <label>Mailing</label>
+    </html>
+    <comment>The ID of the mailing this Job will send.</comment>
+  </field>
+  <foreignKey>
+    <name>mailing_id</name>
+    <table>civicrm_mailing</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contact_id</name>
+    <title>Recipient ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Contact</comment>
+    <html>
+      <label>Recipient</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>email_id</name>
+    <title>Email ID</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>FK to Email</comment>
+    <html>
+      <label>Email</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>email_id</name>
+    <table>civicrm_email</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>phone_id</name>
+    <title>Phone ID</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>FK to Phone</comment>
+    <html>
+      <label>Phone</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>phone_id</name>
+    <table>civicrm_phone</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

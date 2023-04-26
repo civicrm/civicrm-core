@@ -15,7 +15,7 @@ class TextClickTracker implements ClickTrackerInterface {
   public function filterContent($msg, $mailing_id, $queue_id) {
     return self::replaceTextUrls($msg,
       function ($url) use ($mailing_id, $queue_id) {
-        return \CRM_Mailing_BAO_TrackableURL::getTrackerURL($url, $mailing_id,
+        return \CRM_Mailing_BAO_MailingTrackableURL::getTrackerURL($url, $mailing_id,
           $queue_id);
       }
     );
@@ -37,7 +37,7 @@ class TextClickTracker implements ClickTrackerInterface {
     };
     // Find any HTTP(S) URLs in the text.
     // return preg_replace_callback('/\b(?:(?:https?):\/\/|www\.|ftp\.)[-A-Z0-9+&@#\/%=~_|$?!:,.]*[A-Z0-9+&@#\/%=~_|$]/i', $callback, $tex
-    return preg_replace_callback('/\b(?:(?:https?):\/\/)[\w+&@#\/%=~_|$?!:,.{}\[\];]*[\w+&@#\/%=~_|${}\[\];]/iu',
+    return preg_replace_callback('/\b(?:(?:https?):\/\/)[\w+&@#\/%=~_|$?!:,.{}\[\];\-]*[\w+&@#\/%=~_|${}\[\];\-]/iu',
       $callback, $text);
   }
 

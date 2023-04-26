@@ -196,7 +196,7 @@ class DefaultSender extends BaseListener {
     $params = array_merge($params,
       \CRM_Mailing_BAO_BouncePattern::match($errorMessage)
     );
-    \CRM_Mailing_Event_BAO_Bounce::create($params);
+    \CRM_Mailing_Event_BAO_MailingEventBounce::recordBounce($params);
   }
 
 }

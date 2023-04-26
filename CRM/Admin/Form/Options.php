@@ -26,7 +26,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   /**
    * The option group name.
    *
-   * @var array
+   * @var string
    */
   protected $_gName;
 
@@ -137,6 +137,13 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $defaults['color'] = '#ffffff';
     }
     return $defaults;
+  }
+
+  /**
+   * @return string
+   */
+  public function getOptionGroupName() : string {
+    return $this->_gName;
   }
 
   /**
@@ -452,7 +459,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $fieldValues = ['option_group_id' => $this->_gid];
       CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
 
-      if (CRM_Core_BAO_OptionValue::del($this->_id)) {
+      if (CRM_Core_BAO_OptionValue::deleteRecord(['id' => $this->_id])) {
         if ($this->_gName == 'phone_type') {
           CRM_Core_BAO_Phone::setOptionToNull(CRM_Utils_Array::value('value', $this->_defaultValues));
         }
@@ -466,24 +473,14 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
     else {
       $params = $this->exportValues();
-
-      // allow multiple defaults within group.
-      $allowMultiDefaults = ['email_greeting', 'postal_greeting', 'addressee', 'from_email_address'];
-      if (in_array($this->_gName, $allowMultiDefaults)) {
-        if ($this->_gName == 'from_email_address') {
-          $params['reset_default_for'] = ['domain_id' => CRM_Core_Config::domainID()];
-        }
-        elseif ($filter = CRM_Utils_Array::value('contact_type_id', $params)) {
-          $params['filter'] = $filter;
-          $params['reset_default_for'] = ['filter' => "0, " . $params['filter']];
-        }
-
-        //make sure we only have a single space, CRM-6977 and dev/mail/15
-        if ($this->_gName == 'from_email_address') {
-          $params['label'] = $this->sanitizeFromEmailAddress($params['label']);
-        }
+      if ($this->isGreetingOptionGroup()) {
+        $params['filter'] = $params['contact_type_id'];
       }
 
+      //make sure we only have a single space, CRM-6977 and dev/mail/15
+      if ($this->_gName == 'from_email_address') {
+        $params['label'] = $this->sanitizeFromEmailAddress($params['label']);
+      }
       // set value of filter if not present in params
       if ($this->_id && !array_key_exists('filter', $params)) {
         if ($this->_gName == 'participant_role') {
@@ -512,6 +509,15 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   public function sanitizeFromEmailAddress($email) {
     preg_match("/^\"(.*)\" *<([^@>]*@[^@>]*)>$/", $email, $parts);
     return "\"{$parts[1]}\" <$parts[2]>";
+  }
+
+  /**
+   * Is the option group one of our greetings.
+   *
+   * @return bool
+   */
+  protected function isGreetingOptionGroup(): bool {
+    return in_array($this->getOptionGroupName(), ['email_greeting', 'postal_greeting', 'addressee'], TRUE);
   }
 
 }

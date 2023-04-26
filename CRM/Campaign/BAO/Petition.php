@@ -17,6 +17,13 @@
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
 
   /**
+   * Length of the cookie's created by this class
+   *
+   * @var int
+   */
+  protected $cookieExpire;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -588,7 +595,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
       case CRM_Campaign_Form_Petition_Signature::EMAIL_CONFIRM:
         // create mailing event subscription record for this contact
         // this will allow using a hash key to confirm email address by sending a url link
-        $se = CRM_Mailing_Event_BAO_Subscribe::subscribe($group_id,
+        $se = CRM_Mailing_Event_BAO_MailingEventSubscribe::subscribe($group_id,
           $params['email-Primary'],
           $params['contactId'],
           'profile'

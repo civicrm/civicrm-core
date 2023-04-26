@@ -177,6 +177,11 @@ class Afform extends Generic\AbstractEntity {
           ],
         ],
         [
+          'name' => 'summary_contact_type',
+          'data_type' => 'Array',
+          'options' => \CRM_Contact_BAO_ContactType::contactTypePairs(),
+        ],
+        [
           'name' => 'icon',
           'description' => 'Icon shown in the contact summary tab',
         ],

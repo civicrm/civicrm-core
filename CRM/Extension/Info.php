@@ -156,6 +156,21 @@ class CRM_Extension_Info {
   public $version;
 
   /**
+   * @var array
+   */
+  public $typeInfo;
+
+  /**
+   * @var string
+   */
+  public $url;
+
+  /**
+   * @var string
+   */
+  public $category;
+
+  /**
    * Load extension info an XML file.
    *
    * @param string $file

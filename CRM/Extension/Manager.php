@@ -378,6 +378,9 @@ class CRM_Extension_Manager {
 
     sort($keys);
     $disableRequirements = $this->findDisableRequirements($keys);
+
+    $requiredExtensions = $this->mapper->getKeysByTag('mgmt:required');
+
     // This munges order, but makes it comparable.
     sort($disableRequirements);
     if ($keys !== $disableRequirements) {
@@ -388,6 +391,10 @@ class CRM_Extension_Manager {
 
     foreach ($keys as $key) {
       if (isset($origStatuses[$key])) {
+        if (in_array($key, $requiredExtensions)) {
+          throw new CRM_Extension_Exception("Cannot disable required extension: $key");
+        }
+
         switch ($origStatuses[$key]) {
           case self::STATUS_INSTALLED:
             $this->addProcess([$key], 'disabling');
@@ -693,11 +700,12 @@ class CRM_Extension_Manager {
     $dao = new CRM_Core_DAO_Extension();
     $dao->full_name = $info->key;
     if ($dao->find(TRUE)) {
-      if (CRM_Core_BAO_Extension::del($dao->id)) {
+      try {
+        CRM_Core_BAO_Extension::deleteRecord(['id' => $dao->id]);
         CRM_Core_Session::setStatus(ts('Selected option value has been deleted.'), ts('Deleted'), 'success');
       }
-      else {
-        throw new CRM_Extension_Exception("Failed to remove extension entry");
+      catch (CRM_Core_Exception $e) {
+        throw new CRM_Extension_Exception("Failed to remove extension entry $dao->id");
       }
     } // else: post-condition already satisified
   }

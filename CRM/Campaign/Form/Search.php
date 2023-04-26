@@ -58,7 +58,6 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     $this->_defaults = [];
 
     //set the button name.
-    $this->_printButtonName = $this->getButtonName('next', 'print');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->loadStandardSearchOptionsFromUrl();

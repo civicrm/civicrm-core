@@ -18,13 +18,6 @@
  */
 class api_v3_DomainTest extends CiviUnitTestCase {
 
-  /**
-   * This test case doesn't require DB reset - apart from
-   * where cleanDB() is called.
-   * @var bool
-   */
-  public $DBResetRequired = FALSE;
-
   protected $params;
 
   /**

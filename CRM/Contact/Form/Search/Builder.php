@@ -685,9 +685,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     ];
 
     if (isset($mappingId)) {
-      list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingImProvider,
-        $mappingRelation, $mappingOperator, $mappingValue
-        ) = $this->getMappingFields($mappingId);
+      [$mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $mappingRelation, $mappingOperator, $mappingValue] = $this->getMappingFields($mappingId);
 
       $blkCnt = count($mappingName);
       if ($blkCnt >= $blockCount) {

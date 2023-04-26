@@ -33,6 +33,13 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Forms {
     $this->setTitle($userJob['job_type:label']);
     $onDuplicate = $userJob['metadata']['submitted_values']['onDuplicate'];
     $this->assign('dupeError', FALSE);
+    $importBaseURL = $this->getUserJobInfo()['url'] ?? NULL;
+    $this->assign('templateURL', ($importBaseURL && $this->getTemplateID()) ? CRM_Utils_System::url($importBaseURL, ['template_id' => $this->getTemplateID(), 'reset' => 1]) : '');
+    // This can be overridden by Civi-Import so that the Download url
+    // links that go to SearchKit open in a new tab.
+    $this->assign('isOpenResultsInNewTab');
+    $this->assign('allRowsUrl');
+    $this->assign('importedRowsUrl');
 
     if ($onDuplicate === CRM_Import_Parser::DUPLICATE_UPDATE) {
       $this->assign('dupeActionString', ts('These records have been updated with the imported data.'));
@@ -63,7 +70,8 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Forms {
     $this->assign('outputUnavailable', FALSE);
     try {
       $this->assign('totalRowCount', $this->getRowCount());
-      $this->assign('validRowCount', $this->getRowCount(CRM_Import_Parser::VALID) + $this->getRowCount(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
+      $this->assign('unprocessedRowCount', $this->getRowCount() - $this->getRowCount('imported') - $this->getRowCount(CRM_Import_Parser::ERROR) - $this->getRowCount(CRM_Import_Parser::DUPLICATE));
+      $this->assign('importedRowCount', $this->getRowCount('imported'));
       $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
       $this->assign('duplicateRowCount', $this->getRowCount(CRM_Import_Parser::DUPLICATE));
       $this->assign('unMatchCount', $this->getRowCount(CRM_Import_Parser::NO_MATCH));
@@ -100,6 +108,7 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Forms {
       }
       $this->assign('dupeActionString', $dupeActionString);
     }
+    // @todo - remove this - it is never thrown.
     catch (CRM_Import_Exception_ImportTableUnavailable $e) {
       $this->assign('outputUnavailable', TRUE);
     }

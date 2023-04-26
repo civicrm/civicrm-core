@@ -25,9 +25,8 @@ trait DbTestTrait {
    * @param $id
    * @param $match
    * @param bool $delete
-   * @throws \PHPUnit_Framework_AssertionFailedError
    */
-  public function assertDBState($daoName, $id, $match, $delete = FALSE) {
+  public function assertDBState($daoName, $id, $match, $delete = FALSE): void {
     if (empty($id)) {
       // adding this here since developers forget to check for an id
       // and hence we get the first value in the db
@@ -170,14 +169,15 @@ trait DbTestTrait {
    * Example: $this->assertSql(2, 'select count(*) from foo where foo.bar like "%1"',
    * array(1 => array("Whiz", "String")));
    *
-   * @param $expected
-   * @param $query
+   * @param string|null|int $expected
+   * @param string $query
    * @param array $params
    * @param string $message
    *
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
-  public function assertDBQuery($expected, $query, $params = [], $message = '') {
+  public function assertDBQuery($expected, string $query, array $params = [], string $message = ''): void {
     if ($message) {
       $message .= ': ';
     }

@@ -28,7 +28,7 @@ class FlexMailerTask {
   /**
    * @var int
    *   A persistent record for this email delivery.
-   * @see \CRM_Mailing_Event_DAO_Queue
+   * @see \CRM_Mailing_Event_DAO_MailingEventQueue
    */
   private $eventQueueId;
 
@@ -87,7 +87,7 @@ class FlexMailerTask {
 
   /**
    * @return int
-   * @see \CRM_Mailing_Event_DAO_Queue
+   * @see \CRM_Mailing_Event_DAO_MailingEventQueue
    */
   public function getEventQueueId() {
     return $this->eventQueueId;

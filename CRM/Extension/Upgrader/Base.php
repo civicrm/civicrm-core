@@ -3,6 +3,7 @@
 /**
  * Base class which provides helpers to execute upgrade logic.
  *
+ * @since 5.38
  * LIFECYCLE METHODS: Subclasses may optionally define install(), postInstall(),
  * uninstall(), enable(), disable().
  *

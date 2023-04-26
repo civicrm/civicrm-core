@@ -11,7 +11,7 @@
       ids: '<'
     },
     templateUrl: '~/crmSearchTasks/crmSearchTasks.html',
-    controller: function($scope, crmApi4, dialogService) {
+    controller: function($scope, crmApi4, dialogService, $window) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
         initialized = false,
@@ -31,7 +31,7 @@
         initialized = true;
         crmApi4({
           entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural', 'primary_key'], where: [['name', '=', ctrl.entity]]}, 0],
-          tasks: ['SearchDisplay', 'getSearchTasks', {entity: ctrl.entity}]
+          tasks: ['SearchDisplay', 'getSearchTasks', {entity: ctrl.entity, savedSearch: ctrl.search, display: ctrl.display}]
         }).then(function(result) {
           ctrl.entityInfo = result.entityInfo;
           ctrl.tasks = result.tasks;
@@ -71,6 +71,11 @@
             query = action.crmPopup.query && $scope.$eval(action.crmPopup.query, data);
           CRM.loadForm(CRM.url(path, query), {post: action.crmPopup.data && $scope.$eval(action.crmPopup.data, data)})
             .on('crmFormSuccess', ctrl.refresh);
+        }
+        else if (action.redirect) {
+          var redirectPath = $scope.$eval(action.redirect.path, data),
+            redirectQuery = action.redirect.query && $scope.$eval(action.redirect.query, data) && $scope.$eval(action.redirect.data, data);
+          $window.open(CRM.url(redirectPath, redirectQuery), '_blank');
         }
         // If action uses dialogService
         else {

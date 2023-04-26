@@ -19,10 +19,12 @@
 
         function makeWidget(field) {
           var options,
+            filters,
             $el = $($element),
             inputType = field.input_type,
             dataType = field.data_type;
           multi = field.serialize || dataType === 'Array';
+          $el.crmAutocomplete('destroy').crmDatepicker('destroy');
           // Allow input_type to override dataType
           if (inputType) {
             multi = (dataType !== 'Boolean' &&
@@ -34,11 +36,29 @@
           else if (field.fk_entity || field.options || dataType === 'Boolean') {
             if (field.fk_entity) {
               // Static options for choosing current user or other entities on the form
-              options = field.fk_entity === 'Contact' ? ['user_contact_id'] : [];
+              options = [];
+              filters = (field.input_attrs && field.input_attrs.filter) || {};
+              if (field.fk_entity === 'Contact' && (!filters.contact_type || filters.contact_type === 'Individual')) {
+                options.push('user_contact_id');
+              }
               _.each(ctrl.editor.getEntities({type: field.fk_entity}), function(entity) {
-                 options.push({id: entity.name, label: entity.label, icon: afGui.meta.entities[entity.type].icon});
+                // Check if field filters match entity data (e.g. contact_type)
+                var filtersMatch = true;
+                _.each(filters, function(value, key) {
+                  if (entity.data && entity.data[key] && entity.data[key] != value) {
+                    filtersMatch = false;
+                  }
+                });
+                if (filtersMatch) {
+                  options.push({id: entity.name, label: entity.label, icon: afGui.meta.entities[entity.type].icon});
+                }
               });
-              $el.crmEntityRef({entity: field.fk_entity, select: {multiple: multi}, static: options});
+              var params = field.entity && field.name ? {fieldName: field.entity + '.' + field.name} : {filters: filters};
+              $el.crmAutocomplete(field.fk_entity, params, {
+                multiple: multi,
+                "static": options,
+                minimumInputLength: options.length ? 1 : 0
+              });
             } else if (field.options) {
               options = _.transform(field.options, function(options, val) {
                 options.push({id: val.id, text: val.label});
@@ -86,7 +106,9 @@
           ctrl.ngModel.$isEmpty = function(value) {
             return !value || !value.length;
           };
+        };
 
+        this.$onChanges = function() {
           $timeout(function() {
             makeWidget(ctrl.field);
           });

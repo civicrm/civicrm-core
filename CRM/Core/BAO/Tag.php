@@ -22,19 +22,13 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   protected $tree;
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
@@ -89,12 +83,18 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $thisref['name'] = $dao->name;
       $thisref['description'] = $dao->description;
       $thisref['is_selectable'] = $dao->is_selectable;
-      $thisref['children'] = [];
-
+      if (!isset($thisref['children'])) {
+        $thisref['children'] = [];
+      }
       if (!$dao->parent_id) {
         $this->tree[$dao->id] = &$thisref;
       }
       else {
+        if (!isset($refs[$dao->parent_id])) {
+          $refs[$dao->parent_id] = array(
+            'children' => [],
+          );
+        }
         $refs[$dao->parent_id]['children'][$dao->id] = &$thisref;
       }
     }
@@ -344,6 +344,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) static::deleteRecord(['id' => $id]);
   }
 

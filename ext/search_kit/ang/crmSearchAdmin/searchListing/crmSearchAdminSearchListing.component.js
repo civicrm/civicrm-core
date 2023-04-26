@@ -29,6 +29,7 @@
             'id',
             'name',
             'label',
+            'description',
             'api_entity',
             'api_entity:label',
             'api_params',
@@ -55,7 +56,7 @@
             ['Group AS group', 'LEFT', ['id', '=', 'group.saved_search_id']],
             ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
           ],
-          where: [['api_entity', 'IS NOT NULL']],
+          where: [['api_entity', 'IS NOT NULL'], ['is_current', '=', true]],
           groupBy: ['id']
         }
       };
@@ -193,8 +194,13 @@
                 title: ts('Edit Label'),
                 editable: true
               }),
+              searchMeta.fieldToColumn('description', {
+                label: true,
+                title: ts('Edit Description'),
+                editable: true
+              }),
               searchMeta.fieldToColumn('api_entity:label', {
-                label: ts('For'),
+                label: true,
                 empty_value: ts('Missing'),
                 cssRules: [
                   ['font-italic', 'api_entity:label', 'IS EMPTY']

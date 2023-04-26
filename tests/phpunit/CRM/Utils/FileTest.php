@@ -6,6 +6,10 @@
  */
 class CRM_Utils_FileTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->callAPISuccess('OptionValue', 'get', ['option_group_id' => 'safe_file_extension', 'value' => 17, 'api.option_value.delete' => ['id' => "\$value.id"]]);
+  }
+
   /**
    * Test is child path.
    */
@@ -319,7 +323,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    */
   public function testIsDirWithOpenBasedir(?string $input, bool $expected) {
     // This might not always be under cms root, but let's see how it goes.
-    $a_dir = \Civi::paths()->getPath('[civicrm.compile]/');
+    $a_dir = \Civi::paths()->getPath('[civicrm.compile]/.');
 
     if (file_exists("{$a_dir}/isDirTest/ok/ok.txt")) {
       unlink("{$a_dir}/isDirTest/ok/ok.txt");
@@ -339,10 +343,13 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     // where this file is:
     $cms_root = realpath(__DIR__ . '/../../../../../../../..');
 
+    // NOTE: The `[civicrm.compile]` does not necessarily live under the public `[cms.root] -- e.g. if you have a private data-folder.
+    $open_base_dirs = implode(PATH_SEPARATOR, [$cms_root, dirname($a_dir)]);
+
     // This test requires tightening `open_basedir` settings, which is a one-way change.
     // Therefore, we have to do that part of the test in a sub-process.
     // If you run directly in the same-process, then (eg) `phpunit` will have trouble writing error-data to JUnit XML files.
-    [$exitCode, $stdout, $stderr] = $this->runStaticMethodAsScript(__CLASS__, 'doIsDirWithOpenBasedir', [$a_dir, $cms_root, $input, $expected]);
+    [$exitCode, $stdout, $stderr] = $this->runStaticMethodAsScript(__CLASS__, 'doIsDirWithOpenBasedir', [$a_dir, $open_base_dirs, $input, $expected]);
     $this->assertEquals('"OK"', trim($stdout), 'doIsDirWithOpenBasedir() should return OK');
     $this->assertEquals('', trim($stderr), 'doIsDirWithOpenBasedir() should not generate warnings');
     $this->assertEquals(0, $exitCode, 'doIsDirWithOpenBasedir() should exit normally');
@@ -354,22 +361,22 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
   /**
    * @param string $a_dir
-   * @param string $cms_root
+   * @param string $open_base_dirs
    * @param string|null $input
    * @param bool $expected
    * @return string
    * @throws \ErrorException
    */
-  public static function doIsDirWithOpenBasedir(string $a_dir, string $cms_root, ?string $input, bool $expected): string {
+  public static function doIsDirWithOpenBasedir(string $a_dir, string $open_base_dirs, ?string $input, bool $expected): string {
     // We also need temp dir because phpunit creates files in there as it does stuff before we can reset basedir.
-    ini_set('open_basedir', $cms_root . PATH_SEPARATOR . sys_get_temp_dir());
+    ini_set('open_basedir', $open_base_dirs . PATH_SEPARATOR . sys_get_temp_dir());
 
     if (!mkdir("{$a_dir}/isDirTest")) {
-      return 'Failed to make isDirTest';
+      return "Failed to make isDirTest";
     }
 
     if (!mkdir("{$a_dir}/isDirTest/ok")) {
-      return 'Failed to make isDirTest/ok';
+      return "Failed to make isDirTest/ok";
     }
 
     file_put_contents("{$a_dir}/isDirTest/ok/ok.txt", 'Hello World!');
@@ -641,6 +648,36 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
       }
       $this->assertEquals($expectMatches, $actualMatches, "The file $expectFile should be found as follows:");
     }
+  }
+
+  /**
+   * Generate examples to test the safe file extension
+   * @return array
+   */
+  public static function safeFileExtensionExamples(): array {
+    $cases = [
+      'PDF File Extension' => ['pdf', TRUE, TRUE],
+      'PHP File Extension' => ['php', FALSE, FALSE],
+      'PHAR' => ['phar', FALSE, FALSE],
+      'PHP5 File Extension' => ['php5', FALSE, FALSE],
+    ];
+    return $cases;
+  }
+
+  /**
+   * Test that modifying the safe File Extension option group still ensures some are blocked
+   * @dataProvider safeFileExtensionExamples
+   */
+  public function testSafeFileExtensionValidation($extension, $standardInstallCheck, $afterModificationCheck): void {
+    $this->assertEquals($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
+    $optionValue = $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'safe_file_extension',
+      'label' => $extension,
+      'name' => $extension,
+      'value' => 17,
+    ]);
+    unset(Civi::$statics['CRM_Utils_File']['file_extensions']);
+    $this->assertEquals($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
   }
 
 }

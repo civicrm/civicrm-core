@@ -14,7 +14,7 @@ namespace Civi\Api4;
  * MsgTemplate entity.
  *
  * This is a collection of MsgTemplate, for reuse in import, export, etc.
- * @searchable none
+ * @searchable secondary
  * @since 5.26
  * @package Civi\Api4
  */

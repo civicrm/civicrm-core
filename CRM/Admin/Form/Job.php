@@ -34,19 +34,26 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $this->setTitle(ts('Manage - Scheduled Jobs'));
 
     if ($this->_id) {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/job',
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/job/edit',
         "reset=1&action=update&id={$this->_id}",
         FALSE, NULL, FALSE
       );
     }
     else {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/job',
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/job/add',
         "reset=1&action=add",
         FALSE, NULL, FALSE
       );
     }
 
     $this->assign('refreshURL', $refreshURL);
+  }
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Job';
   }
 
   /**
@@ -189,7 +196,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_BAO_Job::del($this->_id);
+      CRM_Core_BAO_Job::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus("", ts('Scheduled Job Deleted.'), "success");
       return;
     }
@@ -233,7 +240,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     if ($ts > time()) {
       $dao->scheduled_run_date = CRM_Utils_Date::currentDBDate($ts);
       // warn about monthly/quarterly scheduling, if applicable
-      if (($dao->run_frequency == 'Monthly') || ($dao->run_frequency == 'Quarter')) {
+      if (($dao->run_frequency === 'Monthly') || ($dao->run_frequency === 'Quarter')) {
         $info = getdate($ts);
         if ($info['mday'] > 28) {
           CRM_Core_Session::setStatus(

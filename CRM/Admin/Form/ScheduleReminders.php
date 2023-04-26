@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * This class generates form components for Scheduling Reminders.
  */
@@ -437,7 +439,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       // delete reminder
-      CRM_Core_BAO_ActionSchedule::del($this->_id);
+      CRM_Core_BAO_ActionSchedule::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected Reminder has been deleted.'), ts('Record Deleted'), 'success');
       if ($this->getContext() === 'event' && $this->getComponentID()) {
         $url = CRM_Utils_System::url('civicrm/event/manage/reminder',
@@ -696,19 +698,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    *
    * @return array
    */
-  public function listTokens() {
-    $tokenProcessor = new \Civi\Token\TokenProcessor(\Civi::dispatcher(), [
-      'controller' => get_class(),
+  public function listTokens(): array {
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
       'smarty' => FALSE,
-      'schema' => ['activityId', 'participantId'],
+      'schema' => ['activityId', 'participantId', 'membershipId', 'contactId', 'eventId', 'contributionId'],
     ]);
-    $tokens = $tokenProcessor->listTokens();
-
-    $tokens = array_merge(CRM_Core_SelectValues::contactTokens(), $tokens);
-    $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
-    $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
-    $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
-    return $tokens;
+    return $tokenProcessor->listTokens();
   }
 
 }

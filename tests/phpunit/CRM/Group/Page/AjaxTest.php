@@ -163,8 +163,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(2, $groups['recordsTotal']);
-    $this->assertEquals('<span><a href="/index.php?q=civicrm/group/search&amp;reset=1&amp;force=1&amp;context=smog&amp;gid=4&amp;component_mode=1" class="action-item crm-hover-button" title=\'Group Contacts\' >Contacts</a><a href="/index.php?q=civicrm/group&amp;reset=1&amp;action=update&amp;id=4" class="action-item crm-hover-button" title=\'Edit Group\' >Settings</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="#" class="action-item crm-hover-button crm-enable-disable" title=\'Disable Group\' >Disable</a></li><li><a href="/index.php?q=civicrm/group&amp;reset=1&amp;action=delete&amp;id=4" class="action-item crm-hover-button small-popup" title=\'Delete Group\' >Delete</a></li></ul></span>', $groups['data'][0]['links']);
-    $this->assertEquals('<span><a href="/index.php?q=civicrm/group/search&amp;reset=1&amp;force=1&amp;context=smog&amp;gid=2&amp;component_mode=1" class="action-item crm-hover-button" title=\'Group Contacts\' >Contacts</a><a href="/index.php?q=civicrm/group&amp;reset=1&amp;action=update&amp;id=2" class="action-item crm-hover-button" title=\'Edit Group\' >Settings</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="#" class="action-item crm-hover-button crm-enable-disable" title=\'Disable Group\' >Disable</a></li><li><a href="/index.php?q=civicrm/group&amp;reset=1&amp;action=delete&amp;id=2" class="action-item crm-hover-button small-popup" title=\'Delete Group\' >Delete</a></li></ul></span>', $groups['data'][1]['links']);
+    $this->assertEquals('<span><a href="/index.php?q=civicrm/group/search&amp;reset=1&amp;force=1&amp;context=smog&amp;gid=4&amp;component_mode=1" class="action-item crm-hover-button" title=\'Group Contacts\' >Contacts</a><a href="/index.php?q=civicrm/group/edit&amp;reset=1&amp;action=update&amp;id=4" class="action-item crm-hover-button" title=\'Edit Group\' >Settings</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="#" class="action-item crm-hover-button crm-enable-disable" title=\'Disable Group\' >Disable</a></li><li><a href="/index.php?q=civicrm/group/edit&amp;reset=1&amp;action=delete&amp;id=4" class="action-item crm-hover-button small-popup" title=\'Delete Group\' >Delete</a></li></ul></span>', $groups['data'][0]['links']);
+    $this->assertEquals('<span><a href="/index.php?q=civicrm/group/search&amp;reset=1&amp;force=1&amp;context=smog&amp;gid=2&amp;component_mode=1" class="action-item crm-hover-button" title=\'Group Contacts\' >Contacts</a><a href="/index.php?q=civicrm/group/edit&amp;reset=1&amp;action=update&amp;id=2" class="action-item crm-hover-button" title=\'Edit Group\' >Settings</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="#" class="action-item crm-hover-button crm-enable-disable" title=\'Disable Group\' >Disable</a></li><li><a href="/index.php?q=civicrm/group/edit&amp;reset=1&amp;action=delete&amp;id=2" class="action-item crm-hover-button small-popup" title=\'Delete Group\' >Delete</a></li></ul></span>', $groups['data'][1]['links']);
   }
 
   /**
@@ -723,10 +723,10 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
       ) VALUES (55, 'civicrm_group', $groupId, 1);
     ");
     // Put the user into this group
-    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
+    $loggedInUser = CRM_Core_Session::singleton()->get('userID');
     $this->callAPISuccess('group_contact', 'create', [
       'group_id' => $groupId,
-      'contact_id' => $this->_loggedInUser,
+      'contact_id' => $loggedInUser,
     ]);
     // Add the ACL
     CRM_Core_DAO::executeQuery("

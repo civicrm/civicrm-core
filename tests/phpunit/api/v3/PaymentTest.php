@@ -1184,7 +1184,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'is_primary' => 1,
     ];
     // api requires contact_id - perhaps incorrectly but use add to get past that.
-    $address = CRM_Core_BAO_Address::add($addressParams);
+    $address = CRM_Core_BAO_Address::writeRecord($addressParams);
 
     $location = $this->callAPISuccess('LocBlock', 'create', ['address_id' => $address->id]);
     $this->callAPISuccess('Event', 'create', [

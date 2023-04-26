@@ -69,33 +69,23 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
-   * @param $isActive
-   *
+   * @param bool $isActive
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $isActive) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_active', $isActive);
   }
 
@@ -510,6 +500,20 @@ WHERE  id = %1";
   }
 
   /**
+   * Is the price set 'quick config'.
+   *
+   * Quick config price sets have a simplified configuration on
+   * contribution and event pages.
+   *
+   * @param int $priceSetID
+   *
+   * @return bool
+   */
+  public static function isQuickConfig(int $priceSetID): bool {
+    return (bool) self::getCachedPriceSetDetail($priceSetID)['is_quick_config'];
+  }
+
+  /**
    * Get the Price Field ID.
    *
    * We call this function when more than one being present would represent an error
@@ -555,7 +559,7 @@ WHERE  id = %1";
    *   Price Set ID
    */
   public static function initSet(&$form, $entityTable = 'civicrm_event', $doNotIncludeExpiredFields = FALSE, $priceSetId = NULL) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     //check if price set is is_config
     if (is_numeric($priceSetId)) {
       if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config') && $form->getVar('_name') != 'Participant') {
@@ -878,38 +882,18 @@ WHERE  id = %1";
   }
 
   /**
-   * Check the current Membership having end date null.
+   * Check for lifetime membership types this contact has that are in this price field.
    *
    * @param array $options
-   * @param int $userid
-   *   Probably actually contact ID.
+   * @param int $contactId
    *
    * @return bool
    */
-  public static function checkCurrentMembership(&$options, $userid) {
-    if (!$userid || empty($options)) {
-      return FALSE;
-    }
-    static $_contact_memberships = [];
-    $checkLifetime = FALSE;
-    foreach ($options as $key => $value) {
-      if (!empty($value['membership_type_id'])) {
-        if (!isset($_contact_memberships[$userid][$value['membership_type_id']])) {
-          $_contact_memberships[$userid][$value['membership_type_id']] = CRM_Member_BAO_Membership::getContactMembership($userid, $value['membership_type_id'], FALSE);
-        }
-        $currentMembership = $_contact_memberships[$userid][$value['membership_type_id']];
-        if (!empty($currentMembership) && empty($currentMembership['end_date'])) {
-          unset($options[$key]);
-          $checkLifetime = TRUE;
-        }
-      }
-    }
-    if ($checkLifetime) {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+  private static function checkCurrentMembership(array $options, int $contactId) : bool {
+    $contactsLifetimeMemberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
+    $contactsLifetimeMembershipTypes = array_column($contactsLifetimeMemberships, 'membership_type_id');
+    $memTypeIdsInPriceField = array_column($options, 'membership_type_id');
+    return (bool) array_intersect($memTypeIdsInPriceField, $contactsLifetimeMembershipTypes);
   }
 
   /**
@@ -1340,8 +1324,7 @@ WHERE       ps.id = %1
   public static function copyPriceSet($baoName, $id, $newId) {
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($baoName, $id);
     if ($priceSetId) {
-      $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
-      if ($isQuickConfig) {
+      if (self::isQuickConfig($priceSetId)) {
         $copyPriceSet = CRM_Price_BAO_PriceSet::copy($priceSetId);
         CRM_Price_BAO_PriceSet::addTo($baoName, $newId, $copyPriceSet->id);
       }
@@ -1681,6 +1664,7 @@ WHERE     ct.id = cp.financial_type_id AND
     $hideAdminValues = !CRM_Core_Permission::check('edit contributions');
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
     $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
+    $checklifetime = FALSE;
     foreach ($feeBlock as $id => $field) {
       if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
         (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE) ||
@@ -1688,10 +1672,9 @@ WHERE     ct.id = cp.financial_type_id AND
       ) {
         $options = $field['options'] ?? NULL;
         if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
-          $userid = $form->getVar('_membershipContactID');
-          $checklifetime = self::checkCurrentMembership($options, $userid);
-          if ($checklifetime) {
-            $form->assign('ispricelifetime', TRUE);
+          $contactId = $form->getVar('_membershipContactID');
+          if ($contactId && $options) {
+            $checklifetime = $checklifetime ?: self::checkCurrentMembership($options, $contactId);
           }
         }
 
@@ -1719,6 +1702,7 @@ WHERE     ct.id = cp.financial_type_id AND
         }
       }
     }
+    $form->assign('ispricelifetime', $checklifetime);
   }
 
 }

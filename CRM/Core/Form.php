@@ -206,6 +206,40 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Get values submitted by the user.
+   *
+   * Compared with $this->controller->exportValues this has a couple of changes
+   * 1) any fields declared in $this->submittableMoneyFields will be de-formatted first.
+   * 2) it is possible to store access fields from related forms if they
+   * are declared in `getSubmittableFields()`. This is notably used in imports
+   * to combine fields from the various screens & save the resulting 'submitted_values'
+   * to the UserJob.
+   *
+   * @return array
+   */
+  public function getSubmittedValues(): array {
+    $values = [];
+    foreach (array_keys($this->getSubmittableFields()) as $key) {
+      $values[$key] = $this->getSubmittedValue($key);
+    }
+    return $values;
+  }
+
+  /**
+   * Get the fields that can be submitted in this form flow.
+   *
+   * To make fields in related forms (ie within the same wizard like
+   * Contribution_Main and Contribution_Confirm) accessible you can override
+   * this function as CRM_Import_Forms does.
+   *
+   * @return string[]
+   */
+  protected function getSubmittableFields(): array {
+    $fieldNames = array_keys($this->controller->exportValues($this->_name));
+    return array_fill_keys($fieldNames, $this->_name);
+  }
+
+  /**
    * Set context variable.
    */
   public function setContext() {
@@ -508,6 +542,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($extra['option_context']);
     }
 
+    // Allow disabled to be a boolean
+    if (isset($attributes['disabled']) && $attributes['disabled'] === FALSE) {
+      unset($attributes['disabled']);
+    }
+
     $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
@@ -689,7 +728,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->buildQuickForm();
 
     $defaults = $this->setDefaultValues();
-    unset($defaults['qfKey']);
+    if (isset($defaults['qfKey'])) {
+      unset($defaults['qfKey']);
+    }
 
     if (!empty($defaults)) {
       $this->setDefaults($defaults);
@@ -1151,7 +1192,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * If renderer is not set create one and initialize it.
    *
-   * @return object
+   * @return CRM_Core_Form_Renderer
    */
   public function &getRenderer() {
     if (!isset($this->_renderer)) {
@@ -1647,7 +1688,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           break;
         }
       }
-      $label = $props['label'] ?? $fieldSpec['title'];
+      $label = $props['label'] ?? $fieldSpec['html']['label'] ?? $fieldSpec['title'];
       if (CRM_Utils_Array::value('context', $props) != 'search') {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
       }
@@ -1713,7 +1754,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws \CRM_Core_Exception
    * @throws \Exception
    * @return mixed
-   *   HTML_QuickForm_Element
+   *   HTML_QuickForm_element
    *   void
    */
   public function addField($name, $props = [], $required = FALSE, $legacyDate = TRUE) {
@@ -1744,8 +1785,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Core field - get metadata.
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
-    $fieldSpecLabel = $fieldSpec['html']['label'] ?? CRM_Utils_Array::value('title', $fieldSpec);
-    $label = CRM_Utils_Array::value('label', $props, $fieldSpecLabel);
+    $label = $props['label'] ?? $fieldSpec['html']['label'] ?? $fieldSpec['title'];
 
     $widget = $props['type'] ?? $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $context == 'search') {
@@ -1788,7 +1828,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['data-api-field'] = $props['name'];
       }
     }
-    $props += CRM_Utils_Array::value('html', $fieldSpec, []);
+    $htmlProps = (array) ($fieldSpec['html'] ?? []);
+    CRM_Utils_Array::remove($htmlProps, 'label', 'filter');
+    $props += $htmlProps;
     if (in_array($widget, ['Select', 'Select2'])
       && !array_key_exists('placeholder', $props)
       && $placeholder = self::selectOrAnyPlaceholder($props, $required, $label)) {
@@ -1889,6 +1931,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->add('wysiwyg', $name, $label, $props, $required);
 
       case 'EntityRef':
+        // Auto-apply filters from field metadata
+        foreach ($fieldSpec['html']['filter'] ?? [] as $filter) {
+          [$k, $v] = explode('=', $filter);
+          $props['api']['params'][$k] = $v;
+        }
         return $this->addEntityRef($name, $label, $props, $required);
 
       case 'Password':
@@ -2194,6 +2241,38 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($setDefaultCurrency) {
       $this->setDefaults([$name => $defaultCurrency]);
     }
+  }
+
+  /**
+   * @param string $name
+   * @param string $label
+   * @param array $props
+   * @param bool $required
+   *
+   * @return HTML_QuickForm_Element
+   */
+  public function addAutocomplete(string $name, string $label = '', array $props = [], bool $required = FALSE) {
+    $props += [
+      'entity' => 'Contact',
+      'api' => [],
+      'select' => [],
+    ];
+    $props['api'] += [
+      'formName' => 'qf:' . get_class($this),
+    ];
+    // If fieldName is missing and no default entity is set for the form, this will throw an excption.
+    // In that case, you should explicitly supply api.fieldName in the format `EntityName.field_name`
+    // because without it autocompleteSubscribers can't do their job.
+    if (empty($props['api']['fieldName'])) {
+      $props['api']['fieldName'] = $this->getDefaultEntity() . '.' . $name;
+    }
+    $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-autocomplete');
+    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
+    $props['data-select-params'] = json_encode($props['select']);
+    $props['data-api-params'] = json_encode($props['api']);
+    $props['data-api-entity'] = $props['entity'];
+    CRM_Utils_Array::remove($props, 'select', 'api', 'entity');
+    return $this->add('text', $name, $label, $props, $required);
   }
 
   /**
@@ -2606,6 +2685,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
     }
+  }
+
+  /**
+   * Push the current url to the userContext.
+   *
+   * This is like a save point :-). The next status bounce will
+   * return the browser to this url unless another is added.
+   */
+  protected function pushUrlToUserContext(): void {
+    CRM_Core_Session::singleton()
+      ->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
   }
 
   /**

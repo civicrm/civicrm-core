@@ -200,6 +200,7 @@ input.crm-form-checkbox + label {
   width: 15em;
 }
 .crm-container .huge,
+input.crm-form-autocomplete,
 input.crm-form-entityref {
   width: 25em;
 }
@@ -2784,6 +2785,7 @@ tbody.scrollContent tr.alternateRow {
 }
 
 .crm-container .disabled,
+.crm-container .crm-disabled,
 .crm-container .disabled *,
 .crm-container .cancelled,
 .crm-container .cancelled td,

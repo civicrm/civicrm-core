@@ -145,6 +145,11 @@
     <title>Is Active</title>
     <type>boolean</type>
     <required>true</required>
+    <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Disabling premium removes it from the premiums_premium join table below.</comment>
     <add>1.4</add>
   </field>

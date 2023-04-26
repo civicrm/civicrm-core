@@ -135,6 +135,13 @@ class CRM_Core_Page {
   ];
 
   /**
+   * The permission we have on this contact
+   *
+   * @var string
+   */
+  public $_permission;
+
+  /**
    * Class constructor.
    *
    * @param string $title
@@ -498,7 +505,7 @@ class CRM_Core_Page {
 
     $standardAttribs = ['aria-hidden' => 'true'];
     if ($text === NULL || $text === '') {
-      $title = $sr = '';
+      $sr = '';
     }
     else {
       $standardAttribs['title'] = $text;

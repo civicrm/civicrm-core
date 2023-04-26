@@ -37,6 +37,11 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
   protected $_outBound_option = NULL;
 
   /**
+   * @var CiviUnitTestCase
+   */
+  protected $_ut;
+
+  /**
    * Constructor.
    *
    * @param CiviUnitTestCase $unit_test The currently running test
