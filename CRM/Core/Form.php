@@ -1688,7 +1688,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           break;
         }
       }
-      $label = $props['label'] ?? $fieldSpec['title'];
+      $label = $props['label'] ?? $fieldSpec['html']['label'] ?? $fieldSpec['title'];
       if (CRM_Utils_Array::value('context', $props) != 'search') {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
       }
@@ -1785,8 +1785,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Core field - get metadata.
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
-    $fieldSpecLabel = $fieldSpec['html']['label'] ?? CRM_Utils_Array::value('title', $fieldSpec);
-    $label = CRM_Utils_Array::value('label', $props, $fieldSpecLabel);
+    $label = $props['label'] ?? $fieldSpec['html']['label'] ?? $fieldSpec['title'];
 
     $widget = $props['type'] ?? $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $context == 'search') {

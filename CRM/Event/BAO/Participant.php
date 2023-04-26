@@ -1803,11 +1803,10 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     }
     $fields = [];
     if (!empty($form->_fields)) {
-      $removeCustomFieldTypes = ['Participant'];
 
       foreach ($form->_fields as $name => $fieldInfo) {
         if ((substr($name, 0, 7) == 'custom_' && !$form->_allowConfirmation
-          && !CRM_Core_BAO_CustomGroup::checkCustomField(substr($name, 7), $removeCustomFieldTypes))
+          && !CRM_Core_BAO_CustomGroup::checkCustomField(substr($name, 7), ['Participant']))
           || substr($name, 0, 12) == 'participant_') {
           continue;
         }

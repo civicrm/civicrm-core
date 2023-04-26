@@ -43,7 +43,7 @@
       <div id="payment_notice">
         <fieldset class="crm-public-form-item crm-group payment_notice-group">
           <legend>{$paymentAgreementTitle}</legend>
-          {ts}Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.{/ts}
+          {$paymentAgreementText}
         </fieldset>
       </div>
     {/if}

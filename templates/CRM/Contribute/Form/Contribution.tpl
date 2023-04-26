@@ -385,8 +385,23 @@
           function checkEmail() {
             var data = $("#contact_id", $form).select2('data');
             if (data && data.extra && data.extra.email && data.extra.email.length) {
-              $("#email-receipt", $form).show();
-              $("#email-address", $form).html(data.extra.email);
+              CRM.api4('Email', 'get', {
+                select: ["on_hold", "contact.do_not_email"],
+                join: [["Contact AS contact", "LEFT", ["contact_id", "=", "contact.id"]]],
+                where: [["contact_id", "=", data.id], ["is_primary", "=", true]]
+              }).then(function(emails) {
+                if (!emails[0]['on_hold'] && !emails[0]['contact.do_not_email']) {
+                  $("#email-receipt", $form).show();
+                  $("#email-address", $form).html(data.extra.email);
+                }
+                else {
+                  CRM.alert(ts("No email receipt can be sent as the contact's primary email address is on hold or they are set to do not email."), ts("Cannot send email receipt"));
+                  $("#email-receipt", $form).hide();
+                }
+              }, function(failure) {
+                $("#email-receipt", $form).show();
+                $("#email-address", $form).html(data.extra.email);
+              });
             }
             else {
               $("#email-receipt", $form).hide();

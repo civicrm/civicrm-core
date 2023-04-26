@@ -9,6 +9,7 @@
 *}
 {* CiviContribute DashBoard (launch page) *}
 {if $buildTabularView}
+{crmRegion name="contribute-dashboard-reports"}
 <table class="report">
 <tr class="columnheader-dark">
     <th scope="col">{ts}Period{/ts}</th>
@@ -33,9 +34,14 @@
     <td><a href="{$startToDate.Valid.url}">{ts}View details{/ts}...</a></td>
 </tr>
 </table>
+{/crmRegion}
+
 {elseif $buildChart}
+{crmRegion name="contribute-dashboard-charts"}
   {include file = "CRM/Contribute/Form/ContributionCharts.tpl"}
+{/crmRegion}
 {else}
+{crmRegion name="contribute-dashboard-summary"}
   <h3>{ts}Contribution Summary{/ts} {help id="id-contribute-intro"}</h3>
       <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
         <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
@@ -64,12 +70,15 @@
 </ul>
 <div id="chartData"></div>
 </div>
-<div class="spacer"></div>
+{/crmRegion}
 
+{crmRegion name="contribute-dashboard-tables"}
+<div class="spacer"></div>
 {if $pager->_totalItems}
     <h3>{ts}Recent Contributions{/ts}</h3>
     <div>
         {include file="CRM/Contribute/Form/Selector.tpl" context="dashboard"}
     </div>
 {/if}
+{/crmRegion}
 {/if}

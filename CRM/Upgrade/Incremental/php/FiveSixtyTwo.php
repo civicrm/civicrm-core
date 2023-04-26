@@ -44,6 +44,9 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
     $this->addTask('Make civicrm_setting.domain_id optional', 'alterColumn', 'civicrm_setting', 'domain_id', "int unsigned DEFAULT NULL COMMENT 'Which Domain does this setting belong to'");
     $this->addTask('Consolidate the list of components', 'consolidateComponents');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Make civicrm_mapping.name required', 'alterColumn', 'civicrm_mapping', 'name', "varchar(64) NOT NULL COMMENT 'Unique name of Mapping'");
+    $this->addTask(ts('Drop index %1', [1 => 'civicrm_mapping.UI_name']), 'dropIndex', 'civicrm_mapping', 'UI_name');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_mapping.UI_name']), 'addIndex', 'civicrm_mapping', [['name']], 'UI');
 
     $this->addTask(
       'Add option group for file_type_id in file table',
