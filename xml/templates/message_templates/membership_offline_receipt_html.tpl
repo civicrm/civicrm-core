@@ -139,7 +139,7 @@
                 {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
                   <tr>
                     <td {$labelStyle}>
-                        {ts}Amount Before Tax{/ts}:
+                        {ts}Amount Before Tax:{/ts}
                     </td>
                     <td {$valueStyle}>
                         {contribution.tax_exclusive_amount}
