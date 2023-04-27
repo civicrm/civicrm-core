@@ -1216,8 +1216,6 @@ function setting_getfields_expectedresult() {
         'help_text' => '',
         'on_change' => [
           '0' => 'CRM_Case_Info::onToggleComponents',
-          '1' => 'CRM_Core_Component::flushEnabledComponents',
-          '2' => 'call://resources/resetCacheCode',
         ],
         'pseudoconstant' => [
           'callback' => 'CRM_Core_SelectValues::getComponentSelectValues',

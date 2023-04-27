@@ -116,15 +116,6 @@ class CRM_Core_Component {
   }
 
   /**
-   * Triggered by on_change callback of the 'enable_components' setting.
-   */
-  public static function flushEnabledComponents() {
-    unset(Civi::$statics[__CLASS__]);
-    CRM_Core_BAO_Navigation::resetNavigation();
-    Civi::cache('metadata')->clear();
-  }
-
-  /**
    * @param bool $translated
    *
    * @return array

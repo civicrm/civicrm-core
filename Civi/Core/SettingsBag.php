@@ -248,8 +248,6 @@ class SettingsBag {
       return $this;
     }
     $this->setDb($key, $value);
-    $this->values[$key] = $value;
-    $this->combined = NULL;
     return $this;
   }
 
@@ -426,6 +424,9 @@ class SettingsBag {
       // to save the field `group_name`, which is required in older schema.
       \CRM_Core_DAO::executeQuery(\CRM_Utils_SQL_Insert::dao($dao)->toSQL());
     }
+
+    $this->values[$name] = $value;
+    $this->combined = NULL;
 
     // Call 'post_change' listeners after the value has been saved.
     // Unlike 'on_change', this will only fire if the oldValue and newValue are not equivalent (using == comparison)

@@ -9,7 +9,7 @@ use CRM_AfformAdmin_ExtensionUtil as E;
  */
 class CRM_Extension_Upgrader_Component extends CRM_Extension_Upgrader_Base {
 
-  public function install() {
+  public function postInstall() {
     CRM_Core_BAO_ConfigSetting::enableComponent($this->getComponentName());
   }
 

@@ -798,8 +798,6 @@ return [
     'help_text' => NULL,
     'on_change' => [
       'CRM_Case_Info::onToggleComponents',
-      'CRM_Core_Component::flushEnabledComponents',
-      'call://resources/resetCacheCode',
     ],
     'post_change' => [
       'CRM_Core_Component::onToggleComponents',
