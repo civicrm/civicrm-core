@@ -1755,10 +1755,10 @@ VALUES
 -- CRM-9714
 
 INSERT INTO `civicrm_price_set` ( `name`, `title`, `is_active`, `extends`, `is_quick_config`, `financial_type_id`, `is_reserved` )
-VALUES ( 'default_contribution_amount', 'Contribution Amount', '1', '2', '1', NULL,1),
-( 'default_membership_type_amount', 'Membership Amount', '1', '3', '1', @financial_type_id_md,1);
+VALUES ( 'default_contribution_amount', 'Contribution Amount', '1', '2', '1', NULL, 1),
+( 'default_membership_type_amount', 'Membership Amount', '1', '3', '1', @financial_type_id_md, 1);
 
-SELECT @setID := max(id) FROM civicrm_price_set WHERE name = 'default_contribution_amount' AND extends = 2 AND is_quick_config = 1 ;
+SELECT @setID := max(id) FROM civicrm_price_set WHERE name = 'default_contribution_amount' AND is_quick_config = 1;
 
 INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`,`weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`,`visibility_id` )
 VALUES ( @setID, 'contribution_amount', 'Contribution Amount', 'Text', '1', '1', '1', '1', '1', '1' );

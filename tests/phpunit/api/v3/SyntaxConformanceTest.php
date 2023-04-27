@@ -1461,6 +1461,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         // FIXME: Why doesn't creating a campaign clear caches?
         civicrm_api3($entityName, 'getfields', ['cache_clear' => 1]);
       }
+      if (!empty($specs['serialize'])) {
+        $entity[$field] = (array) $entity[$field];
+      }
       $updateParams = [
         'id' => $entity['id'],
         $field => $entity[$field] ?? NULL,

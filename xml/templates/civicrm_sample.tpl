@@ -15,7 +15,7 @@ SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 -- Sample Extended Property Group and Fields
 
 INSERT INTO `civicrm_price_set` (`name`,`title`,`is_active`,`extends`,`is_quick_config`, `financial_type_id`)
-VALUES ('help_support_civicrm_amount', 'Help Support CiviCRM!', 1, 2, 0, 1);
+VALUES ('help_support_civicrm_amount', 'Help Support CiviCRM!', 1, '2', 0, 1);
 
 SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE name = 'help_support_civicrm_amount';
 
@@ -141,7 +141,7 @@ SELECT @priceFieldId, LOWER(name), name, description, minimum_fee, id as weight,
 
 
 INSERT INTO `civicrm_price_set` (`name`,`title`,`is_active`,`extends`, `financial_type_id`, `is_quick_config`)
-VALUES ('member_signup_and_renewal', 'Member Signup and Renewal', 1, 3, @financial_type_id, 1),
+VALUES ('member_signup_and_renewal', 'Member Signup and Renewal', 1, '3', @financial_type_id, 1),
        ('pledge_for_civicrm', 'Pledge for CiviCRM!',1,2,null,1);
 
 SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE name = 'member_signup_and_renewal';
@@ -181,9 +181,9 @@ VALUES
 -- Insert sample data for event
 
 INSERT INTO `civicrm_price_set` (`name`,`title`,`is_active`,`extends`, `is_quick_config`, `financial_type_id`)
-VALUES ('rain_forest_cup_youth_soccer_tournament', 'Rain-forest Cup Youth Soccer Tournament', 1, 1, 1,3),
-       ('fall_fundraiser_dinner', 'Fall Fundraiser Dinner', 1, 1, 1,3),
-       ('summer_solstice_festival_day_concert', 'Summer Solstice Festival Day Concert',1,1,0,3);
+VALUES ('rain_forest_cup_youth_soccer_tournament', 'Rain-forest Cup Youth Soccer Tournament', 1, '1', 1, 3),
+       ('fall_fundraiser_dinner', 'Fall Fundraiser Dinner', 1, '1', 1, 3),
+       ('summer_solstice_festival_day_concert', 'Summer Solstice Festival Day Concert', 1, '1', 0, 3);
 
 SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `name` = 'rain_forest_cup_youth_soccer_tournament';
 
