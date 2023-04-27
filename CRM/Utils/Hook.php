@@ -914,6 +914,12 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  public static function rows(&$rows) {
+    return self::singleton()->invoke(['rows'], $rows,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_rows'
+    );
+  }
+
   /**
    * This hook allows modification of the admin panels
    *
