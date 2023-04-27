@@ -55,6 +55,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
+    CRM_Core_BAO_ConfigSetting::enableAllComponents();
     CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_Pledge', [], 1, 0);
     $this->callAPISuccess('Phone', 'create', ['id' => $this->individualCreate(['email' => '']), 'phone' => '911', 'location_type_id' => 'Home']);
     $this->prepareForACLs();
@@ -748,7 +749,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   public function testGetActivityCheckPermissionsByCaseComponent(int $version): void {
     $this->_apiversion = $version;
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $activity = $this->activityCreate(['activity_type_id' => 'Open Case']);
     $activity2 = $this->activityCreate(['activity_type_id' => 'Pledge Reminder']);
     $this->hookClass->setHook('civicrm_aclWhereClause', [

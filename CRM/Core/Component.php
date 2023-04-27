@@ -428,6 +428,9 @@ class CRM_Core_Component {
    * @throws \CRM_Core_Exception.
    */
   public static function onToggleComponents($oldValue, $newValue): void {
+    if (CRM_Core_Config::isUpgradeMode()) {
+      return;
+    }
     $manager = CRM_Extension_System::singleton()->getManager();
     $toEnable = $toDisable = [];
     foreach (self::getComponents() as $component) {

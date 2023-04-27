@@ -44,6 +44,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
+    // Enable components BEFORE starting the transaction or the cache clearing will break the transaction
+    CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $this->useTransaction();
     // DGW
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
@@ -84,7 +86,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    */
   public function testMailerCreateSuccess(int $version): void {
     $this->_apiversion = $version;
-    $this->enableCiviCampaign();
     $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign'], __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);

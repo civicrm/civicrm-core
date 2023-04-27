@@ -93,18 +93,20 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   public function testExtensionGetByStatus() {
     $installed = $this->callAPISuccess('extension', 'get', ['status' => 'installed', 'options' => ['limit' => 0]]);
     $uninstalled = $this->callAPISuccess('extension', 'get', ['status' => 'uninstalled', 'options' => ['limit' => 0]]);
+    $disabled = $this->callAPISuccess('extension', 'get', ['status' => 'disabled', 'options' => ['limit' => 0]]);
 
     // If the filter works, then results should be strictly independent.
     $this->assertEquals(
       [],
       array_intersect(
         CRM_Utils_Array::collect('key', $installed['values']),
-        CRM_Utils_Array::collect('key', $uninstalled['values'])
+        CRM_Utils_Array::collect('key', $uninstalled['values']),
+        CRM_Utils_Array::collect('key', $disabled['values'])
       )
     );
 
     $all = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 0]]);
-    $this->assertEquals($all['count'], $installed['count'] + $uninstalled['count']);
+    $this->assertEquals($all['count'], $installed['count'] + $uninstalled['count'] + $disabled['count']);
   }
 
   public function testGetMultipleExtensions() {
