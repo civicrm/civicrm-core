@@ -50,6 +50,7 @@
     <required>true</required>
     <comment>FK to civicrm_file</comment>
     <html>
+      <type>EntityRef</type>
       <label>File</label>
     </html>
     <add>1.5</add>
