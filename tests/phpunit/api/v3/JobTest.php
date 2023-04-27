@@ -59,8 +59,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->resetHooks();
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone', 'civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule', 'civicrm_group', 'civicrm_group_contact'], TRUE);
-    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_relationship', 'civicrm_website', 'civicrm_phone', 'civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule', 'civicrm_group', 'civicrm_group_contact'], TRUE);
     foreach ($this->originalValues as $entity => $entities) {
       foreach ($entities as $values) {
         $this->callAPISuccess($entity, 'create', $values);
@@ -1389,7 +1388,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
           ],
         ],
       ],
-      [
+      'deceased_no_merge' => [
         [
           'mode' => 'safe',
           'contacts' => [

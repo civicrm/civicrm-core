@@ -284,13 +284,16 @@ WHERE  id IN ( $idString )
         ['relationship_type_id', '=', $relationshipTypeID],
         ['is_active', 'IN', [0, 1]],
       ])
-      ->setSelect(['id', 'is_active', 'start_date', 'end_date', 'contact_id_a.employer_id'])
+      ->setSelect(['id', 'is_active', 'start_date', 'end_date', 'contact_id_a.employer_id', 'contact_id_a.organization_name', 'contact_id_b.organization_name'])
       ->addOrderBy('is_active', 'DESC')
       ->setLimit(1)
       ->execute()->first();
 
     if (!empty($existingRelationship)) {
       if ($existingRelationship['is_active']) {
+        if ($existingRelationship['contact_id_a.organization_name'] !== $existingRelationship['contact_id_b.organization_name']) {
+          self::setCurrentEmployer([$contactID => $employerID]);
+        }
         // My work here is done.
         return;
       }
