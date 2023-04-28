@@ -4741,7 +4741,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    */
   public function testContactGetProximity(): void {
-    CRM_Core_Config::singleton()->geocodeMethod = 'CRM_Utils_MockGeocoder';
     $this->individualCreate();
     $contactID = $this->individualCreate();
     $this->callAPISuccess('Address', 'create', [
