@@ -126,6 +126,9 @@
 
 - name        : Anne Smale
 
+- github      : anthonyblond
+  name        : Anthony Blond
+  
 - github      : anthonylindsay
   name        : Anthony Lindsay
   organization: Annertech
@@ -1457,6 +1460,10 @@
 
 - github      : tapashdatta
 
+- github      : tbember
+  name        : Tiago Bember
+  organization: Giant Rabbit
+
 - github      : TBSliver
   name        : Tom Bloor
 
@@ -1592,6 +1599,8 @@
 
 - name        : William Gordon
   organization: British Humanist Association
+
+- github      : WebmasterBouclier
 
 - github      : webmaster-cses-org-uk
   name        : Adam Wood
