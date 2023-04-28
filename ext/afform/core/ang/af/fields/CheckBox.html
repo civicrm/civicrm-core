@@ -1,6 +1,6 @@
 <ul class="crm-checkbox-list" id="{{ fieldId }}" ng-if="$ctrl.defn.options">
   <li ng-repeat="opt in $ctrl.defn.options track by opt.id" >
-    <input type="checkbox" checklist-model="dataProvider.getFieldData()[$ctrl.fieldName]" id="{{ fieldId + opt.id }}" checklist-value="opt.id" />
+    <input type="checkbox" checklist-model="dataProvider.getFieldData()[$ctrl.fieldName]" ng-required="$ctrl.defn.required && !dataProvider.getFieldData()[$ctrl.fieldName].length" id="{{ fieldId + opt.id }}" checklist-value="opt.id" />
     <label for="{{ fieldId + opt.id }}">{{:: opt.label }}</label>
   </li>
 </ul>
