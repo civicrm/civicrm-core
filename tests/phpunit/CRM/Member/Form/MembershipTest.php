@@ -18,6 +18,7 @@
  */
 
 use Civi\Api4\FinancialType;
+use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
 use Civi\Api4\PriceFieldValue;
 
@@ -1518,16 +1519,19 @@ Expires: ',
    * @return string[]
    */
   private function getExpectedEmailStrings(): array {
+    $membership = Membership::get()->execute()->first();
     return [
+      '<td> ' . CRM_Utils_Date::formatDateOnlyLong($membership['start_date']) . ' </td> <td> ' . CRM_Utils_Date::formatDateOnlyLong($membership['end_date']) . ' </td>',
       '<table id="crm-membership_receipt"',
+      'AnnualFixed',
       'Membership Fee',
       'Financial Type',
       'Member Dues </td>',
-      '<tr> <td colspan="2" style="padding: 4px; border-bottom: 1px solid #999;"> <table> <tr> <th>Item</th> <th>Fee</th> <th>SubTotal</th> <th>Tax Rate</th> <th>Tax Amount</th> <th>Total</th> <th>Membership Start Date</th> <th>Membership Expiration Date</th> </tr> <tr> <td> Membership Amount - AnnualFixed </td>',
+      '<tr> <td colspan="2" style="padding: 4px; border-bottom: 1px solid #999;"> <table> <tr> <th>Item</th> <th>Fee</th> <th>SubTotal</th> <th>Tax Rate</th> <th>Tax Amount</th> <th>Total</th> <th>Membership Start Date</th> <th>Membership Expiration Date</th> </tr> <tr> <td>Membership Amount - AnnualFixed</td>',
       '<td> $50.00 </td> <td> $50.00 </td> <td> 10.00% </td> <td> $5.00 </td> <td> $55.00 </td> <td>',
       'Amount Before Tax: </td>',
       '<td style="padding: 4px; border-bottom: 1px solid #999;"> $50.00 </td>',
-      '<td>&nbsp;Sales Tax 10.00%</td> <td>&nbsp;$5.00</td>',
+      '<td style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"> Sales Tax 10.00%</td> <td style="padding: 4px; border-bottom: 1px solid #999;">$5.00</td>',
       'Total Tax Amount </td> <td style="padding: 4px; border-bottom: 1px solid #999;"> $5.00 </td>',
       'Amount </td> <td style="padding: 4px; border-bottom: 1px solid #999;"> $55.00 </td>',
       'Paid By </td> <td style="padding: 4px; border-bottom: 1px solid #999;"> Check </td>',

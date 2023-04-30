@@ -705,7 +705,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'modelProps' => [
           'receiptText' => $this->getSubmittedValue('receipt_text'),
           'contactId' => $this->_receiptContactId,
-          'contributionID' => $this->getContributionID(),
+          'contributionId' => $this->getContributionID(),
           'membershipID' => $this->_membershipId,
         ],
       ]
