@@ -5059,6 +5059,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'no_display' => TRUE,
         'default' => 0,
         'type' => CRM_Utils_Type::T_BOOLEAN,
+        'title' => ts('Deleted?'),
       ],
     ];
   }
