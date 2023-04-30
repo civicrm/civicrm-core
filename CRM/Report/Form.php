@@ -1386,6 +1386,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         if (empty($field['operatorType'])) {
           $field['operatorType'] = '';
         }
+        $field['no_display'] = $field['no_display'] ?? FALSE;
         $filterGroups[$groupingKey]['tables'][$table][$fieldName] = $field;
         // Filters is deprecated in favour of filterGroups.
         $filters[$table][$fieldName] = $field;
