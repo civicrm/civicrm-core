@@ -750,6 +750,8 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
 
     $this->assign('criteriaForm', FALSE);
+    // Will be overwritten in postProcess if TRUE.
+    $this->assign('printOnly', FALSE);
     // Display Report Criteria section if user has access Report Criteria OR administer Reports AND report instance is not reserved
     if (CRM_Core_Permission::check('administer Reports') ||
       CRM_Core_Permission::check('access Report Criteria')

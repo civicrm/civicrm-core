@@ -289,6 +289,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'filters' => [
           'contribution_id' => [
             'title' => ts('Contribution is a pledge payment'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
           ],
         ],
       ],
