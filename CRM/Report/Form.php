@@ -2520,7 +2520,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         unset($this->_columnHeaders[$key]);
       }
       else {
-        foreach (['colspan', 'type'] as $expectedKey) {
+        foreach (['colspan', 'type', 'group_by'] as $expectedKey) {
           if (!isset($this->_columnHeaders[$key][$expectedKey])) {
             // Ensure it is set to prevent smarty notices.
             $this->_columnHeaders[$key][$expectedKey] = FALSE;
