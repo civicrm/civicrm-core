@@ -33,7 +33,7 @@
          <div class="description">{ts}Select the Activity Type.{/ts}</div></td>
    </tr>
    <tr class="crm-campaign-survey-main-form-block-instructions">
-       <td class="label">{$form.instructions.label}</td>
+       <td class="label">{$form.instructions.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_survey' field='instructions' id=$surveyId}{/if}</td>
        <td class="view-value">{$form.instructions.html}
    </tr>
    <tr class="crm-campaign-survey-main-form-block-default_number_of_contacts">
