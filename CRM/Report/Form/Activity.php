@@ -17,7 +17,10 @@
 class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_selectAliasesTotal = [];
 
-  protected $_customGroupExtends = ['Activity'];
+  protected $_customGroupExtends = [
+    'Activity',
+    'Individual',
+  ];
 
   protected $_nonDisplayFields = [];
 
