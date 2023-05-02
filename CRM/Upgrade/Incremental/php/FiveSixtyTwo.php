@@ -31,6 +31,13 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
         // See also: https://lab.civicrm.org/dev/core/-/issues/3961
         $preUpgradeMessage .= "<p>{$message}</p>";
       }
+
+      if (defined('CIVICRM_SETTINGS_PATH') && CIVICRM_SETTINGS_PATH) {
+        $contents = file_get_contents(CIVICRM_SETTINGS_PATH);
+        if (strpos($contents, 'auto_detect_line_endings') !== FALSE) {
+          $preUpgradeMessage .= '<p>' . ts('Your civicrm.settings.php file contains a line to set the php variable `auto_detect_line_endings`. It is deprecated and the line should be removed from the file.') . '</p>';
+        }
+      }
     }
   }
 
