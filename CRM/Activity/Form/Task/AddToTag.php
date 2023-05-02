@@ -134,7 +134,7 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
         ]);
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts("Added Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success', ['expires' => 0]);
+      CRM_Core_Session::setStatus($status, ts("Added Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success');
     }
 
   }
