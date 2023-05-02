@@ -672,7 +672,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $queue = Civi::queue('user_job_' . $this->getUserJobID(), ['type' => 'Sql', 'error' => 'abort', 'runner' => 'task', 'user_job_id' => $this->getUserJobID(), 'retry_limit' => 5]);
     UserJob::update(FALSE)->setValues(['queue_id.name' => 'user_job_' . $this->getUserJobID()])->addWhere('id', '=', $this->getUserJobID())->execute();
     $offset = 0;
-    $batchSize = 50;
+    $batchSize = Civi::settings()->get('import_batch_size');
     while ($totalRows > 0) {
       if ($totalRows < $batchSize) {
         $batchSize = $totalRows;
