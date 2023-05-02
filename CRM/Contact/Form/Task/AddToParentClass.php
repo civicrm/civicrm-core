@@ -146,7 +146,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     CRM_Core_Session::setStatus($status, ts('Relationship created.', [
       'count' => $outcome['valid'],
       'plural' => 'Relationships created.',
-    ]), 'success', ['expires' => 0]);
+    ]), 'success');
 
   }
 

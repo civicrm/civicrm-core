@@ -232,7 +232,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
       1 => $groupName,
       'count' => $added,
       'plural' => 'Added Contacts to %1',
-    ]), 'success', ['expires' => 0]);
+    ]), 'success');
   }
 
 }
