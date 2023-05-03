@@ -85,6 +85,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->quickCleanup(['civicrm_relationship', 'civicrm_membership'], TRUE);
     RelationshipType::delete(FALSE)->addWhere('id', '>', ($this->relationshipTypeID - 1))->execute();
     parent::tearDown();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviMember');
+
   }
 
   /**
@@ -103,6 +105,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * Test Current Employer is correctly set.
    */
   public function testCurrentEmployerRelationship(): void {
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviMember');
     $employerRelationshipID = $this->callAPISuccessGetValue('RelationshipType', [
       'return' => 'id',
       'name_b_a' => 'Employer Of',
