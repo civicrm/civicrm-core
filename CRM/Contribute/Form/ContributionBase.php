@@ -1306,7 +1306,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($this->_useForMember === NULL) {
       if (CRM_Core_Component::isEnabled('CiviMember') &&
         (!$this->isQuickConfig() || !empty($this->_ccid)) &&
-        CRM_Core_Component::getComponentID('CiviMember') === (int) $this->order->getPriceSetMetadata()['extends']) {
+        (int) CRM_Core_Component::getComponentID('CiviMember') === (int) $this->order->getPriceSetMetadata()['extends']) {
         $this->_useForMember = 1;
       }
       else {
