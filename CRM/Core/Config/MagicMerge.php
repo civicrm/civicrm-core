@@ -402,7 +402,6 @@ class CRM_Core_Config_MagicMerge {
         'inCiviCRM' => FALSE,
         'doNotResetCache' => 0,
         'keyDisable' => FALSE,
-        'initialized' => FALSE,
         'userFrameworkFrontend' => FALSE,
         'userPermissionTemp' => NULL,
       ];
