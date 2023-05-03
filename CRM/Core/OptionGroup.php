@@ -145,7 +145,7 @@ WHERE  v.option_group_id = g.id
       $query .= ' AND  v.is_active = 1 ';
       // Only show options for enabled components
       $componentClause = ' v.component_id IS NULL ';
-      $enabledComponents = CRM_Core_Config::singleton()->enableComponents;
+      $enabledComponents = Civi::settings()->get('enable_components');
       if ($enabledComponents) {
         $enabledComponents = '"' . implode('","', $enabledComponents) . '"';
         $componentClause .= " OR v.component_id IN (SELECT id FROM civicrm_component WHERE name IN ($enabledComponents)) ";

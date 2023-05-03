@@ -421,7 +421,7 @@ class CRM_Core_Component {
    *   Is the component enabled.
    */
   public static function isEnabled(string $component): bool {
-    return in_array($component, CRM_Core_Config::singleton()->enableComponents, TRUE);
+    return in_array($component, Civi::settings()->get('enable_components'), TRUE);
   }
 
 }
