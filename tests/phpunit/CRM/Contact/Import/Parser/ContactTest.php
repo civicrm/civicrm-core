@@ -369,6 +369,34 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that importing a phone/email with "Fill" strategy doesn't get related contact info.
+   * See core#4269.
+   *
+   * @throws \Exception
+   */
+  public function testImportFillWithRelatedContact(): void {
+    $anthony = $this->individualCreate();
+    $jon = $this->individualCreate(['first_name' => 'Jon']);
+    Phone::create()
+      ->addValue('contact_id', $jon)
+      ->addValue('location_type_id:label', 'Home')
+      ->addValue('phone', '123-456-7890')
+      ->execute();
+    Relationship::create(FALSE)
+      ->addValue('contact_id_a', $anthony)
+      ->addValue('contact_id_b', $jon)
+      ->addValue('relationship_type_id', 1)
+      ->execute();
+
+    $this->runImport([
+      'id' => $anthony,
+      'phone' => '212-555-1212',
+    ], CRM_Import_Parser::DUPLICATE_FILL, FALSE);
+    $anthonysPhone = $this->callAPISuccessGetSingle('Phone', ['contact_id' => $anthony]);
+    $this->assertEquals('212-555-1212', $anthonysPhone['phone']);
+  }
+
+  /**
    * Test import parser will fallback to external identifier.
    *
    * In this case no primary match exists (e.g the details are not supplied) so it falls back on external identifier.
