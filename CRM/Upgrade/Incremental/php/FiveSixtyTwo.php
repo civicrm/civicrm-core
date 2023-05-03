@@ -21,17 +21,30 @@
  */
 class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_Base {
 
+
+  /**
+   * How many activities before the queries used here are slow. Guessing.
+   */
+  const ACTIVITY_THRESHOLD = 1000000;
+
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '5.62.alpha1') {
-      $distinctComponentLists = CRM_Core_DAO::executeQuery('SELECT value, count(*) c FROM civicrm_setting WHERE name = "enable_components" GROUP BY value')
-        ->fetchMap('value', 'c');
-      if (count($distinctComponentLists) > 1) {
-        $message = ts('This site has multiple "Domains". The list of active "Components" is being consolidated across all "Domains". If you need different behavior in each "Domain", then consider updating the roles or permissions.');
-        // If you're investigating this - then maybe you should implement hook_permission_check() to dynamically adjust feature visibility?
-        // See also: https://lab.civicrm.org/dev/core/-/issues/3961
-        $preUpgradeMessage .= "<p>{$message}</p>";
-      }
 
+      $docUrl = 'https://civicrm.org/redirect/activities-5.57';
+      $docAnchor = 'target="_blank" href="' . htmlentities($docUrl) . '"';
+      $activityCount = CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_activity');
+      $common_msg = '<p>' . ts('A previous upgrade which removed CiviCase Activity revisions failed to account for all the places this functionality existed. Unfortunately this means that new Revisions have been added. You will need to repeat the action taking in the 5.57.x upgrade.') . '</p>';
+
+      if ($activityCount < self::ACTIVITY_THRESHOLD && CRM_Core_DAO::singleValueQuery('SELECT COUNT(id) FROM civicrm_activity WHERE is_current_revision = 0')) {
+
+        $preUpgradeMessage .= $common_msg . '<p>' . ts('Your database contains CiviCase activity revisions which are deprecated and will begin to appear as duplicates in SearchKit/api4/etc.<ul><li>For further instructions see this <a %1>Lab Snippet</a>.</li></ul>', [1 => $docAnchor]) . '</p>';
+      }
+      // Similarly the original_id ON DELETE drop+recreate is slow, so if we
+      // don't add the task farther down below, then tell people what to do at
+      // their convenience.
+      elseif ($activityCount >= self::ACTIVITY_THRESHOLD) {
+        $preUpgradeMessage .= $common_msg . '<p>' . ts('The activity table <strong>will not update automatically</strong> because it contains too many records. You will need to apply a <strong>manual update</strong>. Please read about <a %1>how to clean data from the defunct "Embedded Activity Revisions" setting</a>.', [1 => $docAnchor]) . '</p>';
+      }
       if (defined('CIVICRM_SETTINGS_PATH') && CIVICRM_SETTINGS_PATH) {
         $contents = file_get_contents(CIVICRM_SETTINGS_PATH);
         if (strpos($contents, 'auto_detect_line_endings') !== FALSE) {
@@ -51,6 +64,9 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
     $this->addTask('Make civicrm_setting.domain_id optional', 'alterColumn', 'civicrm_setting', 'domain_id', "int unsigned DEFAULT NULL COMMENT 'Which Domain does this setting belong to'");
     $this->addTask('Consolidate the list of components', 'consolidateComponents');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    if (CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_activity') < self::ACTIVITY_THRESHOLD) {
+      $this->addTask('Fix dangerous delete cascade', 'fixDeleteCascade');
+    }
     $this->addTask('Make civicrm_mapping.name required', 'alterColumn', 'civicrm_mapping', 'name', "varchar(64) NOT NULL COMMENT 'Unique name of Mapping'");
     $this->addTask(ts('Drop index %1', [1 => 'civicrm_mapping.UI_name']), 'dropIndex', 'civicrm_mapping', 'UI_name');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_mapping.UI_name']), 'addIndex', 'civicrm_mapping', [['name']], 'UI');
