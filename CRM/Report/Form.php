@@ -1360,6 +1360,8 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Add filters to report.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function addFilters() {
     $filters = $filterGroups = [];
@@ -1383,6 +1385,10 @@ class CRM_Report_Form extends CRM_Core_Form {
       }
 
       foreach ($attributes as $fieldName => $field) {
+        if (empty($field['operatorType'])) {
+          $field['operatorType'] = '';
+        }
+        $field['no_display'] = $field['no_display'] ?? FALSE;
         $filterGroups[$groupingKey]['tables'][$table][$fieldName] = $field;
         // Filters is deprecated in favour of filterGroups.
         $filters[$table][$fieldName] = $field;
@@ -1390,10 +1396,10 @@ class CRM_Report_Form extends CRM_Core_Form {
         // @ todo being able to specific options for a field (e.g a date field) in the field spec as an array rather than an override
         // would be useful
         $operations = $this->getOperationPair(
-          CRM_Utils_Array::value('operatorType', $field),
+          $field['operatorType'],
           $fieldName);
 
-        switch (CRM_Utils_Array::value('operatorType', $field)) {
+        switch ($field['operatorType']) {
           case CRM_Report_Form::OP_MONTH:
             if (!array_key_exists('options', $field) ||
               !is_array($field['options']) || empty($field['options'])
@@ -1409,7 +1415,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           case CRM_Report_Form::OP_MULTISELECT_SEPARATOR:
             // assume a multi-select field
             if (!empty($field['options']) ||
-              $fieldName == 'state_province_id' || $fieldName == 'county_id'
+              $fieldName === 'state_province_id' || $fieldName === 'county_id'
             ) {
               $element = $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations,
                 array('onchange' => "return showHideMaxMinVal( '$fieldName', this.value );")
@@ -1418,8 +1424,8 @@ class CRM_Report_Form extends CRM_Core_Form {
               if (count($operations) <= 1) {
                 $element->freeze();
               }
-              if ($fieldName == 'state_province_id' ||
-                $fieldName == 'county_id'
+              if ($fieldName === 'state_province_id' ||
+                $fieldName === 'county_id'
               ) {
                 $this->addChainSelect($fieldName . '_value', [
                   'multiple' => TRUE,
@@ -5056,6 +5062,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'no_display' => TRUE,
         'default' => 0,
         'type' => CRM_Utils_Type::T_BOOLEAN,
+        'title' => ts('Deleted?'),
       ],
     ];
   }
