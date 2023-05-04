@@ -870,6 +870,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
     $contactParams = [
       'contact_id' => $cid,
+      // core#4269 - Don't check relationships for values.
+      'noRelationships' => TRUE,
     ];
 
     $defaults = [];
