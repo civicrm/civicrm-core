@@ -23,8 +23,13 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
 
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '5.62.alpha1') {
-      $distinctComponentLists = CRM_Core_DAO::executeQuery('SELECT value, count(*) c FROM civicrm_setting WHERE name = "enable_components" GROUP BY value')
-        ->fetchMap('value', 'c');
+      $rawComponentLists = CRM_Core_DAO::executeQuery('SELECT value, count(*) c FROM civicrm_setting WHERE name = "enable_components" GROUP BY value')
+        ->fetchMap('value', 'value');
+      $distinctComponentLists = array_unique(array_map(function(string $serializedList) {
+        $list = \CRM_Utils_String::unserialize($serializedList);
+        sort($list);
+        return implode(',', $list);
+      }, $rawComponentLists));
       if (count($distinctComponentLists) > 1) {
         $message = ts('This site has multiple "Domains". The list of active "Components" is being consolidated across all "Domains". If you need different behavior in each "Domain", then consider updating the roles or permissions.');
         // If you're investigating this - then maybe you should implement hook_permission_check() to dynamically adjust feature visibility?
