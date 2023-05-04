@@ -33,7 +33,7 @@
   {counter start=0 skip=1 print=false}
   {foreach from=$rows item=row}
 
-  <tr id='rowid{$list}{$row.case_id}' class="{cycle values="odd-row,even-row"} crm-case crm-case-status_{$row.case_status_id} crm-case-type_{$row.case_type_id}">
+  <tr id='rowid{$row.case_id}' class="{cycle values="odd-row,even-row"} crm-case crm-case-status_{$row.case_status_id} crm-case-type_{$row.case_type_id}">
     {if $context eq 'Search' && !$single}
         {assign var=cbName value=$row.checkbox}
         <td>{$form.$cbName.html}</td>
