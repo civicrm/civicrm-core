@@ -764,6 +764,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $statistics['counts']['count'] = [
         'title' => ts('Total Contributions'),
         'value' => $count,
+        'type' => CRM_Utils_Type::T_INT,
       ];
       $statistics['counts']['avg'] = [
         'title' => ts('Average'),
@@ -790,6 +791,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $statistics['counts']['soft_count'] = [
         'title' => ts('Total Soft Credits'),
         'value' => $softCount,
+        'type' => CRM_Utils_Type::T_INT,
       ];
       $statistics['counts']['soft_avg'] = [
         'title' => ts('Average Soft Credit'),
