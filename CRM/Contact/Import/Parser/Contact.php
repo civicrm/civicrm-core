@@ -885,47 +885,51 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     $contact = get_object_vars($contactObj);
 
     foreach ($params as $key => $value) {
-      if ($key === 'id' || $key === 'contact_type' || $key === 'address') {
+      if (in_array($key, ['id', 'contact_type'])) {
         continue;
       }
+      // These values must be handled differently because we need to account for location type.
+      $checkLocationType = in_array($key, ['address', 'phone', 'email']);
 
-      if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        $custom_params = ['id' => $contact['id'], 'return' => $key];
-        $getValue = civicrm_api3('Contact', 'getvalue', $custom_params);
-        if (empty($getValue)) {
-          unset($getValue);
+      if (!$checkLocationType) {
+        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
+          $custom_params = ['id' => $contact['id'], 'return' => $key];
+          $getValue = civicrm_api3('Contact', 'getvalue', $custom_params);
+          if (empty($getValue)) {
+            unset($getValue);
+          }
         }
-      }
-      else {
-        $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
-      }
-
-      if ($modeFill && isset($getValue)) {
-        unset($params[$key]);
-        if ($customFieldId) {
-          // Extra values must be unset to ensure the values are not
-          // imported.
-          unset($params['custom'][$customFieldId]);
+        else {
+          $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
         }
-      }
-    }
 
-    if (isset($params['address']) && is_array($params['address'])) {
-      foreach ($params['address'] as $key => $value) {
-        if ($modeFill) {
-          $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, 'address');
-
-          if (isset($getValue)) {
-            foreach ($getValue as $cnt => $values) {
-              if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params['address'][$key]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params['address'][$key]['location_type_id']) {
-                unset($params['address'][$key]);
-              }
-            }
+        if ($modeFill && isset($getValue)) {
+          unset($params[$key]);
+          if ($customFieldId) {
+            // Extra values must be unset to ensure the values are not
+            // imported.
+            unset($params['custom'][$customFieldId]);
           }
         }
       }
-      if (count($params['address']) == 0) {
-        unset($params['address']);
+      else {
+        if (is_array($params[$key]) ?? FALSE) {
+          foreach ($params[$key] as $innerKey => $value) {
+            if ($modeFill) {
+              $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
+              if (isset($getValue)) {
+                foreach ($getValue as $cnt => $values) {
+                  if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$key][$innerKey]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$key][$innerKey]['location_type_id']) {
+                    unset($params[$key][$innerKey]);
+                  }
+                }
+              }
+            }
+          }
+          if (count($params[$key]) == 0) {
+            unset($params[$key]);
+          }
+        }
       }
     }
   }
