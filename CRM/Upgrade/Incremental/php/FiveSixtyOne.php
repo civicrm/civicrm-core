@@ -41,6 +41,14 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
     }
   }
 
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
+    if ($rev === '5.61.1') {
+      if (defined('CIVICRM_UF') && CIVICRM_UF === 'Drupal8') {
+        $postUpgradeMessage .= '<p>' . ts('You must do a one-time clear of Drupal caches now before visiting CiviCRM pages to rebuild the menu routes to avoid fatal errors. <a %1>Read more</a>.', [1 => 'href="https://civicrm.org/redirect/drupal-5.61" target="_blank"']) . '</p>';
+      }
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
@@ -69,6 +77,12 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
 
     $this->addTask(ts('Drop index %1', [1 => 'civicrm_campaign.UI_campaign_name']), 'dropIndex', 'civicrm_campaign', 'UI_campaign_name');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_campaign.UI_name']), 'addIndex', 'civicrm_campaign', 'name', 'UI');
+  }
+
+  /**
+   * Needs to exist for postUpgradeMessage to get called.
+   */
+  public function upgrade_5_61_1($rev): void {
   }
 
   /**
