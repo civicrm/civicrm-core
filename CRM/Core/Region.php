@@ -88,7 +88,10 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'scriptUrl':
-          if (!$allowCmsOverride || !$cms->addScriptUrl($snippet['scriptUrl'], $this->_name)) {
+          if (!empty($snippet['esm'])) {
+            $html .= sprintf("<script type=\"module\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
+          }
+          elseif (!$allowCmsOverride || !$cms->addScriptUrl($snippet['scriptUrl'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
           }
           break;
@@ -107,7 +110,10 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'script':
-          if (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
+          if (!empty($snippet['esm'])) {
+            $html .= sprintf("<script type=\"module\">\n%s\n</script>\n", $snippet['script']);
+          }
+          elseif (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $snippet['script']);
           }
           break;
