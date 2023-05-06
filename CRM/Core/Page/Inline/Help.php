@@ -22,6 +22,8 @@ class CRM_Core_Page_Inline_Help {
   public function run() {
     $args = $_REQUEST;
     $file = (string) ($args['file'] ?? '');
+    // windows - just replace so the regex can match
+    $file = str_replace('\\', '/', $file);
     if (preg_match('@^[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)*$@', $file)) {
       $additionalTPLFile = "$file.extra.hlp";
       $file .= '.hlp';
