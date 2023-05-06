@@ -84,9 +84,7 @@
         <table class="form-layout-compressed" >
           <tr class="crm-payment-form-block-trxn_date">
             <td class="label">{$form.trxn_date.label}</td>
-            <td>{$form.trxn_date.html}<br />
-              <span class="description">{ts}The date this payment was received.{/ts}</span>
-            </td>
+            <td>{$form.trxn_date.html}</td>
           </tr>
           <tr class="crm-payment-form-block-payment_instrument_id">
             <td class="label">{$form.payment_instrument_id.label}</td>
