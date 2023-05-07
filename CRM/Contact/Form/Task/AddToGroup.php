@@ -109,10 +109,6 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
 
     if ($this->_context === 'amtg') {
       $groupElement->freeze();
-
-      // also set the group title
-      $groupValues = ['id' => $this->_id, 'title' => $this->_title];
-      $this->assign_by_ref('group', $groupValues);
     }
 
     // Set dynamic page title for 'Add Members Group (confirm)'
