@@ -507,18 +507,16 @@ SET @adminHelplastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, 'https://civicrm.org/get-started?src=iam',        '{ts escape="sql" skip="true"}Get started{/ts}',        'Get started',        NULL, 'AND', @adminHelplastID, '1', NULL, 1 ),
-    ( @domainID, 'https://civicrm.org/documentation?src=iam',      '{ts escape="sql" skip="true"}Documentation{/ts}',      'Documentation',      NULL, 'AND', @adminHelplastID, '1', NULL, 2 ),
-    ( @domainID, 'https://civicrm.org/ask-a-question?src=iam',     '{ts escape="sql" skip="true"}Ask a question{/ts}',     'Ask a question',     NULL, 'AND', @adminHelplastID, '1', NULL, 3 ),
-    ( @domainID, 'https://civicrm.org/experts?src=iam', 		  '{ts escape="sql" skip="true"}Get expert help{/ts}',    'Get expert help',    NULL, 'AND', @adminHelplastID, '1', NULL, 4 ),
-    ( @domainID, 'https://civicrm.org/about?src=iam', 		  '{ts escape="sql" skip="true"}About CiviCRM{/ts}',      'About CiviCRM',      NULL, 'AND', @adminHelplastID, '1', 1, 5 ),
-    ( @domainID, 'https://civicrm.org/register-your-site?src=iam&sid={ldelim}sid{rdelim}', '{ts escape="sql" skip="true"}Register your site{/ts}', 'Register your site', NULL, 'AND', @adminHelplastID, '1', NULL, 6 ),
-    ( @domainID, 'https://civicrm.org/become-a-member?src=iam&sid={ldelim}sid{rdelim}',      '{ts escape="sql" skip="true"}Join CiviCRM{/ts}',       'Join CiviCRM',       NULL, 'AND', @adminHelplastID, '1', NULL, 7 );
+    ( @domainID, 'https://docs.civicrm.org/user/?src=iam',                                 '{ts escape="sql" skip="true"}User Guide{/ts}',         'User Guide',         NULL, 'AND', @adminHelplastID, '1', NULL, 1 ),
+    ( @domainID, 'https://civicrm.org/help?src=iam',                                       '{ts escape="sql" skip="true"}Get Help{/ts}',           'Get Help',           NULL, 'AND', @adminHelplastID, '1', NULL, 2 ),
+    ( @domainID, 'https://civicrm.org/about?src=iam', 		                                 '{ts escape="sql" skip="true"}About CiviCRM{/ts}',      'About CiviCRM',      NULL, 'AND', @adminHelplastID, '1', 1,    3 ),
+    ( @domainID, 'https://civicrm.org/register-your-site?src=iam&sid={ldelim}sid{rdelim}', '{ts escape="sql" skip="true"}Register your Site{/ts}', 'Register your site', NULL, 'AND', @adminHelplastID, '1', NULL, 4 ),
+    ( @domainID, 'https://civicrm.org/become-a-member?src=iam&sid={ldelim}sid{rdelim}',    '{ts escape="sql" skip="true"}Join CiviCRM{/ts}',       'Join CiviCRM',       NULL, 'AND', @adminHelplastID, '1', NULL, 5 );
 
 INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Developer{/ts}', 'Developer', 'administer CiviCRM', '', @adminHelplastID, '1', 1, 8 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Developer{/ts}', 'Developer', 'administer CiviCRM', '', @adminHelplastID, '1', 1, 6 );
 
 SET @devellastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
