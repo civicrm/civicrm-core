@@ -161,6 +161,12 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     // Set $newCredit variable in template to control whether link to credit card mode is included
     $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
+
+    $defaults['payment_instrument_id'] = \Civi\Api4\Contribution::get(FALSE)
+      ->addSelect('payment_instrument_id')
+      ->addWhere('id', '=', $this->_contributionId)
+      ->execute()->first()['payment_instrument_id'];
+
     return $defaults;
   }
 

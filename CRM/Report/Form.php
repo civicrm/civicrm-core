@@ -750,6 +750,8 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
 
     $this->assign('criteriaForm', FALSE);
+    // Will be overwritten in postProcess if TRUE.
+    $this->assign('printOnly', FALSE);
     // Display Report Criteria section if user has access Report Criteria OR administer Reports AND report instance is not reserved
     if (CRM_Core_Permission::check('administer Reports') ||
       CRM_Core_Permission::check('access Report Criteria')
@@ -1319,13 +1321,13 @@ class CRM_Report_Form extends CRM_Core_Form {
                 }
               }
             }
+            // Having a group_title is secret code for being a custom group
+            // which cryptically translates to needing an accordion.
+            // here we make that explicit.
+            $colGroups[$tableName]['use_accordian_for_field_selection'] = !$groupTitle && isset($table['group_title']);
 
-            if (!$groupTitle && isset($table['group_title'])) {
-              $groupTitle = $table['group_title'];
-              // Having a group_title is secret code for being a custom group
-              // which cryptically translates to needing an accordion.
-              // here we make that explicit.
-              $colGroups[$tableName]['use_accordian_for_field_selection'] = TRUE;
+            if (!$groupTitle) {
+              $groupTitle = $table['group_title'] ?? NULL;
             }
 
             $colGroups[$tableName]['fields'][$fieldName] = $field['title'] ?? NULL;
@@ -1358,6 +1360,8 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Add filters to report.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function addFilters() {
     $filters = $filterGroups = [];
@@ -1381,6 +1385,10 @@ class CRM_Report_Form extends CRM_Core_Form {
       }
 
       foreach ($attributes as $fieldName => $field) {
+        if (empty($field['operatorType'])) {
+          $field['operatorType'] = '';
+        }
+        $field['no_display'] = $field['no_display'] ?? FALSE;
         $filterGroups[$groupingKey]['tables'][$table][$fieldName] = $field;
         // Filters is deprecated in favour of filterGroups.
         $filters[$table][$fieldName] = $field;
@@ -1388,10 +1396,10 @@ class CRM_Report_Form extends CRM_Core_Form {
         // @ todo being able to specific options for a field (e.g a date field) in the field spec as an array rather than an override
         // would be useful
         $operations = $this->getOperationPair(
-          CRM_Utils_Array::value('operatorType', $field),
+          $field['operatorType'],
           $fieldName);
 
-        switch (CRM_Utils_Array::value('operatorType', $field)) {
+        switch ($field['operatorType']) {
           case CRM_Report_Form::OP_MONTH:
             if (!array_key_exists('options', $field) ||
               !is_array($field['options']) || empty($field['options'])
@@ -1407,7 +1415,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           case CRM_Report_Form::OP_MULTISELECT_SEPARATOR:
             // assume a multi-select field
             if (!empty($field['options']) ||
-              $fieldName == 'state_province_id' || $fieldName == 'county_id'
+              $fieldName === 'state_province_id' || $fieldName === 'county_id'
             ) {
               $element = $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations,
                 array('onchange' => "return showHideMaxMinVal( '$fieldName', this.value );")
@@ -1416,8 +1424,8 @@ class CRM_Report_Form extends CRM_Core_Form {
               if (count($operations) <= 1) {
                 $element->freeze();
               }
-              if ($fieldName == 'state_province_id' ||
-                $fieldName == 'county_id'
+              if ($fieldName === 'state_province_id' ||
+                $fieldName === 'county_id'
               ) {
                 $this->addChainSelect($fieldName . '_value', [
                   'multiple' => TRUE,
@@ -2520,7 +2528,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         unset($this->_columnHeaders[$key]);
       }
       else {
-        foreach (['colspan', 'type'] as $expectedKey) {
+        foreach (['colspan', 'type', 'group_by'] as $expectedKey) {
           if (!isset($this->_columnHeaders[$key][$expectedKey])) {
             // Ensure it is set to prevent smarty notices.
             $this->_columnHeaders[$key][$expectedKey] = FALSE;
@@ -2604,6 +2612,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    */
   protected function alterStateProvinceID($value, &$row, $selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
+    $row[$selectedfield . '_raw'] = $value;
     $row[$selectedfield . '_link'] = $url;
     $row[$selectedfield . '_hover'] = ts("%1 for this state.", [
       1 => $value,
@@ -5054,6 +5063,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'no_display' => TRUE,
         'default' => 0,
         'type' => CRM_Utils_Type::T_BOOLEAN,
+        'title' => ts('Deleted?'),
       ],
     ];
   }

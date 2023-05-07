@@ -330,7 +330,7 @@ class CRM_Core_I18n_SchemaStructure {
             'required' => "true",
           ],
           'instructions' => [
-            'type' => "TextArea",
+            'type' => "RichTextEditor",
             'rows' => "20",
             'cols' => "80",
           ],

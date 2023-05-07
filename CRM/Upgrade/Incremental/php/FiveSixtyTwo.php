@@ -23,13 +23,25 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
 
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '5.62.alpha1') {
-      $distinctComponentLists = CRM_Core_DAO::executeQuery('SELECT value, count(*) c FROM civicrm_setting WHERE name = "enable_components" GROUP BY value')
-        ->fetchMap('value', 'c');
+      $rawComponentLists = CRM_Core_DAO::executeQuery('SELECT value, count(*) c FROM civicrm_setting WHERE name = "enable_components" GROUP BY value')
+        ->fetchMap('value', 'value');
+      $distinctComponentLists = array_unique(array_map(function(string $serializedList) {
+        $list = \CRM_Utils_String::unserialize($serializedList);
+        sort($list);
+        return implode(',', $list);
+      }, $rawComponentLists));
       if (count($distinctComponentLists) > 1) {
         $message = ts('This site has multiple "Domains". The list of active "Components" is being consolidated across all "Domains". If you need different behavior in each "Domain", then consider updating the roles or permissions.');
         // If you're investigating this - then maybe you should implement hook_permission_check() to dynamically adjust feature visibility?
         // See also: https://lab.civicrm.org/dev/core/-/issues/3961
         $preUpgradeMessage .= "<p>{$message}</p>";
+      }
+
+      if (defined('CIVICRM_SETTINGS_PATH') && CIVICRM_SETTINGS_PATH) {
+        $contents = file_get_contents(CIVICRM_SETTINGS_PATH);
+        if (strpos($contents, 'auto_detect_line_endings') !== FALSE) {
+          $preUpgradeMessage .= '<p>' . ts('Your civicrm.settings.php file contains a line to set the php variable `auto_detect_line_endings`. It is deprecated and the line should be removed from the file.') . '</p>';
+        }
       }
     }
   }
@@ -63,6 +75,10 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
 
   public static function consolidateComponents($ctx): bool {
     $final = static::findAllEnabledComponents();
+    // Ensure CiviGrant is removed from the setting, as this may have been incomplete in a previous upgrade.
+    // @see FiveFortySeven::migrateCiviGrant
+    $final = array_values(array_diff($final, ['CiviGrant']));
+
     $lowestDomainId = CRM_Core_DAO::singleValueQuery('SELECT min(domain_id) FROM civicrm_setting WHERE name = "enable_components"');
     if (!is_numeric($lowestDomainId)) {
       return TRUE;

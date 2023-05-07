@@ -287,9 +287,11 @@ class SpecFormatter {
     if ($inputType == 'Date' && !empty($inputAttrs['formatType'])) {
       self::setLegacyDateFormat($inputAttrs);
     }
-    // Number input for integer fields
-    if ($inputType === 'Text' && $dataTypeName === 'Int') {
+    // Number input for numeric fields
+    if ($inputType === 'Text' && in_array($dataTypeName, ['Int', 'Float'], TRUE)) {
       $inputType = 'Number';
+      // Todo: make 'step' configurable for the custom field
+      $inputAttrs['step'] = $dataTypeName === 'Int' ? 1 : .01;
     }
     // Date/time settings from custom fields
     if ($inputType == 'Date' && !empty($data['custom_group_id'])) {

@@ -4,32 +4,31 @@
 {$receipt_text}
 {else}{ts}Thank you for this contribution.{/ts}{/if}
 
-{if empty($lineItem)}
+{if !$isShowLineItems}
 ===========================================================
 {ts}Membership Information{/ts}
 
 ===========================================================
-{ts}Membership Type{/ts}: {$membership_name}
+{ts}Membership Type{/ts}: {membership.membership_type_id:name}
 {/if}
-{if empty($cancelled)}
-{if empty($lineItem)}
-{ts}Membership Start Date{/ts}: {$mem_start_date}
-{ts}Membership Expiration Date{/ts}: {$mem_end_date}
+{if '{membership.status_id:name}' !== 'Cancelled'}
+{if !$isShowLineItems}
+{ts}Membership Start Date{/ts}: {membership.start_date|crmDate:"Full"}
+{ts}Membership Expiration Date{/ts}: {membership.end_date|crmDate:"Full"}
 {/if}
 
-{if $formValues.total_amount OR $formValues.total_amount eq 0 }
+{if '{contribution.total_amount|raw}' !== '0.00'}
 ===========================================================
 {ts}Membership Fee{/ts}
 
 ===========================================================
-{if !empty($formValues.contributionType_name)}
-{ts}Financial Type{/ts}: {$formValues.contributionType_name}
+{if {contribution.financial_type_id|boolean}}
+{ts}Financial Type{/ts}: {contribution.financial_type_id:label}
 {/if}
-{if !empty($lineItem)}
-{foreach from=$lineItem item=value key=priceset}
+{if $isShowLineItems}
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_total}{ts}Fee{/ts}{/capture}
-{if !empty($dataArray)}
+{if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
 {capture assign=ts_subtotal}{ts}Subtotal{/ts}{/capture}
 {capture assign=ts_taxRate}{ts}Tax Rate{/ts}{/capture}
 {capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
@@ -37,40 +36,35 @@
 {/if}
 {capture assign=ts_start_date}{ts}Membership Start Date{/ts}{/capture}
 {capture assign=ts_end_date}{ts}Membership Expiration Date{/ts}{/capture}
-{$ts_item|string_format:"%-30s"} {$ts_total|string_format:"%10s"} {if !empty($dataArray)} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {$ts_total|string_format:"%10s"} {/if} {$ts_start_date|string_format:"%20s"} {$ts_end_date|string_format:"%20s"}
+{$ts_item|string_format:"%-30s"} {$ts_total|string_format:"%10s"} {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {$ts_total|string_format:"%10s"} {/if} {$ts_start_date|string_format:"%20s"} {$ts_end_date|string_format:"%20s"}
 --------------------------------------------------------------------------------------------------
 
-{foreach from=$value item=line}
-{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.line_total|crmMoney|string_format:"%10s"}  {if !empty($dataArray)} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"}  {else}                  {/if}   {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {/if} {$line.start_date|string_format:"%20s"} {$line.end_date|string_format:"%20s"}
-{/foreach}
+{foreach from=$lineItems item=line}
+{line.title} {$line.line_total|crmMoney|string_format:"%10s"}  {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'} {$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"}  {else}                  {/if}   {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {/if} {$line.membership.start_date|string_format:"%20s"} {$line.membership.end_date|string_format:"%20s"}
 {/foreach}
 
-{if !empty($dataArray)}
-{ts}Amount before Tax{/ts}: {$formValues.total_amount-$totalTaxAmount|crmMoney:$currency}
+{if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+{ts}Amount before Tax:{/ts} {contribution.tax_exclusive_amount}
 
-{foreach from=$dataArray item=value key=priceset}
-{if $priceset}
-{$taxTerm} {$priceset|string_format:"%.2f"} %: {$value|crmMoney:$currency}
-{elseif  $priceset == 0}
-{ts}No{/ts} {$taxTerm}: {$value|crmMoney:$currency}
-{/if}
+{foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
+{if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else} {$taxTerm} {$taxDetail.percentage}%{/if}: {$taxDetail.amount|crmMoney:'{contribution.currency}'}
 {/foreach}
 {/if}
 --------------------------------------------------------------------------------------------------
 {/if}
 
-{if $totalTaxAmount}
-{ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
+{if '{contribution.tax_amount|raw}' !== '0.00'}
+{ts}Total Tax Amount{/ts}: {contribution.tax_amount}
 {/if}
 
-{ts}Amount{/ts}: {$formValues.total_amount|crmMoney}
-{if !empty($receive_date)}
-{ts}Date Received{/ts}: {$receive_date|truncate:10:''|crmDate}
+{ts}Amount{/ts}: {contribution.total_amount}
+{if {contribution.receive_date|boolean}}
+{ts}Date Received{/ts}: {contribution.receive_date}
 {/if}
-{if !empty($formValues.paidBy)}
-{ts}Paid By{/ts}: {$formValues.paidBy}
-{if !empty($formValues.check_number)}
-{ts}Check Number{/ts}: {$formValues.check_number}
+{if {contribution.payment_instrument_id|boolean}}
+{ts}Paid By{/ts}: {contribution.payment_instrument_id:label}
+{if {contribution.check_number|boolean}}
+{ts}Check Number{/ts}: {contribution.check_number|boolean}
 {/if}
 {/if}
 {/if}

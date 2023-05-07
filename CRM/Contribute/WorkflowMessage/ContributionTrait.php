@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Membership;
+
 /**
  * @method array getContribution()
  * @method ?int getContributionID()
@@ -17,7 +19,7 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
 
   /**
    * @var int
-   * @scope tokenContext as contributionId
+   * @scope tokenContext as contributionId, tplParams as contributionID
    */
   public $contributionId;
 
@@ -87,6 +89,7 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * Get bool for whether a line item breakdown be displayed.
    *
    * @return bool
+   * @noinspection PhpUnused
    */
   public function getIsShowLineItems(): bool {
     if (isset($this->isShowLineItems)) {
@@ -107,6 +110,7 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * Get the line items.
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function getLineItems(): array {
     if (isset($this->lineItems)) {
@@ -119,13 +123,23 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
       // always have the contribution ID available as well as migrated ones.
       return [];
     }
-    return $order->getLineItems();
+    $lineItems = $order->getLineItems();
+    foreach ($lineItems as $index => $lineItem) {
+      if ($lineItem['entity_table'] === 'civicrm_membership' && !empty($lineItem['entity_id'])) {
+        // Add in some per line membership details. This could also go in the Order class?
+        $lineItems[$index]['membership'] = Membership::get(FALSE)->addWhere('id', '=', $lineItem['entity_id'])->addSelect('start_date', 'end_date')->execute()->first();
+      }
+    }
+    return $lineItems;
   }
 
   /**
    * Get the line items.
    *
    * @return array
+   * @throws \CRM_Core_Exception
+   *
+   * @noinspection PhpUnused
    */
   public function getTaxRateBreakdown(): array {
     if (isset($this->taxRateBreakdown)) {
@@ -184,6 +198,8 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * and tax are a package.
    *
    * @param array $export
+   *
+   * @noinspection PhpUnused
    */
   protected function exportExtraTplParams(array &$export): void {
     $export['isShowTax'] = (bool) Civi::settings()->get('invoicing');

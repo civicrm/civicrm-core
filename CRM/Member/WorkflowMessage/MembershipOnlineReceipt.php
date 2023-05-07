@@ -22,6 +22,7 @@ use Civi\WorkflowMessage\GenericWorkflowMessage;
  */
 class CRM_Member_WorkflowMessage_MembershipOnlineReceipt extends GenericWorkflowMessage {
   use CRM_Member_WorkflowMessage_MembershipTrait;
+  use CRM_Contribute_WorkflowMessage_ContributionTrait;
   public const WORKFLOW = 'membership_online_receipt';
 
 }

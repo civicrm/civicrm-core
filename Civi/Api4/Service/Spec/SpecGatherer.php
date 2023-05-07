@@ -37,20 +37,20 @@ class SpecGatherer extends AutoService {
    * @param string $action
    * @param bool $includeCustom
    * @param array $values
+   * @param bool $checkPermissions
    *
    * @return \Civi\Api4\Service\Spec\RequestSpec
    * @throws \CRM_Core_Exception
    * @see \Civi\Api4\Service\Spec\Provider\CustomFieldCreationSpecProvider
-   *
    */
-  public function getSpec(string $entity, string $action, bool $includeCustom, array $values = []): RequestSpec {
+  public function getSpec(string $entity, string $action, bool $includeCustom, array $values = [], bool $checkPermissions = FALSE): RequestSpec {
     $specification = new RequestSpec($entity, $action, $values);
 
     // Real entities
     if (strpos($entity, 'Custom_') !== 0) {
       $this->addDAOFields($entity, $action, $specification, $values);
       if ($includeCustom) {
-        $this->addCustomFields($entity, $specification);
+        $this->addCustomFields($entity, $specification, $checkPermissions);
       }
     }
     // Custom pseudo-entities
@@ -140,10 +140,11 @@ class SpecGatherer extends AutoService {
    *
    * @param string $entity
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
+   * @param bool $checkPermissions
    * @throws \CRM_Core_Exception
    * @see \CRM_Core_SelectValues::customGroupExtends
    */
-  private function addCustomFields($entity, RequestSpec $spec) {
+  private function addCustomFields(string $entity, RequestSpec $spec, bool $checkPermissions) {
     $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
     if (!$customInfo) {
       return;
@@ -157,6 +158,15 @@ class SpecGatherer extends AutoService {
       ->addWhere('is_active', '=', TRUE)
       ->addWhere('custom_group_id.is_active', '=', TRUE)
       ->addWhere('custom_group_id.is_multiple', '=', FALSE);
+
+    // Enforce permissions
+    if ($checkPermissions && !\CRM_Core_Permission::customGroupAdmin()) {
+      $allowedGroups = \CRM_Core_Permission::customGroup();
+      if (!$allowedGroups) {
+        return;
+      }
+      $query->addWhere('custom_group_id', 'IN', $allowedGroups);
+    }
 
     // Contact custom groups are extra complicated because contact_type can be a value for extends
     if ($entity === 'Contact') {

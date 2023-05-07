@@ -219,7 +219,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
       1 => $groupName,
       'count' => $added,
       'plural' => 'Added Contacts to %1',
-    ]), 'success', ['expires' => 0]);
+    ]), 'success');
 
     if ($this->_context === 'amtg') {
       CRM_Core_Session::singleton()

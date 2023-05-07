@@ -591,26 +591,28 @@ abstract class CRM_Utils_Hook {
   /**
    * Called when restricting access to contact-groups or custom_field-groups or profile-groups.
    *
-   * @param int $action
-   *   Current action e.g. CRM_ACL_API::VIEW or CRM_ACL_API::EDIT
+   * Hook subscribers should alter the array of $currentGroups by reference.
+   *
+   * @param int $type
+   *   Action type being performed e.g. CRM_ACL_API::VIEW or CRM_ACL_API::EDIT
    * @param int $contactID
    *   User contactID for whom the check is made.
    * @param string $tableName
    *   Table name of group, e.g. `civicrm_uf_group` or `civicrm_custom_group`.
    *   Note: for some weird reason when this hook is called for contact groups, this
    *   value will be `civicrm_saved_search` instead of `civicrm_group` as you'd expect.
-   * @param int[] $allGroups
-   *   The ids of all groups from the above table.
+   * @param array $allGroups
+   *   All groups from the above table, keyed by id.
    * @param int[] $currentGroups
-   *   The ids of allowed groups which may be altered by reference.
+   *   Ids of allowed groups (corresponding to array keys of $allGroups) to be altered by reference.
    *
    * @return null
    *   the return value is ignored
    */
-  public static function aclGroup($action, $contactID, $tableName, &$allGroups, &$currentGroups) {
+  public static function aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
     $null = NULL;
     return self::singleton()
-      ->invoke(['type', 'contactID', 'tableName', 'allGroups', 'currentGroups'], $action, $contactID, $tableName, $allGroups, $currentGroups, $null, 'civicrm_aclGroup');
+      ->invoke(['type', 'contactID', 'tableName', 'allGroups', 'currentGroups'], $type, $contactID, $tableName, $allGroups, $currentGroups, $null, 'civicrm_aclGroup');
   }
 
   /**

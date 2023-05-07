@@ -369,6 +369,63 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that importing a phone/email with "Fill" strategy doesn't get related contact info.
+   * See core#4269.
+   *
+   * @throws \Exception
+   */
+  public function testImportFillWithRelatedContact(): void {
+    $anthony = $this->individualCreate();
+    $jon = $this->individualCreate(['first_name' => 'Jon']);
+    Phone::create()
+      ->addValue('contact_id', $jon)
+      ->addValue('location_type_id:label', 'Home')
+      ->addValue('phone', '123-456-7890')
+      ->execute();
+    Relationship::create(FALSE)
+      ->addValue('contact_id_a', $anthony)
+      ->addValue('contact_id_b', $jon)
+      ->addValue('relationship_type_id', 1)
+      ->execute();
+
+    $this->runImport([
+      'id' => $anthony,
+      'phone' => '212-555-1212',
+    ], CRM_Import_Parser::DUPLICATE_FILL, FALSE);
+    $anthonysPhone = $this->callAPISuccessGetSingle('Phone', ['contact_id' => $anthony]);
+    $this->assertEquals('212-555-1212', $anthonysPhone['phone']);
+  }
+
+  /**
+   * Test that importing a phone/email with "Fill" strategy respects location type.
+   *
+   * @throws \Exception
+   */
+  public function testImportFillWithLocationType(): void {
+    $anthony = $this->individualCreate();
+    Phone::create()
+      ->addValue('contact_id', $anthony)
+      ->addValue('location_type_id:label', 'Home')
+      ->addValue('phone', '123-456-7890')
+      ->execute();
+    $homeLocationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', 'Home');
+    $workLocationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', 'Work');
+    $phoneTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Phone');
+    $fieldMapping = [
+      ['name' => 'id'],
+      ['name' => 'phone', 'location_type_id' => $workLocationTypeID, 'phone_type_id' => $phoneTypeID],
+    ];
+    $this->runImport([
+      'id' => $anthony,
+      'phone' => '212-555-1212',
+    ], CRM_Import_Parser::DUPLICATE_FILL, FALSE, $fieldMapping);
+    $homePhone = $this->callAPISuccessGetSingle('Phone', ['contact_id' => $anthony, 'location_type_id' => $homeLocationTypeID]);
+    $workPhone = $this->callAPISuccessGetSingle('Phone', ['contact_id' => $anthony, 'location_type_id' => $workLocationTypeID]);
+    $this->assertEquals('123-456-7890', $homePhone['phone']);
+    $this->assertEquals('212-555-1212', $workPhone['phone']);
+  }
+
+  /**
    * Test import parser will fallback to external identifier.
    *
    * In this case no primary match exists (e.g the details are not supplied) so it falls back on external identifier.

@@ -26,9 +26,7 @@
             {ts 1=$usedPriceSetTitle}Unable to delete the '%1' price set - it is currently in use by one or more active events or contribution pages or contributions or event templates.{/ts}
         {/if}
 
-      {if $usedBy.civicrm_event or $usedBy.civicrm_contribution_page or $usedBy.civicrm_event_template}
-            {include file="CRM/Price/Page/table.tpl"}
-        {/if}
+        {include file="CRM/Price/Page/table.tpl"}
     </div>
     {/if}
 
