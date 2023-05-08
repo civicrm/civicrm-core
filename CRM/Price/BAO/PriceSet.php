@@ -811,10 +811,11 @@ WHERE  id = %1";
    * Build the price set form.
    *
    * @param CRM_Core_Form $form
+   * @param string|null $component
    *
    * @return void
    */
-  public static function buildPriceSet(&$form) {
+  public static function buildPriceSet(&$form, $component = NULL) {
     $priceSetId = $form->get('priceSetId');
     if (!$priceSetId) {
       return;
@@ -867,23 +868,19 @@ WHERE  id = %1";
     $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetId;
     $form->assign('priceSet', $form->_priceSet);
 
-    $component = 'contribution';
     if ($className == 'CRM_Member_Form_Membership') {
       $component = 'membership';
     }
 
     if ($className == 'CRM_Contribute_Form_Contribution_Main') {
       $feeBlock = &$form->_values['fee'];
-      if (!empty($form->_useForMember)) {
-        $component = 'membership';
-      }
     }
     else {
       $feeBlock = &$form->_priceSet['fields'];
     }
 
     // Call the buildAmount hook.
-    CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
+    CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
 
     self::addPriceFieldsToForm($form, $feeBlock, $validFieldsOnly, $className, $validPriceFieldIds);
   }
