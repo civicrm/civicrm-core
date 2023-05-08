@@ -392,7 +392,6 @@ function _civicrm_api3_contribute_format_params($params, &$values) {
  * @throws Exception
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
-  $ids = [];
   $allowedParams = [
     'receipt_from_email',
     'receipt_from_name',
@@ -404,7 +403,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'payment_processor_id',
   ];
   $input = array_intersect_key($params, array_flip($allowedParams));
-  CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id']);
+  CRM_Contribute_BAO_Contribution::sendMail($input, [], $params['id']);
   return [];
 }
 
