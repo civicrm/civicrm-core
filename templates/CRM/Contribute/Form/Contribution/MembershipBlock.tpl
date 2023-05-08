@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if !empty($useForMember) AND !$is_quick_config}
+{if $isShowMembershipQuickConfigBlock}
   <div id="membership" class="crm-group membership-group">
     {if $context EQ "makeContribution"}
       <div id="priceset">
