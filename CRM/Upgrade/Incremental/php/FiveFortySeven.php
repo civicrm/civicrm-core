@@ -102,7 +102,7 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
   public static function migrateCiviGrant(CRM_Queue_TaskContext $ctx): bool {
     $civiGrantEnabled = CRM_Core_Component::isEnabled('CiviGrant');
     // This was failing on multi-domain setups. See  https://github.com/civicrm/civicrm-core/pull/26043
-    // Instead, we'll handle it in FiveSixtyTwo::consolidateComponents.
+    // Instead, we'll handle it in FiveSixtyTwo::upgrade_5_62_beta1.
     //  if ($civiGrantEnabled) {
     //    CRM_Core_BAO_ConfigSetting::disableComponent('CiviGrant');
     //  }

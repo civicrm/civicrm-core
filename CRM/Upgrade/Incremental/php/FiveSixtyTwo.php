@@ -73,11 +73,18 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
     );
   }
 
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_62_beta1($rev): void {
+    $this->addTask('Remove CiviGrant from list of components', 'removeCiviGrant');
+  }
+
   public static function consolidateComponents($ctx): bool {
     $final = static::findAllEnabledComponents();
-    // Ensure CiviGrant is removed from the setting, as this may have been incomplete in a previous upgrade.
-    // @see FiveFortySeven::migrateCiviGrant
-    $final = array_values(array_diff($final, ['CiviGrant']));
 
     $lowestDomainId = CRM_Core_DAO::singleValueQuery('SELECT min(domain_id) FROM civicrm_setting WHERE name = "enable_components"');
     if (!is_numeric($lowestDomainId)) {
@@ -95,6 +102,19 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
       2 => ['enable_components', 'String'],
     ]);
 
+    return TRUE;
+  }
+
+  public static function removeCiviGrant($ctx): bool {
+    // Ensure CiviGrant is removed from the setting, as this may have been incomplete in a previous upgrade.
+    // @see FiveFortySeven::migrateCiviGrant
+    $components = static::findAllEnabledComponents();
+    if (in_array('CiviGrant', $components, TRUE)) {
+      $components = array_diff($components, ['CiviGrant']);
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET value = %1 WHERE name = "enable_components"', [
+        1 => [serialize($components), 'String'],
+      ]);
+    }
     return TRUE;
   }
 
