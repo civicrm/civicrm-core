@@ -44,8 +44,8 @@
         {if !$sections} {* section headers and sticky headers aren't playing nice yet *}
             <thead class="sticky">
             <tr>
-                {$tableHeader}
-        </tr>
+              {$tableHeader|smarty:nodefaults}
+            </tr>
         </thead>
         {/if}
 
