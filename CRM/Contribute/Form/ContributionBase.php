@@ -1305,9 +1305,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   protected function isMembershipPriceSet(): bool {
     if ($this->_useForMember === NULL) {
-      if (CRM_Core_Component::isEnabled('CiviMember') &&
-        (!$this->isQuickConfig() || !empty($this->_ccid)) &&
-        (int) CRM_Core_Component::getComponentID('CiviMember') === (int) $this->order->getPriceSetMetadata()['extends']) {
+      if ($this->getMainEntityType() === 'membership' &&
+        !$this->isQuickConfig()) {
         $this->_useForMember = 1;
       }
       else {
@@ -1316,6 +1315,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->set('useForMember', $this->_useForMember);
     }
     return (bool) $this->_useForMember;
+  }
+
+  public function getMainEntityType() {
+    if (CRM_Core_Component::isEnabled('CiviMember') && (int) CRM_Core_Component::getComponentID('CiviMember') === (int) $this->order->getPriceSetMetadata()['extends']) {
+      return 'membership';
+    }
+    return 'contribution';
   }
 
   /**
