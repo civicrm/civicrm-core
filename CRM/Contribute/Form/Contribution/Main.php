@@ -373,7 +373,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // build price set form.
       $this->set('priceSetId', $this->_priceSetId);
       if (empty($this->_ccid)) {
-        CRM_Price_BAO_PriceSet::buildPriceSet($this);
+        CRM_Price_BAO_PriceSet::buildPriceSet($this, $this->getMainEntityType());
       }
       if ($this->_values['is_monetary'] &&
         $this->_values['is_recur'] && empty($this->_values['pledge_id'])
@@ -512,6 +512,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->_currentMemberships = [];
 
       $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
+      // This is always true if this line is reachable - remove along with the upcoming if.
       $membershipPriceset = (!empty($this->_priceSetId) && $this->isMembershipPriceSet());
 
       $allowAutoRenewMembership = $autoRenewOption = FALSE;
@@ -634,28 +635,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // Assign autorenew option (0:hide,1:optional,2:required) so we can use it in confirmation etc.
       $autoRenewOption = CRM_Price_BAO_PriceSet::checkAutoRenewForPriceSet($this->_priceSetId);
       $this->assign('autoRenewOption', $autoRenewOption);
-
-      if (!$membershipPriceset) {
-        if (!$this->_membershipBlock['is_required']) {
-          $this->assign('showRadioNoThanks', TRUE);
-          $radio['no_thanks'] = NULL;
-          $this->addRadio('selectMembership', NULL, $radio, [], NULL, FALSE, $radioOptAttrs);
-        }
-        elseif ($this->_membershipBlock['is_required'] && count($radio) == 1) {
-          $temp = array_keys($radio);
-          $this->add('hidden', 'selectMembership', $temp[0], ['id' => 'selectMembership']);
-          $this->assign('singleMembership', TRUE);
-          $this->assign('showRadio', FALSE);
-        }
-        else {
-          foreach ($radioOptAttrs as $opt => $attrs) {
-            $attrs['class'] = ' required';
-          }
-          $this->addRadio('selectMembership', NULL, $radio, [], NULL, FALSE, $radioOptAttrs);
-        }
-
-        $this->addRule('selectMembership', ts('Please select one of the memberships.'), 'required');
-      }
 
       if ((!$this->_values['is_pay_later'] || is_array($this->_paymentProcessors)) && ($allowAutoRenewMembership || $autoRenewOption)) {
         if ($autoRenewOption == 2) {
@@ -784,6 +763,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $self->_useForMember
       )
     ) {
+
+      // appears to be unreachable - selectMembership never set...
       $isTest = $self->_action & CRM_Core_Action::PREVIEW;
       $lifeMember = CRM_Member_BAO_Membership::getAllContactMembership($self->_membershipContactID, $isTest, TRUE);
 

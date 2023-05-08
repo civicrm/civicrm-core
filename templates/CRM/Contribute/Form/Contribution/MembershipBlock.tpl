@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if !empty($useForMember) AND !$is_quick_config}
+{if $isShowMembershipQuickConfigBlock}
   <div id="membership" class="crm-group membership-group">
     {if $context EQ "makeContribution"}
       <div id="priceset">
@@ -158,6 +158,7 @@
       {foreach from=$membershipTypes item=row}
         <tr {if $context EQ "makeContribution"}class="odd-row" {/if}valign="top">
           {if $showRadio }
+            {* unreachable - show radio is never true *}
             {assign var="pid" value=$row.id}
             <td style="width: 1em;">{$form.selectMembership.$pid.html}</td>
           {else}
@@ -203,7 +204,7 @@
           </td>
         </tr>
       {/if}
-      {if $showRadio}
+      {if $showRadio}{* unreachable *}
         {if $showRadioNoThanks } {* Provide no-thanks option when Membership signup is not required - per membership block configuration. *}
           <tr class="odd-row">
             <td>{$form.selectMembership.no_thanks.html}</td>
