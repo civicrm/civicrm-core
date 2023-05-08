@@ -446,6 +446,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->set('values', $this->_values);
       $this->set('fields', $this->_fields);
     }
+    $this->assign('isShowMembershipQuickConfigBlock', $this->isShowMembershipQuickConfigBlock());
     $this->set('membershipBlock', $this->getMembershipBlock());
 
     // Handle PCP
@@ -1315,6 +1316,16 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->set('useForMember', $this->_useForMember);
     }
     return (bool) $this->_useForMember;
+  }
+
+  /**
+   * Should the membership block be displayed.
+   *
+   * This should be shown when the price set is quick config and is a membership price set.
+   * @return bool
+   */
+  protected function isShowMembershipQuickConfigBlock(): bool {
+    return CRM_Core_Component::isEnabled('CiviMember') && $this->getMembershipBlock() && $this->isQuickConfig();
   }
 
   /**
