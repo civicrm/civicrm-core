@@ -487,7 +487,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         [
-          'name' => ts('Source'),
+          'name' => ts('Membership Source'),
           'sort' => 'membership_source',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],

@@ -549,7 +549,7 @@ DESC limit 1");
       $this->add('number', 'num_terms', ts('Number of Terms'), ['size' => 6]);
     }
 
-    $this->add('text', 'source', ts('Source'),
+    $this->add('text', 'source', ts('Membership Source'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_Membership', 'source')
     );
 

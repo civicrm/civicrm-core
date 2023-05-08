@@ -22,7 +22,7 @@
     <th>{ts}Member Since{/ts}</th>
     <th>{ts}Membership Start Date{/ts}</th>
     <th>{ts}Membership Expiration Date{/ts}</th>
-    <th>{ts}Source{/ts}</th>
+    <th>{ts}Membership Source{/ts}</th>
     <th>{ts}Status{/ts}</th>
   </tr>
 {foreach from=$rows item=row}

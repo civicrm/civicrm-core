@@ -42,7 +42,7 @@ class CRM_Contact_Form_Edit_Household {
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
       $form->addField('nick_name');
-      $form->addField('contact_source', ['label' => ts('Source')]);
+      $form->addField('contact_source', ['label' => ts('Contact Source')]);
     }
 
     if (!$inlineEditMode) {

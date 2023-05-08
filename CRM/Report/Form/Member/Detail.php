@@ -94,7 +94,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'title' => ts('Member Since'),
             'default' => TRUE,
           ],
-          'source' => ['title' => ts('Source')],
+          'source' => ['title' => ts('Membership Source')],
         ],
         'filters' => [
           'membership_join_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
