@@ -567,7 +567,7 @@ contribution_recur.payment_instrument_id:name :Check
   public function getTokensAdvertisedByTokenProcessorButNotLegacy(): array {
     return [
       '{membership.custom_1}' => 'Enter text here :: Group with field text',
-      '{membership.source}' => 'Source',
+      '{membership.source}' => 'Membership Source',
       '{membership.status_override_end_date}' => 'Status Override End Date',
     ];
   }
