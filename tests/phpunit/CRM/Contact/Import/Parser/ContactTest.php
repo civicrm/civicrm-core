@@ -434,11 +434,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     [$originalValues, $result] = $this->setUpBaseContact([
       'external_identifier' => '',
       'email' => NULL,
+      'birth_date' => '2008-01-07',
     ]);
-    $updateValues = ['id' => $result['id'], 'email' => 'bill@example.com'];
-    // This is some deep weirdness - this sets a flag for updatingBlankLocinfo - allowing input to be blanked
-    // (which IS a good thing but it's pretty weird & all to do with legacy profile stuff).
-    CRM_Core_Session::singleton()->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
+    $updateValues = ['id' => (int) $result['id'], 'email' => 'bill@example.com', 'birth_date' => ''];
     $this->runImport($updateValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
     $originalValues['id'] = $result['id'];
     $this->callAPISuccessGetSingle('Email', ['contact_id' => $originalValues['id'], 'is_primary' => 1]);
