@@ -143,6 +143,35 @@ class Authenticator extends AutoService implements HookInterface {
   }
 
   /**
+   * Determine whether credentials are valid. This is similar to `auth()`
+   * but stops short of performing an actual login.
+   *
+   * @param array $details
+   * @return array{flow: string, credType: string, jwt: ?array, useSession: bool, userId: ?int, contactId: ?int}
+   *   Description of the validated principal (redacted).
+   * @throws \Civi\Authx\AuthxException
+   */
+  public function validate(array $details): array {
+    if (!isset($details['flow'])) {
+      $this->reject('Authentication logic error: Must specify "flow".');
+    }
+
+    $tgt = AuthenticatorTarget::create([
+      'flow' => $details['flow'],
+      'cred' => $details['cred'] ?? NULL,
+      'siteKey' => $details['siteKey'] ?? NULL,
+      'useSession' => $details['useSession'] ?? FALSE,
+    ]);
+
+    if ($principal = $this->checkCredential($tgt)) {
+      $tgt->setPrincipal($principal);
+    }
+
+    $this->checkPolicy($tgt);
+    return $tgt->createRedacted();
+  }
+
+  /**
    * Assess the credential ($tgt->cred) and determine the matching principal.
    *
    * @param \Civi\Authx\AuthenticatorTarget $tgt

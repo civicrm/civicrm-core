@@ -124,6 +124,8 @@ function authx_civicrm_enable() {
 function authx_civicrm_permission(&$permissions) {
   $permissions['authenticate with password'] = E::ts('AuthX: Authenticate to services with password');
   $permissions['authenticate with api key'] = E::ts('AuthX: Authenticate to services with API key');
+  $permissions['generate any authx credential'] = E::ts('Authx: Generate new JWT credentials for other users via the API');
+  $permissions['validate any authx credential'] = E::ts('Authx: Validate credentials for other users via the API');
 }
 
 // --- Functions below this ship commented out. Uncomment as required. ---
