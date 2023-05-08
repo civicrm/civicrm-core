@@ -331,6 +331,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $processors['values'][0] = [
       'object' => new CRM_Core_Payment_Manual(),
       'id' => 0,
+      'frontend_title' => ts('Pay later'),
+      'title' => ts('Pay later'),
       'payment_processor_type_id' => 0,
       // This shouldn't be required but there are still some processors hacked into core with nasty 'if's.
       'payment_processor_type' => 'Manual',
