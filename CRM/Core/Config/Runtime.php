@@ -16,7 +16,7 @@
  * the DSN, CMS type, CMS URL, etc. Generally, runtime properties must be
  * determined externally (before loading CiviCRM).
  */
-class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
+class CRM_Core_Config_Runtime {
 
   public $dsn;
 
@@ -62,6 +62,11 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
    * @var string
    */
   public $templateDir;
+
+  /**
+   * @var bool
+   */
+  public $initialized;
 
   /**
    * @param bool $loadFromDB
@@ -117,7 +122,7 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
   public function includeCustomPath() {
     $customProprtyName = ['customPHPPathDir', 'customTemplateDir'];
     foreach ($customProprtyName as $property) {
-      $value = $this->getSettings()->get($property);
+      $value = Civi::settings()->get($property);
       if (!empty($value)) {
         $customPath = Civi::paths()->getPath($value);
         set_include_path($customPath . PATH_SEPARATOR . get_include_path());
