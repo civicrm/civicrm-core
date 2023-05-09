@@ -433,6 +433,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     // We need to call the config hook again, since we now know
     // all the modules that are listening on it (CRM-8655).
+    $config = CRM_Core_Config::singleton();
     CRM_Utils_Hook::config($config);
 
     if ($loadUser) {
