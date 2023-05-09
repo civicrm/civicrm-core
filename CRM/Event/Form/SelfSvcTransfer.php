@@ -465,7 +465,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function transferParticipantRegistration($toContactID, $fromParticipantID) {
-    $toParticipantValues = \Civi\Api4\Participant::get()
+    $toParticipantValues = \Civi\Api4\Participant::get(FALSE)
       ->addWhere('id', '=', $fromParticipantID)
       ->execute()
       ->first();
