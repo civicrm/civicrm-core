@@ -426,6 +426,18 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
         'paid_amount' => 'Amount Paid',
         'balance_amount' => 'Balance',
         'tax_exclusive_amount' => 'Tax Exclusive Amount',
+        'contribution_recur_id.id' => 'Recurring Contribution ID',
+        'contribution_recur_id.contact_id' => 'Contact ID',
+        'contribution_recur_id.amount' => 'Amount',
+        'contribution_recur_id.currency' => 'Currency',
+        'contribution_recur_id.frequency_unit' => 'Frequency Unit',
+        'contribution_recur_id.frequency_interval' => 'Interval (number of units)',
+        'contribution_recur_id.start_date' => 'Start Date',
+        'contribution_recur_id.cancel_date' => 'Cancel Date',
+        'contribution_recur_id.cancel_reason' => 'Cancellation Reason',
+        'contribution_recur_id.end_date' => 'Recurring Contribution End Date',
+        'contribution_recur_id.financial_type_id' => 'Financial Type ID',
+        'contribution_recur_id.campaign_id' => 'Campaign ID',
       ], $comparison);
   }
 

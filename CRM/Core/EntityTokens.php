@@ -78,6 +78,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     $cacheKey = $this->getCacheKey();
     if (!Civi::cache('metadata')->has($cacheKey)) {
       $tokensMetadata = $this->getBespokeTokens();
+      $tokensMetadata = array_merge($tokensMetadata, $this->getRelatedTokens());
       foreach ($this->getFieldMetadata() as $field) {
         $this->addFieldToTokenMetadata($tokensMetadata, $field, $this->getExposedFields());
       }
@@ -272,6 +273,13 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * Get any tokens with custom calculation.
    */
   protected function getBespokeTokens(): array {
+    return [];
+  }
+
+  /**
+   * Get related entity tokens.
+   */
+  protected function getRelatedTokens(): array {
     return [];
   }
 

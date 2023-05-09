@@ -10,6 +10,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContributionRecur;
+
 /**
  * Class CRM_Contribute_Tokens
  *
@@ -44,6 +46,28 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
    */
   public function getCurrencyFieldName() {
     return ['currency'];
+  }
+
+  /**
+   * Get Related Entity tokens.
+   *
+   * @return array[]
+   */
+  protected function getRelatedTokens(): array {
+    $tokens = [];
+    $hiddenTokens = ['modified_date', 'create_date', 'trxn_id', 'invoice_id', 'is_test', 'payment_token_id', 'payment_processor_id', 'payment_instrument_id', 'cycle_day', 'installments', 'processor_id', 'next_sched_contribution_date', 'failure_count', 'failure_retry_date', 'auto_renew', 'is_email_receipt', 'contribution_status_id'];
+    $contributionRecurFields = ContributionRecur::getFields(FALSE)->setLoadOptions(TRUE)->execute();
+    foreach ($contributionRecurFields as $contributionRecurField) {
+      $tokens['contribution_recur_id.' . $contributionRecurField['name']] = [
+        'title' => $contributionRecurField['title'],
+        'name' => 'contribution_recur_id.' . $contributionRecurField['name'],
+        'type' => 'mapped',
+        'options' => $contributionRecurField['options'] ?? NULL,
+        'data_type' => $contributionRecurField['data_type'],
+        'audience' => in_array($contributionRecurField['name'], $hiddenTokens) ? 'hidden' : 'user',
+      ];
+    }
+    return $tokens;
   }
 
 }
