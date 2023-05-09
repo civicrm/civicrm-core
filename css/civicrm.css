@@ -697,8 +697,17 @@ input.crm-form-entityref {
   color: #3e3e3e;
 }
 
+.crm-container .status.crm-status-none {
+  background-color: inherit;
+}
+
 .crm-container .crm-footer {
   font-size: 0.8em;
+}
+
+.crm-footer .status {
+  padding: 4px;
+  border: 0px;
 }
 
 #civicrm-footer {
