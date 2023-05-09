@@ -137,7 +137,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_userContext = $session->readUserContext();
     $this->_from_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
     $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
-    $this->isBackoffice = CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, NULL, 'REQUEST') ?? FALSE;
+    $this->isBackoffice = (CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, FALSE, 'REQUEST') && CRM_Core_Permission::check('edit event participants')) ?? FALSE;
     $params = ['id' => $this->_from_participant_id];
     $participant = $values = [];
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
