@@ -196,7 +196,9 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
         //n }
         foreach ($translated['fields'] ?? [] as $field) {
           \Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['fields'][$field['entity_id']][$field['entity_field']] = $field['string'];
-          \Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['language'] = $translated['language'];
+          if (!isset(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['language'][$field['entity_id']])) {
+            \Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['language'][$field['entity_id']] = $field['language'];
+          }
         }
       }
       if (!empty(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage])) {
@@ -237,14 +239,24 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
     }
     $fields = $translations->execute();
     $languages = [];
-    foreach ($fields as $index => $field) {
-      $languages[$field['language']][$index] = $field;
+    foreach ($fields as $field) {
+      $languages[$field['language']][$field['entity_id'] . $field['entity_field']] = $field;
     }
 
     $bizLocale = $userLocale->renegotiate(array_keys($languages));
-    return $bizLocale
-      ? ['fields' => $languages[$bizLocale->nominal], 'language' => $bizLocale->nominal]
-      : [];
+    if ($bizLocale) {
+      $fields = $languages[$bizLocale->nominal];
+
+      foreach ($languages as $language => $languageFields) {
+        if ($language !== $bizLocale->nominal) {
+          // Merge in any missing entities. Ie we might have a translation for one template in es_MX but
+          // need to fall back to es_ES for another.
+          $fields = array_merge($languageFields, $fields);
+        }
+      }
+      return ['fields' => $fields, 'language' => $bizLocale->nominal];
+    }
+    return [];
   }
 
 }

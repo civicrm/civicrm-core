@@ -211,7 +211,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->execute()->indexBy('workflow_name');
     $firstTemplate = array_key_first($messageTemplates);
     $secondTemplate = array_key_last($messageTemplates);
-    foreach ($messageTemplates  as $workflowName => $messageTemplate) {
+    foreach ($messageTemplates as $workflowName => $messageTemplate) {
       $records = [
         ['entity_field' => 'msg_subject', 'string' => 'subject - Spanish', 'language' => 'es_ES'],
         ['entity_field' => 'msg_html', 'string' => 'html -Spanish', 'language' => 'es_ES'],
