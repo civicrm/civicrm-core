@@ -193,6 +193,9 @@
                   return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab['mailing_id_' + mkey]};
                 });
                 return crmMailingAB.attachments[mkey].load();
+              }).catch(function (ex){
+                console.error(ex);
+                throw new Error('Failed to load Mailings');
               });
           }
           else {
