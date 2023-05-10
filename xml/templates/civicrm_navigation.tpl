@@ -510,7 +510,7 @@ VALUES
     ( @domainID, 'https://docs.civicrm.org/user/?src=iam',                                 '{ts escape="sql" skip="true"}User Guide{/ts}',         'User Guide',         NULL, 'AND', @adminHelplastID, '1', NULL, 1 ),
     ( @domainID, 'https://civicrm.org/help?src=iam',                                       '{ts escape="sql" skip="true"}Get Help{/ts}',           'Get Help',           NULL, 'AND', @adminHelplastID, '1', NULL, 2 ),
     ( @domainID, 'https://civicrm.org/about?src=iam', 		                                 '{ts escape="sql" skip="true"}About CiviCRM{/ts}',      'About CiviCRM',      NULL, 'AND', @adminHelplastID, '1', 1,    3 ),
-    ( @domainID, 'https://civicrm.org/register-your-site?src=iam&sid={ldelim}sid{rdelim}', '{ts escape="sql" skip="true"}Register your Site{/ts}', 'Register your site', NULL, 'AND', @adminHelplastID, '1', NULL, 4 ),
+    ( @domainID, 'https://civicrm.org/register-your-site?src=iam&sid={ldelim}sid{rdelim}', '{ts escape="sql" skip="true"}Register Your Site{/ts}', 'Register Your Site', NULL, 'AND', @adminHelplastID, '1', NULL, 4 ),
     ( @domainID, 'https://civicrm.org/become-a-member?src=iam&sid={ldelim}sid{rdelim}',    '{ts escape="sql" skip="true"}Join CiviCRM{/ts}',       'Join CiviCRM',       NULL, 'AND', @adminHelplastID, '1', NULL, 5 );
 
 INSERT INTO civicrm_navigation
