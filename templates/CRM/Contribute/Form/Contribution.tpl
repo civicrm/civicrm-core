@@ -397,6 +397,7 @@
                 else {
                   CRM.alert(ts("No email receipt can be sent as the contact's primary email address is on hold or they are set to do not email."), ts("Cannot send email receipt"));
                   $("#email-receipt", $form).hide();
+                  $("#is_email_receipt", $form).removeAttr('checked');
                 }
               }, function(failure) {
                 $("#email-receipt", $form).show();
@@ -405,11 +406,11 @@
             }
             else {
               $("#email-receipt", $form).hide();
+              $("#is_email_receipt", $form).removeAttr('checked');
             }
-          }
-
           showHideByValue('is_email_receipt', '', 'receiptDate', 'table-row', 'radio', true);
           showHideByValue('is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false);
+          }
         });
 
         {/literal}
