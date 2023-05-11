@@ -62,7 +62,7 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   }
 
   /**
-   * Add an ECMAScript module to the current page (<SCRIPT TYPE=MODULE>).
+   * Add an ECMAScript module (esm) to the current page (<SCRIPT TYPE=MODULE>).
    *
    * Ex: addModule('alert("Hello world");', ['weight' => 123]);
    *
@@ -84,7 +84,7 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   }
 
   /**
-   * Add an ECMAScript Module from file to the current page (<SCRIPT TYPE=MODULE SRC=...>).
+   * Add an ECMAScript Module (esm) from file to the current page (<SCRIPT TYPE=MODULE SRC=...>).
    *
    * Ex: addModuleFile('myextension', 'myscript.js', ['weight' => 123]);
    *
@@ -111,7 +111,7 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   }
 
   /**
-   * Add an ECMAScript Module by URL to the current page (<SCRIPT TYPE=MODULE SRC=...>).
+   * Add an ECMAScript Module (esm) by URL to the current page (<SCRIPT TYPE=MODULE SRC=...>).
    *
    * Ex: addModuleUrl('http://example.com/foo.js', ['weight' => 123])
    *
