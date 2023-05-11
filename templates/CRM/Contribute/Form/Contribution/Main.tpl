@@ -76,7 +76,7 @@
       <div class="help">{ts}You have a current Lifetime Membership which does not need to be renewed.{/ts}</div>
     {/if}
 
-    {if !empty($useForMember) && !$ccid}
+    {if $isShowMembershipQuickConfigBlock && !$ccid}
       <div class="crm-public-form-item crm-section">
         {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="makeContribution"}
       </div>
