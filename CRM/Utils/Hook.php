@@ -2842,6 +2842,34 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Build a list of ECMAScript Modules (ESM's) that are available for auto-loading.
+   *
+   * Subscribers should assume that the $importMap will be cached and re-used.
+   *
+   * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
+   * @link https://github.com/WICG/import-maps
+   * @see \Civi\Core\ImportMap
+   *
+   * @param array $importMap
+   *   Ex: ['imports' => ['square/' => 'https://example.com/square/']]
+   *
+   *   This data-structure is defined by the browser-vendors. In the future, browser-vendors
+   *   may update the supported features. It is the subscribers' responsibility to conform
+   *   with browser standards.
+   * @param array $context
+   *   In the future, the `$context` may provide hints about the usage environment. Based on these
+   *   hints, you may omit unnecessary mappings. However, in the absence of a clear hint,
+   *   listeners should tend to over-communicate (i.e. report all the mappings that you can).
+   */
+  public static function esmImportMap(array &$importMap, array $context): void {
+    $null = NULL;
+    self::singleton()->invoke(['importMap', 'context'], $importMap, $context, $null,
+      $null, $null, $null,
+      'civicrm_esmImportMap'
+    );
+  }
+
+  /**
    * This hook is called for bypass a few civicrm urls from IDS check.
    *
    * @param array $skip list of civicrm urls
