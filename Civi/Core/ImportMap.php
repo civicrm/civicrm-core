@@ -26,7 +26,7 @@ use Civi\Core\Event\GenericHookEvent;
  *
  * If you are writing Javascript code for an extension, then you may want to define new mappings, e.g.
  *
- *   function myext_civicrm_esmImportMap(array &$importMap, array $context) {
+ *   function myext_civicrm_esmImportMap(array &$importMap, array $context): void {
  *     $importMap['imports']['foo/'] = E::url('js/foo/');
  *     $importMap['imports']['bar/'] = E::url('packages/bar/dist/');
  *   }
@@ -94,7 +94,7 @@ class ImportMap extends \Civi\Core\Service\AutoService implements HookInterface 
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
-  public function on_civi_region_render(GenericHookEvent $e) {
+  public function on_civi_region_render(GenericHookEvent $e): void {
     if ($e->region->_name !== 'html-header' || !$this->isAutoInject() || !$this->isRequired()) {
       return;
     }
@@ -188,7 +188,7 @@ class ImportMap extends \Civi\Core\Service\AutoService implements HookInterface 
     }
     else {
       $flags = JSON_UNESCAPED_SLASHES;
-      if (\CRM_Core_Config::singleton()->debug) {
+      if (\Civi::settings()->get('debug_enabled')) {
         $flags |= JSON_PRETTY_PRINT;
       }
       return sprintf("<script type='importmap'>\n%s\n</script>", json_encode($importMap, $flags));
