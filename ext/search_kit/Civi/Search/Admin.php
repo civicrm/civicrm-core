@@ -366,6 +366,24 @@ class Admin {
             }
           }
         }
+        // Custom EntityRef joins
+        foreach ($fields as $field) {
+          if ($field['type'] === 'Custom' && $field['input_type'] === 'EntityRef') {
+            $targetEntity = $allowedEntities[$field['fk_entity']];
+            // Add the EntityRef join
+            [, $bareFieldName] = explode('.', $field['name']);
+            $alias = $entity['name'] . '_' . $field['fk_entity'] . '_' . $bareFieldName;
+            $joins[$entity['name']][] = [
+              'label' => $entity['title'] . ' ' . $field['title'],
+              'description' => $field['description'],
+              'entity' => $field['fk_entity'],
+              'conditions' => self::getJoinConditions($field['name'], $alias . '.id'),
+              'defaults' => [],
+              'alias' => $alias,
+              'multi' => FALSE,
+            ];
+          }
+        }
       }
     }
     return $joins;
