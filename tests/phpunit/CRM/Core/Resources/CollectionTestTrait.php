@@ -128,6 +128,21 @@ trait CRM_Core_Resources_CollectionTestTrait {
 
     $addCases(
       [
+        'add(scriptUrl,esm)' => ['add', ['scriptUrl' => 'http://example.com/foo.js', 'esm' => TRUE]],
+        'addModuleUrl()' => ['addModuleUrl', 'http://example.com/foo.js'],
+      ],
+      [
+        'name' => 'http://example.com/foo.js',
+        'disabled' => FALSE,
+        'weight' => 1,
+        'type' => 'scriptUrl',
+        'scriptUrl' => 'http://example.com/foo.js',
+        'esm' => TRUE,
+      ]
+    );
+
+    $addCases(
+      [
         'add(styleFile)' => ['add', ['styleFile' => ['civicrm', 'css/civicrm.css']]],
         'addStyleFile()' => ['addStyleFile', 'civicrm', 'css/civicrm.css'],
       ],
@@ -152,6 +167,15 @@ trait CRM_Core_Resources_CollectionTestTrait {
         Civi::paths()->getUrl('[civicrm.root]/js/foo.js?r=XXXX'),
       ],
     ];
+
+    $addCases(
+      [
+        'add(scriptFile): esm' => ['add', ['scriptFile' => ['civicrm', 'js/foo.js'], 'esm' => TRUE]],
+        'addScriptFile(): esm' => ['addModuleFile', 'civicrm', 'js/foo.js', ['esm' => TRUE]],
+        'addModuleFile(): dfl' => ['addModuleFile', 'civicrm', 'js/foo.js'],
+      ],
+      $basicFooJs + ['weight' => 1, 'translate' => TRUE, 'esm' => TRUE]
+    );
 
     $addCases(
       [
@@ -192,6 +216,22 @@ trait CRM_Core_Resources_CollectionTestTrait {
         'weight' => 1,
         'type' => 'script',
         'script' => 'window.alert("Boo!");',
+      ]
+    );
+
+    $addCases(
+      [
+        'add(script): esm' => ['add', ['script' => 'window.alert("Boo!");', 'esm' => TRUE]],
+        'addScript(): esm' => ['addScript', 'window.alert("Boo!");', ['esm' => TRUE]],
+        'addModule(): dfl' => ['addModule', 'window.alert("Boo!");'],
+      ],
+      [
+        'name' => 1 + $defaultCount,
+        'disabled' => FALSE,
+        'weight' => 1,
+        'type' => 'script',
+        'script' => 'window.alert("Boo!");',
+        'esm' => TRUE,
       ]
     );
 

@@ -114,6 +114,14 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       'jquery' => '$("div");',
     ]);
     CRM_Core_Region::instance('testAllTypes')->add([
+      'scriptUrl' => '/my%20module.mjs',
+      'esm' => TRUE,
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
+      'script' => 'import foo from "./foobar.mjs";',
+      'esm' => TRUE,
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
       'styleUrl' => '/foo%20bar.css',
     ]);
     CRM_Core_Region::instance('testAllTypes')->add([
@@ -131,6 +139,8 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       . "<script type=\"text/javascript\" src=\"/foo%20bar.js\">\n</script>\n"
       . "<script type=\"text/javascript\">\nalert(\"hi\");\n</script>\n"
       . "<script type=\"text/javascript\">\nCRM.\$(function(\$) {\n\$(\"div\");\n});\n</script>\n"
+      . "<script type=\"module\" src=\"/my%20module.mjs\">\n</script>\n"
+      . "<script type=\"module\">\nimport foo from \"./foobar.mjs\";\n</script>\n"
       . "<link href=\"/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n";
     $this->assertEquals($expected, $actual);
