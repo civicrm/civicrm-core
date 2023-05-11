@@ -22,14 +22,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
-   * How many locationBlocks should we display?
-   *
-   * @var int
-   * @const
-   */
-  const LOCATION_BLOCKS = 1;
-
-  /**
    * The id of the event we are processing.
    *
    * @var int
