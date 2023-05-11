@@ -45,7 +45,7 @@ interface CRM_Core_Resources_CollectionAdderInterface {
   public function addMarkup(string $markup, ...$options);
 
   /**
-   * Add an ECMAScript module to the current page (<SCRIPT TYPE=MODULE>).
+   * Add an ECMAScript Module (ESM) to the current page (<SCRIPT TYPE=MODULE>).
    *
    * Ex: addScript('alert("Hello world");', ['weight' => 123]);
    *
@@ -60,7 +60,7 @@ interface CRM_Core_Resources_CollectionAdderInterface {
   public function addModule(string $code, ...$options);
 
   /**
-   * Add an ECMAScript Module from file to the current page (<SCRIPT TYPE=MODULE SRC=...>).
+   * Add an ECMAScript Module (ESM) from file to the current page (<SCRIPT TYPE=MODULE SRC=...>).
    *
    * Ex: addScriptFile('myextension', 'myscript.js', ['weight' => 123]);
    *
@@ -77,7 +77,7 @@ interface CRM_Core_Resources_CollectionAdderInterface {
   public function addModuleFile(string $ext, string $file, ...$options);
 
   /**
-   * Add an ECMAScript Module by URL to the current page (<SCRIPT TYPE=MODULE SRC=...>).
+   * Add an ECMAScript Module (ESM) by URL to the current page (<SCRIPT TYPE=MODULE SRC=...>).
    *
    * Ex: addScriptUrl('http://example.com/foo.js', ['weight' => 123])
    *

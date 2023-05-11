@@ -88,6 +88,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'scriptUrl':
+          // ECMAScript Modules (ESMs) are basically Javascript files, but they require a slightly different incantation.
           if (!empty($snippet['esm'])) {
             $html .= sprintf("<script type=\"module\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
           }
@@ -110,6 +111,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'script':
+          // ECMAScript Modules (ESMs) are basically Javascript files, but they require a slightly different incantation.
           if (!empty($snippet['esm'])) {
             $html .= sprintf("<script type=\"module\">\n%s\n</script>\n", $snippet['script']);
           }
