@@ -2857,9 +2857,10 @@ abstract class CRM_Utils_Hook {
    *   may update the supported features. It is the subscribers' responsibility to conform
    *   with browser standards.
    * @param array $context
-   *   In the future, the `$context` may provide hints about the usage environment. Based on these
-   *   hints, you may omit unnecessary mappings. However, in the absence of a clear hint,
-   *   listeners should tend to over-communicate (i.e. report all the mappings that you can).
+   *   In the future, the `$context` may provide hints about the usage environment. Based
+   *   on these hints, you may omit unnecessary mappings. However, in the absence of a clear
+   *   hint, listeners should tend to over-communicate (i.e. report all the mappings that
+   *   you can).
    */
   public static function esmImportMap(array &$importMap, array $context): void {
     $null = NULL;
