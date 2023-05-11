@@ -179,7 +179,7 @@ class ImportMap extends \Civi\Core\Service\AutoService implements HookInterface 
     $importMap = \Civi::cache('long')->get('import-map');
     if ($importMap === NULL) {
       $importMap = [];
-      $importMap['imports']['civicrm/'] = \Civi::paths()->getUrl('[civicrm.root]/.');
+      $importMap['imports']['civicrm/'] = \Civi::paths()->getUrl('[civicrm.root]/');
       \CRM_Utils_Hook::esmImportMap($importMap, []);
       \Civi::cache('long')->set('import-map', $importMap);
     }
