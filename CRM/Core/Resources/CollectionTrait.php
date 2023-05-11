@@ -101,6 +101,9 @@ trait CRM_Core_Resources_CollectionTrait {
           break;
       }
     }
+    if (!empty($snippet['esm'])) {
+      Civi::service('import_map')->setRequired(TRUE);
+    }
 
     if ($snippet['type'] === 'scriptFile' && !isset($snippet['scriptFileUrls'])) {
       $res = Civi::resources();
