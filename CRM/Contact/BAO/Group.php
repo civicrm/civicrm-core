@@ -372,8 +372,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
 
       // get current parents for removal if not in the list anymore
+      $currentParentGroupIDs = [];
       $parents = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $params['id'], 'parents');
-      $currentParentGroupIDs = explode(',', $parents);
+      if (!empty($parents)) {
+        $currentParentGroupIDs = explode(',', $parents);
+      }
     }
 
     // form the name only if missing: CRM-627
