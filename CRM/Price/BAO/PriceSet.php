@@ -544,6 +544,9 @@ WHERE  id = %1";
    * @param bool $doNotIncludeExpiredFields
    * @param int $priceSetId
    *   Price Set ID
+   *
+   * @throws \CRM_Core_Exception
+   * @deprecated in CiviCRM 5.58, will be removed around CiviCRM 5.70.
    */
   public static function initSet(&$form, $entityTable = 'civicrm_event', $doNotIncludeExpiredFields = FALSE, $priceSetId = NULL) {
     CRM_Core_Error::deprecatedFunctionWarning('no alternative');
@@ -591,7 +594,7 @@ WHERE  id = %1";
       $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
 
       //get the price set fields participant count.
-      if ($entityTable == 'civicrm_event') {
+      if ($entityTable === 'civicrm_event') {
         //get option count info.
         $form->_priceSet['optionsCountTotal'] = self::getPricesetCount($priceSetId);
         if ($form->_priceSet['optionsCountTotal']) {
