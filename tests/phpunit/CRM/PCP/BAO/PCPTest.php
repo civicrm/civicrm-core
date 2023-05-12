@@ -291,7 +291,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
         ],
       ],
       'customGroup' => [],
-      'is_pay_later' => '0',
     ], $gathered_values);
   }
 
