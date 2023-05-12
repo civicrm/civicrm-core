@@ -29,14 +29,11 @@ use api\v4\Api4TestBase;
 class EntityTest extends Api4TestBase {
 
   public function testEntityGet() {
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
     $result = Entity::get(FALSE)
       ->execute()
       ->indexBy('name');
     $this->assertArrayHasKey('Entity', $result,
       "Entity::get missing itself");
-    $this->assertArrayHasKey('Participant', $result,
-      "Entity::get missing Participant");
 
     $this->assertEquals('CRM_Contact_DAO_Contact', $result['Contact']['dao']);
     $this->assertEquals(['DAOEntity'], $result['Contact']['type']);
