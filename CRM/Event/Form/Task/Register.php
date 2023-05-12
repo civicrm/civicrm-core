@@ -25,7 +25,6 @@
  */
 class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
 
-
   /**
    * Are we operating in "single mode", i.e. adding / editing only
    * one participant record, or is this a batch add operation
@@ -77,6 +76,53 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     $this->assign('participantQfKey', $key);
     $this->assign('participantAction', CRM_Core_Action::ADD);
     $this->assign('urlPathVar', "_qf_Participant_display=true&context=search");
+  }
+
+  /**
+   * Process the form submission.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function postProcess(): void {
+    $params = $this->controller->exportValues($this->_name);
+    // When adding more than one contact, the duplicates are
+    // removed automatically and the user receives one notification.
+    $event_id = $this->_eventId;
+    if (!$event_id && !empty($params['event_id'])) {
+      $event_id = $params['event_id'];
+    }
+    if (!empty($event_id)) {
+      $duplicateContacts = 0;
+      foreach ($this->_contactIds as $k => $dupeCheckContactId) {
+        // Eliminate contacts that have already been assigned to this event.
+        $dupeCheck = new CRM_Event_BAO_Participant();
+        $dupeCheck->contact_id = $dupeCheckContactId;
+        $dupeCheck->event_id = $event_id;
+        $dupeCheck->find(TRUE);
+        if (!empty($dupeCheck->id)) {
+          $duplicateContacts++;
+          unset($this->_contactIds[$k]);
+        }
+      }
+      if ($duplicateContacts > 0) {
+        $msg = ts(
+          '%1 contacts have already been assigned to this event. They were not added a second time.',
+          [1 => $duplicateContacts]
+        );
+        CRM_Core_Session::setStatus($msg);
+      }
+      if (count($this->_contactIds) === 0) {
+        CRM_Core_Session::setStatus(ts('No participants were added.'));
+        return;
+      }
+      // We have to re-key $this->_contactIds so each contact has the same
+      // key as their corresponding record in the $participants array that
+      // will be created below.
+      $this->_contactIds = array_values($this->_contactIds);
+    }
+
+    $statusMsg = $this->submit($params);
+    CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
 
 }

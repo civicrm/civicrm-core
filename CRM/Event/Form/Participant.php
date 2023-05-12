@@ -895,50 +895,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       return;
     }
-    // When adding a single contact, the formRule prevents you from adding duplicates
-    // (See above in formRule()). When adding more than one contact, the duplicates are
-    // removed automatically and the user receives one notification.
-    if ($this->_action & CRM_Core_Action::ADD) {
-      $event_id = $this->_eventId;
-      if (empty($event_id) && !empty($params['event_id'])) {
-        $event_id = $params['event_id'];
-      }
-      if (!$this->_single && !empty($event_id)) {
-        $duplicateContacts = 0;
-        foreach ($this->_contactIds as $k => $dupeCheckContactId) {
-          // Eliminate contacts that have already been assigned to this event.
-          $dupeCheck = new CRM_Event_BAO_Participant();
-          $dupeCheck->contact_id = $dupeCheckContactId;
-          $dupeCheck->event_id = $event_id;
-          $dupeCheck->find(TRUE);
-          if (!empty($dupeCheck->id)) {
-            $duplicateContacts++;
-            unset($this->_contactIds[$k]);
-          }
-        }
-        if ($duplicateContacts > 0) {
-          $msg = ts(
-            "%1 contacts have already been assigned to this event. They were not added a second time.",
-            [1 => $duplicateContacts]
-          );
-          CRM_Core_Session::setStatus($msg);
-        }
-        if (count($this->_contactIds) == 0) {
-          CRM_Core_Session::setStatus(ts("No participants were added."));
-          return;
-        }
-        // We have to re-key $this->_contactIds so each contact has the same
-        // key as their corresponding record in the $participants array that
-        // will be created below.
-        $this->_contactIds = array_values($this->_contactIds);
-      }
-    }
 
     $statusMsg = $this->submit($params);
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
     $session = CRM_Core_Session::singleton();
     $buttonName = $this->controller->getButtonName();
-    if ($this->_context == 'standalone') {
+    if ($this->_context === 'standalone') {
       if ($buttonName == $this->getButtonName('upload', 'new')) {
         $urlParams = 'reset=1&action=add&context=standalone';
         if ($this->_mode) {
