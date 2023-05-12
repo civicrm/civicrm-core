@@ -2848,7 +2848,7 @@ abstract class CRM_Utils_Hook {
    *
    * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
    * @link https://github.com/WICG/import-maps
-   * @see \Civi\Core\ImportMap
+   * @see \Civi\Esm\ImportMap
    *
    * @param array $importMap
    *   Ex: ['imports' => ['square/' => 'https://example.com/square/']]

@@ -1,8 +1,9 @@
 <?php
 
-namespace Civi\Core;
+namespace Civi\Esm;
 
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\HookInterface;
 
 /**
  * ECMAScript Modules (ESMs) allow you to load a JS file based on a physical-path or a
