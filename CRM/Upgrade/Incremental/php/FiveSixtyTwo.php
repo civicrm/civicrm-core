@@ -94,6 +94,8 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
       1 => [$lowestDomainId, 'Positive'],
       2 => ['enable_components', 'String'],
     ]);
+    // Flush the settings cache after updating the `enable_components` setting.
+    \Civi\Core\Container::getBootService('settings_manager')->flush();
 
     return TRUE;
   }

@@ -29,6 +29,10 @@ class CRM_Upgrade_Incremental_php_FiveSixtyThree extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_63_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
+    $enabledComponents = Civi::settings()->get('enable_components');
+    $extensions = array_map(['CRM_Utils_String', 'convertStringToSnakeCase'], $enabledComponents);
+    $this->addExtensionTask('Enable component extensions', $extensions);
   }
 
 }

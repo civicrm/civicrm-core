@@ -248,8 +248,6 @@ class SettingsBag {
       return $this;
     }
     $this->setDb($key, $value);
-    $this->values[$key] = $value;
-    $this->combined = NULL;
     return $this;
   }
 
@@ -379,6 +377,7 @@ class SettingsBag {
       $dao->domain_id = $this->domainId;
     }
     $dao->find(TRUE);
+    $oldValue = \CRM_Utils_String::unserialize($dao->value);
 
     // Call 'on_change' listeners. It would be nice to only fire when there's
     // a genuine change in the data. However, PHP developers have mixed
@@ -388,7 +387,7 @@ class SettingsBag {
       foreach ($metadata['on_change'] as $callback) {
         call_user_func(
           \Civi\Core\Resolver::singleton()->get($callback),
-          \CRM_Utils_String::unserialize($dao->value),
+          $oldValue,
           $value,
           $metadata,
           $this->domainId
@@ -424,6 +423,23 @@ class SettingsBag {
       // Cannot use $dao->save(); in upgrade mode (eg WP + Civi 4.4=>4.7), the DAO will refuse
       // to save the field `group_name`, which is required in older schema.
       \CRM_Core_DAO::executeQuery(\CRM_Utils_SQL_Insert::dao($dao)->toSQL());
+    }
+
+    $this->values[$name] = $value;
+    $this->combined = NULL;
+
+    // Call 'post_change' listeners after the value has been saved.
+    // Unlike 'on_change', this will only fire if the oldValue and newValue are not equivalent (using == comparison)
+    if ($value != $oldValue && !empty($metadata['post_change'])) {
+      foreach ($metadata['post_change'] as $callback) {
+        call_user_func(
+          \Civi\Core\Resolver::singleton()->get($callback),
+          $oldValue,
+          $value,
+          $metadata,
+          $this->domainId
+        );
+      }
     }
   }
 

@@ -410,7 +410,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->setShowCaseActivitiesInCore(FALSE);
     $this->setUpForActivityDashboardTests();
     $this->addCaseWithActivity();
-    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'access all cases and activities',
+    ];
 
     $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($this->_params);
     $this->assertEquals(8, $activityCount);

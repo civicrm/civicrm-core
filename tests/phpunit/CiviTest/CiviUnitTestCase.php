@@ -488,6 +488,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected function assertPostConditions(): void {
     // Reset to version 3 as not all (e.g payments) work on v4
     $this->_apiversion = 3;
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
     if ($this->isLocationTypesOnPostAssert) {
       $this->assertLocationValidity();
     }

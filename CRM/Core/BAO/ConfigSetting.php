@@ -362,6 +362,7 @@ class CRM_Core_BAO_ConfigSetting {
    * @param array $enabledComponents
    */
   public static function setEnabledComponents($enabledComponents) {
+    // The post_change trigger on this setting will sync component extensions, which will also flush caches
     Civi::settings()->set('enable_components', array_values($enabledComponents));
   }
 
