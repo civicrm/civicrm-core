@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Event\GenericHookEvent;
+
 /**
  * Class CRM_Core_Resources_CollectionTrait
  *
@@ -102,7 +104,7 @@ trait CRM_Core_Resources_CollectionTrait {
       }
     }
     if (!empty($snippet['esm'])) {
-      Civi::service('esm.import_map')->useModule($snippet);
+      Civi::dispatcher()->dispatch('civi.esm.useModule', GenericHookEvent::create(['snippet' => &$snippet]));
     }
 
     if ($snippet['type'] === 'scriptFile' && !isset($snippet['scriptFileUrls'])) {
