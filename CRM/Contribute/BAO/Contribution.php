@@ -4234,7 +4234,7 @@ LIMIT 1;";
         );
 
         unset($dates['end_date']);
-        $membershipParams['status_id'] = CRM_Utils_Array::value('id', $calcStatus, 'New');
+        $membershipParams['status_id'] = $calcStatus['id'] ?? 'New';
       }
       //we might be renewing membership,
       //so make status override false.
