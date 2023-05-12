@@ -55,17 +55,17 @@ use Civi\Core\HookInterface;
  *
  * 1. Disable CiviCRM's default SCRIPT renderer:
  *
- *    Civi::dispatcher()->addListener('hook_config', fn($e) => Civi::service('import_map')->setAutoInject(FALSE));
+ *    Civi::dispatcher()->addListener('hook_config', fn($e) => Civi::service('esm.import_map')->setAutoInject(FALSE));
  *
  *    (*You might do this in `CRM_Utils_System_*::initialize()`*)
  *
  * 2. Get the import-map from CiviCRM:
  *
- *    $importMap = Civi::service('import_map')->get();
+ *    $importMap = Civi::service('esm.import_map')->get();
  *
  * 3. Pass the $importMap to the UF's native API (with any required transformations).
  *
- * @service import_map
+ * @service esm.import_map
  */
 class ImportMap extends \Civi\Core\Service\AutoService implements HookInterface {
 
