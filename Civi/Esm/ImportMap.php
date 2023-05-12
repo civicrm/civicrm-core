@@ -102,7 +102,7 @@ class ImportMap extends \Civi\Core\Service\AutoService implements HookInterface 
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
   public function on_civi_region_render(GenericHookEvent $e): void {
-    if ($e->region->_name !== 'html-header' || !$this->isAutoInject() || !$this->isRequired()) {
+    if ($e->region->_name !== 'html-header' || !$this->isAutoInject() || !$this->required) {
       return;
     }
 
@@ -127,20 +127,11 @@ class ImportMap extends \Civi\Core\Service\AutoService implements HookInterface 
   }
 
   /**
-   * Does the current page-load define any "module" files?
-   *
-   * @return bool
-   */
-  public function isRequired(): bool {
-    return $this->required;
-  }
-
-  /**
-   * @param bool $required
+   * @param array $snippet
    * @return ImportMap
    */
-  public function setRequired(bool $required): ImportMap {
-    $this->required = $required;
+  public function useModule(array $snippet): ImportMap {
+    $this->required = TRUE;
     return $this;
   }
 
