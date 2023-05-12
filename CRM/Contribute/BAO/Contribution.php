@@ -2598,6 +2598,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($this->is_test) {
         $isTest = TRUE;
       }
+
+      // "is_pay_later" is used by contribution and membership online receipt to decide if "invoice" or "receipt" is sent:
+      // {if $is_pay_later}{ts}Invoice{/ts}{else}{ts}Receipt{/ts}{/if}
+      // But is_pay_later does not change when the contribution is Completed.
+      // Set it here only if contribution = Pending
+      if ($this->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
+        && $this->is_pay_later == 1) {
+        $values['is_pay_later'] = 1;
+      }
+
       if (!empty($this->_relatedObjects['membership'])) {
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
@@ -2761,8 +2771,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     $values['customGroup'] = $customGroup;
-
-    $values['is_pay_later'] = $this->is_pay_later;
 
     return $values;
   }
