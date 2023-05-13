@@ -151,7 +151,6 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * @param string $entityName
    * @param string $actionName
-   * @throws \CRM_Core_Exception
    */
   public function __construct($entityName, $actionName) {
     // If a namespaced class name is passed in
