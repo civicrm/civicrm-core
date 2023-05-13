@@ -306,6 +306,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ($customFieldID &&
         !array_key_exists($customFieldID, $addressCustomFields)
       ) {
+        // @todo - this can probably go....
         if ($customFields[$customFieldID]['data_type'] == 'Boolean') {
           if (empty($val) && !is_numeric($val) && $this->isFillDuplicates()) {
             //retain earlier value when Import mode is `Fill`
@@ -816,12 +817,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           }
         }
       }
-      if (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
-        && ($value == '' || !isset($value)) &&
-        ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
-        ($key === 'current_employer' && empty($params['current_employer']))) {
-        // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
-        // to avoid update with empty values
+      // Why only these fields...?
+      if ($value === '' && in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'], TRUE)
+        ) {
+        // CRM-10128: if $value is blank, do not fill $data with empty value
         continue;
       }
       else {
