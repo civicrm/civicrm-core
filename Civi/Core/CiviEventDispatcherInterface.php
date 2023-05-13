@@ -26,10 +26,11 @@ interface CiviEventDispatcherInterface {
    *
    * @param string $eventName The name of the event to dispatch. The name of
    *   the event is the name of the method that is invoked on listeners.
-   * @param Event|null $event The event to pass to the event handlers/listeners
-   *   If not supplied, an empty Event instance is created
+   * @param \Symfony\Contracts\EventDispatcher\Event|null $event The event to
+   *   pass to the event handlers/listeners If not supplied, an empty Event
+   *   instance is created
    *
-   * @return Event
+   * @return \Symfony\Contracts\EventDispatcher\Event
    */
   public function dispatch($eventName, $event = NULL);
 
