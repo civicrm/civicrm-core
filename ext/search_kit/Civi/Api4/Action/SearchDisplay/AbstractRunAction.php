@@ -787,7 +787,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
       case 'Date':
       case 'Timestamp':
-        $formatted = \CRM_Utils_Date::customFormat($rawValue);
+        if (!(isset($this->format) && in_array($this->format, ['csv', 'xlsx', 'ods']))) {
+          $formatted = \CRM_Utils_Date::customFormat($rawValue);
+        }
     }
 
     return $formatted;
