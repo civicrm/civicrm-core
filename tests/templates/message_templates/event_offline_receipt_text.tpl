@@ -19,3 +19,13 @@ participant.participant_role_id:name::{participant.participant_role_id:name}
 participant.status_id:name:::{participant.status_id:name}
 email:::{$email}
 event.pay_later_receipt:::{event.pay_later_receipt}
+contribution.total_amount:::{contribution.total_amount|crmMoney}
+contribution.total_amount|raw:::{contribution.total_amount|raw}
+contribution.balance_amount:::{contribution.balance_amount}
+contribution.balance_amount|raw:::{contribution.balance_amount|raw}
+contribution.paid_amount:::{contribution.paid_amount}
+contribution.paid_amount|raw:::{contribution.paid_amount|raw}
+contribution.balance_amount|raw is zero:::{if {contribution.balance_amount|raw} === 0.00}Yes{/if}
+contribution.balance_amount|raw string is zero:::{if '{contribution.balance_amount|raw}' === '0.00'}Yes{/if}
+contribution.balance_amount|boolean:::{if {contribution.balance_amount|boolean}}Yes{else}No{/if}
+contribution.paid_amount|boolean:::{if {contribution.paid_amount|boolean}}Yes{/if}

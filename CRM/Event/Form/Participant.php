@@ -1967,6 +1967,26 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
+   * Get the contribution ID associated with the participant record.
+   *
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getContributionID(): ?int {
+    if (!isset($this->contributionID)) {
+      $this->contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+        $this->getParticipantID(), 'contribution_id', 'participant_id'
+      );
+    }
+    return $this->contributionID;
+  }
+
+  /**
    * Get the value for the revenue recognition date field.
    *
    * @return string
@@ -2235,6 +2255,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         'modelProps' => [
           'participantID' => $this->_id,
           'eventID' => $params['event_id'],
+          'contributionId' => $this->getContributionID(),
         ],
       ];
 
@@ -2251,12 +2272,9 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       //send email with pdf invoice
       $template = CRM_Core_Smarty::singleton();
       $taxAmt = $template->get_template_vars('dataArray');
-      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-        $this->_id, 'contribution_id', 'participant_id'
-      );
       if (Civi::settings()->get('invoice_is_email_pdf')) {
         $sendTemplateParams['isEmailPdf'] = TRUE;
-        $sendTemplateParams['contributionId'] = $contributionId;
+        $sendTemplateParams['contributionId'] = $this->getContributionID();
       }
       [$mailSent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       if ($mailSent) {
