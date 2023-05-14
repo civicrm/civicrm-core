@@ -200,7 +200,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @var int
    */
-  public $_eventId = NULL;
+  public $_eventId;
 
   /**
    * Id of payment, if any
@@ -785,7 +785,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param $files
    * @param self $self
    *
-   * @return array
+   * @return array|true
    *   list of errors to be posted back to the form
    */
   public static function formRule($values, $files, $self) {
@@ -1547,7 +1547,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       ['onclick' => "showHideByValue('send_receipt','','notice','table-row','radio',false); showHideByValue('send_receipt','','from-email','table-row','radio',false);"]
     );
 
-    $form->add('select', 'from_email_address', ts('Receipt From'), $form->_fromEmails['from_email_id']);
+    $form->add('select', 'from_email_address', ts('Receipt From'), $form->getAvailableFromEmails()['from_email_id']);
 
     $form->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
@@ -1566,6 +1566,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $mailingInfo = Civi::settings()->get('mailing_backend');
     $form->assign('outBound_option', $mailingInfo['outBound_option']);
     $form->assign('hasPayment', $form->_paymentId);
+  }
+
+  /**
+   * Get the emails available for the from address.
+   *
+   * @return array
+   */
+  protected function getAvailableFromEmails(): array {
+    return CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
   }
 
   /**
@@ -2225,10 +2234,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       // try to send emails only if email id is present
       // and the do-not-email option is not checked for that contact
       if ($this->_contributorEmail and !$this->_toDoNotEmail) {
-        if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
-          $receiptFrom = $params['from_email_address'];
-        }
-        $sendTemplateParams['from'] = $receiptFrom;
+        $sendTemplateParams['from'] = $params['from_email_address'];
         $sendTemplateParams['toName'] = $this->_contributorDisplayName;
         $sendTemplateParams['toEmail'] = $this->_contributorEmail;
         $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;
