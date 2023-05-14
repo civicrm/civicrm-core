@@ -60,21 +60,85 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         'data_type' => 'String',
         'audience' => 'user',
       ],
-      'contact_email' => [
+      'loc_block_id.email_id.email' => [
         'title' => ts('Event Contact Email'),
-        'name' => 'contact_email',
+        'name' => 'loc_block_id.email_id.email',
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => 'String',
         'audience' => 'user',
       ],
-      'contact_phone' => [
+      'loc_block_id.email_2_id.email' => [
+        'title' => ts('Event Contact Email 2'),
+        'name' => 'loc_block_id.email_2_id.email',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_id.phone' => [
         'title' => ts('Event Contact Phone'),
-        'name' => 'contact_phone',
+        'name' => 'loc_block_id.phone_id.phone',
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => '',
         'audience' => 'user',
+      ],
+      'loc_block_id.phone_id.phone_type_id' => [
+        'title' => ts('Event Contact Phone'),
+        'name' => 'loc_block_id.phone_id.phone_type_id',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'Int',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_id.phone_type_id:label' => [
+        'title' => ts('Event Contact Phone'),
+        'name' => 'loc_block_id.phone_id.phone_type_id:label',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_id.phone_ext' => [
+        'title' => ts('Event Contact Phone Extension'),
+        'name' => 'loc_block_id.phone_id.phone_ext',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_2_id.phone' => [
+        'title' => ts('Event Contact Phone 2'),
+        'name' => 'loc_block_id.phone_2_id.phone',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => '',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_2_id.phone_type_id' => [
+        'title' => ts('Event Contact Phone'),
+        'name' => 'loc_block_id.phone_2_id.phone_type_id',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'Int',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_2_id.phone_type_id:label' => [
+        'title' => ts('Event Contact Phone 2'),
+        'name' => 'loc_block_id.phone_2_id.phone_type_id:label',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_2_id.phone_ext' => [
+        'title' => ts('Event Contact Phone 2 Extension'),
+        'name' => 'loc_block_id.phone_2_id.phone_ext',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
       ],
     ];
   }
@@ -118,7 +182,25 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
           'loc_block_id.address_id.state_province_id:label',
           'loc_block_id.address_id.postal_code',
           'loc_block_id.email_id.email',
+          'loc_block_id.email_2_id.email',
           'loc_block_id.phone_id.phone',
+          'loc_block_id.phone_id.phone_type_id',
+          'loc_block_id.phone_id.phone_ext',
+          'loc_block_id.phone_id.phone_type_id:label',
+          'loc_block_id.phone_2_id.phone',
+          'loc_block_id.phone_2_id.phone_type_id',
+          'loc_block_id.phone_2_id.phone_ext',
+          'loc_block_id.phone_2_id.phone_type_id:label',
+          'confirm_email_text',
+          'is_show_location',
+          'is_show_location:label',
+          'is_public',
+          'is_public:label',
+          'is_monetary:label',
+          'event_type_id:label',
+          'event_type_id:name',
+          'pay_later_text',
+          'pay_later_receipt',
           'custom.*',
         ], $this->getExposedFields()))
         ->execute()->first();
@@ -133,10 +215,11 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       $tokens['registration_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE, TRUE);
       $tokens['start_date']['text/html'] = !empty($event['start_date']) ? new DateTime($event['start_date']) : '';
       $tokens['end_date']['text/html'] = !empty($event['end_date']) ? new DateTime($event['end_date']) : '';
-      $tokens['event_type_id:label']['text/html'] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Event', 'event_type_id', $event['event_type_id']);
-      $tokens['event_type_id:name']['text/html'] = CRM_Core_PseudoConstant::getName('CRM_Event_BAO_Event', 'event_type_id', $event['event_type_id']);
-      $tokens['contact_phone']['text/html'] = $event['loc_block_id.phone_id.phone'];
       $tokens['contact_email']['text/html'] = $event['loc_block_id.email_id.email'];
+      $tokens['contact_phone']['text/html'] = $event['loc_block_id.phone_id.phone'];
+      // We use text/plain for fields which should be converted to html when used in html content.
+      $tokens['confirm_email_text']['text/plain'] = $event['confirm_email_text'];
+      $tokens['pay_later_text']['text/plain'] = $event['pay_later_text'];
 
       foreach ($this->getTokenMetadata() as $fieldName => $fieldSpec) {
         if (!isset($tokens[$fieldName])) {
@@ -168,6 +251,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
   protected function getExposedFields(): array {
     return [
       'event_type_id',
+      'event_type_id:label',
       'title',
       'id',
       'pay_later_receipt',
@@ -175,6 +259,47 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       'end_date',
       'summary',
       'description',
+      'is_show_location',
+      'is_public',
+      'confirm_email_text',
+      'is_monetary',
+    ];
+  }
+
+  /**
+   * Get any overrides for token metadata.
+   *
+   * This is most obviously used for setting the audience, which
+   * will affect widget-presence.
+   *
+   * Changing the audience is done in order to simplify the
+   * UI for more general users.
+   *
+   * @return \string[][]
+   */
+  protected function getTokenMetadataOverrides(): array {
+    return [
+      'is_public' => ['audience' => 'sysadmin'],
+      'is_show_location' => ['audience' => 'sysadmin'],
+      'is_monetary' => ['audience' => 'sysadmin'],
+    ];
+  }
+
+  /**
+   * These tokens still work but we don't advertise them.
+   *
+   * We will actively remove from the following places
+   * - scheduled reminders
+   * - add to 'blocked' on pdf letter & email
+   *
+   * & then at some point start issuing warnings for them.
+   *
+   * @return string[]
+   */
+  protected function getDeprecatedTokens(): array {
+    return [
+      'contact_phone' => 'loc_block_id.phone_id.phone',
+      'contact_email' => 'loc_block_id.email_id.email',
     ];
   }
 

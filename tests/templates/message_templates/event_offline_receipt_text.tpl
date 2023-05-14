@@ -5,6 +5,17 @@ contact.id:::{contact.id}
 event.id:::{event.id}
 participant.id:::{participant.id}
 event.title:::{event.title}
+event.end_date|crmDate:"%Y%m%d"::{event.end_date|crmDate:"%Y%m%d"}
+event.loc_block_id.phone_id.phone:::{event.loc_block_id.phone_id.phone}
+event.loc_block_id.phone_id.phone_type_id:label:::{event.loc_block_id.phone_id.phone_type_id:label}
+event.loc_block_id.phone_id.phone_ext:::{event.loc_block_id.phone_id.phone_ext}
+event.loc_block_id.phone_2_id.phone:::{event.loc_block_id.phone_id.phone_2}
+event.loc_block_id.phone_2_id.phone_type_id:label:::{event.loc_block_id.phone_id.phone_type_id_2:label}
+event.loc_block_id.phone_2_id.phone_ext:::{event.loc_block_id.phone_id.phone_ext_2}
+event.confirm_email_text::{event.confirm_email_text}
+event.is_show_location|boolean::{event.is_show_location|boolean}
+event.is_public|boolean::{event.is_public|boolean}
+participant.participant_role_id:name::{participant.participant_role_id:name}
 participant.status_id:name:::{participant.status_id:name}
 email:::{$email}
 event.pay_later_receipt:::{event.pay_later_receipt}
