@@ -956,31 +956,32 @@ WHERE  civicrm_participant.id = {$participantId}
   /**
    * Get the additional participant ids.
    *
-   * @param int $primaryParticipantId
-   *   Primary partycipant Id.
+   * @param int|null $primaryParticipantID
+   *   Primary participant ID. Null should not be passed in & handling for it
+   *   will be removed.
    * @param bool $excludeCancel
-   *   Do not include participant those are cancelled.
-   *
-   * @param int $oldStatusId
+   *   Do not include cancelled participants.
+   * @param int|null $statusID
+   *   Restrict to the specified status ID.
    *
    * @return array
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @internal not supported to be called from outside of core.
    */
-  public static function getAdditionalParticipantIds($primaryParticipantId, $excludeCancel = TRUE, $oldStatusId = NULL) {
-    $additionalParticipantIds = [];
-    if (!$primaryParticipantId) {
-      return $additionalParticipantIds;
+  public static function getAdditionalParticipantIds(?int $primaryParticipantID, bool $excludeCancel = TRUE, ?int $statusID = NULL): array {
+    if (!$primaryParticipantID) {
+      CRM_Core_Error::deprecatedWarning('should not be called with no IDs');
+      return [];
     }
-
-    $where = "participant.registered_by_id={$primaryParticipantId}";
+    $where = "participant.registered_by_id={$primaryParticipantID}";
     if ($excludeCancel) {
-      $cancelStatusId = 0;
       $negativeStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
-      $cancelStatusId = array_search('Cancelled', $negativeStatuses);
-      $where .= " AND participant.status_id != {$cancelStatusId}";
+      $where .= ' AND participant.status_id != ' . (int) array_search('Cancelled', $negativeStatuses, TRUE);
     }
 
-    if ($oldStatusId) {
-      $where .= " AND participant.status_id = {$oldStatusId}";
+    if ($statusID) {
+      $where .= " AND participant.status_id = {$statusID}";
     }
 
     $query = "
@@ -988,11 +989,12 @@ WHERE  civicrm_participant.id = {$participantId}
     FROM  civicrm_participant participant
    WHERE  {$where}";
 
+    $additionalParticipantIDs = [];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $additionalParticipantIds[$dao->id] = $dao->id;
+      $additionalParticipantIDs[$dao->id] = $dao->id;
     }
-    return $additionalParticipantIds;
+    return $additionalParticipantIDs;
   }
 
   /**
