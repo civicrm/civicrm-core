@@ -85,10 +85,6 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    * @throws \CRM_Core_Exception
    */
   public function getEntitiesHitech(): array {
-    // Ensure all components are enabled so their entities show up
-    foreach (array_keys(\CRM_Core_Component::getComponents()) as $component) {
-      \CRM_Core_BAO_ConfigSetting::enableComponent($component);
-    }
     return $this->toDataProviderArray(Entity::get(FALSE)->execute()->column('name'));
   }
 
@@ -102,20 +98,22 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    * @return array
    */
   public function getEntitiesLotech(): array {
-    // TODO: Auto-scan required core extensions like search_kit
-    $manual['add'] = ['SearchDisplay', 'SearchSegment'];
-    $manual['remove'] = ['CustomValue'];
+    // Core + required core extensions
+    $directores = ['', 'ext/search_kit/', 'ext/civi_*/'];
+    $manual['remove'] = ['CustomValue', 'SKEntity'];
     $manual['transform'] = ['CiviCase' => 'Case'];
 
     $scanned = [];
-    $srcDir = dirname(__DIR__, 5);
-    foreach ((array) glob("$srcDir/Civi/Api4/*.php") as $name) {
-      $fileName = basename($name, '.php');
-      $scanned[] = $manual['transform'][$fileName] ?? $fileName;
+    $baseDir = dirname(__DIR__, 5);
+    foreach ($directores as $directory) {
+      foreach ((array) glob("$baseDir/{$directory}Civi/Api4/*.php") as $name) {
+        $fileName = basename($name, '.php');
+        $scanned[] = $manual['transform'][$fileName] ?? $fileName;
+      }
     }
 
     $names = array_diff(
-      array_unique(array_merge($scanned, $manual['add'])),
+      $scanned,
       $manual['remove']
     );
 

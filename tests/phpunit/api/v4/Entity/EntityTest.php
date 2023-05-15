@@ -19,7 +19,6 @@
 
 namespace api\v4\Entity;
 
-use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Entity;
 use api\v4\Api4TestBase;
 
@@ -59,15 +58,6 @@ class EntityTest extends Api4TestBase {
       ->indexBy('name');
     $this->assertArrayNotHasKey('Participant', $result,
       "Entity::get should not have Participant when CiviEvent disabled");
-
-    // Trying to use a CiviEvent API will fail when component is disabled
-    try {
-      \Civi\Api4\Participant::get(FALSE)->execute();
-      $this->fail();
-    }
-    catch (NotImplementedException $e) {
-      $this->assertStringContainsString('CiviEvent', $e->getMessage());
-    }
 
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
     $result = Entity::get(FALSE)
