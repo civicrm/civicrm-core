@@ -345,11 +345,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $event = $this->eventCreate($eventParams);
     }
 
-    $this->ids['contact']['event'] = (int) $this->individualCreate();
     /** @var CRM_Event_Form_Participant $form */
     $form = $this->getFormObject('CRM_Event_Form_Participant');
     $form->_single = TRUE;
-    $form->_contactID = $form->_contactId = $this->ids['contact']['event'];
+    $form->_contactID = $form->_contactId = $this->getContactID();
     $form->setCustomDataTypes();
     $form->_eventId = $event['id'];
     if (!empty($eventParams['is_monetary'])) {
@@ -554,7 +553,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitPartialPayment($isQuickConfig) {
+  public function testSubmitPartialPayment(bool $isQuickConfig): void {
     $mut = new CiviMailUtils($this, TRUE);
     $form = $this->getForm(['is_monetary' => 1]);
     $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('event')]);
@@ -864,7 +863,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @return int
    */
   protected function getEventID(): int {
-    return $this->ids['Event']['event'];
+    return reset($this->ids['Event']);
   }
 
   /**
@@ -873,7 +872,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @return int
    */
   protected function getContactID(): int {
-    return $this->ids['contact']['event'];
+    if (empty($this->ids['Contact']['event'])) {
+      $this->ids['Contact']['event'] = $this->individualCreate([]);
+    }
+    return $this->ids['Contact']['event'];
   }
 
 }

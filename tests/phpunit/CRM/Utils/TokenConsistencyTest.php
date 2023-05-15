@@ -641,7 +641,7 @@ participant.must_wait :
    * @return string
    */
   protected function getExpectedEventTokenOutput(): string {
-    return 'event.id :' . $this->ids['event'][0] . '
+    return 'event.id :' . $this->ids['Event'][0] . '
 event.title :Annual CiviCRM meet
 event.start_date :October 21st, 2008
 event.end_date :October 23rd, 2008
@@ -871,7 +871,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $tokens = array_keys($this->getEventTokens());
     $html = $this->getTokenString($tokens);
     $tokenProcessor->addMessage('html', $html, 'text/plain');
-    $tokenProcessor->addRow(['eventId' => $this->ids['event'][0]]);
+    $tokenProcessor->addRow(['eventId' => $this->ids['Event'][0]]);
     $tokenProcessor->evaluate();
     $this->assertEquals($expectedEventString, $tokenProcessor->getRow(0)->render('html'));
   }
@@ -901,7 +901,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $html = $this->getTokenString(array_keys($this->getEventTokens()));
 
     $tokenProcessor->addMessage('html', $html, 'text/plain');
-    $tokenProcessor->addRow(['eventId' => $this->ids['event'][0]]);
+    $tokenProcessor->addRow(['eventId' => $this->ids['Event'][0]]);
     $tokenProcessor->evaluate();
     $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
 
@@ -1022,7 +1022,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
         'phone_id' => $phoneID,
       ],
     ])->execute()->first()['id'];
-    $this->ids['event'][0] = $this->eventCreate([
+    $this->ids['Event'][0] = $this->eventCreate([
       'description' => 'event description',
       'end_date' => 20081023,
       'registration_end_date' => 20081015,
@@ -1033,10 +1033,10 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     // this prevents things working just because the id 'happens to be valid'
     $this->participantCreate([
       'register_date' => '2020-01-01',
-      'event_id' => $this->ids['event'][0],
+      'event_id' => $this->ids['Event'][0],
     ]);
     $this->ids['participant'][0] = $this->participantCreate([
-      'event_id' => $this->ids['event'][0],
+      'event_id' => $this->ids['Event'][0],
       'fee_amount' => 50,
       'fee_level' => 'steep',
       $this->getCustomFieldName('participant_int') => '99999',

@@ -1039,7 +1039,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $params['payment_processor'] = is_array($params['payment_processor_id']) ? $params['payment_processor_id'] : [$params['payment_processor_id']];
     }
     $event = Event::create(FALSE)->setValues($params)->execute()->first();
-    $this->ids['event'][] = $event['id'];
+    $this->ids['Event'][] = $event['id'];
     return $event;
   }
 
@@ -1084,7 +1084,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $params = [
       'event_id' => $id,
     ];
-    return $this->callAPISuccess('event', 'delete', $params);
+    return $this->callAPISuccess('Event', 'delete', $params);
   }
 
   /**
