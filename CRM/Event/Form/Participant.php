@@ -818,15 +818,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
 
-    // validate contribution status for 'Failed'.
-    if ($self->_onlinePendingContributionId && !empty($values['record_contribution']) &&
-      (CRM_Utils_Array::value('contribution_status_id', $values) ==
-        array_search('Failed', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
-      )
-    ) {
-      $errorMsg['contribution_status_id'] = ts('Please select a valid payment status before updating.');
-    }
-
     // do the amount validations.
     //skip for update mode since amount is freeze, CRM-6052
     if ((!$self->_id && empty($values['total_amount']) &&
