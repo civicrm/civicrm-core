@@ -33,7 +33,7 @@
   </tr>
   {if empty($is_template)}
   <tr class="crm-contribution-form-block-receive_date">
-    <td class="label">{ts}Received{/ts}</td>
+    <td class="label">{ts}Contribution Date{/ts}</td>
     <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
   </tr>
   {/if}

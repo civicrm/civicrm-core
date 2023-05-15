@@ -210,7 +210,7 @@
           <th class="currency">{ts}Amount{/ts}</th>
           <th>{ts}Financial Type{/ts}</th>
           <th>{ts}Contribution Source{/ts}</th>
-          <th class="received_date">{ts}Received{/ts}</th>
+          <th class="received_date">{ts}Contribution Date{/ts}</th>
           <th>{ts}Status{/ts}</th>
           {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>

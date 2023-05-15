@@ -43,7 +43,7 @@
 {/if}
 {ts}Total Amount{/ts} : {contribution.total_amount}
 {if '{contribution.receive_date}'}
-{ts}Date Received{/ts}: {contribution.receive_date|crmDate:"shortdate"}
+{ts}Contribution Date{/ts}: {contribution.receive_date|crmDate:"shortdate"}
 {/if}
 {if '{contribution.receipt_date}'}
 {ts}Receipt Date{/ts}: {contribution.receipt_date|crmDate:"shortdate"}

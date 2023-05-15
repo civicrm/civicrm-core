@@ -637,7 +637,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         'form_value' => [['receive_date_high', '=', 20180101, 1, 0]],
         'expectedResult' => 1,
         'expected_contact' => ['Mr. Terrence Smith II'],
-        'expected_qill' => 'Date Received - less than or equal to "January 1st, 2018 12:00 AM"',
+        'expected_qill' => 'Contribution Date - less than or equal to "January 1st, 2018 12:00 AM"',
         'expected_where' => "civicrm_contribution.receive_date <= '20180101000000'",
       ],
       'thankyou_date_search' => [

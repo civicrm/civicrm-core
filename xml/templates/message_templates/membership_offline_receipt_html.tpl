@@ -175,7 +175,7 @@
               {if {contribution.receive_date|boolean}}
                 <tr>
                   <td {$labelStyle}>
-                    {ts}Date Received{/ts}
+                    {ts}Contribution Date{/ts}
                   </td>
                   <td {$valueStyle}>
                     {contribution.receive_date}

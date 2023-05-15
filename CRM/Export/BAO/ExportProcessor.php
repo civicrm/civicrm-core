@@ -1304,7 +1304,7 @@ class CRM_Export_BAO_ExportProcessor {
     return [
       'componentPaymentField_total_amount' => ['title' => ts('Total Amount'), 'type' => CRM_Utils_Type::T_MONEY],
       'componentPaymentField_contribution_status' => ['title' => ts('Contribution Status'), 'type' => CRM_Utils_Type::T_STRING],
-      'componentPaymentField_received_date' => ['title' => ts('Date Received'), 'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME],
+      'componentPaymentField_received_date' => ['title' => ts('Contribution Date'), 'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME],
       'componentPaymentField_payment_instrument' => ['title' => ts('Payment Method'), 'type' => CRM_Utils_Type::T_STRING],
       'componentPaymentField_transaction_id' => ['title' => ts('Transaction ID'), 'type' => CRM_Utils_Type::T_STRING],
     ];

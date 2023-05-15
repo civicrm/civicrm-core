@@ -397,7 +397,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
         'financial_type_id:label' => 'Financial Type',
         'contribution_page_id:label' => 'Contribution Page',
         'payment_instrument_id:label' => 'Payment Method',
-        'receive_date' => 'Date Received',
+        'receive_date' => 'Contribution Date',
         'non_deductible_amount' => 'Non-deductible Amount',
         'total_amount' => 'Total Amount',
         'fee_amount' => 'Fee Amount',

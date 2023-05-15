@@ -716,7 +716,7 @@ Sales Tax 10.00% : $10.00
 
 Total Tax Amount : $10.00
 Total Amount : $110.00
-Date Received: ' . date('m/d/Y') . '
+Contribution Date: ' . date('m/d/Y') . '
 Receipt Date: ' . date('m/d/Y') . '
 Paid By: Check',
       ]);
@@ -738,7 +738,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
 
 
 Total Amount : $100.00
-Date Received: ' . date('m/d/Y') . '
+Contribution Date: ' . date('m/d/Y') . '
 Receipt Date: ' . date('m/d/Y') . '
 Paid By: Check',
       ],
@@ -1216,7 +1216,7 @@ Paid By: Check',
     $strings = [
       'Total Tax Amount : $' . $this->formatMoneyInput(1000.00),
       'Total Amount : $' . $this->formatMoneyInput(11000.00),
-      'Date Received: 04/21/2015',
+      'Contribution Date: 04/21/2015',
       'Paid By: Check',
       'Check Number: 12345',
     ];
@@ -1275,7 +1275,7 @@ Paid By: Check',
     $strings = [
       'Total Tax Amount : $' . $this->formatMoneyInput(2000),
       'Total Amount : $' . $this->formatMoneyInput(22000.00),
-      'Date Received: 04/21/2015',
+      'Contribution Date: 04/21/2015',
       'Paid By: Check',
       'Check Number: 12345',
       'Financial Type: Donation',
