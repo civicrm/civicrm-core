@@ -253,7 +253,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return array
    */
-  public function getCreatePaymentParams(): array {
+  protected function getCreatePaymentParams(): array {
     return $this->createPaymentParams;
   }
 
@@ -262,7 +262,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @param array $createPaymentParams
    */
-  public function setCreatePaymentParams(array $createPaymentParams) {
+  protected function setCreatePaymentParams(array $createPaymentParams): void {
     $this->createPaymentParams = $createPaymentParams;
   }
 
@@ -1740,7 +1740,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @throws \CRM_Core_Exception
    */
-  public function processContribution(
+  protected function processContribution(
     &$form, $params, $result, $contactID,
     $pending = FALSE,
     $paymentProcessor = NULL
