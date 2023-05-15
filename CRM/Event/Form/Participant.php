@@ -198,6 +198,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Event id.
    *
+   * @internal - use getEventID
+   *
    * @var int
    */
   public $_eventId;
@@ -230,6 +232,18 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected $createPaymentParams = [];
 
   /**
+   * Get the selected Event ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core.
+   *
+   * @return int|null
+   */
+  public function getEventID(): ?int {
+    return $this->_eventId ?: ($this->getSubmittedValue('event_id') ? (int) $this->getSubmittedValue('event_id') : NULL);
+  }
+
+  /**
    * Get params to create payments.
    *
    * @return array
@@ -250,14 +264,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Explicitly declare the entity api name.
    */
-  public function getDefaultEntity() {
+  public function getDefaultEntity(): string {
     return 'Participant';
   }
 
   /**
    * Default form context used as part of addField()
    */
-  public function getDefaultContext() {
+  public function getDefaultContext(): string {
     return 'create';
   }
 
@@ -363,7 +377,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // when fee amount is included in form
     if (!empty($_POST['hidden_feeblock']) || !empty($_POST['send_receipt'])) {
       if ($this->_submitValues['event_id']) {
-        $this->_eventId = $this->_submitValues['event_id'];
+        $this->_eventId = (int) $this->_submitValues['event_id'];
       }
       CRM_Event_Form_EventFees::preProcess($this);
       $this->buildEventFeeForm($this);
@@ -423,7 +437,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::setDefaultValues($this);
     }
@@ -773,8 +787,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return void
    */
-  public function addRules() {
-    $this->addFormRule(['CRM_Event_Form_Participant', 'formRule'], $this);
+  public function addRules(): void {
+    $this->addFormRule(['CRM_Event_Form_Participant', 'formRule']);
   }
 
   /**
@@ -926,6 +940,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Submit form.
+   *
+   * @internal will be made protected / decommissioned once tests
+   * in core & line item editor are fixed to not call it.
    *
    * @param array $params
    *
@@ -1370,8 +1387,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Set the various IDs relating to custom data types.
+   *
+   * @internal will be made protected once line item editor unit tests
+   * no longer call it.
    */
-  public function setCustomDataTypes() {
+  public function setCustomDataTypes(): void {
     $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
     $this->_roleCustomDataTypeID = array_search('ParticipantRole', $customDataType);
     $this->_eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
@@ -1426,9 +1446,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Build the form object.
    *
+   * @internal - this will be made protected, once some notice is provided to lineItem
+   * edit extension which calls it form tests.
+   *
    * @param \CRM_Event_Form_Participant $form
    *
-   * @return bool
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
