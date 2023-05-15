@@ -2,6 +2,8 @@
 
 namespace Civi\Esm;
 
+use Civi\Core\HookInterface;
+
 /**
  * ECMAScript Modules (ESMs) allow you to load a JS file based on a physical-path or a
  * logical-path. Compare:
@@ -18,8 +20,7 @@ namespace Civi\Esm;
  *   { "import": {"civicrm/": "https://example.com/sites/all/modules/civicrm"}}
  *   </script>
  *
- * If you are writing Javascript code for an extension, then you may want to define new
- * mappings, e.g.
+ * If your extension includes ESM files, then you may want to add items to the import-map:
  *
  *   function myext_civicrm_esmImportMap(array &$importMap, array $context): void {
  *     $importMap['imports']['foo/'] = E::url('js/foo/');
@@ -32,7 +33,7 @@ namespace Civi\Esm;
  *
  * @service esm.import_map
  */
-class ImportMap extends \Civi\Core\Service\AutoService {
+class ImportMap extends \Civi\Core\Service\AutoService implements HookInterface {
 
   /**
    * Get the list of imports.
@@ -61,11 +62,21 @@ class ImportMap extends \Civi\Core\Service\AutoService {
     $importMap = \Civi::cache('long')->get('import-map');
     if ($importMap === NULL) {
       $importMap = [];
-      $importMap['imports']['civicrm/'] = \Civi::paths()->getUrl('[civicrm.root]/');
       \CRM_Utils_Hook::esmImportMap($importMap, []);
       \Civi::cache('long')->set('import-map', $importMap);
     }
     return $importMap;
+  }
+
+  /**
+   * Register default mappings on behalf of civicrm-core.
+   *
+   * @param array $importMap
+   * @param array $context
+   * @return void
+   */
+  public function hook_civicrm_esmImportMap(array &$importMap, array $context): void {
+    $importMap['imports']['civicrm/'] = \Civi::paths()->getUrl('[civicrm.root]/');
   }
 
 }
