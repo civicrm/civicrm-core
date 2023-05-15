@@ -79,6 +79,23 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
   }
 
   /**
+   * Get id of participant being edited.
+   *
+   * This always returns null as it is the form to take action on search results.
+   *
+   * The parent class works on a single record & hence lik
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return null
+   */
+  public function getParticipantID(): ?int {
+    return NULL;
+  }
+
+  /**
    * Process the form submission.
    *
    * @throws \CRM_Core_Exception

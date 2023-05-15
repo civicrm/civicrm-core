@@ -25,6 +25,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Participant ID - use getParticipantID.
    *
    * @var int
+   *
+   * @deprecated unused
    */
   public $_pId;
 
@@ -69,6 +71,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The id of the participation that we are processing.
    *
    * @var int
+   *
+   * @internal use getParticipantID to access in a supported way.
    */
   public $_id;
 
@@ -198,9 +202,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Event id.
    *
-   * @internal - use getEventID
-   *
    * @var int
+   *
+   * @internal - use getEventID to access in a supported way
    */
   public $_eventId;
 
@@ -235,7 +239,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Get the selected Event ID.
    *
    * @api This function will not change in a minor release and is supported for
-   * use outside of core.
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
    *
    * @return int|null
    */
@@ -299,28 +304,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->setPageTitle(ts('Event Registration'));
     }
 
-    // check the current path, if search based, then dont get participantID
-    // CRM-5792
-    $path = CRM_Utils_System::currentPath();
-    if (
-      strpos($path, 'civicrm/contact/search') === 0 ||
-      strpos($path, 'civicrm/group/search') === 0
-    ) {
-      $this->_id = NULL;
-    }
-    else {
-      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    }
-
-    if ($this->_id) {
-      $this->assign('participantId', $this->_id);
+    $this->assign('participantId', $this->getParticipantID());
+    if ($this->getParticipantID()) {
 
       $this->_paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $this->_id, 'id', 'participant_id'
       );
 
       $this->assign('hasPayment', $this->_paymentId);
-      $this->assign('componentId', $this->_id);
+      $this->assign('componentId', $this->getParticipantID());
       $this->assign('component', 'event');
 
       // CRM-12615 - Get payment information from the primary registration
@@ -353,7 +345,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->assign('single', $this->_single);
 
-    if (!$this->_id) {
+    if (!$this->getParticipantID()) {
       $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     }
     $this->assign('action', $this->_action);
@@ -370,9 +362,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       return;
     }
-
-    // assign participant id to the template
-    $this->assign('participantId', $this->_id);
 
     // when fee amount is included in form
     if (!empty($_POST['hidden_feeblock']) || !empty($_POST['send_receipt'])) {
@@ -1971,9 +1960,21 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Get id of participant being edited.
    *
    * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * No exception is thrown as abort is not TRUE.
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
-  protected function getParticipantID() {
-    return $this->_id ?? $this->_pId;
+  public function getParticipantID(): ?int {
+    if ($this->_id === NULL) {
+      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+      $this->_id = $id ? (int) $id : FALSE;
+    }
+    return $this->_id ?: NULL;
   }
 
   /**
