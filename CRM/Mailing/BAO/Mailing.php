@@ -1662,6 +1662,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $errors['body'] = ts('Field "body_html" or "body_text" is required.');
     }
 
+    // check html body content does indeed have some text, sometime just images are used to send email without any text.
+    if (!empty($mailing->body_html) && empty(trim(strip_tags($mailing->body_html)))) {
+      $errors['body_html'] = ts('It appears that the body of your email contains only images, no text - please add text to the body of the email in order to send - this requirement is in place to minimize the chance of your domain being marked as spam by an internet service provider.');
+    }
     if (!Civi::settings()->get('disable_mandatory_tokens_check')) {
       $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
       $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
