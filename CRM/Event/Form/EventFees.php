@@ -37,6 +37,7 @@ class CRM_Event_Form_EventFees {
     $form->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $form);
     $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
 
+    // @todo - stop setting this, call the function, as appropriate. This is in a weird place.
     $form->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($form->_eventId);
 
     //CRM-6907 set event specific currency.

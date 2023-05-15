@@ -227,8 +227,8 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'contributionID' => $orderID,
       'module' => 'event',
       'invoice' => 123,
-      'eventID' => $this->ids['event'][0],
-      'participantID' => Participant::get()->addWhere('event_id', '=', $this->ids['event'][0])->addSelect('id')->execute()->first()['id'],
+      'eventID' => $this->ids['Event'][0],
+      'participantID' => Participant::get()->addWhere('event_id', '=', $this->ids['Event'][0])->addSelect('id')->execute()->first()['id'],
       'payment_status' => 'Refunded',
       'processor_id' => $this->createPaymentProcessor(['payment_processor_type_id' => 'PayPal_Standard']),
     ]);
@@ -312,7 +312,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    * @return int
    */
   protected function getEventID(): int {
-    return $this->ids['event'][0];
+    return $this->ids['Event'][0];
   }
 
   /**
@@ -322,7 +322,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    * @throws CRM_Core_Exception
    */
   protected function createEventOrder(): int {
-    $this->ids['event'][0] = (int) Event::create()->setValues(['title' => 'Event', 'start_date' => 'tomorrow', 'event_type_id:name' => 'Workshop'])->execute()->first()['id'];
+    $this->ids['Event'][0] = (int) Event::create()->setValues(['title' => 'Event', 'start_date' => 'tomorrow', 'event_type_id:name' => 'Workshop'])->execute()->first()['id'];
     $order = $this->callAPISuccess('Order', 'create', [
       'contact_id' => $this->ids['contact'][0],
       'financial_type_id' => 'Donation',
@@ -340,7 +340,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
           ],
           'params' => [
             'contact_id' => $this->ids['contact'][0],
-            'event_id' => $this->ids['event'][0],
+            'event_id' => $this->ids['Event'][0],
           ],
         ],
       ],

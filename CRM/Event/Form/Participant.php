@@ -25,6 +25,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Participant ID - use getParticipantID.
    *
    * @var int
+   *
+   * @deprecated unused
    */
   public $_pId;
 
@@ -69,6 +71,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The id of the participation that we are processing.
    *
    * @var int
+   *
+   * @internal use getParticipantID to access in a supported way.
    */
   public $_id;
 
@@ -199,8 +203,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Event id.
    *
    * @var int
+   *
+   * @internal - use getEventID to access in a supported way
    */
-  public $_eventId = NULL;
+  public $_eventId;
 
   /**
    * Id of payment, if any
@@ -230,6 +236,19 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected $createPaymentParams = [];
 
   /**
+   * Get the selected Event ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int|null
+   */
+  public function getEventID(): ?int {
+    return $this->_eventId ?: ($this->getSubmittedValue('event_id') ? (int) $this->getSubmittedValue('event_id') : NULL);
+  }
+
+  /**
    * Get params to create payments.
    *
    * @return array
@@ -250,14 +269,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Explicitly declare the entity api name.
    */
-  public function getDefaultEntity() {
+  public function getDefaultEntity(): string {
     return 'Participant';
   }
 
   /**
    * Default form context used as part of addField()
    */
-  public function getDefaultContext() {
+  public function getDefaultContext(): string {
     return 'create';
   }
 
@@ -285,28 +304,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->setPageTitle(ts('Event Registration'));
     }
 
-    // check the current path, if search based, then dont get participantID
-    // CRM-5792
-    $path = CRM_Utils_System::currentPath();
-    if (
-      strpos($path, 'civicrm/contact/search') === 0 ||
-      strpos($path, 'civicrm/group/search') === 0
-    ) {
-      $this->_id = NULL;
-    }
-    else {
-      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    }
-
-    if ($this->_id) {
-      $this->assign('participantId', $this->_id);
+    $this->assign('participantId', $this->getParticipantID());
+    if ($this->getParticipantID()) {
 
       $this->_paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $this->_id, 'id', 'participant_id'
       );
 
       $this->assign('hasPayment', $this->_paymentId);
-      $this->assign('componentId', $this->_id);
+      $this->assign('componentId', $this->getParticipantID());
       $this->assign('component', 'event');
 
       // CRM-12615 - Get payment information from the primary registration
@@ -339,7 +345,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->assign('single', $this->_single);
 
-    if (!$this->_id) {
+    if (!$this->getParticipantID()) {
       $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     }
     $this->assign('action', $this->_action);
@@ -357,13 +363,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       return;
     }
 
-    // assign participant id to the template
-    $this->assign('participantId', $this->_id);
-
     // when fee amount is included in form
     if (!empty($_POST['hidden_feeblock']) || !empty($_POST['send_receipt'])) {
       if ($this->_submitValues['event_id']) {
-        $this->_eventId = $this->_submitValues['event_id'];
+        $this->_eventId = (int) $this->_submitValues['event_id'];
       }
       CRM_Event_Form_EventFees::preProcess($this);
       $this->buildEventFeeForm($this);
@@ -423,7 +426,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::setDefaultValues($this);
     }
@@ -773,8 +776,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return void
    */
-  public function addRules() {
-    $this->addFormRule(['CRM_Event_Form_Participant', 'formRule'], $this);
+  public function addRules(): void {
+    $this->addFormRule(['CRM_Event_Form_Participant', 'formRule']);
   }
 
   /**
@@ -785,7 +788,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param $files
    * @param self $self
    *
-   * @return array
+   * @return array|true
    *   list of errors to be posted back to the form
    */
   public static function formRule($values, $files, $self) {
@@ -917,6 +920,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Submit form.
+   *
+   * @internal will be made protected / decommissioned once tests
+   * in core & line item editor are fixed to not call it.
    *
    * @param array $params
    *
@@ -1361,8 +1367,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Set the various IDs relating to custom data types.
+   *
+   * @internal will be made protected once line item editor unit tests
+   * no longer call it.
    */
-  public function setCustomDataTypes() {
+  public function setCustomDataTypes(): void {
     $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
     $this->_roleCustomDataTypeID = array_search('ParticipantRole', $customDataType);
     $this->_eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
@@ -1417,9 +1426,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Build the form object.
    *
+   * @internal - this will be made protected, once some notice is provided to lineItem
+   * edit extension which calls it form tests.
+   *
    * @param \CRM_Event_Form_Participant $form
    *
-   * @return bool
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
@@ -1538,7 +1549,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       ['onclick' => "showHideByValue('send_receipt','','notice','table-row','radio',false); showHideByValue('send_receipt','','from-email','table-row','radio',false);"]
     );
 
-    $form->add('select', 'from_email_address', ts('Receipt From'), $form->_fromEmails['from_email_id']);
+    $form->add('select', 'from_email_address', ts('Receipt From'), $form->getAvailableFromEmails()['from_email_id']);
 
     $form->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
@@ -1557,6 +1568,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $mailingInfo = Civi::settings()->get('mailing_backend');
     $form->assign('outBound_option', $mailingInfo['outBound_option']);
     $form->assign('hasPayment', $form->_paymentId);
+  }
+
+  /**
+   * Get the emails available for the from address.
+   *
+   * @return array
+   */
+  protected function getAvailableFromEmails(): array {
+    return CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
   }
 
   /**
@@ -1931,9 +1951,21 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Get id of participant being edited.
    *
    * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * No exception is thrown as abort is not TRUE.
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
-  protected function getParticipantID() {
-    return $this->_id ?? $this->_pId;
+  public function getParticipantID(): ?int {
+    if ($this->_id === NULL) {
+      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+      $this->_id = $id ? (int) $id : FALSE;
+    }
+    return $this->_id ?: NULL;
   }
 
   /**
@@ -2216,10 +2248,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       // try to send emails only if email id is present
       // and the do-not-email option is not checked for that contact
       if ($this->_contributorEmail and !$this->_toDoNotEmail) {
-        if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
-          $receiptFrom = $params['from_email_address'];
-        }
-        $sendTemplateParams['from'] = $receiptFrom;
+        $sendTemplateParams['from'] = $params['from_email_address'];
         $sendTemplateParams['toName'] = $this->_contributorDisplayName;
         $sendTemplateParams['toEmail'] = $this->_contributorEmail;
         $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;
