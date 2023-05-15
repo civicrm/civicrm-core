@@ -392,7 +392,8 @@ class Container {
       [new Reference('action_object_provider')]
     );
 
-    $container->setAlias('esm.loader', 'esm.loader.browser')->setPublic(TRUE);
+    // $container->setAlias('esm.loader', 'esm.loader.browser')->setPublic(TRUE);
+    $container->setAlias('esm.loader', 'esm.loader.shim')->setPublic(TRUE);
 
     \CRM_Utils_Hook::container($container);
 
