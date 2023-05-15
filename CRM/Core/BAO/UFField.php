@@ -1134,7 +1134,7 @@ SELECT  id
         ],
         'receive_date' => [
           'name' => 'receive_date',
-          'title' => ts('Date Received'),
+          'title' => ts('Contribution Date'),
         ],
         'payment_instrument' => [
           'name' => 'payment_instrument',

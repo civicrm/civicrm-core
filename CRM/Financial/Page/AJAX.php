@@ -287,7 +287,7 @@ class CRM_Financial_Page_AJAX {
       'amount' => ts('Amount'),
       'trxn_id' => ts('Trxn ID'),
       'transaction_date' => ts('Transaction Date'),
-      'receive_date' => ts('Received'),
+      'receive_date' => ts('Contribution Date'),
       'payment_method' => ts('Payment Method'),
       'status' => ts('Status'),
       'name' => ts('Type'),

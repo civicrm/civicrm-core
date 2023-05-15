@@ -316,7 +316,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Status Override' => '',
       'Total Amount' => '200.00',
       'Contribution Status' => 'Pending Label**',
-      'Date Received' => '2019-07-25 07:34:23',
+      'Contribution Date' => '2019-07-25 07:34:23',
       'Payment Method' => 'Check',
       'Transaction ID' => '',
     ];
@@ -2377,7 +2377,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     return [
       82 => 'Financial Type',
       83 => 'Contribution Source',
-      84 => 'Date Received',
+      84 => 'Contribution Date',
       85 => 'Thank-you Date',
       86 => 'Cancelled / Refunded Date',
       87 => 'Total Amount',

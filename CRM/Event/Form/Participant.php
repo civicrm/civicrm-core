@@ -1505,7 +1505,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           ['' => ts('- select -')] + $financialTypes
         );
 
-        $form->add('datepicker', 'receive_date', ts('Received'), [], FALSE, ['time' => TRUE]);
+        $form->add('datepicker', 'receive_date', ts('Contribution Date'), [], FALSE, ['time' => TRUE]);
 
         $form->add('select', 'payment_instrument_id',
           ts('Payment Method'),

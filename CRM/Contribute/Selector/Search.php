@@ -537,7 +537,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             'type' => '',
           ],
           [
-            'name' => ts('Received'),
+            'name' => ts('Contribution Date'),
             'sort' => 'receive_date',
             'field_name' => 'receive_date',
             'type' => 'date',

@@ -59,7 +59,7 @@
 
 {ts}Amount{/ts}: {contribution.total_amount}
 {if {contribution.receive_date|boolean}}
-{ts}Date Received{/ts}: {contribution.receive_date}
+{ts}Contribution Date{/ts}: {contribution.receive_date}
 {/if}
 {if {contribution.payment_instrument_id|boolean}}
 {ts}Paid By{/ts}: {contribution.payment_instrument_id:label}

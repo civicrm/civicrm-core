@@ -388,7 +388,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
           foreach ([
             'componentPaymentField_total_amount' => ts('Total Amount'),
             'componentPaymentField_contribution_status' => ts('Contribution Status'),
-            'componentPaymentField_received_date' => ts('Date Received'),
+            'componentPaymentField_received_date' => ts('Contribution Date'),
             'componentPaymentField_payment_instrument' => ts('Payment Method'),
             'componentPaymentField_transaction_id' => ts('Transaction ID'),
           ] as $payField => $payTitle) {

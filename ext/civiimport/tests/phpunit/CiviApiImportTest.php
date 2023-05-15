@@ -58,7 +58,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     $this->createUserJobTable();
     $userJobParameters = [
       'metadata' => [
-        'DataSource' => ['table_name' => 'abc', 'column_headers' => ['External Identifier', 'Amount Given', 'Date Received', 'Financial Type', 'In honor']],
+        'DataSource' => ['table_name' => 'abc', 'column_headers' => ['External Identifier', 'Amount Given', 'Contribution Date', 'Financial Type', 'In honor']],
         'submitted_values' => [
           'contactType' => 'Individual',
           'contactSubType' => '',

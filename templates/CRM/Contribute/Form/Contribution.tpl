@@ -192,9 +192,7 @@
           {if empty($is_template)}
           <tr class="crm-contribution-form-block-receive_date">
             <td class="label">{$form.receive_date.label}</td>
-            <td>{$form.receive_date.html}<br />
-              <span class="description">{ts}The date this contribution was received.{/ts}</span>
-            </td>
+            <td>{$form.receive_date.html}</td>
           </tr>
           {/if}
         {/if}

@@ -235,7 +235,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'order_bys' => [
             'contribution_id' => ['title' => ts('Contribution #')],
             'contribution_status_id' => ['title' => ts('Contribution Status')],
-            'receive_date'  => ['title' => ts('Date Received')],
+            'receive_date'  => ['title' => ts('Contribution Date')],
           ],
           'grouping' => 'contri-fields',
         ],
