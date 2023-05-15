@@ -1351,10 +1351,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       );
     }
 
-    $sent = [];
-    $notSent = [];
     if (!empty($params['send_receipt'])) {
-      [$sent, $notSent] = $this->sendReceipts($params, $contributionParams['total_amount'], $customFields, $participants, $lineItem[0], $line, $value, $additionalParticipantDetails, $sent, $notSent);
+      $result = $this->sendReceipts($params, $contributionParams['total_amount'], $customFields, $participants, $lineItem[0], $line, $value, $additionalParticipantDetails);
     }
 
     // set the participant id if it is not set
@@ -1362,7 +1360,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_id = $participants[0]->id;
     }
 
-    return $this->getStatusMsg($params, $sent, $updateStatusMsg, $notSent);
+    return $this->getStatusMsg($params, $result['sent'] ?? 0, $result['not_sent'] ?? 0, (string) $updateStatusMsg);
   }
 
   /**
@@ -1385,17 +1383,17 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Get status message
    *
    * @param array $params
-   * @param int $sent
+   * @param int $numberSent
+   * @param int $numberNotSent
    * @param string $updateStatusMsg
-   * @param int $notSent
    *
    * @return string
    */
-  protected function getStatusMsg($params, $sent, $updateStatusMsg, $notSent) {
+  protected function getStatusMsg(array $params, int $numberSent, int $numberNotSent, string $updateStatusMsg): string {
     $statusMsg = '';
     if (($this->_action & CRM_Core_Action::UPDATE)) {
       $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contributorDisplayName]);
-      if (!empty($params['send_receipt']) && count($sent)) {
+      if (!empty($params['send_receipt']) && $numberSent) {
         $statusMsg .= ' ' . ts('A confirmation email has been sent to %1', [1 => $this->_contributorEmail]);
       }
 
@@ -1406,14 +1404,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     elseif ($this->_action & CRM_Core_Action::ADD) {
       if ($this->_single) {
         $statusMsg = ts('Event registration for %1 has been added.', [1 => $this->_contributorDisplayName]);
-        if (!empty($params['send_receipt']) && count($sent)) {
+        if (!empty($params['send_receipt']) && $numberSent) {
           $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', [1 => $this->_contributorEmail]);
         }
       }
       else {
         $statusMsg = ts('Total Participant(s) added to event: %1.', [1 => count($this->_contactIds)]);
-        if (count($notSent) > 0) {
-          $statusMsg .= ' ' . ts('Email has NOT been sent to %1 contact(s) - communication preferences specify DO NOT EMAIL OR valid Email is NOT present. ', [1 => count($notSent)]);
+        if ($numberNotSent > 0) {
+          $statusMsg .= ' ' . ts('Email has NOT been sent to %1 contact(s) - communication preferences specify DO NOT EMAIL OR valid Email is NOT present. ', [1 => $numberNotSent]);
         }
         elseif (isset($params['send_receipt'])) {
           $statusMsg .= ' ' . ts('A confirmation email has been sent to ALL participants');
@@ -2113,13 +2111,13 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @param $line
    * @param $value
    * @param $additionalParticipantDetails
-   * @param array $sent
-   * @param array $notSent
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function sendReceipts($params, $total_amount, array $customFields, array $participants, $lineItem, $line, $value, $additionalParticipantDetails, array $sent, array $notSent): array {
+  protected function sendReceipts($params, $total_amount, array $customFields, array $participants, $lineItem, $line, $value, $additionalParticipantDetails): array {
+    $sent = [];
+    $notSent = [];
     $this->assign('module', 'Event Registration');
     $this->assignEventDetailsToTpl($params['event_id'], CRM_Utils_Array::value('role_id', $params), CRM_Utils_Array::value('receipt_text', $params), $this->_isPaidEvent);
     $this->assign('isAmountzero', 1);
@@ -2280,7 +2278,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         $notSent[] = $contactID;
       }
     }
-    return [$sent, $notSent];
+    return ['sent' => count($sent), 'not_sent' => count($notSent)];
   }
 
 }
