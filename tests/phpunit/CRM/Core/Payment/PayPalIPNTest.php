@@ -336,6 +336,13 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    */
   public function testPayPalIPNSuccessPendingRenewal() {
     $membershipTypeID = $this->membershipTypeCreate();
+    $membership = $this->callAPISuccess('Membership', 'create', [
+      'membership_type_id' => $membershipTypeID,
+      'contact_id' => $this->_contactID,
+      'join_date' => date('Y-m-d', strtotime('-2 year')),
+      'start_date' => date('Y-m-d', strtotime('-2 year')),
+      'end_date' => date('Y-m-d', strtotime('-1 year')),
+    ]);
     $pendingStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $completedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     $params = [
@@ -352,6 +359,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'line_items' => [
         [
           'params' => [
+            'id' => $membership['id'],
             'contact_id' => $this->_contactID,
             'membership_type_id' => $membershipTypeID,
             'skipStatusCal' => TRUE,
@@ -387,7 +395,8 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       ->addWhere('entity_table', '=', 'civicrm_membership')
       ->addSelect('entity_id')
       ->execute()->first()['entity_id'];
-    $preMembership = $this->callAPISuccess('membership', 'get', ['id' => $this->ids['membership']]);
+    // Set the membership Status to be pending to more accurately model what the status of the membership is when done via a contribution form.
+    $this->callAPISuccess('Membership', 'create', ['id' => $this->ids['membership'], 'status_id' => 'pending', 'skipStatusCal' => TRUE]);
     // assert that contribution created before handling payment via paypal standard has no transaction id set and pending status
     $this->assertEquals(NULL, $contribution['values'][$contribution['id']]['trxn_id']);
     $this->assertEquals($pendingStatusID, $contribution['values'][$contribution['id']]['contribution_status_id']);
@@ -405,7 +414,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
     $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
     $membership = $this->callAPISuccess('Membership', 'get', ['id' => $this->ids['membership']]);
-    $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($preMembership['values'][$this->ids['membership']]['end_date']))), $membership['values'][$this->ids['membership']]['end_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('+ 1 year')), $membership['values'][$this->ids['membership']]['end_date']);
   }
 
   /**
