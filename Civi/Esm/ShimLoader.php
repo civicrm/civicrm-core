@@ -26,6 +26,11 @@ use Civi;
  * support. This ensures consistent functionality on all browsers, but it also makes the overhead
  * mandatory.
  *
+ * For a fuller description of this mechanism, see the neighboring README.
+ *
+ * @see \Civi\Esm\BrowserLoader
+ * @see ./README.md
+ *
  * @service esm.loader.shim
  */
 class ShimLoader extends BrowserLoader {
