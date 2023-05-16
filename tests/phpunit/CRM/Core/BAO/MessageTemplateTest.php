@@ -70,6 +70,10 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $allTemplates['fr_CA'] = ['subject' => 'Bonjour Canada', 'html' => 'Voila! Canada', 'text' => '{contribution.total_amount}'];
     $allTemplates['es_PR'] = ['subject' => 'Buenos dias', 'html' => 'Listo', 'text' => '{contribution.total_amount}'];
     $allTemplates['th_TH'] = ['subject' => 'สวัสดี', 'html' => 'ดังนั้น', 'text' => '{contribution.total_amount}'];
+    // en_US is the default language. We add it to ensure the translation is loaded rather than falling back to
+    // the message template. While it might seem you don't need a translation for the site default language
+    // all the draft & approval logic is attached to the translation, not the template.
+    $allTemplates['en_US'] = ['subject' => 'site default', 'html' => 'site default language', 'text' => '{contribution.total_amount}'];
 
     $rendered = [];
     // $rendered['*'] = ['subject' => 'Hello', 'html' => 'Look there!', 'text' => '$ 100.00'];
@@ -78,6 +82,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $rendered['fr_CA'] = ['subject' => 'Bonjour Canada', 'html' => 'Voila! Canada', 'text' => '100,00 $ US'];
     $rendered['es_PR'] = ['subject' => 'Buenos dias', 'html' => 'Listo', 'text' => '100.00 $US'];
     $rendered['th_TH'] = ['subject' => 'สวัสดี', 'html' => 'ดังนั้น', 'text' => 'US$100.00'];
+    $rendered['en_US'] = ['subject' => 'site default', 'html' => 'site default language', 'text' => '$100.00'];
 
     $result = [/* settings, templates, preferredLanguage, expectMessage */];
 
@@ -92,10 +97,15 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $result['fr_CA falls back to fr_FR (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
 
     $result['th_TH matches th_TH (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'th_TH', $rendered['th_TH']];
-    $result['th_TH falls back to system default (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'th_TH', $rendered['*']];
+    $result['th_TH falls back to site default translation (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'th_TH', $rendered['en_US']];
+    // Absent a translation for the site default language it should fall back to the message template.
+    $result['th_TH falls back to system default (all-tpls; no-partials)'] = [$noPartials, array_diff_key($allTemplates, ['en_US' => TRUE]), 'th_TH', $rendered['*']];
     // ^^ The essence of the `partial_locales` setting -- whether partially-supported locales (th_TH) use mixed-mode or fallback to completely diff locale.
     $result['th_TH falls back to system default (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
     $result['th_TH falls back to system default (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
+
+    // Check that the en_US template is loaded, if exists.
+    $result['en_US matches en_US (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'en_US', $rendered['en_US']];
 
     return $result;
   }
