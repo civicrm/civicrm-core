@@ -41,6 +41,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'dedupe_default_limit' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'remote_profile_submissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'allow_alert_autodismissal' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'esm_loader' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'prevNextBackend' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'import_batch_size' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
   ];
@@ -62,6 +63,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
       'recentItemsMaxCount',
       'recentItemsProviders',
       'dedupe_default_limit',
+      'esm_loader',
       'prevNextBackend',
       'import_batch_size',
     ]);
