@@ -21,6 +21,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * This should be the simplest and most efficient way to load modules. However, there may be
  * compatibility issues with older browsers or future UFs.
  *
+ * For a fuller description of this mechanism, see the neighboring README.
+ * @see ./README.md
+ *
  * @service esm.loader.browser
  */
 class BrowserLoader extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {

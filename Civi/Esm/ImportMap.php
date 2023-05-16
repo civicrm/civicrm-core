@@ -11,25 +11,14 @@ use Civi\Core\HookInterface;
  * - import { TableWidget } from 'https://example.com/sites/all/modules/civicrm/js/table-widget.js';
  * - import { TableWidget } from 'civicrm/js/tab-widget.js';
  *
- * The logical-path (`civicrm/js/tab-widget.js`) is much easier to read, and it adapts
- * better to more environments.
+ * The purpose of `Civi\Esm\ImportMap` (aka `esm.import_map`) is to build a list of all
+ * the logical prefixes supported by `civicrm-core` and CiviCRM extensions.
  *
- * Logical-paths must be defined with an import-map:
- *
- *   <script type="importmap">
- *   { "import": {"civicrm/": "https://example.com/sites/all/modules/civicrm"}}
- *   </script>
- *
- * If your extension includes ESM files, then you may want to add items to the import-map:
- *
- *   function myext_civicrm_esmImportMap(array &$importMap, array $context): void {
- *     $importMap['imports']['foo/'] = E::url('js/foo/');
- *     $importMap['imports']['bar/'] = E::url('packages/bar/dist/');
- *   }
- *
- * Note: These mappings are used by an ESM Loader, such as "BasicLoader".
+ * This is generally consumed by BrowserLoader or a similar class. For a fuller description
+ * of this mechanism, see the neighboring README.
  *
  * @see \Civi\Esm\BrowserLoader
+ * @see ./README.md
  *
  * @service esm.import_map
  */
