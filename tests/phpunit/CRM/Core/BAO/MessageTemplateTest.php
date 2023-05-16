@@ -483,6 +483,7 @@ emo
     $this->assertEquals($expected_parts[0], $returned_parts[0]);
     $this->assertApproxEquals($expected_parts[1], $returned_parts[1], 2);
     $this->assertEquals($expected_parts[2], $returned_parts[2]);
+    $restoreTime->cleanup();
   }
 
   /**
@@ -538,6 +539,7 @@ emo
       'contact.contact_is_deleted:',
       'contact.county:',
       'contact.custom_6:',
+      'contact.deceased_date:',
       'contact.do_not_phone:',
     ], array_values($emptyLines), 'Most tokens should have data.');
   }
@@ -703,6 +705,7 @@ emo
       '{contact.job_title}' => 'Job Title',
       '{contact.gender_id:label}' => 'Gender',
       '{contact.birth_date}' => 'Birth Date',
+      '{contact.deceased_date}' => 'Deceased Date',
       '{contact.employer_id}' => 'Current Employer ID',
       '{contact.is_deleted:label}' => 'Contact is in Trash',
       '{contact.created_date}' => 'Created Date',
@@ -889,8 +892,6 @@ emo
    * advertise them and the old 'random' v3 style tokens continued to work.
    *
    * But, we should support them for a bit - which means testing them...
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBrieflyPopularTokens(): void {
     $this->createCustomGroupWithFieldsOfAllTypes([]);
@@ -1096,6 +1097,7 @@ communication_style_id:label |Formal
 job_title |Busy person
 gender_id:label |Female
 birth_date |December 31st, 1998
+deceased_date |
 employer_id |' . $contact['employer_id'] . '
 is_deleted:label |No
 created_date |January 1st, 2020
