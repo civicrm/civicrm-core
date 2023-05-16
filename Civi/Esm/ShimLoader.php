@@ -44,10 +44,6 @@ class ShimLoader extends BrowserLoader {
    *   Ex: '<script type="importmap">{"imports": ...}</script>'
    */
   protected function renderImportMap(array $importMap): string {
-    if (!$this->enableMap || empty($importMap)) {
-      return '';
-    }
-
     $shimUrl = Civi::paths()->getUrl('[civicrm.bower]/es-module-shims/dist/es-module-shims.js');
     $shimHtml = sprintf("<script async src='%s'></script>\n", htmlentities($shimUrl));
 
@@ -67,10 +63,6 @@ class ShimLoader extends BrowserLoader {
    * @see \CRM_Core_Resources_CollectionInterface::add()
    */
   public function renderModule(array $snippet): string {
-    if (!$this->enableModules) {
-      return '';
-    }
-
     switch ($snippet['type']) {
       case 'script':
         return sprintf("<script type=\"module-shim\">\n%s\n</script>\n", $snippet['script']);

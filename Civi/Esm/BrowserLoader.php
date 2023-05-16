@@ -39,20 +39,6 @@ class BrowserLoader extends \Civi\Core\Service\AutoService implements EventSubsc
   }
 
   /**
-   * Should we generate tags like `<script type="importmap">`?
-   *
-   * @var bool
-   */
-  protected $enableMap = TRUE;
-
-  /**
-   * Should we generate tags like `<script type="module src="foo.js">`?
-   *
-   * @var bool
-   */
-  protected $enableModules = TRUE;
-
-  /**
    * @var \Civi\Esm\ImportMap
    * @inject esm.import_map
    */
@@ -71,20 +57,6 @@ class BrowserLoader extends \Civi\Core\Service\AutoService implements EventSubsc
    * @var bool
    */
   protected $required = FALSE;
-
-  /**
-   * @param bool $enableMap
-   */
-  public function setEnableMap(bool $enableMap): void {
-    $this->enableMap = $enableMap;
-  }
-
-  /**
-   * @param bool $enableModules
-   */
-  public function setEnableModules(bool $enableModules): void {
-    $this->enableModules = $enableModules;
-  }
 
   /**
    * Receive a notification that an ESM is being used.
@@ -113,7 +85,7 @@ class BrowserLoader extends \Civi\Core\Service\AutoService implements EventSubsc
     $importMap = $this->importMap->get();
     $region->add([
       'name' => 'import-map',
-      'markup' => $this->renderImportMap($importMap),
+      'markup' => empty($importMap) ? '' : $this->renderImportMap($importMap),
       'weight' => -1000,
     ]);
   }
@@ -127,10 +99,6 @@ class BrowserLoader extends \Civi\Core\Service\AutoService implements EventSubsc
    *   Ex: '<script type="importmap">{"imports": ...}</script>'
    */
   protected function renderImportMap(array $importMap): string {
-    if (!$this->enableMap || empty($importMap)) {
-      return '';
-    }
-
     $flags = JSON_UNESCAPED_SLASHES;
     if (Civi::settings()->get('debug_enabled')) {
       $flags |= JSON_PRETTY_PRINT;
@@ -147,10 +115,6 @@ class BrowserLoader extends \Civi\Core\Service\AutoService implements EventSubsc
    * @see \CRM_Core_Resources_CollectionInterface::add()
    */
   public function renderModule(array $snippet): string {
-    if (!$this->enableModules) {
-      return '';
-    }
-
     switch ($snippet['type']) {
       case 'script':
         return sprintf("<script type=\"module\">\n%s\n</script>\n", $snippet['script']);
