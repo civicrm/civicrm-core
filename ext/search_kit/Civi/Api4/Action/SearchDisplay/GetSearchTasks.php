@@ -193,7 +193,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       // FIXME: tasks() function always checks permissions, should respect `$this->checkPermissions`
       foreach (\CRM_Contribute_Task::tasks() as $id => $task) {
         if (!empty($task['url'])) {
-          $key = \CRM_Core_Key::get('CRM_Contribute_Controller_Task', TRUE);
+          $path = explode('?', $task['url'], 2)[0];
+          $menu = \CRM_Core_Menu::get($path);
+          $key = \CRM_Core_Key::get($menu['page_callback'], TRUE);
+
           $tasks[$entity['name']]['contribution.' . $id] = [
             'title' => $task['title'],
             'icon' => $task['icon'] ?? 'fa-gear',
