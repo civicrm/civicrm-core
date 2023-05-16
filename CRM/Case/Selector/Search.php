@@ -624,6 +624,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'title' => ts('View'),
           'accessKey' => '',
           'ref' => 'View',
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
@@ -633,6 +634,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'icon' => 'fa-pencil',
           'accessKey' => '',
           'ref' => 'Edit',
+          'weight' => -10,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
@@ -642,6 +644,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'icon' => 'fa-trash',
           'accessKey' => '',
           'ref' => 'Delete',
+          'weight' => 100,
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Restore'),

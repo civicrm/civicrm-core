@@ -262,6 +262,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           'qs' => "reset=1&cid=%%id%%{$searchContext}{$extraParams}",
           'title' => ts('View Contact Details'),
           'ref' => 'view-contact',
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
@@ -270,6 +271,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           'qs' => "reset=1&action=update&cid=%%id%%{$searchContext}{$extraParams}",
           'title' => ts('Edit Contact Details'),
           'ref' => 'edit-contact',
+          'weight' => -10,
         ],
       ];
 
@@ -777,6 +779,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
               'qs' => 'reset=1&cid=%%id%%',
               'class' => 'no-popup',
               'title' => ts('View Contact Details'),
+              'weight' => -20,
             ],
             [
               'name' => ts('Restore'),
@@ -791,6 +794,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
               'url' => 'civicrm/contact/view/delete',
               'qs' => 'reset=1&cid=%%id%%&skip_undelete=1',
               'title' => ts('Permanently Delete Contact'),
+              'weight' => 100,
             ];
           }
           $row['action'] = CRM_Core_Action::formLink(
@@ -952,6 +956,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             'qs' => 'reset=1&cid=%%id%%',
             'class' => 'no-popup',
             'title' => ts('View Contact Details'),
+            'weight' => -20,
           ],
           [
             'name' => ts('Restore'),
@@ -966,6 +971,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             'url' => 'civicrm/contact/view/delete',
             'qs' => 'reset=1&cid=%%id%%&skip_undelete=1',
             'title' => ts('Permanently Delete Contact'),
+            'weight' => 100,
           ];
         }
         $row['action'] = CRM_Core_Action::formLink(

@@ -55,6 +55,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('View Recurring Payment'),
         'url' => 'civicrm/contact/view/contributionrecur',
         'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
+        'weight' => -20,
       ],
     ];
 
