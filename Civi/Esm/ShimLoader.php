@@ -3,6 +3,7 @@
 namespace Civi\Esm;
 
 use Civi;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * The ShimLoader leverages `es-module-shims` for loading ECMAScript Modules (ESM's).
@@ -33,15 +34,12 @@ use Civi;
  *
  * @service esm.loader.shim
  */
-class ShimLoader extends BrowserLoader {
+class ShimLoader extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
+
+  use BasicLoaderTrait;
 
   /**
-   * Format the list of imports as an HTML tag.
-   *
-   * @param array $importMap
-   *   Ex: ['imports' => ['square/' => 'https://example.com/square/']]
-   * @return string
-   *   Ex: '<script type="importmap">{"imports": ...}</script>'
+   * @inheritDoc
    */
   protected function renderImportMap(array $importMap): string {
     $shimUrl = Civi::paths()->getUrl('[civicrm.bower]/es-module-shims/dist/es-module-shims.js');
@@ -55,24 +53,17 @@ class ShimLoader extends BrowserLoader {
   }
 
   /**
-   * @param array $snippet
-   *   The module resource being rendered, as per "CollectionInterface::add()".
-   *   Ex: ['type' => 'scriptUrl', 'scriptUrl' => 'https://example.com/foo.js', 'esm' => TRUE]
-   * @return string
-   *   HTML
-   * @see \CRM_Core_Resources_CollectionInterface::add()
+   * @inheritDoc
    */
-  public function renderModule(array $snippet): string {
-    switch ($snippet['type']) {
-      case 'script':
-        return sprintf("<script type=\"module-shim\">\n%s\n</script>\n", $snippet['script']);
+  protected function renderModuleScript(array $snippet): string {
+    return sprintf("<script type=\"module-shim\">\n%s\n</script>\n", $snippet['script']);
+  }
 
-      case 'scriptUrl':
-        return sprintf("<script type=\"module-shim\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
-
-      default:
-        return parent::renderModule($snippet);
-    }
+  /**
+   * @inheritDoc
+   */
+  protected function renderModuleUrl(array $snippet): string {
+    return sprintf("<script type=\"module-shim\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
   }
 
 }
