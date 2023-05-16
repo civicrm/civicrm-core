@@ -48,8 +48,8 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
         if (!CRM_Utils_Mail::validOutBoundMail() || !$contactId) {
           continue;
         }
-        [, $email, $doNotEmail, , $isDeceased] = CRM_Contact_BAO_Contact::getContactDetails($contactId);
-        if (!$doNotEmail && $email && !$isDeceased) {
+        [, $email, $doNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactId);
+        if (!$doNotEmail && $email) {
           $url = 'civicrm/activity/email/add';
           $act['label'] = ts('Send an Email');
         }

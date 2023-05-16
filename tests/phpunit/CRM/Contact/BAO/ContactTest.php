@@ -1062,7 +1062,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $compareParams = [
       $params['first_name'] . ' ' . $params['last_name'],
       CRM_Utils_Array::value('email', $params['email'][1]),
-      (bool ) $params['privacy']['do_not_email'],
+      (bool ) ($params['privacy']['do_not_email'] || $params['email'][1]['on_hold'] || $params['is_deceased']),
     ];
     //Now check the contact details
     $this->assertAttributesEquals($compareParams, $contactDetails);
@@ -1275,6 +1275,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'location_type_id' => 1,
       'is_primary' => 1,
       'email' => 'john.smith@example.org',
+      'on_hold' => 1,
     ];
 
     $params['phone'] = [];

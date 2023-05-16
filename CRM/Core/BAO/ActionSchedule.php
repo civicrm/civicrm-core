@@ -592,7 +592,7 @@ FROM civicrm_action_schedule cas
   protected static function sendReminderEmail($tokenRow, $schedule, $toContactID): array {
     $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID, TRUE);
     if (!$toEmail) {
-      return ['email_missing' => "Couldn't find recipient's email address."];
+      return ['email_missing' => "Recipient has no email or should not be emailed."];
     }
 
     // set up the parameters for CRM_Utils_Mail::send
