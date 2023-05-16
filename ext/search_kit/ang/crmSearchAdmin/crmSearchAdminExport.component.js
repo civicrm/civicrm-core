@@ -34,8 +34,10 @@
         crmApi4(apiCalls)
           .then(function(result) {
             _.each(ctrl.types, function (type) {
-              type.values = _.pluck(_.pluck(_.where(result[0], {entity: type.entity}), 'params'), 'values');
-              type.enabled = !!type.values.length;
+              var params = _.pluck(_.where(result[0], {entity: type.entity}), 'params');
+              type.values = _.pluck(params, 'values');
+              type.match = params[0] && params[0].match;
+              type.enabled = !!params.length;
             });
             // Afforms are not included in the export and are fetched separately
             if (ctrl.afformEnabled) {
@@ -50,10 +52,8 @@
         _.each(ctrl.types, function(type) {
           if (type.enabled) {
             var params = {records: type.values};
-            // Afform always matches on 'name', no need to add it to the API 'save' params
-            if (type.entity !== 'Afform') {
-              // Group and SavedSearch match by 'name', SearchDisplay also matches by 'saved_search_id'.
-              params.match = type.entity === 'SearchDisplay' ? ['name', 'saved_search_id'] : ['name'];
+            if (type.match && type.match.length) {
+              params.match = type.match;
             }
             data.push([type.entity, 'save', params]);
           }
