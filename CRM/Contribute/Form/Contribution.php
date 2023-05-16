@@ -1791,15 +1791,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
+      $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->_values['contribution_status_id'] ?? NULL);
       // process associated membership / participant, CRM-4395
-      if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
+      if ($contribution->id && $action & CRM_Core_Action::UPDATE
+        && in_array($previousStatus, ['Pending', 'Partially paid'], TRUE)
+        && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))) {
         // @todo use Payment.create to do this, remove transitioncomponents function
         // if contribution is being created with a completed status it should be
         // created pending & then Payment.create adds the payment
         CRM_Contribute_BAO_Contribution::transitionComponents([
           'contribution_id' => $contribution->id,
-          'contribution_status_id' => $contribution->contribution_status_id,
-          'previous_contribution_status_id' => $this->_values['contribution_status_id'] ?? NULL,
           'receive_date' => $contribution->receive_date,
         ]);
       }
