@@ -178,9 +178,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test Assigning a target contact but then the logged in user cannot see the contact
+   * Test Assigning a target contact but then the logged in user cannot see the
+   * contact
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testTargetContactNotavaliable() {
+  public function testTargetContactNotAvaliable(): void {
     $contactId = $this->individualCreate();
     $params = [
       'first_name' => 'liz',
@@ -210,9 +213,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activityGetParams = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $activityGetParams += ['contact_id' => $contactId];
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($activityGetParams);
-    // Aseert that we have sensible data to display in the contact tab
+    // Assert that we have sensible data to display in the contact tab
     $this->assertEquals('Anderson, Anthony', $activities['data'][0]['source_contact_name']);
-    // Note that becasue there is a target contact but it is not accessable the output is an empty string not n/a
+    // Note that because there is a target contact but it is not accessible the output is an empty string not n/a
     $this->assertEquals('', $activities['data'][0]['target_contact_name']);
     // verify that doing the underlying query shows we get a target contact_id
     $this->assertEquals(1, CRM_Activity_BAO_Activity::getActivities(['contact_id' => $contactId])[1]['target_contact_count']);
