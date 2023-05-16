@@ -9,7 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Contribution;
 use Civi\Api4\MappingField;
 
 /**
@@ -129,10 +128,11 @@ class CRM_Upgrade_Incremental_php_FiveSixtyOne extends CRM_Upgrade_Incremental_B
       'contribution_check_number' => 'check_number',
       'contribution_campaign_id' => 'campaign_id',
     ];
-    $apiv4 = Contribution::getFields(FALSE)->addWhere('custom_field_id', '>', 0)->execute();
-    foreach ($apiv4 as $apiv4Field) {
-      $fieldMap['custom_' . $apiv4Field['custom_field_id']] = $apiv4Field['name'];
-    }
+    $fieldMap += CRM_Core_DAO::executeQuery('
+      SELECT CONCAT("custom_", fld.id) AS old, CONCAT(grp.name, ".", fld.name) AS new
+      FROM civicrm_custom_field fld, civicrm_custom_group grp
+      WHERE grp.id = fld.custom_group_id AND grp.extends = "Contribution"
+    ')->fetchMap('old', 'new');
 
     // Update the mapped fields.
     foreach ($mappings as $mapping) {
