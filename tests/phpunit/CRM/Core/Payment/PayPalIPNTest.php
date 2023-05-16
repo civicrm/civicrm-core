@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\ContributionRecur;
+use Civi\Api4\LineItem;
 
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
@@ -328,6 +329,83 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
     $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
     $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
+  }
+
+  /**
+   * Allow IPNs to validate when the supplied contact_id has been deleted from the database but there is a valid contact id in the contribution recur object or contribution object
+   */
+  public function testPayPalIPNSuccessPendingRenewal() {
+    $membershipTypeID = $this->membershipTypeCreate();
+    $pendingStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $completedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    $params = [
+      'total_amount' => '200',
+      'financial_type_id' => 'Member Dues',
+      'source' => 'Online Contribution: form payment',
+      'contact_id' => $this->_contactID,
+      'contribution_page_id' => $this->_contributionPageID,
+      'payment_processor_id' => $this->_paymentProcessorID,
+      'is_test' => 0,
+      'receive_date' => '2019-07-25 07:34:23',
+      'skipCleanMoney' => TRUE,
+      'invoice_id' => 'xyz',
+      'line_items' => [
+        [
+          'params' => [
+            'contact_id' => $this->_contactID,
+            'membership_type_id' => $membershipTypeID,
+            'skipStatusCal' => TRUE,
+            'source' => 'Payment',
+          ],
+          'line_item' => [
+            [
+              'label' => 'General',
+              'qty' => 1,
+              'unit_price' => 200,
+              'line_total' => 200,
+              'financial_type_id' => 1,
+              'membership_type_id' => 'General',
+              'entity_table' => 'civicrm_membership',
+              'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', [
+                'return' => 'id',
+                'label' => 'Membership Amount',
+                'options' => ['limit' => 1, 'sort' => 'id DESC'],
+              ]),
+              'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', [
+                'return' => 'id',
+                'label' => 'General',
+                'options' => ['limit' => 1, 'sort' => 'id DESC'],
+              ]),
+            ],
+          ],
+        ],
+      ],
+    ];
+    $contribution = $this->callAPISuccess('Order', 'create', $params);
+    $this->ids['membership'] = LineItem::get()
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addSelect('entity_id')
+      ->execute()->first()['entity_id'];
+    $preMembership = $this->callAPISuccess('membership', 'get', ['id' => $this->ids['membership']]);
+    // assert that contribution created before handling payment via paypal standard has no transaction id set and pending status
+    $this->assertEquals(NULL, $contribution['values'][$contribution['id']]['trxn_id']);
+    $this->assertEquals($pendingStatusID, $contribution['values'][$contribution['id']]['contribution_status_id']);
+    $payPalIPNParams = $this->getPaypalTransaction();
+    $payPalIPNParams['mc_gross'] = '200.00';
+    $payPalIPNParams['settle_amount'] = '195.00';
+    $payPalIPNParams['contributionID'] = $contribution['id'];
+    global $_REQUEST;
+    $_REQUEST = ['q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)] + $payPalIPNParams;
+    // Now process the IPN noting that the contact id that was supplied with the IPN has been deleted but there is still a valid one on the contribution id
+    $payment = CRM_Core_Payment::handlePaymentMethod('PaymentNotification', ['processor_id' => $this->_paymentProcessorID]);
+
+    $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $this->_contributionID, 'sequential' => 1]);
+    // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
+    $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
+    $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
+    $membership = $this->callAPISuccess('Membership', 'get', ['id' => $this->ids['membership']]);
+    $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($preMembership['values'][$this->ids['membership']]['end_date']))), $membership['values'][$this->ids['membership']]['end_date']);
   }
 
   /**
