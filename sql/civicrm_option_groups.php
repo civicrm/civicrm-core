@@ -19,11 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'mobile_provider' => CRM_Core_CodeGen_OptionGroup::create('mobile_provider')
-    ->addMetadata([
-      'title' => ts('Mobile Phone Providers'),
-      'description' => ts('When recording mobile phone numbers for contacts, it may be useful to include the Mobile Phone Service Provider (e.g. Cingular, Sprint, etc.). CiviCRM is installed with the most commonly encountered service providers. Administrators may define as many additional providers as needed.'),
-    ]),
   'individual_prefix' => CRM_Core_CodeGen_OptionGroup::create('individual_prefix')
     ->addMetadata([
       'title' => ts('Individual contact prefixes'),

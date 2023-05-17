@@ -132,7 +132,6 @@ VALUES
   }
 {/php}
 
-SELECT @option_group_id_mobileProvider := max(id) from civicrm_option_group where name = 'mobile_provider';
 SELECT @option_group_id_prefix         := max(id) from civicrm_option_group where name = 'individual_prefix';
 SELECT @option_group_id_suffix         := max(id) from civicrm_option_group where name = 'individual_suffix';
 SELECT @option_group_id_aclRole        := max(id) from civicrm_option_group where name = 'acl_role';
@@ -223,10 +222,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
-   (@option_group_id_mobileProvider, 'Sprint'  , 1, 'Sprint'  , NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_mobileProvider, 'Verizon' , 2, 'Verizon' , NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_mobileProvider, 'Cingular', 3, 'Cingular', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
 
    (@option_group_id_prefix, '{ts escape="sql"}Mrs.{/ts}', 1, 'Mrs.', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_prefix, '{ts escape="sql"}Ms.{/ts}',  2, 'Ms.',  NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
