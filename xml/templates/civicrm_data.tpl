@@ -136,10 +136,6 @@ SELECT @option_group_id_pi             := max(id) from civicrm_option_group wher
 SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
 SELECT @option_group_id_fat            := max(id) from civicrm_option_group where name = 'financial_account_type';
 
-SELECT @option_group_id_date_filter    := max(id) from civicrm_option_group where name = 'relative_date_filters';
-SELECT @option_group_id_ps    := max(id) from civicrm_option_group where name = 'pledge_status';
-SELECT @option_group_id_crs    := max(id) from civicrm_option_group where name = 'contribution_recur_status';
-SELECT @option_group_id_env    := max(id) from civicrm_option_group where name = 'environment';
 SELECT @option_group_id_default_assignee := max(id) from civicrm_option_group where name = 'activity_default_assignee';
 SELECT @option_group_id_entity_batch_extends := max(id) from civicrm_option_group where name = 'entity_batch_extends';
 
@@ -154,95 +150,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
--- Environment
-(@option_group_id_env, '{ts escape="sql"}Production{/ts}', 'Production', 'Production', NULL, NULL, 1, 1, 'Production Environment', 0, 1, 1, NULL, NULL, NULL),
-(@option_group_id_env, '{ts escape="sql"}Staging{/ts}', 'Staging', 'Staging', NULL, NULL, 0, 2, 'Staging Environment', 0, 1, 1, NULL, NULL, NULL),
-(@option_group_id_env, '{ts escape="sql"}Development{/ts}', 'Development', 'Development', NULL, NULL, 0, 3, 'Development Environment', 0, 1, 1, NULL, NULL, NULL),
-
--- Relative Date Filters
-   (@option_group_id_date_filter, '{ts escape="sql"}Today{/ts}', 'this.day', 'this.day', NULL, NULL, 0,1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}This week{/ts}', 'this.week', 'this.week', NULL, NULL, 0,2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}This calendar month{/ts}', 'this.month', 'this.month', NULL, NULL, 0,3, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}This quarter{/ts}', 'this.quarter', 'this.quarter', NULL, NULL, 0,4, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}This fiscal year{/ts}', 'this.fiscal_year', 'this.fiscal_year', NULL, NULL, 0,5, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}This calendar year{/ts}', 'this.year', 'this.year', NULL, NULL, 0,6, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Yesterday{/ts}', 'previous.day', 'previous.day', NULL, NULL, 0,7, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous week{/ts}', 'previous.week', 'previous.week', NULL, NULL, 0,8, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous calendar month{/ts}', 'previous.month', 'previous.month', NULL, NULL, 0,9, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous quarter{/ts}', 'previous.quarter', 'previous.quarter', NULL, NULL, 0,10, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous fiscal year{/ts}', 'previous.fiscal_year', 'previous.fiscal_year', NULL, NULL, 0,11, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous calendar year{/ts}', 'previous.year', 'previous.year', NULL, NULL, 0,12, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Last 7 days including today{/ts}', 'ending.week', 'ending.week', NULL, NULL, 0,13, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Last 30 days including today{/ts}', 'ending_30.day', 'ending.month', NULL, NULL, 0,14, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Last 60 days including today{/ts}', 'ending_60.day', 'ending_2.month', NULL, NULL, 0,15, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Last 90 days including today{/ts}', 'ending_90.day', 'ending.quarter', NULL, NULL, 0,16, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Last 12 months including today{/ts}', 'ending.year', 'ending.year', NULL, NULL, 0,17, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Last 2 years including today{/ts}', 'ending_2.year', 'ending_2.year', NULL, NULL, 0,18, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Last 3 years including today{/ts}', 'ending_3.year', 'ending_3.year', NULL, NULL, 0,19, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Tomorrow{/ts}', 'starting.day', 'starting.day', NULL, NULL, 0,20, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Next week{/ts}', 'next.week', 'next.week', NULL, NULL, 0,21, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Next calendar month{/ts}', 'next.month', 'next.month', NULL, NULL, 0,22, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Next quarter{/ts}', 'next.quarter', 'next.quarter', NULL, NULL, 0,23, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Next fiscal year{/ts}', 'next.fiscal_year', 'next.fiscal_year', NULL, NULL, 0,24, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Next calendar year{/ts}', 'next.year', 'next.year', NULL, NULL, 0,25, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Next 7 days including today{/ts}', 'starting.week', 'starting.week', NULL, NULL, 0,26, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Next 30 days including today{/ts}', 'starting.month', 'starting.month', NULL, NULL, 0,27, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Next 60 days including today{/ts}', 'starting_2.month', 'starting_2.month', NULL, NULL, 0,28, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Next 90 days including today{/ts}', 'starting.quarter', 'starting.quarter', NULL, NULL, 0,29, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Next 12 months including today{/ts}', 'starting.year', 'starting.year', NULL, NULL, 0,30, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Current week to-date{/ts}', 'current.week', 'current.week', NULL, NULL, 0,31, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Current calendar month to-date{/ts}', 'current.month', 'current.month', NULL, NULL, 0,32, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Current quarter to-date{/ts}', 'current.quarter', 'current.quarter', NULL, NULL, 0,33, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Current calendar year to-date{/ts}', 'current.year', 'current.year', NULL, NULL, 0,34, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}To end of yesterday{/ts}', 'earlier.day', 'earlier.day', NULL, NULL, 0,35, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}To end of previous week{/ts}', 'earlier.week', 'earlier.week', NULL, NULL, 0,36, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}To end of previous calendar month{/ts}', 'earlier.month', 'earlier.month', NULL, NULL, 0,37, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}To end of previous quarter{/ts}', 'earlier.quarter', 'earlier.quarter', NULL, NULL, 0,38, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}To end of previous calendar year{/ts}', 'earlier.year', 'earlier.year', NULL, NULL, 0,39, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From start of current day{/ts}', 'greater.day', 'greater.day', NULL, NULL, 0,40, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From start of current week{/ts}', 'greater.week', 'greater.week', NULL, NULL, 0,41, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From start of current calendar month{/ts}', 'greater.month', 'greater.month', NULL, NULL, 0,42, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From start of current quarter{/ts}', 'greater.quarter', 'greater.quarter', NULL, NULL, 0,43, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From start of current calendar year{/ts}', 'greater.year', 'greater.year', NULL, NULL, 0,44, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}To end of current week{/ts}', 'less.week', 'less.week', NULL, NULL, 0,45, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}To end of current calendar month{/ts}', 'less.month', 'less.month', NULL, NULL, 0,46, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}To end of current quarter{/ts}', 'less.quarter', 'less.quarter', NULL, NULL, 0,47, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}To end of current calendar year{/ts}', 'less.year', 'less.year', NULL, NULL, 0,48, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous 2 days{/ts}', 'previous_2.day', 'previous_2.day', NULL, NULL, 0,49, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous 2 weeks{/ts}', 'previous_2.week', 'previous_2.week', NULL, NULL, 0,50, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous 2 calendar months{/ts}', 'previous_2.month', 'previous_2.month', NULL, NULL, 0,51, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous 2 quarters{/ts}', 'previous_2.quarter', 'previous_2.quarter', NULL, NULL, 0,52, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous 2 calendar years{/ts}', 'previous_2.year', 'previous_2.year', NULL, NULL, 0,53, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Previous 2 fiscal years{/ts}', 'previous_2.fiscal_year', 'previous_2.fiscal_year', NULL, NULL, 0,54, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Day prior to yesterday{/ts}', 'previous_before.day', 'previous_before.day', NULL, NULL, 0,55, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Week prior to previous week{/ts}', 'previous_before.week', 'previous_before.week', NULL, NULL, 0,56, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Month prior to previous calendar month{/ts}', 'previous_before.month', 'previous_before.month', NULL, NULL, NULL,57, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Quarter prior to previous quarter{/ts}', 'previous_before.quarter', 'previous_before.quarter', NULL, NULL, 0,58, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Year prior to previous calendar year{/ts}', 'previous_before.year', 'previous_before.year', NULL, NULL, 0,59, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Fiscal year prior to previous fiscal year{/ts}', 'previous_before.fiscal_year', 'previous_before.fiscal_year', NULL, NULL, 0,60, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From end of previous week{/ts}', 'greater_previous.week', 'greater_previous.week', NULL, NULL, 0,61, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From end of previous calendar month{/ts}', 'greater_previous.month', 'greater_previous.month', NULL, NULL, 0,62, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From end of previous quarter{/ts}', 'greater_previous.quarter', 'greater_previous.quarter', NULL, NULL, 0,63, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From end of previous calendar year{/ts}', 'greater_previous.year', 'greater_previous.year', NULL, NULL, 0,64, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- Pledge Status
-  (@option_group_id_ps, '{ts escape="sql"}Completed{/ts}'  , 1, 'Completed'  , NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_ps, '{ts escape="sql"}Pending{/ts}'    , 2, 'Pending'    , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_ps, '{ts escape="sql"}Cancelled{/ts}'  , 3, 'Cancelled'  , NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_ps, '{ts escape="sql"}In Progress{/ts}', 5, 'In Progress', NULL, 0, 0, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_ps, '{ts escape="sql"}Overdue{/ts}'    , 6, 'Overdue'    , NULL, 0, 0, 5, NULL, 0, 1, 1, NULL, NULL, NULL),
-
-
--- Contribution Recur Status
-  (@option_group_id_crs, '{ts escape="sql"}Completed{/ts}'  , 1, 'Completed'  , NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_crs, '{ts escape="sql"}Pending{/ts}'    , 2, 'Pending'    , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_crs, '{ts escape="sql"}Cancelled{/ts}'  , 3, 'Cancelled'  , NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_crs, '{ts escape="sql"}Failed{/ts}'     , 4, 'Failed'     , NULL, 0, 0, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_crs, '{ts escape="sql"}In Progress{/ts}', 5, 'In Progress', NULL, 0, 0, 5, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_crs, '{ts escape="sql"}Overdue{/ts}'    , 6, 'Overdue'    , NULL, 0, 0, 6, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_crs, '{ts escape="sql"}Processing{/ts}' , 7, 'Processing' , NULL, 0, 0, 7, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_crs, '{ts escape="sql"}Failing{/ts}'    , 8, 'Failing'    , NULL, 0, 0, 8, NULL, 0, 1, 1, NULL, NULL, NULL),
 
 -- CiviCase - Activity Assignee Default
 --  (`option_group_id`,             `label`,                                                `value`, `name`,                    `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)

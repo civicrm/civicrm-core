@@ -19,24 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'relative_date_filters' => CRM_Core_CodeGen_OptionGroup::create('relative_date_filters')
-    ->addMetadata([
-      'title' => ts('Relative Date Filters'),
-    ]),
-  'pledge_status' => CRM_Core_CodeGen_OptionGroup::create('pledge_status')
-    ->addMetadata([
-      'title' => ts('Pledge Status'),
-      'is_locked' => '1',
-    ]),
-  'contribution_recur_status' => CRM_Core_CodeGen_OptionGroup::create('contribution_recur_status')
-    ->addMetadata([
-      'title' => ts('Recurring Contribution Status'),
-      'is_locked' => '1',
-    ]),
-  'environment' => CRM_Core_CodeGen_OptionGroup::create('environment')
-    ->addMetadata([
-      'title' => ts('Environment'),
-    ]),
   'activity_default_assignee' => CRM_Core_CodeGen_OptionGroup::create('activity_default_assignee')
     ->addMetadata([
       'title' => ts('Activity default assignee'),
