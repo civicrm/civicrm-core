@@ -155,17 +155,7 @@ class CRM_Utils_SQL_Insert {
     return $this;
   }
 
-  /**
-   * Escape string.
-   *
-   * @param string|null $value
-   *
-   * @return string
-   *   SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
-   */
-  protected function escapeString($value) {
-    return $value === NULL ? 'NULL' : '"' . CRM_Core_DAO::escapeString($value) . '"';
-  }
+  use CRM_Utils_SQL_EscapeStringTrait;
 
   /**
    * Convert to SQL.
