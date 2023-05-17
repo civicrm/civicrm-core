@@ -120,15 +120,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
     }
     if ($this->isMoneyField($field)) {
-      $currency = $this->getCurrency($row);
+      $currency = $this->getCurrency($row) ?: \Civi::settings()->get('defaultCurrency');
       if (empty($fieldValue) && !is_numeric($fieldValue)) {
         $fieldValue = 0;
       }
-      if (!$currency) {
-        // too hard basket for now - just do what we always did.
-        return $row->format('text/plain')->tokens($entity, $field,
-          \CRM_Utils_Money::format($fieldValue, $currency));
-      }
+
       return $row->format('text/plain')->tokens($entity, $field,
         Money::of($fieldValue, $currency));
 

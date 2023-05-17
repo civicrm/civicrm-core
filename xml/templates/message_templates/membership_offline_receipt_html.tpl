@@ -67,7 +67,7 @@
                 </td>
               </tr>
             {/if}
-            {if '{contribution.total_amount|raw}' !== '0.00'}
+            {if {contribution.total_amount|boolean}}
               <tr>
                 <th {$headerStyle}>
                   {ts}Membership Fee{/ts}
@@ -91,7 +91,7 @@
                         <tr>
                           <th>{ts}Item{/ts}</th>
                           <th>{ts}Fee{/ts}</th>
-                          {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+                          {if $isShowTax && {contribution.tax_amount|boolean}}
                             <th>{ts}SubTotal{/ts}</th>
                             <th>{ts}Tax Rate{/ts}</th>
                             <th>{ts}Tax Amount{/ts}</th>
@@ -106,7 +106,7 @@
                             <td>
                               {$line.line_total|crmMoney}
                             </td>
-                            {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+                            {if $isShowTax && {contribution.tax_amount|boolean}}
                               <td>
                                 {$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'}
                               </td>
@@ -137,7 +137,7 @@
                     </td>
                   </tr>
 
-                {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+                {if $isShowTax && {contribution.tax_amount|boolean}}
                   <tr>
                     <td {$labelStyle}>
                         {ts}Amount Before Tax:{/ts}
@@ -154,7 +154,7 @@
                   {/foreach}
                 {/if}
               {/if}
-              {if '{contribution.tax_amount|raw}' !== '0.00'}
+              {if {contribution.tax_amount|boolean}}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Total Tax Amount{/ts}
