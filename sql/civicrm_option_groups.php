@@ -19,10 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'paper_size' => CRM_Core_CodeGen_OptionGroup::create('paper_size')
-    ->addMetadata([
-      'title' => ts('Paper Size'),
-    ]),
   'pdf_format' => CRM_Core_CodeGen_OptionGroup::create('pdf_format')
     ->addMetadata([
       'title' => ts('PDF Page Format'),

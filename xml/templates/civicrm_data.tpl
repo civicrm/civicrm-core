@@ -134,7 +134,6 @@ VALUES
 
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
 
-SELECT @option_group_id_paperSize      := max(id) from civicrm_option_group where name = 'paper_size';
 SELECT @option_group_id_label          := max(id) from civicrm_option_group where name = 'label_format';
 SELECT @option_group_id_aco            := max(id) from civicrm_option_group where name = 'activity_contacts';
 SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
@@ -173,70 +172,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
--- Paper Sizes
-  (@option_group_id_paperSize, '{ts escape="sql"}Letter{/ts}',          '{literal}{"metric":"in","width":8.5,"height":11}{/literal}',          'letter',      NULL, NULL, 1, 1,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Legal{/ts}',           '{literal}{"metric":"in","width":8.5,"height":14}{/literal}',          'legal',       NULL, NULL, 0, 2,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Ledger{/ts}',          '{literal}{"metric":"in","width":17,"height":11}{/literal}',           'ledger',      NULL, NULL, 0, 3,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Tabloid{/ts}',         '{literal}{"metric":"in","width":11,"height":17}{/literal}',           'tabloid',     NULL, NULL, 0, 4,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Executive{/ts}',       '{literal}{"metric":"in","width":7.25,"height":10.5}{/literal}',       'executive',   NULL, NULL, 0, 5,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Folio{/ts}',           '{literal}{"metric":"in","width":8.5,"height":13}{/literal}',          'folio',       NULL, NULL, 0, 6,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope #9{/ts}',     '{literal}{"metric":"pt","width":638.93,"height":278.93}{/literal}',   'envelope-9',  NULL, NULL, 0, 7,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope #10{/ts}',    '{literal}{"metric":"pt","width":684,"height":297}{/literal}',         'envelope-10', NULL, NULL, 0, 8,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope #11{/ts}',    '{literal}{"metric":"pt","width":747,"height":324}{/literal}',         'envelope-11', NULL, NULL, 0, 9,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope #12{/ts}',    '{literal}{"metric":"pt","width":792,"height":342}{/literal}',         'envelope-12', NULL, NULL, 0, 10, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope #14{/ts}',    '{literal}{"metric":"pt","width":828,"height":360}{/literal}',         'envelope-14', NULL, NULL, 0, 11, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope ISO B4{/ts}', '{literal}{"metric":"pt","width":1000.63,"height":708.66}{/literal}',  'envelope-b4', NULL, NULL, 0, 12, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope ISO B5{/ts}', '{literal}{"metric":"pt","width":708.66,"height":498.9}{/literal}',    'envelope-b5', NULL, NULL, 0, 13, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope ISO B6{/ts}', '{literal}{"metric":"pt","width":498.9,"height":354.33}{/literal}',    'envelope-b6', NULL, NULL, 0, 14, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope ISO C3{/ts}', '{literal}{"metric":"pt","width":1298.27,"height":918.42}{/literal}',  'envelope-c3', NULL, NULL, 0, 15, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope ISO C4{/ts}', '{literal}{"metric":"pt","width":918.42,"height":649.13}{/literal}',   'envelope-c4', NULL, NULL, 0, 16, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope ISO C5{/ts}', '{literal}{"metric":"pt","width":649.13,"height":459.21}{/literal}',   'envelope-c5', NULL, NULL, 0, 17, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope ISO C6{/ts}', '{literal}{"metric":"pt","width":459.21,"height":323.15}{/literal}',   'envelope-c6', NULL, NULL, 0, 18, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}Envelope ISO DL{/ts}', '{literal}{"metric":"pt","width":623.622,"height":311.811}{/literal}', 'envelope-dl', NULL, NULL, 0, 19, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A0{/ts}',          '{literal}{"metric":"pt","width":2383.94,"height":3370.39}{/literal}', 'a0',          NULL, NULL, 0, 20, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A1{/ts}',          '{literal}{"metric":"pt","width":1683.78,"height":2383.94}{/literal}', 'a1',          NULL, NULL, 0, 21, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A2{/ts}',          '{literal}{"metric":"pt","width":1190.55,"height":1683.78}{/literal}', 'a2',          NULL, NULL, 0, 22, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A3{/ts}',          '{literal}{"metric":"pt","width":841.89,"height":1190.55}{/literal}',  'a3',          NULL, NULL, 0, 23, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A4{/ts}',          '{literal}{"metric":"pt","width":595.28,"height":841.89}{/literal}',   'a4',          NULL, NULL, 0, 24, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A5{/ts}',          '{literal}{"metric":"pt","width":419.53,"height":595.28}{/literal}',   'a5',          NULL, NULL, 0, 25, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A6{/ts}',          '{literal}{"metric":"pt","width":297.64,"height":419.53}{/literal}',   'a6',          NULL, NULL, 0, 26, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A7{/ts}',          '{literal}{"metric":"pt","width":209.76,"height":297.64}{/literal}',   'a7',          NULL, NULL, 0, 27, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A8{/ts}',          '{literal}{"metric":"pt","width":147.4,"height":209.76}{/literal}',    'a8',          NULL, NULL, 0, 28, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A9{/ts}',          '{literal}{"metric":"pt","width":104.88,"height":147.4}{/literal}',    'a9',          NULL, NULL, 0, 29, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO A10{/ts}',         '{literal}{"metric":"pt","width":73.7,"height":104.88}{/literal}',     'a10',         NULL, NULL, 0, 30, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B0{/ts}',          '{literal}{"metric":"pt","width":2834.65,"height":4008.19}{/literal}', 'b0',          NULL, NULL, 0, 31, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B1{/ts}',          '{literal}{"metric":"pt","width":2004.09,"height":2834.65}{/literal}', 'b1',          NULL, NULL, 0, 32, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B2{/ts}',          '{literal}{"metric":"pt","width":1417.32,"height":2004.09}{/literal}', 'b2',          NULL, NULL, 0, 33, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B3{/ts}',          '{literal}{"metric":"pt","width":1000.63,"height":1417.32}{/literal}', 'b3',          NULL, NULL, 0, 34, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B4{/ts}',          '{literal}{"metric":"pt","width":708.66,"height":1000.63}{/literal}',  'b4',          NULL, NULL, 0, 35, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B5{/ts}',          '{literal}{"metric":"pt","width":498.9,"height":708.66}{/literal}',    'b5',          NULL, NULL, 0, 36, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B6{/ts}',          '{literal}{"metric":"pt","width":354.33,"height":498.9}{/literal}',    'b6',          NULL, NULL, 0, 37, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B7{/ts}',          '{literal}{"metric":"pt","width":249.45,"height":354.33}{/literal}',   'b7',          NULL, NULL, 0, 38, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B8{/ts}',          '{literal}{"metric":"pt","width":175.75,"height":249.45}{/literal}',   'b8',          NULL, NULL, 0, 39, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B9{/ts}',          '{literal}{"metric":"pt","width":124.72,"height":175.75}{/literal}',   'b9',          NULL, NULL, 0, 40, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO B10{/ts}',         '{literal}{"metric":"pt","width":87.87,"height":124.72}{/literal}',    'b10',         NULL, NULL, 0, 41, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C0{/ts}',          '{literal}{"metric":"pt","width":2599.37,"height":3676.54}{/literal}', 'c0',          NULL, NULL, 0, 42, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C1{/ts}',          '{literal}{"metric":"pt","width":1836.85,"height":2599.37}{/literal}', 'c1',          NULL, NULL, 0, 43, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C2{/ts}',          '{literal}{"metric":"pt","width":1298.27,"height":1836.85}{/literal}', 'c2',          NULL, NULL, 0, 44, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C3{/ts}',          '{literal}{"metric":"pt","width":918.43,"height":1298.27}{/literal}',  'c3',          NULL, NULL, 0, 45, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C4{/ts}',          '{literal}{"metric":"pt","width":649.13,"height":918.43}{/literal}',   'c4',          NULL, NULL, 0, 46, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C5{/ts}',          '{literal}{"metric":"pt","width":459.21,"height":649.13}{/literal}',   'c5',          NULL, NULL, 0, 47, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C6{/ts}',          '{literal}{"metric":"pt","width":323.15,"height":459.21}{/literal}',   'c6',          NULL, NULL, 0, 48, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C7{/ts}',          '{literal}{"metric":"pt","width":229.61,"height":323.15}{/literal}',   'c7',          NULL, NULL, 0, 49, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C8{/ts}',          '{literal}{"metric":"pt","width":161.57,"height":229.61}{/literal}',   'c8',          NULL, NULL, 0, 50, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C9{/ts}',          '{literal}{"metric":"pt","width":113.39,"height":161.57}{/literal}',   'c9',          NULL, NULL, 0, 51, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO C10{/ts}',         '{literal}{"metric":"pt","width":79.37,"height":113.39}{/literal}',    'c10',         NULL, NULL, 0, 52, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO RA0{/ts}',         '{literal}{"metric":"pt","width":2437.8,"height":3458.27}{/literal}',  'ra0',         NULL, NULL, 0, 53, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO RA1{/ts}',         '{literal}{"metric":"pt","width":1729.13,"height":2437.8}{/literal}',  'ra1',         NULL, NULL, 0, 54, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO RA2{/ts}',         '{literal}{"metric":"pt","width":1218.9,"height":1729.13}{/literal}',  'ra2',         NULL, NULL, 0, 55, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO RA3{/ts}',         '{literal}{"metric":"pt","width":864.57,"height":1218.9}{/literal}',   'ra3',         NULL, NULL, 0, 56, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO RA4{/ts}',         '{literal}{"metric":"pt","width":609.45,"height":864.57}{/literal}',   'ra4',         NULL, NULL, 0, 57, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO SRA0{/ts}',        '{literal}{"metric":"pt","width":2551.18,"height":3628.35}{/literal}', 'sra0',        NULL, NULL, 0, 58, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO SRA1{/ts}',        '{literal}{"metric":"pt","width":1814.17,"height":2551.18}{/literal}', 'sra1',        NULL, NULL, 0, 59, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO SRA2{/ts}',        '{literal}{"metric":"pt","width":1275.59,"height":1814.17}{/literal}', 'sra2',        NULL, NULL, 0, 60, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO SRA3{/ts}',        '{literal}{"metric":"pt","width":907.09,"height":1275.59}{/literal}',  'sra3',        NULL, NULL, 0, 61, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_paperSize, '{ts escape="sql"}ISO SRA4{/ts}',        '{literal}{"metric":"pt","width":637.8,"height":907.09}{/literal}',    'sra4',        NULL, NULL, 0, 62, NULL, 0, 0, 1, NULL, NULL, NULL),
 
 -- activity_contacts
    (@option_group_id_aco, '{ts escape="sql"}Activity Assignees{/ts}', 1, 'Activity Assignees', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
