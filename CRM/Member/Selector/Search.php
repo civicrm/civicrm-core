@@ -243,6 +243,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         'url' => 'civicrm/contribute/unsubscribe',
         'qs' => 'reset=1&mid=%%id%%&context=%%cxt%%' . $extraParams,
         'title' => ts('Cancel Auto Renew Subscription'),
+        'weight' => 40,
       ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::DISABLE])) {

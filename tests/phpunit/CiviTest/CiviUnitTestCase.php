@@ -2299,8 +2299,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'total_amount' => '200',
       'invoice_id' => 'xyz',
       'financial_type_id' => 'Donation',
-      'contact_id' => $this->_contactID,
-      'contribution_page_id' => $this->_contributionPageID,
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'contribution_page_id' => $this->ids['ContributionPage'][0] ?? NULL,
       'payment_processor_id' => $this->_paymentProcessorID,
       'receive_date' => '2019-07-25 07:34:23',
       'skipCleanMoney' => TRUE,
@@ -2309,7 +2309,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'source' => 'Online Contribution: Page name',
     ], $contributionParams);
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
-      'contact_id' => $this->_contactID,
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'amount' => 1000,
       'sequential' => 1,
       'installments' => 5,
@@ -2319,7 +2319,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'invoice_id' => $contributionParams['invoice_id'],
       'payment_processor_id' => $this->_paymentProcessorID,
       // processor provided ID - use contact ID as proxy.
-      'processor_id' => $this->_contactID,
+      'processor_id' => $this->ids['Contact']['individual_0'],
       'api.Order.create' => $contributionParams,
     ], $recurParams))['values'][0];
     $this->_contributionRecurID = $contributionRecur['id'];
@@ -2349,7 +2349,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     //create a contribution so our membership & contribution don't both have id = 1
     if ($this->callAPISuccess('Contribution', 'getcount', []) === 0) {
       $this->contributionCreate([
-        'contact_id' => $this->_contactID,
+        'contact_id' => $this->ids['Contact']['individual_0'],
         'is_test' => 1,
         'financial_type_id' => 1,
         'invoice_id' => 'abcd',
@@ -2372,7 +2372,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
             ],
           ],
           'params' => [
-            'contact_id' => $this->_contactID,
+            'contact_id' => $this->ids['Contact']['individual_0'],
             'membership_type_id' => $this->ids['membership_type'],
             'source' => 'Payment',
           ],

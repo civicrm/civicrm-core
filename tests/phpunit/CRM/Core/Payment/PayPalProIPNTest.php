@@ -21,7 +21,6 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   protected $_financialTypeID = 1;
   protected $_contactID;
   protected $_contributionRecurID;
-  protected $_contributionPageID;
   protected $_paymentProcessorID;
 
   /**
@@ -37,7 +36,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'payment_processor' => $this->_paymentProcessorID,
     ]);
-    $this->_contributionPageID = $contributionPage['id'];
+    $this->ids['ContributionPage'][0] = $contributionPage['id'];
   }
 
   /**
@@ -267,7 +266,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'payment_status' => 'Completed',
       'product_name' => '5 Per 1 month',
       'charset' => 'windows-1252',
-      'rp_invoice_id' => 'i=xyz&m=&c=&r=&b=&p=' . $this->_contributionPageID,
+      'rp_invoice_id' => 'i=xyz&m=&c=&r=&b=&p=' . $this->ids['ContributionPage'][0],
       'recurring_payment_id' => 'I-3EEUC094KYQW',
       'address_zip' => '90210',
       'first_name' => 'Alanna',
@@ -392,7 +391,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       . '&m=&c=' . $this->_contributionID
       . '&r=' . $this->_contributionRecurID
       . '&b=' . $this->_contactID
-      . '&p=' . $this->_contributionPageID,
+      . '&p=' . $this->ids['ContributionPage'][0],
       'currency_code' => 'GBP',
       'time_created' => '12:39:01 May 09, 2018 PDT',
       'verify_sign' => 'AUg223oCjn4HgJXKkrICawXQ3fyUA2gAd1.f1IPJ4r.9sln-nWcB-EJG',

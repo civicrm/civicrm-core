@@ -34,7 +34,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'receipt_from_name' => 'Pachamama',
       'is_email_receipt' => TRUE,
     ]);
-    $this->_contributionPageID = $contributionPage['id'];
+    $this->_contributionPageID = $this->ids['ContributionPage'][0] = $contributionPage['id'];
   }
 
   public function tearDown(): void {

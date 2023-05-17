@@ -220,7 +220,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $row = $this->csv->fetchOne();
     $expected = [
-      'Contact ID' => $this->contactIDs[0],
+      'Contact ID' => $membership['contact_id'],
       'Contact Type' => 'Individual',
       'Contact Subtype' => '',
       'Do Not Email' => '',
@@ -427,7 +427,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->contactMembershipCreate(['contact_id' => $this->contactIDs[0]]);
 
     $this->_contactID = $this->contactIDs[0];
-    $this->_contributionPageID = NULL;
     $this->_paymentProcessorID = $this->paymentProcessorCreate();
     $this->setupMembershipRecurringPaymentProcessorTransaction();
 
@@ -495,7 +494,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $params['is_primary'] = 0;
     $params['location_type_id'] = 'Work';
     $this->callAPISuccess('address', 'create', $params);
-    $this->contactIDs[] = $contactB = $this->individualCreate();
+    $this->contactIDs[] = $contactB = $this->individualCreate([], 1);
 
     $this->callAPISuccess('address', 'create', [
       'contact_id' => $contactB,
@@ -2988,12 +2987,12 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'Home-email' => 'home@example.com',
       ],
       [
-        'first_name' => 'Anthony',
-        'last_name' => 'Anderson',
+        'first_name' => 'Joe',
+        'last_name' => 'Miller',
         'Home-street_address' => '',
         'Home-city' => '',
         'Home-country' => '',
-        'Home-email' => 'anthony_anderson@civicrm.org',
+        'Home-email' => 'joe_miller@civicrm.org',
       ],
     ], $result);
   }
