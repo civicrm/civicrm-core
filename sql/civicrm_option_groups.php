@@ -19,43 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'contribution_status' => CRM_Core_CodeGen_OptionGroup::create('contribution_status')
-    ->addMetadata([
-      'title' => ts('Contribution Status'),
-      'is_locked' => '1',
-    ]),
-  'pcp_status' => CRM_Core_CodeGen_OptionGroup::create('pcp_status')
-    ->addMetadata([
-      'title' => ts('PCP Status'),
-      'is_locked' => '1',
-    ]),
-  'pcp_owner_notify' => CRM_Core_CodeGen_OptionGroup::create('pcp_owner_notify')
-    ->addMetadata([
-      'title' => ts('PCP owner notifications'),
-      'is_locked' => '1',
-    ]),
-  'participant_role' => CRM_Core_CodeGen_OptionGroup::create('participant_role')
-    ->addMetadata([
-      'title' => ts('Participant Role'),
-      'description' => ts('Define participant roles for events here (e.g. Attendee, Host, Speaker...). You can then assign roles and search for participants by role.'),
-      'data_type' => 'Integer',
-    ]),
-  'event_type' => CRM_Core_CodeGen_OptionGroup::create('event_type')
-    ->addMetadata([
-      'title' => ts('Event Type'),
-      'description' => ts('Use Event Types to categorize your events. Event feeds can be filtered by Event Type and participant searches can use Event Type as a criteria.'),
-      'data_type' => 'Integer',
-    ]),
-  'contact_view_options' => CRM_Core_CodeGen_OptionGroup::create('contact_view_options')
-    ->addMetadata([
-      'title' => ts('Contact View Options'),
-      'is_locked' => '1',
-    ]),
-  'contact_smart_group_display' => CRM_Core_CodeGen_OptionGroup::create('contact_smart_group_display')
-    ->addMetadata([
-      'title' => ts('Contact Smart Group View Options'),
-      'is_locked' => '1',
-    ]),
   'contact_edit_options' => CRM_Core_CodeGen_OptionGroup::create('contact_edit_options')
     ->addMetadata([
       'title' => ts('Contact Edit Options'),

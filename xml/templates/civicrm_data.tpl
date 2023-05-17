@@ -133,13 +133,6 @@ VALUES
 {/php}
 
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
-SELECT @option_group_id_cs             := max(id) from civicrm_option_group where name = 'contribution_status';
-SELECT @option_group_id_pcp            := max(id) from civicrm_option_group where name = 'pcp_status';
-SELECT @option_group_id_pcpOwnerNotify := max(id) from civicrm_option_group where name = 'pcp_owner_notify';
-SELECT @option_group_id_pRole          := max(id) from civicrm_option_group where name = 'participant_role';
-SELECT @option_group_id_etype          := max(id) from civicrm_option_group where name = 'event_type';
-SELECT @option_group_id_cvOpt          := max(id) from civicrm_option_group where name = 'contact_view_options';
-SELECT @option_group_id_csgOpt         := max(id) from civicrm_option_group where name = 'contact_smart_group_display';
 SELECT @option_group_id_ceOpt          := max(id) from civicrm_option_group where name = 'contact_edit_options';
 SELECT @option_group_id_asOpt          := max(id) from civicrm_option_group where name = 'advanced_search_options';
 SELECT @option_group_id_udOpt          := max(id) from civicrm_option_group where name = 'user_dashboard_options';
@@ -218,57 +211,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
-
-  (@option_group_id_cs, '{ts escape="sql"}Completed{/ts}'  , 1, 'Completed'  , NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}Pending{/ts}'    , 2, 'Pending'    , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}Cancelled{/ts}'  , 3, 'Cancelled'  , NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}Failed{/ts}'     , 4, 'Failed'     , NULL, 0, 0, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}Refunded{/ts}'   , 7, 'Refunded'   , NULL, 0, 0, 7, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}Partially paid{/ts}', 8, 'Partially paid', NULL, 0, 0, 8, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}Pending refund{/ts}', 9, 'Pending refund', NULL, 0, 0, 9, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}Chargeback{/ts}', 10, 'Chargeback', NULL, 0, 0, 10, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cs, '{ts escape="sql"}Template{/ts}'  , 11, 'Template',   NULL, 0, 0, 11, '{ts escape="sql"}Status for contribution records which represent a template for a recurring contribution rather than an actual contribution. This status is transitional, to ensure that said contributions don\'t appear in reports. The is_template field is the preferred way to find and filter these contributions.{/ts}', 0, 1, 1, NULL, NULL, NULL),
-
-  (@option_group_id_pcp, '{ts escape="sql"}Waiting Review{/ts}', 1, 'Waiting Review', NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_pcp, '{ts escape="sql"}Approved{/ts}'      , 2, 'Approved'      , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_pcp, '{ts escape="sql"}Not Approved{/ts}'  , 3, 'Not Approved'  , NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
-
-  (@option_group_id_pcpOwnerNotify, '{ts escape="sql"}Owner chooses whether to receive notifications{/ts}', 1, 'owner_chooses', NULL, 0, 1, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_pcpOwnerNotify, '{ts escape="sql"}Notifications are sent to ALL owners{/ts}'      , 2, 'all_owners'      , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_pcpOwnerNotify, '{ts escape="sql"}Notifications are NOT available{/ts}'  , 3, 'no_notifications'  , NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
-
-  (@option_group_id_pRole, '{ts escape="sql"}Attendee{/ts}',  1, 'Attendee',  NULL, 1, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_pRole, '{ts escape="sql"}Volunteer{/ts}', 2, 'Volunteer', NULL, 1, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_pRole, '{ts escape="sql"}Host{/ts}',      3, 'Host',      NULL, 1, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_pRole, '{ts escape="sql"}Speaker{/ts}',   4, 'Speaker',   NULL, 1, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-  (@option_group_id_etype, '{ts escape="sql"}Conference{/ts}', 1, 'Conference',  NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_etype, '{ts escape="sql"}Exhibition{/ts}', 2, 'Exhibition',  NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_etype, '{ts escape="sql"}Fundraiser{/ts}', 3, 'Fundraiser',  NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_etype, '{ts escape="sql"}Meeting{/ts}',    4, 'Meeting',     NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_etype, '{ts escape="sql"}Performance{/ts}',5, 'Performance', NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_etype, '{ts escape="sql"}Workshop{/ts}',   6, 'Workshop',    NULL, 0, 0, 6, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- note that these are not ts'ed since they are used for logic in most cases and not display
--- they are used for display only in the prefernces field settings
-  (@option_group_id_cvOpt, '{ts escape="sql"}Activities{/ts}'   ,   1, 'activity', NULL, 0, 0,  1,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Relationships{/ts}',   2, 'rel', NULL, 0, 0,  2,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Groups{/ts}'       ,   3, 'group', NULL, 0, 0,  3,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Notes{/ts}'        ,   4, 'note', NULL, 0, 0,  4,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Tags{/ts}'         ,   5, 'tag', NULL, 0, 0,  5,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Change Log{/ts}'   ,   6, 'log', NULL, 0, 0,  6,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Contributions{/ts}',   7, 'CiviContribute', NULL, 0, 0,  7,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Memberships{/ts}'  ,   8, 'CiviMember', NULL, 0, 0,  8,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Events{/ts}'       ,   9, 'CiviEvent', NULL, 0, 0,  9,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Cases{/ts}'        ,  10, 'CiviCase', NULL, 0, 0,  10, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Pledges{/ts}'      ,  13, 'CiviPledge', NULL, 0, 0,  13, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cvOpt, '{ts escape="sql"}Mailings{/ts}'     ,  14, 'CiviMail', NULL, 0, 0,  14, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-
-  (@option_group_id_csgOpt, '{ts escape="sql"}Show Smart Groups on Demand{/ts}',1, 'showondemand', NULL, 0, 0,  1,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csgOpt, '{ts escape="sql"}Always Show Smart Groups{/ts}',   2, 'alwaysshow', NULL, 0, 0,  2,  NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csgOpt, '{ts escape="sql"}Hide Smart Groups{/ts}'       ,   3, 'hide', NULL, 0, 0,  3,  NULL, 0, 0, 1, NULL, NULL, NULL),
 
   (@option_group_id_ceOpt, '{ts escape="sql"}Custom Data{/ts}'              ,   1, 'CustomData', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_ceOpt, '{ts escape="sql"}Address{/ts}'                  ,   2, 'Address', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
