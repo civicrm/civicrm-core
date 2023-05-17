@@ -1,7 +1,11 @@
 <?php
 class CRM_Core_CodeGen_OptionGroup {
 
-  protected $metadata = [
+  /**
+   * @var array
+   * @internal
+   */
+  public $metadata = [
     'is_active' => 1,
     'is_reserved' => 1,
     'option_value_fields' => 'name,label,description',
@@ -26,11 +30,18 @@ class CRM_Core_CodeGen_OptionGroup {
 
   protected $rows = [];
 
-  public static function create(string $name): CRM_Core_CodeGen_OptionGroup {
+  /**
+   * @var string
+   * @internal
+   */
+  public $historicalId;
+
+  public static function create(string $name, ?string $historicalId = NULL): CRM_Core_CodeGen_OptionGroup {
     $og = new static();
     $og->metadata['name'] = $name;
     // $og->var = '@option_group_id_' . $name;
     $og->var = '@this_option_group_id';
+    $og->historicalId = $historicalId;
     return $og;
   }
 
