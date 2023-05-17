@@ -19,16 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'individual_prefix' => CRM_Core_CodeGen_OptionGroup::create('individual_prefix')
-    ->addMetadata([
-      'title' => ts('Individual contact prefixes'),
-      'description' => ts('CiviCRM is pre-configured with standard options for individual contact prefixes (Ms., Mr., Dr. etc.). Customize these options and add new ones as needed for your installation.'),
-    ]),
-  'individual_suffix' => CRM_Core_CodeGen_OptionGroup::create('individual_suffix')
-    ->addMetadata([
-      'title' => ts('Individual contact suffixes'),
-      'description' => ts('CiviCRM is pre-configured with standard options for individual contact name suffixes (Jr., Sr., II etc.). Customize these options and add new ones as needed for your installation.'),
-    ]),
   'acl_role' => CRM_Core_CodeGen_OptionGroup::create('acl_role')
     ->addMetadata([
       'title' => ts('ACL Role'),

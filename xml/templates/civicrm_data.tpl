@@ -132,8 +132,6 @@ VALUES
   }
 {/php}
 
-SELECT @option_group_id_prefix         := max(id) from civicrm_option_group where name = 'individual_prefix';
-SELECT @option_group_id_suffix         := max(id) from civicrm_option_group where name = 'individual_suffix';
 SELECT @option_group_id_aclRole        := max(id) from civicrm_option_group where name = 'acl_role';
 SELECT @option_group_id_acc            := max(id) from civicrm_option_group where name = 'accept_creditcard';
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
@@ -222,20 +220,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
-   (@option_group_id_prefix, '{ts escape="sql"}Mrs.{/ts}', 1, 'Mrs.', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_prefix, '{ts escape="sql"}Ms.{/ts}',  2, 'Ms.',  NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_prefix, '{ts escape="sql"}Mr.{/ts}',  3, 'Mr.',  NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_prefix, '{ts escape="sql"}Dr.{/ts}',  4, 'Dr.',  NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-   (@option_group_id_suffix, '{ts escape="sql"}Jr.{/ts}',  1, 'Jr.', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_suffix, '{ts escape="sql"}Sr.{/ts}',  2, 'Sr.', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_suffix, 'II',  3, 'II',  NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_suffix, 'III', 4, 'III', NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_suffix, 'IV',  5, 'IV',  NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_suffix, 'V',   6, 'V',   NULL, 0, 0, 6, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_suffix, 'VI',  7, 'VI',  NULL, 0, 0, 7, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_suffix, 'VII', 8, 'VII', NULL, 0, 0, 8, NULL, 0, 0, 1, NULL, NULL, NULL),
 
    (@option_group_id_aclRole, '{ts escape="sql"}Administrator{/ts}',  1, 'Admin', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_aclRole, '{ts escape="sql"}Authenticated{/ts}',  2, 'Auth' , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
