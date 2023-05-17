@@ -19,32 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'sms_api_type' => CRM_Core_CodeGen_OptionGroup::create('sms_api_type')
-    ->addMetadata([
-      'title' => ts('Api Type'),
-    ]),
-  'sms_provider_name' => CRM_Core_CodeGen_OptionGroup::create('sms_provider_name')
-    ->addMetadata([
-      'title' => ts('Sms Provider Internal Name'),
-    ]),
-  'auto_renew_options' => CRM_Core_CodeGen_OptionGroup::create('auto_renew_options')
-    ->addMetadata([
-      'title' => ts('Auto Renew Options'),
-      'is_locked' => '1',
-    ]),
-  'financial_account_type' => CRM_Core_CodeGen_OptionGroup::create('financial_account_type')
-    ->addMetadata([
-      'title' => ts('Financial Account Type'),
-    ]),
-  'financial_item_status' => CRM_Core_CodeGen_OptionGroup::create('financial_item_status')
-    ->addMetadata([
-      'title' => ts('Financial Item Status'),
-      'is_locked' => '1',
-    ]),
-  'label_type' => CRM_Core_CodeGen_OptionGroup::create('label_type')
-    ->addMetadata([
-      'title' => ts('Label Type'),
-    ]),
   'name_badge' => CRM_Core_CodeGen_OptionGroup::create('name_badge')
     ->addMetadata([
       'title' => ts('Name Badge Format'),

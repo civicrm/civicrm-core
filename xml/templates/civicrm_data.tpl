@@ -134,13 +134,8 @@ VALUES
 
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
 SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
-
-SELECT @option_group_id_sms_api_type   := max(id) from civicrm_option_group where name = 'sms_api_type';
-SELECT @option_group_id_sms_provider_name := max(id) from civicrm_option_group where name = 'sms_provider_name';
-SELECT @option_group_id_aro := max(id) from civicrm_option_group where name = 'auto_renew_options';
 SELECT @option_group_id_fat            := max(id) from civicrm_option_group where name = 'financial_account_type';
-SELECT @option_group_id_financial_item_status := max(id) from civicrm_option_group where name = 'financial_item_status';
-SELECT @option_group_id_label_type := max(id) from civicrm_option_group where name = 'label_type';
+
 SELECT @option_group_id_name_badge := max(id) from civicrm_option_group where name = 'name_badge';
 SELECT @option_group_id_communication_style := max(id) from civicrm_option_group where name = 'communication_style';
 SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
@@ -164,32 +159,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
--- financial_account_type
--- grouping field is specific to Quickbooks for mapping to .iif format
-   (@option_group_id_fat, '{ts escape="sql"}Asset{/ts}', 1, 'Asset', NULL, 0, 0, 1, 'Things you own', 0, 1, 1, 2, NULL, NULL),
-   (@option_group_id_fat, '{ts escape="sql"}Liability{/ts}', 2, 'Liability', NULL, 0, 0, 2, 'Things you owe, like a grant still to be disbursed', 0, 1, 1, 2, NULL, NULL),
-   (@option_group_id_fat, '{ts escape="sql"}Revenue{/ts}', 3, 'Revenue', NULL, 0, 1, 3, 'Income from contributions and sales of tickets and memberships', 0, 1, 1, 2, NULL, NULL),
-   (@option_group_id_fat, '{ts escape="sql"}Cost of Sales{/ts}', 4, 'Cost of Sales', NULL, 0, 0, 4, 'Costs incurred to get revenue, e.g. premiums for donations, dinner for a fundraising dinner ticket', 0, 1, 1, 2, NULL, NULL),
-   (@option_group_id_fat, '{ts escape="sql"}Expenses{/ts}', 5, 'Expenses', NULL, 0, 0, 5, 'Things that are paid for that are consumable, e.g. grants disbursed', 0, 1, 1, 2, NULL, NULL),
-
--- Financial Item Status
-   (@option_group_id_financial_item_status, '{ts escape="sql"}Paid{/ts}', 1, 'Paid', NULL, 0, 0, 1, 'Paid', 0, 1, 1, 2, NULL, NULL),
-   (@option_group_id_financial_item_status, '{ts escape="sql"}Partially paid{/ts}', 2, 'Partially paid', NULL, 0, 0, 2, 'Partially paid', 0, 1, 1, 2, NULL, NULL),
-   (@option_group_id_financial_item_status, '{ts escape="sql"}Unpaid{/ts}', 3, 'Unpaid', NULL, 0, 0, 1, 'Unpaid', 0, 1, 1, 2, NULL, NULL),
-
--- sms_api_type
-   (@option_group_id_sms_api_type, 'http', 1, 'http', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-   (@option_group_id_sms_api_type, 'xml',  2, 'xml',  NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-   (@option_group_id_sms_api_type, 'smtp', 3, 'smtp', NULL, NULL, 0, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
-
--- auto renew options
-   (@option_group_id_aro, '{ts escape="sql"}Renewal Reminder (non-auto-renew memberships only){/ts}', 1, 'Renewal Reminder (non-auto-renew memberships only)', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_aro, '{ts escape="sql"}Auto-renew Memberships Only{/ts}', 2, 'Auto-renew Memberships Only', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_aro, '{ts escape="sql"}Reminder for Both{/ts}', 3, 'Reminder for Both', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- Label Type
-   (@option_group_id_label_type, '{ts escape="sql"}Event Badge{/ts}', 1, 'Event Badge', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
 
 -- Name Label format
    (@option_group_id_name_badge, '{ts escape="sql"}Avery 5395{/ts}', '{literal}{"name":"Avery 5395","paper-size":"a4","metric":"mm","lMargin":15,"tMargin":26,"NX":2,"NY":4,"SpaceX":10,"SpaceY":5,"width":83,"height":57,"font-size":12,"orientation":"portrait","font-name":"helvetica","font-style":"","lPadding":3,"tPadding":3}{/literal}', 'Avery 5395', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
