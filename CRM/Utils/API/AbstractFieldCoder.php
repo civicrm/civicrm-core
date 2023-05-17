@@ -27,7 +27,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
   /**
    * Get skipped fields.
    *
-   * @return array<string>
+   * @return string[]
    *   List of field names
    */
   public function getSkipFields() {

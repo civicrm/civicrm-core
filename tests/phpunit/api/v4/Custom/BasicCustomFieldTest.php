@@ -58,22 +58,22 @@ class BasicCustomFieldTest extends CustomTestBase {
       'first_name' => 'Johann',
       'last_name' => 'Tester',
       'contact_type' => 'Individual',
-      'MyIndividualFields.FavColor' => 'Red',
+      'MyIndividualFields.FavColor' => '<Red>',
     ])['id'];
 
     $contact = Contact::get(FALSE)
       ->addSelect('first_name')
       ->addSelect('MyIndividualFields.FavColor')
       ->addWhere('id', '=', $contactId)
-      ->addWhere('MyIndividualFields.FavColor', '=', 'Red')
+      ->addWhere('MyIndividualFields.FavColor', '=', '<Red>')
       ->execute()
       ->first();
 
-    $this->assertEquals('Red', $contact['MyIndividualFields.FavColor']);
+    $this->assertEquals('<Red>', $contact['MyIndividualFields.FavColor']);
 
     Contact::update()
       ->addWhere('id', '=', $contactId)
-      ->addValue('MyIndividualFields.FavColor', 'Blue')
+      ->addValue('MyIndividualFields.FavColor', 'Blue&Pink')
       ->execute();
 
     $contact = Contact::get(FALSE)
@@ -82,7 +82,7 @@ class BasicCustomFieldTest extends CustomTestBase {
       ->execute()
       ->first();
 
-    $this->assertEquals('Blue', $contact['MyIndividualFields.FavColor']);
+    $this->assertEquals('Blue&Pink', $contact['MyIndividualFields.FavColor']);
 
     // Try setting to null
     Contact::update()
@@ -678,6 +678,60 @@ class BasicCustomFieldTest extends CustomTestBase {
     $roleOptions = array_column($field['options'], 'name');
     $this->assertContains('Volunteer', $roleOptions);
     $this->assertContains('Attendee', $roleOptions);
+  }
+
+  /**
+   * Ensure rich-text html fields store html correctly
+   */
+  public function testRichTextHTML(): void {
+    $cgName = uniqid('My');
+
+    $custom = CustomGroup::create(FALSE)
+      ->addValue('title', $cgName)
+      ->addValue('extends', 'Contact')
+      ->addChain('field1', CustomField::create()
+        ->addValue('label', 'RichText')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'RichTextEditor')
+        ->addValue('data_type', 'Memo'),
+      0)
+      ->addChain('field2', CustomField::create()
+        ->addValue('label', 'TextArea')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'TextArea')
+        ->addValue('data_type', 'Memo'),
+      0)
+      ->execute()->first();
+
+    $cid = $this->createTestRecord('Contact', [
+      'first_name' => 'One',
+      'last_name' => 'Tester',
+      "$cgName.RichText" => '<em>Hello</em><br />APIv4 & RichText!',
+      "$cgName.TextArea" => '<em>Hello</em><br />APIv4 & TextArea!',
+    ])['id'];
+    $contact = Contact::get(FALSE)
+      ->addSelect('custom.*')
+      ->addWhere('id', '=', $cid)
+      ->execute()->first();
+    $this->assertEquals('<em>Hello</em><br />APIv4 & RichText!', $contact["$cgName.RichText"]);
+    $this->assertEquals('<em>Hello</em><br />APIv4 & TextArea!', $contact["$cgName.TextArea"]);
+
+    // The html should have been stored unescaped
+    $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$custom['field1']['column_name']} FROM {$custom['table_name']}");
+    $this->assertEquals('<em>Hello</em><br />APIv4 & RichText!', $dbVal);
+    $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$custom['field2']['column_name']} FROM {$custom['table_name']}");
+    $this->assertEquals('<em>Hello</em><br />APIv4 & TextArea!', $dbVal);
+
+    // APIv3 should work the same way
+    civicrm_api3('Contact', 'create', [
+      'id' => $cid,
+      "custom_{$custom['field1']['id']}" => '<em>Hello</em><br />APIv3 & RichText!',
+      "custom_{$custom['field2']['id']}" => '<em>Hello</em><br />APIv3 & TextArea!',
+    ]);
+    $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$custom['field1']['column_name']} FROM {$custom['table_name']}");
+    $this->assertEquals('<em>Hello</em><br />APIv3 & RichText!', $dbVal);
+    $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$custom['field2']['column_name']} FROM {$custom['table_name']}");
+    $this->assertEquals('<em>Hello</em><br />APIv3 & TextArea!', $dbVal);
   }
 
 }
