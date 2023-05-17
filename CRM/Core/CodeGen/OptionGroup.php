@@ -84,7 +84,7 @@ class CRM_Core_CodeGen_OptionGroup {
    *
    * @return $this
    */
-  public function addValues(array $header, array $optionValues) : CRM_Core_CodeGen_OptionGroup {
+  public function addValueTable(array $header, array $optionValues) : CRM_Core_CodeGen_OptionGroup {
     foreach ($optionValues as $optionValue) {
       $row = [];
       foreach ($optionValue as $key => $value) {

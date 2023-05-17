@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('contribution_recur_status', 'a/0080
     'title' => ts('Recurring Contribution Status'),
     'is_locked' => 1,
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     [ts('Completed'), 'Completed', 1],
     [ts('Pending'), 'Pending', 2],
     [ts('Cancelled'), 'Cancelled', 3],

@@ -5,7 +5,7 @@ return CRM_Core_CodeGen_OptionGroup::create('recent_items_providers', 'b/99')
   ->addMetadata([
     'title' => ts('Recent Items Providers'),
   ])
-  ->addValues(['label', 'value', 'name'], [
+  ->addValueTable(['label', 'value', 'name'], [
     [ts('Contacts'), 'Contact', 'Contact'],
     [ts('Relationships'), 'Relationship', 'Relationship'],
     [ts('Activities'), 'Activity', 'Activity'],

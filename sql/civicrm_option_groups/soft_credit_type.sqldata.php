@@ -5,7 +5,7 @@ return CRM_Core_CodeGen_OptionGroup::create('soft_credit_type', 'b/98')
   ->addMetadata([
     'title' => ts('Soft Credit Types'),
   ])
-  ->addValues(['label', 'value', 'name'], [
+  ->addValueTable(['label', 'value', 'name'], [
     [ts('In Honor of'), 1, 'in_honor_of', 'is_reserved' => 1],
     [ts('In Memory of'), 2, 'in_memory_of', 'is_reserved' => 1],
     [ts('Solicited'), 3, 'solicited', 'is_reserved' => 1, 'is_default' => 1],

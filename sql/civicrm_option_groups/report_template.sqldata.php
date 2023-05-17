@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
   ->addMetadata([
     'title' => ts('Report Template'),
   ])
-  ->addValues(['label', 'name', 'value', 'weight', 'description'], [
+  ->addValueTable(['label', 'name', 'value', 'weight', 'description'], [
     [ts('Constituent Report (Summary)'), 'CRM_Report_Form_Contact_Summary', 'contact/summary', 1, ts('Provides a list of address and telephone information for constituent records in your system.')],
     [ts('Constituent Report (Detail)'), 'CRM_Report_Form_Contact_Detail', 'contact/detail', 2, ts('Provides contact-related information on contributions, memberships, events and activities.')],
     [ts('Activity Details Report'), 'CRM_Report_Form_Activity', 'activity', 3, ts('Provides a list of constituent activity including activity statistics for one/all contacts during a given date range(required)')],

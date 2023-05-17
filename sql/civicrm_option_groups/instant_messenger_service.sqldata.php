@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('instant_messenger_service', 'a/0004
     'title' => ts('Instant Messenger (IM) screen-names'),
     'description' => ts('Commonly-used messaging apps are listed here. Administrators may define as many additional providers as needed.'),
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     ['Yahoo', 'Yahoo', 1],
     ['MSN', 'Msn', 2],
     ['AIM', 'Aim', 3],

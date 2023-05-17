@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('custom_search', 'a/0023')
   ->addMetadata([
     'title' => ts('Custom Search'),
   ])
-  ->addValues(['label', 'name', 'value', 'weight', 'description'], [
+  ->addValueTable(['label', 'name', 'value', 'weight', 'description'], [
     ['CRM_Contact_Form_Search_Custom_Sample', 'CRM_Contact_Form_Search_Custom_Sample', 1, 1, ts('Household Name and State')],
     ['CRM_Contact_Form_Search_Custom_ContributionAggregate', 'CRM_Contact_Form_Search_Custom_ContributionAggregate', 2, 2, ts('Contribution Aggregate')],
     ['CRM_Contact_Form_Search_Custom_Group', 'CRM_Contact_Form_Search_Custom_Group', 4, 4, ts('Include / Exclude Search')],

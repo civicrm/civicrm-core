@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('contact_view_options', 'a/0016')
     'title' => ts('Contact View Options'),
     'is_locked' => 1,
   ])
-  ->addValues(['label', 'name', 'value', 'weight'], [
+  ->addValueTable(['label', 'name', 'value', 'weight'], [
 
     // NOTE: The original SQL had this inaccurate comment. It is unclear if the comment is inaccurate
     // because the situation changed for the better or the worse.

@@ -5,7 +5,7 @@ return CRM_Core_CodeGen_OptionGroup::create('participant_role', 'a/0014')
     'description' => ts('Define participant roles for events here (e.g. Attendee, Host, Speaker...). You can then assign roles and search for participants by role.'),
     'data_type' => 'Integer',
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     [ts('Attendee'), 'Attendee', 1, 'filter' => 1],
     [ts('Volunteer'), 'Volunteer', 2, 'filter' => 1],
     [ts('Host'), 'Host', 3, 'filter' => 1],

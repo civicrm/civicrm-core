@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('preferred_communication_method', 'a
   ->addMetadata([
     'title' => ts('Preferred Communication Method'),
   ])
-  ->addValues(['label', 'name'], [
+  ->addValueTable(['label', 'name'], [
     [ts('Phone'), 'Phone'],
     [ts('Email'), 'Email'],
     [ts('Postal Mail'), 'Postal Mail'],

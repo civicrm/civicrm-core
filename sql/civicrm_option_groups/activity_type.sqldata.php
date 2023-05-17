@@ -7,7 +7,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
     'data_type' => 'Integer',
     'option_value_fields' => 'name,label,description,icon',
   ])
-  ->addValues(['label', 'name', 'value', 'weight'], [
+  ->addValueTable(['label', 'name', 'value', 'weight'], [
     [ts('Meeting'), 'Meeting', '1', '1', 'is_reserved' => '1', 'icon' => 'fa-slideshare'],
     [ts('Phone Call'), 'Phone Call', '2', '2', 'is_reserved' => '1', 'icon' => 'fa-phone'],
     [ts('Email'), 'Email', '3', '3', 'filter' => '1', 'description' => ts('Email sent.'), 'is_reserved' => '1', 'icon' => 'fa-envelope-o'],

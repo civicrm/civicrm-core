@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('label_type', 'a/0072')
   ->addMetadata([
     'title' => ts('Label Type'),
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     [ts('Event Badge'), 'Event Badge', 1],
   ])
   ->addDefaults([

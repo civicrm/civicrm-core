@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('label_format', 'a/0059')
   ->addMetadata([
     'title' => ts('Mailing Label Format'),
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     [ts('Avery 3475'), 3475, '{"paper-size":"a4","orientation":"portrait","font-name":"dejavusans","font-size":10,"font-style":"","metric":"mm","lMargin":0,"tMargin":5,"NX":3,"NY":8,"SpaceX":0,"SpaceY":0,"width":70,"height":36,"lPadding":5.08,"tPadding":5.08}', 'grouping' => 'Avery', 'is_reserved' => 1],
     [ts('Avery 5160'), 5160, '{"paper-size":"letter","orientation":"portrait","font-name":"dejavusans","font-size":8,"font-style":"","metric":"in","lMargin":0.21975,"tMargin":0.5,"NX":3,"NY":10,"SpaceX":0.14,"SpaceY":0,"width":2.5935,"height":1,"lPadding":0.20,"tPadding":0.20}', 'grouping' => 'Avery', 'is_reserved' => 1],
     [ts('Avery 5161'), 5161, '{"paper-size":"letter","orientation":"portrait","font-name":"dejavusans","font-size":8,"font-style":"","metric":"in","lMargin":0.175,"tMargin":0.5,"NX":2,"NY":10,"SpaceX":0.15625,"SpaceY":0,"width":4,"height":1,"lPadding":0.20,"tPadding":0.20}', 'grouping' => 'Avery', 'is_reserved' => 1],

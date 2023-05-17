@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('safe_file_extension', 'a/0028')
   ->addMetadata([
     'title' => ts('Safe File Extension'),
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     ['jpg', 'jpg', 1],
     ['jpeg', 'jpeg', 2],
     ['png', 'png', 3],

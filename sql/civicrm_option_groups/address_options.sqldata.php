@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('address_options', 'a/0021')
   ->addMetadata([
     'title' => ts('Addressing Options'),
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     [ts('Street Address'), 'street_address', 1],
     [ts('Supplemental Address 1'), 'supplemental_address_1', 2],
     [ts('Supplemental Address 2'), 'supplemental_address_2', 3],

@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('batch_status', 'a/0066')
     'title' => ts('Batch Status'),
     'is_locked' => 1,
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     [ts('Open'), 'Open', 1],
     [ts('Closed'), 'Closed', 2],
     [ts('Data Entry'), 'Data Entry', 3],

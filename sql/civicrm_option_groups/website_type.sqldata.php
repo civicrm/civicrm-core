@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('website_type', 'a/0045')
   ->addMetadata([
     'title' => ts('Website Type'),
   ])
-  ->addValues(['label', 'name', 'value', 'weight'], [
+  ->addValueTable(['label', 'name', 'value', 'weight'], [
     ['Work', 'Work', 1, 1, 'is_default' => 1],
     ['Main', 'Main', 2, 2],
     ['Facebook', 'Facebook', 3, 3],

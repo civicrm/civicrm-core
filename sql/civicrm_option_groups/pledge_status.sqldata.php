@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('pledge_status', 'a/0079')
     'title' => ts('Pledge Status'),
     'is_locked' => 1,
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     [ts('Completed'), 'Completed', 1, 'is_reserved' => 1],
     [ts('Pending'), 'Pending', 2, 'is_reserved' => 1],
     [ts('Cancelled'), 'Cancelled', 3, 'is_reserved' => 1],

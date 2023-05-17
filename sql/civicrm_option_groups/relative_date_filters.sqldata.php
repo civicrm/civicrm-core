@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('relative_date_filters', 'a/0078')
   ->addMetadata([
     'title' => ts('Relative Date Filters'),
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     [ts('Today'), 'this.day', 'this.day'],
     [ts('This week'), 'this.week', 'this.week'],
     [ts('This calendar month'), 'this.month', 'this.month'],

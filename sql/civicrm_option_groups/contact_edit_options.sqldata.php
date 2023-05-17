@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('contact_edit_options', 'a/0018')
     'title' => ts('Contact Edit Options'),
     'is_locked' => 1,
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     [ts('Custom Data'), 'CustomData', 1],
     [ts('Address'), 'Address', 2],
     [ts('Communication Preferences'), 'CommunicationPreferences', 3],

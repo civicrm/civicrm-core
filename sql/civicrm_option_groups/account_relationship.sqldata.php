@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
   ->addMetadata([
     'title' => ts('Account Relationship'),
   ])
-  ->addValues(['label', 'name', 'value', 'description'], [
+  ->addValueTable(['label', 'name', 'value', 'description'], [
     // TODO: Shouldn't we have ts() for these descriptions?
     [ts('Income Account is'), 'Income Account is', 1, 'Income Account is', 'is_default' => 1],
     [ts('Credit/Contra Revenue Account is'), 'Credit/Contra Revenue Account is', 2, 'Credit/Contra Revenue Account is'],

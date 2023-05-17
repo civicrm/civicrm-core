@@ -7,7 +7,7 @@ return CRM_Core_CodeGen_OptionGroup::create('encounter_medium', 'b/97')
     'title' => 'Encounter Medium',
     'description' => 'Encounter medium for case activities (e.g. In Person, By Phone, etc.)',
   ])
-  ->addValues(['label', 'name'], [
+  ->addValueTable(['label', 'name'], [
     [ts('In Person'), 'in_person'],
     [ts('Phone'), 'phone', 'is_default' => 1],
     [ts('Email'), 'email'],

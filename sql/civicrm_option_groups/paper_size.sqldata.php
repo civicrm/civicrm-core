@@ -3,7 +3,7 @@ return CRM_Core_CodeGen_OptionGroup::create('paper_size', 'a/0057')
   ->addMetadata([
     'title' => ts('Paper Size'),
   ])
-  ->addValues(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value'], [
     [ts('Letter'), 'letter', '{"metric":"in","width":8.5,"height":11}', 'is_default' => 1],
     [ts('Legal'), 'legal', '{"metric":"in","width":8.5,"height":14}'],
     [ts('Ledger'), 'ledger', '{"metric":"in","width":17,"height":11}'],

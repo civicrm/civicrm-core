@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('user_dashboard_options', 'a/0020')
     'title' => ts('User Dashboard Options'),
     'is_locked' => 1,
   ])
-  ->addValues(['label', 'name', 'value', 'weight'], [
+  ->addValueTable(['label', 'name', 'value', 'weight'], [
     [ts('Groups'), 'Groups', 1, 1],
     [ts('Contributions'), 'CiviContribute', 2, 2],
     [ts('Memberships'), 'CiviMember', 3, 3],

@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('advanced_search_options', 'a/0019')
     'title' => ts('Advanced Search Options'),
     'is_locked' => 1,
   ])
-  ->addValues(['label', 'name', 'value', 'weight'], [
+  ->addValueTable(['label', 'name', 'value', 'weight'], [
     [ts('Address Fields'), 'location', 1, 1],
     [ts('Custom Fields'), 'custom', 2, 2],
     [ts('Activities'), 'activity', 3, 4],

@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('mapping_type', 'a/0030')
     'title' => ts('Mapping Type'),
     'is_locked' => 1,
   ])
-  ->addValues(['label', 'name', 'value', 'weight'], [
+  ->addValueTable(['label', 'name', 'value', 'weight'], [
     [ts('Search Builder'), 'Search Builder', 1, 1, 'is_reserved' => 1],
     [ts('Import Contact'), 'Import Contact', 2, 2, 'is_reserved' => 1],
     [ts('Import Activity'), 'Import Activity', 3, 3, 'is_reserved' => 1],
