@@ -494,7 +494,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
 
     $patterns = [];
 
-    $protos = '(https?|ftp|mailto)';
+    $protos = '(https?|ftp)';
     $letters = '\w';
     $gunk = '\{\}/#~:.?+=&;%@!\,\-\|\(\)\*';
     $punc = '.:?\-';
