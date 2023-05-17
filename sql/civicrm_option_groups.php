@@ -19,39 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'contact_edit_options' => CRM_Core_CodeGen_OptionGroup::create('contact_edit_options')
-    ->addMetadata([
-      'title' => ts('Contact Edit Options'),
-      'is_locked' => '1',
-    ]),
-  'advanced_search_options' => CRM_Core_CodeGen_OptionGroup::create('advanced_search_options')
-    ->addMetadata([
-      'title' => ts('Advanced Search Options'),
-      'is_locked' => '1',
-    ]),
-  'user_dashboard_options' => CRM_Core_CodeGen_OptionGroup::create('user_dashboard_options')
-    ->addMetadata([
-      'title' => ts('User Dashboard Options'),
-      'is_locked' => '1',
-    ]),
-  'address_options' => CRM_Core_CodeGen_OptionGroup::create('address_options')
-    ->addMetadata([
-      'title' => ts('Addressing Options'),
-    ]),
-  'group_type' => CRM_Core_CodeGen_OptionGroup::create('group_type')
-    ->addMetadata([
-      'title' => ts('Group Type'),
-    ]),
-  'custom_search' => CRM_Core_CodeGen_OptionGroup::create('custom_search')
-    ->addMetadata([
-      'title' => ts('Custom Search'),
-    ]),
-  'activity_status' => CRM_Core_CodeGen_OptionGroup::create('activity_status')
-    ->addMetadata([
-      'title' => ts('Activity Status'),
-      'data_type' => 'Integer',
-      'option_value_fields' => 'name,label,description,color',
-    ]),
   'case_type' => CRM_Core_CodeGen_OptionGroup::create('case_type')
     ->addMetadata([
       'title' => ts('Case Type'),

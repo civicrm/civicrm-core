@@ -133,13 +133,7 @@ VALUES
 {/php}
 
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
-SELECT @option_group_id_ceOpt          := max(id) from civicrm_option_group where name = 'contact_edit_options';
-SELECT @option_group_id_asOpt          := max(id) from civicrm_option_group where name = 'advanced_search_options';
-SELECT @option_group_id_udOpt          := max(id) from civicrm_option_group where name = 'user_dashboard_options';
-SELECT @option_group_id_adOpt          := max(id) from civicrm_option_group where name = 'address_options';
-SELECT @option_group_id_gType          := max(id) from civicrm_option_group where name = 'group_type';
-SELECT @option_group_id_csearch        := max(id) from civicrm_option_group where name = 'custom_search';
-SELECT @option_group_id_acs            := max(id) from civicrm_option_group where name = 'activity_status';
+
 SELECT @option_group_id_ct             := max(id) from civicrm_option_group where name = 'case_type';
 SELECT @option_group_id_cas            := max(id) from civicrm_option_group where name = 'case_status';
 SELECT @option_group_id_pl             := max(id) from civicrm_option_group where name = 'participant_listing';
@@ -212,51 +206,6 @@ INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
 
-  (@option_group_id_ceOpt, '{ts escape="sql"}Custom Data{/ts}'              ,   1, 'CustomData', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Address{/ts}'                  ,   2, 'Address', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Communication Preferences{/ts}',   3, 'CommunicationPreferences', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Notes{/ts}'                    ,   4, 'Notes', NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Demographics{/ts}'             ,   5, 'Demographics', NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Tags and Groups{/ts}'          ,   6, 'TagsAndGroups', NULL, 0, 0, 6, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Email{/ts}'                    ,   7, 'Email', NULL, 1, 0, 7, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Phone{/ts}'                    ,   8, 'Phone', NULL, 1, 0, 8, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Instant Messenger{/ts}'        ,   9, 'IM', NULL, 1, 0, 9, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Open ID{/ts}'                  ,   10, 'OpenID', NULL, 1, 0, 10, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Website{/ts}'                  ,   11, 'Website', NULL, 1, 0, 11, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Prefix{/ts}'                   ,   12, 'Prefix', NULL, 2, 0, 12, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Formal Title{/ts}'             ,   13, 'Formal Title', NULL, 2, 0, 13, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}First Name{/ts}'               ,   14, 'First Name', NULL, 2, 0, 14, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Middle Name{/ts}'              ,   15, 'Middle Name', NULL, 2, 0, 15, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Last Name{/ts}'                ,   16, 'Last Name', NULL, 2, 0, 16, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_ceOpt, '{ts escape="sql"}Suffix{/ts}'                   ,   17, 'Suffix', NULL, 2, 0, 17, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-  (@option_group_id_asOpt, '{ts escape="sql"}Address Fields{/ts}'          ,   1, 'location', NULL, 0, 0,  1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Custom Fields{/ts}'           ,   2, 'custom', NULL, 0, 0,  2, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Activities{/ts}'              ,   3, 'activity', NULL, 0, 0,  4, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Relationships{/ts}'           ,   4, 'relationship', NULL, 0, 0,  5, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Notes{/ts}'                   ,   5, 'notes', NULL, 0, 0,  6, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Change Log{/ts}'              ,   6, 'changeLog', NULL, 0, 0,  7, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Contributions{/ts}'           ,   7, 'CiviContribute', NULL, 0, 0,  8, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Memberships{/ts}'             ,   8, 'CiviMember', NULL, 0, 0,  9, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Events{/ts}'                  ,   9, 'CiviEvent', NULL, 0, 0, 10, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Cases{/ts}'                   ,  10, 'CiviCase', NULL, 0, 0, 11, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Demographics{/ts}'            ,  13, 'demographics', NULL, 0, 0, 15, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Pledges{/ts}'                 ,  15, 'CiviPledge', NULL, 0, 0, 17, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Contact Type{/ts}'            ,  16, 'contactType', NULL, 0, 0, 18, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Groups{/ts}'                  ,  17, 'groups', NULL, 0, 0, 19, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Tags{/ts}'                    ,  18, 'tags', NULL, 0, 0, 20, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_asOpt, '{ts escape="sql"}Mailing{/ts}'                 ,  19, 'CiviMail', NULL, 0, 0, 21, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-  (@option_group_id_udOpt, '{ts escape="sql"}Groups{/ts}'                     , 1, 'Groups', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_udOpt, '{ts escape="sql"}Contributions{/ts}'              , 2, 'CiviContribute', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_udOpt, '{ts escape="sql"}Memberships{/ts}'                , 3, 'CiviMember', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_udOpt, '{ts escape="sql"}Events{/ts}'                     , 4, 'CiviEvent', NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_udOpt, '{ts escape="sql"}My Contacts / Organizations{/ts}', 5, 'Permissioned Orgs', NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_udOpt, '{ts escape="sql"}Pledges{/ts}'                    , 7, 'CiviPledge', NULL, 0, 0, 7, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_udOpt, '{ts escape="sql"}Personal Campaign Pages{/ts}'    , 8, 'PCP', NULL, 0, 0, 8, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_udOpt, '{ts escape="sql"}Assigned Activities{/ts}'        , 9, 'Assigned Activities', NULL, 0, 0, 9, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_udOpt, '{ts escape="sql"}Invoices / Credit Notes{/ts}'     , 10, 'Invoices / Credit Notes', NULL, 0, 0, 10, NULL, 0, 0, 1, NULL, NULL, NULL),
-
   (@option_group_id_acsOpt, '{ts escape="sql"}Email Address{/ts}'   , 2, 'email'         , NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_acsOpt, '{ts escape="sql"}Phone{/ts}'           , 3, 'phone'         , NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_acsOpt, '{ts escape="sql"}Street Address{/ts}'  , 4, 'street_address', NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
@@ -272,39 +221,6 @@ VALUES
   (@option_group_id_acConRef, '{ts escape="sql"}State/Province{/ts}'  , 6, 'state_province', NULL, 0, 0, 6, NULL, 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_acConRef, '{ts escape="sql"}Country{/ts}'         , 7, 'country'       , NULL, 0, 0, 7, NULL, 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_acConRef, '{ts escape="sql"}Postal Code{/ts}'     , 8, 'postal_code'   , NULL, 0, 0, 8, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-  (@option_group_id_adOpt, '{ts escape="sql"}Street Address{/ts}'    ,  1, 'street_address', NULL, 0, 0,  1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Supplemental Address 1{/ts}'  ,  2, 'supplemental_address_1', NULL, 0, 0,  2, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Supplemental Address 2{/ts}'  ,  3, 'supplemental_address_2', NULL, 0, 0,  3, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Supplemental Address 3{/ts}'  ,  4, 'supplemental_address_3', NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}City{/ts}'              ,  5, 'city'          , NULL, 0, 0,  5, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Postal Code{/ts}' ,  6, 'postal_code'   , NULL, 0, 0,  6, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Postal Code Suffix{/ts}',  7, 'postal_code_suffix', NULL, 0, 0,  7, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}County{/ts}'            ,  8, 'county'        , NULL, 0, 0,  8, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}State/Province{/ts}'  ,  9, 'state_province', NULL, 0, 0,  9, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Country{/ts}'           , 10, 'country'       , NULL, 0, 0, 10, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Latitude{/ts}'          , 11, 'geo_code_1'    , NULL, 0, 0, 11, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Longitude{/ts}'         , 12, 'geo_code_2', NULL, 0, 0, 12, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Address Name{/ts}'      , 13, 'address_name', NULL, 0, 0, 13, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Street Address Parsing{/ts}', 14, 'street_address_parsing', NULL, 0, 0, 14, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-  (@option_group_id_gType, '{ts escape="sql"}Access Control{/ts}', 1, 'Access Control', NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_gType, '{ts escape="sql"}Mailing List{/ts}',   2, 'Mailing List',   NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_Sample'               , 1, 'CRM_Contact_Form_Search_Custom_Sample'      , NULL, 0, 0, 1, '{ts escape="sql"}Household Name and State{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_ContributionAggregate', 2, 'CRM_Contact_Form_Search_Custom_ContributionAggregate', NULL, 0, 0, 2, '{ts escape="sql"}Contribution Aggregate{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_Group'                , 4, 'CRM_Contact_Form_Search_Custom_Group'       , NULL, 0, 0, 4, '{ts escape="sql"}Include / Exclude Search{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_PostalMailing'        , 5, 'CRM_Contact_Form_Search_Custom_PostalMailing', NULL, 0, 0, 5, '{ts escape="sql"}Postal Mailing{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_Proximity'            , 6, 'CRM_Contact_Form_Search_Custom_Proximity', NULL, 0, 0, 6, '{ts escape="sql"}Proximity Search{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_EventAggregate'       , 7, 'CRM_Contact_Form_Search_Custom_EventAggregate', NULL, 0, 0, 7, '{ts escape="sql"}Event Aggregate{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_ActivitySearch'       , 8, 'CRM_Contact_Form_Search_Custom_ActivitySearch', NULL, 0, 0, 8, '{ts escape="sql"}Activity Search{/ts}', 0, 0, 0, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_PriceSet'             , 9, 'CRM_Contact_Form_Search_Custom_PriceSet', NULL, 0, 0, 9, '{ts escape="sql"}Price Set Details for Event Participants{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_ZipCodeRange'         ,10, 'CRM_Contact_Form_Search_Custom_ZipCodeRange', NULL, 0, 0, 10, '{ts escape="sql"}Zip Code Range{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_DateAdded'            ,11, 'CRM_Contact_Form_Search_Custom_DateAdded', NULL, 0, 0, 11, '{ts escape="sql"}Date Added to CiviCRM{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_MultipleValues'       ,12, 'CRM_Contact_Form_Search_Custom_MultipleValues', NULL, 0, 0, 12, '{ts escape="sql"}Custom Group Multiple Values Listing{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_ContribSYBNT'         ,13, 'CRM_Contact_Form_Search_Custom_ContribSYBNT', NULL, 0, 0, 13, '{ts escape="sql"}Contributions made in Year X and not Year Y{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_TagContributions'     ,14, 'CRM_Contact_Form_Search_Custom_TagContributions', NULL, 0, 0, 14, '{ts escape="sql"}Find Contribution Amounts by Tag{/ts}', 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_FullText'             ,15, 'CRM_Contact_Form_Search_Custom_FullText', NULL, 0, 0, 15, '{ts escape="sql"}Full-text Search{/ts}', 0, 0, 1, NULL, NULL, NULL),
 
 -- report templates
   (@option_group_id_report , '{ts escape="sql"}Constituent Report (Summary){/ts}',            'contact/summary',                'CRM_Report_Form_Contact_Summary',                NULL, 0, 0, 1,  '{ts escape="sql"}Provides a list of address and telephone information for constituent records in your system.{/ts}', 0, 0, 1, NULL, NULL, NULL),
@@ -354,15 +270,6 @@ VALUES
   (@option_group_id_report, '{ts escape="sql"}Recurring Contributions Report{/ts}', 'contribute/recur', 'CRM_Report_Form_Contribute_Recur',               NULL, 0, 0, 49, '{ts escape="sql"}Provides information about the status of recurring contributions{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
   (@option_group_id_report, '{ts escape="sql"}Recurring Contributions Summary{/ts}', 'contribute/recursummary', 'CRM_Report_Form_Contribute_RecurSummary',               NULL, 0, 0, 49, '{ts escape="sql"}Provides simple summary for each payment instrument for which there are recurring contributions (e.g. Credit Card, Standing Order, Direct Debit, etc., NULL), showing within a given date range.{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
   (@option_group_id_report, '{ts escape="sql"}Deferred Revenue Details{/ts}', 'contribute/deferredrevenue', 'CRM_Report_Form_Contribute_DeferredRevenue', NULL, 0, 0, 50, '{ts escape="sql"}Deferred Revenue Details Report{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
-
-  (@option_group_id_acs, '{ts escape="sql"}Scheduled{/ts}',    1, 'Scheduled',    NULL, 0, 1,    1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_acs, '{ts escape="sql"}Completed{/ts}',    2, 'Completed',    NULL, 1, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_acs, '{ts escape="sql"}Cancelled{/ts}',    3, 'Cancelled',    NULL, 2, 0, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_acs, '{ts escape="sql"}Left Message{/ts}', 4, 'Left Message', NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_acs, '{ts escape="sql"}Unreachable{/ts}',  5, 'Unreachable',  NULL, 2, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_acs, '{ts escape="sql"}Not Required{/ts}', 6, 'Not Required', NULL, 2, 0, 6, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_acs, '{ts escape="sql"}Available{/ts}',    7, 'Available',    NULL, 0, 0, 7, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_acs, '{ts escape="sql"}No-show{/ts}',      8, 'No_show',      NULL, 2, 0, 8, NULL, 0, 0, 1, NULL, NULL, NULL),
 
   (@option_group_id_cas, '{ts escape="sql"}Ongoing{/ts}' , 1, 'Open'  ,  'Opened', 0, 1,    1, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cas, '{ts escape="sql"}Resolved{/ts}', 2, 'Closed',  'Closed', 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
