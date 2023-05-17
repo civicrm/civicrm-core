@@ -258,28 +258,33 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
           'url' => 'civicrm/contact/view/rel',
           'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%&selectedChild=rel',
           'title' => ts('View Relationship'),
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/view/rel',
           'qs' => 'action=update&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%',
           'title' => ts('Edit Relationship'),
+          'weight' => -10,
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Relationship'),
+          'weight' => 30,
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Relationship'),
+          'weight' => 40,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/rel',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%',
           'title' => ts('Delete Relationship'),
+          'weight' => 100,
         ],
         // FIXME: Not sure what to put as the key.
         // We want to use it differently later anyway (see CRM_Contact_BAO_Relationship::getRelationship). NONE should make it hidden by default.

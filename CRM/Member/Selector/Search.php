@@ -195,6 +195,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=member' . $extraParams,
           'title' => ts('View Membership'),
+          'weight' => -20,
         ],
       ];
     }
@@ -205,12 +206,14 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Edit Membership'),
+          'weight' => -10,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Delete Membership'),
+          'weight' => 100,
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Renew'),
@@ -240,6 +243,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         'url' => 'civicrm/contribute/unsubscribe',
         'qs' => 'reset=1&mid=%%id%%&context=%%cxt%%' . $extraParams,
         'title' => ts('Cancel Auto Renew Subscription'),
+        'weight' => 40,
       ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::DISABLE])) {

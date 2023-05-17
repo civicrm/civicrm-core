@@ -405,6 +405,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         'url' => 'civicrm/contact/view/contribution',
         'qs' => 'reset=1&id=%%contributionid%%&cid=%%contactId%%&action=view&context=contribution&selectedChild=contribute',
         'title' => ts('View related contribution'),
+        'weight' => -20,
       ],
     ];
 

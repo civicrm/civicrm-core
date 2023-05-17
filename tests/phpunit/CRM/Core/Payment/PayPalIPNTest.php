@@ -119,7 +119,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testIPNPaymentRecurSuccess(): void {
-    $this->setupRecurringPaymentProcessorTransaction([], ['total_amount' => '15.00', 'contribution_page_id' => $this->_contributionPageID]);
+    $this->setupRecurringPaymentProcessorTransaction([], ['total_amount' => '15.00', 'contribution_page_id' => $this->ids['ContributionPage'][0] ?? NULL]);
     $mut = new CiviMailUtils($this, TRUE);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
     $paypalIPN->main();

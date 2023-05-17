@@ -55,6 +55,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('View Recurring Payment'),
         'url' => 'civicrm/contact/view/contributionrecur',
         'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
+        'weight' => -20,
       ],
     ];
 
@@ -138,6 +139,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('Cancel'),
         // Only display on-site links in a popup.
         'class' => (stripos($url, 'http') !== FALSE) ? 'no-popup' : '',
+        'weight' => -50,
       ];
     }
 
@@ -151,6 +153,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'url' => $url,
         // Only display on-site links in a popup.
         'class' => (stripos($url, 'http') !== FALSE) ? 'no-popup' : '',
+        'weight' => -15,
       ];
     }
 
@@ -165,6 +168,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'url' => $url,
         // Only display on-site links in a popup.
         'class' => (stripos($url, 'http') !== FALSE) ? 'no-popup' : '',
+        'weight' => -10,
       ];
     }
     return $links;

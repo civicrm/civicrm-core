@@ -236,12 +236,14 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
         'url' => 'civicrm/contact/view/note',
         'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
         'title' => ts('View Note'),
+        'weight' => -20,
       ],
       CRM_Core_Action::UPDATE => [
         'name' => ts('Edit'),
         'url' => 'civicrm/contact/view/note',
         'qs' => 'action=update&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
         'title' => ts('Edit Note'),
+        'weight' => -10,
       ],
       CRM_Core_Action::ADD => [
         'name' => ts('Comment'),
@@ -254,6 +256,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
         'url' => 'civicrm/contact/view/note',
         'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
         'title' => ts('Delete Note'),
+        'weight' => 100,
       ],
     ];
   }
@@ -270,18 +273,21 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
         'url' => 'civicrm/contact/view/note',
         'qs' => 'action=view&reset=1&cid=%%cid%%&id={id}&selectedChild=note',
         'title' => ts('View Comment'),
+        'weight' => -20,
       ],
       CRM_Core_Action::UPDATE => [
         'name' => ts('Edit'),
         'url' => 'civicrm/contact/view/note',
         'qs' => 'action=update&reset=1&cid=%%cid%%&id={id}&parentId=%%pid%%&selectedChild=note',
         'title' => ts('Edit Comment'),
+        'weight' => -10,
       ],
       CRM_Core_Action::DELETE => [
         'name' => ts('Delete'),
         'url' => 'civicrm/contact/view/note',
         'qs' => 'action=delete&reset=1&cid=%%cid%%&id={id}&selectedChild=note',
         'title' => ts('Delete Comment'),
+        'weight' => 100,
       ],
     ];
   }
