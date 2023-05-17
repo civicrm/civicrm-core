@@ -168,6 +168,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'job_title',
       'gender_id',
       'birth_date',
+      'deceased_date',
       'employer_id',
       'is_deleted',
       'created_date',
