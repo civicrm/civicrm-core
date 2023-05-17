@@ -61,9 +61,10 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
     [ts('Reminder Sent'), 'Reminder Sent', '40', '40', 'filter' => '1', 'is_reserved' => '1', 'description' => ''],
 
     // Activity Types for Financial Transactions Batch
-    [ts('Export Accounting Batch'), 'Export Accounting Batch', '41', '41', 'filter' => '1', 'description' => ts('Export Accounting Batch'), 'is_reserved' => '1', 'component_id' => '2'],
-    [ts('Create Batch'), 'Create Batch', '42', '42', 'filter' => '1', 'description' => ts('Create Batch'), 'is_reserved' => '1', 'component_id' => '2'],
-    [ts('Edit Batch'), 'Edit Batch', '43', '43', 'filter' => '1', 'description' => ts('Edit Batch'), 'is_reserved' => '1', 'component_id' => '2'],
+    // TODO: Shouldn't we have ts() for these descriptions?
+    [ts('Export Accounting Batch'), 'Export Accounting Batch', '41', '41', 'filter' => '1', 'description' => 'Export Accounting Batch', 'is_reserved' => '1', 'component_id' => '2'],
+    [ts('Create Batch'), 'Create Batch', '42', '42', 'filter' => '1', 'description' => 'Create Batch', 'is_reserved' => '1', 'component_id' => '2'],
+    [ts('Edit Batch'), 'Edit Batch', '43', '43', 'filter' => '1', 'description' => 'Edit Batch', 'is_reserved' => '1', 'component_id' => '2'],
 
     // new sms options
     [ts('SMS delivery'), 'SMS delivery', '44', '44', 'filter' => '1', 'description' => ts('SMS delivery'), 'is_reserved' => '1'],
