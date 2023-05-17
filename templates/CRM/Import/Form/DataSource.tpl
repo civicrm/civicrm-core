@@ -73,7 +73,7 @@
       {if array_key_exists('onDuplicate', $form)}
         <tr class="crm-import-uploadfile-from-block-onDuplicate">
           <td class="label">{$form.onDuplicate.label}</td>
-          <td>{$form.onDuplicate.html} {help id="id-onDuplicate"}</td>
+          <td>{$form.onDuplicate.html} {help id="dupes"}</td>
         </tr>
       {/if}
       {if array_key_exists('dedupe_rule_id', $form)}
