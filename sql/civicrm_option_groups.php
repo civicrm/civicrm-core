@@ -19,27 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'name_badge' => CRM_Core_CodeGen_OptionGroup::create('name_badge')
-    ->addMetadata([
-      'title' => ts('Name Badge Format'),
-    ]),
-  'communication_style' => CRM_Core_CodeGen_OptionGroup::create('communication_style')
-    ->addMetadata([
-      'title' => ts('Communication Style'),
-    ]),
-  'msg_mode' => CRM_Core_CodeGen_OptionGroup::create('msg_mode')
-    ->addMetadata([
-      'title' => ts('Message Mode'),
-    ]),
-  'contact_date_reminder_options' => CRM_Core_CodeGen_OptionGroup::create('contact_date_reminder_options')
-    ->addMetadata([
-      'title' => ts('Contact Date Reminder Options'),
-      'is_locked' => '1',
-    ]),
-  'wysiwyg_presets' => CRM_Core_CodeGen_OptionGroup::create('wysiwyg_presets')
-    ->addMetadata([
-      'title' => ts('WYSIWYG Editor Presets'),
-    ]),
   'relative_date_filters' => CRM_Core_CodeGen_OptionGroup::create('relative_date_filters')
     ->addMetadata([
       'title' => ts('Relative Date Filters'),
