@@ -217,6 +217,10 @@ class CRM_Core_Action {
 
     $url = [];
 
+    usort($seqLinks, static function ($a, $b) {
+      return (int) ((int) ($a['weight'] ?? 0) > (int) ($b['weight'] ?? 0));
+    });
+
     foreach ($seqLinks as $i => $link) {
       if (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit'])) {
         $extra = isset($link['extra']) ? self::replace($link['extra'], $values) : NULL;
