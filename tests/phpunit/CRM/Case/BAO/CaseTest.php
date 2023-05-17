@@ -129,7 +129,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSortByCaseContact() {
+  public function testSortByCaseContact(): void {
     // delete any cases if present
     $this->callAPISuccess('Case', 'get', ['api.Case.delete' => ['id' => '$value.id']]);
 
@@ -536,14 +536,14 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Test max_instances
    */
-  public function testMaxInstances() {
+  public function testMaxInstances(): void {
     $loggedInUser = $this->createLoggedInUser();
     $client_id = $this->individualCreate();
     $caseObj = $this->createCase($client_id, $loggedInUser);
     $case_id = $caseObj->id;
 
     // Sanity check to make sure we'll be testing what we think we're testing.
-    $this->assertEquals($caseObj->case_type_id, 1);
+    $this->assertEquals(1, $caseObj->case_type_id);
 
     // Get the case type
     $result = $this->callAPISuccess('CaseType', 'get', [
@@ -553,7 +553,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $caseType = array_shift($result['values']);
     $activityTypeName = $caseType['definition']['activityTypes'][1]['name'];
     // Sanity check to make sure we'll be testing what we think we're testing.
-    $this->assertEquals($activityTypeName, "Medical evaluation");
+    $this->assertEquals('Medical evaluation', $activityTypeName);
 
     // Look up the activity type label - we need it later
     $result = $this->callAPISuccess('OptionValue', 'get', [
