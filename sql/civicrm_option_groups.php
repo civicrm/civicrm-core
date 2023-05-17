@@ -19,19 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'pdf_format' => CRM_Core_CodeGen_OptionGroup::create('pdf_format')
-    ->addMetadata([
-      'title' => ts('PDF Page Format'),
-    ]),
-  'label_format' => CRM_Core_CodeGen_OptionGroup::create('label_format')
-    ->addMetadata([
-      'title' => ts('Mailing Label Format'),
-    ]),
-  'activity_contacts' => CRM_Core_CodeGen_OptionGroup::create('activity_contacts')
-    ->addMetadata([
-      'title' => ts('Activity Contacts'),
-      'is_locked' => '1',
-    ]),
   'account_relationship' => CRM_Core_CodeGen_OptionGroup::create('account_relationship')
     ->addMetadata([
       'title' => ts('Account Relationship'),

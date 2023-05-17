@@ -134,8 +134,6 @@ VALUES
 
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
 
-SELECT @option_group_id_label          := max(id) from civicrm_option_group where name = 'label_format';
-SELECT @option_group_id_aco            := max(id) from civicrm_option_group where name = 'activity_contacts';
 SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
 SELECT @option_group_id_ere            := max(id) from civicrm_option_group where name = 'event_contacts';
 SELECT @option_group_id_conference_slot := max(id) from civicrm_option_group where name = 'conference_slot';
@@ -159,7 +157,6 @@ SELECT @option_group_id_crs    := max(id) from civicrm_option_group where name =
 SELECT @option_group_id_env    := max(id) from civicrm_option_group where name = 'environment';
 SELECT @option_group_id_default_assignee := max(id) from civicrm_option_group where name = 'activity_default_assignee';
 SELECT @option_group_id_entity_batch_extends := max(id) from civicrm_option_group where name = 'entity_batch_extends';
-SELECT @option_group_id_pdf_format := max(id) from civicrm_option_group where name = 'pdf_format';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -172,14 +169,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
--- activity_contacts
-   (@option_group_id_aco, '{ts escape="sql"}Activity Assignees{/ts}', 1, 'Activity Assignees', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_aco, '{ts escape="sql"}Activity Source{/ts}', 2, 'Activity Source', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_aco, '{ts escape="sql"}Activity Targets{/ts}', 3, 'Activity Targets', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- pdf_format
-   (@option_group_id_pdf_format, '{ts escape="sql"}Invoice PDF Format{/ts}', '{literal}{"metric":"px","margin_top":10,"margin_bottom":0,"margin_left":65,"margin_right":0}{/literal}', 'default_invoice_pdf_format', NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
 
 -- financial_account_type
 -- grouping field is specific to Quickbooks for mapping to .iif format
@@ -249,19 +238,6 @@ VALUES
    (@option_group_id_name_badge, '{ts escape="sql"}A6 Badge Portrait 150x106{/ts}', '{literal}{"paper-size":"a4","orientation":"landscape","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":1,"metric":"mm","lMargin":25,"tMargin":27,"SpaceX":0,"SpaceY":35,"width":106,"height":150,"lPadding":5,"tPadding":5}{/literal}', 'A6 Badge Portrait 150x106', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_name_badge, '{ts escape="sql"}Fattorini Name Badge 100x65{/ts}', '{literal}{"paper-size":"a4","orientation":"portrait","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":4,"metric":"mm","lMargin":6,"tMargin":19,"SpaceX":0,"SpaceY":0,"width":100,"height":65,"lPadding":0,"tPadding":0}{/literal}', 'Fattorini Name Badge 100x65', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_name_badge, '{ts escape="sql"}Hanging Badge 3-3/4" x 4-3"/4{/ts}', '{literal}{"paper-size":"a4","orientation":"portrait","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":2,"metric":"mm","lMargin":10,"tMargin":28,"SpaceX":0,"SpaceY":0,"width":96,"height":121,"lPadding":5,"tPadding":5}{/literal}', 'Hanging Badge 3-3/4" x 4-3"/4', NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- Mailing Label Formats
-  (@option_group_id_label, '{ts escape="sql"}Avery 3475{/ts}', '{literal}{"paper-size":"a4","orientation":"portrait","font-name":"dejavusans","font-size":10,"font-style":"","metric":"mm","lMargin":0,"tMargin":5,"NX":3,"NY":8,"SpaceX":0,"SpaceY":0,"width":70,"height":36,"lPadding":5.08,"tPadding":5.08}{/literal}',                   '3475',  'Avery', NULL, 0, 1,  NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_label, '{ts escape="sql"}Avery 5160{/ts}', '{literal}{"paper-size":"letter","orientation":"portrait","font-name":"dejavusans","font-size":8,"font-style":"","metric":"in","lMargin":0.21975,"tMargin":0.5,"NX":3,"NY":10,"SpaceX":0.14,"SpaceY":0,"width":2.5935,"height":1,"lPadding":0.20,"tPadding":0.20}{/literal}', '5160',  'Avery', NULL, 0, 2,  NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_label, '{ts escape="sql"}Avery 5161{/ts}', '{literal}{"paper-size":"letter","orientation":"portrait","font-name":"dejavusans","font-size":8,"font-style":"","metric":"in","lMargin":0.175,"tMargin":0.5,"NX":2,"NY":10,"SpaceX":0.15625,"SpaceY":0,"width":4,"height":1,"lPadding":0.20,"tPadding":0.20}{/literal}',     '5161',  'Avery', NULL, 0, 3,  NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_label, '{ts escape="sql"}Avery 5162{/ts}', '{literal}{"paper-size":"letter","orientation":"portrait","font-name":"dejavusans","font-size":8,"font-style":"","metric":"in","lMargin":0.1525,"tMargin":0.88,"NX":2,"NY":7,"SpaceX":0.195,"SpaceY":0,"width":4,"height":1.33,"lPadding":0.20,"tPadding":0.20}{/literal}',   '5162',  'Avery', NULL, 0, 4,  NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_label, '{ts escape="sql"}Avery 5163{/ts}', '{literal}{"paper-size":"letter","orientation":"portrait","font-name":"dejavusans","font-size":8,"font-style":"","metric":"in","lMargin":0.18,"tMargin":0.5,"NX":2,"NY":5,"SpaceX":0.14,"SpaceY":0,"width":4,"height":2,"lPadding":0.20,"tPadding":0.20}{/literal}',          '5163',  'Avery', NULL, 0, 5,  NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_label, '{ts escape="sql"}Avery 5164{/ts}', '{literal}{"paper-size":"letter","orientation":"portrait","font-name":"dejavusans","font-size":12,"font-style":"","metric":"in","lMargin":0.156,"tMargin":0.5,"NX":2,"NY":3,"SpaceX":0.1875,"SpaceY":0,"width":4,"height":3.33,"lPadding":0.20,"tPadding":0.20}{/literal}',   '5164',  'Avery', NULL, 0, 6,  NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_label, '{ts escape="sql"}Avery 8600{/ts}', '{literal}{"paper-size":"letter","orientation":"portrait","font-name":"dejavusans","font-size":8,"font-style":"","metric":"mm","lMargin":7.1,"tMargin":19,"NX":3,"NY":10,"SpaceX":9.5,"SpaceY":3.1,"width":66.6,"height":25.4,"lPadding":5.08,"tPadding":5.08}{/literal}',    '8600',  'Avery', NULL, 0, 7,  NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_label, '{ts escape="sql"}Avery L7160{/ts}', '{literal}{"paper-size":"a4","orientation":"portrait","font-name":"dejavusans","font-size":9,"font-style":"","metric":"in","lMargin":0.28,"tMargin":0.6,"NX":3,"NY":7,"SpaceX":0.1,"SpaceY":0,"width":2.5,"height":1.5,"lPadding":0.20,"tPadding":0.20}{/literal}',          'L7160', 'Avery', NULL, 0, 8,  NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_label, '{ts escape="sql"}Avery L7161{/ts}', '{literal}{"paper-size":"a4","orientation":"portrait","font-name":"dejavusans","font-size":9,"font-style":"","metric":"in","lMargin":0.28,"tMargin":0.35,"NX":3,"NY":6,"SpaceX":0.1,"SpaceY":0,"width":2.5,"height":1.83,"lPadding":0.20,"tPadding":0.20}{/literal}',        'L7161', 'Avery', NULL, 0, 9,  NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_label, '{ts escape="sql"}Avery L7162{/ts}', '{literal}{"paper-size":"a4","orientation":"portrait","font-name":"dejavusans","font-size":9,"font-style":"","metric":"in","lMargin":0.18,"tMargin":0.51,"NX":2,"NY":8,"SpaceX":0.1,"SpaceY":0,"width":3.9,"height":1.33,"lPadding":0.20,"tPadding":0.20}{/literal}',        'L7162', 'Avery', NULL, 0, 10, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_label, '{ts escape="sql"}Avery L7163{/ts}', '{literal}{"paper-size":"a4","orientation":"portrait","font-name":"dejavusans","font-size":9,"font-style":"","metric":"in","lMargin":0.18,"tMargin":0.6,"NX":2,"NY":7,"SpaceX":0.1,"SpaceY":0,"width":3.9,"height":1.5,"lPadding":0.20,"tPadding":0.20}{/literal}',          'L7163', 'Avery', NULL, 0, 11, NULL, 0, 1, 1, NULL, NULL, NULL),
 
 -- Communication Styles
   (@option_group_id_communication_style, '{ts escape="sql"}Formal{/ts}'  , 1, 'formal'  , NULL, 0, 1, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
