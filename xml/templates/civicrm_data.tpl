@@ -134,11 +134,6 @@ VALUES
 
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
 
-SELECT @option_group_id_currency       := max(id) from civicrm_option_group where name = 'currencies_enabled';
-SELECT @option_group_id_eventBadge     := max(id) from civicrm_option_group where name = 'event_badge';
-SELECT @option_group_id_notePrivacy    := max(id) from civicrm_option_group where name = 'note_privacy';
-SELECT @option_group_id_campaignType   := max(id) from civicrm_option_group where name = 'campaign_type';
-SELECT @option_group_id_campaignStatus := max(id) from civicrm_option_group where name = 'campaign_status';
 SELECT @option_group_id_extensions     := max(id) from civicrm_option_group where name = 'system_extensions';
 SELECT @option_group_id_mail_approval_status := max(id) from civicrm_option_group where name = 'mail_approval_status';
 SELECT @option_group_id_engagement_index := max(id) from civicrm_option_group where name = 'engagement_index';
@@ -182,34 +177,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
--- Available currencies.
-   (@option_group_id_currency, 'USD ($)',      'USD',     'USD',       NULL, 0, 1, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_currency, 'CAD ($)',      'CAD',     'CAD',       NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_currency, 'EUR (€)',      'EUR',     'EUR',       NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_currency, 'GBP (£)',      'GBP',     'GBP',       NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_currency, 'JPY (¥)',      'JPY',     'JPY',       NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- event name badges
-  (@option_group_id_eventBadge,  '{ts escape="sql"}Name Only{/ts}'     , 1, 'CRM_Event_Badge_Simple'  ,  NULL, 0, 0, 1, '{ts escape="sql"}Simple Event Name Badge{/ts}', 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_eventBadge,  '{ts escape="sql"}Name Tent{/ts}'     , 2, 'CRM_Event_Badge_NameTent',  NULL, 0, 0, 2, '{ts escape="sql"}Name Tent{/ts}', 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_eventBadge , '{ts escape="sql"}With Logo{/ts}'     , 3, 'CRM_Event_Badge_Logo'    ,  NULL, 0, 0, 3, '{ts escape="sql"}You can set your own background image{/ts}',                               0, 1, 1, NULL, NULL , NULL),
-  (@option_group_id_eventBadge , '{ts escape="sql"}5395 with Logo{/ts}', 4, 'CRM_Event_Badge_Logo5395',  NULL, 0, 0, 4, '{ts escape="sql"}Avery 5395 compatible labels with logo (4 up by 2, 59.2mm x 85.7mm){/ts}', 0, 1, 1, NULL, NULL , NULL),
-
--- note privacy levels
-  (@option_group_id_notePrivacy, '{ts escape="sql"}None{/ts}',        0, 'None',        NULL, 0, 1, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_notePrivacy, '{ts escape="sql"}Author Only{/ts}', 1, 'Author Only', NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-
--- Compaign Types
-  (@option_group_id_campaignType, '{ts escape="sql"}Direct Mail{/ts}', 1, 'Direct Mail',  NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_campaignType, '{ts escape="sql"}Referral Program{/ts}', 2, 'Referral Program',  NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_campaignType, '{ts escape="sql"}Constituent Engagement{/ts}', 3, 'Constituent Engagement',  NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- Campaign Status
-  (@option_group_id_campaignStatus, '{ts escape="sql"}Planned{/ts}', 1, 'Planned',  NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_campaignStatus, '{ts escape="sql"}In Progress{/ts}', 2, 'In Progress',  NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_campaignStatus, '{ts escape="sql"}Completed{/ts}', 3, 'Completed',  NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_campaignStatus, '{ts escape="sql"}Cancelled{/ts}', 4, 'Cancelled',  NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
 
 -- Engagement Level
   (@option_group_id_engagement_index, '{ts escape="sql"}1{/ts}', 1, '1',  NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL , NULL),

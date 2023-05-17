@@ -19,26 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'currencies_enabled' => CRM_Core_CodeGen_OptionGroup::create('currencies_enabled')
-    ->addMetadata([
-      'title' => ts('Currencies Enabled'),
-    ]),
-  'event_badge' => CRM_Core_CodeGen_OptionGroup::create('event_badge')
-    ->addMetadata([
-      'title' => ts('Event Name Badge'),
-    ]),
-  'note_privacy' => CRM_Core_CodeGen_OptionGroup::create('note_privacy')
-    ->addMetadata([
-      'title' => ts('Privacy levels for notes'),
-    ]),
-  'campaign_type' => CRM_Core_CodeGen_OptionGroup::create('campaign_type')
-    ->addMetadata([
-      'title' => ts('Campaign Type'),
-    ]),
-  'campaign_status' => CRM_Core_CodeGen_OptionGroup::create('campaign_status')
-    ->addMetadata([
-      'title' => ts('Campaign Status'),
-    ]),
   'system_extensions' => CRM_Core_CodeGen_OptionGroup::create('system_extensions')
     ->addMetadata([
       'title' => ts('CiviCRM Extensions'),
