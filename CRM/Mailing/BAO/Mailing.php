@@ -2119,21 +2119,23 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
         case 'opened':
           // do not use group by clause in report, because same report used for total and unique open
-          $reportFilter .= "&distinct=0";
+          $reportFilter .= '&distinct=0';
         case 'opened_unique':
-          $url = "mailing/opened";
-          $searchFilter .= "&mailing_open_status=Y";
+          $url = 'mailing/opened';
+          $searchFilter .= '&mailing_open_status=Y';
           break;
 
         case 'clicks':
         case 'clicks_unique':
-          $url = "mailing/clicks";
-          $searchFilter .= "&mailing_click_status=Y";
+          $url = 'mailing/clicks';
+          $searchFilter .= '&mailing_click_status=Y';
           break;
       }
       $actionLinks[CRM_Core_Action::VIEW]['url'] = CRM_Report_Utils_Report::getNextUrl($url, $reportFilter, FALSE, TRUE);
+      $actionLinks[CRM_Core_Action::VIEW]['weight'] = -20;
       if (array_key_exists(CRM_Core_Action::ADVANCED, $actionLinks)) {
         $actionLinks[CRM_Core_Action::ADVANCED]['qs'] = $searchFilter;
+        $actionLinks[CRM_Core_Action::ADVANCED]['weight'] = 10;
       }
       $report['event_totals']['actionlinks'][$key] = CRM_Core_Action::formLink(
         $actionLinks,
