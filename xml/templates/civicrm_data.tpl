@@ -132,7 +132,6 @@ VALUES
   }
 {/php}
 
-SELECT @option_group_id_gender         := max(id) from civicrm_option_group where name = 'gender';
 SELECT @option_group_id_IMProvider     := max(id) from civicrm_option_group where name = 'instant_messenger_service';
 SELECT @option_group_id_mobileProvider := max(id) from civicrm_option_group where name = 'mobile_provider';
 SELECT @option_group_id_prefix         := max(id) from civicrm_option_group where name = 'individual_prefix';
@@ -225,10 +224,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
-   (@option_group_id_gender, '{ts escape="sql"}Female{/ts}', 1, 'Female', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_gender, '{ts escape="sql"}Male{/ts}',   2, 'Male',   NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_gender, '{ts escape="sql"}Other{/ts}',  3, 'Other',  NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
 
    (@option_group_id_IMProvider, 'Yahoo', 1, 'Yahoo', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_IMProvider, 'MSN',   2, 'Msn',   NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),

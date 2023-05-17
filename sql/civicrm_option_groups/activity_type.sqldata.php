@@ -1,6 +1,6 @@
 <?php
 
-return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/2')
+return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
   ->addMetadata([
     'title' => ts('Activity Type'),
     'description' => ts('Activities track interactions with contacts. Some activity types are reserved for use by automated processes, others can be freely configured.'),

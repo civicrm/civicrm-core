@@ -19,12 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'gender' => CRM_Core_CodeGen_OptionGroup::create('gender')
-    ->addMetadata([
-      'title' => ts('Gender'),
-      'description' => ts('CiviCRM is pre-configured with standard options for individual gender (Male, Female, Other). Modify these options as needed for your installation.'),
-      'data_type' => 'Integer',
-    ]),
   'instant_messenger_service' => CRM_Core_CodeGen_OptionGroup::create('instant_messenger_service')
     ->addMetadata([
       'title' => ts('Instant Messenger (IM) screen-names'),

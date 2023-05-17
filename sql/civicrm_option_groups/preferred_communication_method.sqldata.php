@@ -1,5 +1,5 @@
 <?php
-return CRM_Core_CodeGen_OptionGroup::create('preferred_communication_method', 'a/1')
+return CRM_Core_CodeGen_OptionGroup::create('preferred_communication_method', 'a/0001')
   ->addMetadata([
     'title' => ts('Preferred Communication Method'),
   ])
