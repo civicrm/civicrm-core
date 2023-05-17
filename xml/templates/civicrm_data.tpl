@@ -132,7 +132,6 @@ VALUES
   }
 {/php}
 
-SELECT @option_group_id_IMProvider     := max(id) from civicrm_option_group where name = 'instant_messenger_service';
 SELECT @option_group_id_mobileProvider := max(id) from civicrm_option_group where name = 'mobile_provider';
 SELECT @option_group_id_prefix         := max(id) from civicrm_option_group where name = 'individual_prefix';
 SELECT @option_group_id_suffix         := max(id) from civicrm_option_group where name = 'individual_suffix';
@@ -224,13 +223,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
-   (@option_group_id_IMProvider, 'Yahoo', 1, 'Yahoo', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_IMProvider, 'MSN',   2, 'Msn',   NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_IMProvider, 'AIM',   3, 'Aim',   NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_IMProvider, 'GTalk', 4, 'Gtalk', NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_IMProvider, 'Jabber',5, 'Jabber',NULL, 0, NULL, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_IMProvider, 'Skype', 6, 'Skype', NULL, 0, NULL, 6, NULL, 0, 0, 1, NULL, NULL, NULL),
 
    (@option_group_id_mobileProvider, 'Sprint'  , 1, 'Sprint'  , NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_mobileProvider, 'Verizon' , 2, 'Verizon' , NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),

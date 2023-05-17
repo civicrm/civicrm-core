@@ -19,11 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'instant_messenger_service' => CRM_Core_CodeGen_OptionGroup::create('instant_messenger_service')
-    ->addMetadata([
-      'title' => ts('Instant Messenger (IM) screen-names'),
-      'description' => ts('Commonly-used messaging apps are listed here. Administrators may define as many additional providers as needed.'),
-    ]),
   'mobile_provider' => CRM_Core_CodeGen_OptionGroup::create('mobile_provider')
     ->addMetadata([
       'title' => ts('Mobile Phone Providers'),
