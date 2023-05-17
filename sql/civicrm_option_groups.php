@@ -18,18 +18,4 @@ $readOptionGroups = function (): array {
   return $result;
 };
 
-return $readOptionGroups() + [
-  'activity_default_assignee' => CRM_Core_CodeGen_OptionGroup::create('activity_default_assignee')
-    ->addMetadata([
-      'title' => ts('Activity default assignee'),
-    ]),
-  'entity_batch_extends' => CRM_Core_CodeGen_OptionGroup::create('entity_batch_extends')
-    ->addMetadata([
-      'title' => ts('Entity Batch Extends'),
-    ]),
-  'file_type' => CRM_Core_CodeGen_OptionGroup::create('file_type')
-    ->addMetadata([
-      'title' => ts('File Type'),
-      'data_type' => 'Integer',
-    ]),
-];
+return $readOptionGroups();
