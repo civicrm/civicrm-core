@@ -19,33 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'account_relationship' => CRM_Core_CodeGen_OptionGroup::create('account_relationship')
-    ->addMetadata([
-      'title' => ts('Account Relationship'),
-    ]),
-  'event_contacts' => CRM_Core_CodeGen_OptionGroup::create('event_contacts')
-    ->addMetadata([
-      'title' => ts('Event Recipients'),
-    ]),
-  'conference_slot' => CRM_Core_CodeGen_OptionGroup::create('conference_slot')
-    ->addMetadata([
-      'title' => ts('Conference Slot'),
-    ]),
-  'batch_type' => CRM_Core_CodeGen_OptionGroup::create('batch_type')
-    ->addMetadata([
-      'title' => ts('Batch Type'),
-      'is_locked' => '1',
-    ]),
-  'batch_mode' => CRM_Core_CodeGen_OptionGroup::create('batch_mode')
-    ->addMetadata([
-      'title' => ts('Batch Mode'),
-      'is_locked' => '1',
-    ]),
-  'batch_status' => CRM_Core_CodeGen_OptionGroup::create('batch_status')
-    ->addMetadata([
-      'title' => ts('Batch Status'),
-      'is_locked' => '1',
-    ]),
   'sms_api_type' => CRM_Core_CodeGen_OptionGroup::create('sms_api_type')
     ->addMetadata([
       'title' => ts('Api Type'),

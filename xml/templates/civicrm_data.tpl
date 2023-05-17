@@ -133,13 +133,8 @@ VALUES
 {/php}
 
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
-
 SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
-SELECT @option_group_id_ere            := max(id) from civicrm_option_group where name = 'event_contacts';
-SELECT @option_group_id_conference_slot := max(id) from civicrm_option_group where name = 'conference_slot';
-SELECT @option_group_id_batch_type     := max(id) from civicrm_option_group where name = 'batch_type';
-SELECT @option_group_id_batch_status   := max(id) from civicrm_option_group where name = 'batch_status';
-SELECT @option_group_id_batch_mode     := max(id) from civicrm_option_group where name = 'batch_mode';
+
 SELECT @option_group_id_sms_api_type   := max(id) from civicrm_option_group where name = 'sms_api_type';
 SELECT @option_group_id_sms_provider_name := max(id) from civicrm_option_group where name = 'sms_provider_name';
 SELECT @option_group_id_aro := max(id) from civicrm_option_group where name = 'auto_renew_options';
@@ -177,43 +172,6 @@ VALUES
    (@option_group_id_fat, '{ts escape="sql"}Revenue{/ts}', 3, 'Revenue', NULL, 0, 1, 3, 'Income from contributions and sales of tickets and memberships', 0, 1, 1, 2, NULL, NULL),
    (@option_group_id_fat, '{ts escape="sql"}Cost of Sales{/ts}', 4, 'Cost of Sales', NULL, 0, 0, 4, 'Costs incurred to get revenue, e.g. premiums for donations, dinner for a fundraising dinner ticket', 0, 1, 1, 2, NULL, NULL),
    (@option_group_id_fat, '{ts escape="sql"}Expenses{/ts}', 5, 'Expenses', NULL, 0, 0, 5, 'Things that are paid for that are consumable, e.g. grants disbursed', 0, 1, 1, 2, NULL, NULL),
-
--- account_relationship
-    (@option_group_id_arel, '{ts escape="sql"}Income Account is{/ts}', 1, 'Income Account is', NULL, 0, 1, 1, 'Income Account is', 0, 1, 1, 2, NULL, NULL),
-    (@option_group_id_arel, '{ts escape="sql"}Credit/Contra Revenue Account is{/ts}', 2, 'Credit/Contra Revenue Account is', NULL, 0, 0, 2, 'Credit/Contra Revenue Account is', 0, 1, 1, 2, NULL, NULL),
-    (@option_group_id_arel, '{ts escape="sql"}Accounts Receivable Account is{/ts}', 3, 'Accounts Receivable Account is', NULL, 0, 0, 3, 'Accounts Receivable Account is', 0, 1, 1, 2, NULL, NULL),
-    (@option_group_id_arel, '{ts escape="sql"}Credit Liability Account is{/ts}', 4, 'Credit Liability Account is', NULL, 0, 0, 4, 'Credit Liability Account is', 0, 1, 0, 2, NULL, NULL),
-     (@option_group_id_arel, '{ts escape="sql"}Expense Account is{/ts}', 5, 'Expense Account is', NULL, 0, 0, 5, 'Expense Account is', 0, 1, 1, 2, NULL, NULL),
-     (@option_group_id_arel, '{ts escape="sql"}Asset Account is{/ts}', 6, 'Asset Account is', NULL, 0, 0, 6, 'Asset Account is', 0, 1, 1, 2, NULL, NULL),
-     (@option_group_id_arel, '{ts escape="sql"}Cost of Sales Account is{/ts}', 7, 'Cost of Sales Account is', NULL, 0, 0, 7, 'Cost of Sales Account is', 0, 1, 1, 2, NULL, NULL),
-     (@option_group_id_arel, '{ts escape="sql"}Premiums Inventory Account is{/ts}', 8, 'Premiums Inventory Account is', NULL, 0, 0, 8, 'Premiums Inventory Account is', 0, 1, 1, 2, NULL, NULL),
-     (@option_group_id_arel, '{ts escape="sql"}Discounts Account is{/ts}', 9, 'Discounts Account is', NULL, 0, 0, 9, 'Discounts Account is', 0, 1, 1, 2, NULL, NULL),
-     (@option_group_id_arel, '{ts escape="sql"}Sales Tax Account is{/ts}', 10, 'Sales Tax Account is', NULL, 0, 0, 10, 'Sales Tax Account is', 0, 1, 1, 2, NULL, NULL),
-     (@option_group_id_arel, '{ts escape="sql"}Chargeback Account is{/ts}', 11, 'Chargeback Account is', NULL, 0, 0, 11, 'Chargeback Account is', 0, 1, 1, 2, NULL, NULL),
-     (@option_group_id_arel, '{ts escape="sql"}Deferred Revenue Account is{/ts}', 12, 'Deferred Revenue Account is', NULL, 0, 0, 12, 'Deferred Revenue Account is', 0, 1, 1, 2, NULL, NULL),
-
--- event_contacts
-   (@option_group_id_ere, '{ts escape="sql"}Participant Role{/ts}', 1, 'participant_role', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- default conference slots
-   (@option_group_id_conference_slot, '{ts escape="sql"}Morning Sessions{/ts}', 1, 'Morning Sessions', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_conference_slot, '{ts escape="sql"}Evening Sessions{/ts}', 2, 'Evening Sessions', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- default batch types
-   (@option_group_id_batch_type, '{ts escape="sql"}Contribution{/ts}', 1, 'Contribution', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_batch_type, '{ts escape="sql"}Membership{/ts}', 2, 'Membership', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_batch_type, '{ts escape="sql"}Pledge Payment{/ts}', 3, 'Pledge Payment', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- default batch statuses
-   (@option_group_id_batch_status, '{ts escape="sql"}Open{/ts}', 1, 'Open', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_batch_status, '{ts escape="sql"}Closed{/ts}', 2, 'Closed', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_batch_status, '{ts escape="sql"}Data Entry{/ts}', 3, 'Data Entry', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_batch_status, '{ts escape="sql"}Reopened{/ts}', 4, 'Reopened', NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_batch_status, '{ts escape="sql"}Exported{/ts}', 5, 'Exported', NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
-
--- default batch modes
-   (@option_group_id_batch_mode, '{ts escape="sql"}Manual Batch{/ts}', 1, 'Manual Batch', NULL, 0, 0, 1, 'Manual Batch', 0, 1, 1, 2, NULL, NULL),
-   (@option_group_id_batch_mode, '{ts escape="sql"}Automatic Batch{/ts}', 2, 'Automatic Batch', NULL, 0, 0, 2, 'Automatic Batch', 0, 1, 1, 2, NULL, NULL),
 
 -- Financial Item Status
    (@option_group_id_financial_item_status, '{ts escape="sql"}Paid{/ts}', 1, 'Paid', NULL, 0, 0, 1, 'Paid', 0, 1, 1, 2, NULL, NULL),
