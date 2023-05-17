@@ -4,9 +4,9 @@ return CRM_Core_CodeGen_OptionGroup::create('preferred_communication_method', 'a
     'title' => ts('Preferred Communication Method'),
   ])
   ->addValues(['label', 'name'], [
-    ['Phone', 'Phone'],
-    ['Email', 'Email'],
-    ['Postal Mail', 'Postal Mail'],
-    ['SMS', 'SMS'],
-    ['Fax', 'Fax'],
+    [ts('Phone'), 'Phone'],
+    [ts('Email'), 'Email'],
+    [ts('Postal Mail'), 'Postal Mail'],
+    [ts('SMS'), 'SMS'],
+    [ts('Fax'), 'Fax'],
   ]);
