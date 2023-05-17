@@ -647,8 +647,8 @@ event.start_date :October 21st, 2008
 event.end_date :October 23rd, 2008
 event.event_type_id:label :Conference
 event.summary :If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now
-event.contact_email :event@example.com
-event.contact_phone :456 789
+event.loc_block_id.email_id.email :event@example.com
+event.loc_block_id.phone_id.phone :456 789
 event.description :event description
 event.location :15 Walton St
 Emerald City, Maine 90210
@@ -657,6 +657,7 @@ event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
 event.pay_later_receipt :
 event.custom_1 :my field
+event.confirm_email_text :
 ';
   }
 
@@ -946,14 +947,15 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{event.end_date}' => 'Event End Date',
       '{event.event_type_id:label}' => 'Type',
       '{event.summary}' => 'Event Summary',
-      '{event.contact_email}' => 'Event Contact Email',
-      '{event.contact_phone}' => 'Event Contact Phone',
+      '{event.loc_block_id.email_id.email}' => 'Event Contact Email',
+      '{event.loc_block_id.phone_id.phone}' => 'Event Contact Phone',
       '{event.description}' => 'Event Description',
       '{event.location}' => 'Event Location',
       '{event.info_url}' => 'Event Info URL',
       '{event.registration_url}' => 'Event Registration URL',
       '{event.pay_later_receipt}' => 'Pay Later Receipt Text',
       '{event.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
+      '{event.confirm_email_text}' => 'Confirmation Email Text',
     ];
   }
 

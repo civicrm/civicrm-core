@@ -1,6 +1,8 @@
 <?php
 
+use Civi\Api4\LocBlock;
 use Civi\Api4\Participant;
+use Civi\Api4\Phone;
 
 /**
  *  Test CRM_Event_Form_Registration functions.
@@ -317,6 +319,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'testloggedinreceiptemail@civicrm.org',
       'event.pay_later_receipt:::pay us',
       $this->formatMoneyInput(1550.55),
+      'event.loc_block_id.phone_id.phone:::1235',
+      'event.loc_block_id.phone_id.phone_type_id:label:::Mobile',
+      'event.loc_block_id.phone_id.phone_ext:::456',
+      'event.confirm_email_text::Just do it',
     ]);
 
     $this->callAPISuccess('Email', 'delete', ['id' => $email['id']]);
@@ -336,7 +342,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $submittedValues['contact_id'] = $this->ids['Contact']['event'] = $this->individualCreate();
 
     if (!empty($eventParams['is_monetary'])) {
-      $event = $this->eventCreatePaid($eventParams, [['name' => 'big', 'amount' => 1550.55]]);
+      $phone = Phone::create()->setValues(['phone' => 1235, 'phone_type_id:name' => 'Mobile', 'phone_ext' => 456])->execute()->first();
+      $locationBlockID = LocBlock::create()->setValues(['phone_id' => $phone['id']])->execute()->first()['id'];
+      $event = $this->eventCreatePaid(array_merge([
+        'name' => 'big',
+        'amount' => 1550.55,
+        'loc_block_id' => $locationBlockID,
+        'confirm_email_text' => "Just do it\n Now",
+        'is_show_location' => TRUE,
+      ], $eventParams), [['name' => 'big', 'amount' => 1550.55]]);
       $submittedValues = array_merge($this->getRecordContributionParams('Partially paid', 'Pending'), $submittedValues);
     }
     else {
