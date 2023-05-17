@@ -19,45 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'case_type' => CRM_Core_CodeGen_OptionGroup::create('case_type')
-    ->addMetadata([
-      'title' => ts('Case Type'),
-    ]),
-  'case_status' => CRM_Core_CodeGen_OptionGroup::create('case_status')
-    ->addMetadata([
-      'title' => ts('Case Status'),
-      'option_value_fields' => 'name,label,description,color',
-    ]),
-  'participant_listing' => CRM_Core_CodeGen_OptionGroup::create('participant_listing')
-    ->addMetadata([
-      'title' => ts('Participant Listing'),
-    ]),
-  'safe_file_extension' => CRM_Core_CodeGen_OptionGroup::create('safe_file_extension')
-    ->addMetadata([
-      'title' => ts('Safe File Extension'),
-    ]),
-  'from_email_address' => CRM_Core_CodeGen_OptionGroup::create('from_email_address')
-    ->addMetadata([
-      'title' => ts('From Email Address'),
-      'description' => ts('By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, you can use this page to define one or more general Email Addresses that can be selected as an alternative. EXAMPLE: "Client Services" <clientservices@example.org>.'),
-    ]),
-  'mapping_type' => CRM_Core_CodeGen_OptionGroup::create('mapping_type')
-    ->addMetadata([
-      'title' => ts('Mapping Type'),
-      'is_locked' => '1',
-    ]),
-  'wysiwyg_editor' => CRM_Core_CodeGen_OptionGroup::create('wysiwyg_editor')
-    ->addMetadata([
-      'title' => ts('WYSIWYG Editor'),
-    ]),
-  'recur_frequency_units' => CRM_Core_CodeGen_OptionGroup::create('recur_frequency_units')
-    ->addMetadata([
-      'title' => ts('Recurring Frequency Units'),
-    ]),
-  'phone_type' => CRM_Core_CodeGen_OptionGroup::create('phone_type')
-    ->addMetadata([
-      'title' => ts('Phone Type'),
-    ]),
   'custom_data_type' => CRM_Core_CodeGen_OptionGroup::create('custom_data_type')
     ->addMetadata([
       'title' => ts('Custom Data Type'),

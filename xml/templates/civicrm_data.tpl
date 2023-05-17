@@ -134,15 +134,6 @@ VALUES
 
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
 
-SELECT @option_group_id_ct             := max(id) from civicrm_option_group where name = 'case_type';
-SELECT @option_group_id_cas            := max(id) from civicrm_option_group where name = 'case_status';
-SELECT @option_group_id_pl             := max(id) from civicrm_option_group where name = 'participant_listing';
-SELECT @option_group_id_sfe            := max(id) from civicrm_option_group where name = 'safe_file_extension';
-SELECT @option_group_id_mt             := max(id) from civicrm_option_group where name = 'mapping_type';
-SELECT @option_group_id_we             := max(id) from civicrm_option_group where name = 'wysiwyg_editor';
-SELECT @option_group_id_fu             := max(id) from civicrm_option_group where name = 'recur_frequency_units';
-SELECT @option_group_id_pht            := max(id) from civicrm_option_group where name = 'phone_type';
-SELECT @option_group_id_fma            := max(id) from civicrm_option_group where name = 'from_email_address';
 SELECT @option_group_id_cdt            := max(id) from civicrm_option_group where name = 'custom_data_type';
 SELECT @option_group_id_vis            := max(id) from civicrm_option_group where name = 'visibility';
 SELECT @option_group_id_mp             := max(id) from civicrm_option_group where name = 'mail_protocol';
@@ -270,60 +261,6 @@ VALUES
   (@option_group_id_report, '{ts escape="sql"}Recurring Contributions Report{/ts}', 'contribute/recur', 'CRM_Report_Form_Contribute_Recur',               NULL, 0, 0, 49, '{ts escape="sql"}Provides information about the status of recurring contributions{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
   (@option_group_id_report, '{ts escape="sql"}Recurring Contributions Summary{/ts}', 'contribute/recursummary', 'CRM_Report_Form_Contribute_RecurSummary',               NULL, 0, 0, 49, '{ts escape="sql"}Provides simple summary for each payment instrument for which there are recurring contributions (e.g. Credit Card, Standing Order, Direct Debit, etc., NULL), showing within a given date range.{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
   (@option_group_id_report, '{ts escape="sql"}Deferred Revenue Details{/ts}', 'contribute/deferredrevenue', 'CRM_Report_Form_Contribute_DeferredRevenue', NULL, 0, 0, 50, '{ts escape="sql"}Deferred Revenue Details Report{/ts}', 0, 0, 1, @contributeCompId, NULL, NULL),
-
-  (@option_group_id_cas, '{ts escape="sql"}Ongoing{/ts}' , 1, 'Open'  ,  'Opened', 0, 1,    1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cas, '{ts escape="sql"}Resolved{/ts}', 2, 'Closed',  'Closed', 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_cas, '{ts escape="sql"}Urgent{/ts}'  , 3, 'Urgent',  'Opened', 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-  (@option_group_id_pl, '{ts escape="sql"}Name Only{/ts}'     , 1, 'Name Only'      ,  NULL, 0, 0, 1, 'CRM_Event_Page_ParticipantListing_Name', 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_pl, '{ts escape="sql"}Name and Email{/ts}', 2, 'Name and Email' ,  NULL, 0, 0, 2, 'CRM_Event_Page_ParticipantListing_NameAndEmail', 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_pl, '{ts escape="sql"}Name, Status and Register Date{/ts}' , 3, 'Name, Status and Register Date',  NULL, 0, 0, 3, 'CRM_Event_Page_ParticipantListing_NameStatusAndDate', 0, 1, 1, NULL, NULL, NULL),
-
-  (@option_group_id_sfe, 'jpg',   1, 'jpg',   NULL, 0, 0,  1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'jpeg',  2, 'jpeg',  NULL, 0, 0,  2, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'png',   3, 'png',   NULL, 0, 0,  3, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'gif',   4, 'gif',   NULL, 0, 0,  4, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'txt',   5, 'txt',   NULL, 0, 0,  5, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'pdf',   6, 'pdf',   NULL, 0, 0,  6, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'doc',   7, 'doc',   NULL, 0, 0,  7, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'xls',   8, 'xls',   NULL, 0, 0,  8, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'rtf',   9, 'rtf',   NULL, 0, 0,  9, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'csv',  10, 'csv',   NULL, 0, 0, 10, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'ppt',  11, 'ppt',   NULL, 0, 0, 11, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'docx', 12, 'docx',  NULL, 0, 0, 12, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'xlsx', 13, 'xlsx',  NULL, 0, 0, 13, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'odt',  14, 'odt',   NULL, 0, 0, 14, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'ics',  15, 'ics',   NULL, 0, 0, 15, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_sfe, 'pptx',  16, 'pptx',   NULL, 0, 0, 16, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-  (@option_group_id_we, '{ts escape="sql"}Textarea{/ts}', 1, 'Textarea', NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_we, '{ts escape="sql"}CKEditor 4{/ts}', 2, 'CKEditor', NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-
-  (@option_group_id_mt, '{ts escape="sql"}Search Builder{/ts}',      1, 'Search Builder',      NULL, 0, 0,    1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Import Contact{/ts}',      2, 'Import Contact',      NULL, 0, 0,    2, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Import Activity{/ts}',     3, 'Import Activity',     NULL, 0, 0,    3, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Import Contribution{/ts}', 4, 'Import Contribution', NULL, 0, 0,    4, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Import Membership{/ts}',   5, 'Import Membership',   NULL, 0, 0,    5, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Import Participant{/ts}',  6, 'Import Participant',  NULL, 0, 0,    6, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Export Contact{/ts}',      7, 'Export Contact',      NULL, 0, 0,    7, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Export Contribution{/ts}', 8, 'Export Contribution', NULL, 0, 0,    8, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Export Membership{/ts}',   9, 'Export Membership',   NULL, 0, 0,    9, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Export Participant{/ts}', 10, 'Export Participant',  NULL, 0, 0,   10, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Export Pledge{/ts}',      11, 'Export Pledge',       NULL, 0, 0,   11, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Export Case{/ts}',        12, 'Export Case',         NULL, 0, 0,   12, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_mt, '{ts escape="sql"}Export Activity{/ts}',    14, 'Export Activity',     NULL, 0, 0,   14, NULL, 0, 1, 1, NULL, NULL, NULL),
-
-  (@option_group_id_fu, '{ts escape="sql"}day{/ts}'    , 'day'  ,    'day',  NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_fu, '{ts escape="sql"}week{/ts}'   , 'week' ,   'week',  NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_fu, '{ts escape="sql"}month{/ts}'  , 'month',  'month',  NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_fu, '{ts escape="sql"}year{/ts}'   , 'year' ,   'year',  NULL, 0, 0, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
-
--- phone types.
-  (@option_group_id_pht, '{ts escape="sql"}Phone{/ts}' ,        1, 'Phone'      , NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_pht, '{ts escape="sql"}Mobile{/ts}',        2, 'Mobile'     , NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_pht, '{ts escape="sql"}Fax{/ts}'   ,        3, 'Fax'        , NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_pht, '{ts escape="sql"}Pager{/ts}' ,        4, 'Pager'      , NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_pht, '{ts escape="sql"}Voicemail{/ts}' ,    5, 'Voicemail'  , NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
 
 -- custom data types.
   (@option_group_id_cdt, '{ts escape="sql"}Participants (Role){/ts}',       '1', 'ParticipantRole',      'role_id',                0, 0, 1, NULL, 0, 0, 1, NULL, NULL , NULL),
@@ -733,8 +670,6 @@ VALUES
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`)
 VALUES
--- from email address.
-  (@option_group_id_fma, '"FIXME" <info@EXAMPLE.ORG>', '1', '"FIXME" <info@EXAMPLE.ORG>', NULL, 0, 1, 1, '{ts escape="sql"}Default domain email address and from name.{/ts}', 0, 0, 1, NULL, @domainID, NULL ),
 
 -- Mail Approval Status Preferences
   (@option_group_id_mail_approval_status, '{ts escape="sql"}Approved{/ts}' , 1, 'Approved', NULL, 0, 1, 1, NULL, 0, 1, 1, @mailCompId, @domainID, NULL),
