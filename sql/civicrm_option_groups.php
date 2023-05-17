@@ -1,10 +1,10 @@
 <?php
 
 $readOptionGroups = function (): array {
-  $files = (array) glob(__DIR__ . '/civicrm_option_groups/*.og.php');
+  $files = (array) glob(__DIR__ . '/civicrm_option_groups/*.sqldata.php');
   $result = [];
   foreach ($files as $file) {
-    $basename = preg_replace('/\.og\.php$/', '', basename($file));
+    $basename = preg_replace('/\.sqldata\.php$/', '', basename($file));
     $result[$basename] = include $file;
   }
   uasort($result, function(CRM_Core_CodeGen_OptionGroup $a, CRM_Core_CodeGen_OptionGroup $b) {
