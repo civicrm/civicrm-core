@@ -26,7 +26,14 @@ trait CRM_Utils_SQL_EscapeStringTrait {
         throw new CRM_Core_Exception('SQL builder does not support literal expressions. Must call allowLiterals() first.');
       }
     }
-    return '"' . CRM_Core_DAO::escapeString($value) . '"';
+
+    if (CRM_Core_I18n::$SQL_ESCAPER == NULL) {
+      return '"' . CRM_Core_DAO::escapeString($value) . '"';
+    }
+    else {
+      return '"' . call_user_func(CRM_Core_I18n::$SQL_ESCAPER, $value) . '"';
+    }
+
   }
 
 }
