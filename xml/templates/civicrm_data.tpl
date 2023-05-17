@@ -11,11 +11,6 @@
 --
 -- This file provides template to civicrm_data.mysql. Inserts all base data needed for a new CiviCRM DB
 
-{php}
-  $optionGroups = include 'sql/civicrm_option_groups.php';
-{/php}
-
-
 SET @domainName := 'Default Domain Name';
 SET @defaultOrganization := 'Default Organization';
 
@@ -124,6 +119,7 @@ VALUES
 -- option groups and values for 'preferred communication methods' , 'activity types', 'gender', etc.
 
 {php}
+  $optionGroups = include 'sql/civicrm_option_groups.php';
   $laterGroups = ['encounter_medium', 'soft_credit_type', 'recent_items_providers'];
   foreach ($optionGroups as $groupName => $group) {
     if (!in_array($groupName, $laterGroups)) {
