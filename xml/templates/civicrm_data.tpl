@@ -132,8 +132,6 @@ VALUES
   }
 {/php}
 
-SELECT @option_group_id_aclRole        := max(id) from civicrm_option_group where name = 'acl_role';
-SELECT @option_group_id_acc            := max(id) from civicrm_option_group where name = 'accept_creditcard';
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
 SELECT @option_group_id_cs             := max(id) from civicrm_option_group where name = 'contribution_status';
 SELECT @option_group_id_pcp            := max(id) from civicrm_option_group where name = 'pcp_status';
@@ -221,19 +219,6 @@ INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
 
-   (@option_group_id_aclRole, '{ts escape="sql"}Administrator{/ts}',  1, 'Admin', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_aclRole, '{ts escape="sql"}Authenticated{/ts}',  2, 'Auth' , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-
-   (@option_group_id_acc, 'Visa'      ,  1, 'Visa'      , NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_acc, 'MasterCard',  2, 'MasterCard', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_acc, 'Amex'      ,  3, 'Amex'      , NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_acc, 'Discover'  ,  4, 'Discover'  , NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-  (@option_group_id_pi, '{ts escape="sql"}Credit Card{/ts}',  1, 'Credit Card', NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_pi, '{ts escape="sql"}Debit Card{/ts}',   2, 'Debit Card',  NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_pi, '{ts escape="sql"}Cash{/ts}',         3, 'Cash',        NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_pi, '{ts escape="sql"}Check{/ts}',        4, 'Check',       NULL, 0, 1, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_pi, '{ts escape="sql"}EFT{/ts}',          5, 'EFT',         NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
 
   (@option_group_id_cs, '{ts escape="sql"}Completed{/ts}'  , 1, 'Completed'  , NULL, 0, 0, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Pending{/ts}'    , 2, 'Pending'    , NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL, NULL),

@@ -19,21 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'acl_role' => CRM_Core_CodeGen_OptionGroup::create('acl_role')
-    ->addMetadata([
-      'title' => ts('ACL Role'),
-    ]),
-  'accept_creditcard' => CRM_Core_CodeGen_OptionGroup::create('accept_creditcard')
-    ->addMetadata([
-      'title' => ts('Accepted Credit Cards'),
-      'description' => ts('The following credit card options will be offered to contributors using Online Contribution pages. You will need to verify which cards are accepted by your chosen Payment Processor and update these entries accordingly.IMPORTANT: These options do not control credit card/payment method choices for sites and/or contributors using the PayPal Express service (e.g. where billing information is collected on the Payment Processor\\\'s website).'),
-    ]),
-  'payment_instrument' => CRM_Core_CodeGen_OptionGroup::create('payment_instrument')
-    ->addMetadata([
-      'title' => ts('Payment Methods'),
-      'description' => ts('You may choose to record the payment method used for each contribution and fee. Reserved payment methods are required - you may modify their labels but they can not be deleted (e.g. Check, Credit Card, Debit Card). If your site requires additional payment methods, you can add them here. You can associate each payment method with a Financial Account which specifies where the payment is going (e.g. a bank account for checks and cash).'),
-      'data_type' => 'Integer',
-    ]),
   'contribution_status' => CRM_Core_CodeGen_OptionGroup::create('contribution_status')
     ->addMetadata([
       'title' => ts('Contribution Status'),
