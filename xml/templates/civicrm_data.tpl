@@ -123,107 +123,15 @@ VALUES
 
 -- option groups and values for 'preferred communication methods' , 'activity types', 'gender', etc.
 
-INSERT INTO
-   `civicrm_option_group` (`name`, `title`, `data_type`, `is_reserved`, `is_active`, `is_locked`, `option_value_fields`, `description`)
-VALUES
-   ('preferred_communication_method', '{ts escape="sql"}Preferred Communication Method{/ts}'     , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('activity_type'                 , '{ts escape="sql"}Activity Type{/ts}'                      , 'Integer', 1, 1, 0, 'name,label,description,icon',
-     '{ts escape="sql"}Activities track interactions with contacts. Some activity types are reserved for use by automated processes, others can be freely configured.{/ts}'),
-   ('gender'                        , '{ts escape="sql"}Gender{/ts}'                             , 'Integer', 1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}CiviCRM is pre-configured with standard options for individual gender (Male, Female, Other). Modify these options as needed for your installation.{/ts}'),
-   ('instant_messenger_service'     , '{ts escape="sql"}Instant Messenger (IM) screen-names{/ts}', NULL,      1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}Commonly-used messaging apps are listed here. Administrators may define as many additional providers as needed.{/ts}'),
-   ('mobile_provider'               , '{ts escape="sql"}Mobile Phone Providers{/ts}'             , NULL,      1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}When recording mobile phone numbers for contacts, it may be useful to include the Mobile Phone Service Provider (e.g. Cingular, Sprint, etc.). CiviCRM is installed with the most commonly encountered service providers. Administrators may define as many additional providers as needed.{/ts}'),
-   ('individual_prefix'             , '{ts escape="sql"}Individual contact prefixes{/ts}'        , NULL,      1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}CiviCRM is pre-configured with standard options for individual contact prefixes (Ms., Mr., Dr. etc.). Customize these options and add new ones as needed for your installation.{/ts}'),
-   ('individual_suffix'             , '{ts escape="sql"}Individual contact suffixes{/ts}'        , NULL,      1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}CiviCRM is pre-configured with standard options for individual contact name suffixes (Jr., Sr., II etc.). Customize these options and add new ones as needed for your installation.{/ts}'),
-   ('acl_role'                      , '{ts escape="sql"}ACL Role{/ts}'                           , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('accept_creditcard'             , '{ts escape="sql"}Accepted Credit Cards{/ts}'              , NULL,      1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}The following credit card options will be offered to contributors using Online Contribution pages. You will need to verify which cards are accepted by your chosen Payment Processor and update these entries accordingly.{/ts}{ts escape="sql"}IMPORTANT: These options do not control credit card/payment method choices for sites and/or contributors using the PayPal Express service (e.g. where billing information is collected on the Payment Processor\'s website).{/ts}'),
-   ('payment_instrument'            , '{ts escape="sql"}Payment Methods{/ts}'                    , 'Integer', 1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}You may choose to record the payment method used for each contribution and fee. Reserved payment methods are required - you may modify their labels but they can not be deleted (e.g. Check, Credit Card, Debit Card). If your site requires additional payment methods, you can add them here. You can associate each payment method with a Financial Account which specifies where the payment is going (e.g. a bank account for checks and cash).{/ts}'),
-   ('contribution_status'           , '{ts escape="sql"}Contribution Status{/ts}'                , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('pcp_status'                    , '{ts escape="sql"}PCP Status{/ts}'                         , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('pcp_owner_notify'              , '{ts escape="sql"}PCP owner notifications{/ts}'            , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('participant_role'              , '{ts escape="sql"}Participant Role{/ts}'                   , 'Integer', 1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}Define participant roles for events here (e.g. Attendee, Host, Speaker...). You can then assign roles and search for participants by role.{/ts}'),
-   ('event_type'                    , '{ts escape="sql"}Event Type{/ts}'                         , 'Integer', 1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}Use Event Types to categorize your events. Event feeds can be filtered by Event Type and participant searches can use Event Type as a criteria.{/ts}'),
-   ('contact_view_options'          , '{ts escape="sql"}Contact View Options{/ts}'               , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('contact_smart_group_display'   , '{ts escape="sql"}Contact Smart Group View Options{/ts}'   , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('contact_edit_options'          , '{ts escape="sql"}Contact Edit Options{/ts}'               , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('advanced_search_options'       , '{ts escape="sql"}Advanced Search Options{/ts}'            , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('user_dashboard_options'        , '{ts escape="sql"}User Dashboard Options{/ts}'             , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('address_options'               , '{ts escape="sql"}Addressing Options{/ts}'                 , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('group_type'                    , '{ts escape="sql"}Group Type{/ts}'                         , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('custom_search'                 , '{ts escape="sql"}Custom Search{/ts}'                      , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('activity_status'               , '{ts escape="sql"}Activity Status{/ts}'                    , 'Integer', 1, 1, 0, 'name,label,description,color', NULL),
-   ('case_type'                     , '{ts escape="sql"}Case Type{/ts}'                          , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('case_status'                   , '{ts escape="sql"}Case Status{/ts}'                        , NULL,      1, 1, 0, 'name,label,description,color', NULL),
-   ('participant_listing'           , '{ts escape="sql"}Participant Listing{/ts}'                , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('safe_file_extension'           , '{ts escape="sql"}Safe File Extension{/ts}'                , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('from_email_address'            , '{ts escape="sql"}From Email Address{/ts}'                 , NULL,      1, 1, 0, 'name,label,description',
-     '{ts escape="sql"}By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, you can use this page to define one or more general Email Addresses that can be selected as an alternative. EXAMPLE: "Client Services" <clientservices@example.org>.{/ts}'),
-   ('mapping_type'                  , '{ts escape="sql"}Mapping Type{/ts}'                       , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('wysiwyg_editor'                , '{ts escape="sql"}WYSIWYG Editor{/ts}'                     , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('recur_frequency_units'         , '{ts escape="sql"}Recurring Frequency Units{/ts}'          , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('phone_type'                    , '{ts escape="sql"}Phone Type{/ts}'                         , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('custom_data_type'              , '{ts escape="sql"}Custom Data Type{/ts}'                   , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('visibility'                    , '{ts escape="sql"}Visibility{/ts}'                         , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('mail_protocol'                 , '{ts escape="sql"}Mail Protocol{/ts}'                      , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('priority'                      , '{ts escape="sql"}Priority{/ts}'                           , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('redaction_rule'                , '{ts escape="sql"}Redaction Rule{/ts}'                     , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('report_template'               , '{ts escape="sql"}Report Template{/ts}'                    , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('email_greeting'                , '{ts escape="sql"}Email Greeting Type{/ts}'                , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('postal_greeting'               , '{ts escape="sql"}Postal Greeting Type{/ts}'               , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('addressee'                     , '{ts escape="sql"}Addressee Type{/ts}'                     , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('contact_autocomplete_options'  , '{ts escape="sql"}Autocomplete Contact Search{/ts}'        , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('contact_reference_options'     , '{ts escape="sql"}Contact Reference Autocomplete Options{/ts}', NULL,   1, 1, 1, 'name,label,description', NULL),
-   ('website_type'                  , '{ts escape="sql"}Website Type{/ts}'                       , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('tag_used_for'                  , '{ts escape="sql"}Tag Used For{/ts}'                       , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('note_used_for'                 , '{ts escape="sql"}Note Used For{/ts}'                      , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('currencies_enabled'            , '{ts escape="sql"}Currencies Enabled{/ts}'                 , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('event_badge'                   , '{ts escape="sql"}Event Name Badge{/ts}'                   , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('note_privacy'                  , '{ts escape="sql"}Privacy levels for notes{/ts}'           , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('campaign_type'                 , '{ts escape="sql"}Campaign Type{/ts}'                      , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('campaign_status'               , '{ts escape="sql"}Campaign Status{/ts}'                    , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('system_extensions'             , '{ts escape="sql"}CiviCRM Extensions{/ts}'                 , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('mail_approval_status'          , '{ts escape="sql"}CiviMail Approval Status{/ts}'           , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('engagement_index'              , '{ts escape="sql"}Engagement Index{/ts}'                   , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('cg_extend_objects'             , '{ts escape="sql"}Objects a custom group extends to{/ts}'  , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('paper_size'                    , '{ts escape="sql"}Paper Size{/ts}'                         , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('pdf_format'                    , '{ts escape="sql"}PDF Page Format{/ts}'                    , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('label_format'                  , '{ts escape="sql"}Mailing Label Format{/ts}'               , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('activity_contacts'             , '{ts escape="sql"}Activity Contacts{/ts}'                  , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('account_relationship'          , '{ts escape="sql"}Account Relationship{/ts}'               , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('event_contacts'                , '{ts escape="sql"}Event Recipients{/ts}'                   , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('conference_slot'               , '{ts escape="sql"}Conference Slot{/ts}'                    , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('batch_type'                    , '{ts escape="sql"}Batch Type{/ts}'                         , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('batch_mode'                    , '{ts escape="sql"}Batch Mode{/ts}'                         , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('batch_status'                  , '{ts escape="sql"}Batch Status{/ts}'                       , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('sms_api_type'                  , '{ts escape="sql"}Api Type{/ts}'                           , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('sms_provider_name'             , '{ts escape="sql"}Sms Provider Internal Name{/ts}'         , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('auto_renew_options'            , '{ts escape="sql"}Auto Renew Options{/ts}'                 , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('financial_account_type'        , '{ts escape="sql"}Financial Account Type{/ts}'             , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('financial_item_status'         , '{ts escape="sql"}Financial Item Status{/ts}'              , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('label_type'                    , '{ts escape="sql"}Label Type{/ts}'                         , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('name_badge'                    , '{ts escape="sql"}Name Badge Format{/ts}'                  , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('wysiwyg_presets'               , '{ts escape="sql"}WYSIWYG Editor Presets{/ts}'             , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('relative_date_filters'         , '{ts escape="sql"}Relative Date Filters{/ts}'              , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('pledge_status'                 , '{ts escape="sql"}Pledge Status{/ts}'                      , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('contribution_recur_status'     , '{ts escape="sql"}Recurring Contribution Status{/ts}'      , NULL,      1, 1, 1, 'name,label,description', NULL),
-   ('environment'                   , '{ts escape="sql"}Environment{/ts}'                        , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('activity_default_assignee'     , '{ts escape="sql"}Activity default assignee{/ts}'          , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('entity_batch_extends'          , '{ts escape="sql"}Entity Batch Extends{/ts}'               , NULL,      1, 1, 0, 'name,label,description', NULL),
-   ('file_type'                     , '{ts escape="sql"}File Type{/ts}'                          , 'Integer', 1, 1, 0, 'name,label,description', NULL);
+{php}
+  $laterGroups = ['encounter_medium', 'soft_credit_type', 'recent_items_providers'];
+  foreach ($optionGroups as $groupName => $group) {
+    if (!in_array($groupName, $laterGroups)) {
+      echo $group->toSQL();
+    }
+  }
+{/php}
 
-SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
-SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
 SELECT @option_group_id_gender         := max(id) from civicrm_option_group where name = 'gender';
 SELECT @option_group_id_IMProvider     := max(id) from civicrm_option_group where name = 'instant_messenger_service';
 SELECT @option_group_id_mobileProvider := max(id) from civicrm_option_group where name = 'mobile_provider';
@@ -317,89 +225,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-   (@option_group_id_pcm, '{ts escape="sql"}Phone{/ts}',       1, 'Phone', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_pcm, '{ts escape="sql"}Email{/ts}',       2, 'Email', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_pcm, '{ts escape="sql"}Postal Mail{/ts}', 3, 'Postal Mail', NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_pcm, '{ts escape="sql"}SMS{/ts}',         4, 'SMS', NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_pcm, '{ts escape="sql"}Fax{/ts}',         5, 'Fax', NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
-
-   (@option_group_id_act, '{ts escape="sql"}Meeting{/ts}',                1,  'Meeting',               NULL, 0, 0, 1,  NULL,                                                                                         0, 1, 1, NULL, NULL, 'fa-slideshare'),
-   (@option_group_id_act, '{ts escape="sql"}Phone Call{/ts}',             2,  'Phone Call',            NULL, 0, 0, 2,  NULL,                                                                                         0, 1, 1, NULL, NULL, 'fa-phone'),
-   (@option_group_id_act, '{ts escape="sql"}Email{/ts}',                  3,  'Email',                 NULL, 1, 0, 3,  '{ts escape="sql"}Email sent.{/ts}',                                                          0, 1, 1, NULL, NULL, 'fa-envelope-o'),
-   (@option_group_id_act, '{ts escape="sql"}Outbound SMS{/ts}',           4,  'SMS',                   NULL, 1, 0, 4,  '{ts escape="sql"}Text message (SMS) sent.{/ts}',                                             0, 1, 1, NULL, NULL, 'fa-mobile'),
-   (@option_group_id_act, '{ts escape="sql"}Event Registration{/ts}',     5,  'Event Registration',    NULL, 1, 0, 5,  '{ts escape="sql"}Online or offline event registration.{/ts}',                                0, 1, 1, @eventCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Contribution{/ts}',           6,  'Contribution',          NULL, 1, 0, 6,  '{ts escape="sql"}Online or offline contribution.{/ts}',                                      0, 1, 1, @contributeCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Membership Signup{/ts}',      7,  'Membership Signup',     NULL, 1, 0, 7,  '{ts escape="sql"}Online or offline membership signup.{/ts}',                                 0, 1, 1, @memberCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Membership Renewal{/ts}',     8,  'Membership Renewal',    NULL, 1, 0, 8,  '{ts escape="sql"}Online or offline membership renewal.{/ts}',                                0, 1, 1, @memberCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Tell a Friend{/ts}',          9,  'Tell a Friend',         NULL, 1, 0, 9,  '{ts escape="sql"}Send information about a contribution campaign or event to a friend.{/ts}', 0, 1, 1, NULL, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Pledge Acknowledgment{/ts}',  10, 'Pledge Acknowledgment', NULL, 1, 0, 10, '{ts escape="sql"}Send Pledge Acknowledgment.{/ts}',                                          0, 1, 1, @pledgeCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Pledge Reminder{/ts}',        11, 'Pledge Reminder',       NULL, 1, 0, 11, '{ts escape="sql"}Send Pledge Reminder.{/ts}',                                                0, 1, 1, @pledgeCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Inbound Email{/ts}',          12, 'Inbound Email',         NULL, 1, 0, 12, '{ts escape="sql"}Inbound Email.{/ts}',                                                       0, 1, 1, NULL, NULL, NULL),
-
--- Activity Types for case activities
-   (@option_group_id_act, '{ts escape="sql"}Open Case{/ts}',          13, 'Open Case',          NULL, 0,  0, 13, '', 0, 1, 1, @caseCompId, NULL, 'fa-folder-open-o'),
-   (@option_group_id_act, '{ts escape="sql"}Follow up{/ts}',          14, 'Follow up',          NULL, 0,  0, 14, '', 0, 1, 1, @caseCompId, NULL, 'fa-share-square-o'),
-   (@option_group_id_act, '{ts escape="sql"}Change Case Type{/ts}',   15, 'Change Case Type',   NULL, 0,  0, 15, '', 0, 1, 1, @caseCompId, NULL, 'fa-random'),
-   (@option_group_id_act, '{ts escape="sql"}Change Case Status{/ts}', 16, 'Change Case Status', NULL, 0,  0, 16, '', 0, 1, 1, @caseCompId, NULL, 'fa-pencil-square-o'),
-   (@option_group_id_act, '{ts escape="sql"}Change Case Subject{/ts}',53, 'Change Case Subject',NULL, 0,  0, 53, '', 0, 1, 1, @caseCompId, NULL, 'fa-pencil-square-o'),
-   (@option_group_id_act, '{ts escape="sql"}Change Custom Data{/ts}', 33, 'Change Custom Data', NULL, 0,  0, 33, '', 0, 1, 1, @caseCompId, NULL, 'fa-table'),
-
-   (@option_group_id_act, '{ts escape="sql"}Membership Renewal Reminder{/ts}',        17, 'Membership Renewal Reminder',  NULL, 1, 0, 17, '{ts escape="sql"}offline membership renewal reminder.{/ts}',                      0, 1, 1, @memberCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Change Case Start Date{/ts}',             18, 'Change Case Start Date',         NULL, 0,  0, 18, '', 0, 1, 1, @caseCompId, NULL , 'fa-calendar'),
-   (@option_group_id_act, '{ts escape="sql"}Bulk Email{/ts}',                         19, 'Bulk Email',         NULL, 1, 0, 19, '{ts escape="sql"}Bulk Email Sent.{/ts}',                                                    0, 1, 1, NULL, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Assign Case Role{/ts}',                   20, 'Assign Case Role', NULL,0, 0, 20, '', 0, 1, 1, @caseCompId, NULL, 'fa-user-plus'),
-   (@option_group_id_act, '{ts escape="sql"}Remove Case Role{/ts}',                   21, 'Remove Case Role', NULL,0, 0, 21, '', 0, 1, 1, @caseCompId, NULL, 'fa-user-times'),
-   (@option_group_id_act, '{ts escape="sql"}Print/Merge Document{/ts}',               22, 'Print PDF Letter',    NULL, 0, 0, 22, '{ts escape="sql"}Export letters and other printable documents.{/ts}',                     0, 1, 1, NULL, NULL, 'fa-file-pdf-o'),
-   (@option_group_id_act, '{ts escape="sql"}Merge Case{/ts}',                         23, 'Merge Case', NULL, 0,  0, 23, '', 0, 1, 1, @caseCompId, NULL , 'fa-compress'),
-   (@option_group_id_act, '{ts escape="sql"}Reassigned Case{/ts}',                    24, 'Reassigned Case', NULL, 0,  0, 24, '', 0, 1, 1, @caseCompId, NULL , 'fa-user-circle-o'),
-   (@option_group_id_act, '{ts escape="sql"}Link Cases{/ts}',                         25, 'Link Cases', NULL, 0,  0, 25, '', 0, 1, 1, @caseCompId, NULL , 'fa-link'),
-   (@option_group_id_act, '{ts escape="sql"}Change Case Tags{/ts}',                   26, 'Change Case Tags', NULL,0, 0, 26, '', 0, 1, 1, @caseCompId, NULL, 'fa-tags'),
-   (@option_group_id_act, '{ts escape="sql"}Add Client To Case{/ts}',                 27, 'Add Client To Case', NULL,0, 0, 26, '', 0, 1, 1, @caseCompId, NULL, 'fa-users'),
-
--- Activity Types for CiviCampaign
-   (@option_group_id_act, '{ts escape="sql"}Survey{/ts}',                             28, 'Survey', NULL,0, 0, 27, '', 0, 1, 1, @campaignCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Canvass{/ts}',                            29, 'Canvass', NULL,0, 0, 28, '', 0, 1, 1, @campaignCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}PhoneBank{/ts}',                          30, 'PhoneBank', NULL,0, 0, 29, '', 0, 1, 1, @campaignCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}WalkList{/ts}',                           31, 'WalkList', NULL,0, 0, 30, '', 0, 1, 1, @campaignCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Petition Signature{/ts}',                 32, 'Petition', NULL,0, 0, 31, '', 0, 1, 1, @campaignCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Mass SMS{/ts}',                           34, 'Mass SMS',         NULL, 1, 0, 34, '{ts escape="sql"}Mass SMS{/ts}',                                                    0, 1, 1, NULL, NULL, NULL),
-
--- Additional Membership-related Activity Types
-   (@option_group_id_act, '{ts escape="sql"}Change Membership Status{/ts}',           35, 'Change Membership Status',   NULL, 1, 0, 35, '{ts escape="sql"}Change Membership Status.{/ts}',                         0, 1, 1, @memberCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Change Membership Type{/ts}',             36, 'Change Membership Type',     NULL, 1, 0, 36, '{ts escape="sql"}Change Membership Type.{/ts}',                           0, 1, 1, @memberCompId, NULL, NULL),
-
-   (@option_group_id_act, '{ts escape="sql"}Cancel Recurring Contribution{/ts}',      37, 'Cancel Recurring Contribution', NULL,1, 0, 37, '', 0, 1, 1, @contributeCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Update Recurring Contribution Billing Details{/ts}',      38, 'Update Recurring Contribution Billing Details', NULL,1, 0, 38, '', 0, 1, 1, @contributeCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Update Recurring Contribution{/ts}',      39, 'Update Recurring Contribution', NULL,1, 0, 39, '', 0, 1, 1, @contributeCompId, NULL, NULL),
-
-   (@option_group_id_act, '{ts escape="sql"}Reminder Sent{/ts}',                40, 'Reminder Sent', NULL, 1, 0, 40, '', 0, 1, 1, NULL, NULL, NULL),
-
- -- Activity Types for Financial Transactions Batch
-   (@option_group_id_act, '{ts escape="sql"}Export Accounting Batch{/ts}', 41, 'Export Accounting Batch', NULL, 1, 0, 41, 'Export Accounting Batch', 0, 1, 1, @contributeCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Create Batch{/ts}', 42, 'Create Batch', NULL, 1, 0, 42, 'Create Batch', 0, 1, 1, @contributeCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Edit Batch{/ts}', 43, 'Edit Batch', NULL, 1, 0, 43, 'Edit Batch', 0, 1, 1, @contributeCompId, NULL, NULL),
-
--- new sms options
-   (@option_group_id_act, '{ts escape="sql"}SMS delivery{/ts}', 44, 'SMS delivery', NULL, 1, 0, 44, '{ts escape="sql"}SMS delivery{/ts}', 0, 1, 1, NULL, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Inbound SMS{/ts}',  45, 'Inbound SMS', NULL, 1, 0,  45, '{ts escape="sql"}Inbound SMS{/ts}', 0, 1, 1, NULL, NULL, NULL),
-
-
- -- Activity types for particial payment
-   (@option_group_id_act, '{ts escape="sql"}Payment{/ts}', 46, 'Payment', NULL, 1, 0, 46, '{ts escape="sql"}Additional payment recorded for event or membership fee.{/ts}', 0, 1, 1, @contributeCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Refund{/ts}', 47, 'Refund', NULL, 1, 0, 47, '{ts escape="sql"}Refund recorded for event or membership fee.{/ts}', 0, 1, 1, @contributeCompId, NULL, NULL),
-
- -- for selection changes
-   (@option_group_id_act, '{ts escape="sql"}Change Registration{/ts}', 48, 'Change Registration', NULL, 1, 0, 48, '{ts escape="sql"}Changes to an existing event registration.{/ts}', 0, 1, 1, @eventCompId, NULL, NULL),
- -- for Print or Email Contribution Invoices
-   (@option_group_id_act, '{ts escape="sql"}Downloaded Invoice{/ts}', 49, 'Downloaded Invoice',      NULL, 1, 0, 49, '{ts escape="sql"}Downloaded Invoice.{/ts}',0, 1, 1, NULL, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Emailed Invoice{/ts}', 50, 'Emailed Invoice',      NULL, 1, 0, 50, '{ts escape="sql"}Emailed Invoice.{/ts}',0, 1, 1, NULL, NULL, NULL),
-
-  -- for manual contact merge
-   (@option_group_id_act, '{ts escape="sql"}Contact Merged{/ts}', 51, 'Contact Merged', NULL, 1, 0, 51, '{ts escape="sql"}Contact Merged{/ts}',0, 1, 1, NULL, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Contact Deleted by Merge{/ts}', 52, 'Contact Deleted by Merge', NULL, 1, 0, 52, '{ts escape="sql"}Contact was merged into another contact{/ts}',0, 1, 1, NULL, NULL, NULL),
-
-  -- Activity Type for failed payment
-   (@option_group_id_act, 'Failed Payment', 54, 'Failed Payment', NULL, 1, 0, 54, 'Failed Payment', 0, 1, 1, @contributeCompId, NULL, NULL),
 
    (@option_group_id_gender, '{ts escape="sql"}Female{/ts}', 1, 'Female', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Male{/ts}',   2, 'Male',   NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
