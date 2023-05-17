@@ -19,22 +19,6 @@ $readOptionGroups = function (): array {
 };
 
 return $readOptionGroups() + [
-  'system_extensions' => CRM_Core_CodeGen_OptionGroup::create('system_extensions')
-    ->addMetadata([
-      'title' => ts('CiviCRM Extensions'),
-    ]),
-  'mail_approval_status' => CRM_Core_CodeGen_OptionGroup::create('mail_approval_status')
-    ->addMetadata([
-      'title' => ts('CiviMail Approval Status'),
-    ]),
-  'engagement_index' => CRM_Core_CodeGen_OptionGroup::create('engagement_index')
-    ->addMetadata([
-      'title' => ts('Engagement Index'),
-    ]),
-  'cg_extend_objects' => CRM_Core_CodeGen_OptionGroup::create('cg_extend_objects')
-    ->addMetadata([
-      'title' => ts('Objects a custom group extends to'),
-    ]),
   'paper_size' => CRM_Core_CodeGen_OptionGroup::create('paper_size')
     ->addMetadata([
       'title' => ts('Paper Size'),

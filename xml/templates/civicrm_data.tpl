@@ -134,10 +134,6 @@ VALUES
 
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
 
-SELECT @option_group_id_extensions     := max(id) from civicrm_option_group where name = 'system_extensions';
-SELECT @option_group_id_mail_approval_status := max(id) from civicrm_option_group where name = 'mail_approval_status';
-SELECT @option_group_id_engagement_index := max(id) from civicrm_option_group where name = 'engagement_index';
-SELECT @option_group_id_cgeo           := max(id) from civicrm_option_group where name = 'cg_extend_objects';
 SELECT @option_group_id_paperSize      := max(id) from civicrm_option_group where name = 'paper_size';
 SELECT @option_group_id_label          := max(id) from civicrm_option_group where name = 'label_format';
 SELECT @option_group_id_aco            := max(id) from civicrm_option_group where name = 'activity_contacts';
@@ -177,13 +173,6 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
-
--- Engagement Level
-  (@option_group_id_engagement_index, '{ts escape="sql"}1{/ts}', 1, '1',  NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL , NULL),
-  (@option_group_id_engagement_index, '{ts escape="sql"}2{/ts}', 2, '2',  NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL , NULL),
-  (@option_group_id_engagement_index, '{ts escape="sql"}3{/ts}', 3, '3',  NULL, 0, 0, 3, NULL, 0, 0, 1, NULL, NULL , NULL),
-  (@option_group_id_engagement_index, '{ts escape="sql"}4{/ts}', 4, '4',  NULL, 0, 0, 4, NULL, 0, 0, 1, NULL, NULL , NULL),
-  (@option_group_id_engagement_index, '{ts escape="sql"}5{/ts}', 5, '5',  NULL, 0, 0, 5, NULL, 0, 0, 1, NULL, NULL , NULL),
 
 -- Paper Sizes
   (@option_group_id_paperSize, '{ts escape="sql"}Letter{/ts}',          '{literal}{"metric":"in","width":8.5,"height":11}{/literal}',          'letter',      NULL, NULL, 1, 1,  NULL, 0, 0, 1, NULL, NULL, NULL),
@@ -484,21 +473,6 @@ VALUES
   ( '{ts escape="sql"}Deferred Revenue - Member Dues{/ts}', @contactID, @opLiability, 'Membership revenue to be recognized in future months', '2740', 'OCLIAB', 0, 1, 0, 0
 );
 
--- Now insert option values which require domainID
---
-
-INSERT INTO
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`)
-VALUES
-
--- Mail Approval Status Preferences
-  (@option_group_id_mail_approval_status, '{ts escape="sql"}Approved{/ts}' , 1, 'Approved', NULL, 0, 1, 1, NULL, 0, 1, 1, @mailCompId, @domainID, NULL),
-  (@option_group_id_mail_approval_status, '{ts escape="sql"}Rejected{/ts}' , 2, 'Rejected', NULL, 0, 0, 2, NULL, 0, 1, 1, @mailCompId, @domainID, NULL),
-  (@option_group_id_mail_approval_status, '{ts escape="sql"}None{/ts}' , 3, 'None', NULL, 0, 0, 3, NULL, 0, 1, 1, @mailCompId, @domainID, NULL),
-
--- custom group objects
-  (@option_group_id_cgeo, '{ts escape="sql"}Survey{/ts}', 'Survey', 'civicrm_survey', NULL, 0, 0, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-  (@option_group_id_cgeo, '{ts escape="sql"}Cases{/ts}',  'Case',   'civicrm_case',  'case_type_id', 0, 0, 2, NULL, 0, 0, 1, NULL, NULL, NULL);
 
 -- CRM-6138
 {include file='languages.tpl'}
