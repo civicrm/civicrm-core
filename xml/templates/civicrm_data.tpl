@@ -11,6 +11,11 @@
 --
 -- This file provides template to civicrm_data.mysql. Inserts all base data needed for a new CiviCRM DB
 
+{php}
+  $optionGroups = include 'sql/civicrm_option_groups.php';
+{/php}
+
+
 SET @domainName := 'Default Domain Name';
 SET @defaultOrganization := 'Default Organization';
 
@@ -1118,22 +1123,7 @@ VALUES
 -- CRM-6138
 {include file='languages.tpl'}
 
--- /*******************************************************
--- *
--- * Encounter Medium Option Values (for case activities)
--- *
--- *******************************************************/
-INSERT INTO `civicrm_option_group` (name, title, description, is_reserved, is_active)
-    VALUES  ('encounter_medium', 'Encounter Medium', 'Encounter medium for case activities (e.g. In Person, By Phone, etc.)', 1, 1);
-SELECT @option_group_id_medium        := max(id) from civicrm_option_group where name = 'encounter_medium';
-INSERT INTO
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`)
-VALUES
-    (@option_group_id_medium, '{ts escape="sql"}In Person{/ts}',  1, 'in_person', NULL, 0,  0, 1, NULL, 0, 1, 1),
-    (@option_group_id_medium, '{ts escape="sql"}Phone{/ts}',  2, 'phone', NULL, 0,  1, 2, NULL, 0, 1, 1),
-    (@option_group_id_medium, '{ts escape="sql"}Email{/ts}',  3, 'email', NULL, 0,  0, 3, NULL, 0, 1, 1),
-    (@option_group_id_medium, '{ts escape="sql"}Fax{/ts}',  4, 'fax', NULL, 0,  0, 4, NULL, 0, 1, 1),
-    (@option_group_id_medium, '{ts escape="sql"}Letter Mail{/ts}',  5, 'letter_mail', NULL, 0,  0, 5, NULL, 0, 1, 1);
+{php}echo $optionGroups['encounter_medium']->toSQL();{/php}
 
 -- sample membership status entries
 INSERT INTO
@@ -1768,25 +1758,6 @@ SELECT @fieldID := max(id) FROM civicrm_price_field WHERE name = 'contribution_a
 INSERT INTO `civicrm_price_field_value` (  `price_field_id`, `name`, `label`, `amount`, `weight`, `is_default`, `is_active`, `financial_type_id`)
 VALUES ( @fieldID, 'contribution_amount', 'Contribution Amount', '1', '1', '0', '1', 1);
 
--- CRM-13833
-INSERT INTO civicrm_option_group (`name`, `title`, `is_reserved`, `is_active`) VALUES ('soft_credit_type', '{ts escape="sql"}Soft Credit Types{/ts}', 1, 1);
-
-SELECT @option_group_id_soft_credit_type := max(id) from civicrm_option_group where name = 'soft_credit_type';
-
-INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `weight`, `is_default`, `is_active`, `is_reserved`)
-VALUES
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}In Honor of{/ts}', 1, 'in_honor_of', 1, 0, 1, 1),
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}In Memory of{/ts}', 2, 'in_memory_of', 2, 0, 1, 1),
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Solicited{/ts}', 3, 'solicited', 3, 1, 1, 1),
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Household{/ts}', 4, 'household', 4, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Workplace Giving{/ts}', 5, 'workplace', 5, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Foundation Affiliate{/ts}', 6, 'foundation_affiliate', 6, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}3rd-party Service{/ts}', 7, '3rd-party_service', 7, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Donor-advised Fund{/ts}', 8, 'donor-advised_fund', 8, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Matched Gift{/ts}', 9, 'matched_gift', 9, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Personal Campaign Page{/ts}', 10, 'pcp', 10, 0, 1, 1),
-  (@option_group_id_soft_credit_type   , '{ts escape="sql"}Gift{/ts}', 11, 'gift', 11, 0, 1, 1);
-
 -- Auto-install core extension.
 -- Note this is a limited interim technique for installing core extensions -  the goal is that core extensions would be installed
 -- in the setup routine based on their tags & using the standard extension install api.
@@ -1800,22 +1771,5 @@ INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_act
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'legacycustomsearches', 'Custom search framework', 'Custom search framework', 'legacycustomsearches', 1);
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'org.civicrm.flexmailer', 'FlexMailer', 'FlexMailer', 'flexmailer', 1);
 
--- dev/core#3783 Recent Items providers
-INSERT INTO civicrm_option_group (`name`, `title`, `is_reserved`, `is_active`) VALUES ('recent_items_providers', '{ts escape="sql"}Recent Items Providers{/ts}', 1, 1);
-
-SELECT @option_group_id_recent := max(id) from civicrm_option_group where name = 'recent_items_providers';
-
-INSERT INTO civicrm_option_value (`option_group_id`, label, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, description, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
- VALUES
-    (@option_group_id_recent, '{ts escape="sql"}Contacts{/ts}', 'Contact', 'Contact', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Relationships{/ts}', 'Relationship', 'Relationship', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Activities{/ts}', 'Activity', 'Activity', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Notes{/ts}', 'Note', 'Note', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Groups{/ts}', 'Group', 'Group', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Cases{/ts}', 'Case', 'Case', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Contributions{/ts}', 'Contribution', 'Contribution', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Participants{/ts}', 'Participant', 'Participant', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Memberships{/ts}', 'Membership', 'Membership', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Pledges{/ts}', 'Pledge', 'Pledge', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Events{/ts}', 'Event', 'Event', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL),
-    (@option_group_id_recent, '{ts escape="sql"}Campaigns{/ts}', 'Campaign', 'Campaign', NULL, NULL, 0, 1, '', 0, 1, 1, NULL, NULL);
+{php}echo $optionGroups['soft_credit_type']->toSQL();{/php}
+{php}echo $optionGroups['recent_items_providers']->toSQL();{/php}
