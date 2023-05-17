@@ -222,7 +222,8 @@ class CRM_Core_Action {
     });
 
     foreach ($seqLinks as $i => $link) {
-      if (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit'])) {
+      $isActive = $link['is_active'] ?? TRUE;
+      if ($isActive && (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit']))) {
         $extra = isset($link['extra']) ? self::replace($link['extra'], $values) : NULL;
 
         $frontend = isset($link['fe']);
@@ -257,10 +258,10 @@ class CRM_Core_Action {
 
         $linkContent = $link['name'];
         if (!empty($link['icon'])) {
-          if ($iconMode == 'icon') {
+          if ($iconMode === 'icon') {
             $linkContent = CRM_Core_Page::crmIcon($link['icon'], $link['name'], TRUE, ['title' => '']);
           }
-          elseif ($iconMode == 'both') {
+          elseif ($iconMode === 'both') {
             $linkContent = CRM_Core_Page::crmIcon($link['icon']) . ' ' . $linkContent;
           }
         }
@@ -283,7 +284,7 @@ class CRM_Core_Action {
     }
     else {
       $extra = '';
-      if ($iconMode != 'icon') {
+      if ($iconMode !== 'icon') {
         $extraLinks = array_splice($url, 2);
         if (count($extraLinks) > 1) {
           $mainLinks = array_slice($url, 0, 2);
