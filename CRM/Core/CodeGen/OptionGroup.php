@@ -1,7 +1,14 @@
 <?php
+
+/**
+ * @internal
+ *   This class may change radically if doing so helps with the installer or upgrader.
+ */
 class CRM_Core_CodeGen_OptionGroup {
 
   /**
+   * OptionGroup properties.
+   *
    * @var array
    * @internal
    */
@@ -11,6 +18,11 @@ class CRM_Core_CodeGen_OptionGroup {
     'option_value_fields' => 'name,label,description',
   ];
 
+  /**
+   * Default properties for all OptionValues in this OptionGroup.
+   *
+   * @var array
+   */
   protected $defaults = [
     'color' => NULL,
     'component_id' => NULL,
@@ -64,23 +76,35 @@ class CRM_Core_CodeGen_OptionGroup {
   /**
    * Add a bunch of values to the option-group.
    *
+   * @param array $optionValues
+   *   List of option-value records.
+   *   Ex: [
+   *     ['name' => 'foo_bar', 'label' => ts('Foo Bar')],
+   *     ['name' => 'whiz_bang', 'label' => ts('Whiz Bang')],
+   *   ]
+   * @return $this
+   */
+  public function addValues(array $optionValues) : CRM_Core_CodeGen_OptionGroup {
+    $this->rows = array_merge($this->rows, $optionValues);
+    return $this;
+  }
+
+  /**
+   * Add a bunch of values to the option-group using a tabular notation.
+   *
    * @param array $header
    *   Ex: ['name', 'label']
    * @param array $optionValues
-   *   A list of option-value records.
+   *   A list of option-value records (aligned with the header).
    *
-   *   Generally, each record should match the header.
    *   Ex: [
    *     ['foo_bar', ts('Foo Bar')]
    *     ['whiz_bang', ts('Whiz Bang')]
    *   ]
    *
-   *   Additionally, you may add extra key-value pairs
+   *   Additionally, to address outliers that don't fit tabular form, you may add key-value pairs.
    *
-   *   Ex: [
-   *     ['foo_bar', ts('Foo Bar')]
-   *     ['whiz_bang', ts('Whiz Bang'), 'is_active' => 0, 'component_id' => 100]
-   *   ]
+   *   Ex: ['whiz_bang', ts('Whiz Bang'), 'component_id' => 100]
    *
    * @return $this
    */
