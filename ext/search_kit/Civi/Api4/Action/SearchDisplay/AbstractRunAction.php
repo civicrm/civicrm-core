@@ -207,7 +207,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $out['val'] = $this->rewrite($column, $data);
         }
         else {
-          $out['val'] = $this->formatViewValue($column['key'], $rawValue, $data);
+          $dataType = $this->getSelectExpression($column['key'])['dataType'] ?? NULL;
+          $out['val'] = $this->formatViewValue($column['key'], $rawValue, $data, $dataType);
         }
         if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
           $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
@@ -736,7 +737,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       foreach ($this->getTokens($tokenExpr) as $token) {
         $val = $data[$token] ?? NULL;
         if (isset($val) && $format === 'view') {
-          $val = $this->formatViewValue($token, $val, $data);
+          $dataType = $this->getSelectExpression($token)['dataType'] ?? NULL;
+          $val = $this->formatViewValue($token, $val, $data, $dataType);
         }
         if (!(is_null($index))) {
           $replacement = is_array($val) ? $val[$index] ?? '' : $val;
@@ -759,16 +761,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param string $key
    * @param mixed $rawValue
    * @param array $data
+   * @param string $dataType
    * @return array|string
    */
-  protected function formatViewValue($key, $rawValue, $data) {
+  protected function formatViewValue($key, $rawValue, $data, $dataType) {
     if (is_array($rawValue)) {
-      return array_map(function($val) use ($key, $data) {
-        return $this->formatViewValue($key, $val, $data);
+      return array_map(function($val) use ($key, $data, $dataType) {
+        return $this->formatViewValue($key, $val, $data, $dataType);
       }, $rawValue);
     }
-
-    $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
 
     $formatted = $rawValue;
 
