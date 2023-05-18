@@ -4,6 +4,9 @@ return CRM_Core_CodeGen_OptionGroup::create('wysiwyg_editor', 'a/0031')
     'title' => ts('WYSIWYG Editor'),
   ])
   ->addValueTable(['label', 'name', 'value'], [
-    [ts('Textarea'), 'Textarea', 1, 'is_reserved' => 1],
-    [ts('CKEditor 4'), 'CKEditor', 2, 'is_reserved' => 1],
+    [ts('Textarea'), 'Textarea', 1],
+    [ts('CKEditor 4'), 'CKEditor', 2],
+  ])
+  ->addDefaults([
+    'is_reserved' => 1,
   ]);

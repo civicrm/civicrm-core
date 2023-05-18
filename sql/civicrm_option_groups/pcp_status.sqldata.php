@@ -5,7 +5,10 @@ return CRM_Core_CodeGen_OptionGroup::create('pcp_status', 'a/0012')
     'is_locked' => 1,
   ])
   ->addValueTable(['label', 'name', 'value'], [
-    [ts('Waiting Review'), 'Waiting Review', 1, 'is_reserved' => 1],
-    [ts('Approved'), 'Approved', 2, 'is_reserved' => 1],
-    [ts('Not Approved'), 'Not Approved', 3, 'is_reserved' => 1],
+    [ts('Waiting Review'), 'Waiting Review', 1],
+    [ts('Approved'), 'Approved', 2],
+    [ts('Not Approved'), 'Not Approved', 3],
+  ])
+  ->addDefaults([
+    'is_reserved' => 1,
   ]);

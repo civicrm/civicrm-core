@@ -6,8 +6,11 @@ return CRM_Core_CodeGen_OptionGroup::create('participant_role', 'a/0014')
     'data_type' => 'Integer',
   ])
   ->addValueTable(['label', 'name', 'value'], [
-    [ts('Attendee'), 'Attendee', 1, 'filter' => 1],
-    [ts('Volunteer'), 'Volunteer', 2, 'filter' => 1],
-    [ts('Host'), 'Host', 3, 'filter' => 1],
-    [ts('Speaker'), 'Speaker', 4, 'filter' => 1],
+    [ts('Attendee'), 'Attendee', 1],
+    [ts('Volunteer'), 'Volunteer', 2],
+    [ts('Host'), 'Host', 3],
+    [ts('Speaker'), 'Speaker', 4],
+  ])
+  ->addDefaults([
+    'filter' => 1,
   ]);
