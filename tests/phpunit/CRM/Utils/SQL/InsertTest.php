@@ -43,4 +43,18 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
     $this->assertLike($expected, $insert->toSQL());
   }
 
+  public function testLiteral() {
+    $insert = CRM_Utils_SQL_Insert::into('foo')
+      ->allowLiterals()
+      ->row(['first' => new CRM_Utils_SQL_Literal('1+1'), 'second' => '2'])
+      ->row(['second' => '2b', 'first' => new CRM_Utils_SQL_Literal('CONCAT(@foo, @bar)')]);
+    $expected = '
+      INSERT INTO foo (`first`,`second`) VALUES
+      (1+1,"2"),
+      (CONCAT(@foo, @bar),"2b")
+    ';
+    $this->assertLike($expected, $insert->toSQL());
+
+  }
+
 }
