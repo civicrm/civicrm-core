@@ -2120,7 +2120,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     $notSent = [];
     $this->assign('module', 'Event Registration');
     $this->assignEventDetailsToTpl($params['event_id'], CRM_Utils_Array::value('role_id', $params), CRM_Utils_Array::value('receipt_text', $params), $this->_isPaidEvent);
-    $this->assign('isAmountzero', 1);
 
     if ($this->_isPaidEvent) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
@@ -2147,10 +2146,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
       $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
-
-      // The concept of contributeMode is deprecated.
-      $this->assign('contributeMode', 'direct');
-      $this->assign('isAmountzero', 0);
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
     }

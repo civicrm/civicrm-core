@@ -307,7 +307,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $event['confirm_email_text'] = $params['receipt_text'];
     }
 
-    $this->assign('isAmountzero', 1);
     $this->assign('event', $event);
 
     $this->assign('isShowLocation', $event['is_show_location']);
