@@ -1,0 +1,22 @@
+{*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-pay-later-text-title"}
+  {ts}Pay Later Label{/ts}
+{/htxt}
+{htxt id="id-pay-later-text"}
+{ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form. You may include HTML formatting tags.{/ts}
+{/htxt}
+
+{htxt id="id-is-discount-title"}
+  {ts}Discounts by Signup Date?{/ts}
+{/htxt}
+{htxt id="id-is-discount"}
+{ts}Check this box if you want to offer discounted fees based on registration date (e.g. 'early-registration discounts').{/ts}
+{/htxt}

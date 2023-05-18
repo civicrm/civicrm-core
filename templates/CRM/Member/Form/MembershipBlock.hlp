@@ -7,6 +7,14 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+
+{htxt id="id-is-required-title"}
+  {ts}Require Membership Signup{/ts}
+{/htxt}
+{htxt id="id-is-required"}
+{ts}If checked, user must signup for one of the displayed membership options before continuing.{/ts}
+{/htxt}
+
 {htxt id="id-separate-pay-title"}
   {ts}Separate Payment{/ts}
 {/htxt}

@@ -48,10 +48,7 @@
               {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='intro' id=$friendId}
          {/if}
      </td>
-     <td>{$form.intro.html}<br />
-               <span class="description">{ts 1=$enduser}This message is displayed to the %1 at the top of the Tell a Friend form. You may include HTML tags to add formatting or links.{/ts}
-         </span>
-     </td>
+     <td>{$form.intro.html}</td>
         </tr>
         <tr class="crm-friend-manage-form-block-suggested_message">
      <td class="label">{$form.suggested_message.label}
