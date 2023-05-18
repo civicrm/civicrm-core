@@ -476,6 +476,24 @@ contribution_recur.payment_instrument_id:name :Check
   }
 
   /**
+   * Test balance token works can be rendered as raw & boolean.
+   *
+   * This is a stand in for money tokens in general but as a pseudo-field
+   * it has some added charm.
+   */
+  public function testContributionBalanceToken(): void {
+    $contributionID = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'contribution_status_id' => 'Pending']);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contributionID,
+      'total_amount' => 1,
+    ]);
+    $text = $this->renderText(['contributionId' => $contributionID],
+      '{contribution.balance_amount} {contribution.balance_amount|raw} {contribution.balance_amount|boolean} {contribution.tax_amount|boolean}'
+    );
+    $this->assertEquals('$99.00 99.00 1 0', $text);
+  }
+
+  /**
    * Test that membership tokens are consistently rendered.
    *
    * @throws \CRM_Core_Exception

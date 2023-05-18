@@ -479,11 +479,15 @@ class TokenProcessor {
         case 'crmMoney':
           return \Civi::format()->money($value->getAmount(), $value->getCurrency());
 
+        case 'boolean':
+          // We resolve boolean to 0 or 1 or smarty chokes on FALSE.
+          return (int) $value->getAmount()->isGreaterThan(0);
+
         case 'raw':
           return $value->getAmount();
 
         default:
-          throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
+          throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
       }
     }
 
