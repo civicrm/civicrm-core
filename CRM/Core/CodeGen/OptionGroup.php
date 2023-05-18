@@ -7,6 +7,22 @@
 class CRM_Core_CodeGen_OptionGroup {
 
   /**
+   * Determine the relative order of two option-groups.
+   *
+   * @param \CRM_Core_CodeGen_OptionGroup $a
+   * @param \CRM_Core_CodeGen_OptionGroup $b
+   * @return int
+   */
+  public static function compare(CRM_Core_CodeGen_OptionGroup $a, CRM_Core_CodeGen_OptionGroup $b): int {
+    if ($a->sortKey !== $b->sortKey) {
+      return strnatcmp($a->sortKey, $b->sortKey);
+    }
+    else {
+      return strnatcmp($a->metadata['name'], $b->metadata['name']);
+    }
+  }
+
+  /**
    * OptionGroup properties.
    *
    * @var array
@@ -46,16 +62,15 @@ class CRM_Core_CodeGen_OptionGroup {
 
   /**
    * @var string
-   * @internal
    */
-  public $historicalId;
+  private $sortKey;
 
-  public static function create(string $name, ?string $historicalId = NULL): CRM_Core_CodeGen_OptionGroup {
+  public static function create(string $name, ?string $sortKey = NULL): CRM_Core_CodeGen_OptionGroup {
     $og = new static();
     $og->metadata['name'] = $name;
     // $og->var = '@option_group_id_' . $name;
     $og->var = '@this_option_group_id';
-    $og->historicalId = $historicalId;
+    $og->sortKey = $sortKey;
     return $og;
   }
 
