@@ -3,10 +3,26 @@ return CRM_Core_CodeGen_OptionGroup::create('environment', 'a/0081')
   ->addMetadata([
     'title' => ts('Environment'),
   ])
-  ->addValueTable(['label', 'name', 'value', 'description'], [
-    [ts('Production'), 'Production', 'Production', ts('Production Environment'), 'is_default' => 1],
-    [ts('Staging'), 'Staging', 'Staging', ts('Staging Environment')],
-    [ts('Development'), 'Development', 'Development', ts('Development Environment')],
+  ->addValues([
+    [
+      'label' => ts('Production'),
+      'value' => 'Production',
+      'name' => 'Production',
+      'is_default' => 1,
+      'description' => ts('Production Environment'),
+    ],
+    [
+      'label' => ts('Staging'),
+      'value' => 'Staging',
+      'name' => 'Staging',
+      'description' => ts('Staging Environment'),
+    ],
+    [
+      'label' => ts('Development'),
+      'value' => 'Development',
+      'name' => 'Development',
+      'description' => ts('Development Environment'),
+    ],
   ])
   ->addDefaults([
     'filter' => NULL,

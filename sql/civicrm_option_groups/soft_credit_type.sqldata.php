@@ -1,21 +1,68 @@
 <?php
-
-// CRM-13833
-return CRM_Core_CodeGen_OptionGroup::create('soft_credit_type', 'b/98')
+return CRM_Core_CodeGen_OptionGroup::create('soft_credit_type', 'a/0096')
   ->addMetadata([
     'title' => ts('Soft Credit Types'),
   ])
-  ->addValueTable(['label', 'value', 'name'], [
-    [ts('In Honor of'), 1, 'in_honor_of', 'is_reserved' => 1],
-    [ts('In Memory of'), 2, 'in_memory_of', 'is_reserved' => 1],
-    [ts('Solicited'), 3, 'solicited', 'is_reserved' => 1, 'is_default' => 1],
-    [ts('Household'), 4, 'household'],
-    [ts('Workplace Giving'), 5, 'workplace'],
-    [ts('Foundation Affiliate'), 6, 'foundation_affiliate'],
-    [ts('3rd-party Service'), 7, '3rd-party_service'],
-    [ts('Donor-advised Fund'), 8, 'donor-advised_fund'],
-    [ts('Matched Gift'), 9, 'matched_gift'],
-    [ts('Personal Campaign Page'), 10, 'pcp', 'is_reserved' => 1],
-    [ts('Gift'), 11, 'gift', 'is_reserved' => 1],
-  ])
-  ->addDefaults([]);
+  ->addValues([
+    [
+      'label' => ts('In Honor of'),
+      'value' => 1,
+      'name' => 'in_honor_of',
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('In Memory of'),
+      'value' => 2,
+      'name' => 'in_memory_of',
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('Solicited'),
+      'value' => 3,
+      'name' => 'solicited',
+      'is_default' => 1,
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('Household'),
+      'value' => 4,
+      'name' => 'household',
+    ],
+    [
+      'label' => ts('Workplace Giving'),
+      'value' => 5,
+      'name' => 'workplace',
+    ],
+    [
+      'label' => ts('Foundation Affiliate'),
+      'value' => 6,
+      'name' => 'foundation_affiliate',
+    ],
+    [
+      'label' => ts('3rd-party Service'),
+      'value' => 7,
+      'name' => '3rd-party_service',
+    ],
+    [
+      'label' => ts('Donor-advised Fund'),
+      'value' => 8,
+      'name' => 'donor-advised_fund',
+    ],
+    [
+      'label' => ts('Matched Gift'),
+      'value' => 9,
+      'name' => 'matched_gift',
+    ],
+    [
+      'label' => ts('Personal Campaign Page'),
+      'value' => 10,
+      'name' => 'pcp',
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('Gift'),
+      'value' => 11,
+      'name' => 'gift',
+      'is_reserved' => 1,
+    ],
+  ]);
