@@ -109,4 +109,59 @@ class GroupTest extends Api4TestBase {
     $this->assertEquals([$parent1['title'], $parent2['title']], $get['parents:label']);
   }
 
+  public function testAddRemoveParents() {
+    $group1 = Group::create(FALSE)
+      ->addValue('title', uniqid())
+      ->execute()->single();
+    $parent1 = Group::create(FALSE)
+      ->addValue('title', uniqid())
+      ->execute()->single();
+    $parent2 = Group::create(FALSE)
+      ->addValue('title', uniqid())
+      ->execute()->single();
+
+    // ensure self is not added as parent
+    Group::update(FALSE)
+      ->addValue('parents', [$group1['id']])
+      ->addWhere('id', '=', $group1['id'])
+      ->execute();
+    $get = Group::get(FALSE)
+      ->addWhere('id', '=', $group1['id'])
+      ->addSelect('parents')
+      ->execute()->single();
+    $this->assertEmpty($get['parents']);
+
+    Group::update(FALSE)
+      ->addValue('parents', [$parent1['id'], $parent2['id'], $group1['id']])
+      ->addWhere('id', '=', $group1['id'])
+      ->execute();
+    $get = Group::get(FALSE)
+      ->addWhere('id', '=', $group1['id'])
+      ->addSelect('parents')
+      ->execute()->single();
+    $this->assertEquals([$parent1['id'], $parent2['id']], $get['parents']);
+
+    // ensure adding something else doesn't impact parents
+    Group::update(FALSE)
+      ->addValue('title', uniqid())
+      ->addWhere('id', '=', $group1['id'])
+      ->execute();
+    $get = Group::get(FALSE)
+      ->addWhere('id', '=', $group1['id'])
+      ->addSelect('parents')
+      ->execute()->single();
+    $this->assertEquals([$parent1['id'], $parent2['id']], $get['parents']);
+
+    // ensure removing parent is working
+    Group::update(FALSE)
+      ->addValue('parents', [$parent2['id']])
+      ->addWhere('id', '=', $group1['id'])
+      ->execute();
+    $get = Group::get(FALSE)
+      ->addWhere('id', '=', $group1['id'])
+      ->addSelect('parents')
+      ->execute()->single();
+    $this->assertEquals([$parent2['id']], $get['parents']);
+  }
+
 }
