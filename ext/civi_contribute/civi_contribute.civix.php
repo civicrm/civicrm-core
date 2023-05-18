@@ -6,10 +6,10 @@
  * The ExtensionUtil class provides small stubs for accessing resources of this
  * extension.
  */
-class CRM_CiviContribute_ExtensionUtil {
+class CRM_Contribute_ExtensionUtil {
   const SHORT_NAME = 'civi_contribute';
   const LONG_NAME = 'civi_contribute';
-  const CLASS_PREFIX = 'CRM_CiviContribute';
+  const CLASS_PREFIX = 'CRM_Contribute';
 
   /**
    * Translate a string using the extension's domain.
@@ -77,7 +77,7 @@ class CRM_CiviContribute_ExtensionUtil {
 
 }
 
-use CRM_CiviContribute_ExtensionUtil as E;
+use CRM_Contribute_ExtensionUtil as E;
 
 /**
  * (Delegated) Implements hook_civicrm_config().

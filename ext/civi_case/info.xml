@@ -25,8 +25,8 @@
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <civix>
-    <namespace>CRM/CiviCase</namespace>
+    <namespace>CRM/Case</namespace>
     <format>23.02.1</format>
-    <angularModule>crmCiviCase</angularModule>
+    <angularModule>civiCase</angularModule>
   </civix>
 </extension>
