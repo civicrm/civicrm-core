@@ -42,6 +42,8 @@ class CRM_Core_CodeGen_OptionGroup {
 
   protected $rows = [];
 
+  protected $syncRules = [];
+
   /**
    * @var string
    * @internal
@@ -65,6 +67,23 @@ class CRM_Core_CodeGen_OptionGroup {
    */
   public function addMetadata(array $fields): CRM_Core_CodeGen_OptionGroup {
     $this->metadata = array_merge($this->metadata, $fields);
+    return $this;
+  }
+
+  /**
+   * Copy fields
+   *
+   * @param string $mode
+   *   copy|fill
+   * @param array $fields
+   *   Array(string $srcField => string $destField).
+   *   Ex: ['name' => 'label']
+   * @return $this
+   */
+  public function syncColumns(string $mode, array $fields): CRM_Core_CodeGen_OptionGroup {
+    foreach ($fields as $from => $to) {
+      $this->syncRules[] = [$mode, $from, $to];
+    }
     return $this;
   }
 
@@ -126,6 +145,24 @@ class CRM_Core_CodeGen_OptionGroup {
     $position = 1;
     $result = [];
     foreach ($this->rows as $row) {
+      foreach ($this->syncRules as $syncRule) {
+        [$mode, $from, $to] = $syncRule;
+        switch ($mode) {
+          case 'copy':
+            $row[$to] = $row[$from];
+            break;
+
+          case 'fill':
+            if (array_key_exists($from, $row) && !array_key_exists($to, $row)) {
+              $row[$to] = $row[$from];
+            }
+            break;
+
+          default:
+            throw new \RuntimeException("Invalid sync mod: $mode");
+        }
+      }
+
       $result[] = array_merge(
         ['option_group_id' => new CRM_Utils_SQL_Literal($this->var), 'value' => $position, 'weight' => $position],
         $this->defaults,

@@ -5,49 +5,42 @@ return CRM_Core_CodeGen_OptionGroup::create('custom_search', 'a/0023')
   ])
   ->addValues([
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_Sample',
       'value' => 1,
       'name' => 'CRM_Contact_Form_Search_Custom_Sample',
       'weight' => 1,
       'description' => ts('Household Name and State'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_ContributionAggregate',
       'value' => 2,
       'name' => 'CRM_Contact_Form_Search_Custom_ContributionAggregate',
       'weight' => 2,
       'description' => ts('Contribution Aggregate'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_Group',
       'value' => 4,
       'name' => 'CRM_Contact_Form_Search_Custom_Group',
       'weight' => 4,
       'description' => ts('Include / Exclude Search'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_PostalMailing',
       'value' => 5,
       'name' => 'CRM_Contact_Form_Search_Custom_PostalMailing',
       'weight' => 5,
       'description' => ts('Postal Mailing'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_Proximity',
       'value' => 6,
       'name' => 'CRM_Contact_Form_Search_Custom_Proximity',
       'weight' => 6,
       'description' => ts('Proximity Search'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_EventAggregate',
       'value' => 7,
       'name' => 'CRM_Contact_Form_Search_Custom_EventAggregate',
       'weight' => 7,
       'description' => ts('Event Aggregate'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_ActivitySearch',
       'value' => 8,
       'name' => 'CRM_Contact_Form_Search_Custom_ActivitySearch',
       'weight' => 8,
@@ -55,52 +48,46 @@ return CRM_Core_CodeGen_OptionGroup::create('custom_search', 'a/0023')
       'is_active' => 0,
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_PriceSet',
       'value' => 9,
       'name' => 'CRM_Contact_Form_Search_Custom_PriceSet',
       'weight' => 9,
       'description' => ts('Price Set Details for Event Participants'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_ZipCodeRange',
       'value' => 10,
       'name' => 'CRM_Contact_Form_Search_Custom_ZipCodeRange',
       'weight' => 10,
       'description' => ts('Zip Code Range'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_DateAdded',
       'value' => 11,
       'name' => 'CRM_Contact_Form_Search_Custom_DateAdded',
       'weight' => 11,
       'description' => ts('Date Added to CiviCRM'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_MultipleValues',
       'value' => 12,
       'name' => 'CRM_Contact_Form_Search_Custom_MultipleValues',
       'weight' => 12,
       'description' => ts('Custom Group Multiple Values Listing'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_ContribSYBNT',
       'value' => 13,
       'name' => 'CRM_Contact_Form_Search_Custom_ContribSYBNT',
       'weight' => 13,
       'description' => ts('Contributions made in Year X and not Year Y'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_TagContributions',
       'value' => 14,
       'name' => 'CRM_Contact_Form_Search_Custom_TagContributions',
       'weight' => 14,
       'description' => ts('Find Contribution Amounts by Tag'),
     ],
     [
-      'label' => 'CRM_Contact_Form_Search_Custom_FullText',
       'value' => 15,
       'name' => 'CRM_Contact_Form_Search_Custom_FullText',
       'weight' => 15,
       'description' => ts('Full-text Search'),
     ],
-  ]);
+  ])
+  ->syncColumns('fill', ['name' => 'label']);

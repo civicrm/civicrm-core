@@ -6,6 +6,10 @@ return CRM_Core_CodeGen_OptionGroup::create('batch_mode', 'a/0065')
   ])
   ->addValueTable(['label', 'name', 'value', 'description'], [
     // TODO: Shouldn't we have ts() for these descriptions?
-    [ts('Manual Batch'), 'Manual Batch', 1, 'Manual Batch', 'is_reserved' => 1, 'component_id' => 2],
-    [ts('Automatic Batch'), 'Automatic Batch', 2, 'Automatic Batch', 'is_reserved' => 1, 'component_id' => 2],
+    [ts('Manual Batch'), 'Manual Batch', 1, 'Manual Batch'],
+    [ts('Automatic Batch'), 'Automatic Batch', 2, 'Automatic Batch'],
+  ])
+  ->addDefaults([
+    'is_reserved' => 1,
+    'component_id' => 2,
   ]);
