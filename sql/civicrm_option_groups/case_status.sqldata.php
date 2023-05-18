@@ -4,8 +4,26 @@ return CRM_Core_CodeGen_OptionGroup::create('case_status', 'a/0026')
     'title' => ts('Case Status'),
     'option_value_fields' => 'name,label,description,color',
   ])
-  ->addValueTable(['label', 'name', 'value'], [
-    [ts('Ongoing'), 'Open', 1, 'grouping' => 'Opened', 'is_default' => 1, 'is_reserved' => 1],
-    [ts('Resolved'), 'Closed', 2, 'grouping' => 'Closed', 'is_reserved' => 1],
-    [ts('Urgent'), 'Urgent', 3, 'grouping' => 'Opened'],
+  ->addValues([
+    [
+      'label' => ts('Ongoing'),
+      'value' => 1,
+      'name' => 'Open',
+      'grouping' => 'Opened',
+      'is_default' => 1,
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('Resolved'),
+      'value' => 2,
+      'name' => 'Closed',
+      'grouping' => 'Closed',
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('Urgent'),
+      'value' => 3,
+      'name' => 'Urgent',
+      'grouping' => 'Opened',
+    ],
   ]);

@@ -5,13 +5,54 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_status', 'a/0024')
     'data_type' => 'Integer',
     'option_value_fields' => 'name,label,description,color',
   ])
-  ->addValueTable(['label', 'name', 'value'], [
-    [ts('Scheduled'), 'Scheduled', 1, 'is_default' => 1, 'is_reserved' => 1],
-    [ts('Completed'), 'Completed', 2, 'filter' => 1, 'is_reserved' => 1],
-    [ts('Cancelled'), 'Cancelled', 3, 'filter' => 2, 'is_reserved' => 1],
-    [ts('Left Message'), 'Left Message', 4],
-    [ts('Unreachable'), 'Unreachable', 5, 'filter' => 2],
-    [ts('Not Required'), 'Not Required', 6, 'filter' => 2],
-    [ts('Available'), 'Available', 7],
-    [ts('No-show'), 'No_show', 8, 'filter' => 2],
+  ->addValues([
+    [
+      'label' => ts('Scheduled'),
+      'value' => 1,
+      'name' => 'Scheduled',
+      'is_default' => 1,
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('Completed'),
+      'value' => 2,
+      'name' => 'Completed',
+      'filter' => 1,
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('Cancelled'),
+      'value' => 3,
+      'name' => 'Cancelled',
+      'filter' => 2,
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('Left Message'),
+      'value' => 4,
+      'name' => 'Left Message',
+    ],
+    [
+      'label' => ts('Unreachable'),
+      'value' => 5,
+      'name' => 'Unreachable',
+      'filter' => 2,
+    ],
+    [
+      'label' => ts('Not Required'),
+      'value' => 6,
+      'name' => 'Not Required',
+      'filter' => 2,
+    ],
+    [
+      'label' => ts('Available'),
+      'value' => 7,
+      'name' => 'Available',
+    ],
+    [
+      'label' => ts('No-show'),
+      'value' => 8,
+      'name' => 'No_show',
+      'filter' => 2,
+    ],
   ]);

@@ -3,8 +3,26 @@ return CRM_Core_CodeGen_OptionGroup::create('participant_listing', 'a/0027')
   ->addMetadata([
     'title' => ts('Participant Listing'),
   ])
-  ->addValueTable(['label', 'name', 'value', 'description'], [
-    [ts('Name Only'), 'Name Only', 1, ts('CRM_Event_Page_ParticipantListing_Name'), 'is_reserved' => 1],
-    [ts('Name and Email'), 'Name and Email', 2, ts('CRM_Event_Page_ParticipantListing_NameAndEmail'), 'is_reserved' => 1],
-    [ts('Name, Status and Register Date'), 'Name, Status and Register Date', 3, ts('CRM_Event_Page_ParticipantListing_NameStatusAndDate'), 'is_reserved' => 1],
+  ->addValues([
+    [
+      'label' => ts('Name Only'),
+      'value' => 1,
+      'name' => 'Name Only',
+      'description' => ts('CRM_Event_Page_ParticipantListing_Name'),
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('Name and Email'),
+      'value' => 2,
+      'name' => 'Name and Email',
+      'description' => ts('CRM_Event_Page_ParticipantListing_NameAndEmail'),
+      'is_reserved' => 1,
+    ],
+    [
+      'label' => ts('Name, Status and Register Date'),
+      'value' => 3,
+      'name' => 'Name, Status and Register Date',
+      'description' => ts('CRM_Event_Page_ParticipantListing_NameStatusAndDate'),
+      'is_reserved' => 1,
+    ],
   ]);
