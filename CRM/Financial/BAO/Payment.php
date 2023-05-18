@@ -443,7 +443,6 @@ class CRM_Financial_BAO_Payment {
       'isShowLocation',
       'location',
       'isRefund',
-      'isAmountzero',
       'refundAmount',
       'totalPaid',
       'paymentsComplete',

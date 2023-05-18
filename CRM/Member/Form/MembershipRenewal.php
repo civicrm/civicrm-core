@@ -684,8 +684,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $this->_params,
         $this->_bltID
       ));
-      $this->assign('contributeMode', 'direct');
-      $this->assign('isAmountzero', 0);
+
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
       if ($this->_mode === 'test') {
