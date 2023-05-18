@@ -16,35 +16,30 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
         <tr class="crm-member-membershipblock-form-block-member_is_active">
-            <td class="label"></td><td class="html-adjust">{$form.member_is_active.html}&nbsp;{$form.member_is_active.label}<br />
-            <span class="description">{ts}Include a Membership Signup section in this Online Contribution page?{/ts}</span></td>
+            <td class="label"></td><td class="html-adjust">{$form.member_is_active.html}&nbsp;{$form.member_is_active.label}</td>
         </tr>
     </table>
     <div id="memberFields">
       <table class="form-layout-compressed">
           <tr class="crm-member-membershipblock-form-block-new_title">
               <td class="label">{$form.new_title.label}
-              {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_block' field='new_title' id=$membershipBlockId}{/if}</td><td>{$form.new_title.html}<br />
-              <span class="description">{ts}Membership section title - for new member signups.{/ts}</span></td>
+              {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_block' field='new_title' id=$membershipBlockId}{/if}</td><td>{$form.new_title.html}</td>
           </tr>
           <tr class="crm-member-membershipblock-form-block-new_text">
               <td class="label">{$form.new_text.label}
               {if $action == 2}<br />{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_block' field='new_text' id=$membershipBlockId}{/if}
               </td>
-              <td>{$form.new_text.html}<br />
-              <span class="description">{ts}Membership section introductory text - for new member signups.{/ts}<br /></span><br /></td>
+              <td>{$form.new_text.html}</td>
           </tr>
           <tr class="crm-member-membershipblock-form-block-renewal_title">
               <td class="label">{$form.renewal_title.label}
-              {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_block' field='renewal_title' id=$membershipBlockId}{/if}</td><td>{$form.renewal_title.html}<br />
-              <span class="description">{ts}Membership section title - displayed to renewing members.{/ts}</span></td>
+              {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_block' field='renewal_title' id=$membershipBlockId}{/if}</td><td>{$form.renewal_title.html}</td>
           </tr>
           <tr class="crm-member-membershipblock-form-block-renewal_text">
               <td class="label">{$form.renewal_text.label}
                 {if $action == 2}<br />{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_block' field='renewal_text' id=$membershipBlockId}{/if}
               </td>
-              <td>{$form.renewal_text.html}<br />
-              <span class="description">{ts}Membership section introductory text - displayed to renewing members.{/ts}</span><br /></td>
+              <td>{$form.renewal_text.html}</td>
           </tr>
         <tr class="crm-member-membershipblock-form-block-member_price_set_id">
               <td class="label">{$form.member_price_set_id.label}</td>
@@ -100,16 +95,14 @@
               </td>
           </tr>
           <tr id="requiredSignup" class="crm-member-membershipblock-form-block-is_required">
-              <td class="label"></td><td class="html-adjust">{$form.is_required.html}&nbsp;{$form.is_required.label}<br />
-              <span class="description">{ts}If checked, user must signup for one of the displayed membership options before continuing.{/ts}</span></td>
+              <td class="label"></td><td class="html-adjust">{$form.is_required.html}&nbsp;{$form.is_required.label} {help id="id-is-required"}</td>
           </tr>
           <tr id="separatePayment" class="crm-member-membershipblock-form-block-is_separate_payment">
               <td class="label"></td><td class="html-adjust">{$form.is_separate_payment.html}&nbsp;{$form.is_separate_payment.label} {help id="id-separate-pay"}<br />
               <span class="description">{ts}Check this box if you are including both Membership Signup/Renewal AND a Contribution Amount section, AND you want the membership fee to be charged separately from any additional contribution amount.{/ts}</span></td>
           </tr>
           <tr id="displayFee" class="crm-member-membershipblock-form-block-display_min_fee">
-              <td class="label"></td><td class="html-adjust">{$form.display_min_fee.html}&nbsp;{$form.display_min_fee.label} {help id="id-display-fee"}<br />
-              <span class="description">{ts}Display the membership fee along with the membership name and description for each membership option?{/ts}</span></td>
+              <td class="label"></td><td class="html-adjust">{$form.display_min_fee.html}&nbsp;{$form.display_min_fee.label} {help id="id-display-fee"}</td>
     </tr>
 
       </table>

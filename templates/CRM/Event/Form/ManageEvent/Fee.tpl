@@ -36,9 +36,7 @@
         <table id="currency" class="form-layout">
              <tr class='crm-event-manage-fee-form-block-currency'>
                 <td class="label">{$form.currency.label}</td>
-          <td>{$form.currency.html}<br />
-            <span class="description">{ts}Select the currency to be used for event registration.{/ts}</span>
-          </td>
+          <td>{$form.currency.html}</td>
              </tr>
         </table>
         {if $paymentProcessor}
@@ -67,13 +65,9 @@
 
         <table id="payLaterOptions" class="form-layout">
             <tr class="crm-event-manage-fee-form-block-pay_later_text">
-               <td class="label">{$form.pay_later_text.label}<span class="crm-marker"> *</span> </td>
+               <td class="label">{$form.pay_later_text.label}<span class="crm-marker"> *</span> {help id="id-pay-later-text"}</td>
                <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='pay_later_text' id=$id}{/if}{$form.pay_later_text.html|crmAddClass:big}
                </td>
-            </tr>
-            <tr>
-               <td>&nbsp;</td>
-               <td class="description">{ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form. You may include HTML formatting tags.{/ts}</td>
             </tr>
             <tr class="crm-event-manage-fee-form-block-pay_later_receipt">
                <td class="label">{$form.pay_later_receipt.label}<span class="crm-marker"> *</span> </td>
@@ -154,9 +148,8 @@
     <div id="isDiscount">
          <table class="form-layout">
              <tr class="crm-event-manage-fee-form-block-is_discount">
-                <td class="extra-long-fourty label">{$form.is_discount.html}</td>
-                <td>{$form.is_discount.label}<br /><span class="description">{ts}Check this box if you want to offer discounted fees based on registration date (e.g. 'early-registration discounts').{/ts}</span>
-                </td>
+                <td class="extra-long-fourty label">{$form.is_discount.html} {help id="id-is-discount"}</td>
+                <td>{$form.is_discount.label}</td>
              </tr>
          </table>
     </div>

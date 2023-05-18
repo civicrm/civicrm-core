@@ -17,9 +17,7 @@
   <table class="form-layout-compressed">
     <tr class="crm-contribution-contributionpage-premium-form-block-premiums_active">
       <td class="label">{$form.premiums_active.label}</td>
-      <td class="html-adjust">{$form.premiums_active.html}<br/>
-        <span class="description">{ts}Is the Premiums section enabled for this Online Contributions page?{/ts}</span>
-      </td>
+      <td class="html-adjust">{$form.premiums_active.html}</td>
     </tr>
   </table>
 
