@@ -672,7 +672,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ($this->_membershipBlock) {
       $this->_currentMemberships = [];
 
-      $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
+      $membershipTypeIds = $membershipTypes = [];
       $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember);
 
       $autoRenewMembershipTypeOptions = [];
@@ -745,19 +745,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           elseif ($memType['is_active']) {
 
             if ($allowAutoRenewOpt) {
-              $javascriptMethod = ['onclick' => "return showHideAutoRenew( this.value );"];
               $isAvailableAutoRenew = $this->_membershipBlock['auto_renew'][$value] ?? 1;
               $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $memType['auto_renew'] * $isAvailableAutoRenew;
-              $allowAutoRenewMembership = TRUE;
             }
             else {
-              $javascriptMethod = NULL;
               $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = 0;
             }
 
-            //add membership type.
-            $radio[$memType['id']] = NULL;
-            $radioOptAttrs[$memType['id']] = $javascriptMethod;
             if ($cid) {
               $membership = new CRM_Member_DAO_Membership();
               $membership->contact_id = $cid;
@@ -776,8 +770,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
               if ($membership->find(TRUE)) {
                 if (!$membership->end_date) {
-                  unset($radio[$memType['id']]);
-                  unset($radioOptAttrs[$memType['id']]);
                   $this->assign('islifetime', TRUE);
                   continue;
                 }
