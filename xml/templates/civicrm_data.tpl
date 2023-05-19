@@ -162,13 +162,7 @@ VALUES (@drgid, 'civicrm_contact', 'first_name',     '5'),
        (@drgid, 'civicrm_contact', 'middle_name',    '1'),
        (@drgid, 'civicrm_contact', 'suffix_id',      '1');
 
--- Sample counties (state-province and country lists defined in a separate tpl files)
-INSERT INTO civicrm_county (name, state_province_id) VALUES ('Alameda', 1004);
-INSERT INTO civicrm_county (name, state_province_id) VALUES ('Contra Costa', 1004);
-INSERT INTO civicrm_county (name, state_province_id) VALUES ('Marin', 1004);
-INSERT INTO civicrm_county (name, state_province_id) VALUES ('San Francisco', 1004);
-INSERT INTO civicrm_county (name, state_province_id) VALUES ('San Mateo', 1004);
-INSERT INTO civicrm_county (name, state_province_id) VALUES ('Santa Clara', 1004);
+{php}echo (include "sql/civicrm_data/civicrm_county.sqldata.php")->toSQL();{/php}
 
 -- Bounce classification patterns
 INSERT INTO civicrm_mailing_bounce_type
@@ -435,148 +429,12 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'syntax error in from address'),
     (@bounceTypeID, 'unknown smtp code');
 
--- add sample and reserved profiles
-
-INSERT INTO civicrm_uf_group
-    (id, name,                 group_type,           title,                                      is_cms_user, is_reserved, help_post) VALUES
-    (1,  'name_and_address',   'Individual,Contact',  '{ts escape="sql"}Name and Address{/ts}',   0,           0,           NULL),
-    (2,  'supporter_profile',  'Individual,Contact',  '{ts escape="sql"}Supporter Profile{/ts}',  2,           0,           '<p><strong>{ts escape="sql"}The information you provide will NOT be shared with any third party organisations.{/ts}</strong></p><p>{ts escape="sql"}Thank you for getting involved in our campaign!{/ts}</p>'),
-    (3,  'participant_status', 'Participant',         '{ts escape="sql"}Participant Status{/ts}',             0,      1,           NULL),
-    (4,  'new_individual',     'Individual,Contact',  '{ts escape="sql"}New Individual{/ts}'    ,             0,      1,           NULL),
-    (5,  'new_organization',   'Organization,Contact','{ts escape="sql"}New Organization{/ts}'  ,             0,      1,           NULL),
-    (6,  'new_household',      'Household,Contact',   '{ts escape="sql"}New Household{/ts}'     ,             0,      1,           NULL),
-    (7,  'summary_overlay',    'Contact',             '{ts escape="sql"}Summary Overlay{/ts}'   ,             0,      1,           NULL),
-    (8,  'shared_address',     'Contact',             '{ts escape="sql"}Shared Address{/ts}'                , 0,      1,           NULL),
-    (9,  'on_behalf_organization', 'Contact,Organization','{ts escape="sql"}On Behalf Of Organization{/ts}',  0,      1,           NULL),
-    (10, 'contribution_batch_entry', 'Contribution', '{ts escape="sql"}Contribution Bulk Entry{/ts}' ,       0,      1,           NULL),
-    (11, 'membership_batch_entry', 'Membership',     '{ts escape="sql"}Membership Bulk Entry{/ts}' ,         0,      1,           NULL),
-    (12, 'event_registration', 'Individual,Contact', '{ts escape="sql"}Your Registration Info{/ts}',         0,      0,           NULL),
-    (13, 'honoree_individual', 'Individual,Contact', '{ts escape="sql"}Honoree Individual{/ts}',             0,      1,           NULL);
-
-
-INSERT INTO civicrm_uf_join
-   (is_active,module,entity_table,entity_id,weight,uf_group_id)
-VALUES
-   (1, 'User Registration',NULL, NULL,1,1),
-   (1, 'User Account', NULL, NULL, 1, 1),
-   (1, 'Profile', NULL, NULL, 1, 1),
-   (1, 'Profile', NULL, NULL, 2, 2),
-   (1, 'Profile', NULL, NULL, 11, 12);
-
-INSERT INTO civicrm_uf_field
-       ( uf_group_id, field_name,              is_required, is_reserved, weight, visibility,                  in_selector, is_searchable, location_type_id, label,                                          field_type,    help_post, phone_type_id ) VALUES
-       (  1,           'first_name',            1,           0,           1,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}First Name{/ts}',               'Individual',   NULL,  NULL),
-       (  1,           'last_name',             1,           0,           2,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Last Name{/ts}',                'Individual',   NULL,  NULL),
-       (  1,           'street_address',        0,           0,           3,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}Street Address (Home){/ts}',    'Contact',      NULL,  NULL),
-       (  1,           'city',                  0,           0,           4,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}City (Home){/ts}',              'Contact',      NULL,  NULL),
-       (  1,           'postal_code',           0,           0,           5,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}Postal Code (Home){/ts}',       'Contact',      NULL,  NULL),
-       (  1,           'country',               0,           0,           6,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}Country (Home){/ts}',           'Contact',      NULL,  NULL),
-       (  1,           'state_province',        0,           0,           7,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}State (Home){/ts}',             'Contact',      NULL,  NULL),
-       (  2,           'first_name',            1,           0,           1,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}First Name{/ts}',               'Individual',   NULL,  NULL),
-       (  2,           'last_name',             1,           0,           2,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Last Name{/ts}',                'Individual',   NULL,  NULL),
-       (  2,           'email',                 1,           0,           3,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Email Address{/ts}',            'Contact',      NULL,  NULL),
-       (  3,           'participant_status',    1,           1,           1,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Participant Status{/ts}',       'Participant',  NULL,  NULL),
-       (  4,           'first_name',            1,           0,           1,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}First Name{/ts}',               'Individual',   NULL,  NULL),
-       (  4,           'last_name',             1,           0,           2,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Last Name{/ts}',                'Individual',   NULL,  NULL),
-       (  4,           'email',                 0,           0,           3,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Email Address{/ts}',            'Contact',      NULL,  NULL),
-       (  5,           'organization_name',     1,           0,           2,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Organization Name{/ts}',        'Organization', NULL,  NULL),
-       (  5,           'email',                 0,           0,           3,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Email Address{/ts}',            'Contact',      NULL,  NULL),
-       (  6,           'household_name',        1,           0,           2,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Household Name{/ts}',           'Household',    NULL,  NULL),
-       (  6,           'email',                 0,           0,           3,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Email Address{/ts}',            'Contact',      NULL,  NULL),
-       (  7,           'phone',                 1,           0,           1,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}Home Phone{/ts}',               'Contact',      NULL,  1 ),
-       (  7,           'phone',                 1,           0,           2,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}Home Mobile{/ts}',              'Contact',      NULL,  2 ),
-       (  7,           'street_address',        1,           0,           3,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Primary Address{/ts}',          'Contact',      NULL,  NULL),
-       (  7,           'city',                  1,           0,           4,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}City{/ts}',                     'Contact',      NULL,  NULL),
-       (  7,           'state_province',        1,           0,           5,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}State{/ts}',                    'Contact',      NULL,  NULL),
-       (  7,           'postal_code',           1,           0,           6,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Postal Code{/ts}',              'Contact',      NULL,  NULL),
-       (  7,           'email',                 1,           0,           7,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Primary Email{/ts}',            'Contact',      NULL,  NULL),
-       (  7,           'group',                 1,           0,           8,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Groups{/ts}',                   'Contact',      NULL,  NULL),
-       (  7,           'tag',                   1,           0,           9,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Tags{/ts}',                     'Contact',      NULL,  NULL),
-       (  7,           'gender_id',             1,           0,           10,     'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Gender{/ts}',                   'Individual',   NULL,  NULL),
-       (  7,           'birth_date',            1,           0,           11,     'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Date of Birth{/ts}',            'Individual',   NULL,  NULL),
-       (  8,           'street_address',        1,           1,           1,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}Street Address (Home){/ts}',    'Contact',      NULL,  NULL),
-       (  8,           'city',                  1,           1,           2,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}City (Home){/ts}',              'Contact',      NULL,  NULL),
-       (  8,           'postal_code',           0,           0,           3,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}Postal Code (Home){/ts}',       'Contact',      NULL,  NULL),
-       (  8,           'country',               0,           0,           4,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}Country (Home){/ts}',           'Contact',      NULL,  NULL),
-       (  8,           'state_province',        0,           0,           5,      'User and User Admin Only',  0,           0,             1,             '{ts escape="sql"}State (Home){/ts}',             'Contact',      NULL,  NULL),
-       (  9,           'organization_name',     1,           0,           1,      'User and User Admin Only',  0,           0,             NULL,          '{ts escape="sql"}Organization Name{/ts}',        'Organization', NULL,  NULL),
-       (  9,           'phone',                 1,           0,           2,      'User and User Admin Only',  0,           0,             3,             '{ts escape="sql"}Phone (Main) {/ts}',            'Contact',      NULL,   1),
-       (  9,           'email',                 1,           0,           3,      'User and User Admin Only',  0,           0,             3,             '{ts escape="sql"}Email (Main) {/ts}',            'Contact',      NULL,   NULL),
-       (  9,           'street_address',        1,           0,           4,      'User and User Admin Only',  0,           0,             3,             '{ts escape="sql"}Street Address{/ts}',           'Contact',      NULL,   NULL),
-       (  9,           'city',                  1,           0,           5,      'User and User Admin Only',  0,           0,             3,             '{ts escape="sql"}City{/ts}',                     'Contact',      NULL,   NULL),
-       (  9,           'postal_code',           1,           0,           6,      'User and User Admin Only',  0,           0,             3,             '{ts escape="sql"}Postal Code{/ts}',              'Contact',      NULL,   NULL),
-       (  9,           'country',               1,           0,           7,      'User and User Admin Only',  0,           0,             3,             '{ts escape="sql"}Country{/ts}',                  'Contact',      NULL,   NULL),
-       (  9,           'state_province',        1,           0,           8,      'User and User Admin Only',  0,           0,             3,             '{ts escape="sql"}State/Province{/ts}',         'Contact',      NULL,   NULL),
-       ( 10,     'financial_type',              0, 1, 1, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Financial Type{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'total_amount',                0, 1, 2, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Amount{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'contribution_status_id',      1, 1, 3, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Status{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'receive_date',                1, 1, 4, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Contribution Date{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'contribution_source',         0, 0, 5, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Contribution Source{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'payment_instrument',          0, 0, 6, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Payment Method{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'contribution_check_number',                0, 0, 7, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Check Number{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'send_receipt',                0, 0, 8, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Send Receipt{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'invoice_id',                  0, 0, 9, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Invoice ID{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'soft_credit',                 0, 0, 10, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Soft Credit{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'soft_credit_type',            0, 0, 11, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Soft Credit Type{/ts}', 'Contribution', NULL, NULL ),
-       ( 11,     'membership_type',             1, 1, 1, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Membership Type{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'membership_join_date',        1, 1, 2, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Member Since{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'membership_start_date',       0, 1, 3, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Start Date{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'membership_end_date',         0, 1, 4, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}End Date{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'membership_source',           0, 0, 5, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Membership Source{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'send_receipt',                0, 0, 6, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Send Receipt{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'financial_type',              0, 1, 7, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Financial Type{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'total_amount',                0, 1, 8, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Amount{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'receive_date',                1, 1, 9, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Contribution Date{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'payment_instrument',          0, 0, 10, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Payment Method{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'contribution_check_number',                0, 0, 11, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Check Number{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'contribution_status_id',      1, 1, 12, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Payment Status{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'soft_credit',                 0, 0, 13, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Soft Credit{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'soft_credit_type',            0, 0, 14, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Soft Credit Type{/ts}', 'Membership', NULL, NULL ),
-       ( 12,     'first_name',                  1, 0,  1, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}First Name{/ts}',  'Individual', NULL, NULL),
-       ( 12,     'last_name',                   1, 0,  2, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Last Name{/ts}',   'Individual',  NULL,  NULL),
-       ( 12,     'email',                       1, 0,  3, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Email Address{/ts}', 'Contact', NULL, NULL),
-       ( 13,     'prefix_id',                   0, 1,  1, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Individual Prefix{/ts}', 'Individual', NULL, NULL),
-       ( 13,     'first_name',                  1, 1,  2, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}First Name{/ts}',        'Individual', NULL, NULL),
-       ( 13,     'last_name',                   1, 1,  3, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Last Name{/ts}',         'Individual', NULL, NULL),
-       ( 13,     'email',                       0, 1,  4, 'User and User Admin Only', 0, 0, 1,    '{ts escape="sql"}Email Address{/ts}',     'Contact', NULL, NULL);
-
-
-INSERT INTO civicrm_participant_status_type
-  (id, name,                                  label,                                                       class,      is_reserved, is_active, is_counted, weight, visibility_id) VALUES
-  (1,  'Registered',                          '{ts escape="sql"}Registered{/ts}',                          'Positive', 1,           1,         1,          1,      1            ),
-  (2,  'Attended',                            '{ts escape="sql"}Attended{/ts}',                            'Positive', 0,           1,         1,          2,      2            ),
-  (3,  'No-show',                             '{ts escape="sql"}No-show{/ts}',                             'Negative', 0,           1,         0,          3,      2            ),
-  (4,  'Cancelled',                           '{ts escape="sql"}Cancelled{/ts}',                           'Negative', 1,           1,         0,          4,      2            ),
-  (5,  'Pending from pay later',              '{ts escape="sql"}Pending (pay later){/ts}',                 'Pending',  1,           1,         1,          5,      2            ),
-  (6,  'Pending from incomplete transaction', '{ts escape="sql"}Pending (incomplete transaction){/ts}',    'Pending',  1,           1,         0,          6,      2            ),
-  (7,  'On waitlist',                         '{ts escape="sql"}On waitlist{/ts}',                         'Waiting',  1,           0,         0,          7,      2            ),
-  (8,  'Awaiting approval',                   '{ts escape="sql"}Awaiting approval{/ts}',                   'Waiting',  1,           0,         1,          8,      2            ),
-  (9,  'Pending from waitlist',               '{ts escape="sql"}Pending from waitlist{/ts}',               'Pending',  1,           0,         1,          9,      2            ),
-  (10, 'Pending from approval',               '{ts escape="sql"}Pending from approval{/ts}',               'Pending',  1,           0,         1,          10,     2            ),
-  (11, 'Rejected',                            '{ts escape="sql"}Rejected{/ts}',                            'Negative', 1,           0,         0,          11,     2            ),
-  (12, 'Expired',                             '{ts escape="sql"}Expired{/ts}',                             'Negative', 1,           1,         0,          12,     2            ),
-  (13, 'Pending in cart',                     '{ts escape="sql"}Pending in cart{/ts}',                     'Pending',  1,           1,         0,          13,     2            ),
-  (14,  'Partially paid',                      '{ts escape="sql"}Partially paid{/ts}',                      'Positive', 1,           1,         1,          14,     2           ),
-  (15,  'Pending refund',                      '{ts escape="sql"}Pending refund{/ts}',                      'Positive', 1,           1,         1,          15,     2           ),
-  (16,  'Transferred',                         '{ts escape="sql"}Transferred{/ts}',                         'Negative', 1, 1, 0, 16, 2);
-
--- CRM-8150
-INSERT INTO civicrm_action_mapping
-(entity, entity_value, entity_value_label, entity_status, entity_status_label, entity_date_start, entity_date_end, entity_recipient)
-VALUES
-( 'civicrm_activity', 'activity_type', 'Activity Type', 'activity_status', 'Activity Status', 'activity_date_time', NULL, 'activity_contacts'),
-( 'civicrm_participant', 'event_type', 'Event Type', 'civicrm_participant_status_type', 'Participant Status', 'event_start_date', 'event_end_date', 'event_contacts'),
-( 'civicrm_participant', 'civicrm_event', 'Event Name', 'civicrm_participant_status_type', 'Participant Status', 'event_start_date', 'event_end_date', 'event_contacts'),
-( 'civicrm_membership', 'civicrm_membership_type', 'Membership Type', 'auto_renew_options', 'Auto Renew Options', 'membership_join_date', 'membership_end_date', NULL),
-( 'civicrm_participant', 'event_template', 'Event Template', 'civicrm_participant_status_type', 'Participant Status', 'event_start_date', 'event_end_date', 'event_contacts'),
-( 'civicrm_contact', 'civicrm_contact', 'Date Field', 'contact_date_reminder_options', 'Annual Options', 'date_field', NULL, NULL);
-
-INSERT INTO `civicrm_contact_type`
-  (`id`, `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`, `icon`)
- VALUES
-  ( 1, 'Individual'  , '{ts escape="sql"}Individual{/ts}'  , NULL, NULL, 1, 1, 'fa-user'),
-  ( 2, 'Household'   , '{ts escape="sql"}Household{/ts}'   , NULL, NULL, 1, 1, 'fa-home'),
-  ( 3, 'Organization', '{ts escape="sql"}Organization{/ts}', NULL, NULL, 1, 1, 'fa-building');
+{php}echo (include "sql/civicrm_data/civicrm_uf_group.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_uf_join.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_uf_field.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_participant_status_type.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_action_mapping.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_contact_type.sqldata.php")->toSQL();{/php}
 
 {include file='civicrm_msg_template.tpl'}
 
