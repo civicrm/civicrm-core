@@ -7,9 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $isShowMembershipQuickConfigBlock}
+{if $context EQ "makeContribution"}
   <div id="membership" class="crm-group membership-group">
-    {if $context EQ "makeContribution"}
+
       <div id="priceset">
         <fieldset>
           {if $renewal_mode}
@@ -61,7 +61,7 @@
       <div class="display-block">
         {include file="CRM/Price/Page/LineItem.tpl" context="Membership"}
       </div>
-    {/if}
+
   </div>
 {literal}
   <script type="text/javascript">
