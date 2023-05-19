@@ -59,15 +59,6 @@ SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
   }
 {/php}
 
--- financial accounts
-SELECT @option_group_id_fat            := max(id) from civicrm_option_group where name = 'financial_account_type';
-SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
-SELECT @opexp := value FROM civicrm_option_value WHERE name = 'Expenses' and option_group_id = @option_group_id_fat;
-SELECT @opAsset := value FROM civicrm_option_value WHERE name = 'Asset' and option_group_id = @option_group_id_fat;
-SELECT @opLiability := value FROM civicrm_option_value WHERE name = 'Liability' and option_group_id = @option_group_id_fat;
-SELECT @opCost := value FROM civicrm_option_value WHERE name = 'Cost of Sales' and option_group_id = @option_group_id_fat;
-{php}echo (include "sql/civicrm_data/civicrm_financial_account.sqldata.php")->toSQL();{/php}
-
 -- CRM-6138
 {include file='languages.tpl'}
 
@@ -111,6 +102,15 @@ SELECT @opCost := value FROM civicrm_option_value WHERE name = 'Cost of Sales' a
 {include file='civicrm_msg_template.tpl'}
 
 {php}echo (include "sql/civicrm_data/civicrm_job.sqldata.php")->toSQL();{/php}
+
+-- financial accounts
+SELECT @option_group_id_fat            := max(id) from civicrm_option_group where name = 'financial_account_type';
+SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
+SELECT @opexp := value FROM civicrm_option_value WHERE name = 'Expenses' and option_group_id = @option_group_id_fat;
+SELECT @opAsset := value FROM civicrm_option_value WHERE name = 'Asset' and option_group_id = @option_group_id_fat;
+SELECT @opLiability := value FROM civicrm_option_value WHERE name = 'Liability' and option_group_id = @option_group_id_fat;
+SELECT @opCost := value FROM civicrm_option_value WHERE name = 'Cost of Sales' and option_group_id = @option_group_id_fat;
+{php}echo (include "sql/civicrm_data/civicrm_financial_account.sqldata.php")->toSQL();{/php}
 
 SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
 SELECT @option_value_rel_id  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Income Account is';
