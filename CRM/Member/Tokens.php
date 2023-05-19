@@ -64,7 +64,7 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     if ($field === 'fee') {
       $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($this->getFieldValue($row, 'membership_type_id'));
-      $row->tokens($entity, $field, \CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($membershipType['minimum_fee']));
+      $row->tokens($entity, $field, \CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($membershipType['minimum_fee'] ?? 0));
     }
     else {
       parent::evaluateToken($row, $entity, $field, $prefetch);
