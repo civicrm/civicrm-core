@@ -438,36 +438,7 @@ INSERT INTO civicrm_mailing_bounce_pattern
 
 {include file='civicrm_msg_template.tpl'}
 
--- CRM-8358
-
-INSERT INTO `civicrm_job`
-    ( domain_id, run_frequency, last_run, name, description, api_entity, api_action, parameters, is_active )
-VALUES
-    ( @domainID, 'Daily' ,  NULL, '{ts escape="sql" skip="true"}CiviCRM Update Check{/ts}', '{ts escape="sql" skip="true"}Checks for CiviCRM version updates. Important for keeping the database secure. Also sends anonymous usage statistics to civicrm.org to to assist in prioritizing ongoing development efforts.{/ts}', 'job', 'version_check', NULL, 1),
-    ( @domainID, 'Always' , NULL, '{ts escape="sql" skip="true"}Send Scheduled Mailings{/ts}', '{ts escape="sql" skip="true"}Sends out scheduled CiviMail mailings{/ts}', 'job', 'process_mailing', NULL, 0),
-    ( @domainID, 'Hourly' , NULL, '{ts escape="sql" skip="true"}Fetch Bounces{/ts}', '{ts escape="sql" skip="true"}Fetches bounces from mailings and writes them to mailing statistics{/ts}', 'job', 'fetch_bounces', NULL, 0),
-    ( @domainID, 'Hourly' , NULL, '{ts escape="sql" skip="true"}Process Inbound Emails{/ts}', '{ts escape="sql" skip="true"}Inserts activity for a contact or a case by retrieving inbound emails from a mail directory{/ts}', 'job', 'fetch_activities', NULL, 0),
-    ( @domainID, 'Daily' ,  NULL, '{ts escape="sql" skip="true"}Process Pledges{/ts}', '{ts escape="sql" skip="true"}Updates pledge records and sends out reminders{/ts}', 'job', 'process_pledge','{ts escape="sql" skip="true"}send_reminders=[1 or 0] optional- 1 to send payment reminders{/ts}', 0),
-    ( @domainID, 'Daily' ,  NULL, '{ts escape="sql" skip="true"}Geocode and Parse Addresses{/ts}',  '{ts escape="sql" skip="true"}Retrieves geocodes (lat and long) and / or parses street addresses (populates street number, street name, etc.){/ts}', 'job', 'geocode', '{ts escape="sql" skip="true"}geocoding=[1 or 0] required
-parse=[1 or 0] required
-start=[contact ID] optional-begin with this contact ID
-end=[contact ID] optional-process contacts with IDs less than this
-throttle=[1 or 0] optional-1 adds five second sleep{/ts}', 0),
-    ( @domainID, 'Daily' ,  NULL, '{ts escape="sql" skip="true"}Update Greetings and Addressees{/ts}','{ts escape="sql" skip="true"}Goes through contact records and updates email and postal greetings, or addressee value{/ts}', 'job', 'update_greeting','{ts escape="sql" skip="true"}ct=[Individual or Household or Organization] required
-gt=[email_greeting or postal_greeting or addressee] required
-force=[0 or 1] optional-0 update contacts with null value, 1 update all
-limit=Number optional-Limit the number of contacts to update{/ts}', 0),
-    ( @domainID, 'Daily' ,  NULL, '{ts escape="sql" skip="true"}Mail Reports{/ts}', '{ts escape="sql" skip="true"}Generates and sends out reports via email{/ts}', 'job', 'mail_report','{ts escape="sql" skip="true"}instanceId=[ID of report instance] required
-format=[csv or print] optional-output CSV or print-friendly HTML, else PDF{/ts}', 0),
-    ( @domainID, 'Hourly' ,  NULL, '{ts escape="sql" skip="true"}Send Scheduled Reminders{/ts}', '{ts escape="sql" skip="true"}Sends out scheduled reminders via email{/ts}', 'job', 'send_reminder', NULL, 0),
-    ( @domainID, 'Always' , NULL, '{ts escape="sql" skip="true"}Update Participant Statuses{/ts}', '{ts escape="sql" skip="true"}Updates pending event participant statuses based on time{/ts}', 'job', 'process_participant', NULL, 0),
-    ( @domainID, 'Daily' , NULL, '{ts escape="sql" skip="true"}Update Membership Statuses{/ts}', '{ts escape="sql" skip="true"}Updates membership statuses. WARNING: Membership renewal reminders have been migrated to the Schedule Reminders functionality, which supports multiple renewal reminders.{/ts}', 'job', 'process_membership',   NULL, 0),
-    ( @domainID, 'Always' , NULL, '{ts escape="sql" skip="true"}Process Survey Respondents{/ts}',   '{ts escape="sql" skip="true"}Releases reserved survey respondents when they have been reserved for longer than the Release Frequency days specified for that survey.{/ts}', 'job', 'process_respondent',NULL, 0),
-    ( @domainID, 'Hourly' , NULL, '{ts escape="sql" skip="true"}Clean-up Temporary Data and Files{/ts}','{ts escape="sql" skip="true"}Removes temporary data and files, and clears old data from cache tables. Recommend running this job every hour to help prevent database and file system bloat.{/ts}', 'job', 'cleanup', NULL, 0),
-    ( @domainID, 'Always' , NULL, '{ts escape="sql" skip="true"}Send Scheduled SMS{/ts}',           '{ts escape="sql" skip="true"}Sends out scheduled SMS{/ts}', 'job', 'process_sms',             NULL, 0),
-    ( @domainID, 'Always' , NULL, '{ts escape="sql" skip="true"}Rebuild Smart Group Cache{/ts}', '{ts escape="sql" skip="true"}Rebuilds the smart group cache.{/ts}', 'job', 'group_rebuild', '{ts escape="sql" skip="true"}limit=Number optional-Limit the number of smart groups rebuild{/ts}', 0),
-    ( @domainID, 'Daily' , NULL, '{ts escape="sql" skip="true"}Disable expired relationships{/ts}','{ts escape="sql" skip="true"}Disables relationships that have expired (ie. those relationships whose end date is in the past).{/ts}', 'job', 'disable_expired_relationships', NULL, 0),
-    ( @domainID, 'Daily' , NULL, '{ts escape="sql" skip="true"}Validate Email Address from Mailings.{/ts}', '{ts escape="sql" skip="true"}Updates the reset_date on an email address to indicate that there was a valid delivery to this email address.{/ts}', 'mailing', 'update_email_resetdate', '{ts escape="sql" skip="true"}minDays, maxDays=Consider mailings that have completed between minDays and maxDays{/ts}', 0);
+{php}echo (include "sql/civicrm_data/civicrm_job.sqldata.php")->toSQL();{/php}
 
 SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
 SELECT @option_value_rel_id  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Income Account is';
@@ -548,18 +519,6 @@ SELECT @fieldID := max(id) FROM civicrm_price_field WHERE name = 'contribution_a
 INSERT INTO `civicrm_price_field_value` (  `price_field_id`, `name`, `label`, `amount`, `weight`, `is_default`, `is_active`, `financial_type_id`)
 VALUES ( @fieldID, 'contribution_amount', 'Contribution Amount', '1', '1', '0', '1', 1);
 
--- Auto-install core extension.
--- Note this is a limited interim technique for installing core extensions -  the goal is that core extensions would be installed
--- in the setup routine based on their tags & using the standard extension install api.
--- do not try this at home folks.
-INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'sequentialcreditnotes', 'Sequential credit notes', 'Sequential credit notes', 'sequentialcreditnotes', 1);
-INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'greenwich', 'Theme: Greenwich', 'Theme: Greenwich', 'greenwich', 1);
-INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'eventcart', 'Event cart', 'Event cart', 'eventcart', 1);
-INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'financialacls', 'Financial ACLs', 'Financial ACLs', 'financialacls', 1);
-INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'recaptcha', 'reCAPTCHA', 'reCAPTCHA', 'recaptcha', 1);
-INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'ckeditor4', 'CKEditor4', 'CKEditor4', 'ckeditor4', 1);
-INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'legacycustomsearches', 'Custom search framework', 'Custom search framework', 'legacycustomsearches', 1);
-INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'org.civicrm.flexmailer', 'FlexMailer', 'FlexMailer', 'flexmailer', 1);
-
+{php}echo (include "sql/civicrm_data/civicrm_extension.sqldata.php")->toSQL();{/php}
 {php}echo $optionGroups['soft_credit_type']->toSQL();{/php}
 {php}echo $optionGroups['recent_items_providers']->toSQL();{/php}
