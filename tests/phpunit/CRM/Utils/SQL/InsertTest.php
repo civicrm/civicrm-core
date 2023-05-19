@@ -54,7 +54,19 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
       (CONCAT(@foo, @bar),"2b")
     ';
     $this->assertLike($expected, $insert->toSQL());
+  }
 
+  public function testInsertIgnore() {
+    $insert = CRM_Utils_SQL_Insert::into('foo', 'INSERT IGNORE INTO')
+      ->allowLiterals()
+      ->row(['first' => new CRM_Utils_SQL_Literal('1+1'), 'second' => '2'])
+      ->row(['second' => '2b', 'first' => new CRM_Utils_SQL_Literal('CONCAT(@foo, @bar)')]);
+    $expected = '
+      INSERT IGNORE INTO foo (`first`,`second`) VALUES
+      (1+1,"2"),
+      (CONCAT(@foo, @bar),"2b")
+    ';
+    $this->assertLike($expected, $insert->toSQL());
   }
 
 }
