@@ -128,11 +128,8 @@ VALUES
   }
 {/php}
 
-SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
-SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
-SELECT @option_group_id_fat            := max(id) from civicrm_option_group where name = 'financial_account_type';
-
 -- financial accounts
+SELECT @option_group_id_fat            := max(id) from civicrm_option_group where name = 'financial_account_type';
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
 SELECT @opexp := value FROM civicrm_option_value WHERE name = 'Expenses' and option_group_id = @option_group_id_fat;
 SELECT @opAsset := value FROM civicrm_option_value WHERE name = 'Asset' and option_group_id = @option_group_id_fat;
@@ -720,6 +717,7 @@ format=[csv or print] optional-output CSV or print-friendly HTML, else PDF{/ts}'
     ( @domainID, 'Daily' , NULL, '{ts escape="sql" skip="true"}Disable expired relationships{/ts}','{ts escape="sql" skip="true"}Disables relationships that have expired (ie. those relationships whose end date is in the past).{/ts}', 'job', 'disable_expired_relationships', NULL, 0),
     ( @domainID, 'Daily' , NULL, '{ts escape="sql" skip="true"}Validate Email Address from Mailings.{/ts}', '{ts escape="sql" skip="true"}Updates the reset_date on an email address to indicate that there was a valid delivery to this email address.{/ts}', 'mailing', 'update_email_resetdate', '{ts escape="sql" skip="true"}minDays, maxDays=Consider mailings that have completed between minDays and maxDays{/ts}', 0);
 
+SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
 SELECT @option_value_rel_id  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Income Account is';
 SELECT @option_value_rel_id_exp  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Expense Account is';
 SELECT @option_value_rel_id_ar  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Accounts Receivable Account is';
@@ -772,6 +770,7 @@ SELECT 'civicrm_option_value', cov.id, @option_value_rel_id_as, @financial_accou
 LEFT JOIN civicrm_option_value cov ON cog.id = cov.option_group_id
 WHERE cog.name = 'payment_instrument' AND cov.name NOT IN ('Credit Card', 'Debit Card');
 
+SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
 SELECT @option_value_cc_id  := max(id) FROM `civicrm_option_value` WHERE `option_group_id` = @option_group_id_pi AND `name` = 'Credit Card';
 SELECT @option_value_dc_id  := max(id) FROM `civicrm_option_value` WHERE `option_group_id` = @option_group_id_pi AND `name` = 'Debit Card';
 
