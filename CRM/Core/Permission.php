@@ -1516,6 +1516,12 @@ class CRM_Core_Permission {
         'access CiviCRM',
       ],
     ];
+    $permissions['mapping'] = [
+      'default' => [
+        'access CiviCRM',
+      ],
+    ];
+    $permissions['mapping_field'] = $permissions['mapping'];
 
     $permissions['saved_search'] = [
       'default' => ['administer CiviCRM data'],

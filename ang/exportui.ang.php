@@ -13,7 +13,6 @@ return [
     'ang/exportui',
   ],
   'basePages' => [],
-  'permissions' => ['administer CiviCRM'],
   'requires' => [
     'crmUi',
     'crmUtil',
