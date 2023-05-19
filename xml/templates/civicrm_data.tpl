@@ -43,82 +43,13 @@ VALUES
 INSERT INTO civicrm_domain (name, version, contact_id) VALUES (@domainName, '2.2', @contactID);
 SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 
--- Sample location types
--- CRM-9120 for legacy reasons we are continuing to translate the 'name', but this
--- field is used mainly as an ID, and display_name will be shown to the user, but
--- we have not yet finished modifying all places where the 'name' is shown.
-INSERT INTO civicrm_location_type( name, display_name, vcard_name, description, is_reserved, is_active, is_default ) VALUES( '{ts escape="sql"}Home{/ts}', '{ts escape="sql"}Home{/ts}', 'HOME', '{ts escape="sql"}Place of residence{/ts}', 0, 1, 1 );
-INSERT INTO civicrm_location_type( name, display_name, vcard_name, description, is_reserved, is_active ) VALUES( '{ts escape="sql"}Work{/ts}', '{ts escape="sql"}Work{/ts}', 'WORK', '{ts escape="sql"}Work location{/ts}', 0, 1 );
-INSERT INTO civicrm_location_type( name, display_name, vcard_name, description, is_reserved, is_active ) VALUES( '{ts escape="sql"}Main{/ts}', '{ts escape="sql"}Main{/ts}', NULL, '{ts escape="sql"}Main office location{/ts}', 0, 1 );
-INSERT INTO civicrm_location_type( name, display_name, vcard_name, description, is_reserved, is_active ) VALUES( '{ts escape="sql"}Other{/ts}', '{ts escape="sql"}Other{/ts}', NULL, '{ts escape="sql"}Other location{/ts}', 0, 1 );
--- the following location must stay with the untranslated Billing name, CRM-2064
-INSERT INTO civicrm_location_type( name, display_name, vcard_name, description, is_reserved, is_active ) VALUES( 'Billing',  '{ts escape="sql"}Billing{/ts}', NULL, '{ts escape="sql"}Billing Address location{/ts}', 1, 1 );
-
--- Sample relationship types
-INSERT INTO civicrm_relationship_type( name_a_b,label_a_b, name_b_a,label_b_a, description, contact_type_a, contact_type_b, is_reserved )
-    VALUES( 'Child of', '{ts escape="sql"}Child of{/ts}', 'Parent of', '{ts escape="sql"}Parent of{/ts}', '{ts escape="sql"}Parent/child relationship.{/ts}', 'Individual', 'Individual', 0 ),
-          ( 'Spouse of', '{ts escape="sql"}Spouse of{/ts}', 'Spouse of', '{ts escape="sql"}Spouse of{/ts}', '{ts escape="sql"}Spousal relationship.{/ts}', 'Individual', 'Individual', 0 ),
-          ( 'Partner of', '{ts escape="sql"}Partner of{/ts}', 'Partner of', '{ts escape="sql"}Partner of{/ts}', '{ts escape="sql"}Partner relationship.{/ts}', 'Individual', 'Individual', 0 ),
-          ( 'Sibling of', '{ts escape="sql"}Sibling of{/ts}', 'Sibling of', '{ts escape="sql"}Sibling of{/ts}', '{ts escape="sql"}Sibling relationship.{/ts}', 'Individual','Individual', 0 ),
-          ( 'Employee of', '{ts escape="sql"}Employee of{/ts}', 'Employer of', '{ts escape="sql"}Employer of{/ts}', '{ts escape="sql"}Employment relationship.{/ts}','Individual','Organization', 1 ),
-          ( 'Volunteer for', '{ts escape="sql"}Volunteer for{/ts}', 'Volunteer is', '{ts escape="sql"}Volunteer is{/ts}', '{ts escape="sql"}Volunteer relationship.{/ts}','Individual','Organization', 0 ),
-          ( 'Head of Household for', '{ts escape="sql"}Head of Household for{/ts}', 'Head of Household is', '{ts escape="sql"}Head of Household is{/ts}', '{ts escape="sql"}Head of household.{/ts}','Individual','Household', 1 ),
-          ( 'Household Member of', '{ts escape="sql"}Household Member of{/ts}', 'Household Member is', '{ts escape="sql"}Household Member is{/ts}', '{ts escape="sql"}Household membership.{/ts}','Individual','Household', 1 );
-
--- Relationship Types for CiviCase
-INSERT INTO civicrm_relationship_type( name_a_b,label_a_b, name_b_a,label_b_a, description, contact_type_a, contact_type_b, is_reserved )
-    VALUES( 'Case Coordinator is', 'Case Coordinator is', 'Case Coordinator', 'Case Coordinator', 'Case Coordinator', 'Individual', 'Individual', 0 );
-INSERT INTO civicrm_relationship_type( name_a_b,label_a_b, name_b_a,label_b_a, description, contact_type_a, contact_type_b, is_reserved )
-    VALUES( 'Supervised by', 'Supervised by', 'Supervisor', 'Supervisor', 'Immediate workplace supervisor', 'Individual', 'Individual', 0 );
-
-
--- Sample Tags
-INSERT INTO civicrm_tag( name, description, parent_id,used_for )
-    VALUES
-    ( '{ts escape="sql"}Non-profit{/ts}', '{ts escape="sql"}Any not-for-profit organization.{/ts}', NULL,'civicrm_contact'),
-    ( '{ts escape="sql"}Company{/ts}', '{ts escape="sql"}For-profit organization.{/ts}', NULL,'civicrm_contact'),
-    ( '{ts escape="sql"}Government Entity{/ts}', '{ts escape="sql"}Any governmental entity.{/ts}', NULL,'civicrm_contact'),
-    ( '{ts escape="sql"}Major Donor{/ts}', '{ts escape="sql"}High-value supporter of our organization.{/ts}', NULL,'civicrm_contact'),
-    ( '{ts escape="sql"}Volunteer{/ts}', '{ts escape="sql"}Active volunteers.{/ts}', NULL,'civicrm_contact' );
-
-{capture assign=subgroup}{ldelim}subscribe.group{rdelim}{/capture}
-{capture assign=suburl}{ldelim}subscribe.url{rdelim}{/capture}
-{capture assign=welgroup}{ldelim}welcome.group{rdelim}{/capture}
-{capture assign=unsubgroup}{ldelim}unsubscribe.group{rdelim}{/capture}
-{capture assign=actresub}{ldelim}action.resubscribe{rdelim}{/capture}
-{capture assign=actresuburl}{ldelim}action.resubscribeUrl{rdelim}{/capture}
-{capture assign=resubgroup}{ldelim}resubscribe.group{rdelim}{/capture}
-{capture assign=actunsub}{ldelim}action.unsubscribe{rdelim}{/capture}
-{capture assign=actunsuburl}{ldelim}action.unsubscribeUrl{rdelim}{/capture}
-{capture assign=domname}{ldelim}domain.name{rdelim}{/capture}
-
--- sample CiviCRM mailing components
-INSERT INTO civicrm_mailing_component
-    (name,component_type,subject,body_html,body_text,is_default,is_active)
-VALUES
-    ('{ts escape="sql"}Mailing Header{/ts}','Header','{ts escape="sql"}Descriptive Title for this Header{/ts}','{ts escape="sql"}Sample Header for HTML formatted content.{/ts}','{ts escape="sql"}Sample Header for TEXT formatted content.{/ts}',1,1),
-    ('{ts escape="sql"}Mailing Footer{/ts}','Footer','{ts escape="sql"}Descriptive Title for this Footer.{/ts}','{ts escape="sql"}Sample Footer for HTML formatted content<br/><a href="{ldelim}action.optOutUrl{rdelim}">Unsubscribe</a>  <br/> {ldelim}domain.address{rdelim}{/ts}','{ts escape="sql"}to unsubscribe: {ldelim}action.optOutUrl{rdelim}
-{ldelim}domain.address{rdelim}{/ts}',1,1),
-    ('{ts escape="sql"}Subscribe Message{/ts}','Subscribe','{ts escape="sql"}Subscription Confirmation Request{/ts}','{ts escape="sql" 1=$subgroup 2=$suburl}You have a pending subscription to the %1 mailing list. To confirm this subscription, reply to this email or click <a href="%2">here</a>.{/ts}','{ts escape="sql" 1=$subgroup 2=$suburl}You have a pending subscription to the %1 mailing list. To confirm this subscription, reply to this email or click on this link: %2{/ts}',1,1),
-    ('{ts escape="sql"}Welcome Message{/ts}','Welcome','{ts escape="sql"}Your Subscription has been Activated{/ts}','{ts escape="sql" 1=$welgroup}Welcome. Your subscription to the %1 mailing list has been activated.{/ts}','{ts escape="sql" 1=$welgroup}Welcome. Your subscription to the %1 mailing list has been activated.{/ts}',1,1),
-    ('{ts escape="sql"}Unsubscribe Message{/ts}','Unsubscribe','{ts escape="sql"}Un-subscribe Confirmation{/ts}','{ts escape="sql" 1=$unsubgroup 2=$actresub 3=$actresuburl}You have been un-subscribed from the following groups: %1. You can re-subscribe by mailing %2 or clicking <a href="%3">here</a>.{/ts}','{ts escape="sql" 1=$unsubgroup 2=$actresub 3=$actresuburl}You have been un-subscribed from the following groups: %1. You can re-subscribe by mailing %2 or clicking %3{/ts}',1,1),
-    ('{ts escape="sql"}Resubscribe Message{/ts}','Resubscribe','{ts escape="sql"}Re-subscribe Confirmation{/ts}','{ts escape="sql" 1=$resubgroup 2=$actunsub 3=$actunsuburl}You have been re-subscribed to the following groups: %1. You can un-subscribe by mailing %2 or clicking <a href="%3">here</a>.{/ts}','{ts escape="sql" 1=$resubgroup 2=$actunsub 3=$actunsuburl}You have been re-subscribed to the following groups: %1. You can un-subscribe by mailing %2 or clicking %3{/ts}',1,1),
-    ('{ts escape="sql"}Opt-out Message{/ts}','OptOut','{ts escape="sql"}Opt-out Confirmation{/ts}','{ts escape="sql" 1=$domname}Your email address has been removed from %1 mailing lists.{/ts}','{ts escape="sql" 1=$domname}Your email address has been removed from %1 mailing lists.{/ts}',1,1),
-    ('{ts escape="sql"}Auto-responder{/ts}','Reply','{ts escape="sql"}Please Send Inquiries to Our Contact Email Address{/ts}','{ts escape="sql"}This is an automated reply from an un-attended mailbox. Please send any inquiries to the contact email address listed on our web-site.{/ts}','{ts escape="sql"}This is an automated reply from an un-attended mailbox. Please send any inquiries to the contact email address listed on our web-site.{/ts}',1,1);
-
-
--- contribution types
-INSERT INTO
-   civicrm_financial_type(name, is_reserved, is_active, is_deductible)
-VALUES
-  ( '{ts escape="sql"}Donation{/ts}'             , 0, 1, 1 ),
-  ( '{ts escape="sql"}Member Dues{/ts}'          , 0, 1, 1 ),
-  ( '{ts escape="sql"}Campaign Contribution{/ts}', 0, 1, 0 ),
-  ( '{ts escape="sql"}Event Fee{/ts}'            , 0, 1, 0 );
-
--- option groups and values for 'preferred communication methods' , 'activity types', 'gender', etc.
-
 {php}
+  echo (include "sql/civicrm_data/civicrm_location_type.sqldata.php")->toSQL();
+  echo (include "sql/civicrm_data/civicrm_relationship_type.sqldata.php")->toSQL();
+  echo (include "sql/civicrm_data/civicrm_tag.sqldata.php")->toSQL();
+  echo (include "sql/civicrm_data/civicrm_mailing_component.sqldata.php")->toSQL();
+  echo (include "sql/civicrm_data/civicrm_financial_type.sqldata.php")->toSQL();
+
   $optionGroups = include 'sql/civicrm_data/civicrm_option_group.php';
   $laterGroups = ['encounter_medium', 'soft_credit_type', 'recent_items_providers'];
   foreach ($optionGroups as $groupName => $group) {
@@ -159,49 +90,12 @@ VALUES
 -- CRM-6138
 {include file='languages.tpl'}
 
-{php}echo $optionGroups['encounter_medium']->toSQL();{/php}
-
--- sample membership status entries
-INSERT INTO
-    civicrm_membership_status(name, label, start_event, start_event_adjust_unit, start_event_adjust_interval, end_event, end_event_adjust_unit, end_event_adjust_interval, is_current_member, is_admin, weight, is_default, is_active, is_reserved)
-VALUES
-    ('New',       '{ts escape="sql"}New{/ts}', 'join_date', null, null,'join_date','month',3, 1, 0, 1, 0, 1, 0),
-    ('Current',   '{ts escape="sql"}Current{/ts}', 'start_date', null, null,'end_date', null, null, 1, 0, 2, 1, 1, 0),
-    ('Grace',     '{ts escape="sql"}Grace{/ts}', 'end_date', null, null,'end_date','month', 1, 1, 0, 3, 0, 1, 0),
-    ('Expired',   '{ts escape="sql"}Expired{/ts}', 'end_date', 'month', 1, null, null, null, 0, 0, 4, 0, 1, 0),
-    ('Pending',   '{ts escape="sql"}Pending{/ts}', 'join_date', null, null,'join_date',null,null, 0, 0, 5, 0, 1, 1),
-    ('Cancelled', '{ts escape="sql"}Cancelled{/ts}', 'join_date', null, null,'join_date',null,null, 0, 0, 6, 0, 1, 1),
-    ('Deceased',  '{ts escape="sql"}Deceased{/ts}', null, null, null, null, null, null, 0, 1, 7, 0, 1, 1);
-
-
-INSERT INTO `civicrm_preferences_date`
-  (name, start, end, date_format, time_format, description)
-VALUES
-  ( 'activityDate'    ,  20, 10, '',    '',  '{ts escape="sql"}Date for relationships. activities. contributions: receive, receipt, cancel. membership: join, start, renew. case: start, end.{/ts}'         ),
-  ( 'activityDateTime',  20, 10, '',     1,  '{ts escape="sql"}Date and time for activity: scheduled. participant: registered.{/ts}'                                                                  ),
-  ( 'birth'           , 100,  0, '',    '',  '{ts escape="sql"}Birth and deceased dates. Only year, month and day fields are supported.{/ts}'                                                         ),
-  ( 'creditCard'      ,   0, 10, 'M Y', '',  '{ts escape="sql"}Month and year only for credit card expiration.{/ts}'                                                                                  ),
-  ( 'custom'          ,  20, 20, '',    '',  '{ts escape="sql"}Uses date range passed in by form field. Can pass in a posix date part parameter. Start and end offsets defined here are ignored.{/ts}'),
-  ( 'mailing'         ,   0,  1, '',    '',  '{ts escape="sql"}Date and time. Used for scheduling mailings.{/ts}'                                                                                     ),
-  ( 'searchDate'      ,  20, 20, '',    '',  '{ts escape="sql"}Used in search forms.{/ts}'                                                                                      );
-
-
--- various processor options
---
--- Table structure for table `civicrm_payment_processor_type`
---
-
-INSERT INTO `civicrm_payment_processor_type`
- (name, title, description, is_active, is_default, user_name_label, password_label, signature_label, subject_label, class_name, url_site_default, url_api_default, url_recur_default, url_button_default, url_site_test_default, url_api_test_default, url_recur_test_default, url_button_test_default, billing_mode, is_recur )
-VALUES
- ('PayPal_Standard',    '{ts escape="sql"}PayPal - Website Payments Standard{/ts}', NULL,1,0,'{ts escape="sql"}Merchant Account Email{/ts}',NULL,NULL,NULL,'Payment_PayPalImpl','https://www.paypal.com/',NULL,'https://www.paypal.com/',NULL,'https://www.sandbox.paypal.com/',NULL,'https://www.sandbox.paypal.com/',NULL,4,1),
- ('PayPal',             '{ts escape="sql"}PayPal - Website Payments Pro{/ts}',      NULL,1,0,'{ts escape="sql"}User Name{/ts}','{ts escape="sql"}Password{/ts}','{ts escape="sql"}Signature{/ts}',NULL,'Payment_PayPalImpl','https://www.paypal.com/','https://api-3t.paypal.com/','https://www.paypal.com/','https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif','https://www.sandbox.paypal.com/','https://api-3t.sandbox.paypal.com/','https://www.sandbox.paypal.com/','https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',3, 1),
- ('PayPal_Express',     '{ts escape="sql"}PayPal - Express{/ts}',       NULL,1,0,'{ts escape="sql"}User Name{/ts}','{ts escape="sql"}Password{/ts}','{ts escape="sql"}Signature{/ts}',NULL,'Payment_PayPalImpl','https://www.paypal.com/','https://api-3t.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif','https://www.sandbox.paypal.com/','https://api-3t.sandbox.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',2, 1),
- ('AuthNet',            '{ts escape="sql"}Authorize.Net{/ts}',          NULL,1,0,'{ts escape="sql"}API Login{/ts}','{ts escape="sql"}Payment Key{/ts}','{ts escape="sql"}MD5 Hash{/ts}',NULL,'Payment_AuthorizeNet','https://secure2.authorize.net/gateway/transact.dll',NULL,'https://api2.authorize.net/xml/v1/request.api',NULL,'https://test.authorize.net/gateway/transact.dll',NULL,'https://apitest.authorize.net/xml/v1/request.api',NULL,1,1),
- ('PayJunction',        '{ts escape="sql"}PayJunction{/ts}',            NULL,0,0,'User Name','Password',NULL,NULL,'Payment_PayJunction','https://payjunction.com/quick_link',NULL,NULL,NULL,'https://www.payjunctionlabs.com/quick_link',NULL,NULL,NULL,1,1),
- ('Dummy',              '{ts escape="sql"}Dummy Payment Processor{/ts}',NULL,1,1,'{ts escape="sql"}User Name{/ts}',NULL,NULL,NULL,'Payment_Dummy',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,1),
- ('Realex',             '{ts escape="sql"}Realex Payment{/ts}',         NULL,0,0,'Merchant ID', 'Password', NULL, 'Account', 'Payment_Realex', 'https://epage.payandshop.com/epage.cgi', NULL, NULL, NULL, 'https://epage.payandshop.com/epage-remote.cgi', NULL, NULL, NULL, 1, 0),
- ('FirstData',          '{ts escape="sql"}FirstData (aka linkpoint){/ts}', '{ts escape="sql"}FirstData (aka linkpoint){/ts}', 0, 0, 'Store name', 'certificate path', NULL, NULL, 'Payment_FirstData', 'https://secure.linkpt.net', NULL, NULL, NULL, 'https://staging.linkpt.net', NULL, NULL, NULL, 1, 0);
+{php}
+  echo $optionGroups['encounter_medium']->toSQL();
+  echo (include "sql/civicrm_data/civicrm_membership_status.sqldata.php")->toSQL();
+  echo (include "sql/civicrm_data/civicrm_preferences_date.sqldata.php")->toSQL();
+  echo (include "sql/civicrm_data/civicrm_payment_processor_type.sqldata.php")->toSQL();
+{/php}
 
 
 -- the fuzzy default dedupe rules
