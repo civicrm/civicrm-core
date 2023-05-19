@@ -70,30 +70,29 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return string
    */
-  public static function buildTableSQL($params) {
+  public static function buildTableSQL($params): string {
     $sql = "CREATE TABLE {$params['name']} (";
     if (isset($params['fields']) &&
       is_array($params['fields'])
     ) {
       $separator = "\n";
-      $prefix = NULL;
       foreach ($params['fields'] as $field) {
-        $sql .= self::buildFieldSQL($field, $separator, $prefix);
+        $sql .= self::buildFieldSQL($field, $separator);
         $separator = ",\n";
       }
       foreach ($params['fields'] as $field) {
-        $sql .= self::buildPrimaryKeySQL($field, $separator, $prefix);
+        $sql .= self::buildPrimaryKeySQL($field, $separator);
       }
       foreach ($params['fields'] as $field) {
-        $sql .= self::buildSearchIndexSQL($field, $separator);
+        $sql .= self::buildSearchIndexSQL($field, $separator, 'INDEX ');
       }
       if (isset($params['indexes'])) {
         foreach ($params['indexes'] as $index) {
-          $sql .= self::buildIndexSQL($index, $separator, $prefix);
+          $sql .= self::buildIndexSQL($index, $separator);
         }
       }
       foreach ($params['fields'] as $field) {
-        $sql .= self::buildForeignKeySQL($field, $separator, $prefix, $params['name']);
+        $sql .= self::buildForeignKeySQL($field, $separator, '', $params['name']);
       }
     }
     $sql .= "\n) {$params['attributes']};";
@@ -102,12 +101,12 @@ class CRM_Core_BAO_SchemaHandler {
 
   /**
    * @param array $params
-   * @param $separator
-   * @param $prefix
+   * @param string $separator
+   * @param string $prefix
    *
    * @return string
    */
-  public static function buildFieldSQL($params, $separator, $prefix) {
+  public static function buildFieldSQL($params, $separator, $prefix = ''): string {
     $sql = '';
     $sql .= $separator;
     $sql .= str_repeat(' ', 8);
@@ -138,12 +137,12 @@ class CRM_Core_BAO_SchemaHandler {
   /**
    * @param array $params
    * @param $separator
-   * @param $prefix
+   * @param string $prefix
    *
-   * @return NULL|string
+   * @return string
    */
-  public static function buildPrimaryKeySQL($params, $separator, $prefix) {
-    $sql = NULL;
+  public static function buildPrimaryKeySQL($params, $separator, $prefix = ''): string {
+    $sql = '';
     if (!empty($params['primary'])) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
@@ -193,7 +192,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return string
    */
-  public static function buildIndexSQL(&$params, $separator, $prefix) {
+  public static function buildIndexSQL(&$params, $separator) {
     $sql = '';
     $sql .= $separator;
     $sql .= str_repeat(' ', 8);
@@ -247,14 +246,14 @@ ALTER TABLE {$tableName}
 
   /**
    * @param array $params
-   * @param $separator
-   * @param $prefix
+   * @param string $separator
+   * @param string $prefix
    * @param string $tableName
    *
-   * @return NULL|string
+   * @return string
    */
-  public static function buildForeignKeySQL($params, $separator, $prefix, $tableName) {
-    $sql = NULL;
+  public static function buildForeignKeySQL($params, $separator, $prefix, $tableName): string {
+    $sql = '';
     if (!empty($params['fk_table_name']) && !empty($params['fk_field_name'])) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
