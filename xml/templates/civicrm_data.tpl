@@ -78,69 +78,13 @@ SELECT @opCost := value FROM civicrm_option_value WHERE name = 'Cost of Sales' a
   echo (include "sql/civicrm_data/civicrm_payment_processor_type.sqldata.php")->toSQL();
 {/php}
 
--- the fuzzy default dedupe rules
--- IndividualSupervised uses hard-coded optimized query (CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised)
-INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, used, name, title, is_reserved)
-VALUES ('Individual', 20, 'Supervised', 'IndividualSupervised', '{ts escape="sql"}Name and Email (reserved){/ts}', 1);
-
-SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
-INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
-VALUES (@drgid, 'civicrm_contact', 'first_name', 5),
-       (@drgid, 'civicrm_contact', 'last_name',  7),
-       (@drgid, 'civicrm_email'  , 'email',     10);
-
-INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, used, name, title, is_reserved)
-VALUES ('Organization', 10, 'Supervised', 'OrganizationSupervised', '{ts escape="sql"}Name and Email{/ts}', 0);
-
-SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
-INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
-VALUES (@drgid, 'civicrm_contact', 'organization_name', 10),
-       (@drgid, 'civicrm_email'  , 'email',             10);
-
-INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, used, name, title, is_reserved)
-VALUES ('Household', 10, 'Supervised', 'HouseholdSupervised', '{ts escape="sql"}Name and Email{/ts}', 0);
-
-SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
-INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
-VALUES (@drgid, 'civicrm_contact', 'household_name', 10),
-       (@drgid, 'civicrm_email'  , 'email',          10);
-
--- the strict dedupe rules
--- IndividualUnsupervised uses hard-coded optimized query (CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised)
-INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, used, name, title, is_reserved)
-VALUES ('Individual', 10, 'Unsupervised', 'IndividualUnsupervised', '{ts escape="sql"}Email (reserved){/ts}', 1);
-
-SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
-INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
-VALUES (@drgid, 'civicrm_email', 'email', 10);
-
-INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, used, name, title, is_reserved)
-VALUES ('Organization', 10,  'Unsupervised', 'OrganizationUnsupervised', '{ts escape="sql"}Name and Email{/ts}', 0);
-
-SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
-INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
-VALUES (@drgid, 'civicrm_contact', 'organization_name', 10),
-       (@drgid, 'civicrm_email'  , 'email',             10);
-
-INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, used, name, title, is_reserved)
-VALUES ('Household', 10, 'Unsupervised', 'HouseholdUnsupervised', '{ts escape="sql"}Name and Email{/ts}', 0);
-
-SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
-INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
-VALUES (@drgid, 'civicrm_contact', 'household_name', 10),
-       (@drgid, 'civicrm_email'  , 'email',          10);
-
--- IndividualGeneral uses hard-coded optimized query (CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral)
-INSERT INTO civicrm_dedupe_rule_group (contact_type, threshold, used, name, title, is_reserved)
-VALUES ('Individual', 15, 'General', 'IndividualGeneral', '{ts escape="sql"}Name and Address (reserved){/ts}', 1);
-
-SELECT @drgid := MAX(id) FROM civicrm_dedupe_rule_group;
-INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
-VALUES (@drgid, 'civicrm_contact', 'first_name',     '5'),
-       (@drgid, 'civicrm_contact', 'last_name',      '5'),
-       (@drgid, 'civicrm_address', 'street_address', '5'),
-       (@drgid, 'civicrm_contact', 'middle_name',    '1'),
-       (@drgid, 'civicrm_contact', 'suffix_id',      '1');
+{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/IndividualSupervised.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/OrganizationSupervised.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/HouseholdSupervised.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/IndividualUnsupervised.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/OrganizationUnsupervised.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/HouseholdUnsupervised.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/IndividualGeneral.sqldata.php")->toSQL();{/php}
 
 {php}echo (include "sql/civicrm_data/civicrm_county.sqldata.php")->toSQL();{/php}
 
