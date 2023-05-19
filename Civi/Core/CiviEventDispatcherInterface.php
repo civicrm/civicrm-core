@@ -26,10 +26,12 @@ interface CiviEventDispatcherInterface {
    *
    * @param string $eventName The name of the event to dispatch. The name of
    *   the event is the name of the method that is invoked on listeners.
-   * @param Event|null $event The event to pass to the event handlers/listeners
-   *   If not supplied, an empty Event instance is created
-   *
-   * @return Event
+   * @param object|null $event The event to pass to the event handlers/listeners
+   *   The dispatcher accepts any kind of event-object.
+   *   Events defined by CiviCRM-core are usually based on `GenericHookEvent`.
+   *   If $event is a null, then an empty `GenericHookEvent` is created.
+   * @return object
+   *   The final event object.
    */
   public function dispatch($eventName, $event = NULL);
 
