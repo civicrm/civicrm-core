@@ -362,14 +362,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Event_Form_Participant', $submittedValues);
     $form->preProcess();
     $form->buildForm();
-
-    if (!empty($eventParams['is_monetary'])) {
-      $form->_bltID = 5;
-      $form->_isPaidEvent = TRUE;
-      CRM_Event_Form_EventFees::preProcess($form);
-      $form->assignProcessors();
-      $form->buildEventFeeForm($form);
-    }
     return $form;
   }
 
@@ -518,20 +510,11 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   public function testSubmitWithDeferredRecognition(): void {
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $futureDate = date('Y') + 1 . '-09-20';
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1, 'start_date' => $futureDate]);
-    $form->_quickConfig = TRUE;
-
-    $form->submit([
-      'register_date' => date('Ymd'),
-      'status_id' => 1,
-      'role_id' => 1,
-      $this->getPriceFieldKey() => $this->getPriceFieldValueID(),
-      'priceSetId' => $this->getPriceSetID('event'),
-      'event_id' => $this->getEventID(),
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1, 'start_date' => $futureDate], [
       'record_contribution' => TRUE,
-      'amount_level' => 'blah',
       'financial_type_id' => 1,
     ]);
+    $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     // Api doesn't retrieve it & we don't much want to change that as we want to feature freeze BAO_Query.
     $this->assertEquals($futureDate . ' 00:00:00', CRM_Core_DAO::singleValueQuery("SELECT revenue_recognition_date FROM civicrm_contribution WHERE id = {$contribution['id']}"));
