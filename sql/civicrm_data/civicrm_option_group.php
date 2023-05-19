@@ -1,7 +1,7 @@
 <?php
 
 $readOptionGroups = function (): array {
-  $files = (array) glob(__DIR__ . '/civicrm_option_groups/*.sqldata.php');
+  $files = (array) glob(__DIR__ . '/civicrm_option_group/*.sqldata.php');
   $result = [];
   foreach ($files as $file) {
     $basename = preg_replace('/\.sqldata\.php$/', '', basename($file));

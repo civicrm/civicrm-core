@@ -119,7 +119,7 @@ VALUES
 -- option groups and values for 'preferred communication methods' , 'activity types', 'gender', etc.
 
 {php}
-  $optionGroups = include 'sql/civicrm_option_groups.php';
+  $optionGroups = include 'sql/civicrm_data/civicrm_option_group.php';
   $laterGroups = ['encounter_medium', 'soft_credit_type', 'recent_items_providers'];
   foreach ($optionGroups as $groupName => $group) {
     if (!in_array($groupName, $laterGroups)) {
