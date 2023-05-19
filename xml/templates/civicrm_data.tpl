@@ -132,14 +132,6 @@ SELECT @option_group_id_pi             := max(id) from civicrm_option_group wher
 SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
 SELECT @option_group_id_fat            := max(id) from civicrm_option_group where name = 'financial_account_type';
 
-SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
-SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
-SELECT @memberCompId     := max(id) FROM civicrm_component where name = 'CiviMember';
-SELECT @pledgeCompId     := max(id) FROM civicrm_component where name = 'CiviPledge';
-SELECT @caseCompId       := max(id) FROM civicrm_component where name = 'CiviCase';
-SELECT @campaignCompId   := max(id) FROM civicrm_component where name = 'CiviCampaign';
-SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMail';
-
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
 SELECT @opexp := value FROM civicrm_option_value WHERE name = 'Expenses' and option_group_id = @option_group_id_fat;
