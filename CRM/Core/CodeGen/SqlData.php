@@ -11,9 +11,16 @@ class CRM_Core_CodeGen_SqlData extends CRM_Core_CodeGen_AbstractSqlData {
    */
   protected $table;
 
-  public static function create(string $table): CRM_Core_CodeGen_SqlData {
+  /**
+   * @var string
+   *   Ex: 'INSERT INTO'
+   */
+  protected $verb;
+
+  public static function create(string $table, string $verb = 'INSERT INTO'): CRM_Core_CodeGen_SqlData {
     $sqlData = new static();
     $sqlData->table = $table;
+    $sqlData->verb = $verb;
     return $sqlData;
   }
 
@@ -29,7 +36,7 @@ class CRM_Core_CodeGen_SqlData extends CRM_Core_CodeGen_AbstractSqlData {
     $result = '';
     $rows = $this->toArray();
     if ($rows) {
-      $result .= CRM_Utils_SQL_Insert::into($this->table)
+      $result .= CRM_Utils_SQL_Insert::into($this->table, $this->verb)
         ->allowLiterals()
         ->rows($rows)
         ->toSQL() . ";\n";
