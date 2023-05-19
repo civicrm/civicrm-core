@@ -37,12 +37,7 @@
       <td align="center">{$form.email.$blockId.on_hold.html}</td>
       <td align="center" {if !$multipleBulk}class="crm-email-bulkmail"{/if}>{$form.email.$blockId.is_bulkmail.html}</td>
       <td align="center" class="crm-email-is_primary">{$form.email.$blockId.is_primary.1.html}</td>
-      <td>
-        {if $blockId gt 1}
-          <a title="{ts}Delete Email{/ts}" class="crm-delete-inline crm-hover-button" href="#"><span
-              class="icon delete-icon"></span></a>
-        {/if}
-      </td>
+      <td><a title="{ts}Delete Email{/ts}" class="crm-delete-inline crm-hover-button" href="#"><span class="icon delete-icon"></span></a></td>
     </tr>
   {/section}
 </table>
