@@ -43,13 +43,12 @@ VALUES
 INSERT INTO civicrm_domain (name, version, contact_id) VALUES (@domainName, '2.2', @contactID);
 SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 
+{php}echo (include "sql/civicrm_data/civicrm_location_type.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_relationship_type.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_tag.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_mailing_component.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_financial_type.sqldata.php")->toSQL();{/php}
 {php}
-  echo (include "sql/civicrm_data/civicrm_location_type.sqldata.php")->toSQL();
-  echo (include "sql/civicrm_data/civicrm_relationship_type.sqldata.php")->toSQL();
-  echo (include "sql/civicrm_data/civicrm_tag.sqldata.php")->toSQL();
-  echo (include "sql/civicrm_data/civicrm_mailing_component.sqldata.php")->toSQL();
-  echo (include "sql/civicrm_data/civicrm_financial_type.sqldata.php")->toSQL();
-
   $optionGroups = include 'sql/civicrm_data/civicrm_option_group.php';
   $laterGroups = ['encounter_medium', 'soft_credit_type', 'recent_items_providers'];
   foreach ($optionGroups as $groupName => $group) {
@@ -62,12 +61,11 @@ SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 -- CRM-6138
 {include file='languages.tpl'}
 
-{php}
-  echo $optionGroups['encounter_medium']->toSQL();
-  echo (include "sql/civicrm_data/civicrm_membership_status.sqldata.php")->toSQL();
-  echo (include "sql/civicrm_data/civicrm_preferences_date.sqldata.php")->toSQL();
-  echo (include "sql/civicrm_data/civicrm_payment_processor_type.sqldata.php")->toSQL();
-{/php}
+{php}echo (include "sql/civicrm_data/civicrm_option_group/encounter_medium.sqldata.php")->toSQL();{/php}
+
+{php}echo (include "sql/civicrm_data/civicrm_membership_status.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_preferences_date.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_payment_processor_type.sqldata.php")->toSQL();{/php}
 
 {php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/IndividualSupervised.sqldata.php")->toSQL();{/php}
 {php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/OrganizationSupervised.sqldata.php")->toSQL();{/php}
@@ -192,5 +190,5 @@ INSERT INTO `civicrm_price_field_value` (  `price_field_id`, `name`, `label`, `a
 VALUES ( @fieldID, 'contribution_amount', 'Contribution Amount', '1', '1', '0', '1', 1);
 
 {php}echo (include "sql/civicrm_data/civicrm_extension.sqldata.php")->toSQL();{/php}
-{php}echo $optionGroups['soft_credit_type']->toSQL();{/php}
-{php}echo $optionGroups['recent_items_providers']->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_option_group/soft_credit_type.sqldata.php")->toSQL();{/php}
+{php}echo (include "sql/civicrm_data/civicrm_option_group/recent_items_providers.sqldata.php")->toSQL();{/php}
