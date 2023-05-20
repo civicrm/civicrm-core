@@ -145,10 +145,9 @@
 {/if}
 {if !empty($isPrimary)}
 
-{if !empty($balanceAmount)}{ts}Total Paid{/ts}{else}{ts}Total Amount{/ts}{/if}: {if !empty($totalAmount)}{$totalAmount|crmMoney}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
-
-{if !empty($balanceAmount)}
-{ts}Balance{/ts}: {$balanceAmount|crmMoney}
+{if {contribution.balance_amount|boolean}}{ts}Total Paid{/ts}: {if {contribution.paid_amount|boolean}}{contribution.paid_amount}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+{ts}Balance{/ts}: {contribution.balance_amount}
+{else}{ts}Total Amount{/ts}: {if {contribution.total_amount|boolean}}{contribution.total_amount}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
 {/if}
 
 {if !empty($pricesetFieldsCount) }

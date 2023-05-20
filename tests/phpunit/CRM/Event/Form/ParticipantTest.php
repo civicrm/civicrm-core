@@ -323,6 +323,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'event.loc_block_id.phone_id.phone_type_id:label:::Mobile',
       'event.loc_block_id.phone_id.phone_ext:::456',
       'event.confirm_email_text::Just do it',
+      'contribution.total_amount:::' . Civi::format()->money(1550.55),
+      'contribution.total_amount|raw:::1550.55',
+      'contribution.paid_amount:::' . Civi::format()->money(1550.55),
+      'contribution.paid_amount|raw:::1550.55',
+      'contribution.balance_amount:::' . Civi::format()->money(0),
+      'contribution.balance_amount|raw is zero:::Yes',
+      'contribution.balance_amount|raw string is zero:::Yes',
+      'contribution.balance_amount|boolean:::No',
+      'contribution.paid_amount|boolean:::Yes',
     ]);
 
     $this->callAPISuccess('Email', 'delete', ['id' => $email['id']]);
@@ -592,7 +601,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'check_number' => 879,
       'payment_instrument_id' => $paymentInstrumentID,
     ]);
-    $this->assertPartialPaymentResult($isQuickConfig, $mailUtil);
+    $this->assertPartialPaymentResult($isQuickConfig, $mailUtil, FALSE);
   }
 
   /**
@@ -607,7 +616,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitPendingAddPayment(bool $isQuickConfig): void {
-    $mut = new CiviMailUtils($this, TRUE);
+    $mailUtil = new CiviMailUtils($this, TRUE);
     $form = $this->getForm(['is_monetary' => 1]);
     $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('event')]);
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
@@ -618,7 +627,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'check_number' => 879,
       'payment_instrument_id' => $paymentInstrumentID,
     ]);
-    $this->assertPartialPaymentResult($isQuickConfig, $mut, FALSE);
+    $this->assertPartialPaymentResult($isQuickConfig, $mailUtil, FALSE);
   }
 
   /**
@@ -709,8 +718,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'Annual CiviCRM meet',
       'Registered Email',
       $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' big - 1' : 'Price Field - big',
-      $isAmountPaidOnForm ? 'Total Paid: $20.00' : ' ',
-      'Balance: $1,530.55',
+      $isAmountPaidOnForm ? 'Total Paid: $20.00' : 'Total Paid: ',
+      $isAmountPaidOnForm ? 'Balance: $1,530.55' : 'Balance: $1,550.55',
       'Financial Type: Event Fee',
       'Paid By: Check',
       'Check Number: 879',

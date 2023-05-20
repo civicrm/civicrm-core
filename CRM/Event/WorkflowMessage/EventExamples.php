@@ -61,6 +61,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
   private function addExampleData(GenericWorkflowMessage $messageTemplate, $example): void {
     $messageTemplate->setContact(\Civi\Test::example('entity/Contact/Barb'));
     $messageTemplate->setEventID($example['event_id']);
+    $messageTemplate->setContribution(['total_amount' => 50, 'balance_amount' => 20, 'currency' => 'USD']);
   }
 
   /**

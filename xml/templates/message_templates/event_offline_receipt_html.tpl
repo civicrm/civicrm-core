@@ -263,28 +263,25 @@
        </tr>
       {/if}
       {if !empty($isPrimary)}
-       <tr>
-        <td {$labelStyle}>
-        {if isset($balanceAmount)}
-           {ts}Total Paid{/ts}
+       {if {contribution.balance_amount|boolean}}
+         <tr>
+           <td {$labelStyle}>{ts}Total Paid{/ts}</td>
+           <td {$valueStyle}>
+             {if {contribution.paid_amount|boolean}}{contribution.paid_amount|crmMoney}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+           </td>
+          </tr>
+          <tr>
+           <td {$labelStyle}>{ts}Balance{/ts}</td>
+           <td {$valueStyle}>{contribution.balance_amount}</td>
+         </tr>
         {else}
-           {ts}Total Amount{/ts}
-         {/if}
-        </td>
-        <td {$valueStyle}>
-         {if !empty($totalAmount)}{$totalAmount|crmMoney}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
-        </td>
-       </tr>
-      {if isset($balanceAmount)}
-       <tr>
-        <td {$labelStyle}>
-         {ts}Balance{/ts}
-        </td>
-        <td {$valueStyle}>
-         {$balanceAmount|crmMoney}
-        </td>
-       </tr>
-      {/if}
+         <tr>
+           <td {$labelStyle}>{ts}Total Amount{/ts}</td>
+           <td {$valueStyle}>
+               {if {contribution.total_amount|boolean}}{contribution.total_amount|crmMoney}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+           </td>
+         </tr>
+       {/if}
        {if !empty($pricesetFieldsCount) }
      <tr>
        <td {$labelStyle}>
