@@ -538,7 +538,7 @@ AND    u.status = 1
 
     if ($uid) {
       $account = user_load($uid);
-      if ($account && $account->uid) {
+      if ($account && $account->uid && $account->status) {
         global $user;
         $user = $account;
         return TRUE;
