@@ -301,6 +301,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $fieldsToProvide = [
         'id',
         'name',
+        'title',
+        'frontend_title',
         'payment_processor_type_id',
         'user_name',
         'password',
