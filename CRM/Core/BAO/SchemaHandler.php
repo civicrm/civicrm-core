@@ -156,46 +156,47 @@ class CRM_Core_BAO_SchemaHandler {
    * @param array $params
    * @param string $separator
    * @param string $prefix
-   * @param string|null $existingIndex
+   * @param string $existingIndex
    *
    * @return NULL|string
    */
-  public static function buildSearchIndexSQL($params, $separator, $prefix = '', $existingIndex = NULL) {
-    $sql = NULL;
+  public static function buildSearchIndexSQL($params, $separator, $prefix = '', $existingIndex = '') {
+    $sql = '';
 
-    // dont index blob
+    // Don't index blob
     if ($params['type'] == 'text') {
-      return $sql;
+      return NULL;
     }
+
+    // Perform case-insensitive match to see if index name begins with "index_" or "INDEX_"
+    // (for legacy reasons it could be either)
+    $searchIndexExists = stripos($existingIndex ?? '', 'index_') === 0;
 
     // Add index if field is searchable if it does not reference a foreign key
     // (skip indexing FK fields because it would be redundant to have 2 indexes)
-    if (!empty($params['searchable']) && empty($params['fk_table_name']) && substr($existingIndex ?? '', 0, 5) !== 'INDEX') {
+    if (!empty($params['searchable']) && empty($params['fk_table_name']) && !$searchIndexExists) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
-      $sql .= "INDEX_{$params['name']} ( {$params['name']} )";
+      $sql .= "index_{$params['name']} ( {$params['name']} )";
     }
     // Drop search index if field is no longer searchable
-    elseif (empty($params['searchable']) && substr($existingIndex ?? '', 0, 5) === 'INDEX') {
+    elseif (empty($params['searchable']) && $searchIndexExists) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= "DROP INDEX $existingIndex";
     }
-    return $sql;
+    return $sql ?: NULL;
   }
 
   /**
    * @param array $params
-   * @param $separator
-   * @param $prefix
+   * @param string $separator
    *
    * @return string
    */
-  public static function buildIndexSQL(&$params, $separator) {
-    $sql = '';
-    $sql .= $separator;
-    $sql .= str_repeat(' ', 8);
+  public static function buildIndexSQL($params, $separator = ''): string {
+    $sql = $separator . str_repeat(' ', 8);
     if ($params['unique']) {
       $sql .= 'UNIQUE INDEX';
       $indexName = 'unique';
@@ -221,10 +222,8 @@ class CRM_Core_BAO_SchemaHandler {
   /**
    * @param string $tableName
    * @param string $fkTableName
-   *
-   * @return bool
    */
-  public static function changeFKConstraint($tableName, $fkTableName) {
+  public static function changeFKConstraint($tableName, $fkTableName): void {
     $fkName = "{$tableName}_entity_id";
     if (strlen($fkName) >= 48) {
       $fkName = substr($fkName, 0, 32) . "_" . substr(md5($fkName), 0, 16);
@@ -240,8 +239,6 @@ ALTER TABLE {$tableName}
       ADD CONSTRAINT `FK_{$fkName}` FOREIGN KEY (`entity_id`) REFERENCES {$fkTableName} (`id`) ON DELETE CASCADE;";
     // CRM-7007: do not i18n-rewrite this query
     CRM_Core_DAO::executeQuery($addFKSql, [], TRUE, NULL, FALSE, FALSE);
-
-    return TRUE;
   }
 
   /**

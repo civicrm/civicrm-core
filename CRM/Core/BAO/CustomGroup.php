@@ -188,7 +188,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       self::createTable($group);
     }
     elseif ($tableNameNeedingIndexUpdate) {
-      CRM_Core_BAO_SchemaHandler::changeUniqueToIndex($tableNameNeedingIndexUpdate, CRM_Utils_Array::value('is_multiple', $params));
+      CRM_Core_BAO_SchemaHandler::changeUniqueToIndex($tableNameNeedingIndexUpdate, !empty($params['is_multiple']));
     }
 
     if (CRM_Utils_Array::value('overrideFKConstraint', $params) == 1) {
