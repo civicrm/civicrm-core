@@ -32,6 +32,7 @@ SELECT @locBlockId := id from civicrm_loc_block where phone_id = @phoneId AND em
 
   SELECT @option_group_id_mail_approval_status := max(id) from civicrm_option_group where name = 'mail_approval_status';
   SELECT @option_group_id_fma            := max(id) from civicrm_option_group where name = 'from_email_address';
+  SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMail';
 
   INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`)
