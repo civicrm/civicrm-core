@@ -703,8 +703,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
         'modelProps' => [
           'receiptText' => $this->getSubmittedValue('receipt_text'),
-          'contactId' => $this->_receiptContactId,
-          'contributionId' => $this->getContributionID(),
+          'contactID' => $this->_receiptContactId,
+          'contributionID' => $this->getContributionID(),
           'membershipID' => $this->_membershipId,
         ],
       ]

@@ -2255,7 +2255,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         'modelProps' => [
           'participantID' => $this->_id,
           'eventID' => $params['event_id'],
-          'contributionId' => $this->getContributionID(),
+          'contributionID' => $this->getContributionID(),
         ],
       ];
 

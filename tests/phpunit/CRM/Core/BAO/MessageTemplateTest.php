@@ -308,7 +308,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
     $msg = WorkflowMessage::create('case_activity', [
       'modelProps' => [
-        'contactId' => $contact_id,
+        'contactID' => $contact_id,
         'contact' => ['role' => 'Sand grain counter'],
         'isCaseActivity' => 1,
         'clientId' => $client_id,
