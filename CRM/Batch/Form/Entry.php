@@ -966,8 +966,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
         'modelProps' => [
-          'contributionId' => $this->getCurrentRowContributionID(),
-          'contactId' => $form->_receiptContactId,
+          'contributionID' => $this->getCurrentRowContributionID(),
+          'contactID' => $form->_receiptContactId,
           'membershipID' => $this->getCurrentRowMembershipID(),
         ],
       ]

@@ -981,8 +981,8 @@ DESC limit 1");
         'isTest' => (bool) ($this->_action & CRM_Core_Action::PREVIEW),
         'modelProps' => [
           'receiptText' => $this->getSubmittedValue('receipt_text'),
-          'contributionId' => $formValues['contribution_id'],
-          'contactId' => $this->_receiptContactId,
+          'contributionID' => $formValues['contribution_id'],
+          'contactID' => $this->_receiptContactId,
           'membershipID' => $this->getMembershipID(),
         ],
       ]

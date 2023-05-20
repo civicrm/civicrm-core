@@ -21,8 +21,8 @@ use Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait;
 /**
  * Generic base-class for describing the inputs for a workflow email template.
  *
- * @method $this setContactId(int|null $contactId)
- * @method int|null getContactId()
+ * @method $this setContactID(int|null $contactID)
+ * @method int|null getContactID()
  * @method $this setContact(array|null $contact)
  * @method array|null getContact()
  *
@@ -64,10 +64,10 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
    * The contact receiving this message.
    *
    * @var int|null
-   * @scope tokenContext, tplParams as contactID
+   * @scope tokenContext as contactId, tplParams as contactID
    * @fkEntity Contact
    */
-  protected $contactId;
+  protected $contactID;
 
   /**
    * @var array|null
@@ -82,7 +82,7 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
    * @see ReflectiveWorkflowTrait::validate()
    */
   protected function validateExtra_contact(array &$errors) {
-    if (empty($this->contactId) && empty($this->contact['id'])) {
+    if (empty($this->contactID) && empty($this->contact['id'])) {
       $errors[] = [
         'severity' => 'error',
         'fields' => ['contactId', 'contact'],
@@ -90,7 +90,7 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
         'message' => ts('Message template requires one of these fields (%1)', ['contactId, contact']),
       ];
     }
-    if (!empty($this->contactId) && !empty($this->contact)) {
+    if (!empty($this->contactID) && !empty($this->contact)) {
       $errors[] = [
         'severity' => 'warning',
         'fields' => ['contactId', 'contact'],

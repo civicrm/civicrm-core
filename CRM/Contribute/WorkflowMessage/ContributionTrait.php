@@ -21,7 +21,7 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * @var int
    * @scope tokenContext as contributionId, tplParams as contributionID
    */
-  public $contributionId;
+  public $contributionID;
 
   /**
    * Is the site configured such that tax should be displayed.
@@ -67,9 +67,9 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * @return \CRM_Financial_BAO_Order|null
    */
   private function getOrder(): ?CRM_Financial_BAO_Order {
-    if (!$this->order && $this->contributionId) {
+    if (!$this->order && $this->contributionID) {
       $this->order = new CRM_Financial_BAO_Order();
-      $this->order->setTemplateContributionID($this->contributionId);
+      $this->order->setTemplateContributionID($this->contributionID);
     }
     return $this->order;
   }
@@ -170,7 +170,7 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   public function setContribution(array $contribution): self {
     $this->contribution = $contribution;
     if (!empty($contribution['id'])) {
-      $this->contributionId = $contribution['id'];
+      $this->contributionID = $contribution['id'];
     }
     return $this;
   }
