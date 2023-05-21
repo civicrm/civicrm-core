@@ -407,7 +407,6 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
    * Test convert custom saved search
    */
   public function testSmartGroupCustomDateRangeSearch() {
-    $this->entity = 'Contact';
     $this->createCustomGroupWithFieldOfType([], 'date');
     $dateCustomFieldName = $this->getCustomFieldName('date');
     $this->callAPISuccess('SavedSearch', 'create', [
