@@ -16,8 +16,6 @@
  */
 
 /**
- *  Access Control EntityRole.
- *
  * @deprecated
  */
 class CRM_ACL_BAO_EntityRole extends CRM_ACL_BAO_ACLEntityRole {}
