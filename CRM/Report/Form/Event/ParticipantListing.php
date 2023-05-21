@@ -22,7 +22,6 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
   protected $_groupFilter = TRUE;
   protected $_tagFilter = TRUE;
   protected $_balance = FALSE;
-  protected $campaigns;
 
   protected $_customGroupExtends = array(
     'Participant',
