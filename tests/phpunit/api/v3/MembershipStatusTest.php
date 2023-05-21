@@ -162,7 +162,6 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   public function testDeleteWithMembershipError(): void {
     $membershipStatusID = $this->membershipStatusCreate();
     $this->_contactID = $this->individualCreate();
-    $this->_entity = 'membership';
     $params = [
       'contact_id' => $this->_contactID,
       'membership_type_id' => $this->_membershipTypeID,
