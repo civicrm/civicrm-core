@@ -77,6 +77,32 @@ class ChangeSetTest extends \CiviUnitTestCase {
     $this->assertEquals(2, $counts['~/foo.html']);
   }
 
+  /**
+   * Test that href expressions don't get mangled.
+   */
+  public function testHrefExpressions() {
+    $changeSet = ChangeSet::create(__FUNCTION__);
+    $counts = ['~/foo.html' => 0];
+
+    $changeSet->alterHtml('~/foo.html', function (\phpQueryObject $doc, $file) use (&$counts) {
+      $counts[$file]++;
+      $doc->find('.foo')->attr('foos', '{{:: row.bars }}');
+    });
+
+    $results = ChangeSet::applyResourceFilters([$changeSet], 'partials', [
+      '~/foo.html' => '<a class="foo" ng-href="#/bar/{{:: row.a + \'?params=\' + row.b }}"></a>',
+    ]);
+
+    $this->assertHtmlEquals(
+      // This currently fails if using regular href but it's not clear how
+      // to fix that consistently. ng-href seems more encouraged anyway.
+      // dev/core#4305
+      '<a class="foo" ng-href="#/bar/{{:: row.a + \'?params=\' + row.b }}" foos="{{:: row.bars }}"></a>',
+      $results['~/foo.html']
+    );
+    $this->assertEquals(1, $counts['~/foo.html']);
+  }
+
   protected function assertHtmlEquals($expected, $actual, $message = '') {
     $expected = preg_replace(';>[ \r\n\t]+;', '>', $expected);
     $actual = preg_replace(';>[ \r\n\t]+;', '>', $actual);
