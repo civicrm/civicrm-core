@@ -553,6 +553,14 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_charts = [];
 
   /**
+   * Array of campaign data,
+   * populated by calling `$this::addCampaignFields()`
+   *
+   * @var array
+   */
+  protected $campaigns = [];
+
+  /**
    * @var \Civi\Report\OutputHandlerInterface
    */
   private $outputHandler;
