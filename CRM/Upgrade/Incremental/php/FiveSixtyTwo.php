@@ -44,6 +44,19 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
         }
       }
     }
+    elseif ($rev == '5.62.beta1') {
+      // Copied from FiveFiftySeven, only display if we upgrading from version after 5.57.alpha1
+      if (version_compare($currentVer, '5.57.alpha1', '>')) {
+        $docUrl = 'https://civicrm.org/redirect/activities-5.57';
+        $docAnchor = 'target="_blank" href="' . htmlentities($docUrl) . '"';
+        if (CRM_Core_DAO::singleValueQuery('SELECT COUNT(id) FROM civicrm_activity WHERE is_current_revision = 0')) {
+          // Text copied from FiveFifty Seven
+          $preUpgradeMessage .= '<p>' . ts('Your database contains CiviCase activity revisions which are deprecated and will begin to appear as duplicates in SearchKit/api4/etc.<ul><li>For further instructions see this <a %1>Lab Snippet</a>.</li></ul>', [1 => $docAnchor]) . '</p>';
+          // New text explaination as to why we show this again.
+          $preUpgradeMessage .= '<p>' . ts('Note: You might have followed these steps already but unfortunately a previous upgrade which started ignoring the setting to create CiviCase Activity revisions failed to account for all the places this functionality existed. This means that either new Revisions have been added since you removed them, or not all were removed.') . '</p>';
+        }
+      }
+    }
   }
 
   /**
@@ -71,6 +84,15 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
       ],
       []
     );
+  }
+
+  /**
+   * Upgrade step; Required to ensure pre Upgrade runs.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_62_beta1($rev): void {
   }
 
   public static function consolidateComponents($ctx): bool {
