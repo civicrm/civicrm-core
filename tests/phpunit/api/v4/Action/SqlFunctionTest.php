@@ -168,12 +168,13 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $result = Activity::get(FALSE)
       ->addWhere('id', 'IN', $aids)
       ->addSelect('IF(is_deleted, "Trash", "No Trash") AS trashed')
-      ->addSelect('NULLIF(subject, location) AS subject_is_location')
-      ->addSelect('NULLIF(duration, 456) AS duration_not_456')
-      ->addSelect('COALESCE(duration, location) AS duration_or_location')
-      ->addSelect('GREATEST(duration, 0200) AS duration_or_200')
-      ->addSelect('LEAST(duration, 300) AS 300_or_duration')
+      ->addSelect('NULLIF(subject, location) AS nullif_subject_is_location')
+      ->addSelect('NULLIF(duration, 456) AS nullif_duration_is_456')
+      ->addSelect('COALESCE(duration, location) AS coalesce_duration_location')
+      ->addSelect('GREATEST(duration, 0200) AS greatest_of_duration_or_200')
+      ->addSelect('LEAST(duration, 300) AS least_of_duration_and_300')
       ->addSelect('ISNULL(duration) AS duration_isnull')
+      ->addSelect('IFNULL(duration, 2) AS ifnull_duration_2')
       ->addOrderBy('id')
       ->execute()->indexBy('id');
 
@@ -181,19 +182,34 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('No Trash', $result[$aids[0]]['trashed']);
     $this->assertEquals('Trash', $result[$aids[1]]['trashed']);
     $this->assertEquals('No Trash', $result[$aids[2]]['trashed']);
-    $this->assertEquals(NULL, $result[$aids[0]]['subject_is_location']);
-    $this->assertEquals('xyz', $result[$aids[1]]['subject_is_location']);
-    $this->assertEquals('def', $result[$aids[2]]['subject_is_location']);
-    $this->assertEquals(123, $result[$aids[0]]['duration_not_456']);
-    $this->assertEquals(NULL, $result[$aids[1]]['duration_not_456']);
-    $this->assertEquals(NULL, $result[$aids[2]]['duration_not_456']);
-    $this->assertEquals('123', $result[$aids[0]]['duration_or_location']);
-    $this->assertEquals('abc', $result[$aids[1]]['duration_or_location']);
-    $this->assertEquals(123, $result[$aids[0]]['300_or_duration']);
-    $this->assertEquals(300, $result[$aids[2]]['300_or_duration']);
+
+    $this->assertEquals(NULL, $result[$aids[0]]['nullif_subject_is_location']);
+    $this->assertEquals('xyz', $result[$aids[1]]['nullif_subject_is_location']);
+    $this->assertEquals('def', $result[$aids[2]]['nullif_subject_is_location']);
+
+    $this->assertEquals(123, $result[$aids[0]]['nullif_duration_is_456']);
+    $this->assertEquals(NULL, $result[$aids[1]]['nullif_duration_is_456']);
+    $this->assertEquals(NULL, $result[$aids[2]]['nullif_duration_is_456']);
+
+    $this->assertEquals('123', $result[$aids[0]]['coalesce_duration_location']);
+    $this->assertEquals('abc', $result[$aids[1]]['coalesce_duration_location']);
+    $this->assertEquals('456', $result[$aids[2]]['coalesce_duration_location']);
+
+    $this->assertEquals(200, $result[$aids[0]]['greatest_of_duration_or_200']);
+    $this->assertEquals(NULL, $result[$aids[1]]['greatest_of_duration_or_200']);
+    $this->assertEquals(456, $result[$aids[2]]['greatest_of_duration_or_200']);
+
+    $this->assertEquals(123, $result[$aids[0]]['least_of_duration_and_300']);
+    $this->assertEquals(NULL, $result[$aids[1]]['least_of_duration_and_300']);
+    $this->assertEquals(300, $result[$aids[2]]['least_of_duration_and_300']);
+
     $this->assertEquals(FALSE, $result[$aids[0]]['duration_isnull']);
     $this->assertEquals(TRUE, $result[$aids[1]]['duration_isnull']);
     $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
+
+    $this->assertEquals(123, $result[$aids[0]]['ifnull_duration_2']);
+    $this->assertEquals(2, $result[$aids[1]]['ifnull_duration_2']);
+    $this->assertEquals(456, $result[$aids[2]]['ifnull_duration_2']);
   }
 
   public function testStringFunctions() {
