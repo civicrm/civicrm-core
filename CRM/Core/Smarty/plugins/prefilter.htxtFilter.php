@@ -22,6 +22,10 @@ function smarty_prefilter_htxtFilter($tpl_source, &$smarty) {
       $htxts++;
       return sprintf('{if $id == %s}%s', $m[1], $m[0]);
     },
+    '/\{htxt id=(\$\w+)}/' => function ($m) use (&$htxts) {
+      $htxts++;
+      return sprintf('{if $id == %s}%s', $m[1], $m[0]);
+    },
     ';\{/htxt\};' => function($m) use (&$_htxts) {
       $_htxts++;
       return '{/htxt}{/if}';
