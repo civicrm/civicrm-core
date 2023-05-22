@@ -84,7 +84,7 @@
   </field>
   <field>
     <name>is_primary</name>
-    <title>Primary ID</title>
+    <title>Is Primary</title>
     <type>boolean</type>
     <default>0</default>
     <required>true</required>

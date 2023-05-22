@@ -181,7 +181,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
     ) {
       // Default status if not specified
       $participant->status_id = $participant->status_id ?: self::fields()['participant_status_id']['default'];
-      CRM_Activity_BAO_Activity::addActivity($participant, 'Event Registration');
+      CRM_Activity_BAO_Activity::addActivity($participant, 'Event Registration', $participant->contact_id);
     }
 
     //CRM-5403
@@ -550,23 +550,6 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
     }
 
     return $optionsCount;
-  }
-
-  /**
-   * Get the empty spaces for event those we can allocate
-   * to pending participant to become confirm.
-   *
-   * @deprecated
-   *
-   * @param int $eventId
-   *   Event id.
-   *
-   * @return int
-   *   $spaces  Number of Empty Seats/null.
-   */
-  public static function pendingToConfirmSpaces($eventId) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Event_BAO_Participant::eventFull');
-    return CRM_Event_BAO_Participant::eventFull($eventId, TRUE, FALSE, TRUE, FALSE, TRUE);
   }
 
   /**
@@ -973,31 +956,32 @@ WHERE  civicrm_participant.id = {$participantId}
   /**
    * Get the additional participant ids.
    *
-   * @param int $primaryParticipantId
-   *   Primary partycipant Id.
+   * @param int|null $primaryParticipantID
+   *   Primary participant ID. Null should not be passed in & handling for it
+   *   will be removed.
    * @param bool $excludeCancel
-   *   Do not include participant those are cancelled.
-   *
-   * @param int $oldStatusId
+   *   Do not include cancelled participants.
+   * @param int|null $statusID
+   *   Restrict to the specified status ID.
    *
    * @return array
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @internal not supported to be called from outside of core.
    */
-  public static function getAdditionalParticipantIds($primaryParticipantId, $excludeCancel = TRUE, $oldStatusId = NULL) {
-    $additionalParticipantIds = [];
-    if (!$primaryParticipantId) {
-      return $additionalParticipantIds;
+  public static function getAdditionalParticipantIds(?int $primaryParticipantID, bool $excludeCancel = TRUE, ?int $statusID = NULL): array {
+    if (!$primaryParticipantID) {
+      CRM_Core_Error::deprecatedWarning('should not be called with no IDs');
+      return [];
     }
-
-    $where = "participant.registered_by_id={$primaryParticipantId}";
+    $where = "participant.registered_by_id={$primaryParticipantID}";
     if ($excludeCancel) {
-      $cancelStatusId = 0;
       $negativeStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
-      $cancelStatusId = array_search('Cancelled', $negativeStatuses);
-      $where .= " AND participant.status_id != {$cancelStatusId}";
+      $where .= ' AND participant.status_id != ' . (int) array_search('Cancelled', $negativeStatuses, TRUE);
     }
 
-    if ($oldStatusId) {
-      $where .= " AND participant.status_id = {$oldStatusId}";
+    if ($statusID) {
+      $where .= " AND participant.status_id = {$statusID}";
     }
 
     $query = "
@@ -1005,11 +989,12 @@ WHERE  civicrm_participant.id = {$participantId}
     FROM  civicrm_participant participant
    WHERE  {$where}";
 
+    $additionalParticipantIDs = [];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $additionalParticipantIds[$dao->id] = $dao->id;
+      $additionalParticipantIDs[$dao->id] = $dao->id;
     }
-    return $additionalParticipantIds;
+    return $additionalParticipantIDs;
   }
 
   /**
@@ -1820,11 +1805,10 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     }
     $fields = [];
     if (!empty($form->_fields)) {
-      $removeCustomFieldTypes = ['Participant'];
 
       foreach ($form->_fields as $name => $fieldInfo) {
         if ((substr($name, 0, 7) == 'custom_' && !$form->_allowConfirmation
-          && !CRM_Core_BAO_CustomGroup::checkCustomField(substr($name, 7), $removeCustomFieldTypes))
+          && !CRM_Core_BAO_CustomGroup::checkCustomField(substr($name, 7), ['Participant']))
           || substr($name, 0, 12) == 'participant_') {
           continue;
         }
@@ -1910,6 +1894,17 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    // Set the default role ID on create.
+    if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['role_id'])) {
+      if (!empty($event->params['event_id'])) {
+        $event->params['role_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->params['event_id'], 'default_role_id');
+      }
+      else {
+        $params['role_id'] = CRM_Core_DAO::singleValueQuery('SELECT default_role_id FROM civicrm_event WHERE id = %1', [
+          1 => [$event->params['event_id'], 'Integer'],
+        ]);
+      }
+    }
     if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['created_id'])) {
       // Set the "created_id" field if not already set.
       // The created_id should always be the person that actually did the registration.

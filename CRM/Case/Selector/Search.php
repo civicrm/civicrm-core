@@ -25,7 +25,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @var array
    */
-  public static $_links = NULL;
+  public static $_links;
 
   /**
    * The action links that we need to display for the browse screen.
@@ -101,7 +101,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @var string
    */
-  protected $_additionalClause = NULL;
+  protected $_additionalClause;
 
   /**
    * The query object
@@ -115,7 +115,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @param array $queryParams
    *   Array of parameters for query.
-   * @param \const|int $action - action of search basic or advanced.
+   * @param int $action - action of search basic or advanced.
    * @param string $additionalClause
    *   If the caller wants to further restrict the search (used in participations).
    * @param bool $single
@@ -182,6 +182,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'qs' => 'reset=1&action=renew&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'restore-case',
           'title' => ts('Restore Case'),
+          'weight' => -30,
         ],
       ];
     }
@@ -194,6 +195,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'ref' => 'manage-case',
           'class' => 'no-popup',
           'title' => ts('Manage Case'),
+          'weight' => -20,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
@@ -201,6 +203,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'delete-case',
           'title' => ts('Delete Case'),
+          'weight' => -10,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Assign to Another Client'),
@@ -209,13 +212,14 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'ref' => 'reassign',
           'class' => 'medium-popup',
           'title' => ts('Assign to Another Client'),
+          'weight' => -10,
         ],
       ];
     }
 
     $actionLinks = [];
-    foreach (self::$_links as $key => $value) {
-      $actionLinks['primaryActions'][$key] = $value;
+    foreach (self::$_links as $index => $value) {
+      $actionLinks['primaryActions'][$index] = $value;
     }
 
     return $actionLinks;
@@ -624,6 +628,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'title' => ts('View'),
           'accessKey' => '',
           'ref' => 'View',
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
@@ -633,6 +638,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'icon' => 'fa-pencil',
           'accessKey' => '',
           'ref' => 'Edit',
+          'weight' => -10,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
@@ -642,6 +648,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'icon' => 'fa-trash',
           'accessKey' => '',
           'ref' => 'Delete',
+          'weight' => 100,
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Restore'),
@@ -651,6 +658,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'icon' => 'fa-undo',
           'accessKey' => '',
           'ref' => 'Restore',
+          'weight' => 90,
         ],
         CRM_Core_Action::DETACH => [
           'name' => ts('Move To Case'),
@@ -659,6 +667,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'extra' => 'onclick = "Javascript:fileOnCase( \'move\', %%aid%%, %%caseid%%, this ); return false;"',
           'icon' => 'fa-clipboard',
           'accessKey' => '',
+          'weight' => 60,
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy To Case'),
@@ -667,6 +676,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'extra' => 'onclick = "Javascript:fileOnCase( \'copy\', %%aid%%, %%caseid%%, this ); return false;"',
           'icon' => 'fa-files-o',
           'accessKey' => '',
+          'weight' => 70,
         ],
       ];
     }

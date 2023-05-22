@@ -216,31 +216,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     $template->assign('tplFile', 'CRM/Profile/Form/Edit.tpl');
     $profile = trim($template->fetch('CRM/Form/default.tpl'));
 
-    // not sure how to circumvent our own navigation system to generate the right form url
-    $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $gid . '&amp;reset=1';
-    if ($config->userSystem->is_drupal && $config->cleanURL) {
-      $urlReplaceWith = 'civicrm/profile/create?gid=' . $gid . '&amp;reset=1';
-    }
-    $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
-
-    // FIXME: (CRM-3587) hack to make standalone profile work
-    // in wordpress and joomla without administrator login
-    if ($config->userFramework == 'Joomla') {
-      $profile = str_replace('/administrator/', '/index.php', $profile);
-    }
-    elseif ($config->userFramework == 'WordPress') {
-      //@todo remove this part when it is OK to deprecate CIVICRM_UF_WP_BASEPAGE-CRM-15933
-      if (defined('CIVICRM_UF_WP_BASEPAGE')) {
-        $wpbase = CIVICRM_UF_WP_BASEPAGE;
-      }
-      elseif (!empty($config->wpBasePage)) {
-        $wpbase = $config->wpBasePage;
-      }
-      else {
-        $wpbase = 'index.php';
-      }
-      $profile = str_replace('/wp-admin/admin.php', '/' . $wpbase . '/', $profile);
-    }
+    $profile = $config->userSystem->modifyStandaloneProfile($profile, ['gid' => $gid]);
 
     // add header files
     CRM_Core_Resources::singleton()->addCoreResources('html-header');
@@ -303,7 +279,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $ufGroup[$id]['frontend_title'] = $value['frontend_title'];
       $ufGroup[$id]['created_id'] = $value['created_id'];
       $ufGroup[$id]['created_by'] = CRM_Contact_BAO_Contact::displayName($value['created_id']);
-      $ufGroup[$id]['description'] = $value['description'];
+      $ufGroup[$id]['description'] = $value['description'] ?? '';
       $ufGroup[$id]['is_active'] = $value['is_active'];
       $ufGroup[$id]['group_type'] = $value['group_type'];
       $ufGroup[$id]['is_reserved'] = $value['is_reserved'];

@@ -42,7 +42,7 @@ trait CiviCaseSaveTrait {
     // Add case contacts (clients)
     foreach ((array) $case['contact_id'] as $cid) {
       $contactParams = ['case_id' => $id, 'contact_id' => $cid];
-      \CRM_Case_BAO_CaseContact::create($contactParams);
+      \CRM_Case_BAO_CaseContact::writeRecord($contactParams);
     }
 
     $caseType = \CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $case['case_type_id'], 'name');

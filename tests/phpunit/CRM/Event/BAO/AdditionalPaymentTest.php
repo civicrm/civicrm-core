@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\EntityFinancialAccount;
+
 /**
  * Class CRM_Event_BAO_AdditionalPaymentTest
  *
@@ -24,6 +26,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   protected $contactID;
 
   /**
+   * Event ID.
+   *
+   * @var int
+   */
+  protected $eventID;
+
+  /**
    * Set up.
    *
    * @throws \CRM_Core_Exception
@@ -32,7 +41,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     parent::setUp();
     $this->contactID = $this->individualCreate();
     $event = $this->eventCreate();
-    $this->_eventId = $event['id'];
+    $this->eventID = $event['id'];
   }
 
   /**
@@ -41,7 +50,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->eventDelete($this->_eventId);
+    $this->eventDelete($this->eventID);
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
@@ -72,7 +81,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    */
   protected function addParticipantWithPayment($feeTotal, $actualPaidAmt, $participantParams = [], $contributionParams = []) {
     $priceSetId = $this->eventPriceSetCreate($feeTotal);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceSetId);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->eventID, $priceSetId);
     // -- processing priceSet using the BAO
     $lineItems = [];
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, FALSE);
@@ -93,13 +102,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
         'send_receipt' => 1,
         'is_test' => 0,
         'is_pay_later' => 0,
-        'event_id' => $this->_eventId,
+        'event_id' => $this->eventID,
         'register_date' => date('Y-m-d') . " 00:00:00",
         'role_id' => 1,
         'status_id' => 14,
-        'source' => 'Event_' . $this->_eventId,
+        'source' => 'Event_' . $this->eventID,
         'contact_id' => $this->contactID,
-        'note' => 'Note added for Event_' . $this->_eventId,
+        'note' => 'Note added for Event_' . $this->eventID,
         'fee_level' => 'Price_Field - 55',
       ],
       $participantParams
@@ -191,6 +200,36 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals('Completed', $contribution['contribution_status'], 'Contribution status is not correct');
 
     $this->callAPISuccess('OptionValue', 'delete', ['id' => $paymentInstrumentID]);
+  }
+
+  /**
+   * Create Payment Instrument.
+   *
+   * @param array $params
+   * @param string $financialAccountName
+   *
+   * @return int
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function createPaymentInstrument(array $params = [], string $financialAccountName = 'Donation'): int {
+    $params = array_merge([
+      'label' => 'Payment Instrument - new',
+      'option_group_id' => 'payment_instrument',
+      'is_active' => 1,
+    ], $params);
+    $newPaymentInstrument = $this->callAPISuccess('OptionValue', 'create', $params)['id'];
+
+    $relationTypeID = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
+
+    $financialAccountParams = [
+      'entity_table' => 'civicrm_option_value',
+      'entity_id' => $newPaymentInstrument,
+      'account_relationship' => $relationTypeID,
+      'financial_account_id' => $this->callAPISuccess('FinancialAccount', 'getValue', ['name' => $financialAccountName, 'return' => 'id']),
+    ];
+    EntityFinancialAccount::create()->setValues($financialAccountParams)->execute();
+
+    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $params['label']);
   }
 
   /**

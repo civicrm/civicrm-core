@@ -53,28 +53,33 @@ class CRM_Admin_Page_RelationshipType extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/reltype/edit',
           'qs' => 'action=view&id=%%id%%&reset=1',
           'title' => ts('View Relationship Type'),
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/reltype/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Relationship Type'),
+          'weight' => -10,
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Relationship Type'),
+          'weight' => 40,
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Relationship Type'),
+          'weight' => 30,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/reltype/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Reletionship Type'),
+          'weight' => 100,
         ],
       ];
     }

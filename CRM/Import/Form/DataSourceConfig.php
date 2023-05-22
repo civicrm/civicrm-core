@@ -21,6 +21,25 @@
 class CRM_Import_Form_DataSourceConfig extends CRM_Import_Forms {
 
   /**
+   * Default values for datasource fields.
+   *
+   * @var array
+   */
+  protected $dataSourceDefaults = [];
+
+  /**
+   * Set dataSource default values.
+   *
+   * @param array $dataSourceDefaults
+   *
+   * @return CRM_Import_Form_DataSourceConfig
+   */
+  public function setDataSourceDefaults(array $dataSourceDefaults): CRM_Import_Form_DataSourceConfig {
+    $this->dataSourceDefaults = $dataSourceDefaults;
+    return $this;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception
@@ -56,6 +75,9 @@ class CRM_Import_Form_DataSourceConfig extends CRM_Import_Forms {
       foreach ($this->getDataSourceFields() as $fieldName) {
         $defaults[$fieldName] = $this->getSubmittedValue($fieldName);
       }
+    }
+    else {
+      $defaults = array_merge($this->dataSourceDefaults, $defaults);
     }
     return $defaults;
   }

@@ -919,15 +919,28 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'event_full_text' => 'Sorry! We are already full',
     ];
     $templateResult = $this->callAPISuccess('Event', 'create', ['is_template' => 1, 'template_title' => 'Test tpl'] + $templateParams);
-    $eventResult = $this->callAPISuccess('Event', 'create', [
-      'template_id' => $templateResult['id'],
+
+    $newEventParams = [
       'title' => 'Clone1',
       'start_date' => '2018-06-25 16:00:00',
-    ]);
+      'description' => 'This is a really special edition of this event series with its own description',
+    ];
+    $eventResult = $this->callAPISuccess('Event', 'create', ['template_id' => $templateResult['id']] + $newEventParams);
     $eventResult = $this->callAPISuccess('Event', 'getsingle', ['id' => $eventResult['id']]);
-    foreach ($templateParams as $param => $value) {
+
+    // check fields set on creation are set from the instance values
+    foreach ($newEventParams as $param => $value) {
       $this->assertEquals($value, $eventResult[$param], print_r($eventResult, 1));
     }
+
+    // check unset fields are populated from the template values
+    $fieldsPopulatedFromTemplate = array_diff(array_keys($templateParams), array_keys($newEventParams));
+    foreach ($fieldsPopulatedFromTemplate as $param) {
+      $this->assertEquals($templateParams[$param], $eventResult[$param], print_r($eventResult, 1));
+    }
+
+    // check the newly created event is an event, not a template
+    $this->assertEquals(0, $eventResult['is_template'], print_r($eventResult, 1));
   }
 
   public function testGetListLeadingZero() {

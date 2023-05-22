@@ -215,18 +215,21 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
           'url' => 'civicrm/contact/view/participant',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=event' . $extraParams,
           'title' => ts('View Participation'),
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/view/participant',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Edit Participation'),
+          'weight' => -10,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/participant',
           'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Delete Participation'),
+          'weight' => 100,
         ],
       ];
     }

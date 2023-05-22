@@ -6,6 +6,23 @@
     </select>
   </div>
 </li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'Number' && $ctrl.fieldDefn.data_type === 'Float'">
+  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label>{{:: ts('Decimal places:') }}</label>
+    <select class="form-control" ng-model="getSet('input_attrs.step')" ng-model-options="{getterSetter: true}" title="{{:: ts('Decimal places') }}">
+      <option ng-value="1">0</option>
+      <option ng-value=".1">1</option>
+      <option ng-value=".01">2</option>
+      <option ng-value=".001">3</option>
+      <option ng-value=".0001">4</option>
+      <option ng-value=".00001">5</option>
+      <option ng-value=".000001">6</option>
+      <option ng-value=".0000001">7</option>
+      <option ng-value=".00000001">8</option>
+      <option ng-value=".000000001">9</option>
+    </select>
+  </div>
+</li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'" title="{{:: ts('Use a saved search to filter the autocomplete results') }}">
   <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <input placeholder="{{:: ts('Saved Search') }}" class="form-control" crm-autocomplete="'SavedSearch'" crm-autocomplete-params="{key: 'name', filters: {api_entity: $ctrl.fieldDefn.fk_entity}, formName: 'afformAdmin', fieldName: 'autocompleteSavedSearch'}" auto-open="true" ng-model="getSet('saved_search')" ng-model-options="{getterSetter: true}" ng-change="getSet('search_display')(null)">
@@ -74,6 +91,14 @@
     <i class="crm-i fa-{{ !$ctrl.node.defn.search_range ? '' : 'check-' }}square-o"></i>
     {{:: ts('Search by range') }}
   </a>
+</li>
+<li ng-if="$ctrl.isSearch()">
+  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label>{{:: ts('Operator:') }}</label>
+    <select class="form-control" ng-model="getSet('search_operator')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">
+      <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
+    </select>
+  </div>
 </li>
 <li role="separator" class="divider" ng-if="hasOptions()"></li>
 <li ng-if="hasOptions()" ng-click="$event.stopPropagation()">

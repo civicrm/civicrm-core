@@ -317,8 +317,7 @@ class CRM_Activity_Page_AJAX {
     $mainActivity->activity_date_time = $actDateTime;
     // Make sure this is current revision.
     $mainActivity->is_current_revision = TRUE;
-    $mainActivity->original_id = $otherActivity->id;
-    $otherActivity->is_current_revision = FALSE;
+    $mainActivity->original_id = $mainActivity->parent_id = NULL;
 
     $mainActivity->save();
     $mainActivityId = $mainActivity->id;

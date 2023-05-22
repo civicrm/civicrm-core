@@ -26,6 +26,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
         'name' => 'custom_field_import',
         'label' => ts('Multiple Value Custom Field Import'),
         'entity' => 'Contact',
+        'url' => 'civicrm/import/custom',
       ],
     ];
   }

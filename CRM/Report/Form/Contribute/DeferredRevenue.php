@@ -70,7 +70,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
             'title' => ts('Contact ID'),
           ],
           'source' => [
-            'title' => ts('Source'),
+            'title' => ts('Contribution Source'),
           ],
           'receive_date' => [
             'title' => ts('Receive Date'),

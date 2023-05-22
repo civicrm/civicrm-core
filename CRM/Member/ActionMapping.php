@@ -52,9 +52,9 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
    */
   public function getDateFields() {
     return [
-      'join_date' => ts('Membership Join Date'),
+      'join_date' => ts('Member Since'),
       'start_date' => ts('Membership Start Date'),
-      'end_date' => ts('Membership End Date'),
+      'end_date' => ts('Membership Expiration Date'),
     ];
   }
 

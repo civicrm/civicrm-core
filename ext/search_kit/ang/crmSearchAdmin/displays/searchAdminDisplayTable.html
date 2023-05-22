@@ -10,12 +10,9 @@
     </div>
   </div>
   <div class="form-inline">
-    <div class="checkbox-inline form-control">
-      <label>
-        <input type="checkbox" ng-model="$ctrl.display.settings.actions">
-        <span>{{:: ts('Enable Actions') }}</span>
-      </label>
-    </div>
+    <search-admin-tasks-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-tasks-config>
+  </div>
+  <div class="form-inline">
     <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
   </div>
   <div class="form-inline">

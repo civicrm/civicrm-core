@@ -27,7 +27,6 @@
 class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-  public $DBResetRequired = FALSE;
   public $_entity = 'Job';
   public $_params = [];
   private $_groupID;
@@ -171,7 +170,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   /**
    * Test pause and resume on Mailing.
    */
-  public function testPauseAndResumeMailing() {
+  public function testPauseAndResumeMailing(): void {
     $this->createContactsInGroup(10, $this->_groupID);
     Civi::settings()->add([
       'mailerBatchLimit' => 2,

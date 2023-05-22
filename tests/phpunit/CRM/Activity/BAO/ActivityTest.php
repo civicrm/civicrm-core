@@ -178,9 +178,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test Assigning a target contact but then the logged in user cannot see the contact
+   * Test Assigning a target contact but then the logged in user cannot see the
+   * contact
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testTargetContactNotavaliable() {
+  public function testTargetContactNotAvaliable(): void {
     $contactId = $this->individualCreate();
     $params = [
       'first_name' => 'liz',
@@ -210,9 +213,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activityGetParams = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $activityGetParams += ['contact_id' => $contactId];
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($activityGetParams);
-    // Aseert that we have sensible data to display in the contact tab
+    // Assert that we have sensible data to display in the contact tab
     $this->assertEquals('Anderson, Anthony', $activities['data'][0]['source_contact_name']);
-    // Note that becasue there is a target contact but it is not accessable the output is an empty string not n/a
+    // Note that because there is a target contact but it is not accessible the output is an empty string not n/a
     $this->assertEquals('', $activities['data'][0]['target_contact_name']);
     // verify that doing the underlying query shows we get a target contact_id
     $this->assertEquals(1, CRM_Activity_BAO_Activity::getActivities(['contact_id' => $contactId])[1]['target_contact_count']);
@@ -410,7 +413,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->setShowCaseActivitiesInCore(FALSE);
     $this->setUpForActivityDashboardTests();
     $this->addCaseWithActivity();
-    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'access all cases and activities',
+    ];
 
     $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($this->_params);
     $this->assertEquals(8, $activityCount);
@@ -1229,7 +1236,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'sort_name' => '',
       'display_name' => '',
       'do_not_email' => '',
-      'preferred_mail_format' => '',
       'is_deceased' => '',
       'email' => '',
       'on_hold' => '',
@@ -1630,7 +1636,7 @@ $text
       'campaign_id' => $campaign_id,
       'from_email_address' => 'from@example.com',
       'to' => $contactId1 . '::email@example.com,' . $contactId2 . '::email2@example.com',
-    ], [], []);
+    ], '', []);
     $form->set('cid', $contactId1 . ',' . $contactId2);
     $form->buildForm();
     $form->postProcess();
@@ -1658,8 +1664,6 @@ $textValue
   /**
    * Same as testSendEmailWillReplaceTokensUniquelyForEachContact but with
    * 3 recipients and an attachment.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSendEmailWillReplaceTokensUniquelyForEachContact3(): void {
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
@@ -1698,7 +1702,7 @@ $textValue
         'name' => $fileUri,
       ],
       'attachDesc_1' => '',
-    ], [], []);
+    ], NULL, []);
     $form->set('cid', $contactId1 . ',' . $contactId2 . ',' . $contactId3);
     $form->buildForm();
     $form->postProcess();
@@ -1728,7 +1732,7 @@ $textValue
   /**
    * Checks that attachments are not duplicated for activities.
    */
-  public function testSendEmailDoesNotDuplicateAttachmentFileIdsForActivitiesCreated() {
+  public function testSendEmailDoesNotDuplicateAttachmentFileIDsForActivitiesCreated(): void {
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
     $contactId2 = $this->individualCreate(['last_name' => 'Pink']);
 
@@ -1751,7 +1755,7 @@ $textValue
     $userID = $loggedInUser;
 
     $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
-    $fileName = "test_email_create.txt";
+    $fileName = 'test_email_create.txt';
     $fileUri = "{$filepath}/{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', $fileName);
@@ -1771,7 +1775,7 @@ $textValue
         'name' => $fileUri,
       ],
       'attachDesc_1' => '',
-    ], [], []);
+    ], NULL, []);
     $form->set('cid', $contactId1 . ',' . $contactId2);
     $form->buildForm();
     $form->postProcess();

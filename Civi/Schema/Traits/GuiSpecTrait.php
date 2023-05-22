@@ -38,6 +38,13 @@ trait GuiSpecTrait {
   public $inputType;
 
   /**
+   * Can the field be translated.
+   *
+   * @var bool
+   */
+  public $localizable = FALSE;
+
+  /**
    * @var array
    */
   public $inputAttrs = [];
@@ -90,6 +97,23 @@ trait GuiSpecTrait {
    */
   public function setInputAttrs($inputAttrs) {
     $this->inputAttrs = $inputAttrs;
+    return $this;
+  }
+
+  /**
+   * @return bool
+   */
+  public function getLocalizable() {
+    return $this->localizable;
+  }
+
+  /**
+   * @param bool $localizable
+   *
+   * @return $this
+   */
+  public function setLocalizable(bool $localizable) {
+    $this->localizable = $localizable;
     return $this;
   }
 

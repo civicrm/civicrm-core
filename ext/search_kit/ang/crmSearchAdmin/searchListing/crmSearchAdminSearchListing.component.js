@@ -56,7 +56,7 @@
             ['Group AS group', 'LEFT', ['id', '=', 'group.saved_search_id']],
             ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
           ],
-          where: [['api_entity', 'IS NOT NULL']],
+          where: [['api_entity', 'IS NOT NULL'], ['is_current', '=', true]],
           groupBy: ['id']
         }
       };

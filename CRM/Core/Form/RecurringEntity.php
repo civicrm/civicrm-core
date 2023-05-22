@@ -346,10 +346,10 @@ class CRM_Core_Form_RecurringEntity {
 
         //Delete repeat configuration and rebuild
         if (!empty($params['id'])) {
-          CRM_Core_BAO_ActionSchedule::del($params['id']);
+          CRM_Core_BAO_ActionSchedule::deleteRecord($params);
           unset($params['id']);
         }
-        $actionScheduleObj = CRM_Core_BAO_ActionSchedule::add($dbParams);
+        $actionScheduleObj = CRM_Core_BAO_ActionSchedule::writeRecord($dbParams);
 
         //exclude dates
         $excludeDateList = [];
@@ -364,7 +364,7 @@ class CRM_Core_Form_RecurringEntity {
             'name'
           );
           if ($optionGroupIdExists) {
-            CRM_Core_BAO_OptionGroup::del($optionGroupIdExists);
+            CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $optionGroupIdExists]);
           }
           $optionGroupParams = [
             'name' => $type . '_repeat_exclude_dates_' . $actionScheduleObj->entity_value,

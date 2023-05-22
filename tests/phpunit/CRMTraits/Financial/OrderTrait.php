@@ -36,7 +36,7 @@ trait CRMTraits_Financial_OrderTrait {
       'installments' => 5,
       'frequency_unit' => 'Month',
       'frequency_interval' => 1,
-      'invoice_id' => $this->_invoiceID,
+      'invoice_id' => 'xyz',
       'contribution_status_id' => 2,
       'payment_processor_id' => $this->_paymentProcessorID,
       // processor provided ID - use contact ID as proxy.
@@ -48,7 +48,7 @@ trait CRMTraits_Financial_OrderTrait {
       'financial_type_id' => 'Donation',
       'source' => 'Online Contribution: form payment',
       'contact_id' => $this->_contactID,
-      'contribution_page_id' => $this->_contributionPageID,
+      'contribution_page_id' => $this->ids['ContributionPage'][0] ?? NULL,
       'payment_processor_id' => $this->_paymentProcessorID,
       'is_test' => 0,
       'receive_date' => '2019-07-25 07:34:23',

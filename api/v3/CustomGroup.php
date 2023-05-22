@@ -88,8 +88,9 @@ function _civicrm_api3_custom_group_create_spec(&$params) {
 function civicrm_api3_custom_group_delete($params) {
   $values = new CRM_Core_DAO_CustomGroup();
   $values->id = $params['id'];
-  $values->find(TRUE);
-
+  if (!$values->find(TRUE)) {
+    return civicrm_api3_create_error('Error while deleting custom group');
+  }
   $result = CRM_Core_BAO_CustomGroup::deleteGroup($values, TRUE);
   return $result ? civicrm_api3_create_success() : civicrm_api3_create_error('Error while deleting custom group');
 }

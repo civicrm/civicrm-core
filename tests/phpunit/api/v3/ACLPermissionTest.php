@@ -13,6 +13,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
+use Civi\Api4\Entity;
 
 /**
  * This class is intended to test ACL permission using the multisite module
@@ -35,7 +36,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   protected $isValidateFinancialsOnPostAssert = FALSE;
 
-  public $DBResetRequired = FALSE;
   protected $_entity;
 
   /**
@@ -48,8 +48,14 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   protected $_permissionedDisabledGroup;
 
+  /**
+   * @var string
+   */
+  protected $aclGroupHookType;
+
   public function setUp(): void {
     parent::setUp();
+    CRM_Core_BAO_ConfigSetting::enableAllComponents();
     CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_Pledge', [], 1, 0);
     $this->callAPISuccess('Phone', 'create', ['id' => $this->individualCreate(['email' => '']), 'phone' => '911', 'location_type_id' => 'Home']);
     $this->prepareForACLs();
@@ -743,7 +749,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   public function testGetActivityCheckPermissionsByCaseComponent(int $version): void {
     $this->_apiversion = $version;
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $activity = $this->activityCreate(['activity_type_id' => 'Open Case']);
     $activity2 = $this->activityCreate(['activity_type_id' => 'Pledge Reminder']);
     $this->hookClass->setHook('civicrm_aclWhereClause', [
@@ -1161,6 +1166,98 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->assertCount(1, $customValues);
     $this->assertEquals('C2', $customValues[0]['first_name']);
     $this->assertEquals('2', $customValues[0]['cf.' . $textField]);
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testApi4CustomGroupACL(): void {
+    // Create 2 multi-record custom entities and 2 regular custom fields
+    $customGroups = [];
+    foreach ([1, 2, 3, 4] as $i) {
+      $customGroups[$i] = CustomGroup::create(FALSE)
+        ->addValue('title', "extra_group_$i")
+        ->addValue('extends', 'Contact')
+        ->addValue('is_multiple', $i >= 3)
+        ->addChain('field', CustomField::create()
+          ->addValue('label', "extra_field_$i")
+          ->addValue('custom_group_id', '$id')
+          ->addValue('html_type', 'Text')
+          ->addValue('data_type', 'String')
+        )
+        ->execute()->single()['id'];
+    }
+
+    $this->createLoggedInUser();
+    $this->aclGroupHookType = 'civicrm_custom_group';
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view my contact',
+    ];
+
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+
+    // Unrestricted
+    $this->hookClass->setHook('civicrm_aclGroup', [$this, 'aclGroupHookAllResults']);
+    $getFields = Contact::getFields()
+      ->addWhere('name', 'LIKE', 'extra_group_%.extra_field_%')
+      ->execute();
+    $this->assertCount(2, $getFields);
+
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+
+    // Restricted to no groups
+    $this->hookClass->setHook('civicrm_aclGroup', [$this, 'aclGroupHookNoResults']);
+    $getFields = Contact::getFields()
+      ->addWhere('name', 'LIKE', 'extra_group_%.extra_field_%')
+      ->execute();
+    $this->assertCount(0, $getFields);
+
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+
+    // Restricted to group 2
+    $this->hookClass->setHook('civicrm_aclGroup', [$this, 'aclGroupHookOneResult']);
+    $this->_permissionedGroup = $customGroups[2];
+    $getFields = Contact::getFields()
+      ->addWhere('name', 'LIKE', 'extra_group_%.extra_field_%')
+      ->execute();
+    $this->assertCount(1, $getFields);
+    $this->assertEquals('extra_group_2.extra_field_2', $getFields[0]['name']);
+
+    // Group 2 is not multi-valued, so no custom entities are visible
+    $getEntities = Entity::get()
+      ->addWhere('type', 'CONTAINS', 'CustomValue')
+      ->execute();
+    $this->assertCount(0, $getEntities);
+
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+
+    // Restricted to group 4 (multi-valued entity)
+    $this->_permissionedGroup = $customGroups[4];
+    $getEntities = Entity::get()
+      ->addWhere('type', 'CONTAINS', 'CustomValue')
+      ->execute();
+    $this->assertCount(1, $getEntities);
+    $this->assertEquals('Custom_extra_group_4', $getEntities[0]['name']);
+  }
+
+  public function aclGroupHookAllResults($action, $contactID, $tableName, &$allGroups, &$currentGroups) {
+    if ($tableName === $this->aclGroupHookType) {
+      $currentGroups = array_keys($allGroups);
+    }
+  }
+
+  public function aclGroupHookOneResult($action, $contactID, $tableName, &$allGroups, &$currentGroups) {
+    if ($tableName === $this->aclGroupHookType) {
+      $currentGroups = [$this->_permissionedGroup];
+    }
+  }
+
+  public function aclGroupHookNoResults($action, $contactID, $tableName, &$allGroups, &$currentGroups) {
+    // No change
   }
 
 }

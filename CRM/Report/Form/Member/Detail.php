@@ -79,11 +79,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'no_repeat' => TRUE,
           ],
           'membership_start_date' => [
-            'title' => ts('Start Date'),
+            'title' => ts('Membership Start Date'),
             'default' => TRUE,
           ],
           'membership_end_date' => [
-            'title' => ts('End Date'),
+            'title' => ts('Membership Expiration Date'),
             'default' => TRUE,
           ],
           'owner_membership_id' => [
@@ -91,10 +91,10 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'default' => TRUE,
           ],
           'join_date' => [
-            'title' => ts('Join Date'),
+            'title' => ts('Member Since'),
             'default' => TRUE,
           ],
-          'source' => ['title' => ts('Source')],
+          'source' => ['title' => ts('Membership Source')],
         ],
         'filters' => [
           'membership_join_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
@@ -214,7 +214,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         ],
         'order_bys' => [
           'receive_date' => [
-            'title' => ts('Date Received'),
+            'title' => ts('Contribution Date'),
             'default_weight' => '2',
             'default_order' => 'DESC',
           ],

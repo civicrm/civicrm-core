@@ -309,7 +309,7 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
    */
   public static function setConfigDefault() {
     if (!self::getConfigFile()) {
-      $config = self::fileHeader() . "CKEDITOR.editorConfig = function( config ) {\n\tconfig.allowedContent = true;\n};\n";
+      $config = self::fileHeader() . "CKEDITOR.editorConfig = function( config ) {\n\tconfig.allowedContent = true;\n\tconfig.entities = false;\n};\n";
       // Make sure directories exist
       if (!is_dir(Civi::paths()->getPath('[civicrm.files]/persist'))) {
         mkdir(Civi::paths()->getPath('[civicrm.files]/persist'));

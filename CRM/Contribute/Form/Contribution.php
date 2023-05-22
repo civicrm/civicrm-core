@@ -208,6 +208,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   protected $previousContributionStatus;
 
+
+  /**
+   * Payment Instrument ID
+   *
+   * @var int
+   */
+  public $payment_instrument_id;
+
   /**
    * Explicitly declare the form context.
    */
@@ -397,10 +405,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (empty($defaults['payment_instrument_id'])) {
       $defaults['payment_instrument_id'] = $this->getDefaultPaymentInstrumentId();
     }
-
-    if (!empty($defaults['is_test'])) {
-      $this->assign('is_test', TRUE);
-    }
+    $this->assign('is_test', !empty($defaults['is_test']));
 
     $this->assign('showOption', TRUE);
     // For Premium section.
@@ -422,13 +427,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    if (isset($this->userEmail)) {
-      $this->assign('email', $this->userEmail);
-    }
+    $this->assign('email', $this->userEmail);
+    $this->assign('is_pay_later', !empty($defaults['is_pay_later']));
 
-    if (!empty($defaults['is_pay_later'])) {
-      $this->assign('is_pay_later', TRUE);
-    }
     $this->assign('contribution_status_id', CRM_Utils_Array::value('contribution_status_id', $defaults));
     if (!empty($defaults['contribution_status_id']) && in_array(
         CRM_Contribute_PseudoConstant::contributionStatus($defaults['contribution_status_id'], 'name'),
@@ -590,7 +591,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
-    $this->payment_instrument_id = CRM_Utils_Array::value('payment_instrument_id', $defaults, $this->getDefaultPaymentInstrumentId());
+    $this->payment_instrument_id = $defaults['payment_instrument_id'] ?? $this->getDefaultPaymentInstrumentId();
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->payment_instrument_id);
     if (!empty($this->_recurPaymentProcessors)) {
       $buildRecurBlock = TRUE;
@@ -793,7 +794,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
-    $this->add('text', 'source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
+    $this->add('text', 'source', ts('Contribution Source'), CRM_Utils_Array::value('source', $attributes));
 
     // CRM-7362 --add campaigns.
     CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
@@ -1790,15 +1791,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
+      $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->_values['contribution_status_id'] ?? NULL);
       // process associated membership / participant, CRM-4395
-      if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
+      if ($contribution->id && $action & CRM_Core_Action::UPDATE
+        && in_array($previousStatus, ['Pending', 'Partially paid'], TRUE)
+        && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))) {
         // @todo use Payment.create to do this, remove transitioncomponents function
         // if contribution is being created with a completed status it should be
         // created pending & then Payment.create adds the payment
         CRM_Contribute_BAO_Contribution::transitionComponents([
           'contribution_id' => $contribution->id,
-          'contribution_status_id' => $contribution->contribution_status_id,
-          'previous_contribution_status_id' => $this->_values['contribution_status_id'] ?? NULL,
           'receive_date' => $contribution->receive_date,
         ]);
       }
@@ -2131,6 +2133,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   protected function getPriceSetID() {
     return $this->getSubmittedValue('price_set_id');
+  }
+
+  /**
+   * @param int $id
+   * @todo - this function is a long way, non standard of saying $dao = new CRM_Contribute_DAO_ContributionProduct(); $dao->id = $id; $dao->find();
+   */
+  private function assignPremiumProduct($id): void {
+    $sql = "
+SELECT *
+FROM   civicrm_contribution_product
+WHERE  contribution_id = {$id}
+";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    if ($dao->fetch()) {
+      $this->_premiumID = $dao->id;
+      $this->_productDAO = $dao;
+    }
   }
 
 }

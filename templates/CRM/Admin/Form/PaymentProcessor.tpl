@@ -145,12 +145,15 @@
 {if $action eq 1  or $action eq 2}
   <script type="text/javascript">
   {literal}
-    function reload(refresh) {
-      var paymentProcessorType = cj("#payment_processor_type_id");
-      var url = {/literal}"{$refreshURL}"{literal} + "&pp=" + paymentProcessorType.val();
-      paymentProcessorType.closest('form').attr('data-warn-changes', 'false');
-      window.location.href = url;
-    }
+    CRM.$(function($) {
+      $('#payment_processor_type_id').change(function() {
+        var url = {/literal}"{$refreshURL}"{literal} + "&pp=" + $(this).val();
+        $(this).closest('form').attr('data-warn-changes', 'false')
+          // Ajax refresh (works in a popup or full-screen)
+          .closest('.crm-ajax-container, #crm-main-content-wrapper')
+          .crmSnippet({url: url}).crmSnippet('refresh');
+      });
+    });
   {/literal}
   </script>
 

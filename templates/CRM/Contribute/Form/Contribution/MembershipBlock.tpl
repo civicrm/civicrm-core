@@ -7,9 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if !empty($useForMember) AND !$is_quick_config}
+{if $context EQ "makeContribution"}
   <div id="membership" class="crm-group membership-group">
-    {if $context EQ "makeContribution"}
+
       <div id="priceset">
         <fieldset>
           {if $renewal_mode}
@@ -34,7 +34,7 @@
           {if !empty($membershipTypes)}
             {foreach from=$membershipTypes item=row}
               {if array_key_exists( 'current_membership', $row )}
-                <div id='help'>
+                <div class='help'>
                   {* Lifetime memberships have no end-date so current_membership array key exists but is NULL *}
                   {if $row.current_membership}
                     {if $row.current_membership|crmDate:"%Y%m%d" LT $smarty.now|crmDate:"%Y%m%d"}
@@ -61,7 +61,7 @@
       <div class="display-block">
         {include file="CRM/Price/Page/LineItem.tpl" context="Membership"}
       </div>
-    {/if}
+
   </div>
 {literal}
   <script type="text/javascript">
@@ -158,6 +158,7 @@
       {foreach from=$membershipTypes item=row}
         <tr {if $context EQ "makeContribution"}class="odd-row" {/if}valign="top">
           {if $showRadio }
+            {* unreachable - show radio is never true *}
             {assign var="pid" value=$row.id}
             <td style="width: 1em;">{$form.selectMembership.$pid.html}</td>
           {else}
@@ -203,7 +204,7 @@
           </td>
         </tr>
       {/if}
-      {if $showRadio}
+      {if $showRadio}{* unreachable *}
         {if $showRadioNoThanks } {* Provide no-thanks option when Membership signup is not required - per membership block configuration. *}
           <tr class="odd-row">
             <td>{$form.selectMembership.no_thanks.html}</td>

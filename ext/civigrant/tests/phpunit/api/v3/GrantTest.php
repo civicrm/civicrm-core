@@ -25,8 +25,6 @@ class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test
   protected $ids = [];
   protected $_entity = 'Grant';
 
-  public $DBResetRequired = FALSE;
-
   public function setUpHeadless() {
     return \Civi\Test::headless()
       ->install(['org.civicrm.afform', 'org.civicrm.search_kit'])

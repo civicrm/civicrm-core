@@ -308,7 +308,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
     $msg = WorkflowMessage::create('case_activity', [
       'modelProps' => [
-        'contactId' => $contact_id,
+        'contactID' => $contact_id,
         'contact' => ['role' => 'Sand grain counter'],
         'isCaseActivity' => 1,
         'clientId' => $client_id,
@@ -425,8 +425,8 @@ London, 90210
    */
   public function testContactTokens(): void {
     // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
-    putenv('TIME_FUNC=frozen');
-    CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
+    $restoreTime = $this->useFrozenTime();
+
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hookTokens']);
 
@@ -483,10 +483,65 @@ emo
     $this->assertEquals($expected_parts[0], $returned_parts[0]);
     $this->assertApproxEquals($expected_parts[1], $returned_parts[1], 2);
     $this->assertEquals($expected_parts[2], $returned_parts[2]);
+    $restoreTime->cleanup();
+  }
 
-    // reset time
-    putenv('TIME_FUNC');
-    CRM_Utils_Time::resetTime();
+  /**
+   * Test tokens resolve when parsed one at a time.
+   *
+   * Assuming that `testContactTokens()` has asserted tokens work en masse, we have another
+   * question -- do the tokens work the same when evaluated en-masse and individually?
+   */
+  public function testTokensIndividually(): void {
+    // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
+    // This variable releases the time on destruct so needs to be assigned for the
+    // duration of the test.
+    /** @noinspection PhpUnusedLocalVariableInspection */
+    $restoreTime = $this->useFrozenTime();
+
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hookTokens']);
+
+    $this->createCustomGroupWithFieldsOfAllTypes([]);
+    $tokenData = $this->getOldContactTokens();
+    $this->setupContactFromTokeData($tokenData);
+
+    $context = ['contactId' => $tokenData['contact_id']];
+    $render = static function (string $templateText) use ($context, $tokenData) {
+      try {
+        return CRM_Core_TokenSmarty::render(['text' => $templateText], $context)['text'];
+      }
+      catch (\Throwable $t) {
+        return 'EXCEPTION:' . $t->getMessage();
+      }
+    };
+
+    // Build $tokenLines, a list of expressions like 'contact.display_name:{contact.display_name}'
+    $tokenLines = [];
+    $tokenNames = array_keys($this->getAdvertisedTokens());
+    foreach ($tokenNames as $tokenName) {
+      $tokenLines[] = trim($tokenName, '{}') . ':' . $tokenName;
+    }
+    foreach (array_keys($tokenData) as $key) {
+      $tokenLines[] .= "contact.$key:{contact.$key}";
+    }
+    $tokenLines = array_unique($tokenLines);
+    sort($tokenLines);
+
+    // Evaluate all these token lines
+    $oneByOne = array_map($render, $tokenLines);
+    $allAtOnce = $render(implode("\n", $tokenLines));
+    $this->assertEquals($allAtOnce, implode("\n", $oneByOne));
+
+    $emptyLines = preg_grep('/:$/', $oneByOne);
+    $this->assertEquals([
+      'contact.address_primary.county_id:label:',
+      'contact.contact_is_deleted:',
+      'contact.county:',
+      'contact.custom_6:',
+      'contact.deceased_date:',
+      'contact.do_not_phone:',
+    ], array_values($emptyLines), 'Most tokens should have data.');
   }
 
   /**
@@ -638,7 +693,6 @@ emo
       '{contact.image_URL}' => 'Image Url',
       '{contact.preferred_communication_method:label}' => 'Preferred Communication Method',
       '{contact.preferred_language:label}' => 'Preferred Language',
-      '{contact.preferred_mail_format:label}' => 'Preferred Mail Format',
       '{contact.hash}' => 'Contact Hash',
       '{contact.source}' => 'Contact Source',
       '{contact.first_name}' => 'First Name',
@@ -651,6 +705,7 @@ emo
       '{contact.job_title}' => 'Job Title',
       '{contact.gender_id:label}' => 'Gender',
       '{contact.birth_date}' => 'Birth Date',
+      '{contact.deceased_date}' => 'Deceased Date',
       '{contact.employer_id}' => 'Current Employer ID',
       '{contact.is_deleted:label}' => 'Contact is in Trash',
       '{contact.created_date}' => 'Created Date',
@@ -721,8 +776,7 @@ emo
    * Note it will render additional custom fields if they exist.
    *
    * @return array
-   *
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpDocMissingThrowsInspection
    */
   public function getOldContactTokens(): array {
     return [
@@ -740,7 +794,6 @@ emo
       'image_URL' => 'https://example.com',
       'preferred_communication_method' => 'Phone',
       'preferred_language' => 'fr_CA',
-      'preferred_mail_format' => 'Both',
       'hash' => 'xyz',
       'contact_source' => 'Contact Source',
       'first_name' => 'Robert',
@@ -839,8 +892,6 @@ emo
    * advertise them and the old 'random' v3 style tokens continued to work.
    *
    * But, we should support them for a bit - which means testing them...
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testBrieflyPopularTokens(): void {
     $this->createCustomGroupWithFieldsOfAllTypes([]);
@@ -866,6 +917,21 @@ primary_website:https://civicrm.org
 primary_openid:OpenID
 primary_phone:123-456
 ', $messageHtml);
+  }
+
+  /**
+   * Temporarily freeze time, as perceived through `CRM_Utils_Time`.
+   *
+   * @return \CRM_Utils_AutoClean
+   */
+  protected function useFrozenTime(): CRM_Utils_AutoClean {
+    $oldTimeFunc = getenv('TIME_FUNC');
+    putenv('TIME_FUNC=frozen');
+    CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
+    return CRM_Utils_AutoClean::with(function () use ($oldTimeFunc) {
+      putenv($oldTimeFunc === NULL ? 'TIME_FUNC' : "TIME_FUNC=$oldTimeFunc");
+      CRM_Utils_Time::resetTime();
+    });
   }
 
   /**
@@ -920,7 +986,6 @@ nick_name:Bob
 image_URL:https://example.com
 preferred_communication_method:Phone
 preferred_language:fr_CA
-preferred_mail_format:Both
 hash:xyz
 contact_source:Contact Source
 first_name:Robert
@@ -1020,7 +1085,6 @@ nick_name |Bob
 image_URL |https://example.com
 preferred_communication_method:label |Phone
 preferred_language:label |French (Canada)
-preferred_mail_format:label |Both
 hash |xyz
 source |Contact Source
 first_name |Robert
@@ -1033,6 +1097,7 @@ communication_style_id:label |Formal
 job_title |Busy person
 gender_id:label |Female
 birth_date |December 31st, 1998
+deceased_date |
 employer_id |' . $contact['employer_id'] . '
 is_deleted:label |No
 created_date |January 1st, 2020

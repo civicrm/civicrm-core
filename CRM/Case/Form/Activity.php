@@ -456,7 +456,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $params['is_auto'] = 0;
       }
 
-      // always create a revision of an case activity. CRM-4533
+      // @todo This is called newActParams because it USED TO create new activity revisions. But at the moment just changing the part that is broken.
+      // hidden_custom is always 1, so see above where $params gets merged with the existing activity data every time, including the activity id.
       $newActParams = $params;
 
       // add target contact values in update mode
@@ -484,26 +485,17 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
     }
     else {
-      // create a new version of activity if activity was found to
-      // have been modified/created by user
-
-      // since the params we need to set are very few, and we don't want rest of the
-      // work done by bao create method , lets use dao object to make the changes
-      $params = ['id' => $this->_activityId];
-      $params['is_current_revision'] = 0;
-      $activity = new CRM_Activity_DAO_Activity();
-      $activity->copyValues($params);
-      $activity->save();
-
+      // @todo This can go eventually. Just focusing on not creating new
+      // revisions for now. This is still needed to keep it matched up to any
+      // existing older revisions while they are still in the db.
       // set proper original_id
       if (!empty($this->_defaults['original_id'])) {
         $newActParams['original_id'] = $this->_defaults['original_id'];
       }
       else {
-        $newActParams['original_id'] = $activity->id;
+        $newActParams['original_id'] = NULL;
       }
 
-      //is_current_revision will be set to 1 by default.
       // add attachments if any
       CRM_Core_BAO_File::formatAttachment($newActParams,
         $newActParams,

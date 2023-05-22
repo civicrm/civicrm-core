@@ -6,6 +6,11 @@
  */
 class CRM_Utils_LazyArrayTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   public function testAssoc() {
     $l = $this->createFruitBasket();
     $this->assertFalse($l->isLoaded());

@@ -126,7 +126,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
               'title' => ts('Contribution Page'),
             ],
             'source' => [
-              'title' => ts('Source'),
+              'title' => ts('Contribution Source'),
             ],
             'payment_instrument_id' => [
               'title' => ts('Payment Type'),
@@ -188,7 +188,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
             'thankyou_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
             'contribution_source' => [
-              'title' => ts('Source'),
+              'title' => ts('Contribution Source'),
               'name' => 'source',
               'type' => CRM_Utils_Type::T_STRING,
             ],
@@ -241,7 +241,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'financial_type_id' => ['title' => ts('Financial Type')],
             'contribution_status_id' => ['title' => ts('Contribution Status')],
             'payment_instrument_id' => ['title' => ts('Payment Method')],
-            'receive_date' => ['title' => ts('Date Received')],
+            'receive_date' => ['title' => ts('Contribution Date')],
             'receipt_date' => ['title' => ts('Receipt Date')],
             'thankyou_date' => ['title' => ts('Thank-you Date')],
           ],
@@ -254,6 +254,15 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             ],
           ],
           'grouping' => 'contri-fields',
+        ],
+        'civicrm_pledge_payment' => [
+          'dao' => 'CRM_Pledge_DAO_PledgePayment',
+          'filters' => [
+            'contribution_id' => [
+              'title' => ts('Contribution is a pledge payment'),
+              'type' => CRM_Utils_Type::T_BOOLEAN,
+            ],
+          ],
         ],
         'civicrm_contribution_soft' => [
           'dao' => 'CRM_Contribute_DAO_ContributionSoft',
@@ -985,6 +994,13 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
     $this->joinPhoneFromContact();
     $this->joinAddressFromContact();
     $this->joinEmailFromContact();
+
+    //for pledge payment
+    if ($this->isTableSelected('civicrm_pledge_payment')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_pledge_payment {$this->_aliases['civicrm_pledge_payment']} ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_pledge_payment']}.contribution_id
+      ";
+    }
 
     // include contribution note
     if (!empty($this->_params['fields']['contribution_note']) ||

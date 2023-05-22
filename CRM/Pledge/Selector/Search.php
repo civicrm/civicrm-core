@@ -179,12 +179,16 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
         'url' => 'civicrm/contact/view/pledge',
         'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=pledge' . $extraParams,
         'title' => ts('View Pledge'),
+        'weight' => -20,
+        'is_active' => TRUE,
       ],
       CRM_Core_Action::UPDATE => [
         'name' => ts('Edit'),
         'url' => 'civicrm/contact/view/pledge',
         'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
         'title' => ts('Edit Pledge'),
+        'weight' => -10,
+        'is_active' => TRUE,
       ],
       CRM_Core_Action::DETACH => [
         'name' => ts('Cancel'),
@@ -192,19 +196,18 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
         'qs' => 'reset=1&action=detach&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
         'extra' => 'onclick = "return confirm(\'' . $cancelExtra . '\');"',
         'title' => ts('Cancel Pledge'),
+        'weight' => 20,
+        'is_active' => !in_array('Cancel', $hideOption, TRUE),
       ],
       CRM_Core_Action::DELETE => [
         'name' => ts('Delete'),
         'url' => 'civicrm/contact/view/pledge',
         'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
         'title' => ts('Delete Pledge'),
+        'weight' => 100,
+        'is_active' => TRUE,
       ],
     ];
-
-    if (in_array('Cancel', $hideOption)) {
-      unset(self::$_links[CRM_Core_Action::DETACH]);
-    }
-
     return self::$_links;
   }
 
@@ -312,7 +315,6 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
       if (!empty($row['pledge_is_test'])) {
         $row['pledge_status'] = CRM_Core_TestEntity::appendTestText($row['pledge_status']);
       }
-
       $hideOption = [];
       if (CRM_Utils_Array::key('Cancelled', $row) ||
         CRM_Utils_Array::key('Completed', $row)

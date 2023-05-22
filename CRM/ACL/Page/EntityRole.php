@@ -54,6 +54,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable ACL Role Assignment'),
+          'weight' => 40,
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),

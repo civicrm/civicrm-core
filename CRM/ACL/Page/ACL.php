@@ -54,17 +54,20 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable ACL'),
+          'weight' => 40,
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable ACL'),
+          'weight' => 30,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/acl',
           'qs' => 'reset=1&action=delete&id=%%id%%',
           'title' => ts('Delete ACL'),
+          'weight' => 100,
         ],
       ];
     }

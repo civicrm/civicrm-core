@@ -37,7 +37,7 @@ trait CRM_Contact_Import_MetadataTrait {
     }
 
     foreach ($this->getRelationships() as $key => $var) {
-      list($type) = explode('_', $key);
+      [$type] = explode('_', $key);
       $relationshipType[$key]['title'] = $var;
       $relationshipType[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
       $relationshipType[$key]['import'] = TRUE;

@@ -126,4 +126,22 @@ class AdminTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface
     $this->assertCount(1, $optionValueToGroup);
   }
 
+  public function testEntityRefGetJoins(): void {
+    \Civi\Api4\CustomGroup::create()->setValues([
+      'title' => 'EntityRefFields',
+      'extends' => 'Individual',
+    ])->execute();
+    \Civi\Api4\CustomField::create()->setValues([
+      'label' => 'Favorite Nephew',
+      'name' => 'favorite_nephew',
+      'custom_group_id.name' => 'EntityRefFields',
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'EntityReference',
+      'fk_entity' => 'Contact',
+    ])->execute();
+    $allowedEntities = Admin::getSchema();
+    $joins = Admin::getJoins($allowedEntities);
+    $this->assertContains('Contact Favorite Nephew', array_column($joins['Contact'], 'label'));
+  }
+
 }

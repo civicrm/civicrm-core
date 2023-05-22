@@ -173,7 +173,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *   Do we want all pages or only active pages.
    *
    *
-   * @return array
+   * @return string|array|null
    *   array reference of all contribution pages if any
    */
   public static function &contributionPage($id = NULL, $all = FALSE) {

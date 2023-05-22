@@ -93,7 +93,7 @@
            </tr>
          </table>
 <div class="crm-submit-buttons">
-{if $fields}{$form._qf_Batch_refresh.html}{/if}{include file="CRM/common/formButtons.tpl"}
+{if $fields}{$form._qf_Batch_refresh.html}{/if}{include file="CRM/common/formButtons.tpl" location=''}
 </div>
 </div>
 

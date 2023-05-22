@@ -13,6 +13,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
+    $this->useTransaction();
     $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_contact WHERE first_name='Jeffrey' and last_name='Lebowski'");
 
     // Create noise to ensure we don't accidentally/coincidentally match the first record

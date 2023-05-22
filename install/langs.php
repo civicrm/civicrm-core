@@ -6,6 +6,7 @@
   'ca_ES' => 'Catalan; Valencian',
   'zh_CN' => 'Chinese (China)',
   'zh_TW' => 'Chinese (Taiwan)',
+  'hr_HR' => 'Croatian',
   'cs_CZ' => 'Czech',
   'da_DK' => 'Danish',
   'nl_NL' => 'Dutch (Netherlands)',

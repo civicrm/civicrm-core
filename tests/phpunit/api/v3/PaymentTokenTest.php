@@ -17,16 +17,14 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
   protected $params;
   protected $id;
 
-  public $DBResetRequired = FALSE;
-
   /**
    * Setup for class.
    *
    * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
     $contactID = $this->individualCreate();
     $this->params = [
       'token' => "fancy-token-xxxx",

@@ -27,13 +27,22 @@
 
     <div id="widgetFields">
         <table class="form-layout-compressed">
-            <tr class="crm-contribution-contributionpage-widget-form-block-title"><td class="label">{$form.title.label}<span class="crm-marker"> *</span></td><td>{$form.title.html}</td></tr>
-            <tr class="crm-contribution-form-block-url_logo"><td class="label">{$form.url_logo.label}</span></td><td>{$form.url_logo.html}</td></tr>
-            <tr class="crm-contribution-contributionpage-widget-form-block-button_title"><td class="label">{$form.button_title.label}</td><td>{$form.button_title.html}</td></tr>
-            <tr class="crm-contribution-contributionpage-widget-form-block-about"><td class="label">{$form.about.label}<span class="crm-marker"> *</span></td><td>{$form.about.html}
-<br /><span class="description">{ts}Enter content for the about message. You may include HTML formatting tags. You can also include images, as long as they are already uploaded to a server&mdash;reference them using complete URLs.{/ts}</span>
-</td></tr>
-
+            <tr class="crm-contribution-contributionpage-widget-form-block-title">
+                <td class="label">{$form.title.label}<span class="crm-marker"> *</span></td>
+                <td>{$form.title.html}</td>
+            </tr>
+            <tr class="crm-contribution-form-block-url_logo">
+                <td class="label">{$form.url_logo.label}</span></td>
+                <td>{$form.url_logo.html}</td>
+            </tr>
+            <tr class="crm-contribution-contributionpage-widget-form-block-button_title">
+                <td class="label">{$form.button_title.label}</td>
+                <td>{$form.button_title.html}</td>
+            </tr>
+            <tr class="crm-contribution-contributionpage-widget-form-block-about">
+                <td class="label">{$form.about.label}<span class="crm-marker"> *</span></td>
+                <td>{$form.about.html}</td>
+            </tr>
         </table>
 
         <div id="id-get_code">

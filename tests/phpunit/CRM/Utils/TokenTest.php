@@ -8,6 +8,11 @@ use Civi\Token\TokenProcessor;
  */
 class CRM_Utils_TokenTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * Test for replaceGreetingTokens.
    *

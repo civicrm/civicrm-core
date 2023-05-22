@@ -68,7 +68,7 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
    */
   public function findOrphanedFiles() {
     $orphans = [];
-
+    $core_supplied_vendor = Civi::paths()->getPath('[civicrm.root]/vendor');
     foreach ($this->getRemovedFiles() as $file) {
       $path = Civi::paths()->getPath($file);
       if (empty($path) || strpos('[civicrm', $path) !== FALSE) {
@@ -76,6 +76,10 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
           'file' => $file,
           'path' => $path,
         ]);
+      }
+      // If Vendor directory is not within the civicrm module directory (Drupal 8/9/10) etc ignore checks on the vendor paths.
+      if (strpos($file, '.vendor') !== FALSE && !is_dir($core_supplied_vendor)) {
+        continue;
       }
       if (file_exists($path)) {
         $orphans[] = [

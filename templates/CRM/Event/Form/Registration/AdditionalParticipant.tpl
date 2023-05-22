@@ -55,7 +55,7 @@
 </div>
 
 <div id="crm-submit-buttons" class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl"}
+    {include file="CRM/common/formButtons.tpl" location=''}
 </div>
 </div>
 

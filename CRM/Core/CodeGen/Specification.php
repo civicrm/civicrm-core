@@ -23,7 +23,7 @@ class CRM_Core_CodeGen_Specification {
     $this->buildVersion = $buildVersion;
 
     if ($verbose) {
-      echo "Parsing schema description " . $schemaPath . "\n";
+      echo 'Parsing schema description ' . $schemaPath . "\n";
     }
     $dbXML = CRM_Core_CodeGen_Util_Xml::parse($schemaPath);
 
@@ -45,13 +45,13 @@ class CRM_Core_CodeGen_Specification {
 
     // add archive tables here
     foreach ($this->tables as $name => $table) {
-      if ($table['archive'] == 'true') {
+      if ($table['archive'] === 'true') {
         $name = 'archive_' . $table['name'];
         $table['name'] = $name;
         $table['archive'] = 'false';
         if (isset($table['foreignKey'])) {
           foreach ($table['foreignKey'] as $fkName => $fkValue) {
-            if ($this->tables[$fkValue['table']]['archive'] == 'true') {
+            if ($this->tables[$fkValue['table']]['archive'] === 'true') {
               $table['foreignKey'][$fkName]['table'] = 'archive_' . $table['foreignKey'][$fkName]['table'];
               $table['foreignKey'][$fkName]['uniqName']
                 = str_replace('FK_', 'FK_archive_', $table['foreignKey'][$fkName]['uniqName']);
@@ -355,7 +355,7 @@ class CRM_Core_CodeGen_Specification {
 
       default:
         $field['sqlType'] = $type;
-        if ($type == 'int unsigned' || $type == 'tinyint') {
+        if ($type === 'int unsigned' || $type === 'tinyint') {
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
@@ -372,13 +372,28 @@ class CRM_Core_CodeGen_Specification {
     $field['comment'] = $this->value('comment', $fieldXML);
     $field['deprecated'] = $this->value('deprecated', $fieldXML, FALSE);
     $field['default'] = $this->value('default', $fieldXML);
-    $field['import'] = $this->value('import', $fieldXML);
-    if ($this->value('export', $fieldXML)) {
-      $field['export'] = $this->value('export', $fieldXML);
+    $import = $this->value('import', $fieldXML) ? strtoupper($this->value('import', $fieldXML)) : 'FALSE';
+    $export = $this->value('export', $fieldXML) ? strtoupper($this->value('export', $fieldXML)) : NULL;
+    if (!isset($fieldXML->usage)) {
+      $usage = [
+        'import' => $import,
+        'export' => $export ?? $import,
+      ];
     }
     else {
-      $field['export'] = $this->value('import', $fieldXML);
+      $usage = [];
+      foreach ($fieldXML->usage->children() as $usedFor => $isUsed) {
+        $usage[$usedFor] = strtoupper((string) $isUsed);
+      }
+      $import = $usage['import'] ?? $import;
     }
+    // Ensure all keys are populated. Import is the historical de-facto default.
+    $field['usage'] = array_merge(array_fill_keys(['import', 'export', 'duplicate_matching'], $import), $usage);
+    // Usage for tokens has not historically been in the metadata so we can default to FALSE.
+    // historically hard-coded lists have been used.
+    $field['usage']['token'] = $field['usage']['token'] ?? 'FALSE';
+    $field['import'] = $field['usage']['import'];
+    $field['export'] = $export ?? $import;
     $field['rule'] = $this->value('rule', $fieldXML);
     $field['title'] = $this->value('title', $fieldXML);
     if (!$field['title']) {
@@ -730,7 +745,7 @@ class CRM_Core_CodeGen_Specification {
    * @param $object
    * @param null $default
    *
-   * @return null|string
+   * @return null|string|\SimpleXMLElement
    */
   protected function value($key, &$object, $default = NULL) {
     if (isset($object->$key)) {

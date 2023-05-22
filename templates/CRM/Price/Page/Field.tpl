@@ -13,16 +13,14 @@
   {include file="CRM/Price/Form/DeleteField.tpl"}
 {elseif $action eq 1024 }
   {include file="CRM/Price/Form/Preview.tpl"}
-{elseif ($usedBy and $action eq 8) or $usedBy.civicrm_event or $usedBy.civicrm_contribution_page}
+{elseif $usedBy}
   <div id="price_set_used_by" class="messages status no-popup">
     {icon icon="fa-info-circle"}{/icon}
     {if $action eq 8}
       {ts 1=$usedPriceSetTitle}Unable to delete the '%1' Price Field - it is currently in use by one or more active events or contribution pages or contributions  or event templates.{/ts}
     {/if}
 
-    {if $usedBy.civicrm_event or $usedBy.civicrm_contribution_page or $usedBy.civicrm_event_template}
-      {include file="CRM/Price/Page/table.tpl"}
-    {/if}
+    {include file="CRM/Price/Page/table.tpl"}
   </div>
 {/if}
 

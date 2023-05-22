@@ -57,6 +57,7 @@
  *     not guaranteed among versions/implementations.)
  *   - disabled: int, default=0
  *   - region: string
+ *   - esm: bool, enable ECMAScript Module (ESM) support for "script","scriptFile","scriptUrl"
  *   - translate: bool|string, Autoload translations. (Only applies to 'scriptFile')
  *       - FALSE: Do not load translated strings.
  *       - TRUE: Load translated strings. Use the $ext's default domain.

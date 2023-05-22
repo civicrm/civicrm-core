@@ -181,10 +181,12 @@
         return {field: field, join: join};
       }
       function parseFnArgs(info, expr) {
-        var fnName = expr.split('(')[0],
-          argString = expr.substr(fnName.length + 1, expr.length - fnName.length - 2);
+        var matches = /([_A-Z]+)\((.*)\)(:[a-z]+)?$/.exec(expr),
+          fnName = matches[1],
+          argString = matches[2];
         info.fn = _.find(CRM.crmSearchAdmin.functions, {name: fnName || 'e'});
         info.data_type = (info.fn && info.fn.data_type) || null;
+        info.suffix = matches[3];
 
         function getKeyword(whitelist) {
           var keyword;

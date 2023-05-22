@@ -77,36 +77,6 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test that payment retrieve works based on known pledge id.
-   */
-  public function testRetrieveKnownPledgeID(): void {
-    $params = [
-      'contact_id' => $this->ids['Contact'][0],
-      'frequency_unit' => 'month',
-      'frequency_interval' => 1,
-      'frequency_day' => 1,
-      'original_installment_amount' => 25.00,
-      'installments' => 12,
-      'financial_type_id' => 1,
-      'create_date' => '20100513000000',
-      'acknowledge_date' => '20100513000000',
-      'start_date' => '20100513000000',
-      'status_id' => 2,
-      'currency' => 'USD',
-      'amount' => 300,
-    ];
-
-    $pledge = $this->callAPISuccess('Pledge', 'create', $params);
-
-    $defaults = [];
-    $pledgeParams = ['pledge_id' => $pledge['id']];
-
-    $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($pledgeParams, $defaults);
-
-    $this->assertEquals(1, $pledgeId->N, 'Pledge was retrieved');
-  }
-
-  /**
    *  Test build recur params.
    */
   public function testGetPledgeStartDate(): void {

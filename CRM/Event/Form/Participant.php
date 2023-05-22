@@ -25,6 +25,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Participant ID - use getParticipantID.
    *
    * @var int
+   *
+   * @deprecated unused
    */
   public $_pId;
 
@@ -69,6 +71,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * The id of the participation that we are processing.
    *
    * @var int
+   *
+   * @internal use getParticipantID to access in a supported way.
    */
   public $_id;
 
@@ -199,8 +203,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Event id.
    *
    * @var int
+   *
+   * @internal - use getEventID to access in a supported way
    */
-  public $_eventId = NULL;
+  public $_eventId;
 
   /**
    * Id of payment, if any
@@ -230,11 +236,24 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected $createPaymentParams = [];
 
   /**
+   * Get the selected Event ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int|null
+   */
+  public function getEventID(): ?int {
+    return $this->_eventId ?: ($this->getSubmittedValue('event_id') ? (int) $this->getSubmittedValue('event_id') : NULL);
+  }
+
+  /**
    * Get params to create payments.
    *
    * @return array
    */
-  public function getCreatePaymentParams(): array {
+  protected function getCreatePaymentParams(): array {
     return $this->createPaymentParams;
   }
 
@@ -243,21 +262,21 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @param array $createPaymentParams
    */
-  public function setCreatePaymentParams(array $createPaymentParams) {
+  protected function setCreatePaymentParams(array $createPaymentParams): void {
     $this->createPaymentParams = $createPaymentParams;
   }
 
   /**
    * Explicitly declare the entity api name.
    */
-  public function getDefaultEntity() {
+  public function getDefaultEntity(): string {
     return 'Participant';
   }
 
   /**
    * Default form context used as part of addField()
    */
-  public function getDefaultContext() {
+  public function getDefaultContext(): string {
     return 'create';
   }
 
@@ -285,28 +304,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->setPageTitle(ts('Event Registration'));
     }
 
-    // check the current path, if search based, then dont get participantID
-    // CRM-5792
-    $path = CRM_Utils_System::currentPath();
-    if (
-      strpos($path, 'civicrm/contact/search') === 0 ||
-      strpos($path, 'civicrm/group/search') === 0
-    ) {
-      $this->_id = NULL;
-    }
-    else {
-      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    }
-
-    if ($this->_id) {
-      $this->assign('participantId', $this->_id);
+    $this->assign('participantId', $this->getParticipantID());
+    if ($this->getParticipantID()) {
 
       $this->_paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $this->_id, 'id', 'participant_id'
       );
 
       $this->assign('hasPayment', $this->_paymentId);
-      $this->assign('componentId', $this->_id);
+      $this->assign('componentId', $this->getParticipantID());
       $this->assign('component', 'event');
 
       // CRM-12615 - Get payment information from the primary registration
@@ -339,7 +345,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->assign('single', $this->_single);
 
-    if (!$this->_id) {
+    if (!$this->getParticipantID()) {
       $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     }
     $this->assign('action', $this->_action);
@@ -357,13 +363,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       return;
     }
 
-    // assign participant id to the template
-    $this->assign('participantId', $this->_id);
-
     // when fee amount is included in form
     if (!empty($_POST['hidden_feeblock']) || !empty($_POST['send_receipt'])) {
       if ($this->_submitValues['event_id']) {
-        $this->_eventId = $this->_submitValues['event_id'];
+        $this->_eventId = (int) $this->_submitValues['event_id'];
       }
       CRM_Event_Form_EventFees::preProcess($this);
       $this->buildEventFeeForm($this);
@@ -423,7 +426,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::setDefaultValues($this);
     }
@@ -773,8 +776,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @return void
    */
-  public function addRules() {
-    $this->addFormRule(['CRM_Event_Form_Participant', 'formRule'], $this);
+  public function addRules(): void {
+    $this->addFormRule(['CRM_Event_Form_Participant', 'formRule']);
   }
 
   /**
@@ -785,7 +788,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param $files
    * @param self $self
    *
-   * @return array
+   * @return array|true
    *   list of errors to be posted back to the form
    */
   public static function formRule($values, $files, $self) {
@@ -816,15 +819,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (!empty($values['priceSetId'])) {
         CRM_Price_BAO_PriceField::priceSetValidation($values['priceSetId'], $values, $errorMsg);
       }
-    }
-
-    // validate contribution status for 'Failed'.
-    if ($self->_onlinePendingContributionId && !empty($values['record_contribution']) &&
-      (CRM_Utils_Array::value('contribution_status_id', $values) ==
-        array_search('Failed', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
-      )
-    ) {
-      $errorMsg['contribution_status_id'] = ts('Please select a valid payment status before updating.');
     }
 
     // do the amount validations.
@@ -895,50 +889,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       return;
     }
-    // When adding a single contact, the formRule prevents you from adding duplicates
-    // (See above in formRule()). When adding more than one contact, the duplicates are
-    // removed automatically and the user receives one notification.
-    if ($this->_action & CRM_Core_Action::ADD) {
-      $event_id = $this->_eventId;
-      if (empty($event_id) && !empty($params['event_id'])) {
-        $event_id = $params['event_id'];
-      }
-      if (!$this->_single && !empty($event_id)) {
-        $duplicateContacts = 0;
-        foreach ($this->_contactIds as $k => $dupeCheckContactId) {
-          // Eliminate contacts that have already been assigned to this event.
-          $dupeCheck = new CRM_Event_BAO_Participant();
-          $dupeCheck->contact_id = $dupeCheckContactId;
-          $dupeCheck->event_id = $event_id;
-          $dupeCheck->find(TRUE);
-          if (!empty($dupeCheck->id)) {
-            $duplicateContacts++;
-            unset($this->_contactIds[$k]);
-          }
-        }
-        if ($duplicateContacts > 0) {
-          $msg = ts(
-            "%1 contacts have already been assigned to this event. They were not added a second time.",
-            [1 => $duplicateContacts]
-          );
-          CRM_Core_Session::setStatus($msg);
-        }
-        if (count($this->_contactIds) == 0) {
-          CRM_Core_Session::setStatus(ts("No participants were added."));
-          return;
-        }
-        // We have to re-key $this->_contactIds so each contact has the same
-        // key as their corresponding record in the $participants array that
-        // will be created below.
-        $this->_contactIds = array_values($this->_contactIds);
-      }
-    }
 
     $statusMsg = $this->submit($params);
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
     $session = CRM_Core_Session::singleton();
     $buttonName = $this->controller->getButtonName();
-    if ($this->_context == 'standalone') {
+    if ($this->_context === 'standalone') {
       if ($buttonName == $this->getButtonName('upload', 'new')) {
         $urlParams = 'reset=1&action=add&context=standalone';
         if ($this->_mode) {
@@ -965,6 +921,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Submit form.
    *
+   * @internal will be made protected / decommissioned once tests
+   * in core & line item editor are fixed to not call it.
+   *
    * @param array $params
    *
    * @return string
@@ -978,9 +937,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // set the contact, when contact is selected
     if (!empty($params['contact_id'])) {
       $this->_contactID = $this->_contactId = $params['contact_id'];
-    }
-    if (!$this->_priceSetId && $this->_isPaidEvent) {
-      CRM_Core_Error::deprecatedFunctionWarning('this should never be true, handling to be removed');
     }
     if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $this->_quickConfig = $isQuickConfig;
@@ -1395,173 +1351,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       );
     }
 
-    $sent = [];
-    $notSent = [];
     if (!empty($params['send_receipt'])) {
-
-      $this->assign('module', 'Event Registration');
-      $this->assignEventDetailsToTpl($params['event_id'], CRM_Utils_Array::value('role_id', $params), CRM_Utils_Array::value('receipt_text', $params), $this->_isPaidEvent);
-      $this->assign('isAmountzero', 1);
-
-      if ($this->_isPaidEvent) {
-        $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-        if (!$this->_mode) {
-          if (isset($params['payment_instrument_id'])) {
-            $this->assign('paidBy',
-              CRM_Utils_Array::value($params['payment_instrument_id'],
-                $paymentInstrument
-              )
-            );
-          }
-        }
-
-        $this->assign('totalAmount', $params['total_amount'] ?? $contributionParams['total_amount']);
-        $this->assign('isPrimary', 1);
-        $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
-      }
-      if ($this->_mode) {
-        $this->assignBillingName($params);
-        $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-          $this->_params,
-          $this->_bltID
-        ));
-
-        $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
-        $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
-
-        // The concept of contributeMode is deprecated.
-        $this->assign('contributeMode', 'direct');
-        $this->assign('isAmountzero', 0);
-        $this->assign('is_pay_later', 0);
-        $this->assign('isPrimary', 1);
-      }
-
-      $this->assign('register_date', $params['register_date']);
-      if (isset($params['receive_date'])) {
-        $this->assign('receive_date', $params['receive_date']);
-      }
-
-      $customGroup = [];
-      //format submitted data
-      foreach ($params['custom'] as $fieldID => $values) {
-        foreach ($values as $fieldValue) {
-          $isPublic = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $fieldValue['custom_group_id'], 'is_public');
-          if ($isPublic) {
-            $customFields[$fieldID]['id'] = $fieldID;
-            $formattedValue = CRM_Core_BAO_CustomField::displayValue($fieldValue['value'], $fieldID, $participants[0]->id);
-            $customGroup[$customFields[$fieldID]['groupTitle']][$customFields[$fieldID]['label']] = str_replace('&nbsp;', '', $formattedValue);
-          }
-        }
-      }
-
-      foreach ($this->_contactIds as $num => $contactID) {
-        // Retrieve the name and email of the contact - this will be the TO for receipt email
-        [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
-
-        $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
-
-        $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-        if ($waitingStatus = CRM_Utils_Array::value($params['status_id'], $waitStatus)) {
-          $this->assign('isOnWaitlist', TRUE);
-        }
-
-        $this->assign('customGroup', $customGroup);
-        $this->assign('contactID', $contactID);
-        $this->assign('participantID', $participants[$num]->id);
-
-        $this->_id = $participants[$num]->id;
-
-        if ($this->_isPaidEvent) {
-          // fix amount for each of participants ( for bulk mode )
-          $eventAmount = [];
-          $totalTaxAmount = 0;
-
-          //add dataArray in the receipts in ADD and UPDATE condition
-          $dataArray = [];
-          if ($this->_action & CRM_Core_Action::ADD) {
-            $line = $lineItem[0] ?? [];
-          }
-          elseif ($this->_action & CRM_Core_Action::UPDATE) {
-            $line = $this->_values['line_items'];
-          }
-          if (Civi::settings()->get('invoicing')) {
-            foreach ($line as $key => $value) {
-              if (isset($value['tax_amount'])) {
-                $totalTaxAmount += $value['tax_amount'];
-                if (isset($dataArray[(string) $value['tax_rate']])) {
-                  $dataArray[(string) $value['tax_rate']] = $dataArray[(string) $value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
-                }
-                else {
-                  $dataArray[(string) $value['tax_rate']] = $value['tax_amount'] ?? NULL;
-                }
-              }
-            }
-            $this->assign('taxTerm', $this->getSalesTaxTerm());
-            $this->assign('dataArray', $dataArray);
-          }
-          if (!empty($additionalParticipantDetails)) {
-            $params['amount_level'] = preg_replace('//', '', $params['amount_level']) . ' - ' . $this->_contributorDisplayName;
-          }
-
-          $eventAmount[$num] = [
-            'label' => preg_replace('//', '', $params['amount_level']),
-            'amount' => $params['fee_amount'],
-          ];
-          //as we are using same template for online & offline registration.
-          //So we have to build amount as array.
-          $eventAmount = array_merge($eventAmount, $additionalParticipantDetails);
-          $this->assign('amount', $eventAmount);
-        }
-        $this->assign('totalTaxAmount', $totalTaxAmount ?? 0);
-        $sendTemplateParams = [
-          'workflow' => 'event_offline_receipt',
-          'contactId' => $contactID,
-          'isTest' => !empty($this->_defaultValues['is_test']),
-          'PDFFilename' => ts('confirmation') . '.pdf',
-          'modelProps' => [
-            'participantID' => $this->_id,
-            'eventID' => $params['event_id'],
-          ],
-        ];
-
-        // try to send emails only if email id is present
-        // and the do-not-email option is not checked for that contact
-        if ($this->_contributorEmail and !$this->_toDoNotEmail) {
-          if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
-            $receiptFrom = $params['from_email_address'];
-          }
-          $sendTemplateParams['from'] = $receiptFrom;
-          $sendTemplateParams['toName'] = $this->_contributorDisplayName;
-          $sendTemplateParams['toEmail'] = $this->_contributorEmail;
-          $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;
-          $sendTemplateParams['bcc'] = $this->_fromEmails['bcc'] ?? NULL;
-        }
-
-        //send email with pdf invoice
-        $template = CRM_Core_Smarty::singleton();
-        $taxAmt = $template->get_template_vars('dataArray');
-        $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-          $this->_id, 'contribution_id', 'participant_id'
-        );
-        if (Civi::settings()->get('invoice_is_email_pdf')) {
-          $sendTemplateParams['isEmailPdf'] = TRUE;
-          $sendTemplateParams['contributionId'] = $contributionId;
-        }
-        [$mailSent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-        if ($mailSent) {
-          $sent[] = $contactID;
-          foreach ($participants as $ids => $values) {
-            if ($values->contact_id == $contactID) {
-              $values->details = $params['receipt_text'] ?? NULL;
-              CRM_Activity_BAO_Activity::addActivity($values, 'Email');
-              break;
-            }
-          }
-        }
-        else {
-          $notSent[] = $contactID;
-        }
-      }
+      $result = $this->sendReceipts($params, $contributionParams['total_amount'], $customFields, $participants, $lineItem[0], $line, $value, $additionalParticipantDetails);
     }
 
     // set the participant id if it is not set
@@ -1569,13 +1360,16 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_id = $participants[0]->id;
     }
 
-    return $this->getStatusMsg($params, $sent, $updateStatusMsg, $notSent);
+    return $this->getStatusMsg($params, $result['sent'] ?? 0, $result['not_sent'] ?? 0, (string) $updateStatusMsg);
   }
 
   /**
    * Set the various IDs relating to custom data types.
+   *
+   * @internal will be made protected once line item editor unit tests
+   * no longer call it.
    */
-  public function setCustomDataTypes() {
+  public function setCustomDataTypes(): void {
     $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
     $this->_roleCustomDataTypeID = array_search('ParticipantRole', $customDataType);
     $this->_eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
@@ -1589,17 +1383,17 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Get status message
    *
    * @param array $params
-   * @param int $sent
+   * @param int $numberSent
+   * @param int $numberNotSent
    * @param string $updateStatusMsg
-   * @param int $notSent
    *
    * @return string
    */
-  protected function getStatusMsg($params, $sent, $updateStatusMsg, $notSent) {
+  protected function getStatusMsg(array $params, int $numberSent, int $numberNotSent, string $updateStatusMsg): string {
     $statusMsg = '';
     if (($this->_action & CRM_Core_Action::UPDATE)) {
       $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contributorDisplayName]);
-      if (!empty($params['send_receipt']) && count($sent)) {
+      if (!empty($params['send_receipt']) && $numberSent) {
         $statusMsg .= ' ' . ts('A confirmation email has been sent to %1', [1 => $this->_contributorEmail]);
       }
 
@@ -1610,14 +1404,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     elseif ($this->_action & CRM_Core_Action::ADD) {
       if ($this->_single) {
         $statusMsg = ts('Event registration for %1 has been added.', [1 => $this->_contributorDisplayName]);
-        if (!empty($params['send_receipt']) && count($sent)) {
+        if (!empty($params['send_receipt']) && $numberSent) {
           $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', [1 => $this->_contributorEmail]);
         }
       }
       else {
         $statusMsg = ts('Total Participant(s) added to event: %1.', [1 => count($this->_contactIds)]);
-        if (count($notSent) > 0) {
-          $statusMsg .= ' ' . ts('Email has NOT been sent to %1 contact(s) - communication preferences specify DO NOT EMAIL OR valid Email is NOT present. ', [1 => count($notSent)]);
+        if ($numberNotSent > 0) {
+          $statusMsg .= ' ' . ts('Email has NOT been sent to %1 contact(s) - communication preferences specify DO NOT EMAIL OR valid Email is NOT present. ', [1 => $numberNotSent]);
         }
         elseif (isset($params['send_receipt'])) {
           $statusMsg .= ' ' . ts('A confirmation email has been sent to ALL participants');
@@ -1630,9 +1424,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Build the form object.
    *
+   * @internal - this will be made protected, once some notice is provided to lineItem
+   * edit extension which calls it form tests.
+   *
    * @param \CRM_Event_Form_Participant $form
    *
-   * @return bool
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
@@ -1707,7 +1503,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           ['' => ts('- select -')] + $financialTypes
         );
 
-        $form->add('datepicker', 'receive_date', ts('Received'), [], FALSE, ['time' => TRUE]);
+        $form->add('datepicker', 'receive_date', ts('Contribution Date'), [], FALSE, ['time' => TRUE]);
 
         $form->add('select', 'payment_instrument_id',
           ts('Payment Method'),
@@ -1751,7 +1547,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       ['onclick' => "showHideByValue('send_receipt','','notice','table-row','radio',false); showHideByValue('send_receipt','','from-email','table-row','radio',false);"]
     );
 
-    $form->add('select', 'from_email_address', ts('Receipt From'), $form->_fromEmails['from_email_id']);
+    $form->add('select', 'from_email_address', ts('Receipt From'), $form->getAvailableFromEmails()['from_email_id']);
 
     $form->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
@@ -1770,6 +1566,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $mailingInfo = Civi::settings()->get('mailing_backend');
     $form->assign('outBound_option', $mailingInfo['outBound_option']);
     $form->assign('hasPayment', $form->_paymentId);
+  }
+
+  /**
+   * Get the emails available for the from address.
+   *
+   * @return array
+   */
+  protected function getAvailableFromEmails(): array {
+    return CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
   }
 
   /**
@@ -1797,10 +1602,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       //re-enter the values for UPDATE mode
       $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
       $params['fee_amount'] = $this->getParticipantValue('fee_amount');
-      if (isset($params['priceSetId'])) {
-        CRM_Core_Error::deprecatedFunctionWarning('It seems this line is never hit & can go.');
-        $lineItem[0] = CRM_Price_BAO_LineItem::getLineItems($this->_id);
-      }
+
       //also add additional participant's fee level/priceset
       if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
         $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id);
@@ -1878,11 +1680,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param $eventID
    * @param $participantRoles
    * @param $receiptText
-   * @param $isPaidEvent
    *
    * @return void
    */
-  protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText, $isPaidEvent) {
+  protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText) {
     //use of the message template below requires variables in different format
     $events = [];
     $returnProperties = ['event_type_id', 'fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
@@ -1905,7 +1706,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     else {
       $event['participant_role'] = $role[$participantRoles] ?? NULL;
     }
-    $event['is_monetary'] = $isPaidEvent;
+    $event['is_monetary'] = $this->_isPaidEvent;
 
     if ($receiptText) {
       $event['confirm_email_text'] = $receiptText;
@@ -1936,7 +1737,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @throws \CRM_Core_Exception
    */
-  public function processContribution(
+  protected function processContribution(
     &$form, $params, $result, $contactID,
     $pending = FALSE,
     $paymentProcessor = NULL
@@ -2147,9 +1948,21 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Get id of participant being edited.
    *
    * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * No exception is thrown as abort is not TRUE.
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
-  protected function getParticipantID() {
-    return $this->_id ?? $this->_pId;
+  public function getParticipantID(): ?int {
+    if ($this->_id === NULL) {
+      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+      $this->_id = $id ? (int) $id : FALSE;
+    }
+    return $this->_id ?: NULL;
   }
 
   /**
@@ -2286,6 +2099,183 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $this->assign('id', $this->_id);
       $this->assign('contact_id', $this->_contactId);
     }
+  }
+
+  /**
+   * @param $params
+   * @param $total_amount
+   * @param array $customFields
+   * @param array $participants
+   * @param $lineItem
+   * @param $line
+   * @param $value
+   * @param $additionalParticipantDetails
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function sendReceipts($params, $total_amount, array $customFields, array $participants, $lineItem, $line, $value, $additionalParticipantDetails): array {
+    $sent = [];
+    $notSent = [];
+    $this->assign('module', 'Event Registration');
+    $this->assignEventDetailsToTpl($params['event_id'], CRM_Utils_Array::value('role_id', $params), CRM_Utils_Array::value('receipt_text', $params));
+    // @todo - this is no longer in core templates as of 5.63
+    // we should remove once we have done a 'push upgrade' on addresses - ie advised
+    // people to upgrade their templates in an upgrade message, as
+    // opposed to just updating unmodified templates.
+    $this->assign('isPrimary', (int) $this->_isPaidEvent);
+    if ($this->_isPaidEvent) {
+      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
+      if (!$this->_mode) {
+        if (isset($params['payment_instrument_id'])) {
+          $this->assign('paidBy',
+            CRM_Utils_Array::value($params['payment_instrument_id'],
+              $paymentInstrument
+            )
+          );
+        }
+      }
+
+      $this->assign('totalAmount', $params['total_amount'] ?? $total_amount);
+      $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
+    }
+    if ($this->_mode) {
+      $this->assignBillingName($params);
+      $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
+        $this->_params,
+        $this->_bltID
+      ));
+
+      $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
+      $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
+      $this->assign('is_pay_later', 0);
+    }
+
+    $this->assign('register_date', $params['register_date']);
+    if (isset($params['receive_date'])) {
+      $this->assign('receive_date', $params['receive_date']);
+    }
+
+    $customGroup = [];
+    //format submitted data
+    foreach ($params['custom'] as $fieldID => $values) {
+      foreach ($values as $fieldValue) {
+        $isPublic = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $fieldValue['custom_group_id'], 'is_public');
+        if ($isPublic) {
+          $customFields[$fieldID]['id'] = $fieldID;
+          $formattedValue = CRM_Core_BAO_CustomField::displayValue($fieldValue['value'], $fieldID, $participants[0]->id);
+          $customGroup[$customFields[$fieldID]['groupTitle']][$customFields[$fieldID]['label']] = str_replace('&nbsp;', '', $formattedValue);
+        }
+      }
+    }
+
+    foreach ($this->_contactIds as $num => $contactID) {
+      // Retrieve the name and email of the contact - this will be the TO for receipt email
+      [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
+
+      $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
+
+      $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
+      if ($waitingStatus = CRM_Utils_Array::value($params['status_id'], $waitStatus)) {
+        $this->assign('isOnWaitlist', TRUE);
+      }
+
+      $this->assign('customGroup', $customGroup);
+      $this->assign('contactID', $contactID);
+      $this->assign('participantID', $participants[$num]->id);
+
+      $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+        $participants[$num]->id, 'contribution_id', 'participant_id'
+      );
+      $this->_id = $participants[$num]->id;
+
+      if ($this->_isPaidEvent) {
+        // fix amount for each of participants ( for bulk mode )
+        $eventAmount = [];
+        $totalTaxAmount = 0;
+
+        //add dataArray in the receipts in ADD and UPDATE condition
+        $dataArray = [];
+        if ($this->_action & CRM_Core_Action::ADD) {
+          $line = $lineItem ?? [];
+        }
+        elseif ($this->_action & CRM_Core_Action::UPDATE) {
+          $line = $this->_values['line_items'];
+        }
+        if (Civi::settings()->get('invoicing')) {
+          foreach ($line as $key => $value) {
+            if (isset($value['tax_amount'])) {
+              $totalTaxAmount += $value['tax_amount'];
+              if (isset($dataArray[(string) $value['tax_rate']])) {
+                $dataArray[(string) $value['tax_rate']] = $dataArray[(string) $value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+              }
+              else {
+                $dataArray[(string) $value['tax_rate']] = $value['tax_amount'] ?? NULL;
+              }
+            }
+          }
+          $this->assign('taxTerm', $this->getSalesTaxTerm());
+          $this->assign('dataArray', $dataArray);
+        }
+        if (!empty($additionalParticipantDetails)) {
+          $params['amount_level'] = preg_replace('//', '', $params['amount_level']) . ' - ' . $this->_contributorDisplayName;
+        }
+
+        $eventAmount[$num] = [
+          'label' => preg_replace('//', '', $params['amount_level']),
+          'amount' => $params['fee_amount'],
+        ];
+        //as we are using same template for online & offline registration.
+        //So we have to build amount as array.
+        $eventAmount = array_merge($eventAmount, $additionalParticipantDetails);
+        $this->assign('amount', $eventAmount);
+      }
+      $this->assign('totalTaxAmount', $totalTaxAmount ?? 0);
+      $sendTemplateParams = [
+        'workflow' => 'event_offline_receipt',
+        'contactId' => $contactID,
+        'isTest' => !empty($this->_defaultValues['is_test']),
+        'PDFFilename' => ts('confirmation') . '.pdf',
+        'modelProps' => [
+          'participantID' => $this->_id,
+          'eventID' => $params['event_id'],
+          'contributionID' => $contributionID,
+        ],
+      ];
+
+      // try to send emails only if email id is present
+      // and the do-not-email option is not checked for that contact
+      if ($this->_contributorEmail and !$this->_toDoNotEmail) {
+        $sendTemplateParams['from'] = $params['from_email_address'];
+        $sendTemplateParams['toName'] = $this->_contributorDisplayName;
+        $sendTemplateParams['toEmail'] = $this->_contributorEmail;
+        $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;
+        $sendTemplateParams['bcc'] = $this->_fromEmails['bcc'] ?? NULL;
+      }
+
+      //send email with pdf invoice
+      $template = CRM_Core_Smarty::singleton();
+      $taxAmt = $template->get_template_vars('dataArray');
+      if (Civi::settings()->get('invoice_is_email_pdf')) {
+        $sendTemplateParams['isEmailPdf'] = TRUE;
+        $sendTemplateParams['contributionId'] = $contributionID;
+      }
+      [$mailSent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+      if ($mailSent) {
+        $sent[] = $contactID;
+        foreach ($participants as $ids => $values) {
+          if ($values->contact_id == $contactID) {
+            $values->details = $params['receipt_text'] ?? NULL;
+            CRM_Activity_BAO_Activity::addActivity($values, 'Email');
+            break;
+          }
+        }
+      }
+      else {
+        $notSent[] = $contactID;
+      }
+    }
+    return ['sent' => count($sent), 'not_sent' => count($notSent)];
   }
 
 }

@@ -1,5 +1,5 @@
 INSERT INTO civicrm_mapping (id,name,description,mapping_type_id) Values
-(113, NULL, NULL, NULL);
+(113, 'test_113', NULL, NULL);
 INSERT INTO `civicrm_mapping_field` (`id`, `mapping_id`, `name`, `contact_type`, `column_number`, `location_type_id`, `phone_type_id`, `im_provider_id`, `relationship_type_id`, `relationship_direction`, `grouping`, `operator`, `value`, `website_type_id`) VALUES
 (2841, 113, 'email', 'Individual', 0, NULL, NULL, NULL, NULL, NULL, 1, '', '', NULL),
 (2842, 113, 'do_not_email', 'Individual', 1, NULL, NULL, NULL, NULL, NULL, 1, '!=', '1', NULL),

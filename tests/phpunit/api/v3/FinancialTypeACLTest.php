@@ -27,7 +27,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   public $debug = 0;
   protected $_params;
   protected $_ids = [];
-  protected $_pageParams = [];
 
   /**
    * Parameters to create payment processor.
@@ -72,17 +71,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'url_site' => 'http://dummy.com',
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
-    ];
-    $this->_pageParams = [
-      'title' => 'Test Contribution Page',
-      'financial_type_id' => 1,
-      'currency' => 'USD',
-      'financial_account_id' => 1,
-      'payment_processor' => $this->processorCreate(),
-      'is_active' => 1,
-      'is_allow_other_amount' => 1,
-      'min_amount' => 10,
-      'max_amount' => 1000,
     ];
   }
 

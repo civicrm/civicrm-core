@@ -25,6 +25,7 @@ class BounceTracker extends BaseListener {
     }
 
     $mailing = $e->getMailing();
+    $defaultReturnPath = \CRM_Core_BAO_MailSettings::defaultReturnPath();
 
     foreach ($e->getTasks() as $task) {
       /** @var \Civi\FlexMailer\FlexMailerTask $task */
@@ -33,7 +34,7 @@ class BounceTracker extends BaseListener {
         $task->getAddress());
 
       if (!$task->getMailParam('Return-Path')) {
-        $task->setMailParam('Return-Path', $verp['bounce']);
+        $task->setMailParam('Return-Path', $defaultReturnPath ?? $verp['bounce']);
       }
       if (!$task->getMailParam('X-CiviMail-Bounce')) {
         $task->setMailParam('X-CiviMail-Bounce', $verp['bounce']);

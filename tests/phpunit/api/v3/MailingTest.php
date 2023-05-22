@@ -44,6 +44,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
+    // Enable components BEFORE starting the transaction or the cache clearing will break the transaction
+    CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $this->useTransaction();
     // DGW
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
@@ -84,7 +86,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    */
   public function testMailerCreateSuccess(int $version): void {
     $this->_apiversion = $version;
-    $this->enableCiviCampaign();
     $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign'], __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
@@ -1020,13 +1021,13 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $this->assertTrue($dao->fetch());
 
-    $url = CRM_Mailing_Event_BAO_MailingEventClickThrough::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString('https://civicrm.org', $url);
 
     // Now delete the event queue hashes and see if the tracking still works.
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_event_queue');
 
-    $url = CRM_Mailing_Event_BAO_MailingEventClickThrough::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString('https://civicrm.org', $url);
 
     // Ensure that Google CSS link is not tracked.
@@ -1056,13 +1057,13 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $this->assertTrue($dao->fetch());
 
-    $url = CRM_Mailing_Event_BAO_MailingEventClickThrough::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString($unicodeURL, $url);
 
     // Now delete the event queue hashes and see if the tracking still works.
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_event_queue');
 
-    $url = CRM_Mailing_Event_BAO_MailingEventClickThrough::track($dao->queue_id, $dao->url_id);
+    $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertStringContainsString($unicodeURL, $url);
   }
 

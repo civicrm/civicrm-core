@@ -288,6 +288,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
     // We need to call the config hook again, since we now know
     // all the modules that are listening on it (CRM-8655).
+    $config = CRM_Core_Config::singleton();
     CRM_Utils_Hook::config($config);
 
     if ($loadUser) {
@@ -299,6 +300,22 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       }
     }
     return TRUE;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getCiviSourceStorage(): array {
+    global $civicrm_root;
+
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+
+    return [
+      'url' => CRM_Utils_File::addTrailingSlash('', '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    ];
   }
 
   /**

@@ -21,8 +21,8 @@ use Civi\Test\Invasive;
 class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
 
   protected function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
@@ -109,7 +109,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     /** @var \Civi\WorkflowMessage\WorkflowMessageInterface $ex */
     $ex = static::createExample();
     $ex->import('modelProps', [
-      'contactId' => $this->individualCreate(),
+      'contactID' => $this->individualCreate(),
       'myPublicString' => 'ok',
       'implicitStringArray' => ['single'],
       'myProtectedInt' => 2,
@@ -268,7 +268,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $rand = rand(0, 1000);
     $cid = $this->individualCreate(['first_name' => 'Foo', 'last_name' => 'Bar' . $rand, 'prefix_id' => NULL, 'suffix_id' => NULL]);
     /** @var \Civi\WorkflowMessage\GenericWorkflowMessage $ex */
-    $ex = $this->createExample()->setContactId($cid);
+    $ex = $this->createExample()->setContactID($cid);
     \Civi::dispatcher()->addListener('hook_civicrm_alterMailParams', function($e) use (&$hookCount) {
       $hookCount++;
       $this->assertEquals('my_example_wf', $e->params['workflow'], 'ExampleWorkflow::WORKFLOW should propagate to params[workflow]');

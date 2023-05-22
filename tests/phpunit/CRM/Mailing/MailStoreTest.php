@@ -8,8 +8,8 @@ class CRM_Mailing_MailStoreTest extends \CiviUnitTestCase {
   protected $workDir;
 
   public function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->workDir = tempnam(sys_get_temp_dir(), 'mailstoretest');
     @unlink($this->workDir);
   }

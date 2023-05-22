@@ -1366,7 +1366,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       if ($this->url_tracking && !empty($this->id)) {
         // ensure that Google CSS and any .css files are not tracked.
         if (!(strpos($token, 'css?family') || strpos($token, '.css'))) {
-          $data = CRM_Mailing_BAO_TrackableURL::getTrackerURL($token, $this->id, $event_queue_id);
+          $data = CRM_Mailing_BAO_MailingTrackableURL::getTrackerURL($token, $this->id, $event_queue_id);
           if (!empty($html)) {
             $data = htmlentities($data, ENT_NOQUOTES);
           }
@@ -1754,8 +1754,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'unsubscribe' => CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName(),
       'bounce' => CRM_Mailing_Event_BAO_MailingEventBounce::getTableName(),
       'forward' => CRM_Mailing_Event_BAO_MailingEventForward::getTableName(),
-      'url' => CRM_Mailing_BAO_TrackableURL::getTableName(),
-      'urlopen' => CRM_Mailing_Event_BAO_MailingEventClickThrough::getTableName(),
+      'url' => CRM_Mailing_BAO_MailingTrackableURL::getTableName(),
+      'urlopen' => CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTableName(),
       'component' => CRM_Mailing_BAO_MailingComponent::getTableName(),
       'spool' => CRM_Mailing_BAO_Spool::getTableName(),
     ];
@@ -2119,21 +2119,23 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
         case 'opened':
           // do not use group by clause in report, because same report used for total and unique open
-          $reportFilter .= "&distinct=0";
+          $reportFilter .= '&distinct=0';
         case 'opened_unique':
-          $url = "mailing/opened";
-          $searchFilter .= "&mailing_open_status=Y";
+          $url = 'mailing/opened';
+          $searchFilter .= '&mailing_open_status=Y';
           break;
 
         case 'clicks':
         case 'clicks_unique':
-          $url = "mailing/clicks";
-          $searchFilter .= "&mailing_click_status=Y";
+          $url = 'mailing/clicks';
+          $searchFilter .= '&mailing_click_status=Y';
           break;
       }
       $actionLinks[CRM_Core_Action::VIEW]['url'] = CRM_Report_Utils_Report::getNextUrl($url, $reportFilter, FALSE, TRUE);
+      $actionLinks[CRM_Core_Action::VIEW]['weight'] = -20;
       if (array_key_exists(CRM_Core_Action::ADVANCED, $actionLinks)) {
         $actionLinks[CRM_Core_Action::ADVANCED]['qs'] = $searchFilter;
+        $actionLinks[CRM_Core_Action::ADVANCED]['weight'] = 10;
       }
       $report['event_totals']['actionlinks'][$key] = CRM_Core_Action::formLink(
         $actionLinks,
@@ -2405,6 +2407,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @deprecated
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     static::deleteRecord(['id' => $id]);
   }
 
@@ -2436,7 +2439,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
     CRM_Core_Error::deprecatedWarning('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead');
 
-    CRM_Mailing_BAO_MailingJob::del($id);
+    CRM_Mailing_BAO_MailingJob::deleteRecord(['id' => $id]);
   }
 
   /**
@@ -2467,7 +2470,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     }
 
     $returnProperties = [];
-    $returnProperties['display_name'] = $returnProperties['contact_id'] = $returnProperties['preferred_mail_format'] = $returnProperties['hash'] = 1;
+    $returnProperties['display_name'] = $returnProperties['contact_id'] = $returnProperties['hash'] = 1;
 
     foreach ($properties as $p) {
       $returnProperties[$p] = 1;
@@ -2820,7 +2823,7 @@ ORDER BY civicrm_mailing.name";
     //CRM-12814
     if (!empty($mailings)) {
       $openCounts = CRM_Mailing_Event_BAO_MailingEventOpened::getMailingContactCount(array_keys($mailings), $params['contact_id']);
-      $clickCounts = CRM_Mailing_Event_BAO_MailingEventClickThrough::getMailingContactCount(array_keys($mailings), $params['contact_id']);
+      $clickCounts = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getMailingContactCount(array_keys($mailings), $params['contact_id']);
     }
 
     // format params and add links

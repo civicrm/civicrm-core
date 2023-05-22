@@ -200,8 +200,6 @@ class CRM_Core_Config_MagicMerge {
       'userFrameworkResourceURL' => ['setting-url'],
 
       // "callback" properties are generated on-demand by calling a function.
-      // @todo remove geocodeMethod. As of Feb 2018, $config->geocodeMethod works but gives a deprecation warning.
-      'geocodeMethod' => ['callback', 'CRM_Utils_Geocode', 'getProviderClass'],
       'defaultCurrencySymbol' => ['callback', 'CRM_Core_BAO_Country', 'getDefaultCurrencySymbol'],
       'wpBasePage' => ['callback', 'CRM_Utils_System_WordPress', 'getBasePage'],
     ];
@@ -404,7 +402,6 @@ class CRM_Core_Config_MagicMerge {
         'inCiviCRM' => FALSE,
         'doNotResetCache' => 0,
         'keyDisable' => FALSE,
-        'initialized' => FALSE,
         'userFrameworkFrontend' => FALSE,
         'userPermissionTemp' => NULL,
       ];

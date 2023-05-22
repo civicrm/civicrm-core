@@ -12,6 +12,7 @@
 namespace Civi\BAO;
 
 use Civi\Api4\UserJob;
+use Civi\Core\Exception\DBQueryException;
 use CRM_Civiimport_ExtensionUtil as E;
 use CRM_Core_BAO_CustomValueTable;
 use CRM_Core_DAO;
@@ -136,7 +137,7 @@ class Import extends CRM_Core_DAO {
   public function table(): array {
     $table = [];
     foreach (self::getFieldsForTable($this->tableName()) as $value) {
-      $table[$value['name']] = $value['type'] ?? CRM_Utils_Type::T_STRING;
+      $table[$value['name']] = ($value['data_type'] === 'Integer') ? CRM_Utils_Type::T_INT : CRM_Utils_Type::T_STRING;
       if (!empty($value['required'])) {
         $table[$value['name']] += self::DB_DAO_NOTNULL;
       }
@@ -195,23 +196,46 @@ class Import extends CRM_Core_DAO {
    * @throws \CRM_Core_Exception
    */
   public static function getFieldsForTable(string $tableName): array {
+    $cacheKey = 'civiimport_table_fields' . $tableName;
+    if (\Civi::cache('metadata')->has($cacheKey)) {
+      return \Civi::cache('metadata')->get($cacheKey);
+    }
     if (!CRM_Utils_Rule::alphanumeric($tableName)) {
       // This is purely precautionary so does not need to be a translated string.
       throw new CRM_Core_Exception('Invalid import table');
     }
     $columns = [];
-    $headers = UserJob::get(FALSE)
+    $userJob = UserJob::get(FALSE)
       ->addWhere('metadata', 'LIKE', '%' . $tableName . '%')
-      ->addSelect('metadata')->execute()->first()['metadata']['DataSource']['column_headers'] ?? [];
-    $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
+      ->addSelect('metadata', 'job_type')->execute()->first();
+    $headers = $userJob['metadata']['DataSource']['column_headers'] ?? [];
+    $entity = \CRM_Core_BAO_UserJob::getType($userJob['job_type'])['entity'];
+
+    try {
+      $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
+    }
+    catch (DBQueryException $e) {
+      if ($e->getSQLErrorCode() === 1146) {
+        throw new CRM_Core_Exception('Import table no longer exists');
+      }
+      throw $e;
+    }
+
     $userFieldIndex = 0;
     while ($result->fetch()) {
       $columns[$result->Field] = ['name' => $result->Field, 'table_name' => $tableName];
-      if (substr($result->Field, 1) !== '_') {
-        $columns[$result->Field]['label'] = $headers[$userFieldIndex] ?? $result->Field;
+      if (strpos($result->Field, '_') !== 0) {
+        $columns[$result->Field]['label'] = ts('Import field') . ':' . ($headers[$userFieldIndex] ?? $result->Field);
+        $columns[$result->Field]['data_type'] = 'String';
         $userFieldIndex++;
       }
+      else {
+        $columns[$result->Field]['label'] = ($result->Field === '_entity_id') ? E::ts('Row Imported to %1 ID', [1 => $entity]) : $result->Field;
+        $columns[$result->Field]['fk_entity'] = ($result->Field === '_entity_id') ? $entity : NULL;
+        $columns[$result->Field]['data_type'] = strpos($result->Type, 'int') === 0 ? 'Integer' : 'String';
+      }
     }
+    \Civi::cache('metadata')->set($cacheKey, $columns);
     return $columns;
   }
 

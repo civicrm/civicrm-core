@@ -137,7 +137,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_userContext = $session->readUserContext();
     $this->_from_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
     $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
-    $this->isBackoffice = CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, NULL, 'REQUEST') ?? FALSE;
+    $this->isBackoffice = (CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, FALSE, 'REQUEST') && CRM_Core_Permission::check('edit event participants')) ?? FALSE;
     $params = ['id' => $this->_from_participant_id];
     $participant = $values = [];
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
@@ -465,7 +465,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function transferParticipantRegistration($toContactID, $fromParticipantID) {
-    $toParticipantValues = \Civi\Api4\Participant::get()
+    $toParticipantValues = \Civi\Api4\Participant::get(FALSE)
       ->addWhere('id', '=', $fromParticipantID)
       ->execute()
       ->first();
@@ -475,7 +475,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     ])['values'];
     unset($toParticipantValues['id']);
     $toParticipantValues['contact_id'] = $toContactID;
-    $toParticipantValues['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered');
     $toParticipantValues['register_date'] = date("Y-m-d");
     //first create the new participant row -don't set registered_by yet or email won't be sent
     $participant = CRM_Event_BAO_Participant::create($toParticipantValues);

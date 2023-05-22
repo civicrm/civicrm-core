@@ -375,9 +375,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
-   * FIXME: Api4 custom address fields broken?
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetWithCustom() {
+  public function testGetWithCustom($version) {
+    $this->_apiversion = $version;
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
     $params = $this->_params;

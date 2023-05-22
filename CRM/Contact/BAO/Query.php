@@ -4467,7 +4467,6 @@ civicrm_relationship.start_date > {$today}
           'contact_sub_type' => 1,
           'sort_name' => 1,
           'display_name' => 1,
-          'preferred_mail_format' => 1,
           'nick_name' => 1,
           'first_name' => 1,
           'middle_name' => 1,
@@ -5621,12 +5620,18 @@ civicrm_relationship.start_date > {$today}
    *   Value.
    * @param string $dataType
    *   Data type of the field.
+   * @param bool $isAlreadyEscaped
+   *   Ideally we would be consistent about whether we escape
+   *   before calling this or after, but the code is a fearsome beast
+   *   and poking the sleeping dragon could throw a cat among the
+   *   can of worms. Hence we just schmooze this parameter in
+   *   to prevent double escaping where it is known to occur.
    *
    * @return string
    *   Where clause for the query.
    * @throws \CRM_Core_Exception
    */
-  public static function buildClause($field, $op, $value = NULL, $dataType = NULL) {
+  public static function buildClause($field, $op, $value = NULL, $dataType = 'String', $isAlreadyEscaped = FALSE): string {
     $op = trim($op);
     $clause = "$field $op";
 
@@ -5636,12 +5641,11 @@ civicrm_relationship.start_date > {$today}
         return $clause;
 
       case 'IS EMPTY':
-        $clause = ($dataType == 'Date') ? " $field IS NULL " : " (NULLIF($field, '') IS NULL) ";
+        $clause = ($dataType === 'Date') ? " $field IS NULL " : " (NULLIF($field, '') IS NULL) ";
         return $clause;
 
       case 'IS NOT EMPTY':
-        $clause = ($dataType == 'Date') ? " $field IS NOT NULL " : " (NULLIF($field, '') IS NOT NULL) ";
-        return $clause;
+        return ($dataType === 'Date') ? " $field IS NOT NULL " : " (NULLIF($field, '') IS NOT NULL) ";
 
       case 'RLIKE':
         return " CAST({$field} AS BINARY) RLIKE BINARY '{$value}' ";
@@ -5665,21 +5669,15 @@ civicrm_relationship.start_date > {$today}
 
             return $queryString;
           }
-          if (!empty($value[0]) && $op === 'BETWEEN') {
-            CRM_Core_Error::deprecatedFunctionWarning('Fix search input params');
-            if (($queryString = CRM_Core_DAO::createSQLFilter($field, [$op => $value], $dataType)) != FALSE) {
-              return $queryString;
-            }
-          }
           throw new CRM_Core_Exception(ts('Failed to interpret input for search'));
         }
         $emojiWhere = CRM_Utils_SQL::handleEmojiInQuery($value);
         if ($emojiWhere === '0 = 1') {
           $value = $emojiWhere;
         }
-        $value = CRM_Utils_Type::escape($value, $dataType);
+        $value = $isAlreadyEscaped ? $value : CRM_Utils_Type::escape($value, $dataType);
         // if we don't have a dataType we should assume
-        if ($dataType == 'String' || $dataType == 'Text') {
+        if ($dataType === 'String' || $dataType === 'Text') {
           $value = "'" . $value . "'";
         }
         return "$clause $value";
@@ -6360,8 +6358,8 @@ AND   displayRelType.is_active = 1
    *
    * @param string|CRM_Utils_Sort $sort
    *   The order by string.
-   * @param null $sortOrder
-   *   Who knows? Hu knows. He who knows Hu knows who.
+   * @param string|null $sortOrder
+   *   ASC or DESC
    *
    * @return string
    *   list(string $orderByClause, string $additionalFromClause).
@@ -6369,7 +6367,6 @@ AND   displayRelType.is_active = 1
    * @throws \CRM_Core_Exception
    */
   protected function prepareOrderBy($sort, $sortOrder) {
-    $orderByArray = [];
     $orderBy = '';
 
     if (CRM_Core_Config::singleton()->includeOrderByClause ||

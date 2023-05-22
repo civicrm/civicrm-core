@@ -453,6 +453,8 @@
           .then(function (content) {
             var options = CRM.utils.adjustDialogDefaults({
               autoOpen: false,
+              height: '90%',
+              width: '800px',
               title: ts('Subject: %1', {
                 1: content.subject
               })

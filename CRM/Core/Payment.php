@@ -150,7 +150,7 @@ abstract class CRM_Core_Payment {
    * Note:
    * We normally SHOULD be returning the payment instrument of the payment processor.
    * However there is an outstanding case where this needs overriding, which is
-   * when using CRM_Core_Payment_Manual which uses the pseudoprocessor (id = 0).
+   * when using CRM_Core_Payment_Manual which uses the pseudo-processor (id = 0).
    *
    * i.e. If you're writing a Payment Processor you should NOT be using
    * setPaymentInstrumentID() at all.
@@ -618,6 +618,22 @@ abstract class CRM_Core_Payment {
           return ts('Automatic cancellation is not supported for this payment processor. You or the contributor will need to manually cancel this recurring contribution using the payment processor website.');
         }
         return '';
+
+      case 'agreementTitle':
+        if ($this->getPaymentTypeName() !== 'direct_debit' || $this->_paymentProcessor['billing_mode'] != 1) {
+          return '';
+        }
+        // @todo - 'encourage' processors to override...
+        // CRM_Core_Error::deprecatedWarning('Payment processors should override getText for agreement text');
+        return ts('Agreement');
+
+      case 'agreementText':
+        if ($this->getPaymentTypeName() !== 'direct_debit' || $this->_paymentProcessor['billing_mode'] != 1) {
+          return '';
+        }
+        // @todo - 'encourage' processors to override...
+        // CRM_Core_Error::deprecatedWarning('Payment processors should override getText for agreement text');
+        return ts('Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.');
 
     }
     CRM_Core_Error::deprecatedFunctionWarning('Calls to getText must use a supported method');
@@ -1495,7 +1511,7 @@ abstract class CRM_Core_Payment {
    * @return string
    *   the error message if any
    */
-  abstract protected function checkConfig();
+  abstract public function checkConfig();
 
   /**
    * Redirect for paypal.

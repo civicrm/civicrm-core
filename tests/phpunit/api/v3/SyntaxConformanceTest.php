@@ -40,12 +40,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   protected $deletableTestObjects;
 
-  /**
-   * This test case doesn't require DB reset.
-   * @var bool
-   */
-  public $DBResetRequired = FALSE;
-
   protected $_entity;
 
   /**
@@ -503,7 +497,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'UFJoin',
       'Relationship',
       'RelationshipType',
-      'Note',
       'Membership',
       'Group',
       'File',
@@ -1467,6 +1460,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         // e.g. campaign_id field, need to flush caches.
         // FIXME: Why doesn't creating a campaign clear caches?
         civicrm_api3($entityName, 'getfields', ['cache_clear' => 1]);
+      }
+      if (!empty($specs['serialize'])) {
+        $entity[$field] = (array) $entity[$field];
       }
       $updateParams = [
         'id' => $entity['id'],

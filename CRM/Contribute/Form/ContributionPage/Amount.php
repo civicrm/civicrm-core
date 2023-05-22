@@ -145,9 +145,11 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $this->assign('price', TRUE);
     }
 
-    $this->addField('price_set_id', [
-      'entity' => 'PriceField',
+    $this->addSelect('price_set_id', [
+      'entity' => 'PriceSet',
+      'option_url' => 'civicrm/admin/price',
       'options' => $price,
+      'label' => 'Price Set',
       'onchange' => "showHideAmountBlock( this.value, 'price_set_id' );",
     ]);
 

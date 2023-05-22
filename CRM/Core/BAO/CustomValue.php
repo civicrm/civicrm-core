@@ -57,7 +57,8 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
         return CRM_Utils_Rule::boolean($value);
 
       case 'ContactReference':
-        return CRM_Utils_Rule::validContact($value);
+      case 'EntityReference':
+        return CRM_Utils_Rule::positiveInteger($value);
 
       case 'StateProvince':
 

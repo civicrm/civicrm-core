@@ -47,10 +47,10 @@
             <tr>
                 <th>{ts}Membership{/ts}</th>
                 <th>{ts}Member Since{/ts}</th>
-                <th>{ts}Start Date{/ts}</th>
-                <th>{ts}End Date{/ts}</th>
+                <th>{ts}Membership Start Date{/ts}</th>
+                <th>{ts}Membership Expiration Date{/ts}</th>
                 <th>{ts}Status{/ts}</th>
-                <th>{ts}Source{/ts}</th>
+                <th>{ts}Membership Source{/ts}</th>
                 <th>{ts}Auto-renew{/ts}</th>
                 <th>{ts}Related{/ts}</th>
                 <th></th>
@@ -98,10 +98,10 @@
             <tr>
                 <th>{ts}Membership{/ts}</th>
                 <th>{ts}Member Since{/ts}</th>
-                <th>{ts}Start Date{/ts}</th>
-                <th>{ts}End Date{/ts}</th>
+                <th>{ts}Membership Start Date{/ts}</th>
+                <th>{ts}Membership Expiration Date{/ts}</th>
                 <th>{ts}Status{/ts}</th>
-                <th>{ts}Source{/ts}</th>
+                <th>{ts}Membership Source{/ts}</th>
                 <th>{ts}Auto-renew{/ts}</th>
     <th></th>
             </tr>

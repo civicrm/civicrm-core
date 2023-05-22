@@ -106,7 +106,7 @@
     <localizable>true</localizable>
     <comment>Script instructions for volunteers to use for the survey.</comment>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>20</rows>
       <cols>80</cols>
     </html>

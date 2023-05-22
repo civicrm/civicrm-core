@@ -76,7 +76,9 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
     // read is correct.
 
     CRM_Utils_Cache::$_singleton = NULL;
-    $this->a->values = [];
+    if (property_exists($this->a, 'values')) {
+      $this->a->values = [];
+    }
     $return_2 = $this->a->get('testSetGetItem');
     $this->assertEquals($originalValue, $return_2);
   }

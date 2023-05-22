@@ -161,6 +161,12 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     // Set $newCredit variable in template to control whether link to credit card mode is included
     $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
+
+    $defaults['payment_instrument_id'] = \Civi\Api4\Contribution::get(FALSE)
+      ->addSelect('payment_instrument_id')
+      ->addWhere('id', '=', $this->_contributionId)
+      ->execute()->first()['payment_instrument_id'];
+
     return $defaults;
   }
 
@@ -205,7 +211,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
-    $this->addField('trxn_date', ['entity' => 'FinancialTrxn', 'label' => $this->isARefund() ? ts('Refund Date') : ts('Date Received'), 'context' => 'Contribution'], FALSE, FALSE);
+    $this->addField('trxn_date', ['entity' => 'FinancialTrxn', 'label' => $this->isARefund() ? ts('Refund Date') : ts('Contribution Date'), 'context' => 'Contribution'], FALSE, FALSE);
 
     if ($this->_contactId && $this->_id) {
       if ($this->_component == 'event') {

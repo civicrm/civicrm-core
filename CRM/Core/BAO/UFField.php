@@ -114,32 +114,21 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     //check if custom data profile field is disabled
@@ -164,6 +153,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 
@@ -285,12 +275,15 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * Copy existing profile fields to
    * new profile from the already built profile
    *
+   * @deprecated
+   *
    * @param int $old_id
    *   From which we need to copy.
    * @param bool $new_id
    *   In which to copy.
    */
   public static function copy($old_id, $new_id) {
+    CRM_Core_Error::deprecatedFunctionWarning('');
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->uf_group_id = $old_id;
     $ufField->find();
@@ -316,7 +309,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     $ufField->find();
     while ($ufField->fetch()) {
       //enable/ disable profile
-      CRM_Core_BAO_UFField::del($ufField->id);
+      CRM_Core_BAO_UFField::deleteRecord(['id' => $ufField->id]);
     }
   }
 
@@ -1141,7 +1134,7 @@ SELECT  id
         ],
         'receive_date' => [
           'name' => 'receive_date',
-          'title' => ts('Date Received'),
+          'title' => ts('Contribution Date'),
         ],
         'payment_instrument' => [
           'name' => 'payment_instrument',

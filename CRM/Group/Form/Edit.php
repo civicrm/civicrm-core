@@ -99,7 +99,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       'parent_groups',
       'editSmartGroupURL',
     ]);
-    $this->_id = $this->get('id');
+    // current set id
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     if ($this->_id) {
       $breadCrumb = array(
         array(
@@ -156,6 +157,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/group', 'reset=1'));
     }
+    $this->addExpectedSmartyVariables(['freezeMailingList', 'hideMailingList']);
 
     //build custom data
     CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Group', $this->_id);
@@ -367,16 +369,6 @@ WHERE  title = %1
       $group = CRM_Contact_BAO_Group::create($params);
       // Set the entity id so it is available to postProcess hook consumers
       $this->setEntityId($group->id);
-      //Remove any parent groups requested to be removed
-      if (!empty($this->_groupValues['parents'])) {
-        $parentGroupIds = explode(',', $this->_groupValues['parents']);
-        foreach ($parentGroupIds as $parentGroupId) {
-          if (isset($params["remove_parent_group_$parentGroupId"])) {
-            CRM_Contact_BAO_GroupNesting::remove($parentGroupId, $group->id);
-            $updateNestingCache = TRUE;
-          }
-        }
-      }
 
       CRM_Core_Session::setStatus(ts('The Group \'%1\' has been saved.', array(1 => $group->title)), ts('Group Saved'), 'success');
 
@@ -390,10 +382,6 @@ WHERE  title = %1
       }
     }
 
-    // update the nesting cache
-    if ($updateNestingCache) {
-      CRM_Contact_BAO_GroupNestingCache::update();
-    }
   }
 
   /**

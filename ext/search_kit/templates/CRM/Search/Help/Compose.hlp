@@ -1,0 +1,4 @@
+{htxt id="having"}
+  <p>{ts}Unlike the WHERE clause which filters data in the database, HAVING filters the results shown in the table. This allows filtering of aggregate data or field transformations.{/ts}</p>
+  <p>{ts}Note: Rewrite occurs after HAVING has been applied, so does not affect the HAVING filter.{/ts}</p>
+{/htxt}

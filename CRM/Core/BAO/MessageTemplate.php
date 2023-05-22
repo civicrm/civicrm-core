@@ -26,34 +26,24 @@ require_once 'Mail/mime.php';
 class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implements \Civi\Core\HookInterface {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_MessageTemplate', $id, 'is_active', $is_active);
   }
 
@@ -165,14 +155,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    * @throws \CRM_Core_Exception
    */
   public static function del($messageTemplatesID) {
-    // make sure messageTemplatesID is an integer
-    if (!CRM_Utils_Rule::positiveInteger($messageTemplatesID)) {
-      throw new CRM_Core_Exception(ts('Invalid Message template'));
-    }
-
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     static::deleteRecord(['id' => $messageTemplatesID]);
-    // Yikes - bad idea setting status messages in BAO CRUD functions. Don't do this.
-    CRM_Core_Session::setStatus(ts('Selected message template has been deleted.'), ts('Deleted'), 'success');
   }
 
   /**
@@ -203,7 +187,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    */
   public static function getMessageTemplates($all = TRUE, $isSMS = FALSE) {
 
-    $messageTemplates = \Civi\Api4\MessageTemplate::get()
+    $messageTemplates = MessageTemplate::get()
       ->addSelect('id', 'msg_title')
       ->addWhere('is_active', '=', TRUE)
       ->addWhere('is_sms', '=', $isSMS);
@@ -216,6 +200,24 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
 
     asort($msgTpls);
     return $msgTpls;
+  }
+
+  /**
+   * Get the appropriate pdf format for the given template.
+   *
+   * @param string $workflow
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public static function getPDFFormatForTemplate(string $workflow): array {
+    $pdfFormatID = MessageTemplate::get(FALSE)
+      ->addWhere('workflow_name', '=', $workflow)
+      ->addSelect('pdf_format_id')
+      ->execute()->first()['pdf_format_id'] ?? 0;
+    // Get by ID will fall back to retrieving the default values if
+    // it does not find the appropriate ones - hence passing in 0 works.
+    return CRM_Core_BAO_PdfFormat::getById($pdfFormatID);
   }
 
   /**

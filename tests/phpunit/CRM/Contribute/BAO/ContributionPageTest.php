@@ -53,25 +53,6 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   *  test setIsActive() method
-   */
-  public function testsetIsActive() {
-
-    $params = [
-      'title' => 'Test Contribution Page',
-      'financial_type_id' => self::FINANCIAL_TYPE_ID,
-      'is_active' => 1,
-    ];
-
-    $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
-    $id = $contributionpage->id;
-    $is_active = 1;
-    $pageActive = CRM_Contribute_BAO_ContributionPage::setIsActive($id, $is_active);
-    $this->assertEquals($pageActive, TRUE, 'Verify financial types record deletion.');
-    $this->callAPISuccess('ContributionPage', 'delete', ['id' => $contributionpage->id]);
-  }
-
-  /**
    * Test setValues() method
    */
   public function testSetValues() {

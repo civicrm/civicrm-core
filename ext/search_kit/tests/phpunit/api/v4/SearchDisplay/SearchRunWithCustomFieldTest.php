@@ -453,4 +453,54 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     $this->assertEquals("$lastName zero", $result[1]['columns'][1]['val']);
   }
 
+  public function testEntityReferenceJoins() {
+    CustomGroup::create()->setValues([
+      'title' => 'EntityRefFields',
+      'extends' => 'Individual',
+    ])->execute();
+    CustomField::create()->setValues([
+      'label' => 'Favorite Nephew',
+      'name' => 'favorite_nephew',
+      'custom_group_id.name' => 'EntityRefFields',
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'EntityReference',
+      'fk_entity' => 'Contact',
+    ])->execute();
+    $nephewId = $this->createTestRecord('Contact', ['first_name' => 'Dewey', 'last_name' => 'Duck'])['id'];
+    $uncleId = $this->createTestRecord('Contact', ['first_name' => 'Donald', 'last_name' => 'Duck', 'EntityRefFields.favorite_nephew' => $nephewId])['id'];
+    $contact = Contact::get(FALSE)
+      ->addSelect('first_name', 'EntityRefFields.favorite_nephew.first_name')
+      ->addWhere('id', '=', $uncleId)
+      ->execute()
+      ->first();
+    $this->assertEquals('Donald', $contact['first_name']);
+    $this->assertEquals('Dewey', $contact['EntityRefFields.favorite_nephew.first_name']);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['EntityRefFields.favorite_nephew.first_name'],
+          'where' => [['id', '=', $uncleId]],
+        ],
+        "join" => [
+          [
+            "Contact+AS+Contact_Contact_favorite_nephew_01",
+            "LEFT",
+            [
+              "EntityRefFields.favorite_nephew",
+              "=",
+              "Contact_Contact_favorite_nephew_01.id",
+            ],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals('Dewey', $result[0]['columns'][0]['val']);
+  }
+
 }

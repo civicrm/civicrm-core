@@ -71,7 +71,7 @@
       <td class="label">{ts}Participant Role{/ts}</td>
       <td>{$role}</td></tr>
         <tr class="crm-event-participantview-form-block-register_date">
-      <td class="label">{ts}Registration Date and Time{/ts}</td>
+      <td class="label">{ts}Registration Date{/ts}</td>
       <td>{$register_date|crmDate}&nbsp;</td>
   </tr>
     <tr class="crm-event-participantview-form-block-status">
@@ -83,7 +83,7 @@
   </tr>
     {if $source}
         <tr class="crm-event-participantview-form-block-event_source">
-        <td class="label">{ts}Event Source{/ts}</td><td>{$source}&nbsp;</td>
+        <td class="label">{ts}Participant Source{/ts}</td><td>{$source}&nbsp;</td>
       </tr>
     {/if}
     {if $participantId and $hasPayment}

@@ -234,10 +234,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   public static function formRule($values, $files, $self) {
     $errors = [];
     $contributionPageId = $self->_id;
-    //CRM-4286
-    if (strstr($values['title'], '/')) {
-      $errors['title'] = ts("Please do not use '/' in Title");
-    }
 
     // ensure on-behalf-of profile meets minimum requirements
     if (!empty($values['is_organization'])) {

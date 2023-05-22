@@ -24,7 +24,7 @@
  * @group headless
  */
 class api_v3_MailingContactTest extends CiviUnitTestCase {
-  protected $_entity = 'mailing';
+  protected $contact;
 
   public function setUp(): void {
     parent::setUp();
@@ -33,11 +33,11 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'last_name' => 'xyz1',
     ];
-    $this->_contact = $this->callAPISuccess("contact", "create", $params);
+    $this->contact = $this->callAPISuccess("contact", "create", $params);
   }
 
   public function tearDown(): void {
-    $this->callAPISuccess("contact", "delete", ['id' => $this->_contact['id']]);
+    $this->callAPISuccess("contact", "delete", ['id' => $this->contact['id']]);
     parent::tearDown();
   }
 
@@ -88,7 +88,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    */
   public function testMailingContactNoMailings() {
     $params = [
-      'contact_id' => $this->_contact['id'],
+      'contact_id' => $this->contact['id'],
     ];
     $result = $this->callAPISuccess('MailingContact', 'get', $params);
     $this->assertEquals($result['count'], 0);

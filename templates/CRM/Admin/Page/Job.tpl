@@ -22,7 +22,7 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          {crmButton q="action=add&reset=1" id="newJob"  icon="plus-circle"}{ts}Add New Scheduled Job{/ts}{/crmButton}
+          {crmButton p='civicrm/admin/job/add' q="action=add&reset=1" id="newJob"  icon="plus-circle"}{ts}Add New Scheduled Job{/ts}{/crmButton}
           {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog" icon="list-alt"}{ts}View Log (all jobs){/ts}{/crmButton}
         </div>
       {/if}
@@ -57,7 +57,7 @@
 
     {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          {crmButton q="action=add&reset=1" id="newJob-bottom"  icon="plus-circle"}{ts}Add New Scheduled Job{/ts}{/crmButton}
+          {crmButton p='civicrm/admin/job/add' q="action=add&reset=1" id="newJob-bottom"  icon="plus-circle"}{ts}Add New Scheduled Job{/ts}{/crmButton}
           {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog-bottom" icon="list-alt"}{ts}View Log (all jobs){/ts}{/crmButton}
         </div>
     {/if}
@@ -68,7 +68,7 @@
         {ts}There are no jobs configured.{/ts}
      </div>
      <div class="action-link">
-       <a href="{crmURL p='civicrm/admin/job' q="action=add&reset=1"}" id="newJob-nojobs" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add New Scheduled Job{/ts}</span></a>
+       <a href="{crmURL p='civicrm/admin/job/add' q="action=add&reset=1"}" id="newJob-nojobs" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add New Scheduled Job{/ts}</span></a>
      </div>
 
 {/if}

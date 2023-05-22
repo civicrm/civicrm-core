@@ -57,9 +57,15 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
 
   /**
    * Shared preProcess code.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $this->assignMapFieldVariables();
+    $this->addExpectedSmartyVariables(['highlightedRelFields', 'initHideBoxes']);
+    $this->assign('columnNames', $this->getColumnHeaders());
+    $this->assign('showColumnNames', $this->getSubmittedValue('skipColumnHeader') || $this->getSubmittedValue('dataSource') !== 'CRM_Import_DataSource');
+    $this->assign('highlightedFields', $this->getHighlightedFields());
+    $this->assign('dataValues', array_values($this->getDataRows([], 2)));
     $this->_mapperFields = $this->getAvailableFields();
     asort($this->_mapperFields);
     parent::preProcess();
@@ -74,8 +80,11 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function postProcess() {
-    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
+    // This savedMappingID is the one selected on DataSource. It will be overwritten in saveMapping if any
+    // action was taken on it.
+    $this->savedMappingID = $this->getSubmittedValue('savedMapping') ?: NULL;
     $this->saveMapping();
+    $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     $parser = $this->getParser();
     $parser->init();
     $parser->validate();
@@ -136,6 +145,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   protected function buildSavedMappingFields($savedMappingID) {
+    CRM_Core_Error::deprecatedFunctionWarning('addSavedMappingFields');
     //to save the current mappings
     if (!$savedMappingID) {
       $saveDetailsName = ts('Save this field mapping');
@@ -144,11 +154,10 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       $this->add('text', 'saveMappingDesc', ts('Description'));
     }
     else {
+      // @todo we should stop doing this - the passed in value should be fine, confirmed OK in contact import.
       $savedMapping = $this->get('savedMapping');
-
       $mappingName = (string) civicrm_api3('Mapping', 'getvalue', ['id' => $savedMappingID, 'return' => 'name']);
-      $this->set('loadedMapping', $savedMapping);
-      $this->add('hidden', 'mappingId', $savedMappingID);
+      $this->add('hidden', 'mappingId', $savedMapping);
 
       $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
       $saveDetailsName = ts('Save as a new field mapping');
@@ -156,7 +165,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       $this->add('text', 'saveMappingDesc', ts('Description'));
     }
     $this->assign('savedMappingName', $mappingName ?? NULL);
-    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, ['onclick' => "showSaveDetails(this)"]);
+    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
   }
 
   /**
@@ -215,8 +224,19 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   protected function saveMappingField(int $mappingID, int $columnNumber, bool $isUpdate = FALSE): void {
-    $fieldMapping = (array) $this->getSubmittedValue('mapper')[$columnNumber];
-    $mappedField = $this->getMappedField($fieldMapping, $mappingID, $columnNumber);
+    if (!empty($this->userJob['metadata']['import_mappings'])) {
+      // In this case Civi-Import has already saved the mapping to civicrm_user_job.metadata
+      // and the code here is just keeping civicrm_mapping_field in sync.
+      // Eventually we hope to phase out the use of the civicrm_mapping data &
+      // just use UserJob and Import Templates (UserJob records with 'is_template' = 1
+      $mappedFieldData = $this->userJob['metadata']['import_mappings'][$columnNumber];
+      $mappedField = array_intersect_key(array_fill_keys(['name', 'column_number', 'entity_data'], TRUE), $mappedFieldData);
+      $mappedField['mapping_id'] = $mappingID;
+    }
+    else {
+      $fieldMapping = (array) $this->getSubmittedValue('mapper')[$columnNumber];
+      $mappedField = $this->getMappedField($fieldMapping, $mappingID, $columnNumber);
+    }
     if (empty($mappedField['name'])) {
       $mappedField['name'] = 'do_not_import';
     }
@@ -243,10 +263,12 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   protected function saveMapping(): void {
     //Updating Mapping Records
     if ($this->getSubmittedValue('updateMapping')) {
+      $savedMappingID = (int) $this->getSubmittedValue('mappingId');
       foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $this->saveMappingField((int) $this->getSubmittedValue('mappingId'), $i, TRUE);
+        $this->saveMappingField($savedMappingID, $i, TRUE);
       }
-      $this->updateUserJobMetadata('mapping', ['id' => (int) $this->getSubmittedValue('mappingId')]);
+      $this->setSavedMappingID($savedMappingID);
+      $this->updateUserJobMetadata('Template', ['mapping_id' => (int) $this->getSubmittedValue('mappingId')]);
     }
     //Saving Mapping Details and Records
     if ($this->getSubmittedValue('saveMapping')) {
@@ -255,12 +277,12 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         'description' => $this->getSubmittedValue('saveMappingDesc'),
         'mapping_type_id:name' => $this->getMappingTypeName(),
       ])->execute()->first()['id'];
-
+      $this->setSavedMappingID($savedMappingID);
+      $this->updateUserJobMetadata('Template', ['mapping_id' => $savedMappingID]);
       foreach (array_keys($this->getColumnHeaders()) as $i) {
         $this->saveMappingField($savedMappingID, $i, FALSE);
       }
       $this->set('savedMapping', $savedMappingID);
-      $this->updateUserJobMetadata('mapping', ['id' => $savedMappingID]);
     }
   }
 
@@ -362,8 +384,24 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   protected function addSavedMappingFields(): void {
-    $savedMappingID = (int) $this->getSubmittedValue('savedMapping');
-    $this->buildSavedMappingFields($savedMappingID);
+    $savedMappingID = $this->getSavedMappingID();
+    //to save the current mappings
+    if (!$savedMappingID) {
+      $saveDetailsName = ts('Save this field mapping');
+      $this->applyFilter('saveMappingName', 'trim');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    else {
+      $this->add('hidden', 'mappingId', $savedMappingID);
+
+      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
+      $saveDetailsName = ts('Save as a new field mapping');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    $this->assign('savedMappingName', $this->getMappingName());
+    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
     $this->addFormRule(['CRM_Import_Form_MapField', 'mappingRule']);
   }
 
@@ -419,7 +457,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
         continue;
       }
       $childField = [
-        'text' => $field['title'],
+        'text' => $field['label'] ?? ($field['html']['label'] ?? $field['title']),
         'id' => $fieldName,
         'has_location' => !empty($field['hasLocationType']),
         'default_value' => $field['default_value'] ?? '',

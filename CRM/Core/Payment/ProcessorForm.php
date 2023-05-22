@@ -62,6 +62,9 @@ class CRM_Core_Payment_ProcessorForm {
 
     $form->assign('currency', $form->getCurrency());
 
+    $form->assign('paymentAgreementTitle', $form->_paymentProcessor['object']->getText('agreementTitle', []));
+    $form->assign('paymentAgreementText', $form->_paymentProcessor['object']->getText('agreementText', []));
+
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
       $form->_values['cancelSubscriptionUrl'] = $form->_paymentObject->subscriptionURL(NULL, NULL, 'cancel');

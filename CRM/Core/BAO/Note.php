@@ -105,8 +105,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
    *   (reference) an assoc array of name/value pairs.
    * @param array $ids
    *   (deprecated) associated array with note id - preferably set $params['id'].
-   * @return null|object
-   *   $note CRM_Core_BAO_Note object
+   * @return CRM_Core_BAO_Note|null
    * @throws \CRM_Core_Exception
    */
   public static function add(&$params, $ids = []) {
@@ -121,23 +120,28 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
       }
     }
 
-    $note = new CRM_Core_BAO_Note();
+    $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
 
-    if (!isset($params['privacy'])) {
-      $params['privacy'] = 0;
+    $id = $params['id'] ?? $ids['id'] ?? NULL;
+
+    // Ugly legacy support for deprecated $ids param
+    if ($id) {
+      $params['id'] = $id;
     }
-
-    $note->copyValues($params);
-    if (empty($params['contact_id'])) {
-      if (CRM_Utils_Array::value('entity_table', $params) == 'civicrm_contact') {
-        $note->contact_id = $params['entity_id'];
+    // Set defaults for create mode
+    else {
+      $params += [
+        'privacy' => 0,
+        'contact_id' => $loggedInContactID,
+      ];
+      // If not created by a user, guess the note was self-created
+      if (empty($params['contact_id']) && $params['entity_table'] == 'civicrm_contact') {
+        $params['contact_id'] = $params['entity_id'];
       }
     }
-    $id = $params['id'] ?? $ids['id'] ?? NULL;
-    if ($id) {
-      $note->id = $id;
-    }
 
+    $note = new CRM_Core_BAO_Note();
+    $note->copyValues($params);
     $note->save();
 
     // check and attach and files as needed
@@ -152,7 +156,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
 
       $noteActions = FALSE;
 
-      $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
       if ($loggedInContactID) {
         if ($loggedInContactID == $note->entity_id) {
           $noteActions = TRUE;
@@ -276,7 +279,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
    * @return int
    */
   public static function del($id) {
-    // CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $id]);
 
     return 1;

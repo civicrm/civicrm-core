@@ -94,15 +94,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_UFGroup', $id, 'is_active', $is_active);
@@ -1404,6 +1399,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
    * @deprecated
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) static::deleteRecord(['id' => $id]);
   }
 
@@ -1931,8 +1927,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         // we only have one org - so we should default to it. Not sure about defaulting to first type
         // as it could be missed - so adding a select
         // however, possibly that is more similar to the membership form
-        if (count($types[1]) > 1) {
-          $types[1] = $select + $types[1];
+        $orgId = array_key_first($orgInfo);
+        if (!empty($types[$orgId])) {
+          $types[$orgId] = $select + $types[$orgId];
         }
       }
       else {
@@ -2174,7 +2171,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       if (CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
         $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value($contactId,
           $form->_componentCampaigns
-        ));
+        ), NULL, TRUE, FALSE);
         $form->add('select', $name, $title,
           $campaigns, $required,
           [

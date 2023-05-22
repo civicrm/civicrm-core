@@ -39,6 +39,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     $this->_paymentProcessorType = $result['id'];
     $this->_params = [
       'name' => 'API Test PP',
+      'title' => 'API Test PP',
       'payment_processor_type_id' => $this->_paymentProcessorType,
       'class_name' => 'CRM_Core_Payment_APITest',
       'is_recur' => 0,
@@ -104,6 +105,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'id' => $result['id'],
       'domain_id' => $params['domain_id'],
       'name' => $updateParams['name'],
+      'title' => $params['title'],
+      'frontend_title' => $params['title'],
       'payment_processor_type_id' => $params['payment_processor_type_id'],
       'is_default' => 0,
       'is_test' => 0,

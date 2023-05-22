@@ -180,8 +180,10 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Create a contribution record for Alice with type "Member Dues".
    */
   public function addAliceDues(): void {
-    $this->enableCiviCampaign();
-    $campaignID = $this->campaignCreate();
+    $campaignID = $this->campaignCreate([
+      'title' => 'Campaign',
+      'name' => 'big_campaign',
+    ]);
     $this->ids['Contribution']['alice'] = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['alice']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
@@ -366,20 +368,6 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       }
     }
 
-    $tokens = [
-      'id',
-      'payment_instrument_id:label',
-      'financial_type_id:label',
-      'contribution_status_id:label',
-    ];
-    $legacyTokens = [];
-    $realLegacyTokens = [];
-    foreach (CRM_Core_SelectValues::contributionTokens() as $token => $label) {
-      $legacyTokens[substr($token, 14, -1)] = $label;
-      if (strpos($token, ':') === FALSE) {
-        $realLegacyTokens[substr($token, 14, -1)] = $label;
-      }
-    }
     $fields = (array) Contribution::getFields()->addSelect('name', 'title')->execute()->indexBy('name');
     $allFields = [];
     foreach ($fields as $field) {
@@ -389,7 +377,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     }
     // contact ID is skipped.
     unset($allFields['contact_id']);
-    $this->assertEquals($allFields, $realLegacyTokens);
+
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,
@@ -403,10 +391,54 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       }
       $comparison[substr($token, 14, -1)] = $label;
     }
-    $this->assertEquals($legacyTokens, $comparison);
-    foreach ($tokens as $token) {
-      $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $comparison[$token]);
-    }
+    $this->assertEquals(
+      [
+        'id' => 'Contribution ID',
+        'financial_type_id:label' => 'Financial Type',
+        'contribution_page_id:label' => 'Contribution Page',
+        'payment_instrument_id:label' => 'Payment Method',
+        'receive_date' => 'Contribution Date',
+        'non_deductible_amount' => 'Non-deductible Amount',
+        'total_amount' => 'Total Amount',
+        'fee_amount' => 'Fee Amount',
+        'net_amount' => 'Net Amount',
+        'trxn_id' => 'Transaction ID',
+        'invoice_id' => 'Invoice Reference',
+        'invoice_number' => 'Invoice Number',
+        'currency' => 'Currency',
+        'cancel_date' => 'Cancelled / Refunded Date',
+        'cancel_reason' => 'Cancellation / Refund Reason',
+        'receipt_date' => 'Receipt Date',
+        'thankyou_date' => 'Thank-you Date',
+        'source' => 'Contribution Source',
+        'amount_level' => 'Amount Label',
+        'contribution_recur_id' => 'Recurring Contribution ID',
+        'is_test:label' => 'Test',
+        'is_pay_later:label' => 'Is Pay Later',
+        'contribution_status_id:label' => 'Contribution Status',
+        'address_id' => 'Address ID',
+        'check_number' => 'Check Number',
+        'campaign_id:label' => 'Campaign',
+        'creditnote_id' => 'Credit Note ID',
+        'tax_amount' => 'Tax Amount',
+        'revenue_recognition_date' => 'Revenue Recognition Date',
+        'is_template:label' => 'Is a Template Contribution',
+        'paid_amount' => 'Amount Paid',
+        'balance_amount' => 'Balance',
+        'tax_exclusive_amount' => 'Tax Exclusive Amount',
+        'contribution_recur_id.id' => 'Recurring Contribution ID',
+        'contribution_recur_id.contact_id' => 'Contact ID',
+        'contribution_recur_id.amount' => 'Amount',
+        'contribution_recur_id.currency' => 'Currency',
+        'contribution_recur_id.frequency_unit' => 'Frequency Unit',
+        'contribution_recur_id.frequency_interval' => 'Interval (number of units)',
+        'contribution_recur_id.start_date' => 'Start Date',
+        'contribution_recur_id.cancel_date' => 'Cancel Date',
+        'contribution_recur_id.cancel_reason' => 'Cancellation Reason',
+        'contribution_recur_id.end_date' => 'Recurring Contribution End Date',
+        'contribution_recur_id.financial_type_id' => 'Financial Type ID',
+        'contribution_recur_id.campaign_id' => 'Campaign ID',
+      ], $comparison);
   }
 
   /**

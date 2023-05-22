@@ -27,6 +27,14 @@
 class CRM_Utils_DateTest extends CiviUnitTestCase {
 
   /**
+   * Set up for tests.
+   */
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
+  /**
    * Used by testGetFromTo
    */
   private function fromToData() {

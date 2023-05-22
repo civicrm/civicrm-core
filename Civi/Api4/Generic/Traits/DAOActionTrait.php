@@ -240,14 +240,14 @@ trait DAOActionTrait {
         continue;
       }
 
-      // Null and empty string are interchangeable as far as the custom bao understands
-      if (NULL === $value) {
-        $value = '';
-      }
-
       if ($field['suffix']) {
         $options = FormattingUtil::getPseudoconstantList($field, $name, $params, $this->getActionName());
         $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
+      }
+
+      // Null and empty string are interchangeable as far as the custom bao understands
+      if (NULL === $value) {
+        $value = '';
       }
 
       if ($field['html_type'] === 'CheckBox') {

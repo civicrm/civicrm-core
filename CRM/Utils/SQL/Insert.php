@@ -22,7 +22,11 @@
  */
 class CRM_Utils_SQL_Insert {
 
-  private $verb = 'INSERT INTO';
+  /**
+   * @var string
+   *   Ex: 'INSERT INTO', 'REPLACE INTO'
+   */
+  private $verb;
 
   /**
    * @var string
@@ -45,10 +49,12 @@ class CRM_Utils_SQL_Insert {
    *
    * @param string $table
    *   Table-name and optional alias.
+   * @param string $verb
+   *   Ex: 'INSERT INTO', 'REPLACE INTO'
    * @return CRM_Utils_SQL_Insert
    */
-  public static function into($table) {
-    return new self($table);
+  public static function into($table, string $verb = 'INSERT INTO') {
+    return new self($table, $verb);
   }
 
   /**
@@ -79,9 +85,12 @@ class CRM_Utils_SQL_Insert {
    *
    * @param string $table
    *   Table-name and optional alias.
+   * @param string $verb
+   *   Ex: 'INSERT INTO', 'REPLACE INTO'
    */
-  public function __construct($table) {
+  public function __construct($table, string $verb = 'INSERT INTO') {
     $this->table = $table;
+    $this->verb = $verb;
     $this->rows = [];
   }
 
@@ -155,17 +164,7 @@ class CRM_Utils_SQL_Insert {
     return $this;
   }
 
-  /**
-   * Escape string.
-   *
-   * @param string|null $value
-   *
-   * @return string
-   *   SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
-   */
-  protected function escapeString($value) {
-    return $value === NULL ? 'NULL' : '"' . CRM_Core_DAO::escapeString($value) . '"';
-  }
+  use CRM_Utils_SQL_EscapeStringTrait;
 
   /**
    * Convert to SQL.

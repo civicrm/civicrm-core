@@ -147,6 +147,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Implements hook_civicrm_export().
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function confirmHookWasCalled($exportTempTable, &$headerRows, &$sqlColumns, $exportMode, $componentTable, $ids): void {
     $sqlColumns['display'] = 'display varchar(255)';
@@ -218,7 +220,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $row = $this->csv->fetchOne();
     $expected = [
-      'Contact ID' => $this->contactIDs[0],
+      'Contact ID' => $membership['contact_id'],
       'Contact Type' => 'Individual',
       'Contact Subtype' => '',
       'Do Not Email' => '',
@@ -304,7 +306,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Member Since' => $membership['join_date'],
       'Membership Start Date' => $membership['start_date'],
       'Membership Expiration Date' => $membership['end_date'],
-      'Source' => 'Payment',
+      'Membership Source' => 'Payment',
       'Membership Status' => 'Pending',
       'Membership ID' => '2',
       'Primary Member ID' => '',
@@ -314,7 +316,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Status Override' => '',
       'Total Amount' => '200.00',
       'Contribution Status' => 'Pending Label**',
-      'Date Received' => '2019-07-25 07:34:23',
+      'Contribution Date' => '2019-07-25 07:34:23',
       'Payment Method' => 'Check',
       'Transaction ID' => '',
     ];
@@ -425,8 +427,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->contactMembershipCreate(['contact_id' => $this->contactIDs[0]]);
 
     $this->_contactID = $this->contactIDs[0];
-    $this->_invoiceID = 1234;
-    $this->_contributionPageID = NULL;
     $this->_paymentProcessorID = $this->paymentProcessorCreate();
     $this->setupMembershipRecurringPaymentProcessorTransaction();
 
@@ -494,7 +494,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $params['is_primary'] = 0;
     $params['location_type_id'] = 'Work';
     $this->callAPISuccess('address', 'create', $params);
-    $this->contactIDs[] = $contactB = $this->individualCreate();
+    $this->contactIDs[] = $contactB = $this->individualCreate([], 1);
 
     $this->callAPISuccess('address', 'create', [
       'contact_id' => $contactB,
@@ -723,7 +723,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function testExportCustomData(): void {
     $this->setUpContactExportData();
-    $this->entity = 'Contact';
     $this->createCustomGroupWithFieldsOfAllTypes();
     $longString = 'Blah';
     for ($i = 0; $i < 70; $i++) {
@@ -2221,41 +2220,41 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $headers = [
       0 => 'Contact ID',
       1 => 'Contact Type',
-      2 => 'Contact Subtype',
-      3 => 'Do Not Email',
-      4 => 'Do Not Phone',
-      5 => 'Do Not Mail',
-      6 => 'Do Not Sms',
-      7 => 'Do Not Trade',
-      8 => 'No Bulk Emails (User Opt Out)',
-      9 => 'Legal Identifier',
-      10 => 'External Identifier',
-      11 => 'Sort Name',
-      12 => 'Display Name',
-      13 => 'Nickname',
-      14 => 'Legal Name',
-      15 => 'Image Url',
-      16 => 'Preferred Communication Method',
-      17 => 'Preferred Language',
-      18 => 'Contact Hash',
-      19 => 'Contact Source',
-      20 => 'First Name',
-      21 => 'Middle Name',
-      22 => 'Last Name',
-      23 => 'Individual Prefix',
-      24 => 'Individual Suffix',
-      25 => 'Formal Title',
-      26 => 'Communication Style',
-      27 => 'Email Greeting ID',
-      28 => 'Postal Greeting ID',
-      29 => 'Addressee ID',
-      30 => 'Job Title',
-      31 => 'Gender',
-      32 => 'Birth Date',
-      33 => 'Deceased',
-      34 => 'Deceased Date',
-      35 => 'Household Name',
-      36 => 'Organization Name',
+      2 => 'External Identifier',
+      3 => 'Display Name',
+      4 => 'Organization Name',
+      5 => 'Contact Subtype',
+      6 => 'First Name',
+      7 => 'Middle Name',
+      8 => 'Last Name',
+      9 => 'Do Not Email',
+      10 => 'Do Not Phone',
+      11 => 'Do Not Mail',
+      12 => 'Do Not Sms',
+      13 => 'Do Not Trade',
+      14 => 'No Bulk Emails (User Opt Out)',
+      15 => 'Legal Identifier',
+      16 => 'Sort Name',
+      17 => 'Nickname',
+      18 => 'Legal Name',
+      19 => 'Image Url',
+      20 => 'Preferred Communication Method',
+      21 => 'Preferred Language',
+      22 => 'Contact Hash',
+      23 => 'Contact Source',
+      24 => 'Individual Prefix',
+      25 => 'Individual Suffix',
+      26 => 'Formal Title',
+      27 => 'Communication Style',
+      28 => 'Email Greeting ID',
+      29 => 'Postal Greeting ID',
+      30 => 'Addressee ID',
+      31 => 'Job Title',
+      32 => 'Gender',
+      33 => 'Birth Date',
+      34 => 'Deceased',
+      35 => 'Deceased Date',
+      36 => 'Household Name',
       37 => 'Sic Code',
       38 => 'Unique ID (OpenID)',
       39 => 'Current Employer ID',
@@ -2377,7 +2376,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     return [
       82 => 'Financial Type',
       83 => 'Contribution Source',
-      84 => 'Date Received',
+      84 => 'Contribution Date',
       85 => 'Thank-you Date',
       86 => 'Cancelled / Refunded Date',
       87 => 'Total Amount',
@@ -2455,7 +2454,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       85 => 'Member Since',
       86 => 'Membership Start Date',
       87 => 'Membership Expiration Date',
-      88 => 'Source',
+      88 => 'Membership Source',
       89 => 'Membership Status',
       90 => 'Membership ID',
       91 => 'Primary Member ID',
@@ -2988,12 +2987,12 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'Home-email' => 'home@example.com',
       ],
       [
-        'first_name' => 'Anthony',
-        'last_name' => 'Anderson',
+        'first_name' => 'Joe',
+        'last_name' => 'Miller',
         'Home-street_address' => '',
         'Home-city' => '',
         'Home-country' => '',
-        'Home-email' => 'anthony_anderson@civicrm.org',
+        'Home-email' => 'joe_miller@civicrm.org',
       ],
     ], $result);
   }

@@ -22,5 +22,9 @@
             <div class="description">{ts}Check this box if the first row of your file consists of field names (Example: 'First Name','Last Name','Email'){/ts}</div>
         </td>
     </tr>
+    <tr class="crm-import-datasource-form-block-fieldSeparator">
+      <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
+      <td>{$form.fieldSeparator.html}</td>
+    </tr>
   </table>
 

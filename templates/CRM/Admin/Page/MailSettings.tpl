@@ -25,7 +25,7 @@
             <th>{ts}Domain{/ts}</th>
             <th>{ts}Return-Path{/ts}</th>
             <th>{ts}Protocol{/ts}</th>
-            <th>{ts}Source{/ts}</th>
+            <th>{ts}Mail Folder{/ts}</th>
             <!--<th>{ts}Port{/ts}</th>-->
             <th>{ts}Use SSL?{/ts}</th>
             <th>{ts}Used For{/ts}</th>

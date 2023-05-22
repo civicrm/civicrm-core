@@ -22,7 +22,6 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
   protected $_groupFilter = TRUE;
   protected $_tagFilter = TRUE;
   protected $_balance = FALSE;
-  protected $campaigns;
 
   protected $_customGroupExtends = array(
     'Participant',
@@ -152,7 +151,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
             'name' => 'created_id',
           ),
           'source' => array(
-            'title' => ts('Source'),
+            'title' => ts('Participant Source'),
           ),
           'participant_fee_level' => NULL,
           'participant_fee_amount' => array('title' => ts('Participant Fee')),
@@ -211,7 +210,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
             'operator' => 'like',
           ),
           'source' => array(
-            'title' => ts('Source'),
+            'title' => ts('Participant Source'),
             'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
           ),

@@ -35,6 +35,19 @@ class CoreUtil {
   }
 
   /**
+   * Returns API entity name given an BAO/DAO class name
+   *
+   * Returns null if the API has not been implemented
+   *
+   * @param $baoClassName
+   * @return string|null
+   */
+  public static function getApiNameFromBAO($baoClassName) {
+    $briefName = AllCoreTables::getBriefName($baoClassName);
+    return $briefName && self::getApiClass($briefName) ? $briefName : NULL;
+  }
+
+  /**
    * @param $entityName
    * @return string|\Civi\Api4\Generic\AbstractEntity
    */
@@ -74,7 +87,7 @@ class CoreUtil {
    *
    * @return string
    */
-  public static function getTableName($entityName) {
+  public static function getTableName(string $entityName) {
     return self::getInfoItem($entityName, 'table_name');
   }
 
@@ -303,6 +316,73 @@ class CoreUtil {
       return ['name', 'label', 'description'];
     }
     return explode(',', $fields);
+  }
+
+  /**
+   * Transforms a raw option list (which could be either a flat or non-associative array)
+   * into an APIv4-compatible format.
+   *
+   * @param array|bool $options
+   * @param array|bool $format
+   * @return array|bool
+   */
+  public static function formatOptionList($options, $format) {
+    if (!$options || !is_array($options)) {
+      return $options ?? FALSE;
+    }
+
+    $formatted = [];
+    $first = reset($options);
+    // Flat array requested
+    if ($format === TRUE) {
+      // Convert non-associative to flat array
+      if (is_array($first) && isset($first['id'])) {
+        foreach ($options as $option) {
+          $formatted[$option['id']] = $option['label'] ?? $option['name'] ?? $option['id'];
+        }
+        return $formatted;
+      }
+      return $options;
+    }
+    // Non-associative array of multiple properties requested
+    foreach ($options as $id => $option) {
+      // Transform a flat list
+      if (!is_array($option)) {
+        $option = [
+          'id' => $id,
+          'name' => $id,
+          'label' => $option,
+        ];
+      }
+      $formatted[] = array_intersect_key($option, array_flip($format));
+    }
+    return $formatted;
+  }
+
+  /**
+   * Gets info about all available sql functions
+   * @return array
+   */
+  public static function getSqlFunctions(): array {
+    $fns = [];
+    foreach (glob(\Civi::paths()->getPath('[civicrm.root]/Civi/Api4/Query/SqlFunction*.php')) as $file) {
+      $matches = [];
+      if (preg_match('/(SqlFunction[A-Z_]+)\.php$/', $file, $matches)) {
+        $className = '\Civi\Api4\Query\\' . $matches[1];
+        if (is_subclass_of($className, '\Civi\Api4\Query\SqlFunction')) {
+          $fns[] = [
+            'name' => $className::getName(),
+            'title' => $className::getTitle(),
+            'description' => $className::getDescription(),
+            'params' => $className::getParams(),
+            'category' => $className::getCategory(),
+            'dataType' => $className::getDataType(),
+            'options' => CoreUtil::formatOptionList($className::getOptions(), ['id', 'name', 'label']),
+          ];
+        }
+      }
+    }
+    return $fns;
   }
 
 }

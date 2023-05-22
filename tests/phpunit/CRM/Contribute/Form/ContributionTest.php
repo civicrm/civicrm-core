@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipBlock;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceSet;
 
@@ -28,7 +29,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $_entity = 'Contribution';
   protected $_params;
   protected $_ids = [];
-  protected $_pageParams = [];
   protected $_userId;
 
   /**
@@ -716,7 +716,7 @@ Sales Tax 10.00% : $10.00
 
 Total Tax Amount : $10.00
 Total Amount : $110.00
-Date Received: ' . date('m/d/Y') . '
+Contribution Date: ' . date('m/d/Y') . '
 Receipt Date: ' . date('m/d/Y') . '
 Paid By: Check',
       ]);
@@ -738,7 +738,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
 
 
 Total Amount : $100.00
-Date Received: ' . date('m/d/Y') . '
+Contribution Date: ' . date('m/d/Y') . '
 Receipt Date: ' . date('m/d/Y') . '
 Paid By: Check',
       ],
@@ -1216,7 +1216,7 @@ Paid By: Check',
     $strings = [
       'Total Tax Amount : $' . $this->formatMoneyInput(1000.00),
       'Total Amount : $' . $this->formatMoneyInput(11000.00),
-      'Date Received: 04/21/2015',
+      'Contribution Date: 04/21/2015',
       'Paid By: Check',
       'Check Number: 12345',
     ];
@@ -1275,7 +1275,7 @@ Paid By: Check',
     $strings = [
       'Total Tax Amount : $' . $this->formatMoneyInput(2000),
       'Total Amount : $' . $this->formatMoneyInput(22000.00),
-      'Date Received: 04/21/2015',
+      'Contribution Date: 04/21/2015',
       'Paid By: Check',
       'Check Number: 12345',
       'Financial Type: Donation',
@@ -1366,12 +1366,9 @@ Paid By: Check',
 
   /**
    * Check payment processor is correctly assigned for a contribution page.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
   public function testContributionBasePreProcess(): void {
-    //Create contribution page with only pay later enabled.
+    // Create contribution page with only pay later enabled.
     $params = [
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
@@ -1386,14 +1383,11 @@ Paid By: Check',
       'receipt_from_name' => 'Ego Freud',
     ];
 
-    $page1 = $this->callAPISuccess('ContributionPage', 'create', $params);
-
-    //Execute CRM_Contribute_Form_ContributionBase preProcess
-    //and check the assignment of payment processors
-    $form = new CRM_Contribute_Form_ContributionBase();
-    $form->controller = new CRM_Core_Controller();
-    $form->set('id', $page1['id']);
-    $_REQUEST['id'] = $page1['id'];
+    // Execute CRM_Contribute_Form_ContributionBase preProcess (via child class).
+    // Check the assignment of payment processors.
+    /* @var \CRM_Contribute_Form_Contribution_Main $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main', ['payment_processor_id' => 0]);
+    $_REQUEST['id'] = $this->callAPISuccess('ContributionPage', 'create', $params)['id'];
 
     $form->preProcess();
     $this->assertEquals('pay_later', $form->_paymentProcessor['name']);
@@ -1402,12 +1396,12 @@ Paid By: Check',
     $params['is_pay_later'] = 0;
     $page2 = $this->callAPISuccess('ContributionPage', 'create', $params);
 
-    //Assert an exception is thrown on loading the contribution page.
-    $form = new CRM_Contribute_Form_ContributionBase();
-    $form->controller = new CRM_Core_Controller();
-    $_REQUEST['id'] = $page2['id'];
-    $form->set('id', $page2['id']);
-    $form->preProcess();
+    // @todo - these lines were supposed to assert an exception is thrown on loading the contribution page.
+    // However the test has been quietly passing with that not happening.
+    /* @var \CRM_Contribute_Form_Contribution_Main $form */
+    // $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main', ['payment_processor_id' => 0]);
+    // $_REQUEST['id'] = $page2['id'];
+    // $form->preProcess();
   }
 
   /**
@@ -1635,6 +1629,11 @@ Paid By: Check',
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $contribPage1,
     ]);
+    MembershipBlock::create(FALSE)->setValues([
+      'entity_id' => $contribPage1,
+      'entity_table' => 'civicrm_contribution_page',
+      'is_separate_payment' => FALSE,
+    ])->execute();
 
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_params = [
@@ -1672,9 +1671,9 @@ Paid By: Check',
 
   /**
    * Test non-membership donation on a contribution page
-   * using membership priceset.
+   * using membership PriceSet.
    */
-  public function testDonationOnMembershipPagePriceset() {
+  public function testDonationOnMembershipPagePriceSet(): void {
     $contactID = $this->individualCreate();
     $this->createPriceSetWithPage();
     $form = new CRM_Contribute_Form_Contribution_Confirm();
@@ -1697,7 +1696,6 @@ Paid By: Check',
       'amount' => 10,
       'tax_amount' => NULL,
       'is_pay_later' => 1,
-      'is_quick_config' => 1,
     ];
     $form->submit($form->_params);
 

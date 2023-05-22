@@ -63,7 +63,7 @@
            <th>{ts}Item{/ts}</th>
            <th>{ts}Qty{/ts}</th>
            <th>{ts}Each{/ts}</th>
-           {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+           {if $isShowTax && {contribution.tax_amount|boolean}}
              <th>{ts}Subtotal{/ts}</th>
              <th>{ts}Tax Rate{/ts}</th>
              <th>{ts}Tax Amount{/ts}</th>
@@ -81,7 +81,7 @@
             <td>
              {$line.unit_price|crmMoney:'{contribution.currency}'}
             </td>
-            {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+            {if $isShowTax && {contribution.tax_amount|boolean}}
               <td>
                 {$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'}
               </td>
@@ -107,7 +107,7 @@
        </tr>
 
      {/if}
-     {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+     {if $isShowTax && {contribution.tax_amount|boolean}}
        <tr>
          <td {$labelStyle}>
            {ts} Amount before Tax : {/ts}
@@ -148,7 +148,7 @@
      {if '{contribution.receive_date}'}
        <tr>
        <td {$labelStyle}>
-        {ts}Date Received{/ts}
+        {ts}Contribution Date{/ts}
        </td>
        <td {$valueStyle}>
          {contribution.receive_date|crmDate:"shortdate"}

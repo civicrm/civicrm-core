@@ -85,6 +85,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->quickCleanup(['civicrm_relationship', 'civicrm_membership'], TRUE);
     RelationshipType::delete(FALSE)->addWhere('id', '>', ($this->relationshipTypeID - 1))->execute();
     parent::tearDown();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviMember');
+
   }
 
   /**
@@ -103,6 +105,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * Test Current Employer is correctly set.
    */
   public function testCurrentEmployerRelationship(): void {
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviMember');
     $employerRelationshipID = $this->callAPISuccessGetValue('RelationshipType', [
       'return' => 'id',
       'name_b_a' => 'Employer Of',
@@ -1094,7 +1097,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
     $this->assertEquals(2, $result['count']);
     foreach ($result['values'] as $value) {
-      $this->assertContains($value['relationship_type_id'], [$this->relationshipTypeID, $relType3]);
+      $this->assertContainsEquals($value['relationship_type_id'], [$this->relationshipTypeID, $relType3]);
     }
   }
 
@@ -1202,7 +1205,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     // although our contact has more than one relationship we have passed them in as contact_id_a & can't get reciprocal
     $this->assertEquals(1, $result['count']);
     foreach ($result['values'] as $key => $value) {
-      $this->assertContains($value['relationship_type_id'], [$relType1]);
+      $this->assertContainsEquals($value['relationship_type_id'], [$relType1]);
     }
   }
 

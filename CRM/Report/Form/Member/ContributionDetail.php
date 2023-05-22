@@ -299,15 +299,15 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             'no_repeat' => TRUE,
           ],
           'membership_start_date' => [
-            'title' => ts('Start Date'),
+            'title' => ts('Membership Start Date'),
             'default' => TRUE,
           ],
           'membership_end_date' => [
-            'title' => ts('End Date'),
+            'title' => ts('Membership Expiration Date'),
             'default' => TRUE,
           ],
           'join_date' => [
-            'title' => ts('Join Date'),
+            'title' => ts('Member Since'),
             'default' => TRUE,
           ],
           'source' => ['title' => ts('Membership Source')],

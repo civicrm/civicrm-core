@@ -203,7 +203,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
               'default' => TRUE,
             ],
             'contribution_source' => [
-              'title' => ts('Source'),
+              'title' => ts('Contribution Source'),
               'name' => 'source',
             ],
             'id' => [
@@ -221,7 +221,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
             'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
             'contribution_source' => [
-              'title' => ts('Source'),
+              'title' => ts('Contribution Source'),
               'name' => 'source',
               'type' => CRM_Utils_Type::T_STRING,
             ],
@@ -235,7 +235,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'order_bys' => [
             'contribution_id' => ['title' => ts('Contribution #')],
             'contribution_status_id' => ['title' => ts('Contribution Status')],
-            'receive_date'  => ['title' => ts('Date Received')],
+            'receive_date'  => ['title' => ts('Contribution Date')],
           ],
           'grouping' => 'contri-fields',
         ],

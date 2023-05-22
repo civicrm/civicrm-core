@@ -17,7 +17,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * An array containing the searchDisplay definition
-   * @var array
+   * @var string|array
    */
   protected $display;
 
@@ -193,7 +193,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       // FIXME: tasks() function always checks permissions, should respect `$this->checkPermissions`
       foreach (\CRM_Contribute_Task::tasks() as $id => $task) {
         if (!empty($task['url'])) {
-          $key = \CRM_Core_Key::get('CRM_Contribute_Controller_Task', TRUE);
+          $path = explode('?', $task['url'], 2)[0];
+          $menu = \CRM_Core_Menu::get($path);
+          $key = \CRM_Core_Key::get($menu['page_callback'], TRUE);
+
           $tasks[$entity['name']]['contribution.' . $id] = [
             'title' => $task['title'],
             'icon' => $task['icon'] ?? 'fa-gear',
@@ -206,13 +209,15 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       }
     }
 
-    // Call `hook_civicrm_searchKitTasks`.
-    // Note - this hook serves 2 purposes, both to augment this list of tasks AND to
-    // get a full list of Angular modules which provide tasks. That's why this hook needs
-    // the base-level array and not just the array of tasks for `$this->entity`.
-    // Although it may seem wasteful to have extensions add tasks for all possible entities and then
-    // discard most of it (all but the ones relevant to `$this->entity`), it's necessary to do it this way
-    // so that they can be declared as angular dependencies - see search_kit_civicrm_angularModules().
+    // Call `hook_civicrm_searchKitTasks` which serves 3 purposes:
+    // 1. For extensions to augment this list of tasks
+    // 2. To allow tasks to be added/removed per search display
+    //    Note: Use Events::W_LATE to do so after the tasks are filtered per search-display settings.
+    // 3. To get a full list of Angular modules which provide tasks.
+    //    Note: That's why this hook needs the base-level array and not just the array of tasks for `$this->entity`.
+    //    Although it may seem wasteful to have extensions add tasks for all possible entities and then
+    //    discard most of it (all but the ones relevant to `$this->entity`), it's necessary to do it this way
+    //    so that they can be declared as angular dependencies - see search_kit_civicrm_angularModules().
     $null = NULL;
     $checkPermissions = $this->checkPermissions;
     $userId = $this->checkPermissions ? \CRM_Core_Session::getLoggedInContactID() : NULL;
@@ -234,7 +239,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     $result->exchangeArray($tasks[$entity['name']]);
   }
 
-  public static function fields() {
+  public static function fields(): array {
     return [
       [
         'name' => 'name',

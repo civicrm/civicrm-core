@@ -18,6 +18,10 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
+  /**
+   * @param array $formValues
+   * @return CRM_Contact_Form_Task_AddToGroup
+   */
   protected function getSearchTaskFormObject(array $formValues) {
     $_POST = $formValues;
     $_SERVER['REQUEST_METHOD'] = 'GET';

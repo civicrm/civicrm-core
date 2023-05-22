@@ -117,7 +117,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
           ],
-          'contribution_source' => ['title' => ts('Source')],
+          'contribution_source' => ['title' => ts('Contribution Source')],
           'currency' => [
             'required' => TRUE,
             'no_display' => TRUE,
@@ -282,6 +282,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         ],
         'group_bys' => [
           'batch_id' => ['title' => ts('Batch Title')],
+        ],
+      ],
+      'civicrm_pledge_payment' => [
+        'dao' => 'CRM_Pledge_DAO_PledgePayment',
+        'filters' => [
+          'contribution_id' => [
+            'title' => ts('Contribution is a pledge payment'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ],
         ],
       ],
       'civicrm_contribution_soft' => [
@@ -527,6 +536,13 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $this->joinPhoneFromContact();
     $this->joinEmailFromContact();
 
+    //for pledge payment
+    if ($this->isTableSelected('civicrm_pledge_payment')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_pledge_payment {$this->_aliases['civicrm_pledge_payment']} ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_pledge_payment']}.contribution_id
+      ";
+    }
+
     //for contribution batches
     if ($this->isTableSelected('civicrm_batch')) {
       $this->_from .= "
@@ -748,6 +764,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $statistics['counts']['count'] = [
         'title' => ts('Total Contributions'),
         'value' => $count,
+        'type' => CRM_Utils_Type::T_INT,
       ];
       $statistics['counts']['avg'] = [
         'title' => ts('Average'),
@@ -774,6 +791,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $statistics['counts']['soft_count'] = [
         'title' => ts('Total Soft Credits'),
         'value' => $softCount,
+        'type' => CRM_Utils_Type::T_INT,
       ];
       $statistics['counts']['soft_avg'] = [
         'title' => ts('Average Soft Credit'),

@@ -207,7 +207,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
     // FIXME: What happens if we get to here and no activityType is defined?
 
-    $batch = CRM_Batch_BAO_Batch::create($params);
+    $batch = CRM_Batch_BAO_Batch::writeRecord($params);
 
     //set batch id
     $this->_id = $batch->id;

@@ -483,7 +483,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   public static function buildDedupeRules() {
-    $contactType = CRM_Utils_Request::retrieve('parentId', 'Positive');
+    $contactType = CRM_Utils_Request::retrieve('parentId', 'String');
     $dedupeRules = CRM_Dedupe_BAO_DedupeRuleGroup::getByType($contactType);
 
     CRM_Utils_JSON::output($dedupeRules);

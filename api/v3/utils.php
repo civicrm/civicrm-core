@@ -458,25 +458,6 @@ function _civicrm_api3_store_values(array $fields, array $params, &$values): boo
 }
 
 /**
- * Returns field names of the given entity fields.
- *
- * @deprecated
- * @param array $fields
- *   Fields array to retrieve the field names for.
- * @return array
- */
-function _civicrm_api3_field_names($fields) {
-  CRM_Core_Error::deprecatedFunctionWarning('array_column');
-  $result = [];
-  foreach ($fields as $key => $value) {
-    if (!empty($value['name'])) {
-      $result[] = $value['name'];
-    }
-  }
-  return $result;
-}
-
-/**
  * Get function for query object api.
  *
  * The API supports 2 types of get request. The more complex uses the BAO query object.
@@ -1436,7 +1417,7 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
     NULL,
     $entity_id,
     $groupID,
-    NULL,
+    $subType,
     $subName,
     TRUE,
     NULL,

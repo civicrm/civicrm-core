@@ -56,7 +56,7 @@
       </div>
     {/if}
       <div class="crm-submit-buttons">
-        {include file="CRM/common/formButtons.tpl"}
+        {include file="CRM/common/formButtons.tpl" location=''}
       </div>
       {if !empty($isOnline)}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
       <table class="form-layout-compressed">
@@ -66,7 +66,7 @@
         </tr>
         <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
           <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
-            {if !empty($is_test)}
+            {if $is_test}
               {ts}(test){/ts}
             {/if} {help id="id-financial_type"}
           </td>
@@ -192,9 +192,7 @@
           {if empty($is_template)}
           <tr class="crm-contribution-form-block-receive_date">
             <td class="label">{$form.receive_date.label}</td>
-            <td>{$form.receive_date.html}<br />
-              <span class="description">{ts}The date this contribution was received.{/ts}</span>
-            </td>
+            <td>{$form.receive_date.html}</td>
           </tr>
           {/if}
         {/if}
@@ -284,7 +282,7 @@
     <!-- end of soft credit -->
 
     <!-- start of PCP -->
-    {if $siteHasPCPs && !$payNow}
+    {if array_key_exists('pcp_made_through_id', $form) && !$payNow}
       <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noPCP}collapsed{/if}" id="softCredit">
         <div class="crm-accordion-header">
           {ts}Personal Campaign Page{/ts}&nbsp;{help id="id-pcp"}
@@ -385,16 +383,32 @@
           function checkEmail() {
             var data = $("#contact_id", $form).select2('data');
             if (data && data.extra && data.extra.email && data.extra.email.length) {
-              $("#email-receipt", $form).show();
-              $("#email-address", $form).html(data.extra.email);
+              CRM.api4('Email', 'get', {
+                select: ["on_hold", "contact.do_not_email"],
+                join: [["Contact AS contact", "LEFT", ["contact_id", "=", "contact.id"]]],
+                where: [["contact_id", "=", data.id], ["is_primary", "=", true]]
+              }).then(function(emails) {
+                if (!emails[0]['on_hold'] && !emails[0]['contact.do_not_email']) {
+                  $("#email-receipt", $form).show();
+                  $("#email-address", $form).html(data.extra.email);
+                }
+                else {
+                  CRM.alert(ts("No email receipt can be sent as the contact's primary email address is on hold or they are set to do not email."), ts("Cannot send email receipt"));
+                  $("#email-receipt", $form).hide();
+                  $("#is_email_receipt", $form).removeAttr('checked');
+                }
+              }, function(failure) {
+                $("#email-receipt", $form).show();
+                $("#email-address", $form).html(data.extra.email);
+              });
             }
             else {
               $("#email-receipt", $form).hide();
+              $("#is_email_receipt", $form).removeAttr('checked');
             }
-          }
-
           showHideByValue('is_email_receipt', '', 'receiptDate', 'table-row', 'radio', true);
           showHideByValue('is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false);
+          }
         });
 
         {/literal}

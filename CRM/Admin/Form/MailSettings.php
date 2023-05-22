@@ -77,7 +77,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
 
     $this->add('password', 'password', ts('Password'), ['autocomplete' => 'off']);
 
-    $this->add('text', 'source', ts('Source'), $attributes['source']);
+    $this->add('text', 'source', ts('Mail Folder'), $attributes['source']);
 
     $this->add('checkbox', 'is_ssl', ts('Use SSL?'));
 

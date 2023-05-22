@@ -72,7 +72,7 @@
           <span class="description">{ts}Status of this membership.{/ts}</span></td>
       </tr>
       <tr class="crm-member-membershiprenew-form-block-end_date">
-        <td class="label">{ts}Membership End Date{/ts}</td>
+        <td class="label">{ts}Membership Expiration Date{/ts}</td>
         <td class="html-adjust">&nbsp;{$endDate|crmDate}</td>
       </tr>
       <tr class="crm-member-membershiprenew-form-block-renewal_date">
@@ -81,7 +81,7 @@
       </tr>
       <tr id="defaultNumTerms" class="crm-member-membershiprenew-form-block-default-num_terms">
         <td colspan="2" class="description">
-          {ts}Renewal extends membership end date by one membership period{/ts}
+          {ts}Renewal extends Membership Expiration Date by one membership period{/ts}
           &nbsp; <a id="changeTermsLink" href='#'
                     onclick='changeNumTerms(); return false;'>{ts}change{/ts}</a>
         </td>
@@ -90,7 +90,7 @@
         <td class="label">{$form.num_terms.label}</td>
         <td>{$form.num_terms.html|crmAddClass:two} {ts}membership periods{/ts}<br/>
           <span
-            class="description">{ts}Extend the membership end date by this many membership periods. Make sure the appropriate corresponding fee is entered below.{/ts}</span>
+            class="description">{ts}Extend the Membership Expiration Date by this many membership periods. Make sure the appropriate corresponding fee is entered below.{/ts}</span>
         </td>
       </tr>
       {if $accessContribution and ! $membershipMode}

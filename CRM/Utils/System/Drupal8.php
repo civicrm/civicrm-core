@@ -124,16 +124,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the drupal db.
-   *
-   * @param array $params
-   *   Array of name and mail values.
-   * @param array $errors
-   *   Errors.
-   * @param string $emailName
-   *   Field label for the 'email'.
+   * @inheritdoc
    */
-  public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+  public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     // If we are given a name, let's check to see if it already exists.
     if (!empty($params['name'])) {
       $name = $params['name'];
@@ -440,6 +433,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     // We need to call the config hook again, since we now know
     // all the modules that are listening on it (CRM-8655).
+    $config = CRM_Core_Config::singleton();
     CRM_Utils_Hook::config($config);
 
     if ($loadUser) {
@@ -542,6 +536,19 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function getDefaultBlockLocation() {
     return 'sidebar_first';
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function logger($message, $priority = NULL) {
+    if (CRM_Core_Config::singleton()->userFrameworkLogging) {
+      // dev/core#3438 Prevent cv fatal if logging before CMS bootstrap
+      if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
+        return;
+      }
+      \Drupal::logger('civicrm')->log($priority ?? \Drupal\Core\Logger\RfcLogLevel::DEBUG, '%message', ['%message' => $message]);
+    }
   }
 
   /**
@@ -913,6 +920,43 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function viewsIntegration(): string {
+    return '<p><strong>' . ts('To enable CiviCRM Views integration, install the <a %1>CiviCRM Entity</a> module.', [1 => 'href="https://www.drupal.org/project/civicrm_entity"']) . '</strong></p>';
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    // @todo use Drupal "maintenance page" template and theme during installation
+    // or upgrade.
+    print $content;
+    return NULL;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function ipAddress():?string {
+    return class_exists('Drupal') ? \Drupal::request()->getClientIp() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function mailingWorkflowIsEnabled():bool {
+    if (!\Drupal::moduleHandler()->moduleExists('rules')) {
+      return FALSE;
+    }
+
+    $enableWorkflow = Civi::settings()->get('civimail_workflow');
+
+    return (bool) $enableWorkflow;
   }
 
 }

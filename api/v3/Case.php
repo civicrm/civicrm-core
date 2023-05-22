@@ -110,7 +110,7 @@ function civicrm_api3_case_create($params) {
   if (isset($params['contact_id']) && !isset($params['id'])) {
     foreach ((array) $params['contact_id'] as $cid) {
       $contactParams = ['case_id' => $caseBAO->id, 'contact_id' => $cid];
-      CRM_Case_BAO_CaseContact::create($contactParams);
+      CRM_Case_BAO_CaseContact::writeRecord($contactParams);
     }
   }
 

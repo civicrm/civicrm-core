@@ -40,7 +40,7 @@
             {if $row.type eq 1024}
               {$row.value|crmMoney|escape}
             {elseif $row.type eq 2}
-              {$row.value|escape}
+              {$row.value|purify}
             {else}
                {$row.value|crmNumberFormat|escape}
             {/if}

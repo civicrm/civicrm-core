@@ -34,7 +34,7 @@
 
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
-{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}
+{if {event.pay_later_receipt|boolean}}{event.pay_later_receipt|boolean}{/if}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {/if}
@@ -142,7 +142,7 @@ You were registered by: {$payer.name}
 
 {if !empty($dataArray)}
 {if isset($totalAmount) and isset($totalTaxAmount)}
-{ts}Amount before Tax{/ts}: {$totalAmount-$totalTaxAmount|crmMoney:$currency}
+{ts}Amount before Tax:{/ts} {$totalAmount-$totalTaxAmount|crmMoney:$currency}
 {/if}
 
 {foreach from=$dataArray item=value key=priceset}

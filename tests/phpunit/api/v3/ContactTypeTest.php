@@ -41,7 +41,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->subTypeIndividual = $params['name'];
 
     $params = [
@@ -51,7 +51,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->subTypeOrganization = $params['name'];
 
     $params = [
@@ -61,7 +61,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'parent_id' => 2,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->subTypeHousehold = $params['name'];
   }
 
@@ -271,7 +271,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $subtype = $params['name'];
 
     // check for Type:Individual subype:sub_individual
@@ -314,7 +314,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $subtype = $params['name'];
 
     // check for Type:Organization subype:sub_organization

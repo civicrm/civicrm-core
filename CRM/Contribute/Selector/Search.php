@@ -218,18 +218,21 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           'url' => 'civicrm/contact/view/contribution',
           'qs' => "reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=contribute{$extraParams}",
           'title' => ts('View Contribution'),
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/view/contribution',
           'qs' => "reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%{$extraParams}",
           'title' => ts('Edit Contribution'),
+          'weight' => -10,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/contribution',
           'qs' => "reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%{$extraParams}",
           'title' => ts('Delete Contribution'),
+          'weight' => 100,
         ],
       ];
     }
@@ -530,14 +533,14 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             'type' => '',
           ],
           [
-            'name' => ts('Source'),
+            'name' => ts('Contribution Source'),
             'sort' => 'contribution_source',
             'field_name' => 'contribution_source',
             'direction' => CRM_Utils_Sort::DONTCARE,
             'type' => '',
           ],
           [
-            'name' => ts('Received'),
+            'name' => ts('Contribution Date'),
             'sort' => 'receive_date',
             'field_name' => 'receive_date',
             'type' => 'date',
