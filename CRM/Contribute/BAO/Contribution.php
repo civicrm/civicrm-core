@@ -1786,16 +1786,13 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    *
    */
   public static function transitionComponents($params) {
-    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id']);
-    $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['previous_contribution_status_id']);
     // @todo fix the one place that calls this function to use Payment.create
     // remove this.
     // get minimum required values.
     $contributionId = $params['contribution_id'];
-    $contributionStatusId = $params['contribution_status_id'];
 
     // we process only ( Completed, Cancelled, or Failed ) contributions.
-    if (!$contributionId || $contributionStatus !== 'Completed') {
+    if (!$contributionId) {
       return;
     }
 
@@ -1878,12 +1875,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         $participant->id,
         'status_id'
       );
-    }
-
-    // only pending contribution related object processed.
-    if (!in_array($previousStatus, ['Pending', 'Partially paid'])) {
-      // this is case when we already processed contribution object.
-      return;
     }
 
     if (is_array($memberships)) {
@@ -2039,7 +2030,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     }
 
     if ($pledgePayment) {
-      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, $contributionStatusId);
+      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'));
     }
 
   }
