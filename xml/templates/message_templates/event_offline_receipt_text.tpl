@@ -52,19 +52,24 @@
 {$location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
-{if !empty($location.phone.1.phone) || !empty($location.email.1.email)}
-
+{if {event.loc_block_id.phone_id.phone|boolean} || {event.loc_block_id.email_id.email|boolean}}
 {ts}Event Contacts:{/ts}
-{foreach from=$location.phone item=phone}
-{if $phone.phone}
 
-{if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone}{/if} {if $phone.phone_ext} {ts}ext.{/ts} {$phone.phone_ext}{/if}
-{/foreach}
-{foreach from=$location.email item=eventEmail}
-{if $eventEmail.email}
-
-{ts}Email{/ts}: {$eventEmail.email}{/if}{/foreach}
+{if {event.loc_block_id.phone_id.phone|boolean}}
+{if {event.loc_block_id.phone_id.phone_type_id|boolean}}{event.loc_block_id.phone_id.phone_type_id:label}{else}{ts}Phone{/ts}{/if} {event.loc_block_id.phone_id.phone} {if {event.loc_block_id.phone_id.phone_ext|boolean}} {ts}ext.{/ts} {event.loc_block_id.phone_id.phone_ext}{/if}
 {/if}
+
+{if {event.loc_block_id.phone_2_id.phone|boolean}}
+{if {event.loc_block_id.phone_2_id.phone_type_id|boolean}}{event.loc_block_id.phone_2_id.phone_type_id:label}{else}{ts}Phone{/ts}{/if} {event.loc_block_id.phone_2_id.phone} {if {event.loc_block_id.phone_2_id.phone_ext|boolean}} {ts}ext.{/ts} {event.loc_block_id.phone_2_id.phone_ext}{/if}
+{/if}
+
+{if {event.loc_block_id.email_id.email|boolean}}
+{ts}Email {/ts}{event.loc_block_id.email_id.email}
+{/if}
+{if {event.loc_block_id.email_2_id.email|boolean}}
+{ts}Email {/ts}{event.loc_block_id.email_2_id.email}{/if}
+{/if}
+
 
 {if !empty($event.is_public)}
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
