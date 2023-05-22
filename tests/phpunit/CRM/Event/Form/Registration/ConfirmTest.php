@@ -538,7 +538,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   private function creatEventWithProfile($event): array {
     if (empty($event)) {
-      $event = $this->eventCreate();
+      $event = $this->eventCreate(['is_monetary' => FALSE]);
       $this->createJoinedProfile(['entity_table' => 'civicrm_event', 'entity_id' => $event['id']]);
       $this->addUFField($this->ids['UFGroup']['our profile'], 'note', 'Contact', 'Comment');
     }
@@ -622,7 +622,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * event#64.
    */
   public function testSubmitNonPrimaryEmail(): void {
-    $event = $this->eventCreate();
+    $event = $this->eventCreate(['is_monetary' => FALSE]);
     $mut = new CiviMailUtils($this, TRUE);
     $this->submitForm($event['id'], [
       [
@@ -704,7 +704,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   protected function submitPaidEvent(array $submitValues = []): void {
     $this->dummyProcessorCreate();
-    $event = $this->eventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']]]);
+    $event = $this->eventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE]);
     $this->submitForm($event['id'], array_merge([
       'email-Primary' => 'demo@example.com',
       'credit_card_number' => '4111111111111111',

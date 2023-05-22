@@ -673,7 +673,7 @@ Emerald City, Maine 90210
 
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
-event.pay_later_receipt :
+event.pay_later_receipt :Please transfer funds to our bank account.
 event.custom_1 :my field
 event.confirm_email_text :
 ';
