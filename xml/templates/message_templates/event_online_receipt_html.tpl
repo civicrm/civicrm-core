@@ -48,7 +48,7 @@
       <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
      {/if}
     {elseif !empty($is_pay_later) && empty($isAmountzero) && empty($isAdditionalParticipant)}
-     <p>{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}</p> {* FIXME: this might be text rather than HTML *}
+     <p>{if {event.pay_later_receipt|boolean}}{event.pay_later_receipt|boolean}{/if}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
    </td>
