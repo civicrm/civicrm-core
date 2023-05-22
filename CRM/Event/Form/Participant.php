@@ -1680,11 +1680,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param $eventID
    * @param $participantRoles
    * @param $receiptText
-   * @param $isPaidEvent
    *
    * @return void
    */
-  protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText, $isPaidEvent) {
+  protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText) {
     //use of the message template below requires variables in different format
     $events = [];
     $returnProperties = ['event_type_id', 'fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
@@ -1707,7 +1706,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     else {
       $event['participant_role'] = $role[$participantRoles] ?? NULL;
     }
-    $event['is_monetary'] = $isPaidEvent;
+    $event['is_monetary'] = $this->_isPaidEvent;
 
     if ($receiptText) {
       $event['confirm_email_text'] = $receiptText;
@@ -1967,26 +1966,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * Get the contribution ID associated with the participant record.
-   *
-   *
-   * @api This function will not change in a minor release and is supported for
-   * use outside of core. This annotation / external support for properties
-   * is only given where there is specific test cover.
-   *
-   * @return int|null
-   * @throws \CRM_Core_Exception
-   */
-  public function getContributionID(): ?int {
-    if (!isset($this->contributionID)) {
-      $this->contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-        $this->getParticipantID(), 'contribution_id', 'participant_id'
-      );
-    }
-    return $this->contributionID;
-  }
-
-  /**
    * Get the value for the revenue recognition date field.
    *
    * @return string
@@ -2139,8 +2118,12 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     $sent = [];
     $notSent = [];
     $this->assign('module', 'Event Registration');
-    $this->assignEventDetailsToTpl($params['event_id'], CRM_Utils_Array::value('role_id', $params), CRM_Utils_Array::value('receipt_text', $params), $this->_isPaidEvent);
-
+    $this->assignEventDetailsToTpl($params['event_id'], CRM_Utils_Array::value('role_id', $params), CRM_Utils_Array::value('receipt_text', $params));
+    // @todo - this is no longer in core templates as of 5.63
+    // we should remove once we have done a 'push upgrade' on addresses - ie advised
+    // people to upgrade their templates in an upgrade message, as
+    // opposed to just updating unmodified templates.
+    $this->assign('isPrimary', (int) $this->_isPaidEvent);
     if ($this->_isPaidEvent) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       if (!$this->_mode) {
@@ -2154,7 +2137,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       }
 
       $this->assign('totalAmount', $params['total_amount'] ?? $total_amount);
-      $this->assign('isPrimary', 1);
       $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
     }
     if ($this->_mode) {
@@ -2167,7 +2149,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
       $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
       $this->assign('is_pay_later', 0);
-      $this->assign('isPrimary', 1);
     }
 
     $this->assign('register_date', $params['register_date']);
@@ -2203,6 +2184,9 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $this->assign('contactID', $contactID);
       $this->assign('participantID', $participants[$num]->id);
 
+      $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+        $participants[$num]->id, 'contribution_id', 'participant_id'
+      );
       $this->_id = $participants[$num]->id;
 
       if ($this->_isPaidEvent) {
@@ -2255,7 +2239,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         'modelProps' => [
           'participantID' => $this->_id,
           'eventID' => $params['event_id'],
-          'contributionID' => $this->getContributionID(),
+          'contributionID' => $contributionID,
         ],
       ];
 
@@ -2274,7 +2258,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $taxAmt = $template->get_template_vars('dataArray');
       if (Civi::settings()->get('invoice_is_email_pdf')) {
         $sendTemplateParams['isEmailPdf'] = TRUE;
-        $sendTemplateParams['contributionId'] = $this->getContributionID();
+        $sendTemplateParams['contributionId'] = $contributionID;
       }
       [$mailSent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       if ($mailSent) {
