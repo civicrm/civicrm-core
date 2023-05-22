@@ -86,6 +86,15 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
     );
   }
 
+  /**
+   * Upgrade step; Required to ensure pre Upgrade runs.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_62_beta1($rev): void {
+  }
+
   public static function consolidateComponents($ctx): bool {
     $final = static::findAllEnabledComponents();
     // Ensure CiviGrant is removed from the setting, as this may have been incomplete in a previous upgrade.
