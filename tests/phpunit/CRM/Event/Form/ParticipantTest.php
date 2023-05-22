@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\Address;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Participant;
 use Civi\Api4\Phone;
@@ -259,6 +260,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   public function testParticipantOfflineReceipt(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->swapMessageTemplateForTestTemplate('event_offline_receipt', 'text');
+    $this->swapMessageTemplateForTestTemplate('event_offline_receipt', 'html');
     $mut = new CiviMailUtils($this, TRUE);
     // Create an email associated with the logged in contact
     $loggedInContactID = $this->createLoggedInUser();
@@ -332,6 +334,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'contribution.balance_amount|raw string is zero:::Yes',
       'contribution.balance_amount|boolean:::No',
       'contribution.paid_amount|boolean:::Yes',
+      '<p>Test event type - 1</p>event.location:8 Baker Street<br />
+London,',
+      '$location.address.1.display:<div class="location vcard"><span class="adr"><span class="street-address">8 Baker Street</span><br />
+<span class="extended-address">Upstairs</span><br />
+<span class="locality">London</span>,<br />
+</span></div>',
     ]);
 
     $this->callAPISuccess('Email', 'delete', ['id' => $email['id']]);
@@ -352,7 +360,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     if (!empty($eventParams['is_monetary'])) {
       $phone = Phone::create()->setValues(['phone' => 1235, 'phone_type_id:name' => 'Mobile', 'phone_ext' => 456])->execute()->first();
-      $locationBlockID = LocBlock::create()->setValues(['phone_id' => $phone['id']])->execute()->first()['id'];
+      $address = Address::create()->setValues(['street_address' => '8 Baker Street', 'supplemental_address_1' => 'Upstairs', 'city' => 'London'])->execute()->first();
+      $locationBlockID = LocBlock::create()->setValues(['phone_id' => $phone['id'], 'address_id' => $address['id']])->execute()->first()['id'];
       $event = $this->legacyEventCreatePaid(array_merge([
         'name' => 'big',
         'amount' => 1550.55,
