@@ -61,8 +61,8 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
       '<div foo="ts(\'Hello world\')\"></div>',
     ];
     $cases[5] = [
-      '<a href="{{foo}}" title="{{bar}}"></a>',
-      '<a href="{{foo}}" title="{{bar}}"></a>',
+      '<a ng-href="{{foo}}" title="{{bar}}"></a>',
+      '<a ng-href="{{foo}}" title="{{bar}}"></a>',
     ];
     $cases[6] = [
       '<div ng-if="a && b"></div>',
