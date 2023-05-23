@@ -19,7 +19,7 @@ Required vars: caseType
       <li><a href="#acttab-statuses">{{:: ts('Case Statuses') }}</a></li>
       <li><a href="#acttab-actType">{{:: ts('Activity Types') }}</a></li>
       <li ng-repeat="activitySet in caseType.definition.activitySets">
-        <a href="#acttab-{{$index}}" class="crmCaseType-editable">
+        <a ng-href="#acttab-{{$index}}" class="crmCaseType-editable">
           <div crm-editable-tab-title title="{{:: ts('Click to edit') }}">
             <span>{{ activitySet.label }}</span>
           </div>

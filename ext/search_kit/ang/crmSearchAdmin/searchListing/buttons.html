@@ -1,5 +1,5 @@
 <div class="btn-group btn-group-xs">
-  <a class="btn btn-primary" href="#/edit/{{:: row.data.id }}" ng-if=":: row.permissionToEdit">
+  <a class="btn btn-primary" ng-href="#/edit/{{:: row.data.id }}" ng-if=":: row.permissionToEdit">
     <i class="crm-i fa-pencil"></i>
     {{:: ts('Edit') }}
   </a>
