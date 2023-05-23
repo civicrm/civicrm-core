@@ -107,7 +107,8 @@ There are a few variations on how to perform these steps. Each variant defines a
 (implemented in `Civi\Esm\XXX`).  For example, these two are currently implemented:
 
 * `esm.loader.browser` (`Civi\Esm\BrowserLoader`): Use pure, browser-based loading with `<script type="module">` and `<script type="importmap">`.
-* `esm.loader.shim` (`Civi\Esm\ShimLoader`): Use [es-module-shims](https://github.com/guybedford/es-module-shims) with `<script type="module-shim">` and `<script type="importmap-shim">`.
+* `esm.loader.shim-fast` (`Civi\Esm\ShimLoader`): Use [es-module-shims](https://github.com/guybedford/es-module-shims) as dynamic polyfill (with preference for browser-based loading).
+* `esm.loader.shim-slow` (`Civi\Esm\ShimLoader`): Use [es-module-shims](https://github.com/guybedford/es-module-shims) with more guarantees of cross-browser functionality.
 
 Depending on the local settings/defaults, the _active loader_ will be available as `Civi::service('esm.loader')`.
 

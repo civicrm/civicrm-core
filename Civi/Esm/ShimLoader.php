@@ -31,12 +31,48 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @see \Civi\Esm\BrowserLoader
  * @see ./README.md
- *
- * @service esm.loader.shim
  */
 class ShimLoader extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   use BasicLoaderTrait;
+
+  /**
+   * List of supported script types.
+   *
+   * @var array
+   *   Ex: ['importmap' => 'importmap-shim', 'module' => 'module-shim'];
+   */
+  protected $scriptTypes;
+
+  /**
+   * Load the importmap with `es-module-shims`. Allow it to auto-detect browser support for ESM.
+   *
+   * For browsers that support ESM, this should allow faster execution. However, there may be
+   * small variations or missing features in specific browser implementations.
+   *
+   * @service esm.loader.shim-fast
+   * @return \Civi\Esm\ShimLoader
+   */
+  public static function createFashShim() {
+    $loader = new static();
+    $loader->scriptTypes = ['importmap' => 'importmap', 'module' => 'module'];
+    return $loader;
+  }
+
+  /**
+   * In this flavor, we use `es-module-shims`. We force it to use "shim mode".
+   *
+   * This should provide the most consistent functionality across browser implementations, but
+   * there may be a performance penalty.
+   *
+   * @service esm.loader.shim-slow
+   * @return \Civi\Esm\ShimLoader
+   */
+  public static function createSlowShim() {
+    $loader = new static();
+    $loader->scriptTypes = ['importmap' => 'importmap-shim', 'module' => 'module-shim'];
+    return $loader;
+  }
 
   /**
    * @inheritDoc
@@ -49,21 +85,21 @@ class ShimLoader extends \Civi\Core\Service\AutoService implements EventSubscrib
     if (Civi::settings()->get('debug_enabled')) {
       $flags |= JSON_PRETTY_PRINT;
     }
-    return $shimHtml . sprintf("<script type='importmap-shim'>\n%s\n</script>", json_encode($importMap, $flags));
+    return $shimHtml . sprintf("<script type='%s'>\n%s\n</script>", htmlentities($this->scriptTypes['importmap']), json_encode($importMap, $flags));
   }
 
   /**
    * @inheritDoc
    */
   protected function renderModuleScript(array $snippet): string {
-    return sprintf("<script type=\"module-shim\">\n%s\n</script>\n", $snippet['script']);
+    return sprintf("<script type=\"%s\">\n%s\n</script>\n", htmlentities($this->scriptTypes['module']), $snippet['script']);
   }
 
   /**
    * @inheritDoc
    */
   protected function renderModuleUrl(array $snippet): string {
-    return sprintf("<script type=\"module-shim\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
+    return sprintf("<script type=\"%s\" src=\"%s\">\n</script>\n", htmlentities($this->scriptTypes['module']), $snippet['scriptUrl']);
   }
 
 }

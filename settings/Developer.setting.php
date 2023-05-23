@@ -120,7 +120,7 @@ return [
     'is_contact' => 0,
     'description' => NULL,
     'help_text' => NULL,
-    'options' => ['auto' => ts('Default (Auto-detect)'), 'browser' => ts('Browser'), 'shim' => ts('es-module-shims')],
+    'options' => ['auto' => ts('Default (Auto-detect)'), 'browser' => ts('Browser'), 'shim-fast' => ts('es-module-shims (fast mode)'), 'shim-slow' => ts('es-module-shims (slow mode)')],
   ],
   'fatalErrorHandler' => [
     'group_name' => 'Developer Preferences',

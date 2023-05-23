@@ -589,7 +589,7 @@ class Container {
   public static function createEsmLoader($container): object {
     $name = \Civi::settings()->get('esm_loader');
     if ($name === 'auto') {
-      $name = 'shim';
+      $name = 'shim-fast';
       \Civi::dispatcher()->dispatch('civi.esm.loader.default', GenericHookEvent::create(['default' => &$name]));
     }
     if ($container->has("esm.loader.$name")) {
