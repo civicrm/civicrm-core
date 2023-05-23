@@ -142,4 +142,50 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
 
+  /**
+   * Add local and global form rules.
+   *
+   * @return void
+   */
+  public function addRules(): void {
+    $this->addFormRule(['CRM_Event_Form_Task_Register', 'formRule']);
+  }
+
+  /**
+   * Global validation rules for the form.
+   *
+   * @param array $values
+   *   Posted values of the form.
+   * @param $files
+   * @param CRM_Event_Form_Task_register $self
+   *
+   * @return array|true
+   *   list of errors to be posted back to the form
+   */
+  public static function formRule($values, $files, $self) {
+    $errors = [];
+
+    if (!empty($values['record_contribution'])) {
+      if (empty($values['financial_type_id'])) {
+        $errors['financial_type_id'] = ts('Please enter the associated Financial Type');
+      }
+      if (empty($values['payment_instrument_id'])) {
+        $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
+      }
+      if (!empty($values['priceSetId'])) {
+        CRM_Price_BAO_PriceField::priceSetValidation($values['priceSetId'], $values, $errors);
+      }
+    }
+
+    if ((empty($values['total_amount']) &&
+        empty($self->_values['line_items'])
+      ) ||
+    ) {
+      if ($priceSetId = CRM_Utils_Array::value('priceSetId', $values)) {
+        CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $values, $errors, TRUE);
+      }
+    }
+    return empty($errors) ? TRUE : $errors;
+  }
+
 }

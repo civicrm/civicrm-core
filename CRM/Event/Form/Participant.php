@@ -781,12 +781,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * Global validation rules for the form.
+   * Global validation rules for the CRM_Event_Form_Participant form.
    *
    * @param array $values
    *   Posted values of the form.
    * @param $files
-   * @param self $self
+   * @param CRM_Event_Form_Participant $self
    *
    * @return array|true
    *   list of errors to be posted back to the form
@@ -823,10 +823,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     // do the amount validations.
     //skip for update mode since amount is freeze, CRM-6052
-    if ((!$self->_id && empty($values['total_amount']) &&
+    if ((!$self->getParticipantID() && empty($values['total_amount']) &&
         empty($self->_values['line_items'])
       ) ||
-      ($self->_id && !$self->_paymentId && isset($self->_values['line_items']) && is_array($self->_values['line_items']))
+      ($self->getParticipantID() && !$self->_paymentId && isset($self->_values['line_items']) && is_array($self->_values['line_items']))
     ) {
       if ($priceSetId = CRM_Utils_Array::value('priceSetId', $values)) {
         CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $values, $errorMsg, TRUE);
@@ -834,7 +834,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     // For single additions - show validation error if the contact has already been registered
     // for this event.
-    if ($self->_single && ($self->_action & CRM_Core_Action::ADD)) {
+    if ($self->_action & CRM_Core_Action::ADD) {
       if ($self->_context == 'standalone') {
         $contactId = $values['contact_id'] ?? NULL;
       }
