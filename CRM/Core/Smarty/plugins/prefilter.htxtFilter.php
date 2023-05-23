@@ -18,7 +18,15 @@ function smarty_prefilter_htxtFilter($tpl_source, &$smarty) {
   $_htxts = 0;
 
   $result = preg_replace_callback_array([
-    '/\{htxt id=([\'\"][^\'\"]+[\'\"])/' => function ($m) use (&$htxts) {
+    '/\{htxt id=(\"[-\w]+\")[ }]/' => function ($m) use (&$htxts) {
+      $htxts++;
+      return sprintf('{if $id == %s}%s', $m[1], $m[0]);
+    },
+    '/\{htxt id=(\'[-\w]+\')[ }]/' => function ($m) use (&$htxts) {
+      $htxts++;
+      return sprintf('{if $id == %s}%s', $m[1], $m[0]);
+    },
+    '/\{htxt id=(\$\w+)[ }]/' => function ($m) use (&$htxts) {
       $htxts++;
       return sprintf('{if $id == %s}%s', $m[1], $m[0]);
     },
