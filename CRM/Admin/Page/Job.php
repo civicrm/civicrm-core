@@ -52,17 +52,17 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
           'qs' => 'jid=%%id%%&reset=1',
           'title' => ts('See log entries for this Scheduled Job'),
         ],
+        CRM_Core_Action::VIEW => [
+          'name' => ts('Execute'),
+          'url' => 'civicrm/admin/job/edit',
+          'qs' => 'action=view&id=%%id%%&reset=1',
+          'title' => ts('Execute Scheduled Job Now'),
+        ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/job/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Scheduled Job'),
-        ],
-        CRM_Core_Action::VIEW => [
-          'name' => ts('Execute Now'),
-          'url' => 'civicrm/admin/job/edit',
-          'qs' => 'action=view&id=%%id%%&reset=1',
-          'title' => ts('Execute Scheduled Job Now'),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
