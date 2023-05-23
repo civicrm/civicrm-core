@@ -37,9 +37,9 @@ Below, we consider a few perspectives on this functionality.
 If you develop an extension which includes ESM files, then you may want to add items to the import-map:
 
 ```php
-function myext_civicrm_esmImportMap(array &$importMap, array $context): void {
-  $importMap['imports']['foo/'] = E::url('js/foo/');
-  $importMap['imports']['bar/'] = E::url('packages/bar/dist/');
+function myext_civicrm_esmImportMap(\Civi\Esm\ImportMap $importMap): void {
+  $importMap->addPrefix('foo/', E::LONG_NAME, 'js/foo/');
+  $importMap->addPrefix('bar/', E::LONG_NAME, 'packages/bar/dist/');
 }
 ```
 

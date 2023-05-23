@@ -75,12 +75,27 @@ trait BasicLoaderTrait {
       return;
     }
 
-    $importMap = $this->importMap->get();
+    $importMap = $this->buildImportMap();
     $region->add([
       'name' => 'import-map',
       'markup' => empty($importMap) ? '' : $this->renderImportMap($importMap),
       'weight' => -1000,
     ]);
+  }
+
+  /**
+   * @return array
+   *   The import-map, as defined by the browser-vendor or browser-based polyfill.
+   *   For BasicLoaderTrait, we do a straight-through mapping (read extension-names, generate extension-URLs).
+   * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
+   * @link https://github.com/WICG/import-maps
+   */
+  protected function buildImportMap(): array {
+    $result = [];
+    foreach ($this->importMap->getPrefixes() as $prefix) {
+      $result['imports'][$prefix['prefix']] = Civi::resources()->getUrl($prefix['ext'], $prefix['relPath']);
+    }
+    return $result;
   }
 
   /**

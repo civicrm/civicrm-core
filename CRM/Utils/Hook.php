@@ -2846,25 +2846,17 @@ abstract class CRM_Utils_Hook {
    *
    * Subscribers should assume that the $importMap will be cached and re-used.
    *
-   * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
-   * @link https://github.com/WICG/import-maps
-   * @see \Civi\Esm\ImportMap
+   * Example usage:
    *
-   * @param array $importMap
-   *   Ex: ['imports' => ['square/' => 'https://example.com/square/']]
+   *    function my_civicrm_esmImportMap($importMap): void {
+   *      $importMap->addPrefix('geolib/', E::LONG_NAME, 'packages/geometry-library-1.2.3/');
+   *    }
    *
-   *   This data-structure is defined by the browser-vendors. In the future, browser-vendors
-   *   may update the supported features. It is the subscribers' responsibility to conform
-   *   with browser standards.
-   * @param array $context
-   *   In the future, the `$context` may provide hints about the usage environment. Based
-   *   on these hints, you may omit unnecessary mappings. However, in the absence of a clear
-   *   hint, listeners should tend to over-communicate (i.e. report all the mappings that
-   *   you can).
+   * @param \Civi\Esm\ImportMap $importMap
    */
-  public static function esmImportMap(array &$importMap, array $context): void {
+  public static function esmImportMap(\Civi\Esm\ImportMap $importMap): void {
     $null = NULL;
-    self::singleton()->invoke(['importMap', 'context'], $importMap, $context, $null,
+    self::singleton()->invoke(['importMap'], $importMap, $null, $null,
       $null, $null, $null,
       'civicrm_esmImportMap'
     );
