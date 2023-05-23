@@ -118,7 +118,7 @@ return [
     'title' => ts('ECMAScript Module Loader'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'description' => ts('Specify how to load ESM (JS) files. The "Default" mode is the supported option. Other options may assist with diagnosing or temporarily mitigating compatibility issues.'),
     'help_text' => NULL,
     'options' => ['auto' => ts('Default (Auto-detect)'), 'browser' => ts('Browser'), 'shim-fast' => ts('es-module-shims (fast mode)'), 'shim-slow' => ts('es-module-shims (slow mode)')],
   ],

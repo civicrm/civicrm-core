@@ -45,6 +45,11 @@
                 <td>{$form.assetCache.html}<br />
                 <span class="description">{ts}Store computed JS/CSS content in cache files? (Note: In "Auto" mode, the "Debug" setting will determine whether to activate the cache.){/ts}</span></td>
             </tr>
+            <tr class="crm-debugging-form-block-esm_loader">
+                <td class="label">{$form.esm_loader.label}</td>
+                <td>{$form.esm_loader.html}<br />
+                <span class="description">{$settings_fields.esm_loader.description}</span></td>
+            </tr>
     </table>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
     <div class="spacer"></div>
