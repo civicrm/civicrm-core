@@ -16,6 +16,6 @@
  */
 
 /**
- * Manages dedupe exceptions - ie pairs marked as non-duplicates.
+ * @deprecated
  */
 class CRM_Dedupe_BAO_Exception extends CRM_Dedupe_BAO_DedupeException {}

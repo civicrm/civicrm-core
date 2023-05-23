@@ -10,13 +10,18 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
+ * @deprecated
  */
+class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_BAO_DedupeRuleGroup {
 
-/**
- * The CiviCRM duplicate discovery engine is based on an
- * algorithm designed by David Strauss <david@fourkitchens.com>.
- */
-class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_BAO_DedupeRuleGroup {}
+  /**
+   * @deprecated
+   * @param string $contactType
+   * @return array|string[]
+   */
+  public static function getByType($contactType = NULL): array {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4 DedupeRuleGroup::get');
+    return parent::getByType($contactType);
+  }
+
+}

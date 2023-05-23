@@ -555,10 +555,10 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *   Individual, Household or Organization.
    *
    *
-   * @return array
+   * @return array|string[]
    *   id => "nice name" of rule group
    */
-  public static function getByType($contactType = NULL) {
+  public static function getByType($contactType = NULL): array {
     $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
 
     if ($contactType) {
