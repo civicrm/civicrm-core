@@ -37,4 +37,13 @@ class Group extends Generic\DAOEntity {
     ] + $permissions;
   }
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Contact\RebuildCache
+   */
+  public static function rebuildCache($checkPermissions = TRUE) {
+    return (new Action\Group\RebuildCache(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }
