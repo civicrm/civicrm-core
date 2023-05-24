@@ -42,11 +42,11 @@
         {foreach from=$rows item=row}
         <tr id="job-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
             <td class="crm-job-name"><strong><span data-field="name">{$row.name}</span></strong> ({$row.run_frequency})<br/>
-                {$row.description}<br />
+                {if array_key_exists('description', $row)}{$row.description}{/if}<br />
                 {ts}API Entity:{/ts} {$row.api_entity}<br/>
                 {ts}API Action:{/ts} <strong>{$row.api_action}</strong><br/>
             </td>
-            <td class="crm-job-name">{if $row.parameters eq null}<em>{ts}no parameters{/ts}</em>{else}<pre>{$row.parameters}</pre>{/if}</td>
+            <td class="crm-job-name">{if $row.parameters eq null}<em>{ts}no parameters{/ts}</em>{else}{$row.parameters|nl2br}{/if}</td>
             <td class="crm-job-name">{if $row.last_run eq null}never{else}{$row.last_run|crmDate:$config->dateformatDatetime}{/if}</td>
             <td id="row_{$row.id}_status" class="crm-job-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
