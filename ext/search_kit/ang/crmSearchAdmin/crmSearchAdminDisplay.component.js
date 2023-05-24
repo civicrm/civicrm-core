@@ -62,9 +62,9 @@
           label: ts('Menu'),
           icon: 'fa-bars',
           defaults: {
-            text: ts('Actions'),
+            text: '',
             style: 'default',
-            size: 'btn-sm',
+            size: 'btn-xs',
             icon: 'fa-bars',
             links: []
           }
