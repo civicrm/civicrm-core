@@ -7,9 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $context EQ "makeContribution"}
-  <div id="membership" class="crm-group membership-group">
-
+<div id="membership" class="crm-group membership-group">
+  {if $context EQ "makeContribution"}
       <div id="priceset">
         <fieldset>
           {if $renewal_mode}
@@ -53,6 +52,27 @@
           {include file="CRM/Price/Form/PriceSet.tpl" extends="Membership"}
         </fieldset>
       </div>
+    {literal}
+      <script type="text/javascript">
+        CRM.$(function($) {
+          //if price set is set we use below below code to show for showing auto renew
+          var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
+          var autoRenew = $("#auto_renew_section");
+          var autoRenewCheckbox = $("#auto_renew");
+          var forceRenew = $("#force_renew");
+          autoRenew.hide();
+          forceRenew.hide();
+          if ( autoRenewOption == 1 ) {
+            autoRenew.show();
+          } else if ( autoRenewOption == 2 ) {
+            autoRenewCheckbox.prop('checked',  true );
+            autoRenewCheckbox.attr( 'readonly', true );
+            autoRenew.hide();
+            forceRenew.show();
+          }
+        });
+      </script>
+    {/literal}
     {elseif $lineItem and $priceSetID AND !$is_quick_config}
       {assign var="totalAmount" value=$amount}
       <div class="header-dark">
@@ -61,29 +81,6 @@
       <div class="display-block">
         {include file="CRM/Price/Page/LineItem.tpl" context="Membership"}
       </div>
-
-  </div>
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      //if price set is set we use below below code to show for showing auto renew
-      var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
-      var autoRenew = $("#auto_renew_section");
-      var autoRenewCheckbox = $("#auto_renew");
-      var forceRenew = $("#force_renew");
-      autoRenew.hide();
-      forceRenew.hide();
-      if ( autoRenewOption == 1 ) {
-        autoRenew.show();
-      } else if ( autoRenewOption == 2 ) {
-        autoRenewCheckbox.prop('checked',  true );
-        autoRenewCheckbox.attr( 'readonly', true );
-        autoRenew.hide();
-        forceRenew.show();
-      }
-    });
-  </script>
-{/literal}
 {elseif $membershipBlock AND !$is_quick_config}
   <div id="membership" class="crm-group membership-group">
     {if $context EQ "makeContribution"}
@@ -134,7 +131,7 @@
   </div>
 
 {/if}{* membership block end here *}
-
+</div>
 {if $membershipBlock AND $is_quick_config}
   {if  $context neq "makeContribution" }
     <div class="header-dark">
