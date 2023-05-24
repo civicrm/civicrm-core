@@ -19,7 +19,8 @@
       this.tableClasses = [
         {name: 'table', label: ts('Row Borders')},
         {name: 'table-bordered', label: ts('Column Borders')},
-        {name: 'table-striped', label: ts('Even/Odd Stripes')}
+        {name: 'table-striped', label: ts('Even/Odd Stripes')},
+        {name: 'crm-sticky-header', label: ts('Sticky Header')}
       ];
 
       // Check if array contains item
