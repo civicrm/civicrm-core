@@ -51,4 +51,20 @@ class CiviEventDispatcherTest extends \CiviUnitTestCase {
     }
   }
 
+  /**
+   * This checks whether Civi's dispatcher can be used as a backend for
+   * routing other event-objects (as in PSR-14).
+   */
+  public function testBasicEventObject(): void {
+    $d = new CiviEventDispatcher(\Civi::container());
+    $count = 0;
+    $d->addListener('testBasicEventObject', function($e) use (&$count) {
+      $this->assertTrue(is_object($e));
+      $count += $e->number;
+    });
+    $d->dispatch('testBasicEventObject', (object) ['number' => 100]);
+    $d->dispatch('testBasicEventObject', (object) ['number' => 200]);
+    $this->assertEquals(300, $count, '100 + 200 = 300.');
+  }
+
 }

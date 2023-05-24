@@ -26,10 +26,25 @@ interface CiviEventDispatcherInterface {
    *
    * @param string $eventName The name of the event to dispatch. The name of
    *   the event is the name of the method that is invoked on listeners.
-   * @param Event|null $event The event to pass to the event handlers/listeners
-   *   If not supplied, an empty Event instance is created
+   * @param object|null $event The event to pass to the event handlers/listeners
+   *   The dispatcher technically accepts any kind of event-object.
    *
-   * @return Event
+   *   CiviCRM typically uses GenericHookEvent. Specifically:
+   *   - For `hook_civicrm_*`, GenericHookEvent is strongly required.
+   *   - For `civi.*`, GenericHookEvent is typical but not strongly required.
+   *
+   *   Symfony also defines classes for event-objects (`Event`, `GenericEvent`).
+   *   Historically, these types -were- mandatory, but they have had poor
+   *   interoperability (across versions/environments). `GenericHookEvent` has
+   *   provided easier interoperability.
+   *
+   *   Looking forward, the current dispatcher does not specifically require any
+   *   single type, and there may be use-cases where libraries or extensions
+   *   define other types. The suitability of this is left as an exercise to the reader.
+   *
+   *   If $event is a null, then an empty placeholder (`GenericHookEvent`) is used.
+   * @return object
+   *   The final event object.
    */
   public function dispatch($eventName, $event = NULL);
 
