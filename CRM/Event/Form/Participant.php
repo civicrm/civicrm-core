@@ -455,8 +455,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       // Check if this is a primaryParticipant (registered for others) and retrieve additional participants if true  (CRM-4859)
       if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
-        $this->assign('additionalParticipants', CRM_Event_BAO_Participant::getAdditionalParticipants($this->_id));
+        $additionalParticipants = CRM_Event_BAO_Participant::getAdditionalParticipants($this->_id);
       }
+      $this->assign('additionalParticipants', $additionalParticipants ?? NULL);
 
       // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
       if (!empty($defaults[$this->_id]['participant_registered_by_id'])) {
@@ -465,9 +466,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'contact_id', 'id'
         );
         $this->assign('participant_registered_by_id', $defaults[$this->_id]['participant_registered_by_id']);
-        $this->assign('registered_by_contact_id', $registered_by_contact_id);
         $this->assign('registered_by_display_name', CRM_Contact_BAO_Contact::displayName($registered_by_contact_id));
       }
+      $this->assign('registered_by_contact_id', $registered_by_contact_id ?? NULL);
     }
     elseif ($this->_contactID) {
       $defaults[$this->_id]['contact_id'] = $this->_contactID;
@@ -564,13 +565,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     if (isset($eventID)) {
-      $this->assign('eventID', $eventID);
       $this->set('eventId', $eventID);
     }
+    $this->assign('eventID', $eventID ?? NULL);
 
-    if (isset($this->_eventTypeId)) {
-      $this->assign('eventTypeID', $this->_eventTypeId);
-    }
+    $this->assign('eventTypeID', $this->_eventTypeId);
 
     $this->assign('event_is_test', CRM_Utils_Array::value('event_is_test', $defaults[$this->_id]));
     return $defaults[$this->_id];
@@ -612,8 +611,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           ];
           $this->addRadio('delete_participant', NULL, $deleteParticipants, NULL, '<br />');
           $this->setDefaults(['delete_participant' => 1]);
-          $this->assign('additionalParticipant', $additionalParticipant);
         }
+        $this->assign('additionalParticipant', $additionalParticipant);
       }
       $this->addButtons([
         [
