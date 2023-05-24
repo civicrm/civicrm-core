@@ -253,6 +253,9 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
 
       }
     }
+    if (is_a($event, '\\Symfony\\Component\\EventDispatcher\\Event')) {
+      \CRM_Core_Error::deprecatedWarning('\\Symfony\\Component\\EventDispatcher\\Event is deprecated. Consider using \\Civi\\Core\\Event\\GenericHookEvent. For more information see ' . \CRM_Utils_System::docURL2('dev/hooks/usage/symfony/#events', TRUE));
+    }
     $this->bindPatterns($eventName);
     if ($event === NULL) {
       $event = GenericHookEvent::create([]);
