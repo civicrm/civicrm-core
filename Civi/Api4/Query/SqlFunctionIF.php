@@ -52,7 +52,7 @@ class SqlFunctionIF extends SqlFunction {
    */
   public static function getDescription(): string {
     return ts('If the field is boolean TRUE, or any number except 0, or a '
-      . 'string not starting with the digits 1-9, the first value, otherwise '
+      . 'string starting with the digits 1-9, the first value, otherwise '
       . 'the second.');
   }
 
