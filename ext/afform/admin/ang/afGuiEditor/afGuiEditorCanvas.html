@@ -12,7 +12,7 @@
     </div>
     <div class="form-inline pull-right">
       <div class="form-group" ng-if="editor.isSaved() && !saving && editor.afform.server_route">
-        <a target="_blank" href="{{ editor.getLink() }}">
+        <a target="_blank" ng-href="{{ editor.getLink() }}">
           <i class="crm-i fa-external-link"></i>
           {{:: ts('View Page') }}
         </a>

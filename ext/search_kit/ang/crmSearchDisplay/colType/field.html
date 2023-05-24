@@ -6,7 +6,7 @@
 </span>
 <span ng-if="::colData.links">
   <span ng-repeat="link in colData.links">
-    <a target="{{:: link.target }}" href="{{:: link.url }}">
+    <a target="{{:: link.target }}" ng-href="{{:: link.url }}">
       <i ng-repeat="icon in colData.icons" ng-if="icon.side === 'left'" class="crm-i {{:: icon['class'] }}"></i>
       {{:: link.text }}<i ng-repeat="icon in colData.icons" ng-if="icon.side === 'right'" class="crm-i {{:: icon['class'] }}"></i></a><span ng-if="!$last">,
     </span>
