@@ -114,14 +114,6 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       'jquery' => '$("div");',
     ]);
     CRM_Core_Region::instance('testAllTypes')->add([
-      'scriptUrl' => '/my%20module.mjs',
-      'esm' => TRUE,
-    ]);
-    CRM_Core_Region::instance('testAllTypes')->add([
-      'script' => 'import foo from "./foobar.mjs";',
-      'esm' => TRUE,
-    ]);
-    CRM_Core_Region::instance('testAllTypes')->add([
       'styleUrl' => '/foo%20bar.css',
     ]);
     CRM_Core_Region::instance('testAllTypes')->add([
@@ -139,11 +131,59 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       . "<script type=\"text/javascript\" src=\"/foo%20bar.js\">\n</script>\n"
       . "<script type=\"text/javascript\">\nalert(\"hi\");\n</script>\n"
       . "<script type=\"text/javascript\">\nCRM.\$(function(\$) {\n\$(\"div\");\n});\n</script>\n"
-      . "<script type=\"module-shim\" src=\"/my%20module.mjs\">\n</script>\n"
-      . "<script type=\"module-shim\">\nimport foo from \"./foobar.mjs\";\n</script>\n"
       . "<link href=\"/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n";
     $this->assertEquals($expected, $actual);
+  }
+
+  public function esmLoaders(): array {
+    return [
+      ['browser'],
+      ['shim-slow'],
+      ['shim-fast'],
+    ];
+  }
+
+  /**
+   * @dataProvider esmLoaders
+   * @param string $loader
+   */
+  public function testEsm(string $loader) {
+    Civi::settings()->set('esm_loader', $loader);
+
+    $expected = [];
+    $expected['browser'] = "default<br/>" .
+      "<script type=\"module\" src=\"/my%20module.mjs\">\n</script>\n"
+      . "<script type=\"module\">\nimport foo from \"./foobar.mjs\";\n</script>\n";
+    $expected['shim-fast'] = $expected['browser'];
+    $expected['shim-slow'] = "default<br/>" .
+      "<script type=\"module-shim\" src=\"/my%20module.mjs\">\n</script>\n"
+      . "<script type=\"module-shim\">\nimport foo from \"./foobar.mjs\";\n</script>\n";
+
+    CRM_Core_Region::instance('testEsm')->add([
+      'scriptUrl' => '/my%20module.mjs',
+      'esm' => TRUE,
+    ]);
+    CRM_Core_Region::instance('testEsm')->add([
+      'script' => 'import foo from "./foobar.mjs";',
+      'esm' => TRUE,
+    ]);
+
+    $smarty = CRM_Core_Smarty::singleton();
+    $actual = $smarty->fetch('string:{crmRegion name=testEsm}default<br/>{/crmRegion}');
+    $this->assertEquals($expected[$loader], $actual);
+
+    $header = CRM_Core_Region::instance('html-header')->render('');
+    switch ($loader) {
+      case 'shim-fast':
+      case 'shim-slow':
+        $this->assertTrue(str_contains($header, 'es-module-shims'), 'HTML header should have shim');
+        break;
+
+      default:
+        $this->assertFalse(str_contains($header, 'es-module-shims'), 'HTML header should not have shim');
+        break;
+    }
   }
 
   /**
