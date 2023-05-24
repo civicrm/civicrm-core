@@ -1025,7 +1025,7 @@
         }
         $.each(val, function(k, v) {
           var ts = localizable && localizable.includes(k) && _.isString(v) ? 'E::ts(' : '';
-          ret += (ret ? ', ' : '') + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizable) + (ts ? ')' : '');
+          ret += (ret ? ',' : '') + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizable) + (ts ? ')' : '');
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
@@ -1034,7 +1034,7 @@
           return '[]';
         }
         $.each(val, function(k, v) {
-          ret += (ret ? ', ' : '') + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable);
+          ret += (ret ? ',' : '') + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable);
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
