@@ -23,11 +23,13 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
    */
   public function testCreateDocumentBasicTokens(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-    $case = $this->createCase($this->individualCreate());
+    $sourceContactId = $this->individualCreate();
+    $case = $this->createCase($sourceContactId);
 
     $activity = $this->activityCreate([
       'campaign_id' => $this->campaignCreate(),
       'case_id' => $case->id,
+      'source_contact_id' => $sourceContactId,
     ]);
     $data = [
       ['Subject: {activity.subject}', 'Subject: Discussion on warm beer'],
@@ -44,6 +46,9 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
       ['(legacy) Activity ID: {activity.activity_id}', '(legacy) Activity ID: ' . $activity['id']],
       ['Activity ID: {activity.id}', 'Activity ID: ' . $activity['id']],
       ['(APIv4 virtual field) Case ID: {activity.case_id}', '(APIv4 virtual field) Case ID: ' . $case->id],
+      ['(APIv4 virtual field) Source Contact ID: {activity.source_contact_id}', '(APIv4 virtual field) Source Contact ID: ' . $sourceContactId],
+      ['(APIv4 virtual field) Target Contact IDs: {activity.target_contact_id}', '(APIv4 virtual field) Target Contact IDs: ' . $activity['target_contact_id']],
+      ['(APIv4 virtual field) Assignee Contact IDs: {activity.assignee_contact_id}', '(APIv4 virtual field) Assignee Contact IDs: ' . $activity['assignee_contact_id']],
     ];
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['activityId']]);
 
@@ -81,6 +86,9 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
       '{activity.status_id:label}' => 'Activity Status',
       '{activity.campaign_id:label}' => 'Campaign',
       '{activity.case_id}' => 'Case ID',
+      '{activity.source_contact_id}' => 'Source Contact',
+      '{activity.target_contact_id}' => 'Target Contacts',
+      '{activity.assignee_contact_id}' => 'Assignee Contacts',
     ];
   }
 

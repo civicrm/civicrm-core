@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
+use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 
@@ -45,7 +46,9 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $spec->getFieldByName('activity_type_id')
         ->setDefaultValue(NULL)
         ->setRequired($action === 'create');
+    }
 
+    if (in_array($action, ['get', 'create', 'update'], TRUE)) {
       $field = new FieldSpec('source_contact_id', 'Activity', 'Integer');
       $field->setTitle(ts('Source Contact'));
       $field->setLabel(ts('Added by'));
@@ -53,24 +56,29 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setRequired($action === 'create');
       $field->setFkEntity('Contact');
       $field->setInputType('EntityRef');
+      $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
       $spec->addFieldSpec($field);
 
       $field = new FieldSpec('target_contact_id', 'Activity', 'Array');
       $field->setTitle(ts('Target Contacts'));
-      $field->setLabel(ts('With Contact(s)'));
-      $field->setDescription(ts('Contact(s) involved in this activity.'));
+      $field->setLabel(ts('With Contacts'));
+      $field->setDescription(ts('Contacts involved in this activity.'));
       $field->setFkEntity('Contact');
       $field->setInputType('EntityRef');
       $field->setInputAttrs(['multiple' => TRUE]);
+      $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
+      $field->addOutputFormatter([__CLASS__, 'formatOutputForMultipleActivityContactIds']);
       $spec->addFieldSpec($field);
 
       $field = new FieldSpec('assignee_contact_id', 'Activity', 'Array');
       $field->setTitle(ts('Assignee Contacts'));
       $field->setLabel(ts('Assigned to'));
-      $field->setDescription(ts('Contact(s) assigned to this activity.'));
+      $field->setDescription(ts('Contacts assigned to this activity.'));
       $field->setFkEntity('Contact');
       $field->setInputType('EntityRef');
       $field->setInputAttrs(['multiple' => TRUE]);
+      $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
+      $field->addOutputFormatter([__CLASS__, 'formatOutputForMultipleActivityContactIds']);
       $spec->addFieldSpec($field);
     }
   }
@@ -80,6 +88,28 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
    */
   public function applies($entity, $action) {
     return $entity === 'Activity';
+  }
+
+  public static function renderSqlForActivityContactIds(array $field, Api4SelectQuery $query): string {
+    $contactLinkTypes = [
+      'source_contact_id' => 'Activity Source',
+      'target_contact_id' => 'Activity Targets',
+      'assignee_contact_id' => 'Activity Assignees',
+    ];
+    $recordTypeId = \CRM_Core_PseudoConstant::getKey(
+        'CRM_Activity_BAO_ActivityContact',
+        'record_type_id',
+        $contactLinkTypes[$field['name']]);
+    return '(SELECT GROUP_CONCAT(`civicrm_activity_contact`.`contact_id`) '
+          . 'FROM `civicrm_activity_contact` '
+          . 'WHERE `civicrm_activity_contact`.`activity_id` = `a`.`id` '
+          . 'AND record_type_id = ' . $recordTypeId . ')';
+  }
+
+  public static function formatOutputForMultipleActivityContactIds(
+    ?string &$value, array $row, array $field
+  ): void {
+    $value = explode(',', $value ?? '');
   }
 
 }
