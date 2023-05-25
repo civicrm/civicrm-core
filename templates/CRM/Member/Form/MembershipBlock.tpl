@@ -42,27 +42,18 @@
               <td>{$form.renewal_text.html}</td>
           </tr>
         <tr class="crm-member-membershipblock-form-block-member_price_set_id">
-              <td class="label">{$form.member_price_set_id.label}</td>
-              <td>
-              {if $price eq false}
-                {capture assign=adminPriceSetsURL}{crmURL p="civicrm/admin/price" q="reset=1"}{/capture}
-            <div class="status message">{ts 1=$adminPriceSetsURL}No Membership Price Sets have been configured / enabled for your site. Price sets allow you to configure more complex membership signup and renewal options, including allowing constituents to sign up for multiple memberships at the same time. Click <a href='%1'>here</a> if you want to configure price sets for your site.{/ts}</div>
-          {else}
-              {$form.member_price_set_id.html}
-          {/if}
-          </td>
+            <td class="label">{$form.member_price_set_id.label} {help id="id-member_price_set_id"}</td>
+            <td>{$form.member_price_set_id.html}<br />
+            {if $isQuick}
+                <div id="quickConfigConvertMessage" class="description">{ts}Click <a id='memQuickconfig' href='#'>here</a> if you want to configure the Membership Types below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}</div>
+            {/if}
+            </td>
         </tr>
-    {if $isQuick}
-    <tr id="quickConfigConvertMessage">
-      <td></td>
-      <td><div class="status message">{ts}Click <a id='memQuickconfig' href='#'>here</a> if you want to configure the Membership Types below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}</div></td>
-    </tr>
-    {/if}
-          <tr id="membership_type-label" class="crm-member-membershipblock-form-block-membership_type_label">
+        <tr id="membership_type-label" class="crm-member-membershipblock-form-block-membership_type_label">
             <td class="label">{$form.membership_type_label.label}</td>
             <td>{$form.membership_type_label.html}</td>
-          </tr>
-          <tr id="membership_type-block" class="crm-member-membershipblock-form-block-membership_type">
+        </tr>
+        <tr id="membership_type-block" class="crm-member-membershipblock-form-block-membership_type">
               <td class="label">{$form.membership_type.label}</td>
               <td>
                 {assign var="count" value="1"}
@@ -98,8 +89,7 @@
               <td class="label"></td><td class="html-adjust">{$form.is_required.html}&nbsp;{$form.is_required.label} {help id="id-is-required"}</td>
           </tr>
           <tr id="separatePayment" class="crm-member-membershipblock-form-block-is_separate_payment">
-              <td class="label"></td><td class="html-adjust">{$form.is_separate_payment.html}&nbsp;{$form.is_separate_payment.label} {help id="id-separate-pay"}<br />
-              <span class="description">{ts}Check this box if you are including both Membership Signup/Renewal AND a Contribution Amount section, AND you want the membership fee to be charged separately from any additional contribution amount.{/ts}</span></td>
+              <td class="label"></td><td class="html-adjust">{$form.is_separate_payment.html}&nbsp;{$form.is_separate_payment.label} {help id="id-separate-pay"}</td>
           </tr>
           <tr id="displayFee" class="crm-member-membershipblock-form-block-display_min_fee">
               <td class="label"></td><td class="html-adjust">{$form.display_min_fee.html}&nbsp;{$form.display_min_fee.label} {help id="id-display-fee"}</td>
