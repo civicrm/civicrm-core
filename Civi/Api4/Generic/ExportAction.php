@@ -23,13 +23,14 @@ use Civi\Api4\Utils\CoreUtil;
  *
  * @method $this setId(int $id)
  * @method int getId()
+ * @method $this setMatch(array $match) Specify fields to match for update.
+ * @method bool getMatch()
  * @method $this setCleanup(string $cleanup)
  * @method string getCleanup()
  * @method $this setUpdate(string $update)
  * @method string getUpdate()
  */
 class ExportAction extends AbstractAction {
-  use Traits\MatchParamTrait;
 
   /**
    * Id of $ENTITY to export
@@ -37,6 +38,19 @@ class ExportAction extends AbstractAction {
    * @required
    */
   protected $id;
+
+  /**
+   * Specify fields to match when managed records are being reconciled.
+   *
+   * To prevent "DB Error: Already Exists" errors, it's generally a good idea to set this
+   * value to whatever unique fields this entity has (for most entities it's "name").
+   * The managed system will then check if a record with that name already exists before
+   * trying to create a new one.
+   *
+   * @var array
+   * @optionsCallback getMatchFields
+   */
+  protected $match = ['name'];
 
   /**
    * Specify rule for auto-updating managed entity
@@ -62,17 +76,18 @@ class ExportAction extends AbstractAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    $this->exportRecord($this->getEntityName(), $this->id, $result);
+    $this->exportRecord($this->getEntityName(), $this->id, $result, $this->match);
   }
 
   /**
    * @param string $entityType
    * @param int $entityId
    * @param \Civi\Api4\Generic\Result $result
+   * @param array $matchFields
    * @param string $parentName
    * @param array $excludeFields
    */
-  private function exportRecord(string $entityType, int $entityId, Result $result, $parentName = NULL, $excludeFields = []) {
+  private function exportRecord(string $entityType, int $entityId, Result $result, array $matchFields, $parentName = NULL, $excludeFields = []) {
     if (isset($this->exportedEntities[$entityType][$entityId])) {
       throw new \CRM_Core_Exception("Circular reference detected: attempted to export $entityType id $entityId multiple times.");
     }
@@ -134,7 +149,7 @@ class ExportAction extends AbstractAction {
         // Sometimes fields share an option group; only export it once.
         empty($this->exportedEntities['OptionGroup'][$record['option_group_id']])
       ) {
-        $this->exportRecord('OptionGroup', $record['option_group_id'], $result);
+        $this->exportRecord('OptionGroup', $record['option_group_id'], $result, $matchFields);
       }
     }
     // Don't use joins/pseudoconstants if null or if it has the same value as the original
@@ -156,7 +171,7 @@ class ExportAction extends AbstractAction {
         'values' => $record,
       ],
     ];
-    foreach (array_intersect($this->match, array_keys($allFields)) as $match) {
+    foreach (array_unique(array_intersect($matchFields, array_keys($allFields))) as $match) {
       $export['params']['match'][] = $match;
     }
     $result[] = $export;
@@ -204,8 +219,18 @@ class ExportAction extends AbstractAction {
             return $a->$weightCol < $b->$weightCol ? -1 : 1;
           });
         }
+        $referenceMatchFields = $matchFields;
+        // Add back-reference to "match" fields to enforce uniqueness
+        // See https://lab.civicrm.org/dev/core/-/issues/4286
+        if ($referenceMatchFields) {
+          foreach ($reference::fields() as $field) {
+            if (($field['FKClassName'] ?? '') === $daoName) {
+              $referenceMatchFields[] = $field['name'];
+            }
+          }
+        }
         foreach ($records as $record) {
-          $this->exportRecord($refEntity, $record->id, $result, $name . '_', $exclude);
+          $this->exportRecord($refEntity, $record->id, $result, $referenceMatchFields, $name . '_', $exclude);
         }
       }
     }
@@ -264,6 +289,21 @@ class ExportAction extends AbstractAction {
     catch (NotImplementedException $e) {
       return [];
     }
+  }
+
+  /**
+   * Options callback for $this->match
+   * @return array
+   */
+  protected function getMatchFields() {
+    return (array) civicrm_api4($this->getEntityName(), 'getFields', [
+      'checkPermissions' => FALSE,
+      'action' => 'get',
+      'where' => [
+        ['type', 'IN', ['Field']],
+        ['readonly', '!=', TRUE],
+      ],
+    ], ['name']);
   }
 
 }
