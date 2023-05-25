@@ -101,8 +101,7 @@
             </td>
           </tr>
           <tr class="crm-participant-form-block-source">
-            <td class="label">{$form.source.label}</td><td>{$form.source.html|crmAddClass:huge}<br />
-            <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
+            <td class="label">{$form.source.label}</td><td>{$form.source.html|crmAddClass:huge}</td>
           </tr>
           {if $participantMode}
             <tr class="crm-participant-form-block-payment_processor_id">
