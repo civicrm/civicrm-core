@@ -51,7 +51,7 @@ class SqlFunctionIF extends SqlFunction {
    * @return string
    */
   public static function getDescription(): string {
-    return ts('If the field is empty, the first value, otherwise the second.');
+    return ts('If the field is boolean TRUE, or any number except 0, or a string starting with the digits 1-9, the first value; otherwise the second.');
   }
 
 }
