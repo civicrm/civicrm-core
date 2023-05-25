@@ -151,19 +151,6 @@
     {/if}
   </div>
   <script type="text/javascript">
-    {literal}
-
-    cj("#additional_participants").change(function () {
-      if (typeof skipPaymentMethod == 'function') {
-        // For free event there is no involvement of payment processor, hence
-        // this function is not available. if above condition not present
-        // then you will receive JS Error in case you change multiple
-        // registrant option.
-        skipPaymentMethod();
-      }
-    });
-
-  {/literal}
   {if $pcp && $is_honor_roll }
     pcpAnonymous();
   {/if}
@@ -173,11 +160,19 @@
     $('#additional_participants').change(function() {
       toggleAdditionalParticipants();
       allowParticipant();
+      if (typeof skipPaymentMethod == 'function') {
+        // For free event there is no involvement of payment processor, hence
+        // this function is not available. if above condition not present
+        // then you will receive JS Error in case you change multiple
+        // registrant option.
+        skipPaymentMethod();
+      }
     });
 
     function toggleAdditionalParticipants() {
       var submit_button = $("#crm-submit-buttons > button").html();
       var review_translated = '{/literal}{ts escape="js"}Review{/ts}{literal}';
+      var register_translated = '{/literal}{ts escape="js"}Register{/ts}{literal}';
       var continue_translated = '{/literal}{ts escape="js"}Continue{/ts}{literal}';
       if ($('#additional_participants').val()) {
         $("#additionalParticipantsDescription").show();
