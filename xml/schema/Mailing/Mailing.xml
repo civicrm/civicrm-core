@@ -13,6 +13,8 @@
   <paths>
     <add>civicrm/a/#/mailing/new</add>
     <update>civicrm/a/#/mailing/[id]</update>
+    <view>civicrm/mailing/report?mid=[id]&amp;reset=1</view>
+    <preview>civicrm/mailing/view?id=[id]&amp;reset=1</preview>
   </paths>
   <field>
     <name>id</name>
