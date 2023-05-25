@@ -101,11 +101,13 @@
       if (typeof speed === 'number') {
         $('#civicrm-menu').slideDown(speed, function() {
           $(this).css('display', '');
+          handleResize();
         });
       }
       $('body')
         .removeClass('crm-menubar-hidden')
         .addClass('crm-menubar-visible');
+      handleResize();
     },
     hide: function(speed, showMessage) {
       if (typeof speed === 'number') {
@@ -116,6 +118,7 @@
       $('body')
         .addClass('crm-menubar-hidden')
         .removeClass('crm-menubar-visible');
+      document.documentElement.style.setProperty('--crm-menubar-bottom', '0px');
       if (showMessage === true && $('#crm-notification-container').length && initialized) {
         var alert = CRM.alert('<a href="#" id="crm-restore-menu" >' + _.escape(ts('Restore CiviCRM Menu')) + '</a>', ts('Menu hidden'), 'none', {expires: 10000});
         $('#crm-restore-menu')
@@ -503,6 +506,7 @@
     } else {
       $('body').removeClass('crm-menubar-wrapped');
     }
+    document.documentElement.style.setProperty('--crm-menubar-bottom', ($('#civicrm-menu').height() + $('#civicrm-menu').position().top) + 'px');
   }
 
   // Figure out if we've hit the mobile breakpoint, based on the rule in crm-menubar.css
