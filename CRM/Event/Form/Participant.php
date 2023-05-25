@@ -1740,7 +1740,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     $form->assign('onlinePendingContributionId', $form->get('onlinePendingContributionId'));
 
-    $form->assign('paid', $form->_isPaidEvent);
+    $form->assign('paid', $form->_isPaidEvent ?? NULL);
 
     $form->addElement('checkbox',
       'send_receipt',
@@ -2266,6 +2266,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    */
   protected function assignUrlPath() {
     $this->assign('urlPath', 'civicrm/contact/view/participant');
+    $this->assign('urlPathVar', NULL);
     if (!$this->_id && !$this->_contactId) {
       $breadCrumbs = [
         [
