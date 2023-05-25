@@ -29,6 +29,7 @@
         ctrl.results = null;
         ctrl.rowCount = null;
         ctrl.page = 1;
+        ctrl.selectNone();
       }
 
       this.$onInit = function() {
