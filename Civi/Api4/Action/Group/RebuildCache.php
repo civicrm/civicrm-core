@@ -33,16 +33,7 @@ class RebuildCache extends \Civi\Api4\Generic\AbstractAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    $lock = \Civi::lockManager()->acquire('worker.core.GroupRebuild');
-    if (!$lock->isAcquired()) {
-      throw new \CRM_Core_Exception('Could not acquire lock, another GroupRebuild process is running');
-    }
-
-    $limit = $params['limit'] ?? 0;
-
-    \CRM_Contact_BAO_GroupContactCache::loadAll(NULL, $this->limit);
-
-    $lock->release();
+    \CRM_Contact_BAO_GroupContactCache::lockAndLoad(NULL, $this->limit ?? 0);
   }
 
 }

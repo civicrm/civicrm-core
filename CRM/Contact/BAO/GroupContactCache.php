@@ -141,6 +141,25 @@ AND (
   }
 
   /**
+   * Try to lock before running loadAll().
+   *
+   * @param array|null $groupIDs groupIDs of group that we are checking against
+   *                           if empty, all groups are checked
+   * @param int $limit
+   *   Limits the number of groups we evaluate.
+   *
+   * The lock handling is copied from Api3 Job.group_rebuild
+   */
+  public static function lockAndLoad($groupIDs = NULL, $limit = 0) {
+    $lock = \Civi::lockManager()->acquire('worker.core.GroupRebuild');
+    if (!$lock->isAcquired()) {
+      throw new \CRM_Core_Exception('Could not acquire lock, another GroupRebuild process is running');
+    }
+    self::loadAll($groupIDs, $limit);
+    $lock->release();
+  }
+
+  /**
    * Build the smart group cache for given groups.
    *
    * @param array $groupIDs
