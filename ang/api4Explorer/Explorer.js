@@ -1025,7 +1025,8 @@
         }
         $.each(val, function(k, v) {
           var ts = localizable && localizable.includes(k) && _.isString(v)  && v.length ? 'E::ts(' : '';
-          ret += (ret ? ', ' : '') + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizable) + (ts ? ')' : '');
+          var leadingComma = !ret ? '' : (newLine ? ',' : ', ');
+          ret += leadingComma + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizable) + (ts ? ')' : '');
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
@@ -1034,7 +1035,8 @@
           return '[]';
         }
         $.each(val, function(k, v) {
-          ret += (ret ? ', ' : '') + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable);
+          var leadingComma = !ret ? '' : (newLine ? ',' : ', ');
+          ret += leadingComma + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable);
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
