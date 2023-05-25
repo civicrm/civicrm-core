@@ -536,12 +536,14 @@ ORDER BY start_date desc
       }
       else {
         $curDate = date('YmdHis');
-        $clauses[] = "(end_date >= {$curDate} OR end_date IS NULL)";
+        $dayBefore = date_sub(date_create(), date_interval_create_from_date_string("1 day"))->format('YmdHis');
+        $clauses[] = "(end_date >= {$curDate} OR (end_date IS NULL AND start_date >= {$dayBefore}))";
       }
     }
     else {
       $curDate = date('YmdHis');
-      $clauses[] = "(end_date >= {$curDate} OR end_date IS NULL)";
+      $dayBefore = date_sub(date_create(), date_interval_create_from_date_string("1 day"))->format('YmdHis');
+      $clauses[] = "(end_date >= {$curDate} OR (end_date IS NULL AND start_date >= {$dayBefore}))";
     }
 
     if ($sortBy &&
