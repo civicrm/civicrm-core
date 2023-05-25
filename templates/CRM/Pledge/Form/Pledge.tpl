@@ -60,23 +60,20 @@
           </tr>
           <tr class="crm-pledge-form-block-frequency_day">
             <td class="label nowrap">{$form.frequency_day.label}</td>
-            <td>{$form.frequency_day.html} {ts}day of the period{/ts}<br />
-              <span class="description">{ts}This applies to weekly, monthly and yearly payments.{/ts}</span>
+            <td>{$form.frequency_day.html} {ts}day of the period{/ts}
             </td>
           </tr>
           <tr class="crm-pledge-form-block-create_date">
             <td class="label">{$form.create_date.label}</td>
             <td>
-              {$form.create_date.html}<br />
-              <span class="description">{ts}Date when pledge was made by the contributor.{/ts}</span>
+              {$form.create_date.html}
             </td>
           </tr>
 
           <tr class="crm-pledge-form-block-start_date">
             <td class="label">{$form.start_date.label}</td>
             <td>
-              {$form.start_date.html}<br />
-              <span class="description">{ts}Date of first pledge payment.{/ts}</span>
+              {$form.start_date.html}
             </td>
           </tr>
 
@@ -84,7 +81,7 @@
             {if !empty($form.is_acknowledge)}
           <tr class="crm-pledge-form-block-is_acknowledge">
             <td class="label">{$form.is_acknowledge.label}</td>
-            <td>{$form.is_acknowledge.html}<br />
+            <td>{$form.is_acknowledge.html}
               <span class="description">{ts 1=$email}Automatically email an acknowledgment of this pledge to %1?{/ts}</span>
             </td>
           </tr>
@@ -93,7 +90,8 @@
           <tr id="acknowledgment-receipt" style="display:none;">
             <td class="label">{$form.is_acknowledge.label}</td>
             <td>
-              {$form.is_acknowledge.html} <span class="description">{ts 1='<span id="email-address"></span>'}Automatically email an acknowledgment of this pledge to %1?{/ts}</span>
+              {$form.is_acknowledge.html}
+              <span class="description">{ts 1='<span id="email-address"></span>'}Automatically email an acknowledgment of this pledge to %1?{/ts}</span>
             </td>
           </tr>
         {/if}
@@ -104,15 +102,13 @@
           <tr id="acknowledgeDate">
             <td class="label" class="crm-pledge-form-block-acknowledge_date">{$form.acknowledge_date.label}</td>
             <td>
-              {$form.acknowledge_date.html}<br />
-              <span class="description">{ts}Date when an acknowledgment of the pledge was sent.{/ts}</span>
+              {$form.acknowledge_date.html}
             </td>
           </tr>
           <tr class="crm-pledge-form-block-financial_type_id">
-            <td class="label">{$form.financial_type_id.label}</td>
-            <td>{$form.financial_type_id.html}<br />
-              <span class="description">{ts}Sets the default financial type for payments against this pledge.{/ts}</span>
-            </td>
+            <td class="label">{$form.financial_type_id.label} {help id='id-financial_type_id'}
+</td>
+            <td>{$form.financial_type_id.html}</td>
           </tr>
 
       {* CRM-7362 --add campaign *}
@@ -120,10 +116,8 @@
       campaignTrClass="crm-pledge-form-block-campaign_id"}
 
           <tr class="crm-pledge-form-block-contribution_page_id">
-            <td class="label">{$form.contribution_page_id.label}</td>
-            <td>{$form.contribution_page_id.html}<br />
-              <span class="description">{ts}Select an Online Contribution page that the user can access to make self-service pledge payments. (Only Online Contribution pages configured to include the Pledge option are listed.){/ts}</span>
-            </td>
+            <td class="label">{$form.contribution_page_id.label} {help id='id-contribution_page_id'}</td>
+            <td>{$form.contribution_page_id.html}</td>
           </tr>
 
           <tr class="crm-pledge-form-block-status">

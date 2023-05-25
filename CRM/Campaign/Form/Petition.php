@@ -206,10 +206,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $this->addElement('checkbox', 'is_share', ts('Add footer region with Twitter, Facebook and LinkedIn share buttons and scripts?'));
 
     // is active ?
-    $this->add('checkbox', 'is_active', ts('Is Active?'));
+    $this->add('checkbox', 'is_active', ts('Active?'));
 
     // is default ?
-    $this->add('checkbox', 'is_default', ts('Is Default?'));
+    $this->add('checkbox', 'is_default', ts('Default?'));
 
     // add buttons
     $this->addButtons(
