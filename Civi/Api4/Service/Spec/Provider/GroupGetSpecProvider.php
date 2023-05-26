@@ -27,16 +27,14 @@ class GroupGetSpecProvider extends \Civi\Core\Service\AutoService implements Gen
    * @throws \CRM_Core_Exception
    */
   public function modifySpec(RequestSpec $spec): void {
-    // Number of contacts
-    if (!$spec->getValue('contact_count')) {
-      $field = new FieldSpec('contact_count', 'Group', 'Integer');
-      $field->setLabel(ts('Contact Count'))
-        ->setDescription(ts('Number of contacts in group'))
-        ->setColumnName('id')
-        ->setReadonly(TRUE)
-        ->setSqlRenderer([__CLASS__, 'countContacts']);
-      $spec->addFieldSpec($field);
-    }
+    // Calculated field counts contacts in group
+    $field = new FieldSpec('contact_count', 'Group', 'Integer');
+    $field->setLabel(ts('Contact Count'))
+      ->setDescription(ts('Number of contacts in group'))
+      ->setColumnName('id')
+      ->setReadonly(TRUE)
+      ->setSqlRenderer([__CLASS__, 'countContacts']);
+    $spec->addFieldSpec($field);
   }
 
   /**

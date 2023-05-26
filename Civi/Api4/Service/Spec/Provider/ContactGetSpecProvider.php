@@ -40,7 +40,8 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
       ->setOptionsCallback([__CLASS__, 'getGroupList']);
     $spec->addFieldSpec($field);
 
-    // Fields specific to Individuals
+    // The following fields are specific to Individuals, so omit them if
+    // `contact_type` value was passed to `getFields` and is not "Individual"
     if (!$spec->getValue('contact_type') || $spec->getValue('contact_type') === 'Individual') {
       // Age field
       $field = new FieldSpec('age_years', 'Contact', 'Integer');
