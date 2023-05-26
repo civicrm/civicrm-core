@@ -307,9 +307,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
       $row = [];
       // the columns we are interested in
       foreach (self::$_properties as $property) {
-        if (isset($result->$property)) {
-          $row[$property] = $result->$property;
-        }
+        $row[$property] = $result->$property ?? NULL;
       }
 
       $isDeleted = FALSE;
@@ -358,15 +356,15 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
     //retrieve the scheduled & recent Activity type and date for selector
     if (!empty($scheduledInfo)) {
-      $schdeduledActivity = CRM_Case_BAO_Case::getNextScheduledActivity($scheduledInfo, 'upcoming');
-      foreach ($schdeduledActivity as $key => $value) {
-        $rows[$key]['case_scheduled_activity_date'] = $value['date'];
-        $rows[$key]['case_scheduled_activity_type'] = $value['type'];
+      $scheduledActivity = CRM_Case_BAO_Case::getNextScheduledActivity($scheduledInfo, 'upcoming');
+      foreach ($rows as $key => $row) {
+        $rows[$key]['case_scheduled_activity_date'] = $scheduledActivity[$key]['date'] ?? NULL;
+        $rows[$key]['case_scheduled_activity_type'] = $scheduledActivity[$key]['type'] ?? NULL;
       }
       $recentActivity = CRM_Case_BAO_Case::getNextScheduledActivity($scheduledInfo, 'recent');
-      foreach ($recentActivity as $key => $value) {
-        $rows[$key]['case_recent_activity_date'] = $value['date'];
-        $rows[$key]['case_recent_activity_type'] = $value['type'];
+      foreach ($rows as $key => $row) {
+        $rows[$key]['case_recent_activity_date'] = $recentActivity[$key]['date'] ?? NULL;
+        $rows[$key]['case_recent_activity_type'] = $recentActivity[$key]['type'] ?? NULL;
       }
     }
     return $rows;
