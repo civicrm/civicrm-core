@@ -27,40 +27,34 @@ class ContributionGetSpecProvider extends \Civi\Core\Service\AutoService impleme
    * @throws \CRM_Core_Exception
    */
   public function modifySpec(RequestSpec $spec): void {
-    // Amount paid field
-    if (!$spec->getValue('paid_amount')) {
-      $field = new FieldSpec('paid_amount', 'Contribution', 'Float');
-      $field->setLabel(ts('Amount Paid'))
-        ->setTitle(ts('Amount Paid'))
-        ->setDescription(ts('Amount paid'))
-        ->setType('Extra')
-        ->setDataType('Money')
-        ->setReadonly(TRUE)
-        ->setSqlRenderer([__CLASS__, 'calculateAmountPaid']);
-      $spec->addFieldSpec($field);
-    }
-    if (!$spec->getValue('balance_amount')) {
-      $field = new FieldSpec('balance_amount', 'Contribution', 'Float');
-      $field->setLabel(ts('Balance'))
-        ->setTitle(ts('Balance'))
-        ->setDescription(ts('Balance'))
-        ->setType('Extra')
-        ->setDataType('Money')
-        ->setReadonly(TRUE)
-        ->setSqlRenderer([__CLASS__, 'calculateBalance']);
-      $spec->addFieldSpec($field);
-    }
-    if (!$spec->getValue('tax_exclusive_amount')) {
-      $field = new FieldSpec('tax_exclusive_amount', 'Contribution', 'Float');
-      $field->setLabel(ts('Tax Exclusive Amount'))
-        ->setTitle(ts('Tax Exclusive Amount'))
-        ->setDescription(ts('Tax Exclusive Amount'))
-        ->setType('Extra')
-        ->setDataType('Money')
-        ->setReadonly(TRUE)
-        ->setSqlRenderer([__CLASS__, 'calculateTaxExclusiveAmount']);
-      $spec->addFieldSpec($field);
-    }
+    // Add calculated fields
+    $field = new FieldSpec('paid_amount', 'Contribution', 'Float');
+    $field->setLabel(ts('Amount Paid'))
+      ->setTitle(ts('Amount Paid'))
+      ->setDescription(ts('Amount paid'))
+      ->setType('Extra')
+      ->setDataType('Money')
+      ->setReadonly(TRUE)
+      ->setSqlRenderer([__CLASS__, 'calculateAmountPaid']);
+    $spec->addFieldSpec($field);
+    $field = new FieldSpec('balance_amount', 'Contribution', 'Float');
+    $field->setLabel(ts('Balance'))
+      ->setTitle(ts('Balance'))
+      ->setDescription(ts('Balance'))
+      ->setType('Extra')
+      ->setDataType('Money')
+      ->setReadonly(TRUE)
+      ->setSqlRenderer([__CLASS__, 'calculateBalance']);
+    $spec->addFieldSpec($field);
+    $field = new FieldSpec('tax_exclusive_amount', 'Contribution', 'Float');
+    $field->setLabel(ts('Tax Exclusive Amount'))
+      ->setTitle(ts('Tax Exclusive Amount'))
+      ->setDescription(ts('Tax Exclusive Amount'))
+      ->setType('Extra')
+      ->setDataType('Money')
+      ->setReadonly(TRUE)
+      ->setSqlRenderer([__CLASS__, 'calculateTaxExclusiveAmount']);
+    $spec->addFieldSpec($field);
   }
 
   /**
