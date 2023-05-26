@@ -25,6 +25,7 @@ class AddressCreationSpecProvider extends \Civi\Core\Service\AutoService impleme
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('location_type_id')->setRequired(TRUE);
+    $spec->getFieldByName('is_primary')->setRequired(FALSE);
   }
 
   /**
