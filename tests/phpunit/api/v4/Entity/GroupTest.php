@@ -28,6 +28,65 @@ use Civi\Api4\Group;
  */
 class GroupTest extends Api4TestBase {
 
+  public function testSmartGroupCache(): void {
+    \Civi::settings()->set('smartGroupCacheTimeout', 5);
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id'],
+        'where' => [],
+      ],
+    ]);
+    $smartGroup = $this->createTestRecord('Group', [
+      'saved_search_id' => $savedSearch['id'],
+    ]);
+    $parentGroup = $this->createTestRecord('Group');
+    $childGroup = $this->createTestRecord('Group', [
+      'parents' => [$parentGroup['id']],
+    ]);
+    $groupIds = [$smartGroup['id'], $parentGroup['id'], $childGroup['id']];
+
+    $get = Group::get(FALSE)->addWhere('id', 'IN', $groupIds)
+      ->addSelect('id', 'cache_date', 'cache_expired')
+      ->execute()->indexBy('id');
+    // Static (non-parent) groups should always have a null cache_date and expired should always be false.
+    $this->assertNull($get[$childGroup['id']]['cache_date']);
+    $this->assertFalse($get[$childGroup['id']]['cache_expired']);
+    // The others will start off with no cache date
+    $this->assertNull($get[$parentGroup['id']]['cache_date']);
+    $this->assertTrue($get[$parentGroup['id']]['cache_expired']);
+    $this->assertNull($get[$smartGroup['id']]['cache_date']);
+    $this->assertTrue($get[$smartGroup['id']]['cache_expired']);
+
+    $refresh = Group::refresh(FALSE)
+      ->addWhere('id', 'IN', $groupIds)
+      ->execute();
+    $this->assertCount(2, $refresh);
+
+    $get = Group::get(FALSE)->addWhere('id', 'IN', $groupIds)
+      ->addSelect('id', 'cache_date', 'cache_expired')
+      ->execute()->indexBy('id');
+    $this->assertNull($get[$childGroup['id']]['cache_date']);
+    $this->assertFalse($get[$childGroup['id']]['cache_expired']);
+    $this->assertNotNull($get[$smartGroup['id']]['cache_date']);
+    $this->assertFalse($get[$smartGroup['id']]['cache_expired']);
+
+    // Pretend the group was refreshed 6 minutes ago
+    $lastRefresh = date('YmdHis', strtotime("-6 minutes"));
+    \CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = $lastRefresh WHERE id = %1", [
+      1 => [$smartGroup['id'], 'Integer'],
+    ]);
+
+    $get = Group::get(FALSE)->addWhere('id', 'IN', $groupIds)
+      ->addSelect('id', 'cache_date', 'cache_expired')
+      ->execute()->indexBy('id');
+    $this->assertNull($get[$childGroup['id']]['cache_date']);
+    $this->assertFalse($get[$childGroup['id']]['cache_expired']);
+    $this->assertNotNull($get[$smartGroup['id']]['cache_date']);
+    $this->assertTrue($get[$smartGroup['id']]['cache_expired']);
+  }
+
   public function testCreate() {
     $this->createLoggedInUser();
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [

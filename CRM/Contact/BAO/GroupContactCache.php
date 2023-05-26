@@ -336,11 +336,12 @@ WHERE  id IN ( $groupIDs )
   /**
    * Load the smart group cache for a saved search.
    *
-   * @param object $group
+   * @param CRM_Core_DAO $group
    *   The smart group that needs to be loaded.
    * @param bool $force
    *   deprecated parameter = Should we force a search through.
    *
+   * return bool
    * @throws \CRM_Core_Exception
    */
   public static function load($group, $force = FALSE) {
@@ -361,6 +362,7 @@ WHERE  id IN ( $groupIDs )
       self::releaseGroupLocks([$groupID]);
       $groupContactsTempTable->drop();
     }
+    return in_array($groupID, $lockedGroups);
   }
 
   /**
@@ -482,14 +484,15 @@ ORDER BY   gc.contact_id, g.children
   }
 
   /**
-   * Invalidates the smart group cache for a particular group
-   * @param int $groupID - Group to invalidate
+   * Invalidates the smart group cache for one or more groups
+   * @param int|int[] $groupID - Group to invalidate
    */
   public static function invalidateGroupContactCache($groupID): void {
+    $groupIDs = implode(',', (array) $groupID);
     CRM_Core_DAO::executeQuery('UPDATE civicrm_group
       SET cache_date = NULL
-      WHERE id = %1 AND (saved_search_id IS NOT NULL OR children IS NOT NULL)', [
-        1 => [$groupID, 'Positive'],
+      WHERE id IN (%1) AND (saved_search_id IS NOT NULL OR children IS NOT NULL)', [
+        1 => [$groupIDs, 'CommaSeparatedIntegers'],
       ]);
   }
 
