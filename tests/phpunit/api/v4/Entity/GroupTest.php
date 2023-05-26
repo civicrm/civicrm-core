@@ -124,6 +124,20 @@ class GroupTest extends Api4TestBase {
       ->execute()->single();
     $this->assertEquals([$child1['title'], $child2['title']], $get['children:label']);
 
+    $joined = Group::get(FALSE)
+      ->addWhere('id', 'IN', [$parent1['id'], $parent2['id'], $child1['id'], $child2['id']])
+      ->addSelect('id', 'child_group.id', 'child_group.title')
+      ->addJoin('Group AS child_group', 'INNER', 'GroupNesting', ['id', '=', 'child_group.parent_group_id'])
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertCount(3, $joined);
+    $this->assertEquals($parent1['id'], $joined[0]['id']);
+    $this->assertEquals($child1['title'], $joined[0]['child_group.title']);
+    $this->assertEquals($parent2['id'], $joined[1]['id']);
+    $this->assertEquals($child1['title'], $joined[1]['child_group.title']);
+    $this->assertEquals($parent2['id'], $joined[2]['id']);
+    $this->assertEquals($child2['title'], $joined[2]['child_group.title']);
   }
 
 }
