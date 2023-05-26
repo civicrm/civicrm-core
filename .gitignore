@@ -75,3 +75,7 @@ sql/dummy_processor.mysql
 distmaker/distmaker.conf
 distmaker/out
 /tmp
+nbproject/private/config.properties
+nbproject/private/private.properties
+nbproject/project.properties
+nbproject/project.xml
