@@ -176,7 +176,8 @@
     <title>Next Group Refresh Time</title>
     <required>false</required>
     <readonly>true</readonly>
-    <comment>Date and time when we need to refresh the cache next.</comment>
+    <deprecated>true</deprecated>
+    <comment>Unused deprecated column.</comment>
     <add>4.3</add>
   </field>
   <field>
