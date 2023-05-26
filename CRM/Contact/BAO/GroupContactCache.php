@@ -781,12 +781,12 @@ ORDER BY   gc.contact_id, g.children
    * @param string $tempTableName
    * @param int $groupID
    * @param int|null $savedSearchID
-   * @param string|null $children
+   * @param int[]|null $children
    *
    * @return void
    * @throws \CRM_Core_Exception
    */
-  protected static function insertGroupContactsIntoTempTable(string $tempTableName, int $groupID, ?int $savedSearchID, ?string $children): void {
+  protected static function insertGroupContactsIntoTempTable(string $tempTableName, int $groupID, ?int $savedSearchID, ?array $children): void {
     if ($savedSearchID) {
       $savedSearch = SavedSearch::get(FALSE)
         ->addWhere('id', '=', $savedSearchID)
@@ -835,8 +835,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
         $removed_contacts[] = $dao->contact_id;
       }
 
-      $childrenIDs = explode(',', $children);
-      foreach ($childrenIDs as $childID) {
+      foreach ($children as $childID) {
         $contactIDs = CRM_Contact_BAO_Group::getMember($childID, FALSE);
         // Unset each contact that is removed from the parent group
         foreach ($removed_contacts as $removed_contact) {

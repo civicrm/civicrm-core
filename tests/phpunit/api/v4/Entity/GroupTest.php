@@ -91,22 +91,39 @@ class GroupTest extends Api4TestBase {
     $parent2 = Group::create(FALSE)
       ->addValue('title', uniqid())
       ->execute()->single();
-    $child = Group::create(FALSE)
+    $child1 = Group::create(FALSE)
       ->addValue('title', uniqid())
       ->addValue('parents', [$parent1['id'], $parent2['id']])
       ->execute()->single();
+    $child2 = Group::create(FALSE)
+      ->addValue('title', uniqid())
+      ->addValue('parents', [$parent2['id']])
+      ->execute()->single();
 
     $get = Group::get(FALSE)
-      ->addWhere('id', '=', $child['id'])
+      ->addWhere('id', '=', $child1['id'])
       ->addSelect('parents')
       ->execute()->single();
     $this->assertEquals([$parent1['id'], $parent2['id']], $get['parents']);
 
     $get = Group::get(FALSE)
-      ->addWhere('id', '=', $child['id'])
+      ->addWhere('id', '=', $child1['id'])
       ->addSelect('parents:label')
       ->execute()->single();
     $this->assertEquals([$parent1['title'], $parent2['title']], $get['parents:label']);
+
+    $get = Group::get(FALSE)
+      ->addWhere('id', '=', $parent1['id'])
+      ->addSelect('children')
+      ->execute()->single();
+    $this->assertEquals([$child1['id']], $get['children']);
+
+    $get = Group::get(FALSE)
+      ->addWhere('id', '=', $parent2['id'])
+      ->addSelect('children:label')
+      ->execute()->single();
+    $this->assertEquals([$child1['title'], $child2['title']], $get['children:label']);
+
   }
 
 }

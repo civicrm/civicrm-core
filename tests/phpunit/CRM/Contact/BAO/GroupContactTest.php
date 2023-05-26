@@ -99,11 +99,6 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'parents' => $parentGroup['id'],
     ]);
 
-    $this->callAPISuccess('Group', 'create', [
-      'id' => $parentGroup['id'],
-      'children' => implode(',', [$childGroup['id'], $childSmartGroup['id']]),
-    ]);
-
     // Create a contact within parent group
     $parentContactParams = [
       'first_name' => 'Parent1 Fname',
