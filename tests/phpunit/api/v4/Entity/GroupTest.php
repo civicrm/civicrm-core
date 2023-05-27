@@ -84,6 +84,43 @@ class GroupTest extends Api4TestBase {
       ->execute();
   }
 
+  public function testParentsInWhereClause() {
+    // Create 10 groups - at least 1 id will be 2-digit and contain the number 1
+    $groups = $this->saveTestRecords('Group', [
+      'records' => array_fill(0, 10, []),
+    ]);
+
+    $child1 = $this->createTestRecord('Group', [
+      'parents' => [$groups[1]['id'], $groups[2]['id']],
+    ]);
+    $child2 = $this->createTestRecord('Group', [
+      'parents' => [$groups[8]['id']],
+    ]);
+    $child3 = $this->createTestRecord('Group', [
+      'parents' => [$groups[8]['id'], $groups[9]['id']],
+    ]);
+
+    // Check that a digit of e.g. "1" doesn't match a value of e.g. "10"
+    $firstDigit = substr($groups[9]['id'], 0, 1);
+    $found = Group::get(FALSE)
+      ->addWhere('parents', 'CONTAINS', $firstDigit)
+      ->selectRowCount()
+      ->execute();
+    $this->assertCount(0, $found);
+
+    $found = Group::get(FALSE)
+      ->addWhere('parents', 'CONTAINS', $groups[8]['id'])
+      ->selectRowCount()
+      ->execute();
+    $this->assertCount(2, $found);
+
+    $found = Group::get(FALSE)
+      ->addWhere('parents', 'CONTAINS', $groups[9]['id'])
+      ->execute();
+    $this->assertCount(1, $found);
+    $this->assertEquals($child3['id'], $found[0]['id']);
+  }
+
   public function testGetParents() {
     $parent1 = Group::create(FALSE)
       ->addValue('title', uniqid())

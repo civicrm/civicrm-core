@@ -104,7 +104,7 @@ class CustomContactRefTest extends CustomTestBase {
 
     $result = Contact::get(FALSE)
       ->addSelect('id')
-      ->addWhere('MyContactRef.FavPeople.first_name', 'CONTAINS', 'First')
+      ->addWhere('MyContactRef.FavPeople.first_name', 'CONTAINS', 'FirstFav')
       ->execute()
       ->single();
 
@@ -112,7 +112,7 @@ class CustomContactRefTest extends CustomTestBase {
 
     $result = Contact::get(FALSE)
       ->addSelect('id')
-      ->addWhere('MyContactRef.FavPeople.first_name', 'CONTAINS', 'Second')
+      ->addWhere('MyContactRef.FavPeople.first_name', 'CONTAINS', 'SecondFav')
       ->execute();
 
     $this->assertCount(2, $result);

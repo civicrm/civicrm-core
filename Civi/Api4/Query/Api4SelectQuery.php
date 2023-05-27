@@ -592,8 +592,13 @@ class Api4SelectQuery {
       }
       return $sql ? implode(' AND ', $sql) : NULL;
     }
+
+    // The CONTAINS operator matches a substring for strings. For arrays & serialized fields,
+    // it only matches a complete (not partial) string within the array.
     if ($operator === 'CONTAINS') {
+      $sep = \CRM_Core_DAO::VALUE_SEPARATOR;
       switch ($field['serialize'] ?? NULL) {
+
         case \CRM_Core_DAO::SERIALIZE_JSON:
           $operator = 'LIKE';
           $value = '%"' . $value . '"%';
@@ -603,7 +608,23 @@ class Api4SelectQuery {
 
         case \CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND:
           $operator = 'LIKE';
-          $value = '%' . \CRM_Core_DAO::VALUE_SEPARATOR . $value . \CRM_Core_DAO::VALUE_SEPARATOR . '%';
+          // This is easy to query because the string is always bookended by separators.
+          $value = '%' . $sep . $value . $sep . '%';
+          break;
+
+        case \CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED:
+          $operator = 'REGEXP';
+          // This is harder to query because there's no bookend.
+          // Use regex to match string within separators or content boundary
+          // Escaping regex per https://stackoverflow.com/questions/3782379/whats-the-best-way-to-escape-user-input-for-regular-expressions-in-mysql
+          $value = "(^|$sep)" . preg_quote($value, '&') . "($sep|$)";
+          break;
+
+        case \CRM_Core_DAO::SERIALIZE_COMMA:
+          $operator = 'REGEXP';
+          // Match string within commas or content boundary
+          // Escaping regex per https://stackoverflow.com/questions/3782379/whats-the-best-way-to-escape-user-input-for-regular-expressions-in-mysql
+          $value = '(^|,)' . preg_quote($value, '&') . '(,|$)';
           break;
 
         default:
