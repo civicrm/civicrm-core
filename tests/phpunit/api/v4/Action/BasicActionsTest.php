@@ -337,7 +337,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertArrayHasKey($records[2]['identifier'], (array) $result);
   }
 
-  public function testContainsOperator() {
+  public function testContainsOperators() {
     $records = [
       ['group' => 'one', 'fruit:name' => ['apple', 'pear'], 'weight' => 11],
       ['group' => 'two', 'fruit:name' => ['pear', 'banana'], 'weight' => 12],
@@ -351,9 +351,20 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('one', $result->first()['group']);
 
     $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS', 'apple')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('two', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'CONTAINS', 'pear')
       ->execute();
     $this->assertCount(2, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS', 'pear')
+      ->execute();
+    $this->assertCount(0, $result);
 
     $result = MockBasicEntity::get()
       ->addWhere('group', 'CONTAINS', 'o')
@@ -361,9 +372,19 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertCount(2, $result);
 
     $result = MockBasicEntity::get()
+      ->addWhere('group', 'NOT CONTAINS', 'w')
+      ->execute();
+    $this->assertCount(1, $result);
+
+    $result = MockBasicEntity::get()
       ->addWhere('weight', 'CONTAINS', 1)
       ->execute();
     $this->assertCount(2, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('weight', 'NOT CONTAINS', 2)
+      ->execute();
+    $this->assertCount(1, $result);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:label', 'CONTAINS', 'Banana')
@@ -372,10 +393,22 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('two', $result->first()['group']);
 
     $result = MockBasicEntity::get()
+      ->addWhere('fruit:label', 'NOT CONTAINS', 'Banana')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('one', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
       ->addWhere('weight', 'CONTAINS', 2)
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals('two', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('weight', 'NOT CONTAINS', 2)
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('one', $result->first()['group']);
   }
 
   public function testRegexpOperators() {

@@ -113,6 +113,7 @@ class CoreUtil {
   public static function getOperators() {
     $operators = \CRM_Core_DAO::acceptedSQLOperators();
     $operators[] = 'CONTAINS';
+    $operators[] = 'NOT CONTAINS';
     $operators[] = 'IS EMPTY';
     $operators[] = 'IS NOT EMPTY';
     $operators[] = 'REGEXP';
