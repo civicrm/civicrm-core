@@ -87,8 +87,8 @@
         }));
       }
 
-      this.onPostRun.push(function(result) {
-        _.each(result, function(row) {
+      this.onPostRun.push(function(apiResults) {
+        _.each(apiResults.run, function(row) {
           row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
           // If main entity doesn't exist, no can edit
           if (!row.data['api_entity:label']) {
@@ -161,7 +161,7 @@
 
       this.deleteSearch = function(row) {
         ctrl.runSearch(
-          [['SavedSearch', 'delete', {where: [['id', '=', row.key]]}]],
+          {deleteSearch: ['SavedSearch', 'delete', {where: [['id', '=', row.key]]}]},
           {start: ts('Deleting...'), success: ts('Search Deleted')},
           row
         );
@@ -169,13 +169,13 @@
 
       this.revertSearch = function(row) {
         ctrl.runSearch(
-          [['SavedSearch', 'revert', {
+          {revertSearch: ['SavedSearch', 'revert', {
             where: [['id', '=', row.key]],
             chain: {
               revertDisplays: ['SearchDisplay', 'revert', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', true]]}],
               deleteDisplays: ['SearchDisplay', 'delete', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', false]]}]
             }
-          }]],
+          }]},
           {start: ts('Reverting...'), success: ts('Search Reverted')},
           row
         );

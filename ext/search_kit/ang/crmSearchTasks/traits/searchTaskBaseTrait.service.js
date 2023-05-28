@@ -2,7 +2,7 @@
   "use strict";
 
   // Trait shared by task controllers
-  angular.module('crmSearchDisplay').factory('searchTaskBaseTrait', function(dialogService) {
+  angular.module('crmSearchTasks').factory('searchTaskBaseTrait', function(dialogService) {
     var ts = CRM.ts('org.civicrm.search_kit');
 
     // Trait properties get mixed into task controller using angular.extend()

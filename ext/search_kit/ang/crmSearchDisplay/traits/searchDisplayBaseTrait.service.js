@@ -10,6 +10,7 @@
       page: 1,
       rowCount: null,
       // Arrays may contain callback functions for various events
+      onInitialize: [],
       onChangeFilters: [],
       onPreRun: [],
       onPostRun: [],
@@ -26,6 +27,9 @@
         for (var p=0; p < placeholderCount; ++p) {
           this.placeholders.push({});
         }
+        _.each(ctrl.onInitialize, function(callback) {
+          callback.call(ctrl, $scope, $element);
+        });
 
         // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 300ms
         this.getResultsPronto = _.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});
@@ -81,9 +85,9 @@
         if (this.afFieldset) {
           $scope.$watch(this.afFieldset.getFieldData, onChangeFilters, true);
           // Add filter title to Afform
-          this.onPostRun.push(function(results) {
-            if (results.labels && results.labels.length && $scope.$parent.addTitle) {
-              $scope.$parent.addTitle(results.labels.join(' '));
+          this.onPostRun.push(function(apiResults) {
+            if (apiResults.run.labels && apiResults.run.labels.length && $scope.$parent.addTitle) {
+              $scope.$parent.addTitle(apiResults.run.labels.join(' '));
             }
           });
         }
@@ -145,17 +149,17 @@
         if (!statusParams) {
           this.loading = true;
         }
+        apiCalls = apiCalls || {};
+        apiCalls.run = ['SearchDisplay', 'run', apiParams];
         _.each(ctrl.onPreRun, function(callback) {
-          callback.call(ctrl, apiParams);
+          callback.call(ctrl, apiCalls);
         });
-        apiCalls = apiCalls || [];
-        apiCalls.push(['SearchDisplay', 'run', apiParams]);
         var apiRequest = crmApi4(apiCalls);
         apiRequest.then(function(apiResults) {
           if (requestId < ctrl._runCount) {
             return; // Another request started after this one
           }
-          ctrl.results = _.last(apiResults);
+          ctrl.results = apiResults.run;
           ctrl.editing = ctrl.loading = false;
           // Update rowCount if running for the first time or during an update op
           if (!ctrl.rowCount || editedRow) {
@@ -178,7 +182,7 @@
             }
           }
           _.each(ctrl.onPostRun, function(callback) {
-            callback.call(ctrl, ctrl.results, 'success', editedRow);
+            callback.call(ctrl, apiResults, 'success', editedRow);
           });
         }, function(error) {
           if (requestId < ctrl._runCount) {
