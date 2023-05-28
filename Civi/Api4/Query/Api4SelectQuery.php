@@ -29,8 +29,8 @@ use Civi\Api4\Utils\SelectUtil;
  *
  * * '=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=",
  * * 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
- * * 'IS NOT NULL', 'IS NULL', 'CONTAINS', 'IS EMPTY', 'IS NOT EMPTY',
- * * 'REGEXP', 'NOT REGEXP'.
+ * * 'IS NOT NULL', 'IS NULL', 'CONTAINS', 'NOT CONTAINS',
+ * * 'IS EMPTY', 'IS NOT EMPTY', 'REGEXP', 'NOT REGEXP'.
  */
 class Api4SelectQuery {
 
@@ -593,27 +593,27 @@ class Api4SelectQuery {
       return $sql ? implode(' AND ', $sql) : NULL;
     }
 
-    // The CONTAINS operator matches a substring for strings. For arrays & serialized fields,
-    // it only matches a complete (not partial) string within the array.
-    if ($operator === 'CONTAINS') {
+    // The CONTAINS and NOT CONTAINS operators match a substring for strings.
+    // For arrays & serialized fields, they only match a complete (not partial) string within the array.
+    if ($operator === 'CONTAINS' || $operator === 'NOT CONTAINS') {
       $sep = \CRM_Core_DAO::VALUE_SEPARATOR;
       switch ($field['serialize'] ?? NULL) {
 
         case \CRM_Core_DAO::SERIALIZE_JSON:
-          $operator = 'LIKE';
+          $operator = ($operator === 'CONTAINS') ? 'LIKE' : 'NOT LIKE';
           $value = '%"' . $value . '"%';
           // FIXME: Use this instead of the above hack once MIN_INSTALL_MYSQL_VER is bumped to 5.7.
           // return sprintf('JSON_SEARCH(%s, "one", "%s") IS NOT NULL', $fieldAlias, \CRM_Core_DAO::escapeString($value));
           break;
 
         case \CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND:
-          $operator = 'LIKE';
+          $operator = ($operator === 'CONTAINS') ? 'LIKE' : 'NOT LIKE';
           // This is easy to query because the string is always bookended by separators.
           $value = '%' . $sep . $value . $sep . '%';
           break;
 
         case \CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED:
-          $operator = 'REGEXP';
+          $operator = ($operator === 'CONTAINS') ? 'REGEXP' : 'NOT REGEXP';
           // This is harder to query because there's no bookend.
           // Use regex to match string within separators or content boundary
           // Escaping regex per https://stackoverflow.com/questions/3782379/whats-the-best-way-to-escape-user-input-for-regular-expressions-in-mysql
@@ -621,14 +621,14 @@ class Api4SelectQuery {
           break;
 
         case \CRM_Core_DAO::SERIALIZE_COMMA:
-          $operator = 'REGEXP';
+          $operator = ($operator === 'CONTAINS') ? 'REGEXP' : 'NOT REGEXP';
           // Match string within commas or content boundary
           // Escaping regex per https://stackoverflow.com/questions/3782379/whats-the-best-way-to-escape-user-input-for-regular-expressions-in-mysql
           $value = '(^|,)' . preg_quote($value, '&') . '(,|$)';
           break;
 
         default:
-          $operator = 'LIKE';
+          $operator = ($operator === 'CONTAINS') ? 'LIKE' : 'NOT LIKE';
           $value = '%' . $value . '%';
           break;
       }

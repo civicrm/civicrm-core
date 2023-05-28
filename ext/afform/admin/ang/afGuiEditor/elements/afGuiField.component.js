@@ -353,6 +353,7 @@
         '>=': '≥',
         '<=': '≤',
         'CONTAINS': ts('Contains'),
+        'NOT CONTAINS': ts("Doesn't Contain"),
         'IN': ts('Is One Of'),
         'NOT IN': ts('Not One Of'),
         'LIKE': ts('Is Like'),

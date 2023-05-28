@@ -174,14 +174,15 @@ trait ArrayQueryActionTrait {
         return !in_array($value, $expected);
 
       case 'CONTAINS':
+      case 'NOT CONTAINS':
         if (is_array($value)) {
-          return in_array($expected, $value);
+          return in_array($expected, $value) == ($operator == 'CONTAINS');
         }
         elseif (is_string($value) || is_numeric($value)) {
           // Lowercase check if string contains string
-          return strpos(strtolower((string) $value), strtolower((string) $expected)) !== FALSE;
+          return (strpos(strtolower((string) $value), strtolower((string) $expected)) !== FALSE) == ($operator == 'CONTAINS');
         }
-        return $value == $expected;
+        return ($value == $expected) == ($operator == 'CONTAINS');
 
       default:
         throw new NotImplementedException("Unsupported operator: '$operator' cannot be used with array data");
