@@ -1034,7 +1034,7 @@ WHERE li.contribution_id = %1";
         $line[$getUpdatedLineItemsDAO->price_field_value_id] = $getUpdatedLineItemsDAO->label . ' - ' . (float) $getUpdatedLineItemsDAO->qty;
       }
 
-      $partUpdateFeeAmt['fee_level'] = implode(', ', $line);
+      $partUpdateFeeAmt['fee_level'] = $line;
       $partUpdateFeeAmt['fee_amount'] = $inputParams['amount'];
       CRM_Event_BAO_Participant::add($partUpdateFeeAmt);
 
