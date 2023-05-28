@@ -22,19 +22,16 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
   protected $display;
 
   /**
-   * Name of entity
-   * @var string
-   * @required
-   */
-  protected $entity;
-
-  /**
    * @param \Civi\Api4\Generic\Result $result
    * @throws \CRM_Core_Exception
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
+    $this->loadSavedSearch();
+    $this->loadSearchDisplay();
+
     // Adding checkPermissions filters out actions the user is not allowed to perform
-    $entityName = ($this->entity === 'RelationshipCache') ? 'Relationship' : $this->entity;
+    $entityName = $this->savedSearch['api_entity'];
+    $entityName = ($entityName === 'RelationshipCache') ? 'Relationship' : $entityName;
     $entity = Entity::get($this->checkPermissions)->addWhere('name', '=', $entityName)
       ->addSelect('name', 'title_plural')
       ->setChain([
@@ -46,9 +43,6 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     if (!$entity) {
       return;
     }
-
-    $this->loadSavedSearch();
-    $this->loadSearchDisplay();
 
     $tasks = [$entity['name'] => []];
 
@@ -233,9 +227,9 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     // 2. To allow tasks to be added/removed per search display
     //    Note: Use Events::W_LATE to do so after the tasks are filtered per search-display settings.
     // 3. To get a full list of Angular modules which provide tasks.
-    //    Note: That's why this hook needs the base-level array and not just the array of tasks for `$this->entity`.
+    //    Note: That's why this hook needs the base-level array and not just the array of tasks for `$entity`.
     //    Although it may seem wasteful to have extensions add tasks for all possible entities and then
-    //    discard most of it (all but the ones relevant to `$this->entity`), it's necessary to do it this way
+    //    discard most of it (all but the ones relevant to `$entity`), it's necessary to do it this way
     //    so that they can be declared as angular dependencies - see search_kit_civicrm_angularModules().
     $null = NULL;
     $checkPermissions = $this->checkPermissions;

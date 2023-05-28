@@ -19,7 +19,7 @@
         }
         fetchedMetadata = crmApi4({
           entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural', 'primary_key'], where: [['name', '=', mngr.getEntityName()]]}, 0],
-          tasks: ['SearchDisplay', 'getSearchTasks', {entity: displayCtrl.apiEntity, savedSearch: displayCtrl.search, display: displayCtrl.display}]
+          tasks: ['SearchDisplay', 'getSearchTasks', {savedSearch: displayCtrl.search, display: displayCtrl.display}]
         }).then(function(result) {
           mngr.entityInfo = result.entityInfo;
           mngr.tasks = result.tasks;

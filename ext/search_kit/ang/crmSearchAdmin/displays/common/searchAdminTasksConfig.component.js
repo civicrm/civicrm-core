@@ -14,7 +14,6 @@
 
       this.$onInit = function() {
         crmApi4('SearchDisplay', 'getSearchTasks', {
-          entity: ctrl.apiEntity,
           savedSearch: {api_entity: ctrl.apiEntity, api_params: ctrl.apiParams}
         }).then(function(tasks) {
           ctrl.allTasks = tasks;
