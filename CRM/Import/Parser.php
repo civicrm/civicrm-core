@@ -91,6 +91,11 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected $statesByCountry = [];
 
   /**
+   * @var int|null
+   */
+  protected $siteDefaultCountry = NULL;
+
+  /**
    * @return int|null
    */
   public function getUserJobID(): ?int {
@@ -1954,7 +1959,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return int
    */
   protected function getSiteDefaultCountry(): int {
-    if (!isset($this->siteDefaultCountry)) {
+    if ($this->siteDefaultCountry === NULL) {
       $this->siteDefaultCountry = (int) Civi::settings()->get('defaultContactCountry');
     }
     return $this->siteDefaultCountry;
