@@ -22,6 +22,7 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
 
   protected $_settings = [
     'profile_double_optin' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'no_reply_email_address' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'profile_add_to_group_double_optin' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'track_civimail_replies' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'civimail_workflow' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,

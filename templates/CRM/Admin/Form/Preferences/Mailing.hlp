@@ -1,0 +1,16 @@
+{*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="no_reply_email_address-title"}
+  {ts}Email From Address for no-reply emails.{/ts}
+{/htxt}
+{htxt id="no_reply_email_address"}
+  <p>{ts}Specify an Email From Address to use when the system sends an email but a reply is not expected, for example when a user is sent an email for a double opt-in.{/ts}</p>
+  <p>{ts}Leaving this blank will use the default which will be do-not-reply@default_domain where the default_domain will be the email domain address of your default mailing account also used for bounce handling.{/ts}</p>
+{/htxt}
