@@ -50,7 +50,7 @@ class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine
       unset($this->_pages['CRM_Member_Form_MembershipBlock']);
     }
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
 }
