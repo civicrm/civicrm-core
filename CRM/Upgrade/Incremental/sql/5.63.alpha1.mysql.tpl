@@ -14,3 +14,13 @@ VALUES
     ( {$domainID}, 'https://civicrm.org/help?src=iam',       '{ts escape="sql" skip="true"}Get Help{/ts}',   'Get Help',   NULL, 'AND', @adminHelplastID, '1', NULL, 2 );
 
 UPDATE IGNORE `civicrm_navigation` SET `name` = 'Register Your Site', `label` = '{ts escape="sql" skip="true"}Register Your Site{/ts}' WHERE `name` = 'Register your site';
+
+{if $multilingual}
+    {foreach from=$locales item=locale}
+        UPDATE IGNORE civicrm_uf_field SET label_{$locale} = '{ts escape="sql"}Contribution Date{/ts}' WHERE (field_name = 'receive_date' AND label_{$locale} = '{ts escape="sql"}Received{/ts}' AND uf_group_id IN (10,11));
+        UPDATE IGNORE civicrm_uf_field SET label_{$locale} = '{ts escape="sql"}Contribution Date{/ts}' WHERE (field_name = 'receive_date' AND label_{$locale} = '{ts escape="sql"}Date Received{/ts}' AND uf_group_id NOT IN (10,11));
+    {/foreach}
+{else}
+    UPDATE IGNORE civicrm_uf_field SET label = '{ts escape="sql"}Contribution Date{/ts}' WHERE (field_name = 'receive_date' AND label = '{ts escape="sql"}Received{/ts}' AND uf_group_id IN (10,11));
+    UPDATE IGNORE civicrm_uf_field SET label = '{ts escape="sql"}Contribution Date{/ts}' WHERE (field_name = 'receive_date' AND label = '{ts escape="sql"}Date Received{/ts}' AND uf_group_id NOT IN (10,11));
+{/if}
