@@ -334,6 +334,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   The new group BAO (if created)
    */
   public static function create(&$params) {
+
+    // only check if we need to remove parents if a params was provided
+    $parentsParamProvided = array_key_exists('parents', $params);
+
     $params += [
       'group_type' => NULL,
       'parents' => NULL,
@@ -382,8 +386,12 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
 
-    if (!CRM_Utils_System::isNull($params['parents'])) {
+    if ($parentsParamProvided) {
       $params['parents'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $params['parents']);
+      // failsafe: forbid adding itself as parent
+      if (!empty($params['id']) && ($key = array_search($params['id'], $params['parents'])) !== FALSE) {
+        unset($params['parents'][$key]);
+      }
     }
 
     // convert params if array type
@@ -448,7 +456,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
 
       // first deal with removed parents
-      if (array_key_exists('parents', $params) && !empty($currentParentGroupIDs)) {
+      if ($parentsParamProvided && !empty($currentParentGroupIDs)) {
         foreach ($currentParentGroupIDs as $parentGroupId) {
           // no more parents or not in the new list, let's remove
           if (empty($params['parents']) || !in_array($parentGroupId, $params['parents'])) {
@@ -466,9 +474,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         }
       }
 
-      // this is always required, since we don't know when a
-      // parent group is removed
-      CRM_Contact_BAO_GroupNestingCache::update();
+      // refresh cache if parents param was provided
+      if ($parentsParamProvided || !empty($params['parents'])) {
+        CRM_Contact_BAO_GroupNestingCache::update();
+      }
 
       // update group contact cache for all parent groups
       $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($group->id);
