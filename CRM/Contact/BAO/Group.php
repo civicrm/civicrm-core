@@ -475,7 +475,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
 
       // refresh cache if parents param was provided
-      if ($parentsParamProvided) {
+      if ($parentsParamProvided || !empty($params['parents'])) {
         CRM_Contact_BAO_GroupNestingCache::update();
       }
 
