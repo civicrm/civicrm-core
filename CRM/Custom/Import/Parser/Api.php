@@ -69,7 +69,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
       $this->setImportStatus($rowNumber, 'IMPORTED', '', $formatted['id']);
     }
     catch (CRM_Core_Exception $e) {
-      $this->setImportStatus($rowNumber, 'ERROR', '', $e->getMessage());
+      $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage(), $formatted['id']);
     }
   }
 
