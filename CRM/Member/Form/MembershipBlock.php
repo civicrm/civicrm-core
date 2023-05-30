@@ -170,10 +170,11 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
     else {
       $this->assign('price', TRUE);
     }
-    //$this->add('select', 'member_price_set_id', ts('Membership Price Set'), (['' => ts('- none -')] + $price));
 
-    $this->addField('member_price_set_id', [
-      'entity' => 'PriceField',
+    $this->addSelect('member_price_set_id', [
+      'entity' => 'PriceSet',
+      'option_url' => 'civicrm/admin/price',
+      'label' => ts('Membership Price Set'),
       'name' => 'price_set_id',
       'options' => $price,
     ]);

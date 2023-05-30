@@ -336,11 +336,12 @@ WHERE  id IN ( $groupIDs )
   /**
    * Load the smart group cache for a saved search.
    *
-   * @param object $group
+   * @param CRM_Core_DAO $group
    *   The smart group that needs to be loaded.
    * @param bool $force
    *   deprecated parameter = Should we force a search through.
    *
+   * return bool
    * @throws \CRM_Core_Exception
    */
   public static function load($group, $force = FALSE) {
@@ -361,6 +362,7 @@ WHERE  id IN ( $groupIDs )
       self::releaseGroupLocks([$groupID]);
       $groupContactsTempTable->drop();
     }
+    return in_array($groupID, $lockedGroups);
   }
 
   /**
@@ -482,14 +484,15 @@ ORDER BY   gc.contact_id, g.children
   }
 
   /**
-   * Invalidates the smart group cache for a particular group
-   * @param int $groupID - Group to invalidate
+   * Invalidates the smart group cache for one or more groups
+   * @param int|int[] $groupID - Group to invalidate
    */
   public static function invalidateGroupContactCache($groupID): void {
+    $groupIDs = implode(',', (array) $groupID);
     CRM_Core_DAO::executeQuery('UPDATE civicrm_group
       SET cache_date = NULL
-      WHERE id = %1 AND (saved_search_id IS NOT NULL OR children IS NOT NULL)', [
-        1 => [$groupID, 'Positive'],
+      WHERE id IN (%1) AND (saved_search_id IS NOT NULL OR children IS NOT NULL)', [
+        1 => [$groupIDs, 'CommaSeparatedIntegers'],
       ]);
   }
 
@@ -781,12 +784,12 @@ ORDER BY   gc.contact_id, g.children
    * @param string $tempTableName
    * @param int $groupID
    * @param int|null $savedSearchID
-   * @param string|null $children
+   * @param int[]|null $children
    *
    * @return void
    * @throws \CRM_Core_Exception
    */
-  protected static function insertGroupContactsIntoTempTable(string $tempTableName, int $groupID, ?int $savedSearchID, ?string $children): void {
+  protected static function insertGroupContactsIntoTempTable(string $tempTableName, int $groupID, ?int $savedSearchID, ?array $children): void {
     if ($savedSearchID) {
       $savedSearch = SavedSearch::get(FALSE)
         ->addWhere('id', '=', $savedSearchID)
@@ -835,8 +838,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
         $removed_contacts[] = $dao->contact_id;
       }
 
-      $childrenIDs = explode(',', $children);
-      foreach ($childrenIDs as $childID) {
+      foreach ($children as $childID) {
         $contactIDs = CRM_Contact_BAO_Group::getMember($childID, FALSE);
         // Unset each contact that is removed from the parent group
         foreach ($removed_contacts as $removed_contact) {

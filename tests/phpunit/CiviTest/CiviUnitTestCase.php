@@ -31,6 +31,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Event;
+use Civi\Api4\ExampleData;
 use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
@@ -1015,26 +1016,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       ]);
     }
 
-    // set defaults for missing params
-    $params = array_merge([
-      'title' => 'Annual CiviCRM meet',
-      'summary' => 'If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now',
-      'description' => 'This event is intended to give brief idea about progress of CiviCRM and giving solutions to common user issues',
-      'event_type_id' => 1,
-      'is_public' => 1,
-      'start_date' => 20081021,
-      'end_date' => '+ 1 month',
-      'is_online_registration' => 1,
-      'registration_start_date' => 20080601,
-      'registration_end_date' => '+ 1 month',
-      'max_participants' => 100,
-      'event_full_text' => 'Sorry! We are already full',
-      'is_monetary' => 0,
-      'is_active' => 1,
-      'default_role_id' => 1,
-      'is_show_location' => 0,
-      'is_email_confirm' => 1,
-    ], $params);
+    $params = array_merge($this->getExampleData('Event', 'PaidEvent'), $params);
+
     if (!empty($params['payment_processor_id'])) {
       $params['payment_processor'] = is_array($params['payment_processor_id']) ? $params['payment_processor_id'] : [$params['payment_processor_id']];
     }
@@ -3910,6 +3893,24 @@ WHERE table_schema = DATABASE()");
     if ($this->hookClass) {
       $this->hookClass->reset();
     }
+  }
+
+  /**
+   * Get example data.
+   *
+   * @param string $entity
+   * @param string $name
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getExampleData(string $entity, string $name): array {
+    $data = ExampleData::get(FALSE)
+      ->addSelect('data')
+      ->addWhere('name', '=', 'entity/' . $entity . '/' . $name)
+      ->execute()->first()['data'];
+    unset($data['id']);
+    return $data;
   }
 
 }

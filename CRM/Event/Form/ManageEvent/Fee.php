@@ -255,7 +255,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $this->addSelect('financial_type_id', ['context' => 'search', 'options' => $financialTypes]);
     }
     // add pay later options
-    $this->addElement('checkbox', 'is_pay_later', ts('Enable Pay Later option?'), NULL,
+    $this->addElement('checkbox', 'is_pay_later', ts('Pay later option'), NULL,
       ['onclick' => "return showHideByValue('is_pay_later','','payLaterOptions','block','radio',false);"]
     );
     $this->addElement('textarea', 'pay_later_text', ts('Pay Later Label'),
@@ -274,9 +274,11 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     else {
       $this->assign('price', TRUE);
     }
-    $this->addField('price_set_id', [
-      'entity' => 'PriceField',
+    $this->addSelect('price_set_id', [
+      'entity' => 'PriceSet',
+      'option_url' => 'civicrm/admin/price',
       'options' => $price,
+      'label' => ts('Price Set'),
       'onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);",
     ]);
 

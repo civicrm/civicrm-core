@@ -12,3 +12,8 @@
 #bootstrap-theme .crm-search-display.crm-search-display-table tfoot > tr > td {
   font-weight: bold;
 }
+
+table.crm-sticky-header > thead > tr {
+  position: sticky !important;
+  top: var(--crm-menubar-bottom, 0px);
+}

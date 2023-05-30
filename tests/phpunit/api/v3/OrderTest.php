@@ -513,7 +513,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    */
   public function testAddOrderForParticipant(): void {
     $event = $this->eventCreate();
-    $this->_eventId = $event['id'];
+    $eventId = $event['id'];
     $p = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
@@ -538,7 +538,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'line_item' => $lineItems,
       'params' => [
         'contact_id' => $this->_individualId,
-        'event_id' => $this->_eventId,
+        'event_id' => $eventId,
         'role_id' => 1,
         'register_date' => '2007-07-21 00:00:00',
         'source' => 'Online Event Registration: API Testing',
@@ -578,7 +578,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'line_item' => $lineItems,
       'params' => [
         'contact_id' => $this->individualCreate(),
-        'event_id' => $this->_eventId,
+        'event_id' => $eventId,
         'role_id' => 1,
         'register_date' => '2007-07-21 00:00:00',
         'source' => 'Online Event Registration: API Testing',

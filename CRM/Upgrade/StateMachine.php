@@ -34,7 +34,7 @@ class CRM_Upgrade_StateMachine extends CRM_Core_StateMachine {
 
     $this->_pages = &$pages;
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
 }

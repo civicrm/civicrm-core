@@ -113,6 +113,7 @@ class CoreUtil {
   public static function getOperators() {
     $operators = \CRM_Core_DAO::acceptedSQLOperators();
     $operators[] = 'CONTAINS';
+    $operators[] = 'NOT CONTAINS';
     $operators[] = 'IS EMPTY';
     $operators[] = 'IS NOT EMPTY';
     $operators[] = 'REGEXP';
@@ -188,7 +189,7 @@ class CoreUtil {
     // For get actions, just run a get and ACLs will be applied to the query.
     // It's a cheap trick and not as efficient as not running the query at all,
     // but BAO::checkAccess doesn't consistently check permissions for the "get" action.
-    if (is_a($apiRequest, '\Civi\Api4\Generic\DAOGetAction')) {
+    if (is_a($apiRequest, '\Civi\Api4\Generic\AbstractGetAction')) {
       return (bool) $apiRequest->addSelect('id')->addWhere('id', '=', $record['id'])->execute()->count();
     }
 

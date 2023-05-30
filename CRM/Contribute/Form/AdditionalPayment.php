@@ -152,10 +152,12 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $defaults['trxn_date'] = date('Y-m-d H:i:s');
     }
 
-    if ($this->isARefund() && $this->amountDue < 0) {
-      $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency(abs($this->amountDue));
+    if ($this->isARefund()) {
+      if ($this->amountDue < 0) {
+        $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency(abs($this->amountDue));
+      }
     }
-    elseif ($this->_owed && $this->amountDue > 0) {
+    elseif ($this->_owed) {
       $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_owed);
     }
 
@@ -244,9 +246,12 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         $attributes['fee_amount']
       );
       $this->addRule('fee_amount', ts('Please enter a valid monetary value for Fee Amount.'), 'money');
+      $buttonName = $this->isARefund() ? ts('Record Refund') : ts('Record Payment');
+    }
+    else {
+      $buttonName = ts('Submit Payment');
     }
 
-    $buttonName = $this->isARefund() ? ts('Record Refund') : ts('Record Payment');
     $this->addButtons([
       [
         'type' => 'upload',

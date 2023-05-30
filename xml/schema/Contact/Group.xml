@@ -176,14 +176,15 @@
     <title>Next Group Refresh Time</title>
     <required>false</required>
     <readonly>true</readonly>
-    <comment>Date and time when we need to refresh the cache next.</comment>
+    <deprecated>true</deprecated>
+    <comment>Unused deprecated column.</comment>
     <add>4.3</add>
   </field>
   <field>
     <name>parents</name>
     <type>text</type>
     <title>Group Parents</title>
-    <comment>IDs of the parent(s)</comment>
+    <comment>List of parent groups</comment>
     <add>2.1</add>
     <serialize>COMMA</serialize>
     <pseudoconstant>
@@ -195,15 +196,28 @@
     </pseudoconstant>
     <html>
       <type>EntityRef</type>
-      <label>Parent Group(s)</label>
+      <label>Parent Groups</label>
     </html>
   </field>
   <field>
     <name>children</name>
     <type>text</type>
     <title>Group Children</title>
-    <comment>IDs of the child(ren)</comment>
+    <comment>List of child groups (calculated)</comment>
     <add>2.1</add>
+    <serialize>COMMA</serialize>
+    <readonly>true</readonly>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>title</labelColumn>
+      <prefetch>FALSE</prefetch>
+    </pseudoconstant>
+    <html>
+      <type>EntityRef</type>
+      <label>Child Groups</label>
+    </html>
   </field>
   <field>
     <name>is_hidden</name>

@@ -35,7 +35,7 @@
           </tr>
         {/if}
         <tr class="crm-contribution-contributionpage-amount-form-block-is_pay_later"><td scope="row" class="label">{$form.is_pay_later.label}</td>
-          <td>{$form.is_pay_later.html}<br />
+          <td>{$form.is_pay_later.html}
           <span class="description">{ts}Check this box if you want to give users the option to submit payment offline (e.g. mail in a check, call in a credit card, etc.).{/ts}</span></td>
         </tr>
         <tr id="payLaterFields" class="crm-contribution-form-block-payLaterFields"><td>&nbsp;</td>

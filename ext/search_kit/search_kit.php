@@ -109,3 +109,58 @@ function search_kit_civicrm_post($op, $entity, $id, $object) {
     \Civi::cache('metadata')->clear();
   }
 }
+
+/**
+ * Implements hook_civicrm_entityTypes().
+ */
+function search_kit_civicrm_entityTypes(array &$entityTypes): void {
+  foreach (_getSearchKitEntityDisplays() as $display) {
+    $entityTypes[$display['entityName']] = [
+      'name' => $display['entityName'],
+      'class' => \Civi\BAO\SK_Entity::class,
+      'table' => $display['tableName'],
+    ];
+  }
+}
+
+/**
+ * Returns a SQL-safe table name for a display (for use with displays of type "entity")
+ *
+ * @param string $displayName
+ * @return string
+ */
+function _getSearchKitDisplayTableName(string $displayName): string {
+  return CRM_Utils_String::munge('civicrm_sk_' . CRM_Utils_String::convertStringToSnakeCase($displayName), '_', 64);
+}
+
+/**
+ * Uncached function to fetch displays of type "entity" to be used by boot-level code
+ *
+ * @return array
+ * @throws CRM_Core_Exception
+ */
+function _getSearchKitEntityDisplays(): array {
+  $displays = [];
+  // Can't use the API to fetch search displays because this is called by pre-boot hooks
+  $select = CRM_Utils_SQL_Select::from('civicrm_search_display')
+    ->where('type = "entity"')
+    ->select(['id', 'name', 'label', 'settings']);
+  try {
+    $display = CRM_Core_DAO::executeQuery($select->toSQL());
+    while ($display->fetch()) {
+      $displays[] = [
+        'id' => $display->id,
+        'label' => $display->label,
+        'name' => $display->name,
+        'entityName' => 'SK_' . $display->name,
+        'tableName' => _getSearchKitDisplayTableName($display->name),
+        'settings' => CRM_Core_DAO::unSerializeField($display->settings, \CRM_Core_DAO::SERIALIZE_JSON),
+      ];
+    }
+  }
+  // If the extension hasn't fully installed and the table doesn't exist yet, suppress errors
+  catch (CRM_Core_Exception $e) {
+    return [];
+  }
+  return $displays;
+}

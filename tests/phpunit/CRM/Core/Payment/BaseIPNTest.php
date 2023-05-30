@@ -370,7 +370,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    *
    */
   public function _setUpParticipantObjects(string $participantStatus = 'Attended'): void {
-    $event = $this->eventCreate(['is_email_confirm' => 1]);
+    $event = $this->eventCreate(['is_email_confirm' => 1, 'email_confirm_text' => '']);
     $this->setupContribution();
 
     $this->_eventId = $event['id'];

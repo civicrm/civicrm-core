@@ -833,7 +833,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     // For single additions - show validation error if the contact has already been registered
     // for this event.
-    if ($self->_single && ($self->_action & CRM_Core_Action::ADD)) {
+    if (($self->_action & CRM_Core_Action::ADD)) {
       if ($self->_context == 'standalone') {
         $contactId = $values['contact_id'] ?? NULL;
       }
@@ -855,11 +855,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $dupeCheck->whereAdd("status_id != {$cancelledStatusID} ");
         $dupeCheck->find(TRUE);
         if (!empty($dupeCheck->id)) {
-          $errorMsg['event_id'] = ts("This contact has already been assigned to this event.");
+          $errorMsg['event_id'] = ts('This contact has already been assigned to this event.');
         }
       }
     }
-    return CRM_Utils_Array::crmIsEmptyArray($errorMsg) ? TRUE : $errorMsg;
+    return empty($errorMsg) ? TRUE : $errorMsg;
   }
 
   /**
@@ -1538,7 +1538,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     $form->assign('onlinePendingContributionId', $form->get('onlinePendingContributionId'));
 
-    $form->assign('paid', $form->_isPaidEvent);
+    $form->assign('paid', $form->_isPaidEvent ?? NULL);
 
     $form->addElement('checkbox',
       'send_receipt',
@@ -2084,6 +2084,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    */
   protected function assignUrlPath() {
     $this->assign('urlPath', 'civicrm/contact/view/participant');
+    $this->assign('urlPathVar', NULL);
     if (!$this->_id && !$this->_contactId) {
       $breadCrumbs = [
         [

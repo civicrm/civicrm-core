@@ -64,7 +64,7 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
   /**
    * Quick clean by emptying tables created for the test.
    *
-   * @param array $params
+   * @param array{tablesToTruncate: array} $params
    */
   public function cleanup(array $params): void {
     $params += [

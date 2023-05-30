@@ -51,6 +51,10 @@ class Admin {
       'modules' => $extensions,
       'defaultContactType' => \CRM_Contact_BAO_ContactType::basicTypeInfo()['Individual']['name'] ?? NULL,
       'defaultDistanceUnit' => \CRM_Utils_Address::getDefaultDistanceUnit(),
+      'jobFrequency' => \Civi\Api4\Job::getFields()
+        ->addWhere('name', '=', 'run_frequency')
+        ->setLoadOptions(['id', 'label'])
+        ->execute()->first()['options'],
       'tags' => Tag::get()
         ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
@@ -87,6 +91,7 @@ class Admin {
       '>=' => '≥',
       '<=' => '≤',
       'CONTAINS' => E::ts('Contains'),
+      'NOT CONTAINS' => E::ts("Doesn't Contain"),
       'IN' => E::ts('Is One Of'),
       'NOT IN' => E::ts('Not One Of'),
       'LIKE' => E::ts('Is Like'),
