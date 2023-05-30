@@ -80,7 +80,8 @@
       <td>{$form.end_date.html}</td>
     </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_is_active">
-      <td>&nbsp;</td><td>{$form.honor_block_is_active.html}{$form.honor_block_is_active.label} {help id="id-honoree_section"}</td>
+      <td class ="label">{$form.honor_block_is_active.label} {help id="id-honoree_section"}</td>
+      <td>{$form.honor_block_is_active.html}</td>
   </tr>
 </table>
 <table class="form-layout-compressed" id="honor">

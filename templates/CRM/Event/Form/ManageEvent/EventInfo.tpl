@@ -89,7 +89,7 @@
     </tr>
     <tr id="id-waitlist-text" class="crm-event-manage-eventinfo-form-block-waitlist_text">
       {if !empty($form.waitlist_text)}
-        <td class="label">{$form.waitlist_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='waitlist_text' id=$eventID}{/if}<br />{help id="id-help-waitlist_text"}</td>
+        <td class="label">{$form.waitlist_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='waitlist_text' id=$eventID} {/if}{help id="id-help-waitlist_text"}</td>
         <td>{$form.waitlist_text.html}</td>
       {/if}
     </tr>
