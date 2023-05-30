@@ -1849,38 +1849,40 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $eventTitle = $dao->title;
       $eventId = $dao->event_id;
     }
-    if (!$details['allow_selfcancelxfer'] && !$isBackOffice) {
-      $details['eligible'] = FALSE;
-      $details['ineligible_message'] = ts('This event registration can not be transferred or cancelled. Contact the event organizer if you have questions.');
-      return $details;
-    }
-    // Verify participant status is one that can be self-cancelled
-    if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist'])) {
-      $details['eligible'] = FALSE;
-      $details['ineligible_message'] = ts('You cannot transfer or cancel your registration for %1 as you are not currently registered for this event.', [1 => $eventTitle]);
-      return $details;
-    }
-    // Determine if it's too late to self-service cancel/transfer.
-    $query = "select start_date as start, selfcancelxfer_time as time from civicrm_event where id = " . $eventId;
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $time_limit  = $dao->time;
-      $start_date = $dao->start;
-    }
-    $timenow = new Datetime();
-    if (!$isBackOffice && isset($time_limit)) {
-      $cancelHours = abs($time_limit);
-      $cancelInterval = new DateInterval("PT{$cancelHours}H");
-      $cancelInterval->invert = $time_limit < 0 ? 1 : 0;
-      $cancelDeadline = (new Datetime($start_date))->sub($cancelInterval);
-      if ($timenow > $cancelDeadline) {
+    if (!$isBackOffice) {
+      if (!$details['allow_selfcancelxfer']) {
         $details['eligible'] = FALSE;
-        // Change the language of the status message based on whether the waitlist time limit is positive or negative.
-        $afterOrPrior = $time_limit <= 0 ? 'after' : 'prior to';
-        $moreOrLess = $time_limit <= 0 ? 'more' : 'fewer';
-        $details['ineligible_message'] = ts("Registration for this event cannot be cancelled or transferred %1 than %2 hours %3 the event's start time. Contact the event organizer if you have questions.",
-        [1 => $moreOrLess, 2 => $cancelHours, 3 => $afterOrPrior]);
+        $details['ineligible_message'] = ts('This event registration can not be transferred or cancelled. Contact the event organizer if you have questions.');
+        return $details;
+      }
+      // Verify participant status is one that can be self-cancelled
+      if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist'])) {
+        $details['eligible'] = FALSE;
+        $details['ineligible_message'] = ts('You cannot transfer or cancel your registration for %1 as you are not currently registered for this event.', [1 => $eventTitle]);
+        return $details;
+      }
+      // Determine if it's too late to self-service cancel/transfer.
+      $query = "select start_date as start, selfcancelxfer_time as time from civicrm_event where id = " . $eventId;
+      $dao = CRM_Core_DAO::executeQuery($query);
+      while ($dao->fetch()) {
+        $time_limit  = $dao->time;
+        $start_date = $dao->start;
+      }
+      $timenow = new Datetime();
+      if (isset($time_limit)) {
+        $cancelHours = abs($time_limit);
+        $cancelInterval = new DateInterval("PT{$cancelHours}H");
+        $cancelInterval->invert = $time_limit < 0 ? 1 : 0;
+        $cancelDeadline = (new Datetime($start_date))->sub($cancelInterval);
+        if ($timenow > $cancelDeadline) {
+          $details['eligible'] = FALSE;
+          // Change the language of the status message based on whether the waitlist time limit is positive or negative.
+          $afterOrPrior = $time_limit <= 0 ? 'after' : 'prior to';
+          $moreOrLess = $time_limit <= 0 ? 'more' : 'fewer';
+          $details['ineligible_message'] = ts("Registration for this event cannot be cancelled or transferred %1 than %2 hours %3 the event's start time. Contact the event organizer if you have questions.",
+          [1 => $moreOrLess, 2 => $cancelHours, 3 => $afterOrPrior]);
 
+        }
       }
     }
     return $details;
