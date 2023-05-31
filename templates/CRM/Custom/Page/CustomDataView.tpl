@@ -69,8 +69,6 @@
                           {else}
                             {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
                               {', '|implode:$element.contact_ref_links}
-                            {elseif $element.field_data_type == 'Memo'}
-                              {$element.field_value|nl2br}
                             {else}
                               {$element.field_value}
                             {/if}
@@ -123,8 +121,6 @@
                   <div class="content">
                     {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
                       {', '|implode:$element.contact_ref_links}
-                    {elseif $element.field_data_type == 'Memo'}
-                      {if $element.field_value}{$element.field_value|nl2br}{else}<br/>{/if}
                     {else}
                       {if $element.field_value}{$element.field_value} {else}<br/>{/if}
                     {/if}
