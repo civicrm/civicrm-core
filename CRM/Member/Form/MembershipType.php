@@ -258,17 +258,12 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $result = civicrm_api3("Membership", "get", ["membership_type_id" => $this->_id, "options" => ["limit" => 1]]);
       $membershipRecords = ($result["count"] > 0);
-      if ($membershipRecords) {
-        $memberRel->freeze();
-      }
     }
 
     $this->assign('membershipRecordsExists', $membershipRecords);
-
-    $this->addFormRule(['CRM_Member_Form_MembershipType', 'formRule']);
-
     $this->assign('membershipTypeId', $this->_id);
     $this->assign('deferredFinancialType', Civi::settings()->get('deferred_revenue_enabled') ? array_keys(CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType()) : NULL);
+    $this->addFormRule(['CRM_Member_Form_MembershipType', 'formRule']);
   }
 
   /**
