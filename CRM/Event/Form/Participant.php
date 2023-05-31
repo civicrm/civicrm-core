@@ -1209,7 +1209,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionParams['non_deductible_amount'] = 'null';
         $contributionParams['receipt_date'] = !empty($params['send_receipt']) ? CRM_Utils_Array::value('receive_date', $params) : 'null';
         $contributionParams['contact_id'] = $this->_contactID;
-        $contributionParams['receive_date'] = $params['receive_date'] ?? date('Y-m-d');
+        $contributionParams['receive_date'] = !(empty($params['receive_date'])) ? $params['receive_date'] : $now;
 
         $recordContribution = [
           'financial_type_id',
