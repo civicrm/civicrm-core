@@ -17,6 +17,7 @@
         ctrl = this,
         currentBatch = 0,
         totalBatches,
+        processedCount = 0,
         incrementer;
 
       this.progress = 0;
@@ -62,8 +63,10 @@
           function(result) {
             stopIncrementer();
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
+            processedCount += result.count;
             if (ctrl.last >= ctrl.ids.length) {
               $timeout(function() {
+                result.batchCount = processedCount;
                 ctrl.success({result: result});
               }, 500);
             } else {

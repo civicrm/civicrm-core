@@ -14,8 +14,9 @@
       ctrl.start(ctrl.apiBatch.params);
     }
 
-    this.onSuccess = function() {
-      CRM.alert(ts(ctrl.apiBatch.successMsg, {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('%1 Complete', {1: ctrl.taskTitle}), 'success');
+    this.onSuccess = function(result) {
+      var entityTitle = this.getEntityTitle(result.batchCount);
+      CRM.alert(ts(ctrl.apiBatch.successMsg, {1: result.batchCount, 2: entityTitle}), ts('%1 Complete', {1: ctrl.taskTitle}), 'success');
       this.close();
     };
 
