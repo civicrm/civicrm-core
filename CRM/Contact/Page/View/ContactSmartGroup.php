@@ -38,7 +38,7 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
       }
     }
 
-    $allGroup = CRM_Contact_BAO_GroupContactCache::contactGroup($this->_contactId);
+    $allGroup = CRM_Contact_BAO_GroupContactCache::contactGroup($this->_contactId, FALSE, FALSE);
     $this->assign('groupSmart', NULL);
     $this->assign('groupParent', NULL);
 
