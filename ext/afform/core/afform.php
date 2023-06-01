@@ -509,26 +509,6 @@ function _afform_angular_module_name($fileBaseName, $format = 'camel') {
 }
 
 /**
- * Implements hook_civicrm_alterApiRoutePermissions().
- *
- * @see CRM_Utils_Hook::alterApiRoutePermissions
- */
-function afform_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action) {
-  if ($entity == 'Afform') {
-    // These actions should be accessible to anonymous users; permissions are checked internally
-    $allowedActions = ['prefill', 'submit', 'submitFile', 'getOptions'];
-    if (in_array($action, $allowedActions, TRUE)) {
-      $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
-    }
-  }
-  // This is temporarily stuck here, but probably belongs in core (until this hook is finally abolished)
-  elseif ($action === 'autocomplete') {
-    // Autocomplete widget must be accessible by anonymous users. Permissions are checked internally.
-    $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
-  }
-}
-
-/**
  * Implements hook_civicrm_preProcess().
  *
  * Wordpress only: Adds Afforms to the shortcode dialog (when editing pages/posts).

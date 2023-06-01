@@ -103,4 +103,11 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
     return $contactID;
   }
 
+  public function userLogout() {
+    \CRM_Core_Session::singleton()->reset();
+    UFMatch::delete(FALSE)
+      ->addWhere('uf_name', '=', 'superman')
+      ->execute();
+  }
+
 }

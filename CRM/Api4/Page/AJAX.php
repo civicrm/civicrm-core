@@ -24,6 +24,11 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
    */
   public function run() {
     $response = [];
+    // `$this->urlPath` contains the http request path as an exploded array.
+    // Path for single calls is `civicrm/ajax/api4/Entity/action` with `params` passed to $_REQUEST
+    // or for multiple calls the path is `civicrm/ajax/api4` with `calls` passed to $_POST
+    // Padding the array to avoid undefined index warnings when checking for single/multiple calls
+    $this->urlPath = array_pad($this->urlPath, 5, '');
 
     // First check for problems with the request
     $error = $this->checkRequestMethod();
