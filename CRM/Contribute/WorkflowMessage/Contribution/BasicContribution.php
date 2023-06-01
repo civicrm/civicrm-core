@@ -134,7 +134,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         $mockOrder->setDefaultFinancialTypeID($priceSet['financial_type_id']);
       }
     }
-    foreach (PriceField::get()->addWhere('price_set_id', '=', $mockOrder->getPriceSetID())->execute() as $index => $priceField) {
+    foreach (PriceField::get(FALSE)->addWhere('price_set_id', '=', $mockOrder->getPriceSetID())->execute() as $index => $priceField) {
       $priceFieldValue = PriceFieldValue::get()->addWhere('price_field_id', '=', $priceField['id'])->execute()->first();
       if (empty($example['is_show_line_items'])) {
         $priceFieldValue['amount'] = $contribution['total_amount'];
@@ -157,8 +157,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
    * @throws \CRM_Core_Exception
    */
   private function getNonQuickConfigPriceSet(): ?array {
-    // Permission check defaults to true - likely implicitly OK but may need to be false.
-    return PriceSet::get()
+    return PriceSet::get(FALSE)
       ->addWhere('is_quick_config', '=', FALSE)
       ->execute()
       ->first();
