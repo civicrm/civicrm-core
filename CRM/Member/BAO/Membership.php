@@ -350,6 +350,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         // @todo this is a temporary step to removing $ids['contribution'] completely
         if (empty($params['contribution_id']) && !empty($contributionID)) {
           $params['contribution_id'] = $contributionID;
+          CRM_Core_Error::deprecatedWarning('should be unreachable');
         }
       }
 
@@ -375,6 +376,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         }
         // do cleanup line items if membership edit the Membership type.
         if (!empty($ids['membership'])) {
+          CRM_Core_Error::deprecatedWarning('should be unreachable');
           CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
         }
         // @todo - we should ONLY do the below if a contribution is created. Let's
