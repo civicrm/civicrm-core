@@ -93,7 +93,6 @@
 
                 {if !empty($ppID)}{ts}<a class='action-item crm-hover-button' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
                 <div id="totalAmountBlock">
-                  {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
                   <div id="totalTaxAmount" class="label"></div>
                 </div>
               {/if}
@@ -206,14 +205,15 @@
         {if empty($is_template) and $email and $outBound_option != 2}
           <tr class="crm-contribution-form-block-is_email_receipt">
             <td class="label">{$form.is_email_receipt.label}</td>
-            <td>{$form.is_email_receipt.html}&nbsp;
+            <td>{$form.is_email_receipt.html}
               <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
             </td>
           </tr>
         {elseif empty($is_template) and $context eq 'standalone' and $outBound_option != 2 }
           <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
             <td class="label">{$form.is_email_receipt.label}</td>
-            <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
+            <td>{$form.is_email_receipt.html}
+              <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
             </td>
           </tr>
         {/if}
@@ -226,9 +226,7 @@
         {if empty($is_template)}
         <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
           <td class="label">{$form.receipt_date.label}</td>
-          <td>{$form.receipt_date.html}<br />
-            <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
-          </td>
+          <td>{$form.receipt_date.html}</td>
         </tr>
         {/if}
         {if !empty($form.payment_processor_id)}
@@ -304,16 +302,11 @@
                     </tr>
                     <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
                       <td class="label">{$form.pcp_roll_nickname.label}</td>
-                      <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br/>
-                        <div class="description">{ts}Name or nickname contributor wants to be displayed in the Honor Roll. Enter "Anonymous" for anonymous contributions.{/ts}</div>
-                      </td>
+                      <td>{$form.pcp_roll_nickname.html|crmAddClass:big}</td>
                     </tr>
                     <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">
                       <td class="label" style="vertical-align: top">{$form.pcp_personal_note.label}</td>
-                      <td>
-                        {$form.pcp_personal_note.html}
-                        <div class="description">{ts}Personal message submitted by contributor for display in the Honor Roll.{/ts}</div>
-                      </td>
+                      <td>{$form.pcp_personal_note.html}</td>
                     </tr>
                   </table>
                 </div>

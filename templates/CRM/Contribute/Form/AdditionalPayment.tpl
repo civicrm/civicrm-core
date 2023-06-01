@@ -60,7 +60,7 @@
           <td class="label">
             {$form.is_email_receipt.label}
           </td>
-          <td>{$form.is_email_receipt.html}&nbsp;
+          <td>{$form.is_email_receipt.html}
               <span class="description">{ts 1=$email}Automatically email a receipt to %1?{/ts}</span>
           </td>
         </tr>
@@ -95,8 +95,10 @@
             <td class="label">{$form.trxn_id.label}</td>
             <td>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
-          <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html}<br />
-            <span class="description">{ts}Processing fee for this transaction (if applicable).{/ts}</span></td></tr>
+          <tr class="crm-payment-form-block-fee_amount">
+            <td class="label">{$form.fee_amount.label}</td>
+            <td{$valueStyle}>{$form.fee_amount.html}</td>
+          </tr>
         </table>
       </div>
       {/if}
