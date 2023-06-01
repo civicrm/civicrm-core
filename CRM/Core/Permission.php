@@ -782,7 +782,7 @@ class CRM_Core_Permission {
 
       'view all notes' => [
         $prefix . ts('view all notes'),
-        ts("View notes (for visible contacts) even if they're marked admin only"),
+        ts("View notes (for visible contacts) even if they're marked author only"),
       ],
       'add contact notes' => [
         $prefix . ts('add contact notes'),
