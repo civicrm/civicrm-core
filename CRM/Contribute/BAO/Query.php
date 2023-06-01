@@ -985,7 +985,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       ]
     );
 
-    $form->addField('financial_trxn_card_type_id', ['entity' => 'FinancialTrxn', 'name' => 'card_type_id', 'action' => 'get']);
+    $form->addField('financial_trxn_card_type_id', ['entity' => 'FinancialTrxn', 'name' => 'card_type_id', 'action' => 'get', 'label' => ts('Card Type')]);
 
     $form->add('text', 'financial_trxn_pan_truncation', ts('Card Number'), [
       'size' => 5,

@@ -17,9 +17,6 @@
         <td>
           <label>{$form.title.label}</label>
           {$form.title.html|crmAddClass:twenty}
-          <div class="description font-italic">
-                 {ts}Complete OR partial Event name.{/ts}
-          </div>
         </td>
         <td><label>{ts}Event Type{/ts}</label>
           {$form.event_type_id.html}
