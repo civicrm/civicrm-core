@@ -150,9 +150,9 @@ return [
               'rewrite' => '[api_entity].[api_action]',
             ],
             [
-              'text' => E::ts(''),
+              'text' => '',
               'style' => 'default',
-              'size' => 'btn-sm',
+              'size' => 'btn-xs',
               'icon' => 'fa-bars',
               'links' => [
                 [
