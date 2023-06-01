@@ -43,13 +43,13 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
   }
 
   /**
-   * Given a note id, decide if the note should be displayed based on privacy setting
+   * Given a note id, decide if the note should be hidden based on privacy setting
    *
    * @param object $note
    *   Either the id of the note to retrieve, or the CRM_Core_DAO_Note object itself.
    *
    * @return bool
-   *   TRUE if the note should be displayed, otherwise FALSE
+   *   TRUE if the note should be hidden, otherwise FALSE
    *
    */
   public static function getNotePrivacyHidden($note) {
