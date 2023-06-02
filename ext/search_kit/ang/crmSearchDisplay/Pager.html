@@ -3,7 +3,7 @@
     <div class="form-inline" ng-if="$ctrl.settings.pager.show_count" ng-include="'~/crmSearchDisplay/ResultCount.html'">
     </div>
   </div>
-  <div class="text-center crm-flex-2">
+  <div ng-if="!$ctrl.settings.pager.hide_single || ($ctrl.rowCount > $ctrl.limit)" class="text-center crm-flex-2">
     <ul uib-pagination
         class="pagination"
         boundary-links="true"
