@@ -46,6 +46,12 @@ use Civi\Core\Transaction\Manager;
 use Civi\Payment\System;
 use Civi\Api4\OptionValue;
 use Civi\Test\Api3DocTrait;
+use Civi\Test\ContactTestTrait;
+use Civi\Test\DbTestTrait;
+use Civi\Test\EventTestTrait;
+use Civi\Test\GenericAssertionsTrait;
+use Civi\Test\LocaleTestTrait;
+use Civi\Test\MailingTestTrait;
 use League\Csv\Reader;
 
 /**
@@ -75,11 +81,12 @@ define('API_LATEST_VERSION', 3);
 class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   use Api3DocTrait;
-  use \Civi\Test\GenericAssertionsTrait;
-  use \Civi\Test\DbTestTrait;
-  use \Civi\Test\ContactTestTrait;
-  use \Civi\Test\MailingTestTrait;
-  use \Civi\Test\LocaleTestTrait;
+  use EventTestTrait;
+  use GenericAssertionsTrait;
+  use DbTestTrait;
+  use ContactTestTrait;
+  use MailingTestTrait;
+  use LocaleTestTrait;
 
   /**
    * API version in use.
