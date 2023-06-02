@@ -120,7 +120,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    * @param $full
    * @throws \Exception
    */
-  public function testContactIDs($fv, $count, $ids, $full) {
+  public function testContactIDs($fv, $count, $ids, $full): void {
     $this->loadXMLDataSet(__DIR__ . '/datasets/group-dataset.xml');
 
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
