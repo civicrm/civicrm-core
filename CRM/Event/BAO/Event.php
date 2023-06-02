@@ -315,6 +315,22 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
   }
 
   /**
+   * Returns an array of event pages [id => title]
+   * @return array
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function getEventsForSelect2() {
+    return ['all' => ts('- all -')] +
+      \Civi\Api4\Event::get(FALSE)
+        ->addSelect('id', 'title')
+        ->addWhere('is_active', '=', TRUE)
+        ->execute()
+        ->indexBy('id')
+        ->column('title');
+  }
+
+  /**
    * Get events Summary.
    *
    * @return array

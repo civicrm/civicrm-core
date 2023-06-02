@@ -355,17 +355,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // CRM-18399: used by template to pass pre profile id as a url arg
     $this->assign('custom_pre_id', $this->_values['custom_pre_id']);
 
-    // Required for currency formatting in the JS layer
-
-    // Required for currency formatting in the JS layer
-    // this is a temporary fix intended to resolve a regression quickly
-    // And assigning moneyFormat for js layer formatting
-    // will only work until that is done.
-    // https://github.com/civicrm/civicrm-core/pull/19151
-    $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56));
-
-    CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-
     $contactID = $this->getContactID();
     $this->assign('contact_id', $contactID);
     if ($contactID) {
@@ -432,7 +421,17 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->assign('isAdditionalParticipants', $isAdditionalParticipants);
 
     if ($this->_values['event']['is_monetary']) {
+      // Required for currency formatting in the JS layer
+      // this is a temporary fix intended to resolve a regression quickly
+      // And assigning moneyFormat for js layer formatting
+      // will only work until that is done.
+      // https://github.com/civicrm/civicrm-core/pull/19151
+      $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56));
       self::buildAmount($this);
+      if (!$this->showPaymentOnConfirm) {
+        CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+        $this->addPaymentProcessorFieldsToForm();
+      }
     }
 
     if ($contactID === 0 && !$this->_values['event']['is_multiple_registrations']) {
@@ -440,12 +439,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->addCIDZeroOptions();
     }
 
-    if ($this->_values['event']['is_monetary']) {
-      $this->addPaymentProcessorFieldsToForm();
-    }
-
     $this->addElement('hidden', 'bypass_payment', NULL, ['id' => 'bypass_payment']);
-
     $this->assign('bypassPayment', $bypassPayment);
 
     if (!$contactID) {
@@ -913,7 +907,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($form->_values['event']['is_monetary']) {
       if (empty($form->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 &&
         !isset($fields['payment_processor_id'])) {
-        $errors['payment_processor_id'] = ts('Please select a Payment Method');
+        if (!$form->showPaymentOnConfirm) {
+          $errors['payment_processor_id'] = ts('Please select a Payment Method');
+        }
       }
 
       if (self::isZeroAmount($fields, $form)) {
