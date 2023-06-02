@@ -1837,6 +1837,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Contribute_Form_AdditionalInfo::processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
     }
 
+    // If financial type has changed from non-deductible to deductible, let the user know so they can adjust the non-deductible amount
+    $toType = $submittedValues['financial_type_id'] ?? NULL;
+    $fromType = $this->_defaults['financial_type_id'] ?? NULL;
+    if (($this->_action & CRM_Core_Action::UPDATE) && ($toType != $fromType) && ($submittedValues['non_deductible_amount'] ?? NULL)) {
+      $deductible = \Civi\Api4\FinancialType::get(TRUE)
+        ->addSelect('is_deductible')
+        ->addWhere('id', 'IN', [$toType, $fromType])
+        ->execute()->indexBy('id')->column('is_deductible');
+      if ($deductible[$fromType] == FALSE && $deductible[$toType] == TRUE) {
+        CRM_Core_Session::setStatus(ts("You've changed the financial type for this %1 contribution from non-tax deductible to tax deductible, but the non-deductible amount of %2 has not been changed. This could prevent a tax receipt from being issued correctly. You may want to edit the non-deductible amount.",
+          [1 => Civi::format()->money($submittedValues['total_amount']), 2 => Civi::format()->money($submittedValues['non_deductible_amount'])]),
+          ts('Non-deductible amount'), 'alert', ['expires' => 30000]);
+      }
+    }
+
     CRM_Core_Session::setStatus(implode(' ', $this->statusMessage), $this->statusMessageTitle, 'success');
 
     CRM_Contribute_BAO_Contribution::updateRelatedPledge(
