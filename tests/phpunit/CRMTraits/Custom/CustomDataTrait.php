@@ -40,7 +40,7 @@ trait CRMTraits_Custom_CustomDataTrait {
   public function createCustomGroup(array $params = []): int {
     $params = array_merge([
       'title' => 'Custom Group',
-      'extends' => $this->entity ?? 'Contact',
+      'extends' => $this->getEntity(),
       'weight' => 5,
       'style' => 'Inline',
       'max_multiple' => 0,
@@ -56,6 +56,18 @@ trait CRMTraits_Custom_CustomDataTrait {
       $this->fail('Could not create group ' . $e->getMessage());
     }
     return $this->ids['CustomGroup'][$identifier];
+  }
+
+  /**
+   * Get the entity being acted on.
+   *
+   * @return string
+   */
+  protected function getEntity(): string {
+    if (property_exists($this, 'entity')) {
+      return $this->entity;
+    }
+    return 'Contact';
   }
 
   /**
