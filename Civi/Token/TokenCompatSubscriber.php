@@ -72,7 +72,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {
         $tokenParts = explode('|', $tokenName);
         $modifier = $tokenParts[1] ?? '';
-        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenParts[0]), $e->context['locale'] ?? NULL);
+        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenParts[0]), '');
         if ($smartyVars[$smartyName] instanceof \Brick\Money\Money) {
           // TODO: We should reuse the filters from TokenProcessor::filterTokenValue()
           if ($modifier === 'crmMoney') {
