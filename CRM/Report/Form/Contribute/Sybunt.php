@@ -33,6 +33,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   protected $groupFilterNotOptimised = FALSE;
 
   /**
+   * @var string
+   */
+  protected $statusClause = '';
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -334,7 +339,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   public function where() {
-    $this->_statusClause = "";
+    $this->statusClause = "";
     $clauses = [
       $this->_aliases['civicrm_contribution'] . '.is_test = 0',
       $this->_aliases['civicrm_contribution'] . '.is_template = 0',
@@ -372,7 +377,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
               if (($fieldName == 'contribution_status_id' ||
                   $fieldName == 'financial_type_id') && !empty($clause)
               ) {
-                $this->_statusClause .= " AND " . $clause;
+                $this->statusClause .= " AND " . $clause;
               }
             }
           }
@@ -452,7 +457,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         $sql = "" .
           "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
           implode(',', $contactIds) .
-          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 {$this->_statusClause} {$this->_groupBy} ";
+          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 {$this->statusClause} {$this->_groupBy} ";
       }
 
       $current_year = $this->_params['yid_value'];
@@ -507,7 +512,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
    */
   public function buildChart(&$rows) {
     $graphRows = [];
-    $count = 0;
+    $display = [];
     $current_year = $this->_params['yid_value'];
     $previous_year = $current_year - 1;
     $previous_two_year = $current_year - 2;
