@@ -27,6 +27,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   protected $aclGroupID = NULL;
 
   /**
+   * @var int
+   */
+  protected $activityID;
+
+  /**
    * Our group reports use an alter so transaction cleanup won't work.
    *
    * @throws \Exception
@@ -1149,7 +1154,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testReportsCustomDataOrderBy($template) {
-    $this->entity = 'Contact';
     $this->createCustomGroupWithFieldOfType();
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
