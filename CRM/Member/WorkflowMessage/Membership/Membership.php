@@ -145,8 +145,7 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
    * @throws \CRM_Core_Exception
    */
   private function getPriceSet(): ?array {
-    // Permission check defaults to true - likely implicitly OK but may need to be false.
-    return (array) PriceSet::get()
+    return (array) PriceSet::get(FALSE)
       ->addWhere('extends', '=', CRM_Core_Component::getComponentID('CiviMember'))
       ->addOrderBy('is_quick_config', 'DESC')
       ->execute()->indexBy('id');

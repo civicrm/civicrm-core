@@ -72,7 +72,6 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
    * @throws \CRM_Core_Exception
    */
   private function getPriceSets(): ?array {
-    // Permission check defaults to true - likely implicitly OK but may need to be false.
     $quickConfigPriceSet = $this->getPriceSet(TRUE);
     $nonQuickConfigPriceSet = $this->getPriceSet(FALSE);
 
