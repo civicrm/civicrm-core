@@ -15,7 +15,15 @@
  */
 class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
 
-  protected $_smsRecipients = [];
+  /**
+   * @var array
+   */
+  protected $smsRecipients = [];
+
+  /**
+   * @var array
+   */
+  protected $contactIDs = [];
 
   /**
    * Set up for tests.
@@ -97,13 +105,13 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
     ]);
     // Track the contacts that should get an SMS and which
     // number they should receive it.
-    $this->_smsRecipients = [
+    $this->smsRecipients = [
       $contact1 => "1111111111",
       $contact2 => "2222222222",
       $contact3 => "3333333333",
     ];
 
-    $this->_contactIds = [
+    $this->contactIDs = [
       $contact1,
       $contact2,
       $contact3,
@@ -120,7 +128,7 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
    */
   public function testQuickFormMobileNumbersDisplay() {
     $form = $this->getFormObject('CRM_Core_Form');
-    $form->_contactIds = $this->_contactIds;
+    $form->_contactIds = $this->contactIDs;
     $form->_single = FALSE;
     CRM_Contact_Form_Task_SMSCommon::buildQuickForm($form);
     $contacts = json_decode($form->get_template_vars('toContact'));
