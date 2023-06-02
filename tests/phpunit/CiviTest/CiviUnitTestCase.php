@@ -491,6 +491,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if (!empty($this->ids['UFGroup'])) {
       UFGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['UFGroup'])->execute();
     }
+    $this->assertEquals(13, CRM_Core_DAO::singleValueQuery('select count(*) FROM civicrm_uf_group'));
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
     parent::tearDown();
   }
