@@ -14,3 +14,19 @@ VALUES
     ( {$domainID}, 'https://civicrm.org/help?src=iam',       '{ts escape="sql" skip="true"}Get Help{/ts}',   'Get Help',   NULL, 'AND', @adminHelplastID, '1', NULL, 2 );
 
 UPDATE IGNORE `civicrm_navigation` SET `name` = 'Register Your Site', `label` = '{ts escape="sql" skip="true"}Register Your Site{/ts}' WHERE `name` = 'Register your site';
+
+-- Ensure new name field is not null/unique. Setting to ID is a bit lazy - but sql localisation is painful.
+UPDATE civicrm_contribution_page SET `name` = `id`;
+
+-- Add name field, make frontend_title required (in conjunction with php function)
+{if $multilingual}
+  {foreach from=$locales item=locale}
+    UPDATE `civicrm_contribution_page`
+    SET `frontend_title_{$locale}` = `title_{$locale}`
+    WHERE `frontend_title_{$locale}` IS NULL OR `frontend_title_{$locale}` = '';
+  {/foreach}
+{else}
+  UPDATE `civicrm_contribution_page`
+  SET `frontend_title` = `title`
+  WHERE `frontend_title` IS NULL OR `frontend_title` = '';
+{/if}

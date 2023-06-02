@@ -98,6 +98,7 @@ trait CRMTraits_Contribute_RecurFormsTrait {
         'receipt_from_name' => 'Bob',
         'receipt_from_email' => 'bob@example.org',
         'financial_type_id' => 'Donation',
+        'title' => 'page',
       ])['id'];
     }
     return $this->ids['ContributionPage'][0];

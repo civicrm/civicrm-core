@@ -17,11 +17,13 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Core\Event\PostEvent;
+use Civi\Core\HookInterface;
 
 /**
  * This class contains Contribution Page related functions.
  */
-class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage {
+class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage implements HookInterface {
 
   /**
    * Creates a contribution page.
@@ -31,25 +33,22 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @return CRM_Contribute_DAO_ContributionPage
    */
   public static function create($params) {
-    $financialTypeId = NULL;
-    if (!empty($params['id']) && !CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
-      $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $params['id'], 'financial_type_id');
-    }
-
+    // @todo  - this implode is probably handled by writeRecord - test & remove.
     if (isset($params['payment_processor']) && is_array($params['payment_processor'])) {
       $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['payment_processor']);
     }
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'ContributionPage', CRM_Utils_Array::value('id', $params), $params);
-    $dao = new CRM_Contribute_DAO_ContributionPage();
-    $dao->copyValues($params);
-    $dao->save();
-    if ($financialTypeId && !empty($params['financial_type_id']) && $financialTypeId != $params['financial_type_id']) {
-      CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_contribution_page', $params['financial_type_id']);
-    }
-    CRM_Utils_Hook::post($hook, 'ContributionPage', $dao->id, $dao);
+    return self::writeRecord($params);
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   *
+   * @param \Civi\Core\Event\PostEvent $event
+   *
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public static function self_hook_civicrm_post(PostEvent $event): void {
     CRM_Core_PseudoConstant::flush();
-    return $dao;
   }
 
   /**
