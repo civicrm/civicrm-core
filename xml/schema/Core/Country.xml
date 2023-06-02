@@ -90,6 +90,7 @@
     <comment>Foreign key to civicrm_worldregion.id.</comment>
     <html>
       <label>World Region</label>
+      <type>Select</type>
     </html>
     <add>1.8</add>
     <localize_context>country</localize_context>

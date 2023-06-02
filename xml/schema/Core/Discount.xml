@@ -64,6 +64,7 @@
     <comment>FK to civicrm_price_set</comment>
     <html>
       <label>Price Set</label>
+      <type>Select</type>
     </html>
     <add>4.3</add>
   </field>

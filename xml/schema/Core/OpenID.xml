@@ -47,6 +47,10 @@
       <labelColumn>display_name</labelColumn>
     </pseudoconstant>
     <comment>Which Location does this email belong to.</comment>
+    <html>
+      <label>Location Type</label>
+      <type>Select</type>
+    </html>
     <add>2.0</add>
   </field>
   <index>
