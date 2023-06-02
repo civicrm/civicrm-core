@@ -25,7 +25,7 @@ trait Api4TestTrait {
    *
    * @var array
    */
-  private $testRecords = [];
+  protected $testRecords = [];
 
   /**
    * Inserts a test record, supplying all required values if not provided.

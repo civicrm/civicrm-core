@@ -1042,7 +1042,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
         'phone_id' => $phoneID,
       ],
     ])->execute()->first()['id'];
-    $this->ids['Event'][0] = $this->eventCreate([
+    $this->ids['Event'][0] = $this->eventCreateUnpaid([
       'description' => 'event description',
       'end_date' => 20081023,
       'registration_end_date' => 20081015,
