@@ -49,6 +49,7 @@
     <comment>FK to contribution table.</comment>
     <html>
       <label>Contribution</label>
+      <type>EntityRef</type>
     </html>
     <add>2.1</add>
   </field>
