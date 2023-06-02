@@ -48,8 +48,8 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
 
-    $this->standardProfile = $this->createStandardBillingProfile();
-    $this->customProfile = $this->createCustomBillingProfile();
+    $this->createStandardBillingProfile();
+    $this->createCustomBillingProfile();
 
     $this->standardProcessorTypeID = $this->paymentProcessorTypeCreate([
       'class_name' => 'PaymentProcessorWithStandardBillingRequirements',
@@ -94,77 +94,73 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
     ]);
 
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_uf_group', 'civicrm_uf_field']);
-
     parent::tearDown();
   }
 
-  public function createStandardBillingProfile(): array {
-    return $this->createTestableBillingProfile('standard', TRUE);
+  public function createStandardBillingProfile(): void {
+    $this->createTestableBillingProfile('standard', TRUE);
   }
 
-  public function createCustomBillingProfile(): array {
-    return $this->createTestableBillingProfile('custom', FALSE);
+  public function createCustomBillingProfile(): void {
+    $this->createTestableBillingProfile('custom', FALSE);
   }
 
-  public function createTestableBillingProfile($name, $withState): array {
-    $billingId = CRM_Core_BAO_LocationType::getBilling();
+  public function createTestableBillingProfile($name, $withState): void {
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
 
-    $profile = $this->callAPISuccess('UFGroup', 'create', [
+    $this->ids['UFGroup']["{$name}_billing"] = $this->callAPISuccess('UFGroup', 'create', [
       'group_type' => 'Contact',
       'title' => "Billing fields: $name",
       'name' => "{$name}_billing",
-    ]);
+    ])['id'];
 
     $this->callAPISuccess('UFField', 'create', [
-      'uf_group_id' => $profile['id'],
+      'uf_group_id' => $this->ids['UFGroup']["{$name}_billing"],
       'field_name' => 'first_name',
       'is_required' => TRUE,
     ]);
 
     $this->callAPISuccess('UFField', 'create', [
-      'uf_group_id' => $profile['id'],
+      'uf_group_id' => $this->ids['UFGroup']["{$name}_billing"],
       'field_name' => 'last_name',
       'is_required' => TRUE,
     ]);
 
     $this->callAPISuccess('UFField', 'create', [
-      'uf_group_id' => $profile['id'],
+      'uf_group_id' => $this->ids['UFGroup']["{$name}_billing"],
       'field_name' => 'street_address',
       'is_required' => TRUE,
     ]);
 
     $this->callAPISuccess('UFField', 'create', [
-      'uf_group_id' => $profile['id'],
+      'uf_group_id' => $this->ids['UFGroup']["{$name}_billing"],
       'field_name' => 'city',
-      'location_type_id' => $billingId,
+      'location_type_id' => $billingID,
       'is_required' => TRUE,
     ]);
 
     if ($withState) {
       $this->callAPISuccess('UFField', 'create', [
-        'uf_group_id' => $profile['id'],
+        'uf_group_id' => $this->ids['UFGroup']["{$name}_billing"],
         'field_name' => 'state_province',
-        'location_type_id' => $billingId,
+        'location_type_id' => $billingID,
         'is_required' => TRUE,
       ]);
     }
 
     $this->callAPISuccess('UFField', 'create', [
-      'uf_group_id' => $profile['id'],
+      'uf_group_id' => $this->ids['UFGroup']["{$name}_billing"],
       'field_name' => 'postal_code',
-      'location_type_id' => $billingId,
+      'location_type_id' => $billingID,
       'is_required' => TRUE,
     ]);
 
     $this->callAPISuccess('UFField', 'create', [
-      'uf_group_id' => $profile['id'],
+      'uf_group_id' => $this->ids['UFGroup']["{$name}_billing"],
       'field_name' => 'country',
-      'location_type_id' => $billingId,
+      'location_type_id' => $billingID,
       'is_required' => TRUE,
     ]);
-
-    return $profile;
   }
 
   /**
@@ -172,25 +168,24 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
    * or the custom profile and returns a boolean that
    * indicates whether the billing block can be hidden, or not.
    */
-  public function checkPaymentProcessorWithProfile($processorClass, $case) {
-    $whichProcessor = $case . "ProcessorID";
-    $whichProfile = $case . "Profile";
-
+  public function checkPaymentProcessorWithProfile($processorClass, $case): bool {
+    $whichProcessor = $case . 'ProcessorID';
+    $profileID = $this->ids['UFGroup'][$case . '_billing'];
     $processor = new $processorClass();
     $processor->id = $this->$whichProcessor;
 
     $missingBillingFields = [];
 
     $fields = array_column(
-      $this->callAPISuccess('UFField', 'get', ['uf_group_id' => $this->$whichProfile['id']])['values'],
+      $this->callAPISuccess('UFField', 'get', ['uf_group_id' => $profileID])['values'],
       'field_name'
     );
 
     $fields = array_map(function($field) {
       if (!isset($field['location_type_id'])) {
-        return "$field";
+        return $field;
       }
-      return $field . "-" . $field['location_type_id'];
+      return $field . '-' . $field['location_type_id'];
     }, $fields);
 
     $canBeHidden = FALSE;
@@ -198,7 +193,7 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
       $canBeHidden = CRM_Core_BAO_UFField::assignAddressField(
         $field,
         $missingBillingFields,
-        ['uf_group_id' => $this->$whichProfile['id']],
+        ['uf_group_id' => $profileID],
         array_keys($processor->getBillingAddressFields())
       );
 
@@ -214,15 +209,15 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
    * Checks that, if a payment processor declares the standard
    * billing fields as needed, they must be considered mandatory.
    */
-  public function testPaymentProcessorWithStandardBillingRequirements() {
+  public function testPaymentProcessorWithStandardBillingRequirements(): void {
     $canBeHiddenWithTheStandardProfile = $this->checkPaymentProcessorWithProfile(
-      "PaymentProcessorWithStandardBillingRequirements",
-      "standard"
+      'PaymentProcessorWithStandardBillingRequirements',
+      'standard'
     );
 
     $canBeHiddenWithTheCustomProfile = $this->checkPaymentProcessorWithProfile(
-      "PaymentProcessorWithStandardBillingRequirements",
-      "custom"
+      'PaymentProcessorWithStandardBillingRequirements',
+      'custom'
     );
 
     $this->assertEquals(TRUE, $canBeHiddenWithTheStandardProfile);
