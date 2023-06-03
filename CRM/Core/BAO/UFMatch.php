@@ -249,7 +249,7 @@ AND    domain_id = %2
 
         $contactParameters['contact_type'] = $ctype ?? 'Individual';
 
-         // If contactID exist, user exist and use it
+        // If contactID exist, user exist and use it
         if (isset($dedupeParameters['contact_id'])) {
           $ufmatch->contact_id = $dedupeParameters['contact_id'];
         }
