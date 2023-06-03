@@ -22,8 +22,8 @@
 class CRM_Contact_SelectorTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
-    parent::tearDown();
     $this->quickCleanup(['civicrm_tag', 'civicrm_entity_tag']);
+    parent::tearDown();
   }
 
   /**
