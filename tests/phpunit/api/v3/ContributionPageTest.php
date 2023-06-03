@@ -1809,7 +1809,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testValidate(): void {
     $this->setUpContributionPage();
-    $errors = $this->callAPISuccess('ContributionPage', 'validate', array_merge($this->getBasicSubmitParams(), ['action' => 'submit']))['values'];
+    $errors = $this->callAPISuccess('ContributionPage', 'validate', array_merge($this->getCreditCardSubmitParams(), ['action' => 'submit']))['values'];
     $this->assertEmpty($errors);
   }
 
@@ -1827,7 +1827,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   public function testValidatePost(): void {
     $_SERVER['REQUEST_METHOD'] = 'POST';
     $this->setUpContributionPage();
-    $errors = $this->callAPISuccess('ContributionPage', 'validate', array_merge($this->getBasicSubmitParams(), ['action' => 'submit']))['values'];
+    $errors = $this->callAPISuccess('ContributionPage', 'validate', array_merge($this->getCreditCardSubmitParams(), ['action' => 'submit']))['values'];
     $this->assertEmpty($errors);
     unset($_SERVER['REQUEST_METHOD']);
   }
@@ -1840,7 +1840,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   public function testValidateOutputOnMissingRecurFields(): void {
     $this->params['is_recur_interval'] = 1;
     $this->setUpContributionPage(TRUE);
-    $submitParams = array_merge($this->getBasicSubmitParams(), ['action' => 'submit']);
+    $submitParams = array_merge($this->getCreditCardSubmitParams(), ['action' => 'submit']);
     $submitParams['is_recur'] = 1;
     $submitParams['frequency_interval'] = '';
     $submitParams['frequency_unit'] = '';
@@ -1889,6 +1889,35 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'priceSetId' => $this->_ids['price_set'][0],
       'payment_processor_id' => 0,
     ];
+  }
+
+  /**
+   * Get the params for a simple submit with billing and credit card details.
+   *
+   * @return array
+   */
+  protected function getCreditCardSubmitParams(): array {
+    $this->setupPaymentProcessor();
+    $output = array_merge($this->getBasicSubmitParams(), [
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => '123',
+      'credit_card_exp_date' => [
+        'M' => '1',
+        'Y' => date('Y') + 1,
+      ],
+      'credit_card_type' => 'Visa',
+      'billing_contact_email' => 'bobby@example.com',
+      'billing_first_name' => 'John',
+      'billing_middle_name' => '',
+      'billing_last_name' => "O'Connor",
+      'billing_street_address-5' => '8 Hobbitton Road',
+      'billing_city-5' => 'The Shire',
+      'billing_state_province_id-5' => 1012,
+      'billing_postal_code-5' => 5010,
+      'billing_country_id-5' => 1228,
+    ]);
+    $output['payment_processor_id'] = 1;
+    return $output;
   }
 
   /**
