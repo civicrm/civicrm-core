@@ -249,8 +249,15 @@ AND    domain_id = %2
 
         $contactParameters['contact_type'] = $ctype ?? 'Individual';
 
-        $contactID = civicrm_api3('Contact', 'create', $contactParameters)['id'];
-        $ufmatch->contact_id = $contactID;
+         // If contactID exist, user exist and use it
+        if (isset($dedupeParameters['contact_id'])) {
+          $ufmatch->contact_id = $dedupeParameters['contact_id'];
+        }
+        else {
+          // Conatct does not exist, so create a new one
+          $contactID = civicrm_api3('Contact', 'create', $contactParameters)['id'];
+          $ufmatch->contact_id = $contactID;
+        }
         $ufmatch->uf_name = $uniqId;
       }
 
