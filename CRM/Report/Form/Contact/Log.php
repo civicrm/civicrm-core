@@ -18,6 +18,8 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
+  protected $activityTypes = [];
+
   /**
    * Class constructor.
    */
