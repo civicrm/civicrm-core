@@ -123,7 +123,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    */
   public function testSearchByProfile(): void {
     //Create search profile for contacts.
-    $ufGroup = $this->callAPISuccess('UFGroup', 'create', [
+    $this->setTestEntityID('UFGroup', $this->callAPISuccess('UFGroup', 'create', [
       'group_type' => 'Contact',
       'name' => 'test_search_profile',
       'title' => 'Test Search Profile',
@@ -136,7 +136,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'in_selector' => 1,
         ],
       ],
-    ]);
+    ])['id'], 'test_profile');
     $contactID = $this->individualCreate(['email' => 'mickey@mouseville.com']);
     //Put the email on hold.
     $email = $this->callAPISuccess('Email', 'get', [
@@ -152,7 +152,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       'description' => 'Normal default behaviour',
       'class' => 'CRM_Contact_Selector',
       'settings' => [],
-      'form_values' => ['email' => 'mickey@mouseville.com', 'uf_group_id' => $ufGroup['id']],
+      'form_values' => ['email' => 'mickey@mouseville.com', 'uf_group_id' => $this->ids['UFGroup']['test_profile']],
       'params' => [],
       'return_properties' => NULL,
       'context' => 'advanced',
