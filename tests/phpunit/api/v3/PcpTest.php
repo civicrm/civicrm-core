@@ -34,7 +34,7 @@ class api_v3_PcpTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     $this->params = [
-      'title' => "Pcp title",
+      'title' => 'Pcp title',
       'contact_id' => 1,
       'page_id' => 1,
       'pcp_block_id' => 1,
@@ -45,7 +45,7 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   /**
    * Test create function succeeds.
    */
-  public function testCreatePcp() {
+  public function testCreatePcp(): void {
     $result = $this->callAPIAndDocument('Pcp', 'create', $this->params,
         __FUNCTION__, __FILE__);
     $this->getAndCheck($this->params, $result['id'], $this->entity);
@@ -54,9 +54,9 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   /**
    * Test disable a PCP succeeds.
    */
-  public function testDisablePcp() {
-    $result = civicrm_api3('Pcp', 'create', $this->params);
-    civicrm_api3('Pcp', 'create', ['id' => $result['id'], 'is_active' => 0]);
+  public function testDisablePcp(): void {
+    $result = $this->callAPISuccess('Pcp', 'create', $this->params);
+    $this->callAPISuccess('Pcp', 'create', ['id' => $result['id'], 'is_active' => 0]);
     $this->getAndCheck($this->params + ['is_active' => 0], $result['id'], $this->entity);
   }
 
@@ -67,8 +67,8 @@ class api_v3_PcpTest extends CiviUnitTestCase {
    * action on create. Add extra checks for any 'special' return values or
    * behaviours
    */
-  public function testGetPcp() {
-    $this->createTestEntity();
+  public function testGetPcp(): void {
+    $this->createTestEntity('PCP', $this->params);
     $result = $this->callAPIAndDocument('Pcp', 'get', $this->params,
         __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
@@ -78,8 +78,8 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   /**
    * Check the delete function succeeds.
    */
-  public function testDeletePcp() {
-    $entity = $this->createTestEntity();
+  public function testDeletePcp(): void {
+    $entity = $this->createTestEntity('PCP', $this->params);
     $checkCreated = $this->callAPISuccess($this->entity, 'get',
       ['id' => $entity['id']]);
     $this->assertEquals(1, $checkCreated['count']);
@@ -97,13 +97,12 @@ class api_v3_PcpTest extends CiviUnitTestCase {
    * is best put in the $description variable as it will then be displayed in the
    * test generated examples. (these are to be found in the api/examples folder).
    */
-  public function testGetPcpChainDelete() {
-    $description = "Demonstrates get + delete in the same call.";
-    $subfile = 'ChainedGetDelete';
-    $params = ['title' => "Pcp title", 'api.Pcp.delete' => 1];
+  public function testGetPcpChainDelete(): void {
+    $description = 'Demonstrates get + delete in the same call.';
+    $params = ['title' => 'Pcp title', 'api.Pcp.delete' => 1];
     $this->callAPISuccess('Pcp', 'create', $this->params);
     $this->callAPIAndDocument('Pcp', 'get', $params, __FUNCTION__,
-        __FILE__, $description, $subfile);
+        __FILE__, $description, 'ChainedGetDelete');
     $this->assertEquals(0, $this->callAPISuccess('Pcp', 'getcount', []));
   }
 

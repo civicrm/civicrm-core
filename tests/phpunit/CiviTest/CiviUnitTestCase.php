@@ -491,6 +491,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if (!empty($this->ids['UFGroup'])) {
       UFGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['UFGroup'])->execute();
     }
+    unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
     parent::tearDown();
   }
 
@@ -557,8 +558,20 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return array
    *   api Result
    */
-  public function createTestEntity() {
-    return $entity = $this->callAPISuccess($this->entity, 'create', $this->params);
+
+  /**
+   * Create an entity, recording it's details for tearDown.
+   *
+   * @param string $entity
+   * @param array $params
+   * @param string $identifier
+   *
+   * @return array|int
+   */
+  protected function createTestEntity(string $entity, array $params, string $identifier = 'default') {
+    $result = $this->callAPISuccess($entity, 'create', $params);
+    $this->setTestEntityID($entity, $result['id'], $identifier);
+    return reset($result['values']);
   }
 
   /**

@@ -897,7 +897,7 @@ Paid By: Check',
     ] + $this->getCreditCardParams());
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $note = $this->callAPISuccessGetSingle('note', ['entity_table' => 'civicrm_contribution']);
-    $this->assertEquals($note['note'], 'Super cool and interesting stuff');
+    $this->assertEquals('Super cool and interesting stuff', $note['note']);
   }
 
   /**
@@ -1517,8 +1517,8 @@ Paid By: Check',
       'text_length' => 255,
     ]);
 
-    // create profile
-    $membershipCustomFieldsProfile = civicrm_api3('UFGroup', 'create', [
+    // Create profile.
+    $membershipCustomFieldsProfile = $this->createTestEntity('UFGroup', [
       'is_active' => 1,
       'group_type' => 'Membership,Individual',
       'title' => 'Membership Custom Fields',
@@ -1730,7 +1730,7 @@ Paid By: Check',
   /**
    * Test no warnings or errors during preProcess when editing.
    */
-  public function testPreProcessContributionEdit() {
+  public function testPreProcessContributionEdit(): void {
     // Simulate a contribution in pending status
     $contribution = $this->callAPISuccess(
       'Contribution',
@@ -2109,8 +2109,8 @@ Paid By: Check',
    * Check that formRule validates you can only have one contribution with a
    * given trxn_id.
    */
-  public function testContributionFormRuleDuplicateTrxn() {
-    $contribution = $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, ['trxn_id' => '1234']));
+  public function testContributionFormRuleDuplicateTrxn(): void {
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, ['trxn_id' => '1234']));
 
     $fields = [
       'contact_id' => $this->_individualId,

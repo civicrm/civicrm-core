@@ -28,10 +28,10 @@ class CRM_Profile_Form_EditTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testProfileUrl(): void {
-    $profileID = Civi\Api4\UFGroup::create(FALSE)->setValues([
+    $profileID = $this->createTestEntity('UFGroup', [
       'post_URL' => 'civicrm/{contact.display_name}',
       'title' => 'title',
-    ])->execute()->first()['id'];
+    ])['id'];
     UFJoin::create(FALSE)->setValues([
       'module' => 'Profile',
       'uf_group_id' => $profileID,
