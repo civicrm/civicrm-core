@@ -16,19 +16,19 @@
 <div class="crm-event-id-{$event.id} crm-block crm-event-confirm-form-block">
     {if $isOnWaitlist}
         <div class="help">
-            {ts}Please verify the information below. <span class="bold">Then click 'Continue' to be added to the WAIT LIST for this event</span>. If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
+            {ts}Please verify the information below. <span class="bold">Then click 'Register' to be added to the WAIT LIST for this event</span>. If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
         </div>
     {elseif $isRequireApproval}
         <div class="help">
-            {ts}Please verify the information below. Then click 'Continue' to submit your registration. <span class="bold">Once approved, you will receive an email with a link to a web page where you can complete the registration process.</span>{/ts}
+            {ts}Please verify the information below. Then click 'Register' to submit your registration. <span class="bold">Once approved, you will receive an email with a link to a web page where you can complete the registration process.</span>{/ts}
         </div>
     {else}
         <div class="help">
         {ts}Please verify the information below. Click the <strong>Go Back</strong> button below if you need to make changes.{/ts}
         {if $contributeMode EQ 'notify' and !$is_pay_later and ! $isAmountzero }
-          {ts 1=$paymentProcessor.name}Click the <strong>Continue</strong> button to checkout to %1, where you will select your payment method and complete the registration.{/ts}
+          {ts 1=$paymentProcessor.name}Click the <strong>Register</strong> button to checkout to %1, where you will select your payment method and complete the registration.{/ts}
         {else}
-            {ts}Otherwise, click the <strong>Continue</strong> button below to complete your registration.{/ts}
+            {ts}Otherwise, click the <strong>Register</strong> button below to complete your registration.{/ts}
         {/if}
         </div>
         {if $is_pay_later and !$isAmountzero}
@@ -166,7 +166,7 @@
     {if $contributeMode NEQ 'notify'} {* In 'notify mode, contributor is taken to processor payment forms next *}
     <div class="messages status section continue_message-section">
         <p>
-        {ts}Your registration will not be submitted until you click the <strong>Continue</strong> button. Please click the button one time only. If you need to change any details, click the Go Back button below to return to the previous screen.{/ts}
+        {ts}Your registration will not be submitted until you click the <strong>Register</strong> button. Please click the button one time only. If you need to change any details, click the Go Back button below to return to the previous screen.{/ts}
         </p>
     </div>
     {/if}

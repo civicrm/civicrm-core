@@ -170,6 +170,7 @@
   {literal}
 
   CRM.$(function($) {
+    toggleAdditionalParticipants();
     $('#additional_participants').change(function() {
       toggleAdditionalParticipants();
       allowParticipant();
@@ -177,14 +178,18 @@
 
     function toggleAdditionalParticipants() {
       var submit_button = $("#crm-submit-buttons > button").html();
-      var review_translated = '{/literal}{ts escape="js"}Review{/ts}{literal}';
+      {/literal}{if $event.is_monetary || $event.is_confirm_enabled}{literal}
+        var next_translated = '{/literal}{ts escape="js"}Review{/ts}{literal}';
+      {/literal}{else}{literal}
+        var next_translated = '{/literal}{ts escape="js"}Register{/ts}{literal}';
+      {/literal}{/if}{literal}
       var continue_translated = '{/literal}{ts escape="js"}Continue{/ts}{literal}';
       if ($('#additional_participants').val()) {
         $("#additionalParticipantsDescription").show();
-        $("#crm-submit-buttons > button").html(submit_button.replace(review_translated, continue_translated));
+        $("#crm-submit-buttons > button").html(submit_button.replace(next_translated, continue_translated));
       } else {
         $("#additionalParticipantsDescription").hide();
-        $("#crm-submit-buttons > button").html(submit_button.replace(continue_translated, review_translated));
+        $("#crm-submit-buttons > button").html(submit_button.replace(continue_translated, next_translated));
       }
     }
   });
