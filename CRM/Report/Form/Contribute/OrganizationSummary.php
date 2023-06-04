@@ -33,6 +33,16 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   protected $otherContact;
 
   /**
+   * @var int
+   */
+  protected $relationshipId;
+
+  /**
+   * @var array
+   */
+  protected $relationTypes = [];
+
+  /**
    * Class constructor.
    */
   public function __construct() {
