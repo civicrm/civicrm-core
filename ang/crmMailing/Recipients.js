@@ -222,7 +222,7 @@
                 break;
 
               case 'civicrm_mailing':
-                filterParams = { is_hidden: 0, is_active: 1 };
+                filterParams = { is_hidden: 0, is_active: 1, id: {"!=": scope.$parent.mailing.id} };
                 break;
               }
               var params = {
