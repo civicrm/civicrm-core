@@ -149,6 +149,9 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $fileDAO->id = $dao->cfID;
       unlink($directoryName . DIRECTORY_SEPARATOR . $dao->uri);
     }
+    elseif (empty($fileParams['created_id'])) {
+      $fileDAO->created_id = CRM_Core_Session::getLoggedInContactID();
+    }
 
     if (!empty($fileParams)) {
       $fileDAO->copyValues($fileParams);
