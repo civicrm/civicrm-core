@@ -110,7 +110,7 @@
       <td>{$form.is_active.html} {$form.is_active.label}</td>
     </tr>
 
-    {if $eventID}
+    {if $eventID AND !$isTemplate}
       <tr class="crm-event-manage-eventinfo-form-block-info_link">
         <td>&nbsp;</td>
         <td class="description">
