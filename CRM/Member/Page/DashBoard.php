@@ -32,7 +32,6 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     //what they have access to
     //@todo implement acls on dashboard querys (preferably via api to enhance that at the same time)
     if (!CRM_Core_Permission::check('view all contacts') && !CRM_Core_Permission::check('edit all contacts')) {
-      $this->showMembershipSummary = FALSE;
       $this->assign('membershipSummary', FALSE);
       return;
     }
