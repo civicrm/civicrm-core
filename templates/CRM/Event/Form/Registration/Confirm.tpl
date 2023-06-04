@@ -46,57 +46,6 @@
         </div>
     {/if}
 
-    {if $showPaymentOnConfirm}
-    <div class="crm-group event_info-group">
-      <div class="header-dark">
-          {ts}Payment details{/ts}
-      </div>
-    {if !empty($form.payment_processor_id.label)}
-      <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
-        <legend>{ts}Payment Options{/ts}</legend>
-        <div class="crm-section payment_processor-section">
-          <div class="label">{$form.payment_processor_id.label}</div>
-          <div class="content">{$form.payment_processor_id.html}</div>
-          <div class="clear"></div>
-        </div>
-      </fieldset>
-    {/if}
-        {include file='CRM/Core/BillingBlockWrapper.tpl'}
-    {literal}<script>function calculateTotalFee() { return {/literal}{$totalAmount}{literal} }</script>{/literal}
-    </div>
-    {/if}
-
-    <div class="crm-group event_info-group">
-        <div class="header-dark">
-            {ts}Event Information{/ts}
-        </div>
-        <div class="display-block">
-            {include file="CRM/Event/Form/Registration/EventInfoBlock.tpl"}
-        </div>
-    </div>
-
-    {if $pcpBlock && $pcp_display_in_roll}
-    <div class="crm-group pcp_display-group">
-        <div class="header-dark">
-           {ts}Contribution Honor Roll{/ts}
-        </div>
-        <div class="display-block">
-          {ts}List my contribution{/ts}
-          {if $pcp_is_anonymous}
-              <strong>{ts}anonymously{/ts}.</strong>
-          {else}
-            {ts}under the name{/ts}: <strong>{$pcp_roll_nickname}</strong><br/>
-            {if $pcp_personal_note}
-                {ts}With the personal note{/ts}: <strong>{$pcp_personal_note}</strong>
-            {else}
-             <strong>{ts}With no personal note{/ts}</strong>
-             {/if}
-          {/if}
-          <br />
-        </div>
-    </div>
-    {/if}
-
     {if $paidEvent && !$isRequireApproval && !$isOnWaitlist}
         <div class="crm-group event_fees-group">
             <div class="header-dark">
@@ -133,6 +82,48 @@
             {/if}
 
         </div>
+    {/if}
+
+    {if $showPaymentOnConfirm}
+    <div class="crm-group event_info-group">
+      <div class="header-dark">
+          {ts}Payment details{/ts}
+      </div>
+    {if !empty($form.payment_processor_id.label)}
+      <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
+        <legend>{ts}Payment Options{/ts}</legend>
+        <div class="crm-section payment_processor-section">
+          <div class="label">{$form.payment_processor_id.label}</div>
+          <div class="content">{$form.payment_processor_id.html}</div>
+          <div class="clear"></div>
+        </div>
+      </fieldset>
+    {/if}
+        {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    {literal}<script>function calculateTotalFee() { return {/literal}{$totalAmount}{literal} }</script>{/literal}
+    </div>
+    {/if}
+
+    {if $pcpBlock && $pcp_display_in_roll}
+    <div class="crm-group pcp_display-group">
+        <div class="header-dark">
+           {ts}Contribution Honor Roll{/ts}
+        </div>
+        <div class="display-block">
+          {ts}List my contribution{/ts}
+          {if $pcp_is_anonymous}
+              <strong>{ts}anonymously{/ts}.</strong>
+          {else}
+            {ts}under the name{/ts}: <strong>{$pcp_roll_nickname}</strong><br/>
+            {if $pcp_personal_note}
+                {ts}With the personal note{/ts}: <strong>{$pcp_personal_note}</strong>
+            {else}
+             <strong>{ts}With no personal note{/ts}</strong>
+             {/if}
+          {/if}
+          <br />
+        </div>
+    </div>
     {/if}
 
     {if $event.participant_role neq 'Attendee' and $defaultRole}
@@ -182,6 +173,15 @@
         </div>
       {/crmRegion}
     {/if}
+
+    <div class="crm-group event_info-group">
+        <div class="header-dark">
+            {ts}Event Information{/ts}
+        </div>
+        <div class="display-block">
+            {include file="CRM/Event/Form/Registration/EventInfoBlock.tpl"}
+        </div>
+    </div>
 
     {if $contributeMode NEQ 'notify'} {* In 'notify mode, contributor is taken to processor payment forms next *}
     <div class="messages status section continue_message-section">
