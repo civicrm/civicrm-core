@@ -180,7 +180,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->assertTrue(substr($contribution['contribution_source'], 0, 20) === "Online Contribution:");
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
-    $paypalIPN = new CRM_Core_Payment_PaypalIPN($this->getPaypalRecurSubsequentTransaction());
+    $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurSubsequentTransaction());
     $paypalIPN->main();
     $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membershipEndDate);
     $this->assertEquals($renewedMembershipEndDate, $this->callAPISuccessGetValue('membership', ['return' => 'end_date']));

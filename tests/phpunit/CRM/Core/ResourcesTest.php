@@ -41,7 +41,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     parent::setUp();
 
     $this->mapper = $this->createMapper();
-    $cache = new CRM_Utils_Cache_Arraycache([]);
+    $cache = new CRM_Utils_Cache_ArrayCache([]);
     $this->res = new CRM_Core_Resources($this->mapper, new CRM_Core_Resources_Strings($cache), NULL);
     $this->res->setCacheCode('resTest');
     CRM_Core_Resources::singleton($this->res);
