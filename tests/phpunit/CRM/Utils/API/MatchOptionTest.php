@@ -39,7 +39,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       $this->assertEquals('ignore1@example.com', $value['email']);
       $this->assertEquals(1, count($value['api.Address.get']['values']));
     }
-    CRM_core_DAO::executeQuery('DELETE FROM civicrm_address WHERE contact_id=%1', [
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_address WHERE contact_id=%1', [
       1 => [$this->noise['individual'], 'Positive'],
     ]);
     $this->callAPISuccess('Contact', 'delete', [

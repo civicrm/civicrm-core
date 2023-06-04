@@ -74,7 +74,7 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
   }
 
   public function testCaching() {
-    $cache = new CRM_Utils_Cache_Arraycache([]);
+    $cache = new CRM_Utils_Cache_ArrayCache([]);
     $this->assertTrue(!is_array($cache->get('basic-scan')));
     [$basedir, $c] = $this->_createContainer($cache, 'basic-scan');
     $this->assertEquals('http://example/basedir/foo', $c->getResUrl('test.foo'));
