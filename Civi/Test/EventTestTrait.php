@@ -13,6 +13,9 @@ namespace Civi\Test;
 
 use Civi\Api4\Event;
 use Civi\Api4\ExampleData;
+use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
+use Civi\Api4\PriceSet;
 use Civi\Api4\PriceSetEntity;
 use Civi\Api4\UFField;
 use Civi\Api4\UFGroup;
@@ -78,10 +81,7 @@ trait EventTestTrait {
     $event = $this->eventCreate($eventParameters, $identifier);
     if (array_keys($priceSetParameters) !== ['id']) {
       try {
-
-        // @todo - eventPriceSetCreate is only available from core tests so this can't yet
-        // be used in extensions.
-        $this->setTestEntityID('PriceSet', $this->eventPriceSetCreate(8000.67, 0, 'Radio', [['name' => 'family_package', 'amount' => 1550.55], ['name' => 'corporate_table', 'amount' => 8000.67]]), $identifier);
+        $this->eventCreatePriceSet([], $identifier);
         $this->setTestEntityID('PriceSetEntity', PriceSetEntity::create(FALSE)
           ->setValues([
             'entity_table' => 'civicrm_event',
@@ -321,6 +321,69 @@ trait EventTestTrait {
     catch (\CRM_Core_Exception $e) {
       $this->fail('UF join creation failed for UF Group ' . $profileName . ' with error ' . $e->getMessage());
     }
+  }
+
+  /**
+   * Create a price set for an event.
+   *
+   * @param array $priceSetParameters
+   * @param string $identifier
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function eventCreatePriceSet(array $priceSetParameters, string $identifier): void {
+    $priceSetParameters = array_merge($priceSetParameters, [
+      'min_amount' => 0,
+      'title' => 'Fundraising dinner',
+      'name' => 'fundraising_dinner',
+      'extends:name' => 'CiviEvent',
+      'financial_type_id:name' => 'Event Fee',
+    ]);
+
+    $this->setTestEntityID('PriceSet', PriceSet::create(FALSE)->setValues($priceSetParameters)->execute()->first()['id'], $identifier);
+    $this->setTestEntityID('PriceField', PriceField::create(FALSE)->setValues([
+      'label' => 'Fundraising Dinner',
+      'name' => 'fundraising_dinner',
+      'html_type' => 'Radio',
+      'is_display_amounts' => 1,
+      'options_per_line' => 1,
+      'price_set_id' => $this->ids['PriceSet'][$identifier],
+      'is_enter_qty' => 1,
+      'financial_type_id:name' => 'Event Fee',
+    ])->execute()->first()['id'], $identifier);
+
+    foreach ($this->getPriceFieldOptions() as $optionIdentifier => $priceFieldOption) {
+      $this->setTestEntityID('PriceFieldValue', PriceFieldValue::create(FALSE)->setValues(
+        array_merge([
+          'price_field_id' => $this->ids['PriceField'][$identifier],
+          'financial_type_id:name' => 'Event Fee',
+        ], $priceFieldOption),
+      )->execute()->first()['id'], $identifier . '_' . $optionIdentifier);
+    }
+  }
+
+  /**
+   * Get the options for the price set.
+   *
+   * @param string $identifier Optional string if we want to specify different
+   *   options. This is not currently used but is consistent with our other
+   *   functions and would allow over-riding.
+   *
+   * @return array[]
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPriceFieldOptions(string $identifier = 'PaidEvent'): array {
+    if ($identifier !== 'PaidEvent') {
+      throw new \CRM_Core_Exception('Only paid event currently supported');
+    }
+    return [
+      'free' => ['name' => 'free', 'label' => 'Complementary', 'amount' => 0],
+      'student' => ['name' => 'student', 'label' => 'Student Rate', 'amount' => 100],
+      'standard' => ['name' => 'standard', 'label' => 'Standard Rate', 'amount' => 300],
+      'family_package' => ['name' => 'family_package', 'label' => 'Family Deal', 'amount' => 1550.55],
+      'corporate_table' => ['name' => 'corporate_table', 'label' => 'Corporate Table', 'amount' => 8000.67],
+    ];
   }
 
 }

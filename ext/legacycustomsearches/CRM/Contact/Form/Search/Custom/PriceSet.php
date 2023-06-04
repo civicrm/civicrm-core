@@ -55,10 +55,10 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
   }
 
   public function buildTempTable() {
-    $sql = "id int unsigned NOT NULL AUTO_INCREMENT,
+    $sql = 'id int unsigned NOT NULL AUTO_INCREMENT,
   contact_id int unsigned NOT NULL,
   participant_id int unsigned NOT NULL,
-";
+';
 
     foreach ($this->_columns as $dontCare => $fieldName) {
       if (in_array($fieldName, [
