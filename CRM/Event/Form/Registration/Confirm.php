@@ -398,6 +398,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $errors['payment_processor_id'] = ts('Please select a Payment Method');
     }
 
+    if ($form->showPaymentOnConfirm) {
+      CRM_Core_Payment_Form::validatePaymentInstrument(
+        $fields['payment_processor_id'],
+        $fields,
+        $errors,
+        (!$form->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
+      );
+    }
+
     return empty($errors) ? TRUE : $errors;
   }
 

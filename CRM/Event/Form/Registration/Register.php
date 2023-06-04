@@ -922,12 +922,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       ) {
         return empty($errors) ? TRUE : $errors;
       }
-      CRM_Core_Payment_Form::validatePaymentInstrument(
-        $fields['payment_processor_id'],
-        $fields,
-        $errors,
-        (!$form->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
-      );
+
+      if (!$form->showPaymentOnConfirm) {
+        CRM_Core_Payment_Form::validatePaymentInstrument(
+          $fields['payment_processor_id'],
+          $fields,
+          $errors,
+          (!$form->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
+        );
+      }
     }
 
     return empty($errors) ? TRUE : $errors;
