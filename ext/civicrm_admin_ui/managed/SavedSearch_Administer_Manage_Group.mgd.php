@@ -92,7 +92,11 @@ return [
             ],
           ],
           'limit' => 50,
-          'pager' => [],
+          'pager' => [
+            'show_count' => TRUE,
+            'expose_limit' => TRUE,
+            'hide_single' => TRUE,
+          ],
           'placeholder' => 5,
           'columns' => [
             [

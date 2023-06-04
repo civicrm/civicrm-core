@@ -19,14 +19,20 @@
     <input id="crm-search-admin-display-limit" type="number" min="1" step="1" class="form-control" ng-model="$ctrl.display.settings.limit" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChangeLimit()">
     <div class="checkbox-inline form-control">
       <label>
+        <input type="checkbox" ng-model="$ctrl.display.settings.pager.expose_limit" >
+        <span>{{:: ts('Adjustable Page Size') }}</span>
+      </label>
+    </div>
+    <div class="checkbox-inline form-control">
+      <label>
         <input type="checkbox" ng-model="$ctrl.display.settings.pager.show_count" >
         <span>{{:: ts('Show Count in Pager') }}</span>
       </label>
     </div>
     <div class="checkbox-inline form-control">
       <label>
-        <input type="checkbox" ng-model="$ctrl.display.settings.pager.expose_limit" >
-        <span>{{:: ts('Adjustable Page Size') }}</span>
+        <input type="checkbox" ng-model="$ctrl.display.settings.pager.hide_single">
+        <span>{{:: ts('Hide Pager if One Page') }}</span>
       </label>
     </div>
   </div>
