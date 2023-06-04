@@ -13,7 +13,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function dataProvider() {
+  public function dataProvider(): array {
     return [
       //  Include static group 3
       [
@@ -174,7 +174,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * Clean up after test.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -197,7 +197,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * @dataProvider dataProvider
    *
    * @param array $formValues
-   * @param $ids
+   * @param array $ids
    *
    * @throws \CRM_Core_Exception
    */
@@ -300,7 +300,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     }
 
     // We have migrated from a hard-coded dataset to a dynamic one but are still working with the same
-    // dataprovider at this stage -> wrangle.
+    // data provider at this stage -> wrangle.
     foreach ($formValues as $key => $value) {
       $entity = ucfirst($key);
       if (!array_key_exists($entity, $this->ids)) {
@@ -352,7 +352,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearchProfileHomeCityCRM14263() {
+  public function testSearchProfileHomeCityCRM14263(): void {
     $contactID = $this->individualCreate();
     Civi::settings()->set('defaultSearchProfileID', 1);
     $this->callAPISuccess('address', 'create', [
@@ -393,7 +393,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearchProfileHomeCityNoResultsCRM14263() {
+  public function testSearchProfileHomeCityNoResultsCRM14263(): void {
     $contactID = $this->individualCreate();
     Civi::settings()->set('defaultSearchProfileID', 1);
     $this->callAPISuccess('address', 'create', [
@@ -1167,7 +1167,7 @@ civicrm_relationship.is_active = 1 AND
   /**
    * CRM-19562 ensure that only ids are used for contact_id searching.
    */
-  public function testContactIDClause() {
+  public function testContactIDClause(): void {
     $params = [
       ['mark_x_2', '=', 1, 0, 0],
       ['mark_x_foo@example.com', '=', 1, 0, 0],
@@ -1216,13 +1216,11 @@ civicrm_relationship.is_active = 1 AND
    * Test the sorting on the contact ID query works with a profile search.
    *
    * Checking for lack of fatal.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testContactIDQueryProfileSearchResults() {
-    $profile = $this->callAPISuccess('UFGroup', 'create', ['group_type' => 'Contact', 'name' => 'search', 'title' => 'search']);
+  public function testContactIDQueryProfileSearchResults(): void {
+    $this->ids['UFGroup']['search'] = $this->callAPISuccess('UFGroup', 'create', ['group_type' => 'Contact', 'name' => 'search', 'title' => 'search'])['id'];
     $this->callAPISuccess('UFField', 'create', [
-      'uf_group_id' => $profile['id'],
+      'uf_group_id' => $this->ids['UFGroup']['search'],
       'field_name' => 'postal_code',
       'field_type' => 'Contact',
       'in_selector' => TRUE,
@@ -1230,7 +1228,7 @@ civicrm_relationship.is_active = 1 AND
       'label' => 'postal code',
       'visibility' => 'Public Pages and Listings',
     ]);
-    $selector = new CRM_Contact_Selector(NULL, ['radio_ts' => 'ts_all', 'uf_group_id' => $profile['id']], NULL, ['sort_name' => 1]);
+    $selector = new CRM_Contact_Selector(NULL, ['radio_ts' => 'ts_all', 'uf_group_id' => $this->ids['UFGroup']['search']], NULL, ['sort_name' => 1]);
     $selector->contactIDQuery([], '2_d');
   }
 
@@ -1239,7 +1237,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @return array
    */
-  public function getSortOptions() {
+  public function getSortOptions(): array {
     return [
       ['1_d'],
       ['2_d'],
@@ -1342,7 +1340,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @throws \CRM_Core_Exception
    */
-  public function testRelativeDateFilters($filter, $expectedWhere) {
+  public function testRelativeDateFilters(string $filter, string $expectedWhere): void {
     $params = [['created_date_relative', '=', $filter, 0, 0]];
 
     $dates = CRM_Utils_Date::getFromTo($filter, NULL, NULL);
@@ -1355,7 +1353,7 @@ civicrm_relationship.is_active = 1 AND
       TRUE, FALSE
     );
 
-    [$select, $from, $where, $having] = $query->query();
+    [$select, $from, $where] = $query->query();
     $this->assertEquals($expectedWhere, $where);
   }
 
@@ -1533,7 +1531,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReplaceSpaceByWildcardCondition() {
+  public function testReplaceSpaceByWildcardCondition(): void {
     //Check for wildcard
     $params = [
       0 => [
@@ -1545,13 +1543,13 @@ civicrm_relationship.is_active = 1 AND
       ],
     ];
     $query = new CRM_Contact_BAO_Query($params);
-    [$select, $from, $where] = $query->query();
+    [, , $where] = $query->query();
     $this->assertStringContainsString("contact_a.sort_name LIKE '%John%Doe%'", $where);
 
     //Check for NO wildcard due to comma
     $params[0][2] = 'Doe, John';
     $query = new CRM_Contact_BAO_Query($params);
-    [$select, $from, $where] = $query->query();
+    [, , $where] = $query->query();
     $this->assertStringContainsString("contact_a.sort_name LIKE '%Doe, John%'", $where);
   }
 

@@ -52,3 +52,7 @@
     left: 100%;
   }
 }
+
+#bootstrap-theme .crm-search-display ul.pagination > li {
+  margin: 0;
+}

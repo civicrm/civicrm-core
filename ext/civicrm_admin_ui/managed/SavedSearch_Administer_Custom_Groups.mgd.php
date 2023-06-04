@@ -155,7 +155,7 @@ return [
             ],
             [
               'text' => '',
-              'style' => 'default-outline',
+              'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
               'links' => [

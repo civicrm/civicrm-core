@@ -135,6 +135,24 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ];
     }
 
+    /*
+     * ENTITY-SPECIFIC TASKS BELOW
+     * FIXME: Move these somewhere?
+     */
+
+    if ($entity['name'] === 'Group') {
+      $tasks['Group']['refresh'] = [
+        'title' => E::ts('Refresh Group Cache'),
+        'icon' => 'fa-refresh',
+        'apiBatch' => [
+          'action' => 'refresh',
+          'runMsg' => E::ts('Refreshing %1 %2...'),
+          'successMsg' => E::ts('%1 %2 Refreshed.'),
+          'errorMsg' => E::ts('An error occurred while attempting to refresh %1 %2.'),
+        ],
+      ];
+    }
+
     if ($entity['name'] === 'Contact') {
       // Add contact tasks which support standalone mode
       $contactTasks = $this->checkPermissions ? \CRM_Contact_Task::permissionedTaskTitles(\CRM_Core_Permission::getPermission()) : NULL;

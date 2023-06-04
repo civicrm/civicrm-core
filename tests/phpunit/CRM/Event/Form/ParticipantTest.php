@@ -835,15 +835,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Get the id of the created event.
-   *
-   * @return int
-   */
-  protected function getEventID(): int {
-    return reset($this->ids['Event']);
-  }
-
-  /**
    * Get created contact ID.
    *
    * @return int

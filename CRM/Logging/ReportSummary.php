@@ -36,6 +36,21 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   protected $currentLogTable;
 
   /**
+   * Set within `$this->buildTemporaryTables`
+   *
+   * @var CRM_Utils_SQL_TempTable
+   */
+  protected $temporaryTable;
+
+  /**
+   * The name of the temporary table.
+   * Set within `$this->buildTemporaryTables`
+   *
+   * @var string
+   */
+  protected $temporaryTableName;
+
+  /**
    * Class constructor.
    */
   public function __construct() {

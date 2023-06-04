@@ -238,6 +238,7 @@
     <comment>FK to Financial Type.</comment>
     <html>
       <label>Financial Type</label>
+      <type>Select</type>
     </html>
     <add>4.3</add>
   </field>

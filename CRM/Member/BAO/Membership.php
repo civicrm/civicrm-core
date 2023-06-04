@@ -1769,7 +1769,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * @deprecated
+   * @deprecated in CiviCRM 5.39, will be removed around CiviCRM 5.66.
+   *
+   * Deprecation issue in https://lab.civicrm.org/extensions/civimobileapi/-/issues/86
    *
    * @param int $contactID
    * @param int $membershipTypeID

@@ -33,7 +33,7 @@ class CRM_Contact_Page_View_NoteTest extends CiviUnitTestCase {
     }
     $page = new CRM_Contact_Page_View_Note();
     $page->_contactId = $contactId;
-    $page->_permission = CRM_Core_PERMISSION::EDIT;
+    $page->_permission = CRM_Core_Permission::EDIT;
     $page->browse();
     $this->assertEquals(count($page->values), 5);
     foreach ($page->values as $note) {

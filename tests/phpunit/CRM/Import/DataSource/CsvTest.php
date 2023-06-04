@@ -36,7 +36,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    */
   public function testToCsv(array $fileData): void {
     $form = $this->submitDatasourceForm($fileData['filename']);
-    $csvObject = new CRM_Import_DataSource_Csv($form->getUserJobID());
+    $csvObject = new CRM_Import_DataSource_CSV($form->getUserJobID());
     $rows = $csvObject->getRows(0, 0, [], FALSE);
     foreach (['first_name', 'last_name', 'email'] as $field) {
       $json = json_encode($rows[0][$field]);
@@ -137,7 +137,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    */
   public function testBlankLineAtEnd(): void {
     $form = $this->submitDatasourceForm('blankLineAtEnd.csv');
-    $csvObject = new CRM_Import_DataSource_Csv($form->getUserJobID());
+    $csvObject = new CRM_Import_DataSource_CSV($form->getUserJobID());
 
     $json = json_encode($csvObject->getRow()['email']);
     $this->assertEquals('"yogi@yellowstone.park"', $json);

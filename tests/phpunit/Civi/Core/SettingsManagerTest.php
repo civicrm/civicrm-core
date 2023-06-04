@@ -131,7 +131,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
    * @return SettingsManager
    */
   protected function createManager() {
-    $cache = new \CRM_Utils_Cache_Arraycache([]);
+    $cache = new \CRM_Utils_Cache_ArrayCache([]);
     $cache->set('defaults_domain', $this->domainDefaults);
     $cache->set('defaults_contact', $this->contactDefaults);
     foreach ($this->mandates as $entity => $keyValues) {

@@ -42,6 +42,7 @@
     <required>true</required>
     <html>
       <label>Contribution</label>
+      <type>EntityRef</type>
     </html>
     <add>1.4</add>
   </field>

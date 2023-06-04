@@ -41,10 +41,17 @@ use Civi\Api4\OptionGroup;
 use Civi\Api4\Phone;
 use Civi\Api4\PriceSet;
 use Civi\Api4\RelationshipType;
+use Civi\Api4\UFGroup;
 use Civi\Core\Transaction\Manager;
 use Civi\Payment\System;
 use Civi\Api4\OptionValue;
 use Civi\Test\Api3DocTrait;
+use Civi\Test\ContactTestTrait;
+use Civi\Test\DbTestTrait;
+use Civi\Test\EventTestTrait;
+use Civi\Test\GenericAssertionsTrait;
+use Civi\Test\LocaleTestTrait;
+use Civi\Test\MailingTestTrait;
 use League\Csv\Reader;
 
 /**
@@ -74,11 +81,12 @@ define('API_LATEST_VERSION', 3);
 class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   use Api3DocTrait;
-  use \Civi\Test\GenericAssertionsTrait;
-  use \Civi\Test\DbTestTrait;
-  use \Civi\Test\ContactTestTrait;
-  use \Civi\Test\MailingTestTrait;
-  use \Civi\Test\LocaleTestTrait;
+  use EventTestTrait;
+  use GenericAssertionsTrait;
+  use DbTestTrait;
+  use ContactTestTrait;
+  use MailingTestTrait;
+  use LocaleTestTrait;
 
   /**
    * API version in use.
@@ -435,6 +443,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   /**
    *  Common teardown functions for all unit tests.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
    */
   protected function tearDown(): void {
     $this->_apiversion = 3;
@@ -478,6 +488,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->formController = NULL;
     // Ensure the destruct runs by unsetting the Mutt.
     unset($this->mut);
+    if (!empty($this->ids['UFGroup'])) {
+      UFGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['UFGroup'])->execute();
+    }
     parent::tearDown();
   }
 
@@ -2452,7 +2465,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $paramsSet['extends'] = 1;
     $paramsSet['min_amount'] = $minAmt;
 
-    $priceSetID = PriceSet::create()->setValues($paramsSet)->execute()->first()['id'];
+    $priceSetID = PriceSet::create(FALSE)->setValues($paramsSet)->execute()->first()['id'];
 
     $paramsField = [
       'label' => 'Price Field',

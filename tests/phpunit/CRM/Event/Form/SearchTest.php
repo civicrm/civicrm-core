@@ -32,7 +32,6 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
       break;
     }
 
-    $today = new DateTime();
     $this->participantCreate([
       'event_id'  => $event['id'],
       'contact_id' => $this->individualID,
@@ -40,7 +39,7 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
       'fee_level' => $this->participantPrice['label'],
       'fee_amount' => $this->participantPrice['amount'],
       'fee_currency' => 'USD',
-      'register_date' => $today->format('YmdHis'),
+      'register_date' => 'now',
     ]);
   }
 

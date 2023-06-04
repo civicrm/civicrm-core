@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\ACLPermissionTrait;
+
 /**
  *  Test APIv3 civicrm_report_instance_* functions
  *
@@ -18,13 +20,18 @@
  */
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
-  use Civi\Test\ACLPermissionTrait;
+  use ACLPermissionTrait;
   use CRMTraits_PCP_PCPTestTrait;
   use CRMTraits_Custom_CustomDataTrait;
 
   protected $contactIDs = [];
 
-  protected $aclGroupID = NULL;
+  protected $aclGroupID;
+
+  /**
+   * @var int
+   */
+  protected $activityID;
 
   /**
    * Our group reports use an alter so transaction cleanup won't work.
@@ -46,7 +53,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReportTemplate() {
+  public function testReportTemplate(): void {
     /** @noinspection SpellCheckingInspection */
     $result = $this->callAPISuccess('ReportTemplate', 'create', [
       'label' => 'Example Form',
@@ -122,11 +129,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @dataProvider getReportTemplatesSupportingSelectWhere
    *
-   * @param $reportID
-   *
-   * @throws \CRM_Core_Exception
+   * @param string $reportID
    */
-  public function testReportTemplateSelectWhere($reportID): void {
+  public function testReportTemplateSelectWhere(string $reportID): void {
     $this->hookClass->setHook('civicrm_selectWhereClause', [$this, 'hookSelectWhere']);
     $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $reportID,
@@ -147,7 +152,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function getReportTemplatesSupportingSelectWhere() {
+  public function getReportTemplatesSupportingSelectWhere(): array {
     $allTemplates = self::getReportTemplates();
     // Exclude all that do not work as of test being written. I have not dug into why not.
     $currentlyExcluded = [
@@ -386,7 +391,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getReportTemplates() {
+  public static function getReportTemplates(): array {
     $reportTemplates = [];
     $reportsToSkip = [
       'event/income' => "This report overrides buildQuery() so doesn't seem compatible with this test and you get a syntax error `WHERE civicrm_event.id IN( ) GROUP BY civicrm_event.id`",
@@ -440,9 +445,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     return $templates;
   }
 
-  public static function getConactMenbershipAndContributionReportTemplatesForACLGroupTests(): array {
-    $templates = array_merge([['contact/summary']], self::getMembershipAndContributionReportTemplatesForGroupTests());
-    return $templates;
+  public static function getContactMembershipAndContributionReportTemplatesForACLGroupTests(): array {
+    return array_merge([['contact/summary']], self::getMembershipAndContributionReportTemplatesForGroupTests());
   }
 
   /**
@@ -683,7 +687,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReportsWithNonSmartGroupFilter($template) {
+  public function testReportsWithNonSmartGroupFilter(string $template): void {
     $groupID = $this->setUpPopulatedGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
@@ -697,7 +701,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   /**
    * Test the group filter works on various reports when ACLed user is in play
    *
-   * @dataProvider getConactMenbershipAndContributionReportTemplatesForACLGroupTests
+   * @dataProvider getContactMembershipAndContributionReportTemplatesForACLGroupTests
    *
    * @param string $template
    *   Report template unique identifier.
@@ -857,7 +861,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testContributionSummaryWithSingleContactsInTwoGroups(): void {
-    [$groupID1, $individualID] = $this->setUpPopulatedGroup(TRUE);
+    $groupID1 = $this->setUpPopulatedGroup();
+    $individualID = $this->ids['Contact']['primary'];
     // create second group and add the individual to it.
     $groupID2 = $this->groupCreate(['name' => 'test_group', 'title' => 'test_title']);
     $this->callAPISuccess('GroupContact', 'create', [
@@ -978,14 +983,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * This gives us a range of scenarios for testing contacts are included only once
    * whenever they are hard-added or in the criteria.
    *
-   * @param bool $returnAddedContact
-   *
    * @return int
-   * @throws \CRM_Core_Exception
    */
-  public function setUpPopulatedGroup($returnAddedContact = FALSE) {
+  public function setUpPopulatedGroup() {
     $individual1ID = $this->individualCreate();
-    $individualID = $this->individualCreate();
+    $individualID = $this->ids['Contact']['primary'] = $this->individualCreate();
     $individualIDRemoved = $this->individualCreate();
     $groupID = $this->groupCreate(['name' => uniqid(), 'title' => uniqid()]);
     $this->callAPISuccess('GroupContact', 'create', [
@@ -1006,11 +1008,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
     CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupID);
-
-    if ($returnAddedContact) {
-      return [$groupID, $individualID];
-    }
-
     return $groupID;
   }
 
@@ -1019,7 +1016,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function setUpIntersectingGroups() {
+  public function setUpIntersectingGroups(): array {
     $groupID = $this->setUpPopulatedGroup();
     $groupID2 = $this->setUpPopulatedSmartGroup();
     $addedToBothIndividualID = $this->individualCreate();
@@ -1144,12 +1141,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param string $template
    *   Report template unique identifier.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testReportsCustomDataOrderBy($template) {
-    $this->entity = 'Contact';
+  public function testReportsCustomDataOrderBy(string $template): void {
     $this->createCustomGroupWithFieldOfType();
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
@@ -1168,7 +1161,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReportsWithNoTInSmartGroupFilter($template) {
+  public function testReportsWithNoTInSmartGroupFilter(string $template): void {
     $groupID = $this->setUpPopulatedGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
@@ -1833,7 +1826,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param int|null $contactID
    * @param string $where
    */
-  public function aclGroupContactsOnly($type, &$tables, &$whereTables, &$contactID, &$where) {
+  public function aclGroupContactsOnly(string $type, array &$tables, array &$whereTables, &$contactID, &$where) {
     if (!empty($where)) {
       $where .= ' AND ';
     }

@@ -127,7 +127,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
 
     $form->add('select', 'contribution_page_id',
-      ts('Online Contribution Page'),
+      ts('Contribution Page'),
       [
         '' => ts('- select -'),
       ] +

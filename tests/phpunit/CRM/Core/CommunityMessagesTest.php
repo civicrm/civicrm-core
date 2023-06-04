@@ -125,7 +125,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    $this->cache = new CRM_Utils_Cache_Arraycache([]);
+    $this->cache = new CRM_Utils_Cache_ArrayCache([]);
     self::initWebResponses();
   }
 

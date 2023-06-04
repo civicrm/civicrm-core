@@ -134,8 +134,8 @@ return [
             [
               'text' => E::ts('Links'),
               'style' => 'default',
-              'size' => 'btn-sm',
-              'icon' => 'fa-link',
+              'size' => 'btn-xs',
+              'icon' => 'fa-bars',
               'links' => [
                 [
                   'entity' => '',

@@ -66,7 +66,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
   }
 
   public function testCaching() {
-    $cache = new CRM_Utils_Cache_Arraycache([]);
+    $cache = new CRM_Utils_Cache_ArrayCache([]);
     $this->assertTrue(!is_array($cache->get('ext-collection')));
     $c = $this->_createContainer($cache, 'ext-collection');
     $this->assertEquals('http://foo', $c->getResUrl('test.foo'));

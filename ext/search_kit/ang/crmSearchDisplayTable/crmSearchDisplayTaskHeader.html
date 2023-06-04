@@ -7,9 +7,9 @@
     <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" ng-if="$ctrl.selectAllMenuOpen">
-    <li>
-      <a href ng-click="$ctrl.selectNone()">
-        {{:: ts('None') }}
+    <li ng-if="$ctrl.rowCount > $ctrl.results.length">
+      <a href ng-click="$ctrl.selectAllPages()">
+        {{:: ts('All') }}
       </a>
     </li>
     <li>
@@ -17,9 +17,9 @@
         {{ $ctrl.rowCount > $ctrl.results.length ? ts('This Page') : ts('All') }}
       </a>
     </li>
-    <li ng-if="$ctrl.rowCount > $ctrl.results.length">
-      <a href ng-click="$ctrl.selectAllPages()">
-        {{:: ts('All Pages') }}
+    <li>
+      <a href ng-click="$ctrl.selectNone()">
+        {{:: ts('None') }}
       </a>
     </li>
   </ul>
