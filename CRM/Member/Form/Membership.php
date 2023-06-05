@@ -998,14 +998,14 @@ DESC limit 1");
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
 
-    $params = $softParams = $ids = [];
+    $params = $softParams = [];
 
     $this->processBillingAddress();
     $formValues = $this->_params;
     $formValues = $this->setPriceSetParameters($formValues);
 
     if ($this->_id) {
-      $ids['membership'] = $params['id'] = $this->_id;
+      $params['id'] = $this->_id;
     }
 
     // Set variables that we normally get from context.
@@ -1276,8 +1276,7 @@ DESC limit 1");
         unset($membershipParams['contribution_status_id']);
         $membershipParams['skipLineItem'] = TRUE;
         unset($membershipParams['lineItems']);
-        // @todo stop passing $ids (membership and userId only are set above)
-        $this->setMembership((array) CRM_Member_BAO_Membership::create($membershipParams, $ids));
+        $this->setMembership((array) CRM_Member_BAO_Membership::create($membershipParams));
         $lineItem[$this->_priceSetId][$id]['entity_id'] = $this->membership['id'];
         $lineItem[$this->_priceSetId][$id]['entity_table'] = 'civicrm_membership';
 
