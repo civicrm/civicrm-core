@@ -1245,7 +1245,7 @@ class CRM_Core_Permission {
     ];
 
     // Price sets are shared by several components, user needs access to at least one of them
-    $permissions['price_set'] = [
+    $permissions['price_set'] = $permissions['price_field'] = $permissions['price_field_value'] = $permissions['price_set_entity'] = [
       'default' => [
         ['access CiviEvent', 'access CiviContribute', 'access CiviMember'],
       ],
