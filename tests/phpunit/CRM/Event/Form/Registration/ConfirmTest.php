@@ -718,7 +718,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'billing_state_province_id-5' => '1061',
       'billing_postal_code-5' => '7',
       'billing_country_id-5' => '1228',
-      'priceSetId' => $this->ids['PriceSet']['event'],
+      'priceSetId' => $this->ids['PriceSet']['PaidEvent'],
       $this->getPriceFieldFormLabel('event_radio') => $this->ids['PriceFieldValue']['hundred'],
       'payment_processor_id' => '1',
       'year' => '2019',
