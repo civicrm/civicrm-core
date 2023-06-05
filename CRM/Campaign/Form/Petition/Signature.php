@@ -193,7 +193,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('Petition doesn\'t exist.'));
     }
     if ($this->petition['is_active'] == 0) {
-      CRM_Core_Error::statusBounce(ts('Petition is no longer active.'));
+      $this->assign('isActive', FALSE);
+    }
+    else {
+      $this->assign('isActive', TRUE);
     }
 
     //get userID from session
