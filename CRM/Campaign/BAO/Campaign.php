@@ -38,10 +38,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       if (empty($params['created_id'])) {
         $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
-
-      if (empty($params['created_date'])) {
-        $params['created_date'] = date('YmdHis');
-      }
     }
 
     /** @var \CRM_Campaign_DAO_Campaign $campaign */
