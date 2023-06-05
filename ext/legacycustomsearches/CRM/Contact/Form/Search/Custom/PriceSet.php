@@ -49,11 +49,8 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
 
     $this->setColumns();
 
-    // Actually impossible for it to not be set...
-    if ($this->eventID) {
-      $this->buildTempTable();
-      $this->fillTable();
-    }
+    $this->buildTempTable();
+    $this->fillTable();
 
     // define component access permission needed
     $this->_permissionedComponent = 'CiviEvent';
@@ -211,14 +208,10 @@ AND    p.entity_id    = e.id
       ts('Name') => 'display_name',
     ];
 
-    if (!$this->eventID) {
-      return;
-    }
-
     // for the selected event, find the price set and all the columns associated with it.
     // create a column for each field and option group within it
     $priceSetEntity = PriceSetEntity::get()
-      ->addWhere('entity_table',  '=', 'civicrm_event')
+      ->addWhere('entity_table', '=', 'civicrm_event')
       ->addWhere('entity_id', '=', $this->eventID)
       ->addSelect('price_set_id')
       ->execute()->first();
@@ -229,11 +222,11 @@ AND    p.entity_id    = e.id
       ->execute();
 
     foreach ($priceFieldValues as $value) {
-        $columnHeader = $value['price_field_id.label'] ?? NULL;
-        if ($value['price_field_id.html_type'] !== 'Text') {
-          $columnHeader .= ' - ' . $value['label'];
-        }
-        $this->_columns[$columnHeader] = "price_field_{$value['id']}";
+      $columnHeader = $value['price_field_id.label'] ?? NULL;
+      if ($value['price_field_id.html_type'] !== 'Text') {
+        $columnHeader .= ' - ' . $value['label'];
+      }
+      $this->_columns[$columnHeader] = "price_field_{$value['id']}";
     }
   }
 
