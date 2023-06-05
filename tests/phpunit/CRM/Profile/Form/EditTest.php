@@ -17,11 +17,6 @@ use Civi\Api4\UFJoin;
  */
 class CRM_Profile_Form_EditTest extends CiviUnitTestCase {
 
-  public function tearDown(): void {
-    $this->quickCleanup(['civicrm_uf_field', 'civicrm_uf_group']);
-    parent::tearDown();
-  }
-
   /**
    * Test the url on the profile edit form renders tokens
    *
