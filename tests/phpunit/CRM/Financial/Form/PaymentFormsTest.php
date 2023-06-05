@@ -41,7 +41,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
   public function testEventPaymentForms(): void {
     $this->createAuthorizeNetProcessor();
     $processors = [$this->ids['PaymentProcessor']['anet']];
-    $eventID = $this->legacyEventCreatePaid([
+    $eventID = $this->eventCreatePaid([
       'end_date' => '+ 1 month',
       'registration_end_date' => '+ 1 month',
       'payment_processor' => $processors,
@@ -54,7 +54,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
         'controller' => [],
         'submitValues' => [
           'event' => [$eventID => ['participant' => [1 => ['email' => 'bob@example.com']]]],
-          'event_' . $eventID . '_price_' . $this->ids['PriceField']['event_radio'] => $this->ids['PriceFieldValue']['price_field'],
+          'event_' . $eventID . '_price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
         ],
         'REQUEST' => [],
       ],
@@ -100,7 +100,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
       ->first();
     $this->assertEquals($cart->id, $participant['cart_id']);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'), $participant['status_id']);
-    $this->assertRequestValid(['x_city' => 'The+Shire', 'x_state' => 'IL', 'x_amount' => 1.0]);
+    $this->assertRequestValid(['x_city' => 'The+Shire', 'x_state' => 'IL', 'x_amount' => 300.0]);
   }
 
 }
