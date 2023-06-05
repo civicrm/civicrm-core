@@ -760,7 +760,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $allowUpdate = CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($order['id']);
     $this->assertTrue($allowUpdate);
 
-    $event = $this->eventCreate();
+    $event = $this->eventCreatePaid();
     $params = [
       'contact_id' => $contactID,
       'receive_date' => '2010-01-20',
