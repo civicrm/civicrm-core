@@ -54,7 +54,7 @@
         {include file="CRM/common/pager.tpl" location="top"}
 
         {* Include alpha pager if defined. *}
-        {if $atoZ}
+        {if $aToZ}
             {include file="CRM/common/pagerAToZ.tpl"}
         {/if}
 
