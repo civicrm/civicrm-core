@@ -52,6 +52,7 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field = new FieldSpec('source_contact_id', 'Activity', 'Integer');
       $field->setTitle(ts('Source Contact'));
       $field->setLabel(ts('Added by'));
+      $field->setColumnName('id');
       $field->setDescription(ts('Contact who created this activity.'));
       $field->setRequired($action === 'create');
       $field->setFkEntity('Contact');
@@ -62,23 +63,25 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field = new FieldSpec('target_contact_id', 'Activity', 'Array');
       $field->setTitle(ts('Target Contacts'));
       $field->setLabel(ts('With Contacts'));
+      $field->setColumnName('id');
       $field->setDescription(ts('Contacts involved in this activity.'));
       $field->setFkEntity('Contact');
       $field->setInputType('EntityRef');
       $field->setInputAttrs(['multiple' => TRUE]);
+      $field->setSerialize(\CRM_Core_DAO::SERIALIZE_COMMA);
       $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
-      $field->addOutputFormatter([__CLASS__, 'formatOutputForMultipleActivityContactIds']);
       $spec->addFieldSpec($field);
 
       $field = new FieldSpec('assignee_contact_id', 'Activity', 'Array');
       $field->setTitle(ts('Assignee Contacts'));
       $field->setLabel(ts('Assigned to'));
+      $field->setColumnName('id');
       $field->setDescription(ts('Contacts assigned to this activity.'));
       $field->setFkEntity('Contact');
       $field->setInputType('EntityRef');
       $field->setInputAttrs(['multiple' => TRUE]);
+      $field->setSerialize(\CRM_Core_DAO::SERIALIZE_COMMA);
       $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
-      $field->addOutputFormatter([__CLASS__, 'formatOutputForMultipleActivityContactIds']);
       $spec->addFieldSpec($field);
     }
   }
@@ -100,16 +103,10 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
         'CRM_Activity_BAO_ActivityContact',
         'record_type_id',
         $contactLinkTypes[$field['name']]);
-    return '(SELECT GROUP_CONCAT(`civicrm_activity_contact`.`contact_id`) '
-          . 'FROM `civicrm_activity_contact` '
-          . 'WHERE `civicrm_activity_contact`.`activity_id` = `a`.`id` '
-          . 'AND record_type_id = ' . $recordTypeId . ')';
-  }
-
-  public static function formatOutputForMultipleActivityContactIds(
-    ?string &$value, array $row, array $field
-  ): void {
-    $value = explode(',', $value ?? '');
+    return "(SELECT GROUP_CONCAT(`civicrm_activity_contact`.`contact_id`)
+              FROM `civicrm_activity_contact`
+              WHERE `civicrm_activity_contact`.`activity_id` = {$field['sql_name']}
+              AND record_type_id = $recordTypeId)";
   }
 
 }
