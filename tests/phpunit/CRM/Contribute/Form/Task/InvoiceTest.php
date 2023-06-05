@@ -109,7 +109,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
 
     $this->enableTaxAndInvoicing();
 
-    $event = $this->eventCreatePaid([]);
+    $event = $this->legacyEventCreatePaid([]);
 
     $individualOneId = $this->individualCreate();
     $individualTwoId = $this->individualCreate();

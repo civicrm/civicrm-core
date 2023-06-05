@@ -177,7 +177,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
     $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
     $params = ['is_monetary' => 1, 'financial_type_id' => 1];
-    $event = $this->eventCreatePaid($params, [['name' => 'test', 'amount' => 8000.67]]);
+    $event = $this->legacyEventCreatePaid($params, [['name' => 'test', 'amount' => 8000.67]]);
     $individualID = $this->individualCreate();
     //$this->submitForm($event['id'], [
     $form = CRM_Event_Form_Registration_Confirm::testSubmit([
@@ -704,7 +704,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   protected function submitPaidEvent(array $submitValues = []): void {
     $this->dummyProcessorCreate();
-    $event = $this->eventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE]);
+    $event = $this->legacyEventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE]);
     $this->submitForm($event['id'], array_merge([
       'email-Primary' => 'demo@example.com',
       'credit_card_number' => '4111111111111111',

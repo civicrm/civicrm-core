@@ -41,7 +41,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
   public function testEventPaymentForms(): void {
     $this->createAuthorizeNetProcessor();
     $processors = [$this->ids['PaymentProcessor']['anet']];
-    $eventID = $this->eventCreatePaid([
+    $eventID = $this->legacyEventCreatePaid([
       'end_date' => '+ 1 month',
       'registration_end_date' => '+ 1 month',
       'payment_processor' => $processors,

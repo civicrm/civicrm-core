@@ -353,7 +353,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     if (!empty($eventParams['is_monetary'])) {
       $phone = Phone::create()->setValues(['phone' => 1235, 'phone_type_id:name' => 'Mobile', 'phone_ext' => 456])->execute()->first();
       $locationBlockID = LocBlock::create()->setValues(['phone_id' => $phone['id']])->execute()->first()['id'];
-      $event = $this->eventCreatePaid(array_merge([
+      $event = $this->legacyEventCreatePaid(array_merge([
         'name' => 'big',
         'amount' => 1550.55,
         'loc_block_id' => $locationBlockID,

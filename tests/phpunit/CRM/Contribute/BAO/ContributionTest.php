@@ -614,7 +614,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   public function addParticipantWithContribution() {
     // creating price set, price field
     $this->_contactId = $this->individualCreate();
-    $event = $this->eventCreatePaid([]);
+    $event = $this->legacyEventCreatePaid([]);
     $this->_eventId = $event['id'];
     $priceSetID = $this->ids['PriceSet']['event'];
     $paramsField = [
