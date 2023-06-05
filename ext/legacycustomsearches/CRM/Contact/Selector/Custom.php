@@ -74,8 +74,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   protected $_fields;
 
   /**
-   * The object that implements the search interface
-   * @var object
+   * The object that implements the search interface.
+   *
+   * @var CRM_Contact_Form_Search_Custom_Base
    */
   protected $_search;
 
@@ -425,6 +426,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @throws \CRM_Core_Exception
    */
   public function fillPrevNextCache($sort, $cacheKey, $start = 0, $end = self::CACHE_SIZE): void {
+    if ($this->_search->fillPrevNextCache($cacheKey, $start, $end, $sort)) {
+      return;
+    }
     $sql = $this->_search->contactIDs($start, $end, $sort, TRUE);
 
     // CRM-9096
