@@ -22,7 +22,7 @@
 {/if}
 
 {if ! $isActive}
-  <p>{ts}This petition is no longer active.{/ts}</p>
+  <p>{ts}Petition is no longer active.{/ts}</p>
 {else}
   <div id="intro" class="crm-section">{$petition.instructions}</div>
   <div class="crm-block crm-petition-form-block">
