@@ -306,6 +306,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Event templates should not send reminders to additional contacts.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testTemplateRemindAdditionalContacts(): void {
     $contactId = $this->individualCreate();
@@ -314,7 +316,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
       'group_id' => $groupId,
     ]);
-    $event = $this->eventCreate(['is_template' => 1, 'template_title' => "I'm a template", 'title' => NULL]);
+    $event = $this->eventCreateUnpaid(['is_template' => 1, 'template_title' => "I'm a template", 'title' => NULL]);
     $eventId = $event['id'];
 
     $this->callAPISuccess('action_schedule', 'create', [
@@ -346,7 +348,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
       'group_id' => $groupId,
     ]);
-    $event = $this->eventCreate(['title' => 'delete this event']);
+    $event = $this->eventCreateUnpaid(['title' => 'delete this event']);
     $eventId = $event['id'];
 
     $this->callAPISuccess('action_schedule', 'create', [

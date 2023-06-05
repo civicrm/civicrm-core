@@ -45,7 +45,7 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
   }
 
   public function createOwnEvent() {
-    $event = $this->eventCreate([
+    $event = $this->eventCreateUnpaid([
       'created_id' => $this->contactID,
     ]);
     $this->ownEventID = $event['id'];
@@ -53,7 +53,7 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
 
   public function createOtherEvent() {
     $this->otherContactID = $this->contactID + 1;
-    $event = $this->eventCreate([
+    $event = $this->eventCreateUnpaid([
       'created_id' => $this->otherContactID,
     ]);
     $this->otherEventID = $event['id'];
