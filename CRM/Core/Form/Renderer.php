@@ -85,6 +85,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     self::updateAttributes($element, $required, $error);
 
     $el = parent::_elementToArray($element, $required, $error);
+    $el['textLabel'] = $element->_label ?? NULL;
 
     // add label html
     if (!empty($el['label'])) {
