@@ -18,19 +18,16 @@
   <table class="form-layout-compressed">
    <tr class="crm-campaign-survey-main-form-block-title">
        <td class="label">{$form.title.label}</td>
-       <td class="view-value">{$form.title.html}
-         <div class="description">{ts}Title of the survey.{/ts}</div></td>
+       <td class="view-value">{$form.title.html}</td>
    </tr>
    <tr class="crm-campaign-survey-main-form-block-campaign_id">
      <td class="label">{$form.campaign_id.label}</td>
-     <td class="view-value">{$form.campaign_id.html}
-        <div class="description">{ts}Select the campaign for which survey is created.{/ts}</div>
+     <td class="view-value">{$form.campaign_id.html}</div>
       </td>
    </tr>
    <tr class="crm-campaign-survey-main-form-block-activity_type_id">
        <td class="label">{$form.activity_type_id.label}</td>
-       <td class="view-value">{$form.activity_type_id.html}
-         <div class="description">{ts}Select the Activity Type.{/ts}</div></td>
+       <td class="view-value">{$form.activity_type_id.html}</td>
    </tr>
    <tr class="crm-campaign-survey-main-form-block-instructions">
        <td class="label">{$form.instructions.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_survey' field='instructions' id=$surveyId}{/if}</td>
@@ -49,17 +46,15 @@
    <tr class="crm-campaign-survey-main-form-block-release_frequency">
        <td class="label">{$form.release_frequency.label}</td>
        <td class="view-value">{$form.release_frequency.html}
-      <div class="description">{ts}Reserved respondents are released if they haven't been surveyed within this number of days. The Respondent Processor script must be run periodically to release respondents.{/ts} {docURL page="user/initial-set-up/scheduled-jobs"}</div> </td>
+      <div class="description">{ts}Reserved respondents are released if they haven't been surveyed within this number of days. The Respondent Processor script must be run periodically to release respondents.{/ts} {docURL page="user/initial-set-up/scheduled-jobs"}</div></td>
    </tr>
    <tr class="crm-campaign-survey-main-form-block-is_active">
        <td class="label">{$form.is_active.label}</td>
-       <td class="view-value">{$form.is_active.html}
-      <div class="description">{ts}Is this survey active?{/ts}</div></td>
+       <td class="view-value">{$form.is_active.html}</td>
    </tr>
    <tr class="crm-campaign-survey-main-form-block-is_default">
        <td class="label">{$form.is_default.label}</td>
-       <td class="view-value">{$form.is_default.html}
-     <div class="description">{ts}Is this the default survey?{/ts}</div></td>
+       <td class="view-value">{$form.is_default.html}</td>
    </tr>
    <tr class="crm-campaign-form-block-custom_data">
        <td colspan="2">
