@@ -23,8 +23,7 @@
 
         <tr class="crm-{$formClass}-form-block-total_amount">
           <td class="label">{$form.total_amount.label}</td>
-          <td>{$form.total_amount.html}<br />
-            <span class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span><div class="totaltaxAmount"></div></td>
+          <td>{$form.total_amount.html}</td>
         </tr>
         <tr class="crm-{$formClass}-form-block-receive_date">
           <td class="label">{$form.receive_date.label}</td>
@@ -32,9 +31,7 @@
         </tr>
         <tr class="crm-{$formClass}-form-block-financial_type_id">
           <td class="label">{$form.financial_type_id.label}</td>
-          <td>{$form.financial_type_id.html}<br/>
-            <span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span>
-          </td>
+          <td>{$form.financial_type_id.html}</td>
         </tr>
         <tr class="crm-{$formClass}-form-block-payment_instrument_id">
           <td class="label">{$form.payment_instrument_id.label}<span class='marker'>*</span></td>
@@ -70,8 +67,7 @@
   {/if}
   <tr class="crm-member-{$formClass}-form-block-financial_type_id">
     <td class="label">{$form.financial_type_id.label}</td>
-    <td>{$form.financial_type_id.html}<br/>
-      <span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
+    <td>{$form.financial_type_id.html}</td>
   </tr>
   <tr class="crm-{$formClass}-form-block-total_amount">
     <td class="label">{$form.total_amount.label}</td>
