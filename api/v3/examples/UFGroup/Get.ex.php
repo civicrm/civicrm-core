@@ -56,7 +56,7 @@ function uf_group_get_expectedresult() {
         'help_pre' => 'help pre',
         'help_post' => 'help post',
         'limit_listings_group_id' => '1',
-        'post_URL' => 'http://example.org/post',
+        'post_url' => 'http://example.org/post',
         'add_to_group_id' => '1',
         'add_captcha' => '1',
         'is_map' => '1',

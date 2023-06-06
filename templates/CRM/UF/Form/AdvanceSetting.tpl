@@ -29,9 +29,9 @@
             <td>{$form.notify.html} {help id='id-notify_email' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
 
-        <tr class="crm-uf-advancesetting-form-block-post_URL">
-            <td class="label">{$form.post_URL.label}</td>
-            <td>{$form.post_URL.html} {help id='id-post_URL' file="CRM/UF/Form/Group.hlp"}</td>
+        <tr class="crm-uf-advancesetting-form-block-post_url">
+            <td class="label">{$form.post_url.label}</td>
+            <td>{$form.post_url.html} {help id='id-post_url' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
 
         <tr class="crm-uf-advancesetting-form-block-add_cancel_button">
@@ -39,9 +39,9 @@
             <td>{$form.add_cancel_button.html} {$form.add_cancel_button.label} {help id='id-add_cancel_button' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
 
-        <tr class="cancel_button_section crm-uf-advancesetting-form-block-cancel_URL">
-            <td class="label">{$form.cancel_URL.label}</td>
-            <td>{$form.cancel_URL.html} {help id='id-cancel_URL' file="CRM/UF/Form/Group.hlp"}</td>
+        <tr class="cancel_button_section crm-uf-advancesetting-form-block-cancel_url">
+            <td class="label">{$form.cancel_url.label}</td>
+            <td>{$form.cancel_url.html} {help id='id-cancel_url' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
 
         {foreach from=$advancedFieldsConverted item=fieldName}

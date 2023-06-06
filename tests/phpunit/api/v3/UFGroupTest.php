@@ -47,7 +47,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'add_captcha' => 1,
       'add_contact_to_group' => $this->_groupId,
       'group' => $this->_groupId,
-      'cancel_URL' => 'http://example.org/cancel',
+      'cancel_url' => 'http://example.org/cancel',
       'created_date' => '2009-06-27 00:00:00',
       'created_id' => $this->_contactId,
       'group_type' => 'Individual,Contact',
@@ -62,7 +62,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'is_update_dupe' => 1,
       'name' => 'Test_Group',
       'notify' => 'admin@example.org',
-      'post_URL' => 'http://example.org/post',
+      'post_url' => 'http://example.org/post',
       'title' => 'Test Group',
     ];
   }
@@ -157,7 +157,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'id' => $this->_ufGroupId,
       'add_captcha' => 1,
       'add_contact_to_group' => $this->_groupId,
-      'cancel_URL' => 'http://example.org/cancel',
+      'cancel_url' => 'http://example.org/cancel',
       'created_date' => '2009-06-27',
       'created_id' => $this->_contactId,
       'group' => $this->_groupId,
@@ -173,7 +173,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'is_update_dupe' => 1,
       'name' => 'test_group',
       'notify' => 'admin@example.org',
-      'post_URL' => 'http://example.org/post',
+      'post_url' => 'http://example.org/post',
       'title' => 'Test Group',
     ];
     $result = $this->callAPISuccess('uf_group', 'create', $params);

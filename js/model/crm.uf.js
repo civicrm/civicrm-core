@@ -514,7 +514,7 @@
         help: ts('Select a group if you want contacts to be automatically added to that group when the profile is submitted.'),
         type: 'Number'
       },
-      'cancel_URL': {
+      'cancel_url': {
         title: ts('Cancel Redirect URL'),
         help: ts('If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL if they click the Cancel button - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed.'),
         type: 'Text'
@@ -605,7 +605,7 @@
         help: ts('If you want member(s) of your organization to receive a notification email whenever this Profile form is used to enter or update contact information, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org). The first email address listed will be used as the FROM address in the notifications.'),
         type: 'TextArea'
       },
-      'post_URL': {
+      'post_url': {
         title: ts('Redirect URL'),
         help: ts("If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL after they've submitted the form, you can also use contact tokens in URL - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed with a generic status message - 'Your contact information has been saved.'"),
         type: 'Text'
