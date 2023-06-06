@@ -238,7 +238,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @return null
    */
   public static function addQuickFormElement(
-    &$qf,
+    $qf,
     $elementName,
     $fieldId,
     $inactiveNeeded,
