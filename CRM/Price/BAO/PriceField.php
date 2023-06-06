@@ -273,11 +273,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     $currencyName = $config->defaultCurrency;
 
     if (!isset($label)) {
-      $label = (!empty($qf->_membershipBlock) && $field->name == 'contribution_amount') ? ts('Additional Contribution') : $field->label;
-    }
-
-    if ($field->name === 'contribution_amount') {
-      $qf->_contributionAmount = 1;
+      $label = (!empty($qf->_membershipBlock) && $field->name === 'contribution_amount') ? ts('Additional Contribution') : $field->label;
     }
 
     if (isset($qf->_online) && $qf->_online) {
@@ -313,13 +309,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         ]);
 
         $extra = [];
-        if (!empty($qf->_membershipBlock) && $isQuickConfig && $field->name == 'other_amount' && empty($qf->_contributionAmount)) {
+        if (!empty($qf->_membershipBlock) && $isQuickConfig && $field->name == 'other_amount') {
           $useRequired = 0;
         }
         elseif (!empty($fieldOptions[$optionKey]['label'])) {
           //check for label.
           $label = $fieldOptions[$optionKey]['label'];
-          if ($isQuickConfig && !empty($qf->_contributionAmount) && strtolower($fieldOptions[$optionKey]['name']) == 'other_amount') {
+          if ($isQuickConfig && $field->name === 'contribution_amount' && strtolower($fieldOptions[$optionKey]['name']) == 'other_amount') {
             $label .= '  ' . $currencySymbol;
             $qf->assign('priceset', $elementName);
             $extra = [
@@ -365,7 +361,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       case 'Radio':
         $choice = [];
 
-        if ($isQuickConfig && !empty($qf->_contributionAmount)) {
+        if ($isQuickConfig && $field->name === 'contribution_amount') {
           $qf->assign('contriPriceset', $elementName);
         }
 
