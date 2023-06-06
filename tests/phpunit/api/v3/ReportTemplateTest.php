@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
 use Civi\Test\ACLPermissionTrait;
 
 /**
@@ -35,16 +36,12 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Our group reports use an alter so transaction cleanup won't work.
-   *
-   * @throws \Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'], TRUE);
     (new CRM_Logging_Schema())->dropAllLogTables();
     CRM_Utils_Hook::singleton()->reset();
-    $config = CRM_Core_Config::singleton();
-    unset($config->userPermissionClass->permissions);
     parent::tearDown();
   }
 
@@ -1496,10 +1493,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testPcpReportTotals() {
+  public function testPcpReportTotals(): void {
     $donor1ContactId = $this->individualCreate();
-    $donor2ContactId = $this->individualCreate();
-    $donor3ContactId = $this->individualCreate();
+    $donor2ContactId = $this->individualCreate(['last_name' => 'Black']);
+    $donor3ContactId = $this->individualCreate(['last_name' => 'Cherry']);
 
     // We are going to create two PCP pages. We will create two contributions
     // on the first PCP page and one contribution on the second PCP page.
@@ -1535,6 +1532,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $pcpParams = $this->pcpParams();
     // Keep track of the owner of the page.
     $pcpOwnerContact2Id = $pcpParams['contact_id'];
+    Contact::update()->addWhere('id', '=', $pcpOwnerContact2Id)->setValues(['last_name' => 'Green'])->execute();
     // We're using the same pcpBlock id and contribution page that we created above.
     $pcpParams['pcp_block_id'] = $pcpBlock->id;
     $pcpParams['page_id'] = $contribution_page_id;
@@ -1590,15 +1588,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ];
     $c3 = $this->contributionCreate($contribution3params);
     // Now the soft contribution.
-    $p = [
+    $this->callAPISuccess('ContributionSoft', 'create', [
       'contribution_id' => $c3,
       'pcp_id' => $pcp2->id,
       'contact_id' => $pcpOwnerContact2Id,
       'amount' => 200.00,
       'currency' => 'USD',
       'soft_credit_type_id' => $pcp_soft_credit_type_id,
-    ];
-    $this->callAPISuccess('contribution_soft', 'create', $p);
+    ]);
 
     $template = 'contribute/pcp';
     $rows = $this->callAPISuccess('report_template', 'getrows', [

@@ -23,16 +23,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_TaxTrait;
 
-  /**
-   * Should financials be checked after the test but before tear down.
-   *
-   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
-   * are some test data issues and some real bugs currently blocking.
-   *
-   * @var bool
-   */
-  protected $isValidateFinancialsOnPostAssert = TRUE;
-
   protected $_individualId;
 
   protected $_financialTypeId = 1;
@@ -44,8 +34,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   /**
    * Setup function.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -56,12 +44,11 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match']);
+    parent::tearDown();
   }
 
   /**
@@ -145,7 +132,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * @param array $extraParams
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
   public function addOrder(bool $isPriceSet, float $amount = 300.00, array $extraParams = []): array {
     $p = [
@@ -323,7 +309,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test create order api for membership.
    *
    * @dataProvider dataForTestAddOrderForMembershipWithDates
-   * @throws \CRM_Core_Exception
    *
    * @param array $membershipExtraParams Optional additional params for the membership,
    *    e.g. skipStatusCal or start_date. This can also have a 'renewalOf' key, in which
@@ -333,13 +318,13 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    */
   public function testAddOrderForMembershipWithDates(array $membershipExtraParams, ?string $paymentDate, array $expectations): void {
     if (date('Y-m-d') > static::$phpunitStartedDate) {
-      $this->markTestSkipped("Test run spanned 2 days so skipping test as results would be affected");
+      $this->markTestSkipped('Test run spanned 2 days so skipping test as results would be affected');
     }
     if (date('Hi') > '2357') {
-      $this->markTestSkipped("It‘s less than 2 mins to midnight, test skipped as 'today' may change during test.");
+      $this->markTestSkipped("It‘s less than 2 minutes to midnight, test skipped as 'today' may change during test.");
     }
     if (isset($membershipExtraParams['skipStatusCal']) && !$this->skipStatusCalStillExists()) {
-      $this->markTestSkipped("The test was skipped as skipStatusCal seems to have been removed, so this test is useless and should be removed.");
+      $this->markTestSkipped('The test was skipped as skipStatusCal seems to have been removed, so this test is useless and should be removed.');
     }
 
     $membershipType = $this->membershipTypeCreate();

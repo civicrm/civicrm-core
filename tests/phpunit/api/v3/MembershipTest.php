@@ -479,7 +479,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testGetWithRelationship() {
-    $membershipOrgId = $this->organizationCreate(NULL);
+    $membershipOrgId = $this->organizationCreate();
     $memberContactId = $this->individualCreate();
 
     $relTypeParams = [

@@ -3398,57 +3398,58 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Get parameters to set up a multi-line participant order.
    *
-   * @param int|null $eventID
-   *   Optional event ID. A new event will be created if no event ID is given.
-   *
    * @return array
    */
-  protected function getParticipantOrderParams(?int $eventID = NULL): array {
-    if (!$eventID) {
-      $event = $this->eventCreate();
-      $eventID = $event['id'];
-    }
-
-    $eventParams = [
-      'id' => $eventID,
-      'financial_type_id' => 4,
-      'is_monetary' => 1,
-    ];
-    $this->callAPISuccess('Event', 'create', $eventParams);
-    $priceFields = $this->createPriceSet('event', $eventID);
-    $orderParams = [
+  protected function getParticipantOrderParams(): array {
+    $this->eventCreatePaid();
+    return [
       'total_amount' => 300,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
       'financial_type_id' => 4,
-      'contribution_status_id' => 'Pending',
-    ];
-    foreach ($priceFields['values'] as $priceField) {
-      $orderParams['line_items'][] = [
-        'line_item' => [
-          [
-            'price_field_id' => $priceField['price_field_id'],
-            'price_field_value_id' => $priceField['id'],
-            'label' => $priceField['label'],
-            'field_title' => $priceField['label'],
-            'qty' => 1,
-            'unit_price' => $priceField['amount'],
-            'line_total' => $priceField['amount'],
-            'financial_type_id' => $priceField['financial_type_id'],
-            'entity_table' => 'civicrm_participant',
+      'line_items' => [
+        [
+          'line_item' => [
+            [
+              'price_field_id' => $this->ids['PriceField']['PaidEvent'],
+              'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
+              'qty' => 1,
+              'unit_price' => 100,
+              'line_total' => 100,
+              'entity_table' => 'civicrm_participant',
+            ],
+          ],
+          'params' => [
+            'financial_type_id' => 4,
+            'event_id' => $this->getEventID('PaidEvent'),
+            'role_id' => 1,
+            'status_id' => 14,
+            'fee_currency' => 'USD',
+            'contact_id' => $this->individualCreate(),
           ],
         ],
-        'params' => [
-          'financial_type_id' => 4,
-          'event_id' => $eventID,
-          'role_id' => 1,
-          'status_id' => 14,
-          'fee_currency' => 'USD',
-          'contact_id' => $this->individualCreate(),
+        [
+          'line_item' => [
+            [
+              'price_field_id' => $this->ids['PriceField']['PaidEvent'],
+              'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_plus'],
+              'qty' => 1,
+              'unit_price' => 200,
+              'line_total' => 200,
+              'entity_table' => 'civicrm_participant',
+            ],
+          ],
+          'params' => [
+            'financial_type_id' => 4,
+            'event_id' => $this->getEventID('PaidEvent'),
+            'role_id' => 1,
+            'status_id' => 14,
+            'fee_currency' => 'USD',
+            'contact_id' => $this->individualCreate(),
+          ],
         ],
-      ];
-    }
-    return $orderParams;
+      ],
+    ];
   }
 
   /**
