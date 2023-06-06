@@ -91,4 +91,22 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains($addreses[3], $result);
   }
 
+  public function testMasterAddressJoin() {
+    $contact = $this->createTestRecord('Contact');
+    $master = $this->createTestRecord('Address', [
+      'contact_id' => $contact['id'],
+    ]);
+    $address = $this->createTestRecord('Address', [
+      'master_id' => $master['id'],
+      'contact_id' => $this->createTestRecord('Contact')['id'],
+    ]);
+    $result = Address::get(FALSE)
+      ->addJoin('Contact AS master_contact', 'LEFT', ['master_id.contact_id', '=', 'master_contact.id'])
+      ->addSelect('master_contact.id')
+      // Ensure the query can handle the ambiguity of two joined entities with a `location_type_id` field
+      ->addOrderBy('location_type_id:label', 'ASC')
+      ->execute()->indexBy('id');
+    $this->assertEquals($contact['id'], $result[$address['id']]['master_contact.id']);
+  }
+
 }
