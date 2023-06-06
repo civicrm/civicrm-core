@@ -1064,7 +1064,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  protected function eventCreatePaid(array $params = [], array $options = [['name' => 'hundred', 'amount' => 100]], string $key = 'event'): array {
+  protected function legacyEventCreatePaid(array $params = [], array $options = [['name' => 'hundred', 'amount' => 100]], string $key = 'PaidEvent'): array {
     // @todo - uncomment these - but need to fix an e-notice first.
     // $this->dummyProcessorCreate();
     // $params['payment_processor'] = [$this->ids['PaymentProcessor']['dummy_live']];

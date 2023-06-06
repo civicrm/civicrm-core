@@ -177,7 +177,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
     $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
     $params = ['is_monetary' => 1, 'financial_type_id' => 1];
-    $event = $this->eventCreatePaid($params, [['name' => 'test', 'amount' => 8000.67]]);
+    $event = $this->legacyEventCreatePaid($params, [['name' => 'test', 'amount' => 8000.67]]);
     $individualID = $this->individualCreate();
     //$this->submitForm($event['id'], [
     $form = CRM_Event_Form_Registration_Confirm::testSubmit([
@@ -704,7 +704,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   protected function submitPaidEvent(array $submitValues = []): void {
     $this->dummyProcessorCreate();
-    $event = $this->eventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE]);
+    $event = $this->legacyEventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE]);
     $this->submitForm($event['id'], array_merge([
       'email-Primary' => 'demo@example.com',
       'credit_card_number' => '4111111111111111',
@@ -718,7 +718,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'billing_state_province_id-5' => '1061',
       'billing_postal_code-5' => '7',
       'billing_country_id-5' => '1228',
-      'priceSetId' => $this->ids['PriceSet']['event'],
+      'priceSetId' => $this->ids['PriceSet']['PaidEvent'],
       $this->getPriceFieldFormLabel('event_radio') => $this->ids['PriceFieldValue']['hundred'],
       'payment_processor_id' => '1',
       'year' => '2019',
