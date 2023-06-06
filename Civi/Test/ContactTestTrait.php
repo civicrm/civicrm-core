@@ -56,18 +56,18 @@ trait ContactTestTrait {
    *
    * @param array $params
    *   parameters for civicrm_contact_add api function call
-   * @param int $seq
-   *   sequence number if creating multiple organizations
+   * @param int|string $identifier
+   *   If the identifier is numeric (discouraged) it will affect which contact is loaded.
+   *   Numeric identifiers and values for random other than FALSE are generally
+   *   discouraged in favour if specifying data in params where variety is needed.
    *
    * @return int
    *   id of Organisation created
    */
-  public function organizationCreate($params = [], $seq = 0): int {
-    if (!$params) {
-      $params = [];
-    }
+  public function organizationCreate(array $params = [], $identifier = 'organization_0'): int {
+    $seq = is_numeric($identifier) ? $identifier : 0;
     $params = array_merge($this->sampleContact('Organization', $seq), $params);
-    return $this->_contactCreate($params);
+    return $this->_contactCreate($params, $identifier);
   }
 
   /**
@@ -75,17 +75,21 @@ trait ContactTestTrait {
    *
    * @param array $params
    *   parameters for civicrm_contact_add api function call
-   * @param int $seq
-   *   sequence number if creating multiple individuals
+   * @param int|string $identifier
+   *   If the identifier is numeric (discouraged) it will affect which contact is loaded.
+   *   Numeric identifiers and values for random other than FALSE are generally
+   *   discouraged in favour if specifying data in params where variety is needed.
    * @param bool $random
+   *   Random is deprecated.
    *
    * @return int
    *   id of Individual created
    */
-  public function individualCreate(array $params = [], $seq = 0, $random = FALSE): int {
+  public function individualCreate(array $params = [], $identifier = 'individual_0', bool $random = FALSE): int {
+    $seq = is_numeric($identifier) ? $identifier : 0;
     $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
-    $this->ids['Contact']['individual_' . $seq] = $this->_contactCreate($params);
-    return $this->ids['Contact']['individual_' . $seq];
+    $this->_contactCreate($params, $identifier);
+    return $this->ids['Contact'][$identifier];
   }
 
   /**
@@ -93,17 +97,18 @@ trait ContactTestTrait {
    *
    * @param array $params
    *   parameters for civicrm_contact_add api function call
-   * @param int $seq
-   *   sequence number if creating multiple households
+   * @param int|string $identifier
+   *   If the identifier is numeric (discouraged) it will affect which contact is loaded.
+   *   Numeric identifiers and values for random other than FALSE are generally
+   *   discouraged in favour if specifying data in params where variety is needed.
    *
    * @return int
    *   id of Household created
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function householdCreate($params = [], $seq = 0) {
+  public function householdCreate(array $params = [], $identifier = 'household_0'): int {
+    $seq = is_numeric($identifier) ? $identifier : 0;
     $params = array_merge($this->sampleContact('Household', $seq), $params);
-    return $this->_contactCreate($params);
+    return $this->_contactCreate($params, $identifier);
   }
 
   /**
@@ -118,7 +123,7 @@ trait ContactTestTrait {
    * @return array
    *   properties of sample contact (ie. $params for API call)
    */
-  public function sampleContact($contact_type, $seq = 0, $random = FALSE) {
+  public function sampleContact(string $contact_type, int $seq = 0, bool $random = FALSE): array {
     $samples = [
       'Individual' => [
         // The number of values in each list need to be coprime numbers to not have duplicates
@@ -143,10 +148,10 @@ trait ContactTestTrait {
     foreach ($samples[$contact_type] as $key => $values) {
       $params[$key] = $values[$seq % count($values)];
       if ($random) {
-        $params[$key] .= substr(sha1(rand()), 0, 5);
+        $params[$key] .= substr(sha1(mt_rand()), 0, 5);
       }
     }
-    if ($contact_type == 'Individual') {
+    if ($contact_type === 'Individual') {
       $params['email'] = strtolower(
         $params['first_name'] . '_' . $params['last_name'] . '@civicrm.org'
       );
@@ -161,15 +166,17 @@ trait ContactTestTrait {
    *
    * @param array $params
    *   For civicrm_contact_add api function call.
+   * @param string $identifier
    *
    * @return int
    *   id of contact created
    */
-  private function _contactCreate(array $params): int {
+  private function _contactCreate(array $params, string $identifier = 'Contact'): int {
     $version = $this->_apiversion;
     $this->_apiversion = 3;
-    $result = $this->callAPISuccess('contact', 'create', $params);
+    $result = $this->callAPISuccess('Contact', 'create', $params);
     $this->_apiversion = $version;
+    $this->ids['Contact'][$identifier] = (int) $result['id'];
     return (int) $result['id'];
   }
 
@@ -179,7 +186,7 @@ trait ContactTestTrait {
    * @param int $contactID
    *   Contact ID to delete
    */
-  public function contactDelete($contactID) {
+  public function contactDelete($contactID): void {
     $domain = new \CRM_Core_BAO_Domain();
     $domain->contact_id = $contactID;
     if (!$domain->find(TRUE)) {

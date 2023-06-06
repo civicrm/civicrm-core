@@ -26,7 +26,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
 
-    $this->_contactID = $this->organizationCreate(NULL);
+    $this->_contactID = $this->organizationCreate();
     $this->_locationTypeID = $this->locationTypeCreate();
     $this->locationType2ID = $this->locationTypeCreate([
       'name' => 'New Location Type 2',

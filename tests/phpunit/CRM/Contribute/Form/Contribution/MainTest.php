@@ -168,7 +168,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
   /**
    * Test expired priceset are not returned from buildPriceSet() Function
    */
-  public function testExpiredPriceSet() {
+  public function testExpiredPriceSet(): void {
     $priceSetParams1 = [
       'name' => 'priceset',
       'title' => 'Priceset with Multiple Terms',
@@ -204,7 +204,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
     $priceField2 = $this->callAPISuccess('PriceField', 'create', $params);
 
     //Create price options.
-    $membershipOrgId = $this->organizationCreate(NULL);
+    $membershipOrgId = $this->organizationCreate();
     $memtype = $this->membershipTypeCreate(['member_of_contact_id' => $membershipOrgId]);
     foreach ([$priceField1, $priceField2] as $priceField) {
       $priceFieldValueParams = [

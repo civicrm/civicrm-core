@@ -10,13 +10,11 @@
  */
 
 /**
- * Class api_v3_PriceFieldValueTest
+ * Class api_v3_PriceFieldValueTest.
+ *
  * @group headless
  */
 class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
-
-  const ENTITY = 'price_field_value';
 
   /**
    * @var array
@@ -87,7 +85,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
     ];
 
-    $membershipOrgId = $this->organizationCreate(NULL);
+    $membershipOrgId = $this->organizationCreate();
     $this->membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $membershipOrgId]);
 
     $priceSetParams2 = [
@@ -115,63 +113,43 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
 
   /**
    * Tear down function.
-   *
-   * @throws \Exception
    */
   public function tearDown(): void {
-    $tablesToTruncate = [
-      'civicrm_contact',
-      'civicrm_contribution',
-    ];
-    $this->quickCleanup($tablesToTruncate);
-    $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
-    $this->callAPISuccess('PriceField', 'delete', [
-      'id' => $this->priceFieldID1,
-    ]);
-    $delete = $this->callAPISuccess('PriceSet', 'delete', [
-      'id' => $this->priceSetID1,
-    ]);
-    $this->callAPISuccess('PriceField', 'delete', [
-      'id' => $this->priceFieldID2,
-    ]);
-    $this->callAPISuccess('PriceSet', 'delete', [
-      'id' => $this->priceSetID2,
-    ]);
-
-    $this->assertAPISuccess($delete);
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   public function testCreatePriceFieldValue() {
-    $result = $this->callAPIAndDocument(self::ENTITY, 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('PriceFieldValue', 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->getAndCheck($this->params, $result['id'], self::ENTITY);
+    $this->getAndCheck($this->params, $result['id'], 'PriceFieldValue');
   }
 
-  public function testGetBasicPriceFieldValue() {
-    $createResult = $this->callAPISuccess(self::ENTITY, 'create', $this->params);
+  public function testGetBasicPriceFieldValue(): void {
+    $createResult = $this->callAPISuccess('PriceFieldValue', 'create', $this->params);
     $this->assertAPISuccess($createResult);
     $getParams = [
       'name' => 'contribution_amount',
     ];
-    $getResult = $this->callAPIAndDocument(self::ENTITY, 'get', $getParams, __FUNCTION__, __FILE__);
+    $getResult = $this->callAPIAndDocument('PriceFieldValue', 'get', $getParams, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $getResult['count']);
     $this->callAPISuccess('price_field_value', 'delete', ['id' => $createResult['id']]);
   }
 
   public function testDeletePriceFieldValue() {
-    $startCount = $this->callAPISuccess(self::ENTITY, 'getcount', []);
-    $createResult = $this->callAPISuccess(self::ENTITY, 'create', $this->params);
+    $startCount = $this->callAPISuccess('PriceFieldValue', 'getcount', []);
+    $createResult = $this->callAPISuccess('PriceFieldValue', 'create', $this->params);
     $deleteParams = ['id' => $createResult['id']];
-    $deleteResult = $this->callAPIAndDocument(self::ENTITY, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $deleteResult = $this->callAPIAndDocument('PriceFieldValue', 'delete', $deleteParams, __FUNCTION__, __FILE__);
 
-    $endCount = $this->callAPISuccess(self::ENTITY, 'getcount', []);
+    $endCount = $this->callAPISuccess('PriceFieldValue', 'getcount', []);
     $this->assertEquals($startCount, $endCount);
   }
 
-  public function testGetFieldsPriceFieldValue() {
-    $result = $this->callAPISuccess(self::ENTITY, 'getfields', ['action' => 'create']);
+  public function testGetFieldsPriceFieldValue(): void {
+    $result = $this->callAPISuccess('PriceFieldValue', 'getfields', ['action' => 'create']);
     $this->assertEquals(1, $result['values']['max_value']['type']);
   }
 
@@ -186,10 +164,10 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_active' => 1,
       'financial_type_id' => 2,
     ];
-    $result = $this->callAPIAndDocument(self::ENTITY, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('PriceFieldValue', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['membership_num_terms'], 2);
     $this->assertEquals(1, $result['count']);
-    $this->callAPISuccess(self::ENTITY, 'delete', ['id' => $result['id']]);
+    $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $result['id']]);
   }
 
   public function testGetPriceFieldValuewithMultipleTerms() {
@@ -213,15 +191,15 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_active' => 1,
       'financial_type_id' => 2,
     ];
-    $result1 = $this->callAPISuccess(self::ENTITY, 'create', $params2);
-    $result2 = $this->callAPISuccess(self::ENTITY, 'create', $params2);
-    $result = $this->callAPISuccess(self::ENTITY, 'get', ['price_field_id' => $this->priceFieldID2]);
+    $result1 = $this->callAPISuccess('PriceFieldValue', 'create', $params2);
+    $result2 = $this->callAPISuccess('PriceFieldValue', 'create', $params2);
+    $result = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $this->priceFieldID2]);
     $this->assertEquals(2, $result['count']);
-    $this->callAPISuccess(self::ENTITY, 'delete', ['id' => $result1['id']]);
-    $this->callAPISuccess(self::ENTITY, 'delete', ['id' => $result2['id']]);
+    $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $result1['id']]);
+    $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $result2['id']]);
   }
 
-  public function testCreatePriceFieldValueWithDisabledFinancialType() {
+  public function testCreatePriceFieldValueWithDisabledFinancialType(): void {
     $financialTypeParams = [
       'is_active' => 0,
       'name' => 'Disabled Donations',
@@ -235,20 +213,20 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_active' => 1,
       'financial_type_id' => $financialType['id'],
     ];
-    $this->callAPIFailure(self::ENTITY, 'create', $params);
+    $this->callAPIFailure('PriceFieldValue', 'create', $params);
   }
 
   /**
    * This is the same as testCreatePriceFieldValue but where is_default = 1.
    */
-  public function testCreatePriceFieldValueAsDefault() {
+  public function testCreatePriceFieldValueAsDefault(): void {
     $params = $this->params;
     $params['is_default'] = 1;
-    $result = $this->callAPISuccess(self::ENTITY, 'create', $params);
+    $result = $this->callAPISuccess('PriceFieldValue', 'create', $params);
     $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->getAndCheck($params, $result['id'], self::ENTITY);
+    $this->getAndCheck($params, $result['id'], 'PriceFieldValue');
   }
 
 }

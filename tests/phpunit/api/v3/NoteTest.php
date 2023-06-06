@@ -27,7 +27,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
 
-    $this->_contactID = $this->organizationCreate(NULL);
+    $this->_contactID = $this->organizationCreate();
     $this->_createdDate = date('Y-m-d H:i:s', strtotime('-10 years'));
 
     $this->_params = [
