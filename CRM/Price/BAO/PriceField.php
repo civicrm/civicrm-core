@@ -291,26 +291,15 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
     //use value field.
     $valueFieldName = 'amount';
-    $separator = '|';
-    $taxTerm = Civi::settings()->get('tax_term');
-    $displayOpt = Civi::settings()->get('tax_display_settings');
-    $invoicing = Civi::settings()->get('invoicing');
     switch ($field->html_type) {
       case 'Text':
         $optionKey = key($customOption);
-        $count = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
-        $max_value = CRM_Utils_Array::value('max_value', $customOption[$optionKey], '');
-        $taxAmount = $customOption[$optionKey]['tax_amount'] ?? NULL;
-        if (isset($taxAmount) && $displayOpt && $invoicing) {
-          $qf->assign('displayOpt', $displayOpt);
-          $qf->assign('taxTerm', $taxTerm);
-          $qf->assign('invoicing', $invoicing);
-        }
-        $priceVal = implode($separator, [
-          $customOption[$optionKey][$valueFieldName] + $taxAmount,
-          $count,
-          $max_value,
-        ]);
+        // Text elements have a label before and then a second label after with amount, etc
+        // The second label is added here, we start by clearing out the existing text which is the first label.
+        $customOption[$optionKey]['label'] = NULL;
+        $priceOptionText = self::buildPriceOptionText($customOption[$optionKey], $field->is_display_amounts, $valueFieldName);
+        // This second label is then added to the form as a second form element which just carries the label and is not otherwise used.
+        $elementLabelAfter = &$qf->add('static', $elementName . '_label_after', $priceOptionText['label']);
 
         $extra = [];
         if (!empty($qf->_membershipBlock) && $isQuickConfig && $field->name == 'other_amount' && empty($qf->_contributionAmount)) {
@@ -332,7 +321,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $element = &$qf->add('text', $elementName, $label,
           array_merge($extra,
             [
-              'price' => json_encode([$optionKey, $priceVal]),
+              'price' => json_encode([$optionKey, $priceOptionText['priceVal']]),
               'size' => '4',
             ]
           ),
@@ -346,7 +335,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         if (in_array($optionKey, $freezeOptions)) {
           self::freezeIfEnabled($element, $fieldOptions[$optionKey]);
           // CRM-14696 - Improve display for sold out price set options
-          $element->setLabel($label . '&nbsp;<span class="sold-out-option">' . ts('Sold out') . '</span>');
+          $elementLabelAfter->setLabel('<span class="sold-out-option">' . $elementLabelAfter->getLabel() . '&nbsp;(' . ts('Sold out') . ')</span>');
         }
 
         //CRM-10117
@@ -777,7 +766,7 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
    * @return array
    *   Price field option label, price value
    */
-  public static function buildPriceOptionText($opt, $isDisplayAmounts, $valueFieldName) {
+  protected static function buildPriceOptionText($opt, $isDisplayAmounts, $valueFieldName) {
     $preHelpText = $postHelpText = '';
     $optionLabel = !empty($opt['label']) ? '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' : '';
     if (!empty($opt['help_pre'])) {
