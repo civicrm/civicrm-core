@@ -86,6 +86,9 @@
 - github      : allinappli
   name        : ALL IN APPLI
 
+- github      : allinappliadmin
+  name        : ALL IN APPLI admin
+
 - github      : Anatoleallain
   name        : Anatole
 
@@ -574,6 +577,9 @@
 
 - name        : Graham Smith
   organization: Edinburgh College
+
+- github      : GreysonStalcup
+  name        : Greyson Stalcup
 
 - name        : Guillaume Rischard
   github      : grischard
@@ -1229,6 +1235,8 @@
   name        : Peter Davis
   organization: Fuzion
 
+- github      : peth-systopia
+
 - github      : pillarsdotnet
   name        : Bob Vincent
 
@@ -1540,6 +1548,10 @@
 - github      : twomice
   name        : Allen Shaw
   organization: Joinery
+
+- github      : TychoSchottelius
+  name        : Tycho Schottelius
+  organization: Systopia
 
 - github      : ufundo
   name        : Benjamin W
