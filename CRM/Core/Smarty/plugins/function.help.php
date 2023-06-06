@@ -39,22 +39,21 @@ function smarty_function_help($params, &$smarty) {
   }
 
   $params['file'] = str_replace(['.tpl', '.hlp'], '', $params['file']);
+  $fieldID = str_replace('-', '_', preg_replace('/^id-/', '', $params['id']));
 
   if (empty($params['title'])) {
     $vars = $smarty->get_template_vars();
     $smarty->assign('id', $params['id'] . '-title');
 
-    $name = trim($smarty->fetch($params['file'] . '.hlp'));
-    $extraoutput = '';
+    $name = trim($smarty->fetch($params['file'] . '.hlp')) ?: $vars['form'][$fieldID]['textLabel'] ?? '';
     $additionalTPLFile = $params['file'] . '.extra.hlp';
     if ($smarty->template_exists($additionalTPLFile)) {
-      $extraoutput .= trim($smarty->fetch($additionalTPLFile));
-      // Allow override param to replace default text e.g. {hlp id='foo' override=1}
-      if ($smarty->get_template_vars('override_help_text')) {
-        $name = '';
+      $extraoutput = trim($smarty->fetch($additionalTPLFile));
+      if ($extraoutput) {
+        // Allow override param to replace default text e.g. {hlp id='foo' override=1}
+        $name = ($smarty->get_template_vars('override_help_text') || empty($name)) ? $extraoutput : $name . ' ' . $extraoutput;
       }
     }
-    $name .= $extraoutput;
 
     // Ensure we didn't change any existing vars CRM-11900
     foreach ($vars as $key => $value) {
@@ -64,7 +63,7 @@ function smarty_function_help($params, &$smarty) {
     }
   }
   else {
-    $name = trim(strip_tags($params['title']));
+    $name = trim(strip_tags($params['title'])) ?: $vars['form'][$fieldID]['textLabel'] ?? '';
   }
 
   $class = "helpicon";
