@@ -216,6 +216,9 @@
       if (htmlType === 'CheckBox' || htmlType === 'Radio') {
         $('#serialize', $form).prop('checked', htmlType === 'CheckBox');
       }
+      else {
+        $("#options_per_line", $form).val('');
+      }
 
       showSearchRange(dataType);
       customOptionHtmlType(dataType);
