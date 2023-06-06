@@ -57,7 +57,7 @@
           CRM.api3('Mailing', 'get', {'id': {"IN": mids}}).then(function(result) {
             _.each(result.values, function(mail) {
               if (_.isEmpty(_.where(civimails, {id: parseInt(mail.id)}))) {
-                civimails.push({id: parseInt(mail.id), name: mail.label});
+                civimails.push({id: parseInt(mail.id), name: mail.name});
               }
             });
             CRM.crmMailing.civiMails = civimails;
