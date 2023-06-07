@@ -278,18 +278,18 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    */
   public static function checkRegistration($fields, $self, $contact_id, &$errors) {
     // verify whether this contact already registered for this event
-    $contact_details = CRM_Contact_BAO_Contact::getContactDetails($contact_id);
-    $display_name = $contact_details[0];
-    $query = 'select event_id from civicrm_participant where contact_id = ' . $contact_id;
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $to_event_id[] = $dao->event_id;
-    }
-    if (!empty($to_event_id)) {
-      foreach ($to_event_id as $id) {
-        if ($id == $self->_event_id) {
-          $errors['email'] = $display_name . ts(" is already registered for this event");
-        }
+    $participant = \Civi\Api4\Participant::get(FALSE)
+      ->addSelect('contact_id.display_name')
+      ->addWhere('event_id', '=', $self->_event_id)
+      ->addWhere('contact_id', '=', $contact_id)
+      ->addWhere('event_id.allow_same_participant_emails', '=', FALSE)
+      ->execute()->first();
+    if ($participant) {
+      if (array_key_exists('contact_id', $fields)) {
+        $errors['contact_id'] = ts('%1 is already registered for this event', [1 => $participant['contact_id.display_name']]);
+      }
+      else {
+        $errors['email'] = ts('%1 is already registered for this event', [1 => $fields['email']]);
       }
     }
   }
