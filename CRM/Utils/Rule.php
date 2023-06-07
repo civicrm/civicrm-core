@@ -658,6 +658,10 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function email($value): bool {
+    if ($value === '' || is_null($value)) {
+      // Nothing to check
+      return TRUE;
+    }
     if (function_exists('idn_to_ascii')) {
       $parts = explode('@', $value);
       foreach ($parts as &$part) {
