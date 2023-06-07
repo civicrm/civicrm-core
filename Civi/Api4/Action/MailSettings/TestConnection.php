@@ -12,6 +12,7 @@
 namespace Civi\Api4\Action\MailSettings;
 
 use Civi\Api4\Generic\BasicBatchAction;
+use Civi\Api4\MailSettings;
 
 class TestConnection extends BasicBatchAction {
 
@@ -24,8 +25,13 @@ class TestConnection extends BasicBatchAction {
    * @return array
    */
   protected function doTask($item) {
+    $mailingName = MailSettings::get(FALSE)
+      ->addSelect('name')
+      ->addWhere('id', '=', $item['id'])
+      ->execute()
+      ->first()['name'];
     try {
-      $mailStore = \CRM_Mailing_MailStore::getStore($item['name']);
+      $mailStore = \CRM_Mailing_MailStore::getStore($mailingName);
     }
     catch (\Throwable $t) {
       \Civi::log()->warning('MailSettings: Failed to establish test connection', [
