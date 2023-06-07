@@ -672,7 +672,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testMembershipPaymentForSingleContributionMultipleMembership(): void {
     $membershipTypeID1 = $this->membershipTypeCreate(['name' => 'Parent']);
     $membershipTypeID2 = $this->membershipTypeCreate(['name' => 'Child']);
-    $financialTypeId = $this->getFinancialTypeId('Member Dues');
+    $financialTypeId = $this->getFinancialTypeID('Member Dues');
     $priceSet = $this->callAPISuccess('price_set', 'create', [
       'is_quick_config' => 0,
       'extends' => 'CiviMember',

@@ -95,7 +95,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
       'weight' => 1,
       'options_per_line' => 1,
       'is_enter_qty' => 1,
-      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'visibility_id' => $this->visibilityOptionsKeys['public'],
       'price' => 10,
       'active_on' => date('Y-m-d'),

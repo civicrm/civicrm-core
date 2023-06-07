@@ -2497,7 +2497,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_active' => ['1' => 1],
       'price_set_id' => $priceSetID,
       'is_enter_qty' => 1,
-      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'financial_type_id', 'Event Fee'),
     ];
     if ($type === 'Radio') {
       foreach ($options as $index => $option) {
@@ -2796,8 +2796,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return int
    */
-  public function getFinancialTypeId($name) {
-    return CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $name, 'id', 'name');
+  public function getFinancialTypeID(string $name): int {
+    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'financial_type_id', $name);
   }
 
   /**

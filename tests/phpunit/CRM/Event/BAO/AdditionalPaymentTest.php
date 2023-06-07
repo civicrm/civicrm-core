@@ -237,7 +237,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testAddPartialPayment() {
+  public function testAddPartialPayment(): void {
     // First add an unrelated contribution since otherwise the contribution and
     // participant ids are all 1 so they might match by accident.
     $this->contributionCreate(['contact_id' => $this->individualCreate([], 0, TRUE)]);
