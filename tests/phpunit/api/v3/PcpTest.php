@@ -38,6 +38,7 @@ class api_v3_PcpTest extends CiviUnitTestCase {
       'contact_id' => 1,
       'page_id' => 1,
       'pcp_block_id' => 1,
+      'status_id:name' => 'Approved',
     ];
     parent::setUp();
   }
