@@ -471,6 +471,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if ($createCMSUser) {
         CRM_Core_BAO_CMSUser::buildForm($this, $profileID, TRUE);
       }
+      else {
+        $this->assign('showCMS', FALSE);
+      }
+    }
+    else {
+      $this->assign('showCMS', FALSE);
     }
 
     //we have to load confirm contribution button in template
@@ -524,6 +530,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // add pcp fields
     if ($this->_pcpId) {
       CRM_PCP_BAO_PCP::buildPcp($this->_pcpId, $this);
+    }
+    else {
+      $this->assign('pcp', FALSE);
     }
   }
 
