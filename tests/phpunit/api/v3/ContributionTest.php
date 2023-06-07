@@ -4284,7 +4284,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @return array|int
    * @throws \CRM_Core_Exception
    */
-  protected function setUpRecurringContribution($generalParams = [], $recurParams = []) {
+  protected function setUpRecurringContribution(array $generalParams = [], $recurParams = []) {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
       'contact_id' => $this->individualID,
       'installments' => '12',
@@ -4303,8 +4303,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'contribution_status_id' => 'Pending',
       ], $generalParams);
     $contributionParams['api.Payment.create'] = ['total_amount' => $contributionParams['total_amount']];
-    $originalContribution = $this->callAPISuccess('Order', 'create', $contributionParams);
-    return $originalContribution;
+    return $this->callAPISuccess('Order', 'create', $contributionParams);
   }
 
   /**

@@ -73,7 +73,7 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
     $cleanup = $this->useMultilingual(['en_US' => ['fr_CA', 'nl_NL']]);
     CRM_Core_I18n::singleton()->setLocale('en_US');
 
-    $event = $this->eventCreate();
+    $event = $this->eventCreatePaid();
     $eventId = $event['id'];
     $eventData = civicrm_api3('Event', 'getsingle', ['id' => $eventId]);
 
