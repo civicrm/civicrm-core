@@ -54,39 +54,33 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   protected $participantID4;
 
   /**
-   * @var int
-   */
-  protected $eventID;
-
-  /**
    * Set up for tests.
    */
   public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
-    $event = $this->eventCreate();
-    $this->eventID = $event['id'];
+    $this->eventCreatePaid();
     $this->contactID = $this->individualCreate();
     $this->individualCreate();
 
     $this->participantID = $this->participantCreate([
-      'contactID' => $this->contactID,
-      'eventID' => $this->eventID,
+      'contact_id' => $this->contactID,
+      'event_id' => $this->getEventID(),
     ]);
     $contactID2 = $this->individualCreate();
     $this->participantID2 = $this->participantCreate([
-      'contactID' => $contactID2,
-      'eventID' => $this->eventID,
+      'contact_id' => $contactID2,
+      'event_id' => $this->getEventID(),
     ]);
     $this->participantID3 = $this->participantCreate([
-      'contactID' => $contactID2,
-      'eventID' => $this->eventID,
+      'contact_id' => $contactID2,
+      'event_id' => $this->getEventID(),
     ]);
 
     $this->contactID3 = $this->individualCreate();
     $this->participantID4 = $this->participantCreate([
-      'contactID' => $this->contactID3,
-      'eventID' => $this->eventID,
+      'contact_id' => $this->contactID3,
+      'event_id' => $this->getEventID(),
     ]);
   }
 
@@ -94,21 +88,17 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    * Check with valid array.
    */
   public function testPaymentCreate(): void {
-    //Create Contribution & get contribution ID
-    $contributionID = $this->contributionCreate(['contact_id' => $this->contactID]);
-
-    //Create Participant Payment record With Values
-    $params = [
+    $this->callAPIAndDocument('ParticipantPayment', 'create', [
       'participant_id' => $this->participantID,
-      'contribution_id' => $contributionID,
-    ];
-
-    $this->callAPIAndDocument('participantPayment', 'create', $params, __FUNCTION__, __FILE__);
+      'contribution_id' => $this->contributionCreate(['contact_id' => $this->individualCreate()]),
+    ], __FUNCTION__, __FILE__);
   }
 
   /**
    * Test getPaymentInfo() returns correct
    * information of the participant payment
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentInfoForEvent(): void {
     //Create Contribution & get contribution ID
@@ -130,7 +120,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Check financial records for offline Participants.
    */
-  public function testPaymentOffline() {
+  public function testPaymentOffline(): void {
 
     // create contribution w/o fee
     $contributionID = $this->contributionCreate([
@@ -151,19 +141,15 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     // Update Payment
     $participantPayment = $this->callAPISuccess('participantPayment', 'create', $params);
     $this->assertEquals($participantPayment['id'], $participantPaymentID);
-    $this->assertTrue(array_key_exists('id', $participantPayment));
+    $this->assertArrayHasKey('id', $participantPayment);
     // check Financial records
     $this->_checkFinancialRecords($params, 'offline');
-    $params = [
-      'id' => $participantPaymentID,
-    ];
-    $deletePayment = $this->callAPISuccess('participantPayment', 'delete', $params);
   }
 
   /**
    * Check financial records for online Participant.
    */
-  public function testPaymentOnline() {
+  public function testPaymentOnline(): void {
 
     $pageParams['processor_id'] = $this->processorCreate();
     $contributionPage = $this->contributionPageCreate($pageParams);
@@ -185,19 +171,15 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     // Update Payment
     $participantPayment = $this->callAPISuccess('participantPayment', 'create', $params);
     $this->assertEquals($participantPayment['id'], $participantPaymentID);
-    $this->assertTrue(array_key_exists('id', $participantPayment));
+    $this->assertArrayHasKey('id', $participantPayment);
     // check Financial records
     $this->_checkFinancialRecords($params, 'online');
-    $params = [
-      'id' => $participantPaymentID,
-    ];
-    $this->callAPISuccess('participantPayment', 'delete', $params);
   }
 
   /**
    * Check financial records for online Participant pay later scenario.
    */
-  public function testPaymentPayLaterOnline() {
+  public function testPaymentPayLaterOnline(): void {
     $pageParams['processor_id'] = $this->processorCreate();
     $pageParams['is_pay_later'] = 1;
     $contributionPage = $this->contributionPageCreate($pageParams);
@@ -222,28 +204,20 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     // check Financial Records
     $this->_checkFinancialRecords($params, 'payLater');
     $this->assertEquals($participantPayment['id'], $participantPaymentID);
-    $this->assertTrue(array_key_exists('id', $participantPayment));
-    $params = [
-      'id' => $participantPaymentID,
-    ];
-    $this->callAPISuccess('participantPayment', 'delete', $params);
+    $this->assertArrayHasKey('id', $participantPayment);
   }
 
   /**
-   * Check with wrong id.
+   * Check with invalid id.
    */
-  public function testPaymentDeleteWithWrongID() {
-    $params = [
-      'id' => 0,
-    ];
-    $deletePayment = $this->callAPIFailure('participantPayment', 'delete', $params);
-    $this->assertEquals($deletePayment['error_message'], 'Error while deleting participantPayment');
+  public function testPaymentDeleteWithWrongID(): void {
+    $this->callAPIFailure('ParticipantPayment', 'delete', ['id' => 0], 'Error while deleting participantPayment');
   }
 
   /**
    * Check with valid array.
    */
-  public function testPaymentDelete() {
+  public function testPaymentDelete(): void {
     $contributionID = $this->contributionCreate([
       'contact_id' => $this->contactID,
     ]);
@@ -259,7 +233,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Test civicrm_participantPayment_get - success expected.
    */
-  public function testGet() {
+  public function testGet(): void {
     $contributionID = $this->contributionCreate(['contact_id' => $this->contactID3]);
     $this->participantPaymentCreate($this->participantID4, $contributionID);
 
@@ -278,7 +252,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    * @param array $params
    * @param $context
    */
-  public function _checkFinancialRecords($params, $context) {
+  public function _checkFinancialRecords($params, $context): void {
     $entityParams = [
       'entity_id' => $params['id'],
       'entity_table' => 'civicrm_contribution',
@@ -330,7 +304,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
         'financial_account_id' => 1,
       ];
     }
-    elseif ($context == 'payLater') {
+    elseif ($context === 'payLater') {
       $compareParams = [
         'amount' => 100,
         'status_id' => 3,
@@ -343,7 +317,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * test getParticipantIds() function
    */
-  public function testGetParticipantIds() {
+  public function testGetParticipantIDs(): void {
     $contributionID = $this->contributionCreate(['contact_id' => $this->contactID]);
     $expectedParticipants = [$this->participantID, $this->participantID2];
 

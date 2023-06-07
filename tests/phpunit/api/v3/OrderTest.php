@@ -371,7 +371,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
       ],
     ];
-    $order = $this->callAPISuccess('Order', 'create', $orderCreateParams, __FUNCTION__, __FILE__);
+    $order = $this->callAPISuccess('Order', 'create', $orderCreateParams);
 
     // Create expected dates immediately before order creation to minimise chance of day changing over.
     //$expectedStart = date('Y-m-d'); $expectedEnd = date('Y-m-d', strtotime('+ 1 year - 1 day'));
@@ -497,8 +497,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAddOrderForParticipant(): void {
-    $event = $this->eventCreate();
-    $eventId = $event['id'];
+    $this->eventCreatePaid();
     $p = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
@@ -523,7 +522,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'line_item' => $lineItems,
       'params' => [
         'contact_id' => $this->_individualId,
-        'event_id' => $eventId,
+        'event_id' => $this->getEventID(),
         'role_id' => 1,
         'register_date' => '2007-07-21 00:00:00',
         'source' => 'Online Event Registration: API Testing',
@@ -551,11 +550,11 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
     // Enable the "Pending from approval" status which is not enabled by default
     $pendingFromApprovalParticipantStatus = civicrm_api3('ParticipantStatusType', 'getsingle', [
-      'name' => "Pending from approval",
+      'name' => 'Pending from approval',
     ]);
     civicrm_api3('ParticipantStatusType', 'create', [
       'id' => $pendingFromApprovalParticipantStatus['id'],
-      'name' => "Pending from approval",
+      'name' => 'Pending from approval',
       'is_active' => 1,
     ]);
 
@@ -563,7 +562,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'line_item' => $lineItems,
       'params' => [
         'contact_id' => $this->individualCreate(),
-        'event_id' => $eventId,
+        'event_id' => $this->getEventID(),
         'role_id' => 1,
         'register_date' => '2007-07-21 00:00:00',
         'source' => 'Online Event Registration: API Testing',

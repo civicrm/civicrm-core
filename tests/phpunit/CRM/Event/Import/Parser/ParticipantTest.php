@@ -27,9 +27,8 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
     $this->quickCleanup([
-      'civicrm_event',
-      'civicrm_participant',
       'civicrm_contact',
       'civicrm_email',
       'civicrm_user_job',
@@ -117,7 +116,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    * Test that an external id will not match to a deleted contact..
    */
   public function testImportWithExternalID() :void {
-    $this->eventCreate(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
     $this->individualCreate(['external_identifier' => 'ref-77', 'is_deleted' => TRUE]);
     $this->importCSV('participant_with_ext_id.csv', [
       ['name' => 'event_id'],
@@ -142,7 +141,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    * Test that imports work generally.
    */
   public function testImportParticipant() :void {
-    $this->eventCreate(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
     $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
     $this->importCSV('participant_with_ext_id.csv', [
       ['name' => 'event_id'],
