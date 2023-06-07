@@ -507,11 +507,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
       ];
-      if (
-        !$this->_values['event']['is_multiple_registrations']
-        && !$this->_values['event']['is_monetary']
-        && !$this->_values['event']['is_confirm_enabled']
-      ) {
+      if (!$this->_values['event']['is_monetary'] && !$this->_values['event']['is_confirm_enabled']) {
         $buttonParams['name'] = ts('Register');
       }
       else {
