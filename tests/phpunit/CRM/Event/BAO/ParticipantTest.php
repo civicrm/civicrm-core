@@ -551,6 +551,15 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'isBackOffice' => TRUE,
       'successExpected' => TRUE,
     ];
+    // Update from back office when participant status is Attended
+    $scenarios[] = [
+      'selfSvcEnabled' => 0,
+      'selfSvcHours' => 12,
+      'hoursToEvent' => 16,
+      'participantStatusId' => 2,
+      'isBackOffice' => TRUE,
+      'successExpected' => TRUE,
+    ];
     return $scenarios;
   }
 
