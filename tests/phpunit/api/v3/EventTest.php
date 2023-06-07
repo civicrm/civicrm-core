@@ -92,11 +92,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
-    $tablesToTruncate = [
-      'civicrm_participant',
-      'civicrm_event',
-    ];
-    $this->quickCleanup($tablesToTruncate, TRUE);
+    $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup([], TRUE);
     parent::tearDown();
   }
 

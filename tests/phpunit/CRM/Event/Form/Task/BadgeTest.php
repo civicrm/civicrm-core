@@ -13,7 +13,8 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_participant', 'civicrm_print_label'], TRUE);
+    $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_print_label'], TRUE);
     parent::tearDown();
   }
 
