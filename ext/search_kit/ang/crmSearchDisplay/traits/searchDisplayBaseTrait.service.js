@@ -168,6 +168,14 @@
                 ctrl.rowCount = result.count;
               });
             }
+            // If there are no results on initial load, open the "addNew" link if configured as "autoOpen"
+            if (!ctrl.results.length && requestId === 1 && ctrl.settings.addButton && ctrl.settings.addButton.autoOpen) {
+              CRM.loadForm(ctrl.getButtonUrl())
+                .on('crmFormSuccess', function() {
+                  ctrl.rowCount = null;
+                  ctrl.getResultsPronto();
+                });
+            }
           }
           _.each(ctrl.onPostRun, function(callback) {
             callback.call(ctrl, ctrl.results, 'success', editedRow);
