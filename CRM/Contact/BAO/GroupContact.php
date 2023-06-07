@@ -339,7 +339,9 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
                     civicrm_group.id as group_id,
                     civicrm_group.is_hidden as is_hidden,
                     civicrm_subscription_history.date as date,
-                    civicrm_subscription_history.method as method';
+                    civicrm_subscription_history.method as method,
+                    civicrm_group.saved_search_id as saved_search_id';
+
     }
 
     $where = " WHERE contact_a.id = %1 AND civicrm_group.is_active = 1";
@@ -404,6 +406,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         $values[$id]['title'] = ($public && !empty($group->group_public_title) ? $group->group_public_title : $dao->group_title);
         $values[$id]['visibility'] = $dao->visibility;
         $values[$id]['is_hidden'] = $dao->is_hidden;
+        $values[$id]['saved_search_id'] = $dao->saved_search_id;
         switch ($dao->status) {
           case 'Added':
             $prefix = 'in_';
@@ -419,11 +422,26 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         $values[$id][$prefix . 'date'] = $dao->date;
         $values[$id][$prefix . 'method'] = $dao->method;
         if ($status == 'Removed') {
-          $query = "SELECT `date` as `date_added` FROM civicrm_subscription_history WHERE id = (SELECT max(id) FROM civicrm_subscription_history WHERE contact_id = %1 AND status = \"Added\" AND group_id = $dao->group_id )";
-          $dateDAO = CRM_Core_DAO::executeQuery($query, $params);
-          if ($dateDAO->fetch()) {
-            $values[$id]['date_added'] = $dateDAO->date_added;
-          }
+          $subscriptionHistory = \Civi\Api4\SubscriptionHistory::get()
+            ->addSelect('date', 'status')
+            ->addWhere('contact_id', '=', $contactId)
+            ->addWhere('group_id', '=', $values[$id]['group_id'])
+            ->addWhere('status', 'IN', ['Added', 'Deleted'])
+            ->addOrderBy('date', 'DESC')
+            ->setLimit(1)
+            ->execute()->first();
+          $values[$id]['date_added'] = ($subscriptionHistory && $subscriptionHistory['status'] === 'Added') ? $subscriptionHistory['date'] : NULL;
+
+          $subscriptionRemovedHistory = \Civi\Api4\SubscriptionHistory::get()
+            ->addSelect('date')
+            ->addWhere('date', '>', ($subscriptionHistory) ? $subscriptionHistory['date'] : NULL)
+            ->addWhere('contact_id', '=', $contactId)
+            ->addWhere('group_id', '=', $values[$id]['group_id'])
+            ->addWhere('status', '=', 'Removed')
+            ->addOrderBy('date', 'ASC')
+            ->setLimit(1)
+            ->execute()->first();
+          $values[$id]['out_date'] = ($subscriptionRemovedHistory) ? $subscriptionRemovedHistory['date'] : $values[$id]['out_date'];
         }
       }
       return $values;
