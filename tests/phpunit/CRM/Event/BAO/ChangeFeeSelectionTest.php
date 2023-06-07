@@ -120,7 +120,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
         'is_active' => ['1' => 1],
         'price_set_id' => $priceSetID,
         'is_enter_qty' => 1,
-        'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
+        'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       ];
     }
     else {
@@ -142,7 +142,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
         'is_active' => ['1' => 1],
         'price_set_id' => $priceSetID,
         'is_enter_qty' => 1,
-        'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
+        'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       ];
     }
     $field = CRM_Price_BAO_PriceField::create($paramsField);
