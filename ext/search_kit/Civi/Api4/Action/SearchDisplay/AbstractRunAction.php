@@ -1217,7 +1217,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $labelField = CoreUtil::getInfoItem($field['fk_entity'], 'label_field');
       if ($labelField) {
         $records = civicrm_api4($field['fk_entity'], 'get', [
-          'checkPermissions' => $this->checkPermissions,
+          'checkPermissions' => $this->checkPermissions && empty($this->display['acl_bypass']),
           'where' => [[$idField, 'IN', (array) $value]],
           'select' => [$labelField],
         ]);
