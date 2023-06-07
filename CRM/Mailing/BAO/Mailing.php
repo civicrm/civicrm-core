@@ -2556,7 +2556,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
         $form->add('select', "{$prefix}template", ts('Use Template'),
           ['' => ts('- select -')] + $templates[$prefix], FALSE,
-          ['onChange' => "selectValue( this.value, '{$prefix}');"]
+          ['onChange' => "selectValue( this.value, '{$prefix}');", 'class' => 'crm-select2 huge']
         );
       }
       $form->add('checkbox', "{$prefix}updateTemplate", ts('Update Template'), NULL);
