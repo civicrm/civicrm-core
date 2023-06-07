@@ -569,6 +569,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return array|int
    */
   protected function createTestEntity(string $entity, array $params, string $identifier = 'default') {
+    $params['version'] = 4;
     $result = $this->callAPISuccess($entity, 'create', $params);
     $this->setTestEntityID($entity, $result['id'], $identifier);
     return reset($result['values']);
