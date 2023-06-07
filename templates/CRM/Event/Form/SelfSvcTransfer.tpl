@@ -12,8 +12,12 @@
     <tr>
       <th>{ts}Current<br />Participant{/ts}</th>
       <th>{ts}Event{/ts}</th>
-      <th>{ts}Fee Level{/ts}</th>
-      <th>{ts}Amount{/ts}</th>
+      {if !empty($details.fee_level)}
+        <th>{ts}Fee Level{/ts}</th>
+      {/if}
+      {if !empty($details.fee_amount)}
+        <th>{ts}Amount{/ts}</th>
+      {/if}
       <th>{ts}Registered{/ts}</th>
       <th>{ts}Status{/ts}</th>
       <th>{ts}Role{/ts}</th>
@@ -21,8 +25,12 @@
     <tr class="crm-selfsvctransfer-form-details">
       <td>{$details.name}</td>
       <td>{$details.title}<br />{$details.event_start_date|truncate:10:''|crmDate}</td>
-      <td class="crm-participant-participant_fee_level">{$details.fee_level}</td>
-      <td class="right nowrap crm-paticipant-participant_fee_amount">{$details.fee_amount}</td>
+      {if !empty($details.fee_level)}
+        <td class="crm-participant-participant_fee_level">{$details.fee_level}</td>
+      {/if}
+      {if !empty($details.fee_amount)}
+        <td class="right nowrap crm-paticipant-participant_fee_amount">{$details.fee_amount}</td>
+      {/if}
       <td>{$details.register_date|truncate:10:''|crmDate}</td>
       <td>{$details.status}</td>
       <td class="crm-participant-participant_role">{$details.role}</td>
