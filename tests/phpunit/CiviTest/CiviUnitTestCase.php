@@ -570,7 +570,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   protected function createTestEntity(string $entity, array $params, string $identifier = 'default') {
     $params['version'] = 4;
-    $result = $this->callAPISuccess($entity, 'create', $params);
+    $params['debug'] = TRUE;
+    try {
+      $result = civicrm_api4($entity, 'create', $params);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail('Failed to create ' . $entity . ' : ' . $e->getMessage());
+    }
     $this->setTestEntityID($entity, $result['id'], $identifier);
     return reset($result['values']);
   }
