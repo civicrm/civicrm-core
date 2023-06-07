@@ -76,7 +76,7 @@ class CRM_Profile_Form_EditTest extends CiviUnitTestCase {
       ],
     ];
 
-    $profile = $this->callAPISuccess('uf_group', 'create', $ufGroupParams);
+    $profile = $this->createTestEntity('UFGroup', $ufGroupParams);
     $profileID = $profile['id'];
 
     // Configure the profile to be used as a standalone profile for data entry.
