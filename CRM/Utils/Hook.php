@@ -2842,6 +2842,27 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Build a list of ECMAScript Modules (ESM's) that are available for auto-loading.
+   *
+   * Subscribers should assume that the $importMap will be cached and re-used.
+   *
+   * Example usage:
+   *
+   *    function my_civicrm_esmImportMap($importMap): void {
+   *      $importMap->addPrefix('geolib/', E::LONG_NAME, 'packages/geometry-library-1.2.3/');
+   *    }
+   *
+   * @param \Civi\Esm\ImportMap $importMap
+   */
+  public static function esmImportMap(\Civi\Esm\ImportMap $importMap): void {
+    $null = NULL;
+    self::singleton()->invoke(['importMap'], $importMap, $null, $null,
+      $null, $null, $null,
+      'civicrm_esmImportMap'
+    );
+  }
+
+  /**
    * This hook is called for bypass a few civicrm urls from IDS check.
    *
    * @param array $skip list of civicrm urls

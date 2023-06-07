@@ -197,6 +197,11 @@
         "url": "https://github.com/NickQiZhu/dc.js/archive/2.1.10.zip",
         "ignore": [".*", "style", "web", "*.json", "regression", "scripts", "spec", "src", "docs", "grunt", "Gruntfile.js", "Changelog.md", "welcome.md", "class-hierarchy.dot", "index.js", "CONTRIBUTING.md", "LICENSE_BANNER", "AUTHORS"]
       },
+      "es-module-shims": {
+        "url": "https://ga.jspm.io/npm:es-module-shims@1.7.2/dist/es-module-shims.js",
+        "path": "bower_components/es-module-shims/dist/es-module-shims.js",
+        "_comment": "See also https://github.com/guybedford/es-module-shims/. MIT license."
+      },
       "es6-promise": {
         "url": "https://github.com/components/es6-promise/archive/v4.2.4.zip"
       },

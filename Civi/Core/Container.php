@@ -5,6 +5,7 @@ use Civi\Core\Compiler\AutoServiceScannerPass;
 use Civi\Core\Compiler\EventScannerPass;
 use Civi\Core\Compiler\SpecProviderPass;
 use Civi\Core\Event\EventScanner;
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Lock\LockManager;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -392,6 +393,11 @@ class Container {
       [new Reference('action_object_provider')]
     );
 
+    $container->setDefinition('esm.loader', new Definition(
+      'object',
+      [new Reference('service_container')]
+    ))->setFactory([new Reference(self::SELF), 'createEsmLoader'])->setPublic(TRUE);
+
     \CRM_Utils_Hook::container($container);
 
     return $container;
@@ -572,6 +578,27 @@ class Container {
         : $container->get('prevnext.driver.sql');
     }
     return $container->get('prevnext.driver.' . $setting);
+  }
+
+  /**
+   * Determine which component will load ECMAScript Modules.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @return \object
+   */
+  public static function createEsmLoader($container): object {
+    $name = \Civi::settings()->get('esm_loader');
+    if ($name === 'auto') {
+      $name = 'shim-fast';
+      \Civi::dispatcher()->dispatch('civi.esm.loader.default', GenericHookEvent::create(['default' => &$name]));
+    }
+    if ($container->has("esm.loader.$name")) {
+      return $container->get("esm.loader.$name");
+    }
+    else {
+      \Civi::log()->warning('Invalid ESM loader: {name}', ['name' => $name]);
+      return $container->get("esm.loader.browser");
+    }
   }
 
   /**

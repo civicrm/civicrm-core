@@ -90,7 +90,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
         case 'scriptUrl':
           // ECMAScript Modules (ESMs) are basically Javascript files, but they require a slightly different incantation.
           if (!empty($snippet['esm'])) {
-            $html .= sprintf("<script type=\"module\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
+            $html .= Civi::service('esm.loader')->renderModule($snippet);
           }
           elseif (!$allowCmsOverride || !$cms->addScriptUrl($snippet['scriptUrl'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
@@ -113,7 +113,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
         case 'script':
           // ECMAScript Modules (ESMs) are basically Javascript files, but they require a slightly different incantation.
           if (!empty($snippet['esm'])) {
-            $html .= sprintf("<script type=\"module\">\n%s\n</script>\n", $snippet['script']);
+            $html .= Civi::service('esm.loader')->renderModule($snippet);
           }
           elseif (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $snippet['script']);
