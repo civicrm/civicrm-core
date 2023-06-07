@@ -16,7 +16,7 @@ use Civi\Api4\Generic\BasicBatchAction;
 class TestConnection extends BasicBatchAction {
 
   public function __construct($entityName, $actionName) {
-    parent::__construct($entityName, $actionName, ['id', 'name']);
+    parent::__construct($entityName, $actionName);
   }
 
   /**
