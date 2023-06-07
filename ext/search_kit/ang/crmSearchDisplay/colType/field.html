@@ -1,5 +1,5 @@
 <crm-search-display-editable row="row" col="colData" do-save="$ctrl.runSearch([apiCall], {}, row)" cancel="$ctrl.editing = null;" ng-if="colData.edit && $ctrl.editing && $ctrl.editing[0] === rowIndex && $ctrl.editing[1] === colIndex"></crm-search-display-editable>
-<span ng-if="::!colData.links" ng-class="{'crm-editable-enabled': colData.edit && !$ctrl.editing}" ng-click="colData.edit && !$ctrl.editing && ($ctrl.editing = [rowIndex, colIndex])">
+<span ng-if="::!colData.links" ng-class="{'crm-editable-enabled': colData.edit && !$ctrl.editing, 'crm-editable-disabled': colData.edit && $ctrl.editing}" ng-click="colData.edit && !$ctrl.editing && ($ctrl.editing = [rowIndex, colIndex])">
   <i ng-repeat="icon in colData.icons" ng-if="icon.side === 'left'" class="crm-i {{:: icon['class'] }}"></i>
   {{:: $ctrl.formatFieldValue(colData) }}
   <i ng-repeat="icon in colData.icons" ng-if="icon.side === 'right'" class="crm-i {{:: icon['class'] }}"></i>
