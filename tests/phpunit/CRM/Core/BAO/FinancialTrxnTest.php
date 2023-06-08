@@ -17,6 +17,11 @@ use Civi\Api4\Contribution;
  */
 class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
   /**
    * Check method create().
    *

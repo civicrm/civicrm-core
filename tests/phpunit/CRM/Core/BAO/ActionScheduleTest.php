@@ -853,18 +853,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->deleteTestObjects();
+    $this->quickCleanUpFinancialEntities();
     MembershipType::delete()->addWhere('name', 'NOT IN', ['General', 'Student', 'Lifetime'])->execute();
     $this->quickCleanup([
       'civicrm_action_schedule',
       'civicrm_action_log',
-      'civicrm_membership',
-      'civicrm_line_item',
-      'civicrm_participant',
-      'civicrm_event',
       'civicrm_email',
     ], TRUE);
-    $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
 
@@ -2168,8 +2163,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'registration_start_date' => date('Ymd', strtotime('-5 day')),
       'registration_end_date' => date('Ymd', strtotime('+7 day')),
     ];
-    $event = $this->eventCreate($params);
-    $this->participantCreate(['contact_id' => $contact, 'event_id' => $event['id']]);
+    $event = $this->eventCreateUnpaid($params);
+    $this->participantCreate(['contact_id' => $contact, 'event_id' => $this->getEventID()]);
 
     //Create a scheduled reminder to send email 7 days before registration date.
     $actionSchedule = $this->fixtures['sched_event_type_start_1week_before'];
@@ -2198,8 +2193,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     //Create an event with registration end date = 2 week from now.
     $params['end_date'] = date('Ymd', strtotime('+2 week'));
     $params['registration_end_date'] = date('Ymd', strtotime('+2 week'));
-    $event2 = $this->eventCreate($params);
-    $this->participantCreate(['contact_id' => $contact2, 'event_id' => $event2['id']]);
+    $this->participantCreate(['contact_id' => $contact2, 'event_id' => $this->eventCreateUnpaid($params, 'event_2')['id']]);
 
     //Assert there is no reminder sent to the contact.
     $this->assertCronRuns([

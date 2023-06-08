@@ -15,6 +15,11 @@
  */
 class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
   /**
    * Testing Activity Generation through Entity Recursion.
    */
@@ -84,11 +89,10 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       "start_action_date" => date("YmdHis"),
       "repetition_frequency_unit" => "week",
       "repetition_frequency_interval" => "3",
-      "start_action_condition" => "monday,tuesday,wednesday,thursday,friday,saturday",
-      "start_action_offset" => "2",
+      "start_action_condition" => 'monday,tuesday,wednesday,thursday,friday,saturday',
+      'start_action_offset' => 2,
     ];
-    $actionScheduleObj = CRM_Core_BAO_ActionSchedule::writeRecord($params);
-    return $actionScheduleObj;
+    return CRM_Core_BAO_ActionSchedule::writeRecord($params);
   }
 
   /**
@@ -121,11 +125,10 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   /**
    * Testing Event Generation through Entity Recursion.
    */
-  public function testRepeatEventCreation() {
-    $event = $this->eventCreate();
-    $entity_table = "civicrm_event";
+  public function testRepeatEventCreation(): void {
+    $event = $this->eventCreatePaid();
+    $entity_table = 'civicrm_event';
     $entity_id = $event["id"];
-    CRM_Price_BAO_PriceSet::addTo($entity_table, $entity_id, 1);
     $actionScheduleObj = $this->createActionSchedule($entity_id, $entity_table);
     $recurringEntities = $this->createRecurringEntities($actionScheduleObj, $entity_id, $entity_table);
     $finalResult = CRM_Core_BAO_RecurringEntity::updateModeAndPriceSet($entity_id, $entity_table, CRM_Core_BAO_RecurringEntity::MODE_ALL_ENTITY_IN_SERIES, [], 2);
@@ -134,7 +137,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $priceSetOne = CRM_Price_BAO_PriceSet::getFor($entity_table, $recurringEntities["civicrm_price_set_entity"][0]);
     $priceSetTwo = CRM_Price_BAO_PriceSet::getFor($entity_table, $recurringEntities["civicrm_price_set_entity"][1]);
     $this->assertEquals(2, $priceSetOne, "Price set id of the recurring event is not updated.");
-    $this->assertEquals(2, $priceSetTwo, "Price set id of the recurring event is not updated.");
+    $this->assertEquals(2, $priceSetTwo, 'Price set id of the recurring event is not updated.');
   }
 
   /**
