@@ -225,6 +225,7 @@ class GroupTest extends Api4TestBase {
       ->addSelect('id', 'child_group.id', 'child_group.title')
       ->addJoin('Group AS child_group', 'INNER', 'GroupNesting', ['id', '=', 'child_group.parent_group_id'])
       ->addOrderBy('id')
+      ->addOrderBy('child_group.id')
       ->execute();
 
     $this->assertCount(3, $joined);
