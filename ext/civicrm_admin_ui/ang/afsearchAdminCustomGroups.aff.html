@@ -10,11 +10,5 @@
     <af-field name="extends" defn="{input_attrs: {multiple: true}, label: 'Used For'}" />
     <af-field name="CustomGroup_CustomField_custom_group_id_01.label" defn="{required: false, input_attrs: {}, label: 'Field'}" />
   </div>
-  <div class="btn-group pull-right">
-      <a class="btn btn-primary" ng-href="{{:: crmUrl('civicrm/admin/custom/group/edit', {reset: 1}) }}">
-        <i class="crm-i fa-plus"/>
-        {{:: ts('Add Set of Custom Fields') }}
-      </a>
-  </div>
   <crm-search-display-table search-name="Administer_Custom_Groups" display-name="Table"></crm-search-display-table>
 </div>

@@ -30,7 +30,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_gid;
+  public $_gid;
 
   /**
    * The field id, used when editing the field

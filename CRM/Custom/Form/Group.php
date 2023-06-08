@@ -25,7 +25,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_id;
+  public $_id;
 
   /**
    *  set is empty or not.
@@ -48,6 +48,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
+    $this->preventAjaxSubmit();
     Civi::resources()->addScriptFile('civicrm', 'js/jquery/jquery.crmIconPicker.js');
 
     // current set id
@@ -378,6 +379,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
 
     $result = civicrm_api3('CustomGroup', 'create', $params);
     $group = $result['values'][$result['id']];
+    $this->_id = $result['id'];
 
     // reset the cache
     Civi::cache('fields')->flush();
