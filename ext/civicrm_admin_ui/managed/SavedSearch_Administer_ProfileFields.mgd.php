@@ -174,6 +174,7 @@ return [
             'path' => 'civicrm/admin/uf/group/field/add?reset=1&action=add&gid=[uf_group_id]',
             'text' => E::ts('Add Field'),
             'icon' => 'fa-plus',
+            'autoOpen' => TRUE,
           ],
           'cssRules' => [
             [
