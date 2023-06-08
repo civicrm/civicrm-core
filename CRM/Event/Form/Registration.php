@@ -656,6 +656,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config') && $form->getVar('_name') != 'Participant') {
         $form->assign('quickConfig', 1);
       }
+      else {
+        $form->assign('quickConfig', 0);
+      }
     }
     // get price info
     if ($priceSetId) {

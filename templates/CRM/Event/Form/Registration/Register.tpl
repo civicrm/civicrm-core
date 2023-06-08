@@ -43,14 +43,14 @@
     {/if}
     {/crmRegion}
 
-    {if $event.intro_text}
+    {if array_key_exists('intro_text', $event)}
       <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
         <p>{$event.intro_text}</p>
       </div>
     {/if}
 
     {include file="CRM/common/cidzero.tpl"}
-    {if $pcpSupporterText}
+    {if $pcp AND $pcpSupporterText}
       <div class="crm-public-form-item crm-section pcpSupporterText-section">
         <div class="content">{$pcpSupporterText}</div>
       </div>
@@ -144,7 +144,7 @@
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
 
-    {if $event.footer_text}
+    {if array_key_exists('footer_text', $event)}
       <div id="footer_text" class="crm-public-form-item crm-section event_footer_text-section">
         <p>{$event.footer_text}</p>
       </div>
