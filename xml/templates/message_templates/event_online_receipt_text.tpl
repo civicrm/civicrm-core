@@ -148,8 +148,6 @@ You were registered by: {$payer.name}
 {foreach from=$dataArray item=value key=priceset}
 {if $priceset || $priceset == 0}
 {$taxTerm} {$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
-{else}
-{ts}No{/ts} {$taxTerm}: {$value|crmMoney:$currency}
 {/if}
 {/foreach}
 {/if}
