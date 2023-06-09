@@ -344,6 +344,7 @@ class SettingsManager {
       case 'domain':
         $defaults = [
           'installed' => FALSE,
+          // The default list of components should be kept in sync with "civicrm_extension.sqldata.php".
           'enable_components' => ['CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'],
           'customFileUploadDir' => '[civicrm.files]/custom/',
           'imageUploadDir' => '[civicrm.files]/persist/contribute/',
