@@ -11,6 +11,10 @@
   top: 0;
 }
 
+#bootstrap-theme .crm-search-admin-search-listing-buttons {
+  min-width: 65px;
+}
+
 #bootstrap-theme.crm-search .nav-stacked {
   margin-left: 0;
   margin-right: 20px;

@@ -1,5 +1,5 @@
-<div class="btn-group">
-  <button type="button" class="dropdown-toggle {{:: $ctrl.settings.columns[colIndex].size }} btn-{{:: $ctrl.settings.columns[colIndex].style }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="colData.open = true">
+<div class="btn-group" role="group">
+  <button type="button" class="dropdown-toggle btn {{:: $ctrl.settings.columns[colIndex].size }} btn-{{:: $ctrl.settings.columns[colIndex].style }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="colData.open = true">
     <i ng-if=":: $ctrl.settings.columns[colIndex].icon" class="crm-i {{:: $ctrl.settings.columns[colIndex].icon }}"></i>
     {{:: colData.text }}
     <span class="caret"></span>
