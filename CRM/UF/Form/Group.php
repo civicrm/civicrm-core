@@ -252,8 +252,8 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $showAdvanced = 0;
       $advFields = [
         'group',
-        'post_URL',
-        'cancel_URL',
+        'post_url',
+        'cancel_url',
         'add_captcha',
         'is_map',
         'is_uf_link',

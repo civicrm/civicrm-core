@@ -133,10 +133,10 @@
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
-    <name>post_URL</name>
+    <name>post_url</name>
     <type>varchar</type>
     <length>255</length>
-    <comment>Redirect to URL.</comment>
+    <comment>Redirect to URL on submit.</comment>
     <html>
       <label>Post URL</label>
     </html>
@@ -203,11 +203,14 @@
     <add>1.7</add>
   </field>
   <field>
-    <name>cancel_URL</name>
+    <name>cancel_url</name>
     <title>Profile Cancel URL</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>Redirect to URL when Cancle button clik .</comment>
+    <comment>Redirect to URL when Cancel button clicked.</comment>
+    <html>
+      <label>Cancel URL</label>
+    </html>
     <add>1.4</add>
   </field>
   <field>
