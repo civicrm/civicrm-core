@@ -38,11 +38,13 @@
             'modified_id.display_name',
             'created_date',
             'modified_date',
+            'expires_date',
             'has_base',
             'base_module:label',
             'local_modified_date',
             'DATE(created_date) AS date_created',
             'DATE(modified_date) AS date_modified',
+            'DATE(expires_date) AS expires',
             'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
             'GROUP_CONCAT(display.label ORDER BY display.id) AS display_label',
             'GROUP_CONCAT(display.type:icon ORDER BY display.id) AS display_icon',
@@ -271,6 +273,13 @@
             })
           );
         }
+        ctrl.display.settings.columns.push(
+          searchMeta.fieldToColumn('expires_date', {
+            label: ts('Expires'),
+            title: '[expires_date]',
+            rewrite: '[expires]'
+          })
+        );
         ctrl.display.settings.columns.push({
           type: 'include',
           alignment: 'text-right',
