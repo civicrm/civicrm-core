@@ -132,7 +132,7 @@
       </fieldset>
     {/if}
 
-    {if $priceSet}
+    {if $priceSet && !$showPaymentOnConfirm}
       {include file='CRM/Core/BillingBlockWrapper.tpl'}
     {/if}
 
