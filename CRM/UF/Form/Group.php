@@ -84,6 +84,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
+    $this->preventAjaxSubmit();
     // current form id
     $this->_id = $this->get('id');
     if (!$this->_id) {
@@ -350,6 +351,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
 
       // create uf group
       $ufGroup = CRM_Core_BAO_UFGroup::add($params);
+      $this->_id = $ufGroup->id;
 
       if (!empty($params['is_active'])) {
         //make entry in uf join table
