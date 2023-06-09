@@ -40,7 +40,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $id = $params['id'] ?? NULL;
 
     $op = empty($id) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre('UFField', $op, $id, $params);
+    CRM_Utils_Hook::pre($op, 'UFField', $id, $params);
     // Merge in data from existing field
     if (!empty($id)) {
       $UFField = new CRM_Core_BAO_UFField();
@@ -107,7 +107,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($ufField->uf_group_id, TRUE);
     CRM_Core_BAO_UFGroup::updateGroupTypes($ufField->uf_group_id, $fieldsType);
 
-    CRM_Utils_Hook::post('UFField', $op, $ufField->id, $ufField);
+    CRM_Utils_Hook::post($op, 'UFField', $ufField->id, $ufField);
 
     civicrm_api3('profile', 'getfields', ['cache_clear' => TRUE]);
     return $ufField;
