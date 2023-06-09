@@ -28,7 +28,7 @@
           savedSearch: function($route, crmApi4) {
             var params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
-              select: ['*', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
+              select: ['id', 'name', 'label', 'description', 'api_entity', 'api_params', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
               join: [
                 ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
