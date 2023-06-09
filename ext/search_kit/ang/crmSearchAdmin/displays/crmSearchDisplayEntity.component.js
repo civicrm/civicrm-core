@@ -13,8 +13,8 @@
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
     controller: function($scope, $element, searchDisplayBaseTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        // Mix in traits to this controller
-        ctrl = angular.extend(this, searchDisplayBaseTrait);
+        // Mix in a copy of searchDisplayBaseTrait
+        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait));
 
       this.$onInit = function() {
         // Adding this stuff for the sake of preview, but pollutes the display settings
