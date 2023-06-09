@@ -212,7 +212,7 @@
     </table>
   {/strip}
 {/if}
-{* Include JS for auto renew membership if priceset is Quick Config*}
+
 {if $membershipBlock}
 {literal}
   <script type="text/javascript">
