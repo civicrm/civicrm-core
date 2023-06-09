@@ -676,14 +676,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     CRM_Campaign_BAO_Campaign::addCampaign($this, $campaignId);
     $this->add('datepicker', 'register_date', ts('Registration Date'), [], TRUE, ['time' => TRUE]);
 
-    if ($this->_id) {
-      $this->assign('entityID', $this->_id);
-    }
+    $this->assign('entityID', $this->_id);
 
     $this->addSelect('role_id', ['multiple' => TRUE, 'class' => 'huge'], TRUE);
 
     // CRM-4395
-    $checkCancelledJs = ['onchange' => "return sendNotification( );"];
+    $checkCancelledJs = ['onchange' => 'return sendNotification( );'];
     $confirmJS = NULL;
     if ($this->_onlinePendingContributionId) {
       $cancelledparticipantStatusId = array_search('Cancelled', CRM_Event_PseudoConstant::participantStatus());

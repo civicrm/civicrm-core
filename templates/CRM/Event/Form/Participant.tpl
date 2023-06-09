@@ -151,7 +151,7 @@
     {/if}
 
     {*include custom data js file*}
-    {include file="CRM/common/customData.tpl"}
+    {include file="CRM/common/customData.tpl" groupID=''}
 
     <script type="text/javascript">
       {literal}
