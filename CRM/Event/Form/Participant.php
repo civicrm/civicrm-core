@@ -776,7 +776,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return void
    */
   public function addRules(): void {
-    $this->addFormRule(['CRM_Event_Form_Participant', 'formRule']);
+    $this->addFormRule(['CRM_Event_Form_Participant', 'formRule'], $this);
   }
 
   /**

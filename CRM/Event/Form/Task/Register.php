@@ -148,7 +148,7 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
    * @return void
    */
   public function addRules(): void {
-    $this->addFormRule(['CRM_Event_Form_Task_Register', 'formRule']);
+    $this->addFormRule(['CRM_Event_Form_Task_Register', 'formRule'], $this);
   }
 
   /**
