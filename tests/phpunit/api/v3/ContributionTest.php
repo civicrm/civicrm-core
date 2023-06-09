@@ -3871,10 +3871,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test sending a mail via the API.
    */
-  public function testSendMailEvent() {
+  public function testSendMailEvent(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
-    $event = $this->eventCreate([
+    $event = $this->eventCreatePaid([
       'is_email_confirm' => 1,
       'confirm_from_email' => 'test@civicrm.org',
     ]);
@@ -3974,7 +3974,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function createPendingParticipantContribution() {
-    $this->_ids['event']['test'] = $this->eventCreate(['is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org', 'confirm_email_text' => ''])['id'];
+    $this->_ids['event']['test'] = $this->eventCreatePaid(['is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org', 'confirm_email_text' => ''])['id'];
     $participantID = $this->participantCreate(['event_id' => $this->_ids['event']['test'], 'status_id' => 6, 'contact_id' => $this->individualID]);
     $this->_ids['participant'] = $participantID;
     $params = array_merge($this->_params, ['contact_id' => $this->individualID, 'contribution_status_id' => 2, 'financial_type_id' => 'Event Fee']);

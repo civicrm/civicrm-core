@@ -1027,13 +1027,16 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $params
    *   Name-value pair for an event.
+   * @param string|int $identifier
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    *
    * @noinspection PhpUnhandledExceptionInspection
    * @noinspection PhpDocMissingThrowsInspection
    */
-  public function eventCreate(array $params = []): array {
+  public function eventCreate(array $params = [], $identifier = 0): array {
     // if no contact was passed, make up a dummy event creator
     if (!isset($params['contact_id'])) {
       $params['contact_id'] = $this->_contactCreate([
@@ -1049,7 +1052,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $params['payment_processor'] = is_array($params['payment_processor_id']) ? $params['payment_processor_id'] : [$params['payment_processor_id']];
     }
     $event = Event::create(FALSE)->setValues($params)->execute()->first();
-    $this->ids['Event'][] = $event['id'];
+    $this->ids['Event'][$identifier] = $event['id'];
     return $event;
   }
 
