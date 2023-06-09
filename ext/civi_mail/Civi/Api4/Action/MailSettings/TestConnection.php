@@ -15,8 +15,11 @@ use Civi\Api4\Generic\BasicBatchAction;
 
 class TestConnection extends BasicBatchAction {
 
-  public function __construct($entityName, $actionName) {
-    parent::__construct($entityName, $actionName, ['id', 'name']);
+  /**
+   * @return string[]
+   */
+  protected function getSelect() {
+    return ['id', 'name'];
   }
 
   /**
