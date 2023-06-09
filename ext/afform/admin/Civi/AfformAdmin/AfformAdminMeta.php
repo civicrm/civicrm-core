@@ -31,6 +31,7 @@ class AfformAdminMeta {
     }
     return [
       'afform_type' => $afformTypes,
+      'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
     ];
   }
 
@@ -88,7 +89,7 @@ class AfformAdminMeta {
       'checkPermissions' => FALSE,
       'loadOptions' => ['id', 'label'],
       'action' => 'create',
-      'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type', 'entity', 'fk_entity', 'readonly'],
+      'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type', 'entity', 'fk_entity', 'readonly', 'operators'],
       'where' => [['deprecated', '=', FALSE], ['input_type', 'IS NOT NULL']],
     ];
     if (in_array($entityName, \CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {

@@ -37,6 +37,10 @@
           namePrefix = this.fieldName.substr(0, this.fieldName.length - this.defn.name.length);
         }
 
+        if (this.defn.search_operator) {
+          this.search_operator = this.defn.search_operator;
+        }
+
         // is_primary field - watch others in this afRepeat block to ensure only one is selected
         if (ctrl.fieldName === 'is_primary' && 'repeatIndex' in $scope.dataProvider) {
           $scope.$watch('dataProvider.afRepeat.getEntityController().getData()', function (items, prev) {
@@ -226,22 +230,26 @@
         };
       };
 
+      this.onChangeOperator = function() {
+        $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
+      };
+
       // Getter/Setter function for most fields (except select & entityRef)
       $scope.getSetValue = function(val) {
         var currentVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
         // Setter
         if (arguments.length) {
-          if (ctrl.defn.search_operator) {
+          if (ctrl.search_operator) {
             if (typeof currentVal !== 'object') {
               $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
             }
-            return ($scope.dataProvider.getFieldData()[ctrl.fieldName][ctrl.defn.search_operator] = val);
+            return ($scope.dataProvider.getFieldData()[ctrl.fieldName][ctrl.search_operator] = val);
           }
           return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val);
         }
         // Getter
-        if (ctrl.defn.search_operator) {
-          return (currentVal || {})[ctrl.defn.search_operator];
+        if (ctrl.search_operator) {
+          return (currentVal || {})[ctrl.search_operator];
         }
         return currentVal;
       };
@@ -261,11 +269,11 @@
           else if (ctrl.defn.search_range) {
             return ($scope.dataProvider.getFieldData()[ctrl.fieldName]['>='] = val);
           }
-          else if (ctrl.defn.search_operator) {
+          else if (ctrl.search_operator) {
             if (typeof currentVal !== 'object') {
               $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
             }
-            return ($scope.dataProvider.getFieldData()[ctrl.fieldName][ctrl.defn.search_operator] = val);
+            return ($scope.dataProvider.getFieldData()[ctrl.fieldName][ctrl.search_operator] = val);
           }
           return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val);
         }
@@ -277,8 +285,8 @@
         else if (ctrl.defn.search_range) {
           return currentVal['>='];
         }
-        else if (ctrl.defn.search_operator) {
-          return (currentVal || {})[ctrl.defn.search_operator];
+        else if (ctrl.search_operator) {
+          return (currentVal || {})[ctrl.search_operator];
         }
         return currentVal;
       };

@@ -92,10 +92,18 @@
     {{:: ts('Search by range') }}
   </a>
 </li>
-<li ng-if="$ctrl.isSearch()">
-  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+<li ng-if="$ctrl.isSearch()" ng-click="$event.stopPropagation()">
+  <div href class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Operator:') }}</label>
-    <select class="form-control" ng-model="getSet('search_operator')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">
+    <select class="form-control" ng-model="getSetOperator" ng-model-options="{getterSetter: true}" title="{{:: ts('Set the search operator for this field or allow the user to select it on the form') }}">
+      <option value="">{{:: ts('Auto') }}</option>
+      <option value="_EXPOSE_">{{:: ts('User Select') }}</option>
+      <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
+    </select>
+  </div>
+  <div href class="af-gui-field-select-in-dropdown" ng-if="$ctrl.getSet('expose_operator')">
+    <label>{{:: ts('Default:') }}</label>
+    <select class="form-control" ng-model="getSet('search_operator')" ng-model-options="{getterSetter: true}" title="{{:: ts('Default search operator for the user to select') }}">
       <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
     </select>
   </div>
