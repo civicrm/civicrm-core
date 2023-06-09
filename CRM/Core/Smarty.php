@@ -66,6 +66,16 @@ class CRM_Core_Smarty extends Smarty {
    */
   private $backupFrames = [];
 
+  /**
+   * This is a sentinel-object that indicates an undefined value.
+   *
+   * It lacks any substantive content; but it has unique identity that cannot be mistaken for
+   * organic values like `null`, `string`, `false`, or similar.
+   *
+   * @var object
+   */
+  private static $UNDEFINED_VALUE;
+
   private function initialize() {
     $config = CRM_Core_Config::singleton();
 
@@ -161,6 +171,9 @@ class CRM_Core_Smarty extends Smarty {
    * @return \CRM_Core_Smarty
    */
   public static function &singleton() {
+    if (static::$UNDEFINED_VALUE === NULL) {
+      static::$UNDEFINED_VALUE = new stdClass();
+    }
     if (!isset(self::$_singleton)) {
       self::$_singleton = new CRM_Core_Smarty();
       self::$_singleton->initialize();
@@ -346,7 +359,7 @@ class CRM_Core_Smarty extends Smarty {
     $oldVars = $this->get_template_vars();
     $backupFrame = [];
     foreach ($vars as $key => $value) {
-      $backupFrame[$key] = $oldVars[$key] ?? NULL;
+      $backupFrame[$key] = array_key_exists($key, $oldVars) ? $oldVars[$key] : static::$UNDEFINED_VALUE;
     }
     $this->backupFrames[] = $backupFrame;
 
@@ -373,7 +386,12 @@ class CRM_Core_Smarty extends Smarty {
    */
   public function assignAll($vars) {
     foreach ($vars as $key => $value) {
-      $this->assign($key, $value);
+      if ($value !== static::$UNDEFINED_VALUE) {
+        $this->assign($key, $value);
+      }
+      else {
+        $this->clear_assign($key);
+      }
     }
     return $this;
   }
