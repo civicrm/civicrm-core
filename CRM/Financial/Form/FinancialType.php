@@ -151,7 +151,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
         else {
           $text = ts('Your Financial "%1" Type has been created and assigned to an existing financial account with the same title. You should review the assigned account and determine whether additional account relationships are needed.', $statusArray);
         }
-        CRM_Core_Session::setStatus($text, ts('Saved'), 'success', ['expires' => 0]);
+        CRM_Core_Session::setStatus($text, ts('Saved'), 'success', ['expires' => 30000]);
       }
 
       $session = CRM_Core_Session::singleton();
