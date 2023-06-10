@@ -164,4 +164,51 @@ return [
       ],
     ],
   ],
+  [
+    'name' => 'SavedSearch_Imports',
+    'entity' => 'SavedSearch',
+    'cleanup' => 'always',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'name' => 'Imports',
+        'label' => 'Imports',
+        'form_values' => NULL,
+        'mapping_id' => NULL,
+        'search_custom_id' => NULL,
+        'api_entity' => 'UserJob',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'created_id.display_name',
+            'created_date',
+            'job_type:label',
+            'start_date',
+            'end_date',
+            'status_id:label',
+          ],
+          'orderBy' => [],
+          'where' => [
+            [
+              'is_template',
+              '=',
+              FALSE,
+            ],
+            [
+              'is_current',
+              '=',
+              TRUE,
+            ],
+          ],
+          'groupBy' => [],
+          'join' => [],
+          'having' => [],
+        ],
+        'expires_date' => NULL,
+        'description' => NULL,
+      ],
+    ],
+  ],
 ];
