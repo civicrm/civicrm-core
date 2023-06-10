@@ -1303,7 +1303,7 @@ LIKE %1
    * @param int $id
    *   Id of the DAO object being searched for.
    *
-   * @return CRM_Core_DAO
+   * @return static
    *   Object of the type of the class that called this function.
    *
    * @throws Exception
