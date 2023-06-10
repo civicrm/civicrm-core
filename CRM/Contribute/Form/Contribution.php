@@ -651,7 +651,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ts('Financial Type'),
       ['' => ts('- select -')] + $financialTypes,
       TRUE,
-      ['onChange' => "CRM.buildCustomData( 'Contribution', this.value );"]
+      ['onChange' => "CRM.buildCustomData( 'Contribution', this.value );", 'class' => 'crm-select2']
     );
 
     $paymentInstrument = FALSE;
@@ -662,7 +662,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
         ['' => ts('- select -')] + CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'create'),
-        $required, ['onChange' => "return showHideByValue('payment_instrument_id','{$checkPaymentID}','checkNumber','table-row','select',false);"]
+        $required,
+        ['onChange' => "return showHideByValue('payment_instrument_id','{$checkPaymentID}','checkNumber','table-row','select',false);", 'class' => 'crm-select2']
       );
     }
 
@@ -671,7 +672,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     //add receipt for offline contribution
     $this->addElement('checkbox', 'is_email_receipt', ts('Send Receipt?'));
 
-    $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
+    $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails, FALSE, ['class' => 'crm-select2 huge']);
 
     $componentDetails = [];
     if ($this->_id) {
@@ -691,7 +692,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $statusElement = $this->add('select', 'contribution_status_id',
       ts('Contribution Status'),
       $status,
-      FALSE
+      FALSE,
+      ['class' => 'crm-select2']
     );
 
     $currencyFreeze = FALSE;
@@ -756,10 +758,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         // instead of selecting manually
         $financialTypeIds = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviContribute', 'financial_type_id');
         $element = $this->add('select', 'price_set_id', ts('Choose price set'),
-          [
-            '' => ts('Choose price set'),
-          ] + $priceSets,
-          NULL, ['onchange' => "buildAmount( this.value, " . json_encode($financialTypeIds) . ");"]
+          ['' => ts('Choose price set')] + $priceSets,
+          NULL,
+          ['onchange' => "buildAmount( this.value, " . json_encode($financialTypeIds) . ");", 'class' => 'crm-select2']
         );
         if ($this->_online && !($this->_action & CRM_Core_Action::UPDATE)) {
           $element->freeze();
