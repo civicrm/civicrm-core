@@ -77,6 +77,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   private $groupBys = [];
   private $havings = [];
   private $orderBys = [];
+  private $unions = [];
   private $limit = NULL;
   private $offset = NULL;
   private $distinct = NULL;
@@ -295,6 +296,20 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * @param CRM_Utils_SQL_Select $select
+   * @param string $type
+   * @return $this
+   * @throws CRM_Core_Exception
+   */
+  public function union(CRM_Utils_SQL_Select $select, string $type = 'ALL') {
+    if (!in_array($type, ['DISTINCT', 'ALL'])) {
+      throw new \CRM_Core_Exception('Union must be type "ALL" or "DISTINCT"');
+    }
+    $this->unions[] = [$select, $type];
+    return $this;
+  }
+
+  /**
    * Set one (or multiple) parameters to interpolate into the query.
    *
    * @param array|string $keys
@@ -504,7 +519,16 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     if ($this->groupBys) {
       $sql .= 'GROUP BY ' . implode(', ', $this->groupBys) . "\n";
     }
+    // When using UNIONs with a HAVING clause, wrap query as a derived table so that HAVING can filter all results
+    if ($this->unions && $this->havings) {
+      $sql = "SELECT * FROM (\n" . $sql;
+    }
+    foreach ($this->unions as $union) {
+      $sql .= 'UNION ' . $union[1] . "\n(" . $union[0]->toSql() . ")\n";
+    }
     if ($this->havings) {
+      // Close wrapper of derived table
+      $sql .= $this->unions ? ") b\n" : '';
       $sql .= 'HAVING (' . implode(') AND (', $this->havings) . ")\n";
     }
     if ($this->orderBys) {

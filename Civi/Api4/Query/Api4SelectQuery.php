@@ -12,6 +12,7 @@
 namespace Civi\Api4\Query;
 
 use Civi\API\Exception\UnauthorizedException;
+use Civi\API\Request;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joiner;
 use Civi\Api4\Utils\FormattingUtil;
@@ -149,6 +150,7 @@ class Api4SelectQuery {
   public function getSql() {
     $this->buildSelectClause();
     $this->buildWhereClause();
+    $this->buildUnions();
     $this->buildOrderBy();
     $this->buildLimit();
     $this->buildGroupBy();
@@ -219,7 +221,7 @@ class Api4SelectQuery {
       $select = $this->selectMatchingFields('*');
     }
     else {
-      if ($this->forceSelectId) {
+      if ($this->forceSelectId && !$this->api->getUnion()) {
         $keys = (array) CoreUtil::getInfoItem($this->getEntity(), 'primary_key');
         $select = array_merge($keys, $select);
       }
@@ -378,6 +380,19 @@ class Api4SelectQuery {
   protected function buildGroupBy() {
     foreach ($this->getGroupBy() as $item) {
       $this->query->groupBy($this->renderExpr($this->getExpression($item)));
+    }
+  }
+
+  protected function buildUnions() {
+    foreach ($this->api->getUnion() as $union) {
+      [$entity, $action, $params, $type] = $union + [NULL, 'get', [], 'ALL'];
+      $params['checkPermissions'] = $this->api->getCheckPermissions();
+      $params['version'] = 4;
+      $apiRequest = Request::create($entity, $action, $params);
+      $selectQuery = new Api4SelectQuery($apiRequest);
+      $selectQuery->forceSelectId = FALSE;
+      $selectQuery->getSql();
+      $this->query->union($selectQuery->getQuery(), $type);
     }
   }
 
@@ -1326,7 +1341,7 @@ class Api4SelectQuery {
     // This allows calculated fields to be reused in SELECT, GROUP BY and ORDER BY.
     foreach ($this->selectAliases as $alias => $selectVal) {
       $selectVal = explode(':', $selectVal)[0];
-      if ($alias !== $selectVal && $exprVal === $selectVal) {
+      if (($alias !== $selectVal || $this->api->getUnion()) && $exprVal === $selectVal) {
         return "`$alias`";
       }
     }

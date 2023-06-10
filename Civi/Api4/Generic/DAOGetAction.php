@@ -24,6 +24,8 @@ use Civi\Api4\Utils\CoreUtil;
  *
  * @method $this setHaving(array $clauses)
  * @method array getHaving()
+ * @method $this setUnion(array $unions)
+ * @method array getUnion()
  * @method $this setTranslationMode(string|null $mode)
  * @method string|null getTranslationMode()
  */
@@ -81,6 +83,17 @@ class DAOGetAction extends AbstractGetAction {
    * @var array
    */
   protected $having = [];
+
+  /**
+   * Additional api queries to combine using UNION or UNION ALL
+   *
+   * The SQL rules of unions apply: each query must SELECT the same number of fields
+   * with matching types (in order). Field names do not have to match; (returned fields
+   * will use the name from the original query).
+   *
+   * @var array
+   */
+  protected $union = [];
 
   /**
    * Should we automatically overload the result with translated data?
@@ -230,6 +243,17 @@ class DAOGetAction extends AbstractGetAction {
    */
   public function getJoin(): array {
     return $this->join;
+  }
+
+  /**
+   * @param \Civi\Api4\Generic\DAOGetAction $apiRequest
+   * @param string $type
+   *   DISTINCT or ALL (default)
+   * @return $this
+   */
+  public function addUnion(DAOGetAction $apiRequest, string $type = 'ALL') {
+    $this->union[] = [$apiRequest->getEntityName(), $apiRequest->getActionName(), $apiRequest->getParams(), $type];
+    return $this;
   }
 
 }
