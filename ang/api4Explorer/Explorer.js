@@ -352,7 +352,7 @@
       if (_.isEmpty($scope.availableParams)) {
         return;
       }
-      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having', 'join'];
+      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having', 'join', 'sets'];
       if ($scope.availableParams.limit && $scope.availableParams.offset) {
         specialParams.push('limit', 'offset');
       }
@@ -611,7 +611,7 @@
               });
             });
           }
-          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select' || name === 'join') {
+          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select' || name === 'join' || name === 'sets') {
             $scope.$watch('controls.' + name, function(value) {
               var field = value;
               $timeout(function() {
@@ -619,6 +619,10 @@
                   if (name === 'join') {
                     $scope.params[name].push([field + ' AS ' + _.snakeCase(field), 'LEFT']);
                     ctrl.buildFieldList();
+                  }
+                  else if (name === 'sets') {
+                    var select = $scope.params.select && $scope.params.select.length ? $scope.params.select : ['id'];
+                    $scope.params[name].push(['UNION ALL', field, 'get', '{select: [' + select.join(', ') + '], where: []}']);
                   }
                   else if (typeof objectParams[name] === 'undefined') {
                     $scope.params[name].push(field);
@@ -915,6 +919,11 @@
             code += newLine + "->addChain('" + name + "', " + formatOOP(chain[0], chain[1], chain[2], 2 + indent);
             code += (chain.length > 3 ? ',' : '') + (!_.isEmpty(chain[2]) ? newLine : ' ') + (chain.length > 3 ? phpFormat(chain[3]) : '') + ')';
           });
+        } else if (key === 'sets') {
+          _.each(param, function(set) {
+            code += newLine + "->addSet(" + phpFormat(set[0]) + ', ' + formatOOP(set[1], set[2], set[3], 2 + indent);
+            code += newLine + ')';
+          });
         } else if (key === 'join') {
           _.each(param, function(join) {
             code += newLine + "->addJoin(" + phpFormat(join).slice(1, -1) + ')';
@@ -992,7 +1001,7 @@
           // Fields marked 'localizable' in the schema should get wrapped in ts() for the php format
           var localizable = _.pluck(_.filter(_.findWhere(getEntity().actions, {name: $scope.action}).fields, {localizable: true}), 'name') || [];
           // More field names that probably should be translated
-          localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
+          localizable = _.sets(localizable, ['label', 'title', 'description', 'text']);
           $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable)) + ';', 'php', 1));
           break;
       }
@@ -1420,6 +1429,24 @@
         scope.$watch("chain[1][1]", changeAction);
       }
     };
+  });
+
+  angular.module('api4Explorer').component('api4ExpSet', {
+    bindings: {
+      set: '<',
+      deleteRow: '&',
+      entities: '<'
+    },
+    templateUrl: '~/api4Explorer/Set.html',
+    controller: function($scope) {
+      var ctrl = this;
+
+      $scope.$watch('$ctrl.set[1]', function(entity) {
+        if (!entity) {
+          ctrl.deleteRow();
+        }
+      });
+    }
   });
 
   function getEntity(entityName) {

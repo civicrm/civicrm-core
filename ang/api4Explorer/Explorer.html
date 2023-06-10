@@ -161,6 +161,14 @@
             <a href class="crm-hover-button" title="Clear" ng-click="clearParam('limit');clearParam('offset');" ng-show="!!params.limit || !!params.offset"><i class="crm-i fa-times" aria-hidden="true"></i></a>
           </div>
         </fieldset>
+        <fieldset ng-if="::availableParams.sets" ng-mouseenter="help('sets', availableParams.sets)" ng-mouseleave="help()">
+          <legend>sets</legend>
+          <api4-exp-set class="api4-input form-inline" ng-repeat="clause in params.sets" set="clause" entities="entities" delete-row="clearParam('sets', $index)" >
+          </api4-exp-set>
+          <div class="api4-input form-inline">
+            <input class="form-control" ng-model="controls.sets" crm-ui-select="::{data: entities}" placeholder="Add set" />
+          </div>
+        </fieldset>
         <fieldset ng-if="::availableParams.chain" ng-mouseenter="help('chain', availableParams.chain)" ng-mouseleave="help()">
           <legend>chain</legend>
           <div class="api4-input form-inline" ng-repeat="clause in params.chain" api4-exp-chain="clause" entities="::entities" main-entity="::entity" >
