@@ -850,9 +850,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $trxnId->freeze();
         }
         $financialType->freeze();
-        $this->assign('freezeFinancialType', TRUE);
+        $freezeFinancialType = TRUE;
+
       }
     }
+    $this->assign('freezeFinancialType', $freezeFinancialType ?? FALSE);
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();

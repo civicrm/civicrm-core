@@ -39,7 +39,7 @@
         {/foreach}
       </div>
     </fieldset>
-    {if $paymentAgreementTitle}
+    {if !$isBackOffice && $paymentAgreementTitle}
       <div id="payment_notice">
         <fieldset class="crm-public-form-item crm-group payment_notice-group">
           <legend>{$paymentAgreementTitle}</legend>
