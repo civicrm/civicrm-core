@@ -244,7 +244,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       }
       $message .= '<ul><li>' . implode('</li><li>', $this->_sharedAddressMessage['contactList']) . '</li></ul>';
 
-      $session->setStatus($message, ts('Shared Addresses Owner Deleted'), 'info', ['expires' => 0]);
+      $session->setStatus($message, ts('Shared Addresses Owner Deleted'), 'info', ['expires' => 30000]);
 
       $this->set('sharedAddressMessage', NULL);
     }
