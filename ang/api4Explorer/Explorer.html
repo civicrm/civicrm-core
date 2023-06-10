@@ -161,6 +161,14 @@
             <a href class="crm-hover-button" title="Clear" ng-click="clearParam('limit');clearParam('offset');" ng-show="!!params.limit || !!params.offset"><i class="crm-i fa-times" aria-hidden="true"></i></a>
           </div>
         </fieldset>
+        <fieldset ng-if="::availableParams.union" ng-mouseenter="help('union', availableParams.union)" ng-mouseleave="help()">
+          <legend>union</legend>
+          <api4-exp-union class="api4-input form-inline" ng-repeat="clause in params.union" union="clause" entities="entities" delete-row="clearParam('union', $index)" >
+          </api4-exp-union>
+          <div class="api4-input form-inline">
+            <input class="form-control" ng-model="controls.union" crm-ui-select="::{data: entities}" placeholder="Add union" />
+          </div>
+        </fieldset>
         <fieldset ng-if="::availableParams.chain" ng-mouseenter="help('chain', availableParams.chain)" ng-mouseleave="help()">
           <legend>chain</legend>
           <div class="api4-input form-inline" ng-repeat="clause in params.chain" api4-exp-chain="clause" entities="::entities" main-entity="::entity" >

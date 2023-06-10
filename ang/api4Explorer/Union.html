@@ -1,0 +1,7 @@
+<input class="form-control" ng-model="$ctrl.union[0]" crm-ui-select="{data: $ctrl.entities, allowClear: true, placeholder: 'None'}" />
+<input class="form-control api4-union-action" readonly value="get" >
+<input class="form-control api4-union-params" ng-model="$ctrl.union[2]" placeholder="{{:: ts('Params') }}" >
+<select class="form-control api4-union-type" ng-model="$ctrl.union[3]" placeholder="{{:: ts('Type') }}" >
+  <option value="DISTINCT">DISTINCT</option>
+  <option value="ALL">ALL</option>
+</select>
