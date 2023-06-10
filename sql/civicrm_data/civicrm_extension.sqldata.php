@@ -10,53 +10,65 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO
     'type' => 'module',
     'is_active' => 1,
   ])
+  ->syncColumns('fill', ['full_name' => 'file', 'name' => 'label'])
   ->addValues([
     [
       'full_name' => 'sequentialcreditnotes',
       'name' => 'Sequential credit notes',
-      'label' => 'Sequential credit notes',
-      'file' => 'sequentialcreditnotes',
     ],
     [
       'full_name' => 'greenwich',
       'name' => 'Theme: Greenwich',
-      'label' => 'Theme: Greenwich',
-      'file' => 'greenwich',
     ],
     [
       'full_name' => 'eventcart',
       'name' => 'Event cart',
-      'label' => 'Event cart',
-      'file' => 'eventcart',
     ],
     [
       'full_name' => 'financialacls',
       'name' => 'Financial ACLs',
-      'label' => 'Financial ACLs',
-      'file' => 'financialacls',
     ],
     [
       'full_name' => 'recaptcha',
       'name' => 'reCAPTCHA',
-      'label' => 'reCAPTCHA',
-      'file' => 'recaptcha',
     ],
     [
       'full_name' => 'ckeditor4',
       'name' => 'CKEditor4',
-      'label' => 'CKEditor4',
-      'file' => 'ckeditor4',
     ],
     [
       'full_name' => 'legacycustomsearches',
       'name' => 'Custom search framework',
-      'label' => 'Custom search framework',
-      'file' => 'legacycustomsearches',
     ],
     [
       'full_name' => 'org.civicrm.flexmailer',
       'name' => 'FlexMailer',
-      'label' => 'FlexMailer',
       'file' => 'flexmailer',
+    ],
+
+    // The following should be kept in sync with the *default* list of components (`enable_components`).
+    [
+      'full_name' => 'civi_contribute',
+      'name' => 'CiviContribute',
+    ],
+    [
+      'full_name' => 'civi_event',
+      'name' => 'CiviEvent',
+    ],
+    [
+      'full_name' => 'civi_mail',
+      'name' => 'CiviMail',
+    ],
+    [
+      'full_name' => 'civi_member',
+      'name' => 'CiviMember',
+    ],
+    [
+      'full_name' => 'civi_pledge',
+      'name' => 'CiviPledge',
+    ],
+    [
+      'full_name' => 'civi_report',
+      'name' => 'CiviReport',
     ],
   ]);
