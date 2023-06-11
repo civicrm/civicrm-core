@@ -234,7 +234,8 @@ trait SavedSearchInspectorTrait {
     $fieldName = $fieldNames[0];
     $field = $this->getField($fieldName);
     // If field is not found it must be an aggregated column & belongs in the HAVING clause.
-    if (!$field) {
+    // Or if the query has a UNION, use HAVING to filter the combined results.
+    if (!$field || !empty($this->_apiParams['union'])) {
       $this->_apiParams += ['having' => []];
       $clause =& $this->_apiParams['having'];
     }
