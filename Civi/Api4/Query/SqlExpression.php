@@ -224,7 +224,7 @@ abstract class SqlExpression {
   protected function captureExpressions(string &$arg, array $mustBe, int $max) {
     $captured = [];
     $arg = ltrim($arg);
-    while ($arg) {
+    while (strlen($arg)) {
       $item = $this->captureExpression($arg);
       $arg = ltrim(substr($arg, strlen($item)));
       $expr = self::convert($item, FALSE, $mustBe);
