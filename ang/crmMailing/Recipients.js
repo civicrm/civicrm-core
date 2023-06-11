@@ -10,20 +10,9 @@
       },
       link: function(scope, element, attrs, ngModel) {
         scope.recips = ngModel.$viewValue;
-        scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);
-        scope.mailings = scope.$parent.$eval(attrs.crmAvailMailings);
         refreshMandatory();
 
-        var ts = scope.ts = CRM.ts(null);
-
-        /// Convert MySQL date ("yyyy-mm-dd hh:mm:ss") to JS date object
-        scope.parseDate = function(date) {
-          if (!angular.isString(date)) {
-            return date;
-          }
-          var p = date.split(/[\- :]/);
-          return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]), parseInt(p[3]), parseInt(p[4]), parseInt(p[5]));
-        };
+        var ts = scope.ts = CRM.ts();
 
         /// Remove {value} from {array}
         function arrayRemove(array, value) {
@@ -96,8 +85,8 @@
           var option = convertValueToObj(item.id);
           var icon = (option.entity_type === 'civicrm_mailing') ? 'fa-envelope' : 'fa-users';
           var smartGroupMarker = item.is_smart ? '* ' : '';
-          var spanClass = (option.mode == 'exclude') ? 'crmMailing-exclude' : 'crmMailing-include';
-          if (option.entity_type != 'civicrm_mailing' && isMandatory(option.entity_id)) {
+          var spanClass = (option.mode === 'exclude') ? 'crmMailing-exclude' : 'crmMailing-include';
+          if (option.entity_type !== 'civicrm_mailing' && isMandatory(option.entity_id)) {
             spanClass = 'crmMailing-mandatory';
           }
           return '<i class="crm-i '+icon+'"></i> <span class="' + spanClass + '">' + smartGroupMarker + item.text + '</span>';
@@ -124,7 +113,7 @@
         $(element).select2({
           width: '36em',
           dropdownAutoWidth: true,
-          placeholder: "Groups or Past Recipients",
+          placeholder: ts("Groups or Past Recipients"),
           formatResult: formatItem,
           formatSelection: formatItem,
           escapeMarkup: function(m) {
@@ -139,10 +128,10 @@
 
             for (var i = 0; i < values.length; i++) {
               var dv = convertValueToObj(values[i]);
-              if (dv.entity_type == 'civicrm_group') {
+              if (dv.entity_type === 'civicrm_group') {
                 gids.push(dv.entity_id);
               }
-              else if (dv.entity_type == 'civicrm_mailing') {
+              else if (dv.entity_type === 'civicrm_mailing') {
                 mids.push(dv.entity_id);
               }
             }
@@ -329,12 +318,6 @@
         scope.$watchCollection("recips.mailings.exclude", refreshUI);
         setTimeout(refreshUI, 50);
 
-        scope.$watchCollection(attrs.crmAvailGroups, function() {
-          scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);
-        });
-        scope.$watchCollection(attrs.crmAvailMailings, function() {
-          scope.mailings = scope.$parent.$eval(attrs.crmAvailMailings);
-        });
         scope.$watchCollection(attrs.crmMandatoryGroups, function() {
           refreshMandatory();
         });
