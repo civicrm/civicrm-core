@@ -101,7 +101,7 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
 
     // Color field
     if (isset($fields['color'])) {
-      $e->display['settings']['color'] = 'color';
+      $e->display['settings']['extra']['color'] = 'color';
     }
   }
 

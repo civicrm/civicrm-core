@@ -30,6 +30,15 @@ class EntitySet extends Generic\AbstractEntity {
   }
 
   /**
+   * @param bool $checkPermissions
+   * @return Generic\AutocompleteAction
+   */
+  public static function autocomplete($checkPermissions = TRUE) {
+    return (new Generic\AutocompleteAction('EntitySet', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
    * @return \Civi\Api4\Generic\BasicGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
