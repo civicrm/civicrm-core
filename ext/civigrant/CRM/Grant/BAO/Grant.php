@@ -110,6 +110,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       $title = CRM_Contact_BAO_Contact::displayName($grant->contact_id) . ' - ' . ts('Grant') . ': ' . $grantTypes[$grant->grant_type_id];
 
       civicrm_api4('RecentItem', 'create', [
+        'checkPermissions' => FALSE,
         'values' => [
           'entity_type' => 'Grant',
           'entity_id' => $grant->id,
