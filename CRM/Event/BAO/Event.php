@@ -315,19 +315,22 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
   }
 
   /**
-   * Returns an array of event pages [id => title]
+   * Callback for the experimental `event_show_payment_on_confirm` setting.
+   * Should be removed when that setting gets retired.
    * @return array
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function getEventsForSelect2() {
-    return ['all' => ts('- all -')] +
-      \Civi\Api4\Event::get(FALSE)
+    $options = ['all' => ts('- all -')];
+    // Check that CiviEvent is enabled before calling the api
+    if (class_exists('\Civi\Api4\Event')) {
+      $options += \Civi\Api4\Event::get(FALSE)
         ->addSelect('id', 'title')
         ->addWhere('is_active', '=', TRUE)
         ->execute()
         ->indexBy('id')
         ->column('title');
+    }
+    return $options;
   }
 
   /**
