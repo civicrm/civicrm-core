@@ -734,6 +734,8 @@
             break;
 
           case 'php':
+            // Always shows implicit true permissions check for PHP
+            params.checkPermissions = (params.checkPermissions === false) ? false : true;
             // Write php code
             code.php = '$' + results + " = civicrm_api4('" + entity + "', '" + action + "', [";
             _.each(params, function(param, key) {
@@ -876,9 +878,8 @@
         newLine = "\n" + _.repeat(' ', indent),
         code = '\\' + info.class + '::' + action + '(',
         args = _.cloneDeep(info.class_args || []);
-      if (params.checkPermissions === false) {
-        args.push(false);
-      }
+      // Always shows implicit true permissions check for PHP
+      args.push((params.checkPermissions === false) ? false : true);
       code += _.map(args, phpFormat).join(', ') + ')';
       _.each(params, function(param, key) {
         var val = '';
