@@ -49,4 +49,31 @@ class Utils {
     return $sorter->sort();
   }
 
+  /**
+   * Subset of APIv4 operators that are appropriate for use on Afforms
+   *
+   * This list may be further reduced by fields which declare a limited number of
+   * operators in their metadata.
+   *
+   * @return array
+   */
+  public static function getSearchOperators() {
+    return [
+      '=' => '=',
+      '!=' => '≠',
+      '>' => '>',
+      '<' => '<',
+      '>=' => '≥',
+      '<=' => '≤',
+      'CONTAINS' => ts('Contains'),
+      'NOT CONTAINS' => ts("Doesn't Contain"),
+      'IN' => ts('Is One Of'),
+      'NOT IN' => ts('Not One Of'),
+      'LIKE' => ts('Is Like'),
+      'NOT LIKE' => ts('Not Like'),
+      'REGEXP' => ts('Matches Pattern'),
+      'NOT REGEXP' => ts("Doesn't Match Pattern"),
+    ];
+  }
+
 }

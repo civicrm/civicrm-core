@@ -121,6 +121,19 @@ class AfformMetadataInjector {
     // On a search form, search_range will present a pair of fields (or possibly 3 fields for date select + range)
     $isSearchRange = !empty($fieldDefn['search_range']) && \CRM_Utils_JS::decode($fieldDefn['search_range']);
 
+    // On a search form, the exposed operator requires a list of options.
+    if (!empty($fieldDefn['expose_operator'])) {
+      $operators = Utils::getSearchOperators();
+      // If 'operators' is present in the field definition, use it as a limiter
+      // Afform expects 'operators' in the fieldDefn to be associative key/label, not just a flat array
+      // like it is in the schema.
+      if (!empty($fieldInfo['operators'])) {
+        $operators = array_intersect_key($operators, array_flip($fieldInfo['operators']));
+      }
+      $fieldDefn['operators'] = \CRM_Utils_JS::encode($operators);
+    }
+    unset($fieldInfo['operators']);
+
     // Default placeholder for select inputs
     if ($inputType === 'Select' || $inputType === 'ChainSelect') {
       $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');

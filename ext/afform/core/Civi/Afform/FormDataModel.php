@@ -207,10 +207,14 @@ class FormDataModel {
     if ($action === 'get' && strpos($fieldName, '.')) {
       $namesToMatch[] = substr($fieldName, 0, strrpos($fieldName, '.'));
     }
+    $select = ['name', 'label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity', 'required'];
+    if ($action === 'get') {
+      $select[] = 'operators';
+    }
     $params = [
       'action' => $action,
       'where' => [['name', 'IN', $namesToMatch]],
-      'select' => ['name', 'label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity', 'required'],
+      'select' => $select,
       'loadOptions' => ['id', 'label'],
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,

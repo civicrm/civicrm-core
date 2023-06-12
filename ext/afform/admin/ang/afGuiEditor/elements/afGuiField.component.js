@@ -47,6 +47,11 @@
             inputTypes.push(type);
           }
         });
+        this.searchOperators = CRM.afAdmin.search_operators;
+        // If field has limited operators, set appropriately
+        if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
+          this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
+        }
         setDateOptions();
       };
 
@@ -290,7 +295,24 @@
         }
       };
 
-      // Getter/setter for definition props
+      // Getter/setter for search_operator and expose_operator combo-field
+      // The expose_operator flag changes the behavior of the search_operator field
+      // to either set the value on the backend, or set the default value for the user-select list on the form
+      $scope.getSetOperator = function(val) {
+        if (arguments.length) {
+          // _EXPOSE_ is not a real option for search_operator, instead it sets the expose_operator boolean
+          getSet('expose_operator', val === '_EXPOSE_');
+          if (val === '_EXPOSE_') {
+            getSet('search_operator', _.keys(ctrl.searchOperators)[0]);
+          } else {
+            getSet('search_operator', val);
+          }
+          return val;
+        }
+        return getSet('expose_operator') ? '_EXPOSE_' : getSet('search_operator');
+      };
+
+      // Generic getter/setter for definition props
       $scope.getSet = function(propName) {
         return _.wrap(propName, getSet);
       };
@@ -342,24 +364,6 @@
 
       this.setEditingOptions = function(val) {
         $scope.editingOptions = val;
-      };
-
-      this.searchOperators = {
-        '': ts('Auto'),
-        '=': '=',
-        '!=': '≠',
-        '>': '>',
-        '<': '<',
-        '>=': '≥',
-        '<=': '≤',
-        'CONTAINS': ts('Contains'),
-        'NOT CONTAINS': ts("Doesn't Contain"),
-        'IN': ts('Is One Of'),
-        'NOT IN': ts('Not One Of'),
-        'LIKE': ts('Is Like'),
-        'NOT LIKE': ts('Not Like'),
-        'REGEXP': ts('Matches Pattern'),
-        'NOT REGEXP': ts("Doesn't Match Pattern"),
       };
 
       // Returns a reference to a path n-levels deep within an object
