@@ -962,6 +962,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           if ((!array_key_exists($key['group_id'], $params['group']) || $params['group'][$key['group_id']] != 1) && empty($key['is_hidden'])) {
             $params['group'][$key['group_id']] = -1;
           }
+          // don't try to add to groups that the contact is already Added to
+          elseif (array_key_exists($key['group_id'], $params['group']) && $params['group'][$key['group_id']] == 1) {
+            unset($params['group'][$key['group_id']]);
+          }
         }
       }
     }
