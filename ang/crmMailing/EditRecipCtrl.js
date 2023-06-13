@@ -11,12 +11,7 @@
     var SETTING_DEBOUNCE_MS = 5000;
     var RECIPIENTS_PREVIEW_LIMIT = 50;
 
-    var ts = $scope.ts = CRM.ts(null);
-
-    $scope.isMailingList = function isMailingList(group) {
-      var GROUP_TYPE_MAILING_LIST = '2';
-      return _.contains(group.group_type, GROUP_TYPE_MAILING_LIST);
-    };
+    var ts = $scope.ts = CRM.ts();
 
     $scope.recipients = null;
     $scope.outdated = null;

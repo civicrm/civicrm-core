@@ -1,12 +1,8 @@
 <div ng-controller="EditRecipCtrl" class="crm-mailing-recipients-row">
-  <input
-    type="hidden"
-    crm-mailing-recipients
-    ng-model="mailing.recipients"
-    crm-mandatory-groups="crmMailingConst.groupNames | filter:{is_hidden:1}"
-    crm-ui-id="{{crmMailingBlockRecipients.id}}"
-    name="{{crmMailingBlockRecipients.name}}"
-    ng-required="true" />
+  <i class="crm-i fa-plus-square-o"></i>
+  <crm-mailing-recipients-autocomplete ng-if="mailing" crm-recipients="mailing.recipients" crm-mailing-id="mailing.id" crm-mode="include"></crm-mailing-recipients-autocomplete>
+  <i class="crm-i fa-minus-square-o"></i>
+  <crm-mailing-recipients-autocomplete ng-if="mailing" crm-recipients="mailing.recipients" crm-mailing-id="mailing.id" crm-mode="exclude"></crm-mailing-recipients-autocomplete>
     <a crm-icon="fa-wrench" ng-click="editOptions(mailing)" class="crm-hover-button" title="{{:: ts('Edit Recipient Options') }}"></a>
     <div ng-style="{display: permitRecipientRebuild ? '' : 'inline-block'}">
       <button ng-click="rebuildRecipients()" ng-show="permitRecipientRebuild" class="crm-button" title="{{:: ts('Click to refresh recipient count') }}">{{getRecipientsEstimate()}}</button>
