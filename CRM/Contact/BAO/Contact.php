@@ -298,7 +298,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
 
     $params['contact_id'] = $contact->id;
 
-    if (Civi::settings()->get('is_enabled')) {
+    if (!$isEdit && Civi::settings()->get('is_enabled')) {
       // Enabling multisite causes the contact to be added to the domain group.
       $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
       if (!empty($domainGroupID)) {
