@@ -273,7 +273,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $frequencyUnit = $this->add('select', 'frequency_unit',
       ts('Frequency'),
       ['' => ts('- select -')] + $freqUnitsDisplay,
-      TRUE
+      TRUE,
+      ['class' => 'crm-select2 eight']
     );
 
     $frequencyDay = $this->add('number', 'frequency_day', ts('Payments are due on the'), $attributes['frequency_day'], TRUE);
@@ -317,7 +318,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         ['onclick' => "showHideByValue( 'is_acknowledge', '', 'acknowledgeDate', 'table-row', 'radio', true); showHideByValue( 'is_acknowledge', '', 'fromEmail', 'table-row', 'radio', false );"]
       );
 
-      $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
+      $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails, FALSE, ['class' => 'crm-select2 huge']);
     }
 
     $this->add('datepicker', 'acknowledge_date', ts('Acknowledgment Date'), [], FALSE, ['time' => FALSE]);
@@ -325,7 +326,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->add('select', 'financial_type_id',
       ts('Financial Type'),
       ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::financialType(),
-      TRUE
+      TRUE,
+      ['class' => 'crm-select2']
     );
 
     // CRM-7362 --add campaigns.
@@ -341,7 +343,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $pledgePages[$value['entity_id']] = $pages[$value['entity_id']];
     }
     $this->add('select', 'contribution_page_id', ts('Self-service Payments Page'),
-      ['' => ts('- select -')] + $pledgePages
+      ['' => ts('- select -')] + $pledgePages,
+      FALSE,
+      ['class' => 'crm-select2']
     );
 
     $mailingInfo = Civi::settings()->get('mailing_backend');

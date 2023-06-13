@@ -191,7 +191,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer'));
-    $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, NULL);
+    $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, NULL, ['class' => 'crm-select2']);
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialTrxn');
 
@@ -209,7 +209,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
     }
 
-    $this->add('select', 'from_email_address', ts('Receipt From'), CRM_Financial_BAO_Payment::getValidFromEmailsForPayment($eventID ?? NULL));
+    $this->add('select', 'from_email_address', ts('Receipt From'), CRM_Financial_BAO_Payment::getValidFromEmailsForPayment($eventID ?? NULL), FALSE, ['class' => 'crm-select2 huge']);
 
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
@@ -236,7 +236,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         ts('Payment Method'),
         ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument(),
         TRUE,
-        ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);"]
+        ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);", 'class' => 'crm-select2']
       );
 
       $this->add('text', 'check_number', ts('Check Number'), $attributes['financial_trxn_check_number']);

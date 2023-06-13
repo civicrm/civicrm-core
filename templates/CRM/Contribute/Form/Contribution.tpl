@@ -103,13 +103,12 @@
             <tr id='recurringPaymentBlock'>
               <td></td>
               <td>
-                <strong>{$form.is_recur.html} {ts}every{/ts}
-                  &nbsp;{$form.frequency_interval.html}
-                  &nbsp;{$form.frequency_unit.html}&nbsp;
-                  {ts}for{/ts}
-                  &nbsp;{$form.installments.html}
-                  &nbsp;{$form.installments.label}
-                </strong>
+                {$form.is_recur.html} {ts}every{/ts}
+                &nbsp;{$form.frequency_interval.html}
+                &nbsp;{$form.frequency_unit.html}&nbsp;
+                {ts}for{/ts}
+                &nbsp;{$form.installments.html}
+                &nbsp;{$form.installments.label}
                 <br />
                 <span class="description">
             {ts}You can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
