@@ -31,6 +31,8 @@ use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
+use Civi\Test;
+use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HookInterface;
 
 /**
@@ -51,6 +53,14 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
     \CRM_Core_BAO_ConfigSetting::enableAllComponents();
     parent::setUp();
     $this->resetCheckAccess();
+  }
+
+  public function setUpHeadless(): CiviEnvBuilder {
+    // Install all core extensions that provide APIs
+    return Test::headless()->install([
+      'org.civicrm.search_kit',
+      'civigrant',
+    ])->apply();
   }
 
   /**
@@ -99,7 +109,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    */
   public function getEntitiesLotech(): array {
     // Core + required core extensions
-    $directores = ['', 'ext/search_kit/', 'ext/civi_*/'];
+    $directores = ['', 'ext/search_kit/', 'ext/civigrant/', 'ext/civi_*/'];
     $manual['remove'] = ['CustomValue', 'SKEntity'];
     $manual['transform'] = ['CiviCase' => 'Case'];
 
