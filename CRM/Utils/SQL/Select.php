@@ -72,6 +72,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   private $onDuplicates = [];
   private $selects = [];
   private $from;
+  private $setOps;
   private $joins = [];
   private $wheres = [];
   private $groupBys = [];
@@ -91,6 +92,18 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    */
   public static function from($from, $options = []) {
     return new self($from, $options);
+  }
+
+  /**
+   * Create a new SELECT-like query where.
+   *
+   * @param array $options
+   * @return CRM_Utils_SQL_Select
+   */
+  public static function fromSet($options = []) {
+    $result = new self(NULL, $options);
+    $result->setOps = [];
+    return $result;
   }
 
   /**
@@ -331,6 +344,47 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * Add a union to the list of set operations.
+   *
+   * Ex: CRM_Utils_SQL_Select::fromSet()->union([$subQuery1, $subQuery2])
+   * Ex: CRM_Utils_SQL_Select::fromSet()->union($subQuery1)->union($subQuery2);
+   *
+   * @param string|array|\CRM_Utils_SQL_Select $subQueries
+   * @return $this
+   */
+  public function union($subQueries) {
+    return $this->setOp('UNION', $subQueries);
+  }
+
+  /**
+   * Add a set operation.
+   *
+   * Ex: CRM_Utils_SQL_Select::fromSet()->setOp('INTERSECT', [$subQuery1, $subQuery2])
+   *
+   * @param string $setOperation
+   *   Ex: 'UNION', 'UNION ALL', 'INTERSECT', 'EXCEPT'
+   *   NOTE: The query-builder supports any set-operation. However, MySQL 5.7 only supports UNION.
+   * @param string|array|\CRM_Utils_SQL_Select $subQueries
+   * @return $this
+   * @see https://dev.mysql.com/doc/refman/8.0/en/set-operations.html
+   */
+  public function setOp(string $setOperation, $subQueries) {
+    if ($this->from !== NULL || !is_array($this->setOps)) {
+      throw new CRM_Core_Exception("Set-operation ($setOperation) must have a list of subqueries. Primitive FROM is not supported.");
+    }
+    $subQueries = is_array($subQueries) ? $subQueries : [$subQueries]; /* Simple (array)cast would mishandle objects. */
+    foreach ($subQueries as $subQuery) {
+      if ($this->setOps === []) {
+        $this->setOps[] = ['', $subQuery];
+      }
+      else {
+        $this->setOps[] = [" $setOperation ", $subQuery];
+      }
+    }
+    return $this;
+  }
+
+  /**
    * Insert the results of the SELECT query into another
    * table.
    *
@@ -494,6 +548,14 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     }
     if ($this->from !== NULL) {
       $sql .= 'FROM ' . $this->from . "\n";
+    }
+    elseif (is_array($this->setOps)) {
+      $sql .= 'FROM (';
+      foreach ($this->setOps as $setOp) {
+        $sql .= $setOp[0];
+        $sql .= '(' . (is_object($setOp[1]) ? $setOp[1]->toSQL() : $setOp[1]) . ')';
+      }
+      $sql .= ")\n";
     }
     foreach ($this->joins as $join) {
       $sql .= $join . "\n";
