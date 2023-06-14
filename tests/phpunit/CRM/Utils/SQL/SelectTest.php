@@ -311,10 +311,10 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
   public function testUnion() {
     $a = CRM_Utils_SQL_Select::from('a')->select('a_name')->where('a1 = !num')->param('num', 100);
     $b = CRM_Utils_SQL_Select::from('b')->select('b_name')->where('b2 = @val')->param('val', "ab cd");
-    $u = CRM_Utils_SQL_Select::fromSet()->union([$a, $b])->limit(100)->orderBy('a_name');
+    $u = CRM_Utils_SQL_Select::fromSet()->union('ALL', [$a, $b])->limit(100)->orderBy('a_name');
     $expectA = 'SELECT a_name FROM a WHERE (a1 = 100) ';
     $expectB = 'SELECT b_name FROM b WHERE (b2 = "ab cd") ';
-    $expectUnion = "SELECT * FROM (($expectA) UNION ($expectB)) ORDER BY a_name LIMIT 100 OFFSET 0";
+    $expectUnion = "SELECT * FROM (($expectA) UNION ALL ($expectB)) a ORDER BY a_name LIMIT 100 OFFSET 0";
     $this->assertLike($expectUnion, $u->toSQL());
   }
 
@@ -323,14 +323,14 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $b = CRM_Utils_SQL_Select::from('b')->select('b_name')->where('b2 = @val')->param('val', "bb bb");
     $c = CRM_Utils_SQL_Select::from('c')->select('c_name')->where('c3 = @val')->param('val', "cc cc");
     $u = CRM_Utils_SQL_Select::fromSet()
-      ->union([$a, $b])
-      ->setOp('INTERSECT', $c)
+      ->union('ALL', [$a, $b])
+      ->union('DISTINCT', $c)
       ->limit(100)
       ->orderBy('a_name');
     $expectA = 'SELECT a_name FROM a WHERE (a1 = 100) ';
     $expectB = 'SELECT b_name FROM b WHERE (b2 = "bb bb") ';
     $expectC = 'SELECT c_name FROM c WHERE (c3 = "cc cc") ';
-    $expectUnion = "SELECT * FROM (($expectA) UNION ($expectB) INTERSECT ($expectC)) ORDER BY a_name LIMIT 100 OFFSET 0";
+    $expectUnion = "SELECT * FROM (($expectA) UNION ALL ($expectB) UNION DISTINCT ($expectC)) a ORDER BY a_name LIMIT 100 OFFSET 0";
     $this->assertLike($expectUnion, $u->toSQL());
   }
 
