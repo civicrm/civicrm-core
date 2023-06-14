@@ -130,14 +130,9 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
     if (empty($contactIds) || empty($groupId)) {
       return [];
     }
-
-    CRM_Utils_Hook::pre('create', 'GroupContact', $groupId, $contactIds);
-
     $result = self::bulkAddContactsToGroup($contactIds, $groupId, $method, $status, $tracking);
     CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupId);
     CRM_Contact_BAO_Contact_Utils::clearContactCaches();
-
-    CRM_Utils_Hook::post('create', 'GroupContact', $groupId, $contactIds);
 
     return [count($contactIds), $result['count_added'], $result['count_not_added']];
   }
@@ -711,23 +706,28 @@ AND    contact_id IN ( $contactStr )
       }
 
       $gcValues = $shValues = [];
-      foreach ($input as $cid) {
+      foreach ($input as $key => $cid) {
         if (isset($presentIDs[$cid])) {
+          unset($input[$key]);
           $numContactsNotAdded++;
-          continue;
         }
-
-        $gcValues[] = "( $groupID, $cid, '$status' )";
-        $shValues[] = "( $groupID, $cid, '$date', '$method', '$status', '$tracking' )";
-        $numContactsAdded++;
+        else {
+          $gcValues[] = "( $groupID, $cid, '$status' )";
+          $shValues[] = "( $groupID, $cid, '$date', '$method', '$status', '$tracking' )";
+          $numContactsAdded++;
+        }
       }
 
       if (!empty($gcValues)) {
+        CRM_Utils_Hook::pre('create', 'GroupContact', $groupID, $input);
+
         $cgSQL = $contactGroupSQL . implode(",\n", $gcValues);
         CRM_Core_DAO::executeQuery($cgSQL);
 
         $shSQL = $subscriptioHistorySQL . implode(",\n", $shValues);
         CRM_Core_DAO::executeQuery($shSQL);
+
+        CRM_Utils_Hook::post('create', 'GroupContact', $groupID, $input);
       }
     }
 
