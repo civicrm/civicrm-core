@@ -244,6 +244,14 @@ trait Api4TestTrait {
           return $this->getFkID('Contact');
       }
     }
+    // If there are no options but the field is supposed to have them, we may need to
+    // create a new option
+    if (!empty($field['suffixes']) && !empty($field['table_name'])) {
+      $optionValue = $this->createOptionValue($field['table_name'], $field['name']);
+      if ($optionValue) {
+        return $optionValue;
+      }
+    }
 
     $randomValue = $this->getRandomValue($field['data_type']);
 
@@ -252,6 +260,26 @@ trait Api4TestTrait {
     }
 
     throw new \CRM_Core_Exception('Could not provide default value');
+  }
+
+  /**
+   * Creates a dummy option value when one is required but the option list is empty
+   *
+   * @param string $tableName
+   * @param string $fieldName
+   * @return mixed|null
+   */
+  private function createOptionValue(string $tableName, string $fieldName) {
+    $daoName = \CRM_Core_DAO_AllCoreTables::getClassForTable($tableName);
+    $pseudoconstant = $daoName::getSupportedFields()[$fieldName]['pseudoconstant'] ?? NULL;
+    if (!empty($pseudoconstant['optionGroupName'])) {
+      $newOption = $this->createTestRecord('OptionValue', [
+        'option_group_id:name' => $pseudoconstant['optionGroupName'],
+      ]);
+      return $newOption['value'];
+    }
+    // Other types of
+    return NULL;
   }
 
   /**
