@@ -45,7 +45,7 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
 
     $optionTypes = [
       '1' => ts('Smart Group'),
-      '2' => ts('Normal Group'),
+      '2' => ts('Regular Group'),
     ];
     $this->add('select', 'saved_search', ts('Group Type'),
       ['' => ts('- any -')] + $optionTypes
