@@ -29,7 +29,7 @@ class OpenTracker extends BaseListener {
       $mailParams = $task->getMailParams();
 
       if (!empty($mailParams) && !empty($mailParams['html'])) {
-        $openUrl = \CRM_Utils_System::externUrl('extern/open', 'q='. $task->getEventQueueId());
+        $openUrl = \CRM_Utils_System::externUrl('extern/open', 'q=' . $task->getEventQueueId());
         $mailParams['html'] .= "\n" . '<img src="' . htmlentities($openUrl) . "\" width='1' height='1' alt='' border='0'>";
 
         $task->setMailParams($mailParams);
