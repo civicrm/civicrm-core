@@ -129,7 +129,7 @@ class CRM_Core_Resources_Common {
       if (is_array($item)) {
         $bundle->addSetting($item);
       }
-      elseif (strpos($item, '.css')) {
+      elseif (preg_match('/(\.css$)|(\.css[?&])/', $item)) {
         Civi::resources()->isFullyFormedUrl($item) ? $bundle->addStyleUrl($item, -100) : $bundle->addStyleFile('civicrm', $item, -100);
       }
       elseif (Civi::resources()->isFullyFormedUrl($item)) {
