@@ -964,7 +964,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $clause = $this->getSelectExpression($select);
     // Only deal with fields of type money.
     // TODO: In theory it might be possible to support aggregated columns but be careful about FULL_GROUP_BY errors
-    if (!($clause && $clause['expr']->isType('SqlField') && $clause['dataType'] === 'Money' && $clause['fields'])) {
+    if (!($clause && $clause['dataType'] === 'Money' && $clause['fields'])) {
       return NULL;
     }
     $moneyFieldAlias = array_keys($clause['fields'])[0];
@@ -973,7 +973,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if ($moneyField['type'] === 'Custom') {
       return NULL;
     }
+
     $prefix = substr($moneyFieldAlias, 0, strrpos($moneyFieldAlias, $moneyField['name']));
+
+    // If using aggregation, this will only work if grouping by currency
+    if ($clause['expr']->isType('SqlFunction')) {
+      $groupingByCurrency = array_intersect([$prefix . 'currency', 'currency'], $this->savedSearch['api_params']['groupBy'] ?? []);
+      return \CRM_Utils_Array::first($groupingByCurrency);
+    }
+
     // If the entity has a field named 'currency', just assume that's it.
     if ($this->getField($prefix . 'currency')) {
       return $prefix . 'currency';

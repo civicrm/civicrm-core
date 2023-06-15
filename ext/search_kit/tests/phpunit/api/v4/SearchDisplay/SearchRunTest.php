@@ -1422,6 +1422,49 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('¥500', $result[0]['columns'][0]['val']);
   }
 
+  public function testContributionAggregateCurrency():void {
+    $contributions = $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['total_amount' => 100, 'currency' => 'GBP'],
+        ['total_amount' => 200, 'currency' => 'USD'],
+        ['total_amount' => 500, 'currency' => 'JPY'],
+        ['total_amount' => 200, 'currency' => 'USD'],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['SUM(total_amount) AS total', 'COUNT(id) AS count', 'currency'],
+          'where' => [['id', 'IN', $contributions->column('id')]],
+          'groupBy' => ['currency'],
+        ],
+      ],
+      'display' => NULL,
+      'sort' => [['currency', 'ASC']],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(3, $result);
+
+    // Currency should have been used to format the aggregated values
+    $this->assertEquals('GBP', $result[0]['data']['currency']);
+    $this->assertEquals('£100.00', $result[0]['columns'][0]['val']);
+    $this->assertEquals(1, $result[0]['columns'][1]['val']);
+
+    $this->assertEquals('JPY', $result[1]['data']['currency']);
+    $this->assertEquals('¥500', $result[1]['columns'][0]['val']);
+    $this->assertEquals(1, $result[1]['columns'][1]['val']);
+
+    $this->assertEquals('USD', $result[2]['data']['currency']);
+    $this->assertEquals('$400.00', $result[2]['columns'][0]['val']);
+    $this->assertEquals(2, $result[2]['columns'][1]['val']);
+  }
+
   public function testSelectEquations() {
     $activities = $this->saveTestRecords('Activity', [
       'records' => [
