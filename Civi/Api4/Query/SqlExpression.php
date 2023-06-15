@@ -140,10 +140,10 @@ abstract class SqlExpression {
   /**
    * Renders expression to a sql string, replacing field names with column names.
    *
-   * @param \Civi\Api4\Query\Api4SelectQuery $query
+   * @param \Civi\Api4\Query\Api4Query $query
    * @return string
    */
-  abstract public function render(Api4SelectQuery $query): string;
+  abstract public function render(Api4Query $query): string;
 
   /**
    * @return string
