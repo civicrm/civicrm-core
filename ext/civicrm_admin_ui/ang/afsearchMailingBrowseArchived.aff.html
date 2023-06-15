@@ -1,0 +1,10 @@
+<div af-fieldset="">
+  <div class="af-container af-layout-inline">
+    <af-field name="name" />
+    <af-field name="created_date" defn="{input_type: 'Select', search_range: true, options: [{id: '{}', label: 'Choose Date Range'}, {id: 'this.day', label: 'Today'}, {id: 'previous.day', label: 'Yesterday'}, {id: 'ending.week', label: 'Last 7 days including today'}, {id: 'ending.month', label: 'Last 30 days including today'}, {id: 'ending_2.month', label: 'Last 60 days including today'}, {id: 'ending.year', label: 'Last 12 months including today'}, {id: 'this.year', label: 'This calendar year'}, {id: 'previous.year', label: 'Previous calendar year'}, {id: 'ending_2.year', label: 'Last 2 years including today'}, {id: 'ending_3.year', label: 'Last 3 years including today'}, {id: 'next.year', label: 'Next calendar year'}, {id: 'previous_2.fiscal_year', label: 'Previous 2 fiscal years'}, {id: 'previous_before.fiscal_year', label: 'Fiscal year prior to previous fiscal year'}], input_attrs: {}, label: 'Created Date'}" />
+    <af-field name="created_id.display_name,scheduled_id.display_name" defn="{label: 'Created or Sent by', input_attrs: {}, input_type: 'Text'}" />
+    <af-field name="Mailing_MailingJob_mailing_id_01.status" defn="{input_attrs: {multiple: true}, label: 'Status'}" />
+    <af-field name="language" defn="{input_attrs: {multiple: true}, label: 'Language'}" ng-if="$ctrl.isMulti" />
+  </div>
+  <crm-search-display-table search-name="Mailings_Browse_Scheduled" display-name="Mailings_Table" filters="{is_archived: '1'}></crm-search-display-table>
+</div>
