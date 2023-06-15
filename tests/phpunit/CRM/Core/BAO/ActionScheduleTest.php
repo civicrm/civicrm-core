@@ -1719,6 +1719,94 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Membership Renewal Reminders.
+   */
+  public function testAutoRenewMembershipSchedule(): void {
+    // Create 3 memberships.
+    // Normal membership with end_date = 20120615
+    $membership = $this->createMembershipFromFixture('rolling_membership', 'Grace');
+    $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $membership['contact_id'],
+      'email' => 'test-member@example.com',
+    ]);
+    $membershipTypeID = $membership['membership_type_id'];
+
+    // Auto-renew membership with cancelled recurring payment.
+    $membership2 = $this->createMembershipFromFixture('rolling_membership', 'Grace', [], ['membership_type_id' => $membershipTypeID]);
+    $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $membership2['contact_id'],
+      'email' => 'test-cancelrenew@example.com',
+    ]);
+
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+      'contact_id' => $membership2['contact_id'],
+      'installments' => NULL,
+      'frequency_interval' => '3',
+      'amount' => '100',
+      'contribution_status_id' => 4,
+      'start_date' => '2012-03-15 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+    ]);
+    $this->callAPISuccess('Membership', 'create', [
+      'id' => $membership2['id'],
+      'contribution_recur_id' => $contributionRecur['id'],
+    ]);
+
+    // Auto-renew membership with active recurring payment.
+    $membership3 = $this->createMembershipFromFixture('rolling_membership', 'Grace', [], ['membership_type_id' => $membershipTypeID]);
+    $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $membership3['contact_id'],
+      'email' => 'test-activerenew@example.com',
+    ]);
+
+    $contributionRecur2 = $this->callAPISuccess('contribution_recur', 'create', [
+      'contact_id' => $membership3['contact_id'],
+      'installments' => NULL,
+      'frequency_interval' => '3',
+      'amount' => '100',
+      'contribution_status_id' => 2,
+      'start_date' => '2012-03-15 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+    ]);
+    $this->callAPISuccess('Membership', 'create', [
+      'id' => $membership3['id'],
+      'contribution_recur_id' => $contributionRecur2['id'],
+    ]);
+
+    // Create Reminder to send to auto-renew memberships only.
+    $this->createScheduleFromFixtures('sched_membership_end_2month', [
+      'entity_value' => $membership['membership_type_id'],
+      'entity_status' => 2,
+    ]);
+
+    // end_date=2012-06-15 ; schedule is 2 month after end_date
+    $this->assertCronRuns([
+      [
+        // Only active auto-renew contact shiould receive the reminder.
+        'time' => '2012-08-15 01:00:00',
+        'recipients' => [['test-activerenew@example.com']],
+      ],
+    ]);
+
+    // Create Reminder to send to normal memberships only.
+    $this->createScheduleFromFixtures('sched_membership_end_2month', [
+      'entity_value' => $membership['membership_type_id'],
+      'entity_status' => 1,
+    ]);
+
+    // end_date=2012-06-15 ; schedule is 2 month after end_date
+    $this->assertCronRuns([
+      [
+        // Both normal member & cancelled renewal member shiould receive the reminder.
+        'time' => '2012-08-15 01:00:00',
+        'recipients' => [['test-member@example.com'], ['test-cancelrenew@example.com']],
+      ],
+    ]);
+  }
+
+  /**
    * Test membership end date email.
    *
    * For contacts/members which match schedule based on end date,
