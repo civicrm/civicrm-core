@@ -588,17 +588,20 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         'options' => NULL,
       ],
     ], CRM_Core_Session::singleton()->getStatus());
+
+    // Check if Membership is set to New.
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
   }
 
   /**
-   * Test the submit function of the membership form for unpaid membership.
+   * Test the submit function of the membership form for free membership.
    *
    * It turns out that no receipt is sent. This just locks in that pre-existing
    * behaviour.
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitUnpaid(): void {
+  public function testSubmitFree(): void {
     $this->mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
     MembershipType::update()->addWhere('id', '=', $this->ids['membership_type']['AnnualFixed'])
@@ -614,6 +617,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'financial_type_id' => '',
     ]);
     $form->postProcess();
+
+    // Check if Membership is set to New.
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
+
     $this->mut->checkMailLog([], [
       'Membership',
       'Receipt text',
@@ -1037,6 +1045,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'street_address' => '10 Test St',
       'postal_code' => 90210,
     ]);
+
+    // Check if Membership is set to Pending.
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
   }
 
   /**
@@ -1583,6 +1594,8 @@ Expires: ',
     $form->_contactID = $this->_individualId;
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    // Check if Membership is set to Pending.
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contact_id' => $this->_individualId,
     ]);
