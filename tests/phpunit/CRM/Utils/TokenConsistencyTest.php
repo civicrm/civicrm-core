@@ -668,9 +668,8 @@ event.summary :If you have any CiviCRM related issues or want to track where Civ
 event.loc_block_id.email_id.email :event@example.com
 event.loc_block_id.phone_id.phone :456 789
 event.description :event description
-event.location :15 Walton St
+event.location :15 Walton St<br />
 Emerald City, Maine 90210
-
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
 event.pay_later_receipt :Please transfer funds to our bank account.
@@ -889,7 +888,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $mut->checkMailLog($toCheck);
     $tokens = array_keys($this->getEventTokens());
     $html = $this->getTokenString($tokens);
-    $tokenProcessor->addMessage('html', $html, 'text/plain');
+    $tokenProcessor->addMessage('html', $html, 'text/html');
     $tokenProcessor->addRow(['eventId' => $this->ids['Event'][0]]);
     $tokenProcessor->evaluate();
     $this->assertEquals($expectedEventString, $tokenProcessor->getRow(0)->render('html'));
@@ -919,7 +918,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     ]);
     $html = $this->getTokenString(array_keys($this->getEventTokens()));
 
-    $tokenProcessor->addMessage('html', $html, 'text/plain');
+    $tokenProcessor->addMessage('html', $html, 'text/html');
     $tokenProcessor->addRow(['eventId' => $this->ids['Event'][0]]);
     $tokenProcessor->evaluate();
     $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
