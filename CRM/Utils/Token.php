@@ -926,7 +926,7 @@ class CRM_Utils_Token {
   /**
    * Replace welcome/confirmation tokens
    *
-   * @deprecated since 5.64 will be removed around 5.70
+   * @deprecated since 5.65 will be removed around 5.71
    *
    * @param string $str
    *   The string with tokens to be replaced.

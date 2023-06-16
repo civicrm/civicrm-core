@@ -351,7 +351,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         ],
       ],
       [
-        'version' => '5.56.alpha1',
+        'version' => '5.65.alpha1',
         'upgrade_descriptor' => ts('Update to use tokens'),
         'templates' => [
           ['name' => 'petition_sign', 'type' => 'text'],

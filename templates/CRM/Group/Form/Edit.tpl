@@ -22,6 +22,18 @@
   </div>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout">
+
+    <tr class="crm-group-form-block-frontend-title">
+      <td class="label">{$form.frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='frontend_title' id=$group.id}{/if}</td>
+      <td>{$form.frontend_title.html|crmAddClass:huge}
+          {if !empty($group.saved_search_id)}&nbsp;({ts}Smart Group{/ts}){/if}
+      </td>
+    </tr>
+
+    <tr class="crm-group-form-block-frontend-description">
+      <td class="label">{$form.frontend_description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='frontend_description' id=$group.id}{/if}</td>
+      <td>{$form.frontend_description.html}</td>
+    </tr>
     <tr class="crm-group-form-block-title">
       <td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='title' id=$group.id}{/if}</td>
       <td>{$form.title.html|crmAddClass:huge}
@@ -32,20 +44,6 @@
     <tr class="crm-group-form-block-description">
       <td class="label">{$form.description.label}</td>
       <td>{$form.description.html}</td>
-    </tr>
-
-    <tr><td colspan="2">{ts}If either of the following fields are filled out they will be used instead of the title or description field in profiles and Mailing List Subscription/unsubscribe forms{/ts}</td></tr>
-
-    <tr class="crm-group-form-block-frontend-title">
-      <td class="label">{$form.frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='frontend_title' id=$group.id}{/if}</td>
-      <td>{$form.frontend_title.html|crmAddClass:huge}
-        {if !empty($group.saved_search_id)}&nbsp;({ts}Smart Group{/ts}){/if}
-      </td>
-    </tr>
-
-    <tr class="crm-group-form-block-frontend-description">
-      <td class="label">{$form.frontend_description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='frontend_description' id=$group.id}{/if}</td>
-      <td>{$form.frontend_description.html}</td>
     </tr>
 
     {if !empty($form.group_type)}
