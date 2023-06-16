@@ -372,7 +372,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // build price set form.
       $this->set('priceSetId', $this->_priceSetId);
       if (empty($this->_ccid)) {
-        CRM_Price_BAO_PriceSet::buildPriceSet($this, $this->getMainEntityType());
+        CRM_Price_BAO_PriceSet::buildPriceSet($this, $this->getFormContext());
       }
       if ($this->_values['is_monetary'] &&
         $this->_values['is_recur'] && empty($this->_values['pledge_id'])

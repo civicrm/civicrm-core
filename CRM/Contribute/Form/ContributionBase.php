@@ -1305,7 +1305,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   protected function isMembershipPriceSet(): bool {
     if ($this->_useForMember === NULL) {
-      if ($this->getMainEntityType() === 'membership' &&
+      if ($this->getFormContext() === 'membership' &&
         !$this->isQuickConfig()) {
         $this->_useForMember = 1;
       }
@@ -1317,11 +1317,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     return (bool) $this->_useForMember;
   }
 
-  public function getMainEntityType() {
-    if (CRM_Core_Component::isEnabled('CiviMember') && (int) CRM_Core_Component::getComponentID('CiviMember') === (int) $this->order->getPriceSetMetadata()['extends']) {
-      return 'membership';
-    }
-    return 'contribution';
+  /**
+   * Get the form context.
+   *
+   * This is important for passing to the buildAmount hook as CiviDiscount checks it.
+   *
+   * @return string
+   */
+  public function getFormContext(): string {
+    return $this->order->isMembershipPriceSet() ? 'membership' : 'contribution';
   }
 
   /**

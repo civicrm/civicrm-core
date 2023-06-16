@@ -73,14 +73,14 @@
         });
       </script>
     {/literal}
-    {elseif $lineItem and $priceSetID AND !$is_quick_config}
-      {assign var="totalAmount" value=$amount}
-      <div class="header-dark">
-        {ts}Membership Fee{/ts}
-      </div>
-      <div class="display-block">
-        {include file="CRM/Price/Page/LineItem.tpl" context="Membership"}
-      </div>
+{elseif $membershipBlock and $lineItem and $priceSetID AND !$is_quick_config}
+  {assign var="totalAmount" value=$amount}
+  <div class="header-dark">
+    {ts}Membership Fee{/ts}
+  </div>
+  <div class="display-block">
+    {include file="CRM/Price/Page/LineItem.tpl" context="Membership"}
+  </div>
 {elseif $membershipBlock AND !$is_quick_config}
   <div id="membership" class="crm-group membership-group">
     {if $context EQ "makeContribution"}
