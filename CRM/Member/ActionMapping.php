@@ -98,8 +98,8 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
       $query->where("contribution_recur.contribution_status_id = #pending", ['pending' => $contribution_status_id_pending]);
     }
     elseif (in_array(1, $selectedStatuses)) {
-      $query->join('contribution_recur', 'inner join civicrm_contribution_recur on e.contribution.id = contribution_recur.id');
-      $query->where("contribution_recur.contribution_status_id <> #pending", ['pending' => $contribution_status_id_pending]);
+      $query->join('contribution_recur', 'left join civicrm_contribution_recur on e.contribution.id = contribution_recur.id');
+      $query->where("contribution_recur.contribution_status_id <> #pending or contribution_recur.contribution_status_id is NULL", ['pending' => $contribution_status_id_pending]);
     }
 
     if (!empty($selectedValues)) {
