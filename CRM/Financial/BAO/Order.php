@@ -651,11 +651,21 @@ class CRM_Financial_BAO_Order {
   public function getPriceSetMetadata(): array {
     if (empty($this->priceSetMetadata)) {
       $priceSetMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID());
+      // @todo - make sure this is an array - commented out for now as this PR is against the rc.
+      // $priceSetMetadata['extends'] = explode(CRM_Core_DAO::VALUE_SEPARATOR, $priceSetMetadata['extends']);
       $this->setPriceFieldMetadata($priceSetMetadata['fields']);
       unset($priceSetMetadata['fields']);
       $this->priceSetMetadata = $priceSetMetadata;
     }
     return $this->priceSetMetadata;
+  }
+
+  public function isMembershipPriceSet() {
+    if (!CRM_Core_Component::isEnabled('CiviMember')) {
+      return FALSE;
+    }
+    $extends = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->getPriceSetMetadata()['extends']);
+    return in_array(CRM_Core_Component::getComponentID('CiviMember'), $extends, FALSE);
   }
 
   /**
