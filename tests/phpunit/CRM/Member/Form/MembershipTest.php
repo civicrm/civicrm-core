@@ -588,17 +588,20 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         'options' => NULL,
       ],
     ], CRM_Core_Session::singleton()->getStatus());
+
+    // Check if Membership is set to New.
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
   }
 
   /**
-   * Test the submit function of the membership form for unpaid membership.
+   * Test the submit function of the membership form for free membership.
    *
    * It turns out that no receipt is sent. This just locks in that pre-existing
    * behaviour.
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitUnpaid(): void {
+  public function testSubmitFree(): void {
     $this->mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
     MembershipType::update()->addWhere('id', '=', $this->ids['membership_type']['AnnualFixed'])
@@ -614,10 +617,40 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'financial_type_id' => '',
     ]);
     $form->postProcess();
+
+    // Check if Membership is set to New.
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
+
     $this->mut->checkMailLog([], [
       'Membership',
       'Receipt text',
     ]);
+  }
+
+  /**
+   * Test the submit function of the membership form for paid membership when we don't record a payment.
+   * "Expected result" - ie. what happens now! is that Membership is created with status "New" and no contribution is created.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitPaidNoPayment(): void {
+    $this->createLoggedInUser();
+    $form = $this->getForm([
+      'contact_id' => $this->_individualId,
+      'join_date' => date('Y-m-d'),
+      'membership_type_id' => [$this->ids['contact']['organization'], $this->ids['membership_type']['AnnualFixed']],
+      'total_amount' => 50,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'send_receipt' => TRUE,
+      'receipt_text' => 'Receipt text',
+      'financial_type_id' => '',
+    ]);
+    $form->postProcess();
+
+    // Check if Membership is set to New.
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
   }
 
   /**
@@ -1037,6 +1070,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'street_address' => '10 Test St',
       'postal_code' => 90210,
     ]);
+
+    // Check if Membership is set to Pending.
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
   }
 
   /**
@@ -1048,7 +1084,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testSubmitUpdateMembershipFromPartiallyPaid(): void {
     $memStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'validate');
 
-    //Perform a pay later membership contribution.
+    // Perform a pay later membership contribution.
     $this->testSubmitPayLaterWithBilling();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $this->assertEquals($membership['status_id'], array_search('Pending', $memStatus));
@@ -1076,9 +1112,37 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form = $this->getContributionForm($submitParams);
     $form->postProcess();
 
-    //Check if Membership is updated to New.
+    // Check if Membership is updated to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $this->assertEquals($membership['status_id'], array_search('New', $memStatus));
+  }
+
+  /**
+   * Test if membership is updated to New after contribution
+   * is updated from Partially paid to Completed.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitSaveMembershipNoChangesUnpaid(): void {
+
+    // Perform a pay later membership contribution.
+    $this->testSubmitPayLaterWithBilling();
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
+
+    $_REQUEST['id'] = $membership['id'];
+    $form = $this->getForm([
+      'contact_id' => $this->_individualId,
+      'id' => $membership['id'],
+      'join_date' => date('Y-m-d'),
+      'membership_type_id' => [$this->ids['contact']['organization'], $this->ids['membership_type']['AnnualFixed']],
+      'financial_type_id' => '',
+    ]);
+    $form->postProcess();
+
+    // Check if Membership stays as Pending.
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
   }
 
   /**
@@ -1583,6 +1647,8 @@ Expires: ',
     $form->_contactID = $this->_individualId;
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    // Check if Membership is set to Pending.
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contact_id' => $this->_individualId,
     ]);

@@ -31,6 +31,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   protected $_memType = NULL;
 
+  /**
+   * If this is set (to 'test' or 'live') then the payment processor will be shown on the form to take a payment.
+   *
+   * @var string|null
+   */
   public $_mode;
 
   public $_contributeMode = 'direct';
@@ -1259,16 +1264,30 @@ DESC limit 1");
     }
     else {
       $params['action'] = $this->_action;
+
       foreach ($lineItem[$this->_priceSetId] as $id => $lineItemValues) {
         if (empty($lineItemValues['membership_type_id'])) {
           continue;
         }
 
-        // @todo figure out why recieve_date isn't being set right here.
+        // @todo figure out why receive_date isn't being set right here.
         if (empty($params['receive_date'])) {
           $params['receive_date'] = CRM_Utils_Time::date('Y-m-d H:i:s');
         }
         $membershipParams = array_merge($params, $membershipTypeValues[$lineItemValues['membership_type_id']]);
+
+        // If is_override is empty then status_id="" (because it's a hidden field). That will trigger a recalculation in CRM_Member_BAO_Membership::create
+        //   unless is_override = TRUE or skipStatusCal = TRUE. But skipStatusCal also skips date calculations.
+        // If we are recording a contribution we *do* want to trigger a recalculation of membership status so it can go from Pending->New/Current
+        // So here we check if status_id is empty, default (ie. status in database) is pending and that we are not recording a contribution -
+        //   If all those are true then we skip the status calculation and explicitly set the pending status (to avoid a DB constraint status_id=0).
+        if (empty($membershipParams['status_id'])
+          && !empty($this->_defaultValues['status_id'])
+          && !$this->getSubmittedValue('record_contribution')
+          && (int) $this->_defaultValues['status_id'] === $pendingMembershipStatusId
+        ) {
+          $membershipParams['status_id'] = $this->_defaultValues['status_id'];
+        }
 
         if (!empty($softParams)) {
           $params['soft_credit'] = $softParams;
