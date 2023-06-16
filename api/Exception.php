@@ -10,5 +10,11 @@
 
 // These two classes were basically equivalent
 
+/**
+ * @deprecated in CiviCRM 5.52, will be removed around 5.92. Use CRM_Core_Exception
+ */
 class_alias('CRM_Core_Exception', 'API_Exception');
+/**
+ * @deprecated in CiviCRM 5.52, will be removed around 5.92. Use CRM_Core_Exception
+ */
 class_alias('CRM_Core_Exception', 'CiviCRM_API3_Exception');
