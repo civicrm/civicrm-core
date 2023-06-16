@@ -3375,6 +3375,7 @@ span.crm-select-item-color {
 }
 
 /* in place edit  */
+.crm-container .crm-editable-disabled,
 .crm-container .crm-editable-enabled {
   padding-left: 2px;
   border: 2px dashed transparent;
@@ -3396,6 +3397,7 @@ span.crm-select-item-color {
 .crm-container span.crm-editable-textarea-enabled {
   width: 96%;
 }
+.crm-container span.crm-editable-disabled,
 .crm-container span.crm-editable-enabled {
   display: inline-block !important;
   padding-right: 2px;
