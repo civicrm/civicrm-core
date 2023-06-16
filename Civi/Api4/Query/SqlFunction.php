@@ -142,10 +142,10 @@ abstract class SqlFunction extends SqlExpression {
   /**
    * Render the expression for insertion into the sql query
    *
-   * @param \Civi\Api4\Query\Api4SelectQuery $query
+   * @param \Civi\Api4\Query\Api4Query $query
    * @return string
    */
-  public function render(Api4SelectQuery $query): string {
+  public function render(Api4Query $query): string {
     $output = '';
     foreach ($this->args as $arg) {
       $rendered = $this->renderArg($arg, $query);
@@ -168,10 +168,10 @@ abstract class SqlFunction extends SqlExpression {
 
   /**
    * @param array $arg
-   * @param \Civi\Api4\Query\Api4SelectQuery $query
+   * @param \Civi\Api4\Query\Api4Query $query
    * @return string
    */
-  private function renderArg($arg, Api4SelectQuery $query): string {
+  private function renderArg($arg, Api4Query $query): string {
     $rendered = implode(' ', $arg['prefix']);
     foreach ($arg['expr'] ?? [] as $idx => $expr) {
       if (strlen($rendered) || $idx) {

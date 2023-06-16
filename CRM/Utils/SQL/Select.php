@@ -72,6 +72,8 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   private $onDuplicates = [];
   private $selects = [];
   private $from;
+  private $setOps;
+  private $setAlias;
   private $joins = [];
   private $wheres = [];
   private $groupBys = [];
@@ -94,6 +96,27 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * Create a new SELECT-like query by performing set-operations (e.g. UNION).
+   *
+   * For example, if you want to query two tables and treat the results as one combined-set, then
+   * this is s a set-operation.
+   *
+   * $queryA = CRM_Utils_SQL_Select::from('table_a');
+   * $queryB = CRM_Utils_SQL_Select::from('table_b');
+   * $querySet = CRM_Utils_SQL_Select::fromSet()->union('DISTINCT', [$queryA, $queryB])->toSQL();
+   *
+   * @param array $options
+   *   Ex: ['setAlias' => 'uniondata']
+   * @return CRM_Utils_SQL_Select
+   */
+  public static function fromSet($options = []) {
+    $options = array_merge(['setAlias' => '_sql_set'], $options);
+    $result = new self(NULL, $options);
+    $result->setOps = [];
+    return $result;
+  }
+
+  /**
    * Create a partial SELECT query.
    *
    * @param array $options
@@ -113,6 +136,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   public function __construct($from, $options = []) {
     $this->from = $from;
     $this->mode = $options['mode'] ?? self::INTERPOLATE_AUTO;
+    $this->setAlias = $options['setAlias'] ?? NULL;
   }
 
   /**
@@ -331,6 +355,53 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * Add a union to the list of set operations.
+   *
+   * Ex: CRM_Utils_SQL_Select::fromSet()->union([$subQuery1, $subQuery2])
+   * Ex: CRM_Utils_SQL_Select::fromSet()->union($subQuery1)->union($subQuery2);
+   *
+   * @param string $type "DISTINCT"|"ALL"
+   * @param CRM_Utils_SQL_Select[]|CRM_Utils_SQL_Select $subQueries
+   * @return $this
+   */
+  public function union(string $type, $subQueries) {
+    return $this->setOp("UNION $type", $subQueries);
+  }
+
+  /**
+   * Add a set operation.
+   *
+   * Ex: CRM_Utils_SQL_Select::fromSet()->setOp('INTERSECT', [$subQuery1, $subQuery2])
+   *
+   * @param string $setOperation
+   *   Ex: 'UNION DISTINCT', 'UNION ALL'.
+   *   TODO: 'INTERSECT', 'EXCEPT' when moving to MySQL 8.
+   * @param CRM_Utils_SQL_Select[]|CRM_Utils_SQL_Select $subQueries
+   * @return $this
+   * @see https://dev.mysql.com/doc/refman/8.0/en/set-operations.html
+   */
+  public function setOp(string $setOperation, $subQueries) {
+    // TODO: Support more ops like 'INTERSECT' & 'EXCEPT'
+    $supportedOps = ['UNION DISTINCT', 'UNION ALL'];
+    if (!in_array($setOperation, $supportedOps, TRUE)) {
+      throw new CRM_Core_Exception("Unsupported set-operation '$setOperation'. Must be one of (" . implode(', ', $supportedOps) . ')');
+    }
+    if ($this->from !== NULL || !is_array($this->setOps)) {
+      throw new CRM_Core_Exception("Set-operation '$setOperation' must have a list of subqueries. Primitive FROM is not supported.");
+    }
+    $subQueries = is_array($subQueries) ? $subQueries : [$subQueries]; /* Simple (array)cast would mishandle objects. */
+    foreach ($subQueries as $subQuery) {
+      if ($this->setOps === []) {
+        $this->setOps[] = ['', $subQuery];
+      }
+      else {
+        $this->setOps[] = [" $setOperation ", $subQuery];
+      }
+    }
+    return $this;
+  }
+
+  /**
    * Insert the results of the SELECT query into another
    * table.
    *
@@ -494,6 +565,14 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     }
     if ($this->from !== NULL) {
       $sql .= 'FROM ' . $this->from . "\n";
+    }
+    elseif (is_array($this->setOps)) {
+      $sql .= 'FROM (';
+      foreach ($this->setOps as $setOp) {
+        $sql .= $setOp[0];
+        $sql .= '(' . (is_object($setOp[1]) ? $setOp[1]->toSQL() : $setOp[1]) . ')';
+      }
+      $sql .= ") {$this->setAlias}\n";
     }
     foreach ($this->joins as $join) {
       $sql .= $join . "\n";

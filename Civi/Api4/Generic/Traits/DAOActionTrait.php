@@ -140,7 +140,9 @@ trait DAOActionTrait {
     }
 
     \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
-    FormattingUtil::formatOutputValues($result, $this->entityFields());
+    foreach ($result as &$row) {
+      FormattingUtil::formatOutputValues($row, $this->entityFields());
+    }
     return $result;
   }
 
