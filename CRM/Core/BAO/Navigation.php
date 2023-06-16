@@ -173,7 +173,8 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
       $domainID = CRM_Core_Config::domainID();
       $query = "
 SELECT id, label, parent_id, weight, is_active, name
-FROM civicrm_navigation WHERE domain_id = $domainID";
+FROM civicrm_navigation WHERE domain_id = $domainID
+ORDER BY weight";
       $result = CRM_Core_DAO::executeQuery($query);
 
       $pidGroups = [];
