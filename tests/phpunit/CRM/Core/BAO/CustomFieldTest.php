@@ -975,7 +975,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $dao = CRM_Core_DAO::executeQuery(('SHOW CREATE TABLE ' . $customGroup['values'][$customGroup['id']]['table_name']));
     $dao->fetch();
     $this->assertStringContainsString('`test_link_2` varchar(255) COLLATE ' . CRM_Core_BAO_SchemaHandler::getInUseCollation() . ' DEFAULT NULL', $dao->Create_Table);
-    $this->assertStringContainsString('KEY `INDEX_my_text` (`my_text`)', $dao->Create_Table);
+    $this->assertStringContainsString('KEY `index_my_text` (`my_text`)', $dao->Create_Table);
   }
 
   /**
