@@ -73,6 +73,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   private $selects = [];
   private $from;
   private $setOps;
+  private $setAlias;
   private $joins = [];
   private $wheres = [];
   private $groupBys = [];
@@ -95,12 +96,21 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
-   * Create a new SELECT-like query where.
+   * Create a new SELECT-like query by performing set-operations (e.g. UNION).
+   *
+   * For example, if you want to query two tables and treat the results as one combined-set, then
+   * this is s a set-operation.
+   *
+   * $queryA = CRM_Utils_SQL_Select::from('table_a');
+   * $queryB = CRM_Utils_SQL_Select::from('table_b');
+   * $querySet = CRM_Utils_SQL_Select::fromSet()->union('DISTINCT', [$queryA, $queryB])->toSQL();
    *
    * @param array $options
+   *   Ex: ['setAlias' => 'uniondata']
    * @return CRM_Utils_SQL_Select
    */
   public static function fromSet($options = []) {
+    $options = array_merge(['setAlias' => '_sql_set'], $options);
     $result = new self(NULL, $options);
     $result->setOps = [];
     return $result;
@@ -126,6 +136,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   public function __construct($from, $options = []) {
     $this->from = $from;
     $this->mode = $options['mode'] ?? self::INTERPOLATE_AUTO;
+    $this->setAlias = $options['setAlias'] ?? NULL;
   }
 
   /**
@@ -561,7 +572,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
         $sql .= $setOp[0];
         $sql .= '(' . (is_object($setOp[1]) ? $setOp[1]->toSQL() : $setOp[1]) . ')';
       }
-      $sql .= ") a\n";
+      $sql .= ") {$this->setAlias}\n";
     }
     foreach ($this->joins as $join) {
       $sql .= $join . "\n";

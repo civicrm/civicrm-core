@@ -314,7 +314,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $u = CRM_Utils_SQL_Select::fromSet()->union('ALL', [$a, $b])->limit(100)->orderBy('a_name');
     $expectA = 'SELECT a_name FROM a WHERE (a1 = 100) ';
     $expectB = 'SELECT b_name FROM b WHERE (b2 = "ab cd") ';
-    $expectUnion = "SELECT * FROM (($expectA) UNION ALL ($expectB)) a ORDER BY a_name LIMIT 100 OFFSET 0";
+    $expectUnion = "SELECT * FROM (($expectA) UNION ALL ($expectB)) _sql_set ORDER BY a_name LIMIT 100 OFFSET 0";
     $this->assertLike($expectUnion, $u->toSQL());
   }
 
@@ -330,7 +330,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $expectA = 'SELECT a_name FROM a WHERE (a1 = 100) ';
     $expectB = 'SELECT b_name FROM b WHERE (b2 = "bb bb") ';
     $expectC = 'SELECT c_name FROM c WHERE (c3 = "cc cc") ';
-    $expectUnion = "SELECT * FROM (($expectA) UNION ALL ($expectB) UNION DISTINCT ($expectC)) a ORDER BY a_name LIMIT 100 OFFSET 0";
+    $expectUnion = "SELECT * FROM (($expectA) UNION ALL ($expectB) UNION DISTINCT ($expectC)) _sql_set ORDER BY a_name LIMIT 100 OFFSET 0";
     $this->assertLike($expectUnion, $u->toSQL());
   }
 

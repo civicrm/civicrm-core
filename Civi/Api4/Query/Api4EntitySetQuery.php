@@ -27,7 +27,7 @@ class Api4EntitySetQuery extends Api4Query {
   public function __construct($api) {
     parent::__construct($api);
 
-    $this->query = \CRM_Utils_SQL_Select::fromSet();
+    $this->query = \CRM_Utils_SQL_Select::fromSet(['setAlias' => static::MAIN_TABLE_ALIAS]);
     $isAggregate = $this->isAggregateQuery();
 
     foreach ($api->getSets() as $index => $set) {
