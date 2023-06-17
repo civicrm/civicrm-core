@@ -50,7 +50,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       0 => [
         13 => [
           'price_field_id' => $this->getPriceFieldID(),
-          'price_field_value_id' => $this->ids['PriceFieldValue']['price_field'],
+          'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_standard'],
           'label' => 'Tiny-tots (ages 5-8)',
           'field_title' => 'Tournament Fees',
           'description' => NULL,
@@ -77,7 +77,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'role_id' => 1,
       'event_id' => $form->_eventId,
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
-      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['price_field'],
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
       'is_pay_later' => 1,
       'amount_level' => 'Too much',
       'fee_amount' => 55,
@@ -94,7 +94,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals(2, $contribution['contribution_status_id']);
     $this->callAPISuccessGetSingle('FinancialItem', []);
 
-    $priceSetParams[$this->getPriceFieldKey()] = $this->getPriceFieldValueID();
+    $priceSetParams[$this->getPriceFieldKey()] = $this->ids['PriceFieldValue']['PaidEvent_family_package'];
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participant['id'], 'participant');
     $this->assertEquals(55, $lineItem[1]['subTotal']);
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', []);
@@ -204,12 +204,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'entity_table' => 'civicrm_participant',
       'qty' => 1,
-      'label' => 'big',
+      'label' => 'Family Deal',
       'unit_price' => 1550.55,
       'line_total' => 1550.55,
       'participant_count' => 0,
       'price_field_id' => $this->getPriceFieldID(),
-      'price_field_value_id' => $this->ids['PriceFieldValue']['big'],
+      'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
       'tax_amount' => 0,
       // Interestingly the financial_type_id set in this test is ignored but currently locking in what is happening with this test so setting to 'actual'
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'),
@@ -223,13 +223,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * Initial test of submit function.
    *
    * @param string $thousandSeparator
-   * @param array $fromEmails From Emails array to overwrite the default.
    *
    * @dataProvider getThousandSeparators
    *
    * @throws \Exception
    */
-  public function testSubmitWithFailedPayment(string $thousandSeparator, $fromEmails = []) {
+  public function testSubmitWithFailedPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
     $form->_mode = 'Live';
@@ -362,13 +361,11 @@ London,',
       $phone = Phone::create()->setValues(['phone' => 1235, 'phone_type_id:name' => 'Mobile', 'phone_ext' => 456])->execute()->first();
       $address = Address::create()->setValues(['street_address' => '8 Baker Street', 'supplemental_address_1' => 'Upstairs', 'city' => 'London'])->execute()->first();
       $locationBlockID = LocBlock::create()->setValues(['phone_id' => $phone['id'], 'address_id' => $address['id']])->execute()->first()['id'];
-      $event = $this->legacyEventCreatePaid(array_merge([
-        'name' => 'big',
-        'amount' => 1550.55,
+      $event = $this->eventCreatePaid(array_merge([
         'loc_block_id' => $locationBlockID,
         'confirm_email_text' => "Just do it\n Now",
         'is_show_location' => TRUE,
-      ], $eventParams), [['name' => 'big', 'amount' => 1550.55]]);
+      ], $eventParams));
       $submittedValues = array_merge($this->getRecordContributionParams('Partially paid', 'Pending'), $submittedValues);
     }
     else {
@@ -510,7 +507,7 @@ London,',
       'billing_country_id-5' => 1228,
       'payment_processor_id' => $paymentProcessorID,
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
-      $this->getPriceFieldKey()  => $this->getPriceFieldValueID(),
+      $this->getPriceFieldKey()  => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
       'amount_level' => 'Too much',
       'fee_amount' => $this->formatMoneyInput(1550.55),
       'total_amount' => $this->formatMoneyInput(1550.55),
@@ -559,7 +556,7 @@ London,',
       'hidden_feeblock' => '1',
       'hidden_eventFullMsg' => '',
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
-      $this->getPriceFieldKey() => $this->getPriceFieldValueID(),
+      $this->getPriceFieldKey() => (int) $this->ids['PriceFieldValue']['PaidEvent_family_package'],
       'check_number' => '879',
       'record_contribution' => '1',
       'financial_type_id' => '4',
@@ -666,7 +663,7 @@ London,',
     $this->assertAttributesEquals([
       'contact_id' => $this->getContactID(),
       'event_title' => 'Annual CiviCRM meet',
-      'participant_fee_level' => [0 => 'big - 1'],
+      'participant_fee_level' => [0 => 'Family Deal - 1'],
       'participant_fee_amount' => '1550.55',
       'participant_fee_currency' => 'USD',
       'event_type' => 'Conference',
@@ -682,12 +679,12 @@ London,',
       'entity_id' => $participant['id'],
       'contribution_id' => $contribution['id'],
       'price_field_id' => $this->getPriceFieldID(),
-      'label' => 'big',
+      'label' => 'Family Deal',
       'qty' => '1.00',
       'unit_price' => '1550.55',
       'line_total' => '1550.55',
       'participant_count' => '0',
-      'price_field_value_id' => $this->getPriceFieldValueID(),
+      'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
       'financial_type_id' => '4',
       'tax_amount' => '0.00',
     ], $lineItem);
@@ -707,7 +704,7 @@ London,',
 
     $financialItem = $this->callAPISuccessGetSingle('FinancialItem', []);
     $this->assertAttributesEquals([
-      'description' => 'big',
+      'description' => 'Family Deal',
       'contact_id' => $this->getContactID(),
       'amount' => 1550.55,
       'currency' => 'USD',
@@ -725,7 +722,7 @@ London,',
       'Event Information and Location',
       'Annual CiviCRM meet',
       'Registered Email',
-      $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' big - 1' : 'Price Field - big',
+      $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' Family Deal - 1' : 'Fundraising Dinner - Family...',
       $isAmountPaidOnForm ? 'Total Paid: $20.00' : 'Total Paid: ',
       $isAmountPaidOnForm ? 'Balance: $1,530.55' : 'Balance: $1,550.55',
       'Financial Type: Event Fee',
@@ -758,7 +755,7 @@ London,',
    * @return int
    */
   protected function getPriceFieldValueID(): int {
-    return (int) $this->ids['PriceFieldValue']['big'];
+    return (int) $this->ids['PriceFieldValue']['PaidEvent_standard'];
   }
 
   /**
@@ -773,7 +770,7 @@ London,',
       'hidden_feeblock' => '1',
       'hidden_eventFullMsg' => '',
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
-      $this->getPriceFieldKey() => $this->getPriceFieldValueID(),
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
       'check_number' => '879',
       'record_contribution' => '1',
       'financial_type_id' => '4',
