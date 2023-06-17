@@ -2173,7 +2173,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    *    as a template and is_template is set to TRUE. If this cannot be found the latest added contribution
    *    is used.
    *
-   * @param array $contributionParams
+   * @param int $recurringContributionID
    *
    * @return bool|array
    * @throws \CRM_Core_Exception
@@ -2184,7 +2184,40 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    *  3) Repeat transaction duplicates rather than calls Order.create
    *  4) Use of payment.create still limited - completetransaction is more common.
    */
-  protected static function repeatTransaction(array $input, array $contributionParams) {
+  protected static function repeatTransaction(array $input, int $recurringContributionID) {
+    $inputContributionWhiteList = [
+      'fee_amount',
+      'net_amount',
+      'trxn_id',
+      'check_number',
+      'payment_instrument_id',
+      'is_test',
+      'campaign_id',
+      'receive_date',
+      'receipt_date',
+      'contribution_status_id',
+      'card_type_id',
+      'pan_truncation',
+    ];
+
+    $paymentProcessorId = $input['payment_processor_id'] ?? NULL;
+
+    $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+
+    $contributionParams = array_merge([
+      'contribution_status_id' => $completedContributionStatusID,
+    ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
+    ));
+
+    $contributionParams['payment_processor'] = $paymentProcessorId;
+
+    if (empty($contributionParams['payment_instrument_id']) && $paymentProcessorId) {
+      $contributionParams['payment_instrument_id'] = PaymentProcessor::get(FALSE)->addWhere('id', '=', $paymentProcessorId)->addSelect('payment_instrument_id')->execute()->first()['payment_instrument_id'];
+    }
+
+    if ($recurringContributionID) {
+      $contributionParams['contribution_recur_id'] = $recurringContributionID;
+    }
     $isCompleted = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionParams['contribution_status_id']) === 'Completed';
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
       (int) $contributionParams['contribution_recur_id'],
@@ -3774,6 +3807,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CRM_Core_Exception
    */
   public static function completeOrder($input, $recurringContributionID, $contributionID, $isPostPaymentCreate = FALSE) {
+    if (!$contributionID) {
+      return self::repeatTransaction($input, $recurringContributionID);
+    }
     $transaction = new CRM_Core_Transaction();
 
     $inputContributionWhiteList = [
@@ -3808,10 +3844,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
-    }
-
-    if (!$contributionID) {
-      return self::repeatTransaction($input, $contributionParams);
     }
 
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
