@@ -1510,9 +1510,13 @@ DESC limit 1");
     //CRM-15187
     // display message when membership type is changed
     if (($this->_action & CRM_Core_Action::UPDATE) && $this->getMembershipID() && !in_array($this->_memType, $this->_memTypeSelected)) {
-      $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->getMembershipID(), 'membership');
-      $maxID = max(array_keys($lineItem));
-      $lineItem = $lineItem[$maxID];
+      $lineItems = CRM_Price_BAO_LineItem::getLineItems($this->getMembershipID(), 'membership');
+      if (empty($lineItems)) {
+        return;
+      }
+
+      $maxID = max(array_keys($lineItems));
+      $lineItem = $lineItems[$maxID];
       $membershipTypeDetails = $this->allMembershipTypeDetails[$this->getMembership()['membership_type_id']];
       if ($membershipTypeDetails['financial_type_id'] != $lineItem['financial_type_id']) {
         CRM_Core_Session::setStatus(
