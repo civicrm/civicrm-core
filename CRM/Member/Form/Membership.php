@@ -780,7 +780,7 @@ DESC limit 1");
             }
 
             if (empty($params['status_id']) || in_array($params['status_id'], $status_ids) == FALSE) {
-              $errors['status_id'] = ts('Please enter a status that does NOT represent a current membership status.');
+              $errors['status_id'] = ts('A current lifetime membership cannot have an end date. You can either remove the end date or change the status to a non-current status like Cancelled, Expired, or Deceased.');
             }
 
             if (!empty($params['is_override']) && !CRM_Member_StatusOverrideTypes::isPermanent($params['is_override'])) {
