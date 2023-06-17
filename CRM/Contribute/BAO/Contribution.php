@@ -2185,6 +2185,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    *  4) Use of payment.create still limited - completetransaction is more common.
    */
   protected static function repeatTransaction(array $input, array $contributionParams) {
+    $isCompleted = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionParams['contribution_status_id']) === 'Completed';
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
       (int) $contributionParams['contribution_recur_id'],
       [
@@ -2212,6 +2213,10 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($createContribution['id'], $contributionParams['contribution_recur_id'],
       $contributionParams['status_id'], $contributionParams['total_amount']);
 
+    if ($isCompleted) {
+      // Ideally add deprecation notice here & only accept pending for repeattransaction.
+      return self::completeOrder($input, NULL, $createContribution['id']);
+    }
     return $createContribution;
   }
 
@@ -3806,13 +3811,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if (!$contributionID) {
-      $contributionResult = self::repeatTransaction($input, $contributionParams);
-      $contributionID = $contributionResult['id'];
-      if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
-        // Ideally add deprecation notice here & only accept pending for repeattransaction.
-        return self::completeOrder($input, NULL, $contributionID);
-      }
-      return $contributionResult;
+      return self::repeatTransaction($input, $contributionParams);
     }
 
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
@@ -3834,9 +3833,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contributionParams['id'] = $contributionID;
     $contributionParams['is_post_payment_create'] = $isPostPaymentCreate;
 
-    if (empty($contributionResult)) {
-      $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
-    }
+    $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
 
     $transaction->commit();
     \Civi::log()->info("Contribution {$contributionParams['id']} updated successfully");
