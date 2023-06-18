@@ -4261,7 +4261,7 @@ WHERE  $smartGroupClause
 
     // Description
     if (!empty($description[2]) && trim($description[2])) {
-      $this->_qill[$grouping][] = ts('Relationship description - ' . $description[2]);
+      $this->_qill[$grouping][] = ts('Relationship description - %1', [1 => $description[2]]);
       $description = CRM_Core_DAO::escapeString(trim($description[2]));
       $where[$grouping][] = "civicrm_relationship.description LIKE '%{$description}%'";
     }

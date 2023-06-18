@@ -298,7 +298,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           'now', $excludeIsAdmin, $params['membership_type_id'] ?? NULL, $params
         );
         if (empty($calcStatus)) {
-          throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: {$params['start_date']} end_date {$params['end_date']} join_date {$params['join_date']} as at " . CRM_Utils_Time::date('Y-m-d H:i:s')));
+          throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: %1, end_date: %2, join_date: %3. Current time is: %4.", [1 => $params['start_date'], 2 => $params['end_date'], 3 => $params['join_date'], 4 => CRM_Utils_Time::date('Y-m-d H:i:s')]));
         }
         $params['status_id'] = $calcStatus['id'];
       }

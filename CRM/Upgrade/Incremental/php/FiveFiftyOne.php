@@ -106,9 +106,9 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
     }
     $fieldMap[ts('Soft Credit')] = 'soft_credit';
     $fieldMap[ts('Pledge Payment')] = 'pledge_payment';
-    $fieldMap[ts(ts('Pledge ID'))] = 'pledge_id';
-    $fieldMap[ts(ts('Financial Type'))] = 'financial_type_id';
-    $fieldMap[ts(ts('Payment Method'))] = 'payment_instrument_id';
+    $fieldMap[ts('Pledge ID')] = 'pledge_id';
+    $fieldMap[ts('Financial Type')] = 'financial_type_id';
+    $fieldMap[ts('Payment Method')] = 'payment_instrument_id';
     $fieldMap[ts('- do not import -')] = 'do_not_import';
 
     // Membership fields

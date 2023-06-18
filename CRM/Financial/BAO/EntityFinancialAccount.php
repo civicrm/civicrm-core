@@ -267,10 +267,7 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
     $financialAccountType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialTypeAccount->financial_account_id, 'financial_account_type_id');
     if (CRM_Utils_Array::value($financialTypeAccount->account_relationship, $financialAccountLinks) != $financialAccountType) {
       $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
-      $params = [
-        1 => $accountRelationships[$financialTypeAccount->account_relationship],
-      ];
-      throw new CRM_Core_Exception(ts("This financial account cannot have '%1' relationship.", $params));
+      throw new CRM_Core_Exception(ts("This financial account cannot have '%1' relationship.", [1 => $accountRelationships[$financialTypeAccount->account_relationship]]));
     }
   }
 

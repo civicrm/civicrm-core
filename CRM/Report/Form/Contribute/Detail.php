@@ -935,14 +935,10 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         // ts exception to avoid having ts("%1 %2: %3")
         $title = '%1 contributions / soft-credits: %2';
 
-        if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
-          'contributions_only'
-        ) {
+        if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only') {
           $title = '%1 contributions: %2';
         }
-        elseif (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
-          'soft_credits_only'
-        ) {
+        elseif (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'soft_credits_only') {
           $title = '%1 soft-credits: %2';
         }
         foreach ($totals as $key => $total) {

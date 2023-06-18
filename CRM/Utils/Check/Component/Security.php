@@ -75,12 +75,12 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           $log_url = implode($filePathMarker, $url);
           if ($this->fileExists($log_url)) {
             $docs_url = $this->createDocUrl('the-log-file-should-not-be-accessible');
-            $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
-              . '<br />' .
-              '<a href="%2">Read more about this warning</a>';
+            $msg = ts('The <a %1>CiviCRM debug log</a> should not be downloadable.', [1 => "href='$log_url'"])
+              . '<br />'
+              . '<a href="' . $docs_url . '">' . ts('Read more about this warning') . '</a>';
             $messages[] = new CRM_Utils_Check_Message(
               __FUNCTION__,
-              ts($msg, [1 => $log_url, 2 => $docs_url]),
+              $msg,
               ts('Security Warning'),
               \Psr\Log\LogLevel::WARNING,
               'fa-lock'
