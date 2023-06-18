@@ -95,16 +95,26 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
       $query['casDateField'] = 'e.' . $query['casDateField'];
     }
 
+    $recurStatuses = civicrm_api3('ContributionRecur', 'getoptions', [
+      'field' => "contribution_recur_contribution_status_id",
+    ])['values'] ?? [];
+    // Exclude the renewals that are cancelled or failed.
+    $nonRenewStatusIds = array_keys(array_intersect($recurStatuses, ['Cancelled', 'Failed']));
     // FIXME: Numbers should be constants.
-    $contribution_status_id_pending = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     if (in_array(2, $selectedStatuses)) {
       //auto-renew memberships
-      $query->join('contribution_recur', 'inner join civicrm_contribution_recur on e.contribution.id = contribution_recur.id');
-      $query->where("contribution_recur.contribution_status_id = #pending", ['pending' => $contribution_status_id_pending]);
+      $query->join('cr', 'INNER JOIN civicrm_contribution_recur cr on e.contribution_recur_id = cr.id');
+      $query->where("e.contribution_recur_id IS NOT NULL AND cr.contribution_status_id NOT IN (#nonRenewStatusIds)")
+        ->param('nonRenewStatusIds', $nonRenewStatusIds);
     }
     elseif (in_array(1, $selectedStatuses)) {
-      $query->join('contribution_recur', 'left join civicrm_contribution_recur on e.contribution.id = contribution_recur.id');
-      $query->where("contribution_recur.contribution_status_id <> #pending or contribution_recur.contribution_status_id is NULL", ['pending' => $contribution_status_id_pending]);
+      // non-auto-renew memberships
+      // Include the renewals that were cancelled or Failed.
+      $query->join('cr', 'LEFT JOIN civicrm_contribution_recur cr on e.contribution_recur_id = cr.id');
+      $query->where("e.contribution_recur_id IS NULL OR (
+        e.contribution_recur_id IS NOT NULL AND cr.contribution_status_id IN (#nonRenewStatusIds)
+      )")
+      ->param('nonRenewStatusIds', $nonRenewStatusIds);
     }
 
     if (!empty($selectedValues)) {
