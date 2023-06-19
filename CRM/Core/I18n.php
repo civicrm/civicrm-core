@@ -541,8 +541,11 @@ class CRM_Core_I18n {
         $this->localizeTitles($value);
         $array[$key] = $value;
       }
-      elseif ((string ) $key == 'title') {
-        $array[$key] = ts($value, ['context' => 'menu']);
+      else {
+        $key = (string) $key;
+        if ($key == 'title' || $key == 'desc') {
+          $array[$key] = ts($value, ['context' => 'menu']);
+        }
       }
     }
   }
