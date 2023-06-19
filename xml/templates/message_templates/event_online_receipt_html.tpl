@@ -39,12 +39,12 @@
     <p>
     {if !empty($isOnWaitlist)}
      <p>{ts}You have been added to the WAIT LIST for this event.{/ts}</p>
-     {if !empty($isPrimary)}
+     {if $isPrimary}
        <p>{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}</p>
      {/if}
     {elseif !empty($isRequireApproval)}
      <p>{ts}Your registration has been submitted.{/ts}</p>
-     {if !empty($isPrimary)}
+     {if $isPrimary}
       <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
      {/if}
     {elseif !empty($is_pay_later) && empty($isAmountzero) && empty($isAdditionalParticipant)}
@@ -303,7 +303,7 @@
         </td>
        </tr>
       {/if}
-      {if !empty($isPrimary)}
+      {if $isPrimary}
        <tr>
         <td {$labelStyle}>
          {ts}Total Amount{/ts}
@@ -483,7 +483,7 @@
      <tr>
       <td colspan="2" {$valueStyle}>
         {ts 1=$selfcancelxfer_time 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts} {if !empty($totalAmount)}{ts}Cancellations are not refundable.{/ts}{/if}<br />
-        {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
+        {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participantID`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
         <a href="{$selfService}">{ts}Click here to transfer or cancel your registration.{/ts}</a>
       </td>
      </tr>
