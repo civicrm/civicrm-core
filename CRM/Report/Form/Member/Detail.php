@@ -178,10 +178,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'receipt_date' => NULL,
           'fee_amount' => NULL,
           'net_amount' => NULL,
-          'total_amount' => [
-            'title' => ts('Payment Amount (most recent)'),
-            'statistics' => ['sum' => ts('Amount')],
-          ],
+          'total_amount' => NULL,
         ],
         'filters' => [
           'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
