@@ -160,6 +160,10 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $this->add('select', 'event_id', ts('Event'), $event);
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->addRadio('deny', ts('Mode'), [
+      0 => ts('Allow'),
+      1 => ts('Deny'),
+    ]);
 
     $this->addFormRule(['CRM_ACL_Form_ACL', 'formRule']);
   }
@@ -253,7 +257,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     else {
       $params = $this->controller->exportValues($this->_name);
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['deny'] = 0;
       $params['entity_table'] = 'civicrm_acl_role';
 
       // Figure out which type of object we're permissioning on and set object_table and object_id.
