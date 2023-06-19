@@ -145,28 +145,28 @@
       {/foreach}
      {/if}
 
-     {if !empty($event.is_public)}
+     {if {event.is_public|boolean}}
       <tr>
        <td colspan="2" {$valueStyle}>
-        {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+        {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
         <a href="{$icalFeed}">{ts}Download iCalendar entry for this event.{/ts}</a>
        </td>
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
-        {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+        {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
         <a href="{$gCalendar}">{ts}Add event to Google Calendar{/ts}</a>
        </td>
       </tr>
      {/if}
 
-    {if !empty($event.is_share)}
-        <tr>
-            <td colspan="2" {$valueStyle}>
-                {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&reset=1" a=true fe=1 h=1}{/capture}
-                {include file="CRM/common/SocialNetwork.tpl" emailMode=true url=$eventUrl title=$event.title pageURL=$eventUrl}
-            </td>
-        </tr>
+    {if $event.is_share}
+      <tr>
+        <td colspan="2" {$valueStyle}>
+          {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id={event.id}&reset=1" a=true fe=1 h=1}{/capture}
+          {include file="CRM/common/SocialNetwork.tpl" emailMode=true url=$eventUrl pageURL=$eventUrl title='{event.title}'}
+        </td>
+      </tr>
     {/if}
     {if !empty($payer.name)}
      <tr>
@@ -180,108 +180,92 @@
        </td>
      </tr>
     {/if}
-    {if !empty($event.is_monetary) and empty($isRequireApproval)}
+    {if {event.is_monetary|boolean} and empty($isRequireApproval)}
 
       <tr>
        <th {$headerStyle}>
-        {if !empty($event.fee_label)}{$event.fee_label}{/if}
+        {event.fee_label}
        </th>
       </tr>
 
-      {if !empty($lineItem)}
-       {foreach from=$lineItem item=value key=priceset}
-        {if $value neq 'skip'}
-         {if !empty($isPrimary)}
-          {if $lineItem|@count GT 1} {* Header for multi participant registration cases. *}
-           <tr>
-            <td colspan="2" {$labelStyle}>
-             {ts 1=$priceset+1}Participant %1{/ts} {if !empty($part.$priceset)}{$part.$priceset.info}{/if}
-            </td>
-           </tr>
-          {/if}
-         {/if}
-         <tr>
-          <td colspan="2" {$valueStyle}>
-           <table>
+      {if $isShowLineItems}
+        {foreach from=$participants key=index item=participant}
+          {if $isPrimary || {participant.id} === $participant.id}
+          {if $isPrimary && $lineItems|@count GT 1} {* Header for multi participant registration cases. *}
             <tr>
-             <th>{ts}Item{/ts}</th>
-             <th>{ts}Qty{/ts}</th>
-             <th>{ts}Each{/ts}</th>
-             {if !empty($dataArray)}
-              <th>{ts}SubTotal{/ts}</th>
-              <th>{ts}Tax Rate{/ts}</th>
-              <th>{ts}Tax Amount{/ts}</th>
-             {/if}
-             <th>{ts}Total{/ts}</th>
-       {if  !empty($pricesetFieldsCount) }<th>{ts}Total Participants{/ts}</th>{/if}
+              <td colspan="2" {$labelStyle}>
+                {ts 1=$participant.index}Participant %1{/ts} {$participant.contact.display_name}
+              </td>
             </tr>
-            {foreach from=$value item=line}
-             <tr>
-              <td {$tdfirstStyle}>
-              {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}
-              </td>
-              <td {$tdStyle} align="middle">
-               {$line.qty}
-              </td>
-              <td {$tdStyle}>
-               {$line.unit_price|crmMoney:$currency}
-              </td>
-              {if !empty($dataArray)}
-               <td {$tdStyle}>
-                {$line.unit_price*$line.qty|crmMoney}
-               </td>
-               {if $line.tax_rate || $line.tax_amount != ""}
-                <td {$tdStyle}>
-                 {$line.tax_rate|string_format:"%.2f"}%
-                </td>
-                <td {$tdStyle}>
-                 {$line.tax_amount|crmMoney}
-                </td>
-               {else}
-                <td></td>
-                <td></td>
-               {/if}
-              {/if}
-              <td {$tdStyle}>
-               {$line.line_total+$line.tax_amount|crmMoney:$currency}
-              </td>
-        {if !empty($pricesetFieldsCount) }<td {$tdStyle}>{$line.participant_count}</td> {/if}
-             </tr>
-            {/foreach}
-            {if !empty($individual)}
-              <tr {$participantTotal}>
-                <td colspan=3>{ts}Participant Total{/ts}</td>
-                <td colspan=2>{$individual.$priceset.totalAmtWithTax-$individual.$priceset.totalTaxAmt|crmMoney}</td>
-                <td colspan=1>{$individual.$priceset.totalTaxAmt|crmMoney}</td>
-                <td colspan=2>{$individual.$priceset.totalAmtWithTax|crmMoney}</td>
-              </tr>
-            {/if}
-           </table>
-          </td>
-         </tr>
-        {/if}
-       {/foreach}
-       {if !empty($dataArray)}
-        {if isset($totalAmount) and isset($totalTaxAmount)}
-        <tr>
-         <td {$labelStyle}>
-          {ts} Amount Before Tax: {/ts}
-         </td>
-         <td {$valueStyle}>
-          {$totalAmount-$totalTaxAmount|crmMoney}
-         </td>
-        </tr>
-        {/if}
-        {foreach from=$dataArray item=value key=priceset}
-         <tr>
-          {if $priceset || $priceset == 0}
-           <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
-           <td>&nbsp;{$value|crmMoney:$currency}</td>
           {/if}
-         </tr>
+            <tr>
+              <td colspan="2" {$valueStyle}>
+                <table>
+                  <tr>
+                    <th>{ts}Item{/ts}</th>
+                    <th>{ts}Qty{/ts}</th>
+                    <th>{ts}Each{/ts}</th>
+                      {if $isShowTax && {contribution.tax_amount|boolean}}
+                        <th>{ts}Subtotal{/ts}</th>
+                        <th>{ts}Tax Rate{/ts}</th>
+                        <th>{ts}Tax Amount{/ts}</th>
+                      {/if}
+                    <th>{ts}Total{/ts}</th>
+                      {if !empty($pricesetFieldsCount)}<th>{ts}Total Participants{/ts}</th>{/if}
+                  </tr>
+                  {foreach from=$participant.line_items item=line}
+                    <tr>
+                      <td {$tdfirstStyle}>{$line.title}</td>
+                      <td {$tdStyle} align="middle">{$line.qty}</td>
+                      <td {$tdStyle}>{$line.unit_price|crmMoney:$currency}</td>
+                      {if $line.tax_rate || $line.tax_amount != ""}
+                        <td>{$line.tax_rate|string_format:"%.2f"}%</td>
+                        <td>{$line.tax_amount|crmMoney:$currency}</td>
+                      {else}
+                        <td></td>
+                        <td></td>
+                      {/if}
+                      <td {$tdStyle}>
+                        {$line.line_total+$line.tax_amount|crmMoney:$currency}
+                      </td>
+                      {if !empty($pricesetFieldsCount)}<td {$tdStyle}>{$line.participant_count}</td> {/if}
+                    </tr>
+                  {/foreach}
+                  {if $isShowTax}
+                    <tr {$participantTotal}>
+                      <td colspan=3>{ts}Participant Total{/ts}</td>
+                      <td colspan=2>{$participant.totals.total_amount_exclusive|crmMoney}</td>
+                      <td colspan=1>{$participant.totals.tax_amount|crmMoney}</td>
+                      <td colspan=2>{$participant.totals.total_amount_inclusive|crmMoney}</td>
+                    </tr>
+                  {/if}
+                </table>
+              </td>
+            </tr>
+          {/if}
         {/foreach}
-       {/if}
-      {/if}
+        {/if}
+        {if $isShowTax && {contribution.tax_amount|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {ts}Amount Before Tax:{/ts}
+            </td>
+            <td {$valueStyle}>
+              {if $isPrimary}{contribution.tax_exclusive_amount}{else}{$participant.totals.total_amount_exclusive|crmMoney}{/if}
+            </td>
+        </tr>
+
+            {if !$isPrimary}
+              {* Use the participant specific tax rate breakdown *}
+              {assign var=taxRateBreakdown value=$participant.tax_rate_breakdown}
+            {/if}
+            {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
+              <tr>
+                <td {$labelStyle}>{if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else}{$taxTerm} {$taxDetail.percentage}%{/if}</td>
+                <td {$valueStyle}>{$taxDetail.amount|crmMoney:'{contribution.currency}'}</td>
+              </tr>
+            {/foreach}
+        {/if}
 
       {if !empty($amounts) && empty($lineItem)}
        {foreach from=$amounts item=amnt key=level}
@@ -293,13 +277,13 @@
        {/foreach}
       {/if}
 
-    {if isset($totalTaxAmount)}
+      {if $isShowTax && {contribution.tax_amount|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}Total Tax Amount{/ts}
         </td>
         <td {$valueStyle}>
-         {$totalTaxAmount|crmMoney:$currency}
+          {if $isPrimary}{contribution.tax_amount}{else}{$participant.totals.tax_amount|crmMoney}{/if}
         </td>
        </tr>
       {/if}
@@ -309,7 +293,7 @@
          {ts}Total Amount{/ts}
         </td>
         <td {$valueStyle}>
-         {if !empty($totalAmount)}{$totalAmount|crmMoney:$currency}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+          {contribution.total_amount} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
         </td>
        </tr>
        {if !empty($pricesetFieldsCount) }
@@ -483,7 +467,7 @@
      <tr>
       <td colspan="2" {$valueStyle}>
         {ts 1=$selfcancelxfer_time 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts} {if !empty($totalAmount)}{ts}Cancellations are not refundable.{/ts}{/if}<br />
-        {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participantID`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
+        {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`{participant.id}`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
         <a href="{$selfService}">{ts}Click here to transfer or cancel your registration.{/ts}</a>
       </td>
      </tr>

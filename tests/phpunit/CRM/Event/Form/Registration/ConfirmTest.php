@@ -48,8 +48,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
     $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
-    $params = ['is_monetary' => 1, 'financial_type_id' => 1];
-    $event = $this->eventCreate($params);
+    $event = $this->eventCreatePaid();
     $individualID = $this->individualCreate();
     CRM_Event_Form_Registration_Confirm::testSubmit([
       'id' => $event['id'],
@@ -320,14 +319,12 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * Test for Tax amount for multiple participant.
    *
    * @throws \CRM_Core_Exception
-   * @throws \Exception
    */
   public function testTaxMultipleParticipant(): void {
     // @todo - figure out why this doesn't pass validate financials
     $this->isValidateFinancialsOnPostAssert = FALSE;
     $mut = new CiviMailUtils($this);
-    $params = ['is_monetary' => 1, 'financial_type_id' => 1];
-    $event = $this->eventCreate($params);
+    $event = $this->eventCreatePaid();
     $this->swapMessageTemplateForTestTemplate('event_online_receipt', 'text');
     CRM_Event_Form_Registration_Confirm::testSubmit([
       'id' => $event['id'],
@@ -480,7 +477,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAssignProfiles(): void {
-    $event = $this->eventCreate();
+    $event = $this->eventCreateUnpaid();
     $this->createJoinedProfile(['entity_table' => 'civicrm_event', 'entity_id' => $event['id']]);
 
     $_REQUEST['id'] = $event['id'];
@@ -538,7 +535,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   private function creatEventWithProfile($event): array {
     if (empty($event)) {
-      $event = $this->eventCreate(['is_monetary' => FALSE]);
+      $event = $this->eventCreateUnpaid();
       $this->createJoinedProfile(['entity_table' => 'civicrm_event', 'entity_id' => $event['id']]);
       $this->addUFField($this->ids['UFGroup']['our profile'], 'note', 'Contact', 'Comment');
     }

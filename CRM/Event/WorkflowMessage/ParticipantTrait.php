@@ -1,9 +1,13 @@
 <?php
 
+use Civi\Api4\LineItem;
 use Civi\Api4\Participant;
 
 /**
  * Trait for participant workflow classes.
+ *
+ * @method int getParticipantID()
+ * @method int getEventID()
  */
 trait CRM_Event_WorkflowMessage_ParticipantTrait {
 
@@ -84,6 +88,34 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
   }
 
   /**
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
+   */
+  public function setParticipantID(int $participantID) {
+    $this->participantID = $participantID;
+    if (!$this->getContributionID()) {
+      $lineItem = LineItem::get(FALSE)
+        ->addWhere('entity_table', '=', 'civicrm_participant')
+        ->addWhere('id', '=', $participantID)
+        ->addSelect('contribution_id')
+        ->execute()->first();
+      if (!empty($lineItem)) {
+        $this->setContributionID($lineItem['contribution_id']);
+      }
+      // It might be bad data on the site - let's do a noisy fall back to participant payment
+      // (the relationship between contribution & participant should be in the line item but
+      // some integrations might mess this up - if they are not using the order api).
+      $participantPayment = civicrm_api3('ParticipantPayment', 'get', ['participant_id' => $participantID])['values'];
+      if (!empty($participantPayment)) {
+        $participantPayment = reset($participantPayment);
+        $this->setContributionID((int) $participantPayment['contribution_id']);
+        CRM_Core_Session::setStatus('There might be a data problem, contribution id could not be loaded from the line item');
+      }
+    }
+    return $this;
+  }
+
+  /**
    * Is the participant the primary participant.
    *
    * @return bool
@@ -110,7 +142,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
   public function setParticipant(array $participant): self {
     $this->participant = $participant;
     if (!empty($participant['id'])) {
-      $this->participantID = $participant['id'];
+      $this->setParticipantID($participant['id']);
     }
     if (!empty($participant['event_id'])) {
       $this->eventID = $participant['event_id'];
@@ -149,7 +181,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
         return [];
       }
       // Initiate with the current participant to ensure they are first.
-      $participants = [$this->participantID => ['id' => $this->participantID]];
+      $participants = [$this->participantID => ['id' => $this->participantID, 'tax_rate_breakdown' => []]];
       foreach ($this->getLineItems() as $lineItem) {
         if ($lineItem['entity_table'] === 'civicrm_participant') {
           $participantID = $lineItem['entity_id'];
@@ -167,6 +199,9 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
         $participants[$participantID]['totals']['total_amount_exclusive'] += $lineItem['line_total'];
         $participants[$participantID]['totals']['tax_amount'] += $lineItem['tax_amount'];
         $participants[$participantID]['totals']['total_amount_inclusive'] += ($lineItem['line_total'] + $lineItem['tax_amount']);
+        if (!isset($participants[$participantID]['tax_rate_breakdown'])) {
+          $participants[$participantID]['tax_rate_breakdown'] = [];
+        }
         if (!isset($participants[$participantID]['tax_rate_breakdown'][$lineItem['tax_rate']])) {
           $participants[$participantID]['tax_rate_breakdown'][$lineItem['tax_rate']] = [
             'amount' => 0,
@@ -182,7 +217,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
         $participant['id'] = $participantID;
         $participant['index'] = $count;
         $participant['contact'] = $this->getParticipantContact($participantID);
-        foreach ($participant['tax_rate_breakdown'] as $rate => $details) {
+        foreach ($participant['tax_rate_breakdown'] ?? [] as $rate => $details) {
           if ($details['amount'] === 0.0) {
             unset($participant['tax_rate_breakdown'][$rate]);
           }
