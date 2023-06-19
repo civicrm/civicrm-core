@@ -1395,8 +1395,6 @@ DESC limit 1");
         return;
       }
 
-      // fetch lineitems by updated membership ID
-      $lineItems = CRM_Price_BAO_LineItem::getLineItems($this->getMembershipID(), 'membership');
       // retrieve the related contribution ID
       $contributionID = CRM_Core_DAO::getFieldValue(
         'CRM_Member_DAO_MembershipPayment',
@@ -1423,8 +1421,7 @@ DESC limit 1");
         $this->getMembershipID(),
         'membership',
         $contributionID,
-        $priceSetDetails['fields'],
-        $lineItems
+        $priceSetDetails['fields']
       );
       CRM_Core_Session::setStatus(ts('Associated contribution is updated on membership type change.'), ts('Success'), 'success');
     }
