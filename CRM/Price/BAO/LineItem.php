@@ -618,7 +618,6 @@ WHERE li.contribution_id = %1";
    * @param int $entity
    * @param int $contributionId
    * @param $feeBlock
-   * @param array $lineItems
    *
    * @throws \CRM_Core_Exception
    */
@@ -627,10 +626,9 @@ WHERE li.contribution_id = %1";
     $entityID,
     $entity,
     $contributionId,
-    $feeBlock,
-    $lineItems
+    $feeBlock
   ) {
-    $entityTable = "civicrm_" . $entity;
+    $entityTable = 'civicrm_' . $entity;
     $newLineItems = [];
     CRM_Price_BAO_PriceSet::processAmount($feeBlock,
       $params, $newLineItems
