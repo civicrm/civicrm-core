@@ -697,7 +697,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     if (!$this->_mode) {
       return;
     }
-    $js = ($isBuildRecurBlock ? ['onChange' => "buildRecurBlock( this.value ); return false;"] : NULL);
+    $js = ($isBuildRecurBlock ? ['onChange' => "buildRecurBlock( this.value ); return false;"] : []);
     if ($isBuildAutoRenewBlock) {
       $js = ['onChange' => "buildAutoRenew( null, this.value, '{$this->_mode}');"];
     }
