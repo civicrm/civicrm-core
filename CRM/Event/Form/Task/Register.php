@@ -109,6 +109,9 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
       $event_id = $params['event_id'];
     }
     if (!empty($event_id)) {
+      $allowSameParticipantEmails = \Civi\Api4\Event::get()
+        ->addSelect('allow_same_participant_emails')->addWhere('id', '=', $event_id)->execute()
+        ->first()['allow_same_participant_emails'];
       $duplicateContacts = 0;
       foreach ($this->_contactIds as $k => $dupeCheckContactId) {
         // Eliminate contacts that have already been assigned to this event.
@@ -118,14 +121,24 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
         $dupeCheck->find(TRUE);
         if (!empty($dupeCheck->id)) {
           $duplicateContacts++;
-          unset($this->_contactIds[$k]);
+          if (!$allowSameParticipantEmails) {
+            unset($this->_contactIds[$k]);
+          }
         }
       }
       if ($duplicateContacts > 0) {
-        $msg = ts(
-          '%1 contacts have already been assigned to this event. They were not added a second time.',
-          [1 => $duplicateContacts]
-        );
+        if ($allowSameParticipantEmails) {
+          $msg = ts(
+            '%1 contacts were already registered for this event, but have been added a second time.',
+            [1 => $duplicateContacts]
+          );
+        }
+        else {
+          $msg = ts(
+            '%1 contacts have already been assigned to this event. They were not added a second time.',
+            [1 => $duplicateContacts]
+          );
+        }
         CRM_Core_Session::setStatus($msg);
       }
       if (count($this->_contactIds) === 0) {
@@ -137,7 +150,6 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
       // will be created below.
       $this->_contactIds = array_values($this->_contactIds);
     }
-
     $statusMsg = $this->submit($params);
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
