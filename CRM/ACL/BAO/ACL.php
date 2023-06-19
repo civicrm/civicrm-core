@@ -265,10 +265,12 @@ ORDER BY a.object_id
    AND   a.object_id IN (%1)
 ORDER BY a.object_id
 ";
-      $denyDao = CRM_Core_DAO::executeQuery($denyQuery, [1 => [implode(',', $ids), 'CommaSeparatedIntegers']]);
-      while ($denyDao->fetch()) {
-        $key = array_search($denyDao->object_id, $ids);
-        unset($ids[$key]);
+      if (!empty($ids)) {
+        $denyDao = CRM_Core_DAO::executeQuery($denyQuery, [1 => [implode(',', $ids), 'CommaSeparatedIntegers']]);
+        while ($denyDao->fetch()) {
+          $key = array_search($denyDao->object_id, $ids);
+          unset($ids[$key]);
+        }
       }
 
       if (!empty($ids)) {
