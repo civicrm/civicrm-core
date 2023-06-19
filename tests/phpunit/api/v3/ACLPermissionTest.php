@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ACLEntityRole;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
@@ -1187,7 +1188,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
         )
         ->execute()->single()['id'];
     }
-
     $this->createLoggedInUser();
     $this->aclGroupHookType = 'civicrm_custom_group';
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
@@ -1242,6 +1242,78 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ->execute();
     $this->assertCount(1, $getEntities);
     $this->assertEquals('Custom_extra_group_4', $getEntities[0]['name']);
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testNegativeCustomGroupACL(): void {
+    // Create 2 multi-record custom entities and 2 regular custom fields
+    $customGroups = [];
+    foreach ([1, 2, 3, 4] as $i) {
+      $customGroups[$i] = CustomGroup::create(FALSE)
+        ->addValue('title', "negative_extra_group_$i")
+        ->addValue('extends', 'Contact')
+        ->addValue('is_multiple', $i >= 3)
+        ->addChain('field', CustomField::create()
+          ->addValue('label', "negative_extra_field_$i")
+          ->addValue('custom_group_id', '$id')
+          ->addValue('html_type', 'Text')
+          ->addValue('data_type', 'String')
+        )
+        ->execute()->single()['id'];
+      $this->callAPISuccess('Acl', 'create', [
+        'name' => 'Permit everyone to access custom group ' . $customGroups[$i],
+        'deny' => 0,
+        'entity_table' => 'civicrm_acl_role',
+        'entity_id' => 0,
+        'operation' => 'Edit',
+        'object_table' => 'civicrm_custom_group',
+        'object_id' => $customGroups[$i],
+      ]);
+    }
+
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'acl_role',
+      'label' => 'Test Negative ACL Role',
+      'value' => 4,
+      'is_active' => 1,
+    ]);
+    $aclGroup = $this->groupCreate();
+    ACLEntityRole::create(FALSE)->setValues([
+      'acl_role_id' => 4,
+      'entity_table' => 'civicrm_group',
+      'entity_id' => $aclGroup,
+      'is_active' => 1,
+    ])->execute();
+    $this->callAPISuccess('Acl', 'create', [
+      'name' => 'Test Negative ACL',
+      'deny' => 1,
+      'entity_table' => 'civicrm_acl_role',
+      'entity_id' => 4,
+      'operation' => 'Edit',
+      'object_table' => 'civicrm_custom_group',
+      'object_id' => $customGroups[2],
+    ]);
+    $userID = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view my contact',
+    ];
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $userID,
+      'group_id' => $aclGroup,
+      'status' => 'Added',
+    ]);
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+    $getFields = Contact::getFields()
+      ->addWhere('name', 'LIKE', 'negative_extra_group_%.negative_extra_field_%')
+      ->execute();
+    $this->assertCount(1, $getFields);
+
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
   }
 
   public function aclGroupHookAllResults($action, $contactID, $tableName, &$allGroups, &$currentGroups) {
