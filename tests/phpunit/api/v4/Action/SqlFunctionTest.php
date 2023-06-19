@@ -167,7 +167,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
 
     $result = Activity::get(FALSE)
       ->addWhere('id', 'IN', $aids)
-      ->addSelect('IF(is_deleted, "Trash", "No Trash") AS trashed')
+      ->addSelect('IF(is_deleted, 1, 0) AS trashed')
       ->addSelect('NULLIF(subject, location) AS nullif_subject_is_location')
       ->addSelect('NULLIF(duration, 456) AS nullif_duration_is_456')
       ->addSelect('COALESCE(duration, location) AS coalesce_duration_location')
@@ -179,9 +179,9 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->indexBy('id');
 
     $this->assertCount(3, $result);
-    $this->assertEquals('No Trash', $result[$aids[0]]['trashed']);
-    $this->assertEquals('Trash', $result[$aids[1]]['trashed']);
-    $this->assertEquals('No Trash', $result[$aids[2]]['trashed']);
+    $this->assertEquals(0, $result[$aids[0]]['trashed']);
+    $this->assertEquals(1, $result[$aids[1]]['trashed']);
+    $this->assertEquals(0, $result[$aids[2]]['trashed']);
 
     $this->assertEquals(NULL, $result[$aids[0]]['nullif_subject_is_location']);
     $this->assertEquals('xyz', $result[$aids[1]]['nullif_subject_is_location']);
