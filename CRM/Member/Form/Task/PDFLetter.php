@@ -86,8 +86,8 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   public function postProcessMembers($membershipIDs, $contactIDs) {
     $form = $this;
     $formValues = $form->controller->exportValues($form->getName());
-    [$formValues, $html_message, $messageToken] = $this->processMessageTemplate($formValues);
-
+    [$formValues, $html_message] = $this->processMessageTemplate($formValues);
+    $messageToken = CRM_Utils_Token::getTokens($html_message);
     $html
       = $this->generateHTML(
       $membershipIDs,
