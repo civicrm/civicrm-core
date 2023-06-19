@@ -196,11 +196,16 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
           'is_show_location:label',
           'is_public',
           'is_public:label',
+          'is_share',
+          'is_share:label',
+          'requires_approval',
+          'requires_approval:label',
           'is_monetary:label',
           'event_type_id:label',
           'event_type_id:name',
           'pay_later_text',
           'pay_later_receipt',
+          'fee_label',
           'custom.*',
         ], $this->getExposedFields()))
         ->execute()->first();
