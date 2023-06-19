@@ -383,6 +383,7 @@ trait EventTestTrait {
     }
     return [
       'free' => ['name' => 'free', 'label' => 'Complementary', 'amount' => 0],
+      'student_early' => ['name' => 'student_early', 'label' => 'Student early bird', 'amount' => 50],
       'student' => ['name' => 'student', 'label' => 'Student Rate', 'amount' => 100],
       'student_plus' => ['name' => 'student_plus', 'label' => 'Student Deluxe', 'amount' => 200],
       'standard' => ['name' => 'standard', 'label' => 'Standard Rate', 'amount' => 300],
