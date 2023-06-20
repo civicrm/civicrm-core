@@ -191,7 +191,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer'));
-    $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, NULL, ['class' => 'crm-select2']);
+    $this->addPaymentProcessorSelect(FALSE);
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialTrxn');
 
