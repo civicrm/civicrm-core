@@ -38,14 +38,14 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
           $html .= "<tr><td>{$tableName}</td><td>{$index['name']}</td><td>$fields</td>";
         }
       }
-      $message = "<p>The following tables have missing indices. Click 'Update Indices' button to create them.<p>
-        <p><table><thead><tr><th>Table Name</th><th>Key Name</th><th>Expected Indices</th>
-        </tr></thead><tbody>
-        $html
-        </tbody></table></p>";
+      $message = '<p>' . ts("The following tables have missing indices. Click 'Update Indices' button to create them.") . '<p>'
+        . '<p><table><thead><tr><th>' . ts('Table Name') . '</th><th>' . ts('Key Name') . '</th><th>' . ts('Expected Indices') . '</th>'
+        . '</tr></thead><tbody>'
+        . $html
+        . '</tbody></table></p>';
       $msg = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts($message),
+        $message,
         ts('Performance warning: Missing indices'),
         \Psr\Log\LogLevel::WARNING,
         'fa-server'

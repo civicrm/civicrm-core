@@ -108,7 +108,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       $name = CRM_Utils_String::titleToVar(strtolower($fields['title']));
     }
     if (!CRM_Core_DAO::objectExists($name, 'CRM_Core_DAO_OptionGroup', $self->_id)) {
-      $errors['title'] = ts('Option Group name ' . $name . ' already exists in the database. Option Group Names need to be unique');
+      $errors['title'] = ts("Option Group name '%1' already exists in the database. Option Group Names must be unique.", [1 => $name]);
     }
     return empty($errors) ? TRUE : $errors;
   }
