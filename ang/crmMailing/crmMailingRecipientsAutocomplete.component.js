@@ -6,7 +6,7 @@
       mailingId: '<crmMailingId',
       mode: '@crmMode',
     },
-    template: '<input crm-autocomplete="\'EntitySet\'" ' +
+    template: '<input type="text" crm-autocomplete="\'EntitySet\'" ' +
       'crm-autocomplete-params="$ctrl.autocompleteParams" ' +
       'ng-required="$ctrl.mode === \'include\'" ' +
       'ng-model="$ctrl.getSetValue" ' +
