@@ -594,6 +594,30 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get the default values for line items using this price field value id.
+   *
+   * @param int $id
+   *
+   * @return array
+   */
+  public function getPriceFieldValueDefaults(int $id): array {
+    $valueDefaults = array_intersect_key($this->getPriceFieldValueSpec($id), array_fill_keys([
+      'financial_type_id',
+      'non_deductible_amount',
+      'membership_type_id',
+      'membership_num_terms',
+      'amount',
+      'description',
+      'price_field_id',
+      'label',
+    ], TRUE));
+    $valueDefaults['qty'] = 1;
+    $valueDefaults['unit_price'] = $valueDefaults['amount'];
+    unset($valueDefaults['amount']);
+    return $valueDefaults;
+  }
+
+  /**
    * Get the metadata for the fields in the price set.
    *
    * @internal use in tested core code only.
@@ -1006,6 +1030,14 @@ class CRM_Financial_BAO_Order {
       $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
     }
     else {
+      if (!empty($lineItem['price_field_value_id'])) {
+        // Let's make sure it is an integer not '2' for sanity.
+        $lineItem['price_field_value_id'] = (int) $lineItem['price_field_value_id'];
+        $lineItem = array_merge($this->getPriceFieldValueDefaults($lineItem['price_field_value_id']), $lineItem);
+      }
+      if (!isset($lineItem['line_total'])) {
+        $lineItem['line_total'] = $lineItem['qty'] * $lineItem['unit_price'];
+      }
       $lineItem['tax_rate'] = $this->getTaxRate($lineItem['financial_type_id']);
       $lineItem['tax_amount'] = ($lineItem['tax_rate'] / 100) * $lineItem['line_total'];
     }
