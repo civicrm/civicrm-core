@@ -12,34 +12,21 @@
 namespace Civi\Api4\Query;
 
 /**
- * String sql expression
+ * Boolean sql expression
  */
-class SqlString extends SqlExpression {
+class SqlBool extends SqlExpression {
 
-  protected static $dataType = 'String';
+  protected static $dataType = 'Boolean';
 
   protected function initialize() {
-    // Remove surrounding quotes
-    $str = substr($this->expr, 1, -1);
-    // Unescape the outer quote character inside the string to prevent double-escaping in render()
-    $quot = substr($this->expr, 0, 1);
-    $backslash = chr(0) . 'backslash' . chr(0);
-    $this->expr = str_replace(['\\\\', "\\$quot", $backslash], [$backslash, $quot, '\\\\'], $str);
   }
 
   public function render(Api4Query $query): string {
-    return '"' . \CRM_Core_DAO::escapeString($this->expr) . '"';
-  }
-
-  /**
-   * @return string
-   */
-  public function getExpr(): string {
-    return '"' . $this->expr . '"';
+    return $this->expr === 'TRUE' ? '1' : '0';
   }
 
   public static function getTitle(): string {
-    return ts('Text');
+    return ts('Boolean');
   }
 
 }

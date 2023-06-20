@@ -21,7 +21,8 @@ namespace Civi\Api4\Query;
 abstract class SqlExpression {
 
   /**
-   * @var array
+   * Field names used in this expression
+   * @var string[]
    */
   protected $fields = [];
 
@@ -101,6 +102,9 @@ abstract class SqlExpression {
     }
     elseif ($expr === 'NULL') {
       $className = 'SqlNull';
+    }
+    elseif ($expr === 'TRUE' || $expr === 'FALSE') {
+      $className = 'SqlBool';
     }
     elseif ($expr === '*') {
       $className = 'SqlWild';

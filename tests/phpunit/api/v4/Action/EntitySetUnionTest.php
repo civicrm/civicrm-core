@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\ContactType;
 use Civi\Api4\EntitySet;
 use Civi\Api4\Group;
 use Civi\Api4\Relationship;
@@ -114,7 +115,80 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals(2, $result[1]['count']);
     $this->assertEquals(2, $result[2]['count']);
     $this->assertEquals(1, $result[3]['count']);
+  }
 
+  public function testUnionWithSelectAndOrderBy(): void {
+    $contacts = $this->saveTestRecords('Contact', ['records' => 4])->column('id');
+    $relationships = $this->saveTestRecords('Relationship', [
+      'records' => [
+        ['contact_id_a' => $contacts[0], 'contact_id_b' => $contacts[1]],
+        ['contact_id_a' => $contacts[1], 'contact_id_b' => $contacts[2]],
+        ['contact_id_a' => $contacts[1], 'contact_id_b' => $contacts[3]],
+      ],
+    ]);
+
+    $result = EntitySet::get(FALSE)
+      ->addSelect('contact_id_b', 'UPPER(direction) AS DIR')
+      ->addSet('UNION ALL', Relationship::get()
+        ->addSelect('id', 'contact_id_a', 'contact_id_b', '"a_b" AS direction')
+        ->addWhere('id', 'IN', $relationships->column('id'))
+      )
+      ->addSet('UNION ALL', Relationship::get()
+        ->addSelect('id', 'contact_id_b', 'contact_id_a', '"b_a" AS direction')
+        ->addWhere('id', 'IN', $relationships->column('id'))
+      )
+      ->addWhere('contact_id_a', '=', $contacts[1])
+      ->addOrderBy('direction')
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertCount(3, $result);
+    $this->assertEquals('A_B', $result[0]['DIR']);
+    $this->assertEquals('A_B', $result[1]['DIR']);
+    $this->assertEquals('B_A', $result[2]['DIR']);
+    $this->assertEquals($contacts[2], $result[0]['contact_id_b']);
+    $this->assertEquals($contacts[3], $result[1]['contact_id_b']);
+    $this->assertEquals($contacts[0], $result[2]['contact_id_b']);
+  }
+
+  public function testUnionWithSelectStar() {
+    $subType = $this->createTestRecord('ContactType', [
+      'parent_id:name' => 'Household',
+      'name' => uniqid('HH1'),
+    ]);
+    $result = EntitySet::get(FALSE)
+      ->addSelect('name', 'label', 'parent_id:name')
+      ->addSet('UNION ALL', ContactType::get()
+        ->addWhere('name', '=', 'Household')
+      )
+      ->addSet('UNION ALL', ContactType::get()
+        ->addWhere('id', '=', $subType['id'])
+      )
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(2, $result);
+    $this->assertEquals('Household', $result[1]['parent_id:name']);
+    $this->assertEquals('Household', $result[0]['name']);
+
+    $result = EntitySet::get(FALSE)
+      ->addSelect('id', 'name', 'label', 'parent_id:name', 'is_parent')
+      ->addSet('UNION ALL', ContactType::get()
+        ->addSelect('*', 'TRUE AS is_parent')
+        ->addWhere('name', '=', 'Household')
+      )
+      ->addSet('UNION ALL', ContactType::get()
+        ->addSelect('*', 'FALSE AS is_parent')
+        ->addWhere('id', '=', $subType['id'])
+      )
+      ->addOrderBy('is_parent')
+      ->execute();
+
+    $this->assertCount(2, $result);
+    $this->assertEquals($subType['id'], $result[0]['id']);
+    $this->assertIsInt($result[1]['id']);
+    $this->assertFalse($result[0]['is_parent']);
+    $this->assertEquals('Household', $result[0]['parent_id:name']);
+    $this->assertEquals('Household', $result[1]['name']);
   }
 
 }

@@ -38,16 +38,20 @@ class Api4EntitySetQuery extends Api4Query {
       // For non-aggregated queries, add a tracking id so the rows can be identified
       // for output-formatting purposes
       if (!$isAggregate) {
+        if (!$apiRequest->getSelect()) {
+          $apiRequest->addSelect('*');
+        }
         $apiRequest->addSelect($index . ' AS _api_set_index');
       }
-      $selectQuery = new Api4SelectQuery($apiRequest);
-      $selectQuery->forceSelectId = FALSE;
-      $selectQuery->getSql();
+      $apiRequest->expandSelectClauseWildcards();
+      $subQuery = new Api4SelectQuery($apiRequest);
+      $subQuery->forceSelectId = FALSE;
+      $subQuery->getSql();
       // Update field aliases of all subqueries to match the first query
       if ($index) {
-        $selectQuery->selectAliases = array_combine(array_keys($this->getSubquery()->selectAliases), $selectQuery->selectAliases);
+        $subQuery->selectAliases = array_combine(array_keys($this->getSubquery()->selectAliases), $subQuery->selectAliases);
       }
-      $this->subqueries[] = [$type, $selectQuery];
+      $this->subqueries[] = [$type, $subQuery];
     }
   }
 
@@ -93,37 +97,45 @@ class Api4EntitySetQuery extends Api4Query {
     // Add all subqueries to the FROM clause
     foreach ($this->subqueries as $index => $set) {
       [$type, $selectQuery] = $set;
-
       $this->query->setOp($type, [$selectQuery->getQuery()]);
+    }
+    // Build apiFieldSpec from the select clause of the first query
+    foreach ($this->getSubquery()->selectAliases as $alias => $sql) {
       // If this outer query uses the default of SELECT * then effectively we are selecting
       // all the fields of the first subquery
-      if (!$index && !$select) {
-        $this->selectAliases = $selectQuery->selectAliases;
-        $this->apiFieldSpec = $selectQuery->apiFieldSpec;
+      if (!$select) {
+        $this->selectAliases[$alias] = $alias;
       }
+      $expr = SqlExpression::convert($sql);
+      $field = $expr->getType() === 'SqlField' ? $this->getSubquery()->getField($expr->getFields()[0]) : NULL;
+      $this->addSpecField($alias, [
+        'sql_name' => "`$alias`",
+        'entity' => $field['entity'] ?? NULL,
+        'data_type' => $field['data_type'] ?? $expr::getDataType(),
+      ]);
     }
     // Parse select clause if not using default of *
     foreach ($select as $item) {
       $expr = SqlExpression::convert($item, TRUE);
-      foreach ($expr->getFields() as $fieldName) {
-        $field = $this->getField($fieldName);
-        $this->apiFieldSpec[$fieldName] = $field;
-      }
       $alias = $expr->getAlias();
       $this->selectAliases[$alias] = $expr->getExpr();
       $this->query->select($expr->render($this) . " AS `$alias`");
     }
   }
 
-  public function getField($expr, $strict = FALSE) {
+  /**
+   * @param string $expr
+   * @return array|null
+   */
+  public function getField($expr) {
     $col = strpos($expr, ':');
     $fieldName = $col ? substr($expr, 0, $col) : $expr;
-    return $this->apiFieldSpec[$fieldName] ?? $this->getSubquery()->getField($expr, $strict);
+    return $this->apiFieldSpec[$fieldName] ?? NULL;
   }
 
   protected function buildWhereClause() {
     foreach ($this->getWhere() as $clause) {
-      $sql = $this->treeWalkClauses($clause, 'HAVING');
+      $sql = $this->treeWalkClauses($clause, 'WHERE');
       if ($sql) {
         $this->query->where($sql);
       }
@@ -152,8 +164,13 @@ class Api4EntitySetQuery extends Api4Query {
       if ($dir !== 'ASC' && $dir !== 'DESC') {
         throw new \CRM_Core_Exception("Invalid sort direction. Cannot order by $item $dir");
       }
-      $expr = $this->getExpression($item);
-      $column = $this->renderExpr($expr);
+      if (!empty($this->selectAliases[$item])) {
+        $column = '`' . $item . '`';
+      }
+      else {
+        $expr = $this->getExpression($item);
+        $column = $this->renderExpr($expr);
+      }
       $this->query->orderBy("$column $dir");
     }
   }
