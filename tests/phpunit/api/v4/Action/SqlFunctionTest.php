@@ -226,12 +226,18 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('REPLACE(first_name, "c", "cdef") AS new_first')
       ->addSelect('UPPER(first_name)')
       ->addSelect('LOWER(middle_name)')
+      ->addSelect('LEFT(last_name, 3) AS left_last')
+      ->addSelect('RIGHT(last_name, 3) AS right_last')
+      ->addSelect('SUBSTRING(last_name, 2, 3) AS sub_last')
       ->execute()->first();
 
     $this->assertEquals('abc|Q|tester1', $result['concat_ws']);
     $this->assertEquals('abcdef', $result['new_first']);
     $this->assertEquals('ABC', $result['UPPER:first_name']);
     $this->assertEquals('q', $result['LOWER:middle_name']);
+    $this->assertEquals('tes', $result['left_last']);
+    $this->assertEquals('er1', $result['right_last']);
+    $this->assertEquals('est', $result['sub_last']);
   }
 
   public function testDateFunctions() {
