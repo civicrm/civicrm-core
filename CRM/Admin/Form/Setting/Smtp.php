@@ -256,7 +256,13 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
         $this->_defaults = $mailingBackend;
 
         if (!empty($this->_defaults['smtpPassword'])) {
-          $this->_defaults['smtpPassword'] = \Civi::service('crypto.token')->decrypt($this->_defaults['smtpPassword']);
+          try {
+            $this->_defaults['smtpPassword'] = \Civi::service('crypto.token')->decrypt($this->_defaults['smtpPassword']);
+          }
+          catch (Exception $e) {
+            Civi::log()->error($e->getMessage());
+            CRM_Core_Session::setStatus(ts('Unable to retrieve the encrypted password. Please check your configured encryption keys. The error message is: %1', [1 => $e->getMessage()]), ts("Encryption key error"), "error");
+          }
         }
       }
       else {
