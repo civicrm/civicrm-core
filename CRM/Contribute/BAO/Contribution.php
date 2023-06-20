@@ -2600,6 +2600,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $template->assign('membership_name',
               CRM_Member_PseudoConstant::membershipType($membership->membership_type_id)
             );
+            $template->assign('mem_type_id', $membership->membership_type_id);
             $template->assign('mem_start_date', $membership->start_date);
             $template->assign('mem_join_date', $membership->join_date);
             $template->assign('mem_end_date', $membership->end_date);
