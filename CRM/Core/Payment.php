@@ -1670,7 +1670,7 @@ abstract class CRM_Core_Payment {
     if (!$extension_instance_found) {
       $message = "No extension instances of the '%1' payment processor were found.<br />" .
         "%2 method is unsupported in legacy payment processors.";
-      throw new CRM_Core_Exception(ts($message, [
+      throw new CRM_Core_Exception(_ts($message, [
         1 => $params['processor_name'],
         2 => $method,
       ]));

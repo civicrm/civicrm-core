@@ -68,7 +68,7 @@ class CRM_Admin_Page_AJAX {
         $item['url'] = CRM_Utils_System::evalUrl(CRM_Core_BAO_Navigation::makeFullyFormedUrl($props['url']));
       }
       if (!empty($props['label'])) {
-        $item['label'] = ts($props['label'], ['context' => 'menu']);
+        $item['label'] = _ts($props['label'], ['context' => 'menu']);
       }
       $item['name'] = !empty($props['name']) ? $props['name'] : CRM_Utils_String::munge(CRM_Utils_Array::value('label', $props));
       if (!empty($item['child'])) {

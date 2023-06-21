@@ -347,7 +347,7 @@ SELECT     civicrm_email.id as email_id
         $group[$groupID]['status'] = $contactGroups[$groupID]['status'];
         $status = ts('You are already subscribed in %1, your subscription is %2.', [
           1 => $group[$groupID]['title'],
-          2 => ts($group[$groupID]['status']),
+          2 => _ts($group[$groupID]['status']),
         ]);
         CRM_Utils_System::setUFMessage($status);
         continue;

@@ -260,7 +260,7 @@ trait CRM_Core_Resources_CollectionAdderTrait {
     // TODO: Maybe this should be its own resource type to allow smarter management?
 
     foreach ((array) $text as $str) {
-      $translated = ts($str, [
+      $translated = _ts($str, [
         'domain' => ($domain == 'civicrm') ? NULL : [$domain, NULL],
         'raw' => TRUE,
       ]);

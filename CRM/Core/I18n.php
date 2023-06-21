@@ -524,7 +524,7 @@ class CRM_Core_I18n {
 
     foreach ($array as & $value) {
       if ($value) {
-        $value = ts($value, $params);
+        $value = _ts($value, $params);
       }
     }
   }
@@ -544,7 +544,7 @@ class CRM_Core_I18n {
       else {
         $key = (string) $key;
         if ($key == 'title' || $key == 'desc') {
-          $array[$key] = ts($value, ['context' => 'menu']);
+          $array[$key] = _ts($value, ['context' => 'menu']);
         }
       }
     }

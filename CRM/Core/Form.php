@@ -1580,8 +1580,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     );
     $attributes = ['formatType' => 'searchDate'];
     $extra = ['time' => $isDateTime];
-    $this->add('datepicker', $fieldName . $from, ts($fromLabel), $attributes, $required, $extra);
-    $this->add('datepicker', $fieldName . $to, ts($toLabel), $attributes, $required, $extra);
+    $this->add('datepicker', $fieldName . $from, _ts($fromLabel), $attributes, $required, $extra);
+    $this->add('datepicker', $fieldName . $to, _ts($toLabel), $attributes, $required, $extra);
   }
 
   /**

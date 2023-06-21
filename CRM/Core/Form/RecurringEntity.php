@@ -96,7 +96,7 @@ class CRM_Core_Form_RecurringEntity {
     // Assign variables
     $entityType = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($entityTable);
     $tpl = CRM_Core_Smarty::singleton();
-    $tpl->assign('recurringEntityType', ts($entityType));
+    $tpl->assign('recurringEntityType', _ts($entityType));
     $tpl->assign('currentEntityId', self::$_entityId);
     $tpl->assign('entityTable', self::$_entityTable);
     $tpl->assign('scheduleReminderId', self::$_scheduleReminderID);

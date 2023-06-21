@@ -1224,7 +1224,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
       return $this->recursion->getNextOccurrence($occurDate, $strictly_after);
     }
     catch (Exception $exception) {
-      CRM_Core_Session::setStatus(ts($exception->getMessage()));
+      CRM_Core_Session::setStatus(_ts($exception->getMessage()));
     }
     return FALSE;
   }
