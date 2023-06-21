@@ -802,12 +802,15 @@ class CRM_Core_I18n {
  * Short-named function for string translation, defined in global scope so it's available everywhere.
  *
  * @param string $text
- *   String string for translating.
+ *   String for translating.
+ *   Ex: 'Hello, %1!'
  * @param array $params
- *   Array an array of additional parameters.
- *
+ *   An array of additional parameters, as per `crm_translate()`.
+ *   Ex: [1 => 'Dave']
  * @return string
- *   the translated string
+ *   The translated string
+ *   Ex: '¡Buenos días Dave!`
+ * @see \CRM_Core_I18n::crm_translate()
  */
 function ts($text, $params = []) {
   static $bootstrapReady = FALSE;
