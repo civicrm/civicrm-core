@@ -58,15 +58,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       if ($contribution->contribution_status_id == 1) {
         $first = FALSE;
       }
-      $isFirstOrLastRecurringPayment = $this->recur($contributionRecur, $first);
-
-      if ($isFirstOrLastRecurringPayment) {
-        //send recurring Notification email for user
-        CRM_Contribute_BAO_ContributionPage::recurringNotify($contributionID, TRUE,
-          $contributionRecur
-        );
-      }
-
+      $this->recur($contributionRecur, $first);
       return TRUE;
     }
     catch (CRM_Core_Exception $e) {
@@ -79,7 +71,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @param \CRM_Contribute_BAO_ContributionRecur $recur
    * @param bool $first
    *
-   * @return bool
    * @throws \CRM_Core_Exception
    */
   public function recur($recur, $first) {
@@ -123,11 +114,16 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       // so we just fix the recurring contribution and not change any of
       // the existing contributions
       // CRM-9036
-      return FALSE;
+      return;
     }
 
     CRM_Contribute_BAO_Contribution::completeOrder($input, $recur->id, $first ? $this->getContributionID() : NULL);
-    return $isFirstOrLastRecurringPayment;
+    if ($isFirstOrLastRecurringPayment) {
+      //send recurring Notification email for user
+      CRM_Contribute_BAO_ContributionPage::recurringNotify($this->getContributionID(), TRUE,
+        $this->getContributionRecur()
+      );
+    }
   }
 
   /**
