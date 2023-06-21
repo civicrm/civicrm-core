@@ -43,14 +43,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       //we only get invoice num as a key player from payment gateway response.
       //for ARB we get x_subscription_id and x_subscription_paynum
       $x_subscription_id = $this->getRecurProcessorID();
-      $input = [];
-
-      $input['component'] = 'contribute';
-
-      // load post vars in $input
-      $this->getInput($input);
-      $paymentProcessorID = $this->getPaymentProcessorID();
-
       // Check if the contribution exists
       // make sure contribution exists and is valid
       $contribution = new CRM_Contribute_BAO_Contribution();
@@ -59,23 +51,14 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
       }
 
-      $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
-      $contributionRecur->id = $this->getContributionRecurID();
-      if (!$contributionRecur->find(TRUE)) {
-        throw new CRM_Core_Exception("Could not find contribution recur record: " . $this->getContributionRecurID() . " in IPN request: " . print_r($input, TRUE));
-      }
-      // do a subscription check
-      if ($contributionRecur->processor_id != $this->getRecurProcessorID()) {
-        throw new CRM_Core_Exception('Unrecognized subscription.');
-      }
+      $contributionRecur = $this->getContributionRecur();
 
       // check if first contribution is completed, else complete first contribution
       $first = TRUE;
       if ($contribution->contribution_status_id == 1) {
         $first = FALSE;
       }
-      $input['payment_processor_id'] = $paymentProcessorID;
-      $isFirstOrLastRecurringPayment = $this->recur($input, $contributionRecur, $first);
+      $isFirstOrLastRecurringPayment = $this->recur($contributionRecur, $first);
 
       if ($isFirstOrLastRecurringPayment) {
         //send recurring Notification email for user
@@ -93,15 +76,16 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * @param array $input
    * @param \CRM_Contribute_BAO_ContributionRecur $recur
    * @param bool $first
    *
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  public function recur($input, $recur, $first) {
-
+  public function recur($recur, $first) {
+    $paymentProcessorID = $this->getPaymentProcessorID();
+    $input = $this->getInput();
+    $input['payment_processor_id'] = $paymentProcessorID;
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     $now = date('YmdHis');
@@ -149,11 +133,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * Get the input from passed in fields.
    *
-   * @param array $input
-   *
    * @throws \CRM_Core_Exception
    */
-  public function getInput(&$input) {
+  public function getInput(): array {
+    $input = [];
+    // This component is probably obsolete & will go once we stop calling completeOrder directly.
+    $input['component'] = 'contribute';
     $input['amount'] = $this->retrieve('x_amount', 'String');
     $input['subscription_id'] = $this->getRecurProcessorID();
     $input['response_reason_code'] = $this->retrieve('x_response_reason_code', 'String', FALSE);
@@ -186,6 +171,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     foreach ($params as $civiName => $resName) {
       $input[$civiName] = $this->retrieve($resName, 'String', FALSE);
     }
+    return $input;
   }
 
   /**
@@ -352,6 +338,24 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
   protected function getContributionRecurID(): int {
     $contributionRecur = $this->getContributionRecurObject($this->getRecurProcessorID(), (int) $this->retrieve('x_cust_id', 'Integer', FALSE, 0), $this->getContributionID());
     return (int) $contributionRecur->id;
+  }
+
+  /**
+   *
+   * @return \CRM_Contribute_BAO_ContributionRecur
+   * @throws \CRM_Core_Exception
+   */
+  private function getContributionRecur(): CRM_Contribute_BAO_ContributionRecur {
+    $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
+    $contributionRecur->id = $this->getContributionRecurID();
+    if (!$contributionRecur->find(TRUE)) {
+      throw new CRM_Core_Exception('Could not find contribution recur record: ' . $this->getContributionRecurID() . " in IPN request: " . print_r($this->getInput(), TRUE));
+    }
+    // do a subscription check
+    if ($contributionRecur->processor_id != $this->getRecurProcessorID()) {
+      throw new CRM_Core_Exception('Unrecognized subscription.');
+    }
+    return $contributionRecur;
   }
 
 }
