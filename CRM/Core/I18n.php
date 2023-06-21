@@ -847,3 +847,21 @@ function ts($text, $params = []) {
     return $i18n->crm_translate($text, $params);
   }
 }
+
+/**
+ * Alternate name for `ts()`
+ *
+ * This is functionally equivalent to `ts()`. However, regular `ts()` is subject to extra linting
+ * rules. Using `_ts()` can bypass the linting rules for the rare cases where you really want
+ * special/dynamic values.
+ *
+ * @param array ...$args
+ * @return string
+ * @see ts()
+ * @see \CRM_Core_I18n::crm_translate()
+ * @internal
+ */
+function _ts(...$args) {
+  $f = 'ts';
+  return $f(...$args);
+}
