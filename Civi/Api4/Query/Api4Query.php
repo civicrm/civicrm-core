@@ -146,6 +146,9 @@ abstract class Api4Query {
       return;
     }
     $this->apiFieldSpec[$path] = $field + [
+      'name' => $path,
+      'type' => 'Extra',
+      'entity' => NULL,
       'implicit_join' => NULL,
       'explicit_join' => NULL,
     ];
@@ -296,8 +299,10 @@ abstract class Api4Query {
       $fieldAlias = $expr->render($this);
       if (is_string($value)) {
         $valExpr = $this->getExpression($value);
+        // Format string input
         if ($expr->getType() === 'SqlField' && $valExpr->getType() === 'SqlString') {
-          $value = $valExpr->getExpr();
+          // Strip surrounding quotes
+          $value = substr($valExpr->getExpr(), 1, -1);
           FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName], $this->entityValues, $operator);
           return $this->createSQLClause($fieldAlias, $operator, $value, $this->apiFieldSpec[$fieldName], $depth);
         }
