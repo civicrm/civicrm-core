@@ -109,7 +109,7 @@ function _civiimport_civicrm_get_import_tables(): array {
     if (!CRM_Utils_Rule::alphanumeric($tableName) || !CRM_Core_DAO::singleValueQuery('SHOW TABLES LIKE %1', [1 => [$tableName, 'String']])) {
       continue;
     }
-    $createdBy = $tables->display_name ? '' : ' (' . E::ts('Created by %1', [$tables->display_name, 'String']) . ')';
+    $createdBy = !$tables->display_name ? '' : ' (' . E::ts('created by %1', [1 => $tables->display_name]) . ')';
     $importEntities[$tables->id] = [
       'table_name' => $tableName,
       'created_by' => $tables->display_name,
@@ -118,7 +118,7 @@ function _civiimport_civicrm_get_import_tables(): array {
       'user_job_id' => (int) $tables->id,
       'created_date' => $tables->created_date,
       'expires_date' => $tables->expires_date,
-      'title' => ts('Import Job') . (int) $tables->id,
+      'title' => ts('Import Job') . $tables->id,
       'description' => $tables->created_date . $createdBy,
     ];
   }
