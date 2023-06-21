@@ -43,15 +43,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       //we only get invoice num as a key player from payment gateway response.
       //for ARB we get x_subscription_id and x_subscription_paynum
       $x_subscription_id = $this->getRecurProcessorID();
-      $ids = $input = [];
+      $input = [];
 
       $input['component'] = 'contribute';
 
       // load post vars in $input
       $this->getInput($input);
-
-      // load post ids in $ids
-      $this->getIDs($ids);
       $paymentProcessorID = $this->getPaymentProcessorID();
 
       // Check if the contribution exists
@@ -62,12 +59,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
       }
 
-      $ids['contributionPage'] = $contribution->contribution_page_id;
-
       $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
-      $contributionRecur->id = $ids['contributionRecur'];
+      $contributionRecur->id = $this->getContributionRecurID();
       if (!$contributionRecur->find(TRUE)) {
-        throw new CRM_Core_Exception("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
+        throw new CRM_Core_Exception("Could not find contribution recur record: " . $this->getContributionRecurID() . " in IPN request: " . print_r($input, TRUE));
       }
       // do a subscription check
       if ($contributionRecur->processor_id != $this->getRecurProcessorID()) {
