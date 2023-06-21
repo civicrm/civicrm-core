@@ -78,12 +78,9 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $first = TRUE;
       if ($contribution->contribution_status_id == 1) {
         $first = FALSE;
-        //load new contribution object if required.
-        // create a contribution and then get it processed
-        $contribution = new CRM_Contribute_BAO_Contribution();
       }
       $input['payment_processor_id'] = $paymentProcessorID;
-      $isFirstOrLastRecurringPayment = $this->recur($input, $contributionRecur, $contribution, $first);
+      $isFirstOrLastRecurringPayment = $this->recur($input, $contributionRecur, $first);
 
       if ($isFirstOrLastRecurringPayment) {
         //send recurring Notification email for user
@@ -103,13 +100,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * @param array $input
    * @param \CRM_Contribute_BAO_ContributionRecur $recur
-   * @param \CRM_Contribute_BAO_Contribution $contribution
    * @param bool $first
    *
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  public function recur($input, $recur, $contribution, $first) {
+  public function recur($input, $recur, $first) {
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
@@ -151,7 +147,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $recur->id, $contribution->id ?? NULL);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $recur->id, $first ? $this->getContributionID() : NULL);
     return $isFirstOrLastRecurringPayment;
   }
 
