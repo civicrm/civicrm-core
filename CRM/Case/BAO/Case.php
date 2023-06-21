@@ -71,29 +71,29 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
     if ($e->entity === 'Activity' && in_array($e->action, ['create', 'edit'])) {
       /** @var CRM_Activity_DAO_Activity $activity */
       $activity = $e->object;
+      $params = $e->params;
 
       // If subject contains a ‘[case #…]’ string, file activity on the related case (CRM-5916)
       $matches = [];
-      $subjectToMatch = $activity->subject ?? '';
-      if (preg_match('/\[case #([0-9a-h]{7})\]/', $subjectToMatch, $matches)) {
-        $key = CRM_Core_DAO::escapeString(CIVICRM_SITE_KEY);
-        $hash = $matches[1];
-        $query = "SELECT id FROM civicrm_case WHERE SUBSTR(SHA1(CONCAT('$key', id)), 1, 7) = '" . CRM_Core_DAO::escapeString($hash) . "'";
-      }
-      elseif (preg_match('/\[case #(\d+)\]/', $subjectToMatch, $matches)) {
-        $query = "SELECT id FROM civicrm_case WHERE id = '" . CRM_Core_DAO::escapeString($matches[1]) . "'";
+      if (!isset($params['case_id'])) {
+        $subjectToMatch = $activity->subject ?? '';
+        if (preg_match('/\[case #([0-9a-h]{7})\]/', $subjectToMatch, $matches)) {
+          $key = CRM_Core_DAO::escapeString(CIVICRM_SITE_KEY);
+          $query = "SELECT id FROM civicrm_case WHERE SUBSTR(SHA1(CONCAT('$key', id)), 1, 7) = %1";
+        }
+        elseif (preg_match('/\[case #(\d+)\]/', $subjectToMatch, $matches)) {
+          $query = "SELECT id FROM civicrm_case WHERE id = %1";
+        }
       }
       if (!empty($matches)) {
-        $caseParams = [
-          'activity_id' => $activity->id,
-          'case_id' => CRM_Core_DAO::singleValueQuery($query),
-        ];
-        if ($caseParams['case_id']) {
-          CRM_Case_BAO_Case::processCaseActivity($caseParams);
-        }
-        else {
+        $params['case_id'] = CRM_Core_DAO::singleValueQuery($query, [1 => [$matches[1], 'String']]) ?: NULL;
+        if (!$params['case_id']) {
           CRM_Activity_BAO_Activity::logActivityAction($activity, "Case details for {$matches[1]} not found while recording an activity on case.");
         }
+      }
+      // Add CaseActivity record (or remove if $params['case_id'] is falsey)
+      if (isset($params['case_id'])) {
+        CRM_Case_BAO_Case::updateCaseActivity($activity->id, $params['case_id']);
       }
     }
     if ($e->entity === 'RelationshipType') {
