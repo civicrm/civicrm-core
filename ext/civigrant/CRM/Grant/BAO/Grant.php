@@ -9,10 +9,12 @@
  +--------------------------------------------------------------------+
  */
 
+use CRM_Grant_ExtensionUtil as E;
+
 /**
  * Class CRM_Grant_BAO_Grant
  */
-class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
+class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant implements \Civi\Core\HookInterface {
 
   /**
    * Get events Summary.
@@ -77,122 +79,75 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Add grant.
-   *
-   * @param array $params
-   * @param array $ids
-   *
-   * @return object
+   * @deprecated
    */
-  public static function add($params, $ids = []) {
-    $id = $ids['grant_id'] ?? $params['id'] ?? NULL;
-    $hook = $id ? 'edit' : 'create';
-    CRM_Utils_Hook::pre($hook, 'Grant', $id, $params);
+  public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
+  }
 
-    $grant = new CRM_Grant_DAO_Grant();
-    $grant->id = $id;
+  /**
+   * @deprecated
+   */
+  public static function create($params) {
+    return self::add($params);
+  }
 
-    $grant->copyValues($params);
-
-    // set currency for CRM-1496
-    if (!isset($grant->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $grant->currency = $config->defaultCurrency;
-    }
-
-    $result = $grant->save();
-
-    if (empty($params['skipRecentView'])) {
-      if (!isset($grant->contact_id) || !isset($grant->grant_type_id)) {
-        $grant->find(TRUE);
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
+    if ($event->action === 'create') {
+      // set currency for CRM-1496
+      if (empty($event->params['currency'])) {
+        $event->params['currency'] = Civi::settings()->get('defaultCurrency');
       }
-      $grantTypes = self::buildOptions('grant_type_id');
-      $title = CRM_Contact_BAO_Contact::displayName($grant->contact_id) . ' - ' . ts('Grant') . ': ' . $grantTypes[$grant->grant_type_id];
-
-      civicrm_api4('RecentItem', 'create', [
-        'checkPermissions' => FALSE,
-        'values' => [
-          'entity_type' => 'Grant',
-          'entity_id' => $grant->id,
-          'title' => $title,
-        ],
-      ]);
     }
-
-    CRM_Utils_Hook::post($hook, 'Grant', $grant->id, $grant);
-
-    return $result;
   }
 
   /**
-   * Adds a grant.
-   *
-   * @param array $params
-   * @param array $ids
-   *
-   * @return object
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $e
    */
-  public static function create($params, $ids = []) {
-    $transaction = new CRM_Core_Transaction();
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
+    /** @var CRM_Grant_DAO_Grant $grant */
+    $grant = $e->object;
+    $params = $e->params;
+    if (in_array($e->action, ['create', 'edit'])) {
+      $grant->find(TRUE);
+      $cid = CRM_Core_Session::getLoggedInContactID() ?: $grant->contact_id;
 
-    $grant = self::add($params, $ids);
-
-    if (is_a($grant, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $grant;
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $id = $session->get('userID');
-    if (!$id) {
-      $id = $params['contact_id'] ?? NULL;
-    }
-    if (!empty($params['note']) || CRM_Utils_Array::value('id', CRM_Utils_Array::value('note', $ids))) {
-      $noteParams = [
+      // Log the information on successful add/edit of Grant
+      $logParams = [
         'entity_table' => 'civicrm_grant',
-        'note' => $params['note'] = $params['note'] ? $params['note'] : "null",
         'entity_id' => $grant->id,
-        'contact_id' => $id,
+        'modified_id' => $cid,
+        'modified_date' => date('Ymd'),
       ];
+      CRM_Core_BAO_Log::add($logParams);
 
-      CRM_Core_BAO_Note::add($noteParams, (array) CRM_Utils_Array::value('note', $ids));
+      // Add to recent items list
+      if (empty($params['skipRecentView'])) {
+        $grantTypes = self::buildOptions('grant_type_id');
+        $title = CRM_Contact_BAO_Contact::displayName($grant->contact_id) . ' - ' . E::ts('Grant: %1', [1 => $grantTypes[$grant->grant_type_id]]);
+        civicrm_api4('RecentItem', 'create', [
+          'checkPermissions' => FALSE,
+          'values' => [
+            'entity_type' => 'Grant',
+            'entity_id' => $grant->id,
+            'title' => $title,
+          ],
+        ]);
+      }
     }
-    // Log the information on successful add/edit of Grant
-    $logParams = [
-      'entity_table' => 'civicrm_grant',
-      'entity_id' => $grant->id,
-      'modified_id' => $id,
-      'modified_date' => date('Ymd'),
-    ];
-
-    CRM_Core_BAO_Log::add($logParams);
-
-    // add custom field values
-    if (!empty($params['custom']) && is_array($params['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_grant', $grant->id);
-    }
-
-    // check and attach and files as needed
-    CRM_Core_BAO_File::processAttachment($params,
-      'civicrm_grant',
-      $grant->id
-    );
-
-    $transaction->commit();
-
-    return $grant;
   }
 
   /**
-   * Delete the Contact.
-   *
-   * @param int $id
-   *   Contact id.
-   *
-   * @return bool
-   *
+   * @deprecated
    */
   public static function deleteContact($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     $grant = new CRM_Grant_DAO_Grant();
     $grant->contact_id = $id;
     $grant->delete();
@@ -200,26 +155,11 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   }
 
   /**
-   * Delete the grant.
-   *
-   * @param int $id
-   *   Grant id.
-   *
-   * @return bool|mixed
+   * @deprecated
    */
   public static function del($id) {
-    CRM_Utils_Hook::pre('delete', 'Grant', $id);
-
-    $grant = new CRM_Grant_DAO_Grant();
-    $grant->id = $id;
-
-    $grant->find();
-
-    if ($grant->fetch()) {
-      $results = $grant->delete();
-      CRM_Utils_Hook::post('delete', 'Grant', $grant->id, $grant);
-      return $results;
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    self::deleteRecord(['id' => $id]);
     return FALSE;
   }
 
@@ -233,7 +173,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     $fields = CRM_Grant_DAO_Grant::export();
     $grantNote = [
       'grant_note' => [
-        'title' => ts('Grant Note'),
+        'title' => E::ts('Grant Note'),
         'name' => 'grant_note',
         'data_type' => CRM_Utils_Type::T_TEXT,
       ],

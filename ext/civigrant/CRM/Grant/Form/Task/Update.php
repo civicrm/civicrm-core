@@ -74,6 +74,9 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
         unset($params[$key]);
       }
     }
+    $values = [
+      'skipRecentView' => TRUE,
+    ];
 
     if (!empty($params)) {
       foreach ($params as $key => $value) {
@@ -82,7 +85,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
       foreach ($this->_grantIds as $grantId) {
         $values['id'] = $grantId;
 
-        CRM_Grant_BAO_Grant::add($values);
+        CRM_Grant_BAO_Grant::writeRecord($values);
         $updatedGrants++;
       }
     }
