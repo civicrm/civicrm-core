@@ -529,23 +529,49 @@ ORDER BY a.object_id
     $acls = CRM_ACL_BAO_Cache::build($contactID);
     $aclKeys = array_keys($acls);
     $aclKeys = implode(',', $aclKeys);
+    $select = "a.operation, a.object_id";
+    $hasPriorty = FALSE;
+    if (array_key_exists('priority', CRM_ACL_BAO_ACL::getSupportedFields())) {
+      $select .= ",a.priority";
+      $hasPriority = TRUE;
+    }
     $query = "
-SELECT   a.operation, a.object_id
+SELECT   {$select}
   FROM   civicrm_acl_cache c, civicrm_acl a
  WHERE   c.acl_id       =  a.id
    AND   a.is_active    =  1
    AND   a.object_table = %1
    AND   a.id        IN ( $aclKeys )
    AND   a.deny         = 1
-GROUP BY a.operation,a.object_id
-ORDER BY a.object_id
 ";
     $params = [1 => [$tableName, 'String']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
       if ($dao->object_id) {
         if (self::matchType($type, $dao->operation)) {
-          $ids[] = $dao->object_id;
+          if ($hasPriority) {
+            $permittedRules = CRM_Core_DAO::singleValueQuery("SELECT count(a.id)
+              FROM civicrm_acl a
+              INNER JOIN civicrm_acl_cache c ON c.acl_id = a.id
+              WHERE a.id IN ( $aclKeys )
+              AND a.is_active = 1
+              AND a.object_table = %1
+              AND a.deny = 0
+              AND a.priority > %2
+              AND a.object_id = %3", [
+                1 => [$tableName, 'String'],
+                2 => [(int) $dao->priority, 'Integer'],
+                3 => [$dao->object_id, 'Integer'],
+              ]);
+            if (empty($permittedRules) && !in_array($dao->object_id, $ids, TRUE)) {
+              $ids[] = $dao->object_id;
+            }
+          }
+          else {
+            if (!in_array($dao->object_id, $ids, TRUE)) {
+              $ids[] = $dao->object_id;
+            }
+          }
         }
       }
     }

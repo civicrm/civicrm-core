@@ -31,6 +31,7 @@
               <th>{ts}Description{/ts}</th>
               <th>{ts}Enabled?{/ts}</th>
               <th>{ts}Mode{/ts}</th>
+              <th>{ts}Priority{/ts}</th>
               <th></th>
             </tr>
             </thead>
@@ -44,6 +45,7 @@
                 <td class="crm-acl-name crm-editable" data-field="name">{$row.name}</td>
                 <td class="crm-acl-is_active" id="row_{$aclID}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td class="crm-acl-deny" id="row_{$aclID}_deny">{if $row.deny}{ts}Deny{/ts}{else}{ts}Allow{/ts}{/if}</td>
+                <td class="crm-acl-priority" id="row_{$aclID}_priority">{$row.priority}</td>
                 <td>{$row.action|replace:'xx':$aclID}</td>
               </tr>
             {/foreach}
