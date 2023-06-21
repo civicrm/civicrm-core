@@ -2146,6 +2146,11 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   /**
    * Repeat a transaction as part of a recurring series.
    *
+   * @internal NOT supported to be called from outside of core. Note this function
+   * was made public to be called from the v3 api which IS supported so we can
+   * amend it without regards to possible external callers as this warning
+   * was added in the same commit as it was made public rather than protected.
+   *
    * The ideal flow is
    * 1) Processor calls contribution.repeattransaction with contribution_status_id = Pending
    * 2) The repeattransaction loads the 'template contribution' and calls a hook to allow altering of it .
@@ -2180,11 +2185,12 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @throws \Civi\API\Exception\UnauthorizedException
    * @todo
    *
-   *  2) repeattransaction code is current munged into completeTransaction code for historical bad coding reasons
+   *  2) repeattransaction code is callable from completeTransaction code for historical bad coding reasons
    *  3) Repeat transaction duplicates rather than calls Order.create
    *  4) Use of payment.create still limited - completetransaction is more common.
    */
-  protected static function repeatTransaction(array $input, int $recurringContributionID) {
+  public static function repeatTransaction(array $input, int $recurringContributionID) {
+    // @todo - this was shared with `completeOrder` and not all necessarily apply.
     $inputContributionWhiteList = [
       'fee_amount',
       'net_amount',
@@ -2204,6 +2210,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
     $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
+    // @todo this was taken from completeContribution - it may be this just duplicates
+    // upcoming filtering & can go.
     $contributionParams = array_merge([
       'contribution_status_id' => $completedContributionStatusID,
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)

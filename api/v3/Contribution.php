@@ -665,12 +665,9 @@ function civicrm_api3_contribution_repeattransaction($params) {
     $input['receipt_from_email'] = ($params['receipt_from_email'] ?? NULL) ?: $domainFromEmail;
   }
 
-  // @todo this should call CRM_Contribute_BAO_Contribution::repeatTransaction - some minor cleanup needed to separate
-  // from completeOrder
-  return CRM_Contribute_BAO_Contribution::completeOrder($input,
-    $templateContribution['contribution_recur_id'],
-    NULL,
-    $params['is_post_payment_create'] ?? NULL);
+  return CRM_Contribute_BAO_Contribution::repeatTransaction($input,
+    $templateContribution['contribution_recur_id']
+  );
 }
 
 /**
