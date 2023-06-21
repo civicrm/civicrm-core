@@ -44,8 +44,8 @@
       };
 
       this.securityModes = [
-        {id: 'RBAC', icon: 'fa-lock', text: ts('Enforce Permissions')},
-        {id: 'FBAC', icon: 'fa-unlock', text: ts('Open Access')},
+        {id: 'RBAC', icon: 'fa-user', text: ts('User-Based'), description: ts('Inherit permissions based on the current user or role')},
+        {id: 'FBAC', icon: 'fa-file-text', text: ts('Form-Based'), description: ts('Allow access to any fields listed on the form')},
       ];
 
       // Above mode for use with getterSetter
