@@ -363,6 +363,7 @@
       });
       this.each(function(ufFieldModel){
         const length = ufFieldModelsByKey[ufFieldModel.getSignature()].length > 1;
+        // Allow multiple free html fields, but note this would only work on an English install, and only if the field label hasn't been changed.
         const label = ufFieldModelsByKey[ufFieldModel.getSignature()][0].attributes.label !== 'Free HTML';
         const is_duplicate = length && label;
         if (is_duplicate !== ufFieldModel.get('is_duplicate')) {
