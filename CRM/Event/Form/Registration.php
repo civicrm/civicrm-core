@@ -730,9 +730,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function confirmPostProcess($contactID = NULL, $contribution = NULL) {
-    // add/update contact information
-    unset($this->_params['note']);
-
     //to avoid conflict overwrite $this->_params
     $this->_params = $this->get('value');
 
