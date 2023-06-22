@@ -51,7 +51,7 @@
      </tr>
      <tr class="crm-acl-form-block-priority">
        <td class="label">{$form.priority.label}</td>
-       <td>{$form.priority.label}<br />
+       <td>{$form.priority.html}<br />
          <span class="description">{ts}Higher priority ACL rules will override lower priority rules{/ts}</span>
        </td>
      </tr>

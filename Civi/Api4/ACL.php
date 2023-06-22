@@ -10,6 +10,8 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Generic\Traits\SortableEntity;
+
 /**
  * ACL (Access Control List).
  *
@@ -24,8 +26,10 @@ namespace Civi\Api4;
  * @searchable none
  * @see https://docs.civicrm.org/user/en/latest/initial-set-up/permissions-and-access-control
  * @since 5.19
+ * @orderBy priority
  * @package Civi\Api4
  */
 class ACL extends Generic\DAOEntity {
+  use SortableEntity;
 
 }
