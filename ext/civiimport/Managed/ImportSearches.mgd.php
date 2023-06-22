@@ -45,6 +45,9 @@ foreach ($importEntities as $importEntity) {
         'description' => ts('Temporary import data'),
         'mapping_id' => NULL,
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ];
   $managedEntities[] = [
@@ -72,6 +75,9 @@ foreach ($importEntities as $importEntity) {
         'created_id' => $importEntity['created_id'],
         'description' => ts('Temporary import data'),
         'mapping_id' => NULL,
+      ],
+      'match' => [
+        'name',
       ],
     ],
   ];
@@ -114,6 +120,10 @@ foreach ($importEntities as $importEntity) {
           'columns' => $columns,
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ];
@@ -168,6 +178,10 @@ foreach ($importEntities as $importEntity) {
           ],
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ];

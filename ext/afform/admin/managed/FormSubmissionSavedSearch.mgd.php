@@ -27,6 +27,9 @@ return [
           ],
         ],
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ],
   [
@@ -98,6 +101,10 @@ return [
             ],
           ],
         ],
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ],

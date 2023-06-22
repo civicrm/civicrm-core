@@ -50,6 +50,9 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ],
   [
@@ -89,6 +92,9 @@ return [
           'having' => [],
         ],
         'expires_date' => NULL,
+      ],
+      'match' => [
+        'name',
       ],
     ],
   ],
@@ -162,6 +168,10 @@ return [
         ],
         'acl_bypass' => FALSE,
       ],
+      'match' => [
+        'name',
+        'saved_search_id',
+      ],
     ],
   ],
   [
@@ -208,6 +218,9 @@ return [
         ],
         'expires_date' => NULL,
         'description' => NULL,
+      ],
+      'match' => [
+        'name',
       ],
     ],
   ],
@@ -280,6 +293,10 @@ return [
           ],
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ],
