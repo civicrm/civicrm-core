@@ -228,16 +228,18 @@ SELECT count( a.id )
     if (!empty($acls)) {
       $aclKeys = array_keys($acls);
       $aclKeys = implode(',', $aclKeys);
-
+      $orderBy = 'a.object_id';
+      if (array_key_exists('priority', CRM_ACL_BAO_ACL::getSupportedFields())) {
+        $orderBy .= ',a.priority';
+      }
       $query = "
-SELECT   a.operation, a.object_id
+SELECT   a.operation, a.object_id,a.deny
   FROM   civicrm_acl_cache c, civicrm_acl a
  WHERE   c.acl_id       =  a.id
    AND   a.is_active    =  1
    AND   a.object_table = 'civicrm_group'
    AND   a.id        IN ( $aclKeys )
-   AND   a.deny         = 0
-ORDER BY a.object_id
+ORDER BY {$orderBy}
 ";
 
       $dao = CRM_Core_DAO::executeQuery($query);
@@ -252,24 +254,12 @@ ORDER BY a.object_id
             $whereClause = ' ( 1 ) ';
             break;
           }
-          $ids[] = $dao->object_id;
-        }
-      }
-      $denyQuery = "SELECT   a.operation, a.object_id
-  FROM   civicrm_acl_cache c, civicrm_acl a
- WHERE   c.acl_id       =  a.id
-   AND   a.is_active    =  1
-   AND   a.object_table = 'civicrm_group'
-   AND   a.id        IN ( $aclKeys )
-   AND   a.deny         = 1
-   AND   a.object_id IN (%1)
-ORDER BY a.object_id
-";
-      if (!empty($ids)) {
-        $denyDao = CRM_Core_DAO::executeQuery($denyQuery, [1 => [implode(',', $ids), 'CommaSeparatedIntegers']]);
-        while ($denyDao->fetch()) {
-          $key = array_search($denyDao->object_id, $ids);
-          unset($ids[$key]);
+          if (!$dao->deny) {
+            $ids[] = $dao->object_id;
+          }
+          else {
+            $ids = array_diff($ids, [$dao->object_id]);
+          }
         }
       }
 
@@ -490,7 +480,7 @@ SELECT   a.operation,a.object_id,a.deny
    AND   a.is_active    =  1
    AND   a.object_table = %1
    AND   a.id        IN ( $aclKeys )
-ORDER BY a.object_id
+ORDER BY {$orderBy}
 ";
     $params = [1 => [$tableName, 'String']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
