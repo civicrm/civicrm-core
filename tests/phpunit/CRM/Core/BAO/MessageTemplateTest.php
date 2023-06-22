@@ -11,6 +11,7 @@ use Civi\WorkflowMessage\WorkflowMessage;
 /**
  * Class CRM_Core_BAO_MessageTemplateTest
  * @group headless
+ * @group msgtpl
  */
 class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 

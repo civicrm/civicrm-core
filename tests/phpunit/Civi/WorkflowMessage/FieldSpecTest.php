@@ -13,6 +13,7 @@ namespace Civi\WorkflowMessage;
 
 /**
  * @group headless
+ * @group msgtpl
  */
 class FieldSpecTest extends \CiviUnitTestCase {
 

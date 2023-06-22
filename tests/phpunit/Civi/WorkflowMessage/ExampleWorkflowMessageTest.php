@@ -17,6 +17,7 @@ use Civi\Test\Invasive;
  * Test the WorkflowMessage class
  *
  * @group headless
+ * @group msgtpl
  */
 class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
 
