@@ -135,6 +135,7 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
     $contribution['tax_amount'] = $mockOrder->getTotalTaxAmount() ? round($mockOrder->getTotalTaxAmount(), 2) : 0;
     $messageTemplate->setContribution($contribution);
     $messageTemplate->setOrder($mockOrder);
+    $messageTemplate->setUserText(ts('Send payment by check'));
     $messageTemplate->setContribution($contribution);
   }
 

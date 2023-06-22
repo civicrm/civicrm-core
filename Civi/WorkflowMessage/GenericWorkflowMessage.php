@@ -25,6 +25,8 @@ use Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait;
  * @method int|null getContactID()
  * @method $this setContact(array|null $contact)
  * @method array|null getContact()
+ * @method string getUserText()
+ * @method setUserText(string $userText)
  *
  * @support template-only
  * GenericWorkflowMessage should aim for "full" support, but it's prudent to keep
@@ -68,6 +70,13 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
    * @fkEntity Contact
    */
   protected $contactID;
+
+  /**
+   * @var string
+   *
+   * @scope tplParams as user_text
+   */
+  protected $userText;
 
   /**
    * @var array|null

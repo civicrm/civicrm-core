@@ -983,7 +983,7 @@ DESC limit 1");
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
         'isTest' => (bool) ($this->_action & CRM_Core_Action::PREVIEW),
         'modelProps' => [
-          'receiptText' => $this->getSubmittedValue('receipt_text'),
+          'userText' => $this->getSubmittedValue('receipt_text'),
           'contributionID' => $formValues['contribution_id'],
           'contactID' => $this->_receiptContactId,
           'membershipID' => $this->getMembershipID(),
