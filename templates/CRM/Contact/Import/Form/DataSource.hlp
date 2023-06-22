@@ -46,6 +46,9 @@
       {ts}<strong>No Duplicate Checking:</strong> Inserts all valid records without comparing them to existing contact records for possible duplicates.{/ts}
     </li>
   </ul>
+  <p>
+    {ts}You can only match imported data directly to existing Contact IDs in Update, Fill or No Duplicate Checking modes.{/ts}
+  </p>
 {/htxt}
 
 {htxt id='data-source-selection-title'}
