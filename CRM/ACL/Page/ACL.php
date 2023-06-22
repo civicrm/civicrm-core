@@ -99,12 +99,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
   public function browse() {
     // get all acl's sorted by weight
     $acl = [];
-    $query = "
-  SELECT *
-    FROM civicrm_acl
-   WHERE ( object_table IN ( 'civicrm_saved_search', 'civicrm_uf_group', 'civicrm_custom_group', 'civicrm_event' ) )
-ORDER BY entity_id
-";
+    $query = "SELECT * FROM civicrm_acl";
     $dao = CRM_Core_DAO::executeQuery($query);
 
     $roles = CRM_Core_OptionGroup::values('acl_role');

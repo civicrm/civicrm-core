@@ -2,6 +2,10 @@
 
 UPDATE `civicrm_acl` SET `priority` = `id`;
 
+-- Remove obsolete "Basic ACLs"
+DELETE FROM civicrm_acl
+WHERE object_table NOT IN ('civicrm_saved_search', 'civicrm_uf_group', 'civicrm_custom_group', 'civicrm_event');
+
 -- fix mis-casing of field name. Note the php function doesn't permit the name change hence it is here
 -- but field is not localised.
 ALTER TABLE civicrm_uf_group

@@ -41,12 +41,6 @@
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/acl/basic</path>
-     <title>ACL</title>
-     <page_callback>CRM_ACL_Page_ACLBasic</page_callback>
-     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>
-  <item>
      <path>civicrm/file</path>
      <title>Browse Uploaded files</title>
      <access_arguments>access uploaded files</access_arguments>
