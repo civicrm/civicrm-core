@@ -515,12 +515,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
-    // Add to case
-    if (isset($params['case_id'])) {
-      CRM_Case_BAO_Case::updateCaseActivity($activity->id, $params['case_id']);
-    }
-
-    CRM_Utils_Hook::post($action, 'Activity', $activity->id, $activity);
+    CRM_Utils_Hook::post($action, 'Activity', $activity->id, $activity, $params);
     return $result;
   }
 
