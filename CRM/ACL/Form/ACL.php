@@ -29,7 +29,8 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['object_type'] = 1;
-      $defaults['priority'] = 0;
+      $defaults['deny'] = 0;
+      $defaults['priority'] = 1 + CRM_Utils_Weight::getMax(CRM_ACL_DAO_ACL::class, NULL, 'priority');
     }
 
     $showHide = new CRM_Core_ShowHideBlocks();
@@ -164,8 +165,8 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $this->addRadio('deny', ts('Mode'), [
       0 => ts('Allow'),
       1 => ts('Deny'),
-    ]);
-    $this->add('number', 'priority', ts('Priority'));
+    ], [], NULL, TRUE);
+    $this->add('number', 'priority', ts('Priority'), ['min' => 1], TRUE);
 
     $this->addFormRule(['CRM_ACL_Form_ACL', 'formRule']);
   }
@@ -288,6 +289,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
         $params['id'] = $this->_id;
       }
 
+      $params['priority'] = \CRM_Utils_Weight::updateOtherWeights(CRM_ACL_DAO_ACL::class, $this->_values['priority'] ?? NULL, $params['priority'], NULL, 'priority');
       CRM_ACL_BAO_ACL::writeRecord($params);
     }
   }

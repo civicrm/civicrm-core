@@ -24,14 +24,14 @@
           <table id="options" class="display">
             <thead>
             <tr class="columnheader">
-              <th id="sortable">{ts}Role{/ts}</th>
+              <th>{ts}Role{/ts}</th>
               <th>{ts}Operation{/ts}</th>
               <th>{ts}Type of Data{/ts}</th>
               <th>{ts}Which Data{/ts}</th>
               <th>{ts}Description{/ts}</th>
               <th>{ts}Enabled?{/ts}</th>
               <th>{ts}Mode{/ts}</th>
-              <th>{ts}Priority{/ts}</th>
+              <th id="sortable">{ts}Priority{/ts}</th>
               <th></th>
             </tr>
             </thead>
