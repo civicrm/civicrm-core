@@ -29,6 +29,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['object_type'] = 1;
+      $defaults['priority'] = 0;
     }
 
     $showHide = new CRM_Core_ShowHideBlocks();
@@ -164,6 +165,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       0 => ts('Allow'),
       1 => ts('Deny'),
     ]);
+    $this->add('number', 'priority', ts('Priority'));
 
     $this->addFormRule(['CRM_ACL_Form_ACL', 'formRule']);
   }

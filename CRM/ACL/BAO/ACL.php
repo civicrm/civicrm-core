@@ -365,8 +365,6 @@ SELECT g.*
       $ids = $cache->get($cacheKey);
       if (!is_array($ids)) {
         $ids = self::loadPermittedIDs((int) $contactID, $tableName, $type, $allGroups);
-        $denyIds = self::loadDenyIDs((int) $contactID, $tableName, $type, $allGroups);
-        $ids = array_diff($ids, $denyIds);
         $cache->set($cacheKey, $ids);
       }
     }
@@ -481,15 +479,17 @@ SELECT g.*
     $acls = CRM_ACL_BAO_Cache::build($contactID);
     $aclKeys = array_keys($acls);
     $aclKeys = implode(',', $aclKeys);
+    $orderBy = 'a.object_id';
+    if (array_key_exists('priority', CRM_ACL_BAO_ACL::getSupportedFields())) {
+      $orderBy .= ',a.priority';
+    }
     $query = "
-SELECT   a.operation, a.object_id
+SELECT   a.operation,a.object_id,a.deny
   FROM   civicrm_acl_cache c, civicrm_acl a
  WHERE   c.acl_id       =  a.id
    AND   a.is_active    =  1
    AND   a.object_table = %1
    AND   a.id        IN ( $aclKeys )
-   AND   a.deny         = 0
-GROUP BY a.operation,a.object_id
 ORDER BY a.object_id
 ";
     $params = [1 => [$tableName, 'String']];
@@ -497,56 +497,28 @@ ORDER BY a.object_id
     while ($dao->fetch()) {
       if ($dao->object_id) {
         if (self::matchType($type, $dao->operation)) {
-          $ids[] = $dao->object_id;
+          if (!$dao->deny) {
+            $ids[] = $dao->object_id;
+          }
+          else {
+            $ids = array_diff($ids, [$dao->object_id]);
+          }
         }
       }
       else {
         // this user has got the permission for all objects of this type
         // check if the type matches
         if (self::matchType($type, $dao->operation)) {
-          foreach ($allGroups as $id => $dontCare) {
-            $ids[] = $id;
+          if (!$dao->deny) {
+            foreach ($allGroups as $id => $dontCare) {
+              $ids[] = $id;
+            }
+          }
+          else {
+            $ids = array_diff($ids, array_keys($allGroups));
           }
         }
         break;
-      }
-    }
-    return $ids;
-  }
-
-  /**
-   * Load deny acl IDs
-   *
-   * @param int $contactID
-   * @param string $tableName
-   * @param int $type
-   * @param array $allGroups
-   *
-   * @return array
-   */
-  private static function loadDenyIDs(int $contactID, string $tableName, int $type, $allGroups): array {
-    $ids = [];
-    $acls = CRM_ACL_BAO_Cache::build($contactID);
-    $aclKeys = array_keys($acls);
-    $aclKeys = implode(',', $aclKeys);
-    $query = "
-SELECT   a.operation, a.object_id
-  FROM   civicrm_acl_cache c, civicrm_acl a
- WHERE   c.acl_id       =  a.id
-   AND   a.is_active    =  1
-   AND   a.object_table = %1
-   AND   a.id        IN ( $aclKeys )
-   AND   a.deny         = 1
-GROUP BY a.operation,a.object_id
-ORDER BY a.object_id
-";
-    $params = [1 => [$tableName, 'String']];
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    while ($dao->fetch()) {
-      if ($dao->object_id) {
-        if (self::matchType($type, $dao->operation)) {
-          $ids[] = $dao->object_id;
-        }
       }
     }
     return $ids;
