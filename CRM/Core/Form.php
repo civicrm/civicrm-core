@@ -547,7 +547,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($attributes['disabled']);
     }
 
-    $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
+    if ($type === 'checkbox') {
+      $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), NULL, $attributes);
+    }
+    else {
+      $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
+    }
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
     }
