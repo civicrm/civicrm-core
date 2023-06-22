@@ -118,7 +118,7 @@ function _civiimport_civicrm_get_import_tables(): array {
       'user_job_id' => (int) $tables->id,
       'created_date' => $tables->created_date,
       'expires_date' => $tables->expires_date,
-      'title' => ts('Import Job') . $tables->id,
+      'title' => E::ts('Import Job %1', [1 => $tables->id]),
       'description' => $tables->created_date . $createdBy,
     ];
   }
