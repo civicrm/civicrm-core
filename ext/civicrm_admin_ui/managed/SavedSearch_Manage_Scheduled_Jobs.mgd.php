@@ -229,6 +229,7 @@ return [
       ],
       'match' => [
         'name',
+        'saved_search_id',
       ],
     ],
   ],
