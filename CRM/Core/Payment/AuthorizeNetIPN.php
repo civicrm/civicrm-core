@@ -165,18 +165,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Get ids from input.
-   *
-   * @param array $ids
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function getIDs(&$ids) {
-    $ids['contribution'] = $this->getContributionID();
-    $ids['contributionRecur'] = $this->getContributionRecurID();
-  }
-
-  /**
    * @param string $name
    *   Parameter name.
    * @param string $type
@@ -199,25 +187,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       throw new CRM_Core_Exception("Could not find an entry for $name");
     }
     return $value;
-  }
-
-  /**
-   * Get membership id, if any.
-   *
-   * @param int $contributionID
-   * @param int $contributionRecurID
-   *
-   * @return int|null
-   */
-  protected function getMembershipID(int $contributionID, int $contributionRecurID): ?int {
-    // Get membershipId. Join with membership payment table for additional checks
-    $sql = "
-    SELECT m.id
-      FROM civicrm_membership m
-INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contribution_id = {$contributionID}
-     WHERE m.contribution_recur_id = {$contributionRecurID}
-     LIMIT 1";
-    return CRM_Core_DAO::singleValueQuery($sql);
   }
 
   /**
