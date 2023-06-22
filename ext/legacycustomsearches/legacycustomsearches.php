@@ -31,3 +31,38 @@ function legacycustomsearches_civicrm_install() {
 function legacycustomsearches_civicrm_enable() {
   _legacycustomsearches_civix_civicrm_enable();
 }
+
+/**
+ * Determine the sql
+ * @param array $savedSearch
+ * @param int $groupID
+ * @param string $sql
+ *
+ * @throws \CRM_Core_Exception
+ */
+function legacycustomsearches_civicrm_buildGroupContactCache(array $savedSearch, int $groupID, string &$sql): void {
+  if (empty($savedSearch['search_custom_id'])) {
+    return;
+  }
+  $savedSearchID = $savedSearch['id'];
+  $excludeClause = "
+    NOT IN (
+    SELECT contact_id FROM civicrm_group_contact
+    WHERE civicrm_group_contact.status = 'Removed'
+    AND civicrm_group_contact.group_id = $groupID )";
+  $addSelect = "$groupID AS group_id";
+  $ssParams = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
+  // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
+  if (!empty($ssParams)) {
+    CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
+  }
+  $searchSQL = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID)->contactIDs();
+  $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
+  if (strpos($searchSQL, 'WHERE') === FALSE) {
+    $searchSQL .= " WHERE contact_a.id $excludeClause";
+  }
+  else {
+    $searchSQL .= " AND contact_a.id $excludeClause";
+  }
+  $sql = preg_replace("/^\s*SELECT /", "SELECT $addSelect, ", $searchSQL);
+}

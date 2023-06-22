@@ -1769,6 +1769,38 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Build the group contact cache for the relevant group.
+   *
+   * This hook allows a listener to specify the sql to be used to build a group in
+   * the group contact cache.
+   *
+   * If sql is altered then the api / bao query methods of building the cache will not
+   * be called.
+   *
+   * An example of the sql it might be set to is:
+   *
+   * SELECT 7 AS group_id, contact_a.id as contact_id
+   * FROM  civicrm_contact contact_a
+   * WHERE contact_a.contact_type   = 'Household' AND contact_a.household_name LIKE '%' AND  ( 1 )  ORDER BY contact_a.id
+   * AND contact_a.id
+   *   NOT IN (
+   *   SELECT contact_id FROM civicrm_group_contact
+   *   WHERE civicrm_group_contact.status = 'Removed'
+   *   AND civicrm_group_contact.group_id = 7 )
+   *
+   * @param array $savedSearch
+   * @param int $groupID
+   * @param string $sql
+   */
+  public static function buildGroupContactCache(array $savedSearch, int $groupID, string &$sql): void {
+    $null = NULL;
+    self::singleton()->invoke(['savedSearch', 'groupID', 'sql'], $savedSearch, $groupID,
+      $sql, $null, $null, $null,
+      'civicrm_buildGroupContactCache'
+    );
+  }
+
+  /**
    * (EXPERIMENTAL) Scan extensions for a list of auto-registered interfaces.
    *
    * This hook is currently experimental. It is a means to implementing `mixin/scan-classes@1`.

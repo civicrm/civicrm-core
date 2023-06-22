@@ -533,41 +533,6 @@ ORDER BY   gc.contact_id, g.children
   }
 
   /**
-   * Get sql from a custom search.
-   *
-   * We split it up and store custom class
-   * so temp tables are not destroyed if they are used
-   *
-   * @param array $savedSearch
-   * @param int $groupID
-   *
-   * @return string
-   * @throws \CRM_Core_Exception
-   */
-  protected static function getCustomSearchSQL(array $savedSearch, int $groupID) {
-    $savedSearchID = $savedSearch['id'];
-    $excludeClause = "NOT IN (
-                        SELECT contact_id FROM civicrm_group_contact
-                        WHERE civicrm_group_contact.status = 'Removed'
-                        AND civicrm_group_contact.group_id = $groupID )";
-    $addSelect = "$groupID AS group_id";
-    $ssParams = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
-    // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
-    if (!empty($ssParams)) {
-      CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
-    }
-    $searchSQL = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID)->contactIDs();
-    $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
-    if (strpos($searchSQL, 'WHERE') === FALSE) {
-      $searchSQL .= " WHERE contact_a.id $excludeClause";
-    }
-    else {
-      $searchSQL .= " AND contact_a.id $excludeClause";
-    }
-    return preg_replace("/^\s*SELECT /", "SELECT $addSelect, ", $searchSQL);
-  }
-
-  /**
    * Get array of sql from a saved query object group.
    *
    * @param array $savedSearch
@@ -797,14 +762,20 @@ ORDER BY   gc.contact_id, g.children
         ->execute()
         ->first();
 
-      if ($savedSearch['api_entity']) {
-        $sql = self::getApiSQL($savedSearch, $groupID);
-      }
-      elseif (!empty($savedSearch['search_custom_id'])) {
-        $sql = self::getCustomSearchSQL($savedSearch, $groupID);
-      }
-      else {
-        $sql = self::getQueryObjectSQL($savedSearch, $groupID);
+      $sql = '';
+      CRM_Utils_Hook::buildGroupContactCache($savedSearch, $groupID, $sql);
+      if (!$sql) {
+        if ($savedSearch['api_entity']) {
+          $sql = self::getApiSQL($savedSearch, $groupID);
+        }
+        elseif (!empty($savedSearch['search_custom_id'])) {
+          Group::update(FALSE)->addWhere('id', '=', $groupID)->setValues(['is_active' => FALSE])->execute();
+          CRM_Core_Session::setStatus(ts('Invalid group %1 found and disabled'), [1 => $groupID]);
+          return;
+        }
+        else {
+          $sql = self::getQueryObjectSQL($savedSearch, $groupID);
+        }
       }
     }
 
