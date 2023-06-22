@@ -1,8 +1,6 @@
 {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 
-{if !empty($formValues.receipt_text)}
-{$formValues.receipt_text}
-{else}{ts}Below you will find a receipt for this contribution.{/ts}{/if}
+{ts}Below you will find a receipt for this contribution.{/ts}
 
 ===========================================================
 {ts}Contribution Information{/ts}
