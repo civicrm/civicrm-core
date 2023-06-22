@@ -14,6 +14,11 @@ namespace Civi\WorkflowMessage;
 interface WorkflowMessageInterface {
 
   /**
+   * @return string
+   */
+  public function getWorkflowName(): ?string;
+
+  /**
    * @return \Civi\WorkflowMessage\FieldSpec[]
    *   A list of field-specs that are used in the given format, keyed by their name in that format.
    *   If the implementation does not understand a specific format, return NULL.
