@@ -24,6 +24,18 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   public $contributionID;
 
   /**
+   * @var int
+   *
+   * @scope tplParams
+   */
+  public $totalAmount;
+
+  /**
+   * @var string
+   */
+  public $currency;
+
+  /**
    * Is the site configured such that tax should be displayed.
    *
    * @var bool
@@ -107,6 +119,23 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   }
 
   /**
+   * Get amount, this formats if not already formatted.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public function getTotalAmount(): string {
+    if (!$this->totalAmount) {
+      $this->setContribution(\Civi\Api4\Contribution::get()
+        ->addWhere('id', '=', $this->contributionID)->execute()->first());
+    }
+    if (!is_numeric($this->totalAmount)) {
+      return $this->totalAmount;
+    }
+    return \Civi::format()->money($this->totalAmount, $this->currency, $this->getLocale());
+  }
+
+  /**
    * Get the line items.
    *
    * @return array
@@ -169,6 +198,8 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    */
   public function setContribution(array $contribution): self {
     $this->contribution = $contribution;
+    $this->totalAmount = $contribution['total_amount'];
+    $this->currency = $contribution['currency'];
     if (!empty($contribution['id'])) {
       $this->contributionID = $contribution['id'];
     }
