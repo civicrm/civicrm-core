@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Group;
+
 /**
  *
  * @package CRM
@@ -249,20 +251,19 @@ ORDER BY {$orderBy}
       while ($dao->fetch()) {
         // make sure operation matches the type TODO
         if (self::matchType($type, $dao->operation)) {
-          if (!$dao->object_id) {
-            $ids = [];
-            $whereClause = ' ( 1 ) ';
-            break;
-          }
           if (!$dao->deny) {
-            $ids[] = $dao->object_id;
+            if (empty($dao->object_id)) {
+              $ids = array_merge($ids, Group::get(FALSE)->execute()->column('id'));
+            }
+            else {
+              $ids[] = $dao->object_id;
+            }
           }
           else {
             $ids = array_diff($ids, [$dao->object_id]);
           }
         }
       }
-
       if (!empty($ids)) {
         $ids = implode(',', $ids);
         $query = "
