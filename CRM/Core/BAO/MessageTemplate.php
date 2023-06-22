@@ -465,8 +465,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    */
   protected static function loadTemplate(string $workflowName, bool $isTest, int $messageTemplateID = NULL, $groupName = NULL, ?array $messageTemplateOverride = NULL, ?string $subjectOverride = NULL, ?string $language = NULL): array {
     $base = ['msg_subject' => NULL, 'msg_text' => NULL, 'msg_html' => NULL, 'pdf_format_id' => NULL];
-    if (!$workflowName && !$messageTemplateID) {
-      throw new CRM_Core_Exception(ts("Message template's option value or ID missing."));
+    if (!$workflowName && !$messageTemplateID && !$messageTemplateOverride) {
+      throw new CRM_Core_Exception(ts("Message template not specified. No option value, ID, or template content."));
     }
 
     $apiCall = MessageTemplate::get(FALSE)
@@ -477,11 +477,16 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
 
     if ($messageTemplateID) {
       $apiCall->addWhere('id', '=', (int) $messageTemplateID);
+      $result = $apiCall->execute();
+    }
+    elseif ($workflowName) {
+      $apiCall->addWhere('workflow_name', '=', $workflowName);
+      $result = $apiCall->execute();
     }
     else {
-      $apiCall->addWhere('workflow_name', '=', $workflowName);
+      // Don't bother with query. We know there's nothing.
+      $result = new \Civi\Api4\Generic\Result();
     }
-    $result = $apiCall->execute();
     $messageTemplate = array_merge($base, $result->first() ?: [], $messageTemplateOverride ?: []);
     if (empty($messageTemplate['id']) && empty($messageTemplateOverride)) {
       if ($messageTemplateID) {
