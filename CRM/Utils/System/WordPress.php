@@ -710,7 +710,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Load wordpress bootstrap.
+   * Tries to bootstrap WordPress.
    *
    * @param array $params
    *   Optional credentials
@@ -733,6 +733,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       define('WP_USE_THEMES', FALSE);
     }
 
+    // Load bootstrap file.
     $cmsRootPath = $this->cmsRootPath();
     if (!$cmsRootPath) {
       throw new CRM_Core_Exception("Could not find the install directory for WordPress");
@@ -747,12 +748,20 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     else {
       throw new CRM_Core_Exception("Could not find the bootstrap file for WordPress");
     }
-    $wpUserTimezone = get_option('timezone_string');
-    if ($wpUserTimezone) {
-      date_default_timezone_set($wpUserTimezone);
+
+    // Match CiviCRM timezone to WordPress site timezone.
+    $wpSiteTimezone = $this->getTimeZoneString();
+    if ($wpSiteTimezone) {
+      date_default_timezone_set($wpSiteTimezone);
       CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     }
-    require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
+
+    // Make sure pluggable WordPress functions are available.
+    if (!function_exists('wp_set_current_user')) {
+      require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
+    }
+
+    // Maybe login user.
     $uid = $params['uid'] ?? NULL;
     if (!$uid) {
       $name = $name ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
@@ -781,6 +790,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         return TRUE;
       }
     }
+
     return TRUE;
   }
 
@@ -1153,7 +1163,37 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getTimeZoneString() {
-    return get_option('timezone_string');
+    // Return the timezone string when set.
+    $tzstring = get_option('timezone_string');
+    if (!empty($tzstring)) {
+      return $tzstring;
+    }
+
+    /*
+     * Try and build a deprecated (but currently valid) timezone string
+     * from the GMT offset value.
+     *
+     * Note: manual offsets should be discouraged. WordPress works more
+     * reliably when setting an actual timezone (e.g. "Europe/London")
+     * because of support for Daylight Saving changes.
+     *
+     * Note: the IANA timezone database that provides PHP's timezone
+     * support uses (reversed) POSIX style signs.
+     *
+     * @see https://www.php.net/manual/en/timezones.others.php
+     */
+    $offset = get_option('gmt_offset');
+    if (0 != $offset && floor($offset) == $offset) {
+      $offset_string = $offset > 0 ? "-$offset" : '+' . abs((int) $offset);
+      $tzstring = 'Etc/GMT' . $offset_string;
+    }
+
+    // Default to "UTC" if the timezone string is still empty.
+    if (empty($tzstring)) {
+      $tzstring = 'UTC';
+    }
+
+    return $tzstring;
   }
 
   /**
