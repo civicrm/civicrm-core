@@ -266,7 +266,8 @@ class CRM_Dedupe_Merger {
   public static function locTables() {
     static $locTables;
     if (!$locTables) {
-      $locTables = ['civicrm_email', 'civicrm_address', 'civicrm_phone'];
+      // should be in sync with getLocationBlockInfo
+      $locTables = ['civicrm_email', 'civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website'];
 
       // Allow hook_civicrm_merge() to adjust $locTables
       CRM_Utils_Hook::merge('locTables', $locTables);
