@@ -531,22 +531,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       // https://github.com/civicrm/civicrm-core/pull/17180
       'groupName' => $groupName,
       'workflow' => $workflowName,
+      'isTest' => $isTest,
     ];
 
     CRM_Utils_Hook::alterMailContent($mailContent);
-
-    // add the test banner (if requested)
-    if ($isTest) {
-      $testText = MessageTemplate::get(FALSE)
-        ->setSelect(['msg_subject', 'msg_text', 'msg_html'])
-        ->addWhere('workflow_name', '=', 'test_preview')
-        ->addWhere('is_default', '=', TRUE)
-        ->execute()->first();
-
-      $mailContent['subject'] = $testText['msg_subject'] . $mailContent['subject'];
-      $mailContent['text'] = $testText['msg_text'] . $mailContent['text'];
-      $mailContent['html'] = preg_replace('/<body(.*)$/im', "<body\\1\n{$testText['msg_html']}", $mailContent['html']);
-    }
 
     if (!empty($subjectOverride)) {
       CRM_Core_Error::deprecatedWarning('CRM_Core_BAO_MessageTemplate: $params[subject] is deprecated. Use $params[messageTemplate][msg_subject] instead.');
