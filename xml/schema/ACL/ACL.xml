@@ -6,6 +6,11 @@
   <name>civicrm_acl</name>
   <comment>Access Control List</comment>
   <add>1.6</add>
+  <paths>
+    <add>civicrm/acl/edit?reset=1&amp;action=add</add>
+    <delete>civicrm/acl/delete?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <update>civicrm/acl/edit?reset=1&amp;action=edit&amp;id=[id]</update>
+  </paths>
   <field>
     <name>id</name>
     <title>ACL ID</title>

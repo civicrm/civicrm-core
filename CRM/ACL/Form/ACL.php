@@ -294,4 +294,11 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     }
   }
 
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'ACL';
+  }
+
 }
