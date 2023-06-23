@@ -16,13 +16,6 @@
  */
 class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
-  /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
   protected $_fields = NULL;
 
   protected $_profileId = NULL;

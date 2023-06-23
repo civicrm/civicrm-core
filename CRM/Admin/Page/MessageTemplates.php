@@ -21,13 +21,6 @@
 class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * ids of templates which diverted from the default ones and can be reverted
    * @var array
    */

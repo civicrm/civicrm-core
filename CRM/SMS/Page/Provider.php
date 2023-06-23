@@ -23,13 +23,6 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   public $useLivePageJS = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string

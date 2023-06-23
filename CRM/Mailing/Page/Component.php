@@ -22,13 +22,6 @@
 class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string

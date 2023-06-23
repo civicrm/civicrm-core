@@ -16,6 +16,12 @@
  */
 abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
 
+  /**
+   * Action links for the browse screen.
+   * @var array
+   */
+  public static $_links;
+
   protected $_action;
 
   /**

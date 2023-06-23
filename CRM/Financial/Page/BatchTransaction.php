@@ -20,12 +20,7 @@
  * Page for displaying list of financial batches
  */
 class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
-  /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
+
   public static $_entityID;
 
   public static $_columnHeader = NULL;

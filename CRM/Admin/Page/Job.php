@@ -21,13 +21,6 @@
 class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links;
-
-  /**
    * Get BAO Name.
    *
    * @return string
