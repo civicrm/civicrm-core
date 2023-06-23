@@ -1,4 +1,4 @@
-# Users, Roles, Permissions for Standalone CiviCRM 
+# Users, Roles, Permissions for Standalone CiviCRM
 
 **⚠️ Do not use this extension if you have CiviCRM installed the normal way (e.g. on Drupal, WordPress, Joomla, Backdrop...)!**
 
@@ -13,7 +13,6 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 * PHP v7.4+
 * CiviCRM (standalone)
 
-
 ## Getting started
 
 First, get standalone set up - e.g. you can see the admin interface up and running.
@@ -22,14 +21,19 @@ Next configure AuthX from **Administer » System Settings » Authentication**. Y
 
 Now you can install this extension from the command line. (Clone this repo into web/upload/ext/ then enable it with `cv en standaloneusers`).
 
-On install, an account is created, user `admin`, and the password is printed on the console. The admin user is granted all permissions.
+On install, an account is created, user `admin`, and the password is printed on the console. The admin user is granted all permissions. Example:
+
+```
+% cv en standaloneusers
+Enabling extension "standaloneusers"
+Created New admin User 1 and contact 203 with password iLkPsffZYYA= and ALL permissions.
+```
 
 Now if you try to load your site it should fail: you've got no access rights.
 
 At this stage, because you're moving from a system that had no concept of users to one that does, you'll need to clear your browser cookies for the site, otherwise login will get confused (You may see a "session already active" authx error.)
 
 Done that? Then head to `/civicrm/login`, enter your credentials and hopefully you're now back in the admin interface!
-
 
 
 ## Conventions
