@@ -815,8 +815,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     $groupsDT = [];
     $groupsDT['data'] = $groupList;
-    $groupsDT['recordsTotal'] = !empty($params['total']) ? $params['total'] : NULL;
-    $groupsDT['recordsFiltered'] = !empty($params['total']) ? $params['total'] : NULL;
+    $groupsDT['recordsTotal'] = !empty($params['total']) ? $params['total'] : 0;
+    $groupsDT['recordsFiltered'] = !empty($params['total']) ? $params['total'] : 0;
 
     return $groupsDT;
   }
