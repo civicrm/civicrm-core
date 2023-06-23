@@ -1,9 +1,13 @@
 <?php
 
+use Civi\Api4\LineItem;
 use Civi\Api4\Participant;
 
 /**
  * Trait for participant workflow classes.
+ *
+ * @method int getParticipantID()
+ * @method int getEventID()
  */
 trait CRM_Event_WorkflowMessage_ParticipantTrait {
 
@@ -84,6 +88,33 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
   }
 
   /**
+   * @throws \CRM_Core_Exception
+   */
+  public function setParticipantID(int $participantID): self {
+    $this->participantID = $participantID;
+    if (!$this->getContributionID()) {
+      $lineItem = LineItem::get(FALSE)
+        ->addWhere('entity_table', '=', 'civicrm_participant')
+        ->addWhere('id', '=', $participantID)
+        ->addSelect('contribution_id')
+        ->execute()->first();
+      if (!empty($lineItem)) {
+        $this->setContributionID($lineItem['contribution_id']);
+      }
+      // It might be bad data on the site - let's do a noisy fall back to participant payment
+      // (the relationship between contribution & participant should be in the line item but
+      // some integrations might mess this up - if they are not using the order api).
+      $participantPayment = civicrm_api3('ParticipantPayment', 'get', ['participant_id' => $participantID])['values'];
+      if (!empty($participantPayment)) {
+        $participantPayment = reset($participantPayment);
+        $this->setContributionID((int) $participantPayment['contribution_id']);
+        CRM_Core_Session::setStatus('There might be a data problem, contribution id could not be loaded from the line item');
+      }
+    }
+    return $this;
+  }
+
+  /**
    * Is the participant the primary participant.
    *
    * @return bool
@@ -106,11 +137,12 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * @param array $participant
    *
    * @return $this
+   * @throws \CRM_Core_Exception
    */
   public function setParticipant(array $participant): self {
     $this->participant = $participant;
     if (!empty($participant['id'])) {
-      $this->participantID = $participant['id'];
+      $this->setParticipantID($participant['id']);
     }
     if (!empty($participant['event_id'])) {
       $this->eventID = $participant['event_id'];
