@@ -116,22 +116,13 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   public function run() {
     $this->preProcess();
 
-    $newArgs = func_get_args();
-    // since we want only first function argument
-    $newArgs = $newArgs[0];
-    $this->_isArchived = $this->isArchived($newArgs);
-    if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
-      $mailerJobSize = Civi::settings()->get('mailerJobSize');
-      CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize);
-      CRM_Mailing_BAO_MailingJob::runJobs();
-      CRM_Mailing_BAO_MailingJob::runJobs_post();
-    }
+    $newArgs = func_get_args()[0];
 
     $this->_sortByCharacter
       = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
 
-    // CRM-11920 all should set sortByCharacter to null, not empty string
-    if (strtolower($this->_sortByCharacter) == 'all' || !empty($_POST)) {
+    // CRM-11920 "all" should set sortByCharacter to null, not empty string
+    if (strtolower($this->_sortByCharacter ?: '') == 'all' || !empty($_POST)) {
       $this->_sortByCharacter = NULL;
       $this->set('sortByCharacter', NULL);
     }
