@@ -473,17 +473,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
     //time being hack to strip '&nbsp;'
     //from particular letter line, CRM-6798
     $this->formatMessage($html_message);
-
-    $messageToken = CRM_Utils_Token::getTokens($html_message);
-
-    $returnProperties = [];
-    if (isset($messageToken['contact'])) {
-      foreach ($messageToken['contact'] as $key => $value) {
-        $returnProperties[$value] = 1;
-      }
-    }
-
-    return [$formValues, $html_message, $messageToken, $returnProperties];
+    return [$formValues, $html_message];
   }
 
   /**
