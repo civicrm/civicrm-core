@@ -350,22 +350,22 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
 
     self::synchronizeLegacyParameters($params);
     // Allow WorkflowMessage to run any filters/mappings/cleanups.
+    /** @var \Civi\WorkflowMessage\GenericWorkflowMessage $model */
     $model = $params['model'] ?? WorkflowMessage::create($params['workflow'] ?? 'UNKNOWN');
-    $params = WorkflowMessage::exportAll(WorkflowMessage::importAll($model, $params));
+    WorkflowMessage::importAll($model, $params);
+    $mailContent = $model->resolveContent();
+    $params = WorkflowMessage::exportAll($model);
     unset($params['model']);
     // Subsequent hooks use $params. Retaining the $params['model'] might be nice - but don't do it unless you figure out how to ensure data-consistency (eg $params['tplParams'] <=> $params['model']).
     // If you want to expose the model via hook, consider interjecting a new Hook::alterWorkflowMessage($model) between `importAll()` and `exportAll()`.
 
     self::synchronizeLegacyParameters($params);
-    $language = $params['language'] ?? (!empty($params['contactId']) ? Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $params['contactId'])->addSelect('preferred_language')->execute()->first()['preferred_language'] : NULL);
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
-    [$mailContent, $translatedLanguage] = self::loadTemplate((string) $params['workflow'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $language);
     CRM_Utils_Hook::alterMailContent($mailContent);
     if (!empty($params['subject'])) {
       CRM_Core_Error::deprecatedWarning('CRM_Core_BAO_MessageTemplate: $params[subject] is deprecated. Use $params[messageTemplate][msg_subject] instead.');
       $mailContent['subject'] = $params['subject'];
     }
-    $params['tokenContext']['locale'] = $translatedLanguage ?? $params['language'] ?? NULL;
 
     self::synchronizeLegacyParameters($params);
     $rendered = CRM_Core_TokenSmarty::render(CRM_Utils_Array::subset($mailContent, ['text', 'html', 'subject']), $params['tokenContext'], $params['tplParams']);
@@ -484,8 +484,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    *
    * @return array
    * @throws \CRM_Core_Exception
+   * @internal
    */
-  protected static function loadTemplate(string $workflowName, bool $isTest, int $messageTemplateID = NULL, $groupName = NULL, ?array $messageTemplateOverride = NULL, ?string $language = NULL): array {
+  public static function loadTemplate(string $workflowName, bool $isTest, int $messageTemplateID = NULL, $groupName = NULL, ?array $messageTemplateOverride = NULL, ?string $language = NULL): array {
     $base = ['msg_subject' => NULL, 'msg_text' => NULL, 'msg_html' => NULL, 'pdf_format_id' => NULL];
     if (!$workflowName && !$messageTemplateID && !$messageTemplateOverride) {
       throw new CRM_Core_Exception(ts("Message template not specified. No option value, ID, or template content."));

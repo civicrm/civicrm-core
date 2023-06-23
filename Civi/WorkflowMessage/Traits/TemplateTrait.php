@@ -50,4 +50,15 @@ trait TemplateTrait {
    */
   protected $isTest;
 
+  public function resolveContent(): array {
+    $model = $this;
+    $language = $model->getLocale();
+    if (empty($language) && !empty($model->getContactID())) {
+      $language = \Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $this->getContactID())->addSelect('preferred_language')->execute()->first()['preferred_language'];
+    }
+    [$mailContent, $translatedLanguage] = \CRM_Core_BAO_MessageTemplate::loadTemplate((string) $model->getWorkflowName(), $model->getIsTest(), $model->getTemplateId(), $model->getGroupName(), $model->getTemplate(), $language);
+    $model->setLocale($translatedLanguage ?? $model->getLocale());
+    return $mailContent;
+  }
+
 }
