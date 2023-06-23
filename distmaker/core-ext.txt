@@ -22,6 +22,7 @@ payflowpro
 recaptcha
 search_kit
 sequentialcreditnotes
+standaloneusers
 legacycustomsearches
 elavon
 civi_campaign
