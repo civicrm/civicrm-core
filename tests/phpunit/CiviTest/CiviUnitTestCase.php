@@ -1777,6 +1777,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'civicrm_membership_block',
       'civicrm_event',
       'civicrm_participant',
+      'civicrm_payment_processor',
       'civicrm_participant_payment',
       'civicrm_pledge',
       'civicrm_pcp_block',
@@ -2644,23 +2645,17 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Reinstate the default template.
    *
-   * @param string $templateName
-   * @param string $type
-   *
    * @noinspection PhpUnhandledExceptionInspection
    * @noinspection PhpDocMissingThrowsInspection
    */
-  protected function revertTemplateToReservedTemplate(string $templateName = 'contribution_online_receipt', string $type = 'html'): void {
-    CRM_Core_DAO::executeQuery(
-      "UPDATE civicrm_option_group og
-      LEFT JOIN civicrm_option_value ov ON ov.option_group_id = og.id
-      LEFT JOIN civicrm_msg_template m ON m.workflow_id = ov.id
-      LEFT JOIN civicrm_msg_template m2 ON m2.workflow_id = ov.id AND m2.is_reserved = 1
-      SET m.msg_{$type} = m2.msg_{$type}
-      WHERE og.name = 'msg_tpl_workflow_contribution'
-      AND ov.name = '{$templateName}'
-      AND m.is_default = 1"
-    );
+  protected function revertTemplateToReservedTemplate(): void {
+    CRM_Core_DAO::executeQuery('
+      UPDATE civicrm_msg_template m
+      INNER JOIN civicrm_msg_template m2
+        ON m2.workflow_name = m.workflow_name AND m2.is_reserved = 1
+        AND m.is_default = 1
+      SET m.msg_html = m2.msg_html, m.msg_text = m2.msg_text
+    ');
   }
 
   /**
