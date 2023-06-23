@@ -286,45 +286,60 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     $modelDefaults = [
       // instance of WorkflowMessageInterface, containing a list of data to provide to the message-template
       'model' => NULL,
+
       // Symbolic name of the workflow step. Matches the value in civicrm_msg_template.workflow_name.
       'workflow' => NULL,
+
       // additional template params (other than the ones already set in the template singleton)
       'tplParams' => [],
+
       // additional token params (passed to the TokenProcessor)
       // INTERNAL: 'tokenContext' is currently only intended for use within civicrm-core only. For downstream usage, future updates will provide comparable public APIs.
       'tokenContext' => [],
+
       // properties to import directly to the model object
       'modelProps' => NULL,
+
       // contact id if contact tokens are to be replaced; alias for tokenContext.contactId
       'contactId' => NULL,
     ];
     $viewDefaults = [
       // ID of the specific template to load
       'messageTemplateID' => NULL,
+
       // content of the message template
       // Ex: ['msg_subject' => 'Hello {contact.display_name}', 'msg_html' => '...', 'msg_text' => '...']
       // INTERNAL: 'messageTemplate' is currently only intended for use within civicrm-core only. For downstream usage, future updates will provide comparable public APIs.
       'messageTemplate' => NULL,
+
       // whether this is a test email (and hence should include the test banner)
       'isTest' => FALSE,
+
       // Disable Smarty?
       'disableSmarty' => FALSE,
     ];
     $envelopeDefaults = [
       // the From: header
       'from' => NULL,
+
       // the recipient’s name
       'toName' => NULL,
+
       // the recipient’s email - mail is sent only if set
       'toEmail' => NULL,
+
       // the Cc: header
       'cc' => NULL,
+
       // the Bcc: header
       'bcc' => NULL,
+
       // the Reply-To: header
       'replyTo' => NULL,
+
       // email attachments
       'attachments' => NULL,
+
       // filename of optional PDF version to add as attachment (do not include path)
       'PDFFilename' => NULL,
     ];
