@@ -104,7 +104,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     if (in_array(2, $selectedStatuses)) {
       //auto-renew memberships
       $query->join('cr', 'INNER JOIN civicrm_contribution_recur cr on e.contribution_recur_id = cr.id');
-      $query->where("e.contribution_recur_id IS NOT NULL AND cr.contribution_status_id NOT IN (#nonRenewStatusIds)")
+      $query->where("cr.contribution_status_id NOT IN (#nonRenewStatusIds)")
         ->param('nonRenewStatusIds', $nonRenewStatusIds);
     }
     elseif (in_array(1, $selectedStatuses)) {
@@ -113,8 +113,8 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
       $query->join('cr', 'LEFT JOIN civicrm_contribution_recur cr on e.contribution_recur_id = cr.id');
       $query->where("e.contribution_recur_id IS NULL OR (
         e.contribution_recur_id IS NOT NULL AND cr.contribution_status_id IN (#nonRenewStatusIds)
-      )")
-      ->param('nonRenewStatusIds', $nonRenewStatusIds);
+        )")
+        ->param('nonRenewStatusIds', $nonRenewStatusIds);
     }
 
     if (!empty($selectedValues)) {
