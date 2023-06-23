@@ -56,6 +56,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         \Civi::log('authorize_net')->info($errorMessage);
         return;
       }
+      if ($this->isSuccess() && ($this->getContributionStatus() !== 'Completed')) {
+        ContributionRecur::update(FALSE)->addWhere('id', '=', $this->getContributionRecurID())
+          ->setValues(['trxn_id' => $this->getRecurProcessorID()])->execute();
+      }
       $this->recur();
     }
     catch (CRM_Core_Exception $e) {
@@ -78,7 +82,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     if ($this->isSuccess()) {
       // Approved
       if ($this->getContributionStatus() !== 'Completed') {
-        $recur->trxn_id = $recur->processor_id;
         $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_START;
       }
 
@@ -86,11 +89,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         ($input['subscription_paynum'] >= $recur->installments)
       ) {
         // this is the last payment
-        $recur->end_date = $now;
         $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_END;
-        // This end date update should occur in ContributionRecur::updateOnNewPayment
-        // testIPNPaymentRecurNoReceipt has test cover.
-        $recur->save();
       }
     }
 

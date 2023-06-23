@@ -973,6 +973,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     if (!empty($existing['installments']) && self::isComplete($recurringContributionID, $existing['installments'])) {
       $params['contribution_status_id'] = 'Completed';
       $params['next_sched_contribution_date'] = 'null';
+      $params['end_date'] = 'now';
     }
     else {
       // Only update next sched date if it's empty or up to 48 hours away because payment processors may be managing

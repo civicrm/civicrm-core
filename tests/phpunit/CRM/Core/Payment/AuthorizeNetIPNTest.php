@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\ContributionRecur;
 use Civi\Payment\Exception\PaymentProcessorException;
 use Civi\Api4\Contribution;
 
@@ -24,11 +25,11 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate(['is_test' => 0]);
     $this->_contactID = $this->individualCreate();
-    $contributionPage = $this->callAPISuccess('contribution_page', 'create', [
+    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', [
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_financialTypeID,
+      'financial_type_id' => 'Donation',
       'currency' => 'USD',
-      'payment_processor' => $this->_paymentProcessorID,
+      'payment_processor' => $this->ids['PaymentProcessor']['authorize_net'],
       'max_amount' => 1000,
       'receipt_from_email' => 'gaia@the.cosmos',
       'receipt_from_name' => 'Pachamama',
@@ -54,7 +55,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     // Turn off receipts in contribution page.
     $api_params = [
-      'id' => $this->_contributionPageID,
+      'id' => $this->ids['ContributionPage'][0],
       'is_email_receipt' => FALSE,
     ];
     $this->callAPISuccess('ContributionPage', 'update', $api_params);
@@ -68,12 +69,13 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     // is_email_receipt is not set to 1 if the originating contribution page
     // has is_email_receipt set to 0.
     $_REQUEST['mode'] = 'live';
+    /* @var \CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 200,
       'financial_type_id' => 1,
       'receive_date' => date('m/d/Y'),
       'receive_date_time' => date('H:i:s'),
-      'contact_id' => $this->_contactID,
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'contribution_status_id' => 1,
       'credit_card_number' => 4444333322221111,
       'cvv2' => 123,
@@ -95,10 +97,10 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'installments' => 2,
       'hidden_AdditionalDetail' => 1,
       'hidden_Premium' => 1,
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->ids['PaymentProcessor']['authorize_net'],
       'currency' => 'USD',
       'source' => 'bob sled race',
-      'contribution_page_id' => $this->_contributionPageID,
+      'contribution_page_id' => $this->ids['ContributionPage'][0],
       'is_recur' => TRUE,
     ]);
     $form->buildForm();
@@ -151,20 +153,25 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    */
   public function testIPNPaymentRecurSuccess(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
-    $this->setupRecurringPaymentProcessorTransaction();
+    $this->setupRecurringPaymentProcessorTransaction([
+      'installments' => 3,
+    ]);
+    $this->assertRecurStatus('Pending');
+
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $IPN->main();
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
+    $this->assertRecurStatus('In Progress');
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->ids['Contribution']['default']]);
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $this->assertEquals('6511143069', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertSame(strpos($contribution['contribution_source'], 'Online Contribution:'), 0);
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
-    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
+
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
     $IPN->main();
-    $contribution = $this->callAPISuccess('contribution', 'get', [
-      'contribution_recur_id' => $this->_contributionRecurID,
+    $this->assertRecurStatus('In Progress');
+    $contribution = $this->callAPISuccess('Contribution', 'get', [
+      'contribution_recur_id' => $this->ids['ContributionRecur']['default'],
       'sequential' => 1,
     ])['values'];
     $this->assertCount(2, $contribution);
@@ -173,6 +180,31 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($secondContribution['receive_date'])));
     $this->assertEquals('expensive', $secondContribution['amount_level']);
     $this->assertEquals($this->ids['campaign'][0], $secondContribution['campaign_id']);
+
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN(array_merge($this->getRecurSubsequentTransaction(), ['x_subscription_paynum' => 3, 'x_trans_id' => 'three']));
+    $IPN->main();
+    $this->assertRecurStatus('Completed');
+  }
+
+  /**
+   * Assertion for recurring status.
+   *
+   * @param string $status
+   */
+  public function assertRecurStatus(string $status): void {
+    try {
+      $contributionRecur = ContributionRecur::get()
+        ->addWhere('id', '=', $this->ids['ContributionRecur']['default'])
+        ->addSelect('contribution_status_id:name', 'end_date')
+        ->execute()->first();
+      $this->assertEquals($status, $contributionRecur['contribution_status_id:name']);
+      if ($status === 'Completed') {
+        $this->assertNotEmpty($contributionRecur['end_date']);
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail('Failed to get recurring' . $e->getMessage());
+    }
   }
 
   /**
@@ -193,8 +225,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals('6511143069', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertEquals('Online Contribution:', substr($contribution['contribution_source'], 0, 20));
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
-    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
+    $this->assertRecurStatus('In Progress');
   }
 
   /**
@@ -211,8 +242,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals('6511143069', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertEquals('Online Contribution:', substr($contribution['contribution_source'], 0, 20));
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
-    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
+
+    $this->assertRecurStatus('In Progress');
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN(array_merge(['receive_date' => '2010-07-01'], $this->getRecurSubsequentTransaction()));
     $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', [
