@@ -442,48 +442,35 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_group', $group->id);
     }
 
-    // Secret `no_parent` param is used by the multisite extension to prevent default behavior.
-    if (empty($params['no_parent'])) {
-      $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
-      // If multi-site is_enabled, no parent selected and the group doesn't already have any parents,
-      // set parent to the domain group
-      if (Civi::settings()->get('is_enabled') &&
-        empty($params['parents']) &&
-        $domainGroupID != $group->id &&
-        !CRM_Contact_BAO_GroupNesting::hasParentGroups($group->id)
-      ) {
-        $params['parents'] = [$domainGroupID];
-      }
-
-      // first deal with removed parents
-      if ($parentsParamProvided && !empty($currentParentGroupIDs)) {
-        foreach ($currentParentGroupIDs as $parentGroupId) {
-          // no more parents or not in the new list, let's remove
-          if (empty($params['parents']) || !in_array($parentGroupId, $params['parents'])) {
-            CRM_Contact_BAO_GroupNesting::remove($parentGroupId, $params['id']);
-          }
+    // Process group nesting
+    // first deal with removed parents
+    if ($parentsParamProvided && !empty($currentParentGroupIDs)) {
+      foreach ($currentParentGroupIDs as $parentGroupId) {
+        // no more parents or not in the new list, let's remove
+        if (empty($params['parents']) || !in_array($parentGroupId, $params['parents'])) {
+          CRM_Contact_BAO_GroupNesting::remove($parentGroupId, $params['id']);
         }
       }
+    }
 
-      // then add missing parents
-      if (!CRM_Utils_System::isNull($params['parents'])) {
-        foreach ($params['parents'] as $parentId) {
-          if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
-            CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
-          }
+    // then add missing parents
+    if (!CRM_Utils_System::isNull($params['parents'])) {
+      foreach ($params['parents'] as $parentId) {
+        if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
+          CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
         }
       }
+    }
 
-      // refresh cache if parents param was provided
-      if ($parentsParamProvided || !empty($params['parents'])) {
-        CRM_Contact_BAO_GroupNestingCache::update();
-      }
+    // refresh cache if parents param was provided
+    if ($parentsParamProvided || !empty($params['parents'])) {
+      CRM_Contact_BAO_GroupNestingCache::update();
+    }
 
-      // update group contact cache for all parent groups
-      $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($group->id);
-      foreach ($parentIds as $parentId) {
-        CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($parentId);
-      }
+    // update group contact cache for all parent groups
+    $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($group->id);
+    foreach ($parentIds as $parentId) {
+      CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($parentId);
     }
 
     if (!empty($params['organization_id'])) {
