@@ -130,8 +130,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $this->_sortByCharacter
       = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
 
-    // CRM-11920 all should set sortByCharacter to null, not empty string
-    if (strtolower($this->_sortByCharacter) == 'all' || !empty($_POST)) {
+    // CRM-11920 "all" should set sortByCharacter to null, not empty string
+    if (strtolower($this->_sortByCharacter ?: '') == 'all' || !empty($_POST)) {
       $this->_sortByCharacter = NULL;
       $this->set('sortByCharacter', NULL);
     }
