@@ -1,10 +1,11 @@
 <?php
 
 /**
- * Auto-register "settings/*.setting.php" files.
+ * Auto-register entity declarations from `xml/schema/...*.entityType.php`.
  *
- * @mixinName setting-php
+ * @mixinName entity-types-php
  * @mixinVersion 1.0.0
+ * @since 5.57
  *
  * @param CRM_Extension_MixInfo $mixInfo
  *   On newer deployments, this will be an instance of MixInfo. On older deployments, Civix may polyfill with a work-a-like.
@@ -15,17 +16,20 @@ return function ($mixInfo, $bootCache) {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
-   * @see CRM_Utils_Hook::alterSettingsFolders()
+   * @see CRM_Utils_Hook::entityTypes()
    */
-  Civi::dispatcher()->addListener('hook_civicrm_alterSettingsFolders', function ($e) use ($mixInfo) {
+  Civi::dispatcher()->addListener('hook_civicrm_entityTypes', function ($e) use ($mixInfo) {
     // When deactivating on a polyfill/pre-mixin system, listeners may not cleanup automatically.
-    if (!$mixInfo->isActive()) {
+    if (!$mixInfo->isActive() || !is_dir($mixInfo->getPath('xml/schema/CRM'))) {
       return;
     }
 
-    $settingsDir = $mixInfo->getPath('settings');
-    if (!in_array($settingsDir, $e->settingsFolders) && is_dir($settingsDir)) {
-      $e->settingsFolders[] = $settingsDir;
+    $files = (array) glob($mixInfo->getPath('xml/schema/CRM/*/*.entityType.php'));
+    foreach ($files as $file) {
+      $entities = include $file;
+      foreach ($entities as $entity) {
+        $e->entityTypes[$entity['class']] = $entity;
+      }
     }
   });
 
