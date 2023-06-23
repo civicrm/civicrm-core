@@ -17,6 +17,7 @@ use Civi\WorkflowMessage\Traits\AddressingTrait;
 use Civi\WorkflowMessage\Traits\FinalHelperTrait;
 use Civi\WorkflowMessage\Traits\LocalizationTrait;
 use Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait;
+use Civi\WorkflowMessage\Traits\TemplateTrait;
 
 /**
  * Generic base-class for describing the inputs for a workflow email template.
@@ -47,6 +48,9 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
 
   // Implement setLocale(), etc
   use LocalizationTrait;
+
+  // Implement setTemplate(), etc
+  use TemplateTrait;
 
   /**
    * WorkflowMessage constructor.

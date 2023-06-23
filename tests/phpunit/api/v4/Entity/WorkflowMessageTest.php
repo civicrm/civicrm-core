@@ -26,6 +26,7 @@ use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
+ * @group msgtpl
  */
 class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface {
 

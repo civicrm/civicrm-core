@@ -12,6 +12,7 @@
 
 /**
  * Class CRM_Case_WorkflowMessage_CaseActivityTest
+ * @group msgtpl
  */
 class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
   use \Civi\Test\WorkflowMessageTestTrait;

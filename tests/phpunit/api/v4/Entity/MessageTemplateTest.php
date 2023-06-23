@@ -26,6 +26,7 @@ use Civi\Api4\MessageTemplate;
 
 /**
  * @group headless
+ * @group msgtpl
  */
 class MessageTemplateTest extends Api4TestBase implements TransactionalInterface {
 

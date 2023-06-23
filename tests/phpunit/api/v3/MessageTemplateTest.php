@@ -14,6 +14,7 @@
  *
  * @package CiviCRM_APIv3
  * @group headless
+ * @group msgtpl
  */
 class api_v3_MessageTemplateTest extends CiviUnitTestCase {
 
