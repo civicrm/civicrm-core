@@ -12,11 +12,11 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
   /**
    * Example: Run an external SQL script when the module is installed.
    *
-  public function install() {
-    $this->executeSqlFile('sql/myinstall.sql');
-  }
-
-  /**
+   * public function install() {
+   * $this->executeSqlFile('sql/myinstall.sql');
+   * }
+   *
+   * /**
    * Example: Work with entities usually not available during the install step.
    *
    * This method can be used for any post-install tasks. For example, if a step
@@ -33,12 +33,12 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
 
       // Create an admin contact.
       $contactID = \Civi\Api4\Contact::create(FALSE)
-      ->setValues([
-        'contact_type' => 'Individual',
-        'first_name' => 'Standalone',
-        'last_name' => 'Admin',
-      ])
-      ->execute()->first()['id'];
+        ->setValues([
+          'contact_type' => 'Individual',
+          'first_name' => 'Standalone',
+          'last_name' => 'Admin',
+        ])
+        ->execute()->first()['id'];
       $dummyEmail = 'admin@localhost.localdomain';
 
       // Create user
@@ -72,9 +72,9 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
         $records[] = ['permission' => $permission];
       }
       \Civi\Api4\RolePermission::save(FALSE)
-      ->setDefaults(['role_id' => $roleID])
-      ->setRecords($records)
-      ->execute();
+        ->setDefaults(['role_id' => $roleID])
+        ->setRecords($records)
+        ->execute();
 
       $message = "Created New admin User $userID and contact $contactID with password $password and ALL permissions.";
       \Civi::log()->notice($message);

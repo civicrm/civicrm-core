@@ -37,7 +37,7 @@ class Standalone implements AuthxInterface {
     $contactID = civicrm_api3('UFMatch', 'get', [
       'sequential' => 1,
       'return' => ['contact_id'],
-      'uf_id' => $userId
+      'uf_id' => $userId,
     ])['values'][0]['contact_id'] ?? NULL;
     // Confusingly, Civi stores it's *Contact* ID as *userId* on the session.
     $session->set('userId', $contactID);

@@ -19,7 +19,6 @@ class Security {
   public static $hashLength = 55;
   public static $hashMethod = 'sha512';
 
-
   /**
    * @return static
    */
@@ -40,6 +39,7 @@ class Security {
         // A normal Drupal 7 password.
         $hash = $this->_password_crypt(static::$hashMethod, $plaintextPassword, $storedHashedPassword);
         break;
+
       default:
         // Invalid password
         return FALSE;
@@ -50,7 +50,9 @@ class Security {
   /**
    * CRM_Core_Permission_Standalone::check() delegates here.
    *
-   * @param string $str
+   * @param \CRM_Core_Permission_Standalone $permissionObject
+   *
+   * @param string $permissionName
    *   The permission to check.
    *
    * @param int $userID
@@ -85,9 +87,9 @@ class Security {
    */
   public function getUserIDFromUsername(string $username): ?int {
     return \Civi\Api4\User::get(FALSE)
-    ->addWhere('username', '=', $username)
-    ->execute()
-    ->single()['id'] ?? NULL;
+      ->addWhere('username', '=', $username)
+      ->execute()
+      ->single()['id'] ?? NULL;
   }
 
   /**
@@ -97,11 +99,11 @@ class Security {
    */
   public function loadUserByName(string $username) {
     $user = \Civi\Api4\User::get(FALSE)
-    ->addWhere('username', '=', $username)
-    ->addWhere('is_active', '=', TRUE)
-    ->execute()->first() ?? [];
+      ->addWhere('username', '=', $username)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first() ?? [];
     if ($user) {
-     return $user;
+      return $user;
     }
     return FALSE;
   }
@@ -113,11 +115,11 @@ class Security {
    */
   public function loadUserByID(int $userID) {
     $user = \Civi\Api4\User::get(FALSE)
-    ->addWhere('id', '=', $userID)
-    ->addWhere('is_active', '=', TRUE)
-    ->execute()->first() ?? [];
+      ->addWhere('id', '=', $userID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first() ?? [];
     if ($user) {
-     return $user;
+      return $user;
     }
     return FALSE;
   }
@@ -149,10 +151,10 @@ class Security {
       $hashedPassword = $this->_password_crypt(static::$hashMethod, $params['cms_pass'], $this->_password_generate_salt());
 
       $userID = \Civi\Api4\User::create(FALSE)
-      ->addValue('username', $params['cms_name'])
-      ->addValue('email', $mail)
-      ->addValue('password', $hashedPassword)
-      ->execute()->single()['id'];
+        ->addValue('username', $params['cms_name'])
+        ->addValue('email', $mail)
+        ->addValue('password', $hashedPassword)
+        ->execute()->single()['id'];
     }
     catch (\Exception $e) {
       \Civi::log()->warning("Failed to create user '$mail': " . $e->getMessage());
@@ -174,9 +176,9 @@ class Security {
    */
   public function updateCMSName($ufID, $email) {
     \Civi\Api4\User::update(FALSE)
-    ->addWhere('id', '=', $ufID)
-    ->addValue('email', $email)
-    ->execute();
+      ->addWhere('id', '=', $ufID)
+      ->addValue('email', $email)
+      ->execute();
   }
 
   /**
@@ -303,7 +305,7 @@ class Security {
    *   An existing hash or the output of _password_generate_salt().  Must be
    *   at least 12 characters (the settings and salt).
    *
-   * @return
+   * @return string|bool
    *   A string containing the hashed password (and salt) or FALSE on failure.
    *   The return string will be truncated at DRUPAL_HASH_LENGTH characters max.
    */
@@ -339,7 +341,7 @@ class Security {
     } while (--$count);
 
     $len = strlen($hash);
-    $output =  $setting . $this->_password_base64_encode($hash, $len);
+    $output = $setting . $this->_password_base64_encode($hash, $len);
     // _password_base64_encode() of a 16 byte MD5 will always be 22 characters.
     // _password_base64_encode() of a 64 byte sha512 will always be 86 characters.
     $expected = 12 + ceil((8 * $len) / 6);
@@ -361,16 +363,16 @@ class Security {
    *   Integer that determines the number of iterations used in the hashing
    *   process. A larger value is more secure, but takes more time to complete.
    *
-   * @return
+   * @return string
    *   A 12 character string containing the iteration count and a random salt.
    */
-  public function _password_generate_salt($count_log2 = NULL) {
+  public function _password_generate_salt($count_log2 = NULL): string {
 
     // Standalone: D7 has this stored as a CMS variable setting.
     // @todo use global setting that can be changed in civicrm.settings.php
     // For now, we just pick a value half way between our hard-coded min and max.
     if ($count_log2 === NULL) {
-      $count_log2 = (int) ((static::$maxHashCount + static::$minHashCount)/2);
+      $count_log2 = (int) ((static::$maxHashCount + static::$minHashCount) / 2);
     }
     $output = '$S$';
     // Ensure that $count_log2 is within set bounds.
@@ -382,7 +384,6 @@ class Security {
     return $output;
   }
 
-
   /**
    * This is taken from Drupal 7.91
    *
@@ -393,10 +394,10 @@ class Security {
    * @param $count
    *   The number of characters (bytes) to encode.
    *
-   * @return
+   * @return string
    *   Encoded string
    */
-  public function _password_base64_encode($input, $count) {
+  public function _password_base64_encode($input, $count): string {
     $output = '';
     $i = 0;
     $itoa64 = self::ITOA64;
@@ -422,4 +423,5 @@ class Security {
 
     return $output;
   }
+
 }

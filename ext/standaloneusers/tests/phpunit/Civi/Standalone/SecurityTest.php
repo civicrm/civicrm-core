@@ -6,7 +6,6 @@ use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
-use Civi\Standalone\Security;
 
 /**
  * FIXME - Add test description.
@@ -28,6 +27,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   protected $originalUFPermission;
   protected $contactID;
   protected $userID;
+
   /**
    * Setup used when HeadlessInterface is implemented.
    *
@@ -41,7 +41,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
    */
   public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()
-      ->install(['authx','org.civicrm.search_kit', 'org.civicrm.afform', 'standaloneusers'])
+      ->install(['authx', 'org.civicrm.search_kit', 'org.civicrm.afform', 'standaloneusers'])
       // ->installMe(__DIR__) This causes failure, so we do                 ↑
       ->apply(FALSE);
   }
@@ -59,10 +59,10 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
     list($contactID, $userID, $security) = $this->createFixtureContactAndUser();
 
     $user = \Civi\Api4\User::get(FALSE)
-    ->addSelect('*', 'uf_match.*')
-    ->addWhere('id', '=', $userID)
-    ->addJoin('UFMatch AS uf_match', 'INNER', ['uf_match.uf_id', '=', 'id'])
-    ->execute()->single();
+      ->addSelect('*', 'uf_match.*')
+      ->addWhere('id', '=', $userID)
+      ->addJoin('UFMatch AS uf_match', 'INNER', ['uf_match.uf_id', '=', 'id'])
+      ->execute()->single();
 
     $this->assertEquals('user_one', $user['username']);
     $this->assertEquals('user_one@example.org', $user['email']);
@@ -76,17 +76,17 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
     list($contactID, $userID, $security) = $this->createFixtureContactAndUser();
     // Create role,
     $roleID = \Civi\Api4\Role::create(FALSE)
-    ->setValues([ 'name' => 'staff' ]) ->execute()->first()['id'];
+      ->setValues(['name' => 'staff'])->execute()->first()['id'];
     $this->assertGreaterThan(0, $roleID);
 
     // Assign role to user
     \Civi\Api4\UserRole::create(FALSE)
-    ->setValues(['user_id' => $userID, 'role_id' => $roleID])->execute();
+      ->setValues(['user_id' => $userID, 'role_id' => $roleID])->execute();
 
     // Assign some permissions to the role.
     \Civi\Api4\RolePermission::save(FALSE)
-    ->setDefaults(['role_id' => $roleID])
-    ->setRecords([
+      ->setDefaults(['role_id' => $roleID])
+      ->setRecords([
       // Master control for access to the main CiviCRM backend and API. Give to trusted roles only.
       ['permission' => 'access CiviCRM'],
       // Perform all tasks in the Administer CiviCRM control panel and Import Contacts
@@ -94,8 +94,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
       ['permission' => 'view all contacts'],
       ['permission' => 'add contacts'],
       ['permission' => 'edit all contacts'],
-    ])
-    ->execute();
+      ])
+      ->execute();
 
     $this->switchToOurUFClasses();
     foreach (['access CiviCRM', 'view all contacts', 'add contacts', 'edit all contacts'] as $allowed) {
@@ -129,10 +129,10 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   public function createFixtureContactAndUser(): array {
 
     $contactID = \Civi\Api4\Contact::create(FALSE)
-    ->setValues([
-      'contact_type' => 'Individual',
-      'display_name' => 'Admin McDemo',
-    ])->execute()->first()['id'];
+      ->setValues([
+        'contact_type' => 'Individual',
+        'display_name' => 'Admin McDemo',
+      ])->execute()->first()['id'];
 
     $security = Security::singleton();
     $params = ['cms_name' => 'user_one', 'cms_pass' => 'secret1', 'notify' => FALSE, 'contactID' => $contactID, 'user_one@example.org' => 'user_one@example.org'];
@@ -146,6 +146,5 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
     $this->userID = $userID;
     return [$contactID, $userID, $security];
   }
-
 
 }
