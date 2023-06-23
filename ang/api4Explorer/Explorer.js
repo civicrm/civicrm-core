@@ -1001,7 +1001,7 @@
           // Fields marked 'localizable' in the schema should get wrapped in ts() for the php format
           var localizable = _.pluck(_.filter(_.findWhere(getEntity().actions, {name: $scope.action}).fields, {localizable: true}), 'name') || [];
           // More field names that probably should be translated
-          localizable = _.sets(localizable, ['label', 'title', 'description', 'text']);
+          localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
           $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable)) + ';', 'php', 1));
           break;
       }
