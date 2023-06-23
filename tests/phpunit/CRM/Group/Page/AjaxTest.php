@@ -666,6 +666,9 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * @param array $currentGroups
    */
   public function hook_civicrm_aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
+    if ($tableName !== 'civicrm_group') {
+      return;
+    }
     //don't use api - you will get a loop
     $sql = " SELECT * FROM civicrm_group WHERE name LIKE '%pick%'";
     $groups = [];
@@ -734,7 +737,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
       `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
       )
       VALUES (
-      'core-580', 'civicrm_acl_role', 55, 'Edit', 'civicrm_saved_search', 0, 1
+      'core-580', 'civicrm_acl_role', 55, 'Edit', 'civicrm_group', 0, 1
       );
       ");
 

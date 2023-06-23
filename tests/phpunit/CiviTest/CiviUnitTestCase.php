@@ -2182,7 +2182,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
       )
       VALUES (
-      'view picked', 'civicrm_group', $this->_permissionedGroup , 'Edit', 'civicrm_saved_search', {$this->_permissionedGroup}, 1
+      'view picked', 'civicrm_group', $this->_permissionedGroup , 'Edit', 'civicrm_group', {$this->_permissionedGroup}, 1
       );
       ");
 
@@ -2191,7 +2191,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
       )
       VALUES (
-      'view picked', 'civicrm_group',  $this->_permissionedGroup, 'Edit', 'civicrm_saved_search', {$this->_permissionedDisabledGroup}, 1
+      'view picked', 'civicrm_group',  $this->_permissionedGroup, 'Edit', 'civicrm_group', {$this->_permissionedDisabledGroup}, 1
       );
       ");
     }

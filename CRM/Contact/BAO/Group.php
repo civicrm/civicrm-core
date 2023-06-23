@@ -285,7 +285,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $permissions = NULL;
     if (CRM_Core_Permission::check('edit all contacts') ||
       CRM_ACL_API::groupPermission(CRM_ACL_API::EDIT, $id, NULL,
-        'civicrm_saved_search', $allGroups
+        'civicrm_group', $allGroups
       )
     ) {
       $permissions[] = CRM_Core_Permission::EDIT;
@@ -293,7 +293,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_ACL_API::groupPermission(CRM_ACL_API::VIEW, $id, NULL,
-        'civicrm_saved_search', $allGroups
+        'civicrm_group', $allGroups
       )
     ) {
       $permissions[] = CRM_Core_Permission::VIEW;
@@ -316,8 +316,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $clauses = [];
     if (!CRM_Core_Permission::check([['edit all contacts', 'view all contacts']])) {
       $allGroups = CRM_Core_PseudoConstant::allGroup(NULL, FALSE);
-      // FIXME: TableName 'civicrm_saved_search' seems wrong but is consistent with self::checkPermission
-      $allowedGroups = \CRM_ACL_API::group(CRM_ACL_API::VIEW, NULL, 'civicrm_saved_search', $allGroups);
+      $allowedGroups = \CRM_ACL_API::group(CRM_ACL_API::VIEW, NULL, 'civicrm_group', $allGroups);
       $groupsIn = $allowedGroups ? implode(',', $allowedGroups) : '0';
       $clauses['id'][] = "IN ($groupsIn)";
     }

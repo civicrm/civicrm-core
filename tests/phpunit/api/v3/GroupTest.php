@@ -362,8 +362,10 @@ class api_v3_GroupTest extends CiviUnitTestCase {
    * @param array $ids
    */
   public function aclGroupAllGroups($type, $contactID, $tableName, $allGroups, &$ids) {
-    $group = $this->callAPISuccess('Group', 'get', ['name' => 'Test Group 1']);
-    $ids = array_keys($group['values']);
+    if ($tableName === 'civicrm_group') {
+      $group = $this->callAPISuccess('Group', 'get', ['name' => 'Test Group 1']);
+      $ids = array_keys($group['values']);
+    }
   }
 
 }

@@ -125,7 +125,7 @@ trait ACLPermissionTrait {
    * @throws CRM_Core_Exception
    */
   public function setupCoreACLPermittedAcl($permissionedEntities = [], $groupAllowedAccess = 'Everyone', $operation = 'View', $entity = 'Group') {
-    $tableMap = ['Group' => 'civicrm_saved_search', 'CustomGroup' => 'civicrm_custom_group', 'Profile' => 'civicrm_uf_match', 'Event' => 'civicrm_event'];
+    $tableMap = ['Group' => 'civicrm_group', 'CustomGroup' => 'civicrm_custom_group', 'Profile' => 'civicrm_uf_group', 'Event' => 'civicrm_event'];
     $entityTable = $tableMap[$entity];
 
     $permittedRoleID = ($groupAllowedAccess === 'Everyone') ? 0 : $groupAllowedAccess;

@@ -148,7 +148,7 @@ class CRM_ACL_API {
   public static function group(
     $type,
     $contactID = NULL,
-    $tableName = 'civicrm_saved_search',
+    $tableName = 'civicrm_group',
     $allGroups = NULL,
     $includedGroups = []
   ) {
@@ -181,7 +181,7 @@ class CRM_ACL_API {
     $type,
     $groupID,
     $contactID = NULL,
-    $tableName = 'civicrm_saved_search',
+    $tableName = 'civicrm_group',
     $allGroups = NULL,
     $includedGroups = NULL
   ) {

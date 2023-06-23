@@ -1477,8 +1477,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * this from civicrm_generated.mysql
    */
   private function setUpACLByCheating() {
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl (name, deny, entity_table, entity_id, operation, object_table, object_id, acl_table, acl_id, is_active) VALUES ('Edit All Contacts', 0, 'civicrm_acl_role', 1, 'Edit', 'civicrm_saved_search', 0, NULL, NULL, 1)");
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl (name, deny, entity_table, entity_id, operation, object_table, object_id, acl_table, acl_id, is_active) VALUES ('Core ACL',0,'civicrm_acl_role',0,'All','access CiviMail subscribe/unsubscribe pages',NULL,NULL,NULL,1)");
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl (name, deny, entity_table, entity_id, operation, object_table, object_id, acl_table, acl_id, is_active) VALUES ('Edit All Contacts', 0, 'civicrm_acl_role', 1, 'Edit', 'civicrm_group', 0, NULL, NULL, 1)");
   }
 
 }
