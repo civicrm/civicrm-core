@@ -3,6 +3,7 @@
 .use-civicrm-setup
 /ext/*
 !/ext/afform
+!/ext/standaloneusers
 !/ext/authx
 !/ext/civigrant
 !/ext/civicrm_admin_ui
