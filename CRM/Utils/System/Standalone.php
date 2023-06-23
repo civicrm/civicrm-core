@@ -40,7 +40,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     }
   }
 
-
   /**
    * @inheritdoc
    */
