@@ -782,6 +782,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ], $params);
 
     $result = $this->callAPISuccess('PaymentProcessor', 'create', $params);
+    $this->ids['PaymentProcessor']['authorize_net'] = (int) $result['id'];
     return (int) $result['id'];
   }
 
@@ -2335,8 +2336,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'processor_id' => $this->ids['Contact']['individual_0'],
       'api.Order.create' => $contributionParams,
     ], $recurParams))['values'][0];
-    $this->_contributionRecurID = $contributionRecur['id'];
-    $this->_contributionID = $contributionRecur['api.Order.create']['id'];
+    $this->ids['ContributionRecur']['default'] = $this->_contributionRecurID = $contributionRecur['id'];
+    $this->ids['Contribution']['default'] = $this->_contributionID = $contributionRecur['api.Order.create']['id'];
     $this->ids['Contribution'][0] = $this->_contributionID;
   }
 
