@@ -15,10 +15,18 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Standalone\Security;
+
 /**
  * Standalone specific stuff goes here.
  */
 class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
+
+  public $missingStandaloneExtension = TRUE;
+
+  public function __construct() {
+    $this->missingStandaloneExtension = class_exists(\Civi\Standalone\Security::class);
+  }
 
   /**
    * @inheritdoc
@@ -26,7 +34,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function getDefaultFileStorage() {
     return [
       'url' => 'upload',
-      // @todo Not sure if this is wise
+      // @todo Not sure if this is wise - what about CLI invocation?
       'path' => $_SERVER['DOCUMENT_ROOT'],
     ];
   }
@@ -47,33 +55,20 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    *   uid if user was created, false otherwise
    */
   public function createUser(&$params, $mail) {
-
-    try {
-      $userID = \Civi\Api4\User::create(TRUE)
-      ->addValue('username', $params['cms_name'])
-      ->addValue('mail', $mail)
-      // @todo the Api should ensure a password is encrypted? Or call a method to do that here?
-      ->addValue('password', $params['cms_pass'])
-      ->execute()->single()['id'];
-      }
-    catch (\Exception $e) {
-      \Civi::log()->warning("Failed to create user '$mail': " . $e->getMessage());
+    if ($this->missingStandaloneExtension) {
       return FALSE;
     }
-
-    // @todo This is what Drupal does, but it's unclear why.
-    // CRM_Core_Config::singleton()->inCiviCRM = FALSE;
-    return (int) $userID;
+    return Security::singleton()->createUser($params, $mail);
   }
 
   /**
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
-    \Civi\Api4\User::update(FALSE)
-    ->addWhere('id', '=', $ufID)
-    ->addValue('email', $email)
-    ->execute();
+    if ($this->missingStandaloneExtension) {
+      return FALSE;
+    }
+    return Security::singleton()->updateCMSName($ufID, $email);
   }
 
   /**
@@ -81,8 +76,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : [];
-    // @todo
-    throw new \RuntimeException("Standalone getLoginURL not written yet!");
+    return CRM_Utils_System::url('civicrm/login', $query, TRUE);
   }
 
   /**
@@ -181,9 +175,11 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $forceBackend = FALSE,
     $htmlize = TRUE
   ) {
-    // @todo Implement absolute etc
     $fragment = $fragment ? ('#' . $fragment) : '';
     $url = "/{$path}?{$query}$fragment";
+    if ($absolute) {
+      return rtrim(Civi::settings()->get('userFrameworkResourceURL'), '/') . $url;
+    }
     return $url;
   }
 
@@ -205,65 +201,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @throws \CRM_Core_Exception.
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-
-    // this comment + session lines: copied from Drupal's implementation in case it's important...
-    /* Before we do any loading, let's start the session and write to it.
-     * We typically call authenticate only when we need to bootstrap the CMS
-     * directly via Civi and hence bypass the normal CMS auth and bootstrap
-     * process typically done in CLI and cron scripts. See: CRM-12648
-     */
-    $session = CRM_Core_Session::singleton();
-    $session->set('civicrmInitSession', TRUE);
-
-    $user = \Civi\Api4\User::get(FALSE)
-    ->addWhere('name', '=', $name)
-    ->addWhere('is_active', '=', TRUE)
-    ->addSelect('password', 'contact_id')
-    ->execute()->first() ?? [];
-    $user += ['password' => ''];
-
-    // @todo consider moving this elsewhere.
-    $type = substr($user['password'], 0, 3);
-    switch ($type) {
-      case '$S$':
-        // A normal Drupal 7 password using sha512.
-        $hash = $this->_password_crypt('sha512', $password, $user['password']);
-        break;
-      default:
+    if ($this->missingStandaloneExtension) {
       return FALSE;
     }
-
-    if (!hash_equals($user['password'], $hash)) {
-      return FALSE;
-    }
-
-    // Note: random_int is more appropriate for cryptographical use than mt_rand
-    // The long number is the max 32 bit value.
-    return [$user['civicrm_id'], $user['id'], random_int(0, 2147483647)];
-  }
-
-
-  /**
-   * This is a copy of Drupal7's _password_get_count_log2
-   */
-
-  /**
-   * @inheritDoc
-   *
-   * Note that the parent signature in the docblock says object, but we use a string username for stanalone.
-   *
-   * @todo I (artfulrobot) am unclear what this is really needed for/expected to do.
-   */
-  public function loadUser($username) {
-    $user = \Civi\Api4\User::get(FALSE)
-    ->addWhere('username', '=', $username)
-    ->execute()
-    ->single();
-
-    // Do we do something like this?:
-    // CRM_Core_Session::singleton()->set('userID', $user['id']);
-    // (but we'd need to clear the session etc. and probably use a special method for this?
-    // or maybe this IS the special method for that?)
+    return Security::singleton()->authenticate($name, $password, $loadCMSBootstrap, $realPath);
   }
 
   /**
@@ -275,43 +216,43 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return int|null
    */
   public function getUfId($username) {
-    return \Civi\Api4\User::get(FALSE)
-    ->addWhere('username', '=', $username)
-    ->execute()
-    ->single()['id'];
+    if ($this->missingStandaloneExtension) {
+      return NULL;
+    }
+    return Security::singleton()->getUserIDFromUsername($username);
   }
 
   /**
-   * @inheritDoc
-   */
-  public function permissionDenied() {
-    die('Standalone permissionDenied');
-  }
-
-  /**
-   * @inheritDoc
+   * Immediately stop script execution, log out the user and redirect to the home page.
+   *
+   * @deprecated
+   *   This function should be removed in favor of linking to the CMS's logout page
    */
   public function logout() {
-    // @todo
+    if ($this->missingStandaloneExtension) {
+      return;
+    }
+    return Security::singleton()->logoutUser();
   }
 
   /**
    * @inheritDoc
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+
+    // Q. what does this do? Why do we only include this for maintenance?
     if ($maintenance) {
       $smarty = CRM_Core_Smarty::singleton();
       echo implode('', $smarty->_tpl_vars['pageHTMLHead']);
     }
 
     // @todo Add variables from the body tag? (for Shoreditch)
-
     print $content;
     return NULL;
   }
 
   /**
-   * Bootstrap composer libs.
+   * Bootstrap Standalone.
    *
    * This is used by cv and civix, but not I (artfulrobot) think, in the main http requests.
    *
@@ -329,29 +270,61 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     static $runOnce;
 
-    error_log("artfulrobot: " . __FILE__ . " " . __METHOD__);
     if (!isset($runOnce)) {
       $runOnce = TRUE;
       return TRUE;
     }
 
-    if (!($root = $this->cmsRootPath())) {
-      // What does this guard against?
+    $root = $this->cmsRootPath();
+    if (empty($root) || !is_dir($root) || !chdir($root)) {
       return FALSE;
     }
-    chdir($root);
 
     require_once $root . '../vendor/autoload.php'; /* assumes $root to be the _web_ root path, not the project root path. */
 
-    if ($loadUser) {
-      // @todo
-      // if (!empty($params['uid']) && ...) {
-      //   $this->loadUser($username);
-      // }
-      // elseif (!empty($params['name']) && !empty($params['pass']) && ...can authenticate...) {
-      //   $this->loadUser($params['name']);
-      // }
+    // seems like we've bootstrapped drupal
+    $config = CRM_Core_Config::singleton();
+    $config->cleanURL = 1;
+
+    // Re-check now we have a bit more to go on.
+    $this->missingStandaloneExtension = class_exists(\Civi\Standalone\Security::class);
+
+    // I don't *think* this applies to Standalone:
+    //
+    // we need to call the config hook again, since we now know
+    // all the modules that are listening on it, does not apply
+    // to J! and WP as yet
+    // CRM-8655
+    // CRM_Utils_Hook::config($config);
+
+    if (!$loadUser) {
+      return TRUE;
     }
+
+    if ($this->missingStandaloneExtension) {
+      return FALSE;
+    }
+
+    $security = \Civi\Standalone\Security::singleton();
+    if (!empty($params['uid'])) {
+      $user = $security->loadUserByID($params['uid']);
+    }
+    elseif (!empty($params['name'] && !empty($params['pass']))) {
+      // It seems from looking at the Drupal implementation, that
+      // if given username we expect a correct password.
+      $user = $security->loadUserByName($params['name']);
+      if ($user) {
+        if (!$security->checkPassword($params['pass'], $user['password'] ?? '')) {
+          return FALSE;
+        }
+      }
+    }
+    if (!$user) {
+      return FALSE;
+    }
+
+    $security->loginAuthenticatedUserRecord($user, FALSE);
+
     return TRUE;
   }
 
@@ -383,7 +356,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     if (!empty($civicrm_paths['cms.root']['path'])) {
       return $civicrm_paths['cms.root']['path'];
     }
-    error_log("artfulrobot: " . __FILE__ . " " . __METHOD__);
     throw new \RuntimeException("Standalone requires the path is set for now. Set \$civicrm_paths['cms.root']['path'] in civicrm.settings.php to the webroot.");
   }
 
@@ -391,16 +363,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function isUserLoggedIn() {
-    // @todo
-    return TRUE;
+    if ($this->missingStandaloneExtension) {
+      return TRUE;
+    }
+    return Security::singleton()->isUserLoggedIn();
   }
 
   /**
    * @inheritDoc
    */
   public function isUserRegistrationPermitted() {
-    // @todo Have a setting
-    return TRUE;
+    // We don't support user registration in Standalone.
+    return FALSE;
   }
 
   /**
@@ -423,57 +397,31 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getLoggedInUfID() {
-    // @todo Not implemented
-    // This helps towards getting the CiviCRM menu to display
-    return 1;
+
+    if ($this->missingStandaloneExtension) {
+      // This helps towards getting the CiviCRM menu to display
+      return 1;
+    }
+    return Security::singleton()->getLoggedInUfID();
   }
 
   /**
    * @inheritDoc
-   */
-  public function getDefaultBlockLocation() {
-    // @todo No sidebars, no blocks
-    return 'sidebar_first';
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function flush() {
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getUser($contactID) {
-    $user_details = parent::getUser($contactID);
-    $user_details['name'] = $user_details['name']->value;
-    $user_details['email'] = $user_details['email']->value;
-    return $user_details;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getUniqueIdentifierFromUserObject($user) {
-    // @todo I (artfulrobot) am not sure what object the 'user' is here.
-    // Pretty sure this won't work.
-    return $user->get('email')->value;
-  }
-
-  /**
-   * @inheritDoc
+   *
+   * In Standalone our user object is just an array from a User::get() call.
    */
   public function getUserIDFromUserObject($user) {
-    return $user->get('uid')->value;
+    return $user['id'] ?? NULL;
   }
 
   /**
    * @inheritDoc
    */
   public function synchronizeUsers() {
-    // @todo? artfulrobot says: I don't think we will need this?
-    Civi::log()->debug('CRM_Utils_System_Standalone::synchronizeUsers: not implemented');
+    if ($this->missingStandaloneExtension) {
+      return parent::synchronizeUsers();
+    }
+    return Security::singleton()->synchronizeUsers();
   }
 
   /**
@@ -491,12 +439,15 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return string
    */
   public function getCurrentLanguage() {
-    // @todo
-    Civi::log()->debug('CRM_Utils_System_Standalone::getCurrentLanguage: not implemented');
-    return NULL;
+    if ($this->missingStandaloneExtension) {
+      return NULL;
+    }
+    return Security::singleton()->getCurrentLanguage();
   }
 
   /**
+   * I don't know why this needs to be here? Does it even?
+   *
    * Helper function to extract path, query and route name from Civicrm URLs.
    *
    * For example, 'civicrm/contact/view?reset=1&cid=66' will be returned as:
@@ -559,22 +510,17 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function setUFLocale($civicrm_language) {
-    throw new \RuntimeException("Standalone setUFLocale not written yet!");
-    // @todo
-  }
-
-  /**
-   * @inheritDoc
-   */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
       return $url;
     }
 
-    // @todo
+    // Notice: we CANNOT call log here, it creates a nasty crash.
     // \Civi::log()->warning("Standalone languageNegotiationURL is not written, but was called");
-    return $url;
+    if ($this->missingStandaloneExtension) {
+      return $url;
+    }
+    return Security::singleton()->languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE);
   }
 
   /**
@@ -582,32 +528,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return array
    */
   public function getCMSPermissionsUrlParams() {
-    // @todo
-    \Civi::log()->warning("Standalone getCMSPermissionsUrlParams is not written, but was called");
-    return ['ufAccessURL' => '/fixme/standalone/permissions/url/params'];
-  }
-
-  /**
-   * Start a new session.
-   */
-  public function sessionStart() {
-    session_start();
-    // @todo This helps towards getting the CiviCRM menu to display
-    // but obviously should be replaced once we have user management
-    CRM_Core_Session::singleton()->set('userID', 1);
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function getSessionId() {
-    return session_id();
-  }
-
-  /**
-   * @todo is anything needed here for Standalone?
-   */
-  public function invalidateRouteCache() {
+    if ($this->missingStandaloneExtension) {
+      return ['ufAccessURL' => '/fixme/standalone/permissions/url/params'];
+    }
+    return Security::singleton()->getCMSPermissionsUrlParams();
   }
 
 }

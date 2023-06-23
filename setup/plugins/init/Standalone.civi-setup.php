@@ -29,15 +29,15 @@ if (!defined('CIVI_SETUP')) {
     }
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
-
-  error_log('artfulrobot: ' . __FILE__ . ' listener for civi.setup.init');
+    error_log('artfulrobot: ' . __FILE__ . ' listener for civi.setup.init');
     // Compute settingsPath.
     // We use this structure: /var/www/standalone/data/{civicrm.settings.php,templates_c}
     // to reduce the number of directories that admins have to chmod
 
-    /** @var string $projectRootPath
+    /**
+     * @var string $projectRootPath
      *       refers to the root of the *application*, not the actual webroot as reachable by http.
-     *       Typically this means that $projectRootPath might be like /var/www/example.org/ and
+     *       Typically, this means that $projectRootPath might be like /var/www/example.org/ and
      *       the actual web root would be /var/www/example.org/web/
      */
     $projectRootPath = dirname($model->srcPath, 3);
