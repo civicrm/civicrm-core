@@ -288,7 +288,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       'model' => NULL,
 
       // Symbolic name of the workflow step. Matches the value in civicrm_msg_template.workflow_name.
-      'workflow' => NULL,
+      // This field is allowed as an input. However, the default mechanics go through the 'model'.
+      // 'workflow' => NULL,
 
       // additional template params (other than the ones already set in the template singleton)
       'tplParams' => [],
@@ -345,7 +346,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     ];
 
     self::synchronizeLegacyParameters($params);
+    $params = array_merge($modelDefaults, $viewDefaults, $envelopeDefaults, $params);
 
+    self::synchronizeLegacyParameters($params);
     // Allow WorkflowMessage to run any filters/mappings/cleanups.
     $model = $params['model'] ?? WorkflowMessage::create($params['workflow'] ?? 'UNKNOWN');
     $params = WorkflowMessage::exportAll(WorkflowMessage::importAll($model, $params));
@@ -354,7 +357,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     // If you want to expose the model via hook, consider interjecting a new Hook::alterWorkflowMessage($model) between `importAll()` and `exportAll()`.
 
     self::synchronizeLegacyParameters($params);
-    $params = array_merge($modelDefaults, $viewDefaults, $envelopeDefaults, $params);
     $language = $params['language'] ?? (!empty($params['contactId']) ? Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $params['contactId'])->addSelect('preferred_language')->execute()->first()['preferred_language'] : NULL);
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
     [$mailContent, $translatedLanguage] = self::loadTemplate((string) $params['workflow'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL, $language);
