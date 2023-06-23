@@ -30,15 +30,8 @@ class Abdicator {
    * @return bool
    */
   public static function isFlexmailPreferred($mailing) {
-    if ($mailing->sms_provider_id) {
-      return FALSE;
-    }
-
-    // Use FlexMailer for new-style email blasts (with custom `template_type`).
-    if ($mailing->template_type && $mailing->template_type !== 'traditional') {
-      return TRUE;
-    }
-    return TRUE;
+    // Yes for CiviMail - no for CiviSMS
+    return empty($mailing->sms_provider_id);
   }
 
   /**
