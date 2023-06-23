@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  *
  * @package CRM
@@ -527,6 +529,47 @@ SELECT g.*
       )";
     }
     return '';
+  }
+
+  public static function getObjectTableOptions(): array {
+    return [
+      'civicrm_group' => ts('Group'),
+      'civicrm_uf_group' => ts('Profile'),
+      'civicrm_event' => ts('Event'),
+      'civicrm_custom_group' => ts('Custom Group'),
+    ];
+  }
+
+  public static function getObjectIdOptions($context, $params): array {
+    if (empty($params['values']['object_table']) && empty($params['values']['object_table:label'])) {
+      return [];
+    }
+    if (!empty($params['values']['object_table:label'])) {
+      $table_name = array_flip(self::operationTables())[$params['values']['object_table:label']];
+    }
+    else {
+      $table_name = $params['values']['object_table'];
+    }
+    $finalOptions = [];
+    $entity = CoreUtil::getApiNameFromTableName($table_name);
+    $label = CoreUtil::getInfoItem($entity, 'label_field');
+    $titlePlural = CoreUtil::getInfoItem($entity, 'title_plural');
+    $finalOptions[] = [
+      'label' => ts('All %1', [1 => $titlePlural]),
+      'id' => 0,
+      'name' => 0,
+    ];
+    $options = civicrm_api4($entity, 'get', [
+      'select' => [$label, 'id', 'name'],
+    ]);
+    foreach ($options as $option) {
+      $finalOptions[] = [
+        'label' => $option[$label],
+        'id' => $option['id'],
+        'name' => $option['name'] ?? $option['id'],
+      ];
+    }
+    return $finalOptions;
   }
 
 }

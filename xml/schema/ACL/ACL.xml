@@ -63,6 +63,9 @@
     <type>int unsigned</type>
     <title>Entity ID</title>
     <comment>ID of the object possessing this ACL</comment>
+    <pseudoconstant>
+      <optionGroupName>acl_role</optionGroupName>
+    </pseudoconstant>
     <add>1.6</add>
   </field>
   <dynamicForeignKey>
@@ -91,6 +94,9 @@
     <type>varchar</type>
     <length>64</length>
     <comment>The table of the object controlled by this ACL entry</comment>
+    <pseudoconstant>
+      <callback>CRM_ACL_BAO_ACL::getObjectTableOptions</callback>
+    </pseudoconstant>
     <add>1.6</add>
   </field>
   <field>
@@ -99,6 +105,10 @@
     <type>int unsigned</type>
     <comment>The ID of the object controlled by this ACL entry</comment>
     <add>1.6</add>
+    <pseudoconstant>
+      <callback>CRM_ACL_BAO_ACL::getObjectIdOptions</callback>
+      <prefetch>false</prefetch>
+    </pseudoconstant>
   </field>
   <field>
     <name>acl_table</name>

@@ -23,7 +23,6 @@ use Civi\Api4\Generic\Traits\SortableEntity;
  *
  * Creating a new ACL requires at minimum an entity table, entity ID and object_table.
  *
- * @searchable none
  * @see https://docs.civicrm.org/user/en/latest/initial-set-up/permissions-and-access-control
  * @since 5.19
  * @orderBy priority
