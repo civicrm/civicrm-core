@@ -1,10 +1,38 @@
 <?php
 
+use Civi\Test;
+use Civi\Test\HeadlessInterface;
+use Civi\Test\HookInterface;
+use PHPUnit\Framework\TestCase;
+
 /**
- * Class CRM_Utils_QueryFormatterTest
+ * FIXME - Add test description.
+ *
+ * Tips:
+ *  - With HookInterface, you may implement CiviCRM hooks directly in the test
+ * class. Simply create corresponding functions (e.g. "hook_civicrm_post(...)"
+ * or similar).
+ *  - With TransactionalInterface, any data changes made by setUp() or
+ * test****() functions will rollback automatically -- as long as you don't
+ * manipulate schema or truncate tables. If this test needs to manipulate
+ * schema or truncate tables, then either: a. Do all that using setupHeadless()
+ * and Civi\Test. b. Disable TransactionalInterface, and handle all
+ * setup/teardown yourself.
+ *
  * @group headless
  */
-class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
+class CRM_Utils_QueryFormatterTest extends TestCase implements HeadlessInterface, HookInterface {
+
+  /**
+   * Civi\Test has many helpers, like install(), uninstall(), sql(), and
+   * sqlFile(). See:
+   * https://github.com/civicrm/org.civicrm.testapalooza/blob/master/civi-test.md
+   */
+  public function setUpHeadless(): Test\CiviEnvBuilder {
+    return Test::headless()
+      ->install(['legacycustomsearches'])
+      ->apply();
+  }
 
   public function createExampleTable() {
     CRM_Core_DAO::executeQuery('
@@ -35,7 +63,7 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
       [9, 'firstly someone'],
     ];
     foreach ($rows as $row) {
-      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_fts_example (id,name) VALUES (%1, %2)",
+      CRM_Core_DAO::executeQuery('INSERT INTO civicrm_fts_example (id,name) VALUES (%1, %2)',
         [
           1 => [$row[0], 'Int'],
           2 => [$row[1], 'String'],
