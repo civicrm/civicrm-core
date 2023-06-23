@@ -194,7 +194,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
         if (in_array($values, $smartGroup)) {
           $ssId = CRM_Utils_Array::key($values, $smartGroup);
 
-          $smartSql = CRM_Contact_BAO_SavedSearch::contactIDsSQL($ssId);
+          $smartSql = CRM_Contact_BAO_SearchCustom::contactIDSQL(NULL, $ssId);
 
           $smartSql = $smartSql . " AND contact_a.id NOT IN (
                           SELECT contact_id FROM civicrm_group_contact
@@ -245,7 +245,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
         $ssId = CRM_Utils_Array::key($values, $smartGroup);
 
-        $smartSql = CRM_Contact_BAO_SavedSearch::contactIDsSQL($ssId);
+        $smartSql = CRM_Contact_BAO_SearchCustom::contactIDSQL(NULL, $ssId);
 
         $smartSql .= " AND contact_a.id NOT IN (
                                SELECT contact_id FROM civicrm_group_contact
