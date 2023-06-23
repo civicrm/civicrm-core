@@ -234,7 +234,7 @@ SELECT   a.operation, a.object_id
   FROM   civicrm_acl_cache c, civicrm_acl a
  WHERE   c.acl_id       =  a.id
    AND   a.is_active    =  1
-   AND   a.object_table = 'civicrm_saved_search'
+   AND   a.object_table = 'civicrm_group'
    AND   a.id        IN ( $aclKeys )
    AND   a.deny         = 0
 ORDER BY a.object_id
@@ -259,7 +259,7 @@ ORDER BY a.object_id
   FROM   civicrm_acl_cache c, civicrm_acl a
  WHERE   c.acl_id       =  a.id
    AND   a.is_active    =  1
-   AND   a.object_table = 'civicrm_saved_search'
+   AND   a.object_table = 'civicrm_group'
    AND   a.id        IN ( $aclKeys )
    AND   a.deny         = 1
    AND   a.object_id IN (%1)
@@ -333,7 +333,7 @@ SELECT g.*
   public static function group(
     $type,
     $contactID = NULL,
-    $tableName = 'civicrm_saved_search',
+    $tableName = 'civicrm_group',
     $allGroups = NULL,
     $includedGroups = []
   ) {

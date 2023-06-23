@@ -225,6 +225,9 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * @param array $currentGroups
    */
   public function hook_civicrm_aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
+    if ($tableName !== 'civicrm_group') {
+      return;
+    }
     //don't use api - you will get a loop
     $sql = " SELECT * FROM civicrm_group";
     $groups = [];

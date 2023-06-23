@@ -598,9 +598,7 @@ abstract class CRM_Utils_Hook {
    * @param int $contactID
    *   User contactID for whom the check is made.
    * @param string $tableName
-   *   Table name of group, e.g. `civicrm_uf_group` or `civicrm_custom_group`.
-   *   Note: for some weird reason when this hook is called for contact groups, this
-   *   value will be `civicrm_saved_search` instead of `civicrm_group` as you'd expect.
+   *   Table name of group, e.g. 'civicrm_group' or 'civicrm_uf_group' or 'civicrm_custom_group'.
    * @param array $allGroups
    *   All groups from the above table, keyed by id.
    * @param int[] $currentGroups
@@ -611,6 +609,17 @@ abstract class CRM_Utils_Hook {
    */
   public static function aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
     $null = NULL;
+    // Legacy support for hooks that still expect 'civicrm_group' to be 'civicrm_saved_search'
+    // This was changed in 5.64
+    if ($tableName === 'civicrm_group') {
+      $initialValue = $currentGroups;
+      $legacyTableName = 'civicrm_saved_search';
+      self::singleton()
+        ->invoke(['type', 'contactID', 'tableName', 'allGroups', 'currentGroups'], $type, $contactID, $legacyTableName, $allGroups, $currentGroups, $null, 'civicrm_aclGroup');
+      if ($initialValue != $currentGroups) {
+        CRM_Core_Error::deprecatedWarning('Since 5.64 hook_civicrm_aclGroup passes "civicrm_group" instead of "civicrm_saved_search" for the $tableName when referring to Groups. Hook listeners should be updated.');
+      }
+    }
     return self::singleton()
       ->invoke(['type', 'contactID', 'tableName', 'allGroups', 'currentGroups'], $type, $contactID, $tableName, $allGroups, $currentGroups, $null, 'civicrm_aclGroup');
   }

@@ -1811,7 +1811,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param array $ids
    */
   public function aclGroupOnly($type, $contactID, $tableName, $allGroups, &$ids) {
-    $ids = [$this->aclGroupID];
+    if ($tableName === 'civicrm_group') {
+      $ids = [$this->aclGroupID];
+    }
   }
 
   /**

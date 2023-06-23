@@ -169,7 +169,7 @@ class CRM_Core_Permission_Base {
         Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
       }
 
-      $ids = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_saved_search', $groups);
+      $ids = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_group', $groups);
       if (!empty($ids)) {
         foreach (array_values($ids) as $id) {
           $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
@@ -178,7 +178,7 @@ class CRM_Core_Permission_Base {
         }
       }
 
-      $ids = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_saved_search', $groups);
+      $ids = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_group', $groups);
       if (!empty($ids)) {
         foreach (array_values($ids) as $id) {
           $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');

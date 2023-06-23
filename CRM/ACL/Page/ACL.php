@@ -142,7 +142,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
       }
 
       switch ($acl[$dao->id]['object_table']) {
-        case 'civicrm_saved_search':
+        case 'civicrm_group':
           $acl[$dao->id]['object'] = $group[$acl[$dao->id]['object_id']] ?? NULL;
           $acl[$dao->id]['object_name'] = ts('Group');
           break;

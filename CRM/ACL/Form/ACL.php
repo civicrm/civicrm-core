@@ -37,7 +37,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
     if (isset($defaults['object_table'])) {
       switch ($defaults['object_table']) {
-        case 'civicrm_saved_search':
+        case 'civicrm_group':
           $defaults['group_id'] = $defaults['object_id'];
           $defaults['object_type'] = 1;
           $showHide->addShow("id-group-acl");
@@ -265,7 +265,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       // Figure out which type of object we're permissioning on and set object_table and object_id.
       switch ($params['object_type']) {
         case 1:
-          $params['object_table'] = 'civicrm_saved_search';
+          $params['object_table'] = 'civicrm_group';
           $params['object_id'] = $params['group_id'];
           break;
 
