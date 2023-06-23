@@ -359,7 +359,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     self::synchronizeLegacyParameters($params);
     $language = $params['language'] ?? (!empty($params['contactId']) ? Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $params['contactId'])->addSelect('preferred_language')->execute()->first()['preferred_language'] : NULL);
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
-    [$mailContent, $translatedLanguage] = self::loadTemplate((string) $params['workflow'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL, $language);
+    [$mailContent, $translatedLanguage] = self::loadTemplate((string) $params['workflow'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $language);
+    CRM_Utils_Hook::alterMailContent($mailContent);
+    if (!empty($params['subject'])) {
+      CRM_Core_Error::deprecatedWarning('CRM_Core_BAO_MessageTemplate: $params[subject] is deprecated. Use $params[messageTemplate][msg_subject] instead.');
+      $mailContent['subject'] = $params['subject'];
+    }
     $params['tokenContext']['locale'] = $translatedLanguage ?? $params['language'] ?? NULL;
 
     self::synchronizeLegacyParameters($params);
@@ -475,14 +480,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    * @param array|null $messageTemplateOverride
    *   Optionally, record with msg_subject, msg_text, msg_html.
    *   If omitted, the record will be loaded from workflowName/messageTemplateID.
-   * @param string|null $subjectOverride
-   *   This option is the older, wonkier version of $messageTemplate['msg_subject']...
    * @param string|null $language
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function loadTemplate(string $workflowName, bool $isTest, int $messageTemplateID = NULL, $groupName = NULL, ?array $messageTemplateOverride = NULL, ?string $subjectOverride = NULL, ?string $language = NULL): array {
+  protected static function loadTemplate(string $workflowName, bool $isTest, int $messageTemplateID = NULL, $groupName = NULL, ?array $messageTemplateOverride = NULL, ?string $language = NULL): array {
     $base = ['msg_subject' => NULL, 'msg_text' => NULL, 'msg_html' => NULL, 'pdf_format_id' => NULL];
     if (!$workflowName && !$messageTemplateID && !$messageTemplateOverride) {
       throw new CRM_Core_Exception(ts("Message template not specified. No option value, ID, or template content."));
@@ -533,13 +536,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       'workflow' => $workflowName,
       'isTest' => $isTest,
     ];
-
-    CRM_Utils_Hook::alterMailContent($mailContent);
-
-    if (!empty($subjectOverride)) {
-      CRM_Core_Error::deprecatedWarning('CRM_Core_BAO_MessageTemplate: $params[subject] is deprecated. Use $params[messageTemplate][msg_subject] instead.');
-      $mailContent['subject'] = $subjectOverride;
-    }
 
     return [$mailContent, $messageTemplate['actual_language'] ?? NULL];
   }
