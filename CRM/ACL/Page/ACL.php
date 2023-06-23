@@ -46,7 +46,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
       self::$_links = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/acl',
+          'url' => 'civicrm/acl/edit',
           'qs' => 'reset=1&action=update&id=%%id%%',
           'title' => ts('Edit ACL'),
         ],
@@ -64,7 +64,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/acl',
+          'url' => 'civicrm/acl/delete',
           'qs' => 'reset=1&action=delete&id=%%id%%',
           'title' => ts('Delete ACL'),
           'weight' => 100,
