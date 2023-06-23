@@ -1,10 +1,26 @@
 <?php
 
+use Civi\Test;
+use Civi\Test\HeadlessInterface;
+use Civi\Test\HookInterface;
+use PHPUnit\Framework\TestCase;
+
 /**
  * Class CRM_Core_InnoDBIndexerTest
  * @group headless
  */
-class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
+class CRM_Core_InnoDBIndexerTest extends TestCase implements HeadlessInterface, HookInterface {
+
+  /**
+   * Civi\Test has many helpers, like install(), uninstall(), sql(), and
+   * sqlFile(). See:
+   * https://github.com/civicrm/org.civicrm.testapalooza/blob/master/civi-test.md
+   */
+  public function setUpHeadless(): Test\CiviEnvBuilder {
+    return Test::headless()
+      ->install(['legacycustomsearches'])
+      ->apply();
+  }
 
   /**
    * Indices to be created or removed.
@@ -76,6 +92,8 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
 
   /**
    * When enabled, the FTS index is created, so queries that rely on FTS work.
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function testEnabled(): void {
     $this->indices = [
