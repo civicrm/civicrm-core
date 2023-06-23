@@ -31,6 +31,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFour extends CRM_Upgrade_Incremental_
     $this->addTask('Add priority column onto ACL table', 'addColumn', 'civicrm_acl', 'priority', 'int NOT NULL DEFAULT 0');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Update post_URL/cancel_URL in logging tables', 'updateLogging');
+    $this->addTask('Add in Everybody ACL Role option value', 'addEveryBodyAclOptionValue');
   }
 
   public static function updateLogging($ctx): bool {
@@ -41,6 +42,18 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFour extends CRM_Upgrade_Incremental_
       CRM_Core_DAO::executeQuery("ALTER TABLE $table CHANGE `post_URL` `post_url` varchar(255) DEFAULT NULL COMMENT 'Redirect to URL on submit.',
 CHANGE `cancel_URL` `cancel_url` varchar(255) DEFAULT NULL COMMENT 'Redirect to URL when Cancel button clicked.'");
     }
+    return TRUE;
+  }
+
+  public static function addEverybodyAclOptionValue($ctx): bool {
+    \CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'label' => 'Everybody',
+      'value' => 0,
+      'option_group_id' => 'acl_role',
+      'is_active' => 1,
+      'name' => 'Everybody',
+      'is_reserved' => 1,
+    ]);
     return TRUE;
   }
 

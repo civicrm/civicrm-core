@@ -545,7 +545,7 @@ SELECT g.*
       return [];
     }
     if (!empty($params['values']['object_table:label'])) {
-      $table_name = array_flip(self::operationTables())[$params['values']['object_table:label']];
+      $table_name = array_flip(self::getObjectTableOptions())[$params['values']['object_table:label']];
     }
     else {
       $table_name = $params['values']['object_table'];
