@@ -1400,6 +1400,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     ]);
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate();
+    $contact3 = $this->individualCreate();
     $excludeGroup = $this->groupCreate(['title' => 'exclude group', 'name' => 'exclude group']);
     $otherGroup = $this->groupCreate(['title' => 'Other group', 'name' => 'other group']);
     $this->callAPISuccess('GroupContact', 'create', [
@@ -1425,7 +1426,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_acl_role',
       'entity_id' => 6,
       'operation' => 'Edit',
-      'object_table' => 'civicrm_saved_search',
+      'object_table' => 'civicrm_group',
       'object_id' => 0,
     ]);
     $this->callAPISuccess('Acl', 'create', [
@@ -1434,7 +1435,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_acl_role',
       'entity_id' => 6,
       'operation' => 'Edit',
-      'object_table' => 'civicrm_saved_search',
+      'object_table' => 'civicrm_group',
       'object_id' => $excludeGroup,
       'deny' => 1,
     ]);
@@ -1451,9 +1452,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->cleanupCachedPermissions();
     Civi::cache('metadata')->clear();
     Civi::$statics['CRM_ACL_BAO_ACL'] = [];
-    $contacts = Contact::get()->addWhere('id', 'IN', [$contact1, $contact2])->execute();
-    $this->assertCount(1, $contacts);
+    $contacts = Contact::get()->addWhere('id', 'IN', [$contact1, $contact2, $contact3])->execute();
+    $this->assertCount(2, $contacts);
     $this->assertEquals($contact2, $contacts[0]['id']);
+    $this->assertEquals($contact3, $contacts[1]['id']);
   }
 
   /**

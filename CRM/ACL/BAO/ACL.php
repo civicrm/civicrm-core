@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Group;
-
 /**
  *
  * @package CRM
@@ -225,6 +223,7 @@ SELECT count( a.id )
     $acls = CRM_ACL_BAO_Cache::build($contactID);
 
     $whereClause = NULL;
+    $allInclude = $allExclude = FALSE;
     $clauses = [];
 
     if (!empty($acls)) {
@@ -247,54 +246,37 @@ ORDER BY {$orderBy}
       $dao = CRM_Core_DAO::executeQuery($query);
 
       // do an or of all the where clauses u see
-      $ids = [];
+      $ids = $excludeIds = [];
       while ($dao->fetch()) {
         // make sure operation matches the type TODO
         if (self::matchType($type, $dao->operation)) {
           if (!$dao->deny) {
             if (empty($dao->object_id)) {
-              $ids = array_merge($ids, Group::get(FALSE)->execute()->column('id'));
+              $allInclude = TRUE;
             }
             else {
               $ids[] = $dao->object_id;
             }
           }
           else {
-            $ids = array_diff($ids, [$dao->object_id]);
+            if (empty($dao->object_id)) {
+              $allExclude = TRUE;
+            }
+            else {
+              $excludeIds[] = $dao->object_id;
+            }
           }
         }
       }
+      if (!empty($excludeIds) && !$allInclude) {
+        $ids = array_diff($ids, $excludeIds);
+      }
+      elseif (!empty($excludeIds) && $allInclude) {
+        $ids = [];
+        $clauses[] = self::getGroupClause($excludeIds, 'NOT IN');
+      }
       if (!empty($ids)) {
-        $ids = implode(',', $ids);
-        $query = "
-SELECT g.*
-  FROM civicrm_group g
- WHERE g.id IN ( $ids )
- AND   g.is_active = 1
-";
-        $dao = CRM_Core_DAO::executeQuery($query);
-        $groupIDs = [];
-        $groupContactCacheClause = FALSE;
-        while ($dao->fetch()) {
-          $groupIDs[] = $dao->id;
-
-          if (($dao->saved_search_id || $dao->children || $dao->parents)) {
-            if ($dao->cache_date == NULL) {
-              CRM_Contact_BAO_GroupContactCache::load($dao);
-            }
-            $groupContactCacheClause = " UNION SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id IN (" . implode(', ', $groupIDs) . ")";
-          }
-
-        }
-
-        if ($groupIDs) {
-          $clauses[] = "(
-            `contact_a`.id IN (
-               SELECT contact_id FROM civicrm_group_contact WHERE group_id IN (" . implode(', ', $groupIDs) . ") AND status = 'Added'
-               $groupContactCacheClause
-             )
-          )";
-        }
+        $clauses[] = self::getGroupClause($ids, 'IN');
       }
     }
 
@@ -513,6 +495,38 @@ ORDER BY {$orderBy}
       }
     }
     return $ids;
+  }
+
+  private static function getGroupClause(array $groupIDs, string $operation): string {
+    $ids = implode(',', $groupIDs);
+    $query = "
+SELECT g.*
+  FROM civicrm_group g
+ WHERE g.id IN ( $ids )
+ AND   g.is_active = 1
+";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    $foundGroupIDs = [];
+    $groupContactCacheClause = FALSE;
+    while ($dao->fetch()) {
+      $foundGroupIDs[] = $dao->id;
+      if (($dao->saved_search_id || $dao->children || $dao->parents)) {
+        if ($dao->cache_date == NULL) {
+          CRM_Contact_BAO_GroupContactCache::load($dao);
+        }
+        $groupContactCacheClause = " UNION SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id IN (" . implode(', ', $foundGroupIDs) . ")";
+      }
+    }
+
+    if ($groupIDs) {
+      return "(
+        `contact_a`.id $operation (
+         SELECT contact_id FROM civicrm_group_contact WHERE group_id IN (" . implode(', ', $foundGroupIDs) . ") AND status = 'Added'
+           $groupContactCacheClause
+         )
+      )";
+    }
+    return '';
   }
 
 }
