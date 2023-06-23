@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
 use Civi\Api4\PaymentProcessor;
 
 /**
@@ -34,21 +35,31 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * Main IPN processing function.
-   *
-   * @return bool|void
-   *
-   * @throws \CRM_Core_Exception
    */
   public function main() {
     try {
       //we only get invoice num as a key player from payment gateway response.
       //for ARB we get x_subscription_id and x_subscription_paynum
+      // @todo - no idea what the above comment means. The do-nothing line below
+      // this is only still here as it might relate???
       $x_subscription_id = $this->getRecurProcessorID();
+
+      if (!$this->isSuccess()) {
+        $errorMessage = ts('Subscription payment failed - %1', [1 => htmlspecialchars($input['response_reason_text'])]);
+        ContributionRecur::update(FALSE)
+          ->addWhere('id', '=', $this->getContributionRecurID())
+          ->setValues([
+            'contribution_status_id:name' => 'Failed',
+            'cancel_date' => 'now',
+            'cancel_reason' => $errorMessage,
+          ])->execute();
+        \Civi::log('authorize_net')->info($errorMessage);
+        return;
+      }
       $this->recur();
-      return TRUE;
     }
     catch (CRM_Core_Exception $e) {
-      Civi::log()->debug($e->getMessage());
+      Civi::log('authorize_net')->debug($e->getMessage());
       echo 'Invalid or missing data';
     }
   }
@@ -58,10 +69,8 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    */
   public function recur() {
     $recur = $this->getContributionRecur();
-    $paymentProcessorID = $this->getPaymentProcessorID();
     $input = $this->getInput();
-    $input['payment_processor_id'] = $paymentProcessorID;
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $input['payment_processor_id'] = $this->getPaymentProcessorID();
 
     $now = date('YmdHis');
 
@@ -83,22 +92,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         // testIPNPaymentRecurNoReceipt has test cover.
         $recur->save();
       }
-    }
-    else {
-      // Declined
-      // failed status
-      $recur->contribution_status_id = array_search('Failed', $contributionStatus);
-      $recur->cancel_date = $now;
-      $recur->save();
-
-      $message = ts('Subscription payment failed - %1', [1 => htmlspecialchars($input['response_reason_text'])]);
-      CRM_Core_Error::debug_log_message($message);
-
-      // the recurring contribution has declined a payment or has failed
-      // so we just fix the recurring contribution and not change any of
-      // the existing contributions
-      // CRM-9036
-      return;
     }
 
     CRM_Contribute_BAO_Contribution::completeOrder($input, $recur->id, $this->getContributionStatus() !== 'Completed' ? $this->getContributionID() : NULL);
