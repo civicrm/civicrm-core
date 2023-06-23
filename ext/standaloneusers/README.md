@@ -21,7 +21,7 @@ Next configure AuthX from **Administer » System Settings » Authentication**. Y
 
 Now you can install this extension from the command line. (Clone this repo into web/upload/ext/ then enable it with `cv en standaloneusers`).
 
-On install, an account is created, user `admin`, and the password is printed on the console. The admin user is granted all permissions. Example:
+On install, an account is created, user `admin`, and the password is printed on the console (if you install through the UI, the password is output in the Civi logs). The admin user is granted all permissions. Example:
 
 ```
 % cv en standaloneusers
