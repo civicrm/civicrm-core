@@ -10,6 +10,23 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
   // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
 
   /**
+   * Ensure that we're installing on suitable environment.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function onInstall() {
+    $config = \CRM_Core_Config::singleton();
+    if (!($config->userPermissionClass instanceof \CRM_Core_Permission_Standalone)) {
+      throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
+    }
+    if (!($config->userSystem instanceof \CRM_Utils_System_Standalone)) {
+      throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
+    }
+    parent::onInstall();
+  }
+
+  /**
    * Example: Run an external SQL script when the module is installed.
    *
    * public function install() {
@@ -42,11 +59,6 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
       $dummyEmail = 'admin@localhost.localdomain';
 
       // Create user
-      $config = \CRM_Core_Config::singleton();
-      $originalUFPermission = $config->userPermissionClass;
-      $originalUF = $config->userSystem;
-      $config->userPermissionClass = new \CRM_Core_Permission_Standalone();
-      $config->userSystem = new \CRM_Utils_System_Standalone();
       $password = substr(base64_encode(random_bytes(8)), 0, 12);
       $params = [
         'cms_name'   => 'admin',
@@ -56,8 +68,6 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
         'contactID'  => $contactID,
       ];
       $userID = \CRM_Core_BAO_CMSUser::create($params, $dummyEmail);
-      $config->userPermissionClass = $originalUFPermission;
-      $config->userSystem = $originalUF;
 
       // Create Role
       $roleID = \Civi\Api4\Role::create(FALSE)->setValues(['name' => 'Administrator'])->execute()->first()['id'];
