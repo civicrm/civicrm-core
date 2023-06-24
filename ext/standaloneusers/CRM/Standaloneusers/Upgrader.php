@@ -43,6 +43,11 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
    */
   public function postInstall() {
 
+    Civi::settings()->set('authx_login_cred', array_unique(array_merge(
+      Civi::settings()->get('authx_login_cred'),
+      ['pass']
+    )));
+
     $users = \Civi\Api4\User::get(FALSE)->selectRowCount()->execute()->countMatched();
     if ($users == 0) {
 
