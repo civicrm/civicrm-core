@@ -201,11 +201,12 @@ trait ContactTestTrait {
    * Add a Group.
    *
    * @param array $params
+   * @param string $identifier
    *
    * @return int
    *   groupId of created group
    */
-  public function groupCreate(array $params = []): int {
+  public function groupCreate(array $params = [], string $identifier = 'group'): int {
     $params = array_merge([
       'name' => 'Test Group 1',
       'domain_id' => 1,
@@ -219,7 +220,7 @@ trait ContactTestTrait {
       ],
     ], $params);
 
-    $result = $this->callAPISuccess('Group', 'create', $params);
+    $result = $this->createTestEntity('Group', $params, $identifier);
     return $result['id'];
   }
 

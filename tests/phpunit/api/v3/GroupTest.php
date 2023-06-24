@@ -266,12 +266,14 @@ class api_v3_GroupTest extends CiviUnitTestCase {
    * Per https://lab.civicrm.org/dev/core/issues/1321 the group_type filter is deceptive
    * - it only filters on exact match not 'is one of'.
    *
-   * @throws \CRM_Core_Exception
    */
-  public function testGroupWithGroupTypeFilter() {
-    $this->groupCreate(['group_type' => ['Access Control'], 'name' => 'access_list', 'title' => 'access list']);
-    $this->groupCreate(['group_type' => ['Mailing List'], 'name' => 'mailing_list', 'title' => 'mailing list']);
-    $this->groupCreate(['group_type' => ['Access Control', 'Mailing List'], 'name' => 'group', 'title' => 'group']);
+  public function testGroupWithGroupTypeFilter(): void {
+    // Note that calling the api v3 actually creates groups incorrectly - it the
+    // separator is SEPARATOR_BOOKEND but api v3 just saves the integer for only one.
+    // If you fix that this test fails.... make of that what you will...
+    $this->callAPISuccess('Group', 'create', ['group_type' => ['Access Control'], 'name' => 'access_list', 'title' => 'access list']);
+    $this->callAPISuccess('Group', 'create', ['group_type' => ['Mailing List'], 'name' => 'mailing_list', 'title' => 'mailing list']);
+    $this->callAPISuccess('Group', 'create', ['group_type' => ['Access Control', 'Mailing List'], 'name' => 'group', 'title' => 'group']);
     $group = $this->callAPISuccessGetSingle('Group', ['return' => 'id,title,group_type', 'group_type' => 'Mailing List']);
     $this->assertEquals('mailing list', $group['title']);
   }

@@ -2130,10 +2130,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    *  You need to have pre-created these groups & created the user e.g
    *  $this->createLoggedInUser();
-   *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
-   *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
+   *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' =>
+   * 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
+   *   $this->_permissionedGroup = $this->groupCreate(array('title' =>
+   * 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
    *
    * @param bool $isProfile
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function setupACL($isProfile = FALSE) {
     global $_REQUEST;
@@ -2147,24 +2151,26 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if ($ov->find(TRUE)) {
       CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_value WHERE id = {$ov->id}");
     }
-    $optionValue = $this->callAPISuccess('option_value', 'create', [
+    $this->callAPISuccess('option_value', 'create', [
       'option_group_id' => $optionGroupID,
       'label' => 'pick me',
       'value' => 55,
     ]);
 
-    CRM_Core_DAO::executeQuery("
+    CRM_Core_DAO::executeQuery('
       TRUNCATE civicrm_acl_cache
-    ");
+    ');
 
-    CRM_Core_DAO::executeQuery("
+    CRM_Core_DAO::executeQuery('
       TRUNCATE civicrm_acl_contact_cache
-    ");
+    ');
 
+    // Setting ids is preferred.
+    $permissionedGroup = $this->ids['Group']['permissioned_group'] ?? $this->_permissionedGroup;
     CRM_Core_DAO::executeQuery("
     INSERT INTO civicrm_acl_entity_role (
     `acl_role_id`, `entity_table`, `entity_id`, `is_active`
-    ) VALUES (55, 'civicrm_group', {$this->_permissionedGroup}, 1);
+    ) VALUES (55, 'civicrm_group', $permissionedGroup, 1);
     ");
 
     if ($isProfile) {
@@ -2183,7 +2189,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
       )
       VALUES (
-      'view picked', 'civicrm_group', $this->_permissionedGroup , 'Edit', 'civicrm_group', {$this->_permissionedGroup}, 1
+      'view picked', 'civicrm_group', $permissionedGroup , 'Edit', 'civicrm_group', {$this->_permissionedGroup}, 1
       );
       ");
 
@@ -2192,14 +2198,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
       )
       VALUES (
-      'view picked', 'civicrm_group',  $this->_permissionedGroup, 'Edit', 'civicrm_group', {$this->_permissionedDisabledGroup}, 1
+      'view picked', 'civicrm_group',  $permissionedGroup, 'Edit', 'civicrm_group', {$this->_permissionedDisabledGroup}, 1
       );
       ");
     }
 
     $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
     $this->callAPISuccess('group_contact', 'create', [
-      'group_id' => $this->_permissionedGroup,
+      'group_id' => $permissionedGroup,
       'contact_id' => $this->_loggedInUser,
     ]);
 
