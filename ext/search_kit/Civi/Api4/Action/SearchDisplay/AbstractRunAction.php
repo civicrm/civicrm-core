@@ -118,6 +118,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   protected function formatResult(iterable $result): array {
     $rows = [];
     $keyName = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+    if ($this->savedSearch['api_entity'] === 'RelationshipCache') {
+      $keyName = 'relationship_id';
+    }
     foreach ($result as $index => $record) {
       $data = $columns = [];
       foreach ($this->getSelectClause() as $key => $item) {
