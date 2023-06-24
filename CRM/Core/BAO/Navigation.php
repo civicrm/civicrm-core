@@ -831,7 +831,7 @@ ORDER BY weight";
     }
     $params = [
       'name' => $name,
-      'label' => ts($name),
+      'label' => _ts($name),
       'url' => $url,
       'parent_id' => $parent_id,
       'is_active' => TRUE,

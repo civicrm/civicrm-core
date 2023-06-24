@@ -1391,7 +1391,7 @@ DESC limit 1");
       !in_array($this->_memType, $this->_memTypeSelected)
     ) {
       if ($this->isCreateRecurringContribution()) {
-        CRM_Core_Session::setStatus(ts('Associated recurring contribution cannot be updated on membership type change.', ts('Error'), 'error'));
+        CRM_Core_Session::setStatus(ts('Associated recurring contribution cannot be updated on membership type change.'), ts('Error'), 'error');
         return;
       }
 

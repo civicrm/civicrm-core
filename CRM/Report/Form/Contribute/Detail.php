@@ -942,7 +942,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
           $title = '%1 soft-credits: %2';
         }
         foreach ($totals as $key => $total) {
-          $totalandsum[$key] = ts($title, [
+          $totalandsum[$key] = _ts($title, [
             1 => $total,
             2 => CRM_Utils_Money::format($sumcontribs[$key]),
           ]);

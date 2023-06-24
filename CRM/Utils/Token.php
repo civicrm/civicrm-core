@@ -1711,7 +1711,7 @@ class CRM_Utils_Token {
         else {
           $entity = 'Contact';
         }
-        $sorted[ts($entity)][] = ['id' => $k, 'text' => $v];
+        $sorted[_ts($entity)][] = ['id' => $k, 'text' => $v];
       }
     }
 

@@ -752,13 +752,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       // Handle permissioned relationships
       if (array_key_exists('civicrm_relationship_is_permission_a_b', $row)) {
         $rows[$rowNum]['civicrm_relationship_is_permission_a_b']
-          = ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_a_b']));
+          = _ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_a_b']));
         $entryFound = TRUE;
       }
 
       if (array_key_exists('civicrm_relationship_is_permission_b_a', $row)) {
         $rows[$rowNum]['civicrm_relationship_is_permission_b_a']
-          = ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_b_a']));
+          = _ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_b_a']));
         $entryFound = TRUE;
       }
 

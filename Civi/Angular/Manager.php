@@ -313,7 +313,7 @@ class Manager {
     foreach ($strings as $string) {
       // TODO: should we pass translation domain based on $module[ext] or $module[tsDomain]?
       // It doesn't look like client side really supports the domain right now...
-      $translated = ts($string, [
+      $translated = _ts($string, [
         'domain' => [$module['ext'], NULL],
       ]);
       if ($translated != $string) {
