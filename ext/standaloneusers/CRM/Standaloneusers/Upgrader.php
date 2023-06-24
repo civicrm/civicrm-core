@@ -50,58 +50,12 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
 
     $users = \Civi\Api4\User::get(FALSE)->selectRowCount()->execute()->countMatched();
     if ($users == 0) {
-
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_uf_match');
-
-      // Create an admin contact.
-      $contactID = \Civi\Api4\Contact::create(FALSE)
-        ->setValues([
-          'contact_type' => 'Individual',
-          'first_name' => 'Standalone',
-          'last_name' => 'Admin',
-        ])
-        ->execute()->first()['id'];
-      $dummyEmail = 'admin@localhost.localdomain';
-
-      // Create user
-      $password = substr(base64_encode(random_bytes(8)), 0, 12);
-      $params = [
-        'cms_name'   => 'admin',
-        'cms_pass'   => $password,
-        'notify'     => FALSE,
-        $dummyEmail => $dummyEmail,
-        'contactID'  => $contactID,
-      ];
-      $userID = \CRM_Core_BAO_CMSUser::create($params, $dummyEmail);
-
-      // Create Role
-      $roleID = \Civi\Api4\Role::create(FALSE)->setValues(['name' => 'Administrator'])->execute()->first()['id'];
-
-      // Assign role to user
-      \Civi\Api4\UserRole::create(FALSE)->setValues(['role_id' => $roleID, 'user_id' => $userID])->execute();
-
-      // Create permissions for role
-      // @todo I expect there's a better way than this; this doesn't even bring in all the permissions.
-      $records = [['permission' => 'authenticate with password']];
-      foreach (array_keys(\CRM_Core_Permission::getCorePermissions()) as $permission) {
-        $records[] = ['permission' => $permission];
-      }
-      \Civi\Api4\RolePermission::save(FALSE)
-        ->setDefaults(['role_id' => $roleID])
-        ->setRecords($records)
-        ->execute();
-
-      $message = "Created New admin User $userID and contact $contactID with password $password and ALL permissions.";
-      \Civi::log()->notice($message);
-      if (php_sapi_name() === 'cli') {
-        print $message . "\n";
-      }
-      else {
-        $authx = new \Civi\Authx\Standalone();
-        $authx->loginSession($userID);
-        CRM_Core_Session::setStatus($message . " You are logged in!", 'Standalone installed', 'alert');
-      }
     }
+
+    // `standaloneusers` is installed as part of the overall install process for `Standalone`.
+    // A subsequent step will configure some default users (*depending on local options*).
+    // See also: `StandaloneUsers.civi-setup.php`
   }
 
   /**
