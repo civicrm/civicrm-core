@@ -755,15 +755,12 @@
           };
 
           if (ctrl.ngModel) {
-            var oldValue;
             // Ensure widget is updated when model changes
             ctrl.ngModel.$render = function() {
-              element.val(ctrl.ngModel.$viewValue || '');
               // Trigger change so the Select2 renders the current value,
               // but only if the value has actually changed (to avoid recursion)
-              if (!angular.equals(ctrl.ngModel.$viewValue, oldValue)) {
-                oldValue = ctrl.ngModel.$viewValue;
-                element.change();
+              if (!angular.equals(ctrl.ngModel.$viewValue || '', element.val())) {
+                element.val(ctrl.ngModel.$viewValue || '').change();
               }
             };
 

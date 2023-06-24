@@ -24,17 +24,17 @@ class SqlFunctionIF extends SqlFunction {
     return [
       [
         'optional' => FALSE,
-        'must_be' => ['SqlEquation', 'SqlField'],
+        'must_be' => ['SqlEquation', 'SqlField', 'SqlFunction'],
         'label' => ts('If'),
       ],
       [
         'optional' => FALSE,
-        'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull'],
+        'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull', 'SqlFunction'],
         'label' => ts('Then'),
       ],
       [
         'optional' => FALSE,
-        'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull'],
+        'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull', 'SqlFunction'],
         'label' => ts('Else'),
       ],
     ];

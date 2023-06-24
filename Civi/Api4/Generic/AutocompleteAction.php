@@ -29,6 +29,8 @@ use Civi\Core\Event\GenericHookEvent;
  * @method string getFormName()
  * @method $this setFieldName(string $fieldName) Set fieldName.
  * @method string getFieldName()
+ * @method $this setKey(string $key) Set keyField used as unique identifier.
+ * @method string getKey()
  * @method $this setFilters(array $filters)
  * @method array getFilters()
  */
@@ -123,6 +125,8 @@ class AutocompleteAction extends AbstractAction {
       // Allow the default search to be modified
       \Civi::dispatcher()->dispatch('civi.search.autocompleteDefault', GenericHookEvent::create([
         'savedSearch' => &$this->savedSearch,
+        'formName' => $this->formName,
+        'fieldName' => $this->fieldName,
       ]));
     }
     $this->loadSavedSearch();
@@ -137,7 +141,7 @@ class AutocompleteAction extends AbstractAction {
 
     // Render mode: fetch by id
     if ($this->ids) {
-      $this->savedSearch['api_params']['where'][] = [$keyField, 'IN', $this->ids];
+      $this->addFilter($keyField, ['IN' => $this->ids]);
       unset($this->display['settings']['pager']);
       $return = NULL;
     }
@@ -188,8 +192,8 @@ class AutocompleteAction extends AbstractAction {
       foreach (array_slice($row['columns'], 1) as $col) {
         $item['description'][] = $col['val'];
       }
-      if (!empty($this->display['settings']['color'])) {
-        $item['color'] = $row['data'][$this->display['settings']['color']] ?? NULL;
+      foreach ($this->display['settings']['extra'] ?? [] as $name => $key) {
+        $item[$key] = $row['data'][$name] ?? $item[$key] ?? NULL;
       }
       $result[] = $item;
     }
@@ -232,16 +236,33 @@ class AutocompleteAction extends AbstractAction {
    * @param array $displayFields
    */
   private function augmentSelectClause(string $idField, array $displayFields) {
-    $select = array_merge([$idField], $displayFields);
+    // Don't mess with aggregated queries
+    if ($this->savedSearch['api_entity'] === 'EntitySet' || !empty($this->savedSearch['api_params']['groupBy'])) {
+      return;
+    }
+    // Original select params. Key by alias to avoid duplication.
+    $originalSelect = [];
+    foreach ($this->savedSearch['api_params']['select'] ?? [] as $item) {
+      $alias = explode(' AS ', $item)[1] ?? $item;
+      $originalSelect[$alias] = $item;
+    }
+    // Add any missing fields which should be selected
+    $additions = array_merge([$idField], $displayFields);
     // Add trustedFilters to the SELECT clause so that SearchDisplay::run will trust them
     foreach ($this->trustedFilters as $fields => $val) {
-      $select = array_merge($select, explode(',', $fields));
+      $additions = array_merge($additions, explode(',', $fields));
     }
-    if (!empty($this->display['settings']['color'])) {
-      $select[] = $this->display['settings']['color'];
-    }
-    $select = array_merge($select, array_column($this->display['settings']['sort'] ?? [], 0));
-    $this->savedSearch['api_params']['select'] = array_unique(array_merge($this->savedSearch['api_params']['select'], $select));
+    // Add 'extra' fields defined by the display
+    $additions = array_merge($additions, array_keys($this->display['settings']['extra'] ?? []));
+    // Add 'sort' fields
+    $additions = array_merge($additions, array_column($this->display['settings']['sort'] ?? [], 0));
+
+    // Key by field name and combine with original SELECT
+    $additions = array_unique($additions);
+    $additions = array_combine($additions, $additions);
+
+    // Maintain original order (important when using UNIONs in the query)
+    $this->savedSearch['api_params']['select'] = array_values($originalSelect + $additions);
   }
 
   /**
@@ -265,7 +286,7 @@ class AutocompleteAction extends AbstractAction {
         }
       }
     }
-    return CoreUtil::getIdFieldName($entityName);
+    return $this->display['settings']['keyField'] ?? CoreUtil::getIdFieldName($entityName);
   }
 
   /**
