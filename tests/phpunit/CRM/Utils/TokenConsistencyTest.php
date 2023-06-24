@@ -291,6 +291,61 @@ case.custom_1 :' . '
   }
 
   /**
+   * Test our pseudo-tokens - ie {, } which would show if there is a value before it.
+   *
+   * @dataProvider conditionalDataProvider
+   *
+   * @param string $string
+   */
+  public function testConditionalTokens(string $string, string $expected): void {
+    $text = $this->renderText(['contactId' => $this->individualCreate(['nick_name' => 'Tony', 'middle_name' => ''])], $string);
+    $this->assertEquals($expected, $text);
+  }
+
+  /**
+   * Get variations of conditional strings.
+   *
+   * @return array
+   */
+  public function conditionalDataProvider(): array {
+    // The minimum requirement is to replace https://github.com/civicrm/civicrm-core/blob/848669747c21b186efcb88e5d722de99820c4c04/CRM/Utils/Address.php#L225-L239
+    // but it would be REALLY useful to also handle the Dear {first_name} falling back to Dear Donor type thing - because
+    // then they could be used in name greeting fields without the smarty v2 errors that occur due to the velocity in that scenario.
+    return [
+      [
+        // This works & is in use.
+        'string' => '{contact.last_name}{ }{contact.first_name}',
+        'expected' => 'Anderson Anthony',
+        'values' => [],
+      ],
+      [
+        // This is in sort name.
+        'string' => '{contact.last_name}{, }{contact.first_name}',
+        'expected' => 'Anderson, Anthony',
+        'values' => [],
+      ],
+      [
+        // This might work in addresses - not sure but there sure is some magic
+        'string' => '{contact.first_name}{ (}{contact.nick_name}{) }{contact.last_name}',
+        'expected' => 'Anthony (Tony) Anderson',
+        'values' => ['nick_name' => 'Tony'],
+      ],
+      [
+        // This is a use case we get a bit of demand for ..
+        'string' => 'Dear {contact.first_name}{?friend},',
+        'expected' => 'Dear Anthony',
+        'values' => [],
+      ],
+      [
+        // Same use case - different data ..
+        'string' => 'Dear {contact.first_name}{?friend},',
+        'expected' => 'Dear friend,',
+        'values' => ['first_name' => ''],
+      ],
+    ];
+  }
+
+  /**
    * Test tokens in 2 ways to ensure consistent handling.
    *
    * 1) as part of the greeting processing
