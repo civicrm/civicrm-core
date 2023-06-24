@@ -1779,6 +1779,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'civicrm_participant',
       'civicrm_payment_processor',
       'civicrm_participant_payment',
+      'civicrm_payment_processor',
       'civicrm_pledge',
       'civicrm_pcp_block',
       'civicrm_pcp',
