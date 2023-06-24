@@ -122,7 +122,7 @@
             <td>
               {$form.subject.html|crmAddClass:huge}
               <input class="crm-token-selector big" data-field="subject" />
-              {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+              {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp"}
             </td>
          </tr>
        </table>

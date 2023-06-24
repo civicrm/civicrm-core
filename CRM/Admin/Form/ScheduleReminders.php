@@ -108,7 +108,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     );
 
     $mappings = CRM_Core_BAO_ActionSchedule::getMappings();
-    $selectedMapping = $mappings[$mappingID ? $mappingID : 1];
+    $selectedMapping = $mappings[$mappingID ?: 1];
     $entityRecipientLabels = $selectedMapping->getRecipientTypes() + CRM_Core_BAO_ActionSchedule::getAdditionalRecipients();
     $this->assign('entityMapping', json_encode(
       CRM_Utils_Array::collectMethod('getEntity', $mappings)

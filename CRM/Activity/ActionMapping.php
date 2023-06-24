@@ -18,10 +18,9 @@
 /**
  * Class CRM_Activity_ActionMapping
  *
- * This defines the scheduled-reminder functionality for contact
- * entities. It is useful for, e.g., sending a reminder based on
- * birth date, modification date, or other custom dates on
- * the contact record.
+ * This defines the scheduled-reminder functionality for Activities.
+ * It is useful for, e.g., sending a reminder based on scheduled
+ * date or other custom dates on the activity record.
  */
 class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
 
