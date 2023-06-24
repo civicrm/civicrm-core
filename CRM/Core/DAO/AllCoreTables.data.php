@@ -67,11 +67,6 @@ return [
     'class' => 'CRM_Core_DAO_PrevNextCache',
     'table' => 'civicrm_prevnext_cache',
   ],
-  'CRM_Core_DAO_ActionMapping' => [
-    'name' => 'ActionMapping',
-    'class' => 'CRM_Core_DAO_ActionMapping',
-    'table' => 'civicrm_action_mapping',
-  ],
   'CRM_Core_DAO_RecurringEntity' => [
     'name' => 'RecurringEntity',
     'class' => 'CRM_Core_DAO_RecurringEntity',

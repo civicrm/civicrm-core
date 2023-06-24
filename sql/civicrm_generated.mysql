@@ -67,22 +67,6 @@ LOCK TABLES `civicrm_action_log` WRITE;
 UNLOCK TABLES;
 
 --
--- Dumping data for table `civicrm_action_mapping`
---
-
-LOCK TABLES `civicrm_action_mapping` WRITE;
-/*!40000 ALTER TABLE `civicrm_action_mapping` DISABLE KEYS */;
-INSERT INTO `civicrm_action_mapping` (`id`, `entity`, `entity_value`, `entity_value_label`, `entity_status`, `entity_status_label`, `entity_date_start`, `entity_date_end`, `entity_recipient`) VALUES
- (1,'civicrm_activity','activity_type','Activity Type','activity_status','Activity Status','activity_date_time',NULL,'activity_contacts'),
- (2,'civicrm_participant','event_type','Event Type','civicrm_participant_status_type','Participant Status','event_start_date','event_end_date','event_contacts'),
- (3,'civicrm_participant','civicrm_event','Event Name','civicrm_participant_status_type','Participant Status','event_start_date','event_end_date','event_contacts'),
- (4,'civicrm_membership','civicrm_membership_type','Membership Type','auto_renew_options','Auto Renew Options','membership_join_date','membership_end_date',NULL),
- (5,'civicrm_participant','event_template','Event Template','civicrm_participant_status_type','Participant Status','event_start_date','event_end_date','event_contacts'),
- (6,'civicrm_contact','civicrm_contact','Date Field','contact_date_reminder_options','Annual Options','date_field',NULL,NULL);
-/*!40000 ALTER TABLE `civicrm_action_mapping` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Dumping data for table `civicrm_action_schedule`
 --
 

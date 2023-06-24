@@ -564,6 +564,18 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Drop a table if it exists.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $tableName
+   * @return bool
+   */
+  public static function dropTable($ctx, $tableName) {
+    CRM_Core_BAO_SchemaHandler::dropTable($tableName);
+    return TRUE;
+  }
+
+  /**
    * Drop a table... but only if it's empty.
    *
    * @param CRM_Queue_TaskContext $ctx

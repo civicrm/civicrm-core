@@ -94,7 +94,6 @@ SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 {php}echo (include "sql/civicrm_data/civicrm_uf_join.sqldata.php")->toSQL();{/php}
 {php}echo (include "sql/civicrm_data/civicrm_uf_field.sqldata.php")->toSQL();{/php}
 {php}echo (include "sql/civicrm_data/civicrm_participant_status_type.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_action_mapping.sqldata.php")->toSQL();{/php}
 {php}echo (include "sql/civicrm_data/civicrm_contact_type.sqldata.php")->toSQL();{/php}
 
 {include file='civicrm_msg_template.tpl'}

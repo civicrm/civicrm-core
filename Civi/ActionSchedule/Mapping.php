@@ -37,6 +37,7 @@ namespace Civi\ActionSchedule;
  * The new MappingInterface makes no pretense of database-driven
  * configuration. The dozen places have been consolidated and
  * replaced with functions in MappingInterface.
+ * The unused `civicrm_action_mapping` table has been dropped.
  *
  * This "Mapping" implementation is a refactoring of the old
  * hard-coded bits. Internally, it uses the concepts from
