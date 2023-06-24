@@ -1453,7 +1453,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             $options[$optionValue[0][$keyColumn]] = 'new option value';
           }
         }
-        $entity[$field] = array_rand($options);
+        if ($options) {
+          $entity[$field] = array_rand($options);
+        }
       }
       if (!empty($specs['FKClassName']) && !empty($specs['pseudoconstant'])) {
         // in the weird situation where a field has both an fk and pseudoconstant defined,
