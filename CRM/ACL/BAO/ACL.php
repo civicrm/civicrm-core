@@ -541,35 +541,36 @@ SELECT g.*
   }
 
   public static function getObjectIdOptions($context, $params): array {
-    if (empty($params['values']['object_table']) && empty($params['values']['object_table:label'])) {
+    $tableName = $params['values']['object_table'] ?? NULL;
+    // Look up object_table if not known
+    if (!$tableName && !empty($params['values']['id'])) {
+      $tableName = CRM_Core_DAO::getFieldValue('CRM_ACL_DAO_ACL', $params['values']['id'], 'object_table');
+    }
+    if (!$tableName) {
       return [];
     }
-    if (!empty($params['values']['object_table:label'])) {
-      $table_name = array_flip(self::getObjectTableOptions())[$params['values']['object_table:label']];
-    }
-    else {
-      $table_name = $params['values']['object_table'];
-    }
-    $finalOptions = [];
-    $entity = CoreUtil::getApiNameFromTableName($table_name);
-    $label = CoreUtil::getInfoItem($entity, 'label_field');
-    $titlePlural = CoreUtil::getInfoItem($entity, 'title_plural');
-    $finalOptions[] = [
-      'label' => ts('All %1', [1 => $titlePlural]),
-      'id' => 0,
-      'name' => 0,
-    ];
-    $options = civicrm_api4($entity, 'get', [
-      'select' => [$label, 'id', 'name'],
-    ]);
-    foreach ($options as $option) {
-      $finalOptions[] = [
-        'label' => $option[$label],
-        'id' => $option['id'],
-        'name' => $option['name'] ?? $option['id'],
+    if (!isset(Civi::$statics[__FUNCTION__][$tableName])) {
+      $entity = CoreUtil::getApiNameFromTableName($tableName);
+      $label = CoreUtil::getInfoItem($entity, 'label_field');
+      $titlePlural = CoreUtil::getInfoItem($entity, 'title_plural');
+      Civi::$statics[__FUNCTION__][$tableName] = [];
+      Civi::$statics[__FUNCTION__][$tableName][] = [
+        'label' => ts('All %1', [1 => $titlePlural]),
+        'id' => 0,
+        'name' => 0,
       ];
+      $options = civicrm_api4($entity, 'get', [
+        'select' => [$label, 'id', 'name'],
+      ]);
+      foreach ($options as $option) {
+        Civi::$statics[__FUNCTION__][$tableName][] = [
+          'label' => $option[$label],
+          'id' => $option['id'],
+          'name' => $option['name'] ?? $option['id'],
+        ];
+      }
     }
-    return $finalOptions;
+    return Civi::$statics[__FUNCTION__][$tableName];
   }
 
 }

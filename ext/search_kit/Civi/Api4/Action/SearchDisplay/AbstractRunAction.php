@@ -949,11 +949,24 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $this->addSelectExpression($addition);
     }
 
-    // When selecting monetary fields, also select currency
     foreach ($apiParams['select'] as $select) {
+      // When selecting monetary fields, also select currency
       $currencyFieldName = $this->getCurrencyField($select);
       if ($currencyFieldName) {
         $this->addSelectExpression($currencyFieldName);
+      }
+      // Add field dependencies needed to resolve pseudoconstants
+      $clause = $this->getSelectExpression($select);
+      if ($clause && $clause['expr']->getType() === 'SqlField' && !empty($clause['fields'])) {
+        $fieldAlias = array_keys($clause['fields'])[0];
+        $field = $clause['fields'][$fieldAlias];
+        if (!empty($field['input_attrs']['control_field']) && strpos($fieldAlias, ':')) {
+          $prefix = substr($fieldAlias, 0, strrpos($fieldAlias, $field['name']));
+          // Don't need to add the field if a suffixed version already exists
+          if (!$this->getSelectExpression($prefix . $field['input_attrs']['control_field'] . ':label')) {
+            $this->addSelectExpression($prefix . $field['input_attrs']['control_field']);
+          }
+        }
       }
     }
   }

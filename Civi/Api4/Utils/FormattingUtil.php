@@ -221,6 +221,16 @@ class FormattingUtil {
    */
   public static function formatOutputValues(&$result, $fields, $action = 'get', $selectAliases = []) {
     $contactTypePaths = [];
+    // Save an array of unprocessed values which are useful when replacing pseudocontants
+    $rawValues = $result;
+    foreach ($rawValues as $key => $value) {
+      // Pseudoconstants haven't been replaced yet so strip suffixes from raw values
+      if (strpos($key, ':') > strrpos($key, ')')) {
+        [$fieldName] = explode(':', $key);
+        $rawValues[$fieldName] = $value;
+        unset($rawValues[$key]);
+      }
+    }
     foreach ($result as $key => $value) {
       $fieldExpr = SqlExpression::convert($selectAliases[$key] ?? $key);
       $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields() ?? '');
@@ -239,7 +249,7 @@ class FormattingUtil {
       $suffix = strrpos(($fieldName ?? ''), ':');
       $fieldOptions = NULL;
       if (isset($value) && $suffix) {
-        $fieldOptions = self::getPseudoconstantList($field, $fieldName, $result, $action);
+        $fieldOptions = self::getPseudoconstantList($field, $fieldName, $rawValues, $action);
         $dataType = NULL;
       }
       // Store contact_type value before replacing pseudoconstant (e.g. transforming it to contact_type:label)
@@ -270,13 +280,13 @@ class FormattingUtil {
    * @param array $field
    * @param string $fieldAlias
    *   Field path plus pseudoconstant suffix, e.g. 'contact.employer_id.contact_sub_type:label'
-   * @param array $params
+   * @param array $values
    *   Other values for this object
    * @param string $action
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function getPseudoconstantList(array $field, string $fieldAlias, $params = [], $action = 'get') {
+  public static function getPseudoconstantList(array $field, string $fieldAlias, $values = [], $action = 'get') {
     [$fieldPath, $valueType] = explode(':', $fieldAlias);
     $context = self::$pseudoConstantContexts[$valueType] ?? NULL;
     // For create actions, only unique identifiers can be used.
@@ -288,7 +298,7 @@ class FormattingUtil {
     // Use BAO::buildOptions if possible
     if ($baoName) {
       $fieldName = empty($field['custom_field_id']) ? $field['name'] : 'custom_' . $field['custom_field_id'];
-      $options = $baoName::buildOptions($fieldName, $context, self::filterByPath($params, $fieldPath, $field['name']));
+      $options = $baoName::buildOptions($fieldName, $context, self::filterByPath($values, $fieldPath, $field['name']));
     }
     // Fallback for option lists that exist in the api but not the BAO
     if (!isset($options) || $options === FALSE) {

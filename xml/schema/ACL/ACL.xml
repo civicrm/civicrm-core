@@ -94,6 +94,10 @@
     <type>varchar</type>
     <length>64</length>
     <comment>The table of the object controlled by this ACL entry</comment>
+    <html>
+      <label>Type of Data</label>
+      <type>Select</type>
+    </html>
     <pseudoconstant>
       <callback>CRM_ACL_BAO_ACL::getObjectTableOptions</callback>
     </pseudoconstant>
@@ -105,6 +109,11 @@
     <type>int unsigned</type>
     <comment>The ID of the object controlled by this ACL entry</comment>
     <add>1.6</add>
+    <html>
+      <label>Which Data</label>
+      <type>Select</type>
+      <controlField>object_table</controlField>
+    </html>
     <pseudoconstant>
       <callback>CRM_ACL_BAO_ACL::getObjectIdOptions</callback>
       <prefetch>false</prefetch>

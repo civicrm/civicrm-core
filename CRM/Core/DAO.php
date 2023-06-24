@@ -2779,7 +2779,7 @@ SELECT contact_id
    * @param array $values
    *   Raw field values; whatever is known about this bao object.
    *
-   * Note: $props can contain unsanitized input and should not be passed directly to CRM_Core_PseudoConstant::get
+   * Note: $values can contain unsanitized input and should be handled with care by CRM_Core_PseudoConstant::get
    *
    * @return array|bool
    */

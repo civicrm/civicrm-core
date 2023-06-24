@@ -386,4 +386,31 @@ class CoreUtil {
     return $fns;
   }
 
+  /**
+   * Sorts fields so that control fields are ordered before the fields they control.
+   *
+   * @param array[] $fields
+   * @return void
+   */
+  public static function topSortFields(array &$fields): void {
+    $indexedFields = array_column($fields, NULL, 'name');
+    $needsSort = [];
+    foreach ($indexedFields as $fieldName => $field) {
+      if (!empty($field['input_attrs']['control_field']) && array_key_exists($field['input_attrs']['control_field'], $indexedFields)) {
+        $needsSort[$fieldName] = [$field['input_attrs']['control_field']];
+      }
+    }
+    // Only fire up the Topological sorter if we actually need it...
+    if ($needsSort) {
+      $fields = [];
+      $sorter = new \MJS\TopSort\Implementations\FixedArraySort();
+      foreach ($indexedFields as $fieldName => $field) {
+        $sorter->add($fieldName, $needsSort[$fieldName] ?? []);
+      }
+      foreach ($sorter->sort() as $fieldName) {
+        $fields[] = $indexedFields[$fieldName];
+      }
+    }
+  }
+
 }
