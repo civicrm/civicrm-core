@@ -179,15 +179,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
       if (!empty($_POST) && !$isLogin) {
         $dedupeParameters = $_POST;
         $dedupeParameters['email'] = $uniqId;
-        // dev/core#1858 Ensure that if we have a contactID parameter which is
-        // set in the Create user Record contact task form. That this contactID
-        // value is passed through as the contact_id to the get duplicate
-        // contacts function. This is necessary because for Drupal 8 this
-        // function gets invoked. Before the civicrm_uf_match record is added
-        // where as in D7 it isn't called until the user tries to actually login.
-        if (!empty($dedupeParameters['contactID'])) {
-          $dedupeParameters['contact_id'] = $dedupeParameters['contactID'];
-        }
 
         $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($dedupeParameters, 'Individual', 'Unsupervised', [], FALSE);
 
@@ -239,6 +230,16 @@ AND    domain_id = %2
           'user' => $user,
           'uniqId' => $uniqId,
         ]);
+        // dev/core#1858 Ensure that if we have a contactID parameter
+        // set in the Create user Record contact task form that this contactID
+        // value is passed through as the contact_id to the contact create.
+        // This is necessary because for Drupal 8 synchronizeUFMatch gets
+        // invoked before the civicrm_uf_match record is added whereas in D7
+        // it isn't called until later.
+        // Note this is taken from our dedupeParameters from earlier.
+        if (empty($contactParameters['contact_id']) && !empty($dedupeParameters['contactID'])) {
+          $contactParameters['contact_id'] = $dedupeParameters['contactID'];
+        }
 
         if ($ctype === 'Organization') {
           $contactParameters['organization_name'] = $uniqId;
