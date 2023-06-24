@@ -100,8 +100,9 @@ if (!defined('CIVI_SETUP')) {
     $params['siteKey'] = addslashes($m->siteKey);
     $params['credKeys'] = addslashes(implode(' ', $m->credKeys));
     $params['signKeys'] = addslashes(implode(' ', $m->signKeys));
+    $params['deployID'] = addslashes($m->deployID);
 
-    $extraSettings = array();
+    $extraSettings = [];
 
     foreach ($m->paths as $key => $aspects) {
       foreach ($aspects as $aspect => $value) {
