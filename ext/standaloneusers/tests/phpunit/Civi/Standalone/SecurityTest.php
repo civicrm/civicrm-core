@@ -56,7 +56,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   }
 
   public function testCreateUser():void {
-    list($contactID, $userID, $security) = $this->createFixtureContactAndUser();
+    [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
 
     $user = \Civi\Api4\User::get(FALSE)
       ->addSelect('*', 'uf_match.*')
@@ -73,7 +73,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   }
 
   public function testPerms() {
-    list($contactID, $userID, $security) = $this->createFixtureContactAndUser();
+    [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
     // Create role,
     $roleID = \Civi\Api4\Role::create(FALSE)
       ->setValues(['name' => 'staff'])->execute()->first()['id'];
