@@ -889,7 +889,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Create test with unique field name on source.
    */
-  public function testCreateContributionNullOutThankyouDate() {
+  public function testCreateContributionNullOutThankyouDate(): void {
 
     $params = $this->_params;
     $params['thankyou_date'] = 'yesterday';
@@ -962,7 +962,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionWithNoteUniqueNameAliases(): void {
     $params = [
@@ -2408,7 +2407,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_params['is_test'] = 1;
     $originalContribution = $this->setUpRepeatTransaction(['is_test' => 1], 'single');
 
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
       'contribution_status_id' => 'Completed',
       'trxn_id' => '1234',
@@ -2418,13 +2417,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test repeat contribution passed in status.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionPassedInStatus(): void {
     $originalContribution = $this->setUpRepeatTransaction([], 'single');
 
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
       'contribution_status_id' => 'Pending',
       'trxn_id' => 1234,
