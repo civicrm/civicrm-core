@@ -75,7 +75,38 @@ class CoreUtilTest extends CustomTestBase {
       ->execute()->first();
 
     $this->assertEquals('Civi\Api4\CustomValue', CoreUtil::getApiClass('Custom_' . $multiGroup['name']));
+  }
 
+  public function testTopSortFields() {
+    $sampleFields = [
+      [
+        'name' => 'd',
+        'title' => 'Fourth',
+        'input_attrs' => [
+          'control_field' => 'a',
+        ],
+      ],
+      [
+        'name' => 'a',
+        'title' => 'Third',
+        'input_attrs' => [
+          'control_field' => 'c',
+        ],
+      ],
+      [
+        'name' => 'b',
+        'title' => 'First',
+      ],
+      [
+        'name' => 'c',
+        'title' => 'Second',
+        'input_attrs' => [
+          'control_field' => 'b',
+        ],
+      ],
+    ];
+    CoreUtil::topSortFields($sampleFields);
+    $this->assertEquals(['First', 'Second', 'Third', 'Fourth'], array_column($sampleFields, 'title'));
   }
 
 }

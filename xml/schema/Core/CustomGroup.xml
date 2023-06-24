@@ -74,7 +74,7 @@
     <default>NULL</default>
     <comment>FK to civicrm_option_value.id (for option group custom_data_type.)</comment>
     <pseudoconstant>
-      <optionGroupName>custom_data_type</optionGroupName>
+      <callback>CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions</callback>
     </pseudoconstant>
     <add>2.2</add>
     <html>

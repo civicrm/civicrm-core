@@ -157,10 +157,10 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => TRUE,
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
           'addButton' => [
             'path' => 'civicrm/acl/edit?reset=1&action=add',

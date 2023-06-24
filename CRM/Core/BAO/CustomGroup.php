@@ -2059,10 +2059,10 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    *
    * @param $context
    * @param array $params
-   * @param array $props
    * @return array
    */
-  public static function getExtendsEntityColumnValueOptions($context, $params, $props = []) {
+  public static function getExtendsEntityColumnValueOptions($context, $params) {
+    $props = $params['values'] ?? [];
     // Requesting this option list only makes sense if the value of 'extends' is known or can be looked up
     if (!empty($props['id']) || !empty($props['name']) || !empty($props['extends']) || !empty($props['extends_entity_column_id'])) {
       $id = $props['id'] ?? NULL;
@@ -2147,10 +2147,10 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    *
    * @param string $context
    * @param array $params
-   * @param array $props
    * @return array
    */
-  public static function getExtendsEntityColumnIdOptions($context = NULL, $params = [], $props = []) {
+  public static function getExtendsEntityColumnIdOptions($context = NULL, $params = []) {
+    $props = $params['values'] ?? [];
     $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'custom_data_type', 'id', 'name');
     $optionValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);
 
@@ -2195,16 +2195,6 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
    * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    // This is necessary in order to pass $props to the callback function
-    if ($fieldName === 'extends_entity_column_value') {
-      $options = self::getExtendsEntityColumnValueOptions($context, [], $props);
-      return CRM_Core_PseudoConstant::formatArrayOptions($context, $options);
-    }
-    // Provides filtering by 'extends' entity
-    if ($fieldName === 'extends_entity_column_id') {
-      $options = self::getExtendsEntityColumnIdOptions($context, [], $props);
-      return CRM_Core_PseudoConstant::formatArrayOptions($context, $options);
-    }
     // Legacy support for APIv3 which also needs the ParticipantEventName etc pseudo-selectors
     if ($fieldName === 'extends' && ($props['version'] ?? NULL) == 3) {
       $options = CRM_Core_SelectValues::customGroupExtends();
