@@ -23,13 +23,6 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
   public $useLivePageJS = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string
@@ -37,34 +30,6 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
    */
   public function getBAOName() {
     return 'CRM_Core_BAO_MailSettings';
-  }
-
-  /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      // helper variable for nicer formatting
-      self::$_links = [
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/mailSettings',
-          'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit Mail Settings'),
-        ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/mailSettings',
-          'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete Mail Settings'),
-        ],
-      ];
-    }
-
-    return self::$_links;
   }
 
   /**
