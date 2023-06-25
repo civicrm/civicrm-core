@@ -23,7 +23,7 @@ use Civi\Standalone\Security;
 class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   public function missingStandaloneExtension() {
-    error_log("sessionStart, " . (class_exists(\Civi\Standalone\Security::class) ? 'exists' : 'no ext'));
+    // error_log("sessionStart, " . (class_exists(\Civi\Standalone\Security::class) ? 'exists' : 'no ext'));
     return !class_exists(\Civi\Standalone\Security::class);
   }
 
