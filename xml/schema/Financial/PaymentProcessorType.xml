@@ -6,6 +6,11 @@
   <name>civicrm_payment_processor_type</name>
   <add>1.8</add>
   <component>CiviContribute</component>
+  <paths>
+    <add>civicrm/admin/paymentProcessorType?reset=1&amp;action=add</add>
+    <delete>civicrm/admin/paymentProcessorType?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <update>civicrm/admin/paymentProcessorType?reset=1&amp;action=update&amp;id=[id]</update>
+  </paths>
   <field>
     <name>id</name>
     <title>Payment Processor Type ID</title>
