@@ -23,13 +23,6 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   public $useLivePageJS = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string
@@ -37,42 +30,6 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    */
   public function getBAOName() {
     return 'CRM_SMS_BAO_Provider';
-  }
-
-  /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/sms/provider',
-          'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit Provider'),
-        ),
-        CRM_Core_Action::DELETE => array(
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/sms/provider',
-          'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete Provider'),
-        ),
-        CRM_Core_Action::ENABLE => array(
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Provider'),
-        ),
-        CRM_Core_Action::DISABLE => array(
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Provider'),
-        ),
-      );
-    }
-    return self::$_links;
   }
 
   /**
