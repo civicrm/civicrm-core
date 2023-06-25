@@ -66,6 +66,40 @@ class StandardFilters {
   }
 
   /**
+   * Convert to title case (each word is capitalized).
+   *
+   * The use of the verb 'capitalize' is to align with smarty
+   * @see https://www.smarty.net/docsv2/en/language.modifiers.tpl#language.modifier.capitalize
+   *
+   * @param string $value
+   * @param array $filter
+   * @param string $format
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public static function capitalize($value, array $filter, string $format): string {
+    // Note that Smarty says capitalize equates to ucwords.
+    // ucwords is not multibyte proof and this alternative messes a bit with
+    // intentionally capitalization (DVD => Dvd) but the trade off seems OK.
+    // https://gist.github.com/burakerdem/1007450
+    switch ($format) {
+      case 'text/plain':
+        return mb_convert_case($value, MB_CASE_TITLE);
+
+      case 'text/html':
+        return \CRM_Utils_XML::filterMarkupText((string) $value, function($s) {
+          return mb_convert_case($s, MB_CASE_TITLE);
+        });
+
+      default:
+        throw new \CRM_Core_Exception(sprintf('Filter %s does not support format %s', __FUNCTION__, $format));
+    }
+  }
+
+  /**
    * Convert to boolean.
    *
    * @param string $value

@@ -494,9 +494,17 @@ contribution_recur.payment_instrument_id:name :Check
   }
 
   /**
+   * Test tokens can be capitalized.
+   */
+  public function testCapitalize(): void {
+    $this->individualCreate(['first_name' => 'bob m smith']);
+    $text = $this->renderText(['contactId' => $this->ids['Contact']['individual_0']], '{contact.first_name|capitalize}');
+    $this->assertEquals('Bob M Smith', $text);
+  }
+
+  /**
    * Test that membership tokens are consistently rendered.
    *
-   * @throws \CRM_Core_Exception
    */
   public function testMembershipTokenConsistency(): void {
     $this->createLoggedInUser();
