@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of Gender.
+ * Page for displaying list of option groups and option values.
  */
 class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
 

@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of Gender.
+ * Page for displaying list of survey types.
  */
 class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
 

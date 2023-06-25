@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of financial types
+ * Page for displaying list of financial accounts
  */
 class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
 

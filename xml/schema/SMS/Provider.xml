@@ -6,6 +6,12 @@
   <name>civicrm_sms_provider</name>
   <comment>Table to add different sms providers </comment>
   <add>4.2</add>
+  <paths>
+    <add>civicrm/admin/sms/provider?reset=1&amp;action=add</add>
+    <delete>civicrm/admin/sms/provider?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <update>civicrm/admin/sms/provider?reset=1&amp;action=update&amp;id=[id]</update>
+  </paths>
+  <title>SMS Provider</title>
   <field>
     <name>id</name>
     <title>SMS Provider ID</title>

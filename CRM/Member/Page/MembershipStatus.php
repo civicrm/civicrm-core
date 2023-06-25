@@ -16,18 +16,11 @@
  */
 
 /**
- * Page for displaying list of membership types
+ * Page for displaying list of membership statuses
  */
 class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
 
   public $useLivePageJS = TRUE;
-
-  /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -37,42 +30,6 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
    */
   public function getBAOName() {
     return 'CRM_Member_BAO_MembershipStatus';
-  }
-
-  /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      self::$_links = [
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/member/membershipStatus',
-          'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit Membership Status'),
-        ],
-        CRM_Core_Action::DISABLE => [
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Membership Status'),
-        ],
-        CRM_Core_Action::ENABLE => [
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Membership Status'),
-        ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/member/membershipStatus',
-          'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete Membership Status'),
-        ],
-      ];
-    }
-    return self::$_links;
   }
 
   /**
