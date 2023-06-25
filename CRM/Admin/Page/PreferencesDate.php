@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of location types.
+ * Page for displaying list of date preferences.
  */
 class CRM_Admin_Page_PreferencesDate extends CRM_Core_Page_Basic {
 

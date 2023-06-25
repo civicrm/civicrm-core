@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of membership types
+ * Page for displaying list of membership statuses
  */
 class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
 

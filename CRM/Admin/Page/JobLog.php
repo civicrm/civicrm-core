@@ -18,7 +18,7 @@
 use Civi\Api4\JobLog;
 
 /**
- * Page for displaying list of jobs.
+ * Page for displaying log of jobs.
  */
 class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
 

@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of Payment-Instrument
+ * Page for displaying members.
  */
 class CRM_Member_Page_DashBoard extends CRM_Core_Page {
 

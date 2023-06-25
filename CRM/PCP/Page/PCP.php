@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of financial types
+ * Page for displaying list of personal campaign pages
  */
 class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
 
