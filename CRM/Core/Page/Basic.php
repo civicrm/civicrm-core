@@ -19,23 +19,53 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   protected $_action;
 
   /**
-   * Define all the abstract functions here.
-   */
-
-  /**
    * Name of the BAO to perform various DB manipulations.
    *
-   * @return string
+   * @return CRM_Core_DAO|string
    */
   abstract protected function getBAOName();
 
   /**
-   * An array of action links.
+   * Get array of action links for the "browse" page.
    *
-   * @return array
-   *   (reference)
+   * Transforms from the 'paths' in metadata to the
+   * format expected by basic pages.
+   *
+   * @return array[]
    */
-  abstract protected function &links();
+  public function &links() {
+    $baoName = $this->getBAOName();
+    if (!isset(Civi::$statics[$baoName]['actionLinks'])) {
+      Civi::$statics[$baoName]['actionLinks'] = [];
+      $title = $baoName::getEntityTitle();
+      $paths = $baoName::getEntityPaths();
+      unset($paths['add']);
+      foreach ($paths as $action => $path) {
+        $actionKey = CRM_Core_Action::map($action);
+        if ($actionKey) {
+          [$path, $query] = array_pad(explode('?', $path), 2, '');
+          Civi::$statics[$baoName]['actionLinks'][$actionKey] = [
+            'name' => CRM_Core_Action::getLabel($actionKey),
+            'title' => CRM_Core_Action::getTitle($actionKey, $title),
+            'url' => $path,
+            'qs' => str_replace(['[', ']'], '%%', $query),
+            'weight' => CRM_Core_Action::getWeight($actionKey),
+          ];
+        }
+      }
+      if (isset($baoName::getSupportedFields()['is_active'])) {
+        foreach ([CRM_Core_Action::DISABLE, CRM_Core_Action::ENABLE] as $actionKey) {
+          Civi::$statics[$baoName]['actionLinks'][$actionKey] = [
+            'name' => CRM_Core_Action::getLabel($actionKey),
+            'title' => CRM_Core_Action::getTitle($actionKey, $title),
+            'ref' => 'crm-enable-disable',
+            'weight' => CRM_Core_Action::getWeight($actionKey),
+          ];
+        }
+      }
+    }
+    return Civi::$statics[$baoName]['actionLinks'];
+  }
 
   /**
    * Name of the edit form class.
