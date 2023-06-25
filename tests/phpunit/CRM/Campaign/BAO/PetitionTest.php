@@ -10,6 +10,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MessageTemplate;
+
 /**
  *
  * @package CRM
@@ -17,10 +19,17 @@
  */
 class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->revertTemplateToReservedTemplate();
+    parent::tearDown();
+  }
+
   /**
    * Test Petition Email Sending using Domain tokens
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testPetitionEmailWithDomainTokens() {
+  public function testPetitionEmailWithDomainTokens(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $domain = $this->callAPISuccess('Domain', 'getsingle', ['id' => CRM_Core_Config::domainID()]);
     $this->callAPISuccess('Address', 'create', [
@@ -32,13 +41,13 @@ class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
       'country_id' => 'US',
       'postal_code' => '20500',
     ]);
-    $template_contact = CRM_Core_DAO::singleValueQuery("SELECT msg_html FROM civicrm_msg_template WHERE workflow_name = 'petition_sign' AND is_default = 1");
-    $template_contact .= '
-      {domain.address}';
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_msg_template SET msg_html = '{$template_contact}' WHERE workflow_name = 'petition_sign' AND is_default = 1");
-    $contact = $this->individualCreate();
-    $email = $this->callAPISuccess('email', 'create', [
-      'contact_id' => $contact,
+    $templateContent = CRM_Core_DAO::singleValueQuery("SELECT msg_html FROM civicrm_msg_template WHERE workflow_name = 'petition_sign' AND is_default = 1");
+    MessageTemplate::update()->addWhere('workflow_name', '=', 'petition_sign')
+      ->addWhere('is_default', '=', 1)
+      ->setValues(['msg_html' => $templateContent . '{domain.address}'])->execute();
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $contactID,
       'email' => 'testpetitioncontact@civicrm.org',
     ]);
     $survey = $this->callAPISuccess('Survey', 'create', [
@@ -46,15 +55,17 @@ class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
       'activity_type_id' => 'Petition',
       'bypass_confirm' => 1,
     ]);
-    $params = [
+    CRM_Campaign_BAO_Petition::sendEmail([
       'sid' => $survey['id'],
-      'contactId' => $contact,
+      'contactId' => $contactID,
       'email-Primary' => 'testpetitioncontact@civicrm.org',
-    ];
-    CRM_Campaign_BAO_Petition::sendEmail($params, CRM_Campaign_Form_Petition_Signature::EMAIL_THANK);
+    ], CRM_Campaign_Form_Petition_Signature::EMAIL_THANK);
     $mut->checkMailLog([
       '1600 Pennsylvania Avenue',
       'Washington',
+      'Dear Anthony,
+Thank you for signing Test Petition.
+',
     ]);
     $mut->stop();
   }

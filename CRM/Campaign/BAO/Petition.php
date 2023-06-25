@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Group;
+
 /**
  *
  * @package CRM
@@ -514,32 +516,21 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *   (reference ) an assoc array of name/value pairs.
    *
    * @param int $sendEmailMode
+   *   CRM_Campaign_Form_Petition_Signature::EMAIL_THANK or CRM_Campaign_Form_Petition_Signature::EMAIL_CONFIRM
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
-  public static function sendEmail($params, $sendEmailMode) {
-
-    /* sendEmailMode
-     * CRM_Campaign_Form_Petition_Signature::EMAIL_THANK
-     *   connected user via login/pwd - thank you
-     *    or dedupe contact matched who doesn't have a tag CIVICRM_TAG_UNCONFIRMED - thank you
-     *   or login using fb connect - thank you + click to add msg to fb wall
-     *
-     * CRM_Campaign_Form_Petition_Signature::EMAIL_CONFIRM
-     *  send a confirmation request email
-     */
-
-    // check if the group defined by CIVICRM_PETITION_CONTACTS exists, else create it
-    $petitionGroupName = Civi::settings()->get('petition_contacts');
-
-    $dao = new CRM_Contact_DAO_Group();
-    $dao->title = $petitionGroupName;
-    if (!$dao->find(TRUE)) {
-      $dao->is_active = 1;
-      $dao->visibility = 'User and User Admin Only';
-      $dao->save();
+  public static function sendEmail(array $params, int $sendEmailMode): void {
+    $surveyID = $params['sid'];
+    $contactID = $params['contactId'];
+    $activityID = $params['activityId'] ?? NULL;
+    $group_id = Group::get(FALSE)->addWhere('title', '=', Civi::settings()->get('petition_contacts'))->addSelect('id')->execute()->first()['id'] ?? NULL;
+    if (!$group_id) {
+      $group_id = Group::create(FALSE)->setValues([
+        'title' => Civi::settings()->get('petition_contacts'),
+        'visibility' => 'User and User Admin Only',
+      ])->execute()->first()['id'];
     }
-    $group_id = $dao->id;
 
     // get petition info
     $petitionParams['id'] = $params['sid'];
@@ -550,7 +541,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     }
 
     //get the default domain email address.
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
@@ -568,25 +559,17 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
 
     switch ($sendEmailMode) {
       case CRM_Campaign_Form_Petition_Signature::EMAIL_THANK:
-
-        // add this contact to the CIVICRM_PETITION_CONTACTS group
-        // Cannot pass parameter 1 by reference
-        $p = [$params['contactId']];
-        CRM_Contact_BAO_GroupContact::addContactsToGroup($p, $group_id, 'API');
+        CRM_Contact_BAO_GroupContact::addContactsToGroup([$contactID], $group_id, 'API');
 
         if ($params['email-Primary']) {
           CRM_Core_BAO_MessageTemplate::sendTemplate(
             [
-              'groupName' => 'msg_tpl_workflow_petition',
               'workflow' => 'petition_sign',
-              'contactId' => $params['contactId'],
-              'tplParams' => $tplParams,
+              'modelProps' => ['surveyID' => $surveyID, 'contactID' => $contactID],
               'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
               'toName' => $toName,
               'toEmail' => $params['email-Primary'],
               'replyTo' => $replyTo,
-              'petitionId' => $params['sid'],
-              'petitionTitle' => $petitionInfo['title'],
             ]
           );
         }

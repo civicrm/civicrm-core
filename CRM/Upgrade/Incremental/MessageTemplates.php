@@ -350,6 +350,15 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'contribution_offline_receipt', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '5.56.alpha1',
+        'upgrade_descriptor' => ts('Update to use tokens'),
+        'templates' => [
+          ['name' => 'petition_sign', 'type' => 'text'],
+          ['name' => 'petition_sign', 'type' => 'html'],
+          ['name' => 'petition_sign', 'type' => 'subject'],
+        ],
+      ],
     ];
   }
 
