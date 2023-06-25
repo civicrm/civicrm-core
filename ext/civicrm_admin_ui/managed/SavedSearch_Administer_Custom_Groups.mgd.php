@@ -30,7 +30,7 @@ return [
             'GROUP_CONCAT(DISTINCT CustomGroup_CustomField_custom_group_id_01.label) AS GROUP_CONCAT_CustomGroup_CustomField_custom_group_id_01_label',
           ],
           'orderBy' => [],
-          'where' => [],
+          'where' => [['is_reserved', '=', FALSE]],
           'groupBy' => [
             'id',
           ],
@@ -149,7 +149,7 @@ return [
                   'text' => E::ts('Settings'),
                   'style' => 'default',
                   'path' => '',
-                  'condition' => ['is_reserved', '=', FALSE],
+                  'condition' => [],
                 ],
               ],
               'type' => 'buttons',
