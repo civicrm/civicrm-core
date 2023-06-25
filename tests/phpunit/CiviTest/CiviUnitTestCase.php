@@ -560,22 +560,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
 
   /**
-   * Create an entity, recording it's details for tearDown.
-   *
-   * @param string $entity
-   * @param array $params
-   * @param string $identifier
-   *
-   * @return array|int
-   */
-  protected function createTestEntity(string $entity, array $params, string $identifier = 'default') {
-    $params['version'] = 4;
-    $result = $this->callAPISuccess($entity, 'create', $params);
-    $this->setTestEntityID($entity, $result['id'], $identifier);
-    return reset($result['values']);
-  }
-
-  /**
    * @param array $params
    *
    * @return int

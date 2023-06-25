@@ -39,33 +39,7 @@ use Civi\Api4\UFJoin;
  * profiles and price set data as appropriate.
  */
 trait EventTestTrait {
-
-  /**
-   * Array of IDs created to support the test.
-   *
-   * e.g
-   * $this->ids = ['Event' => ['descriptive_key' => $eventID], 'Group' => [$groupID]];
-   *
-   * @var array
-   */
-  protected $ids = [];
-
-  /**
-   * Records created which will be deleted during tearDown
-   *
-   * @var array
-   */
-  protected $testRecords = [];
-
-  /**
-   * Track tables we have modified during a test.
-   *
-   * Set up functions that add entities can register the relevant tables here for
-   * the cleanup process.
-   *
-   * @var array
-   */
-  protected $tablesToCleanUp = [];
+  use EntityTrait;
 
   /**
    * Create a paid event.
@@ -118,31 +92,6 @@ trait EventTestTrait {
     $eventParameters = array_merge($this->getEventExampleData(), $eventParameters);
     $eventParameters['is_monetary'] = FALSE;
     return $this->eventCreate($eventParameters, $identifier);
-  }
-
-  /**
-   * Set the test entity on the class for access.
-   *
-   * This follows the ids patter and also the api4TestTrait pattern.
-   *
-   * @param string $entity
-   * @param array $values
-   * @param string $identifier
-   */
-  protected function setTestEntity(string $entity, array $values, string $identifier): void {
-    $this->ids[$entity][$identifier] = $values['id'];
-    $this->testRecords[] = [$entity, [[$values['id'] => $values]]];
-    $tableName = \CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity);
-    $this->tablesToCleanUp[$tableName] = $tableName;
-  }
-
-  /**
-   * @param string $entity
-   * @param int $id
-   * @param string $identifier
-   */
-  protected function setTestEntityID(string $entity, int $id, string $identifier): void {
-    $this->setTestEntity($entity, ['id' => $id], $identifier);
   }
 
   /**
