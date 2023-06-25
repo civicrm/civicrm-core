@@ -52,6 +52,13 @@ function legacycustomsearches_civicrm_buildGroupContactCache(array $savedSearch,
     AND civicrm_group_contact.group_id = $groupID )";
   $addSelect = "$groupID AS group_id";
   $ssParams = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
+
+  $customSearchClass = $ssParams['customSearchClass'];
+  // check if there is a special function - formatSavedSearchFields defined in the custom search form
+  if (method_exists($customSearchClass, 'formatSavedSearchFields')) {
+    $customSearchClass::formatSavedSearchFields($ssParams);
+  }
+
   // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
   if (!empty($ssParams)) {
     CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);

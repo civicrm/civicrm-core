@@ -24,7 +24,7 @@ class CRM_Profile_Form_EditTest extends CiviUnitTestCase {
    */
   public function testProfileUrl(): void {
     $profileID = $this->createTestEntity('UFGroup', [
-      'post_URL' => 'civicrm/{contact.display_name}',
+      'post_url' => 'civicrm/{contact.display_name}',
       'title' => 'title',
     ])['id'];
     UFJoin::create(FALSE)->setValues([
@@ -32,10 +32,10 @@ class CRM_Profile_Form_EditTest extends CiviUnitTestCase {
       'uf_group_id' => $profileID,
     ])->execute();
     $this->uFFieldCreate(['uf_group_id' => $profileID]);
-    $id = $this->individualCreate();
+    $contactID = $this->individualCreate();
     $form = $this->getFormObject('CRM_Profile_Form_Edit');
     $form->set('gid', $profileID);
-    $form->set('id', $id);
+    $form->set('id', $contactID);
     $form->buildForm();
     $form->postProcess();
     $this->assertEquals('civicrm/Mr. Anthony Anderson II', CRM_Core_Session::singleton()->popUserContext());
@@ -51,33 +51,26 @@ class CRM_Profile_Form_EditTest extends CiviUnitTestCase {
       'group_type' => 'Individual,Contact',
       'name' => 'test_individual_contact_tag_profile',
       'title' => 'Gimme a tag',
-      'api.uf_field.create' => [
-        [
-          'field_name' => 'first_name',
-          'is_required' => 1,
-          'visibility' => 'Public Pages and Listings',
-          'field_type' => 'Individual',
-          'label' => 'First Name',
-        ],
-        [
-          'field_name' => 'last_name',
-          'is_required' => 1,
-          'visibility' => 'Public Pages and Listings',
-          'field_type' => 'Individual',
-          'label' => 'Last Name',
-        ],
-        [
-          'field_name' => 'tag',
-          'is_required' => 1,
-          'visibility' => 'Public Pages and Listings',
-          'field_type' => 'Contact',
-          'label' => 'Tag',
-        ],
-      ],
     ];
 
     $profile = $this->createTestEntity('UFGroup', $ufGroupParams);
     $profileID = $profile['id'];
+    $this->createTestEntity('UFField', [
+      'field_name' => 'first_name',
+      'is_required' => 1,
+      'visibility' => 'Public Pages and Listings',
+      'field_type' => 'Individual',
+      'label' => 'First Name',
+      'uf_group_id' => $profileID,
+    ]);
+    $this->createTestEntity('UFField', [
+      'field_name' => 'tag',
+      'is_required' => 1,
+      'visibility' => 'Public Pages and Listings',
+      'field_type' => 'Contact',
+      'label' => 'Tag',
+      'uf_group_id' => $profileID,
+    ]);
 
     // Configure the profile to be used as a standalone profile for data entry.
     UFJoin::create(FALSE)->setValues([
