@@ -544,4 +544,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     return Security::singleton()->getCMSPermissionsUrlParams();
   }
 
+  public function permissionDenied() {
+    http_response_code(403);
+    echo "403 Forbidden: You do not have permission to access this resource.\n";
+    // TODO: Prettier error page
+  }
+
 }
