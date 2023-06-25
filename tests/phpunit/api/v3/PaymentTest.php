@@ -883,6 +883,75 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create payment api for pay later contribution
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreatePaymentMultipleTrxnID(): void {
+    $this->createLoggedInUser();
+    $processorID  = $this->paymentProcessorCreate();
+    $contributionParams = [
+      'total_amount' => 100,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'financial_type_id' => 1,
+      'contribution_status_id' => 2,
+      'is_pay_later' => 1,
+      'trxn_id' => 'trxn_1',
+    ];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    //add payment for pay later transaction
+    $params = [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 100,
+      'card_type_id' => 'Visa',
+      'pan_truncation' => '1234',
+      'trxn_result_code' => 'Startling success',
+      'payment_instrument_id' => $processorID,
+      'trxn_id' => 'trxn_2',
+    ];
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
+    $expectedResult = [
+      $payment['id'] => [
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 100,
+        'status_id' => 1,
+        'is_payment' => 1,
+        'card_type_id' => 1,
+        'pan_truncation' => '1234',
+        'trxn_result_code' => 'Startling success',
+        'trxn_id' => 'trxn_2',
+        'payment_instrument_id' => 1,
+      ],
+    ];
+    $this->checkPaymentResult($payment, $expectedResult);
+    // Check entity financial trxn created properly
+    $params = [
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'financial_trxn_id' => $payment['id'],
+    ];
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals(100, $eft['values'][$eft['id']]['amount']);
+    $params = [
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    ];
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals(100, $eft['values'][$eft['id']]['amount']);
+    // Check contribution for completed status
+    $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id']]);
+    $this->assertEquals('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
+    $this->assertEquals('trxn_1,trxn_2', $contribution['values'][$contribution['id']]['trxn_id']);
+    $this->assertEquals(100.00, $contribution['values'][$contribution['id']]['total_amount']);
+    $this->callAPISuccess('Contribution', 'Delete', [
+      'id' => $contribution['id'],
+    ]);
+    $this->validateAllPayments();
+  }
+
+  /**
    * Test net amount is set when fee amount is passed in.
    */
   public function testNetAmount(): void {

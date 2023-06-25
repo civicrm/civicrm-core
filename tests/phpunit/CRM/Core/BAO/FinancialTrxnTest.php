@@ -30,12 +30,12 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   public function testCreate() {
     $contactId = $this->individualCreate();
     $financialTypeId = 1;
-    $this->contributionCreate([
+    $contributionID = $this->contributionCreate([
       'contact_id' => $contactId,
       'financial_type_id' => $financialTypeId,
     ]);
     $params = [
-      'contribution_id' => $financialTypeId,
+      'contribution_id' => $contributionID,
       'to_financial_account_id' => 1,
       'trxn_date' => 20091021184930,
       'trxn_type' => 'Debit',
