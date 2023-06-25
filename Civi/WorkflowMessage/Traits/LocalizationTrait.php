@@ -20,6 +20,18 @@ trait LocalizationTrait {
   protected $locale;
 
   /**
+   * The language that was requested to be rendered.
+   *
+   * This may not be the rendered locale - as the requested language
+   * might be available. This is primarily for extensions to use in
+   * custom workflow messages.
+   *
+   * @var string|null
+   * @scope tokenContext
+   */
+  protected $requestedLocale;
+
+  /**
    * @return string
    */
   public function getLocale(): ?string {
@@ -32,6 +44,31 @@ trait LocalizationTrait {
    */
   public function setLocale(?string $locale) {
     $this->locale = $locale;
+    return $this;
+  }
+
+  /**
+   * Get the requested locale.
+   *
+   * This may differ from the rendered locale (e.g. if a translation is not
+   * available). It is not used in core but extensions may leverage this
+   * information.
+   *
+   * @return string
+   */
+  public function getRequestedLocale(): ?string {
+    return $this->locale;
+  }
+
+  /**
+   * Set the requested locale.
+   *
+   * @param string|null $requestedLocale
+   *
+   * @return $this
+   */
+  public function setRequestedLocale(?string $requestedLocale): self {
+    $this->requestedLocale = $requestedLocale;
     return $this;
   }
 
