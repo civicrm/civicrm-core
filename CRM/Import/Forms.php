@@ -740,6 +740,9 @@ class CRM_Import_Forms extends CRM_Core_Form {
       }
       // Swap out dots for double underscores so as not to break the quick form js.
       // We swap this back on postProcess.
+      // Arg - we need to swap out _. first as it seems some groups end in a trailing underscore.
+      // https://lab.civicrm.org/dev/core/-/issues/4317#note_91322
+      $name = str_replace('_.', '~~', $name);
       $name = str_replace('.', '__', $name);
       $return[$name] = $field['html']['label'] ?? $field['title'];
     }

@@ -104,6 +104,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
       // Swap out dots for double underscores so as not to break the quick form js.
       // We swap this back on postProcess.
+      // Arg - we need to swap out _. first as it seems some groups end in a trailing underscore,
+      // which is indistinguishable to convert back - ie ___ could be _. or ._.
+      // https://lab.civicrm.org/dev/core/-/issues/4317#note_91322
+      $name = str_replace('_.', '~~', $name);
       $name = str_replace('.', '__', $name);
       if (($field['entity'] ?? '') === 'Contact' && $this->isFilterContactFields() && empty($field['match_rule'])) {
         // Filter out metadata that is intended for create & update - this is not available in the quick-form
