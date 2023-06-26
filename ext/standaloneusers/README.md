@@ -15,26 +15,37 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Getting started
 
-First, get standalone set up - e.g. you can see the admin interface up and running.
-
-Next configure AuthX from **Administer » System Settings » Authentication**. You'll need to add **User Password** to the **Acceptable credentials (HTTP Session Login) select. And hit Save.
-
-Now you can install this extension from the command line. (Clone this repo into web/upload/ext/ then enable it with `cv en standaloneusers`).
-
-On install, an account is created, user `admin`, and the password is printed on the console (if you install through the UI, the password is output in the Civi logs). The admin user is granted all permissions. Example:
+Normal installation methods (such as `cv core:install` or `civibuild`) should enable `standaloneusers` by default.
+The installer should display the default user account, such as:
 
 ```
-% cv en standaloneusers
-Enabling extension "standaloneusers"
-Created New admin User 1 and contact 203 with password iLkPsffZYYA= and ALL permissions.
+  "adminUser": "super",
+  "adminPass": "O5fAlyXgdEU",
+  "adminEmail": "admin@localhost.localdomain"
 ```
 
-Now if you try to load your site it should fail: you've got no access rights.
+If not, you may also find the default credentials in the local log.
+
+```
+[notice] Created new user "admin" (user ID #1, contact ID #203) with default password "admin" and ALL permissions.
+```
+
+If you try to load your site it should fail: you've got no access rights.
 
 At this stage, because you're moving from a system that had no concept of users to one that does, you'll need to clear your browser cookies for the site, otherwise login will get confused (You may see a "session already active" authx error.)
 
 Done that? Then head to `/civicrm/login`, enter your credentials and hopefully you're now back in the admin interface!
 
+## Advanced
+
+To customize the default credentials, pass any of these arguments to the installer:
+
+```bash
+cv core:install ... \
+  -m 'extras.adminUser=zeta' \
+  -m 'extras.adminPass=SECRET' \
+  -m 'extras.adminEmail=zeta@example.com'
+```
 
 ## Conventions
 

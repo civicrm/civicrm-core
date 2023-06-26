@@ -2,9 +2,7 @@
 namespace Civi\Standalone;
 
 use CRM_Standaloneusers_ExtensionUtil as E;
-use Civi\Test\CiviEnvBuilder;
-use Civi\Test\HeadlessInterface;
-use Civi\Core\HookInterface;
+use Civi\Test\EndToEndInterface;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -19,35 +17,33 @@ use Civi\Test\TransactionalInterface;
  *       a. Do all that using setupHeadless() and Civi\Test.
  *       b. Disable TransactionalInterface, and handle all setup/teardown yourself.
  *
- * @group headless
+ * Fun fact: Running E2E tests with TransactionalInterface is usually prohibitive because of the
+ * split DB. However, with Standalone, there's a single DB, so it may work some of the time.
+ * (It only becomes prohibitive if you actually use HTTP.)
+ *
+ * @group e2e
  */
-class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
+class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface, TransactionalInterface {
 
   protected $originalUF;
   protected $originalUFPermission;
   protected $contactID;
   protected $userID;
 
-  /**
-   * Setup used when HeadlessInterface is implemented.
-   *
-   * Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
-   *
-   * @link https://github.com/civicrm/org.civicrm.testapalooza/blob/master/civi-test.md
-   *
-   * @return \Civi\Test\CiviEnvBuilder
-   *
-   * @throws \CRM_Extension_Exception_ParseException
-   */
-  public function setUpHeadless(): CiviEnvBuilder {
-    return \Civi\Test::headless()
-      ->install(['authx', 'org.civicrm.search_kit', 'org.civicrm.afform', 'standaloneusers'])
+  public static function setUpBeforeClass(): void {
+    parent::setUpBeforeClass();
+    \Civi\Test::e2e()
+      // ->install(['authx', 'org.civicrm.search_kit', 'org.civicrm.afform', 'standaloneusers'])
+      // We only run on "Standalone", so all the above is given.
       // ->installMe(__DIR__) This causes failure, so we do                 ↑
       ->apply(FALSE);
   }
 
   public function setUp():void {
     parent::setUp();
+    if (CIVICRM_UF !== 'Standalone') {
+      $this->markTestSkipped('Test only applies on Standalone');
+    }
   }
 
   public function tearDown():void {
@@ -56,7 +52,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   }
 
   public function testCreateUser():void {
-    list($contactID, $userID, $security) = $this->createFixtureContactAndUser();
+    [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
 
     $user = \Civi\Api4\User::get(FALSE)
       ->addSelect('*', 'uf_match.*')
@@ -73,7 +69,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   }
 
   public function testPerms() {
-    list($contactID, $userID, $security) = $this->createFixtureContactAndUser();
+    [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
     // Create role,
     $roleID = \Civi\Api4\Role::create(FALSE)
       ->setValues(['name' => 'staff'])->execute()->first()['id'];

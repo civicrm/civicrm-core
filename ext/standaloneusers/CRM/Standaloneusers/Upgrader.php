@@ -10,6 +10,24 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
   // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
 
   /**
+   * Ensure that we're installing on suitable environment.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function onInstall() {
+    $config = \CRM_Core_Config::singleton();
+    // We generally only want to run on standalone. In theory, we might also run headless tests.
+    if (!in_array(get_class($config->userPermissionClass), ['CRM_Core_Permission_Standalone', 'CRM_Core_Permission_Headless'])) {
+      throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
+    }
+    if (!in_array(get_class($config->userSystem), ['CRM_Utils_System_Standalone', 'CRM_Utils_System_Headless'])) {
+      throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
+    }
+    parent::onInstall();
+  }
+
+  /**
    * Example: Run an external SQL script when the module is installed.
    *
    * public function install() {
@@ -26,67 +44,19 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
    */
   public function postInstall() {
 
+    Civi::settings()->set('authx_login_cred', array_unique(array_merge(
+      Civi::settings()->get('authx_login_cred'),
+      ['pass']
+    )));
+
     $users = \Civi\Api4\User::get(FALSE)->selectRowCount()->execute()->countMatched();
     if ($users == 0) {
-
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_uf_match');
-
-      // Create an admin contact.
-      $contactID = \Civi\Api4\Contact::create(FALSE)
-        ->setValues([
-          'contact_type' => 'Individual',
-          'first_name' => 'Standalone',
-          'last_name' => 'Admin',
-        ])
-        ->execute()->first()['id'];
-      $dummyEmail = 'admin@localhost.localdomain';
-
-      // Create user
-      $config = \CRM_Core_Config::singleton();
-      $originalUFPermission = $config->userPermissionClass;
-      $originalUF = $config->userSystem;
-      $config->userPermissionClass = new \CRM_Core_Permission_Standalone();
-      $config->userSystem = new \CRM_Utils_System_Standalone();
-      $password = substr(base64_encode(random_bytes(8)), 0, 12);
-      $params = [
-        'cms_name'   => 'admin',
-        'cms_pass'   => $password,
-        'notify'     => FALSE,
-        $dummyEmail => $dummyEmail,
-        'contactID'  => $contactID,
-      ];
-      $userID = \CRM_Core_BAO_CMSUser::create($params, $dummyEmail);
-      $config->userPermissionClass = $originalUFPermission;
-      $config->userSystem = $originalUF;
-
-      // Create Role
-      $roleID = \Civi\Api4\Role::create(FALSE)->setValues(['name' => 'Administrator'])->execute()->first()['id'];
-
-      // Assign role to user
-      \Civi\Api4\UserRole::create(FALSE)->setValues(['role_id' => $roleID, 'user_id' => $userID])->execute();
-
-      // Create permissions for role
-      // @todo I expect there's a better way than this; this doesn't even bring in all the permissions.
-      $records = [['permission' => 'authenticate with password']];
-      foreach (array_keys(\CRM_Core_Permission::getCorePermissions()) as $permission) {
-        $records[] = ['permission' => $permission];
-      }
-      \Civi\Api4\RolePermission::save(FALSE)
-        ->setDefaults(['role_id' => $roleID])
-        ->setRecords($records)
-        ->execute();
-
-      $message = "Created New admin User $userID and contact $contactID with password $password and ALL permissions.";
-      \Civi::log()->notice($message);
-      if (php_sapi_name() === 'cli') {
-        print $message . "\n";
-      }
-      else {
-        $authx = new \Civi\Authx\Standalone();
-        $authx->loginSession($userID);
-        CRM_Core_Session::setStatus($message . " You are logged in!", 'Standalone installed', 'alert');
-      }
     }
+
+    // `standaloneusers` is installed as part of the overall install process for `Standalone`.
+    // A subsequent step will configure some default users (*depending on local options*).
+    // See also: `StandaloneUsers.civi-setup.php`
   }
 
   /**
