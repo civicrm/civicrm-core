@@ -73,7 +73,7 @@ if (!defined('CIVI_SETUP')) {
     \Civi\Api4\UserRole::create(FALSE)->setValues(['role_id' => $roleID, 'user_id' => $userID])->execute();
 
     // TODO - If admin specified an explicit password, then we don't really need to log it.
-    $message = "Created new user \"admin\" (user ID #$userID, contact ID #$contactID) with default password \"" . ($e->getModel()->extras['adminPass']) . "\" and ALL permissions.";
+    $message = "Created new user \"{$e->getModel()->extras['adminUser']}\" (user ID #$userID, contact ID #$contactID) with password \"" . ($e->getModel()->extras['adminPass']) . "\" and ALL permissions.";
     \Civi::log()->notice($message);
 
   }, \Civi\Setup::PRIORITY_LATE);
