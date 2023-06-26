@@ -99,6 +99,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     }
 
     if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved')) {
+      // I think this does not have ts() because the only time you would see
+      // this is if you manually made a url you weren't supposed to.
       CRM_Core_Error::statusBounce("You cannot add or edit fields in a reserved custom field-set.");
     }
 

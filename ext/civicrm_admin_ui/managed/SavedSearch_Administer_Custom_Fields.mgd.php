@@ -29,7 +29,7 @@ return [
             'option_group_id:label',
           ],
           'orderBy' => [],
-          'where' => [],
+          'where' => [['custom_group_id.is_reserved', '=', FALSE]],
           'groupBy' => [],
           'join' => [],
           'having' => [],
