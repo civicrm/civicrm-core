@@ -79,6 +79,13 @@ interface WorkflowMessageInterface {
   public function assertValid($strict = FALSE);
 
   /**
+   * Get the locale in use, if set.
+   *
+   * @return string|null
+   */
+  public function getLocale(): ?string;
+
+  /**
    * Render a message template.
    *
    * TIP: Do not implement directly. Use FinalHelperTrait.
