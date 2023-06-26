@@ -163,7 +163,7 @@ return [
                 ],
                 [
                   'entity' => 'CustomField',
-                  'action' => 'move',
+                  'action' => 'detach',
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-random',

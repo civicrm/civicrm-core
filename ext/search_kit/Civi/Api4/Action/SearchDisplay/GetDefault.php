@@ -207,44 +207,24 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
     $menu = [];
     $mainEntity = $this->savedSearch['api_entity'] ?? NULL;
     if ($mainEntity && !$this->canAggregate(CoreUtil::getIdFieldName($mainEntity))) {
-      foreach (CoreUtil::getInfoItem($mainEntity, 'paths') as $action => $path) {
-        $link = $this->formatMenuLink($mainEntity, $action);
-        if ($link) {
-          $menu[] = $link;
-        }
+      foreach (Display::getEntityLinks($mainEntity, TRUE) as $link) {
+        $link['join'] = NULL;
+        $menu[] = $link;
       }
     }
     $keys = ['entity' => TRUE, 'bridge' => TRUE];
     foreach ($this->getJoins() as $join) {
       if (!$this->canAggregate($join['alias'] . '.' . CoreUtil::getIdFieldName($join['entity']))) {
         foreach (array_filter(array_intersect_key($join, $keys)) as $joinEntity) {
-          foreach (CoreUtil::getInfoItem($joinEntity, 'paths') as $action => $path) {
-            $link = $this->formatMenuLink($joinEntity, $action, $join['alias']);
-            if ($link) {
-              $menu[] = $link;
-            }
+          $joinLabel = $this->getJoinLabel($join['alias']);
+          foreach (Display::getEntityLinks($joinEntity, $joinLabel) as $link) {
+            $link['join'] = $join['alias'];
+            $menu[] = $link;
           }
         }
       }
     }
     return $menu;
-  }
-
-  /**
-   * @param string $entity
-   * @param string $action
-   * @param string $joinAlias
-   * @return array|NULL
-   */
-  private function formatMenuLink(string $entity, string $action, string $joinAlias = NULL) {
-    if ($joinAlias && $entity === $this->getJoin($joinAlias)['entity']) {
-      $entityLabel = $this->getJoinLabel($joinAlias);
-    }
-    else {
-      $entityLabel = TRUE;
-    }
-    $link = Display::getEntityLinks($entity, $entityLabel)[$action] ?? NULL;
-    return $link ? $link + ['join' => $joinAlias] : NULL;
   }
 
   /**
