@@ -34,7 +34,8 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
     // Adding checkPermissions filters out actions the user is not allowed to perform
-    $entity = Entity::get($this->checkPermissions)->addWhere('name', '=', $this->entity)
+    $entityName = ($this->entity === 'RelationshipCache') ? 'Relationship' : $this->entity;
+    $entity = Entity::get($this->checkPermissions)->addWhere('name', '=', $entityName)
       ->addSelect('name', 'title_plural')
       ->setChain([
         'actions' => ['$name', 'getActions', ['where' => [['name', 'IN', ['update', 'delete']]]], 'name'],

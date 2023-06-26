@@ -42,8 +42,17 @@
         return $scope.$eval('' + ctrl.ids.length + action.number);
       };
 
+      this.updateActionData = function() {
+        if (this.entity === 'RelationshipCache') {
+          this.entity = 'Relationship';
+          this.entityInfo.title = ts('Relationship');
+          this.entityInfo.title_plural = ts('Relationships');
+        }
+      };
+
       this.getActionTitle = function(action) {
         if (ctrl.isActionAllowed(action)) {
+          ctrl.updateActionData();
           return ctrl.ids.length ?
             ts('Perform action on %1 %2', {1: ctrl.ids.length, 2: ctrl.entityInfo[ctrl.ids.length === 1 ? 'title' : 'title_plural']}) :
             ts('Perform action on all %1', {1: ctrl.entityInfo.title_plural});
@@ -55,6 +64,9 @@
         if (!ctrl.isActionAllowed(action)) {
           return;
         }
+        // Update data specific to entity actions.
+        ctrl.updateActionData();
+
         var data = {
           ids: ctrl.ids,
           entity: ctrl.entity,
