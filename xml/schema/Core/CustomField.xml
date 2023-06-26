@@ -13,7 +13,7 @@
     <update>civicrm/admin/custom/group/field/update?action=update&amp;reset=1&amp;id=[id]&amp;gid=[custom_group_id]</update>
     <preview>civicrm/admin/custom/group/preview?reset=1&amp;fid=[id]</preview>
     <delete>civicrm/admin/custom/group/field/delete?reset=1&amp;id=[id]</delete>
-    <move>civicrm/admin/custom/group/field/move?reset=1&amp;fid=[id]</move>
+    <detach>civicrm/admin/custom/group/field/move?reset=1&amp;fid=[id]</detach>
   </paths>
   <field>
     <name>id</name>

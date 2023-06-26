@@ -85,86 +85,103 @@ class CRM_Core_Action {
         'name' => 'add',
         'label' => ts('Add'),
         'weight' => 0,
+        'icon' => 'fa-plus',
       ],
       self::UPDATE => [
         'name' => 'update',
         'label' => ts('Edit'),
         'weight' => -10,
+        'icon' => 'fa-pencil',
       ],
       self::VIEW => [
         'name' => 'view',
         'label' => ts('View'),
         'weight' => -20,
+        'icon' => 'fa-external-link',
       ],
       self::DELETE => [
         'name' => 'delete',
         'label' => ts('Delete'),
         'weight' => 100,
+        'icon' => 'fa-trash',
       ],
       self::BROWSE => [
         'name' => 'browse',
         'label' => ts('Browse'),
         'weight' => 0,
+        'icon' => 'fa-list',
       ],
       self::ENABLE => [
         'name' => 'enable',
         'label' => ts('Enable'),
         'weight' => 40,
+        'icon' => 'fa-repeat',
       ],
       self::DISABLE => [
         'name' => 'disable',
         'label' => ts('Disable'),
         'weight' => 40,
+        'icon' => 'fa-ban',
       ],
       self::EXPORT => [
         'name' => 'export',
         'label' => ts('Export'),
         'weight' => 0,
+        'icon' => 'fa-download',
       ],
       self::PREVIEW => [
         'name' => 'preview',
         'label' => ts('Preview'),
         'weight' => 0,
+        'icon' => 'fa-eye',
       ],
       self::MAP => [
         'name' => 'map',
         'label' => ts('Map'),
         'weight' => 0,
+        'icon' => 'fa-cog',
       ],
       self::COPY => [
         'name' => 'copy',
         'label' => ts('Copy'),
         'weight' => 20,
+        'icon' => 'fa-clone',
       ],
       self::PROFILE => [
         'name' => 'profile',
         'label' => ts('Profile'),
         'weight' => 0,
+        'icon' => 'fa-files-o',
       ],
       self::RENEW => [
         'name' => 'renew',
         'label' => ts('Renew'),
         'weight' => 10,
+        'icon' => 'fa-undo',
       ],
       self::DETACH => [
         'name' => 'detach',
-        'label' => ts('Detach'),
+        'label' => ts('Move'),
         'weight' => 0,
+        'icon' => 'fa-random',
       ],
       self::REVERT => [
         'name' => 'revert',
         'label' => ts('Revert'),
         'weight' => 0,
+        'icon' => 'fa-refresh',
       ],
       self::CLOSE => [
         'name' => 'close',
         'label' => ts('Close'),
         'weight' => 0,
+        'icon' => 'fa-folder',
       ],
       self::REOPEN => [
         'name' => 'reopen',
         'label' => ts('Reopen'),
         'weight' => 0,
+        'icon' => 'fa-folder-open-o',
       ],
     ];
     return Civi::$statics[__CLASS__ . 'Info'];
@@ -509,6 +526,14 @@ class CRM_Core_Action {
   }
 
   /**
+   * @param int $mask
+   * @return int|null
+   */
+  public static function getIcon(int $mask): ?string {
+    return self::getInfo()[$mask]['icon'] ?? NULL;
+  }
+
+  /**
    * Builds a title based on action and entity title, e.g. "Update Contact"
    *
    * @param int $action
@@ -557,7 +582,7 @@ class CRM_Core_Action {
         return ts('Renew %1', [1 => $entityTitle]);
 
       case self::DETACH:
-        return ts('Detach %1', [1 => $entityTitle]);
+        return ts('Move %1', [1 => $entityTitle]);
 
       case self::REVERT:
         return ts('Revert %1', [1 => $entityTitle]);
