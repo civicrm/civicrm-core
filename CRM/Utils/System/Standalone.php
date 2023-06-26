@@ -188,12 +188,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $htmlize = TRUE
   ) {
     $fragment = $fragment ? ('#' . $fragment) : '';
-    $url = "/{$path}?{$query}$fragment";
     if ($absolute) {
-      // @fixme
-      // return implode('/', [rtrim(Civi::settings()->get('userFrameworkResourceURL'), '/') . ltrim($url, '/')]);
+      return Civi::paths()->getUrl("[cms.root]/{$path}?{$query}$fragment");
     }
-    return $url;
+    else {
+      return "/{$path}?{$query}$fragment";
+    }
   }
 
   /**
@@ -288,12 +288,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       return TRUE;
     }
 
-    $root = $this->cmsRootPath();
+    $root = rtrim($this->cmsRootPath(), '/' . DIRECTORY_SEPARATOR);
     if (empty($root) || !is_dir($root) || !chdir($root)) {
       return FALSE;
     }
 
-    require_once $root . '../vendor/autoload.php'; /* assumes $root to be the _web_ root path, not the project root path. */
+    require_once $root . '/../vendor/autoload.php'; /* assumes $root to be the _web_ root path, not the project root path. */
 
     // seems like we've bootstrapped drupal
     $config = CRM_Core_Config::singleton();
