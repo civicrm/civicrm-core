@@ -17,13 +17,10 @@
   <releaseDate>2021-07-25</releaseDate>
   <version>5.64.alpha1</version>
   <develStage>stable</develStage>
-  <tags>
-    <tag>mgmt:hidden</tag>
-  </tags>
   <compatibility>
     <ver>5.64</ver>
   </compatibility>
-  <comments>This is hidden on install to give extensions that require it time to add it to their requires and to allow us to get it out of GroupContact load</comments>
+  <comments>This is our old search system which has limited support. All new effort is on SearchKit</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>

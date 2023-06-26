@@ -449,7 +449,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
       Civi::service('prevnext')->fillWithSql($cacheKey, $sql);
     }
     catch (\Exception $e) {
-      CRM_Core_Error::deprecatedFunctionWarning('Custom searches should return sql capable of filling the prevnext cache.');
+      CRM_Core_Error::deprecatedFunctionWarning('Custom searches should override this function or return sql capable of filling the prevnext cache.');
       // This will always show for CiviRules :-( as a) it orders by 'rule_label'
       // which is not available in the query & b) it uses contact not contact_a
       // as an alias.
