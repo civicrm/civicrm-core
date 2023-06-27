@@ -477,7 +477,7 @@ class TokenProcessor {
       switch ($filter[0] ?? NULL) {
         case NULL:
         case 'crmMoney':
-          return \Civi::format()->money($value->getAmount(), $value->getCurrency());
+          return \Civi::format()->money($value->getAmount(), $value->getCurrency(), $filter[1] ?? NULL);
 
         case 'boolean':
           // We resolve boolean to 0 or 1 or smarty chokes on FALSE.

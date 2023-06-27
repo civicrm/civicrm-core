@@ -476,6 +476,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
         'empty_string' => '',
         'and_such' => '<strong>testing &amp; such</strong>',
       ],
+      'my_currencies' => [
+        'amount' => \Brick\Money\Money::of(123, 'USD', new \Brick\Money\Context\DefaultContext()),
+        'currency' => 'EUR',
+        'locale' => 'fr_FR',
+      ],
     ];
 
     $testCases = [];
@@ -523,6 +528,15 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       ],
       $exampleTokens,
     ];
+    $testCases['crmMoney testing'] = [
+      'text/plain',
+      [
+        'Amount: {my_currencies.amount}' => 'Amount: $123.00',
+        'Amount as money: {my_currencies.amount|crmMoney}' => 'Amount as money: $123.00',
+        'Amount as money in France: {my_currencies.amount|crmMoney:"fr_FR"}' => 'Amount as money in France: 123,00 $US',
+      ],
+      $exampleTokens,
+    ];
     return $testCases;
   }
 
@@ -546,7 +560,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
         $p->addMessage('example', $inputMessage, $messageFormat);
         $p->addRow()
           ->format('text/plain')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_text']))
-          ->format('text/html')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_rich_text']));
+          ->format('text/html')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_rich_text']))
+          ->format('text/plain')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_currencies']));
         foreach ($p->evaluate()->getRows() as $row) {
           $this->assertEquals($expectOutput, $row->render('example'));
           $actualExampleCount++;
