@@ -338,6 +338,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     return TRUE;
   }
 
+  public function loadUser($username) {
+    $security = \Civi\Standalone\Security::singleton();
+    $user = $security->loadUserByName($username);
+    if ($user) {
+      $security->loginAuthenticatedUserRecord($user, TRUE);
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
   /**
    * @inheritdoc
    */

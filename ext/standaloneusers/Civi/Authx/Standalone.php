@@ -56,6 +56,8 @@ class Standalone implements AuthxInterface {
   public function loginStateless($userId) {
     global $loggedInUserId;
     $loggedInUserId = $userId;
+    global $loggedInUser;
+    $loggedInUser = \Civi\Standalone\Security::singleton()->loadUserByID($userId);
   }
 
   /**
