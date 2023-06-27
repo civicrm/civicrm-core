@@ -28,19 +28,8 @@ class Standalone implements AuthxInterface {
    * @inheritDoc
    */
   public function loginSession($userId) {
-    $this->loginStateless($userId);
-
-    $session = \CRM_Core_Session::singleton();
-    $session->set('ufID', $userId);
-
-    // Identify the contact
-    $contactID = civicrm_api3('UFMatch', 'get', [
-      'sequential' => 1,
-      'return' => ['contact_id'],
-      'uf_id' => $userId,
-    ])['values'][0]['contact_id'] ?? NULL;
-    // Confusingly, Civi stores it's *Contact* ID as *userId* on the session.
-    $session->set('userId', $contactID);
+    $user = Security::singleton()->loadUserByID($userId);
+    Security::singleton()->loginAuthenticatedUserRecord($user, TRUE);
   }
 
   /**
@@ -54,10 +43,8 @@ class Standalone implements AuthxInterface {
    * @inheritDoc
    */
   public function loginStateless($userId) {
-    global $loggedInUserId;
-    $loggedInUserId = $userId;
-    global $loggedInUser;
-    $loggedInUser = \Civi\Standalone\Security::singleton()->loadUserByID($userId);
+    $user = Security::singleton()->loadUserByID($userId);
+    Security::singleton()->loginAuthenticatedUserRecord($user, FALSE);
   }
 
   /**

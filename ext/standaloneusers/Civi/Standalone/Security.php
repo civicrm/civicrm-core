@@ -225,12 +225,22 @@ class Security {
    * Currently only used by CRM_Utils_System_Standalone::loadBootstrap
    */
   public function loginAuthenticatedUserRecord(array $user, bool $withSession) {
-    $authX = new \Civi\Authx\Standalone();
+    global $loggedInUserId, $loggedInUser;
+    $loggedInUserId = $user['id'];
+    $loggedInUser = \Civi\Standalone\Security::singleton()->loadUserByID($user['id']);
+
     if ($withSession) {
-      $authX->loginSession($user['id']);
-    }
-    else {
-      $authX->loginStateless($user['id']);
+      $session = \CRM_Core_Session::singleton();
+      $session->set('ufID', $user['id']);
+
+      // Identify the contact
+      $contactID = civicrm_api3('UFMatch', 'get', [
+        'sequential' => 1,
+        'return' => ['contact_id'],
+        'uf_id' => $user['id'],
+      ])['values'][0]['contact_id'] ?? NULL;
+      // Confusingly, Civi stores it's *Contact* ID as *userId* on the session.
+      $session->set('userId', $contactID);
     }
   }
 
