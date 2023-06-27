@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\County;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\StateProvince;
 use Civi\Api4\DedupeRuleGroup;
@@ -1621,15 +1622,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if ($key === 'address') {
         foreach ($value as $index => $address) {
           $stateProvinceID = $address['state_province_id'] ?? NULL;
+          $countyID = $address['county_id'] ?? NULL;
+          $countryID = $address['country_id'] ?? NULL;
           if ($stateProvinceID) {
             if (!is_numeric($stateProvinceID)) {
-              $params['address'][$index]['state_province_id'] = $this->tryToResolveStateProvince($stateProvinceID, $address['country_id'] ?? NULL);
+              $params['address'][$index]['state_province_id'] = $stateProvinceID = $this->tryToResolveStateProvince($stateProvinceID, $countryID);
             }
-            elseif (!empty($address['country_id']) && is_numeric($address['country_id'])) {
+            elseif ($countryID && is_numeric($countryID)) {
               if (!$this->checkStatesForCountry((int) $address['country_id'], [$stateProvinceID])) {
                 $params['address'][$index]['state_province_id'] = 'invalid_import_value';
               }
             }
+          }
+          if ($countyID && !is_numeric($countyID)) {
+            $params['address'][$index]['county_id'] = $this->tryToResolveCounty($countyID, $stateProvinceID, $countryID);
           }
         }
       }
@@ -1707,6 +1713,45 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       }
       $this->externalIdentifiers[] = $externalIdentifier;
     }
+  }
+
+  /**
+   * @param string $countyID
+   * @param string|int|null $stateProvinceID
+   * @param string|int|null $countryID
+   *
+   * @return string|int
+   * @throws \CRM_Core_Exception
+   */
+  private function tryToResolveCounty(string $countyID, $stateProvinceID, $countryID) {
+    $cacheString = $countryID . '_' . $stateProvinceID . '_' . $countyID;
+    if (!isset(\Civi::$statics[$cacheString])) {
+      $possibleCounties = $this->ambiguousOptions['county_id'][mb_strtolower($countyID)] ?? NULL;
+      if (!$possibleCounties || $countyID === 'invalid_import_value') {
+        \Civi::$statics[$cacheString] = $countyID;
+      }
+      else {
+        if ($stateProvinceID === NULL && $countryID === NULL) {
+          $countryID = \Civi::settings()->get('defaultContactCountry');
+        }
+        $countyLookUp = County::get(FALSE)
+          ->addWhere('id', 'IN', $possibleCounties);
+        if ($countryID && is_numeric($countryID)) {
+          $countyLookUp->addWhere('state_province_id.country_id', '=', $countryID);
+        }
+        if ($stateProvinceID && is_numeric($stateProvinceID)) {
+          $countyLookUp->addWhere('state_province_id', '=', $stateProvinceID);
+        }
+        $county = $countyLookUp->execute();
+        if (count($county) === 1) {
+          \Civi::$statics[$cacheString] = $county->first()['id'];
+        }
+        else {
+          \Civi::$statics[$cacheString] = 'invalid_import_value';
+        }
+      }
+    }
+    return \Civi::$statics[$cacheString];
   }
 
 }

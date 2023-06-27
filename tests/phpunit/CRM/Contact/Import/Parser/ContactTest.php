@@ -65,6 +65,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_openid', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship', 'civicrm_im', 'civicrm_website', 'civicrm_queue', 'civicrm_queue_item'], TRUE);
     RelationshipType::delete()->addWhere('name_a_b', '=', 'Dad to')->execute();
     ContactType::delete()->addWhere('name', '=', 'baby')->execute();
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "defaultContactCountry"');
     parent::tearDown();
   }
 
@@ -1348,11 +1349,19 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testImportCountryStateCounty(): void {
+    \Civi::settings()->set('defaultContactCountry', 1013);
     $countyID = County::create()->setValues([
       'name' => 'Farnell',
       'abbreviation' => '',
       'state_province_id' => 1640,
     ])->execute()->first()['id'];
+    // What if there are two counties with the same name?
+    County::create()->setValues([
+      'name' => 'Farnell',
+      'abbreviation' => '',
+      'state_province_id' => 1641,
+    ])->execute()->first()['id'];
+
     $childKey = $this->getRelationships()['Child of']['id'] . '_a_b';
     $addressCustomGroupID = $this->createCustomGroup(['extends' => 'Address', 'name' => 'Address']);
     $contactCustomGroupID = $this->createCustomGroup(['extends' => 'Contact', 'name' => 'Contact']);
