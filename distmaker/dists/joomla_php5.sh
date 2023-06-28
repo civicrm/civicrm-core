@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 P=`dirname $0`
 CFFILE=$P/../distmaker.conf
