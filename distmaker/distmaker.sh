@@ -238,10 +238,12 @@ if [ -d "$DM_SOURCEDIR/drupal-8" ]; then
   dm_git_checkout "$DM_SOURCEDIR/drupal-8" "$DM_REF_DRUPAL8"
 fi
 
-## Get fresh dependencies
-[ -d "$DM_SOURCEDIR/vendor" ] && rm -rf $DM_SOURCEDIR/vendor
-[ -d "$DM_SOURCEDIR/bower_components" ] && rm -rf $DM_SOURCEDIR/bower_components
-dm_generate_vendor "$DM_SOURCEDIR"
+if [ -z "$DM_KEEP_DEPS" ]; then
+  ## Get fresh dependencies
+  [ -d "$DM_SOURCEDIR/vendor" ] && rm -rf $DM_SOURCEDIR/vendor
+  [ -d "$DM_SOURCEDIR/bower_components" ] && rm -rf $DM_SOURCEDIR/bower_components
+  dm_generate_vendor "$DM_SOURCEDIR"
+fi
 
 # Before anything - regenerate DAOs
 

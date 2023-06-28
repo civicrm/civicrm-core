@@ -22,3 +22,12 @@ DM_REF_DRUPAL8=${DM_REF_CORE}
 DM_REF_JOOMLA=${DM_REF_CORE}
 DM_REF_WORDPRESS=${DM_REF_CORE}
 DM_REF_PACKAGES=${DM_REF_CORE}
+
+## Keep the existing git checkouts
+# DM_KEEP_GIT=1
+
+## Keep the existing dependencies
+# DM_KEEP_DEPS=1
+
+## Don't build Joomla's alt. Useful if you're frequently rebuilding Joomla for dev-test process.
+# DM_SKIP_ALT=1

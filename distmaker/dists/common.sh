@@ -258,6 +258,10 @@ function civicrmVersion( ) {
 ## Perform a hard checkout on a given report
 ## usage: dm_git_checkout <repo_path> <tree-ish>
 function dm_git_checkout() {
+  if [ -n "$DM_KEEP_GIT" ]; then
+    echo "Skip git checkout ($1 => $2)"
+    return
+  fi
   pushd "$1"
     git checkout .
     git checkout "$2"
