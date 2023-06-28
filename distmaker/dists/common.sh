@@ -10,6 +10,11 @@ function dm_reset_dirs() {
   mkdir -p "$@"
 }
 
+function dm_rsync() {
+  # ${DM_RSYNC:-rsync} -avC "$@"
+  ${DM_RSYNC:-rsync} -aC "$@"
+}
+
 ## Assert that a folder contains no symlinks
 ##
 ## ex: dev/core#1393, dev/core#1990
@@ -31,7 +36,7 @@ function dm_install_dir() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  ${DM_RSYNC:-rsync} -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
+  dm_rsync --exclude=.git --exclude=.svn "$from/./"  "$to/./"
 }
 
 ## Copy listed files
@@ -68,7 +73,7 @@ function dm_install_bower() {
   done
 
   [ ! -d "$to" ] && mkdir "$to"
-  ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
+  dm_rsync $excludes_rsync "$repo/./" "$to/./"
 }
 
 ## Copy all core files
@@ -112,7 +117,7 @@ function dm_install_coreext() {
 
   for relext in "$@" ; do
     [ ! -d "$to/ext/$relext" ] && mkdir -p "$to/ext/$relext"
-    ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/ext/$relext/./" "$to/ext/$relext/./"
+    dm_rsync $excludes_rsync --include=core "$repo/ext/$relext/./" "$to/ext/$relext/./"
   done
 }
 
@@ -140,7 +145,7 @@ function dm_install_packages() {
   ##   packages/Files packages/PHP packages/Text
 
   [ ! -d "$to" ] && mkdir "$to"
-  ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/./" "$to/./"
+  dm_rsync $excludes_rsync --include=core "$repo/./" "$to/./"
 }
 
 ## Copy Drupal-integration module
@@ -202,7 +207,7 @@ function dm_install_vendor() {
   done
 
   [ ! -d "$to" ] && mkdir "$to"
-  ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
+  dm_rsync $excludes_rsync "$repo/./" "$to/./"
   ## We don't this use CLI script in production, and the symlink breaks D7/BD URL installs
   dm_remove_files "$to" "bin/pscss" "bin/cssmin"
 }
@@ -215,7 +220,7 @@ function dm_install_wordpress() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  ${DM_RSYNC:-rsync} -avC \
+  dm_rsync \
     --exclude=.git \
     --exclude=.svn \
     --exclude=civicrm.config.php.wordpress \
