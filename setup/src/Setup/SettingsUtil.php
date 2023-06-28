@@ -77,12 +77,12 @@ class SettingsUtil {
    *   Evaluated template.
    */
   public static function evaluate(string $tplPath, array $params): string {
-    $str = file_get_contents($tplPath);
-    // FIXME: Use a single call to 'strtr($str, $vars)'
+    $template = file_get_contents($tplPath);
+    $vars = [];
     foreach ($params as $key => $value) {
-      $str = str_replace('%%' . $key . '%%', $value, $str);
+      $vars['%%' . $key . '%%'] = $value;
     }
-    return trim($str) . "\n";
+    return trim(strtr($template, $vars)) . "\n";
   }
 
 }
