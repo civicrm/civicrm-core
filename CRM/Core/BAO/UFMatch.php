@@ -551,13 +551,13 @@ AND    domain_id    = %4
     $query = "SELECT MAX(uf_id)+1 AS next_uf_id FROM civicrm_uf_match";
     $dao = CRM_Core_DAO::executeQuery($query);
     if ($dao->fetch()) {
-      $ufId = $dao->next_uf_id;
+      $ufID = $dao->next_uf_id;
     }
 
-    if (!isset($ufId)) {
-      $ufId = 1;
+    if (!isset($ufID)) {
+      $ufID = 1;
     }
-    return $ufId;
+    return $ufID;
   }
 
   /**

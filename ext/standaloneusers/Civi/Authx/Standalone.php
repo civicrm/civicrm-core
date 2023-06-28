@@ -31,7 +31,7 @@ class Standalone implements AuthxInterface {
     $this->loginStateless($userId);
 
     $session = \CRM_Core_Session::singleton();
-    $session->set('ufId', $userId);
+    $session->set('ufID', $userId);
 
     // Identify the contact
     $contactID = civicrm_api3('UFMatch', 'get', [
@@ -64,7 +64,7 @@ class Standalone implements AuthxInterface {
   public function getCurrentUserId() {
     global $loggedInUserId;
     if (empty($loggedInUserId) && session_status() === PHP_SESSION_ACTIVE) {
-      $loggedInUserId = \CRM_Core_Session::singleton()->get('ufId');
+      $loggedInUserId = \CRM_Core_Session::singleton()->get('ufID');
     }
     return $loggedInUserId;
   }

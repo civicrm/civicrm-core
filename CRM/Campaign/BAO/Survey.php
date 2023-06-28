@@ -837,8 +837,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       return NULL;
     }
 
-    static $ufIds = [];
-    if (!array_key_exists($surveyId, $ufIds)) {
+    static $ufIDs = [];
+    if (!array_key_exists($surveyId, $ufIDs)) {
       //get the profile id.
       $ufJoinParams = [
         'entity_id' => $surveyId,
@@ -849,14 +849,14 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       list($first, $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       if ($first) {
-        $ufIds[$surveyId] = [$first];
+        $ufIDs[$surveyId] = [$first];
       }
       if ($second) {
-        $ufIds[$surveyId][] = array_shift($second);
+        $ufIDs[$surveyId][] = array_shift($second);
       }
     }
 
-    return $ufIds[$surveyId] ?? NULL;
+    return $ufIDs[$surveyId] ?? NULL;
   }
 
   /**

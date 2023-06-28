@@ -376,8 +376,8 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
         //On subsequent honor_block_is_active uncheck, disable(don't delete)
         //that particular honoree profile entry in UFjoin table, CRM-13981
-        $ufId = CRM_Core_BAO_UFJoin::findJoinEntryId($ufJoinParam);
-        if ($ufId) {
+        $ufID = CRM_Core_BAO_UFJoin::findJoinEntryId($ufJoinParam);
+        if ($ufID) {
           $ufJoinParam['uf_group_id'] = CRM_Core_BAO_UFJoin::findUFGroupId($ufJoinParam);
           $ufJoinParam['is_active'] = 0;
           CRM_Core_BAO_UFJoin::create($ufJoinParam);

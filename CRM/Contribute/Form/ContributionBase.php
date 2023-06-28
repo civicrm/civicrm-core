@@ -961,12 +961,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           if (count($organizations)) {
             // Related org url - pass checksum if needed
             $args = [
-              'ufId' => $form->_values['onbehalf_profile_id'],
+              'ufID' => $form->_values['onbehalf_profile_id'],
               'cid' => '',
             ];
             if (!empty($_GET['cs'])) {
               $args = [
-                'ufId' => $form->_values['onbehalf_profile_id'],
+                'ufID' => $form->_values['onbehalf_profile_id'],
                 'uid' => $this->_contactID,
                 'cs' => $_GET['cs'],
                 'cid' => '',

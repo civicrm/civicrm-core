@@ -2520,7 +2520,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * Check whether a profile is valid combination of
    * required profile fields
    *
-   * @param array $ufId
+   * @param array $ufID
    *   Integer id of the profile.
    * @param array $required
    *   Array of fields those are required in the profile.
@@ -2528,17 +2528,17 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return array
    *   associative array of profiles
    */
-  public static function checkValidProfile($ufId, $required = NULL) {
+  public static function checkValidProfile($ufID, $required = NULL) {
     $validProfile = FALSE;
-    if (!$ufId) {
+    if (!$ufID) {
       return $validProfile;
     }
 
-    if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $ufId, 'is_active')) {
+    if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $ufID, 'is_active')) {
       return $validProfile;
     }
 
-    $profileFields = self::getFields($ufId, FALSE, CRM_Core_Action::VIEW, NULL,
+    $profileFields = self::getFields($ufID, FALSE, CRM_Core_Action::VIEW, NULL,
       NULL, FALSE, NULL, FALSE, NULL,
       CRM_Core_Permission::CREATE, NULL
     );

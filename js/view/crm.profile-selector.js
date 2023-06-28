@@ -110,9 +110,9 @@
       var profileSelectorView = this;
       var designerDialog = new CRM.Designer.DesignerDialog({
         findCreateUfGroupModel: function(options) {
-          var ufId = profileSelectorView.getUfGroupId();
+          var ufID = profileSelectorView.getUfGroupId();
           // Retrieve UF group and fields from the api
-          CRM.api('UFGroup', 'getsingle', {id: ufId, "api.UFField.get": 1}, {
+          CRM.api('UFGroup', 'getsingle', {id: ufID, "api.UFField.get": 1}, {
             success: function(formData) {
               // Note: With chaining, API returns some extraneous keys that aren't part of UFGroupModel
               var ufGroupModel = new CRM.UF.UFGroupModel(_.pick(formData, _.keys(CRM.UF.UFGroupModel.prototype.schema)));
@@ -132,9 +132,9 @@
       var profileSelectorView = this;
       var designerDialog = new CRM.Designer.DesignerDialog({
         findCreateUfGroupModel: function(options) {
-          var ufId = profileSelectorView.getUfGroupId();
+          var ufID = profileSelectorView.getUfGroupId();
           // Retrieve UF group and fields from the api
-          CRM.api('UFGroup', 'getsingle', {id: ufId, "api.UFField.get": 1}, {
+          CRM.api('UFGroup', 'getsingle', {id: ufID, "api.UFField.get": 1}, {
             success: function(formData) {
               // Note: With chaining, API returns some extraneous keys that aren't part of UFGroupModel
               var ufGroupModel = new CRM.UF.UFGroupModel(_.pick(formData, _.keys(CRM.UF.UFGroupModel.prototype.schema)));

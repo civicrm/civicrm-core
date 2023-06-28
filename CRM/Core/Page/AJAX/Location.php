@@ -32,7 +32,7 @@ class CRM_Core_Page_AJAX_Location {
    */
   public static function getPermissionedLocation() {
     $cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
-    $ufId = CRM_Utils_Request::retrieve('ufId', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
+    $ufID = CRM_Utils_Request::retrieve('ufID', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
 
     // Verify user id
     $user = CRM_Utils_Request::retrieve('uid', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, CRM_Core_Session::singleton()
@@ -54,7 +54,7 @@ class CRM_Core_Page_AJAX_Location {
 
     $addressSequence = array_flip(CRM_Utils_Address::sequence(\Civi::settings()->get('address_format')));
 
-    $profileFields = CRM_Core_BAO_UFGroup::getFields($ufId, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE,
+    $profileFields = CRM_Core_BAO_UFGroup::getFields($ufID, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE,
       NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
     );
     $website = CRM_Core_BAO_Website::getValues($entityBlock, $values);
