@@ -2,8 +2,10 @@
 // CRM-8358
 return CRM_Core_CodeGen_SqlData::create('civicrm_job')
   ->addDefaults([
+    'is_active' => 0,
     'domain_id' => new CRM_Utils_SQL_Literal('@domainID'),
     'last_run' => NULL,
+    'parameters' => NULL,
   ])
   ->addValues([
     [
@@ -13,7 +15,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_job')
       // FIXME: "to to"
       'api_entity' => 'job',
       'api_action' => 'version_check',
-      'parameters' => NULL,
       'is_active' => 1,
     ],
     [
@@ -22,8 +23,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_job')
       'description' => 'Sends out scheduled CiviMail mailings',
       'api_entity' => 'job',
       'api_action' => 'process_mailing',
-      'parameters' => NULL,
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Hourly',
@@ -31,8 +30,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_job')
       'description' => 'Fetches bounces from mailings and writes them to mailing statistics',
       'api_entity' => 'job',
       'api_action' => 'fetch_bounces',
-      'parameters' => NULL,
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Hourly',
@@ -40,8 +37,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_job')
       'description' => 'Inserts activity for a contact or a case by retrieving inbound emails from a mail directory',
       'api_entity' => 'job',
       'api_action' => 'fetch_activities',
-      'parameters' => NULL,
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Daily',
@@ -50,7 +45,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_job')
       'api_entity' => 'job',
       'api_action' => 'process_pledge',
       'parameters' => 'send_reminders=[1 or 0] optional- 1 to send payment reminders',
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Daily',
@@ -63,7 +57,6 @@ parse=[1 or 0] required
 start=[contact ID] optional-begin with this contact ID
 end=[contact ID] optional-process contacts with IDs less than this
 throttle=[1 or 0] optional-1 adds five second sleep',
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Daily',
@@ -75,7 +68,6 @@ throttle=[1 or 0] optional-1 adds five second sleep',
 gt=[email_greeting or postal_greeting or addressee] required
 force=[0 or 1] optional-0 update contacts with null value, 1 update all
 limit=Number optional-Limit the number of contacts to update',
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Daily',
@@ -85,7 +77,6 @@ limit=Number optional-Limit the number of contacts to update',
       'api_action' => 'mail_report',
       'parameters' => 'instanceId=[ID of report instance] required
 format=[csv or print] optional-output CSV or print-friendly HTML, else PDF',
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Hourly',
@@ -93,8 +84,6 @@ format=[csv or print] optional-output CSV or print-friendly HTML, else PDF',
       'description' => 'Sends out scheduled reminders via email',
       'api_entity' => 'job',
       'api_action' => 'send_reminder',
-      'parameters' => NULL,
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Always',
@@ -102,8 +91,6 @@ format=[csv or print] optional-output CSV or print-friendly HTML, else PDF',
       'description' => 'Updates pending event participant statuses based on time',
       'api_entity' => 'job',
       'api_action' => 'process_participant',
-      'parameters' => NULL,
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Daily',
@@ -111,8 +98,6 @@ format=[csv or print] optional-output CSV or print-friendly HTML, else PDF',
       'description' => 'Updates membership statuses. WARNING: Membership renewal reminders have been migrated to the Schedule Reminders functionality, which supports multiple renewal reminders.',
       'api_entity' => 'job',
       'api_action' => 'process_membership',
-      'parameters' => NULL,
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Always',
@@ -120,8 +105,6 @@ format=[csv or print] optional-output CSV or print-friendly HTML, else PDF',
       'description' => 'Releases reserved survey respondents when they have been reserved for longer than the Release Frequency days specified for that survey.',
       'api_entity' => 'job',
       'api_action' => 'process_respondent',
-      'parameters' => NULL,
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Hourly',
@@ -129,8 +112,6 @@ format=[csv or print] optional-output CSV or print-friendly HTML, else PDF',
       'description' => 'Removes temporary data and files, and clears old data from cache tables. Recommend running this job every hour to help prevent database and file system bloat.',
       'api_entity' => 'job',
       'api_action' => 'cleanup',
-      'parameters' => NULL,
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Always',
@@ -138,8 +119,6 @@ format=[csv or print] optional-output CSV or print-friendly HTML, else PDF',
       'description' => 'Sends out scheduled SMS',
       'api_entity' => 'job',
       'api_action' => 'process_sms',
-      'parameters' => NULL,
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Always',
@@ -148,7 +127,6 @@ format=[csv or print] optional-output CSV or print-friendly HTML, else PDF',
       'api_entity' => 'job',
       'api_action' => 'group_rebuild',
       'parameters' => 'limit=Number optional-Limit the number of smart groups rebuild',
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Daily',
@@ -156,8 +134,6 @@ format=[csv or print] optional-output CSV or print-friendly HTML, else PDF',
       'description' => 'Disables relationships that have expired (ie. those relationships whose end date is in the past).',
       'api_entity' => 'job',
       'api_action' => 'disable_expired_relationships',
-      'parameters' => NULL,
-      'is_active' => 0,
     ],
     [
       'run_frequency' => 'Daily',
@@ -166,6 +142,5 @@ format=[csv or print] optional-output CSV or print-friendly HTML, else PDF',
       'api_entity' => 'mailing',
       'api_action' => 'update_email_resetdate',
       'parameters' => 'minDays, maxDays=Consider mailings that have completed between minDays and maxDays',
-      'is_active' => 0,
     ],
   ]);

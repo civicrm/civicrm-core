@@ -1,6 +1,11 @@
 <?php
 
 return CRM_Core_CodeGen_SqlData::create('civicrm_membership_status')
+  ->addDefaults([
+    'is_active' => 1,
+    'is_default' => 0,
+    'is_admin' => 0,
+  ])
   ->addValues([
     [
       'name' => 'New',
@@ -12,10 +17,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_membership_status')
       'end_event_adjust_unit' => 'month',
       'end_event_adjust_interval' => 3,
       'is_current_member' => 1,
-      'is_admin' => 0,
       'weight' => 1,
-      'is_default' => 0,
-      'is_active' => 1,
       'is_reserved' => 0,
     ],
     [
@@ -28,10 +30,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_membership_status')
       'end_event_adjust_unit' => NULL,
       'end_event_adjust_interval' => NULL,
       'is_current_member' => 1,
-      'is_admin' => 0,
       'weight' => 2,
       'is_default' => 1,
-      'is_active' => 1,
       'is_reserved' => 0,
     ],
     [
@@ -44,10 +44,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_membership_status')
       'end_event_adjust_unit' => 'month',
       'end_event_adjust_interval' => 1,
       'is_current_member' => 1,
-      'is_admin' => 0,
       'weight' => 3,
-      'is_default' => 0,
-      'is_active' => 1,
       'is_reserved' => 0,
     ],
     [
@@ -60,10 +57,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_membership_status')
       'end_event_adjust_unit' => NULL,
       'end_event_adjust_interval' => NULL,
       'is_current_member' => 0,
-      'is_admin' => 0,
       'weight' => 4,
-      'is_default' => 0,
-      'is_active' => 1,
       'is_reserved' => 0,
     ],
     [
@@ -76,10 +70,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_membership_status')
       'end_event_adjust_unit' => NULL,
       'end_event_adjust_interval' => NULL,
       'is_current_member' => 0,
-      'is_admin' => 0,
       'weight' => 5,
-      'is_default' => 0,
-      'is_active' => 1,
       'is_reserved' => 1,
     ],
     [
@@ -92,10 +83,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_membership_status')
       'end_event_adjust_unit' => NULL,
       'end_event_adjust_interval' => NULL,
       'is_current_member' => 0,
-      'is_admin' => 0,
       'weight' => 6,
-      'is_default' => 0,
-      'is_active' => 1,
       'is_reserved' => 1,
     ],
     [
@@ -110,8 +98,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_membership_status')
       'is_current_member' => 0,
       'is_admin' => 1,
       'weight' => 7,
-      'is_default' => 0,
-      'is_active' => 1,
       'is_reserved' => 1,
     ],
   ]);
