@@ -459,6 +459,25 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
     // Create parent job if not yet created.
     // Condition on the existence of a scheduled date.
     if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
+
+      if (!isset($params['is_completed']) || $params['is_completed'] !== 1) {
+        $mailingGroups = \Civi\Api4\MailingGroup::get()
+          ->addSelect('group.id')
+          ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
+          ->addWhere('mailing_id', '=', $mailing->id)
+          ->addWhere('entity_table', '=', 'civicrm_group')
+          ->addWhere('group_type', 'IN', ['Include', 'Exclude'])
+          ->addClause('OR', ['group.saved_search_id', 'IS NOT NULL'], ['group.children', 'IS NOT NULL'])
+          ->execute();
+        foreach ($mailingGroups as $mailingGroup) {
+          CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($mailingGroup['group.id']);
+          $group = new CRM_Contact_DAO_Group();
+          $group->find(TRUE);
+          $group->id = $mailingGroup['group.id'];
+          CRM_Contact_BAO_GroupContactCache::load($group);
+        }
+      }
+
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $mailing->id;
       // If we are creating a new Completed mailing (e.g. import from another system) set the job to completed.
