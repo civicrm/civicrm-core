@@ -10,7 +10,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_location_type')
       'display_name' => ts('Home'),
       'vcard_name' => 'HOME',
       'description' => ts('Place of residence'),
-      'is_reserved' => 0,
       'is_default' => 1,
     ],
     [
@@ -18,21 +17,18 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_location_type')
       'display_name' => ts('Work'),
       'vcard_name' => 'WORK',
       'description' => ts('Work location'),
-      'is_reserved' => 0,
     ],
     [
       'name' => ts('Main'),
       'display_name' => ts('Main'),
       'vcard_name' => NULL,
       'description' => ts('Main office location'),
-      'is_reserved' => 0,
     ],
     [
       'name' => ts('Other'),
       'display_name' => ts('Other'),
       'vcard_name' => NULL,
       'description' => ts('Other location'),
-      'is_reserved' => 0,
     ],
     // -- the following location must stay with the untranslated Billing name, CRM-2064
     [
@@ -46,5 +42,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_location_type')
   ->addDefaults([
     'is_active' => 1,
     'is_default' => NULL,
+    'is_reserved' => 0,
     // FIXME: Doesn't 0 make more sense than NULL?
   ]);
