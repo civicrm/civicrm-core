@@ -3,7 +3,7 @@
 /***Structure****
     Variables (comment out your subtheme)
         - Finsbury Park
-        - Jerry Seinfeld 
+        - Jerry Seinfeld
         - Shoreditch (soon)
         - Aah (soon)
     Resets
@@ -11,10 +11,10 @@
 ****************/
 
 /***************
-    Variables 
+    Variables
 ****************/
 
-/* Finsbury Park 
+/* Finsbury Park
 
 :root {
     --roundness: 0.25rem;
@@ -39,7 +39,7 @@
     --button-background: #f0f0f0;
 }
 
-/* Shoreditch 
+/* Shoreditch
 
 :root {
     --roundness: 2px;
@@ -89,7 +89,7 @@
     --button-background: #2c98ed;
 }
 
-/* Ffresh 
+/* Ffresh
 
 :root {
     --roundness: 2rem;
@@ -115,7 +115,7 @@
 }
 
 /***************
-    Base 
+    Base
 ****************/
 
 body {
@@ -141,7 +141,7 @@ a:hover, a:focus {
 }
 
 /***************
-    UI Elements 
+    UI Elements
 ****************/
 
 #crm-container.standalone-entry .mid-block {
@@ -249,25 +249,38 @@ document.addEventListener('DOMContentLoaded', () => {
         username = document.getElementById('usernameInput'),
         password = document.getElementById('passwordInput');
 
-  submitBtn.addEventListener('click', e => {
-    e.preventDefault();  
+  submitBtn.addEventListener('click', async e => {
+    e.preventDefault();
 
-    fetch(CRM.url("civicrm/authx/login"), {
+    const response = await fetch(CRM.url("civicrm/authx/login"), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       //body: '_authx=Basic ' + btoa(encodeURIComponent(`${username.value}:${password.value}`))
       body: '_authx=Basic ' + encodeURIComponent(btoa(`${username.value}:${password.value}`))
-    })
-    .then(response => response.json()) // <<<---note this
-    .then(data => {
-      console.log(data);
-      window.location = '/civicrm/';
     });
+    if (!response.ok) {
+      const contentType = response.headers.get("content-type");
+      let msg = 'Unexpected error';
+      if (!contentType || !contentType.includes("application/json")) {
+        // Non-JSON response; an error.
+        msg = await response.text();
+        // Example error string: 'HTTP 401 Invalid credential'
+        msg = msg.replace(/^HTTP \d{3} /,'');
+      }
+      else {
+        let responseObj = await response.json();
+        console.log("responseObj with error", responseObj);
+      }
+      alert(`Sorry, that didn‘t work. ${msg}`);
+    }
+    else {
+      // OK response (it includes contact_id and user_id in JSON, but we don't need those)
+      window.location = '/civicrm/';
+    }
   });
 });
-
 /* (function($) { */
 /*     var request = new XMLHttpRequest(); */
 /*     request.open("POST", ); */
