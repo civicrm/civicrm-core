@@ -276,6 +276,9 @@ function dm_git_checkout() {
 ## Download a Civi extension
 ## usage: dm_install_cvext <full-ext-key> <target-path>
 function dm_install_cvext() {
+  if [ -n "$DM_SKIP_EXT" ]; then
+    return
+  fi
   # cv dl -b '@https://civicrm.org/extdir/ver=4.7.25|cms=Drupal/com.iatspayments.civicrm.xml' --destination=$PWD/iatspayments
   cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION|cms=Drupal/$1.xml" --to="$2"
 }
