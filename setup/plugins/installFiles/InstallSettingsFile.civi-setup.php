@@ -60,6 +60,11 @@ if (!defined('CIVI_SETUP')) {
  */
 \Civi\Setup::dispatcher()
   ->addListener('civi.setup.installFiles', function (\Civi\Setup\Event\InstallFilesEvent $e) {
+    if ($e->getModel()->cms === 'Joomla') {
+      // Complicated. Another plugin will do it.
+      return;
+    }
+
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'installFiles'));
 
     /**
