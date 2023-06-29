@@ -1051,8 +1051,8 @@ class CRM_Core_CodeGen_GenerateData {
    * @return string
    */
   private function _individualEmail($contact, $domain = NULL) {
-    $first = $contact->first_name;
-    $last = $contact->last_name;
+    $first = $contact->first_name ?? ($this->probability(.5) ? $this->randomItem('male_name') : $this->randomItem('female_name'));
+    $last = $contact->last_name ?? $this->randomItem('last_name');
     $f = $first[0];
     $l = $last[0];
     $m = $contact->middle_name ? $contact->middle_name[0] . '.' : '';
