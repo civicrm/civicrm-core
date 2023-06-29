@@ -40,7 +40,7 @@ CREATE TABLE `civicrm_role` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Role ID',
   `name` varchar(64) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `index_name`(name)
+  UNIQUE INDEX `UI_name`(name)
 )
 ENGINE=InnoDB;
 
@@ -69,7 +69,7 @@ ENGINE=InnoDB;
 -- *******************************************************/
 CREATE TABLE `civicrm_user` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique User ID',
-  `contact_id` int unsigned COMMENT 'FK to Contact',
+  `contact_id` int unsigned COMMENT 'FK to Contact - possibly redundant',
   `username` varchar(60) NOT NULL,
   `password` varchar(128) NOT NULL COMMENT 'Hashed password',
   `email` varchar(255) NOT NULL COMMENT 'Email (e.g. for password resets)',
@@ -78,9 +78,9 @@ CREATE TABLE `civicrm_user` (
   `when_updated` timestamp NULL,
   `is_active` tinyint NOT NULL DEFAULT 1,
   `timezone` varchar(32) NULL COMMENT 'User\'s timezone',
-  `language` varchar(12) NULL COMMENT 'User\'s language',
+  `language` int unsigned COMMENT 'The language for the user.',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `index_username`(username),
+  UNIQUE INDEX `UI_username`(username),
   CONSTRAINT FK_civicrm_user_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
 )
 ENGINE=InnoDB;

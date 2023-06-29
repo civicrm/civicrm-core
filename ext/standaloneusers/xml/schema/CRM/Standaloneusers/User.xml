@@ -9,6 +9,10 @@
   <searchField>username</searchField>
   <descriptionField>email</descriptionField>
   <log>true</log>
+  <paths>
+    <add>civicrm/user</add>
+    <update>civicrm/user/#?User1=[id]</update>
+  </paths>
 
   <field>
     <name>id</name>
@@ -37,10 +41,14 @@
   </foreignKey>
 
   <field>
+    <label>Username</label>
     <name>username</name>
     <required>true</required>
     <type>varchar</type>
     <length>60</length>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <index>
     <name>UI_username</name>
@@ -62,6 +70,9 @@
     <required>true</required>
     <length>255</length>
     <comment>Email (e.g. for password resets)</comment>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
 
   <field>
@@ -87,6 +98,9 @@
     <type>boolean</type>
     <default>1</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
 
   <field>
@@ -95,6 +109,9 @@
     <length>32</length>
     <required>false</required>
     <comment>User's timezone</comment>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
 
   <field>
