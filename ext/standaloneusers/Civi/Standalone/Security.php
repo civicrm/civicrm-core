@@ -239,8 +239,8 @@ class Security {
         'return' => ['contact_id'],
         'uf_id' => $user['id'],
       ])['values'][0]['contact_id'] ?? NULL;
-      // Confusingly, Civi stores it's *Contact* ID as *userId* on the session.
-      $session->set('userId', $contactID);
+      // Confusingly, Civi stores it's *Contact* ID as *userID* on the session.
+      $session->set('userID', $contactID);
     }
   }
 
