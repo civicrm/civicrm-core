@@ -759,8 +759,11 @@
             ctrl.ngModel.$render = function() {
               // Trigger change so the Select2 renders the current value,
               // but only if the value has actually changed (to avoid recursion)
-              if (!angular.equals(ctrl.ngModel.$viewValue || '', element.val())) {
-                element.val(ctrl.ngModel.$viewValue || '').change();
+              // We need to coerce null|false in the model to '' and numbers to strings.
+              // We need 0 not to be equivalent to null|false|''
+              const newValue = (ctrl.ngModel.$viewValue === null || ctrl.ngModel.$viewValue === undefined || ctrl.ngModel.$viewValue === false) ? '' : ctrl.ngModel.$viewValue.toString();
+              if (newValue !== element.val().toString()) {
+                element.val(newValue).change();
               }
             };
 
