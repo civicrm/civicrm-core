@@ -3,32 +3,6 @@
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
-  // using a temporary alternate path to avoid breaking legacy path
-  [
-    'name' => 'Navigation_Find_Contacts',
-    'entity' => 'Navigation',
-    'cleanup' => 'unused',
-    'update' => 'unmodified',
-    'params' => [
-      'version' => 4,
-      'values' => [
-        'domain_id' => 'current_domain',
-        'label' => E::ts('Find Contacts'),
-        'name' => 'Find Contacts',
-        'url' => 'civicrm/adminui/contact/search',
-        'icon' => NULL,
-        'permission' => NULL,
-        'permission_operator' => '',
-        'parent_id.name' => 'Search',
-        'is_active' => TRUE,
-        'has_separator' => NULL,
-        'weight' => 1,
-      ],
-      'match' => [
-        'name',
-      ],
-    ],
-  ],
   [
     'name' => 'SavedSearch_Find_Contacts',
     'entity' => 'SavedSearch',
