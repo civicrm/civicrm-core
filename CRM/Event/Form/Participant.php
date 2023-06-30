@@ -1492,7 +1492,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $form->_action);
         }
         else {
-          $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+          $financialTypes = CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'create');
         }
 
         $form->add('select', 'financial_type_id',
@@ -1504,7 +1504,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
         $form->add('select', 'payment_instrument_id',
           ts('Payment Method'),
-          ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument(),
+          ['' => ts('- select -')] + CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'create'),
           FALSE, ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);"]
         );
         // don't show transaction id in batch update mode
