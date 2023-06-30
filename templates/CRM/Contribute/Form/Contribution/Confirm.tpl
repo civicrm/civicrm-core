@@ -26,7 +26,7 @@
     <div class="bold pay_later_receipt-section">{$pay_later_receipt}</div>
   {/if}
 
-  {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="confirmContribution"}
+  {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl"}
 
   {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $isDisplayLineItems and $lineItem ) }
     <div class="crm-group amount_display-group">
