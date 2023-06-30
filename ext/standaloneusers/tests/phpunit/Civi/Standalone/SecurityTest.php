@@ -75,22 +75,22 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     // Create a custom role
     $roleID = \Civi\Api4\OptionValue::create(FALSE)
-    ->setValues([
-      'option_group_id.name' => 'role',
-      'name' => 'demo_role',
-      'label' => 'demo_role',
-    ])->execute()->first()['value'];
+      ->setValues([
+        'option_group_id.name' => 'role',
+        'name' => 'demo_role',
+        'label' => 'demo_role',
+      ])->execute()->first()['value'];
 
     // Give our user this role only.
     \Civi\Api4\User::update(FALSE)
-    ->addValue('roles', [$roleID])
-    ->addWhere('id', '=', $userID)
-    ->execute();
+      ->addValue('roles', [$roleID])
+      ->addWhere('id', '=', $userID)
+      ->execute();
 
     $existingPermissions = \Civi\Api4\RolePermission::get(FALSE)
-    ->selectRowCount()
-    ->addWhere('role_id', '=', $demoRoleID)
-    ->execute()->count();
+      ->selectRowCount()
+      ->addWhere('role_id', '=', $demoRoleID)
+      ->execute()->count();
     $this->assertEquals(0, $existingPermissions);
 
     // Assign some permissions to the role.

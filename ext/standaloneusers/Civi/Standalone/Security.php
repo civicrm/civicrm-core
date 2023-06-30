@@ -74,7 +74,7 @@ class Security {
     // @todo handle anonymous permissions!
 
     $roleIDs = \Civi\Api4\User::get(FALSE)->addWhere('id', '=', $userID)
-               ->addSelect('roles')->execute()->first()['roles'];
+      ->addSelect('roles')->execute()->first()['roles'];
 
     // artfulrobot: I think we should cache these per request, e.g. Civi::$statics?
     // except in testing permissions shouldn't change during a request. @todo

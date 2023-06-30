@@ -40,7 +40,8 @@ if (!defined('CIVI_SETUP')) {
 
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'installDatabase'));
 
-    $roleID = 1; // admin should always be role 1 on install.
+    // admin should always be role 1 on install.
+    $roleID = 1;
 
     // @todo I expect there's a better way than this; this doesn't even bring in all the permissions.
     $records = [['permission' => 'authenticate with password']];
@@ -72,9 +73,9 @@ if (!defined('CIVI_SETUP')) {
 
     // Assign 'admin' role to user
     \Civi\Api4\User::update(FALSE)
-    ->addWhere('id', '=', $userID)
-    ->addValue('roles', [$roleID])
-    ->execute();
+      ->addWhere('id', '=', $userID)
+      ->addValue('roles', [$roleID])
+      ->execute();
 
     $message = "Created new user \"{$e->getModel()->extras['adminUser']}\" (user ID #$userID, contact ID #$contactID) with 'admin' role and ";
     $message .= empty($e->getModel()->extras['adminPassWasSpecified'])
