@@ -25,6 +25,8 @@
  */
 class CRM_Note_Form_Note extends CRM_Core_Form {
 
+  use CRM_Core_Form_EntityFormTrait;
+
   /**
    * The table name, used when editing/creating a note
    *
@@ -38,13 +40,6 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * @var int
    */
   protected $_entityId;
-
-  /**
-   * The note id, used when editing the note
-   *
-   * @var int
-   */
-  protected $_id;
 
   /**
    * The parent note id, used when adding a comment to a note
@@ -192,6 +187,9 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
 
     $ids = [];
     $note = CRM_Core_BAO_Note::add($params, $ids);
+
+    // Required for postProcess hooks
+    $this->setEntityId($note->id);
 
     CRM_Core_Session::setStatus(ts('Your Note has been saved.'), ts('Saved'), 'success');
   }
