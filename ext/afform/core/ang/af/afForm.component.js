@@ -116,7 +116,9 @@
           if (url.indexOf('civicrm/') === 0) {
             url = CRM.url(url);
           } else if (url.indexOf('/') === 0) {
-            url = $location.protocol() + '://' + $location.host() + url;
+            let port = $location.port();
+            port = port ? `:${port}` : '';
+            url = `${$location.protocol()}://${$location.host()}${port}${url}`;
           }
           $window.location.href = url;
         }
