@@ -72,12 +72,15 @@ class Security {
     }
 
     // @todo handle anonymous permissions!
-    // No permissions yet; load them now.
+
+    $roleIDs = \Civi\Api4\User::get(FALSE)->addWhere('id', '=', $userID)
+               ->addSelect('roles')->execute()->first()['roles'];
+
+    // artfulrobot: I think we should cache these per request, e.g. Civi::$statics?
+    // except in testing permissions shouldn't change during a request. @todo
     $found = \Civi\Api4\RolePermission::get(FALSE)
       ->selectRowCount()
-      ->addJoin('UserRole AS user_role', 'INNER',
-        ['role_id', '=', 'user_role.role_id'],
-        ['user_role.user_id', '=', $userID])
+      ->addWhere('role_id', 'IN', $roleIDs)
       ->addWhere('permission', '=', $permissionName)
       ->execute()->countMatched();
     return (bool) $found;

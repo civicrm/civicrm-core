@@ -24,14 +24,11 @@
   <field>
     <name>role_id</name>
     <type>int unsigned</type>
-    <comment>FK to Role</comment>
+    <comment>FK to a role option value</comment>
+    <pseudoconstant>
+      <optionGroupName>role</optionGroupName>
+    </pseudoconstant>
   </field>
-  <foreignKey>
-    <name>role_id</name>
-    <table>civicrm_role</table>
-    <key>id</key>
-    <onDelete>CASCADE</onDelete>
-  </foreignKey>
 
   <field>
     <name>permission</name>

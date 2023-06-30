@@ -17,10 +17,8 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 
-DROP TABLE IF EXISTS `civicrm_user_role`;
 DROP TABLE IF EXISTS `civicrm_user`;
 DROP TABLE IF EXISTS `civicrm_role_permission`;
-DROP TABLE IF EXISTS `civicrm_role`;
 
 SET FOREIGN_KEY_CHECKS=1;
 -- /*******************************************************
@@ -31,21 +29,6 @@ SET FOREIGN_KEY_CHECKS=1;
 
 -- /*******************************************************
 -- *
--- * civicrm_role
--- *
--- * Permissions are assigned to roles which are assigned to users
--- *
--- *******************************************************/
-CREATE TABLE `civicrm_role` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Role ID',
-  `name` varchar(64) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `UI_name`(name)
-)
-ENGINE=InnoDB;
-
--- /*******************************************************
--- *
 -- * civicrm_role_permission
 -- *
 -- * Assigns permissions to roles
@@ -53,10 +36,9 @@ ENGINE=InnoDB;
 -- *******************************************************/
 CREATE TABLE `civicrm_role_permission` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique RolePermission ID',
-  `role_id` int unsigned COMMENT 'FK to Role',
+  `role_id` int unsigned COMMENT 'FK to a role option value',
   `permission` varchar(60) NOT NULL COMMENT 'A single permission granted to this role',
-  PRIMARY KEY (`id`),
-  CONSTRAINT FK_civicrm_role_permission_role_id FOREIGN KEY (`role_id`) REFERENCES `civicrm_role`(`id`) ON DELETE CASCADE
+  PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB;
 
@@ -73,6 +55,7 @@ CREATE TABLE `civicrm_user` (
   `username` varchar(60) NOT NULL,
   `password` varchar(128) NOT NULL COMMENT 'Hashed password',
   `email` varchar(255) NOT NULL COMMENT 'Email (e.g. for password resets)',
+  `roles` varchar(128) COMMENT 'FK to values from OptionGroup role',
   `when_created` timestamp DEFAULT CURRENT_TIMESTAMP,
   `when_last_accessed` timestamp NULL,
   `when_updated` timestamp NULL,
@@ -82,23 +65,5 @@ CREATE TABLE `civicrm_user` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `UI_username`(username),
   CONSTRAINT FK_civicrm_user_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
-)
-ENGINE=InnoDB;
-
--- /*******************************************************
--- *
--- * civicrm_user_role
--- *
--- * Assigns Roles to Users
--- *
--- *******************************************************/
-CREATE TABLE `civicrm_user_role` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique UserRole ID',
-  `user_id` int unsigned COMMENT 'FK to User',
-  `role_id` int unsigned COMMENT 'FK to role',
-  PRIMARY KEY (`id`),
-  INDEX `index_user_role`(user_id, role_id),
-  CONSTRAINT FK_civicrm_user_role_user_id FOREIGN KEY (`user_id`) REFERENCES `civicrm_user`(`id`) ON DELETE CASCADE,
-  CONSTRAINT FK_civicrm_user_role_role_id FOREIGN KEY (`role_id`) REFERENCES `civicrm_role`(`id`) ON DELETE CASCADE
 )
 ENGINE=InnoDB;

@@ -30,6 +30,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   protected $contactID;
   protected $userID;
 
+  const ADMIN_ROLE_ID = 1;
+
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
     \Civi\Test::e2e()
@@ -70,14 +72,26 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
   public function testPerms() {
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
-    // Create role,
-    $roleID = \Civi\Api4\Role::create(FALSE)
-      ->setValues(['name' => 'staff'])->execute()->first()['id'];
-    $this->assertGreaterThan(0, $roleID);
 
-    // Assign role to user
-    \Civi\Api4\UserRole::create(FALSE)
-      ->setValues(['user_id' => $userID, 'role_id' => $roleID])->execute();
+    // Create a custom role
+    $roleID = \Civi\Api4\OptionValue::create(FALSE)
+    ->setValues([
+      'option_group_id.name' => 'role',
+      'name' => 'demo_role',
+      'label' => 'demo_role',
+    ])->execute()->first()['value'];
+
+    // Give our user this role only.
+    \Civi\Api4\User::update(FALSE)
+    ->addValue('roles', [$roleID])
+    ->addWhere('id', '=', $userID)
+    ->execute();
+
+    $existingPermissions = \Civi\Api4\RolePermission::get(FALSE)
+    ->selectRowCount()
+    ->addWhere('role_id', '=', $demoRoleID)
+    ->execute()->count();
+    $this->assertEquals(0, $existingPermissions);
 
     // Assign some permissions to the role.
     \Civi\Api4\RolePermission::save(FALSE)
@@ -140,6 +154,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->assertGreaterThan(0, $userID);
     $this->contactID = $contactID;
     $this->userID = $userID;
+
     return [$contactID, $userID, $security];
   }
 

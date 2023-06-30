@@ -76,6 +76,21 @@
   </field>
 
   <field>
+    <name>roles</name>
+    <type>varchar</type>
+    <title>Roles</title>
+    <length>128</length>
+    <comment>FK to values from OptionGroup role</comment>
+    <pseudoconstant>
+      <optionGroupName>role</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
+  </field>
+
+  <field>
     <name>when_created</name>
     <type>timestamp</type>
     <default>CURRENT_TIMESTAMP</default>

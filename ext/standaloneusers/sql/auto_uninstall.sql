@@ -15,9 +15,7 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 
-DROP TABLE IF EXISTS `civicrm_user_role`;
 DROP TABLE IF EXISTS `civicrm_user`;
 DROP TABLE IF EXISTS `civicrm_role_permission`;
-DROP TABLE IF EXISTS `civicrm_role`;
 
 SET FOREIGN_KEY_CHECKS=1;
