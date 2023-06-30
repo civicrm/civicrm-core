@@ -183,7 +183,7 @@ class CRM_Mailing_Event_BAO_MailingEventForward extends CRM_Mailing_Event_DAO_Ma
       $successfulForward = TRUE;
       // Register the delivery event.
 
-      CRM_Mailing_Event_BAO_MailingEventDelivered::create($params);
+      CRM_Mailing_Event_BAO_MailingEventDelivered::recordDelivery($params);
     }
 
     $transaction->commit();
