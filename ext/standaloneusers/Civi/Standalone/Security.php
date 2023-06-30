@@ -227,7 +227,7 @@ class Security {
   public function loginAuthenticatedUserRecord(array $user, bool $withSession) {
     global $loggedInUserId, $loggedInUser;
     $loggedInUserId = $user['id'];
-    $loggedInUser = \Civi\Standalone\Security::singleton()->loadUserByID($user['id']);
+    $loggedInUser = $user;
 
     if ($withSession) {
       $session = \CRM_Core_Session::singleton();
