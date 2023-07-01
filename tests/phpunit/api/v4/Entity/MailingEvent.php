@@ -103,15 +103,15 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
         'records' => [
           ['event_queue_id' => $queueIDs[0], 'org_unsubscribe' => 0],
           ['event_queue_id' => $queueIDs[0], 'org_unsubscribe' => 0],
-          ['event_queue_id' => $queueIDs[0], 'org_unsubscribe' => 1],
-          ['event_queue_id' => $queueIDs[0], 'org_unsubscribe' => 1],
+          ['event_queue_id' => $queueIDs[1], 'org_unsubscribe' => 1],
           ['event_queue_id' => $queueIDs[1], 'org_unsubscribe' => 1],
         ],
       ]);
 
     $mailings = \Civi\Api4\Mailing::get(FALSE)
-      ->addSelect('stats_intended_recipients', 'stats_successful', 'stats_opens_total', 'stats_opens_unique', 'stats_clicks_total',
-        'stats_clicks_unique', 'stats_bounces', 'stats_unsubscribes', 'stats_optouts', 'stats_forwards', 'stats_replies')
+      ->addSelect('stats_intended_recipients', 'stats_successful', 'stats_opens_total', 'stats_opens_unique',
+        'stats_clicks_total', 'stats_clicks_unique', 'stats_bounces', 'stats_unsubscribes', 'stats_optouts',
+        'stats_optouts_and_unsubscribes', 'stats_forwards', 'stats_replies')
       ->addWhere('id', 'IN', [$mid1, $mid2])
       ->addOrderBy('id', 'ASC')
       ->execute();
@@ -136,8 +136,10 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(0, $mailings[1]['stats_replies']);
     $this->assertEquals(1, $mailings[0]['stats_unsubscribes']);
     $this->assertEquals(0, $mailings[1]['stats_unsubscribes']);
-    $this->assertEquals(2, $mailings[0]['stats_optouts']);
+    $this->assertEquals(1, $mailings[0]['stats_optouts']);
     $this->assertEquals(0, $mailings[1]['stats_optouts']);
+    $this->assertEquals(2, $mailings[0]['stats_optouts_and_unsubscribes']);
+    $this->assertEquals(0, $mailings[1]['stats_optouts_and_unsubscribes']);
   }
 
 }

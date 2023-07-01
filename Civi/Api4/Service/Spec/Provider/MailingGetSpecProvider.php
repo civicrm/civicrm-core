@@ -99,6 +99,14 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
       ->setSqlRenderer([__CLASS__, 'countMailingEvents']);
     $spec->addFieldSpec($field);
 
+    $field = new FieldSpec('stats_optouts_and_unsubscribes', 'Mailing', 'Integer');
+    $field->setLabel(ts('Stats: Opt Outs & Unsubscribes'))
+      ->setDescription(ts('Total contacts who opted out or unsubscribed from a mailing'))
+      ->setColumnName('id')
+      ->setReadonly(TRUE)
+      ->setSqlRenderer([__CLASS__, 'countMailingEvents']);
+    $spec->addFieldSpec($field);
+
     $field = new FieldSpec('stats_forwards', 'Mailing', 'Integer');
     $field->setLabel(ts('Stats: Forwards'))
       ->setDescription(ts('Total mailing forwards'))
@@ -170,6 +178,11 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
         $tableName = \CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName();
         $unsubscribeType = 1;
         $count = "DISTINCT $tableName.event_queue_id,$tableName.org_unsubscribe";
+        break;
+
+      case 'stats_optouts_and_unsubscribes':
+        $tableName = \CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName();
+        $count = "DISTINCT $tableName.event_queue_id";
         break;
 
       case 'stats_forwards':
