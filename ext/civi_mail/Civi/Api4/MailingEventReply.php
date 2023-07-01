@@ -11,7 +11,7 @@
 namespace Civi\Api4;
 
 /**
- * TTracks when a contact replies to a mailing.
+ * Tracks when a contact replies to a mailing.
  *
  * @see \Civi\Api4\Mailing
  * @since 5.64
