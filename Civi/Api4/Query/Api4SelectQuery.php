@@ -159,7 +159,7 @@ class Api4SelectQuery extends Api4Query {
         ], ['custom_group' => 'custom_group']);
         $customSelect = [];
         foreach ($customGroups as $groupName) {
-          $customSelect[] = "$groupName.*";
+          $customSelect[] = str_replace([' '], '_', $groupName) . '.*';
         }
         array_splice($select, $customStar, 1, $customSelect);
       }
