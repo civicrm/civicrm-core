@@ -2,10 +2,10 @@
   <thead>
     <tr>
       <th class="crm-search-admin-icon-col"></th>
+      <th>{{:: ts('Link') }}</th>
       <th class="crm-search-admin-icon-col">{{:: ts('Icon') }}</th>
       <th>{{:: ts('Open') }}</th>
       <th>{{:: ts('Text') }}</th>
-      <th>{{:: ts('Link') }}</th>
       <th>{{:: ts('Show if') }}</th>
       <th>{{:: ts('Style') }}</th>
       <th class="crm-search-admin-icon-col"></th>
@@ -15,6 +15,9 @@
     <tr ng-repeat="item in $ctrl.group" class="crm-draggable">
       <td class="crm-search-admin-icon-col">
         <i class="crm-i fa-arrows crm-search-move-icon"></i>
+      </td>
+      <td class="form-inline">
+        <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links" on-change="$ctrl.onChangeLink(item, newLink)"></crm-search-admin-link-select>
       </td>
       <td class="crm-search-admin-icon-col">
         <span class="crm-editable-enabled" ng-click="pickIcon($index)">
@@ -31,9 +34,6 @@
       <td class="form-inline">
         <input type="text" class="form-control" ng-model="item.text">
         <crm-search-admin-token-select model="item" field="text" suffix=":label"></crm-search-admin-token-select>
-      </td>
-      <td class="form-inline">
-        <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links" on-change="$ctrl.onChangeLink(item, newLink)"></crm-search-admin-link-select>
       </td>
       <td class="form-inline">
         <input ng-model="item.condition[0]" crm-ui-select="{placeholder: item.action ? ts('Allowed') : ts('Always'), data: $ctrl.fields}" ng-change="$ctrl.onChangeCondition(item)">
