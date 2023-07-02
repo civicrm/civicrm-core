@@ -56,6 +56,12 @@ class Api4SelectQuery extends Api4Query {
   private $entityAccess = [];
 
   /**
+   * Explicit join currently being processed
+   * @var array
+   */
+  private $openJoin;
+
+  /**
    * @param \Civi\Api4\Generic\DAOGetAction $api
    */
   public function __construct($api) {
@@ -443,6 +449,7 @@ class Api4SelectQuery extends Api4Query {
         $this->addSpecField($alias . '.' . $field['name'], $field);
       }
       $tableName = CoreUtil::getTableName($entity);
+      $this->startNewJoin($tableName, $alias);
       // Save join info to be retrieved by $this->getExplicitJoin()
       $joinOn = array_filter(array_filter($join, 'is_array'));
       $this->explicitJoins[$alias] = [
@@ -454,15 +461,15 @@ class Api4SelectQuery extends Api4Query {
       ];
       // If the first condition is a string, it's the name of a bridge entity
       if (!empty($join[0]) && is_string($join[0]) && \CRM_Utils_Rule::alphanumeric($join[0])) {
-        $this->addBridgeJoin($join, $entity, $alias, $side);
+        $conditions = $this->addBridgeJoin($join, $entity, $alias);
       }
       else {
         $conditions = $this->getJoinConditions($join, $entity, $alias, $joinEntityFields);
         foreach ($joinOn as $clause) {
           $conditions[] = $this->treeWalkClauses($clause, 'ON');
         }
-        $this->join($side, $tableName, $alias, $conditions);
       }
+      $this->finishJoin($side, $conditions);
     }
   }
 
@@ -532,10 +539,9 @@ class Api4SelectQuery extends Api4Query {
    * @param array $joinTree
    * @param string $joinEntity
    * @param string $alias
-   * @param string $side
    * @throws \CRM_Core_Exception
    */
-  protected function addBridgeJoin($joinTree, $joinEntity, $alias, $side) {
+  protected function addBridgeJoin($joinTree, $joinEntity, $alias) {
     $bridgeEntity = array_shift($joinTree);
     $this->explicitJoins[$alias]['bridge'] = $bridgeEntity;
 
@@ -548,21 +554,25 @@ class Api4SelectQuery extends Api4Query {
 
     $linkConditions = $this->getBridgeLinkConditions($bridgeAlias, $alias, $joinTable, $joinRef);
 
-    $bridgeConditions = $this->getBridgeJoinConditions($joinTree, $baseRef, $alias, $bridgeAlias, $bridgeEntity, $side);
+    $bridgeConditions = $this->getBridgeJoinConditions($joinTree, $baseRef, $alias, $bridgeAlias, $bridgeEntity);
 
     $acls = array_values($this->getAclClause($alias, CoreUtil::getBAOFromApiName($joinEntity), [NULL, NULL]));
 
-    $joinConditions = [];
+    $outerConditions = [];
     foreach (array_filter($joinTree) as $clause) {
-      $joinConditions[] = $this->treeWalkClauses($clause, 'ON');
+      $outerConditions[] = $this->treeWalkClauses($clause, 'ON');
     }
 
     // Info needed for joining custom fields extending the bridge entity
     $this->explicitJoins[$alias]['bridge_table_alias'] = $bridgeAlias;
+    // Invert the join
+    $this->openJoin['table'] = $bridgeTable;
+    $this->openJoin['alias'] = $bridgeAlias;
 
-    $outerConditions = array_merge($joinConditions, $bridgeConditions);
+    // Add main table as inner join
     $innerConditions = array_merge($linkConditions, $acls);
-    $this->query->join($alias, "$side JOIN (`$bridgeTable` AS `$bridgeAlias` INNER JOIN `$joinTable` AS `$alias` ON (" . implode(' AND ', $innerConditions) . ")) ON " . implode(' AND ', $outerConditions));
+    $this->addJoin('INNER', $joinTable, $alias, $bridgeAlias, $innerConditions);
+    return array_merge($outerConditions, $bridgeConditions);
   }
 
   /**
@@ -798,7 +808,7 @@ class Api4SelectQuery extends Api4Query {
           if ($bao) {
             $conditions = array_merge($conditions, $this->getAclClause($tableAlias, $bao, $joinPath));
           }
-          $this->join('LEFT', $target, $tableAlias, $conditions);
+          $this->addJoin('LEFT', $target, $tableAlias, $baseTableAlias, $conditions);
         }
 
       }
@@ -808,13 +818,46 @@ class Api4SelectQuery extends Api4Query {
   }
 
   /**
+   * Begins a new join; as long as it's "open" then additional joins will nest inside it.
+   */
+  private function startNewJoin(string $tableName, string $joinAlias): void {
+    $this->openJoin = [
+      'table' => $tableName,
+      'alias' => $joinAlias,
+      'subjoins' => [],
+    ];
+  }
+
+  private function finishJoin(string $side, $conditions): void {
+    $tableAlias = $this->openJoin['alias'];
+    $tableName = $this->openJoin['table'];
+    $subjoinClause = '';
+    foreach ($this->openJoin['subjoins'] as $subjoin) {
+      $subjoinClause .= " INNER JOIN `{$subjoin['table']}` `{$subjoin['alias']}` ON (" . implode(' AND ', $subjoin['conditions']) . ")";
+    }
+    $this->query->join($tableAlias, "$side JOIN (`$tableName` `$tableAlias`$subjoinClause) ON " . implode(' AND ', $conditions));
+    $this->openJoin = NULL;
+  }
+
+  /**
    * @param string $side
    * @param string $tableName
    * @param string $tableAlias
+   * @param string $baseTableAlias
    * @param array $conditions
    */
-  private function join(string $side, string $tableName, string $tableAlias, array $conditions): void {
-    $this->query->join($tableAlias, "$side JOIN `$tableName` `$tableAlias` ON " . implode(' AND ', $conditions));
+  private function addJoin(string $side, string $tableName, string $tableAlias, string $baseTableAlias, array $conditions): void {
+    // If this join is based off the current open join, incorporate it
+    if ($baseTableAlias === ($this->openJoin['alias'] ?? NULL)) {
+      $this->openJoin['subjoins'][] = [
+        'table' => $tableName,
+        'alias' => $tableAlias,
+        'conditions' => $conditions,
+      ];
+    }
+    else {
+      $this->query->join($tableAlias, "$side JOIN `$tableName` `$tableAlias` ON " . implode(' AND ', $conditions));
+    }
   }
 
   /**
