@@ -22,25 +22,25 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
    */
   public function testMinValueForPriceSet(): void {
     $minAmt = 100;
-    $feeAmt = 1000;
-    $event = $this->eventCreate();
-    $form = $this->getEventForm($this->ids['Event'][0]);
-    $priceSetId = $this->eventPriceSetCreate($feeAmt, $minAmt);
-    $priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
+    $priceSetID = $this->eventPriceSetCreate(1000, 100);
+    $event = $this->eventCreatePaid([], ['id' => $priceSetID, 'min_amount' => 100]);
+    $form = $this->getEventForm($this->getEventID());
+
+    $priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetID));
     $form->_values['fee'] = $form->_feeBlock = $priceSet['fields'];
     $form->_values['event'] = $event;
     $form->_skipDupeRegistrationCheck = 1;
 
-    $priceField = $this->callAPISuccess('PriceField', 'get', ['price_set_id' => $priceSetId]);
+    $priceField = $this->callAPISuccess('PriceField', 'get', ['price_set_id' => $priceSetID]);
     $params = [
       'email-Primary' => 'someone@example.com',
-      'priceSetId' => $priceSetId,
+      'priceSetId' => $priceSetID,
     ];
     // Check empty values for price fields.
     foreach (array_keys($priceField['values']) as $fieldId) {
       $params['price_' . $fieldId] = 0;
     }
-    $form->set('priceSetId', $priceSetId);
+    $form->set('priceSetId', $priceSetID);
     $form->set('priceSet', $priceSet);
     $form->set('name', 'CRM_Event_Form_Registration_Register');
     $files = [];
@@ -64,7 +64,7 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery($sql);
 
     // Create an event, fill its participant slots.
-    $event = $this->eventCreate([
+    $event = $this->eventCreateUnpaid([
       'has_waitlist' => 1,
       'max_participants' => 1,
       'start_date' => 20351021,
