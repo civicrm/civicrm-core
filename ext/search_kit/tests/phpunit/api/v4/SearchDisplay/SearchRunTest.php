@@ -406,7 +406,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('testmail@unit.test', $result[0]['columns'][1]['val']);
     $this->assertEquals($email, $result[0]['columns'][1]['edit']['record']['id']);
     $this->assertEquals('Email', $result[0]['columns'][1]['edit']['entity']);
-    $this->assertEquals('Text', $result[0]['columns'][1]['edit']['input_type']);
+    $this->assertEquals('Email', $result[0]['columns'][1]['edit']['input_type']);
     $this->assertEquals('String', $result[0]['columns'][1]['edit']['data_type']);
     $this->assertEquals('email', $result[0]['columns'][1]['edit']['value_key']);
     $this->assertEquals('update', $result[0]['columns'][1]['edit']['action']);
@@ -436,7 +436,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNull($result[1]['columns'][1]['val']);
     $this->assertEquals(['contact_id' => $contacts[1], 'is_primary' => TRUE], $result[1]['columns'][1]['edit']['record']);
     $this->assertEquals('Email', $result[1]['columns'][1]['edit']['entity']);
-    $this->assertEquals('Text', $result[1]['columns'][1]['edit']['input_type']);
+    $this->assertEquals('Email', $result[1]['columns'][1]['edit']['input_type']);
     $this->assertEquals('String', $result[1]['columns'][1]['edit']['data_type']);
     $this->assertEquals('email', $result[1]['columns'][1]['edit']['value_key']);
     $this->assertEquals('create', $result[1]['columns'][1]['edit']['action']);
