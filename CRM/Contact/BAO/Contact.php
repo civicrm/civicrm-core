@@ -2804,7 +2804,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
     $menu = [
       'view' => [
         'title' => ts('View Contact'),
-        'weight' => 0,
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         'ref' => 'view-contact',
         'class' => 'no-popup',
         'key' => 'view',
@@ -2812,7 +2812,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       ],
       'add' => [
         'title' => ts('Edit Contact'),
-        'weight' => 0,
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         'ref' => 'edit-contact',
         'class' => 'no-popup',
         'key' => 'add',
@@ -2820,7 +2820,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       ],
       'delete' => [
         'title' => ts('Delete Contact'),
-        'weight' => 0,
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         'ref' => 'delete-contact',
         'key' => 'delete',
         'permissions' => ['access deleted contacts', 'delete contacts'],
@@ -2957,7 +2957,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'key' => 'print',
         'tab' => 'print',
         'href' => CRM_Utils_System::url('civicrm/contact/view/print',
-          "reset=1&print=1"
+          'reset=1&print=1'
         ),
         'class' => 'print',
         'icon' => 'crm-i fa-print',
@@ -3056,6 +3056,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
             'ref' => $values['ref'],
             'class' => $values['class'] ?? NULL,
             'key' => $values['key'],
+            'weight' => $values['weight'],
           ];
           continue;
         }
@@ -3073,6 +3074,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
           'tab' => $values['tab'] ?? NULL,
           'class' => $values['class'] ?? NULL,
           'key' => $values['key'],
+          'weight' => $values['weight'],
         ];
       }
       else {
@@ -3096,6 +3098,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
             'class' => $value['class'] ?? NULL,
             'icon' => $value['icon'] ?? NULL,
             'key' => $value['key'],
+            'weight' => $value['weight'],
           ];
         }
       }

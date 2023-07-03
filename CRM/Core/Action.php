@@ -138,7 +138,7 @@ class CRM_Core_Action {
       self::MAP => [
         'name' => 'map',
         'label' => ts('Map'),
-        'weight' => 0,
+        'weight' => 10,
         'icon' => 'fa-cog',
       ],
       self::COPY => [
