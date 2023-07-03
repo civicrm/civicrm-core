@@ -86,6 +86,7 @@
       <keyColumn>id</keyColumn>
       <labelColumn>label</labelColumn>
       <nameColumn>name</nameColumn>
+      <condition>name != "everyone"</condition>
     </pseudoconstant>
     <html>
       <type>Select</type>
