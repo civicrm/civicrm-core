@@ -48,8 +48,8 @@ if (!defined('CIVI_SETUP')) {
         [
           'name' => 'everyone',
           'label' => 'Everyone, including anonymous users',
-    // @todo some standard ones, e.g. view civimail.
-          'permissions' => [],
+          // Provide default open permissions
+          'permissions' => ['CiviMail subscribe/unsubscribe pages', 'make online contributions'],
         ],
         [
           'name' => 'admin',

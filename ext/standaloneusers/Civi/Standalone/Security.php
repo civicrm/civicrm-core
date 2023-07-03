@@ -64,35 +64,35 @@ class Security {
   public function checkPermission(\CRM_Core_Permission_Standalone $permissionObject, string $permissionName, $userID) {
 
     // I think null means the current logged-in user
-    xdebug_break();
-    $userID = $userID ?? $this->getLoggedInUfID();
-
-    if (!$userID) {
-      // permissions for anonymous user. @todo
-      return FALSE;
-    }
+    $userID = $userID ?? $this->getLoggedInUfID() ?? 0;
 
     if (!isset(\Civi::$statics[__METHOD__][$userID])) {
-      if ($userID) {
+
+      $roleIDs = [];
+      if ($userID > 0) {
         $roleIDs = \Civi\Api4\User::get(FALSE)->addWhere('id', '=', $userID)
           ->addSelect('roles')->execute()->first()['roles'];
-        // Grant the 'Everyone' role, too.
-        $roleIDs[] = 1;
-      }
-      else {
-        // Everyone
-        $roleIDs = [1];
       }
 
-      $permissionsPerRole = \Civi\Api4\Role::get(FALSE)
+      $permissionsPerRoleApiCall = \Civi\Api4\Role::get(FALSE)
         ->addSelect('permissions')
-        ->addWhere('id', 'IN', $roleIDs)
-      // ->addWhere('is_active', '=', TRUE) @todo
-        ->execute()->column('permissions');
-      $permissions = array_unique(array_merge(...$permissionsPerRole));
+        ->addWhere('is_active', '=', TRUE);
+
+      if ($roleIDs) {
+        $permissionsPerRoleApiCall->addClause(
+          'OR',
+          ['id', 'IN', $roleIDs],
+          ['name', '=', 'everyone'],
+        );
+      }
+      else {
+        $permissionsPerRoleApiCall->addWhere('name', '=', 'everyone');
+      }
+      $permissions = array_unique(array_merge(...$permissionsPerRoleApiCall->execute()->column('permissions')));
       \Civi::$statics[__METHOD__][$userID] = $permissions;
     }
 
+    // print "Does user $userID have $permissionName? " . (in_array($permissionName, \Civi::$statics[__METHOD__][$userID]) ? 'yes': 'no') . "\n";
     return in_array($permissionName, \Civi::$statics[__METHOD__][$userID]);
   }
 
