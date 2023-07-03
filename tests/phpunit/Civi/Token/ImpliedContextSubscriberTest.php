@@ -3,7 +3,7 @@ namespace Civi\Token;
 
 class ImpliedContextSubscriberTest extends \CiviUnitTestCase {
 
-  public function testParticipant_ImplicitEvent() {
+  public function testParticipantImplicitEvent(): void {
     $participantId = $this->participantCreate();
 
     $messages = \CRM_Core_TokenSmarty::render(
@@ -13,9 +13,9 @@ class ImpliedContextSubscriberTest extends \CiviUnitTestCase {
     $this->assertEquals('Go to Annual CiviCRM meet!', $messages['text']);
   }
 
-  public function testParticipant_ExplicitEvent() {
+  public function testParticipantExplicitEvent(): void {
     $participantId = $this->participantCreate();
-    $otherEventId = $this->eventCreate(['title' => 'Alternate Event'])['id'];
+    $otherEventId = $this->eventCreateUnpaid(['title' => 'Alternate Event'])['id'];
 
     $messages = \CRM_Core_TokenSmarty::render(
       ['text' => 'You may also like {event.title}!'],

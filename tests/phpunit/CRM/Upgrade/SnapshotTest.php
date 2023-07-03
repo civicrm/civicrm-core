@@ -72,16 +72,19 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
   }
 
   /**
-   * This example creates multiple snapshots (attributed to different versions, v5.45 and v5.50),
-   * and it ensures that they can be cleaned-up by future upgrades (eg v5.52 and v5.58).
+   * This example creates multiple snapshots (attributed to different versions,
+   * v5.45 and v5.50), and it ensures that they can be cleaned-up by future
+   * upgrades (eg v5.52 and v5.58).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBasicLifecycle(): void {
     for ($i = 0; $i < 15; $i++) {
       $this->individualCreate([], $i);
       $this->organizationCreate([], $i);
     }
-    $this->eventCreate([]);
-    $this->eventCreate([]);
+    $this->eventCreateUnpaid([]);
+    $this->eventCreateUnpaid([]);
 
     $this->runAll(CRM_Upgrade_Snapshot::createTasks('civicrm', '5.45', 'names', CRM_Utils_SQL_Select::from('civicrm_contact')
       ->select('id, display_name, sort_name')
