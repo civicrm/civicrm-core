@@ -163,7 +163,7 @@ trait EventTestTrait {
    *
    * @return array
    */
-  protected function eventCreate(array $params = [], string $identifier = 'event'): array {
+  public function eventCreate(array $params = [], string $identifier = 'event'): array {
     try {
       $event = Event::create(FALSE)->setValues($params)->execute()->first();
       $this->setTestEntity('Event', $event, $identifier);

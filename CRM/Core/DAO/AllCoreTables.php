@@ -360,7 +360,7 @@ class CRM_Core_DAO_AllCoreTables {
    *
    * @return FALSE|string
    */
-  public static function getTableForEntityName($briefName) {
+  public static function getTableForEntityName($briefName): string {
     self::init();
     return self::$entityTypes[$briefName]['table'];
   }

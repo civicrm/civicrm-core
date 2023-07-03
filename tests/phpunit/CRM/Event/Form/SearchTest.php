@@ -6,18 +6,13 @@
 class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
 
   /**
-   * @var int
-   */
-  private $individualID;
-
-  /**
    * @var array
    */
   private $participantPrice;
 
   public function setUp(): void {
     parent::setUp();
-    $this->individualID = $this->individualCreate();
+    $individualID = $this->individualCreate();
     $event = $this->eventCreatePaid();
     $priceFieldValues = $this->createPriceSet('event', $event['id'], [
       'html_type'    => 'Radio',
@@ -34,7 +29,7 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
 
     $this->participantCreate([
       'event_id'  => $event['id'],
-      'contact_id' => $this->individualID,
+      'contact_id' => $individualID,
       'status_id' => 1,
       'fee_level' => $this->participantPrice['label'],
       'fee_amount' => $this->participantPrice['amount'],
@@ -49,9 +44,12 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test that search form returns correct number of rows for complex regex filters.
+   * Test that search form returns correct number of rows for complex regex
+   * filters.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testSearch() {
+  public function testSearch(): void {
     $form = new CRM_Event_Form_Search();
     $form->controller = new CRM_Event_Controller_Search();
     $form->preProcess();
