@@ -18,7 +18,7 @@
 SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS `civicrm_user`;
-DROP TABLE IF EXISTS `civicrm_role_permission`;
+DROP TABLE IF EXISTS `civicrm_role`;
 
 SET FOREIGN_KEY_CHECKS=1;
 -- /*******************************************************
@@ -29,15 +29,17 @@ SET FOREIGN_KEY_CHECKS=1;
 
 -- /*******************************************************
 -- *
--- * civicrm_role_permission
+-- * civicrm_role
 -- *
--- * Assigns permissions to roles
+-- * A Role holds a set of permissions. Roles may be granted to Users.
 -- *
 -- *******************************************************/
-CREATE TABLE `civicrm_role_permission` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique RolePermission ID',
-  `role_id` int unsigned COMMENT 'FK to a role option value',
-  `permission` varchar(60) NOT NULL COMMENT 'A single permission granted to this role',
+CREATE TABLE `civicrm_role` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Role ID',
+  `name` varchar(60) NOT NULL COMMENT 'Machine name for this role',
+  `label` varchar(128) NOT NULL COMMENT 'Human friendly name for this role',
+  `permissions` text NOT NULL COMMENT 'List of permissions granted by this role',
+  `is_active` tinyint DEFAULT 1 COMMENT 'Only active roles grant permissions',
   PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB;
@@ -55,7 +57,7 @@ CREATE TABLE `civicrm_user` (
   `username` varchar(60) NOT NULL,
   `password` varchar(128) NOT NULL COMMENT 'Hashed password',
   `email` varchar(255) NOT NULL COMMENT 'Email (e.g. for password resets)',
-  `roles` varchar(128) COMMENT 'FK to values from OptionGroup role',
+  `roles` varchar(128) COMMENT 'FK to Role',
   `when_created` timestamp DEFAULT CURRENT_TIMESTAMP,
   `when_last_accessed` timestamp NULL,
   `when_updated` timestamp NULL,

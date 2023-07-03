@@ -80,9 +80,12 @@
     <type>varchar</type>
     <title>Roles</title>
     <length>128</length>
-    <comment>FK to values from OptionGroup role</comment>
+    <comment>FK to Role</comment>
     <pseudoconstant>
-      <optionGroupName>role</optionGroupName>
+      <table>civicrm_role</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>label</labelColumn>
+      <nameColumn>name</nameColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>

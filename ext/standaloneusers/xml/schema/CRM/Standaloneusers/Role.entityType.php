@@ -3,8 +3,8 @@
 // https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
 return [
   [
-    'name' => 'RolePermission',
-    'class' => 'CRM_Standaloneusers_DAO_RolePermission',
-    'table' => 'civicrm_role_permission',
+    'name' => 'Role',
+    'class' => 'CRM_Standaloneusers_DAO_Role',
+    'table' => 'civicrm_role',
   ],
 ];

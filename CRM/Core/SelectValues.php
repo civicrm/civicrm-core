@@ -1210,4 +1210,23 @@ class CRM_Core_SelectValues {
     ];
   }
 
+  /**
+   * Callback for Role.permissions pseudoconstant values.
+   *
+   * Permissions for Civi Standalone, not used by CMS-based systems.
+   *
+   * @return array
+   */
+  public static function permissions() {
+    $perms = $options = [];
+    \CRM_Utils_Hook::permissionList($perms);
+
+    foreach ($perms as $machineName => $details) {
+      if ($details['is_active']) {
+        $options[$machineName] = $details['title'];
+      }
+    }
+    return $options;
+  }
+
 }

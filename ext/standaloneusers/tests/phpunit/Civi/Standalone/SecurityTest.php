@@ -74,37 +74,24 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
 
     // Create a custom role
-    $roleID = \Civi\Api4\OptionValue::create(FALSE)
+    $roleID = \Civi\Api4\Role::create(FALSE)
       ->setValues([
-        'option_group_id.name' => 'role',
         'name' => 'demo_role',
         'label' => 'demo_role',
-      ])->execute()->first()['value'];
+        'permissions' => [
+            // Main control for access to the main CiviCRM backend and API. Give to trusted roles only.
+          'access CiviCRM',
+          'view all contacts',
+          'add contacts',
+          'edit all contacts',
+           // 'administer CiviCRM' // Perform all tasks in the Administer CiviCRM control panel and Import Contacts
+        ],
+      ])->execute()->first()['id'];
 
     // Give our user this role only.
     \Civi\Api4\User::update(FALSE)
-      ->addValue('roles', [$roleID])
+      ->addValue('roles:name', ['demo_role'])
       ->addWhere('id', '=', $userID)
-      ->execute();
-
-    $existingPermissions = \Civi\Api4\RolePermission::get(FALSE)
-      ->selectRowCount()
-      ->addWhere('role_id', '=', $demoRoleID)
-      ->execute()->count();
-    $this->assertEquals(0, $existingPermissions);
-
-    // Assign some permissions to the role.
-    \Civi\Api4\RolePermission::save(FALSE)
-      ->setDefaults(['role_id' => $roleID])
-      ->setRecords([
-      // Master control for access to the main CiviCRM backend and API. Give to trusted roles only.
-      ['permission' => 'access CiviCRM'],
-      // Perform all tasks in the Administer CiviCRM control panel and Import Contacts
-      // ['permission' => 'administer CiviCRM'],
-      ['permission' => 'view all contacts'],
-      ['permission' => 'add contacts'],
-      ['permission' => 'edit all contacts'],
-      ])
       ->execute();
 
     $this->switchToOurUFClasses();

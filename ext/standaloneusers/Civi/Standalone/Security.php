@@ -64,6 +64,7 @@ class Security {
   public function checkPermission(\CRM_Core_Permission_Standalone $permissionObject, string $permissionName, $userID) {
 
     // I think null means the current logged-in user
+    xdebug_break();
     $userID = $userID ?? $this->getLoggedInUfID();
 
     if (!$userID) {
@@ -71,19 +72,28 @@ class Security {
       return FALSE;
     }
 
-    // @todo handle anonymous permissions!
+    if (!isset(\Civi::$statics[__METHOD__][$userID])) {
+      if ($userID) {
+        $roleIDs = \Civi\Api4\User::get(FALSE)->addWhere('id', '=', $userID)
+          ->addSelect('roles')->execute()->first()['roles'];
+        // Grant the 'Everyone' role, too.
+        $roleIDs[] = 1;
+      }
+      else {
+        // Everyone
+        $roleIDs = [1];
+      }
 
-    $roleIDs = \Civi\Api4\User::get(FALSE)->addWhere('id', '=', $userID)
-      ->addSelect('roles')->execute()->first()['roles'];
+      $permissionsPerRole = \Civi\Api4\Role::get(FALSE)
+        ->addSelect('permissions')
+        ->addWhere('id', 'IN', $roleIDs)
+      // ->addWhere('is_active', '=', TRUE) @todo
+        ->execute()->column('permissions');
+      $permissions = array_unique(array_merge(...$permissionsPerRole));
+      \Civi::$statics[__METHOD__][$userID] = $permissions;
+    }
 
-    // artfulrobot: I think we should cache these per request, e.g. Civi::$statics?
-    // except in testing permissions shouldn't change during a request. @todo
-    $found = \Civi\Api4\RolePermission::get(FALSE)
-      ->selectRowCount()
-      ->addWhere('role_id', 'IN', $roleIDs)
-      ->addWhere('permission', '=', $permissionName)
-      ->execute()->countMatched();
-    return (bool) $found;
+    return in_array($permissionName, \Civi::$statics[__METHOD__][$userID]);
   }
 
   /**
@@ -143,7 +153,7 @@ class Security {
    *    - 'cms_pass' plaintext password
    *    - 'notify' boolean
    * @param string $mail
-   *   Email id for cms user.
+   *   Email address for cms user.
    *
    * @return int|bool
    *   uid if user was created, false otherwise

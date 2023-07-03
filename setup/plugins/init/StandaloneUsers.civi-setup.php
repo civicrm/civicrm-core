@@ -40,18 +40,24 @@ if (!defined('CIVI_SETUP')) {
 
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'installDatabase'));
 
-    // admin should always be role 1 on install.
-    $roleID = 1;
-
-    // @todo I expect there's a better way than this; this doesn't even bring in all the permissions.
-    $records = [['permission' => 'authenticate with password']];
-    foreach (array_keys(\CRM_Core_Permission::getCorePermissions()) as $permission) {
-      $records[] = ['permission' => $permission];
-    }
-    \Civi\Api4\RolePermission::save(FALSE)
-      ->setDefaults(['role_id' => $roleID])
-      ->setRecords($records)
-      ->execute();
+    $roles = \Civi\Api4\Role::save(FALSE)
+      ->setDefaults([
+        'is_active' => TRUE,
+      ])
+      ->setRecords([
+        [
+          'name' => 'everyone',
+          'label' => 'Everyone, including anonymous users',
+    // @todo some standard ones, e.g. view civimail.
+          'permissions' => [],
+        ],
+        [
+          'name' => 'admin',
+          'label' => 'Administrator',
+          'permissions' => array_keys(\CRM_Core_SelectValues::permissions()),
+        ],
+      ])
+      ->execute()->indexBy('name');
 
     // Create contact+user for admin.
     $contactID = \Civi\Api4\Contact::create(FALSE)
@@ -66,7 +72,6 @@ if (!defined('CIVI_SETUP')) {
       'cms_name'   => $e->getModel()->extras['adminUser'],
       'cms_pass'   => $e->getModel()->extras['adminPass'],
       'notify'     => FALSE,
-      $adminEmail => $adminEmail,
       'contactID'  => $contactID,
     ];
     $userID = \CRM_Core_BAO_CMSUser::create($params, $adminEmail);
@@ -74,7 +79,7 @@ if (!defined('CIVI_SETUP')) {
     // Assign 'admin' role to user
     \Civi\Api4\User::update(FALSE)
       ->addWhere('id', '=', $userID)
-      ->addValue('roles', [$roleID])
+      ->addValue('roles:name', ['admin'])
       ->execute();
 
     $message = "Created new user \"{$e->getModel()->extras['adminUser']}\" (user ID #$userID, contact ID #$contactID) with 'admin' role and ";
