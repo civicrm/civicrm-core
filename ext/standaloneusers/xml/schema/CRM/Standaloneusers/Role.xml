@@ -27,6 +27,9 @@
     <type>varchar</type>
     <length>60</length>
     <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
 
   <field>
@@ -35,6 +38,9 @@
     <type>varchar</type>
     <length>128</length>
     <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
 
   <field>
