@@ -374,6 +374,8 @@
 - github      : dereklewis123
   name        : Derek Lewis
 
+- github      : destrieux
+
 - github      : detsieber
   name        : Detlev Sieber
   organization: Digitalcourage
@@ -559,6 +561,8 @@
 - github      : gemmapotaka
   name        : Gemma Potaka
   organization: Fuzion
+
+- github      : gibsonoliver
 
 - github      : ginkgofjg
   name        : Frank Gómez
@@ -970,6 +974,13 @@
 - github      : mariav0
   name        : Maria
 
+- github      : marcusjwilson
+  name        : Marcus J Wilson
+  organization: Pooka & Co
+
+- github      : mark-rodgers
+  name        : Mark Rodgers
+
 - github      : MarshCastle
   name        : Martin Castle
   organization: Circle Interactive
@@ -1262,6 +1273,9 @@
 - github      : quicksketch
   name        : Nate Lampton
   organization: Lullabot
+
+- github      : quimgil
+  name        : Quim Gil
 
 - name        : Rareș Pamfil
 
