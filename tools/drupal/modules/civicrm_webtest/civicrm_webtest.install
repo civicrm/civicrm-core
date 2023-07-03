@@ -5,7 +5,7 @@
  */
 function civicrm_webtest_enable() {
   $anonymous = 1;
-  
+
   // If Backdrop
   if (function_exists('config_get')) {
     $anonymous = 'anonymous';
@@ -109,6 +109,7 @@ function civicrm_webtest_enable() {
     'view all activities',
     'view all contacts',
     'view all notes',
+    'view debug output',
     'view event info',
     'view event participants',
     'view public CiviMail content',
