@@ -1042,35 +1042,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Create a paid event.
-   *
-   * @param array $params
-   *
-   * @param array $options
-   *
-   * @param string $key
-   *   Index for storing event ID in ids array.
-   *
-   * @return array
-   */
-  protected function legacyEventCreatePaid(array $params = [], array $options = [['name' => 'hundred', 'amount' => 100]], string $key = 'PaidEvent'): array {
-    // @todo - uncomment these - but need to fix an e-notice first.
-    // $this->dummyProcessorCreate();
-    // $params['payment_processor'] = [$this->ids['PaymentProcessor']['dummy_live']];
-    $params = array_merge([
-      'is_monetary' => TRUE,
-      'financial_type_id:name' => 'Event Fee',
-    ], $params);
-
-    $event = $this->eventCreate($params);
-
-    $this->ids['Event'][$key] = (int) $event['id'];
-    $this->ids['PriceSet'][$key] = $this->eventPriceSetCreate(55, 0, 'Radio', $options);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->ids['PriceSet'][$key]);
-    return $event;
-  }
-
-  /**
    * Delete event.
    *
    * @param int $id

@@ -58,8 +58,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'totalAmount' => 8000.67,
       'params' => [
         [
-          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
-          'entryURL' => 'http://dmaster.local/civicrm/event/register?reset=1&amp;id=3',
           'first_name' => 'k',
           'last_name' => 'p',
           'email-Primary' => 'demo@example.com',
@@ -169,18 +167,16 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testWaitlistRegistrationContactIDParam(): void {
-    // @todo - figure out why this doesn't pass validate financials
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $paymentProcessorID = $this->processorCreate();
     /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
     $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
-    $params = ['is_monetary' => 1, 'financial_type_id' => 1];
-    $event = $this->legacyEventCreatePaid($params, [['name' => 'test', 'amount' => 8000.67]]);
+    $params = ['financial_type_id' => 1];
+    $event = $this->eventCreatePaid($params, [['name' => 'test', 'amount' => 8000.67]]);
     $individualID = $this->individualCreate();
     //$this->submitForm($event['id'], [
     $form = CRM_Event_Form_Registration_Confirm::testSubmit([
-      'id' => $event['id'],
+      'id' => $this->getEventID(),
       'contributeMode' => 'direct',
       'registerByID' => $individualID,
       'paymentProcessorObj' => CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID),
@@ -188,8 +184,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'amount_level' => 'Tiny-tots (ages 5-8) - 1',
       'params' => [
         [
-          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
-          'entryURL' => 'http://dmaster.local/civicrm/event/register?reset=1&amp;id=3',
           'first_name' => 'k',
           'last_name' => 'p',
           'email-Primary' => 'demo@example.com',
@@ -250,7 +244,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals('On waitlist', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: On waitlist');
 
     $form = CRM_Event_Form_Registration_Confirm::testSubmit([
-      'id' => $event['id'],
+      'id' => $this->getEventID(),
       'contributeMode' => 'direct',
       'registerByID' => $waitlistContactId,
       'paymentProcessorObj' => CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID),
@@ -258,8 +252,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'amount_level' => 'Tiny-tots (ages 5-8) - 1',
       'params' => [
         [
-          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
-          'entryURL' => 'http://dmaster.local/civicrm/event/register?reset=1&amp;id=3',
           'first_name' => $waitlistContact['first_name'],
           'last_name' => $waitlistContact['last_name'],
           'email-Primary' => $waitlistContact['email'],
@@ -355,7 +347,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'button' => '_qf_Register_upload',
         ],
         [
-          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
           'entryURL' => "http://dmaster.local/civicrm/event/register?reset=1&amp;id={$event['id']}",
           'first_name' => 'Participant2',
           'last_name' => 'LastName',
@@ -369,7 +360,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'tax_amount' => 20,
         ],
         [
-          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
           'entryURL' => "http://dmaster.local/civicrm/event/register?reset=1&amp;id={$event['id']}",
           'first_name' => 'Participant3',
           'last_name' => 'LastName',
@@ -410,7 +400,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[3]);
     $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 2), $mailSent[4]);
     $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[5]);
-    $this->revertTemplateToReservedTemplate('event_online_receipt', 'text');
+    $this->revertTemplateToReservedTemplate();
   }
 
   /**
@@ -428,7 +418,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'is_monetary' => TRUE,
       'financial_type_id' => 'Event Fee',
     ];
-    $event = $this->eventCreate($params);
+    $event = $this->eventCreatePaid($params);
     $priceFieldOptions = [
       'option_label' => 'Price Field',
       'option_value' => 100,
@@ -619,7 +609,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * event#64.
    */
   public function testSubmitNonPrimaryEmail(): void {
-    $event = $this->eventCreate(['is_monetary' => FALSE]);
+    $event = $this->eventCreateUnpaid();
     $mut = new CiviMailUtils($this, TRUE);
     $this->submitForm($event['id'], [
       [
@@ -680,12 +670,17 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    *
    * @param int $eventID
    * @param array $submittedValues Submitted Values
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
   protected function submitForm(int $eventID, array $submittedValues): void {
     $_REQUEST['id'] = $eventID;
+    /* @var CRM_Event_Form_Registration_Register $form */
     $form = $this->getFormObject('CRM_Event_Form_Registration_Register', $submittedValues[0] ?? $submittedValues);
     $form->buildForm();
     $form->postProcess();
+    /* @var CRM_Event_Form_Registration_Confirm $form */
     $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
     $form->preProcess();
     $form->buildForm();
@@ -701,7 +696,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   protected function submitPaidEvent(array $submitValues = []): void {
     $this->dummyProcessorCreate();
-    $event = $this->legacyEventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE]);
+    $event = $this->eventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE]);
     $this->submitForm($event['id'], array_merge([
       'email-Primary' => 'demo@example.com',
       'credit_card_number' => '4111111111111111',
@@ -716,7 +711,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'billing_postal_code-5' => '7',
       'billing_country_id-5' => '1228',
       'priceSetId' => $this->ids['PriceSet']['PaidEvent'],
-      $this->getPriceFieldFormLabel('event_radio') => $this->ids['PriceFieldValue']['hundred'],
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_student'],
       'payment_processor_id' => '1',
       'year' => '2019',
       'month' => '1',
