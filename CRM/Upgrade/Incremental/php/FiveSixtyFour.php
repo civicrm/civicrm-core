@@ -30,6 +30,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFour extends CRM_Upgrade_Incremental_
   public function upgrade_5_64_alpha1($rev): void {
     $this->addTask('Add priority column onto ACL table', 'addColumn', 'civicrm_acl', 'priority', 'int NOT NULL DEFAULT 0');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Drop unused civicrm_action_mapping table', 'dropTable', 'civicrm_action_mapping');
     $this->addTask('Update post_URL/cancel_URL in logging tables', 'updateLogging');
     $this->addTask('Add in Everybody ACL Role option value', 'addEveryBodyAclOptionValue');
   }
