@@ -443,9 +443,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $cacheKey = md5($cacheKey);
     }
 
-    if (!self::$_importFields ||
-      CRM_Utils_Array::value($cacheKey, self::$_importFields) === NULL
-    ) {
+    if (!isset(self::$_importFields[$cacheKey])) {
       if (!self::$_importFields) {
         self::$_importFields = [];
       }
@@ -570,7 +568,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['groupTitle'] = $dao->title;
           $fields[$dao->id]['data_type'] = $dao->data_type;
           $fields[$dao->id]['name'] = 'custom_' . $dao->id;
-          $fields[$dao->id]['type'] = CRM_Utils_Array::value($dao->data_type, self::dataToType());
+          $fields[$dao->id]['type'] = self::dataToType()[$dao->data_type] ?? NULL;
           $fields[$dao->id]['html_type'] = $dao->html_type;
           $fields[$dao->id]['default_value'] = $dao->default_value;
           $fields[$dao->id]['text_length'] = $dao->text_length;
@@ -760,8 +758,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param bool $all
    *
-   * @return int|null
-   *   The id (if exists)
+   * @return array|int|null
    */
   public static function getKeyID($key, $all = FALSE) {
     $match = [];
@@ -772,7 +769,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       else {
         return [
           $match[1],
-          CRM_Utils_Array::value(2, $match),
+          $match[2] ?? NULL,
         ];
       }
     }
@@ -1265,7 +1262,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $display = implode(', ', $v);
         }
         else {
-          $display = CRM_Utils_Array::value($value, $field['options'], '');
+          $display = $field['options'][$value] ?? '';
           // For float type (see Number and Money) $value would be decimal like
           // 1.00 (because it is stored in db as decimal), while options array
           // key would be integer like 1. In this case expression on line above
@@ -1296,7 +1293,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($format) {
           if (array_key_exists($format, $actualPHPFormats)) {
             $customTimeFormat = (array) $actualPHPFormats[$format];
-            switch (CRM_Utils_Array::value('time_format', $field)) {
+            switch ($field['time_format'] ?? NULL) {
               case 1:
                 $customTimeFormat[] = 'g:iA';
                 break;
@@ -2119,7 +2116,7 @@ WHERE  id IN ( %1, %2 )
    */
   protected static function prepareCreate($params) {
     $op = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($op, 'CustomField', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($op, 'CustomField', $params['id'] ?? NULL, $params);
     $params['is_append_field_id_to_column_name'] = !isset($params['column_name']);
     if ($op === 'create') {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
@@ -2675,7 +2672,7 @@ WHERE      f.id IN ($ids)";
       }
       $dataType = $field->data_type;
 
-      $profileField = CRM_Utils_Array::value($key, $profileFields, []);
+      $profileField = $profileFields[$key] ?? [];
       $fieldTitle = $profileField['title'] ?? NULL;
       $isRequired = $profileField['is_required'] ?? NULL;
       if (!$fieldTitle) {
@@ -2687,7 +2684,7 @@ WHERE      f.id IN ($ids)";
         continue;
       }
 
-      //lets validate first for required field.
+      // Validate first for required field.
       if ($isRequired && CRM_Utils_System::isNull($value)) {
         $errors[$key] = ts('%1 is a required field.', [1 => $fieldTitle]);
         continue;
