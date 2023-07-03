@@ -20,4 +20,4 @@ if (!defined('CIVI_SETUP')) {
     \civicrm_api3('Extension', 'enable', array(
       'keys' => $e->getModel()->extensions,
     ));
-  }, \Civi\Setup::PRIORITY_LATE + 200);
+  }, \Civi\Setup::PRIORITY_LATE + 300);

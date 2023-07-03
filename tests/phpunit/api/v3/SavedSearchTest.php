@@ -175,7 +175,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
     $delete_params = ['id' => $create_result['id']];
     $this->callAPIAndDocument(
         $this->_entity, 'delete', $delete_params, __FUNCTION__, __FILE__);
-    $get_result = $this->callAPISuccess($this->_entity, 'get', []);
+    $get_result = $this->callAPISuccess($this->_entity, 'get', ['where' => [['has_base', '=', TRUE]]]);
 
     $this->assertEquals(0, $get_result['count']);
   }

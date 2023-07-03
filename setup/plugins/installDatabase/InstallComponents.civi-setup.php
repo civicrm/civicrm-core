@@ -29,4 +29,4 @@ Civi\Setup::dispatcher()
     }
 
     \Civi::settings()->set('enable_components', $e->getModel()->components);
-  }, \Civi\Setup::PRIORITY_LATE + 300);
+  }, \Civi\Setup::PRIORITY_LATE + 200);
