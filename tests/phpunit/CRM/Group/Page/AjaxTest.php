@@ -80,15 +80,14 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-18528 - Retrieve groups with filter
+   * CRM-18528 - Retrieve groups with filter.
    */
-  public function testGroupListWithFilter() {
+  public function testGroupListWithFilter(): void {
     $this->setPermissionAndRequest(['view all contacts', 'edit groups']);
 
     $_GET = $this->_params;
-    $obj = new CRM_Group_Page_AJAX();
 
-    //filter with title
+    // Filter with title.
     $_GET['title'] = 'not-me-active';
     try {
       CRM_Group_Page_AJAX::getGroupList();
@@ -117,10 +116,9 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     }
     $this->assertEquals(1, $groups['recordsTotal']);
     $this->assertEquals('not-me-active', $groups['data'][0]['title']);
-    unset($_GET['title']);
-    unset($_GET['savedSearch']);
+    unset($_GET['title'], $_GET['savedSearch']);
 
-    // check on status
+    // Check on status.
     $_GET['status'] = 2;
     try {
       CRM_Group_Page_AJAX::getGroupList();
@@ -128,15 +126,15 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $groups = $e->errorData;
     }
-    foreach ($groups['data'] as $key => $val) {
+    foreach ($groups['data'] as $val) {
       $this->assertEquals('crm-entity disabled', $val['DT_RowClass']);
     }
   }
 
   /**
-   * Retrieve groups as 'view all contacts'
+   * Retrieve groups as 'view all contacts'.
    */
-  public function testGroupListViewAllContacts() {
+  public function testGroupListViewAllContacts(): void {
     $this->setPermissionAndRequest(['view all contacts', 'edit groups']);
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
