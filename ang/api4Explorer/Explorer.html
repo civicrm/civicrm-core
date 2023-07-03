@@ -266,7 +266,7 @@
               <span>{{:: ts('Result') }}</span>
             </a>
           </li>
-          <li role="presentation" ng-if="::perm.accessDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
+          <li role="presentation" ng-if="::perm.viewDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
             <a href ng-click="selectedTab.result = 'debug'">
               <i class="fa fa-fw fa-{{ debug ? (status === 'warning' || status === 'danger' ? 'warning' : 'bug') : 'circle-o' }}"></i>
               <span>{{:: ts('Debug') }}</span>
@@ -286,7 +286,7 @@
             <pre class="prettyprint" id="api4-result-{{ $index }}" ng-bind-html="code"></pre>
           </div>
         </div>
-        <div ng-if="::perm.accessDebugOutput" ng-show="selectedTab.result === 'debug'">
+        <div ng-if="::perm.viewDebugOutput" ng-show="selectedTab.result === 'debug'">
           <pre ng-if="debug" class="prettyprint" ng-bind-html="debug"></pre>
           <div ng-if="!debug">
             <p>

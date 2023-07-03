@@ -36,7 +36,7 @@
     $scope.selectedTab = {result: 'result'};
     $scope.crmUrl = CRM.url;
     $scope.perm = {
-      accessDebugOutput: CRM.checkPerm('access debug output'),
+      viewDebugOutput: CRM.checkPerm('view debug output'),
     };
     marked.setOptions({highlight: prettyPrintOne});
     var getMetaParams = {},
