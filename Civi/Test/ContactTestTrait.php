@@ -15,6 +15,8 @@ namespace Civi\Test;
  */
 trait ContactTestTrait {
 
+  use EntityTrait;
+
   /**
    * API version to use for any api calls.
    *

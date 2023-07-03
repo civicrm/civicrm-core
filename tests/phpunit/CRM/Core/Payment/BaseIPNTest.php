@@ -42,7 +42,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   protected $_recurId;
   protected $_membershipId;
   protected $input;
-  protected $ids;
   protected $objects;
 
   /**
