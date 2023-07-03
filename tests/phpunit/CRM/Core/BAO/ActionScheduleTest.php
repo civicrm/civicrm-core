@@ -50,8 +50,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * Setup for tests.
-   *
-   * @throws CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();

@@ -1021,7 +1021,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @noinspection PhpUnhandledExceptionInspection
    * @noinspection PhpDocMissingThrowsInspection
    */
-  public function eventCreate(array $params = [], $identifier = 0): array {
+  public function eventCreate(array $params = [], string $identifier = 'event'): array {
     // if no contact was passed, make up a dummy event creator
     if (!isset($params['contact_id'])) {
       $params['contact_id'] = $this->_contactCreate([

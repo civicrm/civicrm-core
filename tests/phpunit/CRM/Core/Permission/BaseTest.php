@@ -1,12 +1,15 @@
 <?php
 
+use Civi\Test\ACLPermissionTrait;
+
 /**
  * Class CRM_Core_Permission_BaseTest
+ *
  * @group headless
  */
 class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
 
-  use Civi\Test\ACLPermissionTrait;
+  use ACLPermissionTrait;
 
   /**
    * @return array

@@ -34,11 +34,11 @@ trait ContactTestTrait {
   public function createLoggedInUser(): int {
     $params = [
       'first_name' => 'Logged In',
-      'last_name' => 'User ' . rand(),
+      'last_name' => 'User ' . mt_rand(),
       'contact_type' => 'Individual',
       'domain_id' => \CRM_Core_Config::domainID(),
     ];
-    $contactID = $this->individualCreate($params);
+    $contactID = $this->individualCreate($params, 'logged_in');
     $this->callAPISuccess('UFMatch', 'get', ['uf_id' => 6, 'api.UFMatch.delete' => []]);
     $this->callAPISuccess('UFMatch', 'create', [
       'contact_id' => $contactID,
