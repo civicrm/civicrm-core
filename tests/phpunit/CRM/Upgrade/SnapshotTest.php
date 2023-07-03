@@ -12,14 +12,22 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
     CRM_Upgrade_Snapshot::$cleanupAfter = 4;
   }
 
-  public function testTableNames_good() {
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testTableNamesGood(): void {
     $this->assertEquals('snap_civicrm_v5_45_stuff', CRM_Upgrade_Snapshot::createTableName('civicrm', '5.45', 'stuff'));
     $this->assertEquals('snap_civicrm_v5_50_stuffy_things', CRM_Upgrade_Snapshot::createTableName('civicrm', '5.50', 'stuffy_things'));
     $this->assertEquals('snap_oauth_client_v12_34_ext_things', CRM_Upgrade_Snapshot::createTableName('oauth_client', '12.34', 'ext_things'));
     $this->assertEquals('snap_oauth_client_v0_1234_ext_things', CRM_Upgrade_Snapshot::createTableName('oauth_client', '0.1234', 'ext_things'));
   }
 
-  public function testTableNames_bad() {
+  public function testTableNamesBad(): void {
     try {
       CRM_Upgrade_Snapshot::createTableName('civicrm', '5.45', 'ab&cd');
       $this->fail('Accepted invalid name');
@@ -28,7 +36,7 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
       $this->assertRegExp('/Malformed snapshot name/', $e->getMessage());
     }
     try {
-      CRM_Upgrade_Snapshot::createTableName('civicrm', '5.45', 'loremipsumdolorsitametconsecteturadipiscingelitseddoeiusmod');
+      CRM_Upgrade_Snapshot::createTableName('civicrm', '5.45', 'long_table_name_that_is_too_long_for_the_validation');
       $this->fail('Accepted excessive name');
     }
     catch (CRM_Core_Exception $e) {
@@ -38,11 +46,15 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
 
   /**
    * This example creates a snapshot based on particular sliver of data (ie
-   * the "display_name" and "sort_name" for "Individual" records). It ensures that:
+   * the "display_name" and "sort_name" for "Individual" records). It ensures
+   * that:
    *
-   * 1. Some columns are copied - while other columns are not (based on `select()`).
+   * 1. Some columns are copied - while other columns are not (based on
+   * `select()`).
    * 2. Some rows are copied - while other rows are not (based on `where()`).
    * 3. Multiple pages of data are copied.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContent(): void {
     for ($i = 0; $i < 15; $i++) {
@@ -84,7 +96,7 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
       $this->organizationCreate([], $i);
     }
     $this->eventCreateUnpaid([]);
-    $this->eventCreateUnpaid([]);
+    $this->eventCreateUnpaid([], 'second');
 
     $this->runAll(CRM_Upgrade_Snapshot::createTasks('civicrm', '5.45', 'names', CRM_Utils_SQL_Select::from('civicrm_contact')
       ->select('id, display_name, sort_name')
@@ -117,6 +129,8 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
    *   ex: "table_1.column_1"
    * @param string $actualField
    *   ex: "table_2.column_2"
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   protected function assertSameSchema(string $expectField, string $actualField): void {
     [$expectTable, $expectColumn] = explode('.', $expectField);
@@ -138,7 +152,7 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
   }
 
   protected function runAll(iterable $tasks): void {
-    $queue = Civi::queue('snaptest', ['type' => 'Memory']);
+    $queue = Civi::queue('snap-test', ['type' => 'Memory']);
     foreach ($tasks as $task) {
       $queue->createItem($task);
     }

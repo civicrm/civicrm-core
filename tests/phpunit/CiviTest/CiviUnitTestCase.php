@@ -30,7 +30,6 @@ use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
-use Civi\Api4\Event;
 use Civi\Api4\ExampleData;
 use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
@@ -1005,40 +1004,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     return $this->callAPISuccess('Contribution', 'delete', [
       'contribution_id' => $contributionID,
     ]);
-  }
-
-  /**
-   * Create an Event.
-   *
-   * @param array $params
-   *   Name-value pair for an event.
-   * @param string|int $identifier
-   *
-   * @return array
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @noinspection PhpUnhandledExceptionInspection
-   * @noinspection PhpDocMissingThrowsInspection
-   */
-  public function eventCreate(array $params = [], string $identifier = 'event'): array {
-    // if no contact was passed, make up a dummy event creator
-    if (!isset($params['contact_id'])) {
-      $params['contact_id'] = $this->_contactCreate([
-        'contact_type' => 'Individual',
-        'first_name' => 'Event',
-        'last_name' => 'Creator',
-      ]);
-    }
-
-    $params = array_merge($this->getExampleData('Event', 'PaidEvent'), $params);
-
-    if (!empty($params['payment_processor_id'])) {
-      $params['payment_processor'] = is_array($params['payment_processor_id']) ? $params['payment_processor_id'] : [$params['payment_processor_id']];
-    }
-    $event = Event::create(FALSE)->setValues($params)->execute()->first();
-    $this->ids['Event'][$identifier] = $event['id'];
-    return $event;
   }
 
   /**
