@@ -784,7 +784,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $this->ids['Contact']['participant'] = $params['contact_id'] = $this->individualCreate();
     }
     if (empty($params['event_id'])) {
-      $event = $this->eventCreate(['end_date' => 20081023, 'registration_end_date' => 20081015]);
+      $event = $this->eventCreateUnpaid(['end_date' => 20081023, 'registration_end_date' => 20081015]);
       $params['event_id'] = $event['id'];
     }
     $defaults = [
