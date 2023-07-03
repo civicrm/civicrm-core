@@ -177,9 +177,7 @@ class CRM_Core_BAO_CustomQuery {
     foreach ($this->_ids as $id => $values) {
 
       // Fixed for Issue CRM 607
-      if (CRM_Utils_Array::value($id, $this->_fields) === NULL ||
-        !$values
-      ) {
+      if (!isset($this->_fields[$id]) || !$values) {
         continue;
       }
 
@@ -207,7 +205,7 @@ class CRM_Core_BAO_CustomQuery {
           $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
         }
 
-        $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+        $qillOp = CRM_Core_SelectValues::getSearchBuilderOperators()[$op] ?? $op;
 
         // Ensure the table is joined in (eg if in where but not select).
         $this->joinCustomTableForField($field);
