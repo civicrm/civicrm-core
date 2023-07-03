@@ -369,7 +369,7 @@ London,',
       $submittedValues = array_merge($this->getRecordContributionParams('Partially paid', 'Pending'), $submittedValues);
     }
     else {
-      $event = $this->eventCreate($eventParams);
+      $event = $this->eventCreateUnpaid($eventParams);
     }
     $submittedValues['event_id'] = $event['id'];
     $_REQUEST['cid'] = $submittedValues['contact_id'];
