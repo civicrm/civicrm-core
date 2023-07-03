@@ -854,7 +854,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (CRM_Core_Permission::check('administer Multiple Organizations') &&
       CRM_Core_Permission::isMultisiteEnabled()
     ) {
-      $select = ", contact.display_name as org_name, contact.id as org_id";
+      $select = ', contact.display_name as org_name, contact.id as org_id';
       $from = " LEFT JOIN civicrm_group_organization gOrg
                                ON gOrg.group_id = `groups`.id
                         LEFT JOIN civicrm_contact contact
@@ -1286,47 +1286,53 @@ WHERE {$whereClause}";
   /**
    * Define action links.
    *
+   * @param array $params
+   *
    * @return array
    *   array of action links
+   * @throws \CRM_Core_Exception
    */
-  public static function actionLinks($params) {
+  public static function actionLinks(array $params): array {
     // If component_mode is set we change the "View" link to match the requested component type
     if (!isset($params['component_mode'])) {
       $params['component_mode'] = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
     $modeValue = CRM_Contact_Form_Search::getModeValue($params['component_mode']);
-    $links = [
+    return [
       CRM_Core_Action::VIEW => [
         'name' => $modeValue['selectorLabel'],
         'url' => 'civicrm/group/search',
         'qs' => 'reset=1&force=1&context=smog&gid=%%id%%&component_mode=' . $params['component_mode'],
         'title' => ts('Group Contacts'),
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
       ],
       CRM_Core_Action::UPDATE => [
         'name' => ts('Settings'),
         'url' => 'civicrm/group/edit',
         'qs' => 'reset=1&action=update&id=%%id%%',
         'title' => ts('Edit Group'),
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
       ],
       CRM_Core_Action::DISABLE => [
         'name' => ts('Disable'),
         'ref' => 'crm-enable-disable',
         'title' => ts('Disable Group'),
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
       ],
       CRM_Core_Action::ENABLE => [
         'name' => ts('Enable'),
         'ref' => 'crm-enable-disable',
         'title' => ts('Enable Group'),
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
       ],
       CRM_Core_Action::DELETE => [
         'name' => ts('Delete'),
         'url' => 'civicrm/group/edit',
         'qs' => 'reset=1&action=delete&id=%%id%%',
         'title' => ts('Delete Group'),
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
       ],
     ];
-
-    return $links;
   }
 
   /**
