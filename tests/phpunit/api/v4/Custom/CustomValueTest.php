@@ -83,7 +83,7 @@ class CustomValueTest extends CustomTestBase {
     $entity = Entity::get(FALSE)
       ->addWhere('name', '=', "Custom_$group")
       ->execute()->single();
-    $this->assertEquals(['CustomValue'], $entity['type']);
+    $this->assertEquals(['CustomValue', 'DAOEntity'], $entity['type']);
     $this->assertEquals(['id'], $entity['primary_key']);
     $this->assertEquals($customGroup['table_name'], $entity['table_name']);
     $this->assertEquals('Civi\Api4\CustomValue', $entity['class']);
