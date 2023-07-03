@@ -281,11 +281,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
 
-    // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['participant_test']) && $this->_force) {
-      $this->_formValues["participant_test"] = 0;
-    }
-
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, ['event_id']);
 
     $this->set('queryParams', $this->_queryParams);

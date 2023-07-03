@@ -294,6 +294,12 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
 
     while ($result->fetch()) {
       $row = [];
+
+      // Ignore rows where we dont have an id.
+      if (empty($result->pledge_id)) {
+        continue;
+      }
+
       // the columns we are interested in
       foreach (self::$_properties as $property) {
         if (isset($result->$property)) {
