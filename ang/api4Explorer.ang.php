@@ -14,6 +14,6 @@ return [
   ],
   'basePages' => [],
   'bundles' => ['bootstrap3'],
-  'permissions' => ['access debug output', 'edit groups', 'administer reserved groups'],
+  'permissions' => ['view debug output', 'edit groups', 'administer reserved groups'],
   'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'crmRouteBinder', 'ui.sortable', 'api4', 'ngSanitize'],
 ];
