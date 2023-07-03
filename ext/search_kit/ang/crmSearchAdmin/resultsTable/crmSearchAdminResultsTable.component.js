@@ -26,6 +26,9 @@
         ctrl.debug = {
           apiParams: JSON.stringify(ctrl.search.api_params, null, 2)
         };
+        ctrl.perm = {
+          viewDebugOutput: CRM.checkPerm('view debug output'),
+        };
         ctrl.results = null;
         ctrl.rowCount = null;
         ctrl.page = 1;
