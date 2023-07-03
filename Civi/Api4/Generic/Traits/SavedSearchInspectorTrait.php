@@ -87,6 +87,11 @@ trait SavedSearchInspectorTrait {
       $this->display = \Civi\Api4\SearchDisplay::getDefault(FALSE)
         ->addSelect('*', 'type:name')
         ->setSavedSearch($this->savedSearch)
+        ->setContext([
+          'filters' => $this->filters ?? NULL,
+          'formName' => $this->formName ?? NULL,
+          'fieldName' => $this->fieldName ?? NULL,
+        ])
         // Set by AutocompleteAction
         ->setType($this->_displayType ?? 'table')
         ->execute()->first();
