@@ -160,6 +160,10 @@
           return '~/crmSearchTasks/crmSearchInput/float.html';
         }
 
+        if (field.input_type === 'Email') {
+          return '~/crmSearchTasks/crmSearchInput/email.html';
+        }
+
         return '~/crmSearchTasks/crmSearchInput/text.html';
       };
 
