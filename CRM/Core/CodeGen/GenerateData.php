@@ -1141,7 +1141,7 @@ class CRM_Core_CodeGen_GenerateData {
     // add the 3 groups first
     foreach ($this->sampleData['group'] as $groupName) {
       $group = new CRM_Contact_BAO_Group();
-      $group->name = $group->title = $groupName;
+      $group->name = $group->title = $group->frontend_title = $groupName;
       $group->group_type = "12";
       $group->visibility = 'Public Pages';
       $group->is_active = 1;
