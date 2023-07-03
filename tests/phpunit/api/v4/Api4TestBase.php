@@ -46,8 +46,7 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
   }
 
   public function setUpHeadless(): CiviEnvBuilder {
-    // TODO: search_kit should probably be part of the 'headless()' baseline.
-    return Test::headless()->install(['org.civicrm.search_kit'])->apply();
+    return Test::headless()->apply();
   }
 
   /**
