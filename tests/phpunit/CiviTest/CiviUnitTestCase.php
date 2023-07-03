@@ -1139,16 +1139,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Delete Locations of contact.
-   *
-   * @param array $params
-   *   Parameters.
-   */
-  public function locationDelete($params) {
-    $this->callAPISuccess('Location', 'delete', $params);
-  }
-
-  /**
    * Add a Location Type.
    *
    * @param array $params
@@ -1323,30 +1313,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Create Group for a contact.
-   *
-   * @param int $contactID
-   */
-  public function contactGroupCreate(int $contactID): void {
-    $this->callAPISuccess('GroupContact', 'create', [
-      'contact_id.1' => $contactID,
-      'group_id' => 1,
-    ]);
-  }
-
-  /**
-   * Delete Group for a contact.
-   *
-   * @param int $contactID
-   */
-  public function contactGroupDelete(int $contactID): void {
-    $this->callAPISuccess('GroupContact', 'Delete', [
-      'contact_id.1' => $contactID,
-      'group_id' => 1,
-    ]);
-  }
-
-  /**
    * Create Activity.
    *
    * @param array $params
@@ -1384,32 +1350,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $result['target_contact_id'] = $params['target_contact_id'];
     $result['assignee_contact_id'] = $params['assignee_contact_id'];
     return $result;
-  }
-
-  /**
-   * Create an activity type.
-   *
-   * @param array $params
-   *   Parameters.
-   *
-   * @return array
-   */
-  public function activityTypeCreate(array $params): array {
-    return $this->callAPISuccess('ActivityType', 'create', $params);
-  }
-
-  /**
-   * Delete activity type.
-   *
-   * @param int $activityTypeID
-   *   Activity type ID.
-   *
-   * @return array
-   */
-  public function activityTypeDelete(int $activityTypeID): array {
-    return $this->callAPISuccess('ActivityType', 'delete', [
-      'activity_type_id' => $activityTypeID,
-    ]);
   }
 
   /**
