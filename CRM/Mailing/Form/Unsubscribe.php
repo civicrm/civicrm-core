@@ -27,22 +27,22 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
   /**
    * @var int
    */
-  private $_job_id;
+  protected $_job_id;
 
   /**
    * @var int
    */
-  private $_queue_id;
+  protected $_queue_id;
 
   /**
    * @var string
    */
-  private $_hash;
+  protected $_hash;
 
   /**
    * @var string
    */
-  private $_email;
+  protected $_email;
 
   public function preProcess() {
     $this->_job_id = $job_id = CRM_Utils_Request::retrieve('jid', 'Integer', $this);
