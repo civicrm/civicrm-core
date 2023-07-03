@@ -14,8 +14,23 @@ namespace Civi\Api4\Provider;
 use Civi\Api4\CustomValue;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Service\AutoService;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CustomEntityProvider {
+/**
+ * @service
+ * @internal
+ */
+class CustomEntityProvider extends AutoService implements EventSubscriberInterface {
+
+  /**
+   * @return array
+   */
+  public static function getSubscribedEvents() {
+    return [
+      'civi.api4.entityTypes' => ['addCustomEntities', 100],
+    ];
+  }
 
   /**
    * Get custom-field pseudo-entities

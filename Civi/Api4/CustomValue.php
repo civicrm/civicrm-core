@@ -142,9 +142,10 @@ class CustomValue {
   public static function getInfo() {
     return [
       'class' => __CLASS__,
-      'type' => ['CustomValue'],
+      'type' => ['CustomValue', 'DAOEntity'],
       'searchable' => 'secondary',
       'primary_key' => ['id'],
+      'dao' => 'CRM_Core_BAO_CustomValue',
       'see' => [
         'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
         '\Civi\Api4\CustomGroup',
