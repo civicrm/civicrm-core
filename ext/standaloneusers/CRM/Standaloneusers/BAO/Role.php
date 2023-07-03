@@ -13,18 +13,18 @@ class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role {
    */
   /*
   public static function create($params) {
-    $className = 'CRM_Standaloneusers_DAO_Role';
-    $entityName = 'Role';
-    $hook = empty($params['id']) ? 'create' : 'edit';
+  $className = 'CRM_Standaloneusers_DAO_Role';
+  $entityName = 'Role';
+  $hook = empty($params['id']) ? 'create' : 'edit';
 
-    CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
-    $instance = new $className();
-    $instance->copyValues($params);
-    $instance->save();
-    CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
+  CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
+  $instance = new $className();
+  $instance->copyValues($params);
+  $instance->save();
+  CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
 
-    return $instance;
+  return $instance;
   }
-  */
+   */
 
 }
