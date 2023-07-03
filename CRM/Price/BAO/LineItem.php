@@ -582,7 +582,7 @@ WHERE li.contribution_id = %1";
    *   [5] => ['price_field_id' => 5, 'price_field_value_id' => x, 'label....qty...unit_price...line_total...financial_type_id]
    *
    */
-  public static function buildLineItemsForSubmittedPriceField($priceParams, $overrideAmount = NULL, $financialTypeID = NULL) {
+  public static function buildLineItemsForSubmittedPriceField($priceParams, $overrideAmount = NULL, $financialTypeID = NULL): array {
     $lineItems = [];
     foreach ($priceParams as $key => $value) {
       $priceField = self::getPriceFieldMetaData($key);
