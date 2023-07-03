@@ -16,10 +16,14 @@ use Civi\Api4\Query\SqlFunctionGROUP_CONCAT;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
- * Return the default results table for a saved search.
+ * Generate the default display for a saved search.
+ *
+ * Dispatches `civi.search.defaultDisplay` event to allow subscribers to provide a display based on context.
  *
  * @method $this setType(string $type)
  * @method string getType()
+ * @method $this setContext(array $context)
+ * @method array getContext()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class GetDefault extends \Civi\Api4\Generic\AbstractAction {
@@ -41,6 +45,12 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
   protected $type = 'table';
 
   /**
+   * Provide context information; passed through to `civi.search.defaultDisplay` subscribers
+   * @var array
+   */
+  protected $context = [];
+
+  /**
    * @var array
    */
   private $_joinMap;
@@ -60,6 +70,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
     if (!strlen($label) && !empty($this->savedSearch['api_entity'])) {
       $label = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'title_plural');
     }
+    // Initialize empty display
     $display = [
       'id' => NULL,
       'name' => NULL,
@@ -76,6 +87,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       'savedSearch' => $this->savedSearch,
       'display' => &$display,
       'apiAction' => $this,
+      'context' => $this->context,
     ]));
 
     $fields = $this->entityFields();
