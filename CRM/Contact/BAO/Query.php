@@ -6556,7 +6556,7 @@ AND   displayRelType.is_active = 1
     }
     $pseudoConstant = $realField['pseudoconstant'];
     if (empty($pseudoConstant['optionGroupName']) &&
-      CRM_Utils_Array::value('labelColumn', $pseudoConstant) !== 'name') {
+      ($pseudoConstant['labelColumn'] ?? NULL) !== 'name') {
       // We are increasing our pseudoconstant handling - but still very cautiously,
       // hence the check for labelColumn === name
       return FALSE;
@@ -6990,8 +6990,8 @@ AND   displayRelType.is_active = 1
    */
   protected function isPseudoFieldAnFK($fieldSpec) {
     if (empty($fieldSpec['FKClassName'])
-      || CRM_Utils_Array::value('keyColumn', $fieldSpec['pseudoconstant']) !== 'id'
-      || CRM_Utils_Array::value('labelColumn', $fieldSpec['pseudoconstant']) !== 'name') {
+      || ($fieldSpec['pseudoconstant']['keyColumn'] ?? NULL) !== 'id'
+      || ($fieldSpec['pseudoconstant']['labelColumn'] ?? NULL) !== 'name') {
       return FALSE;
     }
     return TRUE;

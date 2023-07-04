@@ -82,7 +82,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
     }
 
     if (!isset($params['id']) ||
-      (CRM_Utils_Array::value('parent_id', $params) != CRM_Utils_Array::value('current_parent_id', $params))
+      (($params['parent_id'] ?? NULL) != ($params['current_parent_id'] ?? NULL))
     ) {
       /* re/calculate the weight, if the Parent ID changed OR create new menu */
 

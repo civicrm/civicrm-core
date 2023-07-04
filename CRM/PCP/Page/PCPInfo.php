@@ -164,7 +164,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
         'pageComponent' => $this->_component,
       ];
 
-      if (!$pcpBlock->is_tellfriend_enabled || CRM_Utils_Array::value('status_id', $pcpInfo) != $approvedId) {
+      if (!$pcpBlock->is_tellfriend_enabled || ($pcpInfo['status_id'] ?? NULL) != $approvedId) {
         unset($link['all'][CRM_Core_Action::DETACH]);
       }
 

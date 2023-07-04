@@ -479,7 +479,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
 
     // Stats for soft credits
     if ($this->_softFrom &&
-      CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) !=
+      ($this->_params['contribution_or_soft_value'] ?? NULL) !=
       'contributions_only'
     ) {
       $totalAmount = $average = [];

@@ -335,7 +335,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
           $sid
         );
 
-        if (CRM_Utils_Array::value('activity_type', $surveysData[$sid]) != 'Petition') {
+        if (($surveysData[$sid]['activity_type'] ?? NULL) != 'Petition') {
           $surveysData[$sid]['voterLinks'] = CRM_Campaign_BAO_Survey::buildPermissionLinks($sid,
             TRUE,
             ts('more')

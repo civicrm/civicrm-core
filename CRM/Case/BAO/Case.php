@@ -1404,7 +1404,7 @@ HERESQL;
 
       $displayName = $info['display_name'] ?? NULL;
 
-      [$result[CRM_Utils_Array::value('contact_id', $info)], $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [$result[$info['contact_id'] ?? NULL], $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
           'groupName' => 'msg_tpl_workflow_case',
           'workflow' => 'case_activity',
@@ -1435,7 +1435,7 @@ HERESQL;
         $recordedActivityParams['target_contact_id'][] = $info['contact_id'];
       }
       else {
-        unset($result[CRM_Utils_Array::value('contact_id', $info)]);
+        unset($result[$info['contact_id'] ?? NULL]);
       }
     }
 

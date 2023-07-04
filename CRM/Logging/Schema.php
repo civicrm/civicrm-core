@@ -722,7 +722,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
       if (!empty($specDiff) && $col !== 'id' && !in_array($col, $diff['ADD'])) {
         if (empty($colSpecs['EXTRA']) || (!empty($colSpecs['EXTRA']) && $colSpecs['EXTRA'] !== 'auto_increment')) {
           // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
-          if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])
+          if ($civiTableSpecs[$col]['DATA_TYPE'] != ($logTableSpecs[$col]['DATA_TYPE'] ?? NULL)
             // We won't alter the log if the length is decreased in case some of the existing data won't fit.
             || CRM_Utils_Array::value('LENGTH', $civiTableSpecs[$col]) > CRM_Utils_Array::value('LENGTH', $logTableSpecs[$col])
           ) {
@@ -730,12 +730,12 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
             $diff['MODIFY'][] = $col;
           }
           elseif ($civiTableSpecs[$col]['DATA_TYPE'] === 'enum' &&
-            CRM_Utils_Array::value('ENUM_VALUES', $civiTableSpecs[$col]) != CRM_Utils_Array::value('ENUM_VALUES', $logTableSpecs[$col])
+            ($civiTableSpecs[$col]['ENUM_VALUES'] ?? NULL) != ($logTableSpecs[$col]['ENUM_VALUES'] ?? NULL)
           ) {
             // column is enum and the permitted values have changed
             $diff['MODIFY'][] = $col;
           }
-          elseif ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
+          elseif ($civiTableSpecs[$col]['IS_NULLABLE'] != ($logTableSpecs[$col]['IS_NULLABLE'] ?? NULL) &&
             $logTableSpecs[$col]['IS_NULLABLE'] === 'NO'
           ) {
             // if is-null property is different, and log table's column is NOT-NULL, surely consider the column

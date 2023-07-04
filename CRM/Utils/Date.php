@@ -83,10 +83,10 @@ class CRM_Utils_Date {
     $date['d'] = sprintf('%02d', $date['d']);
 
     $time = '';
-    if (CRM_Utils_Array::value('H', $date) != NULL ||
-      CRM_Utils_Array::value('h', $date) != NULL ||
-      CRM_Utils_Array::value('i', $date) != NULL ||
-      CRM_Utils_Array::value('s', $date) != NULL
+    if (!empty($date['H']) ||
+      !empty($date['h']) ||
+      !empty($date['i']) ||
+      !empty($date['s'])
     ) {
       // we have time too..
       if (!empty($date['h'])) {

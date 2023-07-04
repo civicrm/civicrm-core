@@ -1677,7 +1677,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       [, $id] = explode('_', $name);
       $label = $props['label'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
       $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
-      if (CRM_Utils_Array::value('context', $props) != 'search') {
+      if (($props['context'] ?? NULL) != 'search') {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
       }
     }
@@ -1694,7 +1694,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
       }
       $label = $props['label'] ?? $fieldSpec['html']['label'] ?? $fieldSpec['title'];
-      if (CRM_Utils_Array::value('context', $props) != 'search') {
+      if (($props['context'] ?? NULL) != 'search') {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
       }
     }

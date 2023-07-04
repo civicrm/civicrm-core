@@ -3462,7 +3462,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         foreach ($table['filters'] as $fieldName => $field) {
           if ((CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE ||
               CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_TIME) &&
-            CRM_Utils_Array::value('operatorType', $field) !=
+            ($field['operatorType'] ?? NULL) !=
             CRM_Report_Form::OP_MONTH
           ) {
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
