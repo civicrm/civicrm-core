@@ -336,7 +336,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
     $updateResultSet = FALSE;
     $resultSetOptGrpId = NULL;
-    if ((CRM_Utils_Array::value('option_type', $params) == 2) &&
+    if ((($params['option_type'] ?? NULL) == 2) &&
       !empty($params['option_group_id'])
     ) {
       $updateResultSet = TRUE;

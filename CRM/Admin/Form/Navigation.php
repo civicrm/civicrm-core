@@ -81,7 +81,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
     $active = $this->add('advcheckbox', 'is_active', ts('Enabled'));
 
-    if (CRM_Utils_Array::value('name', $this->_defaults) == 'Home') {
+    if (($this->_defaults['name'] ?? NULL) == 'Home') {
       $active->freeze();
     }
     else {

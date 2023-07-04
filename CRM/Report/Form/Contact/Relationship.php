@@ -562,10 +562,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
     $isStatusFilter = FALSE;
     $relStatus = NULL;
-    if (CRM_Utils_Array::value('is_active_value', $this->_params) == '1') {
+    if (($this->_params['is_active_value'] ?? NULL) == '1') {
       $relStatus = ts('Is equal to Active');
     }
-    elseif (CRM_Utils_Array::value('is_active_value', $this->_params) == '0') {
+    elseif (($this->_params['is_active_value'] ?? NULL) == '0') {
       $relStatus = ts('Is equal to Inactive');
     }
     if (!empty($statistics['filters'])) {
@@ -573,7 +573,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         // For displaying relationship type filter.
         if ($value['title'] == 'Relationship') {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
-          $op = CRM_Utils_Array::value('relationship_type_id_op', $this->_params) == 'in' ? ts('Is one of') . ' ' : ts('Is not one of') . ' ';
+          $op = ($this->_params['relationship_type_id_op'] ?? NULL) == 'in' ? ts('Is one of') . ' ' : ts('Is not one of') . ' ';
           $relationshipTypes = [];
           foreach ($this->_params['relationship_type_id_value'] as $relationship) {
             $relationshipTypes[] = $relTypes[$relationship]['label_' . $this->relationType];

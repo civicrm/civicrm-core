@@ -1425,7 +1425,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $relTypeValues = [];
         CRM_Contact_BAO_RelationshipType::retrieve($relTypeParams, $relTypeValues);
 
-        if (CRM_Utils_Array::value('name_a_b', $relTypeValues) == CRM_Utils_Array::value('name_b_a', $relTypeValues)) {
+        if (($relTypeValues['name_a_b'] ?? NULL) == CRM_Utils_Array::value('name_b_a', $relTypeValues)) {
           $values[$cid]['relationshipTypeDirection'] = '_a_b';
         }
         else {

@@ -124,7 +124,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->assign('isAmountzero', $this->_totalAmount <= 0);
 
     $this->assign('defaultRole', FALSE);
-    if (CRM_Utils_Array::value('defaultRole', $this->_params[0]) == 1) {
+    if (($this->_params[0]['defaultRole'] ?? NULL) == 1) {
       $this->assign('defaultRole', TRUE);
     }
     $defaults = [];

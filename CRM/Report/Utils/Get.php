@@ -286,7 +286,7 @@ class CRM_Report_Utils_Get {
       if ($urlFields = CRM_Utils_Array::value("fld", $_GET)) {
         $urlFields = explode(',', $urlFields);
       }
-      if (CRM_Utils_Array::value("ufld", $_GET) == 1) {
+      if (($_GET["ufld"] ?? NULL) == 1) {
         // unset all display columns
         $defaults['fields'] = [];
       }

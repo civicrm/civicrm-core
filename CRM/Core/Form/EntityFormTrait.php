@@ -248,7 +248,7 @@ trait CRM_Core_Form_EntityFormTrait {
         $defaults[$fieldSpec['name']] = $value;
       }
       // Store a list of fields with money formatters
-      if (CRM_Utils_Array::value('formatter', $fieldSpec) == 'crmMoney') {
+      if (($fieldSpec['formatter'] ?? NULL) == 'crmMoney') {
         $moneyFields[] = $entityFieldName;
       }
     }

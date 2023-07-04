@@ -916,7 +916,7 @@ SELECT is_primary,
     }
 
     // prevent an endless chain between two shared addresses (prevent chaining 3) CRM-21214
-    if (CRM_Utils_Array::value('id', $params) == $params['master_id']) {
+    if (($params['id'] ?? NULL) == $params['master_id']) {
       $params['master_id'] = NULL;
       CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
     }

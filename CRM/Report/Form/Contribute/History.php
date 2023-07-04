@@ -342,7 +342,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
               continue;
             }
             elseif ($fieldName == 'receive_date') {
-              if ((CRM_Utils_Array::value('this_year_op', $this->_params) ==
+              if ((($this->_params['this_year_op'] ?? NULL) ==
                   'fiscal' && !empty($this->_params['this_year_value'])) ||
                 (CRM_Utils_Array::value('other_year_op', $this->_params ==
                     'fiscal') && !empty($this->_params['other_year_value']))
@@ -598,12 +598,12 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $addWhere = '';
 
     if (!empty($this->_referenceYear['other_year'])) {
-      (CRM_Utils_Array::value('other_year_op', $this->_params) ==
+      (($this->_params['other_year_op'] ?? NULL) ==
         'calendar') ? $other_receive_date = 'YEAR (contri.receive_date)' : $other_receive_date = self::fiscalYearOffset('contri.receive_date');
       $addWhere .= " AND {$this->_aliases['civicrm_contact']}.id NOT IN ( SELECT DISTINCT cont.id FROM civicrm_contact cont, civicrm_contribution contri WHERE  cont.id = contri.contact_id AND {$other_receive_date} = {$this->_referenceYear['other_year']} AND contri.is_test = 0 AND contri.is_template = 0 ) ";
     }
     if (!empty($this->_referenceYear['this_year'])) {
-      (CRM_Utils_Array::value('this_year_op', $this->_params) ==
+      (($this->_params['this_year_op'] ?? NULL) ==
         'calendar') ? $receive_date = 'YEAR (contri.receive_date)' : $receive_date = self::fiscalYearOffset('contri.receive_date');
       $addWhere .= " AND {$this->_aliases['civicrm_contact']}.id IN ( SELECT DISTINCT cont.id FROM civicrm_contact cont, civicrm_contribution contri WHERE cont.id = contri.contact_id AND {$receive_date} = {$this->_referenceYear['this_year']} AND contri.is_test = 0 AND contri.is_template = 0 ) ";
     }

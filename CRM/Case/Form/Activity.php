@@ -336,7 +336,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    */
   public static function formRule($fields, $files, $self) {
     // skip form rule if deleting
-    if (CRM_Utils_Array::value('_qf_Activity_next_', $fields) == 'Delete' || CRM_Utils_Array::value('_qf_Activity_next_', $fields) == 'Restore') {
+    if (($fields['_qf_Activity_next_'] ?? NULL) == 'Delete' || ($fields['_qf_Activity_next_'] ?? NULL) == 'Restore') {
       return TRUE;
     }
 

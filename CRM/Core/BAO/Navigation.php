@@ -888,7 +888,7 @@ ORDER BY weight";
    */
   public static function buildHomeMenu(&$menu) {
     foreach ($menu as &$item) {
-      if (CRM_Utils_Array::value('name', $item['attributes']) === 'Home') {
+      if (($item['attributes']['name'] ?? NULL) === 'Home') {
         unset($item['attributes']['label'], $item['attributes']['url']);
         $item['attributes']['icon'] = 'crm-logo-sm';
         $item['attributes']['attr']['accesskey'] = 'm';

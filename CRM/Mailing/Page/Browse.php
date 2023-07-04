@@ -127,14 +127,14 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $this->set('sortByCharacter', NULL);
     }
 
-    if (CRM_Utils_Array::value(3, $newArgs) == 'unscheduled') {
+    if (($newArgs[3] ?? NULL) == 'unscheduled') {
       $this->_unscheduled = TRUE;
     }
     $this->set('unscheduled', $this->_unscheduled);
 
     $this->set('archived', $this->isArchived($newArgs));
 
-    if (CRM_Utils_Array::value(3, $newArgs) == 'scheduled') {
+    if (($newArgs[3] ?? NULL) == 'scheduled') {
       $this->_scheduled = TRUE;
     }
     $this->set('scheduled', $this->_scheduled);
@@ -243,7 +243,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     if ($this->get('sms')) {
       $urlParams .= '&sms=1';
     }
-    if (CRM_Utils_Array::value(3, $newArgs) == 'unscheduled') {
+    if (($newArgs[3] ?? NULL) == 'unscheduled') {
       $urlString .= '/unscheduled';
       $urlParams .= '&scheduled=false';
       $this->assign('unscheduled', TRUE);
@@ -253,7 +253,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $urlString .= '/archived';
       $this->assign('archived', TRUE);
     }
-    elseif (CRM_Utils_Array::value(3, $newArgs) == 'scheduled') {
+    elseif (($newArgs[3] ?? NULL) == 'scheduled') {
       $urlString .= '/scheduled';
       $urlParams .= '&scheduled=true';
     }

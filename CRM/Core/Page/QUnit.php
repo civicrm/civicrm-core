@@ -66,7 +66,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
     $arg = explode('/', CRM_Utils_System::currentPath());
 
     if ($arg[1] == 'dev'
-      && CRM_Utils_Array::value(2, $arg) == 'qunit'
+      && ($arg[2] ?? NULL) == 'qunit'
       && isset($arg[3])
       && isset($arg[4])
     ) {

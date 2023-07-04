@@ -759,7 +759,7 @@ DESC limit 1");
         }
 
         $membershipDetails = CRM_Member_BAO_MembershipType::getMembershipType($memType);
-        if ($startDate && CRM_Utils_Array::value('period_type', $membershipDetails) === 'rolling') {
+        if ($startDate && ($membershipDetails['period_type'] ?? NULL) === 'rolling') {
           if ($startDate < $joinDate) {
             $errors['start_date'] = ts('Start date must be the same or later than Member since.');
           }

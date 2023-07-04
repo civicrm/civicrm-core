@@ -372,9 +372,9 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
 
     foreach ($this->_logTables as $entity => $detail) {
       if ((in_array($this->getLogType($entity), $logTypes) &&
-          CRM_Utils_Array::value('log_type_op', $this->_params) == 'in') ||
+          ($this->_params['log_type_op'] ?? NULL) == 'in') ||
         (!in_array($this->getLogType($entity), $logTypes) &&
-          CRM_Utils_Array::value('log_type_op', $this->_params) == 'notin')
+          ($this->_params['log_type_op'] ?? NULL) == 'notin')
       ) {
         $this->currentLogTable = $entity;
         $sql = $this->buildQuery(FALSE);

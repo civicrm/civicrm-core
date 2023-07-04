@@ -549,7 +549,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
       $this->noDisplayContributionOrSoftColumn = TRUE;
     }
 
-    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only') {
+    if (($this->_params['contribution_or_soft_value'] ?? NULL) == 'contributions_only') {
       $this->isContributionBaseMode = TRUE;
     }
     if ($this->isContributionBaseMode &&
@@ -586,7 +586,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $sql = "{$select} {$this->_from} {$this->_where} $this->_groupBy";
     $this->createTemporaryTable('civireport_contribution_detail_temp2', $sql);
 
-    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
+    if (($this->_params['contribution_or_soft_value'] ?? NULL) ==
       'soft_credits_only'
     ) {
       // revise pager : prev, next based on soft-credits only
@@ -610,7 +610,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
         "(SELECT * FROM {$this->temporaryTables['civireport_contribution_detail_temp1']['name']})"
       );
     }
-    elseif (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
+    elseif (($this->_params['contribution_or_soft_value'] ?? NULL) ==
       'soft_credits_only'
     ) {
       $this->createTemporaryTable('civireport_contribution_detail_temp3',
@@ -692,7 +692,7 @@ UNION ALL
         }
       }
 
-      if (CRM_Utils_Array::value('civicrm_contribution_contribution_or_soft', $rows[$rowNum]) ==
+      if (($rows[$rowNum]['civicrm_contribution_contribution_or_soft'] ?? NULL) ==
         'Contribution'
       ) {
         unset($rows[$rowNum]['civicrm_contribution_soft_soft_credit_type_id']);
@@ -935,10 +935,10 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         // ts exception to avoid having ts("%1 %2: %3")
         $title = '%1 contributions / soft-credits: %2';
 
-        if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only') {
+        if (($this->_params['contribution_or_soft_value'] ?? NULL) == 'contributions_only') {
           $title = '%1 contributions: %2';
         }
-        elseif (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'soft_credits_only') {
+        elseif (($this->_params['contribution_or_soft_value'] ?? NULL) == 'soft_credits_only') {
           $title = '%1 soft-credits: %2';
         }
         foreach ($totals as $key => $total) {
@@ -1033,12 +1033,12 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
    * Add join to the soft credit table.
    */
   protected function joinContributionToSoftCredit() {
-    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only'
+    if (($this->_params['contribution_or_soft_value'] ?? NULL) == 'contributions_only'
       && !$this->isTableSelected('civicrm_contribution_soft')) {
       return;
     }
     $joinType = ' LEFT ';
-    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'soft_credits_only') {
+    if (($this->_params['contribution_or_soft_value'] ?? NULL) == 'soft_credits_only') {
       $joinType = ' INNER ';
     }
     $this->_from .= "

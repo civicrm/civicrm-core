@@ -328,7 +328,7 @@ ACOS(
    */
   public static function fixInputParams(&$input) {
     foreach ($input as $param) {
-      if (CRM_Utils_Array::value('0', $param) == 'prox_distance') {
+      if (($param['0'] ?? NULL) == 'prox_distance') {
         // add prox_ prefix to these
         $param_alter = ['street_address', 'city', 'postal_code', 'state_province', 'country'];
 

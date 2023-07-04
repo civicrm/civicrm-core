@@ -133,7 +133,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $isSelectedContacts = (self::$_searchFormValues['radio_ts'] ?? NULL) === 'ts_sel';
     $form->assign('isSelectedContacts', $isSelectedContacts);
     // all contacts or action = save a search
-    if ((CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_all') ||
+    if (((self::$_searchFormValues['radio_ts'] ?? NULL) == 'ts_all') ||
       ($form->_task == CRM_Contact_Task::SAVE_SEARCH)
     ) {
       // since we don't store all contacts in prevnextcache, when user selects "all" use query to retrieve contacts

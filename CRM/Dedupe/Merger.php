@@ -2599,7 +2599,7 @@ ORDER BY civicrm_custom_group.weight,
         }
 
         // For other locations, don't merge/add if the values are the same
-        elseif (CRM_Utils_Array::value('main', $migrationInfo['rows'][$key]) == $migrationInfo['rows'][$key]['other']) {
+        elseif (($migrationInfo['rows'][$key]['main'] ?? NULL) == $migrationInfo['rows'][$key]['other']) {
           unset($migrationInfo[$key]);
         }
       }

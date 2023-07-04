@@ -821,7 +821,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $membershipFieldId = $contributionFieldId = $errorKey = $otherFieldId = NULL;
         foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
           // if 'No thank you' membership is selected then set $membershipFieldId
-          if ($fieldValue['name'] == 'membership_amount' && CRM_Utils_Array::value('price_' . $fieldKey, $fields) == 0) {
+          if ($fieldValue['name'] == 'membership_amount' && ($fields['price_' . $fieldKey] ?? NULL) == 0) {
             $membershipFieldId = $fieldKey;
           }
           elseif ($membershipFieldId) {
@@ -832,7 +832,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               $contributionFieldId = $fieldKey;
             }
 
-            if (!$errorKey || CRM_Utils_Array::value('price_' . $contributionFieldId, $fields) == '0') {
+            if (!$errorKey || ($fields['price_' . $contributionFieldId] ?? NULL) == '0') {
               $errorKey = $fieldKey;
             }
           }
@@ -958,7 +958,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // validate PCP fields - if not anonymous, we need a nick name value
     if ($self->_pcpId && !empty($fields['pcp_display_in_roll']) &&
       empty($fields['pcp_is_anonymous']) &&
-      CRM_Utils_Array::value('pcp_roll_nickname', $fields) == ''
+      ($fields['pcp_roll_nickname'] ?? NULL) == ''
     ) {
       $errors['pcp_roll_nickname'] = ts('Please enter a name to include in the Honor Roll, or select \'contribute anonymously\'.');
     }
@@ -991,7 +991,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           if (!isset($fields['pledge_installments'])) {
             $errors['pledge_installments'] = ts('Pledge Installments is required field.');
           }
-          elseif (CRM_Utils_Array::value('pledge_installments', $fields) == 1) {
+          elseif (($fields['pledge_installments'] ?? NULL) == 1) {
             $errors['pledge_installments'] = ts('Pledges consist of multiple scheduled payments. Select one-time contribution if you want to make your gift in a single payment.');
           }
           elseif (empty($fields['pledge_installments'])) {
@@ -1061,7 +1061,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $params['amount_other'] = CRM_Utils_Rule::cleanMoney($params['amount_other']);
     }
 
-    if (CRM_Utils_Array::value('amount', $params) == 'amount_other_radio' || !empty($params['amount_other'])) {
+    if (($params['amount'] ?? NULL) == 'amount_other_radio' || !empty($params['amount_other'])) {
       $amount = $params['amount_other'];
     }
     elseif (!empty($params['pledge_amount'])) {
@@ -1143,7 +1143,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
                 $params['amount'] = $selectedPriceOptionID;
                 if ($priceField->name == 'contribution_amount' ||
                     ($priceField->name == 'membership_amount' &&
-                      CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock) == 0)
+                      ($this->_membershipBlock['is_separate_payment'] ?? NULL) == 0)
                 ) {
                   $this->_values['amount'] = $priceOptions[$selectedPriceOptionID]['amount'] ?? NULL;
                 }

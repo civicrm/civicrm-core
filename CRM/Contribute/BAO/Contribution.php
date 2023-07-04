@@ -3109,7 +3109,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $additionalParticipantId = [];
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'] ?? NULL);
 
-    if (CRM_Utils_Array::value('contribution_mode', $params) === 'participant') {
+    if (($params['contribution_mode'] ?? NULL) === 'participant') {
       $entityId = $params['participant_id'];
       $entityTable = 'civicrm_participant';
       $additionalParticipantId = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);

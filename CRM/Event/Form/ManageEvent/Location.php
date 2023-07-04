@@ -203,7 +203,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $deleteOldBlock = FALSE;
 
     // If 'Use existing location' is selected.
-    if (CRM_Utils_Array::value('location_option', $params) == 2) {
+    if (($params['location_option'] ?? NULL) == 2) {
 
       /*
        * If there is an existing LocBlock and the selected LocBlock is different,
@@ -231,7 +231,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
      * set the loc_block_id for this Event to null so that an update results in
      * creating a new LocBlock.
      */
-    if ($this->_oldLocBlockId && (CRM_Utils_Array::value('location_option', $params) == 1)) {
+    if ($this->_oldLocBlockId && (($params['location_option'] ?? NULL) == 1)) {
       $deleteOldBlock = TRUE;
       CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $this->_id,
         'loc_block_id', 'null'
@@ -266,7 +266,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
      * In order to do so, the IDs of the Address, Phone and Email "Blocks" have
      * to be retrieved and added in to the elements in the $params array.
      */
-    if (CRM_Utils_Array::value('location_option', $params) == 2) {
+    if (($params['location_option'] ?? NULL) == 2) {
       if (empty($this->locationBlock['loc_block_id']) && !empty($params['loc_event_id'])) {
         $isUpdateToExistingLocationBlock = TRUE;
         $existingLocBlock = LocBlock::get()

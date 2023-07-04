@@ -93,14 +93,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
     elseif (!empty($fields['amount']) &&
       (isset($form->_values['discount'][$fields['amount']])
-        && CRM_Utils_Array::value('value', $form->_values['discount'][$fields['amount']]) == 0
+        && ($form->_values['discount'][$fields['amount']]['value'] ?? NULL) == 0
       )
     ) {
       $isZeroAmount = TRUE;
     }
     elseif (!empty($fields['amount']) &&
       (isset($form->_values['fee'][$fields['amount']])
-        && CRM_Utils_Array::value('value', $form->_values['fee'][$fields['amount']]) == 0
+        && ($form->_values['fee'][$fields['amount']]['value'] ?? NULL) == 0
       )
     ) {
       $isZeroAmount = TRUE;
@@ -617,8 +617,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
       foreach ($form->_feeBlock as $field) {
         // public AND admin visibility fields are included for back-office registration and back-office change selections
-        if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
-          (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE) ||
+        if (($field['visibility'] ?? NULL) == 'public' ||
+          (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
           $className == 'CRM_Event_Form_Participant' ||
           $className === 'CRM_Event_Form_Task_Register' ||
           $className == 'CRM_Event_Form_ParticipantFeeSelection'

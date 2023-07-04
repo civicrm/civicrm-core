@@ -1687,7 +1687,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       foreach ($info['values'] as $uniqueName => $fieldSpec) {
         if (
           $uniqueName === $props['field'] ||
-          CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
+          ($fieldSpec['name'] ?? NULL) === $props['field'] ||
           in_array($props['field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, []))
         ) {
           break;

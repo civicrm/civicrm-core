@@ -874,7 +874,7 @@ WHERE li.contribution_id = %1";
     foreach ($previousLineItems as $id => $previousLineItem) {
       if (in_array($previousLineItem['price_field_value_id'], $submittedPriceFieldValueIDs)) {
         $submittedLineItem = $submittedLineItems[$previousLineItem['price_field_value_id']];
-        if (CRM_Utils_Array::value('html_type', $lineItemsToAdd[$previousLineItem['price_field_value_id']]) == 'Text') {
+        if (($lineItemsToAdd[$previousLineItem['price_field_value_id']]['html_type'] ?? NULL) == 'Text') {
           // If a 'Text' price field was updated by changing qty value, then we are not adding new line-item but updating the existing one,
           //  because unlike other kind of price-field, it's related price-field-value-id isn't changed and thats why we need to make an
           //  exception here by adding financial item for updated line-item and will reverse any previous financial item entries.

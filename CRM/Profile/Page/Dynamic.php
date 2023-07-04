@@ -256,7 +256,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       //reformat fields array
       foreach ($fields as $name => $field) {
         // also eliminate all formatting fields
-        if (CRM_Utils_Array::value('field_type', $field) == 'Formatting') {
+        if (($field['field_type'] ?? NULL) == 'Formatting') {
           unset($fields[$name]);
         }
 
@@ -270,7 +270,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         $contactFields = $activityFields = [];
 
         foreach ($fields as $fieldName => $field) {
-          if (CRM_Utils_Array::value('field_type', $field) == 'Activity') {
+          if (($field['field_type'] ?? NULL) == 'Activity') {
             $activityFields[$fieldName] = $field;
           }
           else {

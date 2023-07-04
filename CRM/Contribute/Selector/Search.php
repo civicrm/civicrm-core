@@ -405,7 +405,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       );
 
       $isPayLater = FALSE;
-      if ($result->is_pay_later && CRM_Utils_Array::value('contribution_status_name', $row) == 'Pending') {
+      if ($result->is_pay_later && ($row['contribution_status_name'] ?? NULL) == 'Pending') {
         $isPayLater = TRUE;
         $row['contribution_status'] .= ' (' . ts('Pay Later') . ')';
         $links[CRM_Core_Action::ADD] = [
@@ -415,7 +415,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           'title' => ts('Pay with Credit Card'),
         ];
       }
-      elseif (CRM_Utils_Array::value('contribution_status_name', $row) == 'Pending') {
+      elseif (($row['contribution_status_name'] ?? NULL) == 'Pending') {
         $row['contribution_status'] .= ' (' . ts('Incomplete Transaction') . ')';
       }
 
