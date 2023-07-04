@@ -46,7 +46,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
    * Post test cleanup.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_case', 'civicrm_case_type', 'civicrm_participant', 'civicrm_event'], TRUE);
+    $this->quickCleanup(['civicrm_case', 'civicrm_case_type'], TRUE);
     $this->quickCleanUpFinancialEntities();
 
     // WORKAROUND: CRM_Event_Tokens copies `civicrm_event` data into metadata cache. That should probably change, but that's a different scope-of-work.
@@ -633,11 +633,9 @@ contribution_recur.payment_instrument_id:name :Check
   /**
    * Get expected output from token parsing.
    *
-   * @param int|null $participantCreatedID
-   *
    * @return string
    */
-  protected function getExpectedParticipantTokenOutput(int $participantCreatedID = NULL): string {
+  protected function getExpectedParticipantTokenOutput(): string {
     return "participant.status_id :2
 participant.role_id :1
 participant.register_date :February 19th, 2007
@@ -646,7 +644,7 @@ participant.fee_level :steep
 participant.fee_amount :$50.00
 participant.registered_by_id :
 participant.transferred_to_contact_id :
-participant.created_id :{$participantCreatedID}
+participant.created_id :{$this->ids['Contact']['logged_in']}
 participant.role_id:label :Attendee
 participant.balance :
 participant.custom_2 :99999
@@ -726,7 +724,7 @@ December 21st, 2007
     $this->assertEquals(array_merge($tokens, $this->getEventTokens(), $this->getDomainTokens()), $tokenProcessor->listTokens());
 
     $this->callAPISuccess('job', 'send_reminder', []);
-    $expected = $this->getExpectedParticipantTokenOutput(3);
+    $expected = $this->getExpectedParticipantTokenOutput();
     $mut->checkMailLog([$expected]);
 
     $tokenProcessor->addMessage('html', $this->getTokenString(array_keys($this->getParticipantTokens())), 'text/plain');
@@ -881,6 +879,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
    */
   public function testEventTokenConsistency(): void {
     $mut = new CiviMailUtils($this);
+    $this->createLoggedInUser();
     $this->setupParticipantScheduledReminder();
 
     $tokens = array_merge($this->getEventTokens());
@@ -889,7 +888,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
 
     $expectedEventString = $this->getExpectedEventTokenOutput();
     $this->callAPISuccess('job', 'send_reminder', []);
-    $expectedParticipantString = $this->getExpectedParticipantTokenOutput(5);
+    $expectedParticipantString = $this->getExpectedParticipantTokenOutput();
     $toCheck = array_merge(explode("\n", $expectedEventString), explode("\n", $expectedParticipantString));
     $toCheck[] = $expectedEventString;
     $toCheck[] = $expectedParticipantString;
