@@ -163,7 +163,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
     CRM_Utils_System::setTitle($mailing['subject']);
 
-    if (CRM_Utils_Array::value('snippet', $_GET) === 'json') {
+    if (($_GET['snippet'] ?? NULL) === 'json') {
       CRM_Core_Page_AJAX::returnJsonResponse($content);
     }
     if ($print) {

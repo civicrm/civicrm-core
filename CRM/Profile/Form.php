@@ -548,7 +548,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if ($this->_isContactActivityProfile) {
         $contactFields = $activityFields = [];
         foreach ($this->_fields as $fieldName => $field) {
-          if (CRM_Utils_Array::value('field_type', $field) == 'Activity') {
+          if (($field['field_type'] ?? NULL) == 'Activity') {
             $activityFields[$fieldName] = $field;
           }
           else {
@@ -604,7 +604,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
           if ($htmlType == 'File') {
             $entityId = $this->_id;
-            if (CRM_Utils_Array::value('field_type', $field) == 'Activity' &&
+            if (($field['field_type'] ?? NULL) == 'Activity' &&
               $this->_activityId
             ) {
               $entityId = $this->_activityId;
@@ -651,7 +651,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
           if ($htmlType == 'File') {
             $entityId = $this->_id;
-            if (CRM_Utils_Array::value('field_type', $field) == 'Activity' && $this->_activityId) {
+            if (($field['field_type'] ?? NULL) == 'Activity' && $this->_activityId) {
               $entityId = $this->_activityId;
             }
             $url = CRM_Core_BAO_CustomField::getFileURL($entityId, $customFieldID);
@@ -1252,7 +1252,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     if (($this->_mode & self::MODE_EDIT) && $this->_activityId && $this->_isContactActivityProfile) {
       $profileFields = $activityParams = [];
       foreach ($this->_fields as $fieldName => $field) {
-        if (CRM_Utils_Array::value('field_type', $field) == 'Activity') {
+        if (($field['field_type'] ?? NULL) == 'Activity') {
           if (isset($params[$fieldName])) {
             $activityParams[$fieldName] = $params[$fieldName];
           }

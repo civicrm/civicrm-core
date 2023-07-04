@@ -1047,17 +1047,17 @@ class CRM_Report_Form extends CRM_Core_Form {
           }
           //assign default value as "in" for multiselect
           //operator, To freeze the select element
-          if (CRM_Utils_Array::value('operatorType', $field) ==
+          if (($field['operatorType'] ?? NULL) ==
             CRM_Report_Form::OP_MULTISELECT
           ) {
             $this->_defaults["{$fieldName}_op"] = 'in';
           }
-          if (CRM_Utils_Array::value('operatorType', $field) ==
+          if (($field['operatorType'] ?? NULL) ==
             CRM_Report_Form::OP_ENTITYREF
           ) {
             $this->_defaults["{$fieldName}_op"] = 'in';
           }
-          elseif (CRM_Utils_Array::value('operatorType', $field) ==
+          elseif (($field['operatorType'] ?? NULL) ==
             CRM_Report_Form::OP_MULTISELECT_SEPARATOR
           ) {
             $this->_defaults["{$fieldName}_op"] = 'mhas';
@@ -2123,7 +2123,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
         if ($value !== NULL && is_array($value) && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
-          if (CRM_Utils_Array::value('type', $field) ==
+          if (($field['type'] ?? NULL) ==
             CRM_Utils_Type::T_STRING
           ) {
             //cycle through selections and escape values
@@ -4194,7 +4194,7 @@ ORDER BY cg.weight, cf.weight";
         // handle for ContactReference
         if (array_key_exists('fields', $prop)) {
           foreach ($prop['fields'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value('dataType', $field) ==
+            if (($field['dataType'] ?? NULL) ==
               'ContactReference'
             ) {
               $columnName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', CRM_Core_BAO_CustomField::getKeyID($fieldName), 'column_name');
@@ -4741,7 +4741,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   public function fiscalYearOffset($fieldName) {
     $config = CRM_Core_Config::singleton();
     $fy = $config->fiscalYearStart;
-    if (CRM_Utils_Array::value('yid_op', $this->_params) == 'calendar' ||
+    if (($this->_params['yid_op'] ?? NULL) == 'calendar' ||
       ($fy['d'] == 1 && $fy['M'] == 1)
     ) {
       return "YEAR( $fieldName )";
@@ -6065,7 +6065,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   protected function generateFilterClause($field, $fieldName) {
     if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-      if (CRM_Utils_Array::value('operatorType', $field) ==
+      if (($field['operatorType'] ?? NULL) ==
         CRM_Report_Form::OP_MONTH
       ) {
         $op = $this->_params["{$fieldName}_op"] ?? NULL;

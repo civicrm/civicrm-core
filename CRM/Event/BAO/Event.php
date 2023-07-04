@@ -1356,7 +1356,7 @@ WHERE civicrm_event.is_active = 1
           if (
             CRM_Utils_Array::value('data_type', $v, '') == 'File' ||
             CRM_Utils_Array::value('name', $v, '') == 'image_URL' ||
-            CRM_Utils_Array::value('field_type', $v) == 'Formatting'
+            ($v['field_type'] ?? NULL) == 'Formatting'
           ) {
             unset($fields[$k]);
           }

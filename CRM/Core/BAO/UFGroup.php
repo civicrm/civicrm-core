@@ -516,7 +516,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
         $formattedField['options_per_line'] = $customFields[$field->field_name]['options_per_line'];
         $formattedField['html_type'] = $customFields[$field->field_name]['html_type'];
 
-        if (CRM_Utils_Array::value('html_type', $formattedField) == 'Select Date') {
+        if (($formattedField['html_type'] ?? NULL) == 'Select Date') {
           $formattedField['date_format'] = $customFields[$field->field_name]['date_format'];
           $formattedField['time_format'] = $customFields[$field->field_name]['time_format'];
           $formattedField['is_datetime_field'] = TRUE;
@@ -1286,7 +1286,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
         }
       }
 
-      if ((CRM_Utils_Array::value('visibility', $field) == 'Public Pages and Listings') &&
+      if ((($field['visibility'] ?? NULL) == 'Public Pages and Listings') &&
         CRM_Core_Permission::check('profile listings and forms')
       ) {
 
@@ -1919,7 +1919,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         }
       }
     }
-    elseif (CRM_Utils_Array::value('name', $field) == 'membership_type') {
+    elseif (($field['name'] ?? NULL) == 'membership_type') {
       [$orgInfo, $types] = CRM_Member_BAO_MembershipType::getMembershipTypeInfo();
       $sel = &$form->addElement('hierselect', $name, $title);
       $select = ['' => ts('- select membership type -')];
@@ -1937,7 +1937,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
       $sel->setOptions([$orgInfo, $types]);
     }
-    elseif (CRM_Utils_Array::value('name', $field) == 'membership_status') {
+    elseif (($field['name'] ?? NULL) == 'membership_status') {
       $form->add('select', $name, $title,
         CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'), $required
       );
@@ -2198,7 +2198,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       if (substr($fieldName, 0, 3) === 'is_' or substr($fieldName, 0, 7) === 'do_not_') {
         $form->add('advcheckbox', $name, $title, $attributes, $required);
       }
-      elseif (CRM_Utils_Array::value('html_type', $field) === 'Select Date') {
+      elseif (($field['html_type'] ?? NULL) === 'Select Date') {
         $extra = isset($field['datepicker']) ? $field['datepicker']['extra'] : CRM_Utils_Date::getDatePickerExtra($field);
         $attributes = isset($field['datepicker']) ? $field['datepicker']['attributes'] : CRM_Utils_Date::getDatePickerAttributes($field);
         $form->add('datepicker', $name, $title, $attributes, $required, $extra);
@@ -3208,7 +3208,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                     $defaults['field'][$componentId][$name] = $customValue;
                     break;
                   }
-                  elseif (CRM_Utils_Array::value('data_type', $tree['fields'][$customFieldDetails[0]]) == 'Date') {
+                  elseif (($tree['fields'][$customFieldDetails[0]]['data_type'] ?? NULL) == 'Date') {
                     $skipValue = TRUE;
 
                     // CRM-6681, $default contains formatted date, time values.

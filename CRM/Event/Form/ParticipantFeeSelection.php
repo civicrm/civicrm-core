@@ -325,7 +325,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->assign('event', $event);
 
     $this->assign('isShowLocation', $event['is_show_location']);
-    if (CRM_Utils_Array::value('is_show_location', $event) == 1) {
+    if (($event['is_show_location'] ?? NULL) == 1) {
       $locationParams = [
         'entity_id' => $params['event_id'],
         'entity_table' => 'civicrm_event',

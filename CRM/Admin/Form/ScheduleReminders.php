@@ -542,11 +542,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $params['sms_body_text'] = $values['sms_text_message'] ?? NULL;
     $params['body_html'] = $values['html_message'] ?? NULL;
 
-    if (CRM_Utils_Array::value('recipient', $values) === 'manual') {
+    if (($values['recipient'] ?? NULL) === 'manual') {
       $params['recipient_manual'] = $values['recipient_manual_id'] ?? NULL;
       $params['group_id'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
-    elseif (CRM_Utils_Array::value('recipient', $values) === 'group') {
+    elseif (($values['recipient'] ?? NULL) === 'group') {
       $params['group_id'] = $values['group_id'];
       $params['recipient_manual'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }

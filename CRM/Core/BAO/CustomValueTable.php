@@ -243,7 +243,7 @@ class CRM_Core_BAO_CustomValueTable {
 
           $fieldExtends = $field['extends'] ?? NULL;
           if (
-            CRM_Utils_Array::value('entity_table', $field) === 'civicrm_contact'
+            ($field['entity_table'] ?? NULL) === 'civicrm_contact'
             || $fieldExtends === 'Contact'
             || $fieldExtends === 'Individual'
             || $fieldExtends === 'Organization'

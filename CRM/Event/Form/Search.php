@@ -154,7 +154,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       if (count($eventIds) == 1) {
         //convert form values to clause.
         $seatClause = [];
-        if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0') {
+        if (($this->_formValues['participant_test'] ?? NULL) == '1' || ($this->_formValues['participant_test'] ?? NULL) == '0') {
           $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
         }
         if (!empty($this->_formValues['participant_status_id'])) {

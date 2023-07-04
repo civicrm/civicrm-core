@@ -223,7 +223,7 @@ WHERE      e.id = %1
 
     if (is_array($tabs)) {
       foreach ($tabs as $subPage => $pageVal) {
-        if (CRM_Utils_Array::value('current', $pageVal) === TRUE) {
+        if (($pageVal['current'] ?? NULL) === TRUE) {
           $current = $subPage;
           break;
         }

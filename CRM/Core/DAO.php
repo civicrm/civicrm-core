@@ -840,7 +840,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public static function makeAttribute($field) {
     if ($field) {
-      if (CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_STRING) {
+      if (($field['type'] ?? NULL) == CRM_Utils_Type::T_STRING) {
         $maxLength = $field['maxlength'] ?? NULL;
         $size = $field['size'] ?? NULL;
         if ($maxLength || $size) {
@@ -854,7 +854,7 @@ class CRM_Core_DAO extends DB_DataObject {
           return $attributes;
         }
       }
-      elseif (CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_TEXT) {
+      elseif (($field['type'] ?? NULL) == CRM_Utils_Type::T_TEXT) {
         $rows = $field['rows'] ?? NULL;
         if (!isset($rows)) {
           $rows = 2;
@@ -869,7 +869,7 @@ class CRM_Core_DAO extends DB_DataObject {
         $attributes['cols'] = $cols;
         return $attributes;
       }
-      elseif (CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_INT || CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_FLOAT || CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_MONEY) {
+      elseif (($field['type'] ?? NULL) == CRM_Utils_Type::T_INT || ($field['type'] ?? NULL) == CRM_Utils_Type::T_FLOAT || ($field['type'] ?? NULL) == CRM_Utils_Type::T_MONEY) {
         $attributes['size'] = 6;
         $attributes['maxlength'] = 14;
         return $attributes;
@@ -1643,7 +1643,7 @@ LIKE %1
     $result = $dao->query($queryStr, $i18nRewrite);
 
     // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism.
-    if (CRM_Utils_Array::value('result_buffering', $options) === 0) {
+    if (($options['result_buffering'] ?? NULL) === 0) {
       $dao->N = TRUE;
     }
 
@@ -2742,8 +2742,8 @@ SELECT contact_id
         // We restrict to id + name + FK as we are extending this a bit, but cautiously.
         elseif (
           !empty($field['FKClassName'])
-          && CRM_Utils_Array::value('keyColumn', $pseudoConstant) === 'id'
-          && CRM_Utils_Array::value('labelColumn', $pseudoConstant) === 'name'
+          && ($pseudoConstant['keyColumn'] ?? NULL) === 'id'
+          && ($pseudoConstant['labelColumn'] ?? NULL) === 'name'
         ) {
           $pseudoFieldName = str_replace('_' . $pseudoConstant['keyColumn'], '', $field['name']);
           // This if is just an extra caution when adding change.
@@ -3068,7 +3068,7 @@ SELECT contact_id
     $skipContactCheckFor = ['Note'];
     foreach ($fields as $fieldName => $field) {
       // Clause for contact-related entities like Email, Relationship, etc.
-      if (strpos($field['name'], 'contact_id') === 0 && !in_array($field['entity'], $skipContactCheckFor) && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
+      if (strpos($field['name'], 'contact_id') === 0 && !in_array($field['entity'], $skipContactCheckFor) && ($field['FKClassName'] ?? NULL) == 'CRM_Contact_DAO_Contact') {
         $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
         if (!empty($contactClause)) {
           $clauses[$field['name']] = $contactClause;

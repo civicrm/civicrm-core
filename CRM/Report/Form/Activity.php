@@ -577,7 +577,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           }
 
           if ($field['name'] == 'current_user') {
-            if (CRM_Utils_Array::value("{$fieldName}_value", $this->_params) ==
+            if (($this->_params["{$fieldName}_value"] ?? NULL) ==
               1
             ) {
               // get current user
@@ -657,7 +657,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    * @throws Exception
    */
   public function add2group($groupID) {
-    if (CRM_Utils_Array::value("contact_target_op", $this->_params) == 'nll') {
+    if (($this->_params["contact_target_op"] ?? NULL) == 'nll') {
       CRM_Core_Error::statusBounce(ts('Current filter criteria didn\'t have any target contact to add to group'));
     }
 
@@ -729,12 +729,12 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     //Assign those recordtype to array which have filter operator as 'Is not empty' or 'Is empty'
     $nullFilters = [];
     foreach (['target', 'source', 'assignee'] as $type) {
-      if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) ==
+      if (($this->_params["contact_{$type}_op"] ?? NULL) ==
         'nnll' || !empty($this->_params["contact_{$type}_value"])
       ) {
         $nullFilters[] = " civicrm_contact_contact_{$type}_id IS NOT NULL ";
       }
-      elseif (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) ==
+      elseif (($this->_params["contact_{$type}_op"] ?? NULL) ==
         'nll'
       ) {
         $nullFilters[] = " civicrm_contact_contact_{$type}_id IS NULL ";

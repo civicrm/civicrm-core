@@ -114,7 +114,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
       CRM_Utils_System::redirect($url);
     }
 
-    if ((isset($params['send_option']) && $params['send_option'] == 'send_immediate') || CRM_Utils_Array::value('_qf_Schedule_back', $params) == ts('Previous')) {
+    if ((isset($params['send_option']) && $params['send_option'] == 'send_immediate') || ($params['_qf_Schedule_back'] ?? NULL) == ts('Previous')) {
       return TRUE;
     }
 

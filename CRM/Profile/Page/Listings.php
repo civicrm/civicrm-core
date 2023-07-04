@@ -171,8 +171,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
           $value = '%' . $value . '%';
         }
       }
-      elseif (CRM_Utils_Array::value('html_type', $field) == 'Multi-Select State/Province'
-        || CRM_Utils_Array::value('html_type', $field) == 'Multi-Select Country'
+      elseif (($field['html_type'] ?? NULL) == 'Multi-Select State/Province'
+        || ($field['html_type'] ?? NULL) == 'Multi-Select Country'
       ) {
         $value = CRM_Utils_Request::retrieve($name, 'String', $this, FALSE, NULL, 'REQUEST');
         if (!is_array($value)) {

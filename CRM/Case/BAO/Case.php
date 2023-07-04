@@ -699,7 +699,8 @@ HERESQL;
       $casesList[$key]['manager'] = self::getCaseManagerContact($caseTypes[$case['case_type_id']], $case['case_id']);
 
       $casesList[$key]['date'] = $activityTypeLabels[$case['activity_type_id']] ?? NULL;
-      if ($actId = CRM_Utils_Array::value('activity_id', $case)) {
+      $actId = $case['activity_id'] ?? NULL;
+      if ($actId) {
         if (self::checkPermission($actId, 'view', $case['activity_type_id'], $userID)) {
           if ($type == 'recent') {
             $casesList[$key]['date'] = sprintf('<a class="action-item crm-hover-button" href="%s" title="%s">%s</a>',
@@ -1360,7 +1361,7 @@ HERESQL;
     $tplParams['activityTypeName'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'activity_type_id', $activityTypeId);
     $tplParams['activity'] = $activityInfo;
     foreach ($tplParams['activity']['fields'] as $k => $val) {
-      if (CRM_Utils_Array::value('label', $val) == ts('Subject')) {
+      if (($val['label'] ?? NULL) == ts('Subject')) {
         $activitySubject = $val['value'];
         break;
       }

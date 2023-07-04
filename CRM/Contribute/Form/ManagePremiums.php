@@ -195,14 +195,14 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   public static function formRule($params, $files) {
 
     // If choosing to upload an image, then an image must be provided
-    if (CRM_Utils_Array::value('imageOption', $params) == 'image'
+    if (($params['imageOption'] ?? NULL) == 'image'
       && empty($files['uploadFile']['name'])
     ) {
       $errors['uploadFile'] = ts('A file must be selected');
     }
 
     // If choosing to use image URLs, then both URLs must be present
-    if (CRM_Utils_Array::value('imageOption', $params) == 'thumbnail') {
+    if (($params['imageOption'] ?? NULL) == 'thumbnail') {
       if (!$params['imageUrl']) {
         $errors['imageUrl'] = ts('Image URL is Required');
       }

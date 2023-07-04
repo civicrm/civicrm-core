@@ -1529,7 +1529,7 @@ abstract class CRM_Core_Payment {
 
     if (isset($_GET['payment_date']) &&
       isset($_GET['merchant_return_link']) &&
-      CRM_Utils_Array::value('payment_status', $_GET) == 'Completed' &&
+      ($_GET['payment_status'] ?? NULL) == 'Completed' &&
       $paymentProcessor['payment_processor_type'] == "PayPal_Standard"
     ) {
       return TRUE;
@@ -1615,7 +1615,7 @@ abstract class CRM_Core_Payment {
       // This is called when processor_name is passed - passing processor_id instead is recommended.
       $sql .= " WHERE ppt.name = %2 AND pp.is_test = %1";
       $args[1] = [
-        (CRM_Utils_Array::value('mode', $params) == 'test') ? 1 : 0,
+        (($params['mode'] ?? NULL) == 'test') ? 1 : 0,
         'Integer',
       ];
       $args[2] = [$params['processor_name'], 'String'];

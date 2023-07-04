@@ -222,10 +222,10 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
         }
       }
     }
-    if (CRM_Utils_Array::value('account_relationship', $values) == 'select') {
+    if (($values['account_relationship'] ?? NULL) == 'select') {
       $errorMsg['account_relationship'] = 'Financial Account relationship is a required field.';
     }
-    if (CRM_Utils_Array::value('financial_account_id', $values) == 'select') {
+    if (($values['financial_account_id'] ?? NULL) == 'select') {
       $errorMsg['financial_account_id'] = 'Financial Account is a required field.';
     }
     if (!empty($values['account_relationship']) && !empty($values['financial_account_id'])) {

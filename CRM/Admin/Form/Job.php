@@ -261,7 +261,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $dao->save();
 
     // CRM-11143 - Give warning message if update_greetings is Enabled (is_active) since it generally should not be run automatically via execute action or runjobs url.
-    if ($values['api_action'] == 'update_greeting' && CRM_Utils_Array::value('is_active', $values) == 1) {
+    if ($values['api_action'] == 'update_greeting' && ($values['is_active'] ?? NULL) == 1) {
       $docLink = CRM_Utils_System::docURL2("user/initial-set-up/scheduled-jobs/#job_update_greeting");
       $msg = ts('The update greeting job can be very resource intensive and is typically not necessary to run on a regular basis. If you do choose to enable the job, we recommend you do not run it with the force=1 option, which would rebuild greetings on all records. Leaving that option absent, or setting it to force=0, will only rebuild greetings for contacts that do not currently have a value stored. %1', [1 => $docLink]);
       CRM_Core_Session::setStatus($msg, ts('Warning: Update Greeting job enabled'), 'alert');

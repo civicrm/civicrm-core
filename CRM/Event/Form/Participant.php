@@ -868,11 +868,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $params = $this->controller->exportValues($this->_name);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      if (CRM_Utils_Array::value('delete_participant', $params) == 2) {
+      if (($params['delete_participant'] ?? NULL) == 2) {
         $additionalId = (CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id));
         $participantLinks = (CRM_Event_BAO_Participant::getAdditionalParticipantUrl($additionalId));
       }
-      if (CRM_Utils_Array::value('delete_participant', $params) == 1) {
+      if (($params['delete_participant'] ?? NULL) == 1) {
         $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id);
         foreach ($additionalIds as $value) {
           CRM_Event_BAO_Participant::deleteParticipant($value);
@@ -1476,7 +1476,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
         && empty($form->_values['fee'])
-        && CRM_Utils_Array::value('snippet', $_REQUEST) == CRM_Core_Smarty::PRINT_NOFORM
+        && ($_REQUEST['snippet'] ?? NULL) == CRM_Core_Smarty::PRINT_NOFORM
       ) {
         CRM_Core_Session::setStatus(ts('You do not have all the permissions needed for this page.'), 'Permission Denied', 'error');
         return FALSE;
@@ -1710,7 +1710,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     $this->assign('event', $event);
     $this->assign('isShowLocation', $event['is_show_location']);
-    if (CRM_Utils_Array::value('is_show_location', $event) == 1) {
+    if (($event['is_show_location'] ?? NULL) == 1) {
       $locationParams = [
         'entity_id' => $eventID,
         'entity_table' => 'civicrm_event',
@@ -1787,7 +1787,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $contribParams['is_test'] = 0;
-    if ($form->_action & CRM_Core_Action::PREVIEW || CRM_Utils_Array::value('mode', $params) == 'test') {
+    if ($form->_action & CRM_Core_Action::PREVIEW || ($params['mode'] ?? NULL) == 'test') {
       $contribParams['is_test'] = 1;
     }
 
@@ -1861,7 +1861,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'campaign_id' => $params['campaign_id'] ?? NULL,
     ];
 
-    if ($form->_action & CRM_Core_Action::PREVIEW || CRM_Utils_Array::value('mode', $params) == 'test') {
+    if ($form->_action & CRM_Core_Action::PREVIEW || ($params['mode'] ?? NULL) == 'test') {
       $participantParams['is_test'] = 1;
     }
     else {

@@ -473,7 +473,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         elseif (in_array(substr($field, 0, 3), [
           'is_',
           'do_',
-        ]) || CRM_Utils_Array::value('data_type', $info) == 'Boolean'
+        ]) || ($info['data_type'] ?? NULL) == 'Boolean'
         ) {
           $options[$field] = 'yesno';
           if ($entity != 'contact') {

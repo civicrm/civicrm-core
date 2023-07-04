@@ -316,13 +316,13 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     }
 
     $fixed_period_rollover = FALSE;
-    if (CRM_Utils_Array::value('period_type', $membershipTypeDetails) == 'rolling') {
+    if (($membershipTypeDetails['period_type'] ?? NULL) == 'rolling') {
       if (!$startDate) {
         $startDate = $joinDate;
       }
       $actualStartDate = $startDate;
     }
-    elseif (CRM_Utils_Array::value('period_type', $membershipTypeDetails) == 'fixed') {
+    elseif (($membershipTypeDetails['period_type'] ?? NULL) == 'fixed') {
       // calculate start date
       // if !$startDate then use $joinDate
       $toDay = explode('-', (empty($startDate) ? $joinDate : $startDate));
