@@ -1457,8 +1457,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       ]));
   }
 
+  /**
+   * This is no longer guarding against the original issue, but is still a test
+   * of something. It's now mostly testing a different variation of
+   * relationship + the default in api3 being to not check permissions.
+   */
   public function testCreateWithLesserPermissions() {
-    $this->setUpACLByCheating();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
     $params = [
       'contact_id_a' => $this->_cId_a,
@@ -1468,16 +1472,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $id = $this->callAPISuccess('Relationship', 'create', $params)['id'];
     $relationship = $this->callAPISuccess('Relationship', 'getsingle', ['id' => $id]);
     $this->assertEquals($params, array_intersect_key($relationship, $params));
-    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_acl");
-  }
-
-  /**
-   * Normally a stock install has some acls in the table even if they aren't in
-   * use. I can't figure out how to set them up another way so I just lifted
-   * this from civicrm_generated.mysql
-   */
-  private function setUpACLByCheating() {
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl (name, deny, entity_table, entity_id, operation, object_table, object_id, acl_table, acl_id, is_active) VALUES ('Edit All Contacts', 0, 'civicrm_acl_role', 1, 'Edit', 'civicrm_group', 0, NULL, NULL, 1)");
   }
 
 }
