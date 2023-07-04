@@ -283,9 +283,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return string
    */
   private function rewrite(array $column, array $data): string {
-    $output = $this->replaceTokens($column['rewrite'], $data, 'view');
     // Cheap strpos to skip Smarty processing if not needed
-    if (strpos($output, '{') !== FALSE) {
+    $hasSmarty = strpos($column['rewrite'], '{') !== FALSE;
+    $output = $this->replaceTokens($column['rewrite'], $data, 'view');
+    if ($hasSmarty) {
       $smarty = \CRM_Core_Smarty::singleton();
       $output = $smarty->fetchWith("string:$output", []);
     }
