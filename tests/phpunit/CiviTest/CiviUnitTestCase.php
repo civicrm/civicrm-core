@@ -321,6 +321,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     // clear permissions stub to not check permissions
     $config->userPermissionClass->permissions = NULL;
 
+    // Normally a stock install has some acls in the table even if they aren't in use.
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl (name, deny, entity_table, entity_id, operation, object_table, object_id, acl_table, acl_id, is_active) VALUES ('Edit All Contacts', 0, 'civicrm_acl_role', 1, 'Edit', 'civicrm_group', 0, NULL, NULL, 1)");
+
     //flush component settings
     CRM_Core_Component::getEnabledComponents(TRUE);
 
@@ -464,7 +467,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       CRM_Core_Transaction::forceRollbackIfEnabled();
       Manager::singleton(TRUE);
 
-      $tablesToTruncate = ['civicrm_contact', 'civicrm_uf_match', 'civicrm_email', 'civicrm_address'];
+      $tablesToTruncate = ['civicrm_contact', 'civicrm_uf_match', 'civicrm_email', 'civicrm_address', 'civicrm_acl'];
       $this->quickCleanup($tablesToTruncate);
       $this->createDomainContacts();
     }

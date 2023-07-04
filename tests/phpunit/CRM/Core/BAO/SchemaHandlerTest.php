@@ -145,7 +145,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     CRM_Core_DAO::singleValueQuery('ANALYZE TABLE civicrm_acl');
     $this->assertEquals([
       'civicrm_worldregion' => 6,
-      'civicrm_acl' => 0,
+      'civicrm_acl' => 1,
       'civicrm_domain' => 2,
     ], CRM_Core_BAO_SchemaHandler::getRowCountForTables(['civicrm_domain', 'civicrm_acl', 'random_name', 'civicrm_worldregion']));
     $this->assertEquals(2, CRM_Core_BAO_SchemaHandler::getRowCountForTable('civicrm_domain'));
