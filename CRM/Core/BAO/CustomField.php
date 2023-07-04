@@ -938,8 +938,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           'time' => $field->time_format ? $field->time_format * 12 : FALSE,
         ];
         if ($field->is_search_range && $search) {
-          $qf->add('datepicker', $elementName . '_from', $label, $fieldAttributes + array('placeholder' => ts('From')), FALSE, $params);
-          $qf->add('datepicker', $elementName . '_to', NULL, $fieldAttributes + array('placeholder' => ts('To')), FALSE, $params);
+          $qf->add('datepicker', $elementName . '_from', $label, $fieldAttributes + ['placeholder' => ts('From')], FALSE, $params);
+          $qf->add('datepicker', $elementName . '_to', NULL, $fieldAttributes + ['placeholder' => ts('To')], FALSE, $params);
         }
         else {
           $element = $qf->add('datepicker', $elementName, $label, $fieldAttributes, $useRequired && !$search, $params);
@@ -2696,28 +2696,28 @@ WHERE      f.id IN ($ids)";
         case 'Int':
           $ruleName = 'integer';
           $errorMsg = ts('%1 must be an integer (whole number).',
-            array(1 => $fieldTitle)
+            [1 => $fieldTitle]
           );
           break;
 
         case 'Money':
           $ruleName = 'money';
           $errorMsg = ts('%1 must in proper money format. (decimal point/comma/space is allowed).',
-            array(1 => $fieldTitle)
+            [1 => $fieldTitle]
           );
           break;
 
         case 'Float':
           $ruleName = 'numeric';
           $errorMsg = ts('%1 must be a number (with or without decimal point).',
-            array(1 => $fieldTitle)
+            [1 => $fieldTitle]
           );
           break;
 
         case 'Link':
           $ruleName = 'wikiURL';
           $errorMsg = ts('%1 must be valid Website.',
-            array(1 => $fieldTitle)
+            [1 => $fieldTitle]
           );
           break;
       }

@@ -277,7 +277,7 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
       1 => ['upgrade%' . $highVersion . '.upgrade', 'String'],
     ]);
     $highLogId = $highLog->fetch() ? $highLog->id : CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_log');
-    return array($lowLogId, $highLogId);
+    return [$lowLogId, $highLogId];
   }
 
   /**

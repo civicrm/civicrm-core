@@ -78,20 +78,20 @@ class TAP9 extends Printer implements ResultPrinter {
     $this
       ->writeNotOk($test, 'Failure');
     $message = explode("\n", \PHPUnit\Framework\TestFailure::exceptionToString($e));
-    $diagnostic = array(
+    $diagnostic = [
       'message' => $message[0],
       'severity' => 'fail',
-    );
+    ];
     if ($e instanceof \PHPUnit\Framework\ExpectationFailedException) {
       $cf = $e
         ->getComparisonFailure();
       if ($cf !== NULL) {
-        $diagnostic['data'] = array(
+        $diagnostic['data'] = [
           'got' => $cf
             ->getActual(),
           'expected' => $cf
             ->getExpected(),
-        );
+        ];
       }
     }
 

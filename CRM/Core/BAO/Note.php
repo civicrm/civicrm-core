@@ -167,14 +167,14 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
 
       $recentOther = [];
       if ($noteActions) {
-        $recentOther = array(
+        $recentOther = [
           'editUrl' => CRM_Utils_System::url('civicrm/contact/view/note',
             "reset=1&action=update&cid={$note->entity_id}&id={$note->id}&context=home"
           ),
           'deleteUrl' => CRM_Utils_System::url('civicrm/contact/view/note',
             "reset=1&action=delete&cid={$note->entity_id}&id={$note->id}&context=home"
           ),
-        );
+        ];
       }
 
       // add the recently created Note
@@ -327,7 +327,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
      AND  entity_id = %1
      AND  note is not null
 ORDER BY  modified_date desc";
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
@@ -501,7 +501,7 @@ ORDER BY  modified_date desc";
    *   Contact id whose notes to be deleted.
    */
   public static function cleanContactNotes($contactID) {
-    $params = array(1 => array($contactID, 'Integer'));
+    $params = [1 => [$contactID, 'Integer']];
 
     // delete all notes related to contribution
     $contributeQuery = "DELETE note.*

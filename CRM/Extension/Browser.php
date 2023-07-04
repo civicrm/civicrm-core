@@ -209,7 +209,7 @@ class CRM_Extension_Browser {
    * @throws \CRM_Extension_Exception
    */
   private function grabRemoteJson() {
-    set_error_handler(array('CRM_Extension_Browser', 'downloadError'));
+    set_error_handler(['CRM_Extension_Browser', 'downloadError']);
 
     if (FALSE === $this->getRepositoryUrl()) {
       // don't check if the user has configured civi not to check an external

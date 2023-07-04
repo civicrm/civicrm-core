@@ -83,7 +83,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'callback':
-          $args = $snippet['arguments'] ?? array(&$snippet, &$html);
+          $args = $snippet['arguments'] ?? [&$snippet, &$html];
           $html .= call_user_func_array($snippet['callback'], $args);
           break;
 

@@ -1426,7 +1426,7 @@ class CRM_Report_Form extends CRM_Core_Form {
               $fieldName === 'state_province_id' || $fieldName === 'county_id'
             ) {
               $element = $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations,
-                array('onchange' => "return showHideMaxMinVal( '$fieldName', this.value );")
+                ['onchange' => "return showHideMaxMinVal( '$fieldName', this.value );"]
               );
 
               if (count($operations) <= 1) {
