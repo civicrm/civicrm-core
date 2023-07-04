@@ -17,6 +17,9 @@ class CRM_CivicrmAdminUi_Upgrader extends CRM_Extension_Upgrader_Base {
       ->execute();
   }
 
+  /**
+   * @todo "install" and "uninstall" may not be needed if enable and disable are present. See https://github.com/civicrm/civicrm-core/pull/26669
+   */
   public function install(): void {
     $this->replaceFindContactMenuPath('civicrm/adminui/contact/search');
   }
