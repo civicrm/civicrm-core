@@ -292,11 +292,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal\Core\Url::fromUri("{$base}{$url['path']}", array(
+      $url = \Drupal\Core\Url::fromUri("{$base}{$url['path']}", [
         'query' => $url['query'],
         'fragment' => $fragment,
         'absolute' => $absolute,
-      ))->toString();
+      ])->toString();
     }
     catch (Exception $e) {
       \Drupal::logger('civicrm')->error($e->getMessage());

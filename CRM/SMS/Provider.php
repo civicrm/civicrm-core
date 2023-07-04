@@ -98,7 +98,7 @@ abstract class CRM_SMS_Provider {
       $sql = "
 SELECT scheduled_id FROM civicrm_mailing m
 INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
-      $sourceContactID = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($jobID, 'Integer')));
+      $sourceContactID = CRM_Core_DAO::singleValueQuery($sql, [1 => [$jobID, 'Integer']]);
     }
     elseif ($userID) {
       $sourceContactID = $userID;
@@ -116,14 +116,14 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     }
 
     // note: lets not pass status here, assuming status will be updated by callback
-    $activityParams = array(
+    $activityParams = [
       'source_contact_id' => $sourceContactID,
       'target_contact_id' => $headers['contact_id'],
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS delivery'),
       'activity_date_time' => date('YmdHis'),
       'details' => $message,
       'result' => $apiMsgID,
-    );
+    ];
     return CRM_Activity_BAO_Activity::create($activityParams);
   }
 
@@ -170,9 +170,9 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     if (!$message->fromContactID) {
       // find sender by phone number if $fromContactID not set by hook
       $formatFrom = '%' . $this->formatPhone($this->stripPhone($message->from), $like, "like");
-      $message->fromContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", array(
-        1 => array($formatFrom, 'String'),
-      ));
+      $message->fromContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", [
+        1 => [$formatFrom, 'String'],
+      ]);
     }
 
     if (!$message->fromContactID) {
@@ -184,22 +184,22 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       $phoneloc = array_search('Home', $locationTypes);
       $phonetype = array_search('Mobile', $phoneTypes);
       $stripFrom = $this->stripPhone($message->from);
-      $contactparams = array(
+      $contactparams = [
         'contact_type' => 'Individual',
-        'email' => array(
-          1 => array(
+        'email' => [
+          1 => [
             'location_type_id' => $phoneloc,
             'email' => $stripFrom . '@mobile.sms',
-          ),
-        ),
-        'phone' => array(
-          1 => array(
+          ],
+        ],
+        'phone' => [
+          1 => [
             'phone_type_id' => $phonetype,
             'location_type_id' => $phoneloc,
             'phone' => $stripFrom,
-          ),
-        ),
-      );
+          ],
+        ],
+      ];
       $fromContact = CRM_Contact_BAO_Contact::create($contactparams, FALSE, TRUE, FALSE);
       $message->fromContactID = $fromContact->id;
     }
@@ -207,9 +207,9 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     if (!$message->toContactID) {
       // find recipient if $toContactID not set by hook
       if ($message->to) {
-        $message->toContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", array(
-          1 => array('%' . $message->to, 'String'),
-        ));
+        $message->toContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", [
+          1 => ['%' . $message->to, 'String'],
+        ]);
       }
       else {
         $message->toContactID = $message->fromContactID;
@@ -218,7 +218,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
 
     if ($message->fromContactID) {
       // note: lets not pass status here, assuming status will be updated by callback
-      $activityParams = array(
+      $activityParams = [
         'source_contact_id' => $message->toContactID,
         'target_contact_id' => $message->fromContactID,
         'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound SMS'),
@@ -226,7 +226,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
         'details' => $message->body,
         'phone_number' => $message->from,
-      );
+      ];
       if ($message->trackID) {
         $activityParams['result'] = CRM_Utils_Type::escape($message->trackID, 'String');
       }

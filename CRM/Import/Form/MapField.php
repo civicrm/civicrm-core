@@ -193,9 +193,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
       $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
     }
     if ($weightSum < $threshold) {
-      return $fieldMessage . ' ' . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
-        1 => $threshold,
-      ));
+      return $fieldMessage . ' ' . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [1 => $threshold]);
     }
     return '';
   }

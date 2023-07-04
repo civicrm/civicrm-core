@@ -49,14 +49,14 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     }
 
     // set breadcrumb to return to Custom Search listings page
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Custom Searches'),
         'url' => CRM_Utils_System::url('civicrm/contact/search/custom/list',
           'reset=1'
         ),
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     // use the custom selector
@@ -70,7 +70,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     // instantiate the new class
     $this->_customClass = new $this->_customSearchClass($this->_formValues);
 
-    $this->addFormRule(array($this->_customClass, 'formRule'), $this);
+    $this->addFormRule([$this->_customClass, 'formRule'], $this);
 
     // CRM-12747
     if (isset($this->_customClass->_permissionedComponent) &&
@@ -84,7 +84,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(array($this->_customClass, 'formRule'));
+    $this->addFormRule([$this->_customClass, 'formRule']);
   }
 
   /**

@@ -81,7 +81,7 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
         }
       }
 
-      $result = $app->triggerEvent($fnSuffix, array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6));
+      $result = $app->triggerEvent($fnSuffix, [&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6]);
 
       $moduleResult = $this->commonInvoke($numParams,
         $arg1, $arg2, $arg3, $arg4, $arg5, $arg6,

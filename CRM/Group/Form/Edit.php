@@ -102,18 +102,16 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     // current set id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     if ($this->_id) {
-      $breadCrumb = array(
-        array(
+      $breadCrumb = [
+        [
           'title' => ts('Manage Groups'),
-          'url' => CRM_Utils_System::url('civicrm/group',
-            'reset=1'
-          ),
-        ),
-      );
+          'url' => CRM_Utils_System::url('civicrm/group', 'reset=1'),
+        ],
+      ];
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
       $this->_groupValues = [];
-      $params = array('id' => $this->_id);
+      $params = ['id' => $this->_id];
       $this->_group = CRM_Contact_BAO_Group::retrieve($params, $this->_groupValues);
       $this->_title = $this->_groupValues['title'];
     }
@@ -144,18 +142,18 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to change settings for this reserved group.'));
       }
       if (isset($this->_id)) {
-        $groupValues = array(
+        $groupValues = [
           'id' => $this->_id,
           'title' => $this->_title,
           'saved_search_id' => $this->_groupValues['saved_search_id'] ?? '',
-        );
+        ];
         $this->assign('editSmartGroupURL', isset($this->_groupValues['saved_search_id']) ? CRM_Contact_BAO_SavedSearch::getEditSearchUrl($this->_groupValues['saved_search_id']) : NULL);
         $groupValues['created_by'] = empty($this->_groupValues['created_id']) ? NULL : CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_groupValues['created_id'], 'sort_name', 'id');
         $groupValues['modified_by'] = empty($this->_groupValues['modified_id']) ? NULL : CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_groupValues['modified_id'], 'sort_name', 'id');
 
         $this->assign('group', $groupValues);
 
-        $this->setTitle(ts('Group Settings: %1', array(1 => $this->_title)));
+        $this->setTitle(ts('Group Settings: %1', [1 => $this->_title]));
       }
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/group', 'reset=1'));
@@ -261,12 +259,12 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       $doParentCheck = !($this->_id && CRM_Core_BAO_Domain::isDomainGroup($this->_id));
     }
 
-    $options = array(
+    $options = [
       'selfObj' => $this,
       'parentGroups' => $parentGroups,
       'doParentCheck' => $doParentCheck,
-    );
-    $this->addFormRule(array('CRM_Group_Form_Edit', 'formRule'), $options);
+    ];
+    $this->addFormRule(['CRM_Group_Form_Edit', 'formRule'], $options);
   }
 
   /**
@@ -314,16 +312,16 @@ SELECT count(*)
 FROM   civicrm_group
 WHERE  title = %1
 ";
-      $params = array(1 => array($title, 'String'));
+      $params = [1 => [$title, 'String']];
 
       if ($self->_id) {
         $query .= "AND id <> %2";
-        $params[2] = array($self->_id, 'Integer');
+        $params[2] = [$self->_id, 'Integer'];
       }
 
       $grpCnt = CRM_Core_DAO::singleValueQuery($query, $params);
       if ($grpCnt) {
-        $errors['title'] = ts('Group \'%1\' already exists.', array(1 => $fields['title']));
+        $errors['title'] = ts('Group \'%1\' already exists.', [1 => $fields['title']]);
       }
     }
 
@@ -339,7 +337,7 @@ WHERE  title = %1
     $updateNestingCache = FALSE;
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contact_BAO_Group::discard($this->_id);
-      CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", array(1 => $this->_title)), ts('Group Deleted'), 'success');
+      CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", [1 => $this->_title]), ts('Group Deleted'), 'success');
       $updateNestingCache = TRUE;
     }
     else {
@@ -373,7 +371,7 @@ WHERE  title = %1
       // Set the entity id so it is available to postProcess hook consumers
       $this->setEntityId($group->id);
 
-      CRM_Core_Session::setStatus(ts('The Group \'%1\' has been saved.', array(1 => $group->title)), ts('Group Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('The Group \'%1\' has been saved.', [1 => $group->title]), ts('Group Saved'), 'success');
 
       // Add context to the session, in case we are adding members to the group
       if ($this->_action & CRM_Core_Action::ADD) {
@@ -433,7 +431,7 @@ WHERE  title = %1
       else {
         $required = FALSE;
       }
-      $form->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, array('class' => 'crm-select2', 'multiple' => TRUE));
+      $form->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, ['class' => 'crm-select2', 'multiple' => TRUE]);
     }
 
     return $parentGroups;
@@ -450,7 +448,7 @@ WHERE  title = %1
   public static function buildGroupOrganizations(&$form) {
     if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
       //group organization Element
-      $props = array('api' => array('params' => array('contact_type' => 'Organization')));
+      $props = ['api' => ['params' => ['contact_type' => 'Organization']]];
       $form->addEntityRef('organization_id', ts('Organization'), $props);
     }
   }

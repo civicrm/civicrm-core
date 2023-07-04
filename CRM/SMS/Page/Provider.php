@@ -42,14 +42,14 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - SMS Provider'));
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('SMS Provider'),
         'url' => CRM_Utils_System::url('civicrm/admin/sms/provider',
           'reset=1'
         ),
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'String',
@@ -84,7 +84,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
       $provider['api_type'] = $apiTypes[$provider['api_type']];
 
       $provider['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $provider['id']),
+        ['id' => $provider['id']],
         ts('more'),
         FALSE,
         'sms.provider.row',

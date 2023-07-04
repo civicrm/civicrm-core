@@ -91,9 +91,9 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       }
       else {
         if (!isset($refs[$dao->parent_id])) {
-          $refs[$dao->parent_id] = array(
+          $refs[$dao->parent_id] = [
             'children' => [],
-          );
+          ];
         }
         $refs[$dao->parent_id]['children'][$dao->id] = &$thisref;
       }

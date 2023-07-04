@@ -1251,10 +1251,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $contactMatching = 0;
 
     // Previously used the $wpdb global - which means WordPress *must* be bootstrapped.
-    $wpUsers = get_users(array(
+    $wpUsers = get_users([
       'blog_id' => get_current_blog_id(),
       'number' => -1,
-    ));
+    ]);
 
     foreach ($wpUsers as $wpUserData) {
       $contactCount++;
