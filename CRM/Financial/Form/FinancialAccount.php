@@ -146,7 +146,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         $errorMsg['tax_rate'] = ts('Please enter value for tax rate');
       }
     }
-    if ((CRM_Utils_Array::value('tax_rate', $values) != NULL)) {
+    if ((($values['tax_rate'] ?? NULL) != NULL)) {
       if ($values['tax_rate'] < 0 || $values['tax_rate'] >= 100) {
         $errorMsg['tax_rate'] = ts('Tax Rate Should be between 0 - 100');
       }

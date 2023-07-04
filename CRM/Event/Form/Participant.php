@@ -1339,7 +1339,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $updateStatusMsg = NULL;
     //send mail when participant status changed, CRM-4326
     if ($this->_id && $this->_statusId &&
-      $this->_statusId != CRM_Utils_Array::value('status_id', $params) && !empty($params['is_notify'])
+      $this->_statusId != ($params['status_id'] ?? NULL) && !empty($params['is_notify'])
     ) {
 
       $updateStatusMsg = CRM_Event_BAO_Participant::updateStatusMessage($this->_id,

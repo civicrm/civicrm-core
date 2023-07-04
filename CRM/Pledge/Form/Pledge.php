@@ -310,7 +310,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->assign('eachPaymentAmount', $eachPaymentAmount);
     }
 
-    if (CRM_Utils_Array::value('status_id', $this->_values) !=
+    if (($this->_values['status_id'] ?? NULL) !=
       CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Cancelled')
     ) {
 

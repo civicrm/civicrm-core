@@ -856,7 +856,7 @@ LIMIT  1
           );
         }
         if (!array_key_exists(CRM_Utils_Array::value('display_name', $client), $report->_redactionStringRules)) {
-          $report->_redactionStringRules[CRM_Utils_Array::value('display_name', $client)] = $report->_redactionStringRules[CRM_Utils_Array::value('sort_name', $client)];
+          $report->_redactionStringRules[$client['display_name'] ?? NULL] = $report->_redactionStringRules[$client['sort_name'] ?? NULL];
         }
         $client['sort_name'] = $report->redact(CRM_Utils_Array::value('sort_name', $client), TRUE, $report->_redactionStringRules);
         if (!empty($client['email']) &&

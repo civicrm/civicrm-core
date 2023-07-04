@@ -256,7 +256,7 @@ class CRM_Report_Form_Instance {
 
       // CRM-17310 private reports option.
       $defaults['add_to_my_reports'] = 0;
-      if (CRM_Utils_Array::value('owner_id', $defaults) != NULL) {
+      if (($defaults['owner_id'] ?? NULL) != NULL) {
         $defaults['add_to_my_reports'] = 1;
       }
 
