@@ -262,7 +262,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           'qs' => "reset=1&cid=%%id%%{$searchContext}{$extraParams}",
           'title' => ts('View Contact Details'),
           'ref' => 'view-contact',
-          'weight' => -20,
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
@@ -271,36 +271,37 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           'qs' => "reset=1&action=update&cid=%%id%%{$searchContext}{$extraParams}",
           'title' => ts('Edit Contact Details'),
           'ref' => 'edit-contact',
-          'weight' => -10,
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
       ];
 
       $config = CRM_Core_Config::singleton();
       //CRM-16552: mapAPIKey is not mandatory as google no longer requires an API Key
-      if ($config->mapProvider && ($config->mapAPIKey || $config->mapProvider == 'Google')) {
+      if (\Civi::settings()->get('mapProvider') === 'Google' || (\Civi::settings()->get('mapProvider') && \Civi::settings()->get('mapAPIKey'))) {
         self::$_links[CRM_Core_Action::MAP] = [
           'name' => ts('Map'),
           'url' => 'civicrm/contact/map',
           'qs' => "reset=1&cid=%%id%%{$searchContext}{$extraParams}",
           'title' => ts('Map Contact'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::MAP),
         ];
       }
 
       // Adding Context Menu Links in more action
       if ($contextMenu) {
         $counter = 7000;
-        foreach ($contextMenu as $key => $value) {
+        foreach ($contextMenu as $value) {
           $contextVal = '&context=' . $value['key'];
-          if ($value['key'] == 'delete') {
+          if ($value['key'] === 'delete') {
             $contextVal = $searchContext;
           }
           $url = "civicrm/contact/view/{$value['key']}";
           $qs = "reset=1&action=add&cid=%%id%%{$contextVal}{$extraParams}";
-          if ($value['key'] == 'activity') {
+          if ($value['key'] === 'activity') {
             $qs = "action=browse&selectedChild=activity&reset=1&cid=%%id%%{$extraParams}";
           }
-          elseif ($value['key'] == 'email') {
-            $url = "civicrm/contact/view/activity";
+          elseif ($value['key'] === 'email') {
+            $url = 'civicrm/contact/view/activity';
             $qs = "atype=3&action=add&reset=1&cid=%%id%%{$extraParams}";
           }
 
