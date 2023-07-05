@@ -455,6 +455,12 @@ class CRM_Extension_Manager {
     // TODO: to mitigate the risk of crashing during installation, scan
     // keys/statuses/types before doing anything
 
+    // Component data still lives inside of core-core. Uninstalling is nonsensical.
+    $notUninstallable = array_intersect($keys, $this->mapper->getKeysByTag('component'));
+    if (count($notUninstallable)) {
+      throw new CRM_Extension_Exception("Cannot uninstall extensions which are tagged as components: " . implode(', ', $notUninstallable));
+    }
+
     $this->addProcess($keys, 'uninstall');
 
     foreach ($keys as $key) {
