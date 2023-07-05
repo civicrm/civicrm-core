@@ -290,7 +290,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     if ($this->userPermissionClass->isModulePermissionSupported()) {
       // Can store permissions -- so do it!
       $this->userPermissionClass->upgradePermissions(
-        CRM_Core_Permission::basicPermissions()
+        CRM_Core_Permission::basicPermissions(TRUE)
       );
     }
     elseif (get_class($this->userPermissionClass) !== 'CRM_Core_Permission_UnitTests') {
