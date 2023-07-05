@@ -169,7 +169,7 @@ class CRM_Financial_BAO_Payment {
         }
       }
     }
-
+    self::updateRelatedContribution($params, $params['contribution_id']);
     if ($isPaymentCompletesContribution) {
       if ($contributionStatus === 'Pending refund') {
         // Ideally we could still call completetransaction as non-payment related actions should
@@ -213,7 +213,6 @@ class CRM_Financial_BAO_Payment {
       //  change status to refunded.
       self::updateContributionStatus($contribution['id'], 'Refunded');
     }
-    self::updateRelatedContribution($params, $params['contribution_id']);
     CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], CRM_Utils_Array::value('participant_id', $params), $params['total_amount'], $trxn->currency, $trxn->trxn_date);
     return $trxn;
   }
