@@ -41,6 +41,7 @@
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>smarty-v2@1.0.1</mixin>
     <mixin>entity-types-php@1.0.0</mixin>
+    <mixin>afform-entity-php@1.0.0</mixin>
   </mixins>
   <upgrader>CRM_Standaloneusers_Upgrader</upgrader>
   <tags>

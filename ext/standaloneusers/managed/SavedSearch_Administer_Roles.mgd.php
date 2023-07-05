@@ -3,28 +3,25 @@ use CRM_Standaloneusers_ExtensionUtil as E;
 
 return [
   [
-    'name' => 'SavedSearch_Users',
+    'name' => 'SavedSearch_Roles',
     'entity' => 'SavedSearch',
     'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'Users',
-        'label' => E::ts('Administer Users'),
+        'name' => 'Roles',
+        'label' => E::ts('Roles'),
         'form_values' => NULL,
         'mapping_id' => NULL,
         'search_custom_id' => NULL,
-        'api_entity' => 'User',
+        'api_entity' => 'Role',
         'api_params' => [
           'version' => 4,
           'select' => [
             'id',
-            'username',
-            'email',
+            'label',
             'is_active',
-            'when_created',
-            'when_last_accessed',
           ],
           'orderBy' => [],
           'where' => [],
@@ -41,16 +38,16 @@ return [
     ],
   ],
   [
-    'name' => 'SavedSearch_Users_SearchDisplay_Users',
+    'name' => 'SavedSearch_Roles_SearchDisplay_Roles_Table_1',
     'entity' => 'SearchDisplay',
     'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'Users',
-        'label' => E::ts('Users'),
-        'saved_search_id.name' => 'Users',
+        'name' => 'Roles_Table_1',
+        'label' => E::ts('Roles Table 1'),
+        'saved_search_id.name' => 'Roles',
         'type' => 'table',
         'settings' => [
           'description' => NULL,
@@ -61,19 +58,12 @@ return [
           'columns' => [
             [
               'type' => 'field',
-              'key' => 'id',
-              'dataType' => 'Integer',
-              'label' => E::ts('id'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'username',
+              'key' => 'label',
               'dataType' => 'String',
-              'label' => E::ts('Username'),
+              'label' => E::ts('Label'),
               'sortable' => TRUE,
               'link' => [
-                'path' => '/civicrm/admin/user#?User1=[id]',
+                'path' => '/civicrm/admin/role#?Role1=[id]',
                 'entity' => '',
                 'action' => '',
                 'join' => '',
@@ -82,48 +72,18 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'email',
-              'dataType' => 'String',
-              'label' => E::ts('Email'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
               'key' => 'is_active',
               'dataType' => 'Boolean',
-              'label' => E::ts('Active?'),
+              'label' => E::ts('Active'),
               'sortable' => TRUE,
-              'editable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'when_created',
-              'dataType' => 'Timestamp',
-              'label' => E::ts('When Created'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'when_last_accessed',
-              'dataType' => 'Timestamp',
-              'label' => E::ts('When Last Accessed'),
-              'sortable' => TRUE,
+              'rewrite' => '',
+              'alignment' => '',
             ],
           ],
-          'actions' => [
-            'delete',
-            'disable',
-            'download',
-            'enable',
-          ],
+          'actions' => TRUE,
           'classes' => [
             'table',
             'table-striped',
-          ],
-          'addButton' => [
-            'path' => '/civicrm/admin/user#',
-            'text' => E::ts('Add User'),
-            'icon' => 'fa-plus',
           ],
         ],
         'acl_bypass' => FALSE,

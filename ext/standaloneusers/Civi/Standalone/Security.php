@@ -64,23 +64,36 @@ class Security {
   public function checkPermission(\CRM_Core_Permission_Standalone $permissionObject, string $permissionName, $userID) {
 
     // I think null means the current logged-in user
-    $userID = $userID ?? $this->getLoggedInUfID();
+    $userID = $userID ?? $this->getLoggedInUfID() ?? 0;
 
-    if (!$userID) {
-      // permissions for anonymous user. @todo
-      return FALSE;
+    if (!isset(\Civi::$statics[__METHOD__][$userID])) {
+
+      $roleIDs = [];
+      if ($userID > 0) {
+        $roleIDs = \Civi\Api4\User::get(FALSE)->addWhere('id', '=', $userID)
+          ->addSelect('roles')->execute()->first()['roles'];
+      }
+
+      $permissionsPerRoleApiCall = \Civi\Api4\Role::get(FALSE)
+        ->addSelect('permissions')
+        ->addWhere('is_active', '=', TRUE);
+
+      if ($roleIDs) {
+        $permissionsPerRoleApiCall->addClause(
+          'OR',
+          ['id', 'IN', $roleIDs],
+          ['name', '=', 'everyone'],
+        );
+      }
+      else {
+        $permissionsPerRoleApiCall->addWhere('name', '=', 'everyone');
+      }
+      $permissions = array_unique(array_merge(...$permissionsPerRoleApiCall->execute()->column('permissions')));
+      \Civi::$statics[__METHOD__][$userID] = $permissions;
     }
 
-    // @todo handle anonymous permissions!
-    // No permissions yet; load them now.
-    $found = \Civi\Api4\RolePermission::get(FALSE)
-      ->selectRowCount()
-      ->addJoin('UserRole AS user_role', 'INNER',
-        ['role_id', '=', 'user_role.role_id'],
-        ['user_role.user_id', '=', $userID])
-      ->addWhere('permission', '=', $permissionName)
-      ->execute()->countMatched();
-    return (bool) $found;
+    // print "Does user $userID have $permissionName? " . (in_array($permissionName, \Civi::$statics[__METHOD__][$userID]) ? 'yes': 'no') . "\n";
+    return in_array($permissionName, \Civi::$statics[__METHOD__][$userID]);
   }
 
   /**
@@ -140,7 +153,7 @@ class Security {
    *    - 'cms_pass' plaintext password
    *    - 'notify' boolean
    * @param string $mail
-   *   Email id for cms user.
+   *   Email address for cms user.
    *
    * @return int|bool
    *   uid if user was created, false otherwise

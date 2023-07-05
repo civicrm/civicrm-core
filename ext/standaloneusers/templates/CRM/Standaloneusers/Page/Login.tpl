@@ -3,7 +3,7 @@
 /***Structure****
     Variables (comment out your subtheme)
         - Finsbury Park
-        - Jerry Seinfeld 
+        - Jerry Seinfeld
         - Shoreditch (soon)
         - Aah (soon)
     Resets
@@ -11,10 +11,10 @@
 ****************/
 
 /***************
-    Variables 
+    Variables
 ****************/
 
-/* Finsbury Park 
+/* Finsbury Park
 
 :root {
     --roundness: 0.25rem;
@@ -39,7 +39,7 @@
     --button-background: #f0f0f0;
 }
 
-/* Shoreditch 
+/* Shoreditch
 
 :root {
     --roundness: 2px;
@@ -72,6 +72,7 @@
     --text-colour: #222;
     --text-size: 0.9rem;
     --error-colour: #a00;
+    --success-colour: #86c66c;
     --label-colour: #464354;
     --background-colour: rgb(242,242,237);
     --box-border: 0 transparent solid;
@@ -87,9 +88,10 @@
     --button-padding: .4rem 1.6rem;
     --button-text-colour: #fff;
     --button-background: #2c98ed;
+    --button-text-shadow: none;
 }
 
-/* Ffresh 
+/* Ffresh
 
 :root {
     --roundness: 2rem;
@@ -115,7 +117,7 @@
 }
 
 /***************
-    Base 
+    Base
 ****************/
 
 body {
@@ -141,7 +143,7 @@ a:hover, a:focus {
 }
 
 /***************
-    UI Elements 
+    UI Elements
 ****************/
 
 #crm-container.standalone-entry .mid-block {
@@ -183,7 +185,7 @@ a:hover, a:focus {
 }
 #crm-container.standalone-entry .btn {
     display: inline-block;
-    margin-bottom: 0;
+    margin:0;
     text-align: center;
     vertical-align: middle;
     touch-action: manipulation;
@@ -197,6 +199,7 @@ a:hover, a:focus {
     border-radius: var(--roundness);
     font-family: var(--font-family);
     box-shadow: var(--button-shadow);
+    text-shadow: var(--button-text-shadow);
 }
 #crm-container.standalone-entry .btn:hover,
 #crm-container.standalone-entry .btn:focus {
@@ -211,6 +214,17 @@ a:hover, a:focus {
     color: var(--error-colour);
     margin: 1rem 0;
 }
+
+
+#loggedOutNotice {
+  text-align: center;
+  font-weight: bold;
+  padding: var(--box-padding);
+  background-color: var(--success-colour);
+  margin: 1rem 0;
+  border-radius: var(--box-roundness);
+}
+
 @media  (min-width: 768px) {
     #crm-container.standalone-entry {
         width: 60vw;
@@ -228,6 +242,7 @@ a:hover, a:focus {
 <div id="crm-container" class="crm-container standalone-entry">
   <div class="mid-block">
     <img src="{$logoUrl}" alt="logo for CiviCRM, with an intersecting blue and green triangle">
+    <div class="message info" style="display:none;" id="loggedOutNotice">You have been logged out.</div>
     <form>
       <div>
         <label for="exampleInputEmail1" class="form-label">Username</label>
@@ -238,36 +253,62 @@ a:hover, a:focus {
         <input type="password" class="form-control" id="passwordInput">
       </div>
       <div id="error" style="display:none;" class="form-alert">Your username and password do not match</div>
-      <div class="flex"><button id="loginSubmit" type="submit" class="btn btn-secondary crm-button">Submit</button><a href="request.html">Forgotten password?</a></div>
+      <div class="flex">
+      <a href="request.html">Forgotten password?</a>
+      <button id="loginSubmit" type="submit" class="btn btn-secondary crm-button">Submit</button>
+      </div>
     </form>
   </div>
 </div>
 {literal}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
   const submitBtn = document.getElementById('loginSubmit'),
         username = document.getElementById('usernameInput'),
-        password = document.getElementById('passwordInput');
+        password = document.getElementById('passwordInput'),
+        loggedOutNotice = document.getElementById('loggedOutNotice');
 
-  submitBtn.addEventListener('click', e => {
-    e.preventDefault();  
+  if (window.location.search === '?justLoggedOut') {
+    loggedOutNotice.style.display = '';
+    console.log("successful logout");
+  }
+  else {
+    console.log("no successful logout");
+    }
 
-    fetch(CRM.url("civicrm/authx/login"), {
+  submitBtn.addEventListener('click', async e => {
+    e.preventDefault();
+
+    const response = await fetch(CRM.url("civicrm/authx/login"), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       //body: '_authx=Basic ' + btoa(encodeURIComponent(`${username.value}:${password.value}`))
       body: '_authx=Basic ' + encodeURIComponent(btoa(`${username.value}:${password.value}`))
-    })
-    .then(response => response.json()) // <<<---note this
-    .then(data => {
-      console.log(data);
-      window.location = '/civicrm/';
     });
+    if (!response.ok) {
+      const contentType = response.headers.get("content-type");
+      let msg = 'Unexpected error';
+      if (!contentType || !contentType.includes("application/json")) {
+        // Non-JSON response; an error.
+        msg = await response.text();
+        // Example error string: 'HTTP 401 Invalid credential'
+        msg = msg.replace(/^HTTP \d{3} /,'');
+      }
+      else {
+        let responseObj = await response.json();
+        console.log("responseObj with error", responseObj);
+      }
+      alert(`Sorry, that didn‘t work. ${msg}`);
+    }
+    else {
+      // OK response (it includes contact_id and user_id in JSON, but we don't need those)
+      window.location = '/civicrm/';
+    }
   });
 });
-
 /* (function($) { */
 /*     var request = new XMLHttpRequest(); */
 /*     request.open("POST", ); */

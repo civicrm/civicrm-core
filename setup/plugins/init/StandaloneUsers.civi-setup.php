@@ -2,7 +2,7 @@
 /**
  * @file
  *
- * On "Standalone" UF, default policy is to enable `standaloneusers` and create user+role.
+ * On "Standalone" UF, default policy is to enable `standaloneusers` and create user with admin role.
  */
 
 if (!defined('CIVI_SETUP')) {
@@ -28,6 +28,7 @@ if (!defined('CIVI_SETUP')) {
       'adminPass' => $toAlphanum(random_bytes(8)),
       'adminEmail' => 'admin@localhost.localdomain',
     ];
+    $e->getModel()->extras['adminPassWasSpecified'] = !empty($e->getModel()->extras['adminPass']);
     $e->getModel()->extras = array_merge($defaults, $e->getModel()->extras);
   });
 
@@ -39,17 +40,24 @@ if (!defined('CIVI_SETUP')) {
 
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'installDatabase'));
 
-    // Create role with permissions
-    $roleID = \Civi\Api4\Role::create(FALSE)->setValues(['name' => 'Administrator'])->execute()->first()['id'];
-    // @todo I expect there's a better way than this; this doesn't even bring in all the permissions.
-    $records = [['permission' => 'authenticate with password']];
-    foreach (array_keys(\CRM_Core_Permission::getCorePermissions()) as $permission) {
-      $records[] = ['permission' => $permission];
-    }
-    \Civi\Api4\RolePermission::save(FALSE)
-      ->setDefaults(['role_id' => $roleID])
-      ->setRecords($records)
-      ->execute();
+    $roles = \Civi\Api4\Role::save(FALSE)
+      ->setDefaults([
+        'is_active' => TRUE,
+      ])
+      ->setRecords([
+        [
+          'name' => 'everyone',
+          'label' => 'Everyone, including anonymous users',
+          // Provide default open permissions
+          'permissions' => ['CiviMail subscribe/unsubscribe pages', 'make online contributions'],
+        ],
+        [
+          'name' => 'admin',
+          'label' => 'Administrator',
+          'permissions' => array_keys(\CRM_Core_SelectValues::permissions()),
+        ],
+      ])
+      ->execute()->indexBy('name');
 
     // Create contact+user for admin.
     $contactID = \Civi\Api4\Contact::create(FALSE)
@@ -64,16 +72,20 @@ if (!defined('CIVI_SETUP')) {
       'cms_name'   => $e->getModel()->extras['adminUser'],
       'cms_pass'   => $e->getModel()->extras['adminPass'],
       'notify'     => FALSE,
-      $adminEmail => $adminEmail,
       'contactID'  => $contactID,
     ];
     $userID = \CRM_Core_BAO_CMSUser::create($params, $adminEmail);
 
-    // Assign role to user
-    \Civi\Api4\UserRole::create(FALSE)->setValues(['role_id' => $roleID, 'user_id' => $userID])->execute();
+    // Assign 'admin' role to user
+    \Civi\Api4\User::update(FALSE)
+      ->addWhere('id', '=', $userID)
+      ->addValue('roles:name', ['admin'])
+      ->execute();
 
-    // TODO - If admin specified an explicit password, then we don't really need to log it.
-    $message = "Created new user \"{$e->getModel()->extras['adminUser']}\" (user ID #$userID, contact ID #$contactID) with password \"" . ($e->getModel()->extras['adminPass']) . "\" and ALL permissions.";
+    $message = "Created new user \"{$e->getModel()->extras['adminUser']}\" (user ID #$userID, contact ID #$contactID) with 'admin' role and ";
+    $message .= empty($e->getModel()->extras['adminPassWasSpecified'])
+    ? "random password \"" . ($e->getModel()->extras['adminPass'])
+    : "specified password";
     \Civi::log()->notice($message);
 
   }, \Civi\Setup::PRIORITY_LATE);

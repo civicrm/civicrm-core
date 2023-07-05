@@ -30,6 +30,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   protected $contactID;
   protected $userID;
 
+  const ADMIN_ROLE_ID = 1;
+
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
     \Civi\Test::e2e()
@@ -70,27 +72,26 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
   public function testPerms() {
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
-    // Create role,
+
+    // Create a custom role
     $roleID = \Civi\Api4\Role::create(FALSE)
-      ->setValues(['name' => 'staff'])->execute()->first()['id'];
-    $this->assertGreaterThan(0, $roleID);
+      ->setValues([
+        'name' => 'demo_role',
+        'label' => 'demo_role',
+        'permissions' => [
+            // Main control for access to the main CiviCRM backend and API. Give to trusted roles only.
+          'access CiviCRM',
+          'view all contacts',
+          'add contacts',
+          'edit all contacts',
+           // 'administer CiviCRM' // Perform all tasks in the Administer CiviCRM control panel and Import Contacts
+        ],
+      ])->execute()->first()['id'];
 
-    // Assign role to user
-    \Civi\Api4\UserRole::create(FALSE)
-      ->setValues(['user_id' => $userID, 'role_id' => $roleID])->execute();
-
-    // Assign some permissions to the role.
-    \Civi\Api4\RolePermission::save(FALSE)
-      ->setDefaults(['role_id' => $roleID])
-      ->setRecords([
-      // Master control for access to the main CiviCRM backend and API. Give to trusted roles only.
-      ['permission' => 'access CiviCRM'],
-      // Perform all tasks in the Administer CiviCRM control panel and Import Contacts
-      // ['permission' => 'administer CiviCRM'],
-      ['permission' => 'view all contacts'],
-      ['permission' => 'add contacts'],
-      ['permission' => 'edit all contacts'],
-      ])
+    // Give our user this role only.
+    \Civi\Api4\User::update(FALSE)
+      ->addValue('roles:name', ['demo_role'])
+      ->addWhere('id', '=', $userID)
       ->execute();
 
     $this->switchToOurUFClasses();
@@ -140,6 +141,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->assertGreaterThan(0, $userID);
     $this->contactID = $contactID;
     $this->userID = $userID;
+
     return [$contactID, $userID, $security];
   }
 

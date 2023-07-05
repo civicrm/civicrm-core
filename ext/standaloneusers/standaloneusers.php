@@ -48,19 +48,19 @@ function standaloneusers_civicrm_enable() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
  */
-function standaloneusers_civicrm_navigationMenu(&$menu) {
-  _standalineusers_addUserMenus($menu);
-}
+// function standaloneusers_civicrm_navigationMenu(&$menu) {
+//   _standalineusers_addUserMenus($menu);
+// }
 
-function _standalineusers_addUserMenus(&$menu) {
-  _standaloneusers_civix_insert_navigation_menu($menu, 'Administer/Users and Permissions', [
-    'label' => E::ts('Users'),
-    'name' => 'admin_users',
-    'url' => 'civicrm/search#/display/Users/Users',
-    'permission' => 'access CiviCRM',
-    'operator' => 'OR',
-    'separator' => 0,
-    'weight' => 0,
-  ]);
-  _standaloneusers_civix_navigationMenu($menu);
-}
+// function _standaloneusers_addUserMenus(&$menu) {
+//   _standaloneusers_civix_insert_navigation_menu($menu, 'Administer/Users and Permissions', [
+//     'label' => E::ts('Users'),
+//     'name' => 'admin_users',
+//     'url' => 'civicrm/search#/display/Users/Users',
+//     'permission' => 'cms:administer users',
+//     'operator' => 'OR',
+//     'separator' => 0,
+//     'weight' => 0,
+//   ]);
+//   _standaloneusers_civix_navigationMenu($menu);
+// }
