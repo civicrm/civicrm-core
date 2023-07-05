@@ -13,7 +13,7 @@ namespace Civi\Api4;
 /**
  * MailSettings entity.
  *
- * @searchable none
+ * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
  */
