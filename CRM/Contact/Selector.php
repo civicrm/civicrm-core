@@ -275,7 +275,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         ],
       ];
 
-      $config = CRM_Core_Config::singleton();
       //CRM-16552: mapAPIKey is not mandatory as google no longer requires an API Key
       if (\Civi::settings()->get('mapProvider') === 'Google' || (\Civi::settings()->get('mapProvider') && \Civi::settings()->get('mapAPIKey'))) {
         self::$_links[CRM_Core_Action::MAP] = [
@@ -419,7 +418,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             if (strpos($name, '-') !== FALSE) {
               [$fieldName, $lType, $type] = CRM_Utils_System::explode('-', $name, 3);
 
-              if ($lType == 'Primary') {
+              if ($lType === 'Primary') {
                 $locationTypeName = 1;
               }
               else {
@@ -443,7 +442,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
               }
             }
             //to handle sort key for Internal contactId.CRM-2289
-            if ($name == 'id') {
+            if ($name === 'id') {
               $name = 'contact_id';
             }
 
@@ -559,7 +558,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     if (($output == CRM_Core_Selector_Controller::EXPORT ||
         $output == CRM_Core_Selector_Controller::SCREEN
       ) &&
-      $this->_formValues['radio_ts'] == 'ts_sel'
+      $this->_formValues['radio_ts'] === 'ts_sel'
     ) {
       $includeContactIds = TRUE;
     }
@@ -592,7 +591,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // mask value to hide map link if there are not lat/long
     $mapMask = $mask & 4095;
 
-    if ($this->_searchContext == 'smog') {
+    if ($this->_searchContext === 'smog') {
       $gc = CRM_Core_SelectValues::groupContactStatus();
     }
 
@@ -608,10 +607,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           if (strpos($key, '-') !== FALSE) {
             [$fieldName, $id, $type] = CRM_Utils_System::explode('-', $key, 3);
 
-            if ($id == 'Primary') {
+            if ($id === 'Primary') {
               $locationTypeName = 1;
             }
-            elseif ($fieldName == 'url') {
+            elseif ($fieldName === 'url') {
               $locationTypeName = "website-{$id}";
             }
             else {
@@ -672,7 +671,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $this->_query->convertToPseudoNames($result);
       // the columns we are interested in
       foreach ($names as $property) {
-        if ($property == 'status') {
+        if ($property === 'status') {
           continue;
         }
         if ($cfID = CRM_Core_BAO_CustomField::getKeyID($property)) {
@@ -737,7 +736,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       }
 
       if ($output != CRM_Core_Selector_Controller::EXPORT &&
-        $this->_searchContext == 'smog'
+        $this->_searchContext === 'smog'
       ) {
         if (empty($result->status) &&
           $groupID
