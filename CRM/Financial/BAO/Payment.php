@@ -188,7 +188,6 @@ class CRM_Financial_BAO_Payment {
           'is_post_payment_create' => TRUE,
           'is_email_receipt' => $params['is_send_contribution_notification'],
           'trxn_date' => $params['trxn_date'],
-          'trxn_id' => $params['trxn_id'] ?? NULL,
           'payment_instrument_id' => $paymentTrxnParams['payment_instrument_id'],
           'payment_processor_id' => $paymentTrxnParams['payment_processor_id'] ?? '',
         ]);
