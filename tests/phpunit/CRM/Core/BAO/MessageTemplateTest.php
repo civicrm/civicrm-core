@@ -187,7 +187,65 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       CRM_Utils_Array::subset($rendered, ['subject', 'html', 'text'])
     );
     // Explicitly unset & initiate __destruct so it is clear there is a reason to set it.
-    unset($cleanup);
+    $cleanup->cleanup();
+  }
+
+  /**
+   * Test that a suitable translated message is retrieved when there
+   * is an incomplete translation set.
+   *
+   * This covers a scenario where there is a translated template
+   * for both Spanish and Mexican for one template but for
+   * the other there is only Spanish. It should fall back
+   * to Spanish for the second but, as of writing, it is
+   * not doing so IF another template has a Mexican option.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationIncompleteTemplateSet(): void {
+    $messageTemplates = (array) MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', 'LIKE', 'contribution_%')
+      ->addSelect('id', 'workflow_name')
+      ->setLimit(2)
+      ->execute()->indexBy('workflow_name');
+    $firstTemplate = array_key_first($messageTemplates);
+    $secondTemplate = array_key_last($messageTemplates);
+    foreach ($messageTemplates as $workflowName => $messageTemplate) {
+      $records = [
+        ['entity_field' => 'msg_subject', 'string' => 'subject - Spanish', 'language' => 'es_ES'],
+        ['entity_field' => 'msg_html', 'string' => 'html -Spanish', 'language' => 'es_ES'],
+      ];
+      if ($secondTemplate === $workflowName) {
+        $records[] = ['entity_field' => 'msg_subject', 'string' => 'subject - Mexican', 'language' => 'es_MX'];
+        $records[] = ['entity_field' => 'msg_html', 'string' => 'html - Mexican', 'language' => 'es_MX'];
+      }
+
+      Translation::save()->setRecords($records)->setDefaults([
+        'entity_table' => 'civicrm_msg_template',
+        'entity_id' => $messageTemplate['id'],
+        'status_id:name' => 'active',
+      ])->execute();
+    }
+    $translatedTemplate = MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', '=', $secondTemplate)
+      ->addSelect('id', 'msg_subject', 'msg_html', 'msg_text')
+      ->setLanguage('es_MX')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+    $this->assertEquals('subject - Mexican', $translatedTemplate['msg_subject']);
+
+    // This SHOULD fall back to Spanish...
+    $translatedTemplate = MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', '=', $firstTemplate)
+      ->addSelect('id', 'msg_subject', 'msg_html', 'msg_text')
+      ->setLanguage('es_MX')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+    $this->assertEquals('subject - Spanish', $translatedTemplate['msg_subject']);
   }
 
   /**
