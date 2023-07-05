@@ -15,6 +15,9 @@
   <releaseDate>2023-04-08</releaseDate>
   <version>5.64.alpha1</version>
   <develStage>stable</develStage>
+  <tags>
+    <tag>component</tag>
+  </tags>
   <compatibility>
     <ver>5.64</ver>
   </compatibility>
