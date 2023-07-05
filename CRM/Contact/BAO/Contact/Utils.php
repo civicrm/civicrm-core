@@ -241,27 +241,45 @@ WHERE  id IN ( $idString )
    *
    * @param int $contactID
    *   Contact id of the individual.
-   * @param int|string $employerID
+   * @param int|string $employerIDorName
    *   (id or name).
    * @param int|null $previousEmployerID
    * @param bool $newContact
    *
    * @throws \CRM_Core_Exception
    */
-  public static function createCurrentEmployerRelationship($contactID, $employerID, $previousEmployerID = NULL, $newContact = FALSE): void {
-    if (!$employerID) {
+  public static function createCurrentEmployerRelationship($contactID, $employerIDorName, $previousEmployerID = NULL, $newContact = FALSE): void {
+    if (!$employerIDorName) {
       // This function is not called in core with no organization & should not be
       // Refs CRM-15368,CRM-15547
       CRM_Core_Error::deprecatedWarning('calling this function with no organization is deprecated');
       return;
     }
-    if (!is_numeric($employerID)) {
-      $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $employerID], 'Organization', 'Unsupervised', [], FALSE);
-      $employerID = (int) (reset($dupeIDs) ?: Contact::create(FALSE)
-        ->setValues([
-          'contact_type' => 'Organization',
-          'organization_name' => $employerID,
-        ])->execute()->first()['id']);
+    if (is_numeric($employerIDorName)) {
+      $employerID = $employerIDorName;
+    }
+    else {
+      $employerName = $employerIDorName;
+      $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $employerName], 'Organization', 'Unsupervised', [], FALSE);
+      if (!empty($dupeIDs)) {
+        $employerID = (int) (reset($dupeIDs));
+      }
+      else {
+        $contact = \Civi\Api4\Contact::get(FALSE)
+          ->addSelect('employer_id.organization_name', 'employer_id')
+          ->addWhere('id', '=', $contactID)
+          ->execute()->first();
+        if ($contact && (mb_strtolower($contact['employer_id.organization_name']) === mb_strtolower($employerName))) {
+          $employerID = $contact['employer_id'];
+        }
+        else {
+          $employerID = Contact::create(FALSE)
+            ->setValues([
+              'contact_type' => 'Organization',
+              'organization_name' => $employerName,
+            ])->execute()->first()['id'];
+        }
+      }
     }
 
     $relationshipTypeID = CRM_Contact_BAO_RelationshipType::getEmployeeRelationshipTypeID();

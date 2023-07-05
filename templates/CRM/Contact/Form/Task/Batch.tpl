@@ -19,7 +19,12 @@
       {if $field.skipDisplay}
         {continue}
       {/if}
-      <td>{copyIcon name=$field.name title=$field.title}{$field.title}</td>
+      <td>
+      {if !$field.is_view}
+        {copyIcon name=$field.name title=$field.title}
+      {/if}
+        {$field.title}
+      </td>
     {/foreach}
     </tr>
     </thead>
