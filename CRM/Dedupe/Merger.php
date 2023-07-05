@@ -1542,12 +1542,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         continue;
       }
       $rows["move_$field"] = [
-        'main' => self::getFieldValueAndLabel($field, $main)['label'],
-        'other' => self::getFieldValueAndLabel($field, $other)['label'],
+        'main' => self::getFieldValueAndLabel($field, $main, $checkPermissions)['label'],
+        'other' => self::getFieldValueAndLabel($field, $other, $checkPermissions)['label'],
         'title' => $fields[$field]['label'],
       ];
 
-      $value = self::getFieldValueAndLabel($field, $other)['value'];
+      $value = self::getFieldValueAndLabel($field, $other, $checkPermissions)['value'];
       //CRM-14334
       if ($value === NULL || $value === '') {
         $value = 'null';
@@ -2768,14 +2768,15 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * Get the field value & label for the given field.
    *
-   * @param $field
-   * @param $contact
+   * @param string $field
+   * @param array $contact
+   * @param bool $checkPermissions
    *
    * @return array
    * @throws \Exception
    */
-  private static function getFieldValueAndLabel($field, $contact): array {
-    $fields = self::getMergeFieldsMetadata();
+  private static function getFieldValueAndLabel(string $field, array $contact, bool $checkPermissions): array {
+    $fields = self::getMergeFieldsMetadata($checkPermissions);
     $value = $label = $contact[$field] ?? NULL;
     $fieldSpec = $fields[$field];
     if (!empty($fieldSpec['serialize']) && is_array($value)) {
