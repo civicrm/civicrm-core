@@ -54,6 +54,6 @@ if (strlen($query_string) > 0) {
 $url = str_replace('&amp;', '&', $url);
 
 // CRM-17953 - The CMS is not bootstrapped so cannot use CRM_Utils_System::redirect
-header('X-Robots-Tag', 'noindex');
+header('X-Robots-Tag: noindex');
 header('Location: ' . $url);
 CRM_Utils_System::civiExit();
