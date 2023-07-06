@@ -551,9 +551,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       $this->setMessageIfCountryNotAboveState($fieldName, CRM_Utils_Array::value('location_type_id', $apiFormattedParams), $apiFormattedParams['weight'], $apiFormattedParams['uf_group_id']);
 
-      CRM_Core_Session::setStatus(ts('Your CiviCRM Profile Field \'%1\' has been saved to \'%2\'.',
-        [1 => $name, 2 => $this->_title]
-      ), ts('Profile Field Saved'), 'success');
     }
     $buttonName = $this->controller->getButtonName();
 
