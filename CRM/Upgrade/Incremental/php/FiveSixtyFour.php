@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PaymentProcessor;
+
 /**
  * Upgrade logic for the 5.64.x series.
  *
@@ -33,6 +35,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFour extends CRM_Upgrade_Incremental_
     $this->addTask('Drop unused civicrm_action_mapping table', 'dropTable', 'civicrm_action_mapping');
     $this->addTask('Update post_URL/cancel_URL in logging tables', 'updateLogging');
     $this->addTask('Add in Everybody ACL Role option value', 'addEveryBodyAclOptionValue');
+    $this->addTask('Fix double json encoding of accepted_credit_cards field in payment processor table', 'fixDoubleEscapingPaymentProcessorCreditCards');
   }
 
   public static function updateLogging($ctx): bool {
@@ -55,6 +58,19 @@ CHANGE `cancel_URL` `cancel_url` varchar(255) DEFAULT NULL COMMENT 'Redirect to 
       'name' => 'Everybody',
       'is_reserved' => 1,
     ]);
+    return TRUE;
+  }
+
+  /**
+   * Fix any double json encoding in Payment Processor accepted_credit_cards field
+   */
+  public static function fixDoubleEscapingPaymentProcessorCreditCards() {
+    $paymentProcessors = PaymentProcessor::get(FALSE)->execute();
+    foreach ($paymentProcessors as $paymentProcessor) {
+      if (is_numeric(array_keys($paymentProcessor['accepted_credit_cards'])[0])) {
+        PaymentProcessor::update(FALSE)->addValue('accepted_credit_cards', json_decode($paymentProcessor['accepted_credit_cards'], TRUE))->addWhere('id', '=', $paymentProcessor['id'])->execute();
+      }
+    }
     return TRUE;
   }
 
