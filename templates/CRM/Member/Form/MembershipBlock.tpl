@@ -61,11 +61,9 @@
                   <table class="report">
                     <tr class="columnheader" style="vertical-align:top;"><th style="border-right: 1px solid #4E82CF;">{ts}Include these membership types{/ts}</th><th{if $is_recur} style="border-right: 1px solid #4E82CF;"{/if}>{ts}Default{/ts}<br />
                     </th>{if $is_recur}<th>{ts}Auto-renew{/ts}</th>{/if}</tr>
-                      {assign var="index" value="1"}
                       {foreach name=outer key=key item=item from=$form.membership_type}
-                        {if $index < 10}
-                          {assign var="index" value=`$index+1`}
-                        {else}
+                        {* There are both numeric and non-numeric keys mixed in here, where the non-numeric are metadata that aren't arrays with html members. *}
+                        {if is_array($item) && array_key_exists('html', $item)}
                          <tr>
                           <td class="labels font-light">{$form.membership_type.$key.html}</td>
                           <td class="labels font-light">{$form.membership_type_default.$key.html}</td>
