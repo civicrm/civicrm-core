@@ -72,7 +72,7 @@
   </div>
   <div class="spacer"></div>
 
-  {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="thankContribution"}
+  {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl"}
 
   {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $priceSetID and $lineItem ) }
     <div class="crm-group amount_display-group">

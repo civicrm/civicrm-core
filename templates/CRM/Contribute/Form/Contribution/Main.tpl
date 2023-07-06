@@ -78,7 +78,7 @@
 
     {if $isShowMembershipBlock && !$ccid}
       <div class="crm-public-form-item crm-section">
-        {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="makeContribution"}
+        {include file="CRM/Contribute/Form/Contribution/MainMembershipBlock.tpl"}
       </div>
     {elseif !empty($ccid)}
       {if $lineItem && $priceSetID && !$is_quick_config}
