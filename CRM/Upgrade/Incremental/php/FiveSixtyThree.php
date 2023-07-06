@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PaymentProcessor;
+
 /**
  * Upgrade logic for the 5.63.x series.
  *
@@ -48,6 +50,31 @@ class CRM_Upgrade_Incremental_php_FiveSixtyThree extends CRM_Upgrade_Incremental
     $this->addTask('Make ContributionPage.name required', 'alterColumn', 'civicrm_contribution_page', 'name', "varchar(255) NOT NULL COMMENT 'Unique name for identifying contribution page'");
     $this->addTask('Make ContributionPage.title required', 'alterColumn', 'civicrm_contribution_page', 'title', "varchar(255) NOT NULL COMMENT 'Contribution Page title. For top of page display'", TRUE);
     $this->addTask('Make ContributionPage.frontend_title required', 'alterColumn', 'civicrm_contribution_page', 'frontend_title', "varchar(255) NOT NULL COMMENT 'Contribution Page Public title'", TRUE);
+  }
+
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public function upgrade_5_63_1(string $rev): void {
+    $this->addTask('Fix double json encoding of accepted_credit_cards field in payment processor table', 'fixDoubleEscapingPaymentProcessorCreditCards');
+  }
+
+  /**
+   * Fix any double json encoding in Payment Processor accepted_credit_cards field
+   */
+  public static function fixDoubleEscapingPaymentProcessorCreditCards() {
+    $paymentProcessors = PaymentProcessor::get(FALSE)->execute();
+    foreach ($paymentProcessors as $paymentProcessor) {
+      if (is_numeric(array_keys($paymentProcessor['accepted_credit_cards'])[0])) {
+        PaymentProcessor::update(FALSE)->addValue('accepted_credit_cards', json_decode($paymentProcessor['accepted_credit_cards'], TRUE))->addWhere('id', '=', $paymentProcessor['id'])->execute();
+      }
+    }
+    return TRUE;
   }
 
 }
