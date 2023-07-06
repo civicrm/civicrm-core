@@ -429,7 +429,6 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
           $creditCards[$type] = $creditCardTypes[$type];
         }
       }
-      $creditCards = json_encode($creditCards);
     }
 
     $params = array_merge([
