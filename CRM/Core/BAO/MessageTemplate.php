@@ -245,11 +245,14 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       throw new CRM_Core_Exception(ts('Message template with id of %1 does not have a default to revert to.', [1 => $id]));
     }
 
-    $diverted->msg_subject = $orig->msg_subject;
-    $diverted->msg_text = $orig->msg_text;
-    $diverted->msg_html = $orig->msg_html;
-    $diverted->pdf_format_id = is_null($orig->pdf_format_id) ? 'null' : $orig->pdf_format_id;
-    $diverted->save();
+    // Use write record to trigger hook invocations.
+    self::writeRecord([
+      'msg_subject' => $orig->msg_subject,
+      'msg_text' => $orig->msg_text,
+      'msg_html' => $orig->msg_html,
+      'pdf_format_id' => is_null($orig->pdf_format_id) ? 'null' : $orig->pdf_format_id,
+      'id' => $id,
+    ]);
   }
 
   /**
