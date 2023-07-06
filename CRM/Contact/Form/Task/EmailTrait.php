@@ -919,6 +919,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     // create the params array
     $mailParams = [
       'groupName' => 'Activity Email Sender',
+      'contactId' => $toID,
       'from' => $from,
       'toName' => $toDisplayName,
       'toEmail' => $toEmail,
