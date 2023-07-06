@@ -368,6 +368,7 @@
     <readonly>true</readonly>
     <html>
       <label>Recurring Contribution</label>
+      <type>EntityRef</type>
     </html>
     <add>1.4</add>
   </field>
