@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\PaymentProcessor;
-
 /**
  * Upgrade logic for the 5.64.x series.
  *
@@ -65,10 +63,16 @@ CHANGE `cancel_URL` `cancel_url` varchar(255) DEFAULT NULL COMMENT 'Redirect to 
    * Fix any double json encoding in Payment Processor accepted_credit_cards field
    */
   public static function fixDoubleEscapingPaymentProcessorCreditCards() {
-    $paymentProcessors = PaymentProcessor::get(FALSE)->addWhere('is_test', 'IS NOT NULL')->addWhere('domain_id', 'IS NOT NULL')->execute();
-    foreach ($paymentProcessors as $paymentProcessor) {
-      if (is_array($paymentProcessor['accepted_credit_cards']) && is_numeric(array_keys($paymentProcessor['accepted_credit_cards'])[0])) {
-        PaymentProcessor::update(FALSE)->addValue('accepted_credit_cards', json_decode($paymentProcessor['accepted_credit_cards'][0], TRUE))->addWhere('id', '=', $paymentProcessor['id'])->execute();
+    $paymentProcessors = CRM_Core_DAO::executeQuery("SELECT id, accepted_credit_cards FROM civicrm_payment_processor");
+    while ($paymentProcessors->fetch()) {
+      if (!empty($paymentProcessors->accepted_credit_cards)) {
+        $accepted_credit_cards = json_decode($paymentProcessors->accepted_credit_cards, TRUE);
+        if (is_numeric(array_keys($accepted_credit_cards)[0])) {
+          CRM_Core_DAO::executeQuery("UPDATE civicrm_payment_processor SET accepted_credit_cards = %1 WHERE id = %2", [
+            1 => [$accepted_credit_cards[0], 'String'],
+            2 => [$paymentProcessors->id, 'Positive'],
+          ]);
+        }
       }
     }
     return TRUE;
