@@ -79,7 +79,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return self|null
    */
   public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
