@@ -50,4 +50,35 @@ class CRM_Upgrade_Incremental_php_FiveSixtyThree extends CRM_Upgrade_Incremental
     $this->addTask('Make ContributionPage.frontend_title required', 'alterColumn', 'civicrm_contribution_page', 'frontend_title', "varchar(255) NOT NULL COMMENT 'Contribution Page Public title'", TRUE);
   }
 
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public function upgrade_5_63_1(string $rev): void {
+    $this->addTask('Fix double json encoding of accepted_credit_cards field in payment processor table', 'fixDoubleEscapingPaymentProcessorCreditCards');
+  }
+
+  /**
+   * Fix any double json encoding in Payment Processor accepted_credit_cards field
+   */
+  public static function fixDoubleEscapingPaymentProcessorCreditCards() {
+    $paymentProcessors = CRM_Core_DAO::executeQuery("SELECT id, accepted_credit_cards FROM civicrm_payment_processor");
+    while ($paymentProcessors->fetch()) {
+      if (!empty($paymentProcessors->accepted_credit_cards)) {
+        $accepted_credit_cards = json_decode($paymentProcessors->accepted_credit_cards, TRUE);
+        if (is_numeric(array_keys($accepted_credit_cards)[0])) {
+          CRM_Core_DAO::executeQuery("UPDATE civicrm_payment_processor SET accepted_credit_cards = %1 WHERE id = %2", [
+            1 => [$accepted_credit_cards[0], 'String'],
+            2 => [$paymentProcessors->id, 'Positive'],
+          ]);
+        }
+      }
+    }
+    return TRUE;
+  }
+
 }
