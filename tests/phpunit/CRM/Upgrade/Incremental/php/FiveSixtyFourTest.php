@@ -22,10 +22,14 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFourTest extends CiviUnitTestCase {
     ];
     PaymentProcessor::update()->addValue('accepted_credit_cards', $creditCards)->addWhere('id', '=', $this->ids['PaymentProcessor']['anet'])->execute();
     PaymentProcessor::update()->addValue('accepted_credit_cards', json_encode($creditCards))->addWhere('id', '=', $this->ids['PaymentProcessor']['authorize_net'])->execute();
+    $dummyPaymentProcessor = $this->processorCreate();
+    PaymentProcessor::update()->addValue('accepted_credit_cards', NULL)->addWhere('id', '=', $dummyPaymentProcessor)->execute();
     CRM_Upgrade_Incremental_php_FiveSixtyFour::fixDoubleEscapingPaymentProcessorCreditCards();
-    $paymentProcessors = PaymentProcessor::get()->execute();
+    $paymentProcessors = PaymentProcessor::get()->addWhere('id', 'IN', [$this->ids['PaymentProcessor']['anet'], $this->ids['PaymentProcessor']['authorize_net'], $dummyPaymentProcessor])->execute();
     foreach ($paymentProcessors as $paymentProcessor) {
-      $this->assertEquals($creditCards, $paymentProcessor['accepted_credit_cards']);
+      if (!empty($paymentProcessor['accepted_credit_cards'])) {
+        $this->assertEquals($creditCards, $paymentProcessor['accepted_credit_cards']);
+      }
     }
   }
 

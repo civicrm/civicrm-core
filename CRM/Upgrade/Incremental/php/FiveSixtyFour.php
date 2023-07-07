@@ -65,10 +65,10 @@ CHANGE `cancel_URL` `cancel_url` varchar(255) DEFAULT NULL COMMENT 'Redirect to 
    * Fix any double json encoding in Payment Processor accepted_credit_cards field
    */
   public static function fixDoubleEscapingPaymentProcessorCreditCards() {
-    $paymentProcessors = PaymentProcessor::get(FALSE)->execute();
+    $paymentProcessors = PaymentProcessor::get(FALSE)->addWhere('is_test', 'IS NOT NULL')->addWhere('domain_id', 'IS NOT NULL')->execute();
     foreach ($paymentProcessors as $paymentProcessor) {
-      if (is_numeric(array_keys($paymentProcessor['accepted_credit_cards'])[0])) {
-        PaymentProcessor::update(FALSE)->addValue('accepted_credit_cards', json_decode($paymentProcessor['accepted_credit_cards'], TRUE))->addWhere('id', '=', $paymentProcessor['id'])->execute();
+      if (is_array($paymentProcessor['accepted_credit_cards']) && is_numeric(array_keys($paymentProcessor['accepted_credit_cards'])[0])) {
+        PaymentProcessor::update(FALSE)->addValue('accepted_credit_cards', json_decode($paymentProcessor['accepted_credit_cards'][0], TRUE))->addWhere('id', '=', $paymentProcessor['id'])->execute();
       }
     }
     return TRUE;
