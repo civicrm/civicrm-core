@@ -27,11 +27,32 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   public $submitOnce = TRUE;
 
   public function preProcess() {
-
     parent::preProcess();
     $this->setContext();
 
-    $this->setTitle(ts('Manage - Scheduled Jobs'));
+    if ($this->_action == CRM_Core_Action::DELETE) {
+      $this->setTitle(ts('Delete Scheduled Job'));
+    }
+    elseif ($this->_action == CRM_Core_Action::ADD) {
+      $this->setTitle(ts('New Scheduled Job'));
+    }
+    elseif ($this->_action == CRM_Core_Action::UPDATE) {
+      $this->setTitle(ts('Edit Scheduled Job'));
+    }
+    elseif ($this->_action == CRM_Core_Action::VIEW) {
+      $this->setTitle(ts('Execute Scheduled Job'));
+    }
+
+    CRM_Utils_System::appendBreadCrumb([
+      [
+        'title' => ts('Administer CiviCRM'),
+        'url' => CRM_Utils_System::url('civicrm/admin', 'reset=1'),
+      ],
+      [
+        'title' => ts('Scheduled Jobs'),
+        'url' => CRM_Utils_System::url('civicrm/admin/job', 'reset=1'),
+      ],
+    ]);
 
     if ($this->_id) {
       $refreshURL = CRM_Utils_System::url('civicrm/admin/job/edit',

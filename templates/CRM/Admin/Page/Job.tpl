@@ -7,19 +7,18 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{capture assign=docUrlText}{ts}(Job parameters and command line syntax documentation...){/ts}{/capture}
-{capture assign=runAllURL}{crmURL p='civicrm/admin/runjobs' q="reset=1"}{/capture}
-<div class="help">
-    {ts 1=$runAllURL}You can configure scheduled jobs (cron tasks) for your CiviCRM installation. For most sites, your system administrator should set up one or more 'cron' tasks to run the enabled jobs. However, you can also <a href="%1">run all scheduled jobs manually</a>, or run specific jobs from this screen (click 'more' and then 'Execute Now').{/ts} {docURL page="sysadmin/setup/jobs" text=$docUrlText}
-</div>
 
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 4}
    {include file="CRM/Admin/Form/Job.tpl"}
 {else}
-
-<div class="crm-content-block crm-block">
-{if $rows}
-
+  {capture assign=docUrlText}{ts}(How to setup cron on the command line...){/ts}{/capture}
+  {capture assign=runAllURL}{crmURL p='civicrm/admin/runjobs' q="reset=1"}{/capture}
+  <div class="help">
+    {ts}CiviCRM relies on a number of scheduled jobs that run automatically on a regular basis. These jobs keep data up-to-date and perform other important tasks.{/ts}
+    {ts 1=$runAllURL}For most sites, your system administrator should set up one or more 'cron' tasks to run the enabled jobs. You can also <a href="%1">run all scheduled jobs manually</a>, or run specific jobs from this screen.{/ts} {docURL page="sysadmin/setup/jobs" text=$docUrlText}
+  </div>
+  <div class="crm-content-block crm-block">
+  {if $rows}
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
           {crmButton p='civicrm/admin/job/add' q="action=add&reset=1" id="newJob"  icon="plus-circle"}{ts}Add New Scheduled Job{/ts}{/crmButton}
