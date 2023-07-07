@@ -13,10 +13,10 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2021-11-11</releaseDate>
-  <version>5.64.beta1</version>
+  <version>5.65.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.64</ver>
+    <ver>5.65</ver>
   </compatibility>
   <comments>CiviGrant was originally a core component before migrating to an extension</comments>
   <requires>
