@@ -26,6 +26,15 @@ Released August 2, 2023
 - **[Credits](release-notes/5.64.0.md#credits)**
 - **[Feedback](release-notes/5.64.0.md#feedback)**
 
+## CiviCRM 5.63.1
+
+Released July 7, 2023
+
+- **[Synopsis](release-notes/5.63.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.63.1.md#bugs)**
+- **[Credits](release-notes/5.63.1.md#credits)**
+- **[Feedback](release-notes/5.63.1.md#feedback)**
+
 ## CiviCRM 5.63.0
 
 Released July 5, 2023
