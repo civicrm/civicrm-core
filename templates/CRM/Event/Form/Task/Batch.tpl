@@ -65,11 +65,9 @@
                       <table class="form-layout-compressed">
                       <tr>
                         {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                        {assign var="index" value="1"}
                         {foreach name=optionOuter key=optionKey item=optionItem from=$form.field.$pid.$n}
-                          {if $index < 10}
-                            {assign var="index" value=`$index+1`}
-                          {else}
+                          {* There are both numeric and non-numeric keys mixed in here, where the non-numeric are metadata that aren't arrays with html members. *}
+                          {if is_array($optionItem) && array_key_exists('html', $optionItem)}
                             <td class="labels font-light">{$form.field.$pid.$n.$optionKey.html}</td>
                             {if $count == $field.options_per_line}
                             </tr>
