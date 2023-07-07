@@ -24,9 +24,6 @@
         </div>
       {/if}
     {else}
-      {if $statusProfile EQ 1} {* Update Participant Status in batch task *}
-        <div class="status">{$status}</div>
-      {/if}
       {ts}Update field values for each participant as needed. To set a field to the same value for ALL rows, enter that value for the first participation and then click the
         <strong>Copy icon</strong>
         (next to the column title).{/ts}
