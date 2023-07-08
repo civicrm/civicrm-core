@@ -42,6 +42,7 @@ class StandaloneRouter {
     // TODO: Decide which convention we like more...
 
     $this->addRoute(';^/core/packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
+    $this->addRoute(';^/core/vendor/(.*);', fn($m) => $this->sendFileFromFolder($this->findVendor(), $m[1]));
     $this->addRoute(';^/core/(.*);', fn($m) => $this->sendFileFromFolder($this->findCore(), $m[1]));
 
     $this->addRoute(';^/civicrm-packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
@@ -129,8 +130,11 @@ class StandaloneRouter {
   }
 
   public function findCore(): string {
-    $r = dirname(__DIR__, 2);
-    return $r;
+    return dirname(__DIR__, 2);
+  }
+
+  public function findVendor(): string {
+    return $this->findCore() . '/vendor';
   }
 
   public function findPackages(): string {
