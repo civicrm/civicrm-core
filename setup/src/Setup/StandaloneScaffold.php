@@ -25,18 +25,24 @@ class StandaloneScaffold {
    * Install basic scaffolding for standalone. This creates a handful of small, static
    * folders and files.
    *
-   * @param string $destDir
-   *   Ex: '/var/www/example.com'
-   *   Ex: '/home/myuser/src/civicrm/srv'
-   * @param string $mode
-   *   How to install files. Options:
-   *   - 'copy': Make an exact copy
-   *   - 'symlink': Make a symbolic link
-   *   - 'auto': Choose 'copy' or 'symlink' based on OS compat
-   *
+   * @param array $task
+   *   - 'scaffold-dir': Where to place files
+   *      - Ex: '/var/www/example.com'
+   *      - Ex: '/home/myuser/src/civicrm/srv'
+   *   - 'scaffold-mode': How to install files. Options:
+   *     - 'copy': Make an exact copy
+   *     - 'symlink': Make a symbolic link
+   *     - 'auto': Choose 'copy' or 'symlink' based on OS compat
    * @return void
    */
-  public static function create(string $destDir, string $mode = 'auto'): void {
+  public static function create(array $task): void {
+    $destDir = $task['scaffold-dir'];
+    $mode = $task['scaffold-mode'] ?? 'auto';
+
+    if (empty($destDir)) {
+      throw new \RuntimeException("Missing required parameter: scaffold-dir");
+    }
+
     $srcDir = dirname(__DIR__, 3) . '/setup/res';
 
     if ($mode === 'auto') {

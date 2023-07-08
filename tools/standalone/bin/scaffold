@@ -40,5 +40,8 @@ if (empty($destDir)) {
   exit(1);
 }
 else {
-  \Civi\Setup\StandaloneScaffold::create($destDir, $mode);
+  \Civi\Setup\StandaloneScaffold::create([
+    'scaffold-dir' => $destDir,
+    'scaffold-mode' => $mode,
+  ]);
 }
