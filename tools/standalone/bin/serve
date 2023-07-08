@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+{ # https://stackoverflow.com/a/21100710
+  set -e
+
+  CORE="$PWD"
+  SRV="$CORE/srv"
+  ADDR_PORT="localhost:8000"
+  PHP_CLI_SERVER_WORKERS=5
+
+  export PHP_CLI_SERVER_WORKERS
+
+  echo "Update scaffolding ($SRV)"
+  php "$CORE/tools/standalone/bin/scaffold" $SRV --auto
+
+  echo "Launch PHP web server"
+  php -S "$ADDR_PORT" -t "$SRV/web" "$CORE/tools/standalone/router.php"
+
+  exit
+}
