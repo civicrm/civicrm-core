@@ -24,7 +24,7 @@ if (PHP_SAPI !== 'cli') {
   die("GenCode can only be run from command line.");
 }
 
-require_once dirname(__DIR__) . '/src/scaffold.php';
+require_once dirname(__DIR__, 3) . '/setup/src/Setup/StandaloneScaffold.php';
 
 $destDir = rtrim($argv[1] ?? '', DIRECTORY_SEPARATOR);
 $mode = 'copy'; /* TODO: Try out symlinks... */
@@ -40,5 +40,5 @@ if (empty($destDir)) {
   exit(1);
 }
 else {
-  standalone_scaffold($destDir, $mode);
+  \Civi\Setup\StandaloneScaffold::create($destDir, $mode);
 }
