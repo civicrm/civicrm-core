@@ -77,10 +77,6 @@ if (!defined('CIVI_SETUP')) {
       $model->cmsBaseUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
     }
 
-    // These mandatorySettings become 'Additional settings from installer' (via 'extraSettings') and set values in
-    // $civicrm_setting['domain'][k] = v;
-    $model->mandatorySettings['userFrameworkResourceURL'] = $model->cmsBaseUrl . '/assets/civicrm/core';
-
     // These paths get set as
     // $civicrm_paths[k]['url'|'path'] = v
     $model->paths['cms.root'] = [
@@ -93,4 +89,22 @@ if (!defined('CIVI_SETUP')) {
 
     // Compute default locale.
     $model->lang = $_REQUEST['lang'] ?? 'en_US';
+
+    if (\Composer\InstalledVersions::isInstalled('civicrm/civicrm-asset-plugin')) {
+      $model->mandatorySettings['userFrameworkResourceURL'] = $model->cmsBaseUrl . '/assets/civicrm/core';
+      // civicrm-asset-plugin will fill-in various $paths.
+    }
+    else {
+      $model->mandatorySettings['userFrameworkResourceURL'] = $model->cmsBaseUrl . '/core';
+      $model->paths['civicrm.core']['url'] = $model->cmsBaseUrl . '/core';
+      $model->paths['civicrm.core']['path'] = $model->srcPath;
+      $model->paths['civicrm.vendor']['url'] = $model->cmsBaseUrl . '/core/vendor';
+      $model->paths['civicrm.vendor']['path'] = $model->srcPath . '/vendor';
+      $model->paths['civicrm.bower']['url'] = $model->cmsBaseUrl . '/core/bower_components';
+      $model->paths['civicrm.bower']['path'] = $model->srcPath . '/bower_components';
+      $model->paths['civicrm.packages']['url'] = $model->cmsBaseUrl . '/core/packages';
+      $model->paths['civicrm.packages']['path'] = file_exists($model->srcPath . '/packages')
+          ? $model->srcPath . '/packages'
+          : dirname($model->srcPath) . '/civicrm-packages';
+    }
   });
