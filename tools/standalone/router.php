@@ -9,55 +9,117 @@
  +--------------------------------------------------------------------+
  */
 
+if (PHP_SAPI !== 'cli-server') {
+  http_response_code(403);
+  die("Forbidden");
+}
+
+/**
+ * The StandaloneRouter allows you to run CiviCRM's "Standalone" UF with the PHP built-in server.
+ * It is intended for local development.
+ *
+ * Ex: php -S localhost:8000 -t srv/web/ tools/standalone/router.php
+ */
 class StandaloneRouter {
 
-  const ALLOW_FILES = ';\.(jpg|png|css|js|html|txt|json|yml|xml|md)$;';
+  private const ALLOW_VIRTUAL_FILES = ';\.(jpg|png|css|js|html|txt|json|yml|xml|md)$;';
 
-  public function main(): bool {
-    if (preg_match(';^/core/packages(/.*);', $_SERVER['PHP_SELF'], $m)) {
-      return $this->sendFileFromFolder($this->findPackages(), $m[1]);
-    }
-    if (preg_match(';^/core(/.*);', $_SERVER['PHP_SELF'], $m)) {
-      return $this->sendFileFromFolder($this->findCore(), $m[1]);
-    }
-    else {
-      return $this->invoke($_SERVER['REQUEST_URI']);
-    }
+  private $routes = [];
+
+  public function __construct() {
+    // Note: Routing rules are processed sequentially, until one handles the request.
+
+    // If it looks like a Civi route, then call CRM_Core_Invoke.
+    $this->addRoute(';^/(civicrm(/.*)?)$;', fn($m) => $this->invoke($m[1]));
+
+    // If there's a concrete file in HTTP root (`web/`), then serve that.
+    $this->addRoute(';/(.*);', function($m) {
+      $file = $this->findFile($_SERVER['DOCUMENT_ROOT'], $m[1]);
+      return ($file === NULL) ? FALSE : $this->sendDirect();
+    });
+
+    // Virtually mount civicrm-{core,packages}. This allows us to serve their static assets directly (even on systems that lack symlinks).
+    // TODO: Decide which convention we like more...
+
+    $this->addRoute(';^/core/packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
+    $this->addRoute(';^/core/(.*);', fn($m) => $this->sendFileFromFolder($this->findCore(), $m[1]));
+
+    $this->addRoute(';^/civicrm-packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
+    $this->addRoute(';^/civicrm-core/(.*);', fn($m) => $this->sendFileFromFolder($this->findCore(), $m[1]));
+
+    $this->addRoute(';^/assets/civicrm/core/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
+    $this->addRoute(';^/assets/civicrm/packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findCore(), $m[1]));
+
+    // TODO: Consider allowing CRM_Core_Invoke to handle any route. May affect UF interop.
   }
 
   /**
-   * Send a static file.
+   * Receive a request through the PHP built-in HTTP server. Decide how to process it.
    *
-   * @param string $path
-   *
+   * @link https://www.php.net/manual/en/features.commandline.webserver.php
    * @return bool
+   *   TRUE if the request has been handled.
+   *   FALSE if the request has not been handled.
    */
-  public function sendFile(string $path): bool {
-    if (file_exists($path)) {
-      header('Content-Type: ' . mime_content_type($path));
-      $fh = fopen($path, 'r');
-      fpassthru($fh);
-      fclose($fh);
-      return TRUE;
+  public function main(): bool {
+    $url = parse_url($_SERVER['REQUEST_URI']);
+    foreach ($this->routes as $route) {
+      if (preg_match($route['regex'], $url['path'], $matches)) {
+        $handled = call_user_func($route['handler'], $matches);
+        if ($handled === TRUE) {
+          return TRUE;
+        }
+        if ($handled === '*SEND-DIRECT*') {
+          return FALSE;
+        }
+      }
     }
-    else {
-      return $this->sendError(404, "File not found");
-    }
+    return $this->sendError(404, "Not found");
+  }
+
+  /**
+   * Register another route.
+   *
+   * @param string $regex
+   *   Regular expression to run against the request-path.
+   *   Ex: ';^/foobar/(.*);'
+   * @param callable $handler
+   *   Function to call when routing the match. Receives the regex-matches as input.
+   *   Ex: fn($m) => $this->sendError(500, 'This path is foobared: ' . $m[1]);
+   *   The handler should return TRUE (if handled), FALSE (if skipped), or selected string constants.
+   * @return void
+   */
+  public function addRoute(string $regex, callable $handler): void {
+    $this->routes[] = [
+      'regex' => $regex,
+      'handler' => $handler,
+    ];
+  }
+
+  public function invoke(string $path) {
+    echo "Invoke route: " . htmlentities($path) . "<br>";
     return TRUE;
   }
 
   public function sendFileFromFolder(string $basePath, string $relPath): bool {
-    $absFile = $basePath . $relPath;
-    if (!preg_match(static::ALLOW_FILES, $relPath)) {
+    if (!preg_match(static::ALLOW_VIRTUAL_FILES, $relPath)) {
       return $this->sendError(403, "File type not allowed");
     }
-    if (strpos($_SERVER['REQUEST_URI'], '..') !== FALSE) {
-      $realFile = realpath($absFile);
-      if (strpos($realFile, $basePath) !== 0) {
-        return $this->sendError(403, "Malformed path");
-      }
+
+    $absFile = $this->findFile($basePath, $relPath);
+    if ($absFile === NULL) {
+      return $this->sendError(404, "File not found");
     }
-    return $this->sendFile($absFile);
+
+    $stat = stat($absFile);
+    header('Content-Type: ' . mime_content_type($absFile));
+    header('Content-Length: ' . $stat['size']);
+    readfile($absFile, FALSE);
+    return TRUE;
+  }
+
+  public function sendDirect(): string {
+    return '*SEND-DIRECT*';
   }
 
   public function sendError(int $code, string $message): bool {
@@ -66,14 +128,9 @@ class StandaloneRouter {
     return TRUE;
   }
 
-  public function invoke(string $uri) {
-    echo "Invoke route: " . htmlentities($uri) . "<br>";
-    return TRUE;
-  }
-
-
   public function findCore(): string {
-    return dirname(__DIR__, 2);
+    $r = dirname(__DIR__, 2);
+    return $r;
   }
 
   public function findPackages(): string {
@@ -87,6 +144,22 @@ class StandaloneRouter {
     throw new \RuntimeException("Failed to find civicrm-packages");
   }
 
+  /**
+   * @param string $basePath
+   * @param string $relPath
+   * @return string|null
+   *   If file exists, then return the combined (absolute) path.
+   *   If file does not exist, then return NULL.
+   */
+  private function findFile(string $basePath, string $relPath): ?string {
+    $realBase = realpath($basePath);
+    $realRel = realpath($basePath . '/' . $relPath);
+    if ($realBase && $realRel && strpos($realRel, $realBase) === 0) {
+      return $basePath . '/' . $relPath;
+    }
+    return NULL;
+  }
+
 }
 
-(new StandaloneRouter())->main();
+return (new StandaloneRouter())->main();
