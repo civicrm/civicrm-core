@@ -75,4 +75,5 @@ civicrm.settings.php
 sql/dummy_processor.mysql
 distmaker/distmaker.conf
 distmaker/out
+/srv
 /tmp
