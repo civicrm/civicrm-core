@@ -40,7 +40,23 @@ if (!defined('CIVI_SETUP')) {
      *       Typically, this means that $projectRootPath might be like /var/www/example.org/ and
      *       the actual web root would be /var/www/example.org/web/
      */
-    $projectRootPath = dirname($model->srcPath, 3);
+    $projectRootCandidates = [
+      // Manual configuration
+      $model->extras['standaloneRoot'],
+
+      // Ex: Clone ~/src/civicrm-core; use PHP built-in server and standalone.
+      $model->srcPath . '/srv',
+
+      // Ex: Clone `civicrm-standalone` which depends on `civicrm-core`. Use Apache/nginx/etc.
+      dirname($model->srcPath, 3),
+    ];
+    foreach ($projectRootCandidates as $projectRootCandidate) {
+      if ($projectRootCandidate && file_exists($projectRootCandidate)) {
+        $projectRootPath = $model->extras['standaloneRoot'] = $projectRootCandidate;
+        break;
+      }
+    }
+
     $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'civicrm.settings.php']);
     $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'templates_c']);
     // print "\n-------------------------\nSet model values:\n" . json_encode($model->getValues(), JSON_PRETTY_PRINT) . "\n-----------------------------\n";
