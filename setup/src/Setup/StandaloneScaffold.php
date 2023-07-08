@@ -67,6 +67,9 @@ class StandaloneScaffold {
           break;
 
         case 'symlink':
+          if (file_exists("$destDir/$destFile")) {
+            unlink("$destDir/$destFile");
+          }
           symlink("$srcDir/$srcFile", "$destDir/$destFile");
           break;
       }
