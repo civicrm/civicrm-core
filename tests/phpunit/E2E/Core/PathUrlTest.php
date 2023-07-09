@@ -103,7 +103,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
     // WORKAROUND: There's some issue where the URL gets a diff value in WP E2E env
     // than in normal WP env. The `cv url` command seems to behave more
     // representatively, though this technique is harder to inspect with xdebug.
-    $url = cv('url civicrm/contribute?reset=1');
+    $url = cv('url civicrm/contribute?reset=1 --entry=backend');
     // $url = \CRM_Utils_System::url('civicrm/contribute', 'reset=1', TRUE, NULL, FALSE);
 
     $parts = parse_url($url);
