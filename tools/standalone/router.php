@@ -112,9 +112,12 @@ class StandaloneRouter {
       return $this->sendError(404, "File not found");
     }
 
-    $stat = stat($absFile);
-    header('Content-Type: ' . mime_content_type($absFile));
-    header('Content-Length: ' . $stat['size']);
+    require_once $this->findVendor() . '/autoload.php';
+
+    $info = new SplFileInfo($absFile);
+    $mimeRepository = new \MimeTyper\Repository\MimeDbRepository();
+    header('Content-Type: ' . $mimeRepository->findType($info->getExtension()));
+    header('Content-Length: ' . $info->getSize());
     readfile($absFile, FALSE);
     return TRUE;
   }
