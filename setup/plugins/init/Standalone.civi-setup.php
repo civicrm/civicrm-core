@@ -40,21 +40,29 @@ if (!defined('CIVI_SETUP')) {
      *       Typically, this means that $projectRootPath might be like /var/www/example.org/ and
      *       the actual web root would be /var/www/example.org/web/
      */
-    $projectRootCandidates = [
-      // Manual configuration
-      $model->extras['standaloneRoot'],
+    if (!empty($model->extras['standaloneRoot'])) {
+      $projectRootPath = $model->extras['standaloneRoot'];
+    }
+    else {
+      $candidates = [
+        // Ex: Clone ~/src/civicrm-core; use PHP built-in server and standalone.
+        $model->srcPath . '/srv',
 
-      // Ex: Clone ~/src/civicrm-core; use PHP built-in server and standalone.
-      $model->srcPath . '/srv',
+        // Ex: Make a vhost and clone `civicrm-core` as `HTTP_ROOT/core`
+        dirname($model->srcPath, 2),
 
-      // Ex: Clone `civicrm-standalone` which depends on `civicrm-core`. Use Apache/nginx/etc.
-      dirname($model->srcPath, 3),
-    ];
-    foreach ($projectRootCandidates as $projectRootCandidate) {
-      if ($projectRootCandidate && file_exists($projectRootCandidate)) {
-        $projectRootPath = $model->extras['standaloneRoot'] = $projectRootCandidate;
-        break;
+        // Ex: Clone `civicrm-standalone` which depends on `civicrm-core`. Use Apache/nginx/etc.
+        dirname($model->srcPath, 3),
+      ];
+      foreach ($candidates as $candidate) {
+        if (file_exists($candidate . '/civicrm.config.php.standalone')) {
+          $projectRootPath = $model->extras['standaloneRoot'] = $candidate;
+          break;
+        }
       }
+    }
+    if (empty($projectRootPath)) {
+      throw new \RuntimeException("Failed to identify standalone root. (TIP: Set extras.standaloneRoot)");
     }
 
     $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'civicrm.settings.php']);
