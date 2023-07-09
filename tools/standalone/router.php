@@ -22,7 +22,7 @@ if (PHP_SAPI !== 'cli-server') {
  */
 class StandaloneRouter {
 
-  private const ALLOW_VIRTUAL_FILES = ';\.(jpg|png|css|js|html|txt|json|yml|xml|md)$;';
+  private const ALLOW_VIRTUAL_FILES = ';\.(jpg|png|css|js|html|txt|json|yml|xml|md|woff2)$;';
 
   private $routes = [];
 
