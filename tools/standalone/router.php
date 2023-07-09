@@ -127,7 +127,6 @@ class StandaloneRouter {
     // Add CSS, JS, etc. that is required for this page.
     \CRM_Core_Resources::singleton()->addCoreResources();
 
-    $parts = explode('?', $_SERVER['REQUEST_URI']);
     $args = explode('/', $path);
     // Remove empty values
     $args = array_values(array_filter($args));
