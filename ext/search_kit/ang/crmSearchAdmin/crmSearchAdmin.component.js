@@ -41,6 +41,15 @@
       editGroups: CRM.checkPerm('edit groups')
     };
 
+    // ngModelOptions to debounce input, prevent browser history items for every character
+    this.debounceMode = {
+      updateOn: 'default blur',
+      debounce: {
+        default: 2000,
+        blur: 0
+      }
+    };
+
     this.$onInit = function() {
       this.entityTitle = searchMeta.getEntity(this.savedSearch.api_entity).title_plural;
 
