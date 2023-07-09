@@ -29,8 +29,12 @@ class StandaloneRouter {
   public function __construct() {
     // Note: Routing rules are processed sequentially, until one handles the request.
 
+    // Redirect common entry points
+    $this->addRoute(';^/$;', fn($m) => $this->sendRedirect('/civicrm/'));
+    $this->addRoute(';^/civicrm$;', fn($m) => $this->sendRedirect('/civicrm/'));
+
     // If it looks like a Civi route, then call CRM_Core_Invoke.
-    $this->addRoute(';^/(civicrm(/.*)?)$;', fn($m) => $this->invoke($m[1]));
+    $this->addRoute(';^/(civicrm/.*)$;', fn($m) => $this->invoke($m[1]));
 
     // If there's a concrete file in HTTP root (`web/`), then serve that.
     $this->addRoute(';/(.*);', function($m) {
@@ -97,8 +101,46 @@ class StandaloneRouter {
     ];
   }
 
-  public function invoke(string $path) {
-    echo "Invoke route: " . htmlentities($path) . "<br>";
+  /**
+   * Invoke a civicrm route.
+   *
+   * @param string $path
+   *   Ex: 'civicrm/admin/foobar'
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function invoke(string $path): bool {
+    // Do we need this?
+    $_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'index.php';
+    $_SERVER['SCRIPT_NAME'] = DIRECTORY_SEPARATOR . 'index.php';
+    $_SERVER['PHP_SELF'] = DIRECTORY_SEPARATOR . 'index.php';
+
+    // echo "Invoke route: " . htmlentities($path) . "<br>";
+
+    // require_once $this->findVendor() . '/autoload.php';
+    // require_once 'CRM/Core/ClassLoader.php';
+    // CRM_Core_ClassLoader::singleton()->register();
+    require_once $this->findSettingsPhp();
+
+    // Required so that the userID is set before generating the menu
+    \CRM_Core_Session::singleton()->initialize();
+    // Add CSS, JS, etc. that is required for this page.
+    \CRM_Core_Resources::singleton()->addCoreResources();
+
+    $parts = explode('?', $_SERVER['REQUEST_URI']);
+    $args = explode('/', $path);
+    // Remove empty values
+    $args = array_values(array_filter($args));
+    // Set this for compatibility
+    $_GET['q'] = implode('/', $args);
+    // And finally render the page
+    print CRM_Core_Invoke::invoke($args);
+
+    return TRUE;
+  }
+
+  public function sendRedirect($path) {
+    header('Location: ' . $path);
     return TRUE;
   }
 
@@ -149,6 +191,10 @@ class StandaloneRouter {
       return dirname($core) . '/civicrm-packages';
     }
     throw new \RuntimeException("Failed to find civicrm-packages");
+  }
+
+  public function findSettingsPhp(): string {
+    return dirname($_SERVER['DOCUMENT_ROOT']) . '/data/civicrm.settings.php';
   }
 
   /**
