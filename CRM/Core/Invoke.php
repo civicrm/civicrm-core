@@ -56,7 +56,7 @@ class CRM_Core_Invoke {
     }
     // CRM-15901: Turn off PHP errors display for all ajax calls
     if (($args[1] ?? NULL) == 'ajax' || !empty($_REQUEST['snippet'])) {
-      ini_set('display_errors', 0);
+//      ini_set('display_errors', 0);
     }
 
     if (!defined('CIVICRM_SYMFONY_PATH')) {
