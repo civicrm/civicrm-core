@@ -29,7 +29,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_preferences_date')
       'name' => 'creditCard',
       'start' => 0,
       'end' => 10,
-      'date_format' => 'M Y',
+      'date_format' => 'm Y',
       'time_format' => '',
       'description' => ts('Month and year only for credit card expiration.'),
     ],
