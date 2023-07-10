@@ -84,7 +84,7 @@ if (!defined('CIVI_SETUP')) {
 
     $message = "Created new user \"{$e->getModel()->extras['adminUser']}\" (user ID #$userID, contact ID #$contactID) with 'admin' role and ";
     $message .= empty($e->getModel()->extras['adminPassWasSpecified'])
-    ? "random password \"" . ($e->getModel()->extras['adminPass'])
+    ? "random password \"" . ($e->getModel()->extras['adminPass']) . '"'
     : "specified password";
     \Civi::log()->notice($message);
 
