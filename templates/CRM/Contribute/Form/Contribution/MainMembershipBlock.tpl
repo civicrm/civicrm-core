@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 <div id="membership" class="crm-group membership-group">
-    {if TRUE}
+    {if true}
       <div id="priceset">
         <fieldset>
             {if $renewal_mode}
