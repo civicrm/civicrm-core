@@ -45,10 +45,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     CRM_Utils_System::appendBreadCrumb([
       [
-        'title' => ts('Administer CiviCRM'),
-        'url' => CRM_Utils_System::url('civicrm/admin', 'reset=1'),
-      ],
-      [
         'title' => ts('Scheduled Jobs'),
         'url' => CRM_Utils_System::url('civicrm/admin/job', 'reset=1'),
       ],
