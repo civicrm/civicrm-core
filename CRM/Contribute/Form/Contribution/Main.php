@@ -1360,17 +1360,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Set form variables if contribution ID is found
    */
-  public function assignFormVariablesByContributionID() {
+  public function assignFormVariablesByContributionID(): void {
     $dummyTitle = 0;
     foreach ($this->_paymentProcessors as $pp) {
-      if ($pp['class_name'] == 'Payment_Dummy') {
+      if ($pp['class_name'] === 'Payment_Dummy') {
         $dummyTitle = $pp['name'];
         break;
       }
     }
     $this->assign('dummyTitle', $dummyTitle);
 
-    if (empty($this->_ccid)) {
+    if (empty($this->getExistingContributionID())) {
       return;
     }
     if (!$this->getContactID()) {
@@ -1391,22 +1391,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->assign('taxAmount', $taxAmount);
     }
 
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->_ccid);
-    foreach (array_keys($lineItems) as $id) {
-      $lineItems[$id]['id'] = $id;
-    }
-    $itemId = key($lineItems);
-    if ($itemId && !empty($lineItems[$itemId]['price_field_id'])) {
-      $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
-    }
-
-    if (!empty($lineItems[$itemId]['price_field_id'])) {
-      $this->_lineItem[$this->_priceSetId] = $lineItems;
-    }
-    $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
-    $this->assign('lineItem', $this->_lineItem);
-    $this->assign('is_quick_config', $isQuickConfig);
-    $this->assign('priceSetID', $this->_priceSetId);
+    $lineItems = $this->getExistingContributionLineItems();
+    // Is this used?
+    $this->_lineItem[$this->getPriceSetID()] = $lineItems;
+    $this->assign('lineItem', [$this->getPriceSetID() => $lineItems]);
+    $this->assign('is_quick_config', $this->isQuickConfig());
+    $this->assign('priceSetID', $this->getPriceSetID());
   }
 
   /**
