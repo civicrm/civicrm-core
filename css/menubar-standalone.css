@@ -22,3 +22,11 @@
   }
 
 }
+
+.breadcrumb ol li {
+  display: inline;
+  list-style-type: none;
+}
+.breadcrumb ol li:not(:first-child)::before {
+  content: " \BB ";
+}
