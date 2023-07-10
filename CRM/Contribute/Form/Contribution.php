@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Api4\FinancialType;
 use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
@@ -1292,9 +1293,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!isset($params['is_email_receipt']) && $isEmailReceipt) {
       $params['is_email_receipt'] = $isEmailReceipt;
     }
+    // We may no longer need to set params['is_recur'] - it used to be used in processRecurringContribution
     $params['is_recur'] = $isRecur;
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
-    $recurringContributionID = CRM_Contribute_Form_Contribution_Confirm::processRecurringContribution($form, $params, $contactID, $financialType);
+    $recurringContributionID = !$isRecur ? NULL : CRM_Contribute_Form_Contribution_Confirm::processRecurringContribution($form, $params, [
+      'contact_id' => $contactID,
+      'financial_type_id' => $financialType->id,
+    ]);
 
     $now = date('YmdHis');
     $receiptDate = $params['receipt_date'] ?? NULL;
@@ -1844,7 +1849,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $toType = $submittedValues['financial_type_id'] ?? NULL;
     $fromType = $this->_defaults['financial_type_id'] ?? NULL;
     if (($this->_action & CRM_Core_Action::UPDATE) && ($toType != $fromType) && ($submittedValues['non_deductible_amount'] ?? NULL)) {
-      $deductible = \Civi\Api4\FinancialType::get(TRUE)
+      $deductible = FinancialType::get(TRUE)
         ->addSelect('is_deductible')
         ->addWhere('id', 'IN', [$toType, $fromType])
         ->execute()->indexBy('id')->column('is_deductible');
