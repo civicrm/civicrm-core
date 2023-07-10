@@ -414,7 +414,15 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       return FALSE;
     }
 
-    $content = @file_get_contents("$url");
+    $content = '';
+    try {
+      $response = (new \GuzzleHttp\Client())->request('GET', $url, [
+        'timeout' => \Civi::settings()->get('http_timeout'),
+      ]);
+      $content = $response->getBody()->getContents();
+    }
+    catch (\GuzzleHttp\Exception\GuzzleException $e) {
+    }
     if (stristr($content, $file)) {
       $result = TRUE;
     }
