@@ -64,7 +64,7 @@
     </div>
   {/if}
 {foreach from=$rows item=row}
-  {if !empty($row.icon)}{assign var='hasIcons' value=TRUE}{/if}
+  {if !empty($row.icon)}{assign var='hasIcons' value=true}{/if}
 {/foreach}
 <div id={$gName}>
         {strip}
