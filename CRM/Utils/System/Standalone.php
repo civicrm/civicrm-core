@@ -107,12 +107,14 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function appendBreadCrumb($breadcrumbs) {
+    \Civi::$statics[__CLASS__]['breadcrumb'][] = $breadcrumbs;
   }
 
   /**
    * @inheritDoc
    */
   public function resetBreadCrumb() {
+    \Civi::$statics[__CLASS__]['breadcrumb'] = [];
   }
 
   /**
@@ -257,6 +259,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     if ($maintenance) {
       $smarty = CRM_Core_Smarty::singleton();
       echo implode('', $smarty->_tpl_vars['pageHTMLHead']);
+    }
+
+    // Show the breadcrumb
+    if (!empty(\Civi::$statics[__CLASS__]['breadcrumb'])) {
+      print '<nav aria-label="' . htmlspecialchars(ts('Breadcrumb')) . '" class="breadcrumb"><ol>';
+      print '<li><a href="' . CRM_Utils_System::url('civicrm/dashboard', 'reset=1') . '">' . htmlspecialchars(ts('Home')) . '</a></li>';
+      foreach (\Civi::$statics[__CLASS__]['breadcrumb'] as $breadcrumb) {
+        foreach ($breadcrumb as $item) {
+          print '<li><a href="' . $item['url'] . '">' . htmlspecialchars($item['title']) . '</a></li>';
+        }
+      }
+      print '</ol></nav>';
     }
 
     // @todo Add variables from the body tag? (for Shoreditch)
