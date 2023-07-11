@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Query\SqlField;
+use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 
@@ -74,6 +75,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @var array
    */
   private $_afform;
+
+  /**
+   * @var array
+   */
+  private $tasks;
 
   /**
    * Override execute method to change the result object type
@@ -492,7 +498,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param int $index
    * @return string|null
    */
-  private function getLinkPath($link, $data = NULL, $index = 0) {
+  private function getLinkPath($link, $data = NULL, $index = 0): ?string {
     $path = $link['path'] ?? NULL;
     if (!$path && !empty($link['entity']) && !empty($link['action'])) {
       $entity = $link['entity'];
@@ -536,7 +542,48 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         }
       }
     }
+    elseif (!$path && !empty($link['entity']) && !empty($link['task'])) {
+      $task = $this->getTask($link['task']);
+      // Convert legacy tasks (which have to a url)
+      if (!empty($task['crmPopup'])) {
+        $idField = CoreUtil::getIdFieldName($link['entity']);
+        $path = \CRM_Utils_JS::decode($task['crmPopup']['path']);
+        $amp = strpos($path, '?') ? '&' : '?';
+        $data = \CRM_Utils_JS::getRawProps($task['crmPopup']['data']);
+        // Find the special key that combines selected ids and replace it with id token
+        $idsKey = array_search("ids.join(',')", $data);
+        unset($data[$idsKey]);
+        $path .= $amp . $idsKey . '=[' . $idField . ']';
+        // Add the rest of the data items
+        foreach ($data as $dataKey => $dataRaw) {
+          $path .= '&' . $dataKey . '=' . \CRM_Utils_JS::decode($dataRaw);
+        }
+      }
+    }
     return $path;
+  }
+
+  /**
+   * Returns information about a task, but only if user has permission to use it.
+   *
+   * @param string $taskName
+   * @return array|null
+   */
+  private function getTask(string $taskName): ?array {
+    if (!isset($this->tasks)) {
+      try {
+        $this->tasks = SearchDisplay::getSearchTasks()
+          ->setCheckPermissions($this->getCheckPermissions())
+          ->setSavedSearch($this->getSavedSearch())
+          ->setDisplay($this->getDisplay())
+          ->execute()
+          ->indexBy('name');
+      }
+      catch (\CRM_Core_Exception $e) {
+        $this->tasks = [];
+      }
+    }
+    return $this->tasks[$taskName] ?? NULL;
   }
 
   /**

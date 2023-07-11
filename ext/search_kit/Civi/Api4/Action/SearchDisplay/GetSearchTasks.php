@@ -9,6 +9,8 @@ use Civi\Api4\Entity;
 /**
  * Load the available tasks for a given entity.
  *
+ * @method $this setDisplay(array|string $display)
+ * @method array|string|null getDisplay()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
