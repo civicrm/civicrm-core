@@ -107,9 +107,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function appendBreadCrumb($breadcrumbs) {
-    if (!isset(\Civi::$statics[__CLASS__]['breadcrumb'])) {
-      \Civi::$statics[__CLASS__]['breadcrumb'] = [];
-    }
     \Civi::$statics[__CLASS__]['breadcrumb'][] = $breadcrumbs;
   }
 
