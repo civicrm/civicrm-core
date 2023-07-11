@@ -552,7 +552,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $form->add('datepicker', 'activity_date_high_' . $form->_caseID, ts('To'), [], FALSE, ['time' => FALSE]);
 
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $form->add('checkbox', 'activity_deleted', ts('Deleted Activities'), '', FALSE, ['id' => 'activity_deleted_' . $form->_caseID]);
+      $form->add('checkbox', 'activity_deleted', ts('Deleted Activities'), ['id' => 'activity_deleted_' . $form->_caseID], FALSE);
     }
   }
 
