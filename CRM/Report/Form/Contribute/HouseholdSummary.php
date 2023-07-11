@@ -448,7 +448,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
               $this->_absoluteUrl
             );
 
-            $rows[$rowNum]['civicrm_contact_household_household_name'] = "<a href='$url' title='" . ts('View contact summary for this househould') . "'>" . $value . '</a>';
+            $rows[$rowNum]['civicrm_contact_household_household_name'] = "<a href='$url' title='" . ts('View contact summary for this househould', ['escape' => 'htmlattribute']) . "'>" . $value . '</a>';
           }
           $entryFound = TRUE;
         }

@@ -1892,7 +1892,7 @@ ORDER BY civicrm_custom_group.weight,
                 $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
                 if ($displayName) {
                   $url = CRM_Utils_System::url(str_replace('[id]', $contactId, $path));
-                  $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'][] = '<a href="' . $url . '" title="' . htmlspecialchars(ts('View Contact')) . '">' .
+                  $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'][] = '<a href="' . $url . '" title="' . ts('View Contact', ['escape' => 'htmlattribute']) . '">' .
                     $displayName . '</a>';
                 }
               }

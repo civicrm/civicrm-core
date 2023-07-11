@@ -56,6 +56,9 @@ class CRM_Core_I18n {
 
       case 'js':
         return substr(json_encode($text, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), 1, -1);
+
+      case 'htmlattribute':
+        return htmlspecialchars($text, ENT_QUOTES);
     }
     return $text;
   }
