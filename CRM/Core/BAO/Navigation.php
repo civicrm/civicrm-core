@@ -892,30 +892,31 @@ ORDER BY weight";
         unset($item['attributes']['label'], $item['attributes']['url']);
         $item['attributes']['icon'] = 'crm-logo-sm';
         $item['attributes']['attr']['accesskey'] = 'm';
-        $item['child'] = [
-          [
-            'attributes' => [
-              'label' => ts('CiviCRM Home'),
-              'name' => 'CiviCRM Home',
-              'url' => 'civicrm/dashboard?reset=1',
-              'weight' => 1,
-            ],
+        $item['child'] = [];
+        $item['child'][] = [
+          'attributes' => [
+            'label' => ts('CiviCRM Home'),
+            'name' => 'CiviCRM Home',
+            'url' => 'civicrm/dashboard?reset=1',
+            'weight' => 1,
           ],
-          [
+        ];
+        if (CIVICRM_UF !== 'Standalone') {
+          $item['child'][] = [
             'attributes' => [
               'label' => ts('Hide Menu'),
               'name' => 'Hide Menu',
               'url' => '#hidemenu',
               'weight' => 2,
             ],
-          ],
-          [
-            'attributes' => [
-              'label' => ts('Log out'),
-              'name' => 'Log out',
-              'url' => 'civicrm/logout?reset=1',
-              'weight' => 3,
-            ],
+          ];
+        }
+        $item['child'][] = [
+          'attributes' => [
+            'label' => ts('Log out'),
+            'name' => 'Log out',
+            'url' => 'civicrm/logout?reset=1',
+            'weight' => 3,
           ],
         ];
         return;
