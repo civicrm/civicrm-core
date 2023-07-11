@@ -106,6 +106,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
     // Check that the en_US template is loaded, if exists.
     $result['en_US matches en_US (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'en_US', $rendered['en_US']];
+    // We have no translation for Danish but there IS an en_US one & en_US is the site-default language. We should
+    // fall back to it rather than the message template. Ref https://github.com/civicrm/civicrm-core/pull/26232
+    $result['da_DK matches en_US (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'da_DK', $rendered['en_US']];
 
     return $result;
   }
@@ -218,16 +221,22 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->addWhere('is_default', '=', 1)
       ->addWhere('workflow_name', 'LIKE', 'contribution_%')
       ->addSelect('id', 'workflow_name')
-      ->setLimit(2)
+      ->setLimit(3)
       ->execute()->indexBy('workflow_name');
-    $firstTemplate = array_key_first($messageTemplates);
-    $secondTemplate = array_key_last($messageTemplates);
+    [$firstTemplate, $secondTemplate, $thirdTemplate] = array_keys($messageTemplates);
     foreach ($messageTemplates as $workflowName => $messageTemplate) {
+      // The translation for the site default language is only used when neither of the other 2 exist.
       $records = [
-        ['entity_field' => 'msg_subject', 'string' => 'subject - Spanish', 'language' => 'es_ES'],
-        ['entity_field' => 'msg_html', 'string' => 'html -Spanish', 'language' => 'es_ES'],
+        ['entity_field' => 'msg_subject', 'string' => 'subject - site default translation', 'language' => 'en_US'],
+        ['entity_field' => 'msg_html', 'string' => 'html - site default translation', 'language' => 'en_US'],
       ];
+      if ($workflowName !== $thirdTemplate) {
+        // All except one template gets a Spanish translation. This should be used where there is no Mexican translation.
+        $records[] = ['entity_field' => 'msg_subject', 'string' => 'subject - Spanish', 'language' => 'es_ES'];
+        $records[] = ['entity_field' => 'msg_html', 'string' => 'html -Spanish', 'language' => 'es_ES'];
+      }
       if ($secondTemplate === $workflowName) {
+        // One gets a Mexican translation. This should be used.
         $records[] = ['entity_field' => 'msg_subject', 'string' => 'subject - Mexican', 'language' => 'es_MX'];
         $records[] = ['entity_field' => 'msg_html', 'string' => 'html - Mexican', 'language' => 'es_MX'];
       }
@@ -246,8 +255,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
     $this->assertEquals('subject - Mexican', $translatedTemplate['msg_subject']);
+    $this->assertEquals('html - Mexican', $translatedTemplate['msg_html']);
 
-    // This SHOULD fall back to Spanish...
+    // This should fall back to Spanish...
     $translatedTemplate = MessageTemplate::get()
       ->addWhere('is_default', '=', 1)
       ->addWhere('workflow_name', '=', $firstTemplate)
@@ -256,6 +266,18 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
     $this->assertEquals('subject - Spanish', $translatedTemplate['msg_subject']);
+    $this->assertEquals('html -Spanish', $translatedTemplate['msg_html']);
+
+    // This should fall back to en_US translation...
+    $translatedTemplate = MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', '=', $thirdTemplate)
+      ->addSelect('id', 'msg_subject', 'msg_html', 'msg_text')
+      ->setLanguage('es_MX')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+    $this->assertEquals('subject - site default translation', $translatedTemplate['msg_subject']);
+    $this->assertEquals('html - site default translation', $translatedTemplate['msg_html']);
   }
 
   /**

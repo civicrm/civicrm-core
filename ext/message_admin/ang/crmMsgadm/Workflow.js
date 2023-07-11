@@ -14,11 +14,11 @@
           prefetch: function(crmApi4, crmStatus) {
             var q = crmApi4({
               records: ['MessageTemplate', 'get', {
-                select: ["id", "msg_title", "is_default", "is_active"],
+                select: ["id", "msg_title", "is_default", "is_active", "workflow_name"],
                 where: [["workflow_name", "IS NOT EMPTY"], ["is_reserved", "=", "0"]]
               }],
               translations: ['MessageTemplate', 'get', {
-                select: ["id", "msg_title", "is_default", "is_active", "tx.language:label", "tx.language"],
+                select: ["id", "msg_title", "is_default", "is_active", "workflow_name", "tx.language:label", "tx.language"],
                 join: [["Translation AS tx", "INNER", null, ["tx.entity_table", "=", "'civicrm_msg_template'"], ["tx.entity_id", "=", "id"]]],
                 where: [["workflow_name", "IS NOT EMPTY"], ["is_reserved", "=", "0"]],
                 groupBy: ["id", "tx.language"],
