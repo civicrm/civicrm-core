@@ -31,7 +31,9 @@ trait LocalizationTrait {
    * 1. Your organization serves many similar locales (eg es_MX+es_CR+es_HN or en_GB+en_US+en_NZ).
    * 2. You want to write one message (es_MX) for several locales (es_MX+es_CR+es_HN)
    * 3. You want to include some conditional content that adapts the recipient's requested locale
-   *    (es_CR) -- _even though_ the template was stored as es_MX.
+   *    (es_CR) -- _even though_ the template was stored as es_MX. For example your front end
+   *    website has more nuanced translations than your workflow messages and you wish
+   *    to redirect the user to a page on your website.
    *
    * @var string|null
    * @scope tokenContext

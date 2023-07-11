@@ -278,13 +278,48 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
       foreach ($languages as $language => $languageFields) {
         if ($language !== $bizLocale->nominal) {
           // Merge in any missing entities. Ie we might have a translation for one template in es_MX but
-          // need to fall back to es_ES for another.
-          $fields = array_merge($languageFields, $fields);
+          // need to fall back to es_ES for another. If there is a translation for the site default
+          // language we should fall back to that rather than the messageTemplate
+          // see https://github.com/civicrm/civicrm-core/pull/26232
+          $fields = array_merge(self::getSiteDefaultLanguageTranslations($apiRequest['entity'])['fields'] ?? [], $languageFields, $fields);
         }
       }
       return ['fields' => $fields, 'language' => $bizLocale->nominal];
     }
-    return [];
+
+    // Finally fall back to the translation of the site language, if exists.
+    // ie if the site language is en_US and there is a translation for that, then use it.
+    // see https://github.com/civicrm/civicrm-core/pull/26232
+    return self::getSiteDefaultLanguageTranslations($apiRequest['entity']);
+  }
+
+  /**
+   * Get any translations configured for the site-default language.
+   *
+   * @param string $entity
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getSiteDefaultLanguageTranslations(string $entity): array {
+    if (!isset(\Civi::$statics[__CLASS__]) || !array_key_exists('site_language_translation', \Civi::$statics[__CLASS__])) {
+      \Civi::$statics[__CLASS__]['site_language_translation'] = [];
+      $translations = Translation::get(FALSE)
+        ->addWhere('entity_table', '=', CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity))
+        ->setCheckPermissions(FALSE)
+        ->setSelect(['entity_field', 'entity_id', 'string', 'language'])
+        ->addWhere('language', '=', \Civi::settings()->get('lcMessages'))
+        ->execute();
+      if ($translations !== NULL) {
+        \Civi::$statics[__CLASS__]['site_language_translation'] = [
+          'fields' => [],
+          'language' => \Civi::settings()->get('lcMessages'),
+        ];
+        foreach ($translations as $translatedField) {
+          \Civi::$statics[__CLASS__]['site_language_translation']['fields'][$translatedField['entity_id'] . $translatedField['entity_field']] = $translatedField;
+        }
+      }
+    }
+    return \Civi::$statics[__CLASS__]['site_language_translation'];
   }
 
 }
