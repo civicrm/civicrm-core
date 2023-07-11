@@ -8,108 +8,71 @@
  +--------------------------------------------------------------------+
 *}
 <div id="membership" class="crm-group membership-group">
-    {if true}
-      <div id="priceset">
-        <fieldset>
-            {if $renewal_mode}
-                {if $membershipBlock.renewal_title}
-                  <legend>{$membershipBlock.renewal_title}</legend>
+  <div id="priceset">
+    <fieldset>
+      {if $renewal_mode}
+        {if $membershipBlock.renewal_title}
+          <legend>{$membershipBlock.renewal_title}</legend>
+        {/if}
+        {if $membershipBlock.renewal_text}
+          <div id="membership-intro" class="crm-section membership_renewal_intro-section">
+            {$membershipBlock.renewal_text}
+          </div>
+        {/if}
+      {else}
+        {if $membershipBlock.new_title}
+          <legend>{$membershipBlock.new_title}</legend>
+        {/if}
+        {if $membershipBlock.new_text}
+          <div id="membership-intro" class="crm-section membership_new_intro-section">
+            {$membershipBlock.new_text}
+          </div>
+        {/if}
+      {/if}
+      {if !empty($membershipTypes)}
+        {foreach from=$membershipTypes item=row}
+          {if array_key_exists( 'current_membership', $row )}
+            <div class='help'>
+              {* Lifetime memberships have no end-date so current_membership array key exists but is NULL *}
+              {if $row.current_membership}
+                {if $row.current_membership|crmDate:"%Y%m%d" LT $smarty.now|crmDate:"%Y%m%d"}
+                  {ts 1=$row.current_membership|crmDate 2=$row.name}Your <strong>%2</strong> membership expired on %1.{/ts}<br />
+                {else}
+                  {ts 1=$row.current_membership|crmDate 2=$row.name}Your <strong>%2</strong> membership expires on %1.{/ts}<br />
                 {/if}
-                {if $membershipBlock.renewal_text}
-                  <div id="membership-intro" class="crm-section membership_renewal_intro-section">
-                      {$membershipBlock.renewal_text}
-                  </div>
-                {/if}
-            {else}
-                {if $membershipBlock.new_title}
-                  <legend>{$membershipBlock.new_title}</legend>
-                {/if}
-                {if $membershipBlock.new_text}
-                  <div id="membership-intro" class="crm-section membership_new_intro-section">
-                      {$membershipBlock.new_text}
-                  </div>
-                {/if}
-            {/if}
-            {if !empty($membershipTypes)}
-                {foreach from=$membershipTypes item=row}
-                    {if array_key_exists( 'current_membership', $row )}
-                      <div class='help'>
-                          {* Lifetime memberships have no end-date so current_membership array key exists but is NULL *}
-                          {if $row.current_membership}
-                              {if $row.current_membership|crmDate:"%Y%m%d" LT $smarty.now|crmDate:"%Y%m%d"}
-                                  {ts 1=$row.current_membership|crmDate 2=$row.name}Your <strong>%2</strong> membership expired on %1.{/ts}<br />
-                              {else}
-                                  {ts 1=$row.current_membership|crmDate 2=$row.name}Your <strong>%2</strong> membership expires on %1.{/ts}<br />
-                              {/if}
-                          {else}
-                              {ts 1=$row.name}Your <strong>%1</strong> membership does not expire (you do not need to renew that membership).{/ts}<br />
-                          {/if}
-                      </div>
-                    {/if}
-                {/foreach}
-            {/if}
-
-            {include file="CRM/Price/Form/PriceSet.tpl" extends="Membership"}
-        </fieldset>
-      </div>
-    {literal}
-      <script type="text/javascript">
-        CRM.$(function($) {
-          //if price set is set we use below below code to show for showing auto renew
-          var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
-          var autoRenew = $("#auto_renew_section");
-          var autoRenewCheckbox = $("#auto_renew");
-          var forceRenew = $("#force_renew");
-          autoRenew.hide();
-          forceRenew.hide();
-          if ( autoRenewOption == 1 ) {
-            autoRenew.show();
-          } else if ( autoRenewOption == 2 ) {
-            autoRenewCheckbox.prop('checked',  true );
-            autoRenewCheckbox.attr( 'readonly', true );
-            autoRenew.hide();
-            forceRenew.show();
-          }
-        });
-      </script>
-    {/literal}
-    {elseif $membershipBlock and $lineItem and $priceSetID AND !$is_quick_config}
-        {assign var="totalAmount" value=$amount}
-      <div class="header-dark">
-          {ts}Membership Fee{/ts}
-      </div>
-      <div class="display-block">
-          {include file="CRM/Price/Page/LineItem.tpl" context="Membership"}
-      </div>
-    {elseif $membershipBlock AND !$is_quick_config}
-      <div id="membership" class="crm-group membership-group">
-        <fieldset>
-            {if $renewal_mode }
-                {if $membershipBlock.renewal_title}
-                  <legend>{$membershipBlock.renewal_title}</legend>
-                {/if}
-                {if $membershipBlock.renewal_text}
-                  <div id="membership-intro" class="crm-section membership_renewal_intro-section">
-                    <p>{$membershipBlock.renewal_text}</p>
-                  </div>
-                {/if}
-
-            {else}
-                {if $membershipBlock.new_title}
-                  <legend>{$membershipBlock.new_title}</legend>
-                {/if}
-                {if $membershipBlock.new_text}
-                  <div id="membership-intro" class="crm-section membership_new_intro-section">
-                    <p>{$membershipBlock.new_text}</p>
-                  </div>
-                {/if}
-            {/if}
-
-        </fieldset>
-      </div>
-
-    {/if}{* membership block end here *}
+              {else}
+                {ts 1=$row.name}Your <strong>%1</strong> membership does not expire (you do not need to renew that membership).{/ts}<br />
+              {/if}
+            </div>
+          {/if}
+        {/foreach}
+      {/if}
+      {include file="CRM/Price/Form/PriceSet.tpl" extends="Membership"}
+    </fieldset>
+  </div>
+  {literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      //if price set is set we use below below code to show for showing auto renew
+      var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
+      var autoRenew = $("#auto_renew_section");
+      var autoRenewCheckbox = $("#auto_renew");
+      var forceRenew = $("#force_renew");
+      autoRenew.hide();
+      forceRenew.hide();
+      if ( autoRenewOption == 1 ) {
+        autoRenew.show();
+      } else if ( autoRenewOption == 2 ) {
+        autoRenewCheckbox.prop('checked',  true );
+        autoRenewCheckbox.attr( 'readonly', true );
+        autoRenew.hide();
+        forceRenew.show();
+      }
+    });
+  </script>
+{/literal}
 </div>
+
 {if $membershipBlock AND $is_quick_config}
     {strip}
       <table id="membership-listings">
