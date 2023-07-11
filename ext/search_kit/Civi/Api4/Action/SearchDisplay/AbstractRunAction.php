@@ -420,16 +420,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function formatFieldLinks($column, $data, $value): array {
     $links = [];
     foreach ((array) $value as $index => $val) {
-      $path = $this->getLinkPath($column['link'], $data, $index);
-      $path = $this->replaceTokens($path, $data, 'url', $index);
-      if ($path) {
-        $link = [
-          'text' => $val,
-          'url' => $this->getUrl($path),
-        ];
-        if (!empty($column['link']['target'])) {
-          $link['target'] = $column['link']['target'];
-        }
+      $link = $this->formatLink($column['link'], $data, $val, $index);
+      if ($link) {
         $links[] = $link;
       }
     }
@@ -451,21 +443,29 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if (!$this->checkLinkCondition($item, $data)) {
         continue;
       }
-      $path = $this->replaceTokens($this->getLinkPath($item, $data), $data, 'url');
-      if ($path) {
-        $link = [
-          'text' => $this->replaceTokens($item['text'] ?? '', $data, 'view'),
-          'url' => $this->getUrl($path),
-        ];
-        foreach (['target', 'style', 'icon'] as $prop) {
-          if (!empty($item[$prop])) {
-            $link[$prop] = $item[$prop];
-          }
-        }
+      $link = $this->formatLink($item, $data);
+      if ($link) {
         $out['links'][] = $link;
       }
     }
     return $out;
+  }
+
+  private function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
+    $link = $this->getLinkInfo($link, $data, $index);
+    if (empty($link['path']) && empty($link['task'])) {
+      return NULL;
+    }
+    $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
+    if ($link['path']) {
+      $link['url'] = $this->getUrl($this->replaceTokens($link['path'], $data, 'url', $index));
+      $keys = ['url', 'text', 'title', 'target', 'style', 'icon'];
+    }
+    else {
+      $keys = ['task', 'text', 'title', 'style', 'icon'];
+    }
+    $link = array_intersect_key($link, array_flip($keys));
+    return array_filter($link);
   }
 
   /**
@@ -493,24 +493,33 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * @param array $link
+   * @param array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, icon: string, title: string, text: string} $link
    * @param array $data
    * @param int $index
-   * @return string|null
+   * @return array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, icon: string, title: string, text: string, tokens: array}
    */
-  private function getLinkPath($link, $data = NULL, $index = 0): ?string {
-    $path = $link['path'] ?? NULL;
-    if (!$path && !empty($link['entity']) && !empty($link['action'])) {
-      $entity = $link['entity'];
+  private function getLinkInfo($link, $data = NULL, $index = 0): ?array {
+    $link += [
+      'path' => '',
+      'target' => '',
+      'entity' => '',
+      'text' => '',
+      'title' => '',
+      'tokens' => [],
+    ];
+    $entity = $link['entity'];
+    if ($entity) {
       $idField = $idKey = CoreUtil::getIdFieldName($entity);
       // Hack to support links to relationships
       if ($entity === 'Relationship') {
         $entity = 'RelationshipCache';
         $idKey = 'relationship_id';
       }
-      $path = CoreUtil::getInfoItem($entity, 'paths')[$link['action']] ?? NULL;
+    }
+    if (!$link['path'] && $entity && !empty($link['action'])) {
+      $link['path'] = CoreUtil::getInfoItem($entity, 'paths')[$link['action']] ?? NULL;
       $prefix = '';
-      if ($path && !empty($link['join'])) {
+      if ($link['path'] && !empty($link['join'])) {
         $prefix = $link['join'] . '.';
       }
       // This is a bit clunky, the function_join_field gets un-munged later by $this->getJoinFromAlias()
@@ -518,11 +527,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $prefix = 'GROUP_CONCAT_' . str_replace('.', '_', $prefix);
       }
       if ($prefix) {
-        $path = str_replace('[', '[' . $prefix, $path);
+        $link['path'] = str_replace('[', '[' . $prefix, $link['path']);
       }
       // Check access for edit/update/delete links
       // (presumably if a record is shown in SearchKit the user already has view access, and the check is expensive)
-      if ($path && isset($data) && !in_array($link['action'], ['view', 'preview'], TRUE)) {
+      if ($link['path'] && isset($data) && !in_array($link['action'], ['view', 'preview'], TRUE)) {
         $id = $data[$prefix . $idKey] ?? NULL;
         $id = is_array($id) ? $id[$index] ?? NULL : $id;
         if ($id) {
@@ -542,25 +551,30 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         }
       }
     }
-    elseif (!$path && !empty($link['entity']) && !empty($link['task'])) {
+    elseif (!$link['path'] && $entity && !empty($link['task'])) {
       $task = $this->getTask($link['task']);
       // Convert legacy tasks (which have to a url)
       if (!empty($task['crmPopup'])) {
-        $idField = CoreUtil::getIdFieldName($link['entity']);
-        $path = \CRM_Utils_JS::decode($task['crmPopup']['path']);
-        $amp = strpos($path, '?') ? '&' : '?';
+        $link['path'] = \CRM_Utils_JS::decode($task['crmPopup']['path']);
+        $amp = strpos($link['path'], '?') ? '&' : '?';
         $data = \CRM_Utils_JS::getRawProps($task['crmPopup']['data']);
         // Find the special key that combines selected ids and replace it with id token
         $idsKey = array_search("ids.join(',')", $data);
         unset($data[$idsKey]);
-        $path .= $amp . $idsKey . '=[' . $idField . ']';
+        $link['path'] .= $amp . $idsKey . '=[' . $idField . ']';
         // Add the rest of the data items
         foreach ($data as $dataKey => $dataRaw) {
-          $path .= '&' . $dataKey . '=' . \CRM_Utils_JS::decode($dataRaw);
+          $link['path'] .= '&' . $dataKey . '=' . \CRM_Utils_JS::decode($dataRaw);
         }
       }
+      elseif (!empty($task['apiBatch']) || !empty($task['uiDialog'])) {
+        $link['tokens'][] = $idKey;
+        $link['title'] = $link['title'] ?: $task['title'];
+        $link['task'] = array_intersect_key($task, ['apiBatch' => 1, 'uiDialog' => 1]);
+      }
     }
-    return $path;
+    $link['tokens'] = array_merge($link['tokens'], $this->getTokens($link['path'] . $link['text'] . $link['title']));
+    return $link;
   }
 
   /**
@@ -784,25 +798,23 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return string
    */
   private function replaceTokens($tokenExpr, $data, $format, $index = NULL) {
-    if (strpos(($tokenExpr ?? ''), '[') !== FALSE) {
-      foreach ($this->getTokens($tokenExpr) as $token) {
-        $val = $data[$token] ?? NULL;
-        if (isset($val) && $format === 'view') {
-          $dataType = $this->getSelectExpression($token)['dataType'] ?? NULL;
-          $val = $this->formatViewValue($token, $val, $data, $dataType);
-        }
-        if (!(is_null($index))) {
-          $replacement = is_array($val) ? $val[$index] ?? '' : $val;
-        }
-        else {
-          $replacement = implode(', ', (array) $val);
-        }
-        // A missing token value in a url invalidates it
-        if ($format === 'url' && (!isset($replacement) || $replacement === '')) {
-          return NULL;
-        }
-        $tokenExpr = str_replace('[' . $token . ']', ($replacement ?? ''), ($tokenExpr ?? ''));
+    foreach ($this->getTokens($tokenExpr ?? '') as $token) {
+      $val = $data[$token] ?? NULL;
+      if (isset($val) && $format === 'view') {
+        $dataType = $this->getSelectExpression($token)['dataType'] ?? NULL;
+        $val = $this->formatViewValue($token, $val, $data, $dataType);
       }
+      if (!(is_null($index))) {
+        $replacement = is_array($val) ? $val[$index] ?? '' : $val;
+      }
+      else {
+        $replacement = implode(', ', (array) $val);
+      }
+      // A missing token value in a url invalidates it
+      if ($format === 'url' && (!isset($replacement) || $replacement === '')) {
+        return NULL;
+      }
+      $tokenExpr = str_replace('[' . $token . ']', ($replacement ?? ''), ($tokenExpr ?? ''));
     }
     return $tokenExpr;
   }
@@ -970,12 +982,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $possibleTokens .= ($column['rewrite'] ?? '');
       $possibleTokens .= ($column['title'] ?? '');
       $possibleTokens .= ($column['empty_value'] ?? '');
+
       if (!empty($column['link'])) {
-        $possibleTokens .= $this->getLinkPath($column['link']) ?? '';
+        foreach ($this->getLinkInfo($column['link'])['tokens'] as $token) {
+          $this->addSelectExpression($token);
+        }
       }
       foreach ($column['links'] ?? [] as $link) {
-        $possibleTokens .= $link['text'] ?? '';
-        $possibleTokens .= $this->getLinkPath($link) ?? '';
+        foreach ($this->getLinkInfo($link)['tokens'] as $token) {
+          $this->addSelectExpression($token);
+        }
       }
 
       // Select id, value & grouping for in-place editing

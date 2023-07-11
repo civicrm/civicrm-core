@@ -183,6 +183,14 @@
           (!this.allRowsSelected && this.selectedRows && this.selectedRows.length === this.results.length);
       },
 
+      // If link is to a task rather than an ordinary href, run the task
+      onClickLink: function(link, id, event) {
+        if (link.task) {
+          event.preventDefault();
+          this.taskManager.doTask(_.extend({title: link.title}, link.task), [id]);
+        }
+      },
+
       // onInitialize callback
       onInitialize: [function() {
         // Instantiate task manager object
