@@ -249,6 +249,24 @@
       this.getLinks = function(columnKey) {
         if (!ctrl.links) {
           ctrl.links = {'*': ctrl.crmSearchAdmin.buildLinks(), '0': []};
+          ctrl.links[''] = _.filter(ctrl.links['*'], {join: ''});
+          searchMeta.getSearchTasks(ctrl.savedSearch.api_entity).then(function(tasks) {
+            _.each(tasks, function (task) {
+              if (task.number === '> 0' || task.number === '=== 1') {
+                var link = {
+                  text: task.title,
+                  icon: task.icon,
+                  task: task.name,
+                  entity: ctrl.savedSearch.api_entity,
+                  target: 'crm-popup',
+                  join: '',
+                  style: task.name === 'delete' ? 'danger' : 'default'
+                };
+                ctrl.links['*'].push(link);
+                ctrl.links[''].push(link);
+              }
+            });
+          });
         }
         if (!columnKey) {
           return ctrl.links['*'];

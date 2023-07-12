@@ -20,7 +20,7 @@
     <option value="_blank">{{:: ts('New tab') }}</option>
     <option value="crm-popup">{{:: ts('Popup dialog') }}</option>
   </select>
-  <crm-search-admin-link-select ng-if="col.link" link="col.link" on-change="$ctrl.parent.onChangeLink(col, newLink)" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" links=":: $ctrl.parent.getLinks(col.key)">
+  <crm-search-admin-link-select ng-if="col.link" link="col.link" on-change="$ctrl.parent.onChangeLink(col, newLink)" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" links="$ctrl.parent.getLinks(col.key)">
   </crm-search-admin-link-select>
 </div>
 <div class="form-inline crm-search-admin-flex-row">

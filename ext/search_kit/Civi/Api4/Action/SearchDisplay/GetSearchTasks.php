@@ -269,7 +269,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'name' => 'icon',
       ],
       [
-        'number' => 'icon',
+        'name' => 'number',
       ],
       [
         'name' => 'apiBatch',
