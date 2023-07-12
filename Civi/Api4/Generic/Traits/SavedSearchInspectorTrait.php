@@ -338,6 +338,9 @@ trait SavedSearchInspectorTrait {
    * @return array
    */
   protected function getTokens(string $str): array {
+    if (strpos($str, '[') === FALSE) {
+      return [];
+    }
     $tokens = [];
     preg_match_all('/\\[([^]]+)\\]/', $str, $tokens);
     return array_unique($tokens[1]);

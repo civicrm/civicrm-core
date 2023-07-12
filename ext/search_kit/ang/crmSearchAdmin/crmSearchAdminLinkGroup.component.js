@@ -15,7 +15,7 @@
     controller: function ($scope, $element, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
-        linkProps = ['path', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'condition'];
+        linkProps = ['path', 'task', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'condition'];
 
       ctrl.permissionOperators = [
         {key: '=', value: ts('Has')},
@@ -98,7 +98,7 @@
           path: 'civicrm/'
         });
         var defaultLinks = _.filter(ctrl.links, function(link) {
-          return !link.join;
+          return link.action && !link.join;
         });
         _.each(ctrl.group, function(item) {
           setDefaults(item, item);

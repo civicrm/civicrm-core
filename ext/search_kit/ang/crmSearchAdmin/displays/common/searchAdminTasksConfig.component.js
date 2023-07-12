@@ -8,15 +8,12 @@
       apiParams: '<'
     },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminTasksConfig.html',
-    controller: function($scope, crmApi4, $timeout) {
+    controller: function($scope, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.$onInit = function() {
-        crmApi4('SearchDisplay', 'getSearchTasks', {
-          entity: ctrl.apiEntity,
-          savedSearch: {api_entity: ctrl.apiEntity, api_params: ctrl.apiParams}
-        }).then(function(tasks) {
+        searchMeta.getSearchTasks(ctrl.apiEntity).then(function(tasks) {
           ctrl.allTasks = tasks;
         });
       };

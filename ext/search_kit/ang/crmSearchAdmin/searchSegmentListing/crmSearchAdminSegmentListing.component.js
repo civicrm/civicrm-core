@@ -40,7 +40,7 @@
 
       this.deleteSegment = function(row) {
         ctrl.runSearch(
-          [['SearchSegment', 'delete', {where: [['id', '=', row.key]]}]],
+          {deleteSegment: ['SearchSegment', 'delete', {where: [['id', '=', row.key]]}]},
           {start: ts('Deleting...'), success: ts('Segment Deleted')},
           row
         );

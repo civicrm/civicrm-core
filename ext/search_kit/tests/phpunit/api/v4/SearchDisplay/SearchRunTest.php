@@ -233,6 +233,78 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($lastName, $result->first()['data']['last_name']);
   }
 
+  public function testActionAndTaskLinks():void {
+    $contributions = $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['total_amount' => 100],
+      ],
+    ]);
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['contact_id.display_name'],
+          'where' => [['id', 'IN', $contributions->column('id')]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'contact_id.display_name',
+              'label' => 'Contact',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
+            [
+              'type' => 'buttons',
+              'links' => [
+                [
+                  'entity' => 'Contribution',
+                  'task' => 'contribution.' . \CRM_Contribute_Task::PDF_RECEIPT,
+                  'icon' => 'fa-external-link',
+                ],
+                [
+                  'entity' => 'Contribution',
+                  'task' => 'update',
+                  'icon' => 'fa-pencil',
+                ],
+                [
+                  'entity' => 'Contribution',
+                  'action' => 'delete',
+                  'icon' => 'fa-pencil',
+                  'target' => 'crm-popup',
+                ],
+              ],
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    // TODO: This test may need to be updated as core tasks evolve
+    $this->assertEquals(1, $result->count());
+    // 1st link is to a quickform-based search task (CRM_Contribute_Task::PDF_RECEIPT)
+    $this->assertArrayNotHasKey('task', $result[0]['columns'][1]['links'][0]);
+    $this->assertStringContainsString('id=' . $contributions[0]['id'] . '&qfKey=', $result[0]['columns'][1]['links'][0]['url']);
+    // 2nd link is to the native SK bulk-update task
+    $this->assertArrayNotHasKey('url', $result[0]['columns'][1]['links'][1]);
+    $this->assertArrayHasKey('uiDialog', $result[0]['columns'][1]['links'][1]['task']);
+    // 3rd link is a popup link to the delete contribution quickform
+    $this->assertStringContainsString('action=delete&id=' . $contributions[0]['id'], $result[0]['columns'][1]['links'][2]['url']);
+    $this->assertEquals('crm-popup', $result[0]['columns'][1]['links'][2]['target']);
+  }
+
   /**
    * Test smarty rewrite syntax.
    */

@@ -42,12 +42,12 @@
       };
 
       // Add callbacks for pre & post run
-      this.onPreRun.push(function(apiParams) {
-        apiParams.debug = true;
+      this.onPreRun.push(function(apiCalls) {
+        apiCalls.run.debug = true;
       });
 
-      this.onPostRun.push(function(result) {
-        ctrl.debug = _.extend(_.pick(ctrl.debug, 'apiParams'), result.debug);
+      this.onPostRun.push(function(apiResults) {
+        ctrl.debug = _.extend(_.pick(ctrl.debug, 'apiParams'), apiResults.run.debug);
       });
 
       $scope.sortableColumnOptions = {
