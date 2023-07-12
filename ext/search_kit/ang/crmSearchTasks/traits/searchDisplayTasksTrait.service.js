@@ -14,16 +14,19 @@
       this.entityInfo = null;
 
       this.getMetadata = function() {
-        if (fetchedMetadata) {
-          return;
+        if (!fetchedMetadata) {
+          fetchedMetadata = crmApi4({
+            entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural', 'primary_key'], where: [['name', '=', mngr.getEntityName()]]}, 0],
+            tasks: ['SearchDisplay', 'getSearchTasks', {savedSearch: displayCtrl.search, display: displayCtrl.display}]
+          }).then(function(result) {
+            mngr.entityInfo = result.entityInfo;
+            mngr.tasks = result.tasks;
+          }, function(failure) {
+            mngr.tasks = [];
+            mngr.entityInfo = [];
+          });
         }
-        fetchedMetadata = crmApi4({
-          entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural', 'primary_key'], where: [['name', '=', mngr.getEntityName()]]}, 0],
-          tasks: ['SearchDisplay', 'getSearchTasks', {savedSearch: displayCtrl.search, display: displayCtrl.display}]
-        }).then(function(result) {
-          mngr.entityInfo = result.entityInfo;
-          mngr.tasks = result.tasks;
-        });
+        return fetchedMetadata;
       };
 
       this.getEntityName = function() {
@@ -186,8 +189,11 @@
       // If link is to a task rather than an ordinary href, run the task
       onClickLink: function(link, id, event) {
         if (link.task) {
+          const mngr = this.taskManager;
           event.preventDefault();
-          this.taskManager.doTask(_.extend({title: link.title}, link.task), [id]);
+          mngr.getMetadata().then(function() {
+            mngr.doTask(_.extend({title: link.title}, link.task), [id]);
+          });
         }
       },
 
