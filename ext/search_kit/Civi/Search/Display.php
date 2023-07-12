@@ -69,7 +69,7 @@ class Display {
     }
     // If addLabel is false the placeholder needs to be passed through to javascript
     $label = $addLabel ?: '%1';
-    unset($paths['add']);
+    unset($paths['add'], $paths['browse']);
     foreach (array_keys($paths) as $actionName) {
       $actionKey = \CRM_Core_Action::mapItem($actionName);
       $link = [
