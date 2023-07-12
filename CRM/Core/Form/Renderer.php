@@ -318,7 +318,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       // Format contact as link
       if ($entity == 'Contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
         $url = CRM_Utils_System::url("civicrm/contact/view", ['reset' => 1, 'cid' => $val['id']]);
-        $val['label'] = '<a class="view-contact no-popup" href="' . $url . '" title="' . ts('View Contact') . '">' . CRM_Utils_String::purifyHTML($val['label']) . '</a>';
+        $val['label'] = '<a class="view-contact no-popup" href="' . $url . '" title="' . ts('View Contact', ['escape' => 'htmlattribute']) . '">' . CRM_Utils_String::purifyHTML($val['label']) . '</a>';
       }
       $display[] = $val['label'];
     }
@@ -396,7 +396,7 @@ HEREDOC;
     // Initially hide if not needed
     // Note: visibility:hidden prevents layout jumping around unlike display:none
     $display = $field->getValue() !== NULL ? '' : ' style="visibility:hidden;"';
-    $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear') . '"><i class="crm-i fa-times" aria-hidden="true"></i></a>';
+    $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear', ['escape' => 'htmlattribute']) . '"><i class="crm-i fa-times" aria-hidden="true"></i></a>';
   }
 
 }

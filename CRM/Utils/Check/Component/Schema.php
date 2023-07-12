@@ -147,14 +147,14 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
               'id' => $field['cfid'],
             ]);
             $url = CRM_Utils_System::url('civicrm/admin/custom/group/field/update', "action=update&reset=1&gid={$customField['custom_group_id']}&id={$field['cfid']}", TRUE);
-            $fieldName = '<a href="' . $url . '" title="' . ts('Edit Custom Field', ['escape' => 'js']) . '">' . $customField['label'] . '</a>';
+            $fieldName = '<a href="' . $url . '" title="' . ts('Edit Custom Field', ['escape' => 'htmlattribute']) . '">' . $customField['label'] . '</a>';
           }
           catch (CRM_Core_Exception $e) {
             $fieldName = '<span style="color:red">' . ts('Deleted') . ' - ' . ts('Field ID %1', [1 => $field['cfid']]) . '</span> ';
           }
         }
-        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria', ['escape' => 'js']) . '"> <i class="crm-i fa-pencil" aria-hidden="true"></i> </a>';
-        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group/edit', "reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings', ['escape' => 'js']) . '"> <i class="crm-i fa-gear" aria-hidden="true"></i> </a>';
+        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria', ['escape' => 'htmlattribute']) . '"> <i class="crm-i fa-pencil" aria-hidden="true"></i> </a>';
+        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group/edit', "reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings', ['escape' => 'htmlattribute']) . '"> <i class="crm-i fa-gear" aria-hidden="true"></i> </a>';
         $html .= "<tr><td>{$id} - {$field['title']} </td><td>{$groupEdit} {$groupConfig}</td><td class='disabled'>{$fieldName}</td>";
       }
 
