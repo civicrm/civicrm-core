@@ -38,6 +38,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Our group reports use an alter so transaction cleanup won't work.
    */
   public function tearDown(): void {
+    Civi::settings()->set('logging', 0);
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'], TRUE);
     (new CRM_Logging_Schema())->dropAllLogTables();
@@ -266,9 +267,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $reportID,
     ]);
-    if (strpos($reportID, 'logging') === 0) {
-      Civi::settings()->set('logging', 0);
-    }
   }
 
   /**
@@ -287,7 +285,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'logging/contact/summary',
     ]);
-    Civi::settings()->set('logging', 0);
   }
 
   /**
@@ -319,9 +316,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $reportID,
     ]);
-    if (strpos($reportID, 'logging') === 0) {
-      Civi::settings()->set('logging', 0);
-    }
   }
 
   /**
@@ -349,9 +343,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('report_template', 'getstatistics', [
       'report_id' => $reportID,
     ], __FUNCTION__, __FILE__, $description, 'Getstatistics');
-    if (strpos($reportID, 'logging') === 0) {
-      Civi::settings()->set('logging', 0);
-    }
   }
 
   /**
