@@ -143,7 +143,7 @@ class CRM_Utils_Mail {
   /**
    * Wrapper function to send mail in CiviCRM. Hooks are called from this function. The input parameter
    * is an associateive array which holds the values of field needed to send an email. Note that these
-   * parameters are case specific. The Parameters are:
+   * parameters are case-sensitive. The Parameters are:
    *
    * from    : complete from envelope
    * toName  : name of person to send email
