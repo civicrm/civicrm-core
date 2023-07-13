@@ -11,8 +11,8 @@ UPDATE civicrm_group SET `name` = `id` WHERE name IS NULL;
       WHERE `frontend_title_{$locale}` IS NULL OR `frontend_title_{$locale}` = '';
 
       UPDATE `civicrm_group`
-      SET `frontend_description_{$locale}` = `description_{$locale}`
-      WHERE `frontend_description_{$locale}` IS NULL OR `frontend_description_{$locale}` = '' AND 'description_{$locale}` <> '';
+      SET `frontend_description_{$locale}` = `description`
+      WHERE `frontend_description_{$locale}` IS NULL OR `frontend_description_{$locale}` = '' AND `description` <> '';
     {/foreach}
 {else}
   UPDATE `civicrm_group`
