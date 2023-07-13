@@ -173,7 +173,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ];
     foreach ($allTemplates as $index => $template) {
       $reportID = $template[0];
-      if (in_array($reportID, $currentlyExcluded, TRUE) || stripos($reportID, 'has existing issues') !== FALSE) {
+      if (in_array($reportID, $currentlyExcluded, TRUE)) {
         unset($allTemplates[$index]);
       }
     }
@@ -255,10 +255,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param string $reportID
    */
   public function testReportTemplateGetRowsAllReports(string $reportID): void {
-    //$reportID = 'logging/contact/summary';
-    if (stripos($reportID, 'has existing issues') !== FALSE) {
-      $this->markTestIncomplete($reportID);
-    }
     if (strpos($reportID, 'logging') === 0) {
       Civi::settings()->set('logging', 1);
     }
@@ -309,9 +305,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param $reportID
    */
   public function testReportTemplateGetRowsAllReportsACL($reportID): void {
-    if (stripos($reportID, 'has existing issues') !== FALSE) {
-      $this->markTestIncomplete($reportID);
-    }
     if (strpos($reportID, 'logging') === 0) {
       Civi::settings()->set('logging', 1);
     }
@@ -333,9 +326,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    */
   public function testReportTemplateGetStatisticsAllReports(string $reportID): void {
-    if (stripos($reportID, 'has existing issues') !== FALSE) {
-      $this->markTestIncomplete($reportID);
-    }
     if (in_array($reportID, ['contribute/softcredit', 'contribute/bookkeeping'])) {
       $this->markTestIncomplete($reportID . ' has non e-notices when calling statistics fn');
     }
@@ -388,9 +378,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     foreach ($reports['values'] as $report) {
       if (empty($reportsToSkip[$report['value']])) {
         $reportTemplates[] = [$report['value']];
-      }
-      else {
-        $reportTemplates[] = [$report['value'] . ' has existing issues :  ' . $reportsToSkip[$report['value']]];
       }
     }
 
