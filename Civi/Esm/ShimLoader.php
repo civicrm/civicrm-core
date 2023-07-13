@@ -17,15 +17,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * ShimLoader works by:
  *
  * 1. Adding the extra `es-module-shims.js` file.
+ *     +<script async src="...../es-module-shims/dist/es-module-shims.js">
  * 2. Swapping HTML tags to prefer shim-loading.
  *     -<script type='importmap'>
  *     +<script type='importmap-shim'>
  *     -<script type='module'>
  *     +<script type='module-shim'>
  *
- * The current implementation prefers the shim-based loader regardless of the extent of browser
- * support. This ensures consistent functionality on all browsers, but it also makes the overhead
- * mandatory.
+ * There are a few different modes with trade-offs for performance, consistency, and compatibility.
+ * The methods `createFastShim()` and `createSlowShim()`  have some notes about the trade-offs.
  *
  * For a fuller description of this mechanism, see the neighboring README.
  *

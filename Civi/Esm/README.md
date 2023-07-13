@@ -9,11 +9,11 @@ import { TableWidget } from 'https://example.com/sites/all/modules/civicrm/js/ta
 import { TableWidget } from 'civicrm/js/tab-widget.js';
 ```
 
-CiviCRM source-trees may have a variety of file-structures, based on the hosting environment and local configuration.
-Consequently, writing valid `import` statements for Civi-related code is much easier with logical-paths. They are
-easier to read and easier to adapt.
+Writing `import` statements is easier with logical-paths -- they're short, clean, and adaptable.
+(Recall that CiviCRM is deployed with a variety of web-hosts, UFs, and configuration-options. This
+means that the physical-paths change frequently and dramatically.)
 
-Logical-paths must be defined with an import-map. For native browser-based imports, it looks like:
+Logical-paths must be defined with an `importmap`. For native browser-based imports, it looks like:
 
 ```html
 <script type="importmap">
@@ -72,10 +72,10 @@ At time of writing (early/mid-2023), adoption of browser-based imports/import-ma
 
 * The PHP application-frameworks that we support (Drupal, WordPress, Joomla, Backdrop) have not yet defined services or
   conventions for `importmap`s.  Over time, each may adopt slightly different conventions.  Additionally, these
-  frameworks are pluggable -- in absence of a framework-convention, other plugins may adopt their own conventions.
+  frameworks are pluggable -- in absence of a framework-convention, other (third-party) plugins may enact new conventions.
 
 * The browser standards provide a common model, and we should expect this model to influence future updates throughout
-  the ecosystem.  But it doesn't guarantee interoperability within PHP ecosystem -- future releases (of any framework
+  the ecosystem.  But it doesn't guarantee interoperability within the PHP ecosystem -- future releases (of any framework
   or any plugin) could introduce incompatibilities.  We cannot give good solutions for incompatibilities that don't
   exist yet.
 
@@ -94,23 +94,24 @@ The *loader* is responsible for two tasks:
 
 1. Given that a specific page-view needs a specific ECMAScript Module, render the HTML necessary to load it. For example:
     ```php
-    echo "<script type="module" src="$specificModule"></script>\n";
+    echo "<script type=\"module\" src=\"$specificModule\"></script>\n";
     ```
 2. Given that CiviCRM (as a whole; core+extensions) has defined an import-map, ensure that the import-map is properly
    loaded so that recursive-dependencies may be resolved. For example:
     ```php
     $civicrmImportMap = json_encode(Civi::service('esm.import_map')->get());
-    echo "<script type="importmap">\n{$civicrmImportMap>}</script>\n";
+    echo "<script type=\"importmap\">\n{$civicrmImportMap>}</script>\n";
     ```
 
-There are a few variations on how to perform these steps. Each variant defines a service `esm.loader.XXX`
-(implemented in `Civi\Esm\XXX`).  For example, these two are currently implemented:
+There are multiple loaders, which perform these tasks in slightly different ways.
+
+Every loader defines a service (`esm.loader.XXX`) and class (`Civi\Esm\XXX`).  For example:
 
 * `esm.loader.browser` (`Civi\Esm\BrowserLoader`): Use pure, browser-based loading with `<script type="module">` and `<script type="importmap">`.
 * `esm.loader.shim-fast` (`Civi\Esm\ShimLoader`): Use [es-module-shims](https://github.com/guybedford/es-module-shims) as dynamic polyfill (with preference for browser-based loading).
 * `esm.loader.shim-slow` (`Civi\Esm\ShimLoader`): Use [es-module-shims](https://github.com/guybedford/es-module-shims) with more guarantees of cross-browser functionality.
 
-Depending on the local settings/defaults, the _active loader_ will be available as `Civi::service('esm.loader')`.
+Only one loader is _active_ (based on local settings/defaults). You can access it by calling `Civi::service('esm.loader')`.
 
 > Note: There are some trade-offs between `esm.loader.browser` (more performant) and `esm.loader.shim` (more compatible).  However, this
 > is not why the system has two implementations.  To understand that, see "Conflict playbook" below.)
@@ -166,7 +167,7 @@ Let's continue the hypothetical above: In Jan 2024, Drupal adds a vanilla `impor
       });
     }
     ```
-* Update the Civi-Drupal integration to relay the import-map. For example, if you were very luck, this might be as simple as:
+* Update the Civi-Drupal integration to relay the import-map. For example, if you were very lucky, this might be as simple as:
 
     ```php
     // FILE: civicrm.module

@@ -5,8 +5,10 @@ namespace Civi\Esm;
 use Civi;
 
 /**
- * The AbstractLoader is a base-class BrowserLoader and ShimLoader. These are similar
- * in that they load ESM's by displaying HTML, e.g.
+ * The BasicLoaderTrait is a building-block for BrowserLoader and ShimLoader.
+ *
+ * These are similar -- both need to get a list of modules and format the
+ * list as HTML markup, e.g.
  *
  *   <script type="importmap">
  *   { "import": {"civicrm/": "https://example.com/sites/all/modules/civicrm"}}
@@ -17,7 +19,11 @@ use Civi;
  *   const table = new TableWidget();
  *   </script>
  *
- * However, subclasses may use different HTML.
+ * However, the HTML formatting is slightly different. Observe how `BrowserLoader`
+ * and `ShimLoader` both `BasicLoaderTrait` and then implements methods like `renderModuleScript()`.
+ *
+ * @see \Civi\Esm\BrowserLoader
+ * @see \Civi\Esm\ShimLoader
  */
 trait BasicLoaderTrait {
 
