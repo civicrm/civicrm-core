@@ -289,8 +289,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->getRenewalMembershipID();
 
-    // @todo - this mid needs to go - just making sure references are updated first.
-    $this->_mid = $this->getRenewalMembershipID();
     if ($this->getRenewalMembershipID()) {
       $membership = new CRM_Member_DAO_Membership();
       $membership->id = $this->getRenewalMembershipID();
