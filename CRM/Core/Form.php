@@ -1788,12 +1788,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // Core field - get metadata.
-    $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
-    $fieldSpec = $fieldSpec['values'];
+    $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props)['values'];
     $label = $props['label'] ?? $fieldSpec['html']['label'] ?? $fieldSpec['title'];
 
     $widget = $props['type'] ?? $fieldSpec['html']['type'];
-    if ($widget == 'TextArea' && $context == 'search') {
+    if (in_array($widget, ['TextArea', 'Email'], TRUE) && $context == 'search') {
+      // Don't require a full email to be entered in search mode.
+      // See https://lab.civicrm.org/dev/core/-/issues/4430.
       $widget = 'Text';
     }
 
