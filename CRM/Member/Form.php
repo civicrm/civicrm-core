@@ -78,6 +78,14 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   protected $formContext = 'membership';
 
   /**
+   * Array of the payment fields to be displayed in the payment fieldset (pane) in billingBlock.tpl
+   * this contains all the information to describe these fields from quickform. See CRM_Core_Form_Payment getPaymentFormFieldsMetadata
+   *
+   * @var array
+   */
+  public $_paymentFields = [];
+
+  /**
    * @return string
    */
   public function getFormContext(): string {
