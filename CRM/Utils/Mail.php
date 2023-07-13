@@ -142,7 +142,8 @@ class CRM_Utils_Mail {
 
   /**
    * Wrapper function to send mail in CiviCRM. Hooks are called from this function. The input parameter
-   * is an associateive array which holds the values of field needed to send an email. These are:
+   * is an associateive array which holds the values of field needed to send an email. Note that these
+   * parameters are case-sensitive. The Parameters are:
    *
    * from    : complete from envelope
    * toName  : name of person to send email
@@ -206,8 +207,8 @@ class CRM_Utils_Mail {
     }
     $headers['From'] = $params['from'];
     $headers['To'] = self::formatRFC822Email(
-      CRM_Utils_Array::value('toName', $params),
-      CRM_Utils_Array::value('toEmail', $params),
+      $params['toName'] ?? NULL,
+      $params['toEmail'] ?? NULL,
       FALSE
     );
 
@@ -223,10 +224,10 @@ class CRM_Utils_Mail {
     $headers['Content-Type'] = $htmlMessage ? 'multipart/mixed; charset=utf-8' : 'text/plain; charset=utf-8';
     $headers['Content-Disposition'] = 'inline';
     $headers['Content-Transfer-Encoding'] = '8bit';
-    $headers['Return-Path'] = CRM_Utils_Array::value('returnPath', $params, $defaultReturnPath);
+    $headers['Return-Path'] = $params['returnPath'] ?? $defaultReturnPath;
 
     // CRM-11295: Omit reply-to headers if empty; this avoids issues with overzealous mailservers
-    $replyTo = CRM_Utils_Array::value('replyTo', $params, CRM_Utils_Array::value('from', $params));
+    $replyTo = ($params['replyTo'] ?? ($params['from'] ?? NULL));
 
     if (!empty($replyTo)) {
       $headers['Reply-To'] = $replyTo;
