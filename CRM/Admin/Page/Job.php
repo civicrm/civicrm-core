@@ -102,7 +102,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
     CRM_Utils_System::setTitle(ts('Settings - Scheduled Jobs'));
     CRM_Utils_System::appendBreadCrumb([
       [
-        'title' => ts('Administer CiviCRM'),
+        'title' => ts('Administer'),
         'url' => CRM_Utils_System::url('civicrm/admin', 'reset=1'),
       ],
     ]);
