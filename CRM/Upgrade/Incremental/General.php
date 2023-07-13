@@ -33,7 +33,7 @@ class CRM_Upgrade_Incremental_General {
    *
    * A site running an earlier version will be told to upgrade.
    */
-  const MIN_RECOMMENDED_PHP_VER = '7.3.0';
+  const MIN_RECOMMENDED_PHP_VER = '7.4.0';
 
   /**
    * The minimum PHP version required to install Civi.
