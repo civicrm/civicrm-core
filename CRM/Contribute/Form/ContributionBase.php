@@ -251,11 +251,21 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Out of caution we still allow `get`, `set` to take precedence.
    *
    * @return int|null
+   * @throws \CRM_Core_Exception
    */
   public function getPriceSetID(): ?int {
     if ($this->_priceSetId === NULL) {
       if ($this->get('priceSetId')) {
         $this->_priceSetId = $this->get('priceSetId');
+      }
+      elseif ($this->getExistingContributionID()) {
+        $lineItems = $this->getExistingContributionLineItems();
+        $firstLineItem = reset($lineItems);
+        // If this IF is not true the contribution is messed up! Hopefully this
+        // could never happen.
+        if ($firstLineItem && !empty($firstLineItem['price_field_id'])) {
+          $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $firstLineItem['price_field_id'], 'price_set_id');
+        }
       }
       else {
         $this->_priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id);
@@ -382,7 +392,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       // check for is_monetary status
       $isPayLater = $this->_values['is_pay_later'] ?? NULL;
-      if (!empty($this->_ccid)) {
+      if ($this->getExistingContributionID()) {
         $this->_values['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
           $this->_ccid,
           'financial_type_id'
@@ -1365,6 +1375,26 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
     return $this->renewalMembershipID ?: FALSE;
+  }
+
+  /**
+   * Get the id of an existing contribution the submitter is attempting to pay.
+   *
+   * @return int|null
+   */
+  protected function getExistingContributionID(): ?int {
+    return $this->_ccid ?: CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
+  }
+
+  /**
+   * @return array
+   */
+  protected function getExistingContributionLineItems(): array {
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->getExistingContributionID());
+    foreach (array_keys($lineItems) as $id) {
+      $lineItems[$id]['id'] = $id;
+    }
+    return $lineItems;
   }
 
 }
