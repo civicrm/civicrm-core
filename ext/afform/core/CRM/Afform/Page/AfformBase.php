@@ -26,7 +26,7 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
       // If the user has "admin civicrm" & the admin extension is enabled
       if (CRM_Core_Permission::check('administer CiviCRM')) {
         if (($pagePath[1] ?? NULL) === 'admin') {
-          CRM_Utils_System::appendBreadCrumb([['title' => E::ts('Admin'), 'url' => CRM_Utils_System::url('civicrm/admin')]]);
+          CRM_Utils_System::appendBreadCrumb([['title' => E::ts('Administer'), 'url' => CRM_Utils_System::url('civicrm/admin')]]);
         }
         if ($afform['type'] !== 'system' &&
           \CRM_Extension_System::singleton()->getMapper()->isActiveModule('afform_admin')

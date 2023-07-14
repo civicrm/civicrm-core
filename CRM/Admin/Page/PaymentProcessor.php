@@ -44,7 +44,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
     CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
     $breadCrumb = [
       [
-        'title' => ts('Administration'),
+        'title' => ts('Administer'),
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),

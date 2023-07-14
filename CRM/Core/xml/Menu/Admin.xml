@@ -631,7 +631,7 @@
   </item>
   <item>
      <path>civicrm/admin</path>
-     <title>Administer CiviCRM</title>
+     <title>Administer</title>
      <access_arguments>administer CiviCRM system,administer CiviCRM data,access CiviCRM</access_arguments>
      <page_type>1</page_type>
      <page_callback>CRM_Admin_Page_Admin</page_callback>
