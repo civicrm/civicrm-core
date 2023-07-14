@@ -13,12 +13,9 @@
     <tr class="columnheader">
       <th scope="col">{ts}Amount{/ts}</th>
       <th scope="col">{ts}Frequency{/ts}</th>
-      <th scope="col">
-        {if $recurType EQ 'active'}{ts}Next Scheduled Date{/ts}
-        {elseif $recurType EQ 'inactive'}{ts}End or Modified Date{/ts}
-        {else}{ts}Start Date{/ts}
-        {/if}
-      </th>
+      <th scope="col">{ts}Start Date{/ts}</th>
+      {if $recurType EQ 'active'}<th scope="col">{ts}Next Scheduled Date{/ts}</th>{/if}
+      {if $recurType EQ 'inactive'}<th scope="col">{ts}End or Modified Date{/ts}</th>{/if}
       <th scope="col">{ts}Installments{/ts}</th>
       <th scope="col">{ts}Payment Processor{/ts}</th>
       <th scope="col">{ts}Status{/ts}</th>
@@ -30,16 +27,16 @@
       <tr id="contribution_recur-{$row.id}" data-action="cancel" class="crm-entity {cycle values="even-row,odd-row"}{if NOT $row.is_active} disabled{/if}">
         <td>{$row.amount|crmMoney:$row.currency}{if $row.is_test} ({ts}test{/ts}){/if}</td>
         <td>{ts}Every{/ts} {$row.frequency_interval} {$row.frequency_unit} </td>
-        <td>
-          {if $recurType EQ 'active'}{$row.next_sched_contribution_date|crmDate}
-          {elseif $recurType EQ 'inactive'}
+        <td>{$row.start_date|crmDate}</td>
+        {if $recurType EQ 'active'}<td>{$row.next_sched_contribution_date|crmDate}</td>{/if}
+        {if $recurType EQ 'inactive'}
+          <td>
             {if $row.cancel_date}{$row.cancel_date|crmDate}
             {elseif $row.end_date}{$row.end_date|crmDate}
             {else}{$row.modified_date|crmDate}
             {/if}
-          {else}{$row.start_date|crmDate}
-          {/if}
-        </td>
+          </td>
+        {/if}
         <td>{$row.installments}</td>
         <td>{$row.payment_processor}</td>
         <td>{$row.contribution_status}</td>
