@@ -1122,42 +1122,38 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
-    // @todo refactor this & leverage it from the unit tests.
-    if (!empty($params['priceSetId'])) {
-      $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
-      if ($is_quick_config) {
-        $priceField = new CRM_Price_DAO_PriceField();
-        $priceField->price_set_id = $params['priceSetId'];
-        $priceField->orderBy('weight');
-        $priceField->find();
+    if ($this->isQuickConfig()) {
+      $priceField = new CRM_Price_DAO_PriceField();
+      $priceField->price_set_id = $params['priceSetId'];
+      $priceField->orderBy('weight');
+      $priceField->find();
 
-        $priceOptions = [];
-        while ($priceField->fetch()) {
-          CRM_Price_BAO_PriceFieldValue::getValues($priceField->id, $priceOptions);
-          if (($selectedPriceOptionID = CRM_Utils_Array::value("price_{$priceField->id}", $params)) != FALSE && $selectedPriceOptionID > 0) {
-            switch ($priceField->name) {
-              case 'membership_amount':
-                $this->_params['selectMembership'] = $params['selectMembership'] = $priceOptions[$selectedPriceOptionID]['membership_type_id'] ?? NULL;
-                $this->set('selectMembership', $params['selectMembership']);
+      $priceOptions = [];
+      while ($priceField->fetch()) {
+        CRM_Price_BAO_PriceFieldValue::getValues($priceField->id, $priceOptions);
+        if (($selectedPriceOptionID = CRM_Utils_Array::value("price_{$priceField->id}", $params)) != FALSE && $selectedPriceOptionID > 0) {
+          switch ($priceField->name) {
+            case 'membership_amount':
+              $this->_params['selectMembership'] = $params['selectMembership'] = $priceOptions[$selectedPriceOptionID]['membership_type_id'] ?? NULL;
+              $this->set('selectMembership', $params['selectMembership']);
 
-              case 'contribution_amount':
-                $params['amount'] = $selectedPriceOptionID;
-                if ($priceField->name == 'contribution_amount' ||
-                    ($priceField->name == 'membership_amount' &&
-                      ($this->_membershipBlock['is_separate_payment'] ?? NULL) == 0)
-                ) {
-                  $this->_values['amount'] = $priceOptions[$selectedPriceOptionID]['amount'] ?? NULL;
-                }
-                $this->_values[$selectedPriceOptionID]['value'] = $priceOptions[$selectedPriceOptionID]['amount'] ?? NULL;
-                $this->_values[$selectedPriceOptionID]['label'] = $priceOptions[$selectedPriceOptionID]['label'] ?? NULL;
-                $this->_values[$selectedPriceOptionID]['amount_id'] = $priceOptions[$selectedPriceOptionID]['id'] ?? NULL;
-                $this->_values[$selectedPriceOptionID]['weight'] = $priceOptions[$selectedPriceOptionID]['weight'] ?? NULL;
-                break;
+            case 'contribution_amount':
+              $params['amount'] = $selectedPriceOptionID;
+              if ($priceField->name == 'contribution_amount' ||
+                  ($priceField->name == 'membership_amount' &&
+                    ($this->_membershipBlock['is_separate_payment'] ?? NULL) == 0)
+              ) {
+                $this->_values['amount'] = $priceOptions[$selectedPriceOptionID]['amount'] ?? NULL;
+              }
+              $this->_values[$selectedPriceOptionID]['value'] = $priceOptions[$selectedPriceOptionID]['amount'] ?? NULL;
+              $this->_values[$selectedPriceOptionID]['label'] = $priceOptions[$selectedPriceOptionID]['label'] ?? NULL;
+              $this->_values[$selectedPriceOptionID]['amount_id'] = $priceOptions[$selectedPriceOptionID]['id'] ?? NULL;
+              $this->_values[$selectedPriceOptionID]['weight'] = $priceOptions[$selectedPriceOptionID]['weight'] ?? NULL;
+              break;
 
-              case 'other_amount':
-                $params['amount_other'] = $selectedPriceOptionID;
-                break;
-            }
+            case 'other_amount':
+              $params['amount_other'] = $selectedPriceOptionID;
+              break;
           }
         }
       }
@@ -1176,11 +1172,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // Move more of the above into this function...
     $params['amount'] = $this->getMainContributionAmount($params);
     //If the membership & contribution is used in contribution page & not separate payment
-    $memPresent = $membershipLabel = $fieldOption = $is_quick_config = NULL;
+    $memPresent = $membershipLabel = $fieldOption = NULL;
     $proceFieldAmount = 0;
     if (property_exists($this, '_separateMembershipPayment') && $this->_separateMembershipPayment == 0) {
-      $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
-      if ($is_quick_config) {
+      if ($this->isQuickConfig()) {
         foreach ($this->_priceSet['fields'] as $fieldKey => $fieldVal) {
           if ($fieldVal['name'] == 'membership_amount' && !empty($params['price_' . $fieldKey])) {
             $fieldId = $fieldVal['id'];
@@ -1214,8 +1209,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     elseif ($priceSetId = CRM_Utils_Array::value('priceSetId', $params)) {
       $lineItem = [];
-      $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
-      if ($is_quick_config) {
+      if ($this->isQuickConfig()) {
         foreach ($this->_values['fee'] as $key => & $val) {
           if ($val['name'] == 'other_amount' && $val['html_type'] == 'Text' && !empty($params['price_' . $key])) {
             // Clean out any currency symbols.
