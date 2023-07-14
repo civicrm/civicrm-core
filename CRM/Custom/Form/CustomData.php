@@ -147,7 +147,45 @@ class CRM_Custom_Form_CustomData {
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
 
-    self::setGroupTree($form, $subType, $gid, $onlySubType, $getCachedTree);
+    $singleRecord = NULL;
+    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+      $singleRecord = $form->_groupCount;
+    }
+    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
+    // when a new record is being added for multivalued custom fields.
+    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
+      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+      $singleRecord = 'new';
+    }
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
+      NULL,
+      $form->_entityId,
+      $gid,
+      $subType,
+      $form->_subName,
+      $getCachedTree,
+      $onlySubType,
+      FALSE,
+      CRM_Core_Permission::EDIT,
+      $singleRecord
+    );
+
+    if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
+      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL, NULL, $form->_entityId);
+    }
+    // we should use simplified formatted groupTree
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
+
+    if (isset($form->_groupTree) && is_array($form->_groupTree)) {
+      $keys = array_keys($groupTree);
+      foreach ($keys as $key) {
+        $form->_groupTree[$key] = $groupTree[$key];
+      }
+    }
+    else {
+      $form->_groupTree = $groupTree;
+    }
   }
 
   /**
@@ -173,6 +211,14 @@ class CRM_Custom_Form_CustomData {
   /**
    * Add the group data as a formatted array to the form.
    *
+   * Note this is only called from this class in core but it is called
+   * from the gdpr extension so rather than clean it up we will deprecate in place
+   * and stop calling from core. (Calling functions like this from extensions)
+   * is not supported but since we are aware of it we can deprecate rather than
+   * remove it).
+   *
+   * @deprecated since 5.65 will be removed around 5.80.
+   *
    * @param CRM_Core_Form $form
    * @param string $subType
    * @param int $gid
@@ -183,6 +229,7 @@ class CRM_Custom_Form_CustomData {
    * @throws \CRM_Core_Exception
    */
   public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative - maybe copy & paste to your extension');
     $singleRecord = NULL;
     if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
       $singleRecord = $form->_groupCount;

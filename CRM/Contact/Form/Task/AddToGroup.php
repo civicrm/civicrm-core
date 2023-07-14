@@ -181,7 +181,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
       $groupParams = [];
       $groupParams['title'] = $params['title'];
       $groupParams['description'] = $params['description'];
-      $groupParams['visibility'] = "User and User Admin Only";
+      $groupParams['visibility'] = 'User and User Admin Only';
       $groupParams['group_type'] = array_keys($params['group_type'] ?? []);
       $groupParams['is_active'] = 1;
       $groupParams['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, 'Group');

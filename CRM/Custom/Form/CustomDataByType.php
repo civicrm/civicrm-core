@@ -52,10 +52,68 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
       CRM_Core_Error::deprecatedWarning('Using a CRM_Core_DAO::VALUE_SEPARATOR separated subType on civicrm/custom route is deprecated, use a comma-separated string instead.');
       $this->_subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
-    CRM_Custom_Form_CustomData::setGroupTree($this, $this->_subType, $this->_groupID, $this->_onlySubtype);
+    $this->setGroupTree($this, $this->_subType, $this->_groupID, $this->_onlySubtype);
 
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;
+  }
+
+  /**
+   * Add the group data as a formatted array to the form.
+   *
+   * This was split off from a shared function.
+   *
+   * @param self $form
+   * @param string $subType
+   * @param int $gid
+   * @param bool $onlySubType
+   * @param bool $getCachedTree
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = TRUE) {
+    $singleRecord = NULL;
+    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+      $singleRecord = $form->_groupCount;
+    }
+    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
+    // when a new record is being added for multivalued custom fields.
+    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
+      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+      $singleRecord = 'new';
+    }
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
+      NULL,
+      $form->_entityId,
+      $gid,
+      $subType,
+      $form->_subName,
+      $getCachedTree,
+      $onlySubType,
+      FALSE,
+      CRM_Core_Permission::EDIT,
+      $singleRecord
+    );
+
+    if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
+      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL, NULL, $form->_entityId);
+    }
+    // we should use simplified formatted groupTree
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
+
+    if (isset($form->_groupTree) && is_array($form->_groupTree)) {
+      $keys = array_keys($groupTree);
+      foreach ($keys as $key) {
+        $form->_groupTree[$key] = $groupTree[$key];
+      }
+      return [$form, $groupTree];
+    }
+    else {
+      $form->_groupTree = $groupTree;
+      return [$form, $groupTree];
+    }
   }
 
   /**
