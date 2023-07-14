@@ -20,6 +20,12 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
    */
   protected $_relationshipColumns = [];
 
+  protected $_relationshipFrom = '';
+
+  protected $_relationshipWhere = '';
+
+  protected $_contributionClauses = [];
+
   protected $_customGroupExtends = [
     'Contact',
     'Individual',
@@ -397,8 +403,6 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
   public function where() {
     $whereClauses = $havingClauses = $relationshipWhere = [];
-    $this->_relationshipWhere = '';
-    $this->_contributionClauses = [];
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
