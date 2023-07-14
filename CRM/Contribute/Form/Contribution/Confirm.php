@@ -171,9 +171,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'skipLineItem' => $params['skipLineItem'] ?? 0,
     ];
 
-    if ($paymentProcessorOutcome) {
-      $contributionParams['payment_processor'] = $paymentProcessorOutcome['payment_processor'] ?? NULL;
-    }
     if (!empty($params["is_email_receipt"])) {
       $contributionParams += [
         'receipt_date' => $receiptDate,
@@ -1087,9 +1084,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (isset($params['amount'])) {
       $contributionParams = array_merge(self::getContributionParams(
         $params, $financialType->id,
-        $result, $receiptDate,
+        NULL, $receiptDate,
         $recurringContributionID), $contributionParams
       );
+
+      $contributionParams['payment_processor'] = $result ? ($result['payment_processor'] ?? NULL) : NULL;
       $contributionParams['non_deductible_amount'] = self::getNonDeductibleAmount($params, $financialType, TRUE, $form);
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
