@@ -19,19 +19,17 @@
     <td class="label">{$formElement.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
     <td class="html-adjust">
       {assign var="count" value="1"}
-      {* sort by fails for option per line. Added a variable to iterate through the element array*}
-      {assign var="index" value="1"}
       {foreach name=outer key=key item=item from=$formElement}
-        {if $index < 10}
-          {assign var="index" value=`$index+1`}
-        {else}
-          {$formElement.$key.html}
+        {if is_array($item) && array_key_exists('html', $item)}
+          {$item.html}
           {if $count == $element.options_per_line}
             <br />
             {assign var="count" value="1"}
           {else}
             {assign var="count" value=`$count+1`}
           {/if}
+        {else}
+          {* Skip because this isn't one of the numeric keyed elements that are the options to display, it's non-numeric keys like the field label and metadata. *}
         {/if}
       {/foreach}
 
