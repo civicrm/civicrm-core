@@ -327,6 +327,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   ];
 
   /**
+   * Name of action button
+   *
+   * @var string
+   */
+  protected $_actionButtonName;
+
+  /**
    * Constructor for the basic form page.
    *
    * We should not use QuickForm directly. This class provides a lot
