@@ -2,7 +2,7 @@
 
 $subgroup = '{subscribe.group}';
 $suburl = '{subscribe.url}';
-$welgroup = '{welcome.group}';
+$welgroup = '{group.frontend_title}';
 $unsubgroup = '{unsubscribe.group}';
 $actresub = '{action.resubscribe}';
 $actresuburl = '{action.resubscribeUrl}';

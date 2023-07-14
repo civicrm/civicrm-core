@@ -62,13 +62,13 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    */
   protected function setEntityFields() {
     $this->entityFields = [
+      'frontend_title' => ['name' => 'frontend_title', 'required' => TRUE],
+      'frontend_description' => ['name' => 'frontend_description'],
       'title' => [
         'name' => 'title',
         'required' => TRUE,
       ],
       'description' => ['name' => 'description'],
-      'frontend_title' => ['name' => 'frontend_title'],
-      'frontend_description' => ['name' => 'frontend_description'],
     ];
   }
 
