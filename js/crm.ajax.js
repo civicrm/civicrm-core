@@ -578,7 +578,8 @@
       settings.dialog.height = 300;
     }
     else if ($el.hasClass('medium-popup')) {
-      settings.dialog.width = settings.dialog.height = '50%';
+      settings.dialog.width = '50%';
+      settings.dialog.height = '30%';
     }
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element
