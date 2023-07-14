@@ -35,6 +35,12 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
   public $_contactType = NULL;
 
+  public $_customGroupId = NULL;
+
+  public $_DTparams = [];
+
+  public $_total = NULL;
+
   /**
    * Get BAO Name.
    *
