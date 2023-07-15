@@ -28,9 +28,12 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
   public $_groupId;
 
   /**
-   * Add a few specific things to view contact.
+   * Run the page.
+   *
+   * This method is called after the page is created. It checks for the
+   * type of action and executes that action.
    */
-  public function preProcess() {
+  public function run() {
     $this->_groupId = CRM_Utils_Request::retrieve('gid', 'Positive', $this, TRUE);
     $this->assign('groupId', $this->_groupId);
 
@@ -58,16 +61,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
     $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this, FALSE);
     $this->_cgcount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE);
-  }
-
-  /**
-   * Run the page.
-   *
-   * This method is called after the page is created. It checks for the
-   * type of action and executes that action.
-   */
-  public function run() {
-    $this->preProcess();
 
     //set the userContext stack
     $doneURL = 'civicrm/contact/view';
