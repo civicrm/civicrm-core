@@ -24,20 +24,20 @@ class CRM_Contact_Form_Edit_CustomData {
    * Build all the data structures needed to build the form.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form) {
-    $form->_type = CRM_Utils_Request::retrieve('type', 'String');
+    $customDataType = CRM_Utils_Request::retrieve('type', 'String');
 
-    //build the custom data as other blocks.
-    //$form->assign( "addBlock", false );
-    if ($form->_type) {
+    if ($customDataType) {
       $form->_addBlockName = 'CustomData';
       $form->assign("addBlock", TRUE);
       $form->assign("blockName", $form->_addBlockName);
     }
 
     CRM_Custom_Form_CustomData::preProcess($form, NULL, NULL, NULL,
-      ($form->_type) ? $form->_type : $form->_contactType
+      $customDataType ?: $form->_contactType
     );
 
     //assign group tree after build.
