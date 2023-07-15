@@ -87,15 +87,12 @@ class CRM_Custom_Form_CustomData {
       $form->_type = CRM_Utils_Request::retrieve('type', 'String', $form);
     }
 
-    if (isset($subType)) {
-      $form->_subType = $subType;
-    }
-    else {
-      $form->_subType = CRM_Utils_Request::retrieve('subType', 'String', $form);
+    if (!isset($subType)) {
+      $subType = CRM_Utils_Request::retrieve('subType', 'String', $form);
     }
 
-    if ($form->_subType == 'null') {
-      $form->_subType = NULL;
+    if ($subType === 'null') {
+      $subType = NULL;
     }
 
     if (isset($subName)) {
@@ -141,8 +138,6 @@ class CRM_Custom_Form_CustomData {
 
     $gid = (isset($form->_groupID)) ? $form->_groupID : NULL;
     $getCachedTree = $form->_getCachedTree ?? TRUE;
-
-    $subType = $form->_subType;
     if (!is_array($subType) && strstr(($subType ?? ''), CRM_Core_DAO::VALUE_SEPARATOR)) {
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
