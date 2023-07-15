@@ -34,7 +34,6 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
 
     $this->_type = $this->_cdType = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
     $subType = CRM_Utils_Request::retrieve('subType', 'String');
-    $this->_subName = CRM_Utils_Request::retrieve('subName', 'String');
     $this->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive');
     $this->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive');
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive');
@@ -64,7 +63,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
       $form->_entityId,
       $groupID,
       $subType,
-      $form->_subName,
+      CRM_Utils_Request::retrieve('subName', 'String'),
       TRUE,
       $onlySubType,
       FALSE,
