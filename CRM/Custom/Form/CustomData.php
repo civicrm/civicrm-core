@@ -67,7 +67,9 @@ class CRM_Custom_Form_CustomData {
 
   /**
    * @param CRM_Core_Form $form
-   * @param null|string $subName
+   * @param null|string $extendsEntityColumn
+   *   Additional filter on the type of custom data to retrieve - e.g for
+   *   participant data this could be a value representing role.
    * @param null|string $subType
    * @param null|int $groupCount
    * @param string $type
@@ -77,7 +79,7 @@ class CRM_Custom_Form_CustomData {
    * @throws \CRM_Core_Exception
    */
   public static function preProcess(
-    &$form, $subName = NULL, $subType = NULL,
+    &$form, $extendsEntityColumn = NULL, $subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
   ) {
     if ($type) {
@@ -90,20 +92,14 @@ class CRM_Custom_Form_CustomData {
     if (!isset($subType)) {
       $subType = CRM_Utils_Request::retrieve('subType', 'String', $form);
     }
-
     if ($subType === 'null') {
+      // Is this reachable?
       $subType = NULL;
     }
-
-    if (isset($subName)) {
-      $form->_subName = $subName;
-    }
-    else {
-      $form->_subName = CRM_Utils_Request::retrieve('subName', 'String', $form);
-    }
-
-    if ($form->_subName == 'null') {
-      $form->_subName = NULL;
+    $extendsEntityColumn = $extendsEntityColumn ?: CRM_Utils_Request::retrieve('subName', 'String', $form);
+    if ($extendsEntityColumn === 'null') {
+      // Is this reachable?
+      $extendsEntityColumn = NULL;
     }
 
     if ($groupCount) {
@@ -159,7 +155,7 @@ class CRM_Custom_Form_CustomData {
       $form->_entityId,
       $gid,
       $subType,
-      $form->_subName,
+      $extendsEntityColumn,
       $getCachedTree,
       $onlySubType,
       FALSE,
