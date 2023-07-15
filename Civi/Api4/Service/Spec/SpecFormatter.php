@@ -282,6 +282,7 @@ class SpecFormatter {
     $map = [
       'Select Date' => 'Date',
       'Link' => 'Url',
+      'Autocomplete-Select' => 'EntityRef',
     ];
     $inputType = $map[$inputType] ?? $inputType;
     if ($dataTypeName === 'ContactReference' || $dataTypeName === 'EntityReference') {
@@ -340,6 +341,11 @@ class SpecFormatter {
         }
         $inputAttrs['filter'] = $filters;
       }
+    }
+    // Custom autocompletes
+    if (!empty($data['option_group_id']) && $inputType === 'EntityRef') {
+      $fieldSpec->setFkEntity('OptionValue');
+      $inputAttrs['filter']['option_group_id'] = $data['option_group_id'];
     }
     $fieldSpec
       ->setInputType($inputType)
