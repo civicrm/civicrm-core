@@ -90,6 +90,13 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $_reset;
 
   /**
+   * Saved Search ID retrieved from the GET vars.
+   *
+   * @var int
+   */
+  protected $_ssID;
+
+  /**
    * @return array
    */
   public function getSearchFieldMetadata() {
