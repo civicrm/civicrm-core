@@ -257,7 +257,7 @@
                   text: task.title,
                   icon: task.icon,
                   task: task.name,
-                  entity: ctrl.savedSearch.api_entity,
+                  entity: task.entity,
                   target: 'crm-popup',
                   join: '',
                   style: task.name === 'delete' ? 'danger' : 'default'

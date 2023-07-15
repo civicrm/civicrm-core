@@ -468,12 +468,22 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     return array_filter($link);
   }
 
+  /**
+   * Check access for edit/update/delete links
+   *
+   * (presumably if a record is shown in SearchKit the user already has view access, and the check is expensive)
+   *
+   * @param array $link
+   * @param array $data
+   * @param int $index
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
   private function checkLinkAccess(array $link, array $data, int $index = 0): bool {
     if (empty($link['path']) && empty($link['task'])) {
       return FALSE;
     }
-    // Check access for edit/update/delete links
-    // (presumably if a record is shown in SearchKit the user already has view access, and the check is expensive)
     if ($link['entity'] && !empty($link['action']) && !in_array($link['action'], ['view', 'preview'], TRUE)) {
       $idField = CoreUtil::getIdFieldName($link['entity']);
       $idKey = $this->getIdKeyName($link['entity']);
@@ -585,11 +595,20 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     return $link;
   }
 
+  /**
+   * Get fields needed by a link which should be added to the SELECT clause
+   *
+   * @param array $link
+   * @return array
+   */
   private function getLinkTokens(array $link): array {
     $link = $this->getLinkInfo($link);
     $tokens = [];
     if (!$link['path'] && !empty($link['task'])) {
       $tokens[] = $link['prefix'] . $this->getIdKeyName($link['entity']);
+    }
+    if (!empty($link['condition'][0])) {
+      $tokens[] = $link['condition'][0];
     }
     return array_merge($tokens, $this->getTokens($link['path'] . $link['text'] . $link['title']));
   }
