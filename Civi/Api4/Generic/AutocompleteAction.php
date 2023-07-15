@@ -156,13 +156,13 @@ class AutocompleteAction extends AbstractAction {
       // Always search on the first line of the display
       $searchFields = [$labelField];
       // If input is an integer, search by id
-      if (\CRM_Utils_Rule::positiveInteger($this->input)) {
-        $searchFields[] = $idField;
-        // Add a sort clause to place exact ID match at the top
-        array_unshift($this->display['settings']['sort'], [
-          "($idField = $this->input)",
-          'DESC',
-        ]);
+      $numericInput = $this->page == 1 && \CRM_Utils_Rule::positiveInteger($this->input);
+      if ($numericInput) {
+        $searchFields = [$idField];
+      }
+      // For subsequent pages when searching numeric input
+      elseif ($this->page > 1 && \CRM_Utils_Rule::positiveInteger($this->input)) {
+        $this->page -= 1;
       }
       // If first line uses a rewrite, search on those fields too
       if (!empty($this->display['settings']['columns'][0]['rewrite'])) {
@@ -198,6 +198,10 @@ class AutocompleteAction extends AbstractAction {
       $result[] = $item;
     }
     $result->setCountMatched($apiResult->count());
+    if (!empty($numericInput)) {
+      // Trigger "more results" after searching by exact id
+      $result->setCountMatched($apiResult->count() + 1);
+    }
   }
 
   /**
