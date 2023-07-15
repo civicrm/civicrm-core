@@ -43,7 +43,7 @@ class GetActionsTest extends Api4TestBase implements HookInterface, Transactiona
     }
   }
 
-  public function testContactIconAutocomplete(): void {
+  public function testActionPermissionsOverride(): void {
     $contact = $this->createTestRecord('Contact', [
       'first_name' => 'GetActions',
       'last_name' => 'testContact',
