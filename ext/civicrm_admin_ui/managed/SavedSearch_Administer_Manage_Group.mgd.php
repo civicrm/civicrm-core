@@ -235,6 +235,24 @@ return [
               'icon' => 'fa-bars',
               'links' => [
                 [
+                  'task' => 'enable',
+                  'entity' => 'Group',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-on',
+                  'text' => E::ts('Enable'),
+                  'style' => 'default',
+                  'condition' => ['is_active', '=', FALSE],
+                ],
+                [
+                  'task' => 'disable',
+                  'entity' => 'Group',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-off',
+                  'text' => E::ts('Disable'),
+                  'style' => 'default',
+                  'condition' => ['is_active', '=', TRUE],
+                ],
+                [
                   'entity' => 'Group',
                   'action' => 'delete',
                   'join' => '',
