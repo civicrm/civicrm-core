@@ -49,6 +49,8 @@ class CRM_Core_Page_AJAX_Attachment {
     $config = CRM_Core_Config::singleton();
     $results = [];
 
+    $maxFileSize = \Civi::settings()->get('maxFileSize');
+
     foreach ($files as $key => $file) {
       if (!$config->debug && !self::checkToken($post['crm_attachment_token'])) {
         require_once 'api/v3/utils.php';
@@ -60,6 +62,10 @@ class CRM_Core_Page_AJAX_Attachment {
             'reason' => 'CSRF suspected',
           ]
         );
+      }
+      elseif ($file['size'] > $maxFileSize * 1024 * 1024) {
+        require_once 'api/v3/utils.php';
+        $results[$key] = civicrm_api3_create_error(ts('Each file must be less than %1M in size.', [1 => $maxFileSize]));
       }
       elseif ($file['error']) {
         require_once 'api/v3/utils.php';
