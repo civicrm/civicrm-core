@@ -299,7 +299,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('id=' . $contributions[0]['id'] . '&qfKey=', $result[0]['columns'][1]['links'][0]['url']);
     // 2nd link is to the native SK bulk-update task
     $this->assertArrayNotHasKey('url', $result[0]['columns'][1]['links'][1]);
-    $this->assertArrayHasKey('uiDialog', $result[0]['columns'][1]['links'][1]['task']);
+    $this->assertEquals('update', $result[0]['columns'][1]['links'][1]['task']);
     // 3rd link is a popup link to the delete contribution quickform
     $this->assertStringContainsString('action=delete&id=' . $contributions[0]['id'], $result[0]['columns'][1]['links'][2]['url']);
     $this->assertEquals('crm-popup', $result[0]['columns'][1]['links'][2]['target']);

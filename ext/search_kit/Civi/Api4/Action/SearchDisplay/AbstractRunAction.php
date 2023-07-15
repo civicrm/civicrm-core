@@ -474,7 +474,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     // Check access for edit/update/delete links
     // (presumably if a record is shown in SearchKit the user already has view access, and the check is expensive)
-    if ($link['entity'] && $link['action'] && !in_array($link['action'], ['view', 'preview'], TRUE)) {
+    if ($link['entity'] && !empty($link['action']) && !in_array($link['action'], ['view', 'preview'], TRUE)) {
       $idField = CoreUtil::getIdFieldName($link['entity']);
       $idKey = $this->getIdKeyName($link['entity']);
       $id = $data[$link['prefix'] . $idKey] ?? NULL;
@@ -578,7 +578,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $link['title'] = $link['title'] ?: $task['title'];
           // Fill in the api action if known, for the sake of $this->checkLinkAccess
           $link['action'] = $task['apiBatch']['action'] ?? NULL;
-          $link['task'] = array_intersect_key($task, ['apiBatch' => 1, 'uiDialog' => 1]);
         }
       }
     }
