@@ -33,13 +33,13 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
   public function preProcess() {
 
     $this->_type = $this->_cdType = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
-    $this->_subType = CRM_Utils_Request::retrieve('subType', 'String');
+    $subType = CRM_Utils_Request::retrieve('subType', 'String');
     $this->_subName = CRM_Utils_Request::retrieve('subName', 'String');
     $this->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive');
     $this->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive');
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive');
-    $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive');
-    $this->_onlySubtype = CRM_Utils_Request::retrieve('onlySubtype', 'Boolean');
+    $this->_groupID = $groupID = CRM_Utils_Request::retrieve('groupID', 'Positive');
+    $onlySubType = CRM_Utils_Request::retrieve('onlySubtype', 'Boolean');
     $this->_action = CRM_Utils_Request::retrieve('action', 'Alphanumeric');
     $this->assign('cdType', FALSE);
     $this->assign('cgCount', $this->_groupCount);
@@ -48,7 +48,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     if (array_key_exists($this->_type, $contactTypes)) {
       $this->assign('contactId', $this->_entityId);
     }
-    $this->setGroupTree($this, $this->_subType, $this->_groupID, $this->_onlySubtype);
+    $this->setGroupTree($this, $subType, $groupID, $onlySubType);
 
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;
