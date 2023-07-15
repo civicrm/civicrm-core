@@ -53,13 +53,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_prefix = 'activity_';
 
   /**
-   * The saved search ID retrieved from the GET vars.
-   *
-   * @var int
-   */
-  protected $_ssID;
-
-  /**
    * @return string
    */
   public function getDefaultEntity(): string {

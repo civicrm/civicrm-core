@@ -48,13 +48,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   protected $_prefix = "event_";
 
   /**
-   * The saved search ID retrieved from the GET vars.
-   *
-   * @var int
-   */
-  protected $_ssID;
-
-  /**
    * Metadata of all fields to include on the form.
    *
    * @var array
