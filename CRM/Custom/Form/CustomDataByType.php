@@ -48,25 +48,6 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     if (array_key_exists($this->_type, $contactTypes)) {
       $this->assign('contactId', $this->_entityId);
     }
-    $this->setGroupTree($this, $subType, $groupID, $onlySubType);
-
-    $this->assign('suppressForm', TRUE);
-    $this->controller->_generateQFKey = FALSE;
-  }
-
-  /**
-   * Add the group data as a formatted array to the form.
-   *
-   * This was split off from a shared function.
-   *
-   * @param self $form
-   * @param string $subType
-   * @param int $gid
-   * @param bool $onlySubType
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL) {
     $singleRecord = NULL;
     if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
       $singleRecord = $form->_groupCount;
@@ -81,7 +62,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
       NULL,
       $form->_entityId,
-      $gid,
+      $groupID,
       $subType,
       $form->_subName,
       TRUE,
@@ -106,6 +87,9 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     else {
       $form->_groupTree = $groupTree;
     }
+
+    $this->assign('suppressForm', TRUE);
+    $this->controller->_generateQFKey = FALSE;
   }
 
   /**
