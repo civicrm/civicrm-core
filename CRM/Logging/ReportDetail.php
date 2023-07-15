@@ -33,10 +33,13 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $raw;
   protected $tables = [];
   protected $interval = '10 SECOND';
+  protected $dblimit;
+  protected $dboffset;
 
   protected $altered_name;
   protected $altered_by;
   protected $altered_by_id;
+  protected $layout;
 
   /**
    * detail/summary report ids
