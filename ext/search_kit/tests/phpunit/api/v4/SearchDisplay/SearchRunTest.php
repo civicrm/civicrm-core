@@ -667,6 +667,10 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
                 'label' => 'First Name',
                 'dataType' => 'String',
                 'type' => 'field',
+                'link' => [
+                  'entity' => 'Contact',
+                  'action' => 'update',
+                ],
               ],
               [
                 'key' => 'last_name',
@@ -706,6 +710,16 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(2, $result);
     $this->assertEquals($sampleData['Three'], $result[0]['data']['id']);
     $this->assertEquals($sampleData['Four'], $result[1]['data']['id']);
+
+    // Ensure edit link is only shown for contacts we have permission to edit
+    $hooks->setHook('civicrm_aclWhereClause', [$this, 'aclViewAllEditOne']);
+    $this->cleanupCachedPermissions();
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(4, $result);
+    $this->assertNotEmpty($result[1]['columns'][1]['links']);
+    $this->assertTrue(empty($result[1]['columns'][0]['links']));
+    $this->assertTrue(empty($result[1]['columns'][2]['links']));
+    $this->assertTrue(empty($result[1]['columns'][3]['links']));
   }
 
   public function testWithACLBypass() {
@@ -1727,6 +1741,26 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('fa-user', $result[1]['columns'][0]['icons'][0]['class']);
     $this->assertEquals('Starry', $result[2]['columns'][0]['val']);
     $this->assertEquals('fa-star', $result[2]['columns'][0]['icons'][0]['class']);
+  }
+
+  /**
+   * Returns all contacts in VIEW mode but only specified contact for EDIT.
+   *
+   * @implements CRM_Utils_Hook::aclWhereClause
+   *
+   * @param int $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int $contactID
+   * @param string|null $where
+   */
+  public function aclViewAllEditOne(int $type, array &$tables, array &$whereTables, int &$contactID, ?string &$where): void {
+    if ($type === \CRM_Core_Permission::VIEW) {
+      $where = ' (1) ';
+    }
+    elseif ($type === \CRM_Core_Permission::EDIT) {
+      $where = ' contact_a.id = ' . $this->allowedContactId;
+    }
   }
 
 }
