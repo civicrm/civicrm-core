@@ -2068,10 +2068,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       ");
     }
 
-    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
+    $loggedInUser = CRM_Core_Session::singleton()->get('userID');
     $this->callAPISuccess('group_contact', 'create', [
       'group_id' => $permissionedGroup,
-      'contact_id' => $this->_loggedInUser,
+      'contact_id' => $loggedInUser,
     ]);
 
     if (!$isProfile) {
