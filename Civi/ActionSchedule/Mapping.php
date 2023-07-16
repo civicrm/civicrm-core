@@ -156,8 +156,12 @@ abstract class Mapping implements MappingInterface {
   /**
    * @return string
    */
-  public function getEntity() {
+  public function getEntityTable(): string {
     return $this->entity;
+  }
+
+  public function getEntityName(): string {
+    return \CRM_Core_DAO_AllCoreTables::getEntityNameForTable($this->getEntityTable());
   }
 
   /**

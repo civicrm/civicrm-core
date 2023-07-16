@@ -23,9 +23,16 @@ interface MappingInterface {
   public function getId();
 
   /**
+   * Name of the table belonging to the main entity e.g. `civicrm_activity`
    * @return string
    */
-  public function getEntity();
+  public function getEntityTable(): string;
+
+  /**
+   * Main entity name e.g. `Activity`
+   * @return string
+   */
+  public function getEntityName(): string;
 
   /**
    * Get a printable label for this mapping type.

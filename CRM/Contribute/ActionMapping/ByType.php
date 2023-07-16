@@ -45,8 +45,15 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
   /**
    * @return string
    */
-  public function getEntity() {
+  public function getEntityTable(): string {
     return 'civicrm_contribution';
+  }
+
+  /**
+   * @return string
+   */
+  public function getEntityName(): string {
+    return 'Contribution';
   }
 
   /**
