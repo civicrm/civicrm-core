@@ -29,12 +29,21 @@ class StandaloneRouter {
   public function __construct() {
     // Note: Routing rules are processed sequentially, until one handles the request.
 
+    // The above would be prettier in php74's `fn()` notation.
+
     // Redirect common entry points
-    $this->addRoute(';^/$;', fn($m) => $this->sendRedirect('/civicrm/'));
-    $this->addRoute(';^/civicrm$;', fn($m) => $this->sendRedirect('/civicrm/'));
+    $this->addRoute(';^/$;', function($m) {
+      return $this->sendRedirect('/civicrm/');
+    });
+
+    $this->addRoute(';^/civicrm$;', function($m) {
+      return $this->sendRedirect('/civicrm/');
+    });
 
     // If it looks like a Civi route, then call CRM_Core_Invoke.
-    $this->addRoute(';^/(civicrm/.*)$;', fn($m) => $this->invoke($m[1]));
+    $this->addRoute(';^/(civicrm/.*)$;', function($m) {
+      return $this->invoke($m[1]);
+    });
 
     // If there's a concrete file in HTTP root (`web/`), then serve that.
     $this->addRoute(';/(.*);', function($m) {
@@ -43,17 +52,26 @@ class StandaloneRouter {
     });
 
     // Virtually mount civicrm-{core,packages}. This allows us to serve their static assets directly (even on systems that lack symlinks).
-    // TODO: Decide which convention we like more...
 
-    $this->addRoute(';^/core/packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
-    $this->addRoute(';^/core/vendor/(.*);', fn($m) => $this->sendFileFromFolder($this->findVendor(), $m[1]));
-    $this->addRoute(';^/core/(.*);', fn($m) => $this->sendFileFromFolder($this->findCore(), $m[1]));
+    $this->addRoute(';^/core/packages/(.*);', function($m) {
+      return $this->sendFileFromFolder($this->findPackages(), $m[1]);
+    });
+    $this->addRoute(';^/core/vendor/(.*);', function($m) {
+      return $this->sendFileFromFolder($this->findVendor(), $m[1]);
+    });
+    $this->addRoute(';^/core/(.*);', function($m) {
+      return $this->sendFileFromFolder($this->findCore(), $m[1]);
+    });
 
-    $this->addRoute(';^/civicrm-packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
-    $this->addRoute(';^/civicrm-core/(.*);', fn($m) => $this->sendFileFromFolder($this->findCore(), $m[1]));
+    // $this->addRoute(';^/core/packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
+    // $this->addRoute(';^/core/vendor/(.*);', fn($m) => $this->sendFileFromFolder($this->findVendor(), $m[1]));
+    // $this->addRoute(';^/core/(.*);', fn($m) => $this->sendFileFromFolder($this->findCore(), $m[1]));
 
-    $this->addRoute(';^/assets/civicrm/core/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
-    $this->addRoute(';^/assets/civicrm/packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findCore(), $m[1]));
+    // $this->addRoute(';^/civicrm-packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
+    // $this->addRoute(';^/civicrm-core/(.*);', fn($m) => $this->sendFileFromFolder($this->findCore(), $m[1]));
+    //
+    // $this->addRoute(';^/assets/civicrm/core/(.*);', fn($m) => $this->sendFileFromFolder($this->findPackages(), $m[1]));
+    // $this->addRoute(';^/assets/civicrm/packages/(.*);', fn($m) => $this->sendFileFromFolder($this->findCore(), $m[1]));
 
     // TODO: Consider allowing CRM_Core_Invoke to handle any route. May affect UF interop.
   }
