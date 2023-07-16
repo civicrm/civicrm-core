@@ -29,6 +29,12 @@ class CRM_Core_ManagedEntities {
   protected $moduleIndex;
 
   /**
+   * All API entities, keyed by version
+   * @var array
+   */
+  protected $entityIndex;
+
+  /**
    * Get an instance.
    * @param bool $fresh
    * @return \CRM_Core_ManagedEntities
@@ -108,6 +114,7 @@ class CRM_Core_ManagedEntities {
    */
   public function reconcile($modules = NULL) {
     $modules = $modules ? (array) $modules : NULL;
+    $this->loadEntityIndex();
     $declarations = $this->getDeclarations($modules);
     $plan = $this->createPlan($declarations, $modules);
     $this->reconcileEntities($plan);
@@ -566,8 +573,27 @@ class CRM_Core_ManagedEntities {
           'update' => $declaration['update'] ?? 'always',
         ];
       }
+      // If the entity type doesn't exist, it may be provided by an extension that hasn't loaded yet.
+      // Log the error and skip processing to prevent a crash
+      if (!$this->entityExists($declaration['entity'], $declaration['params']['version'])) {
+        Civi::log()->error("Unable to {$plan[$key]['managed_action']} managed entity declared by $declaration[module]. Entity type '$declaration[entity]' is missing. This error will be resolved once the extension that provides '$declaration[entity]' is enabled.");
+        unset($plan[$key]);
+      }
     }
     return $plan;
+  }
+
+  private function loadEntityIndex() {
+    $this->entityIndex = [];
+    $this->entityIndex[3] = civicrm_api3('Entity', 'get')['values'];
+    $this->entityIndex[4] = \Civi\Api4\Entity::get(FALSE)
+      ->addSelect('name')
+      ->execute()
+      ->column('name');
+  }
+
+  private function entityExists(string $entityName, int $apiVersion): bool {
+    return in_array($entityName, $this->entityIndex[$apiVersion]);
   }
 
 }
