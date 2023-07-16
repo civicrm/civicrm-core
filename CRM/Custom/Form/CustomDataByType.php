@@ -58,9 +58,9 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
       $singleRecord = 'new';
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree(CRM_Utils_Request::retrieve('type', 'String'),
       NULL,
-      $form->_entityId,
+      CRM_Utils_Request::retrieve('entityID', 'Positive'),
       $groupID,
       $subType,
       CRM_Utils_Request::retrieve('subName', 'String'),
@@ -71,20 +71,20 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
       $singleRecord
     );
 
-    if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
-      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL, NULL, $form->_entityId);
+    if (property_exists($this, '_customValueCount') && !empty($groupTree)) {
+      $this->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, NULL, NULL, NULL, $this->_entityId);
     }
     // we should use simplified formatted groupTree
-    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_groupCount, $this);
 
-    if (isset($form->_groupTree) && is_array($form->_groupTree)) {
+    if (isset($this->_groupTree) && is_array($this->_groupTree)) {
       $keys = array_keys($groupTree);
       foreach ($keys as $key) {
-        $form->_groupTree[$key] = $groupTree[$key];
+        $this->_groupTree[$key] = $groupTree[$key];
       }
     }
     else {
-      $form->_groupTree = $groupTree;
+      $this->_groupTree = $groupTree;
     }
 
     $this->assign('suppressForm', TRUE);
