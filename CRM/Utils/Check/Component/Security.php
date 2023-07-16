@@ -109,6 +109,10 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @todo Test with WordPress, Joomla.
    */
   public function checkUploadsAreNotAccessible() {
+    if ($this->isLimitedDevelopmentServer()) {
+      return [];
+    }
+
     $messages = [];
 
     $config = CRM_Core_Config::singleton();
@@ -141,6 +145,28 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Some security checks require sending a real HTTP request. This breaks the single-threading
+   * model historically used by the PHP built-in webserver (for local development). There is some
+   * experimental support for multi-threading in PHP 7.4+. Anecdotally, this is still insufficient
+   * on PHP 7.4 -- but it works well enough on PHP 8.1.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkHttpAuditable() {
+    $messages = [];
+    if ($this->isLimitedDevelopmentServer()) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('In PHP 7.x, the built-in HTTP server cannot execute some security checks. This problem only affects local development on older versions of PHP.'),
+        ts('Incomplete Security Checks'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-lock'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Check if our uploads or ConfigAndLog directories have browseable
    * listings.
    *
@@ -156,6 +182,10 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @todo Test with WordPress, Joomla.
    */
   public function checkDirectoriesAreNotBrowseable() {
+    if ($this->isLimitedDevelopmentServer()) {
+      return [];
+    }
+
     $messages = [];
     $config = CRM_Core_Config::singleton();
     $publicDirs = [
@@ -354,6 +384,10 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       );
     }
     return $messages;
+  }
+
+  public function isLimitedDevelopmentServer(): bool {
+    return PHP_SAPI === 'cli-server' && version_compare(PHP_VERSION, '8.0', '<');
   }
 
   /**
