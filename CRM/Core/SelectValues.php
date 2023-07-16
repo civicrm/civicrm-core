@@ -1222,7 +1222,7 @@ class CRM_Core_SelectValues {
     \CRM_Utils_Hook::permissionList($perms);
 
     foreach ($perms as $machineName => $details) {
-      if ($details['is_active']) {
+      if (!empty($details['is_active'])) {
         $options[$machineName] = $details['title'];
       }
     }
