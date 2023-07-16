@@ -138,7 +138,12 @@ class StandaloneRouter {
     // require_once $this->findVendor() . '/autoload.php';
     // require_once 'CRM/Core/ClassLoader.php';
     // CRM_Core_ClassLoader::singleton()->register();
-    require_once $this->findSettingsPhp();
+    $settingsPhp = $this->findSettingsPhp();
+    if (!file_exists($settingsPhp)) {
+      return $this->runSetup();
+    }
+
+    require_once $settingsPhp;
 
     // Required so that the userID is set before generating the menu
     \CRM_Core_Session::singleton()->initialize();
@@ -154,6 +159,35 @@ class StandaloneRouter {
     print CRM_Core_Invoke::invoke($args);
 
     return TRUE;
+  }
+
+  public function runSetup(): bool {
+    $classLoader = implode(DIRECTORY_SEPARATOR, [$this->findCore(), 'CRM', 'Core', 'ClassLoader.php']);
+    require_once $classLoader;
+    CRM_Core_ClassLoader::singleton()->register();
+
+    $coreUrl = '/core';
+
+    \Civi\Setup::assertProtocolCompatibility(1.0);
+
+    \Civi\Setup::init([
+      // This is just enough information to get going.
+      'cms'     => 'Standalone',
+      'srcPath' => $this->findCore(),
+    ]);
+    $ctrl = \Civi\Setup::instance()->createController()->getCtrl();
+
+    $ctrl->setUrls([
+      // The URL of this setup controller. May be used for POST-backs
+      'ctrl'             => '/civicrm', /* @todo this had url('civicrm') ? */
+      // The base URL for loading resource files (images/javascripts) for this project. Includes trailing slash.
+      'res'              => $coreUrl . '/setup/res/',
+      'jquery.js'        => $coreUrl . '/bower_components/jquery/dist/jquery.min.js',
+      'font-awesome.css' => $coreUrl . '/bower_components/font-awesome/css/font-awesome.min.css',
+    ]);
+    \Civi\Setup\BasicRunner::run($ctrl);
+    exit();
+
   }
 
   public function sendRedirect($path) {
