@@ -123,10 +123,6 @@
         </td>
       </tr>
     {/if}
-    <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-    </tr>
   </table>
   {include file="CRM/common/customDataBlock.tpl"}
   <div class="crm-submit-buttons">
