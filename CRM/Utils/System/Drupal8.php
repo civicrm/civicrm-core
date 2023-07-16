@@ -23,7 +23,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     $user = \Drupal::currentUser();
     $user_register_conf = \Drupal::config('user.settings')->get('register');
     $verify_mail_conf = \Drupal::config('user.settings')->get('verify_mail');
@@ -35,7 +35,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     /** @var \Drupal\user\Entity\User $account */
     $account = \Drupal::entityTypeManager()->getStorage('user')->create();
-    $account->setUsername($params['cms_name'])->setEmail($params[$mail]);
+    $account->setUsername($params['cms_name'])->setEmail($params[$mailParam]);
 
     // Allow user to set password only if they are an admin or if
     // the site settings don't require email verification.

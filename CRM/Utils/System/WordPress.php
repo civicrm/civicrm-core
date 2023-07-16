@@ -874,11 +874,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     $user_data = [
       'ID' => '',
       'user_login' => $params['cms_name'],
-      'user_email' => $params[$mail],
+      'user_email' => $params[$mailParam],
       'nickname' => $params['cms_name'],
       'role' => get_option('default_role'),
     ];
