@@ -30,7 +30,7 @@ class DbUtil {
     return array(
       'server' => $server,
       'username' => $parsed['user'] ?: NULL,
-      'password' => $parsed['pass'] ?: NULL,
+      'password' => $parsed['pass'] ?? NULL,
       'database' => $database,
       'ssl_params' => self::parseSSL($parsed['query'] ?? NULL),
     );

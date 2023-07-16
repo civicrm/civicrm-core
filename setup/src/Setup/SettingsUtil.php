@@ -15,7 +15,7 @@ class SettingsUtil {
     $params['frontEnd'] = 0;
     $params['baseURL'] = addslashes(rtrim($m->cmsBaseUrl, '/'));
     $params['dbUser'] = addslashes(urlencode($m->db['username']));
-    $params['dbPass'] = addslashes(urlencode($m->db['password']));
+    $params['dbPass'] = addslashes(urlencode($m->db['password'] ?? ''));
     $params['dbHost'] = addslashes(implode(':', array_map('urlencode', explode(':', $m->db['server']))));
     $params['dbName'] = addslashes(urlencode($m->db['database']));
     // The '&' prefix is awkward, but we don't know what's already in the file.
