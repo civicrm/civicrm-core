@@ -132,10 +132,10 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ])->execute()->first()['id'];
 
     $security = Security::singleton();
-    $params = ['cms_name' => 'user_one', 'cms_pass' => 'secret1', 'notify' => FALSE, 'contactID' => $contactID, 'user_one@example.org' => 'user_one@example.org'];
+    $params = ['cms_name' => 'user_one', 'cms_pass' => 'secret1', 'notify' => FALSE, 'contactID' => $contactID, 'email' => 'user_one@example.org'];
 
     $this->switchToOurUFClasses();
-    $userID = \CRM_Core_BAO_CMSUser::create($params, 'user_one@example.org');
+    $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
     $this->switchBackFromOurUFClasses();
 
     $this->assertGreaterThan(0, $userID);

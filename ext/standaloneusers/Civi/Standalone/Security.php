@@ -152,16 +152,17 @@ class Security {
    *    - 'cms_name'
    *    - 'cms_pass' plaintext password
    *    - 'notify' boolean
-   * @param string $mail
-   *   Email address for cms user.
+   * @param string $mailParam
+   *   Name of the $param which contains the email address.
    *
    * @return int|bool
    *   uid if user was created, false otherwise
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     try {
       // Q. should this be in the api for User.create?
       $hashedPassword = $this->_password_crypt(static::$hashMethod, $params['cms_pass'], $this->_password_generate_salt());
+      $mail = $params[$mailParam];
 
       $userID = \Civi\Api4\User::create(FALSE)
         ->addValue('username', $params['cms_name'])
