@@ -23,12 +23,12 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     $form_state = form_state_defaults();
 
     $form_state['input'] = [
       'name' => $params['cms_name'],
-      'mail' => $params[$mail],
+      'mail' => $params[$mailParam],
       'op' => 'Create new account',
     ];
 

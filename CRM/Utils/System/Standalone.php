@@ -60,17 +60,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    *    - 'cms_name'
    *    - 'cms_pass' plaintext password
    *    - 'notify' boolean
-   * @param string $mail
-   *   Email id for cms user.
+   * @param string $mailParam
+   *   Name of the param which contains the email address.
+   *   Because. Right. OK. That's what it is.
    *
    * @return int|bool
    *   uid if user was created, false otherwise
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     if ($this->missingStandaloneExtension()) {
       return FALSE;
     }
-    return Security::singleton()->createUser($params, $mail);
+    return Security::singleton()->createUser($params, $mailParam);
   }
 
   /**

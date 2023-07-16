@@ -36,7 +36,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     $baseDir = JPATH_SITE;
     $userParams = JComponentHelper::getParams('com_users');
 
@@ -72,7 +72,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $values['name'] = $fullname;
     $values['username'] = trim($params['cms_name']);
     $values['password1'] = $values['password2'] = $params['cms_pass'];
-    $values['email1'] = $values['email2'] = trim($params[$mail]);
+    $values['email1'] = $values['email2'] = trim($params[$mailParam]);
 
     $lang = JFactory::getLanguage();
     $lang->load('com_users', $baseDir);

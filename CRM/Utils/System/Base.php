@@ -363,13 +363,14 @@ abstract class CRM_Utils_System_Base {
    * Create a user in the CMS.
    *
    * @param array $params
-   * @param string $mail
-   *   Email id for cms user.
+   * @param string $mailParam
+   *   Name of the $param which contains the email address.
+   *   Because. Right. OK. That's what it is.
    *
    * @return int|bool
    *   uid if user exists, false otherwise
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     return FALSE;
   }
 
