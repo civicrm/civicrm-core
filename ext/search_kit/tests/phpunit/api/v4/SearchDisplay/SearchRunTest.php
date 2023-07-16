@@ -299,10 +299,89 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('id=' . $contributions[0]['id'] . '&qfKey=', $result[0]['columns'][1]['links'][0]['url']);
     // 2nd link is to the native SK bulk-update task
     $this->assertArrayNotHasKey('url', $result[0]['columns'][1]['links'][1]);
-    $this->assertArrayHasKey('uiDialog', $result[0]['columns'][1]['links'][1]['task']);
+    $this->assertEquals('update', $result[0]['columns'][1]['links'][1]['task']);
     // 3rd link is a popup link to the delete contribution quickform
     $this->assertStringContainsString('action=delete&id=' . $contributions[0]['id'], $result[0]['columns'][1]['links'][2]['url']);
     $this->assertEquals('crm-popup', $result[0]['columns'][1]['links'][2]['target']);
+  }
+
+  public function testRelationshipCacheLinks():void {
+    $relationships = $this->saveTestRecords('Relationship', [
+      'records' => [
+        ['contact_id_a' => $this->createTestRecord('Contact')['id'], 'is_active' => TRUE],
+        ['contact_id_a' => $this->createTestRecord('Contact')['id'], 'is_active' => FALSE],
+      ],
+    ]);
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'RelationshipCache',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['near_contact_id.display_name'],
+          'where' => [['relationship_id', 'IN', $relationships->column('id')]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'near_contact_id.display_name',
+              'label' => 'Contact',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
+            [
+              'type' => 'links',
+              'links' => [
+                [
+                  'entity' => 'Relationship',
+                  'action' => 'view',
+                  'icon' => 'fa-external-link',
+                ],
+                [
+                  'entity' => 'Relationship',
+                  'task' => 'delete',
+                  'icon' => 'fa-trash',
+                ],
+                [
+                  'entity' => 'Relationship',
+                  'task' => 'enable',
+                  'condition' => ['is_active', '=', FALSE],
+                ],
+                [
+                  'entity' => 'Relationship',
+                  'task' => 'disable',
+                  'condition' => ['is_active', '=', TRUE],
+                ],
+              ],
+            ],
+          ],
+          'sort' => [
+            ['relationship_id', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(4, $result);
+    $this->assertCount(3, $result[0]['columns'][1]['links']);
+    // 1st link is to a quickform-based action
+    $this->assertArrayNotHasKey('task', $result[0]['columns'][1]['links'][0]);
+    $this->assertStringContainsString('id=' . $relationships[0]['id'], $result[0]['columns'][1]['links'][0]['url']);
+    // 2nd link is to the native SK bulk-delete task
+    $this->assertArrayNotHasKey('url', $result[0]['columns'][1]['links'][1]);
+    $this->assertEquals('delete', $result[0]['columns'][1]['links'][1]['task']);
+    // 3rd link is the disable task for active relationships or the enable task for inactive ones
+    $this->assertEquals('disable', $result[0]['columns'][1]['links'][2]['task']);
+    $this->assertEquals('disable', $result[1]['columns'][1]['links'][2]['task']);
+    $this->assertEquals('enable', $result[2]['columns'][1]['links'][2]['task']);
+    $this->assertEquals('enable', $result[3]['columns'][1]['links'][2]['task']);
   }
 
   /**

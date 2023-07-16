@@ -41,6 +41,9 @@
       this.isDisplayReady = function() {
         return !displayCtrl.loading && displayCtrl.results && displayCtrl.results.length;
       };
+      this.getTaskInfo = function(taskName) {
+        return _.findWhere(mngr.tasks, {name: taskName});
+      };
 
       this.doTask = function(task, ids) {
         var data = {
@@ -192,7 +195,7 @@
           const mngr = this.taskManager;
           event.preventDefault();
           mngr.getMetadata().then(function() {
-            mngr.doTask(_.extend({title: link.title}, link.task), [id]);
+            mngr.doTask(_.extend({title: link.title}, mngr.getTaskInfo(link.task)), [id]);
           });
         }
       },
@@ -220,6 +223,15 @@
           if (index > -1 && !_.findWhere(apiResults.run, {key: editedRow.key})) {
             this.selectedRows.splice(index, 1);
           }
+        }
+        else if (status === 'success' && !editedRow && apiResults.run && apiResults.run[0]) {
+          const mngr = this.taskManager;
+          // If results contain a link to a task, prefetch task info to prevent latency when clicking the link
+          _.each(apiResults.run[0].columns, function(column) {
+            if ((column.link && column.link.task) || _.find(column.links || [], 'task')) {
+              mngr.getMetadata();
+            }
+          });
         }
       }]
 

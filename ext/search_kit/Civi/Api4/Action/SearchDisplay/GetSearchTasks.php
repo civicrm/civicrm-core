@@ -33,6 +33,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
 
     // Adding checkPermissions filters out actions the user is not allowed to perform
     $entityName = $this->savedSearch['api_entity'];
+    // Hack to support relationships
     $entityName = ($entityName === 'RelationshipCache') ? 'Relationship' : $entityName;
     $entity = Entity::get($this->checkPermissions)->addWhere('name', '=', $entityName)
       ->addSelect('name', 'title_plural')
@@ -243,6 +244,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
 
     foreach ($tasks[$entity['name']] as $name => &$task) {
       $task['name'] = $name;
+      $task['entity'] = $entity['name'];
       // Add default for number of rows action requires
       $task += ['number' => '> 0'];
     }
@@ -270,6 +272,9 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ],
       [
         'name' => 'number',
+      ],
+      [
+        'name' => 'entity',
       ],
       [
         'name' => 'apiBatch',

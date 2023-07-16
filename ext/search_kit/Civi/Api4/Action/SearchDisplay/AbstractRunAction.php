@@ -453,7 +453,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
   private function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
     $link = $this->getLinkInfo($link, $data, $index);
-    if (empty($link['path']) && empty($link['task'])) {
+    if (!$this->checkLinkAccess($link, $data, $index)) {
       return NULL;
     }
     $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
@@ -466,6 +466,47 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     $link = array_intersect_key($link, array_flip($keys));
     return array_filter($link);
+  }
+
+  /**
+   * Check access for edit/update/delete links
+   *
+   * (presumably if a record is shown in SearchKit the user already has view access, and the check is expensive)
+   *
+   * @param array $link
+   * @param array $data
+   * @param int $index
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  private function checkLinkAccess(array $link, array $data, int $index = 0): bool {
+    if (empty($link['path']) && empty($link['task'])) {
+      return FALSE;
+    }
+    if ($link['entity'] && !empty($link['action']) && !in_array($link['action'], ['view', 'preview'], TRUE)) {
+      $idField = CoreUtil::getIdFieldName($link['entity']);
+      $idKey = $this->getIdKeyName($link['entity']);
+      $id = $data[$link['prefix'] . $idKey] ?? NULL;
+      $id = is_array($id) ? $id[$index] ?? NULL : $id;
+      if ($id) {
+        $values = [$idField => $id];
+        // If not aggregated, add other values to help checkAccess be efficient
+        if (!is_array($data[$link['prefix'] . $idKey])) {
+          $values += \CRM_Utils_Array::filterByPrefix($data, $link['prefix']);
+        }
+        $isApiAction = civicrm_api4($link['entity'], 'getActions', [
+          'checkPermissions' => FALSE,
+          'where' => [['name', '=', $link['action']]],
+        ])->count();
+        return civicrm_api4($link['entity'], 'checkAccess', [
+          // Fudge links with funny action names to check 'update'
+          'action' => $isApiAction ? $link['action'] : 'update',
+          'values' => $values,
+        ], 0)['access'];
+      }
+    }
+    return TRUE;
   }
 
   /**
@@ -494,87 +535,82 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * @param array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, icon: string, title: string, text: string} $link
-   * @param array $data
-   * @param int $index
-   * @return array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, icon: string, title: string, text: string, tokens: array}
+   * @return array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, icon: string, title: string, text: string, prefix: string}
    */
-  private function getLinkInfo($link, $data = NULL, $index = 0): ?array {
+  private function getLinkInfo(array $link): array {
     $link += [
       'path' => '',
       'target' => '',
       'entity' => '',
       'text' => '',
       'title' => '',
-      'tokens' => [],
+      'prefix' => '',
     ];
     $entity = $link['entity'];
+    $idKey = $this->getIdKeyName($link['entity']);
     if ($entity) {
-      $idField = $idKey = CoreUtil::getIdFieldName($entity);
       // Hack to support links to relationships
       if ($entity === 'Relationship') {
         $entity = 'RelationshipCache';
-        $idKey = 'relationship_id';
       }
-    }
-    if (!$link['path'] && $entity && !empty($link['action'])) {
-      $link['path'] = CoreUtil::getInfoItem($entity, 'paths')[$link['action']] ?? NULL;
-      $prefix = '';
-      if ($link['path'] && !empty($link['join'])) {
-        $prefix = $link['join'] . '.';
+      if (!empty($link['join'])) {
+        $link['prefix'] = $link['join'] . '.';
       }
-      // This is a bit clunky, the function_join_field gets un-munged later by $this->getJoinFromAlias()
-      if ($this->canAggregate($prefix . $idKey)) {
-        $prefix = 'GROUP_CONCAT_' . str_replace('.', '_', $prefix);
+      // Get path from action
+      if (!$link['path'] && !empty($link['action'])) {
+        $link['path'] = CoreUtil::getInfoItem($entity, 'paths')[$link['action']] ?? NULL;
+        // This is a bit clunky, the function_join_field gets un-munged later by $this->getJoinFromAlias()
+        if ($this->canAggregate($link['prefix'] . $idKey)) {
+          $link['prefix'] = 'GROUP_CONCAT_' . str_replace('.', '_', $link['prefix']);
+        }
+        if ($link['prefix']) {
+          $link['path'] = str_replace('[', '[' . $link['prefix'], $link['path']);
+        }
       }
-      if ($prefix) {
-        $link['path'] = str_replace('[', '[' . $prefix, $link['path']);
-      }
-      // Check access for edit/update/delete links
-      // (presumably if a record is shown in SearchKit the user already has view access, and the check is expensive)
-      if ($link['path'] && isset($data) && !in_array($link['action'], ['view', 'preview'], TRUE)) {
-        $id = $data[$prefix . $idKey] ?? NULL;
-        $id = is_array($id) ? $id[$index] ?? NULL : $id;
-        if ($id) {
-          $values = [$idField => $id];
-          // If not aggregated, add other values to help checkAccess be efficient
-          if (!is_array($data[$prefix . $idKey])) {
-            $values += \CRM_Utils_Array::filterByPrefix($data, $prefix);
+      elseif (!$link['path'] && !empty($link['task'])) {
+        $task = $this->getTask($link['task']);
+        // Convert legacy tasks (which have a url)
+        if (!empty($task['crmPopup'])) {
+          $idField = CoreUtil::getIdFieldName($link['entity']);
+          $link['path'] = \CRM_Utils_JS::decode($task['crmPopup']['path']);
+          $data = \CRM_Utils_JS::getRawProps($task['crmPopup']['data']);
+          // Find the special key that combines selected ids and replace it with id token
+          $idsKey = array_search("ids.join(',')", $data);
+          unset($data[$idsKey]);
+          $amp = strpos($link['path'], '?') ? '&' : '?';
+          $link['path'] .= $amp . $idField . '=[' . $link['prefix'] . $idKey . ']';
+          // Add the rest of the data items
+          foreach ($data as $dataKey => $dataRaw) {
+            $link['path'] .= '&' . $dataKey . '=' . \CRM_Utils_JS::decode($dataRaw);
           }
-          $access = civicrm_api4($link['entity'], 'checkAccess', [
-            // Fudge links with funny action names to check 'update'
-            'action' => $link['action'] === 'delete' ? 'delete' : 'update',
-            'values' => $values,
-          ], 0)['access'];
-          if (!$access) {
-            return NULL;
-          }
+        }
+        elseif (!empty($task['apiBatch']) || !empty($task['uiDialog'])) {
+          $link['title'] = $link['title'] ?: $task['title'];
+          // Fill in the api action if known, for the sake of $this->checkLinkAccess
+          $link['action'] = $task['apiBatch']['action'] ?? NULL;
         }
       }
     }
-    elseif (!$link['path'] && $entity && !empty($link['task'])) {
-      $task = $this->getTask($link['task']);
-      // Convert legacy tasks (which have to a url)
-      if (!empty($task['crmPopup'])) {
-        $link['path'] = \CRM_Utils_JS::decode($task['crmPopup']['path']);
-        $amp = strpos($link['path'], '?') ? '&' : '?';
-        $data = \CRM_Utils_JS::getRawProps($task['crmPopup']['data']);
-        // Find the special key that combines selected ids and replace it with id token
-        $idsKey = array_search("ids.join(',')", $data);
-        unset($data[$idsKey]);
-        $link['path'] .= $amp . $idsKey . '=[' . $idField . ']';
-        // Add the rest of the data items
-        foreach ($data as $dataKey => $dataRaw) {
-          $link['path'] .= '&' . $dataKey . '=' . \CRM_Utils_JS::decode($dataRaw);
-        }
-      }
-      elseif (!empty($task['apiBatch']) || !empty($task['uiDialog'])) {
-        $link['tokens'][] = $idKey;
-        $link['title'] = $link['title'] ?: $task['title'];
-        $link['task'] = array_intersect_key($task, ['apiBatch' => 1, 'uiDialog' => 1]);
-      }
-    }
-    $link['tokens'] = array_merge($link['tokens'], $this->getTokens($link['path'] . $link['text'] . $link['title']));
+    $link['key'] = $link['prefix'] . $idKey;
     return $link;
+  }
+
+  /**
+   * Get fields needed by a link which should be added to the SELECT clause
+   *
+   * @param array $link
+   * @return array
+   */
+  private function getLinkTokens(array $link): array {
+    $link = $this->getLinkInfo($link);
+    $tokens = [];
+    if (!$link['path'] && !empty($link['task'])) {
+      $tokens[] = $link['prefix'] . $this->getIdKeyName($link['entity']);
+    }
+    if (!empty($link['condition'][0])) {
+      $tokens[] = $link['condition'][0];
+    }
+    return array_merge($tokens, $this->getTokens($link['path'] . $link['text'] . $link['title']));
   }
 
   /**
@@ -984,12 +1020,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $possibleTokens .= ($column['empty_value'] ?? '');
 
       if (!empty($column['link'])) {
-        foreach ($this->getLinkInfo($column['link'])['tokens'] as $token) {
+        foreach ($this->getLinkTokens($column['link']) as $token) {
           $this->addSelectExpression($token);
         }
       }
       foreach ($column['links'] ?? [] as $link) {
-        foreach ($this->getLinkInfo($link)['tokens'] as $token) {
+        foreach ($this->getLinkTokens($link) as $token) {
           $this->addSelectExpression($token);
         }
       }
@@ -1335,6 +1371,19 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $values;
+  }
+
+  /**
+   * Given an entity name, returns the data fieldName used to identify it.
+   * @param string|null $entityName
+   * @return string
+   */
+  protected function getIdKeyName(?string $entityName) {
+    // Hack to support links to relationships
+    if ($entityName === 'Relationship') {
+      return 'relationship_id';
+    }
+    return CoreUtil::getIdFieldName($entityName);
   }
 
 }
