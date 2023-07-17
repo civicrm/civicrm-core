@@ -198,13 +198,13 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
 
     $createCase = $this->callAPISuccess('Case', 'create', [
       'case_type_id' => $createCaseType['id'],
-      'contact_id' => $this->_loggedInUser,
+      'contact_id' => $this->getLoggedInUser(),
       'subject' => 'Example',
     ]);
 
     // Deletion fails while case-type is in-use
     $deleteCaseType = $this->callAPIFailure('CaseType', 'delete', ['id' => $createCaseType['id']]);
-    $this->assertEquals("You can not delete this case type -- it is assigned to 1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", $deleteCaseType['error_message']);
+    $this->assertEquals('You can not delete this case type -- it is assigned to 1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.', $deleteCaseType['error_message']);
     $getCaseType = $this->callAPISuccess('CaseType', 'get', ['id' => $createCaseType['id']]);
     $this->assertEquals(1, $getCaseType['count']);
 

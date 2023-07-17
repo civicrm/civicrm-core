@@ -7,7 +7,7 @@ class CRM_Case_Form_ChangeStartDateTest extends CiviCaseTestCase {
 
   public function testChangeCaseStartDate(): void {
     $clientId = $this->individualCreate();
-    $caseObj = $this->createCase($clientId, $this->_loggedInUser);
+    $caseObj = $this->createCase($clientId, $this->getLoggedInUser());
 
     $result = $this->callAPISuccess('Case', 'getsingle', [
       'id' => $caseObj->id,
@@ -28,7 +28,7 @@ class CRM_Case_Form_ChangeStartDateTest extends CiviCaseTestCase {
     $form = $this->getFormObject('CRM_Case_Form_Activity', [
       'activity_type_id' => $activity_type_id,
       'caseid' => $caseObj->id,
-      'source_contact_id' => $this->_loggedInUser,
+      'source_contact_id' => $this->getLoggedInUser(),
       'target_contact_id' => $clientId,
       'cid' => $clientId,
       'activity_date_time' => date('Y-m-d H:i:s'),

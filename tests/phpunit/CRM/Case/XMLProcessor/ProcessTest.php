@@ -214,7 +214,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
       // @todo This seems wrong, it just happens to work out because both caseId and caseTypeId equal 1 in the stock setup here.
       'caseID' => $this->caseTypeId,
       'clientID' => $this->contacts['ana'],
-      'creatorID' => $this->_loggedInUser,
+      'creatorID' => $this->getLoggedInUser(),
     ];
   }
 
@@ -264,7 +264,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
 
     // Make another case and add a case role with the same relationship we
     // want, but a different person.
-    $caseObj = $this->createCase($this->contacts['ana'], $this->_loggedInUser);
+    $caseObj = $this->createCase($this->contacts['ana'], $this->getLoggedInUser());
     $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a' => $this->contacts['ana'],
       'contact_id_b' => $this->contacts['carlos'],
@@ -393,7 +393,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['USER_CREATING_THE_CASE'];
 
     $this->process->createActivity($this->activityTypeXml, $this->activityParams);
-    $this->assertActivityAssignedToContactExists($this->_loggedInUser);
+    $this->assertActivityAssignedToContactExists($this->getLoggedInUser());
   }
 
   /**

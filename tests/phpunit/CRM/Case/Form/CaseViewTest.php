@@ -8,9 +8,9 @@ class CRM_Case_Form_CaseViewTest extends CiviCaseTestCase {
   /**
    * Test that the search filter dropdown includes the desired activity types.
    */
-  public function testSearchFilterDropdown() {
+  public function testSearchFilterDropdown(): void {
     $client_id = $this->individualCreate([], 0, TRUE);
-    $caseObj = $this->createCase($client_id, $this->_loggedInUser);
+    $caseObj = $this->createCase($client_id, $this->getLoggedInUser());
 
     $form = $this->getFormObject('CRM_Case_Form_CaseView');
     $form->set('cid', $client_id);
