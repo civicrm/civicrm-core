@@ -16,7 +16,13 @@
  */
 
 /**
- * This form is intended to replace the overloading of many forms to generate a snippet for custom data.
+ * This form is loaded when custom data is loaded by ajax.
+ *
+ * The forms ALSO need to call enough functions from Form_CustomData
+ * to ensure the fields they need are added to the form or the values will be
+ * ignored in post process (ie. quick form will filter them out).
+ *
+ * This form never submits & hence has no post process.
  */
 class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
 
@@ -71,9 +77,6 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
       $singleRecord
     );
 
-    if (property_exists($this, '_customValueCount') && !empty($groupTree)) {
-      $this->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, NULL, NULL, NULL, $this->_entityId);
-    }
     // we should use simplified formatted groupTree
     $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_groupCount, $this);
 
