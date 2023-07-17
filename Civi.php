@@ -218,4 +218,62 @@ class Civi {
     return \Civi\Core\Container::getBootService('settings_manager')->getBagByDomain($domainID);
   }
 
+  /**
+   * Construct a URL based on a logical service address.
+   *
+   * Ex: Link to constituent's dashboard (on frontend UI)
+   *   $url = Civi::url('frontend://civicrm/user?reset=1');
+   *
+   * Ex: Link to constituent's dashboard (on frontend UI or backend UI -- whatever matches current page-view)
+   *   $url = Civi::url('//civicrm/user?reset=1');
+   *
+   * Ex: Link to constituent's dashboard (with method calls - good for dynamic options)
+   *   $url = Civi::url('frontend:')
+   *     ->setPath('civicrm/user')
+   *     ->addQuery(['reset' => 1]);
+   *
+   * Ex: Link to constituent's dashboard (with quick flags: absolute URL, SSL required, HTML escaping)
+   *   $url = Civi::url('frontend://civicrm/user?reset=1', 'ash');
+   *
+   * Ex: Link to constituent's dashboard (with method flags - good for dynamic options)
+   *   $url = Civi::url('frontend://civicrm/user?reset=1')
+   *     ->setPreferFormat('absolute')
+   *     ->setSsl(TRUE)
+   *     ->setHtmlEscape(TRUE);
+   *
+   * Ex: Link to a dynamically generated asset-file.
+   *   $url = Civi::url('assetBuilder://crm-l10n.js?locale=en_US');
+   *
+   * Ex: Link to a static asset (resource-file) in an extension.
+   *   $url = Civi::url('ext://org.civicrm.search_kit/css/crmSearchTasks.css');
+   *
+   * NOTE: CiviCRM is integrated into many environments, and they handle URL-construction different ways.
+   * For example, in Joomla+WordPress, there are separate sub-applications for the public-facing
+   * frontend UI (`/`) and the staff-facing backend UI (`/wp-admin/` or `/administrator/`) -- each follows
+   * a different URL-formula. But in Drupal, all use the same formula. To
+   *
+   * @param string $logicalUri
+   *   Logical URI. The scheme of the URI may be one of:
+   *     - 'frontend://' (Front-end page-route for constituents)
+   *     - 'backend://' (Back-end page-route for staff)
+   *     - 'service://` (Web-service page-route for automated integrations; aka webhooks and IPNs)
+   *     - 'current://' (Whichever UI is currently active)
+   *     - 'assetBuilder://' (Dynamically-generated asset-file)
+   *     - 'ext://' (Static asset-file provided by an extension)
+   *   An empty scheme (`//hello.txt`) is equivalent to `current://hello.txt`.
+   * @param string|null $flags
+   *   List of flags. Some combination of the following:
+   *   - 'a': absolute
+   *   - 'r': relative
+   *   - 'h': html
+   *   - 'p': plain text
+   *   - 's': ssl
+   *   FIXME: Should we have a flag for appending 'resCacheCode'?
+   * @return \Civi\Core\Url
+   *   URL object which may be modified or rendered as text.
+   */
+  public static function url(string $logicalUri, ?string $flags = NULL): \Civi\Core\Url {
+    return new \Civi\Core\Url($logicalUri, $flags);
+  }
+
 }
