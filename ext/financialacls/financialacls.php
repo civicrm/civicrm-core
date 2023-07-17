@@ -372,17 +372,6 @@ function financialacls_toggle() {
   unset(\Civi::$statics['CRM_Financial_BAO_FinancialType']);
 }
 
-// --- Functions below this ship commented out. Uncomment as required. ---
-
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess
- */
-//function financialacls_civicrm_preProcess($formName, &$form) {
-//
-//}
-
 /**
  * Require financial acl permissions for financial screens.
  *
@@ -394,20 +383,3 @@ function financialacls_civicrm_alterMenu(array &$menu): void {
   }
   $menu['civicrm/admin/financial/financialType']['access_arguments'] = [['administer CiviCRM Financial Types']];
 }
-
-/**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
- */
-//function financialacls_civicrm_navigationMenu(&$menu) {
-//  _financialacls_civix_insert_navigation_menu($menu, 'Mailings', array(
-//    'label' => E::ts('New subliminal message'),
-//    'name' => 'mailing_subliminal_message',
-//    'url' => 'civicrm/mailing/subliminal',
-//    'permission' => 'access CiviMail',
-//    'operator' => 'OR',
-//    'separator' => 0,
-//  ));
-//  _financialacls_civix_navigationMenu($menu);
-//}

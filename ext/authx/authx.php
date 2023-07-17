@@ -128,17 +128,6 @@ function authx_civicrm_permission(&$permissions) {
   $permissions['validate any authx credential'] = E::ts('Authx: Validate credentials for other users via the API');
 }
 
-// --- Functions below this ship commented out. Uncomment as required. ---
-
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess
- */
-//function authx_civicrm_preProcess($formName, &$form) {
-//
-//}
-
 /**
  * Implements hook_civicrm_navigationMenu().
  *
