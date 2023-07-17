@@ -38,7 +38,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
 
     // set up case and set the custom field initial value
     $client_id = $this->individualCreate([], 0, TRUE);
-    $caseObj = $this->createCase($client_id, $this->_loggedInUser);
+    $caseObj = $this->createCase($client_id, $this->getLoggedInUser());
     if (isset($input['custom_field_oldvalue'])) {
       $this->callAPISuccess('CustomValue', 'create', [
         "custom_{$custom_field['id']}" => $input['custom_field_oldvalue'],
@@ -349,7 +349,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
 
     // Create a case and set the custom field to something
     $individual = $this->individualCreate();
-    $caseObj = $this->createCase($individual, $this->_loggedInUser);
+    $caseObj = $this->createCase($individual, $this->getLoggedInUser());
     $caseId = $caseObj->id;
     $this->callAPISuccess('CustomValue', 'create', [
       "custom_{$customField['id']}" => 'immutable text',

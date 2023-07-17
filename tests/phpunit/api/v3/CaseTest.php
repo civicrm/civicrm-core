@@ -483,10 +483,10 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       // follow up
       'activity_type_id' => $this->followup_activity_type_value,
       'subject' => 'Test followup 123',
-      'source_contact_id' => $this->_loggedInUser,
+      'source_contact_id' => $this->getLoggedInUser(),
       'target_contact_id' => $this->_params['contact_id'],
     ];
-    $result = $this->callAPISuccess('activity', 'create', $params);
+    $result = $this->callAPISuccess('Activity', 'create', $params);
     $this->assertEquals($result['values'][$result['id']]['activity_type_id'], $params['activity_type_id']);
 
     // might need this for other tests that piggyback on this one

@@ -7,9 +7,9 @@ class CRM_Case_Form_EmailTest extends CiviCaseTestCase {
 
   public function testOpeningEmailForm(): void {
     $clientId = $this->individualCreate();
-    $caseObj = $this->createCase($clientId, $this->_loggedInUser);
+    $caseObj = $this->createCase($clientId, $this->getLoggedInUser());
 
-    $url = "civicrm/case/email/add?reset=1&action=add&atype=3&cid={$this->_loggedInUser}&caseid={$caseObj->id}";
+    $url = "civicrm/case/email/add?reset=1&action=add&atype=3&cid={$this->getLoggedInUser()}&caseid={$caseObj->id}";
 
     $_SERVER['REQUEST_URI'] = $url;
     $urlParts = explode('?', $url);
@@ -42,12 +42,12 @@ class CRM_Case_Form_EmailTest extends CiviCaseTestCase {
 
   public function testCaseTokenForRecipientAddedAfterOpeningForm(): void {
     $clientId = $this->individualCreate();
-    $caseObj = $this->createCase($clientId, $this->_loggedInUser);
+    $caseObj = $this->createCase($clientId, $this->getLoggedInUser());
 
     $anotherPersonId = $this->individualCreate([], 1);
     $anotherPersonInfo = $this->callAPISuccess('Contact', 'getsingle', ['id' => $anotherPersonId]);
 
-    $senderEmail = $this->callAPISuccess('Email', 'getsingle', ['contact_id' => $this->_loggedInUser]);
+    $senderEmail = $this->callAPISuccess('Email', 'getsingle', ['contact_id' => $this->getLoggedInUser()]);
 
     $mut = new CiviMailUtils($this);
 

@@ -2004,7 +2004,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function setupACL($isProfile = FALSE) {
+  public function setupACL(bool $isProfile = FALSE): void {
     global $_REQUEST;
     $_REQUEST = $this->_params;
 
@@ -2077,6 +2077,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if (!$isProfile) {
       CRM_ACL_BAO_Cache::resetCache();
     }
+  }
+
+  /**
+   * Get the logged in user record.
+   *
+   * @return int|null
+   */
+  public function getLoggedInUser(): ?int {
+    return CRM_Core_Session::singleton()->get('userID') ?: NULL;
   }
 
   /**
@@ -3450,22 +3459,18 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Create and return a case object for the given Client ID.
    *
-   * @param int $clientId
-   * @param int $loggedInUser
+   * @param int $clientID
+   * @param int|null $loggedInUser
    *   Omit or pass NULL to use the same as clientId
    * @param array $extra
    *   Optional specific parameters such as start_date
    *
    * @return CRM_Case_BAO_Case
    */
-  public function createCase($clientId, $loggedInUser = NULL, $extra = []) {
-    if (empty($loggedInUser)) {
-      // backwards compatibility - but it's more typical that the creator is a different person than the client
-      $loggedInUser = $clientId;
-    }
+  public function createCase(int $clientID, ?int $loggedInUser = NULL, array $extra = []): CRM_Case_DAO_Case {
     $caseParams = array_merge([
       'activity_subject' => 'Case Subject',
-      'client_id'        => $clientId,
+      'client_id'        => $clientID,
       'case_type_id'     => 1,
       'status_id'        => 1,
       'case_type'        => 'housing_support',
@@ -3475,8 +3480,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'medium_id'        => 2,
       'activity_details' => '',
     ], $extra);
-    $form = new CRM_Case_Form_Case();
-    return $form->testSubmit($caseParams, 'OpenCase', $loggedInUser, 'standalone');
+    return (new CRM_Case_Form_Case())->testSubmit($caseParams, 'OpenCase', $loggedInUser ?: $clientID, 'standalone');
   }
 
   /**
