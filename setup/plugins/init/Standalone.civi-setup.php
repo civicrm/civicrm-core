@@ -9,6 +9,17 @@ if (!defined('CIVI_SETUP')) {
   exit("Installation plugins must only be loaded by the installer.\n");
 }
 
+function _standalone_setup_scheme(): string {
+  if ((!empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https') ||
+    (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ||
+    (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')) {
+    return 'https';
+  }
+  else {
+    return 'http';
+  }
+}
+
 \Civi\Setup::dispatcher()
   ->addListener('civi.setup.checkAuthorized', function (\Civi\Setup\Event\CheckAuthorizedEvent $e) {
     $model = $e->getModel();
@@ -82,7 +93,7 @@ if (!defined('CIVI_SETUP')) {
     // original: $model->cmsBaseUrl = $_SERVER['HTTP_ORIGIN'] ?: $_SERVER['HTTP_REFERER'];
     if (empty($model->cmsBaseUrl)) {
       // A buildkit install (which uses cv core:install) sets this correctly. But a standard composer-then-website type install does not.
-      $model->cmsBaseUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+      $model->cmsBaseUrl = _standalone_setup_scheme() . '://' . $_SERVER['HTTP_HOST'];
     }
 
     // These paths get set as

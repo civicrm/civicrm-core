@@ -71,10 +71,11 @@ if (!defined('CIVI_SETUP')) {
     $params = [
       'cms_name'   => $e->getModel()->extras['adminUser'],
       'cms_pass'   => $e->getModel()->extras['adminPass'],
+      'email'       => $adminEmail,
       'notify'     => FALSE,
       'contactID'  => $contactID,
     ];
-    $userID = \CRM_Core_BAO_CMSUser::create($params, $adminEmail);
+    $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
 
     // Assign 'admin' role to user
     \Civi\Api4\User::update(FALSE)
