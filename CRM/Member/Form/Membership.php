@@ -23,15 +23,6 @@ use Civi\Api4\ContributionRecur;
 class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
-   * IDs of relevant entities.
-   *
-   * @var array
-   */
-  protected $ids = [];
-
-  protected $_memType = NULL;
-
-  /**
    * If this is set (to 'test' or 'live') then the payment processor will be shown on the form to take a payment.
    *
    * @var string|null
@@ -40,22 +31,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   public $_contributeMode = 'direct';
 
-  protected $_recurMembershipTypes;
-
   protected $_memTypeSelected;
-
-  /**
-   * Display name of the member.
-   *
-   * @var string
-   */
-  protected $_memberDisplayName = NULL;
-
-  /**
-   * email of the person paying for the membership (used for receipts)
-   * @var string
-   */
-  protected $_memberEmail = NULL;
 
   /**
    * Contact ID of the member.
@@ -63,54 +39,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @var int
    */
   public $_contactID = NULL;
-
-  /**
-   * Display name of the person paying for the membership (used for receipts)
-   *
-   * @var string
-   */
-  protected $_contributorDisplayName = NULL;
-
-  /**
-   * Email of the person paying for the membership (used for receipts).
-   *
-   * @var string
-   */
-  protected $_contributorEmail;
-
-  /**
-   * email of the person paying for the membership (used for receipts)
-   *
-   * @var int
-   */
-  protected $_contributorContactID = NULL;
-
-  /**
-   * ID of the person the receipt is to go to.
-   *
-   * @var int
-   */
-  protected $_receiptContactId = NULL;
-
-  /**
-   * Keep a class variable for ALL membership IDs so
-   * postProcess hook function can do something with it
-   *
-   * @var array
-   */
-  protected $_membershipIDs = [];
-
-  /**
-   * Membership created or edited on this form.
-   *
-   * If a price set creates multiple this will be the last one created.
-   *
-   * This 'last' bias reflects historical code - but it's mostly used in the receipt
-   * and there is all sorts of weird and wonderful handling that potentially compensates.
-   *
-   * @var array
-   */
-  protected $membership = [];
 
   /**
    * Set entity fields to be assigned to the form.
