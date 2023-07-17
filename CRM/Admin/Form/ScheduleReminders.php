@@ -47,15 +47,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   }
 
   /**
-   * Build all the data structures needed to build the form.
-   */
-  public function preProcess() {
-    parent::preProcess();
-
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive');
-  }
-
-  /**
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
