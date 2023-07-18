@@ -24,8 +24,10 @@ UPDATE civicrm_group SET `name` = `id` WHERE name IS NULL;
   WHERE `frontend_description` IS NULL OR `frontend_description` = '' AND description <> '';
 {/if}
 
+{literal}
 UPDATE civicrm_mailing_component
 SET body_html = REPLACE(body_html, '{welcome.group}', '{group.frontend_title}'),
 body_text = REPLACE(body_text, '{welcome.group}', '{group.frontend_title}'),
 subject = REPLACE(subject, '{welcome.group}', '{group.frontend_title}')
 WHERE component_type = 'Welcome';
+{/literal}
