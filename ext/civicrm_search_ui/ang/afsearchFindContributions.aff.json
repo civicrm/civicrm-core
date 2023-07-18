@@ -10,10 +10,14 @@
     "is_token": false,
     "contact_summary": null,
     "summary_contact_type": null,
-    "icon": "fa-list-alt",
+    "icon": "fa-credit-card",
     "server_route": "civicrm/sk/contrib",
-    "permission": "access CiviCRM",
+    "permission": "access CiviContribute",
     "redirect": null,
     "create_submission": false,
-    "navigation": null
+    "navigation": {
+        "parent": "Experimental",
+        "label": "Find Contributions",
+        "weight": 0
+    }
 }

@@ -1,4 +1,5 @@
 <div af-fieldset="">
+  <p class="af-text">This is intended as a replacement for the Find Contributions page.&nbsp; Please provide feedback at https://lab.civicrm.org/dev/core/-/issues/3912</p>
   <div class="af-container af-layout-inline af-collapsible" af-title="Contact Filters">
     <af-field name="Contribution_Contact_contact_id_01.display_name,Contribution_Contact_contact_id_01.sort_name,Contribution_Contact_contact_id_01.email_primary.email" defn="{label: 'Name or Email', input_type: 'Text'}" />
     <af-field name="Contribution_Contact_contact_id_01.tags" defn="{input_attrs: {multiple: true}}" />
@@ -39,6 +40,9 @@
     <legend class="af-text">Dev note: want this as page name select. &nbsp; Does anyone use PCP's???</legend>
     <af-field name="Contribution_ContributionSoft_contribution_id_01_ContributionSoft_PCP_pcp_id_01.id" />
     <af-field name="Contribution_ContributionSoft_contribution_id_01_ContributionSoft_PCP_pcp_id_01.is_honor_roll" defn="{label: 'Honor Roll?'}" />
+  </div>
+  <div class="af-container" af-title="Summary">
+    <crm-search-display-table search-name="Find_Contributions_totals" display-name="Find_Contributions_totals_Table_1"></crm-search-display-table>
   </div>
   <crm-search-display-table search-name="Find_Contributions_2" display-name="Find_Contributions_Table_1"></crm-search-display-table>
 </div>
