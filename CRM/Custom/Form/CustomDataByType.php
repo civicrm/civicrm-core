@@ -27,31 +27,39 @@
 class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
 
   /**
-   * Contact ID associated with the Custom Data
-   *
-   * @var int
+   * @var array
    */
-  public $_contactID = NULL;
+  private $groupTree;
+
+  /**
+   * @var array
+   */
+  private $groupCount;
+
+  /**
+   * @var int|mixed|string|null
+   */
+  private $groupID;
 
   /**
    * Preprocess function.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
+  public function preProcess(): void {
 
-    $this->_type = $this->_cdType = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
+    $customDataType = CRM_Utils_Request::retrieve('type', 'String', NULL, TRUE);
     $subType = CRM_Utils_Request::retrieve('subType', 'String');
-    $this->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive');
-    $this->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive');
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive');
-    $this->_groupID = $groupID = CRM_Utils_Request::retrieve('groupID', 'Positive');
+    $this->groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive');
+    $this->groupID = $groupID = CRM_Utils_Request::retrieve('groupID', 'Positive');
     $onlySubType = CRM_Utils_Request::retrieve('onlySubtype', 'Boolean');
     $this->_action = CRM_Utils_Request::retrieve('action', 'Alphanumeric');
     $this->assign('cdType', FALSE);
-    $this->assign('cgCount', $this->_groupCount);
+    $this->assign('cgCount', $this->groupCount);
 
     $contactTypes = CRM_Contact_BAO_ContactType::contactTypeInfo();
-    if (array_key_exists($this->_type, $contactTypes)) {
-      $this->assign('contactId', $this->_entityId);
+    if (array_key_exists($customDataType, $contactTypes)) {
+      $this->assign('contactId', CRM_Utils_Request::retrieve('entityID', 'Positive'));
     }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree(CRM_Utils_Request::retrieve('type', 'String'),
@@ -61,23 +69,20 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
       $subType,
       CRM_Utils_Request::retrieve('subName', 'String'),
       TRUE,
-      $onlySubType,
-      FALSE,
-      CRM_Core_Permission::EDIT,
-      NULL
+      $onlySubType
     );
 
     // we should use simplified formatted groupTree
-    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_groupCount, $this);
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->groupCount, $this);
 
-    if (isset($this->_groupTree) && is_array($this->_groupTree)) {
+    if (isset($this->groupTree) && is_array($this->groupTree)) {
       $keys = array_keys($groupTree);
       foreach ($keys as $key) {
-        $this->_groupTree[$key] = $groupTree[$key];
+        $this->groupTree[$key] = $groupTree[$key];
       }
     }
     else {
-      $this->_groupTree = $groupTree;
+      $this->groupTree = $groupTree;
     }
 
     $this->assign('suppressForm', TRUE);
@@ -89,19 +94,21 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
    *
    * @return array
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $defaults = [];
-    CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE, $this->get('action'));
+    CRM_Core_BAO_CustomGroup::setDefaults($this->groupTree, $defaults, FALSE, FALSE, $this->get('action'));
     return $defaults;
   }
 
   /**
    * Build quick form.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->addElement('hidden', 'hidden_custom', 1);
-    $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", $this->_groupCount);
-    CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
+    $this->addElement('hidden', "hidden_custom_group_count[{$this->groupID}]", $this->groupCount);
+    CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->groupTree);
   }
 
 }
