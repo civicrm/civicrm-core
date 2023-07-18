@@ -79,8 +79,12 @@
               }
               var fieldDefault = null;
 
-              if (Boolean(importMappings)) {
+              if (Boolean(importMappings) && importMappings.hasOwnProperty(index)) {
                 // If this form has already been used for the job, load from what it saved.
+                // Note we also checked the importMapping was defined. This would be FALSE
+                // if a csv is being imported with more fields than the are in the original
+                // mapping. We check for that so it will skip gracefully.
+                // (The user will see a warning.)
                 fieldName = importMappings[index].name;
                 fieldDefault = importMappings[index].default_value;
               }
