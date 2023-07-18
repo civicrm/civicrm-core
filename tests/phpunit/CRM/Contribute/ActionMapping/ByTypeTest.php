@@ -229,7 +229,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Schedule message delivery for contributions of type "Member Dues".
    */
   public function scheduleForDues() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+    $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded([1]);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded([1]);
@@ -239,7 +239,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Schedule message delivery for contributions of type "Donation".
    */
   public function scheduleForDonation() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+    $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded([2]);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
@@ -249,7 +249,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Schedule message delivery for any contribution, regardless of type.
    */
   public function scheduleForAny() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+    $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded(NULL);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
@@ -259,7 +259,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Schedule message delivery to the 'soft credit' assignee.
    */
   public function scheduleForSoftCreditor() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+    $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded(NULL);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);

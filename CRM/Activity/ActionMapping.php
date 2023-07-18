@@ -16,38 +16,49 @@
 
 
 /**
- * Class CRM_Activity_ActionMapping
- *
  * This defines the scheduled-reminder functionality for Activities.
  * It is useful for, e.g., sending a reminder based on scheduled
  * date or other custom dates on the activity record.
  */
-class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
+class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
 
   /**
-   * The value for civicrm_action_schedule.mapping_id which identifies the
-   * "Activity" mapping.
-   *
-   * Note: This value is chosen to match legacy DB IDs.
+   * Note: This value is an integer for legacy reasons; but going forward any new
+   * action mapping classes should return a string from `getId` instead of using a constant.
    */
   const ACTIVITY_MAPPING_ID = 1;
 
-  /**
-   * Register Activity-related action mappings.
-   *
-   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
-   */
-  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(CRM_Activity_ActionMapping::create([
-      'id' => CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID,
-      'entity' => 'civicrm_activity',
-      'entity_label' => ts('Activity'),
-      'entity_value' => 'activity_type',
-      'entity_value_label' => ts('Activity Type'),
-      'entity_status' => 'activity_status',
-      'entity_status_label' => ts('Activity Status'),
-      'entity_date_start' => 'activity_date_time',
-    ]));
+  public function getId() {
+    return self::ACTIVITY_MAPPING_ID;
+  }
+
+  public function getEntityName(): string {
+    return 'Activity';
+  }
+
+  public function getValueHeader(): string {
+    return ts('Activity Type');
+  }
+
+  public function getValueLabels(): array {
+    // CRM-20510: Include CiviCampaign activity types along with CiviCase IF component is enabled
+    $activityTypes = \CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+    asort($activityTypes);
+    return $activityTypes;
+  }
+
+  public function getStatusHeader(): string {
+    return ts('Activity Status');
+  }
+
+  public function getStatusLabels($value): array {
+    return CRM_Core_PseudoConstant::activityStatus();
+  }
+
+  public function getDateFields(): array {
+    return [
+      'activity_date_time' => ts('Activity Date'),
+    ];
   }
 
   /**
@@ -60,7 +71,7 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
    *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes() {
+  public function getRecipientTypes(): array {
     return \CRM_Core_OptionGroup::values('activity_contacts');
   }
 
@@ -78,11 +89,11 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @return \CRM_Utils_SQL_Select
    * @see RecipientBuilder
    */
-  public function createQuery($schedule, $phase, $defaultParams) {
+  public function createQuery($schedule, $phase, $defaultParams): CRM_Utils_SQL_Select {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
-    $query = \CRM_Utils_SQL_Select::from("{$this->entity} e")->param($defaultParams);
+    $query = \CRM_Utils_SQL_Select::from("{$this->getEntityTable()} e")->param($defaultParams);
     $query['casAddlCheckFrom'] = 'civicrm_activity e';
     $query['casContactIdField'] = 'r.contact_id';
     $query['casEntityIdField'] = 'e.id';
@@ -115,14 +126,6 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query->where('e.is_current_revision = 1 AND e.is_deleted = 0');
 
     return $query;
-  }
-
-  /**
-   * Determine whether a schedule based on this mapping should
-   * send to additional contacts.
-   */
-  public function sendToAdditional($entityId): bool {
-    return TRUE;
   }
 
 }
