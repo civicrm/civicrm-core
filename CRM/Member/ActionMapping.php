@@ -11,37 +11,45 @@
 
 
 /**
- * Class CRM_Member_ActionMapping
- *
  * This defines the scheduled-reminder functionality for CiviMember
  * memberships. It allows one to target reminders based on join date
  * or end date, with additional filtering based on membership-type.
  */
-class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
+class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
 
   /**
-   * The value for civicrm_action_schedule.mapping_id which identifies the
-   * "Membership Type" mapping.
-   *
-   * Note: This value is chosen to match legacy DB IDs.
+   * Note: This value is an integer for legacy reasons; but going forward any new
+   * action mapping classes should return a string from `getId` instead of using a constant.
    */
   const MEMBERSHIP_TYPE_MAPPING_ID = 4;
 
-  /**
-   * Register CiviMember-related action mappings.
-   *
-   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
-   */
-  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(CRM_Member_ActionMapping::create([
-      'id' => CRM_Member_ActionMapping::MEMBERSHIP_TYPE_MAPPING_ID,
-      'entity' => 'civicrm_membership',
-      'entity_label' => ts('Membership'),
-      'entity_value' => 'civicrm_membership_type',
-      'entity_value_label' => ts('Membership Type'),
-      'entity_status' => 'auto_renew_options',
-      'entity_status_label' => ts('Auto Renew Options'),
-    ]));
+  public function getId() {
+    return self::MEMBERSHIP_TYPE_MAPPING_ID;
+  }
+
+  public function getEntityName(): string {
+    return 'Membership';
+  }
+
+  public function getValueHeader(): string {
+    return ts('Membership Type');
+  }
+
+  public function getValueLabels(): array {
+    return CRM_Member_PseudoConstant::membershipType();
+  }
+
+  public function getStatusHeader(): string {
+    return ts('Auto Renew Options');
+  }
+
+  public function getStatusLabels($value): array {
+    if ($value && \CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $value, 'auto_renew')) {
+      return \CRM_Core_OptionGroup::values('auto_renew_options');
+    }
+    else {
+      return [];
+    }
   }
 
   /**
@@ -50,7 +58,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @return array
    *   Array(string $fieldName => string $fieldLabel).
    */
-  public function getDateFields() {
+  public function getDateFields(): array {
     return [
       'join_date' => ts('Member Since'),
       'start_date' => ts('Membership Start Date'),
@@ -71,11 +79,11 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @return \CRM_Utils_SQL_Select
    * @see RecipientBuilder
    */
-  public function createQuery($schedule, $phase, $defaultParams) {
+  public function createQuery($schedule, $phase, $defaultParams): CRM_Utils_SQL_Select {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
-    $query = \CRM_Utils_SQL_Select::from("{$this->entity} e")->param($defaultParams);
+    $query = \CRM_Utils_SQL_Select::from("{$this->getEntityTable()} e")->param($defaultParams);
     $query['casAddlCheckFrom'] = 'civicrm_membership e';
     $query['casContactIdField'] = 'e.contact_id';
     $query['casEntityIdField'] = 'e.id';
@@ -159,21 +167,13 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
    *
    * @param \CRM_Core_DAO_ActionSchedule $schedule
    */
-  public function resetOnTriggerDateChange($schedule) {
+  public function resetOnTriggerDateChange($schedule): bool {
     if ($schedule->absolute_date !== NULL) {
       return FALSE;
     }
     else {
       return TRUE;
     }
-  }
-
-  /**
-   * Determine whether a schedule based on this mapping should
-   * send to additional contacts.
-   */
-  public function sendToAdditional($entityId): bool {
-    return TRUE;
   }
 
 }

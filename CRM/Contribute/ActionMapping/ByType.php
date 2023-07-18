@@ -18,35 +18,13 @@
  *  - The receipt-date, cancel-date, or thankyou-date.
  *  - The type of contribution.
  */
-class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\MappingInterface {
-
-  /**
-   * The value for civicrm_action_schedule.mapping_id which identifies the
-   * "Contribution Page" mapping.
-   */
-  const MAPPING_ID = 'contribtype';
-
-  /**
-   * Register Activity-related action mappings.
-   *
-   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
-   */
-  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(new static());
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getId() {
-    return self::MAPPING_ID;
-  }
+class CRM_Contribute_ActionMapping_ByType extends CRM_Contribute_ActionMapping {
 
   /**
    * @return string
    */
-  public function getEntity() {
-    return 'civicrm_contribution';
+  public function getId() {
+    return 'contribtype';
   }
 
   /**
@@ -54,7 +32,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *
    * @return string
    */
-  public function getLabel() {
+  public function getLabel(): string {
     return ts('Contribution Type');
   }
 
@@ -63,17 +41,8 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *
    * @return string
    */
-  public function getValueHeader() {
+  public function getValueHeader(): string {
     return ts('Financial Type');
-  }
-
-  /**
-   * Get a printable label to use as the header on the 'status' filter.
-   *
-   * @return string
-   */
-  public function getStatusHeader() {
-    return ts('Contribution Status');
   }
 
   /**
@@ -84,38 +53,8 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *   Ex: array(123 => 'Phone Call', 456 => 'Meeting').
    * @throws CRM_Core_Exception
    */
-  public function getValueLabels() {
+  public function getValueLabels(): array {
     return CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'get', []);
-  }
-
-  /**
-   * Get a list of status options.
-   *
-   * @param string|int $value
-   *   The list of status options may be contingent upon the selected filter value.
-   *   This is the selected filter value.
-   * @return array
-   *   Array(string $value => string $label).
-   *   Ex: Array(123 => 'Completed', 456 => 'Scheduled').
-   * @throws CRM_Core_Exception
-   */
-  public function getStatusLabels($value) {
-    return CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'get', []);
-  }
-
-  /**
-   * Get a list of available date fields.
-   *
-   * @return array
-   *   Array(string $fieldName => string $fieldLabel).
-   */
-  public function getDateFields() {
-    return [
-      'receive_date' => ts('Receive Date'),
-      'cancel_date' => ts('Cancel Date'),
-      'receipt_date' => ts('Receipt Date'),
-      'thankyou_date' => ts('Thank You Date'),
-    ];
   }
 
   /**
@@ -128,7 +67,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes() {
+  public function getRecipientTypes(): array {
     return [
       'soft_credit_type' => ts('Soft Credit Role'),
     ];
@@ -147,7 +86,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
    * @see getRecipientTypes
    */
-  public function getRecipientListing($recipientType) {
+  public function getRecipientListing($recipientType): array {
     switch ($recipientType) {
       case 'soft_credit_type':
         return \CRM_Core_OptionGroup::values('soft_credit_type', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
@@ -155,19 +94,6 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
       default:
         return [];
     }
-  }
-
-  /**
-   * Determine whether a schedule based on this mapping is sufficiently
-   * complete.
-   *
-   * @param \CRM_Core_DAO_ActionSchedule $schedule
-   * @return array
-   *   Array (string $code => string $message).
-   *   List of error messages.
-   */
-  public function validateSchedule($schedule) {
-    return [];
   }
 
   /**
@@ -183,7 +109,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
    * @see RecipientBuilder
    * @throws CRM_Core_Exception
    */
-  public function createQuery($schedule, $phase, $defaultParams) {
+  public function createQuery($schedule, $phase, $defaultParams): CRM_Utils_SQL_Select {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
@@ -221,26 +147,6 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
     }
 
     return $query;
-  }
-
-  /**
-   * Determine whether a schedule based on this mapping should
-   * reset the reminder state if the trigger date changes.
-   *
-   * @return bool
-   *
-   * @param \CRM_Core_DAO_ActionSchedule $schedule
-   */
-  public function resetOnTriggerDateChange($schedule) {
-    return FALSE;
-  }
-
-  /**
-   * Determine whether a schedule based on this mapping should
-   * send to additional contacts.
-   */
-  public function sendToAdditional($entityId): bool {
-    return TRUE;
   }
 
 }

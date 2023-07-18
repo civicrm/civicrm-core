@@ -18,35 +18,43 @@ namespace Civi\ActionSchedule;
 interface MappingInterface {
 
   /**
-   * @return mixed
+   * Unique identifier of this mapping type.
+   *
+   * Should return a "machine name" style string (older implementations return an int -- don't follow their example).
+   * @return string|int
    */
   public function getId();
 
   /**
+   * Name of the table belonging to the main entity e.g. `civicrm_activity`
    * @return string
    */
-  public function getEntity();
+  public function getEntityTable(): string;
 
   /**
-   * Get a printable label for this mapping type.
-   *
+   * Main entity name e.g. `Activity`
+   * @return string
+   */
+  public function getEntityName(): string;
+
+  /**
+   * Label of this mapping type as shown in the "Entity" dropdown-select on the form.
    * @return string
    */
   public function getLabel();
 
   /**
-   * Get a printable label to use as the header on the 'value' filter.
-   *
+   * Label of the primary filter field on the form, e.g. "Activity Type"
    * @return string
    */
-  public function getValueHeader();
+  public function getValueHeader(): string;
 
   /**
    * Get a printable label to use as the header on the 'status' filter.
    *
    * @return string
    */
-  public function getStatusHeader();
+  public function getStatusHeader(): string;
 
   /**
    * Get a list of value options.
@@ -55,7 +63,7 @@ interface MappingInterface {
    *   Array(string $value => string $label).
    *   Ex: array(123 => 'Phone Call', 456 => 'Meeting').
    */
-  public function getValueLabels();
+  public function getValueLabels(): array;
 
   /**
    * Get a list of status options.
@@ -67,7 +75,7 @@ interface MappingInterface {
    *   Array(string $value => string $label).
    *   Ex: Array(123 => 'Completed', 456 => 'Scheduled').
    */
-  public function getStatusLabels($value);
+  public function getStatusLabels($value): array;
 
   /**
    * Get a list of available date fields.
@@ -75,7 +83,7 @@ interface MappingInterface {
    * @return array
    *   Array(string $fieldName => string $fieldLabel).
    */
-  public function getDateFields();
+  public function getDateFields(): array;
 
   /**
    * Get a list of recipient types.
@@ -87,7 +95,7 @@ interface MappingInterface {
    *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes();
+  public function getRecipientTypes(): array;
 
   /**
    * Get a list of recipients which match the given type.
@@ -102,7 +110,7 @@ interface MappingInterface {
    *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
    * @see getRecipientTypes
    */
-  public function getRecipientListing($recipientType);
+  public function getRecipientListing($recipientType): array;
 
   /**
    * Determine whether a schedule based on this mapping is sufficiently
@@ -113,7 +121,7 @@ interface MappingInterface {
    *   Array (string $code => string $message).
    *   List of error messages.
    */
-  public function validateSchedule($schedule);
+  public function validateSchedule($schedule): array;
 
   /**
    * Generate a query to locate contacts who match the given
@@ -127,7 +135,7 @@ interface MappingInterface {
    * @return \CRM_Utils_SQL_Select
    * @see RecipientBuilder
    */
-  public function createQuery($schedule, $phase, $defaultParams);
+  public function createQuery($schedule, $phase, $defaultParams): \CRM_Utils_SQL_Select;
 
   /**
    * Determine whether a schedule based on this mapping should
@@ -137,7 +145,7 @@ interface MappingInterface {
    *
    * @param \CRM_Core_DAO_ActionSchedule $schedule
    */
-  public function resetOnTriggerDateChange($schedule);
+  public function resetOnTriggerDateChange($schedule): bool;
 
   /**
    * Determine whether a schedule based on this mapping should

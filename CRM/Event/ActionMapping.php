@@ -12,58 +12,28 @@
 use Civi\ActionSchedule\RecipientBuilder;
 
 /**
- * Class CRM_Event_ActionMapping
- *
- * This defines the scheduled-reminder functionality for CiviEvent
- * participants. It allows one to target messages on the
- * event's start-date/end-date, with additional filtering by
- * event-type, event-template, or event-id.
+ * Shared scheduled-reminder functionality for CiviEvent participants.
  */
-class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
+abstract class CRM_Event_ActionMapping extends \Civi\ActionSchedule\MappingBase {
 
   /**
-   * The value for civicrm_action_schedule.mapping_id which identifies the
-   * "Event Type" mapping.
-   *
-   * Note: This value is chosen to match legacy DB IDs.
+   * Note: These values are integers for legacy reasons; but going forward any new
+   * action mapping classes should return a string from `getId` instead of using a constant.
    */
   const EVENT_TYPE_MAPPING_ID = 2;
   const EVENT_NAME_MAPPING_ID = 3;
   const EVENT_TPL_MAPPING_ID = 5;
 
-  /**
-   * Register CiviEvent-related action mappings.
-   *
-   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
-   */
-  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(CRM_Event_ActionMapping::create([
-      'id' => CRM_Event_ActionMapping::EVENT_TYPE_MAPPING_ID,
-      'entity' => 'civicrm_participant',
-      'entity_label' => ts('Event Type'),
-      'entity_value' => 'event_type',
-      'entity_value_label' => ts('Event Type'),
-      'entity_status' => 'civicrm_participant_status_type',
-      'entity_status_label' => ts('Participant Status'),
-    ]));
-    $registrations->register(CRM_Event_ActionMapping::create([
-      'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
-      'entity' => 'civicrm_participant',
-      'entity_label' => ts('Event Name'),
-      'entity_value' => 'civicrm_event',
-      'entity_value_label' => ts('Event Name'),
-      'entity_status' => 'civicrm_participant_status_type',
-      'entity_status_label' => ts('Participant Status'),
-    ]));
-    $registrations->register(CRM_Event_ActionMapping::create([
-      'id' => CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID,
-      'entity' => 'civicrm_participant',
-      'entity_label' => ts('Event Template'),
-      'entity_value' => 'event_template',
-      'entity_value_label' => ts('Event Template'),
-      'entity_status' => 'civicrm_participant_status_type',
-      'entity_status_label' => ts('Participant Status'),
-    ]));
+  public function getEntityName(): string {
+    return 'Participant';
+  }
+
+  public function getStatusHeader(): string {
+    return ts('Participant Status');
+  }
+
+  public function getStatusLabels($value): array {
+    return CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
   }
 
   /**
@@ -72,7 +42,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @return array
    *   Array(string $fieldName => string $fieldLabel).
    */
-  public function getDateFields() {
+  public function getDateFields(): array {
     return [
       'start_date' => ts('Event Start'),
       'end_date' => ts('Event End'),
@@ -91,7 +61,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
    *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes() {
+  public function getRecipientTypes(): array {
     return \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
   }
 
@@ -108,7 +78,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
    *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
    * @see getRecipientTypes
    */
-  public function getRecipientListing($recipientType) {
+  public function getRecipientListing($recipientType): array {
     switch ($recipientType) {
       case 'participant_role':
         return \CRM_Event_PseudoConstant::participantRole();
@@ -131,11 +101,11 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @return \CRM_Utils_SQL_Select
    * @see RecipientBuilder
    */
-  public function createQuery($schedule, $phase, $defaultParams) {
+  public function createQuery($schedule, $phase, $defaultParams): CRM_Utils_SQL_Select {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
-    $query = \CRM_Utils_SQL_Select::from("{$this->entity} e")->param($defaultParams);
+    $query = \CRM_Utils_SQL_Select::from("{$this->getEntityTable()} e")->param($defaultParams);
     $query['casAddlCheckFrom'] = 'civicrm_event r';
     $query['casContactIdField'] = 'e.contact_id';
     $query['casEntityIdField'] = 'e.id';
@@ -162,12 +132,12 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     // build where clause
     // FIXME: This handles scheduled reminder of type "Event Name" and "Event Type", gives incorrect result on "Event Template".
     if (!empty($selectedValues)) {
-      $valueField = ($this->id == \CRM_Event_ActionMapping::EVENT_TYPE_MAPPING_ID) ? 'event_type_id' : 'id';
+      $valueField = ($this->getId() == self::EVENT_TYPE_MAPPING_ID) ? 'event_type_id' : 'id';
       $query->where("r.{$valueField} IN (@selectedValues)")
         ->param('selectedValues', $selectedValues);
     }
     else {
-      $query->where(($this->id == \CRM_Event_ActionMapping::EVENT_TYPE_MAPPING_ID) ? "r.event_type_id IS NULL" : "r.id IS NULL");
+      $query->where(($this->getId() == self::EVENT_TYPE_MAPPING_ID) ? "r.event_type_id IS NULL" : "r.id IS NULL");
     }
 
     $query->where('r.is_active = 1');
@@ -197,7 +167,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
    */
   public function sendToAdditional($entityId): bool {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($entityId);
-    switch ($this->id) {
+    switch ($this->getId()) {
       case self::EVENT_TYPE_MAPPING_ID:
         $valueTable = 'e';
         $valueField = 'event_type_id';

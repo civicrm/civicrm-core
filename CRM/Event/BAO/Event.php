@@ -449,9 +449,6 @@ $event_summary_limit
     ];
 
     $params = [1 => [$optionGroupId, 'Integer']];
-    $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
-      'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
-    ]));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
       foreach ($properties as $property => $name) {
@@ -556,7 +553,7 @@ $event_summary_limit
       $eventSummary['events'][$dao->id]['is_show_location'] = $dao->is_show_location;
       $eventSummary['events'][$dao->id]['is_subevent'] = $dao->slot_label_id;
       $eventSummary['events'][$dao->id]['is_pcp_enabled'] = $dao->is_pcp_enabled;
-      $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mapping->getId());
+      $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
       $eventSummary['events'][$dao->id]['is_repeating_event'] = $dao->is_repeating_event;
 
       $statusTypes = CRM_Event_PseudoConstant::participantStatus();
@@ -997,12 +994,8 @@ WHERE civicrm_event.is_active = 1
       ['replace' => ['target_entity_id' => $copyEvent->id]]
     );
 
-    $oldMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
-      'id' => ($eventValues['is_template'] ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID),
-    ]));
-    $copyMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
-      'id' => ($copyEvent->is_template == 1 ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID),
-    ]));
+    $oldMapping = CRM_Core_BAO_ActionSchedule::getMapping($eventValues['is_template'] ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
+    $copyMapping = CRM_Core_BAO_ActionSchedule::getMapping($copyEvent->is_template == 1 ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
     CRM_Core_DAO::copyGeneric('CRM_Core_DAO_ActionSchedule',
       ['entity_value' => $id, 'mapping_id' => $oldMapping->getId()],
       ['entity_value' => $copyEvent->id, 'mapping_id' => $copyMapping->getId()]

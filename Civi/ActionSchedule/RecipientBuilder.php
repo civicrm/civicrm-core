@@ -190,9 +190,9 @@ class RecipientBuilder {
       ->merge($this->prepareAddlFilter('c.id'))
       ->where("c.id NOT IN (
              SELECT rem.contact_id
-             FROM civicrm_action_log rem INNER JOIN {$this->mapping->getEntity()} e ON rem.entity_id = e.id
+             FROM civicrm_action_log rem INNER JOIN {$this->mapping->getEntityTable()} e ON rem.entity_id = e.id
              WHERE rem.action_schedule_id = {$this->actionSchedule->id}
-             AND rem.entity_table = '{$this->mapping->getEntity()}'
+             AND rem.entity_table = '{$this->mapping->getEntityTable()}'
              )")
       // Where does e.id come from here? ^^^
       ->groupBy("c.id")
@@ -276,7 +276,7 @@ class RecipientBuilder {
     $defaultParams = [
       'casActionScheduleId' => $this->actionSchedule->id,
       'casMappingId' => $this->mapping->getId(),
-      'casMappingEntity' => $this->mapping->getEntity(),
+      'casMappingEntity' => $this->mapping->getEntityTable(),
       'casNow' => $this->now,
     ];
 
@@ -403,7 +403,7 @@ class RecipientBuilder {
       $date = $operator . "(!casDateField, INTERVAL {$actionSchedule->start_action_offset} {$actionSchedule->start_action_unit})";
       $startDateClauses[] = "'!casNow' >= {$date}";
       // This is weird. Waddupwidat?
-      if ($this->mapping->getEntity() == 'civicrm_participant') {
+      if ($this->mapping->getEntityTable() == 'civicrm_participant') {
         $startDateClauses[] = $operator . "(!casNow, INTERVAL 1 DAY ) {$op} " . '!casDateField';
       }
       else {
@@ -567,7 +567,7 @@ WHERE      $group.id = {$groupId}
     switch ($for) {
       case 'rel':
         $contactIdField = $query['casContactIdField'];
-        $entityName = $this->mapping->getEntity();
+        $entityName = $this->mapping->getEntityTable();
         $entityIdField = $query['casEntityIdField'];
         break;
 

@@ -11,39 +11,58 @@
 
 
 /**
- * Class CRM_Contact_ActionMapping
- *
  * This defines the scheduled-reminder functionality for contact
  * entities. It is useful for, e.g., sending a reminder based on
  * birth date, modification date, or other custom dates on
  * the contact record.
  */
-class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
+class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
 
   /**
-   * The value for civicrm_action_schedule.mapping_id which identifies the
-   * "Contact" mapping.
-   *
-   * Note: This value is chosen to match legacy DB IDs.
+   * Note: This value is an integer for legacy reasons; but going forward any new
+   * action mapping classes should return a string from `getId` instead of using a constant.
    */
   const CONTACT_MAPPING_ID = 6;
 
-  /**
-   * Register Contact-related action mappings.
-   *
-   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
-   */
-  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(CRM_Contact_ActionMapping::create([
-      'id' => CRM_Contact_ActionMapping::CONTACT_MAPPING_ID,
-      'entity' => 'civicrm_contact',
-      'entity_label' => ts('Contact'),
-      'entity_value' => 'civicrm_contact',
-      'entity_value_label' => ts('Date Field'),
-      'entity_status' => 'contact_date_reminder_options',
-      'entity_status_label' => ts('Annual Options'),
-      'entity_date_start' => 'date_field',
-    ]));
+  public function getId() {
+    return self::CONTACT_MAPPING_ID;
+  }
+
+  public function getEntityName(): string {
+    return 'Contact';
+  }
+
+  public function getValueHeader(): string {
+    return ts('Date Field');
+  }
+
+  public function getValueLabels(): array {
+    $allCustomFields = \CRM_Core_BAO_CustomField::getFields('');
+    $dateFields = [
+      'birth_date' => ts('Birth Date'),
+      'created_date' => ts('Created Date'),
+      'modified_date' => ts('Modified Date'),
+    ];
+    foreach ($allCustomFields as $fieldID => $field) {
+      if ($field['data_type'] == 'Date') {
+        $dateFields["custom_$fieldID"] = $field['label'];
+      }
+    }
+    return $dateFields;
+  }
+
+  public function getStatusHeader(): string {
+    return ts('Annual Options');
+  }
+
+  public function getStatusLabels($value): array {
+    return CRM_Core_OptionGroup::values('contact_date_reminder_options');
+  }
+
+  public function getDateFields(): array {
+    return [
+      'date_field' => ts('Date Field'),
+    ];
   }
 
   private $contactDateFields = [
@@ -61,7 +80,7 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
    *   Array (string $code => string $message).
    *   List of error messages.
    */
-  public function validateSchedule($schedule) {
+  public function validateSchedule($schedule): array {
     $errors = [];
     if (CRM_Utils_System::isNull($schedule->entity_value) || $schedule->entity_value === '0') {
       $errors['entity'] = ts('Please select a specific date field.');
@@ -90,7 +109,7 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @throws \CRM_Core_Exception
    * @see RecipientBuilder
    */
-  public function createQuery($schedule, $phase, $defaultParams) {
+  public function createQuery($schedule, $phase, $defaultParams): CRM_Utils_SQL_Select {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
@@ -101,7 +120,7 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
     }
     elseif (in_array($selectedValues[0], $this->contactDateFields)) {
       $dateDBField = $selectedValues[0];
-      $query = \CRM_Utils_SQL_Select::from("{$this->entity} e")->param($defaultParams);
+      $query = \CRM_Utils_SQL_Select::from("{$this->getEntityTable()} e")->param($defaultParams);
       $query->param([
         'casAddlCheckFrom' => 'civicrm_contact e',
         'casContactIdField' => 'e.id',
@@ -137,14 +156,6 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
     }
 
     return $query;
-  }
-
-  /**
-   * Determine whether a schedule based on this mapping should
-   * send to additional contacts.
-   */
-  public function sendToAdditional($entityId): bool {
-    return TRUE;
   }
 
 }
