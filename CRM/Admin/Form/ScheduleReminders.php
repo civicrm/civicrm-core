@@ -78,15 +78,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
     if ($isEvent) {
       $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->getComponentID(), 'is_template');
-      $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
-        'id' => $isTemplate ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
-      ]));
-      if ($mapping) {
-        $this->_mappingID = $mapping->getId();
-      }
-      else {
-        throw new CRM_Core_Exception('Could not find mapping for event scheduled reminders.');
-      }
+      $this->_mappingID = $isTemplate ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID;
     }
 
     if (!empty($_POST) && !empty($_POST['entity']) && empty($this->getContext())) {
@@ -221,12 +213,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('datepicker', 'effective_end_date', ts('Effective end date'), [], FALSE);
 
     $recipientListingOptions = [];
-
-    if ($mappingID) {
-      $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
-        'id' => $mappingID,
-      ]));
-    }
 
     $limitOptions = ['' => '-neither-', 1 => ts('Limit to'), 0 => ts('Also include')];
 
