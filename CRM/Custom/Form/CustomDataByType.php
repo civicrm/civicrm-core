@@ -53,16 +53,6 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     if (array_key_exists($this->_type, $contactTypes)) {
       $this->assign('contactId', $this->_entityId);
     }
-    $singleRecord = NULL;
-    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = $form->_groupCount;
-    }
-    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
-    // when a new record is being added for multivalued custom fields.
-    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
-      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = 'new';
-    }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree(CRM_Utils_Request::retrieve('type', 'String'),
       NULL,
@@ -74,7 +64,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
       $onlySubType,
       FALSE,
       CRM_Core_Permission::EDIT,
-      $singleRecord
+      NULL
     );
 
     // we should use simplified formatted groupTree
