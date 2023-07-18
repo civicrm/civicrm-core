@@ -12,7 +12,7 @@ UPDATE civicrm_group SET `name` = `id` WHERE name IS NULL;
 
       UPDATE `civicrm_group`
       SET `frontend_description_{$locale}` = `description`
-      WHERE `frontend_description_{$locale}` IS NULL OR `frontend_description_{$locale}` = '' AND `description` <> '';
+      WHERE (`frontend_description_{$locale}` IS NULL OR `frontend_description_{$locale}` = '') AND `description` <> '';
     {/foreach}
 {else}
   UPDATE `civicrm_group`
@@ -21,11 +21,13 @@ UPDATE civicrm_group SET `name` = `id` WHERE name IS NULL;
 
   UPDATE `civicrm_group`
   SET `frontend_description` = `description`
-  WHERE `frontend_description` IS NULL OR `frontend_description` = '' AND description <> '';
+  WHERE (`frontend_description` IS NULL OR `frontend_description` = '') AND description <> '';
 {/if}
 
+{literal}
 UPDATE civicrm_mailing_component
 SET body_html = REPLACE(body_html, '{welcome.group}', '{group.frontend_title}'),
 body_text = REPLACE(body_text, '{welcome.group}', '{group.frontend_title}'),
 subject = REPLACE(subject, '{welcome.group}', '{group.frontend_title}')
 WHERE component_type = 'Welcome';
+{/literal}
