@@ -27,6 +27,8 @@ UPDATE `civicrm_job` SET `api_entity` = CONCAT(UPPER(SUBSTRING(`api_entity`, 1 ,
   WHERE (`frontend_description` IS NULL OR `frontend_description` = '') AND description <> '';
 {/if}
 
+UPDATE `civicrm_action_schedule` SET `limit_to` = 2 WHERE `limit_to` = 0;
+
 {literal}
 UPDATE civicrm_mailing_component
 SET body_html = REPLACE(body_html, '{welcome.group}', '{group.frontend_title}'),

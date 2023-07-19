@@ -218,7 +218,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $recipientListingOptions = [];
 
-    $limitOptions = ['' => '-neither-', 1 => ts('Limit to'), 0 => ts('Also include')];
+    $limitOptions = ['' => ts('Neither')] + CRM_Core_BAO_ActionSchedule::buildOptions('limit_to');
 
     $recipientLabels = ['activity' => ts('Recipients'), 'other' => ts('Limit or Add Recipients')];
     $this->assign('recipientLabels', $recipientLabels);
@@ -351,7 +351,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         'target_id' => 'recipient_manual_id',
       ],
     ];
-    if ($fields['limit_to'] != '' && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
+    if ($fields['limit_to'] && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
       $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify at least one %1', [1 => $recipientKind[$fields['recipient']]['name']]);
     }
 
@@ -537,7 +537,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['group_id'] = $values['group_id'];
       $params['recipient_manual'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
-    elseif (isset($values['recipient_listing']) && isset($values['limit_to']) && !CRM_Utils_System::isNull($values['recipient_listing']) && !CRM_Utils_System::isNull($values['limit_to'])) {
+    elseif (isset($values['recipient_listing']) && !empty($values['limit_to']) && !CRM_Utils_System::isNull($values['recipient_listing'])) {
       $params['recipient'] = $values['recipient'] ?? NULL;
       $params['recipient_listing'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         CRM_Utils_Array::value('recipient_listing', $values)

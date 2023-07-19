@@ -460,13 +460,13 @@ FROM civicrm_action_schedule cas
       ->where("reminder.action_date_time IS NULL")
       ->param([
         'casActionScheduleId' => $actionSchedule->id,
-        'casMailingJoinType' => ($actionSchedule->limit_to == 0) ? 'LEFT JOIN' : 'INNER JOIN',
+        'casMailingJoinType' => ($actionSchedule->limit_to == 2) ? 'LEFT JOIN' : 'INNER JOIN',
         'casMappingId' => $mapping->getId(),
         'casMappingEntity' => $mapping->getEntityTable(),
         'casEntityJoinExpr' => 'e.id = IF(reminder.entity_table = "civicrm_contact", reminder.contact_id, reminder.entity_id)',
       ]);
 
-    if ($actionSchedule->limit_to == 0) {
+    if ($actionSchedule->limit_to == 2) {
       $select->where("e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact'");
     }
 

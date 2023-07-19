@@ -134,7 +134,7 @@ class CRM_Core_Form_RecurringEntity {
         $defaults['ends'] = 2;
       }
       $defaults['limit_to'] = self::$_scheduleReminderDetails->limit_to;
-      if (self::$_scheduleReminderDetails->limit_to) {
+      if (self::$_scheduleReminderDetails->limit_to == 1) {
         $defaults['repeats_by'] = 1;
       }
       if (self::$_scheduleReminderDetails->entity_status) {

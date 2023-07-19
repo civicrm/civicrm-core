@@ -34,6 +34,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFive extends CRM_Upgrade_Incremental_
     $this->addTask('Make Group.title required', 'alterColumn', 'civicrm_group', 'title', "varchar(255) NOT NULL COMMENT 'Alternative public title for this Group.'", TRUE);
     $this->addTask('Make Group.frontend_title required', 'alterColumn', 'civicrm_group', 'frontend_title', "varchar(255) NOT NULL COMMENT 'Alternative public description of the group.'", TRUE);
 
+    $this->addTask('Update ActionSchedule.limit_to column', 'alterColumn', 'civicrm_action_schedule', 'limit_to', "int COMMENT 'Is this the recipient criteria limited to OR in addition to?'");
   }
 
 }

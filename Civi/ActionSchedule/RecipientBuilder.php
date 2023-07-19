@@ -280,10 +280,9 @@ class RecipientBuilder {
       'casNow' => $this->now,
     ];
 
-    /** @var \CRM_Utils_SQL_Select $query */
     $query = $this->mapping->createQuery($this->actionSchedule, $phase, $defaultParams);
 
-    if ($this->actionSchedule->limit_to /*1*/) {
+    if ($this->actionSchedule->limit_to == 1) {
       $query->merge($this->prepareContactFilter($query['casContactIdField']));
     }
 
@@ -468,7 +467,7 @@ WHERE      $group.id = {$groupId}
    */
   protected function prepareAddlFilter($contactIdField) {
     $contactAddlFilter = NULL;
-    if ($this->actionSchedule->limit_to !== NULL && !$this->actionSchedule->limit_to /*0*/) {
+    if ($this->actionSchedule->limit_to == 2) {
       $contactAddlFilter = $this->prepareContactFilter($contactIdField);
     }
     return $contactAddlFilter;
