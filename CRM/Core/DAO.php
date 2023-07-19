@@ -3315,7 +3315,8 @@ SELECT contact_id
       // No unique index on "name", do nothing
       return;
     }
-    $label = $this->label ?? $this->title ?? NULL;
+    $labelField = $this::$_labelField;
+    $label = $this->$labelField ?? NULL;
     if (!$label && $label !== '0') {
       // No label supplied, do nothing
       return;

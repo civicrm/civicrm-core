@@ -31,3 +31,13 @@ body_text = REPLACE(body_text, '{welcome.group}', '{group.frontend_title}'),
 subject = REPLACE(subject, '{welcome.group}', '{group.frontend_title}')
 WHERE component_type = 'Welcome';
 {/literal}
+
+UPDATE `civicrm_location_type` SET `is_active` = 0 WHERE `is_active` IS NULL;
+UPDATE `civicrm_location_type` SET `name` = CONCAT('location_', id) WHERE `name` IS NULL;
+UPDATE `civicrm_location_type` SET `display_name` = `name` WHERE `display_name` IS NULL;
+ALTER TABLE `civicrm_location_type`
+  MODIFY COLUMN `name` varchar(64) NOT NULL COMMENT 'Location Type Name.',
+  MODIFY COLUMN `display_name` varchar(64) NOT NULL COMMENT 'Location Type Display Name.',
+  MODIFY COLUMN `is_reserved` tinyint NOT NULL DEFAULT 0 COMMENT 'Is this location type a predefined system location?',
+  MODIFY COLUMN `is_active` tinyint NOT NULL DEFAULT 1 COMMENT 'Is this property active?',
+  MODIFY COLUMN `is_default` tinyint NOT NULL DEFAULT 0 COMMENT 'Is this location type the default?';
