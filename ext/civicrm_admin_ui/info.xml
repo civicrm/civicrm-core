@@ -16,7 +16,7 @@
   </urls>
   <releaseDate>2022-01-02</releaseDate>
   <version>5.65.alpha1</version>
-  <develStage>alpha</develStage>
+  <develStage>beta</develStage>
   <compatibility>
     <ver>5.65</ver>
   </compatibility>
