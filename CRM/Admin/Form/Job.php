@@ -195,11 +195,9 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $defaults['scheduled_run_date'] = date("Y-m-d H:i:s", $ts);
     }
 
-    // CRM-10708
-    // job entity thats shipped with core is all lower case.
-    // this makes sure camel casing is followed for proper working of default population.
+    // Legacy data might use lowercase api entity name, but it should always be CamelCase
     if (!empty($defaults['api_entity'])) {
-      $defaults['api_entity'] = ucfirst($defaults['api_entity']);
+      $defaults['api_entity'] = CRM_Utils_String::convertStringToCamel($defaults['api_entity']);
     }
 
     return $defaults;

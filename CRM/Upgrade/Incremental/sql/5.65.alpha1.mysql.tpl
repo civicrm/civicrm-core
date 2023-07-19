@@ -3,6 +3,9 @@
 -- Ensure new name field is not null/unique. Setting to ID is a bit lazy - but it works.
 UPDATE civicrm_group SET `name` = `id` WHERE name IS NULL;
 
+-- Ensure API entity names always start with uppercase
+UPDATE `civicrm_job` SET `api_entity` = CONCAT(UPPER(SUBSTRING(`api_entity`, 1 ,1)), SUBSTRING(`api_entity`, 2));
+
 -- Add name field, make frontend_title required (in conjunction with php function)
 {if $multilingual}
     {foreach from=$locales item=locale}
