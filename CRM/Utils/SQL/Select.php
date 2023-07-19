@@ -10,7 +10,10 @@
  */
 
 /**
- * Dear God Why Do I Have To Write This (Dumb SQL Builder)
+ * Object-oriented SQL builder for SELECT queries.
+ *
+ * This class is foundational to CiviCRM's query functionality for the API,
+ * SearchKit, ScheduledReminders, MailingRecipients, etc.
  *
  * Usage:
  * ```
