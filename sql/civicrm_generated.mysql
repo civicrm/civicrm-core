@@ -4274,10 +4274,10 @@ LOCK TABLES `civicrm_location_type` WRITE;
 /*!40000 ALTER TABLE `civicrm_location_type` DISABLE KEYS */;
 INSERT INTO `civicrm_location_type` (`id`, `name`, `display_name`, `vcard_name`, `description`, `is_reserved`, `is_active`, `is_default`) VALUES
  (1,'Home','Home','HOME','Place of residence',0,1,1),
- (2,'Work','Work','WORK','Work location',0,1,NULL),
- (3,'Main','Main',NULL,'Main office location',0,1,NULL),
- (4,'Other','Other',NULL,'Other location',0,1,NULL),
- (5,'Billing','Billing',NULL,'Billing Address location',1,1,NULL);
+ (2,'Work','Work','WORK','Work location',0,1,0),
+ (3,'Main','Main',NULL,'Main office location',0,1,0),
+ (4,'Other','Other',NULL,'Other location',0,1,0),
+ (5,'Billing','Billing',NULL,'Billing Address location',1,1,0);
 /*!40000 ALTER TABLE `civicrm_location_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
