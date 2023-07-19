@@ -16,11 +16,12 @@
  */
 
 use Civi\ActionSchedule\Event\MappingRegisterEvent;
+use Civi\Core\HookInterface;
 
 /**
  * This class contains functions for managing Scheduled Reminders
  */
-class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
+class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements HookInterface {
 
   /**
    * @param array $filters
@@ -167,6 +168,19 @@ FROM civicrm_action_schedule cas
   public static function add(array $params): CRM_Core_DAO_ActionSchedule {
     CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
+  }
+
+  /**
+   * @param \Civi\Core\Event\PreEvent $event
+   * @implements hook_civicrm_pre
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (in_array($event->action, ['create', 'edit'])) {
+      if (isset($event->params['limit_to']) && in_array($event->params['limit_to'], [0, '0', FALSE], TRUE)) {
+        CRM_Core_Error::deprecatedWarning('Deprecated value "0" is no longer a valid option for ActionSchedule.limit_to; changed to "2".');
+        $event->params['limit_to'] = 2;
+      }
+    }
   }
 
   /**

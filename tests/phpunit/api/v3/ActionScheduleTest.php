@@ -32,8 +32,7 @@
  * @group headless
  */
 class api_v3_ActionScheduleTest extends CiviUnitTestCase {
-  protected $_params;
-  protected $_params2;
+
   protected $_entity = 'action_schedule';
 
   /**
@@ -127,7 +126,21 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertEquals($actionSchedule['values'][$actionSchedule['id']]['start_action_offset'], $params['start_action_offset']);
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
     $this->assertEquals($oldCount + 1, $newCount);
+  }
 
+  public function testDeprecatedLimitToValue(): void {
+    $params = [
+      'title' => 'Hello',
+      'limit_to' => 0,
+      'entity_value' => 'Meeting',
+      'entity_status' => 'Scheduled',
+      'mapping_id' => CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID,
+      'start_action_date' => 'activity_date_time',
+      'body_html' => 'Test description',
+      'subject' => 'Test subject',
+    ];
+    $actionSchedule = $this->callAPIFailure('action_schedule', 'create', $params);
+    $this->assertStringContainsString('ActionSchedule.limit_to', $actionSchedule['error_message']);
   }
 
 }
