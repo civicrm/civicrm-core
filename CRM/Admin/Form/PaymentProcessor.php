@@ -248,10 +248,6 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $errors['_qf_default'] = ts('You must have at least the test or live section filled');
     }
 
-    if (!empty($errors)) {
-      return $errors;
-    }
-
     return empty($errors) ? TRUE : $errors;
   }
 

@@ -117,4 +117,25 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
     return $copy;
   }
 
+  /**
+   * Parse multi-line `$parameters` string into an array
+   *
+   * @param string|null $parameters
+   * @return array
+   * @throws CRM_Core_Exception
+   */
+  public static function parseParameters(?string $parameters): array {
+    $result = ['version' => 3];
+    $lines = $parameters ? explode("\n", $parameters) : [];
+
+    foreach ($lines as $line) {
+      $pair = explode("=", $line);
+      if ($pair === FALSE || count($pair) !== 2 || !trim($pair[0]) || trim($pair[1]) === '') {
+        throw new CRM_Core_Exception('Malformed API parameters in scheduled job');
+      }
+      $result[trim($pair[0])] = trim($pair[1]);
+    }
+    return $result;
+  }
+
 }
