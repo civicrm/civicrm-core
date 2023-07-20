@@ -9,7 +9,7 @@
     <email>aidan.saunders@squiffle.uk</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">https://lab.civicrm.org/dev/core/-/issues/3912</url>
+    <url desc="Main Extension Page">https://github.com/civicrm/civicrm-core/tree/master/ext/civicrm_search_ui</url>
     <url desc="Documentation">https://lab.civicrm.org/dev/core/-/issues/3912</url>
     <url desc="Support">https://lab.civicrm.org/dev/core/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
