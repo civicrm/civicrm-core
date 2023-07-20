@@ -36,3 +36,9 @@ body_text = REPLACE(body_text, '{welcome.group}', '{group.frontend_title}'),
 subject = REPLACE(subject, '{welcome.group}', '{group.frontend_title}')
 WHERE component_type = 'Welcome';
 {/literal}
+
+UPDATE `civicrm_location_type` SET `is_reserved` = 0 WHERE `is_reserved` IS NULL;
+UPDATE `civicrm_location_type` SET `is_active` = 0 WHERE `is_active` IS NULL;
+UPDATE `civicrm_location_type` SET `is_default` = 0 WHERE `is_default` IS NULL;
+UPDATE `civicrm_location_type` SET `name` = CONCAT('location_', id) WHERE `name` IS NULL;
+UPDATE `civicrm_location_type` SET {localize field=display_name}`display_name` = COALESCE(`display_name`, `name`){/localize};

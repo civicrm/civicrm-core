@@ -30,7 +30,7 @@ class CRM_Core_I18n_SchemaStructure {
     if (!$result) {
       $result = [
         'civicrm_location_type' => [
-          'display_name' => "varchar(64) COMMENT 'Location Type Display Name.'",
+          'display_name' => "varchar(64) NOT NULL COMMENT 'Location Type Display Name.'",
         ],
         'civicrm_option_group' => [
           'title' => "varchar(255) COMMENT 'Option Group title.'",
@@ -266,6 +266,7 @@ class CRM_Core_I18n_SchemaStructure {
         'civicrm_location_type' => [
           'display_name' => [
             'type' => "Text",
+            'required' => "true",
           ],
         ],
         'civicrm_option_group' => [

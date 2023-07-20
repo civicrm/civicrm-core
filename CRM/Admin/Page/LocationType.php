@@ -76,7 +76,7 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
     foreach ($rows as &$row) {
       // prevent smarty notices.
       foreach (['is_default', 'class', 'vcard_name'] as $expectedField) {
-        if (!isset($row['is_default'])) {
+        if (!isset($row[$expectedField])) {
           $row[$expectedField] = NULL;
         }
       }

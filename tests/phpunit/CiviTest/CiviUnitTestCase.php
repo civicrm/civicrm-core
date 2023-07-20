@@ -1117,16 +1117,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   public function locationTypeCreate(array $params = []): int {
     $params = array_merge([
       'name' => 'New Location Type',
+      'display_name' => 'New Location Type',
       'vcard_name' => 'New Location Type',
       'description' => 'Location Type for Delete',
       'is_active' => 1,
     ], $params);
 
-    $locationType = new CRM_Core_DAO_LocationType();
-    $locationType->copyValues($params);
-    $locationType->save();
-    // clear getfields cache
-    CRM_Core_PseudoConstant::flush();
+    $locationType = CRM_Core_BAO_LocationType::writeRecord($params);
     $this->callAPISuccess('Phone', 'getfields', ['version' => 3, 'cache_clear' => 1]);
     return $locationType->id;
   }
