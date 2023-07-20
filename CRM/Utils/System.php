@@ -278,7 +278,7 @@ class CRM_Utils_System {
     }
 
     $config = CRM_Core_Config::singleton();
-    $url = $config->userSystem->url($path, $query, $absolute, $fragment, $frontend, $forceBackend, $htmlize);
+    $url = $config->userSystem->url($path, $query, $absolute, $fragment, $frontend, $forceBackend);
 
     if ($htmlize) {
       $url = htmlentities($url);
@@ -301,7 +301,7 @@ class CRM_Utils_System {
    * @param string $fragment
    *   A fragment identifier (named anchor) to append to the link.
    * @param bool $htmlize
-   *   Whether to encode special html characters such as &.
+   *   Unused param
    * @param bool $frontend
    *   This link should be to the CMS front end (applies to WP & Joomla).
    * @param bool $forceBackend
@@ -315,13 +315,13 @@ class CRM_Utils_System {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
+    $htmlize = NULL,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
     $query = self::makeQueryString($query);
-    return $config->userSystem->getNotifyUrl($path, $query, $absolute, $fragment, $frontend, $forceBackend, $htmlize);
+    return $config->userSystem->getNotifyUrl($path, $query, $absolute, $fragment, $frontend, $forceBackend);
   }
 
   /**
