@@ -34,7 +34,7 @@
     </div>
   {/if}
   <div class="action-link">
-    {assign var='link' value="civicrm/admin/scheduleReminders"}
+    {assign var='link' value="civicrm/admin/scheduleReminders/edit"}
     {if !empty($component)}
       {assign var='urlParams' value="action=add&context=$component&compId=$id&reset=1"}
     {else}

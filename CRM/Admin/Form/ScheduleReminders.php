@@ -22,12 +22,6 @@ use Civi\Token\TokenProcessor;
  */
 class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
-  /**
-   * Scheduled Reminder ID.
-   * @var int
-   */
-  public $_id;
-
   protected $_compId;
 
   /**
@@ -52,6 +46,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    */
   public function setComponentID($compId): void {
     $this->_compId = $compId;
+  }
+
+  /**
+   * @return string
+   */
+  public function getDefaultEntity(): string {
+    return 'ActionSchedule';
   }
 
   /**
@@ -371,7 +372,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   }
 
   /**
-   * @return int
+   * @return array
    */
   public function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {

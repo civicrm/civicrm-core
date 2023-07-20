@@ -300,6 +300,13 @@
      <weight>40</weight>
   </item>
   <item>
+     <path>civicrm/admin/scheduleReminders/edit</path>
+     <title>Schedule Reminders</title>
+     <page_callback>CRM_Admin_Form_ScheduleReminders</page_callback>
+     <access_callback>1</access_callback>
+     <access_arguments>administer CiviCRM data;edit all events</access_arguments>
+  </item>
+  <item>
      <path>civicrm/admin/weight</path>
      <page_callback>CRM_Utils_Weight::fixOrder</page_callback>
   </item>

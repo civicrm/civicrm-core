@@ -6,6 +6,12 @@
   <name>civicrm_action_schedule</name>
   <comment>Table to store the reminders.</comment>
   <add>3.4</add>
+  <labelField>title</labelField>
+  <paths>
+    <add>civicrm/admin/scheduleReminders/edit?reset=1&amp;action=add</add>
+    <update>civicrm/admin/scheduleReminders/edit?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/admin/scheduleReminders/edit?reset=1&amp;action=delete&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Action Schedule ID</title>
