@@ -320,8 +320,8 @@
   </item>
   <item>
      <path>civicrm/admin/labelFormats</path>
-     <title>Label Formats</title>
-     <desc>Configure Label Formats that are used when creating mailing labels.</desc>
+     <title>Label Page Formats</title>
+     <desc>Configure label sizes and page layouts that are used when printing mailing labels.</desc>
      <page_callback>CRM_Admin_Page_LabelFormats</page_callback>
      <adminGroup>Communications</adminGroup>
      <weight>60</weight>
