@@ -94,7 +94,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    */
   public function preProcess() {
     parent::preProcess();
-    CRM_Core_Session::singleton()->pushUserContext('civicrm/admin/paymentProcessor?reset=1');
+    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/paymentProcessor', ['reset' => 1], FALSE, NULL, FALSE));
 
     $this->setPaymentProcessorTypeID();
     $this->setPaymentProcessor();
