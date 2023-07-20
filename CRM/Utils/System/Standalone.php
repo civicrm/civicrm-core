@@ -187,8 +187,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE,
-    $htmlize = TRUE
+    $forceBackend = FALSE
   ) {
     $fragment = $fragment ? ('#' . $fragment) : '';
     if ($absolute) {
