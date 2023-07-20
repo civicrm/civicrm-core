@@ -13,7 +13,6 @@
   {ts}Then select and review the premiums that you want to offer on this contribution page.{/ts}
 </div>
 <div id="id_Premiums" class="crm-block crm-form-block crm-contribution-contributionpage-premium-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
     <tr class="crm-contribution-contributionpage-premium-form-block-premiums_active">
       <td class="label">{$form.premiums_active.label}</td>

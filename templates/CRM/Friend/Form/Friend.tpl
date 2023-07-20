@@ -24,7 +24,6 @@
   {/if}
   {ts}If sharing through social media is enabled, links allowing people to share with their social network will also be included on the Tell a Friend form (e.g. Facebook "Like" and Twitter). You can turn social media sharing on and off from the Settings tab.{/ts}
 </div>
-   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
         <tr class="crm-friend-manage-form-block-tf_is_active">
            <td class="label"">{$form.tf_is_active.html}</td>

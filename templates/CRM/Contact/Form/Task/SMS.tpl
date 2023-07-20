@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-contactSMS-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 {if $suppressedSms > 0}
     <div class="status">
         <p>{ts count=$suppressedSms plural='SMS will NOT be sent to %count contacts - (no phone number on file, or communication preferences specify DO NOT SMS, or contact is deceased).'}SMS will NOT be sent to %count contact - (no phone number on file, or communication preferences specify DO NOT SMS, or contact is deceased).{/ts}</p>

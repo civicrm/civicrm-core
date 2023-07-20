@@ -8,8 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-miscellaneous-form-block">
-   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
     <table class="form-layout">
       <tr class="crm-miscellaneous-form-block-checksum_timeout">
         <td class="label">{$form.checksum_timeout.label}</td>
@@ -17,7 +15,6 @@
             <span class="description">{ts}The number of days before a personalized (hashed) link will expire.{/ts}</span></td>
       </tr>
     </table>
-
     <table class="form-layout">
       <tr class="crm-miscellaneous-form-block-contact_undelete">
         <td class="label">{$form.contact_undelete.label}</td>

@@ -9,11 +9,10 @@
 *}
 {* Configure Membership signup/renewal block for an Online Contribution page *}
 <div id="form" class="crm-block crm-form-block crm-member-membershipblock-form-block">
-<div class="help">
+  <div class="help">
     {ts}Use this form to enable and configure a Membership Signup and Renewal section for this Online Contribution Page. If you're not using this page for membership signup, leave the <strong>Enabled</strong> box un-checked..{/ts} {docURL page="user/membership/online-membership-sign-up/"}
-</div>
+  </div>
   {if !empty($form.membership_type.html)}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
         <tr class="crm-member-membershipblock-form-block-member_is_active">
             <td class="label"></td><td class="html-adjust">{$form.member_is_active.html}&nbsp;{$form.member_is_active.label}</td>
@@ -101,7 +100,7 @@
          {ts 1=$linkURL}You need to have at least one <a href="%1">Membership Type</a> with 'Public' visibility in order to enable self-service Membership Signup and Renewal.{/ts}
       </div>
   {/if}
-      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
 {literal}

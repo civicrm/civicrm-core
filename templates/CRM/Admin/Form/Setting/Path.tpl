@@ -17,7 +17,6 @@
     </p>
 </div>
 <div class="crm-block crm-form-block crm-path-form-block">
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
            <table class="form-layout">
             <tr class="crm-path-form-block-uploadDir">
                 <td class="label">{$form.uploadDir.label}</td>

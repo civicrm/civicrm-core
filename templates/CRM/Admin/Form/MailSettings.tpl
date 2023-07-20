@@ -9,13 +9,12 @@
 *}
 {* this template is used for adding/editing email settings.  *}
 <div class="crm-block crm-form-block crm-mail-settings-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
       {ts}WARNING: Deleting this option will result in the loss of mail settings data.{/ts} {ts}Do you want to continue?{/ts}
     </div>
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {else}
     <table class="form-layout-compressed">
 

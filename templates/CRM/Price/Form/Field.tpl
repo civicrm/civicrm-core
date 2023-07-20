@@ -79,7 +79,6 @@
 </script>
 {/literal}
 <div class="crm-block crm-form-block crm-price-field-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout">
     <tr class="crm-price-field-form-block-label">
       <td class="label">{$form.label.label}</td>

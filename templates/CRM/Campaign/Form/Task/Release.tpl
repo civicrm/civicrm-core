@@ -7,21 +7,12 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<h3>
-{ts}Release Respondents{/ts}
-</h3>
+<h3>{ts}Release Respondents{/ts}</h3>
 <div class="crm-form-block crm-block crm-campaign-task-release-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-<table class="form-layout-compressed">
-  <tr class="crm-campaign-task-release-form-block-surveytitle">
-    <td colspan=2>
-      <div class="status">
-        {icon icon="fa-info-circle"}{/icon}{ts 1=$surveyTitle}Do you want to release respondents for '%1' ?{/ts}
-      </div>
-    </td>
-  </tr>
-
-    <tr><td colspan=2>{include file="CRM/Contact/Form/Task.tpl"}</td></tr>
-</table>
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  <div class="messages status no-popup">
+    {icon icon="fa-info-circle"}{/icon}
+    {ts 1=$surveyTitle}Do you want to release respondents for '%1' ?{/ts}
+  </div>
+  {include file="CRM/Contact/Form/Task.tpl"}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

@@ -49,7 +49,6 @@
           {$form.delete_participant.html}
         {/if}
         {else} {* If action is other than Delete *}
-        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
           {if $context EQ 'standalone' OR $context EQ 'participant' OR $action EQ 2}
             <tr class="crm-participant-form-contact-id">

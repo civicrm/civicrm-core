@@ -9,17 +9,15 @@
 *}
 {* This template is used for adding/configuring SMS Providers  *}
 <div class="crm-block crm-form-block crm-job-form-block">
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
 {if $action eq 8}
   <div class="messages status no-popup">
-      {icon icon="fa-info-circle"}{/icon}
-        {ts}Do you want to continue?{/ts}
+    {icon icon="fa-info-circle"}{/icon}
+    {ts}Do you want to continue?{/ts}
   </div>
 {elseif $action eq 128}
   <div class="messages status no-popup">
-      {icon icon="fa-info-circle"}{/icon}
-        {ts}Are you sure you would like to execute this job?{/ts}
+    {icon icon="fa-info-circle"}{/icon}
+    {ts}Are you sure you would like to execute this job?{/ts}
   </div>
 {else}
   <table class="form-layout-compressed">
@@ -53,7 +51,7 @@
   </table>
 {/if}
 </table>
-       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </fieldset>
 </div>
 

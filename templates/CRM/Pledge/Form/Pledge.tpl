@@ -26,7 +26,6 @@
     {/if}
 {/if}
 <div class="crm-block crm-form-block crm-pledge-form-block">
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    {if $action eq 8}
     <div class="messages status no-popup">
     {icon icon="fa-info-circle"}{/icon}

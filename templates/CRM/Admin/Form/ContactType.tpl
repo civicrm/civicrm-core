@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing Contact Type  *}
-
 <div class="crm-block crm-form-block crm-contact-type-form-block">
 {if $action eq 8}
   <div class="messages status no-popup">
@@ -16,7 +15,6 @@
         {ts}WARNING: {ts}This action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}{/ts}
     </div>
 {else}
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
  <table class="form-layout-compressed">
    <tr class="crm-contact-type-form-block-label">
       <td class="label">{$form.label.label}
@@ -24,7 +22,6 @@
         {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contact_type' field='label' id= $cid }
       {/if}
       </td>
-
       <td>{$form.label.html}</td>
    </tr>
    <tr class="crm-contact-type-form-block-parent_id">
@@ -54,7 +51,6 @@
        {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contact_type' field='description' id= $cid}
      {/if}
      </td>
-
      <td>{$form.description.html}</td>
    </tr>
    <tr class="crm-contact-type-form-block-is_active">

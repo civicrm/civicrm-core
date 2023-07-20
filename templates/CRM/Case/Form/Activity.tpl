@@ -10,12 +10,6 @@
 
 {* this template is used for adding/editing activities for a case. *}
 <div class="crm-block crm-form-block crm-case-activity-form-block">
-
-  {if $action neq 8 and $action  neq 32768 }
-  {* Include form buttons on top for new and edit modes. *}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-  {/if}
-
   {if $action eq 8 or $action eq 32768 }
   <div class="messages status no-popup">
     <i class="crm-i fa-info-circle" aria-hidden="true"></i> &nbsp;

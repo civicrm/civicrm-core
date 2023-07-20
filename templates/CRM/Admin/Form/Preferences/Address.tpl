@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-preferences-address-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <h3>{ts}Mailing Labels{/ts}</h3>
         <table class="form-layout">
         <tr class="crm-preferences-address-form-block-mailing_format">

@@ -7,11 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 <table class="form-layout">
-  <tr  class="crm-contribution-contributionpage-pcp-form-block-pcp_active">
-      <td class="label">&nbsp;</td>
-      <td>{$form.pcp_active.html} {$form.pcp_active.label}</td>
+  <tr class="crm-contribution-contributionpage-pcp-form-block-pcp_active">
+    <td class="label">&nbsp;</td>
+    <td>{$form.pcp_active.html} {$form.pcp_active.label}</td>
   </tr>
 </table>
 

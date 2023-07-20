@@ -12,10 +12,9 @@
 {if $action eq 8}
   <div class="messages status no-popup">
     {icon icon="fa-info-circle"}{/icon}
-        {ts}WARNING: Delete will remove this permission from the specified ACL Role.{/ts} {ts}Do you want to continue?{/ts}
+    {ts}WARNING: Delete will remove this permission from the specified ACL Role.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {else}
-   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    <table class="form-layout-compressed">
      <tr class="crm-acl-form-block-name">
         <td class="label">{$form.name.label}</td>
