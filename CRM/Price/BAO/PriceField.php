@@ -445,11 +445,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         break;
 
       case 'Select':
-        $selectOption = $allowedOptions = [];
+        $selectOption = $allowedOptions = $priceVal = [];
 
         foreach ($customOption as $opt) {
           $priceOptionText = self::buildPriceOptionText($opt, $field->is_display_amounts, $valueFieldName);
           $priceOptionText['label'] = strip_tags($priceOptionText['label']);
+          $priceVal[$opt['id']] = $priceOptionText['priceVal'];
 
           if (!in_array($opt['id'], $freezeOptions)) {
             $allowedOptions[] = $opt['id'];
@@ -484,7 +485,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         $element = &$qf->add('select', $elementName, $label, $selectOption, $useRequired && $field->is_required, [
           'placeholder' => ts('- select %1 -', [1 => $label]),
-          'price' => json_encode($priceOptionText['priceVal']),
+          'price' => json_encode($priceVal),
           'class' => 'crm-select2' . $class,
           'data-price-field-values' => json_encode($customOption),
         ]);
