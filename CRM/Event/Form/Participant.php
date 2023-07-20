@@ -2192,7 +2192,10 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         $eventAmount = [];
         $totalTaxAmount = 0;
 
-        //add dataArray in the receipts in ADD and UPDATE condition
+        // add dataArray in the receipts in ADD and UPDATE condition
+        // dataArray contains the total tax amount for each tax rate, in the form [tax rate => total tax amount]
+        // include 0% tax rate if it exists because if $dataArray controls if tax is shown for each line item
+        // in the message templates and we want to show 0% tax if set, even if there is no total tax
         $dataArray = [];
         if ($this->_action & CRM_Core_Action::ADD) {
           $line = $lineItem ?? [];
@@ -2202,13 +2205,13 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         }
         if (Civi::settings()->get('invoicing')) {
           foreach ($line as $key => $value) {
-            if (isset($value['tax_amount'])) {
+            if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
               $totalTaxAmount += $value['tax_amount'];
               if (isset($dataArray[(string) $value['tax_rate']])) {
-                $dataArray[(string) $value['tax_rate']] = $dataArray[(string) $value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+                $dataArray[(string) $value['tax_rate']] += $value['tax_amount'];
               }
               else {
-                $dataArray[(string) $value['tax_rate']] = $value['tax_amount'] ?? NULL;
+                $dataArray[(string) $value['tax_rate']] = $value['tax_amount'];
               }
             }
           }
