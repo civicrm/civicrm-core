@@ -69,6 +69,10 @@ class CRM_Admin_Form extends CRM_Core_Form {
       $this->_BAOName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getFullName($this->getDefaultEntity()));
     }
     $this->retrieveValues();
+    // Once form is submitted, user should be redirected back to the "browse" page.
+    if (isset($this->_BAOName::getEntityPaths()['browse'])) {
+      $this->pushUrlToUserContext($this->_BAOName::getEntityPaths()['browse']);
+    }
   }
 
   /**
