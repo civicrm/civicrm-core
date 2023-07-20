@@ -16,11 +16,12 @@
  */
 
 use Civi\ActionSchedule\Event\MappingRegisterEvent;
+use Civi\Core\HookInterface;
 
 /**
  * This class contains functions for managing Scheduled Reminders
  */
-class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
+class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements HookInterface {
 
   /**
    * @param array $filters
@@ -167,6 +168,19 @@ FROM civicrm_action_schedule cas
   public static function add(array $params): CRM_Core_DAO_ActionSchedule {
     CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
+  }
+
+  /**
+   * @param \Civi\Core\Event\PreEvent $event
+   * @implements hook_civicrm_pre
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (in_array($event->action, ['create', 'edit'])) {
+      if (isset($event->params['limit_to']) && in_array($event->params['limit_to'], [0, '0', FALSE], TRUE)) {
+        CRM_Core_Error::deprecatedWarning('Deprecated value "0" is no longer a valid option for ActionSchedule.limit_to; changed to "2".');
+        $event->params['limit_to'] = 2;
+      }
+    }
   }
 
   /**
@@ -460,13 +474,13 @@ FROM civicrm_action_schedule cas
       ->where("reminder.action_date_time IS NULL")
       ->param([
         'casActionScheduleId' => $actionSchedule->id,
-        'casMailingJoinType' => ($actionSchedule->limit_to == 0) ? 'LEFT JOIN' : 'INNER JOIN',
+        'casMailingJoinType' => ($actionSchedule->limit_to == 2) ? 'LEFT JOIN' : 'INNER JOIN',
         'casMappingId' => $mapping->getId(),
         'casMappingEntity' => $mapping->getEntityTable(),
         'casEntityJoinExpr' => 'e.id = IF(reminder.entity_table = "civicrm_contact", reminder.contact_id, reminder.entity_id)',
       ]);
 
-    if ($actionSchedule->limit_to == 0) {
+    if ($actionSchedule->limit_to == 2) {
       $select->where("e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact'");
     }
 

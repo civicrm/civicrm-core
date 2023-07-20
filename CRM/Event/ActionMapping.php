@@ -116,7 +116,7 @@ abstract class CRM_Event_ActionMapping extends \Civi\ActionSchedule\MappingBase 
     }
 
     $query->join('r', 'INNER JOIN civicrm_event r ON e.event_id = r.id');
-    if ($schedule->recipient_listing && $schedule->limit_to) {
+    if ($schedule->recipient_listing && $schedule->limit_to == 1) {
       switch ($schedule->recipient) {
         case 'participant_role':
           $regex = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', \CRM_Utils_Array::explodePadded($schedule->recipient_listing)) . "([[:cntrl:]]|$)";

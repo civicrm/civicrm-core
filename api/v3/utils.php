@@ -2065,6 +2065,11 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
     // https://lab.civicrm.org/dev/rc/-/issues/14
     $fieldValue = 1;
   }
+  if ($fieldName === 'limit_to' && in_array($fieldValue, [0, '0'], TRUE)) {
+    // https://github.com/civicrm/civicrm-core/pull/26881
+    // FALSE will bypass the below validation and then the BAO will change it to 2 with a deprecation notice
+    $fieldValue = FALSE;
+  }
   if (strpos(($op ?? ''), 'NULL') !== FALSE || strpos(($op ?? ''), 'EMPTY') !== FALSE) {
     return;
   }

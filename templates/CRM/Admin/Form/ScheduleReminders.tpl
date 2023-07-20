@@ -226,10 +226,10 @@
         if ($('#entity_0', $form).val() != '1' || !($('#entity_0').length)) {
           // Some Event entity is selected.
           if (['2', '3', '5'].includes($('#entity_0', $form).val())) {
-            $('#limit_to option[value="0"]', $form).attr('disabled','disabled').removeAttr('selected');
+            $('#limit_to option[value="2"]', $form).attr('disabled','disabled').removeAttr('selected');
           }
           else {
-            $('#limit_to option[value="0"]', $form).removeAttr('disabled');
+            $('#limit_to option[value="2"]', $form).removeAttr('disabled');
           }
           // Anything but Activity is selected.
           if ($('#limit_to', $form).val() == '') {

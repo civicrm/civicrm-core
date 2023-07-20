@@ -135,7 +135,7 @@ class CRM_Contribute_ActionMapping_ByType extends CRM_Contribute_ActionMapping {
         ->param('selectedStatuses', $selectedStatuses);
     }
 
-    if ($schedule->recipient_listing && $schedule->limit_to) {
+    if ($schedule->recipient_listing && $schedule->limit_to == 1) {
       switch ($schedule->recipient) {
         case 'soft_credit_type':
           $query['casContactIdField'] = 'soft.contact_id';

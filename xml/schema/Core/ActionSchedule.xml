@@ -8,6 +8,7 @@
   <add>3.4</add>
   <labelField>title</labelField>
   <paths>
+    <browse>civicrm/admin/scheduleReminders</browse>
     <add>civicrm/admin/scheduleReminders/edit?reset=1&amp;action=add</add>
     <update>civicrm/admin/scheduleReminders/edit?reset=1&amp;action=update&amp;id=[id]</update>
     <delete>civicrm/admin/scheduleReminders/edit?reset=1&amp;action=delete&amp;id=[id]</delete>
@@ -54,11 +55,14 @@
   </field>
   <field>
     <name>limit_to</name>
-    <type>boolean</type>
+    <type>int</type>
     <comment>Is this the recipient criteria limited to OR in addition to?</comment>
     <html>
       <label>Limit To</label>
     </html>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getLimitToValues</callback>
+    </pseudoconstant>
     <add>4.4</add>
   </field>
   <field>
