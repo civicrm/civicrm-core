@@ -44,7 +44,6 @@
         {/if}
 {elseif $action eq 1 or $action eq 2} {* action is add or update *}
   <div class="crm-block crm-form-block crm-note-form-block">
-    <div class="content crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout">
             <tr>
                 <td class="label">{$form.subject.label}</td>

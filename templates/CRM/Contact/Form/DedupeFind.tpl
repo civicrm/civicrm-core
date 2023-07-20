@@ -14,7 +14,6 @@
     {/ts}
 </div>
 <div class="crm-block crm-form-block crm-dedupe-find-form-block">
-   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    <table class="form-layout-compressed">
      <tr class="crm-dedupe-find-form-block-group_id">
        <td class="label">{$form.group_id.label}</td>

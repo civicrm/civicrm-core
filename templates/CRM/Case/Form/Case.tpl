@@ -13,10 +13,6 @@
 *}
 <div class="crm-block crm-form-block crm-case-form-block">
 
-{if $action neq 8 && $action neq 32768}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-{/if}
-
 <h3>{if $action eq 8}{ts}Delete Case{/ts}{elseif $action eq 32768}{ts}Restore Case{/ts}{/if}</h3>
 {if $action eq 8 or $action eq 32768 }
       <div class="messages status no-popup">

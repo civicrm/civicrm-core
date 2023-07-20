@@ -12,9 +12,7 @@
   {include file="CRM/Core/Form/EntityForm.tpl"}
 {else}
 <div class="crm-block crm-form-block crm-membership-type-form-block">
-
   <div class="form-item" id="membership_type_form">
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
       {foreach from=$tpl_standardised_fields item=fieldName}
        {assign var=fieldSpec value=$entityFields.$fieldName}

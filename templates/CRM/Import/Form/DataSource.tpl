@@ -21,8 +21,6 @@
   <div class="help">
     {ts 1=$importEntity 2= $importEntities}The %1 Import Wizard allows you to easily upload %2 from other applications into CiviCRM.{/ts}
   </div>
-
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <div id="choose-data-source" class="form-item">
     <h3>{ts}Choose Data Source{/ts}</h3>
     <table class="form-layout">
@@ -202,4 +200,3 @@
     {literal}<script type="text/javascript">CRM.$('#use_existing_upload').prop('checked',true).change();</script>{/literal}
   {/if}
 </div>
-

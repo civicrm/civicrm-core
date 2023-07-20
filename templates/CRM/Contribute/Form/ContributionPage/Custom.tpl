@@ -12,7 +12,6 @@
 <div class="help">
     <p>{ts}You may want to collect information from contributors beyond what is required to make a contribution. For example, you may want to inquire about volunteer availability and skills. Add any number of fields to your contribution form by selecting CiviCRM Profiles (collections of fields) to include at the beginning of the page, and/or at the bottom.{/ts} {help id="contrib-profile"}</p>
 </div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
     <tr class="crm-contribution-contributionpage-custom-form-block-custom_pre_id">
        <td class="label">{$form.custom_pre_id.label}</td>

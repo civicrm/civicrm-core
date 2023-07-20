@@ -10,7 +10,6 @@
 {* this template is used for adding/editing/deleting membership status  *}
 <div class="crm-block crm-form-block crm-membership-status-form-block" id=membership_status>
 <fieldset><legend>{if $action eq 1}{ts}New Membership Status{/ts}{elseif $action eq 2}{ts}Edit Membership Status{/ts}{else}{ts}Delete Membership Status{/ts}{/if}</legend>
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}

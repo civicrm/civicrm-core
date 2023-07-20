@@ -9,7 +9,6 @@
 *}
 {* View Case Activities *}
 <div class="crm-block crm-content-block crm-case-activity-view-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top" linkButtons=$actionLinks}</div>
   {if $revs}
     {strip}
       <table class="crm-info-panel">

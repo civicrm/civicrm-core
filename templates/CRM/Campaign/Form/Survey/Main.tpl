@@ -9,12 +9,6 @@
 *}
 
 <div class="crm-block crm-form-block crm-campaign-survey-main-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-  {if $action  eq 1}
-    <div class="help">
-      {ts}Use this form to Add new Survey. You can create a new Activity type, specific to this Survey or select an existing activity type for this Survey.{/ts}
-    </div>
-  {/if}
   <table class="form-layout-compressed">
    <tr class="crm-campaign-survey-main-form-block-title">
        <td class="label">{$form.title.label}</td>
@@ -62,7 +56,7 @@
        </td>
    </tr>
   </table>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
 {*include profile link function*}

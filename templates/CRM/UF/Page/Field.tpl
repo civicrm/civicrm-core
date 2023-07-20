@@ -16,12 +16,6 @@
 <div class="crm-content-block">
     {if $ufField}
         <div id="field_page">
-        {if not ($action eq 2 or $action eq 1)}
-            <div class="action-link">
-                {crmButton p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid" icon="plus-circle"}{ts}Add Field{/ts}{/crmButton}{if !$isGroupReserved}{crmButton p="civicrm/admin/uf/group/update" q="action=update&id=`$gid`&reset=1&context=field" icon="wrench"}{ts}Edit Settings{/ts}{/crmButton}{/if}{crmButton p="civicrm/admin/uf/group" q="action=preview&id=`$gid`&reset=1&field=0&context=field" icon="television"}{ts}Preview (all fields){/ts}{/crmButton}{if !$skipCreate }{crmButton p="civicrm/profile/create" q="gid=$gid&reset=1" icon="play-circle"}{ts}Use (create mode){/ts}{/crmButton}{/if}
-                <div class="clear"></div>
-            </div>
-        {/if}
         {strip}
         {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}

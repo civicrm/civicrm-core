@@ -27,12 +27,6 @@
 {* priceField is set when e.g. in browse mode *}
 {if $action NEQ 8 and !empty($priceField)}
 <div class="crm-content-block crm-block">
-  <div class="action-link">
-    {if !$isReserved}
-      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
-    {/if}
-      {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="television"}{ts}Preview (all fields){/ts}{/crmButton}
-  </div>
   <div id="field_page">
   {strip}
   {* handle enable/disable actions*}

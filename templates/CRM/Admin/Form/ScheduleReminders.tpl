@@ -9,7 +9,6 @@
 *}
 {* This template is used for adding/scheduling reminders.  *}
 <div class="crm-block crm-form-block crm-scheduleReminder-form-block">
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
 {if $action eq 8}
   <div class="messages status no-popup">

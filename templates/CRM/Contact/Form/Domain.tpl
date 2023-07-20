@@ -9,12 +9,9 @@
 *}
 {* this template is used for viewing and editing Domain information (for system-generated emails CiviMail-related values) *}
 <div class="crm-block crm-form-block crm-domain-form-block">
-{if !($action eq 4)}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-{/if}
-    <table class="form-layout-compressed">
-  <tr>
-        <td>
+  <table class="form-layout-compressed">
+    <tr>
+      <td>
       {$form.name.label}{help id="domain-name"}<br />
       {$form.name.html}
       <br /><span class="description">{ts}The name of the organization or entity which owns this CiviCRM site or domain. This is the default organization contact record.{/ts}</span>

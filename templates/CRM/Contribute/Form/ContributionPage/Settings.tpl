@@ -18,7 +18,6 @@
     {/if}
 </div>
 <div class="crm-block crm-form-block crm-contribution-contributionpage-settings-form-block">
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
       <tr class="crm-contribution-contributionpage-settings-form-block-frontend-title">
         <td class="label">{$form.frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='frontend_title' id=$contributionPageID}{/if}</td>

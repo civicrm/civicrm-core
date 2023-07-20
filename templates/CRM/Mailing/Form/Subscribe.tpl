@@ -9,17 +9,12 @@
 *}
 {* this template is used for web-based subscriptions to mailing list type groups  *}
 <div class="crm-block crm-mailing-subscribe-form-block">
-{if $single}
-    <div class="help">
-        {ts}Enter your email address and click <strong>Subscribe</strong>. You will receive a confirmation request via email shortly. Your subscription will be activated after you respond to that email.{/ts}
-    </div>
-{else}
-    <div class="help">
-        {ts}Enter your email address and check the box next to each mailing list you want to join. Then click the <strong>Subscribe</strong> button. You will receive a confirmation request via email for each selected list. Activate your subscription to each list by responding to the corresponding confirmation email.{/ts}
-    </div>
-{/if}
-
-<table class="form-layout-compressed">
+  {if $single}
+    <div class="help">{ts}Enter your email address and click <strong>Subscribe</strong>. You will receive a confirmation request via email shortly. Your subscription will be activated after you respond to that email.{/ts}</div>
+  {else}
+    <div class="help">{ts}Enter your email address and check the box next to each mailing list you want to join. Then click the <strong>Subscribe</strong> button. You will receive a confirmation request via email for each selected list. Activate your subscription to each list by responding to the corresponding confirmation email.{/ts}</div>
+  {/if}
+  <table class="form-layout-compressed">
     <tr class="crm-mailing-subscribe-form-block-email"><td style="width: 10%;">{$form.email.label}</td><td>{$form.email.html}</td></tr>
     <tr><td colspan="2">
         <div class="spacer"></div>
@@ -39,6 +34,6 @@
         {/if}
         </td>
     </tr>
-</table>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-</div><!-- end crm-block -->
+  </table>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+</div>

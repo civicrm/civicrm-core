@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-{$formName}-block">
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {include file="CRM/Form/basicFormFields.tpl"}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
