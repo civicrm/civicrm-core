@@ -89,7 +89,7 @@ class CRM_Core_ManagedEntities {
         $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
       }
       catch (Exception $e) {
-        $this->onApiError($dao->name, 'getsingle', $result['error_message']);
+        $this->onApiError($dao->module, $dao->name, 'getsingle', $result['error_message'], $e);
       }
       return $result;
     }
@@ -186,7 +186,7 @@ class CRM_Core_ManagedEntities {
         $result = civicrm_api4($item['entity_type'], 'save', $params);
       }
       catch (CRM_Core_Exception $e) {
-        $this->onApiError($item['name'], 'save', $e->getMessage());
+        $this->onApiError($item['module'], $item['name'], 'save', $e->getMessage(), $e);
         return;
       }
       $id = $result->first()['id'];
@@ -195,7 +195,7 @@ class CRM_Core_ManagedEntities {
     else {
       $result = civicrm_api($item['entity_type'], 'create', $params);
       if (!empty($result['is_error'])) {
-        $this->onApiError($item['name'], 'create', $result['error_message']);
+        $this->onApiError($item['module'], $item['name'], 'create', $result['error_message']);
         return;
       }
       $id = $result['id'];
@@ -254,7 +254,7 @@ class CRM_Core_ManagedEntities {
 
       $result = civicrm_api($item['entity_type'], 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($item['name'], 'create', $result['error_message']);
+        $this->onApiError($item['module'], $item['name'], 'create', $result['error_message']);
         return;
       }
     }
@@ -267,7 +267,7 @@ class CRM_Core_ManagedEntities {
         civicrm_api4($item['entity_type'], 'update', $params);
       }
       catch (CRM_Core_Exception $e) {
-        $this->onApiError($item['name'], 'update', $e->getMessage());
+        $this->onApiError($item['module'], $item['name'], 'update', $e->getMessage(), $e);
         return;
       }
     }
@@ -301,7 +301,7 @@ class CRM_Core_ManagedEntities {
       ];
       $result = civicrm_api($item['entity_type'], 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($item['name'], 'create', $result['error_message']);
+        $this->onApiError($item['module'], $item['name'], 'create', $result['error_message']);
         return;
       }
       // Reset the `entity_modified_date` timestamp to indicate that the entity has not been modified by the user.
@@ -371,7 +371,7 @@ class CRM_Core_ManagedEntities {
         }
       }
       catch (CRM_Core_Exception $e) {
-        $this->onApiError($item['name'], 'delete', $e->getMessage());
+        $this->onApiError($item['module'], $item['name'], 'delete', $e->getMessage(), $e);
       }
       // Ensure managed record is deleted.
       // Note: in many cases CRM_Core_BAO_Managed::on_hook_civicrm_post() will take care of
@@ -475,23 +475,22 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
+   * @param string $moduleName
    * @param string $managedEntityName
    * @param string $actionName
    * @param string $errorMessage
-   *
-   * @throws CRM_Core_Exception
+   * @param Throwable|null $exception
    */
-  protected function onApiError(string $managedEntityName, string $actionName, string $errorMessage): void {
-    $message = "Unable to $actionName managed entity '$managedEntityName'. $errorMessage";
+  protected function onApiError(string $moduleName, string $managedEntityName, string $actionName, string $errorMessage, ?Throwable $exception = NULL): void {
     // During upgrade  this problem might be due to an about-to-be-installed extension
     // So only log the error if it persists outside of upgrade mode
-    if (!CRM_Core_Config::isUpgradeMode()) {
-      Civi::log()->error($message);
+    if (CRM_Core_Config::isUpgradeMode()) {
+      return;
     }
-    // Errors should be very loud when debugging
-    if (Civi::settings()->get('debug_enabled')) {
-      throw new CRM_Core_Exception($message);
-    }
+
+    $message = sprintf('(%s) Unable to %s managed entity "%s": %s', $moduleName, $actionName, $managedEntityName, $errorMessage);
+    $context = $exception ? ['exception' => $exception] : [];
+    Civi::log()->error($message, $context);
   }
 
   /**
