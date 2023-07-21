@@ -40,6 +40,14 @@ final class Url {
   private $fragment;
 
   /**
+   * Whether to auto-append the cache-busting resource code.
+   *
+   * @var bool|null
+   *    NULL definition TBD (either "off" or "automatic"?)
+   */
+  private $cacheCode;
+
+  /**
    * Preferred format.
    *
    * Note that this is not strictly guaranteed. It may sometimes return absolute URLs even if you
@@ -204,6 +212,26 @@ final class Url {
   }
 
   /**
+   * @return bool|null
+   */
+  public function getCacheCode(): ?bool {
+    return $this->cacheCode;
+  }
+
+  /**
+   * Specify whether to append a cache-busting code.
+   *
+   * @param bool|null $cacheCode
+   *   TRUE: Do append
+   *   FALSE: Do not append
+   * @return $this;
+   */
+  public function setCacheCode(?bool $cacheCode) {
+    $this->cacheCode = $cacheCode;
+    return $this;
+  }
+
+  /**
    * @return string|null
    *   'relative' or 'absolute'
    */
@@ -339,6 +367,11 @@ final class Url {
         case 's';
           $this->ssl = TRUE;
           break;
+
+        // (c)ache code for resources
+        case 'c':
+          $this->cacheCode = TRUE;
+          break;
       }
     }
     return $this;
@@ -393,6 +426,10 @@ final class Url {
 
       default:
         throw new \RuntimeException("Unknown URL scheme: {$this->getScheme()}");
+    }
+
+    if ($this->cacheCode) {
+      $result = \Civi::resources()->addCacheCode($result);
     }
 
     // TODO decide if the current default is good enough for future

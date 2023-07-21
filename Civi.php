@@ -267,6 +267,7 @@ class Civi {
    *   - 'h': html (aka `setHtmlEscape(TRUE)`)
    *   - 't': text (aka `setHtmlEscape(FALSE)`)
    *   - 's': ssl (aka `setSsl(TRUE)`)
+   *   - 'c': cache code for resources (aka Civi::resources()->addCacheCode())
    *   FIXME: Should we have a flag for appending 'resCacheCode'?
    * @return \Civi\Core\Url
    *   URL object which may be modified or rendered as text.
