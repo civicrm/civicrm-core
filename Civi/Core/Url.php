@@ -330,8 +330,8 @@ final class Url {
           $this->htmlEscape = TRUE;
           break;
 
-        // (p)lain text encoding
-        case 'p':
+        // (t)ext encoding (canonical URL form)
+        case 't':
           $this->htmlEscape = FALSE;
           break;
 

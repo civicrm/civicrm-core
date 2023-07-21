@@ -265,7 +265,7 @@ class Civi {
    *   - 'a': absolute (aka `setPreferFormat('absolute')`)
    *   - 'r': relative (aka `setPreferFormat('relative')`)
    *   - 'h': html (aka `setHtmlEscape(TRUE)`)
-   *   - 'p': plain text (aka `setHtmlEscape(FALSE)`)
+   *   - 't': text (aka `setHtmlEscape(FALSE)`)
    *   - 's': ssl (aka `setSsl(TRUE)`)
    *   FIXME: Should we have a flag for appending 'resCacheCode'?
    * @return \Civi\Core\Url
