@@ -381,28 +381,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 41,
       'name' => 'Export Accounting Batch',
       'filter' => 1,
-      // FIXME: Shouldn't this use ts()
-      'description' => 'Export Accounting Batch',
-      'is_reserved' => 1,
-      'component_id' => 2,
-    ],
-    [
-      'label' => ts('Create Batch'),
-      'value' => 42,
-      'name' => 'Create Batch',
-      'filter' => 1,
-      // FIXME: Shouldn't this use ts()
-      'description' => 'Create Batch',
-      'is_reserved' => 1,
-      'component_id' => 2,
-    ],
-    [
-      'label' => ts('Edit Batch'),
-      'value' => 43,
-      'name' => 'Edit Batch',
-      'filter' => 1,
-      // FIXME: Shouldn't this use ts()
-      'description' => 'Edit Batch',
+      'description' => ts('Export Accounting Batch'),
       'is_reserved' => 1,
       'component_id' => 2,
     ],

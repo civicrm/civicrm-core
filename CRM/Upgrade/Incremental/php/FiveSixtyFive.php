@@ -40,6 +40,40 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFive extends CRM_Upgrade_Incremental_
     $this->addTask('Make Group.frontend_title required', 'alterColumn', 'civicrm_group', 'frontend_title', "varchar(255) NOT NULL COMMENT 'Alternative public description of the group.'", TRUE);
 
     $this->addTask('Update ActionSchedule.limit_to column', 'alterColumn', 'civicrm_action_schedule', 'limit_to', "int COMMENT 'Is this the recipient criteria limited to OR in addition to?'");
+    $this->addTask('Remove Batch Create/Edit Activity Types', 'removeFinancialBatchActivityTypes');
+  }
+
+  /**
+   * dev/financial#216 Remove the Create/Edit Batch Activity Types if they were
+   * never used. Otherwise we leave them there for now, and extension could
+   * re-implement the old behaviour.
+   */
+  public static function removeFinancialBatchActivityTypes($ctx): bool {
+    $atypes = [];
+    $atypes[] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Create Batch');
+    $atypes[] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Edit Batch');
+
+    if (empty(array_filter($atypes))) {
+      return TRUE;
+    }
+
+    // Check for existing Create Batch activities (no need to check for Edit)
+    $exists = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_activity WHERE activity_type_id = %1 LIMIT 1', [
+      1 => [$atypes[0], 'Positive'],
+    ]);
+
+    if (!$exists) {
+      $option_group_id = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_group WHERE name = "activity_type"');
+
+      if ($option_group_id) {
+        CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_value WHERE option_group_id = %1 AND value IN (%2)', [
+          1 => [$option_group_id, 'Positive'],
+          2 => [implode(',', $atypes), 'CommaSeparatedIntegers'],
+        ]);
+      }
+    }
+
+    return TRUE;
   }
 
 }
