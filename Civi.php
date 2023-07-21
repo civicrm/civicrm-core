@@ -251,27 +251,22 @@ class Civi {
    *   $url = Civi::url('frontend://civicrm/ajax/api4/[entity]/[action]')
    *      ->addVars(['entity' => 'Foo', 'action' => 'bar']);
    *
-   * NOTE: CiviCRM is integrated into many environments, and they handle URL-construction different ways.
-   * For example, in Joomla+WordPress, there are separate sub-applications for the public-facing
-   * frontend UI (`/`) and the staff-facing backend UI (`/wp-admin/` or `/administrator/`) -- each follows
-   * a different URL-formula. But in Drupal, all use the same formula. To
-   *
    * @param string $logicalUri
    *   Logical URI. The scheme of the URI may be one of:
    *     - 'frontend://' (Front-end page-route for constituents)
    *     - 'backend://' (Back-end page-route for staff)
    *     - 'service://` (Web-service page-route for automated integrations; aka webhooks and IPNs)
    *     - 'current://' (Whichever UI is currently active)
-   *     - 'assetBuilder://' (Dynamically-generated asset-file)
+   *     - 'assetBuilder://' (Dynamically-generated asset-file; see \Civi\Core\AssetBuilder)
    *     - 'ext://' (Static asset-file provided by an extension)
    *   An empty scheme (`//hello.txt`) is equivalent to `current://hello.txt`.
    * @param string|null $flags
    *   List of flags. Some combination of the following:
-   *   - 'a': absolute
-   *   - 'r': relative
-   *   - 'h': html
-   *   - 'p': plain text
-   *   - 's': ssl
+   *   - 'a': absolute (aka `setPreferFormat('absolute')`)
+   *   - 'r': relative (aka `setPreferFormat('relative')`)
+   *   - 'h': html (aka `setHtmlEscape(TRUE)`)
+   *   - 'p': plain text (aka `setHtmlEscape(FALSE)`)
+   *   - 's': ssl (aka `setSsl(TRUE)`)
    *   FIXME: Should we have a flag for appending 'resCacheCode'?
    * @return \Civi\Core\Url
    *   URL object which may be modified or rendered as text.

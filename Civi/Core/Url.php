@@ -8,6 +8,11 @@ namespace Civi\Core;
  * As input, this class takes a *logical URI*, which may include a range of configurable sub-parts (path, query, fragment, etc).
  *
  * As output, it provides a *concrete URL* that can be used by a web-browser to make requests.
+ *
+ * The typical way to construct a URL object is through `Civi::url()`, which features more
+ * documentation and examples.
+ *
+ * @see \Civi::url()
  */
 final class Url {
 
@@ -207,7 +212,13 @@ final class Url {
   }
 
   /**
+   * Specify whether to prefer absolute or relative formatting.
+   *
    * @param string|null $preferFormat
+   *   One of:
+   *   - 'relative': Prefer relative format, if available
+   *   - 'absolute': Prefer absolute format
+   *   - NULL: Decide format based on current environment/request. (Ordinary web UI requests prefer 'relative'.)
    */
   public function setPreferFormat(?string $preferFormat): Url {
     $this->preferFormat = $preferFormat;
@@ -222,7 +233,10 @@ final class Url {
   }
 
   /**
+   * Specify whether to enable HTML escaping of the final output.
+   *
    * @param bool $htmlEscape
+   * @return $this
    */
   public function setHtmlEscape(bool $htmlEscape): Url {
     $this->htmlEscape = $htmlEscape;
@@ -237,7 +251,12 @@ final class Url {
   }
 
   /**
+   * Specify whether the hyperlink should use SSL.
+   *
    * @param bool|null $ssl
+   *   TRUE: Force SSL on. (Convert "http:" to "https:")
+   *   FALSE: Force SSL off. (Convert "https:" to "http:")
+   *   NULL: Inherit current SSL-ness
    */
   public function setSsl(?bool $ssl): Url {
     $this->ssl = $ssl;
@@ -252,7 +271,15 @@ final class Url {
   }
 
   /**
+   * Specify a list of variables. After composing all parts of the URL, variables will be replaced
+   * with their URL-encoded values.
+   *
+   * Example:
+   *   Civi::url('frontend://civicrm/greeter?cid=[contact]&msg=[message]')
+   *     ->setVars(['contact' => 123, 'message' => 'Hello to you & you & you!');
+   *
    * @param string[]|null $vars
+   * @return $this
    */
   public function setVars(?array $vars): Url {
     $this->vars = $vars;
@@ -260,8 +287,14 @@ final class Url {
   }
 
   /**
-   * @param string[] $vars
+   * Add more variables. After composing all parts of the URL, variables will be replaced
+   * with their URL-encoded values.
    *
+   * Example:
+   *   Civi::url('frontend://civicrm/greeter?cid=[contact]&msg=[message]')
+   *     ->addVars(['contact' => 123, 'message' => 'Hello to you & you & you!');
+   *
+   * @param string[] $vars
    * @return $this
    */
   public function addVars(array $vars): Url {
@@ -270,12 +303,12 @@ final class Url {
   }
 
   /**
+   * Apply a series of flags using short-hand notation.
+   *
    * @param string $flags
-   *   A series of flag-letters. Any of the following:
-   *   - [a]bsolute
-   *   - [r]elative
-   *   - [h]tml
-   *   - [s]sl
+   *   List of flag-letters, such as (a)bsolute or (r)elative
+   *   For a full list, see Civi::url().
+   * @see Civi::url()
    * @return $this
    */
   public function useFlags(string $flags): Url {
