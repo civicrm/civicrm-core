@@ -247,6 +247,10 @@ class Civi {
    * Ex: Link to a static asset (resource-file) in an extension.
    *   $url = Civi::url('ext://org.civicrm.search_kit/css/crmSearchTasks.css');
    *
+   * Ex: Link with variable substitution
+   *   $url = Civi::url('frontend://civicrm/ajax/api4/[entity]/[action]')
+   *      ->addVars(['entity' => 'Foo', 'action' => 'bar']);
+   *
    * NOTE: CiviCRM is integrated into many environments, and they handle URL-construction different ways.
    * For example, in Joomla+WordPress, there are separate sub-applications for the public-facing
    * frontend UI (`/`) and the staff-facing backend UI (`/wp-admin/` or `/administrator/`) -- each follows

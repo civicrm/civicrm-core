@@ -65,6 +65,13 @@ final class Url {
   private $ssl = NULL;
 
   /**
+   * List of values to mix-in to the final/rendered URL.
+   *
+   * @var string[]|null
+   */
+  private $vars;
+
+  /**
    * @param string $logicalUri
    * @param string|null $flags
    * @see \Civi::url()
@@ -238,6 +245,31 @@ final class Url {
   }
 
   /**
+   * @return string[]|null
+   */
+  public function getVars(): ?array {
+    return $this->vars;
+  }
+
+  /**
+   * @param string[]|null $vars
+   */
+  public function setVars(?array $vars): Url {
+    $this->vars = $vars;
+    return $this;
+  }
+
+  /**
+   * @param string[] $vars
+   *
+   * @return $this
+   */
+  public function addVars(array $vars): Url {
+    $this->vars = array_merge($this->vars ?: [], $vars);
+    return $this;
+  }
+
+  /**
    * @param string $flags
    *   A series of flag-letters. Any of the following:
    *   - [a]bsolute
@@ -337,6 +369,14 @@ final class Url {
     }
     elseif (!$ssl && str_starts_with($result, 'https:')) {
       $result = 'http:' . substr($result, 6);
+    }
+
+    if ($this->vars !== NULL) {
+      // Replace variables
+      $result = preg_replace_callback('/\[(\w+)\]/', function($m) {
+        $var = $m[1];
+        return isset($this->vars[$var]) ? urlencode($this->vars[$var]) : "[$var]";
+      }, $result);
     }
 
     return $this->htmlEscape ? htmlentities($result) : $result;
