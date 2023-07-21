@@ -9,7 +9,7 @@ namespace Civi\Core;
  *
  * As output, it provides a *concrete URL* that can be used by a web-browser to make requests.
  */
-class Url {
+final class Url {
 
   /**
    * @var string
@@ -286,24 +286,16 @@ class Url {
    */
   public function __toString(): string {
     $userSystem = \CRM_Core_Config::singleton()->userSystem;
+    $preferFormat = $this->getPreferFormat() ?: static::detectFormat();
     $scheme = $this->getScheme();
-    $preferFormat = $this->getPreferFormat();
 
-    // Translate subjective values to real values.
-    switch ($scheme) {
-      case 'current':
-        $preferFormat = $preferFormat ?: 'relative';
-        $scheme = $userSystem->isFrontEndPage() ? 'frontend' : 'backend';
-        // The current call could actually be a 'service' request, but we treat those as equivalent to 'frontend', so maybe it doesn't matter.
-        break;
+    if ($scheme === NULL || $scheme === 'current') {
+      $scheme = static::detectScheme();
+    }
 
-      case 'default':
-        // $preferFormat = $preferFormat ?: 'absolute';
-        // TODO pick $scheme = 'frontend' or 'backend' or 'service';
-        throw new \RuntimeException("FIXME: Implement lookup for default ");
-
-      default:
-        $preferFormat = $preferFormat ?: 'absolute';
+    if ($scheme === 'default') {
+      // TODO Use metadata to pick $scheme = 'frontend' or 'backend' or 'service';
+      throw new \RuntimeException("FIXME: Implement lookup for default ");
     }
 
     switch ($scheme) {
@@ -348,6 +340,34 @@ class Url {
     }
 
     return $this->htmlEscape ? htmlentities($result) : $result;
+  }
+
+  private static function detectFormat(): string {
+    // Some environments may override default - e.g. cv-cli prefers absolute URLs
+    // WISHLIST: If handling `Job.*`, then 'absolute'
+    // WISHLIST: If active route is a web-service/web-hook/IPN, then 'absolute'
+    foreach ($GLOBALS['civicrm_url_defaults'] ?? [] as $default) {
+      if (isset($default['format'])) {
+        return $default['format'];
+      }
+    }
+
+    // Web UI: Most CiviCRM routes (`CRM_Core_Invoke::invoke()`) and CMS blocks
+    return 'relative';
+  }
+
+  private static function detectScheme(): string {
+    // Some environments may override default - e.g. cv-cli prefers 'default://'.
+    // WISHLIST: If handling `Job.*`, then `default://'
+    // WISHLIST: If active route is a web-service/web-hook/IPN, then 'default://'
+    foreach ($GLOBALS['civicrm_url_defaults'] ?? [] as $default) {
+      if (isset($default['scheme'])) {
+        return $default['scheme'];
+      }
+    }
+
+    // Web UI: Most CiviCRM routes (`CRM_Core_Invoke::invoke()`) and CMS blocks
+    return \CRM_Core_Config::singleton()->userSystem->isFrontEndPage() ? 'frontend' : 'backend';
   }
 
 }
