@@ -162,7 +162,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       $params['contact_sub_type_a'] = $cTypeA[1] ? $cTypeA[1] : 'null';
       $params['contact_sub_type_b'] = $cTypeB[1] ? $cTypeB[1] : 'null';
 
-      if (!strlen(trim(CRM_Utils_Array::value('label_b_a', $params)))) {
+      if (!strlen(trim($params['label_b_a'] ?? ''))) {
         $params['label_b_a'] = $params['label_a_b'] ?? NULL;
       }
 
