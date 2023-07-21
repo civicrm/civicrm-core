@@ -541,11 +541,8 @@ SELECT g.*
   }
 
   public static function getObjectIdOptions($context, $params): array {
-    $tableName = $params['values']['object_table'] ?? NULL;
-    // Look up object_table if not known
-    if (!$tableName && !empty($params['values']['id'])) {
-      $tableName = CRM_Core_DAO::getFieldValue('CRM_ACL_DAO_ACL', $params['values']['id'], 'object_table');
-    }
+    $values = self::fillValues($params['values'], ['object_table']);
+    $tableName = $values['object_table'];
     if (!$tableName) {
       return [];
     }

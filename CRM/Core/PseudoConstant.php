@@ -193,6 +193,7 @@ class CRM_Core_PseudoConstant {
       'fresh' => FALSE,
       'context' => $context,
       'condition' => [],
+      'values' => [],
     ];
     $entity = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
 

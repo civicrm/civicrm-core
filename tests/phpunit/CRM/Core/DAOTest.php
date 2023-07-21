@@ -602,4 +602,15 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertNull($dao->expired_date);
   }
 
+  public function testFillValues() {
+    $label = uniqid();
+    $saved = CRM_Contact_BAO_SavedSearch::writeRecord([
+      'label' => $label,
+    ]);
+    $onlyId = ['id' => $saved->id];
+    $onlyName = ['name' => $saved->name];
+    $this->assertEquals($label, CRM_Contact_BAO_SavedSearch::fillValues($onlyId, ['label'])['label']);
+    $this->assertEquals($label, CRM_Contact_BAO_SavedSearch::fillValues($onlyName, ['label'])['label']);
+  }
+
 }
