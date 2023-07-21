@@ -2665,7 +2665,7 @@ class CRM_Contact_BAO_Query {
    * @param string $primaryLocation
    * @return string
    */
-  protected static function getEntitySpecificJoins($name, $mode, $side, $primaryLocation) {
+  protected static function getEntitySpecificJoins($name, $mode, $side, $primaryLocation): string {
     $limitToPrimaryClause = $primaryLocation ? "AND {$name}.is_primary = 1" : '';
     switch ($name) {
       case 'civicrm_address':
@@ -2727,7 +2727,7 @@ class CRM_Contact_BAO_Query {
       case 'civicrm_activity_contact':
       case 'source_contact':
       case 'activity_priority':
-        return CRM_Activity_BAO_Query::from($name, $mode, $side);
+        return CRM_Activity_BAO_Query::from($name, $mode, $side) ?? '';
 
       case 'civicrm_entity_tag':
         $from = " $side JOIN civicrm_entity_tag ON ( civicrm_entity_tag.entity_table = 'civicrm_contact'";
