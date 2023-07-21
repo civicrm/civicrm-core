@@ -1,6 +1,6 @@
 <?php
 
-use CRM_CivicrmAdminUi_ExtensionUtil as E;
+use CRM_CivicrmSearchUi_ExtensionUtil as E;
 
 return [
   [
