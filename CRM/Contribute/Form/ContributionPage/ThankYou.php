@@ -84,7 +84,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
     // if is_email_receipt is set, the receipt message must be non-empty
     if (!empty($fields['is_email_receipt'])) {
       //added for CRM-1348
-      $email = trim(CRM_Utils_Array::value('receipt_from_email', $fields));
+      $email = trim($fields['receipt_from_email'] ?? '');
       if (empty($email) || !CRM_Utils_Rule::email($email)) {
         $errors['receipt_from_email'] = ts('A valid Receipt From Email address must be specified if Email Receipt to Contributor is enabled');
       }

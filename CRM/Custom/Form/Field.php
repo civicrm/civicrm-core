@@ -863,7 +863,7 @@ AND    option_group_id = %2";
 
     $filter = 'null';
     if ($params['data_type'] == 'ContactReference' && !empty($params['filter_selected'])) {
-      if ($params['filter_selected'] == 'Advance' && trim(CRM_Utils_Array::value('filter', $params))) {
+      if ($params['filter_selected'] == 'Advance' && trim($params['filter'] ?? '')) {
         $filter = trim($params['filter']);
       }
       elseif ($params['filter_selected'] == 'Group' && !empty($params['group_id'])) {

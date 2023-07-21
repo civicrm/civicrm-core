@@ -762,8 +762,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     // Maybe login user.
     $uid = $params['uid'] ?? NULL;
     if (!$uid) {
-      $name = $name ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
-      $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $_REQUEST));
+      $name = $name ?: trim($_REQUEST['name'] ?? '');
+      $pass = $pass ?: trim($_REQUEST['pass'] ?? '');
       if ($name) {
         $uid = wp_authenticate($name, $pass);
         if (!$uid) {
