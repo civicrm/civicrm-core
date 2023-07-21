@@ -49,7 +49,14 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
 
   public function setUp(): void {
     $this->_managedEntities = [];
+    // Ensure exceptions get thrown
+    \Civi::settings()->set('debug_enabled', TRUE);
     parent::setUp();
+  }
+
+  public function tearDown(): void {
+    \Civi::settings()->revert('debug_enabled');
+    parent::tearDown();
   }
 
   public function setUpHeadless(): CiviEnvBuilder {

@@ -89,7 +89,7 @@ class CRM_Core_ManagedEntities {
         $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
       }
       catch (Exception $e) {
-        $this->onApiError($dao->entity_type, 'getsingle', $params, $result);
+        $this->onApiError($dao->name, 'getsingle', $result['error_message']);
       }
       return $result;
     }
@@ -182,14 +182,21 @@ class CRM_Core_ManagedEntities {
       // Use "save" instead of "create" action to accommodate a "match" param
       $params['records'] = [$params['values']];
       unset($params['values']);
-      $result = civicrm_api4($item['entity_type'], 'save', $params);
+      try {
+        $result = civicrm_api4($item['entity_type'], 'save', $params);
+      }
+      catch (CRM_Core_Exception $e) {
+        $this->onApiError($item['name'], 'save', $e->getMessage());
+        return;
+      }
       $id = $result->first()['id'];
     }
     // APIv3
     else {
       $result = civicrm_api($item['entity_type'], 'create', $params);
       if (!empty($result['is_error'])) {
-        $this->onApiError($item['entity_type'], 'create', $params, $result);
+        $this->onApiError($item['name'], 'create', $result['error_message']);
+        return;
       }
       $id = $result['id'];
     }
@@ -247,7 +254,8 @@ class CRM_Core_ManagedEntities {
 
       $result = civicrm_api($item['entity_type'], 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($item['entity_type'], 'create', $params, $result);
+        $this->onApiError($item['name'], 'create', $result['error_message']);
+        return;
       }
     }
     elseif ($doUpdate && $item['params']['version'] == 4) {
@@ -255,7 +263,13 @@ class CRM_Core_ManagedEntities {
       $params['values']['id'] = $item['entity_id'];
       // 'match' param doesn't apply to "update" action
       unset($params['match']);
-      civicrm_api4($item['entity_type'], 'update', $params);
+      try {
+        civicrm_api4($item['entity_type'], 'update', $params);
+      }
+      catch (CRM_Core_Exception $e) {
+        $this->onApiError($item['name'], 'update', $e->getMessage());
+        return;
+      }
     }
 
     if (isset($item['cleanup']) || $doUpdate) {
@@ -287,7 +301,8 @@ class CRM_Core_ManagedEntities {
       ];
       $result = civicrm_api($item['entity_type'], 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($item['entity_type'], 'create', $params, $result);
+        $this->onApiError($item['name'], 'create', $result['error_message']);
+        return;
       }
       // Reset the `entity_modified_date` timestamp to indicate that the entity has not been modified by the user.
       $dao = new CRM_Core_DAO_Managed();
@@ -339,29 +354,24 @@ class CRM_Core_ManagedEntities {
 
     // Delete the entity and the managed record
     if ($doDelete) {
-      // APIv4 delete
-      if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
-        civicrm_api4($item['entity_type'], 'delete', [
-          'checkPermissions' => FALSE,
-          'where' => [['id', '=', $item['entity_id']]],
-        ]);
-      }
-      // APIv3 delete
-      else {
-        $params = [
-          'version' => 3,
-          'id' => $item['entity_id'],
-        ];
-        $check = civicrm_api3($item['entity_type'], 'get', $params);
-        if ($check['count']) {
-          $result = civicrm_api($item['entity_type'], 'delete', $params);
-          if ($result['is_error']) {
-            if (isset($item['name'])) {
-              $params['name'] = $item['name'];
-            }
-            $this->onApiError($item['entity_type'], 'delete', $params, $result);
+      try {
+        // APIv4 delete
+        if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
+          civicrm_api4($item['entity_type'], 'delete', [
+            'checkPermissions' => FALSE,
+            'where' => [['id', '=', $item['entity_id']]],
+          ]);
+        }
+        // APIv3 delete
+        else {
+          $check = civicrm_api3($item['entity_type'], 'get', ['id' => $item['entity_id']]);
+          if ($check['count']) {
+            civicrm_api3($item['entity_type'], 'delete', ['id' => $item['entity_id']]);
           }
         }
+      }
+      catch (CRM_Core_Exception $e) {
+        $this->onApiError($item['name'], 'delete', $e->getMessage());
       }
       // Ensure managed record is deleted.
       // Note: in many cases CRM_Core_BAO_Managed::on_hook_civicrm_post() will take care of
@@ -465,23 +475,23 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param string $entity
-   * @param string $action
-   * @param array $params
-   * @param array $result
+   * @param string $managedEntityName
+   * @param string $actionName
+   * @param string $errorMessage
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
-  protected function onApiError($entity, $action, $params, $result) {
-    CRM_Core_Error::debug_var('ManagedEntities_failed', [
-      'entity' => $entity,
-      'action' => $action,
-      'params' => $params,
-      'result' => $result,
-    ]);
-    throw new Exception('API error: ' . $result['error_message'] . ' on ' . $entity . '.' . $action
-      . (!empty($params['name']) ? '( entity name ' . $params['name'] . ')' : '')
-    );
+  protected function onApiError(string $managedEntityName, string $actionName, string $errorMessage): void {
+    $message = "Unable to $actionName managed entity '$managedEntityName'. $errorMessage";
+    // During upgrade  this problem might be due to an about-to-be-installed extension
+    // So only log the error if it persists outside of upgrade mode
+    if (!CRM_Core_Config::isUpgradeMode()) {
+      Civi::log()->error($message);
+    }
+    // Errors should be very loud when debugging
+    if (Civi::settings()->get('debug_enabled')) {
+      throw new CRM_Core_Exception($message);
+    }
   }
 
   /**
