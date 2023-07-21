@@ -93,6 +93,9 @@ final class Url {
     if ($logicalUri[0] === '/') {
       $logicalUri = 'current:' . $logicalUri;
     }
+    elseif ($logicalUri[0] === '[') {
+      $logicalUri = 'asset://' . $logicalUri;
+    }
 
     $parsed = parse_url($logicalUri);
     $this->scheme = $parsed['scheme'] ?? NULL;
@@ -413,15 +416,23 @@ final class Url {
         $result = \Civi::service('asset_builder')->getUrl($assetName, $assetParams);
         break;
 
+      case 'asset':
+        if (preg_match(';^\[([\w\.]+)\](.*)$;', $this->getPath(), $m)) {
+          [, $var, $rest] = $m;
+          $result = rtrim(\Civi::paths()->getVariable($var, 'url'), '/');
+          if ($preferFormat === 'relative') {
+            $result = \CRM_Utils_Url::toRelative($result);
+          }
+          $result .= $rest . $this->composeSuffix();
+        }
+        else {
+          throw new \RuntimeException("Malformed asset path: {$this->getPath()}");
+        }
+        break;
+
       case 'ext':
         $parts = explode('/', $this->getPath(), 2);
-        $result = \Civi::resources()->getUrl($parts[0], $parts[1] ?? NULL, FALSE);
-        if ($this->query) {
-          $result .= '?' . $this->query;
-        }
-        if ($this->fragment) {
-          $result .= '#' . $this->fragment;
-        }
+        $result = \Civi::resources()->getUrl($parts[0], $parts[1] ?? NULL, FALSE) . $this->composeSuffix();
         break;
 
       default:
@@ -450,6 +461,17 @@ final class Url {
     }
 
     return $this->htmlEscape ? htmlentities($result) : $result;
+  }
+
+  private function composeSuffix(): string {
+    $result = '';
+    if ($this->query) {
+      $result .= '?' . $this->query;
+    }
+    if ($this->fragment) {
+      $result .= '#' . $this->fragment;
+    }
+    return $result;
   }
 
   private static function detectFormat(): string {

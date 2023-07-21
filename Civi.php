@@ -244,6 +244,9 @@ class Civi {
    * Ex: Link to a dynamically generated asset-file.
    *   $url = Civi::url('assetBuilder://crm-l10n.js?locale=en_US');
    *
+   * Ex: Link to a static asset (resource-file) in one of core's configurable paths.
+   *   $url = Civi::url('[civicrm.root]/js/Common.js');
+   *
    * Ex: Link to a static asset (resource-file) in an extension.
    *   $url = Civi::url('ext://org.civicrm.search_kit/css/crmSearchTasks.css');
    *
@@ -257,6 +260,7 @@ class Civi {
    *     - 'backend://' (Back-end page-route for staff)
    *     - 'service://` (Web-service page-route for automated integrations; aka webhooks and IPNs)
    *     - 'current://' (Whichever UI is currently active)
+   *     - 'asset://' (Static asset-file; see \Civi::paths())
    *     - 'assetBuilder://' (Dynamically-generated asset-file; see \Civi\Core\AssetBuilder)
    *     - 'ext://' (Static asset-file provided by an extension)
    *   An empty scheme (`//hello.txt`) is equivalent to `current://hello.txt`.
