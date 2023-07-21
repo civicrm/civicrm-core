@@ -2701,14 +2701,18 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Push the current url to the userContext.
+   * Push path to the userContext (defaults to current url path).
    *
    * This is like a save point :-). The next status bounce will
    * return the browser to this url unless another is added.
+   *
+   * @param string $path
+   *   Path string e.g. `civicrm/foo/bar?reset=1`, defaults to current path.
    */
-  protected function pushUrlToUserContext(): void {
-    CRM_Core_Session::singleton()
-      ->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
+  protected function pushUrlToUserContext(string $path = NULL): void {
+    $url = CRM_Utils_System::url($path ?: CRM_Utils_System::currentPath() . '?reset=1',
+      '', FALSE, NULL, FALSE);
+    CRM_Core_Session::singleton()->pushUserContext($url);
   }
 
   /**
