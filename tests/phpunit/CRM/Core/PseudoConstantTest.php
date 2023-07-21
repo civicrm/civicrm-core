@@ -188,19 +188,23 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ],
         [
           'fieldName' => 'start_action_unit',
-          'sample' => 'hour',
+          'sample' => 'hours',
         ],
         [
           'fieldName' => 'repetition_frequency_unit',
-          'sample' => 'hour',
+          'sample' => 'hours',
         ],
         [
           'fieldName' => 'end_frequency_unit',
-          'sample' => 'hour',
+          'sample' => 'hours',
         ],
         [
           'fieldName' => 'mode',
           'sample' => 'Email',
+        ],
+        [
+          'fieldName' => 'mapping_id',
+          'sample' => 'Event Type',
         ],
       ],
       'CRM_Dedupe_DAO_DedupeRuleGroup' => [
