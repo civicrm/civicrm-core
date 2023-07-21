@@ -96,20 +96,23 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
     if (!$this->getContributionID()) {
       $lineItem = LineItem::get(FALSE)
         ->addWhere('entity_table', '=', 'civicrm_participant')
-        ->addWhere('id', '=', $participantID)
+        ->addWhere('entity_id', '=', $participantID)
         ->addSelect('contribution_id')
         ->execute()->first();
       if (!empty($lineItem)) {
         $this->setContributionID($lineItem['contribution_id']);
       }
-      // It might be bad data on the site - let's do a noisy fall back to participant payment
-      // (the relationship between contribution & participant should be in the line item but
-      // some integrations might mess this up - if they are not using the order api).
-      $participantPayment = civicrm_api3('ParticipantPayment', 'get', ['participant_id' => $participantID])['values'];
-      if (!empty($participantPayment)) {
-        $participantPayment = reset($participantPayment);
-        $this->setContributionID((int) $participantPayment['contribution_id']);
+      else {
+        // no ts() since this should be rare
         CRM_Core_Session::setStatus('There might be a data problem, contribution id could not be loaded from the line item');
+        // It might be bad data on the site - let's do a noisy fall back to participant payment
+        // (the relationship between contribution & participant should be in the line item but
+        // some integrations might mess this up - if they are not using the order api).
+        $participantPayment = civicrm_api3('ParticipantPayment', 'get', ['participant_id' => $participantID])['values'];
+        if (!empty($participantPayment)) {
+          $participantPayment = reset($participantPayment);
+          $this->setContributionID((int) $participantPayment['contribution_id']);
+        }
       }
     }
     return $this;
