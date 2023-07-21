@@ -540,7 +540,14 @@ SELECT g.*
     ];
   }
 
-  public static function getObjectIdOptions($context, $params): array {
+  /**
+   * Provides pseudoconstant list for `object_id` field.
+   *
+   * @param string $fieldName
+   * @param array $params
+   * @return array
+   */
+  public static function getObjectIdOptions(string $fieldName, array $params): array {
     $values = self::fillValues($params['values'], ['object_table']);
     $tableName = $values['object_table'];
     if (!$tableName) {

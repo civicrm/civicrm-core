@@ -2145,11 +2145,11 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   /**
    * Loads pseudoconstant option values for the `extends_entity_column_id` field.
    *
-   * @param string $context
+   * @param string $fieldName
    * @param array $params
    * @return array
    */
-  public static function getExtendsEntityColumnIdOptions($context = NULL, $params = []) {
+  public static function getExtendsEntityColumnIdOptions(string $fieldName = NULL, array $params = []) {
     $props = $params['values'] ?? [];
     $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'custom_data_type', 'id', 'name');
     $optionValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);
