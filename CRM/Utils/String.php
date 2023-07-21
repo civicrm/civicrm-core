@@ -355,14 +355,11 @@ class CRM_Utils_String {
    *   true if the urls match, else false
    */
   public static function match($url1, $url2) {
-    $url1 = strtolower($url1);
-    $url2 = strtolower($url2);
+    $component1 = parse_url(strtolower($url1));
+    $component2 = parse_url(strtolower($url2));
 
-    $url1Str = parse_url($url1);
-    $url2Str = parse_url($url2);
-
-    if ($url1Str['path'] == $url2Str['path'] &&
-      self::extractURLVarValue(CRM_Utils_Array::value('query', $url1Str)) == self::extractURLVarValue(CRM_Utils_Array::value('query', $url2Str))
+    if ($component1['path'] == $component2['path'] &&
+      self::extractURLVarValue($component1['query'] ?? '') == self::extractURLVarValue($component2['query'] ?? '')
     ) {
       return TRUE;
     }
