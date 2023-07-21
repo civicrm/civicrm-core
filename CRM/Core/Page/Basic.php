@@ -39,7 +39,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
       Civi::$statics[$baoName]['actionLinks'] = [];
       $title = $baoName::getEntityTitle();
       $paths = $baoName::getEntityPaths();
-      unset($paths['add']);
+      unset($paths['add'], $paths['browse']);
       foreach ($paths as $action => $path) {
         $actionKey = CRM_Core_Action::map($action);
         if ($actionKey) {
