@@ -40,13 +40,19 @@ class CRM_Utils_Url {
    * Convert to a relative URL (if host/port matches).
    *
    * @param string $value
+   * @param string|null $currentHostPort
+   *   The value of HTTP_HOST. (NULL means "lookup HTTP_HOST")
    * @return string
    */
-  public static function toRelative(string $value): string {
-    $parsed = parse_url($value);
-    if (isset($_SERVER['HTTP_HOST']) && isset($parsed['host']) && $_SERVER['HTTP_HOST'] == $parsed['host']) {
-      $value = $parsed['path'];
+  public static function toRelative(string $value, ?string $currentHostPort = NULL): string {
+    $currentHostPort = $currentHostPort ?: $_SERVER['HTTP_HOST'] ?? NULL;
+
+    if (preg_match(';^(//|http://|https://)([^/]*)(.*);', $value, $m)) {
+      if ($m[2] === $currentHostPort) {
+        return $m[3];
+      }
     }
+
     return $value;
   }
 
