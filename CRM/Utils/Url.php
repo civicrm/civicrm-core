@@ -36,4 +36,18 @@ class CRM_Utils_Url {
     return $parsed->__toString();
   }
 
+  /**
+   * Convert to a relative URL (if host/port matches).
+   *
+   * @param string $value
+   * @return string
+   */
+  public static function toRelative(string $value): string {
+    $parsed = parse_url($value);
+    if (isset($_SERVER['HTTP_HOST']) && isset($parsed['host']) && $_SERVER['HTTP_HOST'] == $parsed['host']) {
+      $value = $parsed['path'];
+    }
+    return $value;
+  }
+
 }
