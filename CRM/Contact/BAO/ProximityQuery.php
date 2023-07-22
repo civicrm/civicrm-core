@@ -301,8 +301,8 @@ ACOS(
     }
 
     if (
-      !is_numeric(CRM_Utils_Array::value('geo_code_1', $proximityAddress)) ||
-      !is_numeric(CRM_Utils_Array::value('geo_code_2', $proximityAddress))
+      !is_numeric($proximityAddress['geo_code_1'] ?? '') ||
+      !is_numeric($proximityAddress['geo_code_2'] ?? '')
     ) {
       // we are setting the where clause to 0 here, so we wont return anything
       $qill .= ': ' . ts('We could not geocode the destination address.');

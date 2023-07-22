@@ -567,7 +567,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     // chk for renewal for multiple terms CRM-8750
     $numRenewTerms = 1;
-    if (is_numeric(CRM_Utils_Array::value('num_terms', $this->_params))) {
+    if (is_numeric($this->_params['num_terms'] ?? '')) {
       $numRenewTerms = $this->_params['num_terms'];
     }
 

@@ -809,7 +809,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             $result->contact_id
           );
         }
-        elseif ((is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) ||
+        elseif ((is_numeric($row['geo_code_1'] ?? '')) ||
           (!empty($row['city']) && !empty($row['state_province']))
         ) {
           $row['action'] = CRM_Core_Action::formLink(
@@ -942,7 +942,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         $mask = CRM_Core_Action::mask(array_merge([CRM_Core_Permission::VIEW], $basicPermissions));
       }
 
-      if ((!is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) &&
+      if ((!is_numeric($row['geo_code_1'] ?? '')) &&
         (empty($row['city']) || empty($row['state_province']))
       ) {
         $mask = $mask & 4095;

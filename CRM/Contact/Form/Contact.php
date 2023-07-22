@@ -890,7 +890,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
 
-    if (is_numeric(CRM_Utils_Array::value('current_employer_id', $params)) && !empty($params['current_employer'])) {
+    if (is_numeric($params['current_employer_id'] ?? '') && !empty($params['current_employer'])) {
       $params['current_employer'] = $params['current_employer_id'];
     }
 

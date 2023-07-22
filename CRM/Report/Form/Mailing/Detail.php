@@ -345,7 +345,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     }
 
     if (array_key_exists('reply_id', $this->_params['fields']) ||
-      is_numeric(CRM_Utils_Array::value('is_replied_value', $this->_params))
+      is_numeric($this->_params['is_replied_value'] ?? '')
     ) {
       if (($this->_params['is_replied_value'] ?? NULL) == 1) {
         $joinType = 'INNER';
@@ -363,7 +363,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     }
 
     if (array_key_exists('unsubscribe_id', $this->_params['fields']) ||
-      is_numeric(CRM_Utils_Array::value('is_unsubscribed_value', $this->_params))
+      is_numeric($this->_params['is_unsubscribed_value'] ?? '')
     ) {
       if (($this->_params['is_unsubscribed_value'] ?? NULL) == 1
       ) {
@@ -383,7 +383,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     }
 
     if (array_key_exists('optout_id', $this->_params['fields']) ||
-      is_numeric(CRM_Utils_Array::value('is_optout_value', $this->_params))
+      is_numeric($this->_params['is_optout_value'] ?? '')
     ) {
       if (($this->_params['is_optout_value'] ?? NULL) == 1) {
         $joinType = 'INNER';
@@ -402,7 +402,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     }
 
     if (array_key_exists('forward_id', $this->_params['fields']) ||
-      is_numeric(CRM_Utils_Array::value('is_forwarded_value', $this->_params))
+      is_numeric($this->_params['is_forwarded_value'] ?? '')
     ) {
       if (($this->_params['is_forwarded_value'] ?? NULL) == 1) {
         $joinType = 'INNER';

@@ -470,7 +470,7 @@ $event_summary_limit
               $ids = [];
               $params = ['entity_id' => $dao->id, 'entity_table' => 'civicrm_event'];
               $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
-              if (is_numeric(CRM_Utils_Array::value('geo_code_1', $values['location']['address'][1])) ||
+              if (is_numeric($values['location']['address'][1]['geo_code_1'] ?? '') ||
                 (
                   !empty($values['location']['address'][1]['city']) &&
                   !empty($values['location']['address'][1]['state_province_id'])
