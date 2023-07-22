@@ -897,7 +897,7 @@ class CRM_Report_Form extends CRM_Core_Form {
             if ($fieldGrp == 'filters') {
               // fill operator types
               if (!array_key_exists('operatorType', $this->_columns[$tableName][$fieldGrp][$fieldName])) {
-                switch (CRM_Utils_Array::value('type', $this->_columns[$tableName][$fieldGrp][$fieldName])) {
+                switch ($this->_columns[$tableName][$fieldGrp][$fieldName]['type'] ?? NULL) {
                   case CRM_Utils_Type::T_MONEY:
                   case CRM_Utils_Type::T_FLOAT:
                     $this->_columns[$tableName][$fieldGrp][$fieldName]['operatorType'] = CRM_Report_Form::OP_FLOAT;
@@ -2834,7 +2834,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             !empty($this->_params['group_bys'][$fieldName]) &&
             !empty($this->_params['group_bys_freq'])
           ) {
-            switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
+            switch ($this->_params['group_bys_freq'][$fieldName] ?? NULL) {
               case 'YEARWEEK':
                 $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY) AS {$tableName}_{$fieldName}_start";
                 $select[] = "YEARWEEK({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";

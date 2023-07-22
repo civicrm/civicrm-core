@@ -398,7 +398,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     }
 
     //set parent id if its edit mode
-    if ($parentId = CRM_Utils_Array::value('parent_id', $this->_defaults)) {
+    if ($parentId = $this->_defaults['parent_id'] ?? NULL) {
       $params['parent_id'] = $parentId;
     }
 

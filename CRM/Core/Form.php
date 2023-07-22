@@ -2381,7 +2381,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public static function validateMandatoryFields($fields, $values, &$errors) {
     foreach ($fields as $name => $fld) {
-      if (!empty($fld['is_required']) && CRM_Utils_System::isNull(CRM_Utils_Array::value($name, $values))) {
+      if (!empty($fld['is_required']) && CRM_Utils_System::isNull($values[$name] ?? NULL)) {
         $errors[$name] = ts('%1 is a required field.', [1 => $fld['title']]);
       }
     }

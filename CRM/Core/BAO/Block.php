@@ -118,7 +118,7 @@ class CRM_Core_BAO_Block {
    */
   public static function dataExists($blockFields, &$params) {
     foreach ($blockFields as $field) {
-      if (CRM_Utils_System::isNull(CRM_Utils_Array::value($field, $params))) {
+      if (CRM_Utils_System::isNull($params[$field] ?? NULL)) {
         return FALSE;
       }
     }
@@ -232,7 +232,7 @@ class CRM_Core_BAO_Block {
       // if in some cases (eg. email used in Online Conribution Page, Profiles, etc.) id is not set
       // lets try to add using the previous method to avoid any false creation of existing data.
       foreach ($blockIds as $blockId => $blockValue) {
-        if (empty($value['id']) && $blockValue['locationTypeId'] == CRM_Utils_Array::value('location_type_id', $value) && !$isIdSet) {
+        if (empty($value['id']) && $blockValue['locationTypeId'] == ($value['location_type_id'] ?? NULL) && !$isIdSet) {
           $valueId = FALSE;
           if ($blockName == 'phone') {
             $phoneTypeBlockValue = $blockValue['phoneTypeId'] ?? NULL;

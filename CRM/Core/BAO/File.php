@@ -42,7 +42,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     $op = empty($params['id']) ? 'create' : 'edit';
 
-    CRM_Utils_Hook::pre($op, 'File', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($op, 'File', $params['id'] ?? NULL, $params);
 
     $fileDAO->copyValues($params);
 

@@ -102,7 +102,7 @@ function civicrm_api3_relationship_get($params) {
     return ['count' => $relationships];
   }
   foreach ($relationships as $relationshipId => $values) {
-    _civicrm_api3_custom_data_get($relationships[$relationshipId], CRM_Utils_Array::value('check_permissions', $params), 'Relationship', $relationshipId, NULL, CRM_Utils_Array::value('relationship_type_id', $values));
+    _civicrm_api3_custom_data_get($relationships[$relationshipId], $params['check_permissions'] ?? 0, 'Relationship', $relationshipId, NULL, $values['relationship_type_id'] ?? NULL);
   }
   return civicrm_api3_create_success($relationships, $params);
 }

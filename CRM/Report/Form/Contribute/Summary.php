@@ -365,7 +365,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       if (array_key_exists('group_bys', $table)) {
         foreach ($table['group_bys'] as $fieldName => $field) {
           if (!empty($this->_params['group_bys'][$fieldName])) {
-            switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
+            switch ($this->_params['group_bys_freq'][$fieldName] ?? NULL) {
               case 'YEARWEEK':
                 $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY) AS {$tableName}_{$fieldName}_start";
                 $select[] = "YEARWEEK({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";
@@ -621,7 +621,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
 
     $softCredit = $this->_params['fields']['soft_amount'] ?? NULL;
-    $onlySoftCredit = $softCredit && !CRM_Utils_Array::value('total_amount', $this->_params['fields']);
+    $onlySoftCredit = $softCredit && empty($this->_params['fields']['total_amount']);
     if (!isset($this->_groupByArray['civicrm_contribution_currency'])) {
       $this->_groupByArray['civicrm_contribution_currency'] = 'currency';
     }

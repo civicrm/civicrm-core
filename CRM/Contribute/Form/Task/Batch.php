@@ -143,7 +143,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
           }
 
           if (!empty($entityColumnValue[$typeId]) ||
-            CRM_Utils_System::isNull(CRM_Utils_Array::value($typeId, $entityColumnValue))
+            CRM_Utils_System::isNull($entityColumnValue[$typeId] ?? NULL)
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contributionId);
           }

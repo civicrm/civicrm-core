@@ -1450,7 +1450,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->_discountId);
       $lineItem = [];
       $totalTaxAmount = 0;
-      if (!CRM_Utils_System::isNull(CRM_Utils_Array::value('line_items', $form->_values))) {
+      if (!CRM_Utils_System::isNull($form->_values['line_items'] ?? NULL)) {
         $lineItem[] = $form->_values['line_items'];
         foreach ($form->_values['line_items'] as $key => $value) {
           $totalTaxAmount = $value['tax_amount'] + $totalTaxAmount;
