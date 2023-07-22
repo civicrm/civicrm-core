@@ -87,7 +87,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     $standardTimeline = $params['standardTimeline'] ?? NULL;
     $activitySetName = $params['activitySetName'] ?? NULL;
 
-    if ('Open Case' == CRM_Utils_Array::value('activityTypeName', $params)) {
+    if ('Open Case' == ($params['activityTypeName'] ?? '')) {
       // create relationships for the ones that are required
       foreach ($xml->CaseRoles as $caseRoleXML) {
         foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
@@ -109,7 +109,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       }
     }
 
-    if ('Change Case Start Date' == CRM_Utils_Array::value('activityTypeName', $params)) {
+    if ('Change Case Start Date' == ($params['activityTypeName'] ?? '')) {
       // delete all existing activities which are non-empty
       $this->deleteEmptyActivity($params);
     }
@@ -136,7 +136,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @param array $params
    */
   public function processStandardTimeline($activitySetXML, &$params) {
-    if ('Change Case Type' == CRM_Utils_Array::value('activityTypeName', $params)
+    if ('Change Case Type' == ($params['activityTypeName'] ?? '')
       && CRM_Utils_Array::value('resetTimeline', $params, TRUE)
     ) {
       // delete all existing activities which are non-empty

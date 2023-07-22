@@ -310,7 +310,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
     }
 
-    if (($params['upload_type'] || file_exists(CRM_Utils_Array::value('tmp_name', $files['textFile']))) ||
+    if (($params['upload_type'] || file_exists($files['textFile']['tmp_name'] ?? '')) ||
       (!$params['upload_type'] && $params['text_message'])
     ) {
 

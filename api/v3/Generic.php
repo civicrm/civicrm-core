@@ -40,7 +40,7 @@
  */
 function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   static $results = [];
-  if ((CRM_Utils_Array::value('cache_clear', $apiRequest['params']))) {
+  if (!empty($apiRequest['params']['cache_clear'])) {
     $results = [];
     // we will also clear pseudoconstants here - should potentially be moved to relevant BAO classes
     CRM_Core_PseudoConstant::flush();
