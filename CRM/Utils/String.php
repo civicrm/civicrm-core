@@ -73,8 +73,8 @@ class CRM_Utils_String {
     // CRM-11744
     $name = preg_replace('/[^a-zA-Z0-9]+/', $char, trim($name));
 
-    //If there are no ascii characters present.
-    if ($name == $char) {
+    // If there are no ascii characters present.
+    if (!strlen(trim($name, $char))) {
       $name = self::createRandom($len, self::ALPHANUMERIC);
     }
 
