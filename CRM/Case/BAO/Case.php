@@ -706,7 +706,7 @@ HERESQL;
             $casesList[$key]['date'] = sprintf('<a class="action-item crm-hover-button" href="%s" title="%s">%s</a>',
               CRM_Utils_System::url('civicrm/case/activity/view', ['reset' => 1, 'cid' => $case['contact_id'], 'aid' => $case['activity_id']]),
               ts('View activity'),
-              CRM_Utils_Array::value($case['activity_type_id'], $activityTypeLabels)
+              $activityTypeLabels[$case['activity_type_id']] ?? ''
             );
           }
           else {
@@ -715,7 +715,7 @@ HERESQL;
               $status,
               CRM_Utils_System::url('civicrm/case/activity/view', ['reset' => 1, 'cid' => $case['contact_id'], 'aid' => $case['activity_id']]),
               ts('View activity'),
-              CRM_Utils_Array::value($case['activity_type_id'], $activityTypeLabels)
+              $activityTypeLabels[$case['activity_type_id']] ?? ''
             );
           }
         }
