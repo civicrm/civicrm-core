@@ -787,7 +787,7 @@ SELECT  id
 
     if (!empty($index) && (
         // it's empty so we set it OR
-        !CRM_Utils_Array::value($prefixName, $profileAddressFields)
+        empty($profileAddressFields[$prefixName])
         //we are dealing with billing id (precedence)
         || $index == $billing_id
         // we are dealing with primary & billing not set

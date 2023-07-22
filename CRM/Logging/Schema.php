@@ -337,7 +337,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       $engineChanged = isset($tableSpec['engine']) && (strtoupper($tableSpec['engine']) != $currentEngine);
       $engineConfigChanged = isset($tableSpec['engine_config']) && (strtoupper($tableSpec['engine_config']) != $this->getEngineConfigForLogTable($logTable));
       if ($engineChanged || ($engineConfigChanged && $params['updateChangedEngineConfig'])) {
-        $alterSql[] = "ENGINE=" . $tableSpec['engine'] . " " . CRM_Utils_Array::value('engine_config', $tableSpec);
+        $alterSql[] = "ENGINE=" . $tableSpec['engine'] . " " . ($tableSpec['engine_config'] ?? '');
       }
       if (!empty($tableSpec['indexes'])) {
         $indexes = $this->getIndexesForTable($logTable);

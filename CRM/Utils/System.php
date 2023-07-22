@@ -1253,7 +1253,7 @@ class CRM_Utils_System {
     // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
     if (Civi::settings()->get('enableSSL') &&
       !self::isSSL() &&
-      strtolower(CRM_Utils_Array::value('X_FORWARDED_PROTO', $req_headers)) != 'https'
+      strtolower($req_headers['X_FORWARDED_PROTO'] ?? '') != 'https'
     ) {
       // ensure that SSL is enabled on a civicrm url (for cookie reasons etc)
       $url = "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";

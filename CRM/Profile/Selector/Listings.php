@@ -428,7 +428,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         $field = $vars[$key];
         $fieldArray = explode('-', $field['name']);
         $fieldType = $fieldArray['2'] ?? NULL;
-        if (is_numeric(CRM_Utils_Array::value('1', $fieldArray))) {
+        if (is_numeric($fieldArray['1'] ?? '')) {
           if (!in_array($fieldType, $multipleFields)) {
             $locationType = new CRM_Core_DAO_LocationType();
             $locationType->id = $fieldArray[1];

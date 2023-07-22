@@ -321,7 +321,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $errors['sms_text_message'] = ts('The SMS message is a required field.');
     }
 
-    if (empty($self->getContext()) && CRM_Utils_System::isNull(CRM_Utils_Array::value(1, $fields['entity']))) {
+    if (empty($self->getContext()) && CRM_Utils_System::isNull($fields['entity'][1] ?? NULL)) {
       $errors['entity'] = ts('Please select entity value');
     }
 

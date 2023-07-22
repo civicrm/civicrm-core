@@ -40,7 +40,7 @@
  */
 function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   static $results = [];
-  if ((CRM_Utils_Array::value('cache_clear', $apiRequest['params']))) {
+  if (!empty($apiRequest['params']['cache_clear'])) {
     $results = [];
     // we will also clear pseudoconstants here - should potentially be moved to relevant BAO classes
     CRM_Core_PseudoConstant::flush();
@@ -279,7 +279,7 @@ function _civicrm_api3_generic_getfield_spec(&$params, $apiRequest) {
 function civicrm_api3_generic_getcount($apiRequest) {
   $apiRequest['params']['options']['is_count'] = TRUE;
   $result = civicrm_api($apiRequest['entity'], 'get', $apiRequest['params']);
-  if (is_numeric(CRM_Utils_Array::value('values', $result))) {
+  if (is_numeric($result['values'] ?? '')) {
     return (int) $result['values'];
   }
   if (!isset($result['count'])) {

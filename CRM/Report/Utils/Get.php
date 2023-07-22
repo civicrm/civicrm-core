@@ -206,7 +206,7 @@ class CRM_Report_Utils_Get {
     // process only filters for now
     foreach ($fieldGrp as $tableName => $fields) {
       foreach ($fields as $fieldName => $field) {
-        switch (CRM_Utils_Array::value('type', $field)) {
+        switch ($field['type'] ?? NULL) {
           case CRM_Utils_Type::T_INT:
           case CRM_Utils_Type::T_FLOAT:
           case CRM_Utils_Type::T_MONEY:

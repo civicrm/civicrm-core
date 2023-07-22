@@ -1523,7 +1523,7 @@ function _civicrm_api3_validate($entity, $action, $params) {
  * @throws Exception
  */
 function _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $params, $action) {
-  switch (CRM_Utils_Array::value('type', $fieldInfo)) {
+  switch ($fieldInfo['type'] ?? NULL) {
     case CRM_Utils_Type::T_INT:
       _civicrm_api3_validate_integer($params, $fieldName, $fieldInfo, $entity);
       break;
@@ -1585,7 +1585,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
     $fields = array_merge($fields, $chainApiParams);
   }
   foreach ($fields as $fieldName => $fieldInfo) {
-    switch (CRM_Utils_Array::value('type', $fieldInfo)) {
+    switch ($fieldInfo['type'] ?? NULL) {
       case CRM_Utils_Type::T_INT:
         //field is of type integer
         _civicrm_api3_validate_integer($params, $fieldName, $fieldInfo, $entity);

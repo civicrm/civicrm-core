@@ -456,7 +456,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         );
       }
       else {
-        $q = "action=view&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . CRM_Utils_Array::value('source_contact_id', $params) . "&context=home";
+        $q = "action=view&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . ($params['source_contact_id'] ?? '') . "&context=home";
         if ($activity->activity_type_id != CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email')) {
           $url = CRM_Utils_System::url('civicrm/activity', $q);
           if ($activity->activity_type_id == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Print PDF Letter')) {
@@ -466,13 +466,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           }
           else {
             $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/activity/add',
-              "action=update&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . CRM_Utils_Array::value('source_contact_id', $params) . "&context=home"
+              "action=update&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . ($params['source_contact_id'] ?? '') . "&context=home"
             );
           }
 
           if (CRM_Core_Permission::check("delete activities")) {
             $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/activity',
-              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . CRM_Utils_Array::value('source_contact_id', $params) . "&context=home"
+              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . ($params['source_contact_id'] ?? '') . "&context=home"
             );
           }
         }
@@ -480,7 +480,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           $url = CRM_Utils_System::url('civicrm/activity/view', $q);
           if (CRM_Core_Permission::check('delete activities')) {
             $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/activity',
-              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . CRM_Utils_Array::value('source_contact_id', $params) . "&context=home"
+              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . ($params['source_contact_id'] ?? '') . "&context=home"
             );
           }
         }

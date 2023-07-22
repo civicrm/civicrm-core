@@ -470,7 +470,7 @@ $event_summary_limit
               $ids = [];
               $params = ['entity_id' => $dao->id, 'entity_table' => 'civicrm_event'];
               $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
-              if (is_numeric(CRM_Utils_Array::value('geo_code_1', $values['location']['address'][1])) ||
+              if (is_numeric($values['location']['address'][1]['geo_code_1'] ?? '') ||
                 (
                   !empty($values['location']['address'][1]['city']) &&
                   !empty($values['location']['address'][1]['state_province_id'])
@@ -1244,7 +1244,7 @@ WHERE civicrm_event.is_active = 1
           ];
         }
         else {
-          $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values['event']) . " <" . CRM_Utils_Array::value('confirm_from_email', $values['event']) . ">";
+          $sendTemplateParams['from'] = ($values['event']['confirm_from_name'] ?? '') . " <" . ($values['event']['confirm_from_email'] ?? '') . ">";
           $sendTemplateParams['toName'] = $displayName;
           $sendTemplateParams['toEmail'] = $notifyEmail;
           $sendTemplateParams['autoSubmitted'] = TRUE;
@@ -1954,9 +1954,9 @@ WHERE  ce.loc_block_id = $locBlockId";
   public static function validRegistrationDate(&$values) {
     // make sure that we are between registration start date and end dates
     // and that if the event has ended, registration is still specifically open
-    $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_start_date', $values));
-    $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_end_date', $values));
-    $eventEnd = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('end_date', $values));
+    $startDate = CRM_Utils_Date::unixTime($values['registration_start_date'] ?? '');
+    $endDate = CRM_Utils_Date::unixTime($values['registration_end_date'] ?? '');
+    $eventEnd = CRM_Utils_Date::unixTime($values['end_date'] ?? '');
     $now = time();
     $validDate = TRUE;
     if ($startDate && $startDate >= $now) {

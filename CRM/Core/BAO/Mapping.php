@@ -483,14 +483,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
           $saveMappingFields['name'] = $v['4'] ?? NULL;
         }
 
-        if (is_numeric(CRM_Utils_Array::value('3', $v))) {
+        if (is_numeric($v['3'] ?? '')) {
           $locationTypeId = $v['3'] ?? NULL;
         }
-        elseif (is_numeric(CRM_Utils_Array::value('5', $v))) {
+        elseif (is_numeric($v['5'] ?? '')) {
           $locationTypeId = $v['5'] ?? NULL;
         }
 
-        if (is_numeric(CRM_Utils_Array::value('4', $v))) {
+        if (is_numeric($v['4'] ?? '')) {
           if ($saveMappingFields['name'] === 'im') {
             $saveMappingFields['im_provider_id'] = $v[4];
           }
@@ -498,7 +498,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
             $saveMappingFields['phone_type_id'] = $v['4'] ?? NULL;
           }
         }
-        elseif (is_numeric(CRM_Utils_Array::value('6', $v))) {
+        elseif (is_numeric($v['6'] ?? '')) {
           $saveMappingFields['phone_type_id'] = $v['6'] ?? NULL;
         }
 

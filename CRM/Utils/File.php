@@ -417,16 +417,16 @@ class CRM_Utils_File {
     $uniqID = md5(uniqid(rand(), TRUE));
     $info = pathinfo($name);
     $basename = substr($info['basename'],
-      0, -(strlen(CRM_Utils_Array::value('extension', $info, '')) + (CRM_Utils_Array::value('extension', $info, '') == '' ? 0 : 1))
+      0, -(strlen($info['extension'] ?? '') + (($info['extension'] ?? '') == '' ? 0 : 1))
     );
-    if (!self::isExtensionSafe(CRM_Utils_Array::value('extension', $info, ''))) {
+    if (!self::isExtensionSafe($info['extension'] ?? '')) {
       // munge extension so it cannot have an embbeded dot in it
       // The maximum length of a filename for most filesystems is 255 chars.
       // We'll truncate at 240 to give some room for the extension.
-      return CRM_Utils_String::munge("{$basename}_" . CRM_Utils_Array::value('extension', $info) . "_{$uniqID}", '_', 240) . ".unknown";
+      return CRM_Utils_String::munge("{$basename}_" . ($info['extension'] ?? '') . "_{$uniqID}", '_', 240) . ".unknown";
     }
     else {
-      return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . CRM_Utils_Array::value('extension', $info);
+      return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . ($info['extension'] ?? '');
     }
   }
 

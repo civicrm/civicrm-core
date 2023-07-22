@@ -660,7 +660,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
       $extIdentifier = $contactFields['external_identifier'] ?? NULL;
       if ($extIdentifier) {
         $tmpContactField['external_identifier'] = $extIdentifier;
-        $tmpContactField['external_identifier']['title'] = CRM_Utils_Array::value('title', $extIdentifier) . ' (match to contact)';
+        $tmpContactField['external_identifier']['title'] = ($extIdentifier['title'] ?? '') . ' (match to contact)';
       }
       $tmpFields['participant_contact_id']['title'] = $tmpFields['participant_contact_id']['title'] . ' (match to contact)';
 

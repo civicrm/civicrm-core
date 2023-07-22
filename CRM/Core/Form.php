@@ -996,7 +996,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   protected function prepareParamsForPaymentProcessor($params) {
     // also add location name to the array
-    $params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
+    $params["address_name-{$this->_bltID}"] = ($params['billing_first_name'] ?? '') . ' ' . ($params['billing_middle_name'] ?? '') . ' ' . ($params['billing_last_name'] ?? '');
     $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
     // Add additional parameters that the payment processors are used to receiving.
     if (!empty($params["billing_state_province_id-{$this->_bltID}"])) {
@@ -2381,7 +2381,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public static function validateMandatoryFields($fields, $values, &$errors) {
     foreach ($fields as $name => $fld) {
-      if (!empty($fld['is_required']) && CRM_Utils_System::isNull(CRM_Utils_Array::value($name, $values))) {
+      if (!empty($fld['is_required']) && CRM_Utils_System::isNull($values[$name] ?? NULL)) {
         $errors[$name] = ts('%1 is a required field.', [1 => $fld['title']]);
       }
     }

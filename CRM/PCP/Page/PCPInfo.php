@@ -219,12 +219,12 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     }
     // make sure that we are between contribution page start and end dates OR registration start date and end dates if they are set
     if ($pcpBlock->entity_table == 'civicrm_event') {
-      $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_start_date', $pageInfo));
-      $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_end_date', $pageInfo));
+      $startDate = CRM_Utils_Date::unixTime($pageInfo['registration_start_date'] ?? '');
+      $endDate = CRM_Utils_Date::unixTime($pageInfo['registration_end_date'] ?? '');
     }
     else {
-      $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('start_date', $pageInfo));
-      $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('end_date', $pageInfo));
+      $startDate = CRM_Utils_Date::unixTime($pageInfo['start_date'] ?? '');
+      $endDate = CRM_Utils_Date::unixTime($pageInfo['end_date'] ?? '');
     }
 
     $now = time();

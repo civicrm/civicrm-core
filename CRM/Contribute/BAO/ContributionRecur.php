@@ -849,7 +849,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $form->assign('contribution_recur_pane_open', FALSE);
     foreach (self::getRecurringFields() as $key) {
       if ($key === 'contribution_recur_payment_made' && !empty($form->_formValues) &&
-        !CRM_Utils_System::isNull(CRM_Utils_Array::value($key, $form->_formValues))
+        !CRM_Utils_System::isNull($form->_formValues[$key] ?? NULL)
       ) {
         $form->assign('contribution_recur_pane_open', TRUE);
         break;

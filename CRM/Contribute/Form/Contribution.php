@@ -1741,7 +1741,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       if (CRM_Contribute_BAO_Contribution::isContributionStatusNegative($params['contribution_status_id'])
       ) {
-        if (CRM_Utils_System::isNull(CRM_Utils_Array::value('cancel_date', $params))) {
+        if (CRM_Utils_System::isNull($params['cancel_date'] ?? NULL)) {
           $params['cancel_date'] = date('YmdHis');
         }
       }
