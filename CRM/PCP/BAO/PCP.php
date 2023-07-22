@@ -521,13 +521,13 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
 
       // ignore startDate for events - PCP's can be active long before event start date
       $startDate = 0;
-      $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('end_date', $entity));
+      $endDate = CRM_Utils_Date::unixTime($entity['end_date'] ?? '');
     }
     elseif ($component == 'contribute') {
       $urlBase = 'civicrm/contribute/transact';
       //start and end date of the contribution page
-      $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('start_date', $entity));
-      $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('end_date', $entity));
+      $startDate = CRM_Utils_Date::unixTime($entity['start_date'] ?? '');
+      $endDate = CRM_Utils_Date::unixTime($entity['end_date'] ?? '');
     }
 
     // define redirect url back to contrib page or event if needed
@@ -552,8 +552,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     }
     // Check if we're in range for contribution page start and end dates. for events, check if after event end date
     elseif (($startDate && $startDate > $now) || ($endDate && $endDate < $now)) {
-      $customStartDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('start_date', $entity));
-      $customEndDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $entity));
+      $customStartDate = CRM_Utils_Date::customFormat($entity['start_date'] ?? '');
+      $customEndDate = CRM_Utils_Date::customFormat($entity['end_date'] ?? '');
       if ($startDate && $endDate) {
         $statusMessage = ts('The Personal Campaign Page you have just visited is only active from %1 to %2. However you can still support the campaign here.',
           [1 => $customStartDate, 2 => $customEndDate]
