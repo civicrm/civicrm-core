@@ -87,10 +87,10 @@ function civicrm_api3_relationship_get($params) {
   }
   else {
     $relationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
-      CRM_Utils_Array::value('status_id', $params),
+      $params['status_id'] ?? 0,
       0,
-      CRM_Utils_Array::value('is_count', $options),
-      CRM_Utils_Array::value('id', $params),
+      $options['is_count'] ?? 0,
+      $params['id'] ?? 0,
       NULL,
       NULL,
       FALSE,

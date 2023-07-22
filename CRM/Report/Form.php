@@ -3540,11 +3540,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 isset($field['options']) &&
                 is_array($field['options']) && !empty($field['options'])
               ) {
-                $value = CRM_Utils_Array::value($op, $pair) . " " .
+                $value = ($pair[$op] ?? '') . " " .
                   CRM_Utils_Array::value($val, $field['options'], $val);
               }
               elseif ($val || $val == '0') {
-                $value = CRM_Utils_Array::value($op, $pair) . " " . $val;
+                $value = ($pair[$op] ?? '') . " " . $val;
               }
             }
             if ($value && empty($field['no_display'])) {
@@ -3648,7 +3648,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    */
   public function compileContent() {
     $templateFile = $this->getHookedTemplateFileName();
-    return CRM_Utils_Array::value('report_header', $this->_formValues) .
+    return ($this->_formValues['report_header'] ?? '') .
     CRM_Core_Form::$_template->fetch($templateFile) .
     CRM_Utils_Array::value('report_footer', $this->_formValues);
   }
