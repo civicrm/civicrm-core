@@ -439,7 +439,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         "email-{$this->_bltID}" => 1,
       ];
 
-      $params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
+      $params["address_name-{$this->_bltID}"] = ($params['billing_first_name'] ?? '') . ' ' . ($params['billing_middle_name'] ?? '') . ' ' . ($params['billing_last_name'] ?? '');
 
       $params["email-{$this->_bltID}"] = $params['billing_contact_email'];
       CRM_Contact_BAO_Contact::createProfileContact(

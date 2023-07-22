@@ -210,7 +210,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $this->setTitle(ts('View Event Registration for') . ' ' . $displayName);
 
     $roleId = $values[$participantID]['role_id'] ?? NULL;
-    $title = $displayName . ' (' . CRM_Utils_Array::value($roleId, $participantRoles) . ' - ' . $eventTitle . ')';
+    $title = $displayName . ' (' . ($participantRoles[$roleId] ?? '') . ' - ' . $eventTitle . ')';
 
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;
     $viewRoles = [];

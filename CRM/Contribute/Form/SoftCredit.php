@@ -150,7 +150,7 @@ class CRM_Contribute_Form_SoftCredit {
       $pcpId = $pcpInfo['pcp_id'] ?? NULL;
       $pcpTitle = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcpId, 'title');
       $contributionPageTitle = CRM_PCP_BAO_PCP::getPcpPageTitle($pcpId, 'contribute');
-      $defaults['pcp_made_through'] = CRM_Utils_Array::value('sort_name', $pcpInfo) . " :: " . $pcpTitle . " :: " . $contributionPageTitle;
+      $defaults['pcp_made_through'] = ($pcpInfo['sort_name'] ?? '') . " :: " . $pcpTitle . " :: " . $contributionPageTitle;
       $defaults['pcp_made_through_id'] = $pcpInfo['pcp_id'] ?? NULL;
       $defaults['pcp_display_in_roll'] = $pcpInfo['pcp_display_in_roll'] ?? NULL;
       $defaults['pcp_roll_nickname'] = $pcpInfo['pcp_roll_nickname'] ?? NULL;

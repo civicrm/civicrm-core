@@ -3540,11 +3540,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 isset($field['options']) &&
                 is_array($field['options']) && !empty($field['options'])
               ) {
-                $value = CRM_Utils_Array::value($op, $pair) . " " .
+                $value = ($pair[$op] ?? '') . " " .
                   CRM_Utils_Array::value($val, $field['options'], $val);
               }
               elseif ($val || $val == '0') {
-                $value = CRM_Utils_Array::value($op, $pair) . " " . $val;
+                $value = ($pair[$op] ?? '') . " " . $val;
               }
             }
             if ($value && empty($field['no_display'])) {

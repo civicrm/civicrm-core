@@ -142,11 +142,11 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     $title = NULL;
     if ($this->_id) {
       if ($this->_isTemplate) {
-        $title = ts('Edit Event Template') . ' - ' . CRM_Utils_Array::value('template_title', $eventInfo);
+        $title = ts('Edit Event Template') . ' - ' . ($eventInfo['template_title'] ?? '');
       }
       else {
         $configureText = $this->_isRepeatingEvent ? ts('Configure Repeating Event') : ts('Configure Event');
-        $title = $configureText . ' - ' . CRM_Utils_Array::value('title', $eventInfo);
+        $title = $configureText . ' - ' . ($eventInfo['title'] ?? '');
       }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
