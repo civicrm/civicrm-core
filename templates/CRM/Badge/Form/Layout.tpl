@@ -23,7 +23,7 @@
       </tr>
       <tr class="crm-badge-layout-form-block-label_format_name">
         <td class="label">{$form.label_format_name.label}</td>
-        <td>{$form.label_format_name.html} {help id="id-label_format"}</td>
+        <td>{$form.label_format_name.html} {help id="id-label_format" file="CRM/Badge/Form/Layout.hlp"}</td>
       </tr>
       <tr class="crm-badge-layout-form-block-description">
         <td class="label">{$form.description.label}</td>
