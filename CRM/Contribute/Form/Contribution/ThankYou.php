@@ -403,11 +403,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
                 $memType['current_membership'] = $membership['end_date'];
                 if (!$endDate) {
                   $endDate = $memType['current_membership'];
-                  $this->_defaultMemTypeId = $memType['id'];
                 }
                 if ($memType['current_membership'] < $endDate) {
                   $endDate = $memType['current_membership'];
-                  $this->_defaultMemTypeId = $memType['id'];
                 }
               }
             }
