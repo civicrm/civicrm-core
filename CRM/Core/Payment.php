@@ -500,8 +500,7 @@ abstract class CRM_Core_Payment {
   /**
    * Default payment instrument validation.
    *
-   * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card
-   * Not a static function, because I need to check for payment_type.
+   * Payment processors should override this.
    *
    * @param array $values
    * @param array $errors
