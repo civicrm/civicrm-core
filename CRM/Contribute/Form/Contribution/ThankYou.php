@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Membership;
+
 /**
  * Form for thank-you / success page - 3rd step of online contribution process.
  */
@@ -383,7 +385,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
             if ($cid) {
               //show current membership, skip pending and cancelled membership records,
               //because we take first membership record id for renewal
-              $membership = \Civi\Api4\Membership::get(FALSE)
+              $membership = Membership::get(FALSE)
                 ->addSelect('end_date', 'membership_type_id', 'membership_type_id.duration_unit:name')
                 ->addWhere('contact_id', '=', $cid)
                 ->addWhere('membership_type_id', '=', $memType['id'])
@@ -393,11 +395,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
                 ->execute()
                 ->first();
 
-              if ($membership) {
-                if ($membership["membership_type_id.duration_unit:name"] === 'lifetime') {
-                  $this->assign('islifetime', TRUE);
-                  continue;
-                }
+              if ($membership && $membership['membership_type_id.duration_unit:name'] !== 'lifetime') {
                 $this->assign('renewal_mode', TRUE);
                 $this->_currentMemberships[$membership['membership_type_id']] = $membership['membership_type_id'];
                 $memType['current_membership'] = $membership['end_date'];
