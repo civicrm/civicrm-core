@@ -1472,10 +1472,6 @@ input.crm-form-entityref {
   list-style: none;
 }
 
-#crm-container .crm-actions-ribbon li.crm-delete-action {
-  margin-left: 30px;
-}
-
 #crm-container .crm-actions-ribbon li.crm-previous-action,
 #crm-container .crm-actions-ribbon li.crm-next-action {
   float: right;
