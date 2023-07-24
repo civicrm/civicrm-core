@@ -213,6 +213,7 @@ trait ContactTestTrait {
       'name' => 'Test Group 1',
       'domain_id' => 1,
       'title' => 'New Test Group Created',
+      'frontend_title' => 'Public group name',
       'description' => 'New Test Group Created',
       'is_active' => 1,
       'visibility' => 'Public Pages',

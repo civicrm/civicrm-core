@@ -26,6 +26,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
    * Test civicrm_mailing_group_event_subscribe with given contact ID.
    */
   public function testMailerGroupSubscribeGivenContactID(): void {
+    $mailUtil = new CiviMailUtils($this);
     $email = 'test@example.org';
     $params = [
       'first_name' => 'Test',
@@ -44,6 +45,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('MailingEventSubscribe', 'create', $params);
     $this->assertEquals($result['values'][$result['id']]['contact_id'], $contactID);
+    $mailUtil->checkAllMailLog(['You have a pending subscription to the Public group name mailing list']);
   }
 
   /**
