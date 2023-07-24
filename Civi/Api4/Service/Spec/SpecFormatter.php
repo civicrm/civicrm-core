@@ -240,7 +240,7 @@ class SpecFormatter {
           }
         }
         elseif ($returnFormat && !empty($pseudoconstant['callback'])) {
-          $callbackOptions = call_user_func(\Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), NULL, [], $values);
+          $callbackOptions = call_user_func(\Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), $fieldName, ['values' => $values]);
           foreach ($callbackOptions as $callbackOption) {
             if (is_array($callbackOption) && !empty($callbackOption['id']) && isset($optionIndex[$callbackOption['id']])) {
               $options[$optionIndex[$callbackOption['id']]] += $callbackOption;

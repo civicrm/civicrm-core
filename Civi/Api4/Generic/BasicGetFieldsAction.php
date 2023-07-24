@@ -171,7 +171,7 @@ class BasicGetFieldsAction extends BasicGetAction {
         $field['options'] = self::pseudoconstantOptions($field['pseudoconstant']['optionGroupName']);
       }
       elseif (!empty($field['pseudoconstant']['callback'])) {
-        $field['options'] = call_user_func(\Civi\Core\Resolver::singleton()->get($field['pseudoconstant']['callback']));
+        $field['options'] = call_user_func(\Civi\Core\Resolver::singleton()->get($field['pseudoconstant']['callback']), $field['name'], []);
       }
       else {
         throw new \CRM_Core_Exception('Unsupported pseudoconstant type for field "' . $field['name'] . '"');

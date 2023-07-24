@@ -54,6 +54,61 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
   }
 
   /**
+   * Provides the pseudoconstant list for `mapping_id` field.
+   * @return array
+   */
+  public static function getMappingOptions(): array {
+    return CRM_Utils_Array::collectMethod('getLabel', self::getMappings());
+  }
+
+  /**
+   * Provides pseudoconstant list for `entity_value` field.
+   * @return array
+   */
+  public static function getEntityValueOptions(string $fieldName, array $params): array {
+    $values = self::fillValues($params['values'], ['mapping_id']);
+    if (!$values['mapping_id']) {
+      return [];
+    }
+    return self::getMapping($values['mapping_id'])->getValueLabels();
+  }
+
+  /**
+   * Provides pseudoconstant list for `entity_status` field.
+   * @return array
+   */
+  public static function getEntityStatusOptions(string $fieldName, array $params): array {
+    $values = self::fillValues($params['values'], ['mapping_id', 'entity_value']);
+    if (!$values['mapping_id']) {
+      return [];
+    }
+    return self::getMapping($values['mapping_id'])->getStatusLabels($values['entity_value']);
+  }
+
+  /**
+   * Provides pseudoconstant list for `start_action_date` & `end_date` fields.
+   * @return array
+   */
+  public static function getActionDateOptions(string $fieldName, array $params): array {
+    $values = self::fillValues($params['values'], ['mapping_id', 'entity_value']);
+    if (!$values['mapping_id']) {
+      return [];
+    }
+    return self::getMapping($values['mapping_id'])->getDateFields($values['entity_value']);
+  }
+
+  /**
+   * Provides pseudoconstant lists for `start_action_unit`, `repetition_frequency_unit` & `end_frequency_unit`.
+   * @return array
+   */
+  public static function getDateUnits(string $fieldName, array $params): array {
+    $controlField = self::fields()[$fieldName]['html']['controlField'];
+    $values = self::fillValues($params['values'], [$controlField]);
+    $count = $values[$controlField] ?? 0;
+    return CRM_Core_SelectValues::getRecurringFrequencyUnits($count);
+  }
+
+  /**
    * For each entity, get a list of entity-value labels.
    *
    * @return array
@@ -137,7 +192,10 @@ FROM civicrm_action_schedule cas
       $list[$dao->id]['start_action_offset'] = $dao->start_action_offset;
       $list[$dao->id]['start_action_unit'] = $dao->start_action_unit;
       $list[$dao->id]['start_action_condition'] = $dao->start_action_condition;
-      $list[$dao->id]['entityDate'] = ucwords(str_replace('_', ' ', $dao->entityDate));
+      $list[$dao->id]['mapping_id'] = $dao->mapping_id;
+      $list[$dao->id]['entity_value'] = explode(CRM_Core_DAO::VALUE_SEPARATOR, $dao->entityValueIds);
+      $dateOptions = self::getActionDateOptions('start_action_date', ['values' => $list[$dao->id]]);
+      $list[$dao->id]['entityDate'] = $dateOptions[$dao->entityDate] ?? '';
       $list[$dao->id]['absolute_date'] = $dao->absolute_date;
       $list[$dao->id]['entity'] = $filterMapping->getLabel();
       $list[$dao->id]['value'] = implode(', ', CRM_Utils_Array::subset(
