@@ -100,6 +100,18 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
   }
 
   /**
+   * Provides pseudoconstant list for `recipient_listing` field.
+   * @return array|null
+   */
+  public static function getRecipientListingOptions(string $fieldName, array $params): ?array {
+    $values = self::fillValues($params['values'], ['mapping_id', 'recipient']);
+    if (!$values['mapping_id']) {
+      return [];
+    }
+    return self::getMapping($values['mapping_id'])->getRecipientListing($values['recipient']);
+  }
+
+  /**
    * Provides pseudoconstant list for `entity_status` field.
    * @return array
    */
@@ -457,17 +469,11 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param int $mappingID
-   * @param $recipientType
-   *
-   * @return array
+   * @deprecated
    */
   public static function getRecipientListing($mappingID, $recipientType) {
-    $mapping = CRM_Core_BAO_ActionSchedule::getMapping($mappingID);
-    if (!$mapping) {
-      return [];
-    }
-    return $mapping->getRecipientListing($recipientType);
+    CRM_Core_Error::deprecatedFunctionWarning('getRecipientListingOptions');
+    return self::getRecipientListingOptions('recipient_listing', ['values' => ['mapping_id' => $mappingID, 'recipient' => $recipientType]]);
   }
 
   /**

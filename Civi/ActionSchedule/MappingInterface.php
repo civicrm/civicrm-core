@@ -93,28 +93,23 @@ interface MappingInterface {
   public static function getLimitToOptions(): array;
 
   /**
-   * Get a list of recipient types.
+   * Get option list for `recipient` field.
    *
    * Note: A single schedule may filter on *zero* or *one* recipient types.
    * When an admin chooses a value, it's stored in $schedule->recipient.
    *
    * @return array
-   *   array(string $value => string $label).
-   *   Ex: array('assignee' => 'Activity Assignee').
+   *   Ex: ['assignee' => 'Activity Assignee', ...].
    */
   public static function getRecipientTypes(): array;
 
   /**
-   * Get a list of recipients which match the given type.
-   *
-   * Note: A single schedule may filter on *multiple* recipients.
-   * When an admin chooses value(s), it's stored in $schedule->recipient_listing.
+   * Get option list for `recipient_listing` field.
    *
    * @param string $recipientType
-   *   Ex: 'participant_role'.
+   *   Value of `recipient` field
    * @return array
-   *   Array(mixed $name => string $label).
-   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
+   *   Ex: [1 => 'Attendee', 2 => 'Volunteer', ...].
    * @see getRecipientTypes
    */
   public function getRecipientListing($recipientType): array;

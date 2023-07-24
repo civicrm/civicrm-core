@@ -269,6 +269,16 @@
     <title>Recipient Listing</title>
     <type>varchar</type>
     <length>128</length>
+    <serialize>SEPARATOR_TRIMMED</serialize>
+    <html>
+      <label>Recipient Roles</label>
+      <type>Select</type>
+      <multiple>1</multiple>
+      <controlField>recipient</controlField>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getRecipientListingOptions</callback>
+    </pseudoconstant>
     <comment>listing based on recipient field.</comment>
     <add>4.1</add>
   </field>
