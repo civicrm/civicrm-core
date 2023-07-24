@@ -351,7 +351,7 @@ if (!CRM.vars) CRM.vars = {};
    * @returns {*}
    */
   CRM.utils.adjustDialogDefaults = function(settings) {
-    settings = $.extend({width: '65%', height: '65%', modal: true}, settings || {});
+    settings = $.extend({width: '65%', height: '40%', modal: true}, settings || {});
     // Support relative height
     if (typeof settings.height === 'string' && settings.height.indexOf('%') > 0) {
       settings.height = parseInt($(window).height() * (parseFloat(settings.height)/100), 10);
