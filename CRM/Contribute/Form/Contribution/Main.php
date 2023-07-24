@@ -1201,7 +1201,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     if (!empty($this->_ccid)) {
-      $this->set('lineItem', $this->_lineItem);
+      $this->set('lineItem', [$this->getPriceSetID() => $this->getExistingContributionLineItems()]);
     }
     elseif ($priceSetId = CRM_Utils_Array::value('priceSetId', $params)) {
       $lineItem = [];
@@ -1383,8 +1383,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $lineItems = $this->getExistingContributionLineItems();
-    // Is this used?
-    $this->_lineItem[$this->getPriceSetID()] = $lineItems;
     $this->assign('lineItem', [$this->getPriceSetID() => $lineItems]);
     $this->assign('is_quick_config', $this->isQuickConfig());
     $this->assign('priceSetID', $this->getPriceSetID());
