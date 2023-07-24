@@ -12,6 +12,7 @@
 namespace Civi\ActionSchedule;
 
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Base implementation of MappingInterface.
@@ -19,7 +20,13 @@ use Civi\Api4\Utils\CoreUtil;
  * Extend this class to register a new type of ActionSchedule mapping.
  * Note: When choosing a value to return from `getId()`, use a "machine name" style string.
  */
-abstract class MappingBase implements MappingInterface {
+abstract class MappingBase extends AutoSubscriber implements MappingInterface {
+
+  public static function getSubscribedEvents(): array {
+    return [
+      'civi.actionSchedule.getMappings' => 'onRegisterActionMappings',
+    ];
+  }
 
   /**
    * Register this action mapping type with CRM_Core_BAO_ActionSchedule.
