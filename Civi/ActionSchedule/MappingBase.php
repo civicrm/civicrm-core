@@ -59,6 +59,21 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
     return $this->getLabel();
   }
 
+  public static function getLimitToOptions(): array {
+    return [
+      [
+        'id' => 1,
+        'name' => 'limit',
+        'label' => ts('Limit to'),
+      ],
+      [
+        'id' => 2,
+        'name' => 'add',
+        'label' => ts('Also include'),
+      ],
+    ];
+  }
+
   public function getRecipientListing($recipientType): array {
     return [];
   }

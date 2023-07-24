@@ -58,10 +58,12 @@
     <type>int</type>
     <comment>Is this the recipient criteria limited to OR in addition to?</comment>
     <html>
-      <label>Limit To</label>
+      <label>Limit/Add</label>
+      <type>Select</type>
+      <controlField>mapping_id</controlField>
     </html>
     <pseudoconstant>
-      <callback>CRM_Core_SelectValues::getLimitToValues</callback>
+      <callback>CRM_Core_BAO_ActionSchedule::getLimitToOptions</callback>
     </pseudoconstant>
     <add>4.4</add>
   </field>

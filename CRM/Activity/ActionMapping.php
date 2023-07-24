@@ -61,6 +61,16 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     ];
   }
 
+  public static function getLimitToOptions(): array {
+    return [
+      [
+        'id' => 1,
+        'name' => 'limit',
+        'label' => ts('Recipients'),
+      ],
+    ];
+  }
+
   /**
    * Get a list of recipient types.
    *

@@ -51,6 +51,11 @@ abstract class CRM_Event_ActionMapping extends \Civi\ActionSchedule\MappingBase 
     ];
   }
 
+  public static function getLimitToOptions(): array {
+    // Events only support "limit", not "add".
+    return CRM_Utils_Array::findAll(parent::getLimitToOptions(), ['name' => 'limit']);
+  }
+
   /**
    * Get a list of recipient types.
    *

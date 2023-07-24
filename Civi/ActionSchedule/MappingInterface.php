@@ -86,6 +86,13 @@ interface MappingInterface {
   public function getDateFields(): array;
 
   /**
+   * Get the option list for `limit_to` (non-associative format)
+   *
+   * @return array
+   */
+  public static function getLimitToOptions(): array;
+
+  /**
    * Get a list of recipient types.
    *
    * Note: A single schedule may filter on *zero* or *one* recipient types.

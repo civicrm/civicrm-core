@@ -1229,24 +1229,4 @@ class CRM_Core_SelectValues {
     return $options;
   }
 
-  /**
-   * Limit-to options for schedule reminders.
-   *
-   * @return array
-   */
-  public static function getLimitToValues(): array {
-    return [
-      [
-        'id' => 1,
-        'name' => 'limit',
-        'label' => ts('Limit to'),
-      ],
-      [
-        'id' => 2,
-        'name' => 'add',
-        'label' => ts('Also include'),
-      ],
-    ];
-  }
-
 }

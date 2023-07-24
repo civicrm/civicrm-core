@@ -74,6 +74,18 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
   }
 
   /**
+   * Provides pseudoconstant list for `limit_to` field.
+   * @return array|null
+   */
+  public static function getLimitToOptions(string $fieldName, array $params): ?array {
+    $values = self::fillValues($params['values'], ['mapping_id']);
+    if (!$values['mapping_id']) {
+      return Civi\ActionSchedule\MappingBase::getLimitToOptions();
+    }
+    return self::getMapping($values['mapping_id'])::getLimitToOptions();
+  }
+
+  /**
    * Provides pseudoconstant list for `entity_status` field.
    * @return array
    */
