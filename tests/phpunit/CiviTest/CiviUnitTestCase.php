@@ -854,22 +854,22 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Create contribution page.
    *
    * @param array $params
+   * @param string $identifier
    *
    * @return array
    *   Array of contribution page
    */
-  public function contributionPageCreate($params = []): array {
-    $pageParams = array_merge([
+  public function contributionPageCreate(array $params = [], string $identifier = 'test'): array {
+    return $this->createTestEntity('ContributionPage', array_merge([
       'title' => 'Test Contribution Page',
-      'financial_type_id' => 1,
+      'financial_type_id:name' => 'Donation',
       'currency' => 'USD',
       'financial_account_id' => 1,
       'is_active' => 1,
       'is_allow_other_amount' => 1,
       'min_amount' => 10,
       'max_amount' => 1000,
-    ], $params);
-    return $this->callAPISuccess('ContributionPage', 'create', $pageParams);
+    ], $params), $identifier);
   }
 
   /**

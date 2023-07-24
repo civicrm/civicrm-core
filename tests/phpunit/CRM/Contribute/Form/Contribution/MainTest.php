@@ -19,12 +19,6 @@
 class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
 
   /**
-   * The id of the contribution page.
-   * @var int
-   */
-  private $contributionPageId;
-
-  /**
    * The id of the contribution page's payment processor.
    * @var int
    */
@@ -54,9 +48,9 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
   /**
    * Establish a standard list of submit params to more accurately test the submission.
    */
-  private function getSubmitParams() {
+  private function getSubmitParams(): array {
     return [
-      'id' => $this->contributionPageId,
+      'id' => $this->ids['ContributionPage']['test'],
       'amount' => 80,
       'first_name' => 'Billy',
       'last_name' => 'Gruff',
@@ -74,7 +68,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
   /**
    * Test that the membership is set to recurring if the membership type is always autorenew.
    */
-  public function testSetRecurFunction() {
+  public function testSetRecurFunction(): void {
     $membershipTypeID = $this->membershipTypeCreate(['auto_renew' => 2, 'minimum_fee' => 80]);
     $form = $this->getContributionForm();
     $priceFieldValueId = $this->getPriceFieldValue($membershipTypeID);
@@ -87,7 +81,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
   /**
    * Test that the membership is set to recurring if the membership type is optionally autorenew and is_recur is true.
    */
-  public function testSetRecurFunctionOptionalYes() {
+  public function testSetRecurFunctionOptionalYes(): void {
     $membershipTypeID = $this->membershipTypeCreate(['auto_renew' => 1, 'minimum_fee' => 80]);
     $form = $this->getContributionForm();
     $priceFieldValueId = $this->getPriceFieldValue($membershipTypeID);
@@ -100,7 +94,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
   /**
    * Test that the membership is not set to recurring if the membership type is optionally autorenew and is_recur is false.
    */
-  public function testSetRecurFunctionOptionalNo() {
+  public function testSetRecurFunctionOptionalNo(): void {
     $membershipTypeID = $this->membershipTypeCreate(['auto_renew' => 1, 'minimum_fee' => 80]);
     $form = $this->getContributionForm();
     $priceFieldValueId = $this->getPriceFieldValue($membershipTypeID);
@@ -127,42 +121,49 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
   /**
    * Get a contribution form object for testing.
    *
+   * @params array $submittedValues
+   * @params array $params
+   *
    * @return \CRM_Contribute_Form_Contribution_Main
    */
-  protected function getContributionForm($params = []) {
-    $this->priceSetId = $params['priceSetID'] ?? $this->callAPISuccessGetValue('PriceSet', [
-      'name' => 'default_membership_type_amount',
-      'return' => 'id',
-    ]);
+  protected function getContributionForm(array $submittedValues = [], $params = []): CRM_Contribute_Form_Contribution_Main {
+    try {
+      $this->priceSetId = $params['priceSetID'] ?? $this->callAPISuccessGetValue('PriceSet', [
+        'name' => 'default_membership_type_amount',
+        'return' => 'id',
+      ]);
 
-    $paymentProcessor = $this->paymentProcessorCreate([
-      'payment_processor_type_id' => 'Dummy',
-      'is_test' => 0,
-    ]);
+      $paymentProcessor = $submittedValues['payment_processor_id'] = $this->paymentProcessorCreate([
+        'payment_processor_type_id' => 'Dummy',
+        'is_test' => 0,
+      ]);
 
-    $contributionPageParams = (array_merge($params, [
-      'currency' => 'NZD',
-      'goal_amount' => 6000,
-      'is_pay_later' => 0,
-      'is_monetary' => 1,
-      'pay_later_text' => 'Front up',
-      'pay_later_receipt' => 'Ta',
-      'is_email_receipt' => 1,
-      'payment_processor' => $paymentProcessor,
-      'amount_block_is_active' => 1,
-    ]));
-
-    /** @var \CRM_Contribute_Form_Contribution_Main $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main');
-    $contributionPage = reset($this->contributionPageCreate($contributionPageParams)['values']);
-    $form->set('id', $contributionPage['id']);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPage['id'], $this->priceSetId);
-    $form->preProcess();
-    $form->buildQuickForm();
-    // Need these values to create more realistic submit params (in getSubmitParams).
-    $this->paymentProcessorId = $paymentProcessor;
-    $this->contributionPageId = (int) $contributionPage['id'];
-    return $form;
+      $contributionPageParams = (array_merge($params, [
+        'currency' => 'NZD',
+        'goal_amount' => 6000,
+        'is_pay_later' => 0,
+        'is_monetary' => 1,
+        'pay_later_text' => 'Front up',
+        'pay_later_receipt' => 'Ta',
+        'is_email_receipt' => 1,
+        'payment_processor' => [$paymentProcessor],
+        'amount_block_is_active' => 1,
+      ]));
+      $contributionPage = $this->contributionPageCreate($contributionPageParams);
+      $submittedValues['id'] = $_REQUEST['id'] = (int) $contributionPage['id'];
+      /** @var \CRM_Contribute_Form_Contribution_Main $form */
+      $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main', $submittedValues);
+      $form->set('id', $contributionPage['id']);
+      CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPage['id'], $this->priceSetId);
+      $form->preProcess();
+      $form->buildQuickForm();
+      // Need these values to create more realistic submit params (in getSubmitParams).
+      $this->paymentProcessorId = $paymentProcessor;
+      return $form;
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail('Failed to prepare form' . $e->getMessage());
+    }
   }
 
   /**
@@ -219,7 +220,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       $this->callAPISuccess('PriceFieldValue', 'create', $priceFieldValueParams);
     }
 
-    $form = $this->getContributionForm(['priceSetID' => $priceSet['id']]);
+    $form = $this->getContributionForm([], ['priceSetID' => $priceSet['id']]);
     foreach ($form->_priceSet['fields'] as $pField) {
       foreach ($pField['options'] as $opId => $opValues) {
         $membershipTypeIds[$opValues['membership_type_id']] = $opValues['membership_type_id'];
