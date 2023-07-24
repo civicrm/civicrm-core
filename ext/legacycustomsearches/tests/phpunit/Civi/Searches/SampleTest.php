@@ -237,7 +237,7 @@ class SampleTest extends TestCase implements HeadlessInterface, HookInterface, T
         'Household - CA - 2',
       ]),
     ];
-    $searches = SavedSearch::get()->addSelect('*')->execute();
+    $searches = SavedSearch::get()->addSelect('*')->addWhere('has_base', '=', FALSE)->execute();
     foreach ($searches as $index => $search) {
       $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($search['id']);
       $obj = new CRM_Contact_Form_Search_Custom_Sample($formValues);
