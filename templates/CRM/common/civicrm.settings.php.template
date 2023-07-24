@@ -82,6 +82,9 @@ if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
  * Database URL format:
  *      define( 'CIVICRM_DSN', 'mysql://crm_db_username:crm_db_password@db_server/crm_database?new_link=true');
  *
+ * See https://docs.civicrm.org/installation/en/latest/general/mysql_tls/#dsn-settings for how to append
+ * ssl options to the Database URL.
+ *
  * Drupal and CiviCRM can share the same database, or can be installed into separate databases.
  * Backdrop CMS and CiviCRM can also share the same database, or can be installed into separate databases.
  *
