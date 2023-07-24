@@ -9,10 +9,10 @@
   <title>ACL Role Assignment</title>
   <titlePlural>ACL Role Assignments</titlePlural>
   <paths>
-    <add>civicrm/acl/entityrole?reset=1&amp;action=add</add>
-    <delete>civicrm/acl/entityrole?reset=1&amp;action=delete&amp;id=[id]</delete>
-    <update>civicrm/acl/entityrole?reset=1&amp;action=update&amp;id=[id]</update>
-    <browse>civicrm/acl</browse>
+    <add>civicrm/acl/entityrole/edit?reset=1&amp;action=add</add>
+    <delete>civicrm/acl/entityrole/edit?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <update>civicrm/acl/entityrole/edit?reset=1&amp;action=update&amp;id=[id]</update>
+    <browse>civicrm/acl/entityrole</browse>
   </paths>
   <field>
     <name>id</name>

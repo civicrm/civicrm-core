@@ -53,6 +53,12 @@
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
   </item>
   <item>
+     <path>civicrm/acl/entityrole/edit</path>
+     <title>Assign Users to ACL Roles</title>
+     <page_callback>CRM_ACL_Form_EntityRole</page_callback>
+     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
+  </item>>
+  <item>
      <path>civicrm/file</path>
      <title>Browse Uploaded files</title>
      <access_arguments>access uploaded files</access_arguments>

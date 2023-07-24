@@ -24,7 +24,14 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
   public $submitOnce = TRUE;
 
   /**
-   * Build the form object.
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity(): string {
+    return 'ACLEntityRole';
+  }
+
+  /**
+   * http://adminui.localhost/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Facl%2Fentityrole&reset=1&action=add Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
