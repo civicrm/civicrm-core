@@ -12,6 +12,8 @@
 /**
  * This defines the scheduled-reminder functionality for CiviEvent
  * participants with filtering by event-type.
+ * @service
+ * @internal
  */
 class CRM_Event_ActionMapping_ByEvent extends CRM_Event_ActionMapping {
 

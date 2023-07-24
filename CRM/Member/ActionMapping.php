@@ -14,6 +14,8 @@
  * This defines the scheduled-reminder functionality for CiviMember
  * memberships. It allows one to target reminders based on join date
  * or end date, with additional filtering based on membership-type.
+ * @service
+ * @internal
  */
 class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
 

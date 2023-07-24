@@ -15,6 +15,8 @@
  * entities. It is useful for, e.g., sending a reminder based on
  * birth date, modification date, or other custom dates on
  * the contact record.
+ * @service
+ * @internal
  */
 class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
 

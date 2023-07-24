@@ -17,6 +17,8 @@
  * entities. It is useful for sending a reminder based on:
  *  - The receipt-date, cancel-date, or thankyou-date.
  *  - The type of contribution.
+ * @service
+ * @internal
  */
 class CRM_Contribute_ActionMapping_ByType extends CRM_Contribute_ActionMapping {
 
