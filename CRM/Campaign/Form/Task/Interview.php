@@ -217,7 +217,8 @@ WHERE {$clause}
     $this->_resultOptions = $this->get('resultOptions');
     if (!is_array($this->_resultOptions)) {
       $this->_resultOptions = [];
-      if ($resultOptionId = CRM_Utils_Array::value('result_id', $this->_surveyValues)) {
+      $resultOptionId = $this->_surveyValues['result_id'] ?? NULL;
+      if ($resultOptionId) {
         $this->_resultOptions = CRM_Core_OptionGroup::valuesByID($resultOptionId);
       }
       $this->set('resultOptions', $this->_resultOptions);

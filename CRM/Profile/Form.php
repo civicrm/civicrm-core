@@ -1057,7 +1057,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
-      if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
+      $greetingType = $fields[$greeting] ?? NULL;
+      if ($greetingType) {
         $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greeting . '_id', 'Customized');
         if ($customizedValue == $greetingType && empty($fields[$greeting . '_custom'])) {
           $errors[$greeting . '_custom'] = ts('Custom  %1 is a required field if %1 is of type Customized.',
@@ -1084,7 +1085,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $returnProperties = ['is_multiple', 'table_name'];
         CRM_Core_DAO::commonRetrieve("CRM_Core_DAO_CustomGroup", $filterParams, $returnValues, $returnProperties);
         if (!empty($returnValues['is_multiple'])) {
-          if ($tableName = CRM_Utils_Array::value('table_name', $returnValues)) {
+          $tableName = $returnValues['table_name'] ?? NULL;
+          if ($tableName) {
             $sql = "DELETE FROM {$tableName} WHERE id = %1 AND entity_id = %2";
             $sqlParams = [
               1 => [$this->_recordId, 'Integer'],

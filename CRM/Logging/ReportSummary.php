@@ -364,7 +364,8 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
     }
 
     $logTypeTableClause = '(1)';
-    if ($logTypeTableValue = CRM_Utils_Array::value("log_type_table_value", $this->_params)) {
+    $logTypeTableValue = $this->_params["log_type_table_value"] ?? NULL;
+    if ($logTypeTableValue) {
       $logTypeTableClause = $this->whereClause($this->_columns['log_civicrm_entity']['filters']['log_type_table'],
         $this->_params['log_type_table_op'], $logTypeTableValue, NULL, NULL);
       unset($this->_params['log_type_table_value']);

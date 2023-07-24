@@ -753,9 +753,8 @@ AND    cf.id IN ( $fieldIDList )
     }
 
     $default = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
-    if (!($type = CRM_Utils_Array::value('entityType', $params)) ||
-      in_array($params['entityType'], $default)
-    ) {
+    $type = $params['entityType'] ?? NULL;
+    if (!$type || in_array($params['entityType'], $default)) {
       $type = NULL;
     }
     else {

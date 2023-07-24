@@ -129,7 +129,8 @@ function civicrm_api3_membership_status_delete(array $params): array {
  *   Array of status id and status name
  */
 function civicrm_api3_membership_status_calc($membershipParams) {
-  if (!($membershipID = CRM_Utils_Array::value('membership_id', $membershipParams))) {
+  $membershipID = $membershipParams['membership_id'] ?? NULL;
+  if (!$membershipID) {
     throw new CRM_Core_Exception('membershipParams do not contain membership_id');
   }
 

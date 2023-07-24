@@ -186,7 +186,8 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
 
     //contact type for pick up profiles as per selected contact types with subtypes
     //CRM-5521
-    if ($selectedTypes = CRM_Utils_Array::value('contact_type', self::$_searchFormValues)) {
+    $selectedTypes = self::$_searchFormValues['contact_type'] ?? NULL;
+    if ($selectedTypes) {
       if (!is_array($selectedTypes)) {
         $selectedTypes = explode(' ', $selectedTypes);
       }

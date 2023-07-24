@@ -141,7 +141,8 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
         }
       }
 
-      if ($emails = CRM_Utils_Array::value('notify_email', $params)) {
+      $emails = $params['notify_email'] ?? NULL;
+      if ($emails) {
         $emailArray = explode(',', $emails);
         foreach ($emailArray as $email) {
           if ($email && !CRM_Utils_Rule::email(trim($email))) {

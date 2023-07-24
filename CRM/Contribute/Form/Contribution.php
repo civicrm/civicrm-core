@@ -744,7 +744,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         if ($pledgePaymentId) {
           $buildPriceSet = FALSE;
         }
-        if ($participantID = CRM_Utils_Array::value('participant', $componentDetails)) {
+        $participantID = $componentDetails['participant'] ?? NULL;
+        if ($participantID) {
           $participantLI = CRM_Price_BAO_LineItem::getLineItems($participantID);
           if (!CRM_Utils_System::isNull($participantLI)) {
             $buildPriceSet = FALSE;
@@ -890,7 +891,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Do the amount validations.
     if (empty($fields['total_amount']) && empty($self->_lineItems)) {
-      if ($priceSetId = CRM_Utils_Array::value('price_set_id', $fields)) {
+      $priceSetId = $fields['price_set_id'] ?? NULL;
+      if ($priceSetId) {
         CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $fields, $errors);
       }
     }

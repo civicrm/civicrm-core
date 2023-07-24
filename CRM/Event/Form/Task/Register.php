@@ -181,7 +181,8 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     if (empty($values['total_amount']) &&
         empty($self->_values['line_items'])
       ) {
-      if ($priceSetId = CRM_Utils_Array::value('priceSetId', $values)) {
+      $priceSetId = $values['priceSetId'] ?? NULL;
+      if ($priceSetId) {
         CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $values, $errorMsg, TRUE);
       }
     }

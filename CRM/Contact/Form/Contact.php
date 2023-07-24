@@ -319,7 +319,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if (!empty($_POST['hidden_custom'])) {
       $customGroupCount = $_POST['hidden_custom_group_count'] ?? NULL;
 
-      if ($contactSubType = CRM_Utils_Array::value('contact_sub_type', $_POST)) {
+      $contactSubType = $_POST['contact_sub_type'] ?? NULL;
+      if ($contactSubType) {
         $paramSubType = implode(',', $contactSubType);
       }
 
@@ -686,7 +687,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       ) {
         $invalidStreetNumbers = [];
         foreach ($fields['address'] as $cnt => $address) {
-          if ($streetNumber = CRM_Utils_Array::value('street_number', $address)) {
+          $streetNumber = $address['street_number'] ?? NULL;
+          if ($streetNumber) {
             $parsedAddress = CRM_Core_BAO_Address::parseStreetAddress($address['street_number']);
             if (empty($parsedAddress['street_number'])) {
               $invalidStreetNumbers[] = $cnt;

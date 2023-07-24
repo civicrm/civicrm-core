@@ -1007,7 +1007,8 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
         $contactIds[] = $contactID;
       }
       else {
-        if ($greetingBuffer = CRM_Utils_Array::value($filterContactFldIds[$contactID], $allGreetings)) {
+        $greetingBuffer = $allGreetings[$filterContactFldIds[$contactID]] ?? NULL;
+        if ($greetingBuffer) {
           $greetingString = $greetingBuffer;
         }
       }

@@ -91,11 +91,13 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     $values['target_contact_value'] = $values['target_contact_value'] ?? NULL;
 
     // Get the campaign.
-    if ($campaignId = CRM_Utils_Array::value('campaign_id', $defaults)) {
+    $campaignId = $defaults['campaign_id'] ?? NULL;
+    if ($campaignId) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
     }
-    if ($engagementLevel = CRM_Utils_Array::value('engagement_level', $defaults)) {
+    $engagementLevel = $defaults['engagement_level'] ?? NULL;
+    if ($engagementLevel) {
       $engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
       $values['engagement_level'] = CRM_Utils_Array::value($engagementLevel, $engagementLevels, $engagementLevel);
     }

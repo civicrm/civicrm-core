@@ -86,10 +86,12 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
     ) {
       /* re/calculate the weight, if the Parent ID changed OR create new menu */
 
-      if ($navName = CRM_Utils_Array::value('name', $params)) {
+      $navName = $params['name'] ?? NULL;
+      $navLabel = $params['label'] ?? NULL;
+      if ($navName) {
         $params['name'] = $navName;
       }
-      elseif ($navLabel = CRM_Utils_Array::value('label', $params)) {
+      elseif ($navLabel) {
         $params['name'] = $navLabel;
       }
 

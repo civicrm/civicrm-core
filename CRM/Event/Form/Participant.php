@@ -825,7 +825,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       ) ||
       ($self->_id && !$self->_paymentId && isset($self->_values['line_items']) && is_array($self->_values['line_items']))
     ) {
-      if ($priceSetId = CRM_Utils_Array::value('priceSetId', $values)) {
+      $priceSetId = $values['priceSetId'] ?? NULL;
+      if ($priceSetId) {
         CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $values, $errorMsg, TRUE);
       }
     }
@@ -2174,7 +2175,8 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
 
       $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-      if ($waitingStatus = CRM_Utils_Array::value($params['status_id'], $waitStatus)) {
+      $waitingStatus = $waitStatus[$params['status_id']] ?? NULL;
+      if ($waitingStatus) {
         $this->assign('isOnWaitlist', TRUE);
       }
 

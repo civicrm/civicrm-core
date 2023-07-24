@@ -394,7 +394,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         $defaults['entity'] = $entityStatus;
       }
 
-      if ($recipientListing = CRM_Utils_Array::value('recipient_listing', $defaults)) {
+      $recipientListing = $defaults['recipient_listing'] ?? NULL;
+      if ($recipientListing) {
         $defaults['recipient_listing'] = explode(CRM_Core_DAO::VALUE_SEPARATOR,
           $recipientListing
         );
@@ -411,7 +412,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         $defaults['recipient'] = 'manual';
         $defaults['recipient_manual_id'] = $defaults['recipient_manual'];
       }
-      if ($contactLanguage = CRM_Utils_Array::value('filter_contact_language', $defaults)) {
+      $contactLanguage = $defaults['filter_contact_language'] ?? NULL;
+      if ($contactLanguage) {
         $defaults['filter_contact_language'] = explode(CRM_Core_DAO::VALUE_SEPARATOR, $contactLanguage);
       }
     }

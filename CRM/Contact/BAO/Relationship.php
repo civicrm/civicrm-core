@@ -787,7 +787,8 @@ WHERE  is_active = 1 AND relationship_type_id = ' . CRM_Utils_Type::escape($type
       ' AND contact_id_b = ' . CRM_Utils_Type::escape($id, 'Integer') . " ) ) ";
 
     //if caseId is provided, include it duplicate checking.
-    if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
+    $caseId = $params['case_id'] ?? NULL;
+    if ($caseId) {
       $queryString .= ' AND case_id = ' . CRM_Utils_Type::escape($caseId, 'Integer');
     }
 

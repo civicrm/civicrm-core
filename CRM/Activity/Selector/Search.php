@@ -319,7 +319,8 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
       $row['campaign'] = $allCampaigns[$result->activity_campaign_id] ?? NULL;
       $row['campaign_id'] = $result->activity_campaign_id;
 
-      if ($engagementLevel = CRM_Utils_Array::value('activity_engagement_level', $row)) {
+      $engagementLevel = $row['activity_engagement_level'] ?? NULL;
+      if ($engagementLevel) {
         $row['activity_engagement_level'] = CRM_Utils_Array::value($engagementLevel,
           $engagementLevels, $engagementLevel
         );

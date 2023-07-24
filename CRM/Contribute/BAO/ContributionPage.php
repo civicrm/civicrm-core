@@ -291,7 +291,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       //profile is of Individual ( including the custom data of membership/contribution )
       //IF Individual type not present in profile then it is consider as Organization data.
       $userID = $contactID;
-      if ($preID = CRM_Utils_Array::value('custom_pre_id', $values)) {
+      $preID = $values['custom_pre_id'] ?? NULL;
+      if ($preID) {
         if (!empty($values['related_contact'])) {
           $preProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($preID);
           if (in_array('Individual', $preProfileTypes) || in_array('Contact', $preProfileTypes)) {
@@ -302,7 +303,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         [$values['customPre_grouptitle'], $values['customPre']] = self::getProfileNameAndFields($preID, $userID, $params['custom_pre_id']);
       }
       $userID = $contactID;
-      if ($postID = CRM_Utils_Array::value('custom_post_id', $values)) {
+      $postID = $values['custom_post_id'] ?? NULL;
+      if ($postID) {
         if (!empty($values['related_contact'])) {
           $postProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($postID);
           if (in_array('Individual', $postProfileTypes) || in_array('Contact', $postProfileTypes)) {
@@ -367,12 +369,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $tplParams['contributionTypeName'] = $tplParams['financialTypeName'];
       }
 
-      if ($contributionPageId = CRM_Utils_Array::value('id', $values)) {
+      $contributionPageId = $values['id'] ?? NULL;
+      if ($contributionPageId) {
         $tplParams['contributionPageId'] = $contributionPageId;
       }
 
       // address required during receipt processing (pdf and email receipt)
-      if ($displayAddress = CRM_Utils_Array::value('address', $values)) {
+      $displayAddress = $values['address'] ?? NULL;
+      if ($displayAddress) {
         $tplParams['address'] = $displayAddress;
       }
 
