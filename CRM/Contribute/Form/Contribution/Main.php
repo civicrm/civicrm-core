@@ -182,32 +182,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $paymentAmount += $value['scheduled_amount'];
           $duePayment = TRUE;
         }
-        elseif ($value['status'] == 'Completed' && $value['contribution_id']) {
-          $completedContributionIds[] = $value['contribution_id'];
-        }
       }
       $this->_defaults['price_' . $this->_priceSetId] = $paymentAmount;
-
-      if (count($completedContributionIds)) {
-        $softCredit = [];
-        foreach ($completedContributionIds as $id) {
-          $softCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($id);
-        }
-        if (isset($softCredit['soft_credit'])) {
-          $this->_defaults['soft_credit_type_id'] = $softCredit['soft_credit'][1]['soft_credit_type'];
-
-          //since honoree profile fieldname of fields are prefixed with 'honor'
-          //we need to reformat the fieldname to append prefix during setting default values
-          CRM_Core_BAO_UFGroup::setProfileDefaults(
-            $softCredit['soft_credit'][1]['contact_id'],
-            CRM_Core_BAO_UFGroup::getFields($this->_honoreeProfileId),
-            $defaults
-          );
-          foreach ($defaults as $fieldName => $value) {
-            $this->_defaults['honor[' . $fieldName . ']'] = $value;
-          }
-        }
-      }
     }
     elseif (!empty($this->_values['pledge_block_id'])) {
       //set default to one time contribution.
