@@ -1272,10 +1272,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // generate and set an invoiceID for this transaction
     $invoiceID = md5(uniqid(rand(), TRUE));
     $this->set('invoiceID', $invoiceID);
-    $params['invoiceID'] = $invoiceID;
-    $title = !empty($this->_values['frontend_title']) ? $this->_values['frontend_title'] : $this->_values['title'];
-    $params['description'] = ts('Online Contribution') . ': ' . ((!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $title));
-    $params['button'] = $this->controller->getButtonName();
+
     // required only if is_monetary and valid positive amount
     if ($this->_values['is_monetary'] &&
       !empty($this->_paymentProcessor) &&
@@ -1283,18 +1280,21 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     ) {
       // The concept of contributeMode is deprecated - as should be the 'is_monetary' setting.
       $this->setContributeMode();
-      // Really this setting of $this->_params & params within it should be done earlier on in the function
-      // probably the values determined here should be reused in confirm postProcess as there is no opportunity to alter anything
-      // on the confirm page. However as we are dealing with a stable release we go as close to where it is used
-      // as possible.
-      // In general the form has a lack of clarity of the logic of why things are set on the form in some cases &
-      // the logic around when $this->_params is used compared to other params arrays.
-      $this->_params = array_merge($params, $this->_params);
       $this->setRecurringMembershipParams();
       if ($this->_paymentProcessor &&
         $this->_paymentProcessor['object']->supports('preApproval')
       ) {
-        $this->handlePreApproval($this->_params);
+        // Really this setting of $this->_params & params within it should be done earlier on in the function
+        // probably the values determined here should be reused in confirm postProcess as there is no opportunity to alter anything
+        // on the confirm page. However as we are dealing with a stable release we go as close to where it is used
+        // as possible.
+        // In general the form has a lack of clarity of the logic of why things are set on the form in some cases &
+        // the logic around when $this->_params is used compared to other params arrays.
+        $params = array_merge($params, $this->_params);
+        $params['button'] = $this->controller->getButtonName();
+        $params['invoiceID'] = $invoiceID;
+        $params['description'] = ts('Online Contribution') . ': ' . ((!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['frontend_title']));
+        $this->handlePreApproval($params);
       }
     }
   }
