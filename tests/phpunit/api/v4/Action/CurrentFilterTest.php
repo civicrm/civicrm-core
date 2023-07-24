@@ -150,9 +150,9 @@ class CurrentFilterTest extends Api4TestBase implements TransactionalInterface {
       'name' => 'expired',
     ])->execute()->first();
 
-    $getCurrent = (array) SavedSearch::get()->addWhere('is_current', '=', TRUE)->execute()->indexBy('id');
-    $notCurrent = (array) SavedSearch::get()->addWhere('is_current', '=', FALSE)->execute()->indexBy('id');
-    $getAll = (array) SavedSearch::get()->addSelect('is_current')->execute()->indexBy('id');
+    $getCurrent = (array) SavedSearch::get()->addWhere('is_current', '=', TRUE)->addWhere('has_base', '=', FALSE)->execute()->indexBy('id');
+    $notCurrent = (array) SavedSearch::get()->addWhere('is_current', '=', FALSE)->addWhere('has_base', '=', FALSE)->execute()->indexBy('id');
+    $getAll = (array) SavedSearch::get()->addSelect('is_current')->addWhere('has_base', '=', FALSE)->execute()->indexBy('id');
 
     $this->assertTrue($getAll[$current['id']]['is_current']);
     $this->assertTrue($getAll[$indefinite['id']]['is_current']);

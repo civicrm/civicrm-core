@@ -44,7 +44,7 @@ class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
     catch (CRM_Core_Exception_PrematureExitException $e) {
       // Nothing to see here.
     }
-    $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
+    $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', ['where' => [['has_base', '=', FALSE]]]);
     $this->assertEquals($formValues, $savedSearch['form_values']);
   }
 
