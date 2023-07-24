@@ -2,7 +2,7 @@
     "type": "search",
     "title": "Find Contacts",
     "icon": "fa-list-alt",
-    "server_route": "civicrm/adminui/contact/search",
+    "server_route": "civicrm/searchui/contact/search",
     "permission": "access CiviCRM",
     "navigation": null,
     "requires": [],
