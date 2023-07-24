@@ -427,7 +427,8 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
         $typeValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $key);
         $cType = $typeValue['0'] ?? NULL;
         $typeUrl = 'ct=' . $cType;
-        if ($csType = CRM_Utils_Array::value('1', $typeValue)) {
+        $csType = $typeValue['1'] ?? NULL;
+        if ($csType) {
           $typeUrl .= "&cst=$csType";
         }
         $shortCut = [
@@ -436,7 +437,8 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
           'ref' => "new-$value",
           'title' => $value,
         ];
-        if ($csType = CRM_Utils_Array::value('1', $typeValue)) {
+        $csType = $typeValue['1'] ?? NULL;
+        if ($csType) {
           $shortCuts[$cType]['shortCuts'][] = $shortCut;
         }
         else {

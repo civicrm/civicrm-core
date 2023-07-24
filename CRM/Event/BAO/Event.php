@@ -1206,14 +1206,16 @@ WHERE civicrm_event.is_active = 1
         ];
 
         // address required during receipt processing (pdf and email receipt)
-        if ($displayAddress = CRM_Utils_Array::value('address', $values)) {
+        $displayAddress = $values['address'] ?? NULL;
+        if ($displayAddress) {
           $sendTemplateParams['tplParams']['address'] = $displayAddress;
           // The concept of contributeMode is deprecated.
           $sendTemplateParams['tplParams']['contributeMode'] = NULL;
         }
 
         // set lineItem details
-        if ($lineItem = CRM_Utils_Array::value('lineItem', $values)) {
+        $lineItem = $values['lineItem'] ?? NULL;
+        if ($lineItem) {
           // check if additional participant, if so filter only to relevant ones
           // CRM-9902
           if (!empty($values['params']['additionalParticipant'])) {
@@ -1994,10 +1996,12 @@ WHERE  ce.loc_block_id = $locBlockId";
     if ($contactID) {
       $params = ['contact_id' => $contactID];
 
-      if ($eventId = CRM_Utils_Array::value('id', $values['event'])) {
+      $eventId = $values['event']['id'] ?? NULL;
+      if ($eventId) {
         $params['event_id'] = $eventId;
       }
-      if ($roleId = CRM_Utils_Array::value('default_role_id', $values['event'])) {
+      $roleId = $values['event']['default_role_id'] ?? NULL;
+      if ($roleId) {
         $params['role_id'] = $roleId;
       }
       $alreadyRegistered = self::checkRegistration($params);

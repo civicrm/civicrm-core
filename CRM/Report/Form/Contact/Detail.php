@@ -909,29 +909,34 @@ HERESQL;
         foreach ($rows as $rowNum => $row) {
           // handle contribution
           if ($component == 'contribution_civireport') {
-            if ($val = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
+            $val = $row['civicrm_contribution_financial_type_id'] ?? NULL;
+            if ($val) {
               $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($val, FALSE);
             }
 
-            if ($val = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
+            $val = $row['civicrm_contribution_contribution_status_id'] ?? NULL;
+            if ($val) {
               $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_contribution_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($val, 'label');
             }
             $entryFound = TRUE;
           }
 
           if ($component === 'membership_civireport') {
-            if ($val = CRM_Utils_Array::value('civicrm_membership_membership_type_id', $row)) {
+            $val = $row['civicrm_membership_membership_type_id'] ?? NULL;
+            if ($val) {
               $componentRows[$contactID][$component][$rowNum]['civicrm_membership_membership_type_id'] = CRM_Member_PseudoConstant::membershipType($val, FALSE);
             }
 
-            if ($val = CRM_Utils_Array::value('civicrm_membership_status_id', $row)) {
+            $val = $row['civicrm_membership_status_id'] ?? NULL;
+            if ($val) {
               $componentRows[$contactID][$component][$rowNum]['civicrm_membership_status_id'] = CRM_Member_PseudoConstant::membershipStatus($val, FALSE);
             }
             $entryFound = TRUE;
           }
 
           if ($component == 'participant_civireport') {
-            if ($val = CRM_Utils_Array::value('civicrm_participant_event_id', $row)) {
+            $val = $row['civicrm_participant_event_id'] ?? NULL;
+            if ($val) {
               $componentRows[$contactID][$component][$rowNum]['civicrm_participant_event_id'] = CRM_Event_PseudoConstant::event($val, FALSE);
               $url = CRM_Report_Utils_Report::getNextUrl('event/income',
                 'reset=1&force=1&id_op=in&id_value=' . $val,
@@ -942,10 +947,12 @@ HERESQL;
               $entryFound = TRUE;
             }
 
-            if ($val = CRM_Utils_Array::value('civicrm_participant_participant_status_id', $row)) {
+            $val = $row['civicrm_participant_participant_status_id'] ?? NULL;
+            if ($val) {
               $componentRows[$contactID][$component][$rowNum]['civicrm_participant_participant_status_id'] = CRM_Event_PseudoConstant::participantStatus($val, FALSE);
             }
-            if ($val = CRM_Utils_Array::value('civicrm_participant_role_id', $row)) {
+            $val = $row['civicrm_participant_role_id'] ?? NULL;
+            if ($val) {
               $roles = explode(CRM_Core_DAO::VALUE_SEPARATOR, $val);
               $value = [];
               foreach ($roles as $role) {
@@ -958,17 +965,20 @@ HERESQL;
           }
 
           if ($component == 'activity_civireport') {
-            if ($val = CRM_Utils_Array::value('civicrm_activity_activity_type_id', $row)) {
+            $val = $row['civicrm_activity_activity_type_id'] ?? NULL;
+            if ($val) {
               $componentRows[$contactID][$component][$rowNum]['civicrm_activity_activity_type_id'] = $activityTypes[$val];
             }
-            if ($val = CRM_Utils_Array::value('civicrm_activity_activity_status_id', $row)) {
+            $val = $row['civicrm_activity_activity_status_id'] ?? NULL;
+            if ($val) {
               $componentRows[$contactID][$component][$rowNum]['civicrm_activity_activity_status_id'] = $activityStatus[$val];
             }
 
             $entryFound = TRUE;
           }
           if ($component == 'membership_civireport') {
-            if ($val = CRM_Utils_Array::value('civicrm_membership_membership_status_id', $row)) {
+            $val = $row['civicrm_membership_membership_status_id'] ?? NULL;
+            if ($val) {
               $componentRows[$contactID][$component][$rowNum]['civicrm_membership_membership_status_id'] = CRM_Member_PseudoConstant::membershipStatus($val);
             }
             $entryFound = TRUE;

@@ -373,7 +373,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     // don't allow price set w/ membership signup, CRM-5095
-    if ($priceSetId = CRM_Utils_Array::value('price_set_id', $fields)) {
+    $priceSetId = $fields['price_set_id'] ?? NULL;
+    if ($priceSetId) {
       // don't allow price set w/ membership.
       if ($hasMembershipBlk) {
         $errors['price_set_id'] = ts('You cannot enable both a Contribution Price Set and Membership Signup on the same online contribution page.');
@@ -621,7 +622,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
               $priceSetId = $usedPriceSetId;
             }
             else {
-              if ($priceFieldId = CRM_Utils_Array::value('price_field_id', $params)) {
+              $priceFieldId = $params['price_field_id'] ?? NULL;
+              if ($priceFieldId) {
                 foreach ($params['price_field_value'] as $arrayID => $fieldValueID) {
                   if (empty($params['label'][$arrayID]) && empty($params['value'][$arrayID]) && !empty($fieldValueID)) {
                     CRM_Price_BAO_PriceFieldValue::setIsActive($fieldValueID, '0');
@@ -688,7 +690,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
               CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
 
-              if (!$priceFieldID = CRM_Utils_Array::value('id', $editedResults)) {
+              $priceFieldID = $editedResults['id'] ?? NULL;
+              if (!$priceFieldID) {
                 $fieldParams = [
                   'name' => 'other_amount',
                   'label' => ts('Other Amount'),

@@ -1804,7 +1804,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     //get the campaign
-    if ($campaignId = CRM_Utils_Array::value('campaign_id', $report['mailing'])) {
+    $campaignId = $report['mailing']['campaign_id'] ?? NULL;
+    if ($campaignId) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $report['mailing']['campaign'] = $campaigns[$campaignId];
     }

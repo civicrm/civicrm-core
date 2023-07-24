@@ -1062,8 +1062,8 @@ class CRM_Report_Form extends CRM_Core_Form {
           ) {
             $this->_defaults["{$fieldName}_op"] = 'mhas';
           }
-          elseif ($op = CRM_Utils_Array::value('default_op', $field)) {
-            $this->_defaults["{$fieldName}_op"] = $op;
+          elseif (!empty($field['default_op'])) {
+            $this->_defaults["{$fieldName}_op"] = $field['default_op'];
           }
         }
       }

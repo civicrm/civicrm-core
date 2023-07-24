@@ -513,7 +513,8 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $from = $select = [];
     $case = $this->_aliases['civicrm_case'];
 
-    if ($activityType = CRM_Utils_Array::value('case_activity_all_dates', $this->_params['case_detail_extra'])) {
+    $activityType = $this->_params['case_detail_extra']['case_activity_all_dates'] ?? NULL;
+    if ($activityType) {
       $select[] = "GROUP_CONCAT(DISTINCT(civireport_activity_all_{$activityType}.{$this->_caseDetailExtra['case_activity_all_dates']['name']}) ORDER BY civireport_activity_all_{$activityType}.{$this->_caseDetailExtra['case_activity_all_dates']['name']}) as case_activity_all_dates";
 
       $from[] = " LEFT JOIN civicrm_case_activity civireport_case_activity_all_{$activityType} ON ( civireport_case_activity_all_{$activityType}.case_id = {$case}.id)

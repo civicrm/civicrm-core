@@ -403,7 +403,8 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
         );
       }
 
-      if ($type = CRM_Utils_Array::value('civicrm_contact_contact_type', $values)) {
+      $type = $values['civicrm_contact_contact_type'] ?? NULL;
+      if ($type) {
         $grantStatistics['civicrm_contact_contact_type']['title'] = ts('By Contact Type');
         $title = "Total Number of {$type}(s)";
         self::getStatistics($grantStatistics['civicrm_contact_contact_type'], $title, $values,

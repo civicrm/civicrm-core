@@ -191,7 +191,8 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     //do check for campaigns
     $values['campaign'] = '';
-    if ($campaignId = CRM_Utils_Array::value('campaign_id', $values)) {
+    $campaignId = $values['campaign_id'] ?? NULL;
+    if ($campaignId) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
     }

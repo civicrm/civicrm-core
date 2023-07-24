@@ -1643,7 +1643,8 @@ class CRM_Contact_BAO_Query {
         }
       }
       elseif ($id === 'email_on_hold') {
-        if ($onHoldValue = CRM_Utils_Array::value('email_on_hold', $formValues)) {
+        $onHoldValue = $formValues['email_on_hold'] ?? NULL;
+        if ($onHoldValue) {
           // onHoldValue should be 0 or 1 or an array. Some legacy groups may hold ''
           // so in 5.11 we have an extra if that should become redundant over time.
           // https://lab.civicrm.org/dev/core/issues/745
@@ -6021,6 +6022,7 @@ AND   displayRelType.is_active = 1
           continue;
         }
 
+        $baoName = $value['bao'] ?? NULL;
         if (CRM_Utils_System::isNull($val)) {
           $dao->$key = NULL;
         }
@@ -6052,7 +6054,7 @@ AND   displayRelType.is_active = 1
             $dao->$key = CRM_Core_PseudoConstant::getLabel($value['bao'], $value['idCol'], $val);
           }
         }
-        elseif ($baoName = CRM_Utils_Array::value('bao', $value, NULL)) {
+        elseif ($baoName) {
           //preserve id value
           $idColumn = "{$key}_id";
           $dao->$idColumn = $val;

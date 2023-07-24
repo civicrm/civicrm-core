@@ -712,19 +712,23 @@ UNION ALL
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
       }
 
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
+      $value = $row['civicrm_contribution_financial_type_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $contributionTypes[$value];
         $entryFound = TRUE;
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
+      $value = $row['civicrm_contribution_contribution_status_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
         $entryFound = TRUE;
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_page_id', $row)) {
+      $value = $row['civicrm_contribution_contribution_page_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_contribution_page_id'] = $contributionPages[$value];
         $entryFound = TRUE;
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_payment_instrument_id', $row)) {
+      $value = $row['civicrm_contribution_payment_instrument_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_payment_instrument_id'] = $paymentInstruments[$value];
         $entryFound = TRUE;
       }
@@ -738,7 +742,8 @@ UNION ALL
       }
 
       // Contribution amount links to viewing contribution
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_total_amount', $row)) {
+      $value = $row['civicrm_contribution_total_amount'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_total_amount'] = CRM_Utils_Money::format($value, $row['civicrm_contribution_currency']);
         if (CRM_Core_Permission::check('access CiviContribute')) {
           $url = CRM_Utils_System::url(
@@ -826,7 +831,8 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       }
 
       // Contribution amount links to viewing contribution
-      if ($value = CRM_Utils_Array::value('civicrm_pledge_payment_pledge_id', $row)) {
+      $value = $row['civicrm_pledge_payment_pledge_id'] ?? NULL;
+      if ($value) {
         if (CRM_Core_Permission::check('access CiviContribute')) {
           $url = CRM_Utils_System::url(
             "civicrm/contact/view/pledge",

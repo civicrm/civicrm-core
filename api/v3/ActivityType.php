@@ -57,7 +57,8 @@ function civicrm_api3_activity_type_create($params) {
 
   $action = 1;
 
-  if ($optionValueID = CRM_Utils_Array::value('option_value_id', $params)) {
+  $optionValueID = $params['option_value_id'] ?? NULL;
+  if ($optionValueID) {
     $action = 2;
   }
 

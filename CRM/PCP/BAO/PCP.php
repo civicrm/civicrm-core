@@ -705,7 +705,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     );
     $tplParams['pcpInfoURL'] = $pcpInfoURL;
     $tplParams['contribPageTitle'] = $contribPageTitle;
-    if ($emails = CRM_Utils_Array::value('notify_email', $pcpBlockInfo)) {
+    $emails = $pcpBlockInfo['notify_email'] ?? NULL;
+    if ($emails) {
       $emailArray = explode(',', $emails);
       $tplParams['pcpNotifyEmailAddress'] = $emailArray[0];
     }

@@ -99,7 +99,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       //Modify mapper fields title if fields are present in dedupe rule
       if (is_array($this->_dedupeFields[$contactType])) {
         foreach ($this->_dedupeFields[$contactType] as $val) {
-          if ($valTitle = CRM_Utils_Array::value($val, $this->_mapperFields)) {
+          $valTitle = $this->_mapperFields[$val] ?? NULL;
+          if ($valTitle) {
             $this->_mapperFields[$val] = $valTitle . ' (match to contact)';
           }
         }
@@ -203,7 +204,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           static $cTypeArray = [];
           if ($relatedContactType !== $this->getContactType() && !in_array($relatedContactType, $cTypeArray)) {
             foreach ($this->_dedupeFields[$relatedContactType] as $val) {
-              if ($valTitle = CRM_Utils_Array::value($val, $this->_formattedFieldNames[$relatedContactType])) {
+              $valTitle = $this->_formattedFieldNames[$relatedContactType][$val] ?? NULL;
+              if ($valTitle) {
                 $this->_formattedFieldNames[$relatedContactType][$val] = $valTitle . ' (match to contact)';
               }
             }

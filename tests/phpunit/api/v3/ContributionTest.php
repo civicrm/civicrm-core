@@ -4264,7 +4264,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'value' => '6',
       'is_active' => 1,
     ]);
-    if ($id = CRM_Utils_Array::value('id', $result)) {
+    $id = $result['id'] ?? NULL;
+    if ($id) {
       $this->callAPISuccess('OptionValue', 'delete', ['id' => $id]);
     }
   }

@@ -258,7 +258,8 @@ class CRM_Report_Utils_Get {
 
     if (is_array($fieldGrp)) {
       foreach ($fieldGrp as $tableName => $fields) {
-        if ($groupBys = CRM_Utils_Array::value("gby", $_GET)) {
+        $groupBys = $_GET["gby"] ?? NULL;
+        if ($groupBys) {
           $groupBys = explode(' ', $groupBys);
           if (!empty($groupBys)) {
             if (!$flag) {
@@ -283,7 +284,8 @@ class CRM_Report_Utils_Get {
   public static function processFields(&$reportFields, &$defaults) {
     //add filters from url
     if (is_array($reportFields)) {
-      if ($urlFields = CRM_Utils_Array::value("fld", $_GET)) {
+      $urlFields = $_GET["fld"] ?? NULL;
+      if ($urlFields) {
         $urlFields = explode(',', $urlFields);
       }
       if (($_GET["ufld"] ?? NULL) == 1) {

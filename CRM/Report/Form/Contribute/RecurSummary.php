@@ -295,7 +295,8 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
       $total = $total + $amountDao->amount;
 
       // handle payment instrument id
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_payment_instrument_id', $row)) {
+      $value = $row['civicrm_contribution_recur_payment_instrument_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_recur_payment_instrument_id'] = $paymentInstruments[$value];
         $entryFound = TRUE;
       }

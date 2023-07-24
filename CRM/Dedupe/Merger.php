@@ -2078,8 +2078,10 @@ ORDER BY civicrm_custom_group.weight,
     }
 
     // CRM-15681 merge sub_types
-    if ($other_sub_types = CRM_Utils_Array::value('contact_sub_type', $migrationInfo['other_details'])) {
-      if ($main_sub_types = CRM_Utils_Array::value('contact_sub_type', $migrationInfo['main_details'])) {
+    $other_sub_types = $migrationInfo['other_details']['contact_sub_type'] ?? NULL;
+    $main_sub_types = $migrationInfo['main_details']['contact_sub_type'] ?? NULL;
+    if ($other_sub_types) {
+      if ($main_sub_types) {
         $submitted['contact_sub_type'] = array_unique(array_merge($main_sub_types, $other_sub_types));
       }
       else {

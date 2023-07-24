@@ -104,7 +104,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $qParams = "reset=1&amp;id={$this->_id}";
-    if ($pcpId = CRM_Utils_Array::value('pcp_id', $this->_pcpInfo)) {
+    $pcpId = $this->_pcpInfo['pcp_id'] ?? NULL;
+    if ($pcpId) {
       $qParams .= "&amp;pcpId={$pcpId}";
     }
     $this->assign('qParams', $qParams);
@@ -1006,7 +1007,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
-      if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
+      $greetingType = $fields[$greeting] ?? NULL;
+      if ($greetingType) {
         $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greeting . '_id', 'Customized');
         if ($customizedValue == $greetingType && empty($fielse[$greeting . '_custom'])) {
           $errors[$greeting . '_custom'] = ts('Custom %1 is a required field if %1 is of type Customized.',
@@ -1176,10 +1178,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->set('amount_level', CRM_Utils_Array::value('amount_level', $params));
     }
 
+    $priceSetId = $params['priceSetId'] ?? NULL;
     if (!empty($this->_ccid)) {
       $this->set('lineItem', [$this->getPriceSetID() => $this->getExistingContributionLineItems()]);
     }
-    elseif ($priceSetId = CRM_Utils_Array::value('priceSetId', $params)) {
+    elseif ($priceSetId) {
       $lineItem = [];
       if ($this->isQuickConfig()) {
         foreach ($this->_values['fee'] as $key => & $val) {

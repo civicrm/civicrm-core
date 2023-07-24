@@ -107,7 +107,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
       ];
 
       foreach ($billing as $key => $val) {
-        if ($value = CRM_Utils_Array::value($val, $params)) {
+        $value = $params[$val] ?? NULL;
+        if ($value) {
           if (!empty($params[$key])) {
             unset($params[$val]);
           }
