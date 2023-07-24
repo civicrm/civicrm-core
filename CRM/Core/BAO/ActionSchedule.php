@@ -58,7 +58,9 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
    * @return array
    */
   public static function getMappingOptions(): array {
-    return CRM_Utils_Array::collectMethod('getLabel', self::getMappings());
+    $mappings = CRM_Utils_Array::collectMethod('getLabel', self::getMappings());
+    natcasesort($mappings);
+    return $mappings;
   }
 
   /**
