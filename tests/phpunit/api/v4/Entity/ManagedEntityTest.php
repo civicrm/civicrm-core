@@ -688,13 +688,15 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     ];
     $this->_managedEntities = [$managed];
 
+    \CRM_Core_Session::singleton()->getStatus(TRUE);
+    $this->assertEquals([], \CRM_Core_Session::singleton()->getStatus());
+
     // Without "match" in the params, it will try and fail to add a duplicate managed record
-    try {
-      CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
-    }
-    catch (\Exception $e) {
-    }
-    $this->assertStringContainsString('already exists', $e->getMessage());
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    $status = \CRM_Core_Session::singleton()->getStatus(TRUE);
+    $this->assertStringContainsString('already exists', $status[0]['text']);
+    $this->assertEquals('error', $status[0]['type']);
 
     // Now reconcile using a match param
     $managed['params']['match'] = ['name'];
