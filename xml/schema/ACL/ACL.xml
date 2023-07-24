@@ -10,6 +10,7 @@
     <add>civicrm/acl/edit?reset=1&amp;action=add</add>
     <delete>civicrm/acl/delete?reset=1&amp;action=delete&amp;id=[id]</delete>
     <update>civicrm/acl/edit?reset=1&amp;action=edit&amp;id=[id]</update>
+    <browse>civicrm/acl</browse>
   </paths>
   <field>
     <name>id</name>

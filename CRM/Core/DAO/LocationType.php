@@ -43,10 +43,10 @@ class CRM_Core_DAO_LocationType extends CRM_Core_DAO {
    * @var string[]
    */
   protected static $_paths = [
-    'browse' => 'civicrm/admin/locationType',
     'add' => 'civicrm/admin/locationType/edit?action=add&reset=1',
     'update' => 'civicrm/admin/locationType/edit?action=update&id=[id]&reset=1',
     'delete' => 'civicrm/admin/locationType/edit?action=delete&id=[id]&reset=1',
+    'browse' => 'civicrm/admin/locationType',
   ];
 
   /**

@@ -12,6 +12,7 @@
     <view>civicrm/admin/reltype/edit?action=view&amp;id=[id]&amp;reset=1</view>
     <update>civicrm/admin/reltype/edit?action=update&amp;id=[id]&amp;reset=1</update>
     <delete>civicrm/admin/reltype/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+    <browse>civicrm/admin/reltype</browse>
   </paths>
   <log>true</log>
   <field>

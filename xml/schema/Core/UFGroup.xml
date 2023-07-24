@@ -13,6 +13,7 @@
     <preview>civicrm/admin/uf/group/preview?reset=1&amp;gid=[id]</preview>
     <update>civicrm/admin/uf/group/update?action=update&amp;reset=1&amp;id=[id]</update>
     <delete>civicrm/admin/uf/group/update?action=delete&amp;reset=1&amp;id=[id]</delete>
+    <browse>civicrm/admin/uf/group</browse>
   </paths>
   <field>
     <name>id</name>
