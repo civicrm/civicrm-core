@@ -294,4 +294,14 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
     return TRUE;
   }
 
+  /**
+   * Override default payment instrument validation, as recommended.
+   *
+   * We have nothing to validate here.
+   *
+   * @param array $values
+   * @param array $errors
+   */
+  public function validatePaymentInstrument($values, &$errors): void {}
+
 }
