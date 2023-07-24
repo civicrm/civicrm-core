@@ -13,6 +13,7 @@
     <add>civicrm/admin/contribute/add?reset=1&amp;action=add</add>
     <update>civicrm/admin/contribute/settings?reset=1&amp;action=update&amp;id=[id]</update>
     <delete>civicrm/admin/contribute?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <browse>civicrm/admin/contribute</browse>
   </paths>
   <field>
     <name>id</name>

@@ -11,6 +11,7 @@
     <add>civicrm/admin/job/add?reset=1&amp;action=add</add>
     <delete>civicrm/admin/job/edit?reset=1&amp;action=delete&amp;id=[id]</delete>
     <update>civicrm/admin/job/edit?reset=1&amp;action=update&amp;id=[id]</update>
+    <browse>civicrm/admin/job</browse>
   </paths>
   <field>
     <name>id</name>

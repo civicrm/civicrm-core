@@ -11,6 +11,7 @@
     <add>civicrm/admin/options/subtype/edit?action=add&amp;reset=1</add>
     <update>civicrm/admin/options/subtype/edit?action=update&amp;id=[id]&amp;reset=1</update>
     <delete>civicrm/admin/options/subtype/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+    <browse>civicrm/admin/options/subtype</browse>
   </paths>
   <field>
     <name>id</name>

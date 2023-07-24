@@ -12,6 +12,7 @@
     <add>civicrm/acl/entityrole?reset=1&amp;action=add</add>
     <delete>civicrm/acl/entityrole?reset=1&amp;action=delete&amp;id=[id]</delete>
     <update>civicrm/acl/entityrole?reset=1&amp;action=update&amp;id=[id]</update>
+    <browse>civicrm/acl</browse>
   </paths>
   <field>
     <name>id</name>

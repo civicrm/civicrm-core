@@ -15,6 +15,7 @@
     <update>civicrm/admin/custom/group/edit?action=update&amp;reset=1&amp;id=[id]</update>
     <preview>civicrm/admin/custom/group/preview?reset=1&amp;gid=[id]</preview>
     <delete>civicrm/admin/custom/group/delete?reset=1&amp;id=[id]</delete>
+    <browse>civicrm/admin/custom/group</browse>
   </paths>
   <field>
     <name>id</name>
