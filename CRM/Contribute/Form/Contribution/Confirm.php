@@ -762,11 +762,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
                 ->execute()
                 ->first();
 
-              if ($membership) {
-                if ($membership["membership_type_id.duration_unit:name"] === 'lifetime') {
-                  $this->assign('islifetime', TRUE);
-                  continue;
-                }
+              if ($membership && $membership['membership_type_id.duration_unit:name'] !== 'lifetime') {
                 $this->assign('renewal_mode', TRUE);
                 $this->_currentMemberships[$membership['membership_type_id']] = $membership['membership_type_id'];
                 $memType['current_membership'] = $membership['end_date'];
