@@ -50,7 +50,12 @@
     <comment>Recipient</comment>
     <html>
       <label>Recipient</label>
+      <type>Select</type>
+      <controlField>mapping_id</controlField>
     </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getRecipientOptions</callback>
+    </pseudoconstant>
     <add>3.4</add>
   </field>
   <field>

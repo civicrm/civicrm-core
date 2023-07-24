@@ -86,6 +86,18 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
   }
 
   /**
+   * Provides pseudoconstant list for `recipient` field.
+   * @return array|null
+   */
+  public static function getRecipientOptions(string $fieldName, array $params): ?array {
+    $values = self::fillValues($params['values'], ['mapping_id']);
+    if (!$values['mapping_id']) {
+      return Civi\ActionSchedule\MappingBase::getRecipientTypes();
+    }
+    return self::getMapping($values['mapping_id'])::getRecipientTypes();
+  }
+
+  /**
    * Provides pseudoconstant list for `entity_status` field.
    * @return array
    */
@@ -727,12 +739,10 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * Get the list of generic recipient types supported by all entities/mappings.
-   *
-   * @return array
-   *   array(mixed $value => string $label).
+   * @deprecated
    */
   public static function getAdditionalRecipients(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4 getFields');
     return [
       'manual' => ts('Choose Recipient(s)'),
       'group' => ts('Select Group'),

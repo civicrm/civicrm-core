@@ -66,8 +66,9 @@ abstract class CRM_Event_ActionMapping extends \Civi\ActionSchedule\MappingBase 
    *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes(): array {
-    return \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+  public static function getRecipientTypes(): array {
+    $types = \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+    return $types + parent::getRecipientTypes();
   }
 
   /**

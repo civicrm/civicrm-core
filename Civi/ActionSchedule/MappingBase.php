@@ -78,8 +78,11 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
     return [];
   }
 
-  public function getRecipientTypes(): array {
-    return [];
+  public static function getRecipientTypes(): array {
+    return [
+      'manual' => ts('Choose Recipient(s)'),
+      'group' => ts('Select Group'),
+    ];
   }
 
   public function validateSchedule($schedule): array {

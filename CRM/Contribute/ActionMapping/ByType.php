@@ -67,10 +67,10 @@ class CRM_Contribute_ActionMapping_ByType extends CRM_Contribute_ActionMapping {
    *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes(): array {
-    return [
-      'soft_credit_type' => ts('Soft Credit Role'),
-    ];
+  public static function getRecipientTypes(): array {
+    $types = parent::getRecipientTypes();
+    $types['soft_credit_type'] = ts('Soft Credit Role');
+    return $types;
   }
 
   /**

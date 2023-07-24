@@ -102,7 +102,7 @@ interface MappingInterface {
    *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes(): array;
+  public static function getRecipientTypes(): array;
 
   /**
    * Get a list of recipients which match the given type.
