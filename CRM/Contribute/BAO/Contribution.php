@@ -180,7 +180,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       $params['tax_amount'] = $taxAmount;
     }
     if (isset($params['tax_amount']) && empty($params['skipLineItem'])
-      && !CRM_Utils_Money::equals($params['tax_amount'], $taxAmount, ($params['currency'] ?? Civi::settings()->get('defaultCurrency')))
+      && !CRM_Utils_Money::equals((float) $params['tax_amount'], $taxAmount, ($params['currency'] ?? Civi::settings()->get('defaultCurrency')))
     ) {
       CRM_Core_Error::deprecatedWarning('passing in incorrect tax amounts is deprecated');
     }
