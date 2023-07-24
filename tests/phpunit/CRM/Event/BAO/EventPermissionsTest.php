@@ -72,7 +72,8 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
     $this->setViewOwnEventPermissions();
     $this->assertTrue(CRM_Event_BAO_Event::checkPermission($this->ids['Event']['own'], CRM_Core_Permission::VIEW));
     // Now check that caching is actually working.
-    \Civi::$statics['CRM_Event_BAO_Event']['permission']['view'][$this->ids['Event']['own']] = FALSE;
+    $userId = CRM_Core_Session::getLoggedInContactID();
+    \Civi::$statics['CRM_Event_BAO_Event']["perm_$userId"]['view'][$this->ids['Event']['own']] = FALSE;
     $permissions = CRM_Event_BAO_Event::checkPermission($this->ids['Event']['own'], CRM_Core_Permission::VIEW);
     $this->assertFalse($permissions);
   }
