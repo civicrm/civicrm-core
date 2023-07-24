@@ -69,6 +69,77 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   }
 
   /**
+   * Get URLs through Civi::url().
+   *
+   * @see \Civi\Core\UrlTest
+   */
+  public function testUrl(): void {
+    // Make some requests for actual URLs
+    $this->assertUrlContentRegex(';MIT-LICENSE.txt;', \Civi::url('[civicrm.packages]/jquery/plugins/jquery.timeentry.js', 'a'));
+    $this->assertUrlContentRegex(';MIT-LICENSE.txt;', \Civi::url('asset://[civicrm.packages]/jquery/plugins/jquery.timeentry.js', 'a'));
+    $this->assertUrlContentRegex(';Please enter a valid email address;', \Civi::url('assetBuilder://crm-l10n.js?locale=en_US', 'a'));
+    $this->assertUrlContentRegex(';.module..crmSearchAdmin;', \Civi::url('ext://org.civicrm.search_kit/ang/crmSearchAdmin.module.js', 'a'));
+    $this->assertUrlContentRegex(';crm-section event_date_time-section;', \Civi::url('frontend://civicrm/event/info?id=1', 'a'));
+
+    // Check for well-formedness of some URLs
+    $urlPats = [];
+    switch (CIVICRM_UF) {
+      case 'Drupal':
+      case 'Drupal8':
+      case 'Backdrop':
+        $urlPats[] = [';/civicrm/event/info\?reset=1&id=9;', \Civi::url('frontend://civicrm/event/info?reset=1')->addQuery('id=9')];
+        $urlPats[] = [';/civicrm/admin\?reset=1;', \Civi::url('backend://civicrm/admin')->addQuery(['reset' => 1])];
+        break;
+
+      case 'WordPress':
+        $urlPats[] = [';civiwp=CiviCRM.*civicrm.*event.*info.*reset=1&id=9;', \Civi::url('frontend://civicrm/event/info?reset=1')->addQuery('id=9')];
+        $urlPats[] = [';/wp-admin.*civicrm.*admin.*reset=1;', \Civi::url('backend://civicrm/admin?reset=1')];
+        break;
+
+      case 'Joomla':
+        $urlPats[] = [';/index.php\?.*task=civicrm/event/info&reset=1&id=9;', \Civi::url('frontend://civicrm/event/inof?reset=1')->addQuery('id=9')];
+        $urlPats[] = [';/administrator/.*task=civicrm/admin/reset=1;', \Civi::url('backend://civicrm/admin')->addQuery('reset=1')];
+        break;
+
+      default:
+        $this->fail('Unrecognized UF: ' . CIVICRM_UF);
+    }
+
+    $urlPats[] = [';^https?://.*civicrm;', \Civi::url('frontend://civicrm/event/info?reset=1', 'a')];
+    $urlPats[] = [';^https://.*civicrm;', \Civi::url('frontend://civicrm/event/info?reset=1', 'as')];
+
+    // Some test-harnesses have HTTP_HOST. Some don't. It's pre-req for truly relative URLs.
+    if (!empty($_SERVER['HTTP_HOST'])) {
+      $urlPats[] = [';^/.*civicrm.*ajax.*api4.*Contact.*get;', \Civi::url('backend://civicrm/ajax/api4/Contact/get', 'r')];
+    }
+
+    $this->assertNotEmpty($urlPats);
+    foreach ($urlPats as $urlPat) {
+      $this->assertRegExp($urlPat[0], $urlPat[1]);
+    }
+  }
+
+  /**
+   * Check that 'frontend://', 'backend://', and 'current://' have the expected relations.
+   */
+  public function testUrl_FrontBackCurrent(): void {
+    $front = (string) \Civi::url('frontend://civicrm/profile/view');
+    $back = (string) \Civi::url('backend://civicrm/profile/view');
+    $current = (string) \Civi::url('current://civicrm/profile/view');
+    $this->assertStringContainsString('profile', $front);
+    $this->assertStringContainsString('profile', $back);
+    $this->assertStringContainsString('profile', $current);
+    if (CIVICRM_UF === 'WordPress' || CIVICRM_UF === 'Joomla') {
+      $this->assertNotEquals($front, $back, "On WordPress/Joomla, some URLs should support frontend+backend flavors.");
+    }
+    else {
+      $this->assertEquals($front, $back, "On Drupal/Backdrop/Standalone, frontend and backend URLs should look the same.");
+    }
+    $this->assertEquals($back, $current, "Within E2E tests, current routing style is backend.");
+    // For purposes of this test, it doesn't matter if "current" is frontend or backend - as long as it's consistent.
+  }
+
+  /**
    * @param string $expectContentRegex
    * @param string $url
    */
