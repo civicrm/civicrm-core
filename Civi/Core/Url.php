@@ -109,6 +109,13 @@ final class Url implements \JsonSerializable {
   private $vars;
 
   /**
+   * Define a dynamic lookup for variables.
+   *
+   * @var callable|null
+   */
+  private $varsCallback;
+
+  /**
    * @param string $logicalUri
    * @param string|null $flags
    * @see \Civi::url()
@@ -431,6 +438,27 @@ final class Url implements \JsonSerializable {
   }
 
   /**
+   * @return callable|null
+   */
+  public function getVarsCallback(): ?callable {
+    return $this->varsCallback;
+  }
+
+  /**
+   * Configure dynamic lookup for variables.
+   *
+   * @param callable|null $varsCallback
+   *   Function(string $varName): ?string
+   *   Determine the string-value of the variable. (May be ''.)
+   *   If the variable is unavailable, return NULL.
+   * @return $this
+   */
+  public function setVarsCallback(?callable $varsCallback) {
+    $this->varsCallback = $varsCallback;
+    return $this;
+  }
+
+  /**
    * Apply a series of flags using short-hand notation.
    *
    * @param string $flags
@@ -553,7 +581,16 @@ final class Url implements \JsonSerializable {
       // Replace variables
       $result = preg_replace_callback('/\[(\w+)\]/', function($m) {
         $var = $m[1];
-        return isset($this->vars[$var]) ? urlencode($this->vars[$var]) : "[$var]";
+        if (isset($this->vars[$var])) {
+          return urlencode($this->vars[$var]);
+        }
+        if ($this->varsCallback !== NULL) {
+          $value = call_user_func($this->varsCallback, $var);
+          if ($value !== NULL) {
+            return urlencode($value);
+          }
+        }
+        return "[$var]";
       }, $result);
     }
 
