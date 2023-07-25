@@ -477,14 +477,6 @@ class Container {
       'CRM_Core_LegacyErrorHandler',
       'handleException',
     ], -200);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Activity_ActionMapping', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Contact_ActionMapping', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Contribute_ActionMapping_ByPage', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Contribute_ActionMapping_ByType', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Event_ActionMapping_ByType', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Event_ActionMapping_ByEvent', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Event_ActionMapping_ByTemplate', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Member_ActionMapping', 'onRegisterActionMappings']);
 
     return $dispatcher;
   }
