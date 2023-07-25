@@ -33,7 +33,7 @@ namespace Civi\Core;
  * This cl
  * @see \Civi::url()
  */
-final class Url {
+final class Url implements \JsonSerializable {
 
   /**
    * @var string
@@ -558,6 +558,11 @@ final class Url {
     }
 
     return $this->htmlEscape ? htmlentities($result) : $result;
+  }
+
+  #[\ReturnTypeWillChange]
+  public function jsonSerialize() {
+    return $this->__toString();
   }
 
   private function composeSuffix(): string {
