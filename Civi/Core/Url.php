@@ -12,6 +12,25 @@ namespace Civi\Core;
  * The typical way to construct a URL object is through `Civi::url()`, which features more
  * documentation and examples.
  *
+ * This class-model has several properties. Most properties follow one of two patterns:
+ *
+ *   - URL components (such as `path`, `query`, `fragment`, `fragmentQuery`).
+ *     These have getter/setter/adder methods. They are stored as raw URL substrings.
+ *   - Smart flags (such as `preferFormat`, `ssl`, `cacheCode`).
+ *     These have getter/setter methods. They are stored as simple types (booleans or strings).
+ *     They also have aliases via `__construct(...$flags)` and `useFlags($flags)`
+ *
+ * URI components (`path`, `query`, etc) can be understood as raw-strings or data-arrays. Compare:
+ *
+ *  - "Path":           "civicrm/foo+bar/whiz+bang" vs ['civicrm', 'foo bar', 'whiz bang']
+ *  - "Query:           "a=100&b=Hello+world" vs ["a" => 100, "b" => "Hello world"]
+ *  - "Fragment":       "#/mailing/new" vs ["/mailing", "/new"]
+ *  - "Fragment Query": "angularDebug=1" vs ["angularDebug" => 1]
+ *
+ * The raw-string is supported from all angles (storage+getters+setters+adders).
+ * Additionally, the setters+adders accept arrays.
+ *
+ * This cl
  * @see \Civi::url()
  */
 final class Url {
@@ -38,6 +57,11 @@ final class Url {
    * @var string|null
    */
   private $fragment;
+
+  /**
+   * @var string|null
+   */
+  private $fragmentQuery;
 
   /**
    * Whether to auto-append the cache-busting resource code.
@@ -104,7 +128,9 @@ final class Url {
       $this->path .= $parsed['path'];
     }
     $this->query = $parsed['query'] ?? NULL;
-    $this->fragment = $parsed['fragment'] ?? NULL;
+    $fragmentParts = isset($parsed['fragment']) ? explode('?', $parsed['fragment'], 2) : [];
+    $this->fragment = $fragmentParts[0] ?? NULL;
+    $this->fragmentQuery = $fragmentParts[1] ?? NULL;
 
     if ($flags !== NULL) {
       $this->useFlags($flags);
@@ -113,6 +139,7 @@ final class Url {
 
   /**
    * @return string
+   *   Ex: 'frontend' or 'backend'
    */
   public function getScheme() {
     return $this->scheme;
@@ -120,6 +147,7 @@ final class Url {
 
   /**
    * @param string $scheme
+   *   Ex: 'frontend' or 'backend'
    */
   public function setScheme(string $scheme): Url {
     $this->scheme = $scheme;
@@ -127,90 +155,159 @@ final class Url {
   }
 
   /**
-   * @return mixed
+   * @return string|null
+   *   Ex: 'civicrm/event/info'
+   *   Ex: 'civicrm/hello+world%3F'
    */
   public function getPath() {
     return $this->path;
   }
 
   /**
-   * @param string $path
+   * @param string|string[]|null $path
+   *   Ex: 'civicrm/event/info'
+   *   Ex: 'civicrm/hello+world%3F'
+   *   Ex: ['civicrm', 'hello world?']
    */
-  public function setPath(string $path): Url {
-    $this->path = $path;
+  public function setPath($path): Url {
+    $this->path = static::encodePath($path);
     return $this;
   }
 
   /**
-   * @param string|string[] $pathParts
+   * Add new sections to the path.
+   *
+   * When adding new parts to the path, there is an implicit delimiter ('/') between parts.
+   *
+   * @param string|string[] $path
+   *   Ex: 'civicrm/event/info'
+   *   Ex: 'civicrm/hello+world%3F'
+   *   Ex: ['civicrm', 'hello world?']
    * @return $this
    */
-  public function addPath($pathParts): Url {
-    $suffix = implode('/', (array) $pathParts);
-    if ($this->path === NULL) {
-      $this->path = $suffix;
-    }
-    else {
-      $this->path = rtrim($this->path, '/') . '/' . $suffix;
-    }
+  public function addPath($path): Url {
+    static::appendString($this->path, '/', static::encodePath($path));
     return $this;
   }
 
   /**
    * @return string|null
+   *   Ex: 'name=John+Doughnut&id=9'
    */
   public function getQuery(): ?string {
     return $this->query;
   }
 
   /**
-   * @param string|array|null $query
+   * @param string|string[]|null $query
+   *   Ex: 'name=John+Doughnut&id=9'
+   *   Ex: ['name' => 'John Doughnut', 'id' => 9]
+   * @return $this
    */
   public function setQuery($query): Url {
-    $this->query = \CRM_Utils_System::makeQueryString($query);
+    if (is_array($query)) {
+      $query = \CRM_Utils_System::makeQueryString($query);
+    }
+    $this->query = $query;
     return $this;
   }
 
   /**
-   * @param string|array $query
+   * @param string|string[] $query
+   *   Ex: 'name=John+Doughnut&id=9'
+   *   Ex: ['name' => 'John Doughnut', 'id' => 9]
    * @return $this
    */
   public function addQuery($query): Url {
-    if ($this->query === NULL) {
-      $this->query = \CRM_Utils_System::makeQueryString($query);
+    if (is_array($query)) {
+      $query = \CRM_Utils_System::makeQueryString($query);
     }
-    else {
-      $this->query .= '&' . \CRM_Utils_System::makeQueryString($query);
-    }
+    static::appendString($this->query, '&', $query);
     return $this;
   }
 
   /**
+   * Get the primary fragment.
+   *
+   * NOTE: This is the primary fragment identifier (as in `#id` or `#/client/side/route`).
+   * and does not include fregment queries. (as in '#?angularDebug=1').
+   *
    * @return string|null
+   *   Ex: '/mailing/new'
+   *   Ex: '/foo+bar%3F/newish%3F'
+   * @see Url::getFragmentQuery()
+   * @see Url::composeFragment()
    */
   public function getFragment(): ?string {
     return $this->fragment;
   }
 
   /**
-   * @param string|null $fragment
+   * Replace the fragment.
+   *
+   * NOTE: This is the primary fragment identifier (as in `#id` or `#/client/side/route`).
+   * and does not include fregment queries. (as in '#?angularDebug=1').
+   *
+   * @param string|string[]|null $fragment
+   *   Ex: '/mailing/new'
+   *   Ex: '/foo+bar/newish%3F'
+   *   Ex: ['', 'foo bar', 'newish?']
+   * @return $this
+   * @see Url::setFragmentQuery()
+   * @see url::composeFragment()
    */
-  public function setFragment(?string $fragment): Url {
-    $this->fragment = \CRM_Utils_System::makeQueryString($fragment);
+  public function setFragment($fragment): Url {
+    $this->fragment = static::encodePath($fragment);
     return $this;
   }
 
   /**
-   * @param string|array $fragment
+   * Add to fragment.
+   *
+   * @param string|string[] $fragment
+   *   Ex: 'mailing/new'
+   *   Ex: 'foo+bar/newish%3F'
+   *   Ex: ['foo bar', 'newish?']
    * @return $this
    */
   public function addFragment($fragment): Url {
-    if ($this->fragment === NULL) {
-      $this->fragment = \CRM_Utils_System::makeQueryString($fragment);
+    static::appendString($this->fragment, '/', static::encodePath($fragment));
+    return $this;
+  }
+
+  /**
+   * @return string|null
+   *   Ex: 'name=John+Doughnut&id=9'
+   */
+  public function getFragmentQuery(): ?string {
+    return $this->fragmentQuery;
+  }
+
+  /**
+   * @param string|string[]|null $fragmentQuery
+   *   Ex: 'name=John+Doughnut&id=9'
+   *   Ex: ['name' => 'John Doughnut', 'id' => 9]
+   * @return $this
+   */
+  public function setFragmentQuery($fragmentQuery) {
+    if (is_array($fragmentQuery)) {
+      $fragmentQuery = \CRM_Utils_System::makeQueryString($fragmentQuery);
     }
-    else {
-      $this->fragment .= '&' . \CRM_Utils_System::makeQueryString($fragment);
+    $this->fragmentQuery = $fragmentQuery;
+    return $this;
+  }
+
+  /**
+   * @param string|array $fragmentQuery
+   *   Ex: 'name=John+Doughnut&id=9'
+   *   Ex: ['name' => 'John Doughnut', 'id' => 9]
+   * @return $this
+   */
+  public function addFragmentQuery($fragmentQuery): Url {
+    if (is_array($fragmentQuery)) {
+      $fragmentQuery = \CRM_Utils_System::makeQueryString($fragmentQuery);
     }
+    static::appendString($this->fragmentQuery, '&', $fragmentQuery);
     return $this;
   }
 
@@ -402,11 +499,11 @@ final class Url {
     switch ($scheme) {
       case 'frontend':
       case 'service':
-        $result = $userSystem->url($this->getPath(), $this->getQuery(), $preferFormat === 'absolute', $this->getFragment(), TRUE, FALSE, FALSE);
+        $result = $userSystem->url($this->getPath(), $this->getQuery(), $preferFormat === 'absolute', $this->composeFragment(), TRUE, FALSE, FALSE);
         break;
 
       case 'backend':
-        $result = $userSystem->url($this->getPath(), $this->getQuery(), $preferFormat === 'absolute', $this->getFragment(), FALSE, TRUE, FALSE);
+        $result = $userSystem->url($this->getPath(), $this->getQuery(), $preferFormat === 'absolute', $this->composeFragment(), FALSE, TRUE, FALSE);
         break;
 
       case 'assetBuilder':
@@ -465,13 +562,22 @@ final class Url {
 
   private function composeSuffix(): string {
     $result = '';
-    if ($this->query) {
+    if ($this->query !== NULL && $this->query !== '') {
       $result .= '?' . $this->query;
     }
-    if ($this->fragment) {
-      $result .= '#' . $this->fragment;
+    $fragment = $this->composeFragment();
+    if ($fragment !== NULL && $fragment !== '') {
+      $result .= '#' . $fragment;
     }
     return $result;
+  }
+
+  private function composeFragment(): ?string {
+    $fragment = $this->fragment;
+    if ($this->fragmentQuery !== NULL && $this->fragmentQuery !== '') {
+      $fragment = ($fragment ?: '') . '?' . $this->fragmentQuery;
+    }
+    return $fragment;
   }
 
   private static function detectFormat(): string {
@@ -500,6 +606,44 @@ final class Url {
 
     // Web UI: Most CiviCRM routes (`CRM_Core_Invoke::invoke()`) and CMS blocks
     return \CRM_Core_Config::singleton()->userSystem->isFrontEndPage() ? 'frontend' : 'backend';
+  }
+
+  /**
+   * @param string|string[]|null $path
+   *   Ex: 'greet/hello+world/en'
+   *   Ex: ['greet', 'hello world', 'en']
+   * @return string|null
+   *   Ex: 'greet/hello+world/en'
+   */
+  private static function encodePath($path): ?string {
+    if (is_array($path)) {
+      $encodedArray = array_map('urlencode', $path);
+      return implode('/', $encodedArray);
+    }
+    else {
+      return $path;
+    }
+  }
+
+  private static function appendString(?string &$var, string $separator, ?string $value): void {
+    if ($value === NULL) {
+      return;
+    }
+
+    if ($var === NULL) {
+      $var = $value;
+      return;
+    }
+
+    // Dedupe separators
+    if (str_ends_with($var, $separator)) {
+      $var = rtrim($var, $separator);
+    }
+    if ($value[0] === $separator) {
+      $value = ltrim($value, $separator);
+    }
+
+    $var = $var . $separator . $value;
   }
 
 }

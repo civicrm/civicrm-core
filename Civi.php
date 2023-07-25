@@ -219,12 +219,21 @@ class Civi {
   }
 
   /**
-   * Construct a URL based on a logical service address.
+   * Construct a URL based on a logical service address. URL building follows a few rules:
    *
-   * Ex: Link to constituent's dashboard (on frontend UI)
+   * 1. You should initialize with a baseline URL (e.g. 'frontend://civicrm/profile/view?id=123&gid=456').
+   * 2. The scheme indicates the general type of URL ('frontend://', 'backend://', 'asset://', 'assetBuilder://').
+   * 3. The URL object provides getters, setters, and adders (e.g. `getScheme()`, `setPath(...)`, `addQuery(...)`)
+   * 4. Strings are raw. Arrays are auto-encoded. (`addQuery('name=John+Doughnut')` or `addQuery(['name' => 'John Doughnut'])`)
+   * 5. You may use variable expressions (`id=[contact]&gid=[profile]`).
+   * 6. The URL can be cast to string (aka `__toString()`).
+   *
+   * Here are several examples:
+   *
+   * Ex: Link to constituent's dashboard (specifically on frontend UI)
    *   $url = Civi::url('frontend://civicrm/user?reset=1');
    *
-   * Ex: Link to constituent's dashboard (on frontend UI or backend UI -- whatever matches current page-view)
+   * Ex: Link to constituent's dashboard (on frontend UI or backend UI -- based on the active scheme of current page-view)
    *   $url = Civi::url('//civicrm/user?reset=1');
    *
    * Ex: Link to constituent's dashboard (with method calls - good for dynamic options)

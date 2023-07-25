@@ -51,15 +51,17 @@ class UrlTest extends \CiviUnitTestCase {
   public function testPath() {
     $examples = [];
     $examples[] = ['civicrm/ajax/api4', Civi::url('service://civicrm/ajax/api4')];
-    $examples[] = ['civicrm/ajax/api4/Contact/get', Civi::url('service://civicrm/ajax/api4')->addPath('Contact/get')];
-    $examples[] = ['civicrm/ajax/api4/Contact/get', Civi::url('service://civicrm/ajax/api4')->addPath('Contact')->addPath('get')];
+    $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4/Contact/get+stuff')];
+    $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4')->addPath(['Contact', 'get stuff'])];
+    $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4/Contact')->addPath('get+stuff')];
+    $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4/Contact')->addPath(['get stuff'])];
     $examples[] = ['civicrm/new-path', Civi::url('service://civicrm/old-path')->setPath('civicrm/new-path')];
 
     foreach ($examples as $key => $example) {
       /** @var \Civi\Core\Url $url */
       [$expected, $url] = $example;
-      $this->assertEquals($expected, $url->getPath());
-      $this->assertStringContainsString($expected, (string) $url);
+      $this->assertEquals($expected, $url->getPath(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
+      $this->assertStringContainsString($expected, (string) $url, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
     }
   }
 
@@ -69,15 +71,59 @@ class UrlTest extends \CiviUnitTestCase {
     $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view')->addQuery('reset=1&id=9')];
     $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view')->addQuery(['reset' => 1, 'id' => 9])];
     $examples[] = ['noise=Hello+world%3F', Civi::url('frontend://civicrm/profile/view?noise=Hello+world%3F')];
+    $examples[] = ['noise=Hello+world%3F', Civi::url('frontend://civicrm/profile/view')->addQuery('noise=Hello+world%3F')];
     $examples[] = ['noise=Hello+world%3F', Civi::url('frontend://civicrm/profile/view')->addQuery(['noise' => 'Hello world?'])];
     $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery('reset=1&id=9')];
+    $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery(['reset' => 1, 'id' => 9])];
     $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery('reset=1')->addQuery('id=9')];
 
     foreach ($examples as $key => $example) {
       /** @var \Civi\Core\Url $url */
       [$expected, $url] = $example;
-      $this->assertEquals($expected, $url->getQuery());
-      $this->assertStringContainsString($expected, (string) $url);
+      $this->assertEquals($expected, $url->getQuery(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
+      $this->assertStringContainsString($expected, (string) $url, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
+    }
+  }
+
+  public function testFragment() {
+    $examples = [];
+    $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/mailing/new')];
+    $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/')->addFragment('mailing/new')];
+    $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/')->addFragment('/mailing/new')];
+    $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/')->addFragment(['mailing', 'new'])];
+    $examples[] = [NULL, Civi::url('frontend://civicrm/a/#/mailing/new')->setFragment(NULL)];
+    $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/mailing/new+stuff?extra=1')];
+    $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/mailing?extra=1')->addFragment('new+stuff')];
+    $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/mailing?extra=1')->addFragment(['new stuff'])];
+    $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/ignore?extra=1')->setFragment('/mailing/new+stuff')];
+    $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/ignore?extra=1')->setFragment(['', 'mailing', 'new stuff'])];
+
+    foreach ($examples as $key => $example) {
+      /** @var \Civi\Core\Url $url */
+      [$expected, $url] = $example;
+      $this->assertEquals($expected, $url->getFragment(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
+      if ($expected !== NULL) {
+        $this->assertStringContainsString($expected, (string) $url, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
+      }
+    }
+  }
+
+  public function testFragmentQuery() {
+    $examples = [];
+    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new?angularDebug=1&extra=hello+world%3F')];
+    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new?angularDebug=1')->addFragmentQuery('extra=hello+world%3F')];
+    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->addFragmentQuery('angularDebug=1&extra=hello+world%3F')];
+    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->addFragmentQuery(['angularDebug' => 1, 'extra' => 'hello world?'])];
+    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->setFragmentQuery('angularDebug=1&extra=hello+world%3F')];
+    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->setFragmentQuery(['angularDebug' => 1, 'extra' => 'hello world?'])];
+
+    foreach ($examples as $key => $example) {
+      /** @var \Civi\Core\Url $url */
+      [$expected, $url] = $example;
+      $this->assertEquals($expected, $url->getFragmentQuery(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
+      if ($expected !== NULL) {
+        $this->assertStringContainsString($expected, (string) $url, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
+      }
     }
   }
 
