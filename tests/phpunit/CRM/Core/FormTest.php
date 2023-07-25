@@ -91,8 +91,8 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
       'title' => 'Priciest Price Set',
     ])['id'];
 
-    $_SERVER['REQUEST_URI'] = "civicrm/admin/price/field?reset=1&action=add&sid={$priceSetId}";
-    $_GET['q'] = 'civicrm/admin/price/field';
+    $_SERVER['REQUEST_URI'] = "civicrm/admin/price/field/edit?reset=1&action=add&sid={$priceSetId}";
+    $_GET['q'] = 'civicrm/admin/price/field/edit';
     $_REQUEST['reset'] = 1;
     $_REQUEST['action'] = 'add';
     $_REQUEST['sid'] = $priceSetId;

@@ -57,7 +57,7 @@
 
         {if NOT ($action eq 1 or $action eq 2) }
         <div class="action-link">
-            {crmButton p='civicrm/admin/price' q="action=add&reset=1" id="newPriceSet"  icon="plus-circle"}{ts}Add Set of Price Fields{/ts}{/crmButton}
+            {crmButton p='civicrm/admin/price/edit' q="action=add&reset=1" id="newPriceSet"  icon="plus-circle"}{ts}Add Set of Price Fields{/ts}{/crmButton}
         </div>
         {/if}
 
@@ -67,7 +67,7 @@
       {if $action ne 1} {* When we are adding an item, we should not display this message *}
         {capture assign=infoTitle}{ts}No price sets have been added yet.{/ts}{/capture}
         {assign var="infoType" value="no-popup"}
-        {capture assign=crmURL}{crmURL p='civicrm/admin/price' q='action=add&reset=1'}{/capture}
+        {capture assign=crmURL}{crmURL p='civicrm/admin/price/edit' q='action=add&reset=1'}{/capture}
         {capture assign=infoMessage}{ts 1=$crmURL}You can <a href='%1'>create one here</a>.{/ts}{/capture}
         {include file="CRM/common/info.tpl"}
       {/if}
