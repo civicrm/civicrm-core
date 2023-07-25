@@ -426,7 +426,7 @@ final class Url implements \JsonSerializable {
    * @return $this
    */
   public function addVars(array $vars): Url {
-    $this->vars = array_merge($this->vars ?: [], $vars);
+    $this->vars = $vars + ($this->vars ?: []);
     return $this;
   }
 

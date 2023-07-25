@@ -127,4 +127,26 @@ class UrlTest extends \CiviUnitTestCase {
     }
   }
 
+  public function testVars(): void {
+    $vars = ['hi' => 'hello world?', 'contact' => 123];
+
+    $examples = [];
+    $examples[] = ['civicrm/admin/hello+world%3F', Civi::url('backend://civicrm/admin/[hi]?x=1')];
+    $examples[] = ['msg=hello+world%3F&id=123', Civi::url('backend://civicrm/admin?msg=[hi]&id=[contact]')];
+    $examples[] = ['a=123&b=456', Civi::url('backend://civicrm/admin?a=[1]&b=[2]')->addVars([1 => 123, 2 => 456])];
+    $examples[] = ['#/page?msg=hello+world%3F', Civi::url('backend://civicrm/a/#/page?msg=[hi]')];
+    $examples[] = ['a=hello+world%3F&b=Au+re%2Fvoir', Civi::url('frontend://civicrm/user?a=[hi]&b=[bye]')->addVars(['bye' => 'Au re/voir'])];
+    $examples[] = ['some_xyz=123', Civi::url('//civicrm/foo?some_[key]=123')->addVars(['key' => 'xyz'])];
+
+    // Unrecognized []'s are preserved as literals, which allows interop with deep form fields
+    $examples[] = ['some[key]=123', Civi::url('//civicrm/foo?some[key]=123')];
+
+    foreach ($examples as $key => $example) {
+      /** @var \Civi\Core\Url $url */
+      [$expected, $url] = $example;
+      $url->addVars($vars);
+      $this->assertStringContainsString($expected, (string) $url, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
+    }
+  }
+
 }
