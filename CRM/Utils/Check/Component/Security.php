@@ -414,7 +414,21 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       return FALSE;
     }
 
-    $content = @file_get_contents("$url");
+    // Since this can be confusing as to how this works:
+    // $url corresponds to $dir not $file, but we're not checking if we can
+    // retrieve $file, we're checking if retrieving $url gives us a LISTING of
+    // the files in $dir. So $content is that listing, and then the stristr
+    // is checking if $file, which is the bare filename (e.g. "delete-this-123")
+    // is contained in that listing (which would be undesirable).
+    $content = '';
+    try {
+      $response = (new \GuzzleHttp\Client())->request('GET', $url, [
+        'timeout' => \Civi::settings()->get('http_timeout'),
+      ]);
+      $content = $response->getBody()->getContents();
+    }
+    catch (\GuzzleHttp\Exception\GuzzleException $e) {
+    }
     if (stristr($content, $file)) {
       $result = TRUE;
     }
