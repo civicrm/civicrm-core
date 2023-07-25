@@ -269,6 +269,7 @@ class Civi {
    *     - 'backend://' (Back-end page-route for staff)
    *     - 'service://` (Web-service page-route for automated integrations; aka webhooks and IPNs)
    *     - 'current://' (Whichever UI is currently active)
+   *     - 'default://'(Whichever UI is recorded in the metadata)
    *     - 'asset://' (Static asset-file; see \Civi::paths())
    *     - 'assetBuilder://' (Dynamically-generated asset-file; see \Civi\Core\AssetBuilder)
    *     - 'ext://' (Static asset-file provided by an extension)

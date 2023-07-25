@@ -139,6 +139,16 @@ class PathUrlTest extends \CiviEndToEndTestCase {
     // For purposes of this test, it doesn't matter if "current" is frontend or backend - as long as it's consistent.
   }
 
+  public function testUrl_DefaultUI(): void {
+    $adminDefault = (string) \Civi::url('default://civicrm/admin');
+    $adminBackend = (string) \Civi::url('backend://civicrm/admin');
+    $this->assertEquals($adminBackend, $adminDefault, "civicrm/admin should default to backend");
+
+    $userDefault = (string) \Civi::url('default://civicrm/user');
+    $userBackend = (string) \Civi::url('frontend://civicrm/user');
+    $this->assertEquals($userBackend, $userDefault, "civicrm/user should default to frontend");
+  }
+
   /**
    * @param string $expectContentRegex
    * @param string $url

@@ -520,8 +520,7 @@ final class Url implements \JsonSerializable {
     }
 
     if ($scheme === 'default') {
-      // TODO Use metadata to pick $scheme = 'frontend' or 'backend' or 'service';
-      throw new \RuntimeException("FIXME: Implement lookup for default ");
+      $scheme = \CRM_Core_Menu::isPublicRoute($this->getPath()) ? 'frontend' : 'backend';
     }
 
     switch ($scheme) {
