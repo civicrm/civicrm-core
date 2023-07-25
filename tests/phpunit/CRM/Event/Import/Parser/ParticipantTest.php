@@ -114,6 +114,8 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 
   /**
    * Test that an external id will not match to a deleted contact..
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testImportWithExternalID() :void {
     $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
@@ -131,6 +133,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'status_id'],
       ['name' => 'register_date'],
       ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
@@ -139,9 +142,12 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 
   /**
    * Test that imports work generally.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testImportParticipant() :void {
     $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'checkbox');
     $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
     $this->importCSV('participant_with_ext_id.csv', [
       ['name' => 'event_id'],
@@ -156,6 +162,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'status_id'],
       ['name' => 'register_date'],
       ['name' => 'do_not_import'],
+      ['name' => $this->getCustomFieldName('checkbox')],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
@@ -171,12 +178,14 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals('2022-12-07 00:00:00', $result['participant_register_date']);
     $this->assertEquals(['Attendee', 'Volunteer'], $result['participant_role']);
     $this->assertEquals(0, $result['participant_is_pay_later']);
+    $this->assertEquals(['P', 'M'], array_keys($result[$this->getCustomFieldName('checkbox')]));
   }
 
   /**
    * @param array $submittedValues
    *
    * @return int
+   * @throws \CRM_Core_Exception
    */
   protected function getUserJobID(array $submittedValues = []): int {
     $userJobID = UserJob::create()->setValues([
