@@ -523,6 +523,7 @@ final class Url implements \JsonSerializable {
       $scheme = \CRM_Core_Menu::isPublicRoute($this->getPath()) ? 'frontend' : 'backend';
     }
 
+    // Goal: After this switch(), we should have the $scheme, $path, and $query combined.
     switch ($scheme) {
       case 'assetBuilder':
         $assetName = $this->getPath();
@@ -534,11 +535,8 @@ final class Url implements \JsonSerializable {
       case 'asset':
         if (preg_match(';^\[([\w\.]+)\](.*)$;', $this->getPath(), $m)) {
           [, $var, $rest] = $m;
-          $result = rtrim(\Civi::paths()->getVariable($var, 'url'), '/');
-          if ($preferFormat === 'relative') {
-            $result = \CRM_Utils_Url::toRelative($result);
-          }
-          $result .= $rest . $this->composeSuffix();
+          $varValue = rtrim(\Civi::paths()->getVariable($var, 'url'), '/');
+          $result = $varValue . $rest . $this->composeQuery();
         }
         else {
           throw new \RuntimeException("Malformed asset path: {$this->getPath()}");
@@ -547,7 +545,7 @@ final class Url implements \JsonSerializable {
 
       case 'ext':
         $parts = explode('/', $this->getPath(), 2);
-        $result = \Civi::resources()->getUrl($parts[0], $parts[1] ?? NULL, FALSE) . $this->composeSuffix();
+        $result = \Civi::resources()->getUrl($parts[0], $parts[1] ?? NULL, FALSE) . $this->composeQuery();
         break;
 
       // Handle 'frontend', 'backend', 'service', and any extras.
@@ -556,17 +554,17 @@ final class Url implements \JsonSerializable {
         if ($result === NULL) {
           throw new \RuntimeException("Unknown URL scheme: $scheme");
         }
-        if ($preferFormat === 'relative') {
-          $result = \CRM_Utils_Url::toRelative($result);
-        }
-        if ($fragment = $this->composeFragment()) {
-          $result .= '#' . $fragment;
-        }
         break;
     }
 
     if ($this->cacheCode) {
       $result = \Civi::resources()->addCacheCode($result);
+    }
+
+    $result .= $this->composeFragment();
+
+    if ($preferFormat === 'relative') {
+      $result = \CRM_Utils_Url::toRelative($result);
     }
 
     // TODO decide if the current default is good enough for future
@@ -603,24 +601,29 @@ final class Url implements \JsonSerializable {
     return $this->__toString();
   }
 
-  private function composeSuffix(): string {
-    $result = '';
+  /**
+   * @return string
+   *   '' or '?foo=bar'
+   */
+  private function composeQuery(): string {
     if ($this->query !== NULL && $this->query !== '') {
-      $result .= '?' . $this->query;
+      return '?' . $this->query;
     }
-    $fragment = $this->composeFragment();
-    if ($fragment !== NULL && $fragment !== '') {
-      $result .= '#' . $fragment;
+    else {
+      return '';
     }
-    return $result;
   }
 
-  private function composeFragment(): ?string {
-    $fragment = $this->fragment;
+  /**
+   * @return string
+   *   '' or '#foobar'
+   */
+  private function composeFragment(): string {
+    $fragment = $this->fragment ?: '';
     if ($this->fragmentQuery !== NULL && $this->fragmentQuery !== '') {
-      $fragment = ($fragment ?: '') . '?' . $this->fragmentQuery;
+      $fragment .= '?' . $this->fragmentQuery;
     }
-    return $fragment;
+    return ($fragment === '') ? '' : "#$fragment";
   }
 
   private static function detectFormat(): string {

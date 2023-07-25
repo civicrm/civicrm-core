@@ -34,11 +34,15 @@ class UrlTest extends \CiviUnitTestCase {
     $absolutes = [];
     $absolutes['flag'] = Civi::url('backend://civicrm/admin', 'a');
     $absolutes['method'] = Civi::url('backend://civicrm/admin')->setPreferFormat('absolute');
+    $absolutes['ext'] = Civi::url('ext://org.civicrm.search_kit/js/foobar.js', 'a');
+    $absolutes['asset'] = Civi::url('asset://[civicrm.packages]/js/foobar.js', 'a');
 
     $relatives = [];
     $relatives['default'] = Civi::url('backend://civicrm/admin');
     $relatives['flag'] = Civi::url('backend://civicrm/admin', 'r');
     $relatives['method'] = Civi::url('backend://civicrm/admin')->setPreferFormat('relative');
+    $relatives['ext'] = Civi::url('ext://org.civicrm.search_kit/js/foobar.js', 'r');
+    $relatives['asset'] = Civi::url('asset://[civicrm.packages]/js/foobar.js', 'r');
 
     foreach ($absolutes as $key => $url) {
       $this->assertRegExp(';^https?://;', (string) $url, "absolutes[$key] should be absolute URL");
