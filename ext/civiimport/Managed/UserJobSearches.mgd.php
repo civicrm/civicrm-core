@@ -138,7 +138,7 @@ return [
               'label' => E::ts('Import Name'),
               'sortable' => TRUE,
               'link' => [
-                'path' => 'civicrm/import/contribution?reset=1&template_id=[id]',
+                'path' => '[job_type:url]?reset=1&template_id=[id]',
                 'entity' => '',
                 'action' => '',
                 'join' => '',
@@ -264,7 +264,7 @@ return [
               'label' => E::ts('Import Name'),
               'sortable' => TRUE,
               'link' => [
-                'path' => 'civicrm/import/contribution?reset=1&template_id=[id]',
+                'path' => '[job_type:url]?reset=1&template_id=[id]',
                 'entity' => '',
                 'action' => '',
                 'join' => '',
