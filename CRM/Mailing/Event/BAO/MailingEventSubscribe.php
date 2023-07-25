@@ -197,7 +197,6 @@ SELECT     civicrm_email.id as email_id
     $component->find(TRUE);
 
     $params = [
-      'subject' => $component->subject,
       'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'toEmail' => $email,
       'replyTo' => $confirm,
@@ -237,18 +236,18 @@ SELECT     civicrm_email.id as email_id
 
     $tokenProcessor->addMessage('body_html', $html, 'text/html');
     $tokenProcessor->addMessage('body_text', $text, 'text/plain');
+    $tokenProcessor->addMessage('subject', $component->subject, 'text/plain');
     $tokenProcessor->addRow(['contactId' => $this->contact_id, 'groupId' => $this->group_id]);
     $tokenProcessor->evaluate();
-    $html = $tokenProcessor->getRow(0)->render('body_html');
-    $text = $tokenProcessor->getRow(0)->render('body_text');
+    $params['html'] = $tokenProcessor->getRow(0)->render('body_html');
+    $params['text'] = $tokenProcessor->getRow(0)->render('body_text');
+    $params['subject'] = $tokenProcessor->getRow(0)->render('subject');
 
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 's',
       $this->contact_id,
       $this->id,
       $this->hash
     );
-    $params['html'] = $html;
-    $params['text'] = $text;
     if (CRM_Core_BAO_MailSettings::includeMessageId()) {
       $params['messageId'] = $params['Message-ID'];
     }
