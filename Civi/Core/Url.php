@@ -524,15 +524,6 @@ final class Url implements \JsonSerializable {
     }
 
     switch ($scheme) {
-      case 'frontend':
-      case 'service':
-        $result = $userSystem->url($this->getPath(), $this->getQuery(), $preferFormat === 'absolute', $this->composeFragment(), TRUE, FALSE, FALSE);
-        break;
-
-      case 'backend':
-        $result = $userSystem->url($this->getPath(), $this->getQuery(), $preferFormat === 'absolute', $this->composeFragment(), FALSE, TRUE, FALSE);
-        break;
-
       case 'assetBuilder':
         $assetName = $this->getPath();
         $assetParams = [];
@@ -559,8 +550,19 @@ final class Url implements \JsonSerializable {
         $result = \Civi::resources()->getUrl($parts[0], $parts[1] ?? NULL, FALSE) . $this->composeSuffix();
         break;
 
+      // Handle 'frontend', 'backend', 'service', and any extras.
       default:
-        throw new \RuntimeException("Unknown URL scheme: {$this->getScheme()}");
+        $result = $userSystem->getRouteUrl($scheme, $this->getPath(), $this->getQuery());
+        if ($result === NULL) {
+          throw new \RuntimeException("Unknown URL scheme: $scheme");
+        }
+        if ($preferFormat === 'relative') {
+          $result = \CRM_Utils_Url::toRelative($result);
+        }
+        if ($fragment = $this->composeFragment()) {
+          $result .= '#' . $fragment;
+        }
+        break;
     }
 
     if ($this->cacheCode) {
