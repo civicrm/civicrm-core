@@ -46,6 +46,8 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
   $group->is_active = 1;
   $group->id        = (int) $group_id;
   if (!$group->find(TRUE)) {
+    fprintf(STDERR, "Is this it\n");
+    throw new \Exception('Maybe this is it');
     throw new CRM_Core_Exception('Invalid Group id');
   }
 
