@@ -1017,7 +1017,7 @@ WHERE civicrm_event.is_active = 1
     }
 
     CRM_Utils_System::flushCache();
-    CRM_Utils_Hook::copy('Event', $copyEvent);
+    CRM_Utils_Hook::copy('Event', $copyEvent, $id);
 
     return $copyEvent;
   }

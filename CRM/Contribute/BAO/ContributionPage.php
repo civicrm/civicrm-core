@@ -711,7 +711,7 @@ WHERE entity_table = 'civicrm_contribution_page'
 
     $copy->save();
 
-    CRM_Utils_Hook::copy('ContributionPage', $copy);
+    CRM_Utils_Hook::copy('ContributionPage', $copy, $id);
 
     return $copy;
   }
