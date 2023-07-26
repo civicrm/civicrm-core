@@ -133,12 +133,15 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
    * Test function for messages on upgrade.
    */
   public function testMessageTemplateGetUpgradeMessages() {
+    \Civi\Api4\MessageTemplate::update(FALSE)
+      ->addValue('msg_text', 'Edited text')
+      ->addWhere('workflow_name', '=', 'contribution_online_receipt')
+      ->addWhere('is_default', '=', TRUE)
+      ->execute();
     $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates('5.4.alpha1');
     $messages = $messageTemplateObject->getUpgradeMessages();
     $this->assertEquals([
-      'Memberships - Receipt (on-line)' => 'Use email greeting at top where available',
       'Contributions - Receipt (on-line)' => 'Use email greeting at top where available',
-      'Events - Registration Confirmation and Receipt (on-line)' => 'Use email greeting at top where available',
     ], $messages);
   }
 
