@@ -1061,7 +1061,7 @@ WHERE  id = %1";
     }
     $copy->save();
 
-    CRM_Utils_Hook::copy('Set', $copy);
+    CRM_Utils_Hook::copy('Set', $copy, $id);
     unset(\Civi::$statics['CRM_Core_PseudoConstant']);
     return $copy;
   }

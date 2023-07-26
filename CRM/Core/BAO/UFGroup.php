@@ -2648,7 +2648,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $params = [1 => [$copy->id, 'Integer']];
       CRM_Core_DAO::executeQuery($query, $params);
     }
-    CRM_Utils_Hook::copy('UFGroup', $copy);
+    CRM_Utils_Hook::copy('UFGroup', $copy, $id);
 
     return $copy;
   }
