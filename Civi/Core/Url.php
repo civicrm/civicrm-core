@@ -116,17 +116,39 @@ final class Url implements \JsonSerializable {
   private $varsCallback;
 
   /**
-   * @param string $logicalUri
+   * @param string|null $logicalUri
    * @param string|null $flags
    * @see \Civi::url()
    */
-  public function __construct(string $logicalUri, ?string $flags = NULL) {
+  public function __construct(?string $logicalUri = NULL, ?string $flags = NULL) {
+    if ($logicalUri !== NULL) {
+      $this->useUri($logicalUri);
+    }
+    if ($flags !== NULL) {
+      $this->useFlags($flags);
+    }
+  }
+
+  /**
+   * Parse a logical URI.
+   *
+   * @param string $logicalUri
+   * @return void
+   */
+  protected function useUri(string $logicalUri): void {
     if ($logicalUri[0] === '/') {
+      // Scheme-relative path implies a preferences to inherit current scheme.
       $logicalUri = 'current:' . $logicalUri;
     }
     elseif ($logicalUri[0] === '[') {
       $logicalUri = 'asset://' . $logicalUri;
     }
+    // else: Should we fill in scheme when there is NO indicator (eg $logicalUri===`civicrm/event/info')?
+    // It could be a little annoying to write `frontend://` everywhere. It's not hard to add this.
+    // But it's ambiguous whether `current://` or `default://` is the better interpretation.
+    // I'd sooner vote for something explicit but short -- eg aliases (f<=>frontend; d<=>default)
+    //   - `Civi::url('f://civicrm/event/info')`
+    //   - `Civi::url('civicrm/event/info', 'f')`.
 
     $parsed = parse_url($logicalUri);
     $this->scheme = $parsed['scheme'] ?? NULL;
@@ -138,10 +160,6 @@ final class Url implements \JsonSerializable {
     $fragmentParts = isset($parsed['fragment']) ? explode('?', $parsed['fragment'], 2) : [];
     $this->fragment = $fragmentParts[0] ?? NULL;
     $this->fragmentQuery = $fragmentParts[1] ?? NULL;
-
-    if ($flags !== NULL) {
-      $this->useFlags($flags);
-    }
   }
 
   /**

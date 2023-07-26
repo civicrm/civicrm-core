@@ -153,4 +153,36 @@ class UrlTest extends \CiviUnitTestCase {
     }
   }
 
+  public function testFunkyStartPoints(): void {
+    $baseline = (string) \Civi::url('frontend://civicrm/event/info?id=1');
+    $this->assertStringContainsString('event/info', $baseline);
+
+    $alternatives = [
+      // Start with nothing!
+      \Civi::url()
+        ->setScheme('frontend')
+        ->setPath(['civicrm', 'event', 'info'])
+        ->addQuery(['id' => 1]),
+
+      // Start with nothing! And build it backwards!
+      \Civi::url()
+        ->addQuery(['id' => 1])
+        ->addPath('civicrm')->addPath('event')->addPath('info')
+        ->setScheme('frontend'),
+
+      // Start with just the scheme
+      \Civi::url('frontend:')
+        ->addPath('civicrm/event/info')
+        ->addQuery('id=1'),
+
+      // Start with just the path
+      \Civi::url('civicrm/event/info')
+        ->setScheme('frontend')
+        ->addQuery(['id' => 1]),
+    ];
+    foreach ($alternatives as $key => $alternative) {
+      $this->assertEquals($baseline, (string) $alternative, "Alternative #$key should match baseline");
+    }
+  }
+
 }

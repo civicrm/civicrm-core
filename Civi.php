@@ -219,21 +219,35 @@ class Civi {
   }
 
   /**
-   * Construct a URL based on a logical service address. URL building follows a few rules:
+   * Construct a URL based on a logical service address. For example:
    *
-   * 1. You should initialize with a baseline URL (e.g. 'frontend://civicrm/profile/view?id=123&gid=456').
+   *   Civi::url('frontend://civicrm/user?reset=1');
+   *
+   *   Civi::url()
+   *     ->setScheme('frontend')
+   *     ->setPath(['civicrm', 'user'])
+   *     ->setQuery(['reset' => 1])
+   *
+   * URL building follows a few rules:
+   *
+   * 1. You may initialize with a baseline URL.
    * 2. The scheme indicates the general type of URL ('frontend://', 'backend://', 'asset://', 'assetBuilder://').
-   * 3. The URL object provides getters, setters, and adders (e.g. `getScheme()`, `setPath(...)`, `addQuery(...)`)
+   * 3. The result object provides getters, setters, and adders (e.g. `getScheme()`, `setPath(...)`, `addQuery(...)`)
    * 4. Strings are raw. Arrays are auto-encoded. (`addQuery('name=John+Doughnut')` or `addQuery(['name' => 'John Doughnut'])`)
    * 5. You may use variable expressions (`id=[contact]&gid=[profile]`).
    * 6. The URL can be cast to string (aka `__toString()`).
    *
+   * If you are converting from `CRM_Utils_System::url()` to `Civi::url()`, then be sure to:
+   *
+   * - Pay attention to the scheme (eg 'current://' vs 'frontend://')
+   * - Pay attention to HTML escaping, as the behavior changed:
+   *      - Civi::url() returns plain URLs (eg "id=100&gid=200") by default
+   *      - CRM_Utils_System::url() returns HTML-escaped URLs (eg "id=100&amp;gid=200") by default
+   *
    * Here are several examples:
    *
-   * Ex: Link to constituent's dashboard (specifically on frontend UI)
-   *   $url = Civi::url('frontend://civicrm/user?reset=1');
-   *
    * Ex: Link to constituent's dashboard (on frontend UI or backend UI -- based on the active scheme of current page-view)
+   *   $url = Civi::url('current://civicrm/user?reset=1');
    *   $url = Civi::url('//civicrm/user?reset=1');
    *
    * Ex: Link to constituent's dashboard (with method calls - good for dynamic options)
@@ -263,13 +277,13 @@ class Civi {
    *   $url = Civi::url('frontend://civicrm/ajax/api4/[entity]/[action]')
    *      ->addVars(['entity' => 'Foo', 'action' => 'bar']);
    *
-   * @param string $logicalUri
+   * @param string|null $logicalUri
    *   Logical URI. The scheme of the URI may be one of:
    *     - 'frontend://' (Front-end page-route for constituents)
    *     - 'backend://' (Back-end page-route for staff)
-   *     - 'service://` (Web-service page-route for automated integrations; aka webhooks and IPNs)
+   *     - 'service://' (Web-service page-route for automated integrations; aka webhooks and IPNs)
    *     - 'current://' (Whichever UI is currently active)
-   *     - 'default://'(Whichever UI is recorded in the metadata)
+   *     - 'default://' (Whichever UI is recorded in the metadata)
    *     - 'asset://' (Static asset-file; see \Civi::paths())
    *     - 'assetBuilder://' (Dynamically-generated asset-file; see \Civi\Core\AssetBuilder)
    *     - 'ext://' (Static asset-file provided by an extension)
@@ -282,11 +296,10 @@ class Civi {
    *   - 't': text (aka `setHtmlEscape(FALSE)`)
    *   - 's': ssl (aka `setSsl(TRUE)`)
    *   - 'c': cache code for resources (aka Civi::resources()->addCacheCode())
-   *   FIXME: Should we have a flag for appending 'resCacheCode'?
    * @return \Civi\Core\Url
    *   URL object which may be modified or rendered as text.
    */
-  public static function url(string $logicalUri, ?string $flags = NULL): \Civi\Core\Url {
+  public static function url(?string $logicalUri = NULL, ?string $flags = NULL): \Civi\Core\Url {
     return new \Civi\Core\Url($logicalUri, $flags);
   }
 
