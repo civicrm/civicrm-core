@@ -47,13 +47,13 @@ if (!defined('CIVI_SETUP')) {
       ->setRecords([
         [
           'name' => 'everyone',
-          'label' => 'Everyone, including anonymous users',
+          'label' => ts('Everyone, including anonymous users'),
           // Provide default open permissions
-          'permissions' => ['CiviMail subscribe/unsubscribe pages', 'make online contributions'],
+          'permissions' => ['CiviMail subscribe/unsubscribe pages', 'make online contributions', 'view event info', 'register for events'],
         ],
         [
           'name' => 'admin',
-          'label' => 'Administrator',
+          'label' => ts('Administrator'),
           'permissions' => array_keys(\CRM_Core_SelectValues::permissions()),
         ],
       ])
