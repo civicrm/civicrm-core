@@ -157,7 +157,8 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     if ($this->isLimitedDevelopmentServer()) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('In PHP 7.x, the built-in HTTP server cannot execute some security checks. This problem only affects local development on older versions of PHP.'),
+        // No ts since end users should never see this
+        'The built-in php HTTP server has no configuration options to secure folders, and so there is no point testing if they are secure. This problem only affects local development and E2E testing.',
         ts('Incomplete Security Checks'),
         \Psr\Log\LogLevel::WARNING,
         'fa-lock'
@@ -387,7 +388,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   public function isLimitedDevelopmentServer(): bool {
-    return PHP_SAPI === 'cli-server' && version_compare(PHP_VERSION, '8.0', '<');
+    return PHP_SAPI === 'cli-server';
   }
 
   /**
@@ -461,8 +462,17 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       return FALSE;
     }
 
+    // @todo why call fileExists before doing almost the same thing. It's slightly different than reading the file's content, but is it necessary?
     if ($this->fileExists("$url/$file")) {
-      $content = @file_get_contents("$url/$file");
+      $content = '';
+      try {
+        $response = (new \GuzzleHttp\Client())->request('GET', "$url/$file", [
+          'timeout' => \Civi::settings()->get('http_timeout'),
+        ]);
+        $content = $response->getBody()->getContents();
+      }
+      catch (\GuzzleHttp\Exception\GuzzleException $e) {
+      }
       if (preg_match('/delete me/', $content)) {
         $result = TRUE;
       }
