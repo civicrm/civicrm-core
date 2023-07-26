@@ -12,14 +12,12 @@
 namespace Civi\Api4\Event\Subscriber;
 
 use Civi\Core\Event\GenericHookEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Event subscriber to filter search display tasks
- * @service
- * @internal
  */
-class SearchDisplayTasksSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
+class SearchDisplayTasksSubscriber extends AutoSubscriber {
 
   /**
    * Filter tasks with a priority of -50, which allows W_MIDDLE & W_EARLY to go first, but W_LATE to go after.

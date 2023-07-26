@@ -18,15 +18,12 @@ use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Manages tables and API entities created from search displays of type "entity"
- * @service
- * @internal
  */
-class SKEntitySubscriber extends AutoService implements EventSubscriberInterface {
+class SKEntitySubscriber extends AutoSubscriber {
 
   use SavedSearchInspectorTrait;
 

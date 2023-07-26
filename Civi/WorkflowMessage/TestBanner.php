@@ -13,17 +13,14 @@
 namespace Civi\WorkflowMessage;
 
 use Civi\Api4\MessageTemplate;
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Service\AutoSubscriber;
 
 /**
  * If someone sends an automated message for a test record (e.g. Contribution with `is_test=1`),
  * then we add a banner to the automated message.
  *
- * @service
- * @internal
  */
-class TestBanner extends AutoService implements EventSubscriberInterface {
+class TestBanner extends AutoSubscriber {
 
   public static function getSubscribedEvents() {
     return [

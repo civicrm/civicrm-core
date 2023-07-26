@@ -15,8 +15,6 @@
  * entities. It is useful for sending a reminder based on:
  *  - The receipt-date, cancel-date, or thankyou-date.
  *  - The type of contribution.
- * @service
- * @internal
  */
 abstract class CRM_Contribute_ActionMapping extends \Civi\ActionSchedule\MappingBase {
 

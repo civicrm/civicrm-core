@@ -12,15 +12,12 @@
 namespace Civi\Api4\Service\Autocomplete;
 
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Provide autocomplete searches tailored to the CiviMail recipients widget
- * @service
- * @internal
  */
-class MailingRecipientsAutocompleteProvider extends AutoService implements EventSubscriberInterface {
+class MailingRecipientsAutocompleteProvider extends AutoSubscriber {
 
   /**
    * @return array

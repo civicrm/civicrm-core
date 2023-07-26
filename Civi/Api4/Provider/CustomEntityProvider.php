@@ -14,14 +14,11 @@ namespace Civi\Api4\Provider;
 use Civi\Api4\CustomValue;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Service\AutoSubscriber;
 
 /**
- * @service
- * @internal
  */
-class CustomEntityProvider extends AutoService implements EventSubscriberInterface {
+class CustomEntityProvider extends AutoSubscriber {
 
   /**
    * @return array

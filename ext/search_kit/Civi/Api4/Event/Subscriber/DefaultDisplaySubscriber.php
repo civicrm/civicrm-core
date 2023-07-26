@@ -14,17 +14,14 @@ namespace Civi\Api4\Event\Subscriber;
 use Civi\API\Request;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Provides default display for type 'table' and type 'autocomplete'
  *
  * Other extensions can override or modify these defaults on a per-type or per-entity basis.
- *
- * @service
- * @internal
  */
-class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
+class DefaultDisplaySubscriber extends AutoSubscriber {
 
   /**
    * @return array

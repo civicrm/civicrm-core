@@ -11,15 +11,12 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Preprocess api autocomplete requests
- * @service
- * @internal
  */
-class AutocompleteFieldSubscriber extends AutoService implements EventSubscriberInterface {
+class AutocompleteFieldSubscriber extends AutoSubscriber {
 
   /**
    * @return array

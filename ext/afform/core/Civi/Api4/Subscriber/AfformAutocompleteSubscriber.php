@@ -11,19 +11,16 @@
 
 namespace Civi\Api4\Subscriber;
 
-use Civi\Core\Service\AutoService;
+use Civi\Core\Service\AutoSubscriber;
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Afform;
 use Civi\Api4\Generic\AutocompleteAction;
 use Civi\Api4\Utils\CoreUtil;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Preprocess api autocomplete requests
- * @service
- * @internal
  */
-class AfformAutocompleteSubscriber extends AutoService implements EventSubscriberInterface {
+class AfformAutocompleteSubscriber extends AutoSubscriber {
 
   /**
    * @return array

@@ -6,15 +6,12 @@ use CRM_Recaptcha_ExtensionUtil as E;
 use Civi\Afform\AHQ;
 use Civi\Afform\Event\AfformValidateEvent;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Provides ReCaptcha2 validation element to Afform
- * @internal
- * @service
  */
-class AfformReCaptcha2 extends AutoService implements EventSubscriberInterface {
+class AfformReCaptcha2 extends AutoSubscriber {
 
   /**
    * @return array
