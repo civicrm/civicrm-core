@@ -68,13 +68,13 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       self::$_actionLinks = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit Option'),
-          'url' => 'civicrm/admin/price/field/option',
+          'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'reset=1&action=update&oid=%%oid%%&fid=%%fid%%&sid=%%sid%%',
           'title' => ts('Edit Price Option'),
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
-          'url' => 'civicrm/admin/price/field/option',
+          'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'action=view&oid=%%oid%%',
           'title' => ts('View Price Option'),
         ],
@@ -90,7 +90,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/price/field/option',
+          'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'action=delete&oid=%%oid%%',
           'title' => ts('Disable Price Option'),
         ],

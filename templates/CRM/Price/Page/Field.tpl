@@ -74,9 +74,9 @@
   </div>
   <div class="action-link">
     {if !$isReserved}
-      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/edit" q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
     {/if}
-    {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="television"}{ts}Preview (all fields){/ts}{/crmButton}
+    {crmButton p="civicrm/admin/price/edit" q="action=preview&sid=`$sid`&reset=1&context=field" icon="television"}{ts}Preview (all fields){/ts}{/crmButton}
   </div>
 </div>
 {else}
@@ -86,7 +86,7 @@
       {ts}None found.{/ts}
     </div>
     <div class="action-link">
-      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/edit" q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

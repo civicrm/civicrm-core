@@ -679,13 +679,29 @@
      <path_arguments>action=add</path_arguments>
   </item>
   <item>
+     <path>civicrm/admin/price/edit</path>
+     <title>Price Sets</title>
+     <page_callback>CRM_Price_Page_Set</page_callback>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+  </item>
+  <item>
      <path>civicrm/admin/price/field</path>
      <title>Price Fields</title>
      <page_callback>CRM_Price_Page_Field</page_callback>
      <skipBreadcrumb>true</skipBreadcrumb>
   </item>
   <item>
+     <path>civicrm/admin/price/field/edit</path>
+     <title>Price Fields</title>
+     <page_callback>CRM_Price_Page_Field</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/price/field/option</path>
+     <title>Price Field Options</title>
+     <page_callback>CRM_Price_Page_Option</page_callback>
+  </item>
+  <item>
+     <path>civicrm/admin/price/field/option/edit</path>
      <title>Price Field Options</title>
      <page_callback>CRM_Price_Page_Option</page_callback>
   </item>
