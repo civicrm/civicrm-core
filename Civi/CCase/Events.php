@@ -10,12 +10,14 @@
  */
 namespace Civi\CCase;
 
+use Civi\Core\Service\AutoSubscriber;
+
 /**
  * Class Events
  *
  * @package Civi\CCase
  */
-class Events {
+class Events implements AutoSubscriber {
 
   /**
    * List of cases for which we are actively firing case-change event
@@ -26,6 +28,14 @@ class Events {
    * @var array
    */
   public static $isActive = [];
+
+  public static function getSubscribedEvents() {
+    return [
+      'hook_civicrm_post::Activity' => 'fireCaseChange',
+      'hook_civicrm_post::Case' => 'fireCaseChange',
+      'hook_civicrm_caseChange' => 'delegateToXmlListeners',
+    ];
+  }
 
   /**
    * Following a change to an activity or case, fire the case-change event.

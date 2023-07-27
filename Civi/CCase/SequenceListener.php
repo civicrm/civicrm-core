@@ -1,17 +1,25 @@
 <?php
 namespace Civi\CCase;
 
+use Civi\Core\Service\AutoSubscriber;
+
 /**
  * The sequence-listener looks for CiviCase XML tags with "<sequence>". If
  * a change is made to any record in case-type which uses "<sequence>", then
  * it attempts to add the next step in the sequence.
  */
-class SequenceListener implements CaseChangeListener {
+class SequenceListener implements CaseChangeListener, AutoSubscriber {
 
   /**
    * @var SequenceListener
    */
   private static $singleton;
+
+  public static function getSubscribedEvents() {
+    return [
+      'hook_civicrm_caseChange' => 'onCaseChange_static',
+    ];
+  }
 
   /**
    * @param bool $reset
