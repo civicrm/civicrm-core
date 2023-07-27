@@ -10,7 +10,7 @@
 <div>
   {if $groupExist}
     <div class="messages status no-popup">
-      {ts}Are you sure you want to remove {$name_masked} from the mailing list(s) shown below:{/ts}<br/>
+      {ts 1=$name_masked}Are you sure you want to remove %1 from the mailing list(s) shown below:{/ts}<br/>
     </div>
     <table class="selector" style="width: auto; margin-top: 20px;">
       {counter start=0 skip=1 print=false}
@@ -22,7 +22,7 @@
       {/foreach}
     </table>
     <div class="crm-block crm-form-block crm-miscellaneous-form-block">
-      <p>{ts}You are requesting to unsubscribe <strong>all email addresses for {$name_masked}</strong> from the above mailing list.{/ts}</p>
+      <p>{ts 1=$name_masked}You are requesting to unsubscribe <strong>all email addresses for %1</strong> from the above mailing list.{/ts}</p>
       <p>
         {ts}If this is not your name, there is no need to do anything. You have <strong>not</strong> been added to any mailing lists.{/ts}
         {ts}If you <strong>wish to unsubscribe this person</strong> please click the <strong>Unsubscribe</strong> button to confirm.{/ts}

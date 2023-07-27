@@ -73,9 +73,6 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $this->assign('email', $email);
     $this->_email = $email;
 
-    $optOutURL = CRM_Utils_System::url("civicrm/mailing/optout", "reset=1&jid={$job_id}&qid={$queue_id}&h={$hash}");
-    $this->assign('optout_URL', $optOutURL);
-
     $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job_id, $queue_id, $hash, TRUE);
     $this->assign('groups', $groups);
     $groupExist = NULL;
