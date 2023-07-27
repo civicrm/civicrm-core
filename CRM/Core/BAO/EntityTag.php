@@ -15,8 +15,14 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
+class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag implements \Civi\Core\Service\AutoSubscriber {
   use CRM_Core_DynamicFKAccessTrait;
+
+  public static function getSubscribedEvents() {
+    return [
+      'civi.dao.preDelete' => 'preDeleteOtherEntity',
+    ];
+  }
 
   /**
    * Given a contact id, it returns an array of tag id's the contact belongs to.
