@@ -181,7 +181,7 @@
         return {field: field, join: join};
       }
       function parseFnArgs(info, expr) {
-        var matches = /([_A-Z]+)\((.*)\)(:[a-z]+)?$/.exec(expr),
+        var matches = /([_A-Z]*)\((.*)\)(:[a-z]+)?$/.exec(expr),
           fnName = matches[1],
           argString = matches[2];
         info.fn = _.find(CRM.crmSearchAdmin.functions, {name: fnName || 'e'});
