@@ -159,7 +159,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
         __FUNCTION__,
         // No ts since end users should never see this
         'The built-in php HTTP server has no configuration options to secure folders, and so there is no point testing if they are secure. This problem only affects local development and E2E testing.',
-        ts('Incomplete Security Checks'),
+        'Incomplete Security Checks',
         \Psr\Log\LogLevel::WARNING,
         'fa-lock'
       );
