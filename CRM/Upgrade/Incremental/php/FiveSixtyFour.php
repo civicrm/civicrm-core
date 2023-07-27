@@ -22,6 +22,20 @@
 class CRM_Upgrade_Incremental_php_FiveSixtyFour extends CRM_Upgrade_Incremental_Base {
 
   /**
+   * How many activities before the queries used here are slow. Guessing.
+   */
+  const ACTIVITY_THRESHOLD = 1000000;
+
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    if ($rev === '5.64.beta1') {
+      // The ON DELETE constraint drop+recreate can be slow, so tell people what to do at their convenience if db is large.
+      if (CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_activity') >= self::ACTIVITY_THRESHOLD) {
+        $preUpgradeMessage .= '<p>' . ts('<strong>ACTION REQUIRED</strong>: You will need to apply a <strong>manual update</strong> because your civicrm_activity table is large and the update will run slowly. Please read about <a %1>how to apply this update manually</a>.', [1 => 'target="_blank" href="https://civicrm.org/redirect/activities-parentid-cascade"']) . '</p>';
+      }
+    }
+  }
+
+  /**
    * Upgrade step; adds tasks including 'runSql'.
    *
    * @param string $rev
@@ -34,6 +48,19 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFour extends CRM_Upgrade_Incremental_
     $this->addTask('Update post_URL/cancel_URL in logging tables', 'updateLogging');
     $this->addTask('Add in Everybody ACL Role option value', 'addEveryBodyAclOptionValue');
     $this->addTask('Fix double json encoding of accepted_credit_cards field in payment processor table', 'fixDoubleEscapingPaymentProcessorCreditCards');
+  }
+
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_64_beta1($rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    if (CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_activity') < self::ACTIVITY_THRESHOLD) {
+      $this->addTask('Fix dangerous delete cascade', 'fixDeleteCascade');
+    }
   }
 
   public static function updateLogging($ctx): bool {
@@ -75,6 +102,15 @@ CHANGE `cancel_URL` `cancel_url` varchar(255) DEFAULT NULL COMMENT 'Redirect to 
         }
       }
     }
+    return TRUE;
+  }
+
+  /**
+   * Fix DELETE CASCADE that can lead to loss of data.
+   */
+  public static function fixDeleteCascade($ctx): bool {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_activity', 'FK_civicrm_activity_parent_id');
+    CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_activity` ADD CONSTRAINT `FK_civicrm_activity_parent_id` FOREIGN KEY (`parent_id`) REFERENCES `civicrm_activity` (`id`) ON DELETE SET NULL');
     return TRUE;
   }
 
