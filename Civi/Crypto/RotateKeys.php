@@ -12,13 +12,20 @@
 namespace Civi\Crypto;
 
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Class RotateKeys
  *
  * @package Civi\Crypto
  */
-class RotateKeys {
+class RotateKeys implements AutoSubscriber {
+
+  public static function getSubscribedEvents() {
+    return [
+      'hook_civicrm_cryptoRotateKey' => 'rotateSmtp',
+    ];
+  }
 
   /**
    * The SMTP password is stored inside of the 'mailing_backend' setting.
