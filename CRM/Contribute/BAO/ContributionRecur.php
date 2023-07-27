@@ -19,7 +19,7 @@ use Civi\Api4\LineItem;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur implements Civi\Test\HookInterface {
+class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur implements Civi\Core\HookInterface {
 
   /**
    * Create recurring contribution.
