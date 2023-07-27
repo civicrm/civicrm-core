@@ -83,7 +83,6 @@ class AutoDefinition {
   }
 
   protected static function createBaseline(\ReflectionClass $class, ?array $docBlock = []): Definition {
-    $class = is_string($class) ? new \ReflectionClass($class) : $class;
     $def = new Definition($class->getName());
     $def->setPublic(TRUE);
     self::applyTags($def, $class, $docBlock);
