@@ -563,10 +563,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   /**
    * @param array $params
+   * @param string $identifer
    *
    * @return int
    */
-  public function membershipTypeCreate($params = []) {
+  public function membershipTypeCreate(array $params = [], $identifer = 'test'): int {
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Core_Config::clearDBCache();
     $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
@@ -587,7 +588,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Utils_Cache::singleton()->flush();
-
+    $this->ids['MembershipType'][$identifer] = (int) $result['id'];
     return (int) $result['id'];
   }
 

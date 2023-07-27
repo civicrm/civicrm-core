@@ -1370,6 +1370,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Function for unit tests on the postProcess function.
    *
+   * @deprecated - we are ditching this approach in favour of 'full form flow'
+   * = ie simulating postProcess.
+   *
    * @param array $params
    *
    * @throws \CRM_Core_Exception
