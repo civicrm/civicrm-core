@@ -13,10 +13,10 @@ namespace Civi\Api4;
 /**
  * MembershipLog entity.
  *
- * @searchable primary
- * @since 5.42
+ * @since 5.65
  * @package Civi\Api4
  */
 class MembershipLog extends Generic\DAOEntity {
+  use Generic\Traits\ReadOnlyEntity;
 
 }
