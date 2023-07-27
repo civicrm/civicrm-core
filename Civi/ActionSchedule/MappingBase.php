@@ -85,6 +85,10 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
     ];
   }
 
+  public function checkAccess(array $entityValue): bool {
+    return FALSE;
+  }
+
   public function validateSchedule($schedule): array {
     return [];
   }

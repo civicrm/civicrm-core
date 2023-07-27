@@ -27,4 +27,8 @@ class CRM_Event_ActionMapping_ByType extends CRM_Event_ActionMapping {
     return CRM_Event_PseudoConstant::eventType();
   }
 
+  public function checkAccess(array $entityValue): bool {
+    return FALSE;
+  }
+
 }

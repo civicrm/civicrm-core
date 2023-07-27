@@ -57,6 +57,32 @@ abstract class CRM_Event_ActionMapping extends \Civi\ActionSchedule\MappingBase 
   }
 
   /**
+   * Check access to event when the ScheduledReminder form is embedded on an event page
+   *
+   * @param array $entityValue
+   *   An array of event ids
+   * @return bool
+   */
+  public function checkAccess(array $entityValue): bool {
+    if (!$entityValue) {
+      return FALSE;
+    }
+    // This field is technically multivalued. In reality it should only ever contain one value,
+    // (because a ScheduledReminder form can only be embedded on one event page at a time)
+    // but since it's an array, a loop seems appropriate.
+    foreach ($entityValue as $eventId) {
+      $access = \Civi\Api4\Event::checkAccess()
+        ->setAction('update')
+        ->addValue('id', $eventId)
+        ->execute()->first()['access'];
+      if (!$access) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
    * Get a list of recipient types.
    *
    * Note: A single schedule may filter on *zero* or *one* recipient types.

@@ -115,6 +115,23 @@ interface MappingInterface {
   public function getRecipientListing($recipientType): array;
 
   /**
+   * Check if the user has permission to create a reminder for given `entity_value`.
+   *
+   * This function is called by the form to escalate permissions so that less-privileged users can
+   * create a reminder for a particular entity even if they do not have 'administer CiviCRM data'.
+   *
+   * Return FALSE and the default permission of 'administer CiviCRM data' will be enforced.
+   *
+   * Note that `entity_value` is a serialized field, so will be passed as an array, even though
+   * more than one value doesn't make sense in the context of embedding the ScheduledReminder form
+   * on a page belonging to a single entity.
+   *
+   * @param array $entityValue
+   * @return bool
+   */
+  public function checkAccess(array $entityValue): bool;
+
+  /**
    * Determine whether a schedule based on this mapping is sufficiently
    * complete.
    *
