@@ -13,15 +13,13 @@ namespace Civi\Core\Service;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * AutoSubscriber allows child classes to listen to events.
+ * AutoSubscriber allows classes to listen to events.
  *
- * Child classes must implement the `getSubscribedEvents` method, and the callbacks
+ * Classes must implement the `getSubscribedEvents` method, and the callbacks
  * it returns will be automatically registered.
  *
- * This class implies @service @internal on all subclasses.
+ * This is like `AutoServiceInterface` with @service @internal on all impl.
  */
-abstract class AutoSubscriber implements AutoServiceInterface, EventSubscriberInterface {
-
-  use AutoServiceTrait;
+interface AutoSubscriber extends EventSubscriberInterface {
 
 }

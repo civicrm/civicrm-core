@@ -16,7 +16,7 @@ use Civi\Core\Service\AutoSubscriber;
 /**
  * Preprocess api autocomplete requests
  */
-class AutocompleteFieldSubscriber extends AutoSubscriber {
+class AutocompleteFieldSubscriber implements AutoSubscriber {
 
   /**
    * @return array

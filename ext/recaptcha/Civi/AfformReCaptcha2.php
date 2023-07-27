@@ -11,7 +11,7 @@ use Civi\Core\Service\AutoSubscriber;
 /**
  * Provides ReCaptcha2 validation element to Afform
  */
-class AfformReCaptcha2 extends AutoSubscriber {
+class AfformReCaptcha2 implements AutoSubscriber {
 
   /**
    * @return array

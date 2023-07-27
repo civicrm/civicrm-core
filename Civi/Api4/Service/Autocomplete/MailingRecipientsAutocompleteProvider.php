@@ -17,7 +17,7 @@ use Civi\Core\Service\AutoSubscriber;
 /**
  * Provide autocomplete searches tailored to the CiviMail recipients widget
  */
-class MailingRecipientsAutocompleteProvider extends AutoSubscriber {
+class MailingRecipientsAutocompleteProvider implements AutoSubscriber {
 
   /**
    * @return array

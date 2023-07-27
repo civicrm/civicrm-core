@@ -26,10 +26,6 @@ class AutoDefinition {
     $result = [];
 
     $classDoc = ReflectionUtils::parseDocBlock($class->getDocComment());
-    // AutoSubscriber is an internal service by default
-    if (is_a($className, AutoSubscriber::class, TRUE)) {
-      $classDoc += ['service' => TRUE, 'internal' => TRUE];
-    }
     if (!empty($classDoc['service'])) {
       $serviceName = static::pickName($classDoc, $class->getName());
       $def = static::createBaseline($class, $classDoc);
@@ -114,7 +110,7 @@ class AutoDefinition {
    * @param \ReflectionClass $class
    * @param array $docBlock
    */
-  protected static function applyTags(Definition $def, \ReflectionClass $class, array $docBlock): void {
+  public static function applyTags(Definition $def, \ReflectionClass $class, array $docBlock): void {
     if (!empty($docBlock['internal'])) {
       $def->addTag('internal');
     }

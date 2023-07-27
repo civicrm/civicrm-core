@@ -17,7 +17,7 @@ use Civi\Core\Service\AutoSubscriber;
 /**
  * Event subscriber to filter search display tasks
  */
-class SearchDisplayTasksSubscriber extends AutoSubscriber {
+class SearchDisplayTasksSubscriber implements AutoSubscriber {
 
   /**
    * Filter tasks with a priority of -50, which allows W_MIDDLE & W_EARLY to go first, but W_LATE to go after.

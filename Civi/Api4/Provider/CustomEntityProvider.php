@@ -18,7 +18,7 @@ use Civi\Core\Service\AutoSubscriber;
 
 /**
  */
-class CustomEntityProvider extends AutoSubscriber {
+class CustomEntityProvider implements AutoSubscriber {
 
   /**
    * @return array

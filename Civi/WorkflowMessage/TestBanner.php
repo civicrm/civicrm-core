@@ -20,7 +20,7 @@ use Civi\Core\Service\AutoSubscriber;
  * then we add a banner to the automated message.
  *
  */
-class TestBanner extends AutoSubscriber {
+class TestBanner implements AutoSubscriber {
 
   public static function getSubscribedEvents() {
     return [

@@ -20,7 +20,7 @@ use Civi\Core\Service\AutoSubscriber;
  * Extend this class to register a new type of ActionSchedule mapping.
  * Note: When choosing a value to return from `getId()`, use a "machine name" style string.
  */
-abstract class MappingBase extends AutoSubscriber implements MappingInterface {
+abstract class MappingBase implements AutoSubscriber, MappingInterface {
 
   public static function getSubscribedEvents(): array {
     return [

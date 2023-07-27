@@ -2,6 +2,7 @@
 namespace Civi\Core;
 
 use Civi\Core\Compiler\AutoServiceScannerPass;
+use Civi\Core\Compiler\AutoSubscriberScannerPass;
 use Civi\Core\Compiler\EventScannerPass;
 use Civi\Core\Compiler\SpecProviderPass;
 use Civi\Core\Event\EventScanner;
@@ -100,6 +101,7 @@ class Container {
     $civicrm_base_path = dirname(dirname(__DIR__));
     $container = new ContainerBuilder();
     $container->addCompilerPass(new AutoServiceScannerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1000);
+    $container->addCompilerPass(new AutoSubscriberScannerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 999);
     $container->addCompilerPass(new EventScannerPass());
     $container->addCompilerPass(new SpecProviderPass());
     $container->addCompilerPass(new RegisterListenersPass());

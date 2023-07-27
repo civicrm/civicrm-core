@@ -21,7 +21,7 @@ use Civi\Core\Service\AutoSubscriber;
  *
  * Other extensions can override or modify these defaults on a per-type or per-entity basis.
  */
-class DefaultDisplaySubscriber extends AutoSubscriber {
+class DefaultDisplaySubscriber implements AutoSubscriber {
 
   /**
    * @return array

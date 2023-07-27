@@ -23,7 +23,7 @@ use Civi\Core\Service\AutoSubscriber;
 /**
  * Manages tables and API entities created from search displays of type "entity"
  */
-class SKEntitySubscriber extends AutoSubscriber {
+class SKEntitySubscriber implements AutoSubscriber {
 
   use SavedSearchInspectorTrait;
 

@@ -20,7 +20,7 @@ use Civi\Api4\Utils\CoreUtil;
 /**
  * Preprocess api autocomplete requests
  */
-class AfformAutocompleteSubscriber extends AutoSubscriber {
+class AfformAutocompleteSubscriber implements AutoSubscriber {
 
   /**
    * @return array
