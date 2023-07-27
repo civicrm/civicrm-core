@@ -124,12 +124,6 @@ class AutoDefinition {
     if ($class->implementsInterface(SpecProviderInterface::class)) {
       $def->addTag('spec_provider');
     }
-
-    if (!empty($classDoc['serviceTags'])) {
-      foreach (static::splitSymbols($classDoc['serviceTags']) as $extraTag) {
-        $def->addTag($extraTag);
-      }
-    }
   }
 
   /**

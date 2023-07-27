@@ -20,7 +20,6 @@ namespace Civi\Core\Service;
  *
  * - Declare a service. This can be done on a `class` or static factory-method. Supported annotations:
  *     - `@service NAME`: Set the name of the new service.
- *     - `@serviceTags TAG-1,TAG-2`: Declare additional tags for the service.
  *     - `@internal`: Generate a hidden/automatic name. Limit discovery of the service.
  * - Initialize the service by calling methods. This works with factory-, constructor-, and setter-methods.
  *     - `@inject SERVICE-1,SERVICE-2`: Call the method automatically. Pass a list of other services as parameters.
