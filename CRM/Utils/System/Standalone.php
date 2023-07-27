@@ -108,10 +108,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function appendBreadCrumb($breadcrumbs) {
-    if (!isset(\Civi::$statics[__CLASS__]['breadcrumb'])) {
-      \Civi::$statics[__CLASS__]['breadcrumb'] = [];
-    }
-    \Civi::$statics[__CLASS__]['breadcrumb'] += $breadcrumbs;
+    $crumbs = \Civi::$statics[__CLASS__]['breadcrumb'] ?? [];
+    $crumbs = array_merge($crumbs, $breadcrumbs);
+    \Civi::$statics[__CLASS__]['breadcrumb'] = $crumbs;
     CRM_Core_Smarty::singleton()->assign('breadcrumb', \Civi::$statics[__CLASS__]['breadcrumb']);
   }
 
