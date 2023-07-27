@@ -142,7 +142,7 @@ class ClassScanner {
     $classes = [];
     static::scanFolders($classes, $civicrmRoot, 'Civi/Test/ExampleData', '\\');
     // Most older CRM_ stuff doesn't implement event listeners & services so can be skipped.
-    static::scanFolders($classes, $civicrmRoot, 'CRM', '_', ';(Upgrade|Utils|Exception|_DAO|_Page|_Controller|_StateMachine|_Selector|_CodeGen|_QuickForm);');
+    static::scanFolders($classes, $civicrmRoot, 'CRM', '_', ';(Upgrade|Utils|Exception|_DAO|_Page|_Form|_Controller|_StateMachine|_Selector|_CodeGen|_QuickForm);');
     static::scanFolders($classes, $civicrmRoot, 'Civi', '\\', ';\\\(Security|Test)\\\;');
 
     $cache->set($cacheKey, $classes, static::TTL);
