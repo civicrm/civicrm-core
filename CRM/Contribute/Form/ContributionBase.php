@@ -360,6 +360,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->order = new CRM_Financial_BAO_Order();
       $this->order->setPriceSetID($this->getPriceSetID());
     }
+    else {
+      CRM_Core_Error::deprecatedFunctionWarning('forms require a price set it');
+    }
     $this->_priceSet = $this->get('priceSet');
 
     if (!$this->_values) {
