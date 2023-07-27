@@ -109,21 +109,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function appendBreadCrumb($breadcrumbs) {
     $crumbs = \Civi::$statics[__CLASS__]['breadcrumb'] ?? [];
-
-    foreach ($breadcrumbs as $crumb) {
-      $duplicate = FALSE;
-      foreach ($crumbs as $existingCrumb) {
-        if ($existingCrumb['url'] === $crumb['url']) {
-          $duplicate = TRUE;
-          break;
-        }
-      }
-      if (!$duplicate) {
-        $crumbs[] = $crumb;
-      }
-    }
+    $crumbs += array_column($breadcrumbs, null, 'url');
     \Civi::$statics[__CLASS__]['breadcrumb'] = $crumbs;
-    CRM_Core_Smarty::singleton()->assign('breadcrumb', $crumbs);
+    CRM_Core_Smarty::singleton()->assign('breadcrumb', array_values($crumbs));
   }
 
   /**
