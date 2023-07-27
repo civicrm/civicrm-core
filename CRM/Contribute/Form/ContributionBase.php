@@ -276,6 +276,27 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * @return string
+   */
+  protected function getInvoiceID(): string {
+    if (!$this->get('invoiceID')) {
+      $this->setInvoiceID();
+
+    }
+    return $this->get('invoiceID');
+  }
+
+  /**
+   * @return string
+   */
+  protected function setInvoiceID(): string {
+    // generate and set an invoiceID for this transaction
+    $invoiceID = md5(uniqid(mt_rand(), TRUE));
+    $this->set('invoiceID', $invoiceID);
+    return $invoiceID;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Contribute_Exception_InactiveContributionPageException

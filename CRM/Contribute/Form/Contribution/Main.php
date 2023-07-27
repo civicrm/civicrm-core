@@ -1093,7 +1093,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (array_key_exists('contribution_campaign_id', $params)) {
       $params['campaign_id'] = $params['contribution_campaign_id'];
     }
-
+    $this->setInvoiceID();
     $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     if ($this->isQuickConfig()) {
@@ -1248,13 +1248,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->set('amount', $params['amount']);
     }
 
-    // generate and set an invoiceID for this transaction
-    $invoiceID = md5(uniqid(rand(), TRUE));
-    $this->set('invoiceID', $invoiceID);
-    $params['invoiceID'] = $invoiceID;
-    $title = !empty($this->_values['frontend_title']) ? $this->_values['frontend_title'] : $this->_values['title'];
-    $params['description'] = ts('Online Contribution') . ': ' . ((!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $title));
-    $params['button'] = $this->controller->getButtonName();
     // required only if is_monetary and valid positive amount
     if ($this->_values['is_monetary'] &&
       !empty($this->_paymentProcessor) &&
@@ -1262,18 +1255,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     ) {
       // The concept of contributeMode is deprecated - as should be the 'is_monetary' setting.
       $this->setContributeMode();
-      // Really this setting of $this->_params & params within it should be done earlier on in the function
-      // probably the values determined here should be reused in confirm postProcess as there is no opportunity to alter anything
-      // on the confirm page. However as we are dealing with a stable release we go as close to where it is used
-      // as possible.
-      // In general the form has a lack of clarity of the logic of why things are set on the form in some cases &
-      // the logic around when $this->_params is used compared to other params arrays.
-      $this->_params = array_merge($params, $this->_params);
       $this->setRecurringMembershipParams();
+      // Ideally we would just pass handlePreApproval the params it actually needs
+      // rather than a grab bag of what is available.
+      $params = array_merge($params, $this->_params);
+      $params['description'] = ts('Online Contribution') . ': ' . ((!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['frontend_title']));
+      $params['button'] = $this->controller->getButtonName();
+      $params['invoiceID'] = $this->getInvoiceID();
       if ($this->_paymentProcessor &&
         $this->_paymentProcessor['object']->supports('preApproval')
       ) {
-        $this->handlePreApproval($this->_params);
+        $this->handlePreApproval($params);
       }
     }
   }
