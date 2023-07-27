@@ -231,7 +231,7 @@
     <table>civicrm_activity</table>
     <key>id</key>
     <add>1.1</add>
-    <onDelete>CASCADE</onDelete>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
     <name>is_test</name>
