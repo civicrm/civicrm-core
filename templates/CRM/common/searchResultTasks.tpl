@@ -41,13 +41,6 @@
   </tr>
   <tr>
     <td colspan="2">
-    {* Note print buttons were mostly removed except for Campaign search - the following lines can be removed soon CRM-12872 *}
-    {if !empty($printButtonName)}
-       {$form.$printButtonName.html} &nbsp; &nbsp;
-    {elseif !empty($form._qf_Search_next_print)}
-       {$form._qf_Search_next_print.html} &nbsp; &nbsp;
-     {/if}
-
       <span id='task-section'>
         {$form.task.html}
         {if $actionButtonName}
