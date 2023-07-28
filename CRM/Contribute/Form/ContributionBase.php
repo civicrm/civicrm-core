@@ -361,7 +361,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->order->setPriceSetID($this->getPriceSetID());
     }
     else {
-      CRM_Core_Error::deprecatedFunctionWarning('forms require a price set it');
+      CRM_Core_Error::deprecatedFunctionWarning('forms require a price set ID');
     }
     $this->_priceSet = $this->get('priceSet');
 
