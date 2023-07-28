@@ -260,8 +260,10 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $this->set('values', $this->_values);
     }
     $defaults = $this->_values;
+    // These fields are not exposed on the form and 'name' is exposed on amount, with a different meaning.
+    // see https://lab.civicrm.org/dev/core/-/issues/4453.
+    unset($defaults['name'], $defaults['created_id'], $defaults['created_date']);
 
-    $config = CRM_Core_Config::singleton();
     if (isset($this->_id)) {
 
       //set defaults for pledgeBlock values.
@@ -285,7 +287,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       ];
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = $pledgeBlockDefaults[$key] ?? NULL;
-        if ($key == 'pledge_start_date' && !empty($pledgeBlockDefaults[$key])) {
+        if ($key === 'pledge_start_date' && !empty($pledgeBlockDefaults[$key])) {
           $defaultPledgeDate = (array) json_decode($pledgeBlockDefaults['pledge_start_date']);
           $pledgeDateFields = [
             'pledge_calendar_date' => 'calendar_date',
