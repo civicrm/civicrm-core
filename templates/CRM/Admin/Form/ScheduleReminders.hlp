@@ -19,7 +19,7 @@
 
 {htxt id="limit_to"}
   <p>{ts}Select 'Limit to' if you want to only send reminders to contacts with the criteria selected above AND who ALSO match this criteria. If you select 'Choose Recipients' - only the chosen contacts will receive the reminder (AND only if they ALSO match the criteria above).{/ts}</p>
-  <p>{ts}Select 'Also include' if you want to also send reminders to contacts who match this criteria. If you select 'Choose Recipients' - the chosen contacts will also receive the reminder (in ADDITION TO the contacts who match the criteria above).{/ts}</p>
+  <p>{ts}Select 'Also include' if you want to also send reminders to contacts who match this criteria. If you select 'Choose Recipients' - the chosen contacts will also receive the reminder (in ADDITION TO the contacts who match the criteria above).{/ts} {ts}You can't also include contacts when the reminder is for an event.{/ts}</p>
 {/htxt}
 
 {htxt id="recipient"}
