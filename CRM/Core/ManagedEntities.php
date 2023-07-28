@@ -482,9 +482,9 @@ class CRM_Core_ManagedEntities {
    * @param Throwable|null $exception
    */
   protected function onApiError(string $moduleName, string $managedEntityName, string $actionName, string $errorMessage, ?Throwable $exception = NULL): void {
-    // During upgrade  this problem might be due to an about-to-be-installed extension
+    // During install/upgrade this problem might be due to an about-to-be-installed extension
     // So only log the error if it persists outside of upgrade mode
-    if (CRM_Core_Config::isUpgradeMode()) {
+    if (CRM_Core_Config::isUpgradeMode() || defined('CIVI_SETUP')) {
       return;
     }
 
