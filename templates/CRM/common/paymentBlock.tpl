@@ -90,7 +90,8 @@
       {else}
         {capture assign='urlPathVar'}{/capture}
       {/if}
-      {if $billing_profile_id}
+      // Billing profile ID is only ever set on front end forms, to force entering address for pay later.
+      {if !$isBackOffice && $billing_profile_id}
         {capture assign='profilePathVar'}billing_profile_id={$billing_profile_id}&{/capture}
       {else}
         {capture assign='profilePathVar'}{/capture}
