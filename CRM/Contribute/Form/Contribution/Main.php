@@ -753,14 +753,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $previousId = $otherAmount = FALSE;
       while ($priceField->fetch()) {
 
-        if ($self->isQuickConfig() && ($priceField->name == 'contribution_amount' || $priceField->name == 'membership_amount')) {
+        if ($self->isQuickConfig() && ($priceField->name === 'contribution_amount' || $priceField->name === 'membership_amount')) {
           $previousId = $priceField->id;
-          if ($priceField->name == 'membership_amount' && !$priceField->is_active) {
+          if ($priceField->name === 'membership_amount' && !$priceField->is_active) {
             $membershipIsActive = FALSE;
           }
         }
-        if ($priceField->name == 'other_amount') {
-          if ($self->_quickConfig && empty($fields["price_{$priceField->id}"]) &&
+        if ($priceField->name === 'other_amount') {
+          if ($self->isQuickConfig() && empty($fields["price_{$priceField->id}"]) &&
             array_key_exists("price_{$previousId}", $fields) && isset($fields["price_{$previousId}"]) && $self->_values['fee'][$previousId]['name'] == 'contribution_amount' && empty($fields["price_{$previousId}"])
           ) {
             $otherAmount = $priceField->id;
@@ -833,7 +833,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $priceFieldMemTypes = [];
 
         foreach ($self->_priceSet['fields'] as $priceId => $value) {
-          if (!empty($fields['price_' . $priceId]) || ($self->_quickConfig && $value['name'] == 'membership_amount' && empty($self->_membershipBlock['is_required']))) {
+          if (!empty($fields['price_' . $priceId]) || ($self->isQuickConfig() && $value['name'] === 'membership_amount' && empty($self->_membershipBlock['is_required']))) {
             if (!empty($fields['price_' . $priceId]) && is_array($fields['price_' . $priceId])) {
               foreach ($fields['price_' . $priceId] as $priceFldVal => $isSet) {
                 if ($isSet) {
