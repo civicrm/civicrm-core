@@ -224,7 +224,7 @@
         $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
         if ($('#entity_0', $form).val() != '1' || !($('#entity_0').length)) {
           // Some Event entity is selected.
-          if (['2', '3', '5'].includes($('#entity_0', $form).val())) {
+          if (['2', '3', '5'].includes($('#entity_0', $form).val()) || {/literal}'{$context}'{literal} === 'event') {
             $('#limit_to option[value="2"]', $form).attr('disabled','disabled').removeAttr('selected');
           }
           else {
