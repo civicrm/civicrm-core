@@ -3369,6 +3369,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         'contribution_id' => $contribution['id'],
         'return' => ['tax_amount', 'line_total', 'entity_table', 'entity_id', 'qty'],
       ])['values'];
+      $this->assertIsNumeric($contribution['tax_amount']);
       $total = 0;
       $taxTotal = 0;
       $memberships = [];
