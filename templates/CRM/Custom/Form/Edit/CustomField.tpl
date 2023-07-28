@@ -46,7 +46,7 @@
     <td class="html-adjust">
       {$formElement.html}&nbsp;
       {if $element.data_type eq 'File'}
-        {if $element.element_value.data}
+        {if is_array($element.element_value) && array_key_exists('data', $element.element_value) && $element.element_value.data}
           <div class="crm-attachment-wrapper crm-entity" id="file_{$element.element_name}">
             <span class="html-adjust"><br/>&nbsp;{ts}Attached File{/ts}: &nbsp;
               {if $element.element_value.displayURL}
