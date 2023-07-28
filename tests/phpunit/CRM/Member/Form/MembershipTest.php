@@ -84,7 +84,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * and redirect stdin to a temporary file.
    */
   public function setUp(): void {
-    $this->_apiversion = 3;
     parent::setUp();
 
     $this->_individualId = $this->individualCreate();
@@ -663,13 +662,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     // @todo figure out why financial validation fails with this test.
     $this->isValidateFinancialsOnPostAssert = FALSE;
     // Step 1: Create a Membership via backoffice whose with 50.00 payment
-    $form = $this->getForm();
-    $this->mut = new CiviMailUtils($this, TRUE);
-    $this->createLoggedInUser();
-    $priceSet = $this->callAPISuccess('PriceSet', 'Get', ["extends" => "CiviMember"]);
-    $form->set('priceSetId', $priceSet['id']);
-    CRM_Price_BAO_PriceSet::buildPriceSet($form);
-    $params = [
+    $form = $this->getForm([
       'cid' => $this->_individualId,
       'join_date' => date('Y-m-d'),
       'start_date' => '',
@@ -679,17 +672,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'record_contribution' => 1,
       'total_amount' => 50,
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-      //Member dues, see data.xml
       'financial_type_id' => '2',
       'payment_processor_id' => $this->_paymentProcessorID,
-    ];
-    $form->_contactID = $this->_individualId;
-    $form->testSubmit($params);
+    ]);
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->createLoggedInUser();
+    $form->postProcess();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     // check the membership status after partial payment, if its Pending
-    $this->assertEquals(array_search('New', CRM_Member_PseudoConstant::membershipStatus()), $membership['status_id']);
+    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contact_id' => $this->_individualId,
     ]);
@@ -712,12 +705,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'financial_type_id' => 2,
     ]);
     Civi::settings()->set('update_contribution_on_membership_type_change', TRUE);
-    $form = $this->getForm();
-    $form->preProcess();
-    $form->_id = $membership['id'];
-    $form->set('priceSetId', $priceSet['id']);
-    CRM_Price_BAO_PriceSet::buildPriceSet($form);
-    $form->_action = CRM_Core_Action::UPDATE;
+    $_REQUEST['id'] = $membership['id'];
     $params = [
       'cid' => $this->_individualId,
       'join_date' => date('Y-m-d'),
@@ -727,13 +715,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => [$this->ids['contact']['organization'], $secondMembershipType['id']],
       'status_id' => 1,
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       //Member dues, see data.xml
       'financial_type_id' => '2',
       'payment_processor_id' => $this->_paymentProcessorID,
     ];
+    $form = $this->getForm($params);
+    $form->preProcess();
+    $form->buildQuickForm();
+    $form->_action = CRM_Core_Action::UPDATE;
     $form->_contactID = $this->_individualId;
-    $form->testSubmit($params);
+    $form->postProcess();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     // check the membership status after partial payment, if its Pending
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
@@ -749,7 +741,10 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     //Update to lifetime membership.
     $params['membership_type_id'] = [$this->ids['contact']['organization'], $this->ids['membership_type']['lifetime']];
-    $form->testSubmit($params);
+    $form = $this->getForm($params);
+    $form->preProcess();
+    $form->buildQuickForm();
+    $form->postProcess();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $this->assertEquals($this->ids['membership_type']['lifetime'], $membership['membership_type_id']);
     $this->assertTrue(empty($membership['end_date']), 'Lifetime Membership on the individual has an End date.');
