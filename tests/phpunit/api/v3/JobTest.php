@@ -1083,8 +1083,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the batch merge copes with view only custom data field. View Only custom fields
-   * should never be merged.
+   * Test the batch merge copes with view only custom data field.
    */
   public function testBatchMergeCustomDataViewOnlyField(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
@@ -1099,7 +1098,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertCount(1, $result['values']['merged']);
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
-    $this->assertEquals('', $mouse['custom_' . $customField['id']]);
+    $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
   }
 
   /**

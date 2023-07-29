@@ -1642,16 +1642,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $checkPermissions ? CRM_Core_Permission::EDIT : FALSE
     );
 
-    $ignoredCustomFields = self::ignoredFields('custom');
     foreach ($otherTree as $gid => $group) {
       if (!isset($group['fields'])) {
         continue;
       }
 
       foreach ($group['fields'] as $fid => $field) {
-        if (in_array($group['name'] . '.' . $field['name'], $ignoredCustomFields)) {
-          continue;
-        }
         $mainContactValue = $mainTree[$gid]['fields'][$fid]['customValue'] ?? NULL;
         $otherContactValue = $otherTree[$gid]['fields'][$fid]['customValue'] ?? NULL;
         if (in_array($fid, $compareFields['custom'])) {
@@ -2035,6 +2031,8 @@ ORDER BY civicrm_custom_group.weight,
       $submitted = [];
     }
 
+    // Move view only custom fields CRM-5362
+    $viewOnlyCustomFields = [];
     foreach ($submitted as $key => $value) {
       if (strpos($key, 'custom_') === 0) {
         $fieldID = (int) substr($key, 7);
@@ -2043,11 +2041,18 @@ ORDER BY civicrm_custom_group.weight,
           $htmlType = (string) $fieldMetadata['html_type'];
           $isSerialized = CRM_Core_BAO_CustomField::isSerialized($fieldMetadata);
           $isView = (bool) $fieldMetadata['is_view'];
-          if (!$isView) {
-            $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
+          if ($isView) {
+            $viewOnlyCustomFields[$key] = $value;
           }
+          $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
         }
       }
+    }
+
+    // special case to set values for view only, CRM-5362
+    if (!empty($viewOnlyCustomFields)) {
+      $viewOnlyCustomFields['entityID'] = $mainId;
+      CRM_Core_BAO_CustomValueTable::setValues($viewOnlyCustomFields);
     }
 
     // dev/core#996 Ensure that the earliest created date is stored against the kept contact id
@@ -2758,18 +2763,7 @@ ORDER BY civicrm_custom_group.weight,
         'postal_greeting_display',
         'addressee_display',
       ],
-      'custom' => [],
     ];
-
-    $readOnlyCustomFields = \Civi\Api4\CustomField::get(FALSE)
-      ->addSelect('custom_group_id.name', 'name')
-      ->addWhere('is_view', '=', TRUE)
-      ->addWhere('custom_group_id.extends', 'IN', ['Individual', 'Household', 'Organization', 'Contact'])
-      ->execute();
-    foreach ($readOnlyCustomFields as $field) {
-      $keysToIgnore['custom'][] = $field['custom_group_id.name'] . '.' . $field['name'];
-    }
-
     return $keysToIgnore[$type];
   }
 
