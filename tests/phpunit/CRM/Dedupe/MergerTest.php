@@ -1047,6 +1047,41 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Verifies that when two contacts with view only custom fields are merged,
+   * the view only field of the record being deleted is merged.
+   */
+  public function testMigrationOfViewOnlyCustomData() {
+    // Create Custom Fields
+    $createGroup = $this->setupCustomGroupForIndividual();
+    $customField = $this->setupCustomField('TestField', $createGroup);
+
+    // Contacts setup
+    $this->setupMatchData();
+    $originalContactID = $this->contacts[0]['id'];
+    $duplicateContactID = $this->contacts[1]['id'];
+
+    // Update the text custom fields for duplicate contact
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $duplicateContactID,
+      "custom_{$customField['id']}" => 'abc',
+    ]);
+    $this->assertCustomFieldValue($duplicateContactID, 'abc', "custom_{$customField['id']}");
+
+    // Change custom field to view only.
+    $this->callAPISuccess('CustomField', 'update', ['id' => $customField['id'], 'is_view' => TRUE]);
+
+    // Merge, and ensure that the value was migrated
+    $this->mergeContacts($originalContactID, $duplicateContactID, [
+      "move_custom_{$customField['id']}" => 'abc',
+    ]);
+    $this->assertCustomFieldValue($originalContactID, 'abc', "custom_{$customField['id']}");
+
+    // cleanup created custom set
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $customField['id']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $createGroup['id']]);
+  }
+
+  /**
    * Calls merge method on given contacts, with values given in $params array.
    *
    * @param $originalContactID

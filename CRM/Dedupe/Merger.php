@@ -2041,10 +2041,10 @@ ORDER BY civicrm_custom_group.weight,
           $htmlType = (string) $fieldMetadata['html_type'];
           $isSerialized = CRM_Core_BAO_CustomField::isSerialized($fieldMetadata);
           $isView = (bool) $fieldMetadata['is_view'];
-          if ($isView) {
-            $viewOnlyCustomFields[$key] = $value;
-          }
           $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
+          if ($isView) {
+            $viewOnlyCustomFields[$key] = $submitted[$key];
+          }
         }
       }
     }
