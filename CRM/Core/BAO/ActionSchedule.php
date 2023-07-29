@@ -147,6 +147,24 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
   }
 
   /**
+   * Provides pseudoconstant list for `filter_contact_language`.
+   * @return array
+   */
+  public static function getFilterContactLanguageOptions(): array {
+    $languages = CRM_Core_I18n::languages(TRUE);
+    return $languages + [CRM_Core_I18n::NONE => ts('Contacts with no preferred language')];
+  }
+
+  /**
+   * Provides pseudoconstant list for `communication_language`.
+   * @return array
+   */
+  public static function getCommunicationLanguageOptions(): array {
+    $languages = CRM_Core_I18n::languages(TRUE);
+    return [CRM_Core_I18n::AUTO => ts('Follow recipient preferred language')] + $languages;
+  }
+
+  /**
    * For each entity, get a list of entity-value labels.
    *
    * @return array

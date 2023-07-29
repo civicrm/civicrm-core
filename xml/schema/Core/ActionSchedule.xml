@@ -7,6 +7,7 @@
   <comment>Table to store the reminders.</comment>
   <add>3.4</add>
   <labelField>title</labelField>
+  <title>Scheduled Reminder</title>
   <paths>
     <browse>civicrm/admin/scheduleReminders</browse>
     <add>civicrm/admin/scheduleReminders/edit?reset=1&amp;action=add</add>
@@ -31,6 +32,9 @@
     <name>name</name>
     <title>Name</title>
     <type>varchar</type>
+    <html>
+      <type>Text</type>
+    </html>
     <length>64</length>
     <comment>Name of the action(reminder)</comment>
     <add>3.4</add>
@@ -39,6 +43,9 @@
     <name>title</name>
     <title>Title</title>
     <type>varchar</type>
+    <html>
+      <type>Text</type>
+    </html>
     <length>64</length>
     <comment>Title of the action(reminder)</comment>
     <add>3.4</add>
@@ -49,7 +56,7 @@
     <length>64</length>
     <comment>Recipient</comment>
     <html>
-      <label>Recipient</label>
+      <label>Limit or Add Recipients</label>
       <type>Select</type>
       <controlField>mapping_id</controlField>
     </html>
@@ -112,6 +119,8 @@
     <comment>Reminder Interval.</comment>
     <default>0</default>
     <html>
+      <type>Number</type>
+      <min>0</min>
       <label>Start Action Offset</label>
     </html>
     <add>3.4</add>
@@ -137,8 +146,12 @@
     <length>64</length>
     <comment>Reminder Action</comment>
     <html>
-      <label>Start Action condition</label>
+      <type>Select</type>
+      <label>Start Condition</label>
     </html>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::beforeAfter</callback>
+    </pseudoconstant>
     <add>3.4</add>
   </field>
   <field>
@@ -188,6 +201,8 @@
     <default>0</default>
     <comment>Time interval for repeating the reminder.</comment>
     <html>
+      <type>Number</type>
+      <min>0</min>
       <label>Repetition Frequency Interval</label>
     </html>
     <add>3.4</add>
@@ -212,6 +227,8 @@
     <type>int unsigned</type>
     <comment>Time interval till repeating the reminder.</comment>
     <html>
+      <type>Number</type>
+      <min>0</min>
       <label>End Frequency Interval</label>
     </html>
     <add>3.4</add>
@@ -223,8 +240,12 @@
     <length>32</length>
     <comment>Reminder Action till repeating the reminder.</comment>
     <html>
-      <label>End Action</label>
+      <type>Select</type>
+      <label>End Condition</label>
     </html>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::beforeAfter</callback>
+    </pseudoconstant>
     <add>3.4</add>
   </field>
   <field>
@@ -259,6 +280,11 @@
     <name>recipient_manual</name>
     <title>Recipient Manual</title>
     <type>varchar</type>
+    <html>
+      <type>EntityRef</type>
+      <label>Manual Recipients</label>
+      <multiple>1</multiple>
+    </html>
     <length>128</length>
     <comment>Contact IDs to which reminder should be sent.</comment>
     <serialize>COMMA</serialize>
@@ -286,6 +312,9 @@
     <name>body_text</name>
     <title>Reminder Text</title>
     <type>longtext</type>
+    <html>
+      <type>TextArea</type>
+    </html>
     <comment>Body of the mailing in text format.</comment>
     <add>3.4</add>
   </field>
@@ -293,6 +322,9 @@
     <name>body_html</name>
     <title>Reminder HTML</title>
     <type>longtext</type>
+    <html>
+      <type>RichTextEditor</type>
+    </html>
     <comment>Body of the mailing in html format.</comment>
     <add>3.4</add>
   </field>
@@ -300,6 +332,9 @@
     <name>sms_body_text</name>
     <title>SMS Reminder Text</title>
     <type>longtext</type>
+    <html>
+      <type>TextArea</type>
+    </html>
     <comment>Content of the SMS text.</comment>
     <add>4.5</add>
   </field>
@@ -307,14 +342,20 @@
     <name>subject</name>
     <title>Reminder Subject</title>
     <type>varchar</type>
+    <html>
+      <type>Text</type>
+    </html>
     <length>128</length>
     <comment>Subject of mailing</comment>
     <add>3.4</add>
   </field>
   <field>
     <name>record_activity</name>
-    <title>Record Activity for Reminder?</title>
+    <title>Record Activity</title>
     <type>boolean</type>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <default>0</default>
     <required>true</required>
     <comment>Record Activity for this reminder?</comment>
@@ -392,6 +433,10 @@
     <name>absolute_date</name>
     <title>Fixed Date for Reminder</title>
     <type>date</type>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
     <comment>Date on which the reminder be sent.</comment>
     <add>4.1</add>
   </field>
@@ -399,6 +444,10 @@
     <name>from_name</name>
     <title>Reminder from Name</title>
     <type>varchar</type>
+    <html>
+      <label>From Name</label>
+      <type>Text</type>
+    </html>
     <length>255</length>
     <comment>Name in "from" field</comment>
     <add>4.5</add>
@@ -407,6 +456,10 @@
     <name>from_email</name>
     <title>Reminder From Email</title>
     <type>varchar</type>
+    <html>
+      <label>From Email</label>
+      <type>Email</type>
+    </html>
     <length>255</length>
     <comment>Email address in "from" field</comment>
     <add>4.5</add>
@@ -435,6 +488,9 @@
       <type>Select</type>
       <label>SMS Provider</label>
     </html>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::smsProvider</callback>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>sms_provider_id</name>
@@ -458,9 +514,15 @@
     <type>varchar</type>
     <length>128</length>
     <comment>Used for multilingual installation</comment>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <html>
-      <label>Filter Contact Language</label>
+      <type>Select</type>
+      <multiple>1</multiple>
+      <label>Recipients Language</label>
     </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getFilterContactLanguageOptions</callback>
+    </pseudoconstant>
     <add>4.7</add>
   </field>
   <field>
@@ -469,8 +531,12 @@
     <length>8</length>
     <comment>Used for multilingual installation</comment>
     <html>
+      <type>Select</type>
       <label>Communication Language</label>
     </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getCommunicationLanguageOptions</callback>
+    </pseudoconstant>
     <add>4.7</add>
   </field>
   <field>
@@ -501,6 +567,10 @@
     <title>Effective start date</title>
     <uniqueName>action_schedule_effective_start_date</uniqueName>
     <type>timestamp</type>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
     <comment>Earliest date to consider start events from.</comment>
     <required>false</required>
     <export>true</export>
@@ -511,6 +581,10 @@
     <title>Effective end date</title>
     <uniqueName>action_schedule_effective_end_date</uniqueName>
     <type>timestamp</type>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
     <comment>Latest date to consider end events from.</comment>
     <required>false</required>
     <export>true</export>

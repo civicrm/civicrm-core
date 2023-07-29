@@ -488,6 +488,19 @@ class CRM_Core_SelectValues {
     return $addr;
   }
 
+  public static function smsProvider(): array {
+    $providers = CRM_SMS_BAO_Provider::getProviders(NULL, NULL, TRUE, 'is_default desc, title');
+    $result = [];
+    foreach ($providers as $provider) {
+      $result[] = [
+        'id' => $provider['id'],
+        'name' => $provider['name'],
+        'label' => $provider['title'],
+      ];
+    }
+    return $result;
+  }
+
   /**
    * Different type of Mailing Tokens.
    *
@@ -1190,6 +1203,13 @@ class CRM_Core_SelectValues {
     return [
       'AND' => ts('And'),
       'OR' => ts('Or'),
+    ];
+  }
+
+  public static function beforeAfter() {
+    return [
+      'before' => ts('Before'),
+      'after' => ts('After'),
     ];
   }
 
