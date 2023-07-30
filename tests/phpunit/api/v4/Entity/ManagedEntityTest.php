@@ -536,7 +536,12 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       new CRM_Core_Module('legacycustomsearches', TRUE),
       new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
-    (new CRM_Core_ManagedEntities($allModules))->reconcile();
+    $modulesToReconcile = [
+      'unit.test.fake.ext',
+      'legacycustomsearches',
+      'org.civicrm.search_kit',
+    ];
+    (new CRM_Core_ManagedEntities($allModules))->reconcile($modulesToReconcile);
 
     $nav = Navigation::get(FALSE)
       ->addWhere('name', '=', 'Test_Parent')
@@ -587,7 +592,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     ];
     // If module is disabled it will not run hook_civicrm_managed.
     $this->_managedEntities = [];
-    (new CRM_Core_ManagedEntities($allModules))->reconcile();
+    (new CRM_Core_ManagedEntities($allModules))->reconcile($modulesToReconcile);
 
     // Children's weight should have been unaffected, but they should be disabled
     $children = Navigation::get(FALSE)
@@ -614,7 +619,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     $this->_managedEntities = $managedEntities;
-    (new CRM_Core_ManagedEntities($allModules))->reconcile();
+    (new CRM_Core_ManagedEntities($allModules))->reconcile($modulesToReconcile);
 
     // Children's weight should have been unaffected, but they should be enabled
     $children = Navigation::get(FALSE)
