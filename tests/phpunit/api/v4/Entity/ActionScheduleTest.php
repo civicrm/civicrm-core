@@ -24,12 +24,12 @@ class ActionScheduleTest extends Api4TestBase {
 
   public function testGetOptionsBasic(): void {
     $fields = ActionSchedule::getFields(FALSE)
-      ->setLoadOptions(['id', 'name', 'label'])
+      ->setLoadOptions(['id', 'name', 'label', 'icon'])
       ->execute()
       ->indexBy('name');
 
-    $this->assertContains(['id' => '1', 'name' => 'activity_type', 'label' => 'Activity'], $fields['mapping_id']['options']);
-    $this->assertContains(['id' => 'contribpage', 'name' => 'contribpage', 'label' => 'Contribution Page'], $fields['mapping_id']['options']);
+    $this->assertContains(['id' => '1', 'name' => 'activity_type', 'label' => 'Activity', 'icon' => 'fa-tasks'], $fields['mapping_id']['options']);
+    $this->assertContains(['id' => 'contribpage', 'name' => 'contribpage', 'label' => 'Contribution Page', 'icon' => 'fa-credit-card'], $fields['mapping_id']['options']);
 
     $this->assertContains(['id' => 'day', 'name' => 'day', 'label' => 'days'], $fields['start_action_unit']['options']);
     $this->assertContains(['id' => 'week', 'name' => 'week', 'label' => 'weeks'], $fields['repetition_frequency_unit']['options']);

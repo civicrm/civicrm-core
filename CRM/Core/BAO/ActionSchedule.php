@@ -64,6 +64,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
         'id' => $mapping->getId(),
         'name' => $mapping->getName(),
         'label' => $mapping->getLabel(),
+        'icon' => \Civi\Api4\Utils\CoreUtil::getInfoItem($mapping->getEntityName(), 'icon'),
       ];
     }
     usort($mappings, function($m1, $m2) {
