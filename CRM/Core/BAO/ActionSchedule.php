@@ -44,22 +44,31 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
   }
 
   /**
-   * @param string|int $identifier
-   *   Name of the mapping e.g. 'contribpage' or CRM_Contact_ActionMapping::CONTACT_MAPPING_ID
+   * @param string|int $mappingId
+   *   Id of the mapping e.g. 'contribpage' or CRM_Contact_ActionMapping::CONTACT_MAPPING_ID
    *
    * @return \Civi\ActionSchedule\MappingInterface|NULL
    */
-  public static function getMapping($identifier) {
-    return self::getMappings()[$identifier] ?? NULL;
+  public static function getMapping($mappingId) {
+    return self::getMappings()[$mappingId] ?? NULL;
   }
 
   /**
    * Provides the pseudoconstant list for `mapping_id` field.
-   * @return array
+   * @return array[]
    */
   public static function getMappingOptions(): array {
-    $mappings = CRM_Utils_Array::collectMethod('getLabel', self::getMappings());
-    natcasesort($mappings);
+    $mappings = [];
+    foreach (self::getMappings() as $mapping) {
+      $mappings[] = [
+        'id' => $mapping->getId(),
+        'name' => $mapping->getName(),
+        'label' => $mapping->getLabel(),
+      ];
+    }
+    usort($mappings, function($m1, $m2) {
+      return strnatcasecmp($m1['label'], $m2['label']);
+    });
     return $mappings;
   }
 
@@ -203,7 +212,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
   /**
    * Retrieve list of Scheduled Reminders.
    *
-   * @param \Civi\ActionSchedule\Mapping|null $filterMapping
+   * @param \Civi\ActionSchedule\MappingInterface|null $filterMapping
    *   Filter by the schedule's mapping type.
    * @param int $filterValue
    *   Filter by the schedule's entity_value.

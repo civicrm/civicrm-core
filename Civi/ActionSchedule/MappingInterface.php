@@ -20,10 +20,19 @@ interface MappingInterface {
   /**
    * Unique identifier of this mapping type.
    *
-   * Should return a "machine name" style string (older implementations return an int -- don't follow their example).
+   * Should return a "machine_name" style string (same output as `getName()`)
+   * Note: Some legacy implementations return an int. Don't follow those examples.
    * @return string|int
    */
   public function getId();
+
+  /**
+   * Unique name of this mapping type.
+   *
+   * Should return a "machine_name" style string (should be the same as `getId()`).
+   * @return string
+   */
+  public function getName(): string;
 
   /**
    * Name of the table belonging to the main entity e.g. `civicrm_activity`

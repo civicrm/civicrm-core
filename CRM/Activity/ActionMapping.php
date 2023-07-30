@@ -32,6 +32,10 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return self::ACTIVITY_MAPPING_ID;
   }
 
+  public function getName(): string {
+    return 'activity_type';
+  }
+
   public function getEntityName(): string {
     return 'Activity';
   }

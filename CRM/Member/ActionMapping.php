@@ -27,6 +27,10 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return self::MEMBERSHIP_TYPE_MAPPING_ID;
   }
 
+  public function getName(): string {
+    return 'membership_type';
+  }
+
   public function getEntityName(): string {
     return 'Membership';
   }

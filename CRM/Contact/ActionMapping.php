@@ -28,6 +28,10 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return self::CONTACT_MAPPING_ID;
   }
 
+  public function getName(): string {
+    return 'contact';
+  }
+
   public function getEntityName(): string {
     return 'Contact';
   }

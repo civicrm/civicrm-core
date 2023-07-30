@@ -19,6 +19,10 @@ class CRM_Event_ActionMapping_ByTemplate extends CRM_Event_ActionMapping {
     return self::EVENT_TPL_MAPPING_ID;
   }
 
+  public function getName(): string {
+    return 'event_template';
+  }
+
   public function getLabel(): string {
     return ts('Event Template');
   }

@@ -23,7 +23,7 @@ class CRM_Contribute_ActionMapping_ByType extends CRM_Contribute_ActionMapping {
   /**
    * @return string
    */
-  public function getId() {
+  public function getName(): string {
     return 'contribtype';
   }
 

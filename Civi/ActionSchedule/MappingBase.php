@@ -22,6 +22,10 @@ use Civi\Core\Service\AutoSubscriber;
  */
 abstract class MappingBase extends AutoSubscriber implements MappingInterface {
 
+  public function getId() {
+    return $this->getName();
+  }
+
   public static function getSubscribedEvents(): array {
     return [
       'civi.actionSchedule.getMappings' => 'onRegisterActionMappings',

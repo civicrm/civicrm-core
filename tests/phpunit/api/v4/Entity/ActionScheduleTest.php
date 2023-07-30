@@ -24,22 +24,24 @@ class ActionScheduleTest extends Api4TestBase {
 
   public function testGetOptionsBasic() {
     $fields = ActionSchedule::getFields(FALSE)
-      ->setLoadOptions(TRUE)
+      ->setLoadOptions(['id', 'name', 'label'])
       ->execute()
       ->indexBy('name');
 
-    $this->assertArrayHasKey('1', $fields['mapping_id']['options']);
-    $this->assertArrayHasKey('contribpage', $fields['mapping_id']['options']);
+    $this->assertContains(['id' => '1', 'name' => 'activity_type', 'label' => 'Activity'], $fields['mapping_id']['options']);
+    $this->assertContains(['id' => 'contribpage', 'name' => 'contribpage', 'label' => 'Contribution Page'], $fields['mapping_id']['options']);
 
-    $this->assertArrayHasKey('day', $fields['start_action_unit']['options']);
-    $this->assertArrayHasKey('week', $fields['repetition_frequency_unit']['options']);
-    $this->assertArrayHasKey('month', $fields['end_frequency_unit']['options']);
+    $this->assertContains(['id' => 'day', 'name' => 'day', 'label' => 'days'], $fields['start_action_unit']['options']);
+    $this->assertContains(['id' => 'week', 'name' => 'week', 'label' => 'weeks'], $fields['repetition_frequency_unit']['options']);
+    $this->assertContains(['id' => 'month', 'name' => 'month', 'label' => 'months'], $fields['end_frequency_unit']['options']);
 
-    $this->assertArrayHasKey('manual', $fields['recipient']['options']);
-    $this->assertArrayHasKey('group', $fields['recipient']['options']);
+    $this->assertEquals('manual', $fields['recipient']['options'][0]['name']);
+    $this->assertEquals('group', $fields['recipient']['options'][1]['name']);
 
-    $this->assertArrayHasKey('1', $fields['limit_to']['options']);
-    $this->assertArrayHasKey('2', $fields['limit_to']['options']);
+    $this->assertEquals('1', $fields['limit_to']['options'][0]['id']);
+    $this->assertEquals('limit', $fields['limit_to']['options'][0]['name']);
+    $this->assertEquals('2', $fields['limit_to']['options'][1]['id']);
+    $this->assertEquals('add', $fields['limit_to']['options'][1]['name']);
   }
 
 }
