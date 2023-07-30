@@ -129,7 +129,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
     if (!$values['mapping_id']) {
       return [];
     }
-    return self::getMapping($values['mapping_id'])->getStatusLabels($values['entity_value']);
+    return self::getMapping($values['mapping_id'])->getStatusLabels((array) $values['entity_value']);
   }
 
   /**
@@ -268,7 +268,7 @@ FROM civicrm_action_schedule cas
         explode(CRM_Core_DAO::VALUE_SEPARATOR, $dao->entityValueIds)
       ));
       $list[$dao->id]['status'] = implode(', ', CRM_Utils_Array::subset(
-        $filterMapping->getStatusLabels($dao->entityValueIds),
+        $filterMapping->getStatusLabels($list[$dao->id]['entity_value']),
         explode(CRM_Core_DAO::VALUE_SEPARATOR, $dao->entityStatusIds)
       ));
       $list[$dao->id]['is_repeat'] = $dao->is_repeat;

@@ -40,8 +40,13 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return 'Activity';
   }
 
-  public function getValueHeader(): string {
-    return ts('Activity Type');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    $spec->getFieldByName('entity_value')
+      ->setLabel(ts('Activity Type'));
+    $spec->getFieldByName('entity_status')
+      ->setLabel(ts('Activity Status'));
+    $spec->getFieldByName('recipient')
+      ->setLabel(ts('Recipients'));
   }
 
   public function getValueLabels(): array {
@@ -51,11 +56,7 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return $activityTypes;
   }
 
-  public function getStatusHeader(): string {
-    return ts('Activity Status');
-  }
-
-  public function getStatusLabels($value): array {
+  public function getStatusLabels(?array $entityValue): array {
     return CRM_Core_PseudoConstant::activityStatus();
   }
 

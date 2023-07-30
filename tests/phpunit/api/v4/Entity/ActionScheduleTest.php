@@ -22,7 +22,7 @@ use Civi\Api4\ActionSchedule;
  */
 class ActionScheduleTest extends Api4TestBase {
 
-  public function testGetOptionsBasic() {
+  public function testGetOptionsBasic(): void {
     $fields = ActionSchedule::getFields(FALSE)
       ->setLoadOptions(['id', 'name', 'label'])
       ->execute()
@@ -42,6 +42,22 @@ class ActionScheduleTest extends Api4TestBase {
     $this->assertEquals('limit', $fields['limit_to']['options'][0]['name']);
     $this->assertEquals('2', $fields['limit_to']['options'][1]['id']);
     $this->assertEquals('add', $fields['limit_to']['options'][1]['name']);
+  }
+
+  public function testGetFieldsForActivity(): void {
+    $fields = ActionSchedule::getFields(FALSE)
+      ->setLoadOptions(TRUE)
+      ->addValue('mapping_id:name', 'activity_type')
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertEquals('Activity Type', $fields['entity_value']['label']);
+    $this->assertContains('Meeting', $fields['entity_value']['options']);
+    $this->assertEquals('Activity Status', $fields['entity_status']['label']);
+    $this->assertContains('Scheduled', $fields['entity_status']['options']);
+    $this->assertArrayHasKey('activity_date_time', $fields['start_action_date']['options']);
+    $this->assertArrayHasKey('1', $fields['limit_to']['options']);
+    $this->assertArrayNotHasKey('2', $fields['limit_to']['options']);
   }
 
 }

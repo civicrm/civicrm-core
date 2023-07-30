@@ -59,10 +59,6 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
     return CoreUtil::getInfoItem($this->getEntityName(), 'title');
   }
 
-  public function getValueHeader(): string {
-    return $this->getLabel();
-  }
-
   public static function getLimitToOptions(): array {
     return [
       [
@@ -107,6 +103,12 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
 
   public function sendToAdditional($entityId): bool {
     return TRUE;
+  }
+
+  final public function applies(string $entity, string $action, array $values = []) {
+    return $entity === 'ActionSchedule' &&
+      in_array($action, ['create', 'get', 'update', 'save'], TRUE) &&
+      $this->getId() == ($values['mapping_id'] ?? NULL);
   }
 
 }

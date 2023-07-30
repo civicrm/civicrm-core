@@ -36,13 +36,12 @@ class CRM_Contribute_ActionMapping_ByType extends CRM_Contribute_ActionMapping {
     return ts('Contribution Type');
   }
 
-  /**
-   * Get a printable label to use as the header on the 'value' filter.
-   *
-   * @return string
-   */
-  public function getValueHeader(): string {
-    return ts('Financial Type');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    parent::modifySpec($spec);
+    $spec->getFieldByName('entity_value')
+      ->setLabel(ts('Financial Type'));
+    $spec->getFieldByName('recipient_listing')
+      ->setRequired($spec->getValue('limit_to') && $spec->getValue('recipient') === 'soft_credit_type');
   }
 
   /**

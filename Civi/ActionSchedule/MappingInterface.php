@@ -11,11 +11,13 @@
 
 namespace Civi\ActionSchedule;
 
+use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
+
 /**
  * Interface MappingInterface
  * @package Civi\ActionSchedule
  */
-interface MappingInterface {
+interface MappingInterface extends SpecProviderInterface {
 
   /**
    * Unique identifier of this mapping type.
@@ -53,38 +55,17 @@ interface MappingInterface {
   public function getLabel();
 
   /**
-   * Label of the primary filter field on the form, e.g. "Activity Type"
-   * @return string
-   */
-  public function getValueHeader(): string;
-
-  /**
-   * Get a printable label to use as the header on the 'status' filter.
-   *
-   * @return string
-   */
-  public function getStatusHeader(): string;
-
-  /**
-   * Get a list of value options.
-   *
-   * @return array
-   *   Array(string $value => string $label).
-   *   Ex: array(123 => 'Phone Call', 456 => 'Meeting').
+   * Get option list for the `entity_value` field.
    */
   public function getValueLabels(): array;
 
   /**
-   * Get a list of status options.
+   * Get option list for the `entity_status` field.
    *
-   * @param string|int $value
-   *   The list of status options may be contingent upon the selected filter value.
-   *   This is the selected filter value.
-   * @return array
-   *   Array(string $value => string $label).
-   *   Ex: Array(123 => 'Completed', 456 => 'Scheduled').
+   * @param array|null $entityValue
+   *   Selected value(s) of the `entity_value` field.
    */
-  public function getStatusLabels($value): array;
+  public function getStatusLabels(?array $entityValue): array;
 
   /**
    * Get a list of available date fields.

@@ -36,8 +36,14 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return 'Contact';
   }
 
-  public function getValueHeader(): string {
-    return ts('Date Field');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    $spec->getFieldByName('entity_value')
+      ->setLabel(ts('Date Field'))
+      ->setInputAttr('multiple', FALSE);
+    $spec->getFieldByName('entity_status')
+      ->setLabel(ts('Annual Options'))
+      ->setInputAttr('multiple', FALSE)
+      ->setRequired(TRUE);
   }
 
   public function getValueLabels(): array {
@@ -55,11 +61,7 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return $dateFields;
   }
 
-  public function getStatusHeader(): string {
-    return ts('Annual Options');
-  }
-
-  public function getStatusLabels($value): array {
+  public function getStatusLabels(?array $entityValue): array {
     return CRM_Core_OptionGroup::values('contact_date_reminder_options');
   }
 

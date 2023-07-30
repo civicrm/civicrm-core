@@ -28,11 +28,18 @@ abstract class CRM_Event_ActionMapping extends \Civi\ActionSchedule\MappingBase 
     return 'Participant';
   }
 
-  public function getStatusHeader(): string {
-    return ts('Participant Status');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    $spec->getFieldByName('entity_value')
+      ->setLabel($this->getLabel());
+    $spec->getFieldByName('entity_status')
+      ->setLabel(ts('Participant Status'));
+    $spec->getFieldByName('recipient')
+      ->setLabel(ts('Recipients'));
+    $spec->getFieldByName('recipient_listing')
+      ->setRequired($spec->getValue('recipient') === 'participant_role');
   }
 
-  public function getStatusLabels($value): array {
+  public function getStatusLabels(?array $entityValue): array {
     return CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
   }
 

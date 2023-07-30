@@ -101,6 +101,16 @@ trait GuiSpecTrait {
   }
 
   /**
+   * @param string $attrName
+   * @param $attrValue
+   * @return $this
+   */
+  public function setInputAttr(string $attrName, $attrValue) {
+    $this->inputAttrs[$attrName] = $attrValue;
+    return $this;
+  }
+
+  /**
    * @return bool
    */
   public function getLocalizable() {
