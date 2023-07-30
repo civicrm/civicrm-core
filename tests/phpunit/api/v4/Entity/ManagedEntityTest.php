@@ -530,17 +530,8 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // Refresh managed entities with module active
     $allModules = [
       new CRM_Core_Module('unit.test.fake.ext', TRUE),
-      // We can't wip out this enabled module as it still have declared
-      // managed entities & the test will fail if we pretend it doesn't exist
-      // here but still let it declare entities.
-      new CRM_Core_Module('legacycustomsearches', TRUE),
-      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
-    $modulesToReconcile = [
-      'unit.test.fake.ext',
-      'legacycustomsearches',
-      'org.civicrm.search_kit',
-    ];
+    $modulesToReconcile = ['unit.test.fake.ext'];
     (new CRM_Core_ManagedEntities($allModules))->reconcile($modulesToReconcile);
 
     $nav = Navigation::get(FALSE)
@@ -584,11 +575,6 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // Refresh managed entities with module disabled
     $allModules = [
       new CRM_Core_Module('unit.test.fake.ext', FALSE),
-      // We can't wip out this enabled module as it still have declared
-      // managed entities & the test will fail if we pretend it doesn't exist
-      // here but still let it declare entities.
-      new CRM_Core_Module('legacycustomsearches', TRUE),
-      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     // If module is disabled it will not run hook_civicrm_managed.
     $this->_managedEntities = [];
@@ -612,11 +598,6 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // Refresh managed entities with module active
     $allModules = [
       new CRM_Core_Module('unit.test.fake.ext', TRUE),
-      // We can't wip out this enabled module as it still have declared
-      // managed entities & the test will fail if we pretend it doesn't exist
-      // here but still let it declare entities.
-      new CRM_Core_Module('legacycustomsearches', TRUE),
-      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     $this->_managedEntities = $managedEntities;
     (new CRM_Core_ManagedEntities($allModules))->reconcile($modulesToReconcile);
