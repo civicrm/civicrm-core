@@ -41,6 +41,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFive extends CRM_Upgrade_Incremental_
 
     $this->addTask('Update ActionSchedule.limit_to column', 'alterColumn', 'civicrm_action_schedule', 'limit_to', "int COMMENT 'Is this the recipient criteria limited to OR in addition to?'");
     $this->addTask('Remove Batch Create/Edit Activity Types', 'removeFinancialBatchActivityTypes');
+    $this->addTask('Update New Price Set path', 'updateNewPriceSetPath');
   }
 
   /**
@@ -73,6 +74,17 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFive extends CRM_Upgrade_Incremental_
       }
     }
 
+    return TRUE;
+  }
+
+  /**
+   * Update menu paths for 'New Price Set' - https://github.com/civicrm/civicrm-core/pull/26929
+   */
+  public static function updateNewPriceSetPath($ctx): bool {
+    \Civi\Api4\Navigation::update(FALSE)
+      ->addWhere('name', '=', 'New Price Set')
+      ->addValue('url', 'civicrm/admin/price/edit?reset=1&action=add')
+      ->execute();
     return TRUE;
   }
 
