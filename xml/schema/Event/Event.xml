@@ -905,7 +905,7 @@
     </pseudoconstant>
     <add>4.5</add>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Dedupe Rule</label>
     </html>
   </field>

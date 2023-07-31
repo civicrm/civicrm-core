@@ -68,7 +68,7 @@
     <export>true</export>
     <import>true</import>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Financial Type</label>
     </html>
     <add>4.3</add>
@@ -92,7 +92,7 @@
       <labelColumn>title</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Contribution Page</label>
     </html>
     <add>1.5</add>

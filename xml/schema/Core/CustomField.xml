@@ -43,7 +43,7 @@
       <labelColumn>title</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Custom Group</label>
     </html>
   </field>

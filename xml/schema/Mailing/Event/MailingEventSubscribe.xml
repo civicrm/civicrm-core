@@ -34,7 +34,7 @@
       <labelColumn>title</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Group</label>
     </html>
   </field>

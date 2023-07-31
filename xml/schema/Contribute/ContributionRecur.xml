@@ -363,7 +363,7 @@
       <labelColumn>title</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Payment Processor</label>
     </html>
   </field>
@@ -387,7 +387,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Financial Type</label>
     </html>
   </field>

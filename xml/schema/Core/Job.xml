@@ -41,7 +41,7 @@
     <comment>Which Domain is this scheduled job for</comment>
     <html>
       <label>Domain</label>
-      <type>Select</type>
+      <type>EntityRef</type>
     </html>
     <add>4.1</add>
   </field>

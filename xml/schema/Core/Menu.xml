@@ -33,7 +33,7 @@
     <comment>Which Domain is this menu item for</comment>
     <html>
       <label>Domain</label>
-      <type>Select</type>
+      <type>EntityRef</type>
     </html>
     <add>3.0</add>
   </field>
@@ -141,7 +141,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Component</label>
     </html>
   </field>

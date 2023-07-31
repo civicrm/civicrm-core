@@ -375,7 +375,7 @@
     </pseudoconstant>
     <localize_context>country</localize_context>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Country</label>
     </html>
     <add>1.1</add>

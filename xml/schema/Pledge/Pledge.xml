@@ -65,7 +65,7 @@
     </pseudoconstant>
     <add>4.3</add>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Financial Type</label>
     </html>
   </field>

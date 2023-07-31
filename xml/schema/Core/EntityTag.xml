@@ -60,7 +60,7 @@
       <condition>is_tagset != 1</condition>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Tag</label>
     </html>
   </field>

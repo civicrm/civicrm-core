@@ -78,7 +78,7 @@
     <!-- changed to not required in 4.3 in order to change ON DELETE CASCADE FK constraint to SET NULL -->
     <html>
       <label>Price Field</label>
-      <type>Select</type>
+      <type>EntityRef</type>
     </html>
     <add>1.7</add>
   </field>
@@ -191,7 +191,7 @@
     <comment>FK to Financial Type.</comment>
     <add>4.3</add>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Financial Type</label>
     </html>
   </field>

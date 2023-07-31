@@ -92,7 +92,7 @@
       <labelColumn>label</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Status</label>
     </html>
   </field>

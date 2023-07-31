@@ -33,7 +33,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>From Account</label>
     </html>
   </field>
@@ -55,7 +55,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>To Account</label>
     </html>
   </field>
@@ -180,7 +180,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Payment Processor</label>
     </html>
     <add>4.3</add>

@@ -514,7 +514,7 @@
     <type>int unsigned</type>
     <add>4.2</add>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>SMS Provider</label>
     </html>
   </field>

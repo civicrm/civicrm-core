@@ -73,7 +73,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Membership Type</label>
     </html>
     <add>1.5</add>
@@ -158,7 +158,7 @@
       <labelColumn>label</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Status</label>
     </html>
     <add>1.5</add>
