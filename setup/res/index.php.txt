@@ -74,12 +74,16 @@ function standaloneErrorHandler(
   if ($handlingError) {
     throw new \RuntimeException("Died: error was thrown during error handling");
   }
-  $handlingError = TRUE;
+  $config = CRM_Core_Config::singleton();
+  if (!$config->debug) {
+    // For these errors to show, we must be debugging.
+    return;
+  }
 
+  $handlingError = TRUE;
   $trace = '';
-  // Might be nice to offer something like this to trace down errors.
-  $debug = CRM_Core_Config::singleton()->debug;
-  if ($debug) {
+  if ($config->backtrace) {
+    // Backtrace is configured for errors.
     $trace = [];
     foreach (array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1) as $item) {
       $_ = '';
