@@ -1523,6 +1523,9 @@
 - github      : tobiaslounsbury
   name        : Tobias Lounsbury
 
+- github      : TobiasVoigt
+  name        : Tobias Voigt
+
 - name        : Thomas Mannell
   organization: Registered Nurses' Association of Ontario
 
@@ -1710,3 +1713,5 @@
 - github      : mikeybeck
   name        : Mike Beck
   organization: Fuzion
+
+- github      : ziljah
