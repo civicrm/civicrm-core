@@ -150,9 +150,7 @@ class CRM_Financial_BAO_Payment {
         }
 
         foreach ($financialItems as $item) {
-          if ($item['price_field_value_id'] === (int) $value['price_field_value_id']
-            && in_array($item['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
-          ) {
+          if (in_array($item['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)) {
             // @todo - this is expected to be broken - it should be fixed to
             // a) have the getPayableLineItems add the amount to allocate for tax
             // b) call EntityFinancialTrxn directly - per above.
