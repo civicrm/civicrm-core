@@ -566,8 +566,15 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   public function permissionDenied() {
-    http_response_code(403);
-    echo "403 Forbidden: You do not have permission to access this resource.\n";
+    // If not logged in, they need to.
+    if (CRM_Core_Session::singleton()->get('ufID')) {
+      // They are logged in; they're just not allowed this page.
+      CRM_Core_Error::statusBounce(ts("Access denied"), CRM_Utils_System::url('civicrm'));
+    }
+    else {
+      CRM_Utils_System::redirect('/civicrm/login?anonAccessDenied');
+    }
+
     // TODO: Prettier error page
   }
 
