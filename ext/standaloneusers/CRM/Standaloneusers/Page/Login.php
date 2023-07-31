@@ -1,5 +1,6 @@
 <?php
 use CRM_Standaloneusers_ExtensionUtil as E;
+use Civi\Standalone\Security;
 
 class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
 
@@ -10,6 +11,8 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
     // // Example: Assign a variable for use in a template
     // $this->assign('currentTime', date('Y-m-d H:i:s'));
     $this->assign('logoUrl', E::url('images/civicrm-logo.png'));
+    // Remove breadcrumb for login page.
+    $this->assign('breadcrumb', NULL);
 
     parent::run();
   }
@@ -18,8 +21,7 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
    * Log out.
    */
   public function logout() {
-    // Same as CRM_Authx_Page_AJAX::logout()
-    _authx_uf()->logoutSession();
+    Security::singleton()->logoutUser();
     // Dump them back on the log-IN page.
     CRM_Utils_System::redirect('/civicrm/login?justLoggedOut');
   }

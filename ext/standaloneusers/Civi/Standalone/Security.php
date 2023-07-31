@@ -138,9 +138,11 @@ class Security {
   }
 
   /**
+   *
    */
   public function logoutUser() {
-    // @todo
+    // This is the same call as in CRM_Authx_Page_AJAX::logout()
+    _authx_uf()->logoutSession();
   }
 
   /**

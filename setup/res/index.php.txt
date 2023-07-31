@@ -1,34 +1,31 @@
 <?php
 
 function invoke() {
-  // Redirect to the dashboard for discoverability
-  // but in the future we may want a login page or something else.
-  if ($_SERVER['REQUEST_URI'] == '/') {
-    CRM_Utils_System::redirect('/civicrm');
-  }
+  $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 
-  if (!empty($_SERVER['REQUEST_URI'])) {
-    // Required so that the userID is set before generating the menu
-    \CRM_Core_Session::singleton()->initialize();
-    // Add CSS, JS, etc. that is required for this page.
-    \CRM_Core_Resources::singleton()->addCoreResources();
+  // Required so that the userID is set before generating the menu
+  \CRM_Core_Session::singleton()->initialize();
+  // Add CSS, JS, etc. that is required for this page.
+  \CRM_Core_Resources::singleton()->addCoreResources();
+  $parts = explode('?', $requestUri);
+  $args = explode('/', $parts[0] ?? '');
+  // Remove empty path segments, a//b becomes equivalent to a/b
+  $args = array_values(array_filter($args));
+  if (!$args) {
+    // This is a request for the site's homepage. See if we have one.
+    $item = CRM_Core_Invoke::getItem('/');
+    if (!$item) {
+      // We have no public homepage, so send them to login.
+      // This doesn't allow for /civicrm itself to be public,
+      // but that's got to be a pretty edge case, right?!
+      CRM_Utils_System::redirect('/civicrm/login');
+    }
+  }
+  // This IS required for compatibility. e.g. the extensions (at least) quickform uses it for the form's action attribute.
+  $_GET['q'] = implode('/', $args);
 
-    $parts = explode('?', $_SERVER['REQUEST_URI']);
-    $args = explode('/', $parts[0]);
-    // Remove empty values
-    $args = array_values(array_filter($args));
-    // Set this for compatibility
-    $_GET['q'] = implode('/', $args);
-    // And finally render the page
-    print CRM_Core_Invoke::invoke($args);
-  }
-  else {
-    // @todo Is it necessary to support this?
-    // Apache has not been tested yet, but presumably not required.
-    $config = CRM_Core_Config::singleton();
-    $urlVar = $config->userFrameworkURLVar;
-    print CRM_Core_Invoke::invoke(explode('/', $_GET[$urlVar]));
-  }
+  // Render the page
+  print CRM_Core_Invoke::invoke($args);
 }
 
 function findStandaloneSettings(): string {

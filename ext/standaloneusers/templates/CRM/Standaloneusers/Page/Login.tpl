@@ -72,6 +72,7 @@
     --text-colour: #222;
     --text-size: 0.9rem;
     --error-colour: #a00;
+    --warning-colour: #fbb862;
     --success-colour: #86c66c;
     --label-colour: #464354;
     --background-colour: rgb(242,242,237);
@@ -224,6 +225,14 @@ a:hover, a:focus {
   margin: 1rem 0;
   border-radius: var(--box-roundness);
 }
+#anonAccessDenied {
+  text-align: center;
+  font-weight: bold;
+  padding: var(--box-padding);
+  background-color: var(--warning-colour);
+  margin: 1rem 0;
+  border-radius: var(--box-roundness);
+}
 
 @media  (min-width: 768px) {
     #crm-container.standalone-entry {
@@ -242,7 +251,8 @@ a:hover, a:focus {
 <div id="crm-container" class="crm-container standalone-entry">
   <div class="mid-block">
     <img src="{$logoUrl}" alt="logo for CiviCRM, with an intersecting blue and green triangle">
-    <div class="message info" style="display:none;" id="loggedOutNotice">You have been logged out.</div>
+    <div class="message info" style="display:none;" id="loggedOutNotice">{ts}You have been logged out.{/ts}</div>
+    <div class="message warning" style="display:none;" id="anonAccessDenied">{ts}You may need to login to access that.{/ts}</div>
     <form>
       <div>
         <label for="exampleInputEmail1" class="form-label">Username</label>
@@ -269,13 +279,14 @@ document.addEventListener('DOMContentLoaded', () => {
         password = document.getElementById('passwordInput'),
         loggedOutNotice = document.getElementById('loggedOutNotice');
 
+  // Special messages.
   if (window.location.search === '?justLoggedOut') {
     loggedOutNotice.style.display = '';
     console.log("successful logout");
   }
-  else {
-    console.log("no successful logout");
-    }
+  else if (window.location.search === '?anonAccessDenied') {
+    anonAccessDenied.style.display = '';
+  }
 
   submitBtn.addEventListener('click', async e => {
     e.preventDefault();
