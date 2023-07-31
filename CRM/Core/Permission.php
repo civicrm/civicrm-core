@@ -211,7 +211,7 @@ class CRM_Core_Permission {
    * @return array
    *   array reference of all groups.
    */
-  public static function group($groupType, $excludeHidden = TRUE) {
+  public static function group($groupType, $excludeHidden = TRUE): array {
     $config = CRM_Core_Config::singleton();
     return $config->userPermissionClass->group($groupType, $excludeHidden);
   }

@@ -746,7 +746,7 @@ AND    contact_id IN ( $contactStr )
    *
    * @return array|bool
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
+  public static function buildOptions($fieldName, $context = NULL, $props = []): array {
     $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, [], $context);
 
     // Sort group list by hierarchy

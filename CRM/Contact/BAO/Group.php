@@ -1055,7 +1055,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $spacer = '<span class="child-indent"></span>',
     $titleOnly = FALSE,
     $public = FALSE
-  ) {
+  ): array {
     if (empty($groupIDs)) {
       return [];
     }
