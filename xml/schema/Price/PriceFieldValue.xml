@@ -35,6 +35,7 @@
     <required>true</required>
     <comment>FK to civicrm_price_field</comment>
     <html>
+      <type>EntityRef</type>
       <label>Price Field</label>
     </html>
     <add>3.3</add>
@@ -165,7 +166,7 @@
     <default>NULL</default>
     <comment>FK to Membership Type</comment>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Membership Type</label>
     </html>
     <add>3.4</add>
