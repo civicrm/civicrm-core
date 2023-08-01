@@ -35,6 +35,12 @@ SET body_html = REPLACE(body_html, '{welcome.group}', '{group.frontend_title}'),
 body_text = REPLACE(body_text, '{welcome.group}', '{group.frontend_title}'),
 subject = REPLACE(subject, '{welcome.group}', '{group.frontend_title}')
 WHERE component_type = 'Welcome';
+
+UPDATE civicrm_mailing_component
+SET body_html = REPLACE(body_html, '{subscribe.group}', '{group.frontend_title}'),
+body_text = REPLACE(body_text, '{subscribe.group}', '{group.frontend_title}'),
+subject = REPLACE(subject, '{subscribe.group}', '{group.frontend_title}')
+WHERE component_type = 'Subscribe';
 {/literal}
 
 UPDATE `civicrm_location_type` SET `is_reserved` = 0 WHERE `is_reserved` IS NULL;

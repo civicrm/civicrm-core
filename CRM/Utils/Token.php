@@ -860,6 +860,8 @@ class CRM_Utils_Token {
   /**
    * Replace subscription-confirmation-request tokens
    *
+   * @deprecated
+   *
    * @param string $str
    *   The string with tokens to be replaced.
    * @param string $group
@@ -872,6 +874,7 @@ class CRM_Utils_Token {
    *   The processed string
    */
   public static function &replaceSubscribeTokens($str, $group, $url, $html) {
+    CRM_Core_Error::deprecatedFunctionWarning('use token processor');
     if (self::token_match('subscribe', 'group', $str)) {
       self::token_replace('subscribe', 'group', $group, $str);
     }
