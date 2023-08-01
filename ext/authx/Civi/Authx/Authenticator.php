@@ -259,7 +259,7 @@ class Authenticator extends AutoService implements HookInterface {
    */
   protected function login(AuthenticatorTarget $tgt) {
     $isSameValue = function($a, $b) {
-      return !empty($a) && (string) $a === (string) $b;
+      return (is_null($a) && is_null($b)) || (!empty($a) && (string) $a === (string) $b);
     };
 
     if (\CRM_Core_Session::getLoggedInContactID() || $this->authxUf->getCurrentUserId()) {
