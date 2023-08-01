@@ -2,7 +2,7 @@
 {if !empty($receipt_text)}
 {$receipt_text}
 {/if}
-{if $is_pay_later}
+{if '{contribution.contribution_status_id:name}' === 'Pending'}
 
 ===========================================================
 {$pay_later_receipt}

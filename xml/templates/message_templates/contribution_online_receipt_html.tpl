@@ -25,7 +25,7 @@
      <p>{$receipt_text|htmlize}</p>
     {/if}
 
-    {if $is_pay_later}
+    {if '{contribution.contribution_status_id:name}' === 'Pending'}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
