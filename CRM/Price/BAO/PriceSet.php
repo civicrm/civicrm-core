@@ -823,9 +823,6 @@ WHERE  id = %1";
     }
 
     $form->assign('quickConfig', $quickConfig);
-    if ($className == 'CRM_Contribute_Form_Contribution_Main') {
-      $form->_quickConfig = $quickConfig;
-    }
 
     // Mark which field should have the auto-renew checkbox, if any. CRM-18305
     if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
