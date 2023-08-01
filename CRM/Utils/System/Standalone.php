@@ -570,6 +570,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     // If not logged in, they need to.
     if (CRM_Core_Session::singleton()->get('ufID')) {
       // They are logged in; they're just not allowed this page.
+
+      // Check the (misconfiguration?) case that they're not allowed the civi homepage.
+      $item = CRM_Core_Invoke::getItem('civicrm/');
+      if (!CRM_Core_Permission::checkMenuItem($item)) {
+        throw new RuntimeException("User is allowed to login but does not have the requisite 'access CiviCRM' permission.");
+      }
       CRM_Core_Error::statusBounce(ts("Access denied"), CRM_Utils_System::url('civicrm'));
     }
     else {
@@ -604,6 +610,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       'use_only_cookies' => 1,
       'use_strict_mode'  => 1,
     ]);
+    CRM_Utils_System::redirect('/civicrm/login?anonAccessDenied');
   }
 
 }

@@ -10,13 +10,27 @@ function invoke() {
   // Remove empty path segments, a//b becomes equivalent to a/b
   $args = array_values(array_filter($args));
   if (!$args) {
-    // This is a request for the site's homepage. See if we have one.
+    // This is a request for the site's homepage. See if we have one...
     $item = CRM_Core_Invoke::getItem('/');
     if (!$item) {
-      // We have no public homepage, so send them to login.
-      // This doesn't allow for /civicrm itself to be public,
-      // but that's got to be a pretty edge case, right?!
-      CRM_Utils_System::redirect('/civicrm/login');
+      if (!($parts[0] === 'civicrm' && $parts[1] === 'ajax')
+          && ($_REQUEST['METHOD'] === 'GET')
+      ) {
+        // Looks like a browser request to a non-existant homepage.
+        // If logged in, send them to civi, otherwise send them to login.
+        // (This doesn't allow for /civicrm itself to be public,
+        // but that's got to be a pretty edge case, right?!)
+        $destination = empty(CRM_Core_Session::singleton()->get('ufID'))
+        ? '/civicrm/login'
+        : '/civicrm';
+
+        CRM_Utils_System::redirect($destination);
+      }
+      else {
+        // Looks like a webservice request, give raw 403.
+        http_response_code(403);
+        CRM_Utils_System::civiExit();
+      }
     }
   }
   // This IS required for compatibility. e.g. the extensions (at least) quickform uses it for the form's action attribute.
