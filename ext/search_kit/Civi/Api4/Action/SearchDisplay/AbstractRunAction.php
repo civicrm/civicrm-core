@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\API\Exception\UnauthorizedException;
+use Civi\API\Request;
 use Civi\Api4\Query\SqlField;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
@@ -80,6 +81,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @var array
    */
   private $tasks;
+
+  /**
+   * @var array
+   */
+  private $entityActions;
 
   /**
    * Override execute method to change the result object type
@@ -469,9 +475,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Check access for edit/update/delete links
+   * Check if a link should be visible to the user based on their permissions
    *
-   * (presumably if a record is shown in SearchKit the user already has view access, and the check is expensive)
+   * Checks ACLs for all links other than VIEW (presumably if a record is shown in
+   * SearchKit then the user already has view access, and the check is expensive).
    *
    * @param array $link
    * @param array $data
@@ -484,7 +491,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (empty($link['path']) && empty($link['task'])) {
       return FALSE;
     }
-    if ($link['entity'] && !empty($link['action']) && !in_array($link['action'], ['view', 'preview'], TRUE)) {
+    if ($link['entity'] && !empty($link['action']) && !in_array($link['action'], ['view', 'preview'], TRUE) && $this->getCheckPermissions()) {
+      $actionName = $this->getPermittedLinkAction($link['entity'], $link['action']);
+      if (!$actionName) {
+        return FALSE;
+      }
       $idField = CoreUtil::getIdFieldName($link['entity']);
       $idKey = $this->getIdKeyName($link['entity']);
       $id = $data[$link['prefix'] . $idKey] ?? NULL;
@@ -495,18 +506,49 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         if (!is_array($data[$link['prefix'] . $idKey])) {
           $values += \CRM_Utils_Array::filterByPrefix($data, $link['prefix']);
         }
-        $isApiAction = civicrm_api4($link['entity'], 'getActions', [
-          'checkPermissions' => FALSE,
-          'where' => [['name', '=', $link['action']]],
-        ])->count();
-        return civicrm_api4($link['entity'], 'checkAccess', [
-          // Fudge links with funny action names to check 'update'
-          'action' => $isApiAction ? $link['action'] : 'update',
-          'values' => $values,
-        ], 0)['access'];
+        // These 2 lines are the heart of the `checkAccess` api action.
+        // Calling this directly is more performant than going through the api wrapper
+        $apiRequest = Request::create($link['entity'], $actionName, ['version' => 4]);
+        return CoreUtil::checkAccessRecord($apiRequest, $values);
       }
     }
     return TRUE;
+  }
+
+  /**
+   * Given entity/action name, return the api action name if the user is allowed to run it.
+   *
+   * This function serves 2 purposes:
+   * 1. Efficiently check api gatekeeper permissions (reuses a single getActions api call for every link).
+   * 2. Transform funny action names (some links have non-api-standard actions like "detach" or "copy").
+   *
+   * @param string $entityName
+   * @param string $actionName
+   * @return string|null
+   */
+  private function getPermittedLinkAction(string $entityName, string $actionName): ?string {
+    // Load api actions and cache for performance (this function may be called hundreds of times per request)
+    if (!isset($this->entityActions[$entityName])) {
+      $this->entityActions[$entityName] = [
+        'all' => civicrm_api4($entityName, 'getActions', ['checkPermissions' => FALSE])->column('name'),
+        'allowed' => civicrm_api4($entityName, 'getActions', ['checkPermissions' => TRUE])->column('name'),
+      ];
+    }
+    // Action exists and is permitted
+    if (in_array($actionName, $this->entityActions[$entityName]['allowed'], TRUE)) {
+      return $actionName;
+    }
+    // Action exists but is not permitted
+    elseif (in_array($actionName, $this->entityActions[$entityName]['all'], TRUE)) {
+      return NULL;
+    }
+    // Api action does not exist, so it's a link with a weird action name like "detach".
+    // Fall-back on "update"
+    elseif (in_array('update', $this->entityActions[$entityName]['allowed'], TRUE)) {
+      return 'update';
+    }
+    // Api action does not exist and user does not have permission to "update".
+    return NULL;
   }
 
   /**

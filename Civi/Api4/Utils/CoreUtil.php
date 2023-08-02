@@ -15,6 +15,7 @@ namespace Civi\Api4\Utils;
 use Civi\API\Exception\NotImplementedException;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
+use Civi\Api4\Generic\AbstractAction;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class CoreUtil {
@@ -172,14 +173,13 @@ class CoreUtil {
    *
    * @param \Civi\Api4\Generic\AbstractAction $apiRequest
    * @param array $record
-   * @param int|string $userID
-   *   Contact ID of the user we are testing,. 0 for the anonymous user.
+   * @param int|null $userID
+   *   Contact ID of the user we are testing, 0 for the anonymous user.
    * @return bool
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\NotImplementedException
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function checkAccessRecord(\Civi\Api4\Generic\AbstractAction $apiRequest, array $record, int $userID) {
+  public static function checkAccessRecord(AbstractAction $apiRequest, array $record, int $userID = NULL) {
+    $userID = $userID ?? \CRM_Core_Session::getLoggedInContactID() ?? 0;
 
     // Super-admins always have access to everything
     if (\CRM_Core_Permission::check('all CiviCRM permissions and ACLs', $userID)) {
