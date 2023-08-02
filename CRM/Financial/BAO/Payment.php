@@ -96,12 +96,15 @@ class CRM_Financial_BAO_Payment {
     $trxn = CRM_Core_BAO_FinancialTrxn::create($paymentTrxnParams);
 
     if ($params['total_amount'] < 0 && !empty($params['cancelled_payment_id'])) {
+      // Payment was cancelled. Reverse the financial transactions.
       self::reverseAllocationsFromPreviousPayment($params, $trxn->id);
     }
     else {
+      // Record new "payment" (financial_trxn, financial_item, entity_financial_trxn etc).
       $salesTaxFinancialAccount = CRM_Contribute_BAO_Contribution::getSalesTaxFinancialAccounts();
+      // Get all the lineitems and add financial_item information to them for the contribution on which we are recording a payment.
       $financialItems = LineItem::get(FALSE)
-        ->addSelect('tax_amount', 'price_field_value_id', 'financial_item.id', 'financial_item.status_id:name', 'financial_item.financial_account_id')
+        ->addSelect('tax_amount', 'price_field_value_id', 'financial_item.id', 'financial_item.status_id:name', 'financial_item.financial_account_id', 'financial_item.entity_id')
         ->addJoin(
           'FinancialItem AS financial_item',
           'INNER',
@@ -112,6 +115,7 @@ class CRM_Financial_BAO_Payment {
         ->addOrderBy('financial_item.id', 'DESC')
         ->addWhere('contribution_id', '=', (int) $params['contribution_id'])->execute();
 
+      // Loop through our list of payable lineitems
       foreach ($lineItems as $lineItem) {
         if ($lineItem['allocation'] === (float) 0) {
           continue;
@@ -119,29 +123,33 @@ class CRM_Financial_BAO_Payment {
         $financialItemID = NULL;
         $currentFinancialItemStatus = NULL;
         foreach ($financialItems as $financialItem) {
-          // We check against price_field_value_id rather than line item
-          // id because that is what the code did previously - but it's
-          // unclear whether this is for good reason or bad coding.
-          if ($financialItem['price_field_value_id'] === (int) $lineItem['price_field_value_id']
+          // $financialItems is a list of all lineitems for the contribution
+          // Loop through all of them and match on the first one which is not of type "Sales Tax".
+          if ($financialItem['financial_item.entity_id'] === (int) $lineItem['id']
             && !in_array($financialItem['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
           ) {
             $financialItemID = $financialItem['financial_item.id'];
             $currentFinancialItemStatus = $financialItem['financial_item.status_id:name'];
+            // We can break out of the loop because there will only be one lineitem=financial_item.entity_id.
+            break;
           }
         }
         if (!$financialItemID) {
+          // If we didn't find a lineitem that is NOT of type "Sales Tax" then create a new one.
           $financialItemID = self::getNewFinancialItemID($lineItem, $params['trxn_date'], $contribution['contact_id'], $paymentTrxnParams['currency']);
         }
 
+        // Now create an EntityFinancialTrxn record to link the new financial_trxn to the lineitem and mark it as paid.
         $eftParams = [
           'entity_table' => 'civicrm_financial_item',
           'financial_trxn_id' => $trxn->id,
           'entity_id' => $financialItemID,
           'amount' => $lineItem['allocation'],
         ];
-
         civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
-        if ($currentFinancialItemStatus && 'Paid' !== $currentFinancialItemStatus) {
+
+        if ($currentFinancialItemStatus && ('Paid' !== $currentFinancialItemStatus)) {
+          // Did the lineitem get fully paid?
           $newStatus = $lineItem['allocation'] < $lineItem['balance'] ? 'Partially paid' : 'Paid';
           FinancialItem::update(FALSE)
             ->addValue('status_id:name', $newStatus)
@@ -150,9 +158,12 @@ class CRM_Financial_BAO_Payment {
         }
 
         foreach ($financialItems as $financialItem) {
-          if ($financialItem['price_field_value_id'] === (int) $lineItem['price_field_value_id']
+          // $financialItems is a list of all lineitems for the contribution
+          // Now we loop through all of them and match on the first one which IS of type "Sales Tax".
+          if ($financialItem['financial_item.entity_id'] === (int) $lineItem['id']
             && in_array($financialItem['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
           ) {
+            // If we find a "Sales Tax" lineitem we record a tax entry in entityFiancncialTrxn
             // @todo - this is expected to be broken - it should be fixed to
             // a) have the getPayableLineItems add the amount to allocate for tax
             // b) call EntityFinancialTrxn directly - per above.
@@ -596,7 +607,7 @@ class CRM_Financial_BAO_Payment {
   /**
    * Reverse the entity financial transactions associated with the cancelled payment.
    *
-   * The reversals are linked to the new payemnt.
+   * The reversals are linked to the new payment.
    *
    * @param array $params
    * @param int $trxnID
