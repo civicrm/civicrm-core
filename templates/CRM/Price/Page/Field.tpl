@@ -86,7 +86,7 @@
       {ts}None found.{/ts}
     </div>
     <div class="action-link">
-      {crmButton p="civicrm/admin/price/edit" q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/field/edit" q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
     </div>
   {/if}
 {/if}
