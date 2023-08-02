@@ -112,46 +112,46 @@ class CRM_Financial_BAO_Payment {
         ->addOrderBy('financial_item.id', 'DESC')
         ->addWhere('contribution_id', '=', (int) $params['contribution_id'])->execute();
 
-      foreach ($lineItems as $key => $value) {
-        if ($value['allocation'] === (float) 0) {
+      foreach ($lineItems as $lineItem) {
+        if ($lineItem['allocation'] === (float) 0) {
           continue;
         }
         $financialItemID = NULL;
         $currentFinancialItemStatus = NULL;
-        foreach ($financialItems as $item) {
+        foreach ($financialItems as $financialItem) {
           // We check against price_field_value_id rather than line item
           // id because that is what the code did previously - but it's
           // unclear whether this is for good reason or bad coding.
-          if ($item['price_field_value_id'] === (int) $value['price_field_value_id']
-            && !in_array($item['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
+          if ($financialItem['price_field_value_id'] === (int) $lineItem['price_field_value_id']
+            && !in_array($financialItem['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
           ) {
-            $financialItemID = $item['financial_item.id'];
-            $currentFinancialItemStatus = $item['financial_item.status_id:name'];
+            $financialItemID = $financialItem['financial_item.id'];
+            $currentFinancialItemStatus = $financialItem['financial_item.status_id:name'];
           }
         }
         if (!$financialItemID) {
-          $financialItemID = self::getNewFinancialItemID($value, $params['trxn_date'], $contribution['contact_id'], $paymentTrxnParams['currency']);
+          $financialItemID = self::getNewFinancialItemID($lineItem, $params['trxn_date'], $contribution['contact_id'], $paymentTrxnParams['currency']);
         }
 
         $eftParams = [
           'entity_table' => 'civicrm_financial_item',
           'financial_trxn_id' => $trxn->id,
           'entity_id' => $financialItemID,
-          'amount' => $value['allocation'],
+          'amount' => $lineItem['allocation'],
         ];
 
         civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
         if ($currentFinancialItemStatus && 'Paid' !== $currentFinancialItemStatus) {
-          $newStatus = $value['allocation'] < $value['balance'] ? 'Partially paid' : 'Paid';
+          $newStatus = $lineItem['allocation'] < $lineItem['balance'] ? 'Partially paid' : 'Paid';
           FinancialItem::update(FALSE)
             ->addValue('status_id:name', $newStatus)
             ->addWhere('id', '=', $financialItemID)
             ->execute();
         }
 
-        foreach ($financialItems as $item) {
-          if ($item['price_field_value_id'] === (int) $value['price_field_value_id']
-            && in_array($item['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
+        foreach ($financialItems as $financialItem) {
+          if ($financialItem['price_field_value_id'] === (int) $lineItem['price_field_value_id']
+            && in_array($financialItem['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
           ) {
             // @todo - this is expected to be broken - it should be fixed to
             // a) have the getPayableLineItems add the amount to allocate for tax
@@ -161,9 +161,9 @@ class CRM_Financial_BAO_Payment {
               'contribution_total_amount' => $contribution['total_amount'],
               'trxn_total_amount' => $params['total_amount'],
               'trxn_id' => $trxn->id,
-              'line_item_amount' => $item['tax_amount'],
+              'line_item_amount' => $financialItem['tax_amount'],
             ];
-            $eftParams['entity_id'] = $item['financial_item.id'];
+            $eftParams['entity_id'] = $financialItem['financial_item.id'];
             CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
           }
         }
