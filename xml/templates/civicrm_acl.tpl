@@ -17,8 +17,8 @@ VALUES
 ('Edit All Contacts', 0, 'civicrm_acl_role', 1, 'Edit', 'civicrm_group', 0, NULL, NULL, 1, 1);
 
 -- Create default Groups for User Permissioning
-INSERT INTO civicrm_group (`id`, `name`, `title`, `description`, `source`, `saved_search_id`, `is_active`, `visibility`, `group_type`)
-VALUES (1, 'Administrators', '{ts escape="sql"}Administrators{/ts}', '{ts escape="sql"}Contacts in this group are assigned Administrator role permissions.{/ts}', NULL, NULL, 1, 'User and User Admin Only', '1');
+INSERT INTO civicrm_group (`id`, `name`, `title`, `description`, `source`, `saved_search_id`, `is_active`, `visibility`, `group_type`, `frontend_title`)
+VALUES (1, 'Administrators', '{ts escape="sql"}Administrators{/ts}', '{ts escape="sql"}Contacts in this group are assigned Administrator role permissions.{/ts}', NULL, NULL, 1, 'User and User Admin Only', '1', '{ts escape="sql"}Administrators{/ts}');
 
 -- Assign above Group (entity) to the Administrator Role
 INSERT INTO civicrm_acl_entity_role
