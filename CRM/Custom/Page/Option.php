@@ -167,8 +167,8 @@ WHERE  option_group_id = %1";
         [1 => $reusedNames]
       );
       CRM_Utils_System::setTitle($newTitle);
-      $this->assign('reusedNames', $reusedNames);
     }
+    $this->assign('reusedNames', !empty($reusedNames) ? $reusedNames : NULL);
     $this->assign('optionGroupID', $optionGroupID);
   }
 
