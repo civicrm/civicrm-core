@@ -935,6 +935,13 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($className);
 
+    // For legacy reasons, empty values would sometimes be passed around as the string 'null'.
+    // The DAO treats 'null' the same as '', and an empty string makes a lot more sense!
+    // For the sake of hooks, normalize these values.
+    $record = array_map(function ($value) {
+      return $value === 'null' ? '' : $value;
+    }, $record);
+
     \CRM_Utils_Hook::pre($op, $entityName, $record[$idField] ?? NULL, $record);
     $fields = static::getSupportedFields();
     $instance = new static();
