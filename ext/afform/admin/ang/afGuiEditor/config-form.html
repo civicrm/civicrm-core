@@ -53,6 +53,14 @@
       <p class="help-block">{{:: ts('Allows CiviMail authors to easily link to this page') }}</p>
     </div>
 
+    <div class="form-group" ng-if="!!editor.afform.is_token">
+      <label>
+        {{:: ts('Token Redirect') }}
+      </label>
+      <input ng-model="editor.afform.authx_redirect" class="form-control">
+      <p class="help-block">{{:: ts('Redirect URL if authentication via token fails. (Example: "civicrm/authfailed")') }}</p>
+    </div>
+
     <div class="form-group">
       <div class="form-inline">
         <label ng-class="{disabled: !editor.afform.server_route}">

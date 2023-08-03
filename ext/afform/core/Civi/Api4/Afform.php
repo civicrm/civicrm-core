@@ -169,6 +169,9 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Boolean',
         ],
         [
+          'name' => 'authx_redirect',
+        ],
+        [
           'name' => 'contact_summary',
           'data_type' => 'String',
           'options' => [
