@@ -199,9 +199,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     if (Civi::settings()->get('invoicing')) {
       $this->assign('totalTaxAmount', $totalTaxAmount);
     }
-    if ($participantCount) {
-      $this->assign('pricesetFieldsCount', $participantCount);
-    }
+    $this->assign('pricesetFieldsCount', $participantCount);
     $this->assign('displayName', $displayName);
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
     $this->setTitle(ts('View Event Registration for') . ' ' . $displayName);
