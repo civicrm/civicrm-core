@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Phone;
+
 /**
  *
  * @package CRM
@@ -207,9 +209,10 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     if (!$message->toContactID) {
       // find recipient if $toContactID not set by hook
       if ($message->to) {
-        $message->toContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", [
-          1 => ['%' . $message->to, 'String'],
-        ]);
+        $message->toContactID = Phone::get(FALSE)
+          ->addWhere('contact_id.is_deleted', '=', FALSE)
+          ->addWhere('phone_numeric', 'LIKE', $this->formatPhoneNumber($this->stripPhone($message->to)))
+          ->execute()->first()['contact_id'] ?? NULL;
       }
       else {
         $message->toContactID = $message->fromContactID;
@@ -226,6 +229,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
         'details' => $message->body,
         'phone_number' => $message->from,
+        'subject' => ts("Inbound SMS from %1", [1 => $message->from]),
       ];
       if ($message->trackID) {
         $activityParams['result'] = CRM_Utils_Type::escape($message->trackID, 'String');
