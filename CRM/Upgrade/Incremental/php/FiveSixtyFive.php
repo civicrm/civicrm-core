@@ -39,6 +39,8 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFive extends CRM_Upgrade_Incremental_
     $this->addTask('Make Group.title required', 'alterColumn', 'civicrm_group', 'title', "varchar(255) NOT NULL COMMENT 'Alternative public title for this Group.'", TRUE);
     $this->addTask('Make Group.frontend_title required', 'alterColumn', 'civicrm_group', 'frontend_title', "varchar(255) NOT NULL COMMENT 'Alternative public description of the group.'", TRUE);
 
+    $this->addTask('Make ActionSchedule.name required', 'alterColumn', 'civicrm_action_schedule', 'name', "varchar(64) NOT NULL COMMENT 'Name of the action(reminder)'");
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_action_schedule.UI_name']), 'addIndex', 'civicrm_action_schedule', 'name', 'UI');
     $this->addTask('Update ActionSchedule.limit_to column', 'alterColumn', 'civicrm_action_schedule', 'limit_to', "int COMMENT 'Is this the recipient criteria limited to OR in addition to?'");
     $this->addTask('Remove Batch Create/Edit Activity Types', 'removeFinancialBatchActivityTypes');
     $this->addTask('Update New Price Set path', 'updateNewPriceSetPath');

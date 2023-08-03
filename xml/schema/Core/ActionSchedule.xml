@@ -33,8 +33,15 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Name of the action(reminder)</comment>
+    <required>true</required>
     <add>3.4</add>
   </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>5.65</add>
+  </index>
   <field>
     <name>title</name>
     <title>Title</title>
