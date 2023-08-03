@@ -490,8 +490,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Like select but accepts rich array data (with nesting, colors, icons, etc) as option list.
     if ($inputType == 'select2') {
       $type = 'text';
-      $options = $attributes;
-      $attributes = ($extra ? $extra : []) + ['class' => ''];
+      $options = [];
+      foreach ($attributes as $option) {
+        // Transform options from api4.getFields format
+        $option['text'] = $option['text'] ?? $option['label'];
+        unset($option['label']);
+        $options[] = $option;
+      }
+      $attributes = ($extra ?: []) + ['class' => ''];
       $attributes['class'] = ltrim($attributes['class'] . " crm-select2 crm-form-select2");
       $attributes['data-select-params'] = json_encode(['data' => $options, 'multiple' => !empty($attributes['multiple'])]);
       unset($attributes['multiple']);
@@ -1824,6 +1830,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       if ($context == 'search') {
         $widget = $widget == 'Select2' ? $widget : 'Select';
         $props['multiple'] = CRM_Utils_Array::value('multiple', $props, TRUE);
+      }
+      elseif (!empty($fieldSpec['serialize'])) {
+        $props['multiple'] = TRUE;
       }
 
       // Add data for popup link.

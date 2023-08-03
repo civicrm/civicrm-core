@@ -34,6 +34,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
 
     $mapping = CRM_Core_BAO_ActionSchedule::getMapping($this->_isTemplate ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
     $reminderList = CRM_Core_BAO_ActionSchedule::getList($mapping, $this->_id);
+    $scheduleReminder = new CRM_Admin_Page_ScheduleReminders();
     // Add action links to each of the reminders
     foreach ($reminderList as & $format) {
       $action = CRM_Core_Action::UPDATE + CRM_Core_Action::DELETE;
@@ -43,10 +44,9 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
       else {
         $action += CRM_Core_Action::ENABLE;
       }
-      $scheduleReminder = new CRM_Admin_Page_ScheduleReminders();
       $links = $scheduleReminder->links();
-      $links[CRM_Core_Action::DELETE]['qs'] .= "&context=event&compId={$this->_id}";
-      $links[CRM_Core_Action::UPDATE]['qs'] .= "&context=event&compId={$this->_id}";
+      $links[CRM_Core_Action::DELETE]['qs'] .= "&mapping_id={$mapping->getId()}&entity_value={$this->_id}";
+      $links[CRM_Core_Action::UPDATE]['qs'] .= "&mapping_id={$mapping->getId()}&entity_value={$this->_id}";
       $format['action'] = CRM_Core_Action::formLink(
         $links,
         $action,
@@ -61,7 +61,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
 
     $this->assign('rows', $reminderList);
     $this->assign('setTab', $setTab);
-    $this->assign('component', 'event');
+    $this->assign('addNewLink', $scheduleReminder->getLinkPath('add') . "&mapping_id={$mapping->getId()}&entity_value={$this->_id}");
 
     // Update tab "disabled" css class
     $this->ajaxResponse['tabValid'] = is_array($reminderList) && (count($reminderList) > 0);

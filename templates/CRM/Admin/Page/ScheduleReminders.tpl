@@ -34,13 +34,7 @@
     </div>
   {/if}
   <div class="action-link">
-    {assign var='link' value="civicrm/admin/scheduleReminders/edit"}
-    {if !empty($component)}
-      {assign var='urlParams' value="action=add&context=$component&compId=$id&reset=1"}
-    {else}
-      {assign var='urlParams' value="action=add&reset=1"}
-    {/if}
-    {crmButton p=$link q=$urlParams id="newScheduleReminder"  icon="plus-circle"}{ts}Add Reminder{/ts}{/crmButton}
+    {crmButton p=$addNewLink id="newScheduleReminder" icon="plus-circle"}{ts}Add Reminder{/ts}{/crmButton}
   </div>
   </div>
 {/if}

@@ -295,7 +295,7 @@
      <desc>Schedule Reminders.</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
      <access_callback>1</access_callback>
-     <access_arguments>administer CiviCRM data;edit all events</access_arguments>
+     <access_arguments>administer CiviCRM data</access_arguments>
      <adminGroup>Communications</adminGroup>
      <weight>40</weight>
   </item>
@@ -704,16 +704,6 @@
      <path>civicrm/admin/price/field/option/edit</path>
      <title>Price Field Options</title>
      <page_callback>CRM_Price_Page_Option</page_callback>
-  </item>
-  <item>
-     <path>civicrm/ajax/mapping</path>
-     <page_callback>CRM_Admin_Page_AJAX::mappingList</page_callback>
-     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/ajax/recipientListing</path>
-     <page_callback>CRM_Admin_Page_AJAX::recipientListing</page_callback>
-     <access_arguments>access CiviEvent,access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/admin/sms/provider</path>

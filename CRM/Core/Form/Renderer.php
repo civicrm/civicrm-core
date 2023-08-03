@@ -165,15 +165,19 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       }
     }
 
-    $class = $element->getAttribute('class');
+    $class = $element->getAttribute('class') ?? '';
     $type = $element->getType();
     if (!$class) {
       if ($type == 'text' || $type == 'password') {
         $size = $element->getAttribute('size');
         if (!empty($size)) {
-          $class = self::$_sizeMapper[$size] ?? NULL;
+          $class = self::$_sizeMapper[$size] ?? '';
         }
       }
+    }
+    // When select2 is an <input> it requires comma-separated values instead of an array
+    if (in_array($type, ['text', 'hidden']) && str_contains($class, 'crm-select2') && is_array($element->getValue())) {
+      $element->setValue(implode(',', $element->getValue()));
     }
 
     if ($type == 'select' && $element->getAttribute('multiple')) {

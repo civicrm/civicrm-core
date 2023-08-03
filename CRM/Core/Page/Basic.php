@@ -451,4 +451,16 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     return [];
   }
 
+  /**
+   * Get the menu path corresponding to an action on this entity
+   *
+   * @param string $linkAction
+   *   e.g. "view"
+   * @return string|null
+   *   e.g. "civicrm/activity?reset=1&action=view&id=[id]"
+   */
+  public function getLinkPath(string $linkAction): ?string {
+    return $this->getBAOName()::getEntityPaths()[$linkAction] ?? NULL;
+  }
+
 }

@@ -78,30 +78,6 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
   ];
 
   /**
-   * Determine whether a schedule based on this mapping is sufficiently
-   * complete.
-   *
-   * @param \CRM_Core_DAO_ActionSchedule $schedule
-   * @return array
-   *   Array (string $code => string $message).
-   *   List of error messages.
-   */
-  public function validateSchedule($schedule): array {
-    $errors = [];
-    if (CRM_Utils_System::isNull($schedule->entity_value) || $schedule->entity_value === '0') {
-      $errors['entity'] = ts('Please select a specific date field.');
-    }
-    elseif (count(CRM_Utils_Array::explodePadded($schedule->entity_value)) > 1) {
-      $errors['entity'] = ts('You may only select one contact field per reminder');
-    }
-    elseif (CRM_Utils_System::isNull($schedule->entity_status) || $schedule->entity_status === '0') {
-      $errors['entity'] = ts('Please select whether the reminder is sent each year.');
-    }
-
-    return $errors;
-  }
-
-  /**
    * Generate a query to locate recipients who match the given
    * schedule.
    *

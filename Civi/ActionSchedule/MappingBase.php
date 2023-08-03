@@ -89,10 +89,6 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
     return FALSE;
   }
 
-  public function validateSchedule($schedule): array {
-    return [];
-  }
-
   public function getDateFields(): array {
     return [];
   }

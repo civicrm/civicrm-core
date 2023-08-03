@@ -24,7 +24,7 @@ class CRM_Event_ActionMapping_ByEvent extends CRM_Event_ActionMapping {
   }
 
   public function getLabel(): string {
-    return ts('Event Name');
+    return ts('Event');
   }
 
   public function getValueLabels(): array {

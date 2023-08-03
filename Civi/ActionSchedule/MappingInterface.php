@@ -122,17 +122,6 @@ interface MappingInterface extends SpecProviderInterface {
   public function checkAccess(array $entityValue): bool;
 
   /**
-   * Determine whether a schedule based on this mapping is sufficiently
-   * complete.
-   *
-   * @param \CRM_Core_DAO_ActionSchedule $schedule
-   * @return array
-   *   Array (string $code => string $message).
-   *   List of error messages.
-   */
-  public function validateSchedule($schedule): array;
-
-  /**
    * Generate a query to locate contacts who match the given
    * schedule.
    *

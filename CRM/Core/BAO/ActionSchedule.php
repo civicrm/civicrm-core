@@ -130,7 +130,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
     if (!$values['mapping_id']) {
       return [];
     }
-    return self::getMapping($values['mapping_id'])->getStatusLabels((array) $values['entity_value']);
+    return self::getMapping($values['mapping_id'])->getStatusLabels($values['entity_value']);
   }
 
   /**
@@ -172,42 +172,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
   public static function getCommunicationLanguageOptions(): array {
     $languages = CRM_Core_I18n::languages(TRUE);
     return [CRM_Core_I18n::AUTO => ts('Follow recipient preferred language')] + $languages;
-  }
-
-  /**
-   * For each entity, get a list of entity-value labels.
-   *
-   * @return array
-   *   Ex: $entityValueLabels[$mappingId][$valueId] = $valueLabel.
-   * @throws CRM_Core_Exception
-   */
-  public static function getAllEntityValueLabels() {
-    $entityValueLabels = [];
-    foreach (CRM_Core_BAO_ActionSchedule::getMappings() as $mapping) {
-      $entityValueLabels[$mapping->getId()] = $mapping->getValueLabels();
-      $valueLabel = ['- ' . strtolower($mapping->getValueHeader()) . ' -'];
-      $entityValueLabels[$mapping->getId()] = $valueLabel + $entityValueLabels[$mapping->getId()];
-    }
-    return $entityValueLabels;
-  }
-
-  /**
-   * For each entity, get a list of entity-status labels.
-   *
-   * @return array
-   *   Ex: $entityValueLabels[$mappingId][$valueId][$statusId] = $statusLabel.
-   */
-  public static function getAllEntityStatusLabels() {
-    $entityValueLabels = self::getAllEntityValueLabels();
-    $entityStatusLabels = [];
-    foreach (CRM_Core_BAO_ActionSchedule::getMappings() as $mapping) {
-      $statusLabel = ['- ' . strtolower($mapping->getStatusHeader()) . ' -'];
-      $entityStatusLabels[$mapping->getId()] = $entityValueLabels[$mapping->getId()];
-      foreach ($entityStatusLabels[$mapping->getId()] as $kkey => & $vval) {
-        $vval = $statusLabel + $mapping->getStatusLabels($kkey);
-      }
-    }
-    return $entityStatusLabels;
   }
 
   /**
@@ -300,9 +264,29 @@ FROM civicrm_action_schedule cas
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if (in_array($event->action, ['create', 'edit'])) {
-      if (isset($event->params['limit_to']) && in_array($event->params['limit_to'], [0, '0', FALSE], TRUE)) {
+      $values =& $event->params;
+      if (isset($values['limit_to']) && in_array($values['limit_to'], [0, '0', FALSE], TRUE)) {
         CRM_Core_Error::deprecatedWarning('Deprecated value "0" is no longer a valid option for ActionSchedule.limit_to; changed to "2".');
-        $event->params['limit_to'] = 2;
+        $values['limit_to'] = 2;
+      }
+      $recipient = $values['recipient'] ?? NULL;
+      if ($recipient && $recipient !== 'group') {
+        $values['group_id'] = '';
+      }
+      elseif ($recipient && $recipient !== 'manual') {
+        $values['recipient_manual'] = '';
+      }
+      if ($recipient === 'group' || $recipient === 'manual') {
+        $values['recipient_listing'] = '';
+      }
+      // When repeat is disabled, wipe all related fields
+      if (isset($values['is_repeat']) && !$values['is_repeat']) {
+        $values['repetition_frequency_unit'] = '';
+        $values['repetition_frequency_interval'] = '';
+        $values['end_frequency_unit'] = '';
+        $values['end_frequency_interval'] = '';
+        $values['end_action'] = '';
+        $values['end_date'] = '';
       }
     }
   }
