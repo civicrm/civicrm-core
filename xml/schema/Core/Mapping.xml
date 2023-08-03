@@ -6,6 +6,7 @@
   <name>civicrm_mapping</name>
   <comment>Store field mappings in import or export for reuse</comment>
   <labelField>name</labelField>
+  <title>Field Mapping</title>
   <add>1.2</add>
   <field>
     <name>id</name>
