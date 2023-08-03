@@ -166,6 +166,37 @@ class CRM_Upgrade_Snapshot {
   }
 
   /**
+   * Generate the query/queries for storing a snapshot (if the local policy supports snapshotting).
+   *
+   * This method does all updates in one go. It is suitable for small/moderate data-sets. If you need to support
+   * larger data-sets, use createTasks() instead.
+   *
+   * @param string $owner
+   *   Name of the component/module/extension that owns the snapshot.
+   *   Ex: 'civicrm'
+   * @param string $version
+   *   Ex: '5.50'
+   * @param string $name
+   * @param string $select
+   *   Raw SQL SELECT for finding data.
+   * @throws \CRM_Core_Exception
+   * @return string[]
+   *   SQL statements to execute.
+   *   May be array if there no statements to execute.
+   */
+  public static function createSingleTask(string $owner, string $version, string $name, string $select): array {
+    $destTable = static::createTableName($owner, $version, $name);
+    if (!empty(CRM_Upgrade_Snapshot::getActivationIssues())) {
+      return [];
+    }
+
+    $result = [];
+    $result[] = "DROP TABLE IF EXISTS `{$destTable}`";
+    $result[] = "CREATE TABLE `{$destTable}` ROW_FORMAT=COMPRESSED AS {$select}";
+    return $result;
+  }
+
+  /**
    * @param \CRM_Queue_TaskContext $ctx
    * @param string $sql
    *
