@@ -28,6 +28,24 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFive extends CRM_Upgrade_Incremental_
    *   The version number matching this function name
    */
   public function upgrade_5_65_alpha1($rev): void {
+    $this->addSnapshotTask('group', CRM_Utils_SQL_Select::from('civicrm_group')
+      ->select(['id', 'name', 'title', 'frontend_title', 'description', 'frontend_description'])
+      ->where('name IS NULL OR `frontend_title` IS NULL OR `frontend_title` = "" OR `frontend_description` IS NULL OR `frontend_description` = ""')
+    );
+    $this->addSnapshotTask('job', CRM_Utils_SQL_Select::from('civicrm_job')
+      ->select(['id', 'api_entity'])
+    );
+    $this->addSnapshotTask('schedule', CRM_Utils_SQL_Select::from('civicrm_action_schedule')
+      ->select(['id', 'limit_to'])
+    );
+    $this->addSnapshotTask('mailcomp', CRM_Utils_SQL_Select::from('civicrm_mailing_component')
+      ->select(['id', 'component_type', 'body_html', 'body_text', 'subject'])
+      ->where('component_type IN ("Welcome", "Subscribe")')
+    );
+    $this->addSnapshotTask('loctype', CRM_Utils_SQL_Select::from('civicrm_location_type')
+      ->select(['id', 'name', 'display_name', 'is_reserved', 'is_active', 'is_default'])
+    );
+
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     // These should run after the sql file.
     $this->addTask('Make LocationType.name required', 'alterColumn', 'civicrm_location_type', 'name', "varchar(64) NOT NULL COMMENT 'Location Type Name.'");
