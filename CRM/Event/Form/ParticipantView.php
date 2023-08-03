@@ -59,26 +59,22 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $this->assign('componentId', $participantID);
     $this->assign('component', 'event');
 
-    if ($parentParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-      $participantID, 'registered_by_id'
-    )
-    ) {
-      $parentHasPayment = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-        $parentParticipantId, 'id', 'participant_id'
-      );
-      $this->assign('parentHasPayment', $parentHasPayment);
-    }
+    $parentParticipantID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
+      $participantID, 'registered_by_id');
+    $this->assign('parentHasPayment', !$parentParticipantID ? NULL : CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+      $parentParticipantID, 'id', 'participant_id'
+    ));
 
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
     $status = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantStatusType', $statusId, 'name', 'id');
-    if ($status == 'Transferred') {
+    if ($status === 'Transferred') {
       $transferId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'transferred_to_contact_id', 'id');
       $pid = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $transferId, 'id', 'contact_id');
       $transferName = current(CRM_Contact_BAO_Contact::getContactDetails($transferId));
       $this->assign('pid', $pid);
       $this->assign('transferId', $transferId);
-      $this->assign('transferName', $transferName);
     }
+    $this->assign('transferName', $transferName ?? NULL);
 
     // CRM-20879: Show 'Transfer or Cancel' option beside 'Change fee selection'
     //  only if logged in user have 'edit event participants' permission and
@@ -203,9 +199,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     if (Civi::settings()->get('invoicing')) {
       $this->assign('totalTaxAmount', $totalTaxAmount);
     }
-    if ($participantCount) {
-      $this->assign('pricesetFieldsCount', $participantCount);
-    }
+    $this->assign('pricesetFieldsCount', $participantCount);
     $this->assign('displayName', $displayName);
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
     $this->setTitle(ts('View Event Registration for') . ' ' . $displayName);
