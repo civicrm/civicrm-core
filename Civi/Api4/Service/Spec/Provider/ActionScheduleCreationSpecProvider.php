@@ -25,6 +25,7 @@ class ActionScheduleCreationSpecProvider extends \Civi\Core\Service\AutoService 
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('title')->setRequired(TRUE);
+    $spec->getFieldByName('name')->setRequired(FALSE);
     $spec->getFieldByName('mapping_id')->setRequired(TRUE);
     $spec->getFieldByName('entity_value')->setRequired(TRUE);
     $spec->getFieldByName('start_action_date')->setRequiredIf('empty($values.absolute_date)');

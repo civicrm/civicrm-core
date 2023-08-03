@@ -36,9 +36,6 @@ function civicrm_api3_action_schedule_get($params) {
  */
 function civicrm_api3_action_schedule_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, ['start_action_date', 'absolute_date']);
-  if (!array_key_exists('name', $params) && !array_key_exists('id', $params)) {
-    $params['name'] = CRM_Utils_String::munge($params['title']);
-  }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ActionSchedule');
 }
 

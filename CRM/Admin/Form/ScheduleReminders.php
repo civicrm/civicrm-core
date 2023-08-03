@@ -585,10 +585,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
     }
-    elseif ($this->_action & CRM_Core_Action::ADD) {
-      // we do this only once, so name never changes
-      $params['name'] = CRM_Utils_String::munge($params['title'], '_', 64);
-    }
 
     $modePrefixes = ['Mail' => NULL, 'SMS' => 'SMS'];
 
