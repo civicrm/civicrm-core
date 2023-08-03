@@ -84,6 +84,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
    */
   private function createActionSchedule($entity_id, $entity_table) {
     $params = [
+      'title' => 'My Reminder',
       "used_for" => $entity_table,
       "entity_value" => $entity_id,
       "start_action_date" => date("YmdHis"),
