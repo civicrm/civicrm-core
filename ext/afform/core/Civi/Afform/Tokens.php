@@ -194,7 +194,8 @@ class Tokens {
     ]);
 
     $url = \CRM_Utils_System::url($afform['server_route'],
-      ['_authx' => $bearerToken, '_authxSes' => 1, '_authxRedir' => $afform['authx_redirect'] ?? ''],
+      ['_authx' => $bearerToken, '_authxSes' => 1] +
+        (!empty($afform['authx_redirect']) ? ['_authxRedir' => $afform['authx_redirect']] : []),
       TRUE,
       NULL,
       FALSE,
