@@ -45,6 +45,10 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFive extends CRM_Upgrade_Incremental_
     $this->addSnapshotTask('loctype', CRM_Utils_SQL_Select::from('civicrm_location_type')
       ->select(['id', 'name', 'display_name', 'is_reserved', 'is_active', 'is_default'])
     );
+    $this->addSnapshotTask('contribution', CRM_Utils_SQL_Select::from('civicrm_contribution')
+      ->select(['id', 'tax_amount'])
+      ->where('tax_amount IS NULL')
+    );
 
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     // These should run after the sql file.
