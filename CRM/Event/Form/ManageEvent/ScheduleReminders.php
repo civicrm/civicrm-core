@@ -30,7 +30,6 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
   public function preProcess() {
     parent::preProcess();
     $this->setSelectedChild('reminder');
-    $setTab = CRM_Utils_Request::retrieve('setTab', 'Int', $this, FALSE, 0);
 
     $mapping = CRM_Core_BAO_ActionSchedule::getMapping($this->_isTemplate ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
     $reminderList = CRM_Core_BAO_ActionSchedule::getList($mapping, $this->_id);
@@ -60,7 +59,6 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     }
 
     $this->assign('rows', $reminderList);
-    $this->assign('setTab', $setTab);
     $this->assign('addNewLink', $scheduleReminder->getLinkPath('add') . "&mapping_id={$mapping->getId()}&entity_value={$this->_id}");
 
     // Update tab "disabled" css class
@@ -72,7 +70,8 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
    * @return string
    */
   public function getTemplateFileName() {
-    return 'CRM/Admin/Page/ScheduleReminders.tpl';
+    $setTab = CRM_Utils_Request::retrieve('setTab', 'Int', NULL, FALSE, 0);
+    return $setTab ? 'CRM/Event/Form/ManageEvent/Tab.tpl' : 'CRM/Admin/Page/ScheduleReminders.tpl';
   }
 
 }

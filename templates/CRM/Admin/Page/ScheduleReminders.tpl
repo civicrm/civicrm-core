@@ -8,11 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is for configuring Scheduled Reminders *}
-{if !empty($setTab) and $setTab eq 1}
-  {if !empty($component) and $component eq 'event'}
-     {include file="CRM/Event/Form/ManageEvent/Tab.tpl"}
-  {/if}
-{else}
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
 {else}
@@ -37,5 +32,4 @@
     {crmButton p=$addNewLink id="newScheduleReminder" icon="plus-circle"}{ts}Add Reminder{/ts}{/crmButton}
   </div>
   </div>
-{/if}
 {/if}
