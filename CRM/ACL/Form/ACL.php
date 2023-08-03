@@ -95,8 +95,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $this->setPageTitle(ts('ACL'));
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }

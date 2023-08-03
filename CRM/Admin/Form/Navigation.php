@@ -37,8 +37,6 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $this->setPageTitle(ts('Menu Item'));
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
