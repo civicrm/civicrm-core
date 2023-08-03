@@ -17,7 +17,7 @@
         ctrl = this,
         // Prefix used for SearchKit explicit joins
         namePrefix = '',
-        boolOptions = [{id: true, label: ts('Yes')}, {id: false, label: ts('No')}],
+        boolOptions = [{id: '1', label: ts('Yes')}, {id: '0', label: ts('No')}],
         // Used to store chain select options loaded on-the-fly
         chainSelectOptions = null,
         // Only used for is_primary radio button
@@ -143,7 +143,7 @@
       };
 
       // correct the type for the value, make sure numbers are numbers and not string
-      function correctValueType(value, dataType) {
+      function correctValueType(value, dataType, inputType) {
         // let's skip type correction for null values
         if (value === null) {
           return value;
@@ -159,7 +159,12 @@
         } else if (dataType == 'Integer') {
           value = +value;
         } else if (dataType == 'Boolean') {
-          value = (value == 1);
+          // note that boolean is treated as Interger for all input types except CheckBox
+          if (inputType == 'CheckBox') {
+            value = (value == 1);
+          } else {
+            value = +value;
+          }
         }
         return value;
       }
@@ -167,7 +172,7 @@
       // Set default value; ensure data type matches input type
       function setValue(value) {
         // correct the value type
-        value = correctValueType(value, ctrl.defn.data_type);
+        value = correctValueType(value, ctrl.defn.data_type, ctrl.defn.input_type);
 
         if (ctrl.defn.input_type === 'Number' && ctrl.defn.search_range) {
           if (!_.isPlainObject(value)) {
@@ -190,7 +195,7 @@
           };
         }
         else if (!_.isArray(value) &&
-          ((['Select', 'EntityRef'].includes(ctrl.defn.input_type) && ctrl.defn.input_attrs.multiple) || ctrl.defn.input_type === 'CheckBox')
+          ((['Select', 'EntityRef'].includes(ctrl.defn.input_type) && ctrl.defn.input_attrs.multiple) || (ctrl.defn.input_type === 'CheckBox' && ctrl.defn.data_type !== 'Boolean'))
         ) {
           value =  value.split(',');
         }
