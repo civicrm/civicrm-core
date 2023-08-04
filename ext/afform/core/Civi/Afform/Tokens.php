@@ -181,8 +181,8 @@ class Tokens {
    * @throws \Civi\Crypto\Exception\CryptoException
    */
   public static function createUrl($afform, $contactId): string {
-    $expires = \CRM_Utils_Time::time() +
-      (\Civi::settings()->get('checksum_timeout') * 24 * 60 * 60);
+    $timeout = $afform['authx_timeout'] ?? \Civi::settings()->get('checksum_timeout');
+    $expires = \CRM_Utils_Time::time() + $timeout * 24 * 60 * 60;
 
     /** @var \Civi\Crypto\CryptoJwt $jwt */
     $jwt = \Civi::service('crypto.jwt');

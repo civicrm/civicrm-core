@@ -34,7 +34,7 @@
       <label for="af_config_form_server_route">
         {{:: ts('Page Route') }}
       </label>
-      <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" ng-model-options="editor.debounceMode">
+      <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[\-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" ng-model-options="editor.debounceMode">
       <p class="help-block">{{:: ts('Expose the form as a standalone webpage. (Example: "civicrm/my-form")') }}</p>
     </div>
 
@@ -45,21 +45,6 @@
       </label>
     </div>
 
-    <div class="form-group" ng-if="!!editor.afform.server_route">
-      <label>
-        <input type="checkbox" ng-model="editor.afform.is_token">
-        {{:: ts('Provide Email Token') }}
-      </label>
-      <p class="help-block">{{:: ts('Allows CiviMail authors to easily link to this page') }}</p>
-    </div>
-
-    <div class="form-group" ng-if="!!editor.afform.is_token">
-      <label>
-        {{:: ts('Token Redirect') }}
-      </label>
-      <input ng-model="editor.afform.authx_redirect" class="form-control">
-      <p class="help-block">{{:: ts('Redirect URL if authentication via token fails. (Example: "civicrm/authfailed")') }}</p>
-    </div>
 
     <div class="form-group">
       <div class="form-inline">
@@ -116,6 +101,31 @@
         {{:: ts('Add to Dashboard') }}
       </label>
       <p class="help-block">{{:: ts('Allow CiviCRM users to add the form to their home dashboard.') }}</p>
+    </div>
+
+    <div class="form-group">
+      <label ng-class="{disabled: !editor.afform.server_route}">
+        <input type="checkbox" ng-model="editor.afform.is_token" ng-disabled="!editor.afform.server_route">
+        {{:: ts('Provide Email Token') }}
+      </label>
+      <p class="help-block">{{:: ts('Allows CiviMail authors to easily link to this page') }}</p>
+      <p class="help-block disabled" ng-if="!editor.afform.server_route">{{:: ts('Requires a page route') }}</p>
+    </div>
+
+    <div class="form-group" ng-if="!!editor.afform.is_token && !!editor.afform.server_route">
+      <label>
+        {{:: ts('Token Timeout') }}
+      </label>
+      <input class="form-control" type="number" placeholder="{{:: ts('Days') }}" min="0" step="1" ng-model="editor.afform.authx_timeout">
+      <p class="help-block">{{:: ts('Number of days token is valid for.  Uses system default if not specfied.') }}</p>
+    </div>
+
+    <div class="form-group" ng-if="!!editor.afform.is_token && !!editor.afform.server_route">
+      <label>
+        {{:: ts('Token Redirect') }}
+      </label>
+      <input ng-model="editor.afform.authx_redirect" class="form-control">
+      <p class="help-block">{{:: ts('Redirect URL if authentication via token fails. (Example: "civicrm/authfailed")') }}</p>
     </div>
 
   </fieldset>

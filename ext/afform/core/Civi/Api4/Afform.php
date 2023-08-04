@@ -169,6 +169,10 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Boolean',
         ],
         [
+          'name' => 'authx_timeout',
+          'data_type' => 'Integer',
+        ],
+        [
           'name' => 'authx_redirect',
         ],
         [
