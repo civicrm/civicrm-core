@@ -463,8 +463,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return NULL;
     }
     $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
-    if ($link['path']) {
-      $link['url'] = $this->getUrl($this->replaceTokens($link['path'], $data, 'url', $index));
+    // Will return null if `$link[path]` is empty or if any tokens do not resolve
+    $path = $this->replaceTokens($link['path'], $data, 'url', $index);
+    if ($path) {
+      $link['url'] = $this->getUrl($path);
       $keys = ['url', 'text', 'title', 'target', 'style', 'icon'];
     }
     else {
