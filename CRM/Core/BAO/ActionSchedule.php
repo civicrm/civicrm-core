@@ -34,7 +34,14 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
       $event = \Civi::dispatcher()
         ->dispatch('civi.actionSchedule.getMappings',
           new MappingRegisterEvent());
-      Civi::$statics[__CLASS__]['mappings'] = $event->getMappings();
+      // Filter out mappings from disabled components.
+      // TODO: we could move the mapping classes into their respective
+      // component-extensions and this would happen automatically.
+      // Civi::$statics[__CLASS__]['mappings'] = $event->getMappings();
+      $allEntities = \Civi\Api4\Entity::get(FALSE)->execute()->column('name');
+      Civi::$statics[__CLASS__]['mappings'] = array_filter($event->getMappings(), function($mapping) use ($allEntities) {
+        return in_array($mapping->getEntityName(), $allEntities, TRUE);
+      });
     }
     if (isset($filters['id'])) {
       CRM_Core_Error::deprecatedWarning('Use "getMapping" to retrieve a single mapping by id instead of passing a filter to "GetMappings".');

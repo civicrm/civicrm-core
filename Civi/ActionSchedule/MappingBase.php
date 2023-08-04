@@ -56,7 +56,7 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
   }
 
   public function getLabel(): string {
-    return CoreUtil::getInfoItem($this->getEntityName(), 'title');
+    return CoreUtil::getInfoItem($this->getEntityName(), 'title') ?: ts('Unknown');
   }
 
   public static function getLimitToOptions(): array {
