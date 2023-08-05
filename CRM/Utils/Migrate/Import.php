@@ -295,7 +295,7 @@ AND        v.name = %1
 
               case 2:
                 // ParticipantEventName
-                $condition = "( is_template IS NULL OR is_template != 1 ) AND title IN( '{$optValues}' )";
+                $condition = "is_template = 0 AND title IN( '{$optValues}' )";
                 $optionIDs = CRM_Event_PseudoConstant::event(NULL, FALSE, $condition);
                 break;
 

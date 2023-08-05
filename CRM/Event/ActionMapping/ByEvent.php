@@ -24,7 +24,7 @@ class CRM_Event_ActionMapping_ByEvent extends CRM_Event_ActionMapping {
   }
 
   public function getValueLabels(): array {
-    return CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
+    return CRM_Event_PseudoConstant::event(NULL, FALSE, "is_template = 0");
   }
 
 }

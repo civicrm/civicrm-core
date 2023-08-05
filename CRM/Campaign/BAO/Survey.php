@@ -503,7 +503,7 @@ INNER JOIN  civicrm_activity_contact activityTarget
 INNER JOIN  civicrm_activity_contact activityAssignment
   ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
      WHERE  activity.source_record_id = %1
-     AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 ) ";
+     AND  activity.is_deleted = 0 ";
     if (!empty($interviewerId)) {
       $query .= "AND activityAssignment.contact_id = %2 ";
       $params[2] = [$interviewerId, 'Integer'];
@@ -598,7 +598,7 @@ INNER JOIN  civicrm_activity_contact activityAssignment
 INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a.id )
      WHERE  activity.source_record_id = %1
        AND  activity.activity_type_id = %2
-       AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 )
+       AND  activity.is_deleted = 0
             $whereClause";
 
     $params = [

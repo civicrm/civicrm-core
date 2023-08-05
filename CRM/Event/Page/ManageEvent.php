@@ -312,7 +312,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     $params = [];
     $whereClause = $this->whereClause($params, TRUE, $this->_force);
     // because is_template != 1 would be to simple
-    $whereClause .= ' AND (is_template = 0 OR is_template IS NULL)';
+    $whereClause .= ' AND is_template = 0';
 
     $this->pager($whereClause, $params);
 

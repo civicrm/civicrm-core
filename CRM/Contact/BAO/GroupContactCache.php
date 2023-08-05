@@ -82,7 +82,7 @@ AND (
 )";
 
     if (!$includeHiddenGroups) {
-      $query .= "AND (g.is_hidden = 0 OR g.is_hidden IS NULL)";
+      $query .= "AND g.is_hidden = 0";
     }
 
     if (!empty($groupIDClause)) {
@@ -431,7 +431,7 @@ SELECT     gc.group_id, gc.contact_id, g.title, g.children, g.description
 FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
 WHERE      gc.contact_id = $contactID
-            AND (g.is_hidden = 0 OR g.is_hidden IS NULL)
+            AND g.is_hidden = 0
 ORDER BY   gc.contact_id, g.children
 ";
 

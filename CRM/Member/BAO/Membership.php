@@ -819,7 +819,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $dao->is_test = $isTest;
     }
     else {
-      $dao->whereAdd('is_test IS NULL OR is_test = 0');
+      $dao->whereAdd('is_test = 0');
     }
 
     //avoid pending membership as current membership: CRM-3027
@@ -1027,7 +1027,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
 
     $testClause = 'membership.is_test = 1';
     if (!$isTest) {
-      $testClause = '( membership.is_test IS NULL OR membership.is_test = 0 )';
+      $testClause = '( membership.is_test = 0 )';
     }
 
     if (!self::$_signupActType || !self::$_renewalActType) {
@@ -1686,7 +1686,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
   public static function getMembershipJoins($membershipTypeId, $startDate, $endDate, $isTest = 0) {
     $testClause = 'membership.is_test = 1';
     if (!$isTest) {
-      $testClause = '( membership.is_test IS NULL OR membership.is_test = 0 )';
+      $testClause = '( membership.is_test = 0 )';
     }
     if (!self::$_signupActType) {
       self::_getActTypes();
@@ -1739,7 +1739,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   public static function getMembershipRenewals($membershipTypeId, $startDate, $endDate, $isTest = 0) {
     $testClause = 'membership.is_test = 1';
     if (!$isTest) {
-      $testClause = '( membership.is_test IS NULL OR membership.is_test = 0 )';
+      $testClause = '( membership.is_test = 0 )';
     }
     if (!self::$_renewalActType) {
       self::_getActTypes();
@@ -2282,7 +2282,7 @@ WHERE {$whereClause}";
       self::processOverriddenUntilDateMembership($dao1);
     }
 
-    $query = $baseQuery . " AND (civicrm_membership.is_override = 0 OR civicrm_membership.is_override IS NULL)
+    $query = $baseQuery . " AND civicrm_membership.is_override = 0
      AND {$membershipStatusClause}
      AND civicrm_membership.owner_membership_id IS NULL ";
 

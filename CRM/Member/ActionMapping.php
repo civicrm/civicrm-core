@@ -123,7 +123,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     // scheduling another kind of reminder might not expect members to be
     // excluded if they have status overrides.  Ideally there would be some kind
     // of setting per reminder.
-    $query->where("( e.is_override IS NULL OR e.is_override = 0 )");
+    $query->where("e.is_override = 0");
 
     // FIXME: Similarly to overrides, excluding contacts who can't edit the
     // primary member makes sense in the context of renewals (see CRM-11342) but
