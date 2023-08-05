@@ -91,6 +91,8 @@ class Admin {
       '<=' => '≤',
       'CONTAINS' => E::ts('Contains'),
       'NOT CONTAINS' => E::ts("Doesn't Contain"),
+      'CONTAINS ONE OF' => E::ts('Contains One Of'),
+      'NOT CONTAINS ONE OF' => E::ts("Doesn't Contain One Of"),
       'IN' => E::ts('Is One Of'),
       'NOT IN' => E::ts('Not One Of'),
       'LIKE' => E::ts('Is Like'),

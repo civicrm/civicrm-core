@@ -356,10 +356,43 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('one', $result->first()['group']);
 
     $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'CONTAINS', ['apple', 'pear'])
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('one', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'CONTAINS ONE OF', 'apple')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('one', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'CONTAINS ONE OF', ['apple', 'pear'])
+      ->execute();
+    $this->assertCount(2, $result);
+
+    $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'NOT CONTAINS', 'apple')
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals('two', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', ['apple', 'pear'])
+      ->execute();
+    $this->assertCount(0, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', 'apple')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('two', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', ['apple', 'pear'])
+      ->execute();
+    $this->assertCount(0, $result);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'CONTAINS', 'pear')

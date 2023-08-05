@@ -62,7 +62,7 @@
       this.isMulti = function() {
         // If there's a search operator, return `true` if the operator takes multiple values, else `false`
         if (ctrl.op) {
-          return ctrl.op === 'IN' || ctrl.op === 'NOT IN';
+          return ctrl.op === 'IN' || ctrl.op === 'NOT IN' || ctrl.op === 'CONTAINS' || ctrl.op === 'NOT CONTAINS' || ctrl.op === 'CONTAINS ONE OF' || ctrl.op === 'NOT CONTAINS ONE OF';
         }
         // If no search operator this is an input for e.g. the bulk update action
         // Return `true` if the field is multi-valued, else `null`
