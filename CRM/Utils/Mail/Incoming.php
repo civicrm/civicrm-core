@@ -286,41 +286,6 @@ class CRM_Utils_Mail_Incoming {
   }
 
   /**
-   * @param $file
-   *
-   * @return array
-   * @throws Exception
-   */
-  public function &parse(&$file) {
-
-    // check that the file exists and has some content
-    if (!file_exists($file) ||
-      !trim(file_get_contents($file))
-    ) {
-      return CRM_Core_Error::createAPIError(ts('%1 does not exists or is empty',
-        [1 => $file]
-      ));
-    }
-
-    // explode email to digestable format
-    $set = new ezcMailFileSet([$file]);
-    $parser = new ezcMailParser();
-    $mail = $parser->parseMail($set);
-
-    if (!$mail) {
-      return CRM_Core_Error::createAPIError(ts('%1 could not be parsed',
-        [1 => $file]
-      ));
-    }
-
-    // since we only have one fileset
-    $mail = $mail[0];
-
-    $mailParams = self::parseMailingObject($mail);
-    return $mailParams;
-  }
-
-  /**
    * @param $mail
    * @param $createContact
    * @param $requireContact
