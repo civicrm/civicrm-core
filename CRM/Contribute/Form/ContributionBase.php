@@ -138,8 +138,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public $_contactID;
 
-  protected $_userID;
-
   /**
    * The Membership ID for membership renewal
    *
@@ -293,9 +291,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
     $this->_emailExists = $this->get('emailExists');
 
-    // this was used prior to the cleverer this_>getContactID - unsure now
-    $this->_userID = CRM_Core_Session::getLoggedInContactID();
-
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->getRenewalMembershipID();
 
@@ -307,7 +302,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         $this->_defaultMemTypeId = $membership->membership_type_id;
         if ($membership->contact_id != $this->_contactID) {
           $validMembership = FALSE;
-          $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, NULL, NULL, 'Organization');
+          $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), NULL, NULL, 'Organization');
           if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
             $this->_membershipContactID = $membership->contact_id;
             $this->assign('membershipContactID', $this->_membershipContactID);
@@ -321,7 +316,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
               // Convert to comma separated list.
               $inheritedRelTypes = implode(',', CRM_Utils_Array::explodePadded($membershipType->relationship_type_id));
-              $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, $membershipType->relationship_type_id);
+              $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), $membershipType->relationship_type_id);
               if (array_key_exists($membership->contact_id, $permContacts)) {
                 $this->_membershipContactID = $membership->contact_id;
                 $validMembership = TRUE;
@@ -1122,8 +1117,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     ];
 
     $validUser = FALSE;
-    if ($this->_userID &&
-      $this->_userID == $pledgeValues['contact_id']
+    // @todo - override getRequestedContactID to add in checking pledge values, then
+    // getContactID will do all this.
+    $userID = CRM_Core_Session::getLoggedInContactID();
+    if ($userID &&
+      $userID == $pledgeValues['contact_id']
     ) {
       //check for authenticated  user.
       $validUser = TRUE;

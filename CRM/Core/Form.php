@@ -199,6 +199,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $exportedValues = [];
 
   /**
+   * The contact ID that has been authenticated and can be used for checking permissions.
+   *
+   * It could be a combination of cid in the url plus a checksum or the logged in user.
+   * Importantly it can be used to run permission checks on.
+   *
+   * @var int
+   */
+  private $authenticatedContactID;
+
+  /**
    * @return string
    */
   public function getContext() {
@@ -2388,64 +2398,113 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Get contact if for a form object. Prioritise
-   *   - cid in URL if 0 (on behalf on someoneelse)
-   *      (@todo consider setting a variable if onbehalf for clarity of downstream 'if's
-   *   - logged in user id if it matches the one in the cid in the URL
-   *   - contact id validated from a checksum from a checksum
-   *   - cid from the url if the caller has ACL permission to view
-   *   - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
+   * Get contact iD for a form object.
+   *
+   * This checks the requestedContactID and returns it if
+   * - it is the number 0 (relevant for online contribution & event forms).
+   * - it is the logged in user
+   * - it is validated by a checksum in the url.
+   * - it is a contact that the logged in user has permission to view
+   *
+   * Failing that it returns the logged in user, if any. This is may be useful
+   * for users taking actions from their contact dashboard (although usually one
+   * of the variants above would be hit).
    *
    * @return NULL|int
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function setContactID() {
-    $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    if (isset($this->_params) && !empty($this->_params['select_contact_id'])) {
-      $tempID = $this->_params['select_contact_id'];
-    }
-    if (isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
-      // event form stores as an indexed array, contribution form not so much...
-      $tempID = $this->_params[0]['select_contact_id'];
-    }
+    $requestedContactID = $this->getRequestedContactID();
 
     // force to ignore the authenticated user
-    if ($tempID === '0' || $tempID === 0) {
+    if ($requestedContactID === 0) {
       // we set the cid on the form so that this will be retained for the Confirm page
       // in the multi-page form & prevent us returning the $userID when this is called
       // from that page
       // we don't really need to set it when $tempID is set because the params have that stored
       $this->set('cid', 0);
-      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $tempID]);
-      return (int) $tempID;
+      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => $requestedContactID]);
+      return (int) $requestedContactID;
     }
 
-    $userID = CRM_Core_Session::getLoggedInContactID();
-
-    if (!is_null($tempID) && $tempID === $userID) {
-      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $tempID]);
-      return (int) $userID;
-    }
-
-    //check if this is a checksum authentication
-    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
-    if ($userChecksum) {
-      //check for anonymous user.
-      $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
-      if ($validUser) {
-        CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $tempID]);
-        CRM_Core_Resources::singleton()->addVars('coreForm', ['checksum' => $userChecksum]);
-        return $tempID;
+    if ($requestedContactID === $this->getAuthenticatedContactID()) {
+      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => $requestedContactID]);
+      // Check if this is a checksum authentication.
+      if ($this->getAuthenticatedCheckSumContactID()) {
+        CRM_Core_Resources::singleton()->addVars('coreForm', ['checksum' => CRM_Utils_Request::retrieve('cs', 'String', $this)]);
       }
+      return $requestedContactID;
     }
+
     // check if user has permission, CRM-12062
-    elseif ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
-      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $tempID]);
-      return $tempID;
+    if ($requestedContactID && CRM_Contact_BAO_Contact_Permission::allow($requestedContactID)) {
+      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $requestedContactID]);
+      return $requestedContactID;
     }
+    $userID = CRM_Core_Session::getLoggedInContactID();
     if (is_numeric($userID)) {
       CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $userID]);
     }
     return is_numeric($userID) ? $userID : NULL;
+  }
+
+  /**
+   * Get the contact ID that has been requested (via url or form value).
+   *
+   * Ideally the forms would override this so only the cid in the url
+   * would be checked in the shared form function.
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  public function getRequestedContactID(): ?int {
+    if (isset($this->_params) && !empty($this->_params['select_contact_id'])) {
+      return (int) $this->_params['select_contact_id'];
+    }
+    if (isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
+      // Event form stores as an indexed array, contribution form not so much...
+      return (int) $this->_params[0]['select_contact_id'];
+    }
+    $urlContactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    return is_numeric($urlContactID) ? (int) $urlContactID : NULL;
+  }
+
+  /**
+   * Get the authenticated contact ID.
+   *
+   * This is either
+   *  - a contact ID authenticated by checksum
+   *  - the logged in user
+   *  - 0 for none.
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getAuthenticatedContactID() : int {
+    if ($this->authenticatedContactID === NULL) {
+      $this->authenticatedContactID = $this->getAuthenticatedCheckSumContactID();
+      if (!$this->authenticatedContactID) {
+        $this->authenticatedContactID = (int) CRM_Core_Session::getLoggedInContactID();
+      }
+    }
+    return $this->authenticatedContactID;
+  }
+
+  /**
+   * Get the contact ID authenticated as a valid by checksum.
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function getAuthenticatedCheckSumContactID(): int {
+    $requestedContactID = $this->getRequestedContactID();
+    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
+    if ($userChecksum && CRM_Contact_BAO_Contact_Utils::validChecksum($requestedContactID, $userChecksum)) {
+      return $requestedContactID;
+    }
+    return 0;
   }
 
   /**
