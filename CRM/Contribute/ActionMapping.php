@@ -40,7 +40,7 @@ abstract class CRM_Contribute_ActionMapping extends \Civi\ActionSchedule\Mapping
     return CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'get', []);
   }
 
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
       'receive_date' => ts('Receive Date'),
       'cancel_date' => ts('Cancel Date'),

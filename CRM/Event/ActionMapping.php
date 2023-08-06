@@ -43,13 +43,7 @@ abstract class CRM_Event_ActionMapping extends \Civi\ActionSchedule\MappingBase 
     return CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
   }
 
-  /**
-   * Get a list of available date fields.
-   *
-   * @return array
-   *   Array(string $fieldName => string $fieldLabel).
-   */
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
       'start_date' => ts('Event Start'),
       'end_date' => ts('Event End'),

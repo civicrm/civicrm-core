@@ -60,7 +60,7 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return CRM_Core_PseudoConstant::activityStatus();
   }
 
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
       'activity_date_time' => ts('Activity Date'),
     ];

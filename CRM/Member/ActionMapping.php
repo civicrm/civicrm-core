@@ -55,13 +55,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return [];
   }
 
-  /**
-   * Get a list of available date fields.
-   *
-   * @return array
-   *   Array(string $fieldName => string $fieldLabel).
-   */
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
       'join_date' => ts('Member Since'),
       'start_date' => ts('Membership Start Date'),

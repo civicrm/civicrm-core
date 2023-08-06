@@ -89,7 +89,7 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
     return FALSE;
   }
 
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [];
   }
 

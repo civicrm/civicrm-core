@@ -68,12 +68,13 @@ interface MappingInterface extends SpecProviderInterface {
   public function getStatusLabels(?array $entityValue): array;
 
   /**
-   * Get a list of available date fields.
+   * Get option list for `start_action_date` & `end_date` fields.
    *
+   * @param array|null $entityValue
+   *   Selected value(s) of the `entity_value` field.
    * @return array
-   *   Array(string $fieldName => string $fieldLabel).
    */
-  public function getDateFields(): array;
+  public function getDateFields(?array $entityValue = NULL): array;
 
   /**
    * Get the option list for `limit_to` (non-associative format)

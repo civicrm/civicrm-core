@@ -65,7 +65,7 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return CRM_Core_OptionGroup::values('contact_date_reminder_options');
   }
 
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
       'date_field' => ts('Date Field'),
     ];
