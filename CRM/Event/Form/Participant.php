@@ -2172,8 +2172,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       // Retrieve the name and email of the contact - this will be the TO for receipt email
       [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
 
-      $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
-
       $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
       $waitingStatus = $waitStatus[$params['status_id']] ?? NULL;
       if ($waitingStatus) {
@@ -2257,13 +2255,11 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       }
 
       //send email with pdf invoice
-      $template = CRM_Core_Smarty::singleton();
-      $taxAmt = $template->get_template_vars('dataArray');
       if (Civi::settings()->get('invoice_is_email_pdf')) {
         $sendTemplateParams['isEmailPdf'] = TRUE;
         $sendTemplateParams['contributionId'] = $contributionID;
       }
-      [$mailSent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+      [$mailSent] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       if ($mailSent) {
         $sent[] = $contactID;
         foreach ($participants as $ids => $values) {
