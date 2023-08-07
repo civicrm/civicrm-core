@@ -1048,8 +1048,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Verifies that when two contacts with view only custom fields are merged,
-   * the view only field of the record being deleted is not merged, it is
-   * simply deleted (it should also not be visible on the page).
+   * the view only field of the record being deleted is merged.
    */
   public function testMigrationOfViewOnlyCustomData() {
     // Create Custom Fields
@@ -1071,11 +1070,11 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // Change custom field to view only.
     $this->callAPISuccess('CustomField', 'update', ['id' => $customField['id'], 'is_view' => TRUE]);
 
-    // Merge, and ensure that no value was migrated
+    // Merge, and ensure that the value was migrated
     $this->mergeContacts($originalContactID, $duplicateContactID, [
-      "move_custom_{$customField['id']}" => NULL,
+      "move_custom_{$customField['id']}" => 'abc',
     ]);
-    $this->assertCustomFieldValue($originalContactID, '', "custom_{$customField['id']}");
+    $this->assertCustomFieldValue($originalContactID, 'abc', "custom_{$customField['id']}");
 
     // cleanup created custom set
     $this->callAPISuccess('CustomField', 'delete', ['id' => $customField['id']]);

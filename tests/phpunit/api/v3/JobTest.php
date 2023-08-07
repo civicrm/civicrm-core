@@ -37,6 +37,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
   private $originalValues = [];
 
   /**
+   * Make sure triggers are rebuilt even if test fails. We don't need to do it
+   * for every test, so use this to signal tearDown.
+   * @var bool
+   */
+  private $rebuildTriggers = FALSE;
+
+  /**
    * Set up for tests.
    */
   public function setUp(): void {
@@ -58,6 +65,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->resetHooks();
+    if ($this->rebuildTriggers) {
+      \Civi::service('sql_triggers')->rebuild();
+      // not sure if this is necessary but clear it to be sure
+      CRM_Core_DAO::executeQuery('SET @CIVICRM_MERGE=NULL');
+      $this->rebuildTriggers = FALSE;
+    }
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_relationship', 'civicrm_website', 'civicrm_phone', 'civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule', 'civicrm_group', 'civicrm_group_contact'], TRUE);
     foreach ($this->originalValues as $entity => $entities) {
@@ -1070,8 +1083,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the batch merge copes with view only custom data field. View Only custom fields
-   * should never be merged.
+   * Test the batch merge copes with view only custom data field.
    */
   public function testBatchMergeCustomDataViewOnlyField(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
@@ -1086,7 +1098,109 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertCount(1, $result['values']['merged']);
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
-    $this->assertEquals('', $mouse['custom_' . $customField['id']]);
+    $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
+  }
+
+  /**
+   * hook_civicrm_merge implementation for testBatchMergeCustomDataViewOnlyDateField
+   */
+  public function hookMergeViewOnly($type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL) {
+    if ($mainId && $otherId) {
+      if ($type = 'sqls' && isset($tables)) {
+        // prevent DB trigger from forcing our view-only date field to CURRENT_TIMESTAMP
+        CRM_Core_DAO::executeQuery('SET @CIVICRM_MERGE=1');
+      }
+    }
+  }
+
+  /**
+   * Similar to testBatchMergeCustomDataViewOnlyField but with a hook and it's a date field.
+   * This is based on a real-world example and demonstrates one reason we're enforcing view-only custom fields get merged.
+   * There are two fields that go together, and it doesn't make sense to merge one but not the other, and the view-only date field is not easily recomputable.
+   */
+  public function testBatchMergeCustomDataViewOnlyDateField(): void {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
+
+    $customGroup = $this->customGroupCreate();
+    $customGroup = $this->callAPISuccess('CustomGroup', 'getsingle', ['id' => $customGroup['id'], 'return' => ['id', 'table_name']]);
+    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
+    $customField = $this->callAPISuccess('CustomField', 'getsingle', ['id' => $customField['id'], 'return' => ['id', 'column_name']]);
+    $customFieldDate = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Custom Last Updated',
+      'data_type' => 'Date',
+      'html_type' => 'Select Date',
+      'is_view' => 1,
+      // It seems like it creates db errors if we don't specify these? Don't feel like looking into that right now.
+      'is_searchable' => 0,
+      'date_format' => 'mm/dd/yy',
+      'time_format' => 1,
+      'default_value' => NULL,
+    ]);
+    $customFieldDate = $this->callAPISuccess('CustomField', 'getsingle', ['id' => $customFieldDate['id'], 'return' => ['id', 'column_name']]);
+
+    $this->hookClass->setHook('civicrm_merge', [$this, 'hookMergeViewOnly']);
+    $this->hookClass->setHook('civicrm_triggerInfo', function(&$info, $tableName) use ($customGroup, $customField, $customFieldDate) {
+      // code styling is complaining so do it this way
+      $sqlinsert = <<<ENDSQLINSERT
+        IF (isnull(@CIVICRM_MERGE)) THEN
+          IF (NEW.{$customField['column_name']} IS NOT NULL AND NEW.{$customField['column_name']} <> '') THEN
+            SET NEW.{$customFieldDate['column_name']} = CURRENT_TIMESTAMP;
+          END IF;
+        END IF;
+ENDSQLINSERT;
+      $sqlupdate = <<<ENDSQLUPDATE
+        IF (isnull(@CIVICRM_MERGE)) THEN
+          IF (NEW.{$customField['column_name']} IS NOT NULL AND NEW.{$customField['column_name']} <> '' AND (NEW.{$customField['column_name']} <> OLD.{$customField['column_name']} OR OLD.{$customField['column_name']} IS NULL)) THEN
+          SET NEW.{$customFieldDate['column_name']} = CURRENT_TIMESTAMP;
+          END IF;
+        END IF;
+ENDSQLUPDATE;
+      $info[] = [
+        'table' => $customGroup['table_name'],
+        'when' => 'BEFORE',
+        'event' => ['INSERT'],
+        'sql' => $sqlinsert,
+      ];
+      $info[] = [
+        'table' => $customGroup['table_name'],
+        'when' => 'BEFORE',
+        'event' => ['UPDATE'],
+        'sql' => $sqlupdate,
+      ];
+    });
+    // let tearDown know about us to reset the triggers after
+    $this->rebuildTriggers = TRUE;
+    \Civi::service('sql_triggers')->rebuild();
+
+    // create first contact, without the (regular) custom field value.
+    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
+    $mouseContactId = $this->individualCreate($mouseParams);
+
+    // Check that the date field was NOT set
+    // See comment at bottom why this is important
+    $datevalue = $this->callAPISuccess('Contact', 'getsingle', ['id' => $mouseContactId, 'return' => ['custom_' . $customFieldDate['id']]]);
+    $datevalue = $datevalue['custom_' . $customFieldDate['id']];
+    $this->assertEmpty($datevalue);
+
+    // create second contact, with a value.
+    $duplicateId = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 'blah']));
+
+    // get the view-only field's current value for the 2nd contact which should have been set by trigger
+    $viewOnlyFieldValue = $this->callAPISuccess('Contact', 'getsingle', ['id' => $duplicateId, 'return' => ['custom_' . $customFieldDate['id']]]);
+    $viewOnlyFieldValue = $viewOnlyFieldValue['custom_' . $customFieldDate['id']];
+    $this->assertNotEmpty($viewOnlyFieldValue);
+
+    // Merge. Since the date field and regular field go together, we want those merged, and our hooks are set up so that the triggers won't update the date field during merge.
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
+    $this->assertCount(1, $result['values']['merged']);
+
+    $mouse = $this->callAPISuccess('Contact', 'getsingle', ['id' => $mouseContactId, 'return' => ['custom_' . $customField['id'], 'custom_' . $customFieldDate['id']]]);
+    // check the regular field got merged just while we're here
+    $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
+    // now check the view-only field. It should be the one that was merged from the duplicate.
+    // Note that the original contact will not have a value for the custom date field because there was no corresponding regular custom field value, so we don't have to worry about a timing issue where both date fields happen to have the same timestamp. We've already checked above that both the original is blank and the duplicate has a nonempty value.
+    $this->assertEquals($viewOnlyFieldValue, $mouse['custom_' . $customFieldDate['id']]);
   }
 
   /**
