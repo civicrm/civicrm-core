@@ -173,13 +173,14 @@ trait CRM_Core_Form_EntityFormTrait {
     $this->applyFilter('__ALL__', 'trim');
     $this->addEntityFieldsToTemplate();
     foreach ($this->entityFields as $index => $fields) {
-      $this->entityFields[$index] = array_merge([
+      $this->entityFields[$index] = array_replace_recursive([
         'template' => '',
-        'help' => [],
+        'help' => ['id' => '', 'file' => ''],
         'pre_html_text' => '',
         'post_html_text' => '',
         'description' => '',
-        'documentation_link' => '',
+        'documentation_link' => ['page' => '', 'resource' => ''],
+        'place_holder' => '',
       ], $fields);
     }
     $this->assign('entityFields', $this->entityFields);
