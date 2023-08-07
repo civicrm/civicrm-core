@@ -176,8 +176,8 @@
 
 {/if}
 
-{if $register_date}
-{ts}Registration Date{/ts}: {$register_date|crmDate}
+{if {participant.register_date|boolean}}
+{ts}Registration Date{/ts}: {participant.register_date}
 {/if}
 {if $receive_date}
 {ts}Transaction Date{/ts}: {$receive_date|crmDate}

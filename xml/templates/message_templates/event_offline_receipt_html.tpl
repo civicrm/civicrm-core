@@ -329,13 +329,13 @@
         </tr>
        {/if}
 
-       {if $register_date}
+       {if {participant.register_date|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Registration Date{/ts}
          </td>
          <td {$valueStyle}>
-          {$register_date|crmDate}
+           {participant.register_date}
          </td>
         </tr>
        {/if}
