@@ -36,7 +36,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
 
   public static function setupStandardAccount($setupAction) {
     return [
-      'url' => CRM_Utils_System::url('civicrm/admin/mailSettings', 'action=add&reset=1', TRUE, NULL, FALSE),
+      'url' => CRM_Utils_System::url('civicrm/admin/mailSettings/edit', 'action=add&reset=1', TRUE, NULL, FALSE),
     ];
   }
 

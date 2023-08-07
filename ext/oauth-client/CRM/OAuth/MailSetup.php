@@ -90,7 +90,7 @@ class CRM_OAuth_MailSetup {
       'info'
     );
 
-    $nextUrl = CRM_Utils_System::url('civicrm/admin/mailSettings', [
+    $nextUrl = CRM_Utils_System::url('civicrm/admin/mailSettings/edit', [
       'action' => 'update',
       'id' => $mailSettings['id'],
       'reset' => 1,
