@@ -1400,20 +1400,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
-      if ($this->_single) {
-        $statusMsg = ts('Event registration for %1 has been added.', [1 => $this->_contributorDisplayName]);
-        if (!empty($params['send_receipt']) && $numberSent) {
-          $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', [1 => $this->_contributorEmail]);
-        }
-      }
-      else {
-        $statusMsg = ts('Total Participant(s) added to event: %1.', [1 => count($this->_contactIds)]);
-        if ($numberNotSent > 0) {
-          $statusMsg .= ' ' . ts('Email has NOT been sent to %1 contact(s) - communication preferences specify DO NOT EMAIL OR valid Email is NOT present. ', [1 => $numberNotSent]);
-        }
-        elseif (isset($params['send_receipt'])) {
-          $statusMsg .= ' ' . ts('A confirmation email has been sent to ALL participants');
-        }
+      $statusMsg = ts('Event registration for %1 has been added.', [1 => $this->_contributorDisplayName]);
+      if (!empty($params['send_receipt']) && $numberSent) {
+        $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', [1 => $this->_contributorEmail]);
       }
     }
     return $statusMsg;

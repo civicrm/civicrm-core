@@ -155,6 +155,30 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
   }
 
   /**
+   * Get status message
+   *
+   * @param array $params
+   * @param int $numberSent
+   * @param int $numberNotSent
+   * @param string $updateStatusMsg
+   *
+   * @return string
+   */
+  protected function getStatusMsg(array $params, int $numberSent, int $numberNotSent, string $updateStatusMsg): string {
+    $statusMsg = '';
+    if ($this->_action & CRM_Core_Action::ADD) {
+      $statusMsg = ts('Total Participant(s) added to event: %1.', [1 => count($this->_contactIds)]);
+      if ($numberNotSent > 0) {
+        $statusMsg .= ' ' . ts('Email has NOT been sent to %1 contact(s) - communication preferences specify DO NOT EMAIL OR valid Email is NOT present. ', [1 => $numberNotSent]);
+      }
+      elseif (isset($params['send_receipt'])) {
+        $statusMsg .= ' ' . ts('A confirmation email has been sent to ALL participants');
+      }
+    }
+    return $statusMsg;
+  }
+
+  /**
    * Add local and global form rules.
    *
    * @return void
