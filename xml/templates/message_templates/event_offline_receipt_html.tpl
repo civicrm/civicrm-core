@@ -269,13 +269,13 @@
         </tr>
        {/foreach}
       {/if}
-      {if $totalTaxAmount}
+      {if {contribution.tax_amount|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}Total Tax Amount{/ts}
         </td>
         <td {$valueStyle}>
-         {$totalTaxAmount|crmMoney:$currency}
+          {contribution.tax_amount}
         </td>
        </tr>
       {/if}

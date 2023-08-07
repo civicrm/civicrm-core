@@ -139,8 +139,8 @@
 {/foreach}
 {/if}
 
-{if $totalTaxAmount}
-{ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
+{if {contribution.tax_amount|boolean}}
+{ts}Total Tax Amount{/ts}: {contribution.tax_amount}
 {/if}
 {if {event.is_monetary|boolean}}
 
