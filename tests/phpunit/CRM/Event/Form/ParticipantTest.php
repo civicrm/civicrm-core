@@ -548,7 +548,7 @@ London,',
    * @throws \CRM_Core_Exception
    */
   public function testSubmitPartialPayment(bool $isQuickConfig): void {
-    $mut = new CiviMailUtils($this, TRUE);
+    $mailUtil = new CiviMailUtils($this, TRUE);
     $form = $this->getForm(['is_monetary' => 1]);
     $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('PaidEvent')]);
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
@@ -582,7 +582,7 @@ London,',
       'MAX_FILE_SIZE' => '33554432',
     ];
     $form->submit($submitParams);
-    $this->assertPartialPaymentResult($isQuickConfig, $mut);
+    $this->assertPartialPaymentResult($isQuickConfig, $mailUtil);
   }
 
   /**
@@ -722,6 +722,7 @@ London,',
       'Event Information and Location',
       'Annual CiviCRM meet',
       'Registered Email',
+      'Just do it',
       $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' Family Deal - 1' : 'Fundraising Dinner - Family...',
       $isAmountPaidOnForm ? 'Total Paid: $20.00' : 'Total Paid: ',
       $isAmountPaidOnForm ? 'Balance: $1,530.55' : 'Balance: $1,550.55',

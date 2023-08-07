@@ -56,7 +56,7 @@ location.phone.1.phone_type_display:::{$location.phone.1.phone_type_display}
 location.phone.1.phone_ext:::{$location.phone.1.phone_ext}
 location.email.1.email:::{$location.email.1.email}
 {/if}
-{if !empty($event.is_public)}
+{if {event.is_public|boolean}}
 event.is_public:::{$event.is_public}
 {/if}
 {if !empty($payer.name)}
