@@ -18,36 +18,24 @@
           <tr>
             <td>
               {$form.title.label}<br />
-              {$form.title.html}<br />
-              <span class="description font-italic">
-                {ts}Complete OR partial group name.{/ts}
-              </span>
+              {$form.title.html}
             </td>
             {if !empty($form.created_by)}
               <td>
                 {$form.created_by.label}<br />
-                {$form.created_by.html}<br />
-                <span class="description font-italic">
-                  {ts}Complete OR partial creator name.{/ts}
-                </span>
+                {$form.created_by.html}
               </td>
             {/if}
             <td>
               {$form.visibility.label}<br />
-              {$form.visibility.html}<br />
-              <span class="description font-italic">
-               {ts}Filter search by visibility.{/ts}
-              </span>
+              {$form.visibility.html}
             </td>
           </tr>
           <tr>
             {if !empty($form.group_type_search)}
               <td id="group_type-block">
                 {$form.group_type_search.label}<br />
-                {$form.group_type_search.html}<br />
-                <span class="description font-italic">
-                  {ts}Filter search by group type(s).{/ts}
-                </span>
+                {$form.group_type_search.html}
               </td>
             {/if}
             {if !empty($form.group_status)}
