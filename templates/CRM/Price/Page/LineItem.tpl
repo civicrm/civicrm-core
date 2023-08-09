@@ -94,7 +94,7 @@
       {if $totalTaxAmount}
         {ts}Event SubTotal: {$totalAmount-$totalTaxAmount|crmMoney:$currency}{/ts}<br />
       {/if}
-      {ts}Event Total{/ts}:
+      {ts}Total Amount{/ts}:
     {elseif $context EQ "Membership"}
       {ts}Membership Fee Total{/ts}:
     {else}

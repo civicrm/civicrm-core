@@ -108,7 +108,7 @@
     {if $context EQ "Contribution"}
       {ts}Contribution Total{/ts}:
     {elseif $context EQ "Event"}
-      {ts}Event Total{/ts}:
+      {ts}Total Amount{/ts}:
     {elseif $context EQ "Membership"}
       {ts}Membership Fee Total{/ts}:
     {else}
