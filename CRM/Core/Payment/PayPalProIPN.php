@@ -282,6 +282,8 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         break;
 
       case 'recurring_payment':
+        $recur->processor_id = $this->retrieve('recurring_payment_id', 'String');
+        $recur->trxn_id = $recur->processor_id;
         if (!$first) {
           if ($input['paymentStatus'] !== 'Completed') {
             throw new CRM_Core_Exception('Ignore all IPN payments that are not completed');
