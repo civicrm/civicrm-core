@@ -295,6 +295,9 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
           $input['contribution_recur_id'] = $this->getContributionRecurID();
 
           civicrm_api3('Contribution', 'repeattransaction', $input);
+          $recur->processor_id = $this->retrieve('recurring_payment_id', 'String');
+          $recur->trxn_id = $recur->processor_id;
+          $recur->save();
           return;
         }
 

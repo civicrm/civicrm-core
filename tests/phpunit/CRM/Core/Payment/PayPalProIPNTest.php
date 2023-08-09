@@ -81,6 +81,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $this->assertCount(1, $contributions);
     // source gets set by processor
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
+    $this->assertEquals('I-8XHAKBG12SFP', $contributionRecur['processor_id']);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
     $paypalIPN->main();
