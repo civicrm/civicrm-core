@@ -17,8 +17,7 @@
  */
 class api_v3_SystemTest extends CiviUnitTestCase {
 
-  const TEST_CACHE_GROUP = 'SystemTest';
-  const TEST_CACHE_PATH = 'api/v3/system';
+  private const TEST_CACHE_PATH = 'api/v3/system';
 
   /**
    * Sets up the fixture, for example, opens a network connection.
@@ -27,18 +26,18 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->useTransaction(TRUE);
+    $this->useTransaction();
   }
 
   /**
    * Test system flush.
    */
-  public function testFlush() {
+  public function testFlush(): void {
     // Note: this operation actually flushes several different caches; we don't
     // check all of them -- just enough to make sure that the API is doing
     // something
 
-    $this->assertTrue(NULL === Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
+    $this->assertNull(Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
 
     $data = 'abc';
     Civi::cache()->set(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH), $data);
@@ -46,47 +45,47 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $this->assertEquals('abc', Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
 
     $params = [];
-    $result = $this->callAPIAndDocument('system', 'flush', $params, __FUNCTION__, __FILE__, "Flush all system caches", 'Flush');
+    $this->callAPIAndDocument('system', 'flush', $params, __FUNCTION__, __FILE__, 'Flush all system caches', 'Flush');
 
-    $this->assertTrue(NULL === Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
+    $this->assertNull(Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
   }
 
   /**
    * Test system log function.
    */
-  public function testSystemLog() {
+  public function testSystemLog(): void {
     $this->callAPISuccess('system', 'log', ['level' => 'info', 'message' => 'We wish you a merry Christmas']);
     $result = $this->callAPISuccess('SystemLog', 'getsingle', [
       'sequential' => 1,
       'message' => ['LIKE' => '%Chris%'],
     ]);
-    $this->assertEquals($result['message'], 'We wish you a merry Christmas');
-    $this->assertEquals($result['level'], 'info');
+    $this->assertEquals('We wish you a merry Christmas', $result['message']);
+    $this->assertEquals('info', $result['level']);
   }
 
   /**
    * Test system log function.
    */
-  public function testSystemLogNoLevel() {
+  public function testSystemLogNoLevel(): void {
     $this->callAPISuccess('system', 'log', ['message' => 'We wish you a merry Christmas', 'level' => 'alert']);
     $result = $this->callAPISuccess('SystemLog', 'getsingle', [
       'sequential' => 1,
       'message' => ['LIKE' => '%Chris%'],
     ]);
-    $this->assertEquals($result['message'], 'We wish you a merry Christmas');
-    $this->assertEquals($result['level'], 'alert');
+    $this->assertEquals('We wish you a merry Christmas', $result['message']);
+    $this->assertEquals('alert', $result['level']);
   }
 
-  public function testSystemGet() {
+  public function testSystemGet(): void {
     $result = $this->callAPISuccess('system', 'get', []);
-    $this->assertRegExp('/^[0-9]+\.[0-9]+\.[0-9a-z\-]+$/', $result['values'][0]['version']);
+    $this->assertMatchesRegularExpression('/^[0-9]+\.[0-9]+\.[0-9a-z\-]+$/', $result['values'][0]['version']);
     $this->assertEquals('UnitTests', $result['values'][0]['uf']);
   }
 
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testSystemUTFMB8Conversion() {
+  public function testSystemUTFMB8Conversion(): void {
     if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), '5.7', '>=')) {
       $this->callAPISuccess('System', 'utf8conversion', []);
       $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
