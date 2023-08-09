@@ -270,12 +270,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
           'isDefault' => TRUE,
         ],
         [
-          'type' => 'upload',
-          'name' => ts('Save and Done'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'subName' => 'done',
-        ],
-        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ],

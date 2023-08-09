@@ -765,7 +765,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'civicrm/contact/search',
       'civicrm/group/search',
     ];
-    if (!in_array($path, $excludeForPaths)) {
+    if (!$this->getParticipantID() && !in_array($path, $excludeForPaths)) {
       $buttons[] = [
         'type' => 'upload',
         'name' => ts('Save and New'),

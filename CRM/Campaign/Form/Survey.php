@@ -101,17 +101,6 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
           'name' => ts('Save'),
           'isDefault' => TRUE,
         ],
-        [
-          'type' => 'upload',
-          'name' => ts('Save and Done'),
-          'subName' => 'done',
-        ],
-        [
-          'type' => 'upload',
-          'name' => ts('Save and Next'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'subName' => 'next',
-        ],
       ];
     }
     else {

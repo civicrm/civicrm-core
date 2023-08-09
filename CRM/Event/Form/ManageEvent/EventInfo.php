@@ -244,22 +244,11 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     }
 
     $this->set('id', $event->id);
-
     $this->postProcessHook();
 
     if ($this->_action & CRM_Core_Action::ADD) {
-      $url = 'civicrm/event/manage/location';
-      $urlParams = "action=update&reset=1&id={$event->id}";
-      // special case for 'Save and Done' consistency.
-      if ('_qf_EventInfo_upload_done' === $this->controller->getButtonName('submit')) {
-        $url = 'civicrm/event/manage';
-        $urlParams = 'reset=1';
-        CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-          [1 => $this->getTitle()]
-        ), ts('Saved'), 'success');
-      }
-
-      CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
+      $url = CRM_Utils_System::url('civicrm/event/manage/location', "action=update&reset=1&id={$event->id}");
+      CRM_Utils_System::redirect($url);
     }
 
     parent::endPostProcess();

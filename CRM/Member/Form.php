@@ -346,22 +346,25 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       ]);
     }
     else {
-      $this->addButtons([
+      $buttons = [
         [
           'type' => 'upload',
           'name' => ts('Save'),
           'isDefault' => TRUE,
         ],
-        [
+      ];
+      if (!$this->_id) {
+        $buttons[] = [
           'type' => 'upload',
           'name' => ts('Save and New'),
           'subName' => 'new',
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]);
+        ];
+      };
+      $buttons[] = [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ];
+      $this->addButtons($buttons);
     }
   }
 

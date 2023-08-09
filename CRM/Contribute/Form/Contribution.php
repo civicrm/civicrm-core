@@ -884,24 +884,27 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $mailingInfo = Civi::settings()->get('mailing_backend');
     $this->assign('outBound_option', $mailingInfo['outBound_option']);
 
-    $this->addButtons([
+    $buttons = [
       [
         'type' => 'upload',
         'name' => ts('Save'),
         'js' => $js,
         'isDefault' => TRUE,
       ],
-      [
+    ];
+    if (!$this->_id) {
+      $buttons[] = [
         'type' => 'upload',
         'name' => ts('Save and New'),
         'js' => $js,
         'subName' => 'new',
-      ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ],
-    ]);
+      ];
+    }
+    $buttons[] = [
+      'type' => 'cancel',
+      'name' => ts('Cancel'),
+    ];
+    $this->addButtons($buttons);
 
     // if contribution is related to membership or participant freeze Financial Type, Amount
     if ($this->_id) {

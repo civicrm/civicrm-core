@@ -72,11 +72,8 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * @return void
    */
   public function buildQuickForm() {
-    $this->_last = TRUE;
     CRM_PCP_BAO_PCP::buildPCPForm($this);
-
     $this->addElement('checkbox', 'pcp_active', ts('Enable Personal Campaign Pages? (for this contribution page)'), NULL, ['onclick' => "return showHideByValue('pcp_active',true,'pcpFields','table-row','radio',false);"]);
-
     parent::buildQuickForm();
     $this->addFormRule(['CRM_PCP_Form_Contribute', 'formRule'], $this);
   }

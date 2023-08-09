@@ -10,9 +10,6 @@
 {* Step 1 of New Event Wizard, and Edit Event Info form. *}
 
 <div class="crm-block crm-form-block crm-event-manage-eventinfo-form-block">
-  <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="top"}
-  </div>
   <table class="form-layout-compressed">
     {if !empty($form.template_id)}
       <tr class="crm-event-manage-eventinfo-form-block-template_id">
