@@ -214,7 +214,6 @@ class CRM_Queue_Runner {
 
     if ($taskResult['numberOfItems'] === 0) {
       $result = $this->handleEnd();
-      $this->enableBackgroundExecution();
       if (!empty($result['redirect_url'])) {
         CRM_Utils_System::redirect($result['redirect_url']);
       }
@@ -353,6 +352,7 @@ class CRM_Queue_Runner {
     if (!empty($this->onEndUrl)) {
       $result['redirect_url'] = $this->onEndUrl;
     }
+    $this->enableBackgroundExecution();
     return $result;
   }
 
