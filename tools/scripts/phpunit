@@ -92,6 +92,9 @@ function pickPhpunitCommand() {
   if (getenv('PHPUNIT')) {
     return getenv('PHPUNIT');
   }
+  elseif (version_compare(PHP_VERSION, '7.3', '>=')) {
+    return 'phpunit9';
+  }
   elseif (version_compare(PHP_VERSION, '7.2', '>=')) {
     return 'phpunit8';
   }
