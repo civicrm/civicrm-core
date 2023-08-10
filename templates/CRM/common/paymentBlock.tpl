@@ -104,7 +104,7 @@
       var currency = '{$currency}';
       currency = currency == '' ? $('#currency').val() : currency;
 
-      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="formName=`$form.formName``$urlPathVar``$isBackOfficePathVar``$profilePathVar``$contributionPageID``$preProfileID`processor_id=__type__"}".replace("__type__", type);;
+      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="formName=`$form.formName``$urlPathVar``$isBackOfficePathVar``$profilePathVar``$contributionPageID``$preProfileID`processor_id=__type__"}".replace("processor_id=__type__", "processor_id=" + type);
       {literal}
       if (typeof(CRM.vars) != "undefined") {
         if (typeof(CRM.vars.coreForm) != "undefined") {
