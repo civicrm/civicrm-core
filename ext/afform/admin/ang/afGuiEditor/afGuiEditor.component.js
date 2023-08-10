@@ -21,6 +21,8 @@
     controller: function($scope, crmApi4, afGui, $parse, $timeout, $location) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
 
+      this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
+
       this.afform = null;
       $scope.saving = false;
       $scope.selectedEntityName = null;

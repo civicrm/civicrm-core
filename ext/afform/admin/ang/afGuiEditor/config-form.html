@@ -112,7 +112,7 @@
       <p class="help-block disabled" ng-if="!editor.afform.server_route">{{:: ts('Requires a page route') }}</p>
     </div>
 
-    <div class="form-group" ng-if="!!editor.afform.is_token && !!editor.afform.server_route">
+    <div class="form-group" ng-if="!!editor.isSuperAdmin && !!editor.afform.is_token && !!editor.afform.server_route">
       <label>
         {{:: ts('Token Timeout') }}
       </label>
