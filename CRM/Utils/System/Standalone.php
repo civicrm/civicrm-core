@@ -206,6 +206,20 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
+   * Path of the current page e.g. 'civicrm/contact/view'
+   *
+   * @return string|null
+   *   the current menu path
+   */
+  public static function currentPath() {
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if ($path[0] == '/') {
+      $path = substr($path, 1);
+    }
+    return $path;
+  }
+
+  /**
    * @inheritDoc
    * Authenticate the user against the CMS db.
    *

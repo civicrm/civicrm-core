@@ -173,6 +173,17 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Path of the current page e.g. 'civicrm/contact/view'
+   *
+   * @return string|null
+   *   the current menu path
+   */
+  public static function currentPath() {
+    $config = CRM_Core_Config::singleton();
+    return isset($_GET[$config->userFrameworkURLVar]) ? trim($_GET[$config->userFrameworkURLVar], '/') : NULL;
+  }
+
+  /**
    * Authenticate the user against the CMS db.
    *
    * @param string $name

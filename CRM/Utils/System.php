@@ -39,6 +39,7 @@
  * @method static void appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
  * @method static void alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
  * @method static bool shouldExitAfterFatal() Should the current execution exit after a fatal error?
+ * @method static string|null currentPath() Path of the current page e.g. 'civicrm/contact/view'
  */
 class CRM_Utils_System {
 
@@ -431,17 +432,6 @@ class CRM_Utils_System {
   ) {
     $url = self::url($path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend);
     return "<a href=\"$url\">$text</a>";
-  }
-
-  /**
-   * Path of the current page e.g. 'civicrm/contact/view'
-   *
-   * @return string|null
-   *   the current menu path
-   */
-  public static function currentPath() {
-    $config = CRM_Core_Config::singleton();
-    return isset($_GET[$config->userFrameworkURLVar]) ? trim($_GET[$config->userFrameworkURLVar], '/') : NULL;
   }
 
   /**
