@@ -490,7 +490,7 @@ AND    u.status = 1
     global $language;
 
     $langcode = substr($civicrm_language, 0, 2);
-    $languages = language_list(FALSE, TRUE);
+    $languages = language_list();
 
     if (isset($languages[$langcode])) {
       $language = $languages[$langcode];
