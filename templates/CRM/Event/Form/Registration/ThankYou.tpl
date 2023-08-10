@@ -99,7 +99,7 @@
                 {/if}
                 {if $totalAmount}
                  <div class="crm-section no-label total-amount-section">
-                    <div class="content bold">{ts}Event Total{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
+                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
                     <div class="clear"></div>
                   </div>
 
