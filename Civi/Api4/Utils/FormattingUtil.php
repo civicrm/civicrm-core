@@ -446,7 +446,7 @@ class FormattingUtil {
    * @return array
    */
   public static function filterByPath(array $values, string $fieldPath, string $fieldName): array {
-    $prefix = substr($fieldPath, 0, strpos($fieldPath, $fieldName));
+    $prefix = substr($fieldPath, 0, strrpos($fieldPath, $fieldName));
     return \CRM_Utils_Array::filterByPrefix($values, $prefix);
   }
 
