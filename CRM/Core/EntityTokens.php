@@ -348,10 +348,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function checkActive(TokenProcessor $processor) {
-    return (!empty($processor->context['actionMapping'])
+    return ((!empty($processor->context['actionMapping'])
         // This makes the 'schema context compulsory - which feels accidental
         // since recent discu
-      && $processor->context['actionMapping']->getEntity()) || in_array($this->getEntityIDField(), $processor->context['schema']);
+      && $processor->context['actionMapping']->getEntity()) || in_array($this->getEntityIDField(), $processor->context['schema'])) && in_array($this->getApiEntityName(), array_keys(\Civi::service('action_object_provider')->getEntities()));
   }
 
   /**
