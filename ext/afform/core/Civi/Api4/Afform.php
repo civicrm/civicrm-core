@@ -171,6 +171,7 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'authx_timeout',
           'data_type' => 'Integer',
+          'permission' => ['all CiviCRM permissions and ACLs'],
         ],
         [
           'name' => 'authx_redirect',
