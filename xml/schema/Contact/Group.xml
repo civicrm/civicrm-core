@@ -198,7 +198,7 @@
       <keyColumn>id</keyColumn>
       <nameColumn>name</nameColumn>
       <labelColumn>title</labelColumn>
-      <prefetch>FALSE</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
     <html>
       <type>EntityRef</type>
@@ -218,7 +218,7 @@
       <keyColumn>id</keyColumn>
       <nameColumn>name</nameColumn>
       <labelColumn>title</labelColumn>
-      <prefetch>FALSE</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
     <html>
       <type>EntityRef</type>

@@ -117,7 +117,7 @@
     </html>
     <pseudoconstant>
       <callback>CRM_ACL_BAO_ACL::getObjectIdOptions</callback>
-      <prefetch>false</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
   </field>
   <field>

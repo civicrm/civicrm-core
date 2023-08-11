@@ -68,8 +68,8 @@ class SpecFormatter {
       $field->setLabel($data['html']['label'] ?? NULL);
       $field->setLocalizable($data['localizable'] ?? FALSE);
       if (!empty($data['pseudoconstant'])) {
-        // Do not load options if 'prefetch' is explicitly FALSE
-        if (!isset($data['pseudoconstant']['prefetch']) || $data['pseudoconstant']['prefetch'] === FALSE) {
+        // Do not load options if 'prefetch' is disabled
+        if (($data['pseudoconstant']['prefetch'] ?? NULL) !== 'disabled') {
           $field->setOptionsCallback([__CLASS__, 'getOptions']);
         }
         // These suffixes are always supported if a field has options
