@@ -21,6 +21,8 @@
  */
 class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment {
 
+  use CRM_Core_Form_EntityTrackingTrait;
+
   /**
    * Participant ID - use getParticipantID.
    *
@@ -1382,9 +1384,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected function getStatusMsg(array $params, int $numberSent, int $numberNotSent, string $updateStatusMsg): string {
     $statusMsg = '';
     if (($this->_action & CRM_Core_Action::UPDATE)) {
-      $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contributorDisplayName]);
+      $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->getContactValue('display_name')]);
       if (!empty($params['send_receipt']) && $numberSent) {
-        $statusMsg .= ' ' . ts('A confirmation email has been sent to %1', [1 => $this->_contributorEmail]);
+        $statusMsg .= ' ' . ts('A confirmation email has been sent to %1', [1 => $this->getContactValue('email_primary.email')]);
       }
 
       if ($updateStatusMsg) {
@@ -1392,9 +1394,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
-      $statusMsg = ts('Event registration for %1 has been added.', [1 => $this->_contributorDisplayName]);
+      $statusMsg = ts('Event registration for %1 has been added.', [1 => $this->getContactValue('display_name')]);
       if (!empty($params['send_receipt']) && $numberSent) {
-        $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', [1 => $this->_contributorEmail]);
+        $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', [1 => $this->getContactValue('email_primary.email')]);
       }
     }
     return $statusMsg;
@@ -1933,18 +1935,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * Get a value from the existing participant record (applies to edits).
+   * Get the contact id that the form is being submitted for.
    *
-   * @param string $fieldName
+   * @todo consolidate Contact ID properties....
    *
-   * @return array
-   * @throws \CRM_Core_Exception
+   * @return int
    */
-  protected function getParticipantValue($fieldName) {
-    if (!$this->participantRecord) {
-      $this->participantRecord = civicrm_api3('Participant', 'getsingle', ['id' => $this->_id]);
-    }
-    return $this->participantRecord[$fieldName] ?? $this->participantRecord['participant_' . $fieldName];
+  public function getContactID() {
+    return $this->_contactId;
   }
 
   /**
