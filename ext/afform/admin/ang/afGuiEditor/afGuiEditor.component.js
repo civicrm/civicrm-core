@@ -403,6 +403,14 @@
         }
       };
 
+      this.toggleEmailVerification = function() {
+        if (editor.afform.require_email_confirmation) {
+          editor.afform.require_email_confirmation = null;
+        } else {
+          editor.afform.create_submission = true;
+        }
+      }
+
       function loadNavigationMenu() {
         if ('navigationMenu' in editor) {
           return;
@@ -615,6 +623,10 @@
         var afform = JSON.parse(angular.toJson(editor.afform));
         // This might be set to undefined by validation
         afform.server_route = afform.server_route || '';
+        // create submission is required if email confirmation is selected.
+        if (afform.require_email_confirmation) {
+          afform.create_submission = true;
+        }
         $scope.saving = true;
         crmApi4('Afform', 'save', {formatWhitespace: true, records: [afform]})
           .then(function (data) {

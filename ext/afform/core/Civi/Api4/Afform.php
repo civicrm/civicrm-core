@@ -232,6 +232,10 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Boolean',
         ],
         [
+          'name' => 'require_email_confirmation',
+          'data_type' => 'Boolean',
+        ],
+        [
           'name' => 'navigation',
           'title' => E::ts('Navigation Menu'),
           'data_type' => 'Array',

@@ -122,10 +122,9 @@
     </p>
 
     <div ng-if="editor.afform.submit_enabled">
-
       <div class="form-group">
         <label>
-          <input type="checkbox" ng-model="editor.afform.create_submission" >
+          <input type="checkbox" ng-model="editor.afform.create_submission" ng-class="{'disabled': !!editor.afform.require_email_confirmation}">
           {{:: ts('Log Submissions') }}
         </label>
         <p class="help-block">{{:: ts('Keep a log of the date, time, user, and items saved by each form submission.') }}</p>
@@ -134,6 +133,14 @@
       <div class="form-inline" ng-if="editor.afform.create_submission">
         <label for="submit_limit">{{:: ts('Maximum Submissions') }}</label>
         <input type="number" min="1" step="1" id="submit_limit" ng-model="editor.afform.submit_limit" placeholder="{{:: ts('Unlimited') }}">
+      </div>
+
+      <div class="form-group" >
+        <label>
+          <input type="checkbox" ng-model="editor.afform.require_email_confirmation" ng-click="editor.toggleEmailVerification()">
+          {{:: ts('Verify email before processing') }}
+        </label>
+        <p class="help-block">{{:: ts('The data will be processed and stored in CiviCRM only after email verfication. Email field is required if you enable this setting.') }}</p>
       </div>
 
       <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}">
