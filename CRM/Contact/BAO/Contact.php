@@ -3311,7 +3311,9 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     switch ($fieldName) {
       case 'contact_sub_type':
         if (!empty($props['contact_type'])) {
-          $params['condition'] = "parent_id = (SELECT id FROM civicrm_contact_type WHERE name='{$props['contact_type']}')";
+          $params['condition'] = CRM_Core_DAO::composeQuery('parent_id = (SELECT id FROM civicrm_contact_type WHERE name = %1)', [
+            1 => [$props['contact_type'], 'String'],
+          ]);
         }
         break;
 

@@ -160,9 +160,12 @@ WHERE  v.option_group_id = g.id
       $query .= $condition;
     }
 
-    $query .= " ORDER BY v.{$orderBy}";
+    $query .= " ORDER BY v.`%2`";
 
-    $p = [1 => [$name, 'String']];
+    $p = [
+      1 => [$name, 'String'],
+      2 => [$orderBy, 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
+    ];
     $dao = CRM_Core_DAO::executeQuery($query, $p);
 
     $var = self::valuesCommon($dao, $flip, $grouping, $localize, $labelColumnName);
