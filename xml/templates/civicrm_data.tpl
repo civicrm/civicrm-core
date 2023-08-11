@@ -43,62 +43,54 @@ VALUES
 INSERT INTO civicrm_domain (name, version, contact_id) VALUES (@domainName, '2.2', @contactID);
 SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 
-{php}echo (include "sql/civicrm_data/civicrm_location_type.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_relationship_type.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_tag.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_component.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_financial_type.sqldata.php")->toSQL();{/php}
-{php}
-  $optionGroups = include 'sql/civicrm_data/civicrm_option_group.php';
-  $laterGroups = ['encounter_medium', 'soft_credit_type', 'recent_items_providers'];
-  foreach ($optionGroups as $groupName => $group) {
-    if (!in_array($groupName, $laterGroups)) {
-      echo $group->toSQL();
-    }
-  }
-{/php}
+{crmSqlData file="sql/civicrm_data/civicrm_location_type.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_relationship_type.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_tag.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_component.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_financial_type.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_option_group/*.sqldata.php" exclude=';(encounter_medium|soft_credit_type|recent_items_providers).sqldata.php$;'}
 
 -- CRM-6138
 {include file='languages.tpl'}
 
-{php}echo (include "sql/civicrm_data/civicrm_option_group/encounter_medium.sqldata.php")->toSQL();{/php}
+{crmSqlData file="sql/civicrm_data/civicrm_option_group/encounter_medium.sqldata.php"}
 
-{php}echo (include "sql/civicrm_data/civicrm_membership_status.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_preferences_date.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_payment_processor_type.sqldata.php")->toSQL();{/php}
+{crmSqlData file="sql/civicrm_data/civicrm_membership_status.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_preferences_date.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_payment_processor_type.sqldata.php"}
 
-{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/IndividualSupervised.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/OrganizationSupervised.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/HouseholdSupervised.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/IndividualUnsupervised.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/OrganizationUnsupervised.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/HouseholdUnsupervised.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_dedupe_rule/IndividualGeneral.sqldata.php")->toSQL();{/php}
+{crmSqlData file="sql/civicrm_data/civicrm_dedupe_rule/IndividualSupervised.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_dedupe_rule/OrganizationSupervised.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_dedupe_rule/HouseholdSupervised.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_dedupe_rule/IndividualUnsupervised.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_dedupe_rule/OrganizationUnsupervised.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_dedupe_rule/HouseholdUnsupervised.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_dedupe_rule/IndividualGeneral.sqldata.php"}
 
-{php}echo (include "sql/civicrm_data/civicrm_county.sqldata.php")->toSQL();{/php}
+{crmSqlData file="sql/civicrm_data/civicrm_county.sqldata.php"}
 
 -- Bounce classification patterns
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/AOL.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/Away.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/Dns.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/Host.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/Inactive.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/Invalid.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/Loop.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/Quota.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/Relay.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/Spam.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_mailing_bounce_type/Syntax.sqldata.php")->toSQL();{/php}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/AOL.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/Away.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/Dns.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/Host.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/Inactive.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/Invalid.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/Loop.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/Quota.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/Relay.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/Spam.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_mailing_bounce_type/Syntax.sqldata.php"}
 
-{php}echo (include "sql/civicrm_data/civicrm_uf_group.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_uf_join.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_uf_field.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_participant_status_type.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_contact_type.sqldata.php")->toSQL();{/php}
+{crmSqlData file="sql/civicrm_data/civicrm_uf_group.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_uf_join.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_uf_field.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_participant_status_type.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_contact_type.sqldata.php"}
 
 {include file='civicrm_msg_template.tpl'}
 
-{php}echo (include "sql/civicrm_data/civicrm_job.sqldata.php")->toSQL();{/php}
+{crmSqlData file="sql/civicrm_data/civicrm_job.sqldata.php"}
 
 -- financial accounts
 SELECT @option_group_id_fat            := max(id) from civicrm_option_group where name = 'financial_account_type';
@@ -107,7 +99,7 @@ SELECT @opexp := value FROM civicrm_option_value WHERE name = 'Expenses' and opt
 SELECT @opAsset := value FROM civicrm_option_value WHERE name = 'Asset' and option_group_id = @option_group_id_fat;
 SELECT @opLiability := value FROM civicrm_option_value WHERE name = 'Liability' and option_group_id = @option_group_id_fat;
 SELECT @opCost := value FROM civicrm_option_value WHERE name = 'Cost of Sales' and option_group_id = @option_group_id_fat;
-{php}echo (include "sql/civicrm_data/civicrm_financial_account.sqldata.php")->toSQL();{/php}
+{crmSqlData file="sql/civicrm_data/civicrm_financial_account.sqldata.php"}
 
 SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
 SELECT @option_value_rel_id  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Income Account is';
@@ -188,6 +180,6 @@ SELECT @fieldID := max(id) FROM civicrm_price_field WHERE name = 'contribution_a
 INSERT INTO `civicrm_price_field_value` (  `price_field_id`, `name`, `label`, `amount`, `weight`, `is_default`, `is_active`, `financial_type_id`)
 VALUES ( @fieldID, 'contribution_amount', 'Contribution Amount', '1', '1', '0', '1', 1);
 
-{php}echo (include "sql/civicrm_data/civicrm_extension.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_option_group/soft_credit_type.sqldata.php")->toSQL();{/php}
-{php}echo (include "sql/civicrm_data/civicrm_option_group/recent_items_providers.sqldata.php")->toSQL();{/php}
+{crmSqlData file="sql/civicrm_data/civicrm_extension.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_option_group/soft_credit_type.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_option_group/recent_items_providers.sqldata.php"}
