@@ -129,6 +129,9 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getRelatedTokens(): array {
     $tokens = [];
+    if (!in_array('ContributionRecur', array_keys(\Civi::service('action_object_provider')->getEntities()))) {
+      return $tokens;
+    }
     $hiddenTokens = ['modified_date', 'create_date', 'trxn_id', 'invoice_id', 'is_test', 'payment_token_id', 'payment_processor_id', 'payment_instrument_id', 'cycle_day', 'installments', 'processor_id', 'next_sched_contribution_date', 'failure_count', 'failure_retry_date', 'auto_renew', 'is_email_receipt', 'contribution_status_id'];
     $contributionRecurFields = ContributionRecur::getFields(FALSE)->setLoadOptions(TRUE)->execute();
     foreach ($contributionRecurFields as $contributionRecurField) {
