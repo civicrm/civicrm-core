@@ -566,12 +566,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Initiate event fee.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Event_Form_Participant|\CRM_Event_Form_Registration|\CRM_Event_Form_ParticipantFeeSelection|\CRM_Event_Form_Task_Register $form
    * @param int $eventID
    * @param bool $doNotIncludeExpiredFields
    *   See CRM-16456.
    *
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   public static function initEventFee(&$form, $eventID, $doNotIncludeExpiredFields = TRUE) {
     // get price info
