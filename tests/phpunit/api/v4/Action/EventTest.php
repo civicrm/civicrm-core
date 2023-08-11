@@ -16,6 +16,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+namespace api\v4\Action;
+
 use api\v4\Api4TestBase;
 use Civi\Api4\Event;
 use Civi\Test\TransactionalInterface;
