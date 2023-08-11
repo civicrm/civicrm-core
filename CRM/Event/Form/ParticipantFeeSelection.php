@@ -172,7 +172,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     //retrieve custom information
     $this->_values = [];
 
-    CRM_Event_Form_Registration::initEventFee($this, $event['id'], $this->_action !== CRM_Core_Action::UPDATE);
+    CRM_Event_Form_Registration::initEventFee($this, $event['id'], $this->_action !== CRM_Core_Action::UPDATE, $this->getDiscountID());
     CRM_Event_Form_Registration_Register::buildAmount($this, TRUE);
 
     if (!CRM_Utils_System::isNull($this->_values['line_items'] ?? NULL)) {
@@ -223,6 +223,23 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     $this->addButtons($buttons);
     $this->addFormRule(['CRM_Event_Form_ParticipantFeeSelection', 'formRule'], $this);
+  }
+
+  /**
+   * Get the discount ID.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getDiscountID(): ?int {
+    $discountID = (int) CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event');
+    return $discountID ?: NULL;
   }
 
   /**
@@ -388,6 +405,25 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     }
 
     CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+  }
+
+  /**
+   * Get the event ID.
+   *
+   * This function is supported for use outside of core.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  public function getEventID(): int {
+    if (!$this->_eventId) {
+      $this->_eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_participantId, 'event_id');
+    }
+    return $this->_eventId;
   }
 
 }

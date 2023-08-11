@@ -524,8 +524,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       $this->_eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventID, 'event_type_id', 'id');
 
-      $this->_discountId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'discount_id');
-      if ($this->_discountId) {
+      if ($this->getDiscountID()) {
+        // This doesn't seem used....
         $this->set('discountId', $this->_discountId);
       }
     }
@@ -1436,8 +1436,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       //retrieve custom information
       $form->_values = [];
-      CRM_Event_Form_Registration::initEventFee($form, $event['id'], FALSE);
-      CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->_discountId);
+      CRM_Event_Form_Registration::initEventFee($form, $event['id'], FALSE, $form->getDiscountID());
+      CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->getDiscountID());
       $lineItem = [];
       $totalTaxAmount = 0;
       if (!CRM_Utils_System::isNull($form->_values['line_items'] ?? NULL)) {
@@ -2264,6 +2264,30 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       }
     }
     return ['sent' => count($sent), 'not_sent' => count($notSent)];
+  }
+
+  /**
+   * Get the discount ID.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getDiscountID(): ?int {
+    if ($this->_discountId === NULL) {
+      if ($this->getParticipantID()) {
+        $this->_discountId = (int) CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->getParticipantID(), 'discount_id');
+      }
+      else {
+        $this->_discountId = (int) CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event');
+      }
+    }
+    return $this->_discountId ?: NULL;
   }
 
 }
