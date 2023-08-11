@@ -74,11 +74,22 @@ class Submit extends AbstractProcessor {
 
     // Save submission record
     if (!empty($this->_afform['create_submission'])) {
+      $status = 'Processed';
+      if (!empty($this->_afform['require_email_confirmation'])) {
+        $status = 'Pending';
+      }
+
       $submission = AfformSubmission::create(FALSE)
         ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
         ->addValue('afform_name', $this->name)
         ->addValue('data', $this->getValues())
+        ->addValue('status_id:name', $status)
         ->execute()->first();
+    }
+
+    // let's not save the data in other CiviCRM table if email verification is needed.
+    if (!empty($this->_afform['require_email_confirmation'])) {
+      return [];
     }
 
     // Call submit handlers
