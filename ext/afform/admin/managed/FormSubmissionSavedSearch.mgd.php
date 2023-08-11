@@ -7,8 +7,8 @@ return [
   [
     'name' => 'AfAdmin_Submission_List',
     'entity' => 'SavedSearch',
+    'cleanup' => 'always',
     'update' => 'unmodified',
-    'cleanup' => 'unused',
     'params' => [
       'version' => 4,
       'values' => [
@@ -24,8 +24,11 @@ return [
             'id',
             'contact_id.display_name',
             'submission_date',
+            'status_id:label',
           ],
         ],
+        'expires_date' => NULL,
+        'description' => NULL,
       ],
       'match' => [
         'name',
@@ -35,8 +38,8 @@ return [
   [
     'name' => 'AfAdmin_Submission_List_Display',
     'entity' => 'SearchDisplay',
+    'cleanup' => 'always',
     'update' => 'unmodified',
-    'cleanup' => 'unused',
     'params' => [
       'version' => 4,
       'values' => [
@@ -44,8 +47,6 @@ return [
         'label' => E::ts('Form Submissions Table'),
         'saved_search_id.name' => 'AfAdmin_Submission_List',
         'type' => 'table',
-        'actions' => TRUE,
-        'acl_bypass' => FALSE,
         'settings' => [
           'actions' => TRUE,
           'limit' => 50,
@@ -93,6 +94,13 @@ return [
               'label' => E::ts('Submission Date/Time'),
               'sortable' => TRUE,
             ],
+            [
+              'type' => 'field',
+              'key' => 'status_id:label',
+              'dataType' => 'Integer',
+              'label' => E::ts('Submission Status'),
+              'sortable' => TRUE,
+            ],
           ],
           'sort' => [
             [
@@ -100,7 +108,9 @@ return [
               'ASC',
             ],
           ],
+          'placeholder' => 5,
         ],
+        'acl_bypass' => FALSE,
       ],
       'match' => [
         'name',
