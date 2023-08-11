@@ -62,6 +62,7 @@
     <html>
       <type>Select</type>
       <label>Tag</label>
+      <controlField>entity_table</controlField>
     </html>
   </field>
   <foreignKey>

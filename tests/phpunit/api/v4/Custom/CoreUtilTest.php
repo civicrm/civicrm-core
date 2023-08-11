@@ -30,7 +30,7 @@ class CoreUtilTest extends CustomTestBase {
 
   /**
    */
-  public function testGetApiNameFromTableName() {
+  public function testGetApiNameFromTableName(): void {
     $this->assertEquals('Contact', CoreUtil::getApiNameFromTableName('civicrm_contact'));
     $this->assertNull(CoreUtil::getApiNameFromTableName('civicrm_nothing'));
 
@@ -56,7 +56,7 @@ class CoreUtilTest extends CustomTestBase {
     $this->assertEquals($multiGroup['table_name'], CoreUtil::getTableName('Custom_' . $multiGroup['name']));
   }
 
-  public function testGetApiClass() {
+  public function testGetApiClass(): void {
     $this->assertEquals('Civi\Api4\Contact', CoreUtil::getApiClass('Contact'));
     $this->assertEquals('Civi\Api4\CiviCase', CoreUtil::getApiClass('Case'));
     $this->assertNull(CoreUtil::getApiClass('NothingAtAll'));
@@ -75,38 +75,6 @@ class CoreUtilTest extends CustomTestBase {
       ->execute()->first();
 
     $this->assertEquals('Civi\Api4\CustomValue', CoreUtil::getApiClass('Custom_' . $multiGroup['name']));
-  }
-
-  public function testTopSortFields() {
-    $sampleFields = [
-      [
-        'name' => 'd',
-        'title' => 'Fourth',
-        'input_attrs' => [
-          'control_field' => 'a',
-        ],
-      ],
-      [
-        'name' => 'a',
-        'title' => 'Third',
-        'input_attrs' => [
-          'control_field' => 'c',
-        ],
-      ],
-      [
-        'name' => 'b',
-        'title' => 'First',
-      ],
-      [
-        'name' => 'c',
-        'title' => 'Second',
-        'input_attrs' => [
-          'control_field' => 'b',
-        ],
-      ],
-    ];
-    CoreUtil::topSortFields($sampleFields);
-    $this->assertEquals(['First', 'Second', 'Third', 'Fourth'], array_column($sampleFields, 'title'));
   }
 
 }

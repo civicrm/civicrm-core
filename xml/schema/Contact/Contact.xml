@@ -137,6 +137,7 @@
     <html>
       <type>Select</type>
       <multiple>1</multiple>
+      <controlField>contact_type</controlField>
     </html>
     <serialize>SEPARATOR_BOOKEND</serialize>
     <add>1.5</add>

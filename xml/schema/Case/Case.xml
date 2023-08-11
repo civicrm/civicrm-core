@@ -122,6 +122,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <controlField>case_type_id</controlField>
     </html>
     <add>1.8</add>
   </field>
