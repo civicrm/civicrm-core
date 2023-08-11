@@ -71,10 +71,7 @@ class SpecFormatter {
       $field->setLabel($data['html']['label'] ?? NULL);
       $field->setLocalizable($data['localizable'] ?? FALSE);
       if (!empty($data['pseudoconstant'])) {
-        // Do not load options if 'prefetch' is disabled
-        if (($data['pseudoconstant']['prefetch'] ?? NULL) !== 'disabled') {
-          $field->setOptionsCallback([__CLASS__, 'getOptions']);
-        }
+        $field->setOptionsCallback([__CLASS__, 'getOptions'], $data['pseudoconstant']);
         // Explicitly declared suffixes
         if (!empty($data['pseudoconstant']['suffixes'])) {
           $suffixes = $data['pseudoconstant']['suffixes'];
@@ -144,9 +141,15 @@ class SpecFormatter {
    * @param array $values
    * @param bool|array $returnFormat
    * @param bool $checkPermissions
+   * @param array|NULL $pseudoconstant
    * @return array|false
    */
-  public static function getOptions($spec, $values, $returnFormat, $checkPermissions) {
+  public static function getOptions($spec, $values, $returnFormat, $checkPermissions, $pseudoconstant = NULL) {
+    // Do not load options if 'prefetch' is disabled
+    // Note: Internal getFields calls will override to always enable prefetch
+    if (($pseudoconstant['prefetch'] ?? NULL) === 'disabled') {
+      return FALSE;
+    }
     $fieldName = $spec->getName();
 
     if ($spec instanceof CustomFieldSpec) {

@@ -64,6 +64,9 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
 
     foreach ($fields as $field) {
       if ($this->loadOptions) {
+        if ($this->_isInternal) {
+          $field->setOptionsCallbackParam('prefetch', NULL);
+        }
         $field->getOptions($this->values, $this->loadOptions, $this->checkPermissions);
       }
       $fieldArray[$field->getName()] = $field->toArray();

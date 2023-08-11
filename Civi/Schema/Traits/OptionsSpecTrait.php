@@ -93,4 +93,14 @@ trait OptionsSpecTrait {
     return $this;
   }
 
+  /**
+   * @param string $paramName
+   * @param mixed $paramValue
+   * @return $this
+   */
+  public function setOptionsCallbackParam(string $paramName, $paramValue) {
+    $this->optionsCallbackParams[$paramName] = $paramValue;
+    return $this;
+  }
+
 }

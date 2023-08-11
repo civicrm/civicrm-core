@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\Api4\Generic\Result;
 use Civi\Api4\Query\SqlExpression;
 
 require_once 'api/v3/utils.php';
@@ -291,29 +292,37 @@ class FormattingUtil {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function getPseudoconstantList(array $field, string $fieldAlias, $values = [], $action = 'get') {
+  public static function getPseudoconstantList(array $field, string $fieldAlias, array $values = [], string $action = 'get') {
     [$fieldPath, $valueType] = explode(':', $fieldAlias);
-    $context = self::$pseudoConstantContexts[$valueType] ?? NULL;
+    if (isset(\Civi::$statics['CRM_Core_PseudoConstant']['Api4'][$field['entity']][$field['name']][$action][$valueType])) {
+      return \Civi::$statics['CRM_Core_PseudoConstant']['Api4'][$field['entity']][$field['name']][$action][$valueType];
+    }
     // For create actions, only unique identifiers can be used.
     // For get actions any valid suffix is ok.
-    if (($action === 'create' && !$context) || !in_array($valueType, self::$pseudoConstantSuffixes, TRUE)) {
+    if (($action === 'create' && empty(self::$pseudoConstantContexts[$valueType])) || !in_array($valueType, self::$pseudoConstantSuffixes, TRUE)) {
       throw new \CRM_Core_Exception('Illegal expression');
     }
-    $baoName = $context ? CoreUtil::getBAOFromApiName($field['entity']) : NULL;
-    // Use BAO::buildOptions if possible
-    if ($baoName) {
-      $fieldName = empty($field['custom_field_id']) ? $field['name'] : 'custom_' . $field['custom_field_id'];
-      $options = $baoName::buildOptions($fieldName, $context, self::filterByPath($values, $fieldPath, $field['name']));
+    $result = new Result();
+    $getFields = \Civi\API\Request::create($field['entity'], 'getFields', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'action' => $action,
+      'loadOptions' => ['id', $valueType],
+      'where' => [['name', '=', $field['name']]],
+      'values' => self::filterByPath($values, $fieldPath, $field['name']),
+    ]);
+    // Pass TRUE for the private $isInternal param
+    $getFields->_run($result, TRUE);
+    $fieldInfo = $result->single();
+    if (!is_array($fieldInfo['options'])) {
+      throw new \CRM_Core_Exception("No option list found for '{$field['name']}'");
     }
-    // Fallback for option lists that exist in the api but not the BAO
-    if (!isset($options) || $options === FALSE) {
-      $options = civicrm_api4($field['entity'], 'getFields', ['checkPermissions' => FALSE, 'action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? NULL;
-      $options = $options ? array_column($options, $valueType, 'id') : $options;
+    $options = array_column($fieldInfo['options'], $valueType, 'id');
+    // If the option list is dynamic, don't use caching
+    if (empty($fieldInfo['input_attrs']['control_field'])) {
+      \Civi::$statics['CRM_Core_PseudoConstant']['Api4'][$field['entity']][$field['name']][$action][$valueType] = $options;
     }
-    if (is_array($options)) {
-      return $options;
-    }
-    throw new \CRM_Core_Exception("No option list found for '{$field['name']}'");
+    return $options;
   }
 
   /**

@@ -66,6 +66,11 @@ class BasicGetFieldsAction extends BasicGetAction {
 
   /**
    * @var bool
+   */
+  protected $_isInternal = FALSE;
+
+  /**
+   * @var bool
    * @deprecated
    */
   protected $includeCustom;
@@ -82,9 +87,13 @@ class BasicGetFieldsAction extends BasicGetAction {
    *    See for example BasicGetFieldsAction::fields() or GetActions::fields().
    *
    * @param Result $result
+   * @internal @param bool $_isInternal
+   *   Passing true will return @internal properties, and override the 'prefetch' of pseudoconstants.
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function _run(Result $result) {
+    // _isInternal param is not part of function signature (to be compatible with parent class)
+    $this->_isInternal = func_get_args()[1] ?? FALSE;
     try {
       $actionClass = \Civi\API\Request::create($this->getEntityName(), $this->getAction(), ['version' => 4]);
     }
@@ -96,9 +105,7 @@ class BasicGetFieldsAction extends BasicGetAction {
     else {
       $values = $this->getRecords();
     }
-    // $isInternal param is not part of function signature (to be compatible with parent class)
-    $isInternal = func_get_args()[1] ?? FALSE;
-    $this->formatResults($values, $isInternal);
+    $this->formatResults($values);
     $this->queryArray($values, $result);
   }
 
@@ -113,9 +120,8 @@ class BasicGetFieldsAction extends BasicGetAction {
    * Instead just override $this->fields and this function will respect that.
    *
    * @param array $values
-   * @param bool $isInternal
    */
-  protected function formatResults(&$values, $isInternal) {
+  protected function formatResults(&$values) {
     $fieldDefaults = array_column($this->fields(), 'default_value', 'name') +
       array_fill_keys(array_column($this->fields(), 'name'), NULL);
     // Enforce field permissions
@@ -127,7 +133,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       }
     }
     // Unless this is an internal getFields call, filter out @internal properties
-    $internalProps = $isInternal ? [] : array_filter(array_column($this->fields(), '@internal', 'name'));
+    $internalProps = $this->_isInternal ? [] : array_filter(array_column($this->fields(), '@internal', 'name'));
     foreach ($values as &$field) {
       $defaults = array_intersect_key([
         'title' => empty($field['name']) ? NULL : ucwords(str_replace('_', ' ', $field['name'])),
