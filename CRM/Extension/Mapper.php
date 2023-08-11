@@ -452,10 +452,11 @@ class CRM_Extension_Mapper {
         $this->keyToInfo($key);
       }
       catch (CRM_Extension_Exception_ParseException $e) {
-        CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
-          1 => $e->getMessage(),
+        CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
+          1 => $key,
+          2 => $e->getMessage(),
         ]), '', 'error');
-        CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
+        CRM_Core_Error::debug_log_message("Parse error in extension " . $key . ": " . $e->getMessage());
         continue;
       }
     }
@@ -515,7 +516,7 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * Given te class, provides the template name.
+   * Given the class, provides the template name.
    * @todo consider multiple templates, support for one template for now
    *
    *
@@ -576,10 +577,11 @@ class CRM_Extension_Mapper {
         $info = $this->keyToInfo($key);
       }
       catch (CRM_Extension_Exception_ParseException $e) {
-        CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
-          1 => $e->getMessage(),
+        CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
+          1 => $key,
+          2 => $e->getMessage(),
         ]), '', 'error');
-        CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
+        CRM_Core_Error::debug_log_message("Parse error in extension " . $key . ": " . $e->getMessage());
         return NULL;
       }
 

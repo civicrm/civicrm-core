@@ -214,10 +214,11 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
             $info = CRM_Extension_Info::loadFromFile($infoPath);
           }
           catch (CRM_Extension_Exception_ParseException $e) {
-            CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
-              1 => $e->getMessage(),
+            CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
+              1 => ltrim($relPath, '/'),
+              2 => $e->getMessage(),
             ]), '', 'error');
-            CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
+            CRM_Core_Error::debug_log_message("Parse error in extension " . ltrim($relPath, '/') . ": " . $e->getMessage());
             continue;
           }
           $visible = TRUE;
