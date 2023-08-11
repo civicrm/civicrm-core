@@ -88,4 +88,15 @@ class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * Upgrade 1003 - add status column to afform submissions
+   * @see https://lab.civicrm.org/dev/core/-/issues/4232
+   * @return bool
+   */
+  public function upgrade_1003(): bool {
+    $this->ctx->log->info('Applying update 1003 - add status column to afform submissions.');
+    $this->addColumn('civicrm_afform_submission', 'status_id', "INT UNSIGNED NOT NULL  DEFAULT 1 COMMENT 'fk to Afform Submission Status options in civicrm_option_values'");
+    return TRUE;
+  }
+
 }
