@@ -458,7 +458,7 @@ AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
       $setTree[$setID]['fields'][$fieldID]['id'] = $fieldID;
 
       foreach ($priceFields as $field) {
-        if ($field == 'id' || is_null($dao->$field)) {
+        if ($field === 'id') {
           continue;
         }
 
