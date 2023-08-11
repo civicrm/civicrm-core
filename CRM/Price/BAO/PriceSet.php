@@ -386,7 +386,7 @@ WHERE     cpf.price_set_id = %1";
    * @param int $setID
    *   Price Set ID.
    * @param bool $required
-   *   Appears to have no effect based on reading the code.
+   *   Deprecated.
    * @param bool $doNotIncludeExpiredFields
    *   Should only fields where today's date falls within the valid range be returned?
    *
@@ -415,9 +415,6 @@ WHERE     cpf.price_set_id = %1";
       'visibility_id',
       'is_required',
     ];
-    if ($required == TRUE) {
-      $priceFields[] = 'is_required';
-    }
 
     // create select
     $select = 'SELECT ' . implode(',', $priceFields);
