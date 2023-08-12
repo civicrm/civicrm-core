@@ -43,6 +43,9 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     $this->assertTrue(isset($result['case_activity']));
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function testRenderDefaultTemplate(): void {
     $ex = ExampleData::get(FALSE)
       ->addWhere('name', '=', 'workflow/case_activity/CaseModelExample')
@@ -53,10 +56,13 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
       ->execute()
       ->single();
     $result = $ex['render'][0];
-    $this->assertRegExp('/Case ID : 1234/', $result['text']);
+    $this->assertMatchesRegularExpression('/Case ID : 1234/', $result['text']);
   }
 
-  public function testRenderCustomTemplate() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenderCustomTemplate(): void {
     $ex = ExampleData::get(0)
       ->addWhere('name', '=', 'workflow/case_activity/CaseModelExample')
       ->addSelect('data')
@@ -70,10 +76,10 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
       ])
       ->execute()
       ->single();
-    $this->assertRegExp('/The role is myrole./', $result['text']);
+    $this->assertMatchesRegularExpression('/The role is myrole./', $result['text']);
   }
 
-  public function testRenderExamplesBaseline() {
+  public function testRenderExamplesBaseline(): void {
     $examples = $this->getRenderExamples();
     $this->assertTrue(isset($examples['workflow/contribution_recurring_edit/AlexCancelled']));
   }
@@ -132,7 +138,7 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     foreach ($example['asserts']['default'] as $num => $assert) {
       $msg = sprintf('Check assertion(%s) on example (%s)', $num, $example['name']);
       if (isset($assert['regex'])) {
-        $this->assertRegExp($assert['regex'], $result[$assert['for']], $msg);
+        $this->assertMatchesRegularExpression($assert['regex'], $result[$assert['for']], $msg);
       }
       else {
         $this->fail('Unrecognized assertion: ' . json_encode($assert));

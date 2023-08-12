@@ -38,23 +38,23 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
   /**
    * Make sure that formatBacktrace() accepts values from debug_backtrace()
    */
-  public function testFormatBacktrace_debug() {
+  public function testFormatBacktraceDebug(): void {
     $bt = debug_backtrace();
     $msg = CRM_Core_Error::formatBacktrace($bt);
-    $this->assertRegexp('/CRM_Core_ErrorTest->testFormatBacktrace_debug/', $msg);
+    $this->assertMatchesRegularExpression('/CRM_Core_ErrorTest->testFormatBacktraceDebug/', $msg);
   }
 
   /**
    * Make sure that formatBacktrace() accepts values from Exception::getTrace()
    */
-  public function testFormatBacktrace_exception() {
+  public function testFormatBacktraceException(): void {
     $e = new Exception('foo');
     $msg = CRM_Core_Error::formatBacktrace($e->getTrace());
-    $this->assertRegexp('/CRM_Core_ErrorTest->testFormatBacktrace_exception/', $msg);
+    $this->assertMatchesRegularExpression('/CRM_Core_ErrorTest->testFormatBacktraceException/', $msg);
   }
 
-  public function testExceptionLogging() {
-    $e = new \Exception("the exception");
+  public function testExceptionLogging(): void {
+    $e = new \Exception('the exception');
     Civi::log()->notice('There was an exception!', [
       'exception' => $e,
     ]);
