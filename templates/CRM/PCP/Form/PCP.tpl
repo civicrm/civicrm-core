@@ -45,7 +45,7 @@
         <td>{$form.notify_email.html} {help id="id-notify"}</td>
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-supporter_profile_id">
-        <td class="label">{$form.supporter_profile_id.label}</td>
+        <td class="label">{$form.supporter_profile_id.label} <span class="crm-marker"> *</span></td>
         <td>{$form.supporter_profile_id.html} {help id="id-supporter_profile"}</td>
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-owner_notify_id">
