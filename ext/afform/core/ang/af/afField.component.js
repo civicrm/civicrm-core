@@ -208,8 +208,8 @@
       };
 
       ctrl.isReadonly = function() {
-        if (ctrl.defn.is_id) {
-          return ctrl.afFieldset.getEntity().actions.update === false;
+        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
+          return ctrl.afFieldset.getEntity().actions[ctrl.defn.input_attrs.autofill] === false;
         }
         // TODO: Not actually used, but could be used if we wanted to render displayOnly
         // fields as more than just raw data. I think we probably ought to do so for entityRef fields
@@ -220,11 +220,11 @@
 
       // ngChange callback from Existing entity field
       ctrl.onSelectEntity = function() {
-        if (ctrl.defn.is_id) {
+        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
           var val = $scope.getSetSelect();
           var entity = ctrl.afFieldset.modelName;
           var index = ctrl.getEntityIndex();
-          ctrl.afFieldset.afFormCtrl.loadData(entity, index, val);
+          ctrl.afFieldset.afFormCtrl.loadData(entity, index, val, ctrl.defn.name);
         }
       };
 

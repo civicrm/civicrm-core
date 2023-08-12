@@ -123,9 +123,10 @@ class FormDataModel {
       return TRUE;
     }
 
-    // "Update" effectively means "read+save".
+    // "Get" is used for autofilling entities in "update" mode, but also for
+    // pre-populating fields from a template in "create" mode.
     if ($action === 'get') {
-      $action = 'update';
+      return TRUE;
     }
 
     $result = !empty($entityDefn['actions'][$action]);
@@ -237,8 +238,9 @@ class FormDataModel {
       $entityTitle = CoreUtil::getInfoItem($entityName, 'title');
       $field['input_type'] = 'EntityRef';
       $field['fk_entity'] = $entityName;
-      $field['is_id'] = TRUE;
       $field['label'] = E::ts('Existing %1', [1 => $entityTitle]);
+      // Afform-only (so far) metadata tells the form to update an existing entity autofilled from this value
+      $field['input_attrs']['autofill'] = 'update';
       $field['input_attrs']['placeholder'] = E::ts('Select %1', [1 => $entityTitle]);
     }
     // If this is an implicit join, get new field from fk entity

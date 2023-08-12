@@ -1,4 +1,4 @@
-<li ng-if="!$ctrl.fieldDefn.is_id">
+<li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
   <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Type:') }}</label>
     <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">
@@ -50,7 +50,7 @@
     {{:: ts('Required') }}
   </a>
 </li>
-<li ng-if="!$ctrl.fieldDefn.is_id">
+<li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
   <a href ng-click="toggleDefaultValue(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Pre-fill this field with a value') }}">
     <i class="crm-i fa-{{ $ctrl.hasDefaultValue ? 'check-' : '' }}square-o"></i>
     {{:: ts('Default value') }}
