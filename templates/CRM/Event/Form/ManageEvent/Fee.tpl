@@ -42,7 +42,7 @@
         {if $paymentProcessor}
          <table id="paymentProcessor" class="form-layout">
              <tr class="crm-event-manage-fee-form-block-payment_processor">
-                <td class="label">{$form.payment_processor.label} {help id="id-payment_processor-text"}</td>
+                <td class="label">{$form.payment_processor.label} {help id="id-payment_processor"}</td>
               <td>{$form.payment_processor.html}</td>
              </tr>
          </table>
