@@ -112,6 +112,8 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
   protected function exportExtraTokenContext(array &$export): void {
     // Tax term is exposed at the generic level as so many templates use it
     // (e.g. Membership, participant, pledge as well as contributions).
+    // However, these basically now all implement the ContributionTrait so we
+    // can hopefully remove from here (after some checking).
     $export['smartyTokenAlias']['taxTerm'] = 'domain.tax_term';
   }
 
