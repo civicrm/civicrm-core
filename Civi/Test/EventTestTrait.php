@@ -57,9 +57,9 @@ trait EventTestTrait {
   protected function eventCreatePaid(array $eventParameters = [], array $priceSetParameters = [], string $identifier = 'PaidEvent'): array {
     $eventParameters = array_merge($this->getEventExampleData(), $eventParameters);
     $event = $this->eventCreate($eventParameters, $identifier);
-    if (array_keys($priceSetParameters) !== ['id']) {
+    if (empty($priceSetParameters['id'])) {
       try {
-        $this->eventCreatePriceSet([], $identifier);
+        $this->eventCreatePriceSet($priceSetParameters, $identifier);
         $this->setTestEntityID('PriceSetEntity', PriceSetEntity::create(FALSE)
           ->setValues([
             'entity_table' => 'civicrm_event',

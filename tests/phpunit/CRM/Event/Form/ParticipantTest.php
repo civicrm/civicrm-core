@@ -349,12 +349,13 @@ London,',
    *
    * @param array $eventParams
    * @param array $submittedValues
+   * @param bool $isQuickConfig
    *
    * @return CRM_Event_Form_Participant
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getForm(array $eventParams = [], array $submittedValues = []): CRM_Event_Form_Participant {
+  protected function getForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE): CRM_Event_Form_Participant {
     $submittedValues['contact_id'] = $this->ids['Contact']['event'] = $this->individualCreate();
 
     if (!empty($eventParams['is_monetary'])) {
@@ -365,7 +366,7 @@ London,',
         'loc_block_id' => $locationBlockID,
         'confirm_email_text' => "Just do it\n Now",
         'is_show_location' => TRUE,
-      ], $eventParams));
+      ], $eventParams), ['is_quick_config' => $isQuickConfig]);
       $submittedValues = array_merge($this->getRecordContributionParams('Partially paid', 'Pending'), $submittedValues);
     }
     else {
@@ -549,7 +550,7 @@ London,',
    */
   public function testSubmitPartialPayment(bool $isQuickConfig): void {
     $mailUtil = new CiviMailUtils($this, TRUE);
-    $form = $this->getForm(['is_monetary' => 1]);
+    $form = $this->getForm(['is_monetary' => 1, 'start_date' => '2023-02-15 15:00', 'end_date' => '2023-02-15 18:00']);
     $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('PaidEvent')]);
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $submitParams = [
@@ -596,8 +597,7 @@ London,',
    */
   public function testSubmitPendingPartiallyPaidAddPayment(bool $isQuickConfig): void {
     $mailUtil = new CiviMailUtils($this, TRUE);
-    $form = $this->getForm(['is_monetary' => 1]);
-    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('PaidEvent')]);
+    $form = $this->getForm(['is_monetary' => 1, 'start_date' => '2023-02-15 15:00', 'end_date' => '2023-02-15 18:00'], [], $isQuickConfig);
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $form->postProcess();
     $this->callAPISuccess('Payment', 'create', [
@@ -622,7 +622,7 @@ London,',
    */
   public function testSubmitPendingAddPayment(bool $isQuickConfig): void {
     $mailUtil = new CiviMailUtils($this, TRUE);
-    $form = $this->getForm(['is_monetary' => 1]);
+    $form = $this->getForm(['is_monetary' => 1, 'start_date' => '2023-02-15 15:00', 'end_date' => '2023-02-15 18:00']);
     $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('PaidEvent')]);
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $form->postProcess();
@@ -728,6 +728,7 @@ London,',
       $isAmountPaidOnForm ? 'Balance: $1,530.55' : 'Balance: $1,550.55',
       'Financial Type: Event Fee',
       'Paid By: Check',
+      'February 15th, 2023  3:00 PM- 6:00 PM',
       'Check Number: 879',
     ]);
   }
