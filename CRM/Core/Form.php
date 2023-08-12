@@ -2478,6 +2478,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *  - the logged in user
    *  - 0 for none.
    *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
    * @return int
    *
    * @throws \CRM_Core_Exception
