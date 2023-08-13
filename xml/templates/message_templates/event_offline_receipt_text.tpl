@@ -134,11 +134,6 @@
 {/if}
 {/if}
 
-{if !empty($amount) && !$lineItem}
-{foreach from=$amount item=amnt key=level}{$amnt.amount|crmMoney} {$amnt.label}
-{/foreach}
-{/if}
-
 {if $totalTaxAmount}
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}

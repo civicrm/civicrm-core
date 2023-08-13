@@ -260,15 +260,6 @@
        {/if}
       {/if}
 
-      {if !empty($amount) && !$lineItem}
-       {foreach from=$amount item=amnt key=level}
-        <tr>
-         <td colspan="2" {$valueStyle}>
-          {$amnt.amount|crmMoney} {$amnt.label}
-         </td>
-        </tr>
-       {/foreach}
-      {/if}
       {if $totalTaxAmount}
        <tr>
         <td {$labelStyle}>
