@@ -2207,9 +2207,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
           $this->assign('taxTerm', $this->getSalesTaxTerm());
           $this->assign('dataArray', $dataArray);
         }
-        if (!empty($additionalParticipantDetails)) {
-          $params['amount_level'] = preg_replace('//', '', $params['amount_level']) . ' - ' . $this->_contributorDisplayName;
-        }
 
         $eventAmount[$num] = [
           'label' => preg_replace('//', '', $params['amount_level']),
