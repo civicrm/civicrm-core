@@ -43,8 +43,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testSubmitUnpaidPriceChangeWhileStillPending(): void {
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
-    $form->_quickConfig = TRUE;
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1], [], TRUE);
 
     $form->_lineItem = [
       0 => [
@@ -188,9 +187,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   public function testSubmitWithPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1], [], TRUE);
     $form->_mode = 'Live';
-    $form->_quickConfig = TRUE;
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
     $form->submit($this->getSubmitParamsForCreditCardPayment($paymentProcessorID));
     $participant = $this->callAPISuccessGetSingle('Participant', []);
@@ -230,9 +228,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   public function testSubmitWithFailedPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1], [], TRUE);
     $form->_mode = 'Live';
-    $form->_quickConfig = TRUE;
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
     Civi\Payment\System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
 
@@ -294,9 +291,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     // Use the email created as the from email ensuring we are passing a numeric from to test dev/core#1069
     $this->setCurrencySeparators($thousandSeparator);
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us']);
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us'], [], TRUE);
     $form->_mode = 'Live';
-    $form->_quickConfig = TRUE;
     $form->_fromEmails = [
       'from_email_id' => [$email['id'] => 1],
     ];
@@ -550,39 +546,19 @@ London,',
    */
   public function testSubmitPartialPayment(bool $isQuickConfig): void {
     $mailUtil = new CiviMailUtils($this, TRUE);
-    $form = $this->getForm(['is_monetary' => 1, 'start_date' => '2023-02-15 15:00', 'end_date' => '2023-02-15 18:00']);
-    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('PaidEvent')]);
-    $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
-    $submitParams = [
-      'hidden_feeblock' => '1',
-      'hidden_eventFullMsg' => '',
-      'priceSetId' => $this->getPriceSetID('PaidEvent'),
-      $this->getPriceFieldKey() => (int) $this->ids['PriceFieldValue']['PaidEvent_family_package'],
-      'check_number' => '879',
-      'record_contribution' => '1',
-      'financial_type_id' => '4',
-      'receive_date' => '2020-01-31 00:51:00',
-      'payment_instrument_id' => $paymentInstrumentID,
-      'trxn_id' => '',
+    $form = $this->getForm(['is_monetary' => 1, 'start_date' => '2023-02-15 15:00', 'end_date' => '2023-02-15 18:00'], [
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       'total_amount' => '20',
       'send_receipt' => '1',
-      'from_email_address' => '"FIXME" <info@EXAMPLE.ORG>',
-      'receipt_text' => 'Contact the Development Department if you need to make any changes to your registration.',
-      'hidden_custom' => '1',
-      'hidden_custom_group_count' => ['' => 1],
-      'custom_4_-1' => '',
       'contact_id' => $this->getContactID(),
-      'event_id' => $this->getEventID('PaidEvent'),
-      'campaign_id' => '',
       'register_date' => '2020-01-31 00:50:00',
       'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Partially paid'),
       'source' => 'I wrote this',
       'note' => 'I wrote a note',
-      'MAX_FILE_SIZE' => '33554432',
-    ];
-    $form->submit($submitParams);
+    ], $isQuickConfig);
+    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('PaidEvent')]);
+    $form->postProcess();
     $this->assertPartialPaymentResult($isQuickConfig, $mailUtil);
   }
 
