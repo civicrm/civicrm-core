@@ -219,4 +219,14 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
     $export['isShowTax'] = (bool) Civi::settings()->get('invoicing');
   }
 
+  /**
+   * Specify any tokens that should be exported as smarty variables.
+   *
+   * @param array $export
+   */
+  protected function exportExtraTokenContext(array &$export): void {
+    $export['smartyTokenAlias']['currency'] = 'contribution.currency';
+    $export['smartyTokenAlias']['taxTerm'] = 'domain.tax_term';
+  }
+
 }
