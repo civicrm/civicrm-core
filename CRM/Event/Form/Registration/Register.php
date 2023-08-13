@@ -427,7 +427,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // will only work until that is done.
       // https://github.com/civicrm/civicrm-core/pull/19151
       $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56));
-      self::buildAmount($this);
+      // build amount only when needed, skip incase of event full and waitlisting is enabled
+      // and few other conditions check preProcess()
+      if (!$this->_noFees) {
+        self::buildAmount($this);
+      }
       if (!$this->showPaymentOnConfirm) {
         CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
         $this->addPaymentProcessorFieldsToForm();
@@ -549,12 +553,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @throws \CRM_Core_Exception
    */
   public static function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
-    // build amount only when needed, skip incase of event full and waitlisting is enabled
-    // and few other conditions check preProcess()
-    if (property_exists($form, '_noFees') && $form->_noFees) {
-      return;
-    }
-
     //if payment done, no need to build the fee block.
     if (!empty($form->_paymentId)) {
       //fix to display line item in update mode.
