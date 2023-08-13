@@ -370,7 +370,7 @@ INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id 
     if (array_key_exists('is_active', $params)) {
       $active = "( campaign.is_active = 1 )";
       if (!empty($params['is_active'])) {
-        $active = "( campaign.is_active = 0 OR campaign.is_active IS NULL )";
+        $active = "campaign.is_active = 0";
       }
       $where[] = $active;
     }

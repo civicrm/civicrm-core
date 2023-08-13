@@ -213,7 +213,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     // although if target is contribution page this might not be correct. fixme? dgg
     $query = "SELECT id, title, start_date, end_date, registration_start_date, registration_end_date
                   FROM civicrm_event
-                  WHERE is_template IS NULL OR is_template != 1";
+                  WHERE is_template = 0";
     $epages = CRM_Core_DAO::executeQuery($query);
     while ($epages->fetch()) {
       $pages['event'][$epages->id]['id'] = $epages->id;

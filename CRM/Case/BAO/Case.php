@@ -1902,7 +1902,7 @@ HERESQL;
 
     $whereClause = "mainCase.id = %2";
     if ($excludeDeleted) {
-      $whereClause .= " AND ( relAct.is_deleted = 0 OR relAct.is_deleted IS NULL )";
+      $whereClause .= " AND relAct.is_deleted = 0";
     }
 
     $query = "
@@ -1945,7 +1945,7 @@ HERESQL;
 
     $whereClause = 'relCase.id IN ( ' . implode(',', $relatedCaseIds) . ' )';
     if ($excludeDeleted) {
-      $whereClause .= " AND ( relCase.is_deleted = 0 OR relCase.is_deleted IS NULL )";
+      $whereClause .= " AND relCase.is_deleted = 0";
     }
 
     //filter for permissioned cases.

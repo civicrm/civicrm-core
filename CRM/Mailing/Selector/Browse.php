@@ -582,7 +582,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         $clauses[] = "civicrm_mailing.is_archived = 1";
       }
       else {
-        $clauses[] = "(civicrm_mailing.is_archived IS NULL OR civicrm_mailing.is_archived = 0)";
+        $clauses[] = "civicrm_mailing.is_archived = 0";
       }
     }
 

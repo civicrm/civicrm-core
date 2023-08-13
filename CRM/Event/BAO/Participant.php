@@ -356,7 +356,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
 
     $where = [' event.id = %1 '];
     if (!$considerTestParticipant) {
-      $where[] = ' ( participant.is_test = 0 OR participant.is_test IS NULL ) ';
+      $where[] = ' participant.is_test = 0 ';
     }
 
     // Only count Participant Roles with the "Counted?" flag.
@@ -511,7 +511,7 @@ SELECT  event.event_full_text,
 
     $isTestClause = NULL;
     if (!$considerTestParticipants) {
-      $isTestClause = ' AND ( participant.is_test IS NULL OR participant.is_test = 0 )';
+      $isTestClause = ' AND participant.is_test = 0 ';
     }
 
     $skipParticipantClause = NULL;
