@@ -109,4 +109,26 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
     $this->callAPISuccess('PriceSet', 'delete', ['id' => $priceSetId]);
   }
 
+  /**
+   * Test the getAuthenticatedUser function.
+   *
+   * It should return a checksum validated user, falling back to the logged in user.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetAuthenticatedUser(): void {
+    $_REQUEST['cid'] = $this->individualCreate();
+    $_REQUEST['cs'] = CRM_Contact_BAO_Contact_Utils::generateChecksum($_REQUEST['cid']);
+    $form = $this->getFormObject('CRM_Core_Form');
+    $this->assertEquals($_REQUEST['cid'], $form->getAuthenticatedContactID());
+
+    $_REQUEST['cs'] = 'abc';
+    $form = $this->getFormObject('CRM_Core_Form');
+    $this->assertEquals(0, $form->getAuthenticatedContactID());
+
+    $form = $this->getFormObject('CRM_Core_Form');
+    $this->createLoggedInUser();
+    $this->assertEquals($this->ids['Contact']['logged_in'], $form->getAuthenticatedContactID());
+  }
+
 }

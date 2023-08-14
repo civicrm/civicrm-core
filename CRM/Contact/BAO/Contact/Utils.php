@@ -148,12 +148,12 @@ WHERE  id IN ( $idString )
     }
 
     if (!$hash) {
-      if ($entityType == 'contact') {
+      if ($entityType === 'contact') {
         $hash = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
           $entityId, 'hash'
         );
       }
-      elseif ($entityType == 'mailing') {
+      elseif ($entityType === 'mailing') {
         $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing',
           $entityId, 'hash'
         );
