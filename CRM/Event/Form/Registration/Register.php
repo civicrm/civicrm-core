@@ -546,13 +546,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @throws \CRM_Core_Exception
    */
   public static function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
-    //if payment done, no need to build the fee block.
-    if (!empty($form->_paymentId)) {
-      //fix to display line item in update mode.
-      $form->assign('priceSet', $form->_priceSet ?? NULL);
-      return;
-    }
-
     $feeFields = $form->_values['fee'] ?? NULL;
 
     if (is_array($feeFields)) {

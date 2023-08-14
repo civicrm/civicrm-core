@@ -1429,7 +1429,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       //retrieve custom information
       $form->_values = [];
       CRM_Event_Form_Registration::initEventFee($form, $event['id'], FALSE, $form->getDiscountID());
-      CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->getDiscountID());
+      //if payment done, no need to build the fee block.
+      if (!empty($form->_paymentId)) {
+        //fix to display line item in update mode.
+        $form->assign('priceSet', $form->_priceSet ?? NULL);
+      }
+      else {
+        CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->getDiscountID());
+      }
       $lineItem = [];
       $totalTaxAmount = 0;
       if (!CRM_Utils_System::isNull($form->_values['line_items'] ?? NULL)) {
