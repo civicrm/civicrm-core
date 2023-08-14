@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\Afform;
 
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
+use Civi\Afform\Event\AfformSubmitEvent;
 use Civi\Afform\FormDataModel;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Generic\Result;
@@ -301,6 +302,119 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   public function setName(string $name) {
     $this->name = $name;
     return $this;
+  }
+
+  /**
+   * Replace Entity reference fields with the id of the referenced entity.
+   * @param string $entityName
+   * @param $records
+   */
+  public function replaceReferences($entityName, $records) {
+    $entityNames = array_diff(array_keys($this->_entityIds), [$entityName]);
+    $entityType = $this->_formDataModel->getEntity($entityName)['type'];
+    foreach ($records as $key => $record) {
+      foreach ($record['fields'] as $field => $value) {
+        if (array_intersect($entityNames, (array) $value) && $this->getEntityField($entityType, $field)['input_type'] === 'EntityRef') {
+          if (is_array($value)) {
+            foreach ($value as $i => $val) {
+              if (in_array($val, $entityNames, TRUE)) {
+                $refIds = array_filter(array_column($this->_entityIds[$val], 'id'));
+                array_splice($records[$key]['fields'][$field], $i, 1, $refIds);
+              }
+            }
+          }
+          else {
+            $records[$key]['fields'][$field] = $this->_entityIds[$value][0]['id'] ?? NULL;
+          }
+        }
+      }
+    }
+    return $records;
+  }
+
+  /**
+   * @param array $records
+   * @param string $entityName
+   */
+  public function fillIdFields(array &$records, string $entityName): void {
+    foreach ($records as $index => &$record) {
+      if (empty($record['fields']['id']) && !empty($this->_entityIds[$entityName][$index]['id'])) {
+        $record['fields']['id'] = $this->_entityIds[$entityName][$index]['id'];
+      }
+    }
+  }
+
+  /**
+   * Recursively add entity IDs to the values.
+   */
+  protected function combineValuesAndIds($values, $ids, $isJoin = FALSE) {
+    $combined = [];
+    $values += array_fill_keys(array_keys($ids), []);
+    foreach ($values as $name => $value) {
+      foreach ($value as $idx => $val) {
+        $idData = $ids[$name][$idx] ?? [];
+        if (!$isJoin) {
+          $idData['_joins'] = $this->combineValuesAndIds($val['joins'] ?? [], $idData['_joins'] ?? [], TRUE);
+        }
+        $item = array_merge($isJoin ? $val : ($val['fields'] ?? []), $idData);
+        $combined[$name][$idx] = $item;
+      }
+    }
+    return $combined;
+  }
+
+  /**
+   * Preprocess submitted values
+   */
+  public function preprocessSubmittedValues(array $submittedValues) {
+    $entityValues = [];
+    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
+      $entityValues[$entityName] = [];
+      // Gather submitted field values from $values['fields'] and sub-entities from $values['joins']
+      foreach ($submittedValues[$entityName] ?? [] as $values) {
+        // Only accept values from fields on the form
+        $values['fields'] = array_intersect_key($values['fields'] ?? [], $entity['fields']);
+        // Only accept joins set on the form
+        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
+        foreach ($values['joins'] as $joinEntity => &$joinValues) {
+          // Enforce the limit set by join[max]
+          $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
+          foreach ($joinValues as $index => $vals) {
+            // Only accept values from join fields on the form
+            $joinValues[$index] = array_intersect_key($vals, $entity['joins'][$joinEntity]['fields'] ?? []);
+            // Merge in pre-set data
+            $joinValues[$index] = array_merge($joinValues[$index], $entity['joins'][$joinEntity]['data'] ?? []);
+          }
+        }
+        $entityValues[$entityName][] = $values;
+      }
+      if (!empty($entity['data'])) {
+        // If no submitted values but data exists, fill the minimum number of records
+        for ($index = 0; $index < $entity['min']; $index++) {
+          $entityValues[$entityName][$index] = $entityValues[$entityName][$index] ?? ['fields' => []];
+        }
+        // Predetermined values override submitted values
+        foreach ($entityValues[$entityName] as $index => $vals) {
+          $entityValues[$entityName][$index]['fields'] = $entity['data'] + $vals['fields'];
+        }
+      }
+    }
+
+    return $entityValues;
+  }
+
+  /**
+   * Process form data
+   */
+  public function processFormData(array $entityValues) {
+    $entityWeights = \Civi\Afform\Utils::getEntityWeights($this->_formDataModel->getEntities(), $entityValues);
+    foreach ($entityWeights as $entityName) {
+      $entityType = $this->_formDataModel->getEntity($entityName)['type'];
+      $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
+      $this->fillIdFields($records, $entityName);
+      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
+      \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
+    }
   }
 
 }
