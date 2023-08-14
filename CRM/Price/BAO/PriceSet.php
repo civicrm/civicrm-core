@@ -814,12 +814,7 @@ WHERE  id = %1";
     $priceSet = self::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
     $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
     $validPriceFieldIds = array_keys($form->_priceSet['fields']);
-    $form->_quickConfig = $quickConfig = 0;
-    if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config')) {
-      $quickConfig = 1;
-    }
-
-    $form->assign('quickConfig', $quickConfig);
+    $form->assign('quickConfig', (int) CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config'));
 
     // Mark which field should have the auto-renew checkbox, if any. CRM-18305
     if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {

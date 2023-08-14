@@ -47,16 +47,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_values;
 
   /**
-   * The values for the quickconfig for priceset.
-   *
-   * @var bool
-   */
-  public $_quickConfig = NULL;
-
-  /**
    * Price Set ID, if the new price set method is used
    *
    * @var int
+   *
+   * @internal use getPriceSetID().
    */
   public $_priceSetId;
 
@@ -936,9 +931,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if (!empty($params['contact_id'])) {
       $this->_contactID = $this->_contactId = $params['contact_id'];
     }
-    if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $this->_quickConfig = $isQuickConfig;
-    }
 
     if ($this->_id) {
       $params['id'] = $this->_id;
@@ -1315,7 +1307,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           if (is_array($value) && $value != 'skip') {
             foreach ($value as $lineKey => $line) {
               //10117 update the line items for participants if contribution amount is recorded
-              if ($this->_quickConfig && !empty($params['total_amount']) &&
+              if ($this->isQuickConfig() && !empty($params['total_amount']) &&
                 ($params['status_id'] != array_search('Partially paid', $participantStatus))
               ) {
                 $line['unit_price'] = $line['line_total'] = $params['total_amount'];
@@ -1617,7 +1609,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       //lineitems with the financial type selected in form
       $submittedFinancialType = $params['financial_type_id'] ?? NULL;
       $isPaymentRecorded = $params['record_contribution'] ?? NULL;
-      if ($isPaymentRecorded && $this->_quickConfig && $submittedFinancialType) {
+      if ($isPaymentRecorded && $this->isQuickConfig() && $submittedFinancialType) {
         foreach ($lineItem[0] as &$values) {
           $values['financial_type_id'] = $submittedFinancialType;
         }
@@ -1625,7 +1617,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       $params['fee_level'] = $params['amount_level'];
       $contributionParams['total_amount'] = $params['amount'];
-      if ($this->_quickConfig && !empty($params['total_amount']) &&
+      if ($this->isQuickConfig() && !empty($params['total_amount']) &&
         $params['status_id'] != array_search('Partially paid', $participantStatus)
       ) {
         $params['fee_amount'] = $params['total_amount'];
@@ -1655,7 +1647,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (isset($participantCount)) {
         $this->assign('pricesetFieldsCount', $participantCount);
       }
-      $this->assign('lineItem', empty($lineItem[0]) || $this->_quickConfig ? FALSE : $lineItem);
+      $this->assign('lineItem', empty($lineItem[0]) || $this->isQuickConfig() ? FALSE : $lineItem);
     }
     else {
       $this->assign('amount_level', $params['amount_level']);
@@ -2283,6 +2275,40 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       }
     }
     return $this->_discountId ?: NULL;
+  }
+
+  /**
+   * Get the Price Set ID in use.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getPriceSetID(): ?int {
+    if ($this->_priceSetId === NULL) {
+      if ($this->getDiscountID()) {
+        $this->_priceSetId = (int) CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $this->getDiscountID(), 'price_set_id');
+      }
+      else {
+        $this->_priceSetId = (int) CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->getEventID());
+      }
+      $this->set('priceSetId', $this->_priceSetId);
+    }
+    return $this->_priceSetId ?: NULL;
+  }
+
+  /**
+   * Is the price set quick config.
+   *
+   * @return bool
+   */
+  public function isQuickConfig(): bool {
+    return $this->getPriceSetID() && CRM_Price_BAO_PriceSet::isQuickConfig($this->getPriceSetID());
   }
 
 }
