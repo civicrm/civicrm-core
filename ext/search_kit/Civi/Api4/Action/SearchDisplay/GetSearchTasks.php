@@ -71,6 +71,13 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       'number' => '>= 0',
     ];
 
+    $tasks[$entity['name']]['process'] = [
+      'module' => 'crmSearchTasks',
+      'title' => E::ts('Process Submissions'),
+      'icon' => 'fa-save',
+      'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskProcess.html'],
+    ];
+
     if (array_key_exists('update', $entity['actions'])) {
       $tasks[$entity['name']]['update'] = [
         'module' => 'crmSearchTasks',
