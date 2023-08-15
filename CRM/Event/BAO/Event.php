@@ -1304,7 +1304,7 @@ WHERE civicrm_event.is_active = 1
       $profileIds = $id;
     }
 
-    $val = $groupTitles = NULL;
+    $val = $groupTitles = [];
     foreach ($profileIds as $gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = [];
