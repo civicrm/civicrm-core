@@ -486,6 +486,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function toBeSkipped_updatesingle($sequential = FALSE) {
     $entitiesWithout = [
       'Attachment',
+      // This one confuses the test by unsetting some fields based on the values of others
+      'ActionSchedule',
       // pseudo-entity; testUpdateSingleValueAlter doesn't introspect properly on it. Multiple magic fields
       'Mailing',
       'MailingEventUnsubscribe',

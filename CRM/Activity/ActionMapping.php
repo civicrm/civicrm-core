@@ -32,12 +32,21 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return self::ACTIVITY_MAPPING_ID;
   }
 
+  public function getName(): string {
+    return 'activity_type';
+  }
+
   public function getEntityName(): string {
     return 'Activity';
   }
 
-  public function getValueHeader(): string {
-    return ts('Activity Type');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    $spec->getFieldByName('entity_value')
+      ->setLabel(ts('Activity Type'));
+    $spec->getFieldByName('entity_status')
+      ->setLabel(ts('Activity Status'));
+    $spec->getFieldByName('recipient')
+      ->setLabel(ts('Recipients'));
   }
 
   public function getValueLabels(): array {
@@ -47,17 +56,23 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return $activityTypes;
   }
 
-  public function getStatusHeader(): string {
-    return ts('Activity Status');
-  }
-
-  public function getStatusLabels($value): array {
+  public function getStatusLabels(?array $entityValue): array {
     return CRM_Core_PseudoConstant::activityStatus();
   }
 
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
       'activity_date_time' => ts('Activity Date'),
+    ];
+  }
+
+  public static function getLimitToOptions(): array {
+    return [
+      [
+        'id' => 1,
+        'name' => 'limit',
+        'label' => ts('Recipients'),
+      ],
     ];
   }
 
@@ -71,8 +86,8 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
    *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes(): array {
-    return \CRM_Core_OptionGroup::values('activity_contacts');
+  public static function getRecipientTypes(): array {
+    return \CRM_Core_OptionGroup::values('activity_contacts') + parent::getRecipientTypes();
   }
 
   /**

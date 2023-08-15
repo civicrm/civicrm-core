@@ -28,12 +28,22 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return self::CONTACT_MAPPING_ID;
   }
 
+  public function getName(): string {
+    return 'contact';
+  }
+
   public function getEntityName(): string {
     return 'Contact';
   }
 
-  public function getValueHeader(): string {
-    return ts('Date Field');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    $spec->getFieldByName('entity_value')
+      ->setLabel(ts('Date Field'))
+      ->setInputAttr('multiple', FALSE);
+    $spec->getFieldByName('entity_status')
+      ->setLabel(ts('Annual Options'))
+      ->setInputAttr('multiple', FALSE)
+      ->setRequired(TRUE);
   }
 
   public function getValueLabels(): array {
@@ -51,15 +61,11 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return $dateFields;
   }
 
-  public function getStatusHeader(): string {
-    return ts('Annual Options');
-  }
-
-  public function getStatusLabels($value): array {
+  public function getStatusLabels(?array $entityValue): array {
     return CRM_Core_OptionGroup::values('contact_date_reminder_options');
   }
 
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
       'date_field' => ts('Date Field'),
     ];
@@ -70,30 +76,6 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     'created_date',
     'modified_date',
   ];
-
-  /**
-   * Determine whether a schedule based on this mapping is sufficiently
-   * complete.
-   *
-   * @param \CRM_Core_DAO_ActionSchedule $schedule
-   * @return array
-   *   Array (string $code => string $message).
-   *   List of error messages.
-   */
-  public function validateSchedule($schedule): array {
-    $errors = [];
-    if (CRM_Utils_System::isNull($schedule->entity_value) || $schedule->entity_value === '0') {
-      $errors['entity'] = ts('Please select a specific date field.');
-    }
-    elseif (count(CRM_Utils_Array::explodePadded($schedule->entity_value)) > 1) {
-      $errors['entity'] = ts('You may only select one contact field per reminder');
-    }
-    elseif (CRM_Utils_System::isNull($schedule->entity_status) || $schedule->entity_status === '0') {
-      $errors['entity'] = ts('Please select whether the reminder is sent each year.');
-    }
-
-    return $errors;
-  }
 
   /**
    * Generate a query to locate recipients who match the given

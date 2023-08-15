@@ -34,7 +34,14 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
       $event = \Civi::dispatcher()
         ->dispatch('civi.actionSchedule.getMappings',
           new MappingRegisterEvent());
-      Civi::$statics[__CLASS__]['mappings'] = $event->getMappings();
+      // Filter out mappings from disabled components.
+      // TODO: we could move the mapping classes into their respective
+      // component-extensions and this would happen automatically.
+      // Civi::$statics[__CLASS__]['mappings'] = $event->getMappings();
+      $allEntities = \Civi\Api4\Entity::get(FALSE)->execute()->column('name');
+      Civi::$statics[__CLASS__]['mappings'] = array_filter($event->getMappings(), function($mapping) use ($allEntities) {
+        return in_array($mapping->getEntityName(), $allEntities, TRUE);
+      });
     }
     if (isset($filters['id'])) {
       CRM_Core_Error::deprecatedWarning('Use "getMapping" to retrieve a single mapping by id instead of passing a filter to "GetMappings".');
@@ -44,21 +51,33 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
   }
 
   /**
-   * @param string|int $identifier
-   *   Name of the mapping e.g. 'contribpage' or CRM_Contact_ActionMapping::CONTACT_MAPPING_ID
+   * @param string|int $mappingId
+   *   Id of the mapping e.g. 'contribpage' or CRM_Contact_ActionMapping::CONTACT_MAPPING_ID
    *
    * @return \Civi\ActionSchedule\MappingInterface|NULL
    */
-  public static function getMapping($identifier) {
-    return self::getMappings()[$identifier] ?? NULL;
+  public static function getMapping($mappingId) {
+    return self::getMappings()[$mappingId] ?? NULL;
   }
 
   /**
    * Provides the pseudoconstant list for `mapping_id` field.
-   * @return array
+   * @return array[]
    */
   public static function getMappingOptions(): array {
-    return CRM_Utils_Array::collectMethod('getLabel', self::getMappings());
+    $mappings = [];
+    foreach (self::getMappings() as $mapping) {
+      $mappings[] = [
+        'id' => $mapping->getId(),
+        'name' => $mapping->getName(),
+        'label' => $mapping->getLabel(),
+        'icon' => \Civi\Api4\Utils\CoreUtil::getInfoItem($mapping->getEntityName(), 'icon'),
+      ];
+    }
+    usort($mappings, function($m1, $m2) {
+      return strnatcasecmp($m1['label'], $m2['label']);
+    });
+    return $mappings;
   }
 
   /**
@@ -71,6 +90,42 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
       return [];
     }
     return self::getMapping($values['mapping_id'])->getValueLabels();
+  }
+
+  /**
+   * Provides pseudoconstant list for `limit_to` field.
+   * @return array|null
+   */
+  public static function getLimitToOptions(string $fieldName, array $params): ?array {
+    $values = self::fillValues($params['values'], ['mapping_id']);
+    if (!$values['mapping_id']) {
+      return Civi\ActionSchedule\MappingBase::getLimitToOptions();
+    }
+    return self::getMapping($values['mapping_id'])::getLimitToOptions();
+  }
+
+  /**
+   * Provides pseudoconstant list for `recipient` field.
+   * @return array|null
+   */
+  public static function getRecipientOptions(string $fieldName, array $params): ?array {
+    $values = self::fillValues($params['values'], ['mapping_id']);
+    if (!$values['mapping_id']) {
+      return Civi\ActionSchedule\MappingBase::getRecipientTypes();
+    }
+    return self::getMapping($values['mapping_id'])::getRecipientTypes();
+  }
+
+  /**
+   * Provides pseudoconstant list for `recipient_listing` field.
+   * @return array|null
+   */
+  public static function getRecipientListingOptions(string $fieldName, array $params): ?array {
+    $values = self::fillValues($params['values'], ['mapping_id', 'recipient']);
+    if (!$values['mapping_id']) {
+      return [];
+    }
+    return self::getMapping($values['mapping_id'])->getRecipientListing($values['recipient']);
   }
 
   /**
@@ -109,45 +164,27 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
   }
 
   /**
-   * For each entity, get a list of entity-value labels.
-   *
+   * Provides pseudoconstant list for `filter_contact_language`.
    * @return array
-   *   Ex: $entityValueLabels[$mappingId][$valueId] = $valueLabel.
-   * @throws CRM_Core_Exception
    */
-  public static function getAllEntityValueLabels() {
-    $entityValueLabels = [];
-    foreach (CRM_Core_BAO_ActionSchedule::getMappings() as $mapping) {
-      $entityValueLabels[$mapping->getId()] = $mapping->getValueLabels();
-      $valueLabel = ['- ' . strtolower($mapping->getValueHeader()) . ' -'];
-      $entityValueLabels[$mapping->getId()] = $valueLabel + $entityValueLabels[$mapping->getId()];
-    }
-    return $entityValueLabels;
+  public static function getFilterContactLanguageOptions(): array {
+    $languages = CRM_Core_I18n::languages(TRUE);
+    return $languages + [CRM_Core_I18n::NONE => ts('Contacts with no preferred language')];
   }
 
   /**
-   * For each entity, get a list of entity-status labels.
-   *
+   * Provides pseudoconstant list for `communication_language`.
    * @return array
-   *   Ex: $entityValueLabels[$mappingId][$valueId][$statusId] = $statusLabel.
    */
-  public static function getAllEntityStatusLabels() {
-    $entityValueLabels = self::getAllEntityValueLabels();
-    $entityStatusLabels = [];
-    foreach (CRM_Core_BAO_ActionSchedule::getMappings() as $mapping) {
-      $statusLabel = ['- ' . strtolower($mapping->getStatusHeader()) . ' -'];
-      $entityStatusLabels[$mapping->getId()] = $entityValueLabels[$mapping->getId()];
-      foreach ($entityStatusLabels[$mapping->getId()] as $kkey => & $vval) {
-        $vval = $statusLabel + $mapping->getStatusLabels($kkey);
-      }
-    }
-    return $entityStatusLabels;
+  public static function getCommunicationLanguageOptions(): array {
+    $languages = CRM_Core_I18n::languages(TRUE);
+    return [CRM_Core_I18n::AUTO => ts('Follow recipient preferred language')] + $languages;
   }
 
   /**
    * Retrieve list of Scheduled Reminders.
    *
-   * @param \Civi\ActionSchedule\Mapping|null $filterMapping
+   * @param \Civi\ActionSchedule\MappingInterface|null $filterMapping
    *   Filter by the schedule's mapping type.
    * @param int $filterValue
    *   Filter by the schedule's entity_value.
@@ -203,7 +240,7 @@ FROM civicrm_action_schedule cas
         explode(CRM_Core_DAO::VALUE_SEPARATOR, $dao->entityValueIds)
       ));
       $list[$dao->id]['status'] = implode(', ', CRM_Utils_Array::subset(
-        $filterMapping->getStatusLabels($dao->entityValueIds),
+        $filterMapping->getStatusLabels($list[$dao->id]['entity_value']),
         explode(CRM_Core_DAO::VALUE_SEPARATOR, $dao->entityStatusIds)
       ));
       $list[$dao->id]['is_repeat'] = $dao->is_repeat;
@@ -234,9 +271,29 @@ FROM civicrm_action_schedule cas
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if (in_array($event->action, ['create', 'edit'])) {
-      if (isset($event->params['limit_to']) && in_array($event->params['limit_to'], [0, '0', FALSE], TRUE)) {
+      $values =& $event->params;
+      if (isset($values['limit_to']) && in_array($values['limit_to'], [0, '0', FALSE], TRUE)) {
         CRM_Core_Error::deprecatedWarning('Deprecated value "0" is no longer a valid option for ActionSchedule.limit_to; changed to "2".');
-        $event->params['limit_to'] = 2;
+        $values['limit_to'] = 2;
+      }
+      $recipient = $values['recipient'] ?? NULL;
+      if ($recipient && $recipient !== 'group') {
+        $values['group_id'] = '';
+      }
+      elseif ($recipient && $recipient !== 'manual') {
+        $values['recipient_manual'] = '';
+      }
+      if ($recipient === 'group' || $recipient === 'manual') {
+        $values['recipient_listing'] = '';
+      }
+      // When repeat is disabled, wipe all related fields
+      if (isset($values['is_repeat']) && !$values['is_repeat']) {
+        $values['repetition_frequency_unit'] = '';
+        $values['repetition_frequency_interval'] = '';
+        $values['end_frequency_unit'] = '';
+        $values['end_frequency_interval'] = '';
+        $values['end_action'] = '';
+        $values['end_date'] = '';
       }
     }
   }
@@ -431,17 +488,11 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param int $mappingID
-   * @param $recipientType
-   *
-   * @return array
+   * @deprecated
    */
   public static function getRecipientListing($mappingID, $recipientType) {
-    $mapping = CRM_Core_BAO_ActionSchedule::getMapping($mappingID);
-    if (!$mapping) {
-      return [];
-    }
-    return $mapping->getRecipientListing($recipientType);
+    CRM_Core_Error::deprecatedFunctionWarning('getRecipientListingOptions');
+    return self::getRecipientListingOptions('recipient_listing', ['values' => ['mapping_id' => $mappingID, 'recipient' => $recipientType]]);
   }
 
   /**
@@ -715,12 +766,10 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * Get the list of generic recipient types supported by all entities/mappings.
-   *
-   * @return array
-   *   array(mixed $value => string $label).
+   * @deprecated
    */
   public static function getAdditionalRecipients(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4 getFields');
     return [
       'manual' => ts('Choose Recipient(s)'),
       'group' => ts('Select Group'),

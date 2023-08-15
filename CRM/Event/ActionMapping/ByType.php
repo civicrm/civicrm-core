@@ -19,12 +19,20 @@ class CRM_Event_ActionMapping_ByType extends CRM_Event_ActionMapping {
     return self::EVENT_TYPE_MAPPING_ID;
   }
 
+  public function getName(): string {
+    return 'event_type';
+  }
+
   public function getLabel(): string {
     return ts('Event Type');
   }
 
   public function getValueLabels(): array {
     return CRM_Event_PseudoConstant::eventType();
+  }
+
+  public function checkAccess(array $entityValue): bool {
+    return FALSE;
   }
 
 }

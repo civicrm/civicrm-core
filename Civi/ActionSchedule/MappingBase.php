@@ -22,6 +22,10 @@ use Civi\Core\Service\AutoSubscriber;
  */
 abstract class MappingBase extends AutoSubscriber implements MappingInterface {
 
+  public function getId() {
+    return $this->getName();
+  }
+
   public static function getSubscribedEvents(): array {
     return [
       'civi.actionSchedule.getMappings' => 'onRegisterActionMappings',
@@ -52,26 +56,40 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
   }
 
   public function getLabel(): string {
-    return CoreUtil::getInfoItem($this->getEntityName(), 'title');
+    return CoreUtil::getInfoItem($this->getEntityName(), 'title') ?: ts('Unknown');
   }
 
-  public function getValueHeader(): string {
-    return $this->getLabel();
+  public static function getLimitToOptions(): array {
+    return [
+      [
+        'id' => 1,
+        'name' => 'limit',
+        'label' => ts('Limit to'),
+      ],
+      [
+        'id' => 2,
+        'name' => 'add',
+        'label' => ts('Also include'),
+      ],
+    ];
   }
 
   public function getRecipientListing($recipientType): array {
     return [];
   }
 
-  public function getRecipientTypes(): array {
-    return [];
+  public static function getRecipientTypes(): array {
+    return [
+      'manual' => ts('Choose Recipient(s)'),
+      'group' => ts('Select Group'),
+    ];
   }
 
-  public function validateSchedule($schedule): array {
-    return [];
+  public function checkAccess(array $entityValue): bool {
+    return FALSE;
   }
 
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [];
   }
 
@@ -81,6 +99,12 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
 
   public function sendToAdditional($entityId): bool {
     return TRUE;
+  }
+
+  final public function applies(string $entity, string $action, array $values = []) {
+    return $entity === 'ActionSchedule' &&
+      in_array($action, ['create', 'get', 'update', 'save'], TRUE) &&
+      $this->getId() == ($values['mapping_id'] ?? NULL);
   }
 
 }

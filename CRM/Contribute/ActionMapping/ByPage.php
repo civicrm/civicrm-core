@@ -23,7 +23,7 @@ class CRM_Contribute_ActionMapping_ByPage extends CRM_Contribute_ActionMapping {
   /**
    * @return string
    */
-  public function getId() {
+  public function getName(): string {
     return 'contribpage';
   }
 
@@ -36,13 +36,10 @@ class CRM_Contribute_ActionMapping_ByPage extends CRM_Contribute_ActionMapping {
     return ts('Contribution Page');
   }
 
-  /**
-   * Get a printable label to use as the header on the 'value' filter.
-   *
-   * @return string
-   */
-  public function getValueHeader(): string {
-    return ts('Contribution Page');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    parent::modifySpec($spec);
+    $spec->getFieldByName('entity_value')
+      ->setLabel(ts('Contribution Page'));
   }
 
   /**

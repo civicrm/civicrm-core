@@ -485,7 +485,7 @@ abstract class AbstractAction implements \ArrayAccess {
           $unmatched[] = $fieldName;
         }
         elseif (!empty($fieldInfo['required_if'])) {
-          if ($this->evaluateCondition($fieldInfo['required_if'], ['values' => $values])) {
+          if (self::evaluateCondition($fieldInfo['required_if'], ['values' => $values])) {
             $unmatched[] = $fieldName;
           }
         }
@@ -549,7 +549,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  protected function evaluateCondition($expr, $vars) {
+  public static function evaluateCondition($expr, $vars) {
     if (strpos($expr, '}') !== FALSE || strpos($expr, '{') !== FALSE) {
       throw new \CRM_Core_Exception('Illegal character in expression');
     }

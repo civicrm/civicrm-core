@@ -24,22 +24,23 @@ abstract class CRM_Contribute_ActionMapping extends \Civi\ActionSchedule\Mapping
     return 'Contribution';
   }
 
-  public function getStatusHeader(): string {
-    return ts('Contribution Status');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    $spec->getFieldByName('entity_status')
+      ->setLabel(ts('Contribution Status'));
   }
 
   /**
    * Get a list of status options.
    *
-   * @param string|int $value
+   * @param array|null $entityValue
    * @return array
    * @throws CRM_Core_Exception
    */
-  public function getStatusLabels($value): array {
+  public function getStatusLabels(?array $entityValue): array {
     return CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'get', []);
   }
 
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
       'receive_date' => ts('Receive Date'),
       'cancel_date' => ts('Cancel Date'),

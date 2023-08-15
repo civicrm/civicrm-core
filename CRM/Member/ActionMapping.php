@@ -27,38 +27,35 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return self::MEMBERSHIP_TYPE_MAPPING_ID;
   }
 
+  public function getName(): string {
+    return 'membership_type';
+  }
+
   public function getEntityName(): string {
     return 'Membership';
   }
 
-  public function getValueHeader(): string {
-    return ts('Membership Type');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    $spec->getFieldByName('entity_value')
+      ->setLabel(ts('Membership Type'));
+    $spec->getFieldByName('entity_status')
+      ->setLabel(ts('Auto Renew Options'));
   }
 
   public function getValueLabels(): array {
     return CRM_Member_PseudoConstant::membershipType();
   }
 
-  public function getStatusHeader(): string {
-    return ts('Auto Renew Options');
+  public function getStatusLabels(?array $entityValue): array {
+    foreach ($entityValue ?? [] as $membershipType) {
+      if (\CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipType, 'auto_renew')) {
+        return \CRM_Core_OptionGroup::values('auto_renew_options');
+      }
+    }
+    return [];
   }
 
-  public function getStatusLabels($value): array {
-    if ($value && \CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $value, 'auto_renew')) {
-      return \CRM_Core_OptionGroup::values('auto_renew_options');
-    }
-    else {
-      return [];
-    }
-  }
-
-  /**
-   * Get a list of available date fields.
-   *
-   * @return array
-   *   Array(string $fieldName => string $fieldLabel).
-   */
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
       'join_date' => ts('Member Since'),
       'start_date' => ts('Membership Start Date'),

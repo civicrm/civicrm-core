@@ -42,6 +42,12 @@ class CRM_Admin_Form extends CRM_Core_Form {
   protected $_BAOName;
 
   /**
+   * Whether to use the legacy `retrieve` method or APIv4 to load values.
+   * @var string
+   */
+  protected $retrieveMethod = 'retrieve';
+
+  /**
    * Explicitly declare the form context.
    */
   public function getDefaultContext() {
@@ -139,18 +145,25 @@ class CRM_Admin_Form extends CRM_Core_Form {
   }
 
   /**
-   * Retrieve entity from the database.
-   *
-   * TODO: Add flag to allow forms to opt-in to using API::get instead of BAO::retrieve
+   * Retrieve entity from the database using legacy retrieve method (default) or APIv4.
    *
    * @return array
    */
   protected function retrieveValues(): array {
     $this->_values = [];
     if (isset($this->_id) && CRM_Utils_Rule::positiveInteger($this->_id)) {
-      $params = ['id' => $this->_id];
-      // FIXME: `retrieve` function is deprecated :(
-      $this->_BAOName::retrieve($params, $this->_values);
+      if ($this->retrieveMethod === 'retrieve') {
+        $params = ['id' => $this->_id];
+        $this->_BAOName::retrieve($params, $this->_values);
+      }
+      elseif ($this->retrieveMethod === 'api4') {
+        $this->_values = civicrm_api4($this->getDefaultEntity(), 'get', [
+          'where' => [['id', '=', $this->_id]],
+        ])->single();
+      }
+      else {
+        throw new CRM_Core_Exception("Unknown retrieve method '$this->retrieveMethod' in " . get_class($this));
+      }
     }
     return $this->_values;
   }

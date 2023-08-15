@@ -2,6 +2,7 @@
 
 namespace Civi\Test;
 
+use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Service\Spec\Provider\FinancialItemCreationSpecProvider;
 use Civi\Api4\Utils\CoreUtil;
@@ -123,12 +124,16 @@ trait Api4TestTrait {
         ['default_value', 'IS EMPTY'],
         ['readonly', 'IS EMPTY'],
       ],
+      'orderBy' => ['required' => 'DESC'],
     ], 'name');
 
     $extraValues = [];
-    foreach ($requiredFields as $fieldName => $requiredField) {
-      if (!isset($values[$fieldName])) {
-        $extraValues[$fieldName] = $this->getRequiredValue($requiredField);
+    foreach ($requiredFields as $fieldName => $field) {
+      if (
+        !isset($values[$fieldName]) &&
+        ($field['required'] || AbstractAction::evaluateCondition($field['required_if'], $values + $extraValues))
+      ) {
+        $extraValues[$fieldName] = $this->getRequiredValue($field);
       }
     }
 

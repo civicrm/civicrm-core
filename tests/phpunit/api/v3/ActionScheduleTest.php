@@ -63,6 +63,11 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'is_active' => 1,
       'record_activity' => 1,
       'start_action_date' => 'activity_date_time',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'start_action_condition' => 'before',
+      'subject' => 'Hello',
+      'body_html' => '<p>Hello</p>',
       'mapping_id' => CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID,
     ];
     $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);

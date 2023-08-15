@@ -280,62 +280,6 @@ class CRM_Admin_Page_AJAX {
   }
 
   /**
-   * Get a list of mappings.
-   *
-   * This appears to be only used by scheduled reminders.
-   */
-  public static function mappingList() {
-    if (empty($_GET['mappingID'])) {
-      CRM_Utils_JSON::output(['status' => 'error', 'error_msg' => 'required params missing.']);
-    }
-
-    $mapping = CRM_Core_BAO_ActionSchedule::getMapping($_GET['mappingID']);
-    $dateFieldLabels = $mapping ? $mapping->getDateFields() : [];
-
-    // The UX here is quirky -- for "Activity" types, there's a simple drop "Recipients"
-    // dropdown which is always displayed. For other types, the "Recipients" drop down is
-    // conditional upon the weird isLimit ('Limit To / Also Include / Neither') dropdown.
-    $noThanksJustKidding = !$_GET['isLimit'];
-    if ($mapping instanceof CRM_Activity_ActionMapping || !$noThanksJustKidding) {
-      $entityRecipientLabels = $mapping ? ($mapping->getRecipientTypes() + CRM_Core_BAO_ActionSchedule::getAdditionalRecipients()) : [];
-    }
-    else {
-      $entityRecipientLabels = CRM_Core_BAO_ActionSchedule::getAdditionalRecipients();
-    }
-    $recipientMapping = array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels));
-
-    $output = [
-      'sel4' => CRM_Utils_Array::makeNonAssociative($dateFieldLabels),
-      'sel5' => CRM_Utils_Array::makeNonAssociative($entityRecipientLabels),
-      'recipientMapping' => $recipientMapping,
-    ];
-
-    CRM_Utils_JSON::output($output);
-  }
-
-  /**
-   * (Scheduled Reminders) Get the list of possible recipient filters.
-   *
-   * Ex: GET /civicrm/ajax/recipientListing?mappingID=contribpage&recipientType=
-   */
-  public static function recipientListing() {
-    $mappingID = filter_input(INPUT_GET, 'mappingID', FILTER_VALIDATE_REGEXP, [
-      'options' => [
-        'regexp' => '/^[a-zA-Z0-9_\-]+$/',
-      ],
-    ]);
-    $recipientType = filter_input(INPUT_GET, 'recipientType', FILTER_VALIDATE_REGEXP, [
-      'options' => [
-        'regexp' => '/^[a-zA-Z0-9_\-]+$/',
-      ],
-    ]);
-
-    CRM_Utils_JSON::output([
-      'recipients' => CRM_Utils_Array::makeNonAssociative(CRM_Core_BAO_ActionSchedule::getRecipientListing($mappingID, $recipientType)),
-    ]);
-  }
-
-  /**
    * Outputs one branch in the tag tree
    *
    * Used by jstree to incrementally load tags

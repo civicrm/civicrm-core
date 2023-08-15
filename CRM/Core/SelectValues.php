@@ -488,6 +488,19 @@ class CRM_Core_SelectValues {
     return $addr;
   }
 
+  public static function smsProvider(): array {
+    $providers = CRM_SMS_BAO_Provider::getProviders(NULL, NULL, TRUE, 'is_default desc, title');
+    $result = [];
+    foreach ($providers as $provider) {
+      $result[] = [
+        'id' => $provider['id'],
+        'name' => $provider['name'],
+        'label' => $provider['title'],
+      ];
+    }
+    return $result;
+  }
+
   /**
    * Different type of Mailing Tokens.
    *
@@ -1193,6 +1206,13 @@ class CRM_Core_SelectValues {
     ];
   }
 
+  public static function beforeAfter() {
+    return [
+      'before' => ts('Before'),
+      'after' => ts('After'),
+    ];
+  }
+
   /**
    * Columns from the option_value table which may or may not be used by each option_group.
    *
@@ -1227,26 +1247,6 @@ class CRM_Core_SelectValues {
       }
     }
     return $options;
-  }
-
-  /**
-   * Limit-to options for schedule reminders.
-   *
-   * @return array
-   */
-  public static function getLimitToValues(): array {
-    return [
-      [
-        'id' => 1,
-        'name' => 'limit',
-        'label' => ts('Limit to'),
-      ],
-      [
-        'id' => 2,
-        'name' => 'add',
-        'label' => ts('Also include'),
-      ],
-    ];
   }
 
 }

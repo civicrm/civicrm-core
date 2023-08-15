@@ -66,7 +66,7 @@ class SpecGatherer extends AutoService {
     }
 
     foreach ($this->specProviders as $provider) {
-      if ($provider->applies($entity, $action)) {
+      if ($provider->applies($entity, $action, $specification->getValues())) {
         $provider->modifySpec($specification);
       }
     }

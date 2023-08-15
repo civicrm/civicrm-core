@@ -28,27 +28,59 @@ abstract class CRM_Event_ActionMapping extends \Civi\ActionSchedule\MappingBase 
     return 'Participant';
   }
 
-  public function getStatusHeader(): string {
-    return ts('Participant Status');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    $spec->getFieldByName('entity_value')
+      ->setLabel($this->getLabel());
+    $spec->getFieldByName('entity_status')
+      ->setLabel(ts('Participant Status'));
+    $spec->getFieldByName('recipient')
+      ->setLabel(ts('Recipients'));
+    $spec->getFieldByName('recipient_listing')
+      ->setRequired($spec->getValue('recipient') === 'participant_role');
   }
 
-  public function getStatusLabels($value): array {
+  public function getStatusLabels(?array $entityValue): array {
     return CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
   }
 
-  /**
-   * Get a list of available date fields.
-   *
-   * @return array
-   *   Array(string $fieldName => string $fieldLabel).
-   */
-  public function getDateFields(): array {
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
       'start_date' => ts('Event Start'),
       'end_date' => ts('Event End'),
       'registration_start_date' => ts('Registration Start'),
       'registration_end_date' => ts('Registration End'),
     ];
+  }
+
+  public static function getLimitToOptions(): array {
+    // Events only support "limit", not "add".
+    return CRM_Utils_Array::findAll(parent::getLimitToOptions(), ['name' => 'limit']);
+  }
+
+  /**
+   * Check access to event when the ScheduledReminder form is embedded on an event page
+   *
+   * @param array $entityValue
+   *   An array of event ids
+   * @return bool
+   */
+  public function checkAccess(array $entityValue): bool {
+    if (!$entityValue) {
+      return FALSE;
+    }
+    // This field is technically multivalued. In reality it should only ever contain one value,
+    // (because a ScheduledReminder form can only be embedded on one event page at a time)
+    // but since it's an array, a loop seems appropriate.
+    foreach ($entityValue as $eventId) {
+      $access = \Civi\Api4\Event::checkAccess()
+        ->setAction('update')
+        ->addValue('id', $eventId)
+        ->execute()->first()['access'];
+      if (!$access) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
   /**
@@ -61,8 +93,9 @@ abstract class CRM_Event_ActionMapping extends \Civi\ActionSchedule\MappingBase 
    *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes(): array {
-    return \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+  public static function getRecipientTypes(): array {
+    $types = \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+    return $types + parent::getRecipientTypes();
   }
 
   /**

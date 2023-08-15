@@ -2055,66 +2055,68 @@ WHERE  ce.loc_block_id = $locBlockId";
    *
    * @param int $eventId
    * @param int $permissionType
+   * @param int $userId
    *
    * @return bool|array
    *   Whether the user has permission for this event (or if eventId=NULL an array of permissions)
    * @throws \CRM_Core_Exception
    */
-  public static function checkPermission(int $eventId, $permissionType = CRM_Core_Permission::VIEW) {
+  public static function checkPermission(int $eventId, $permissionType = CRM_Core_Permission::VIEW, $userId = NULL) {
+    $userId = $userId ?? CRM_Core_Session::getLoggedInContactID();
     switch ($permissionType) {
       case CRM_Core_Permission::EDIT:
         // We also set the cached "view" permission to TRUE if "edit" is TRUE
-        if (isset(Civi::$statics[__CLASS__]['permission']['edit'][$eventId])) {
-          return Civi::$statics[__CLASS__]['permission']['edit'][$eventId];
+        if (isset(Civi::$statics[__CLASS__]["perm_$userId"]['edit'][$eventId])) {
+          return Civi::$statics[__CLASS__]["perm_$userId"]['edit'][$eventId];
         }
-        Civi::$statics[__CLASS__]['permission']['edit'][$eventId] = FALSE;
+        Civi::$statics[__CLASS__]["perm_$userId"]['edit'][$eventId] = FALSE;
 
         [$allEvents, $createdEvents] = self::checkPermissionGetInfo($eventId);
         // Note: for a multisite setup, a user with edit all events, can edit all events
         // including those from other sites
-        if (($permissionType == CRM_Core_Permission::EDIT) && CRM_Core_Permission::check('edit all events')) {
-          Civi::$statics[__CLASS__]['permission']['edit'][$eventId] = TRUE;
-          Civi::$statics[__CLASS__]['permission']['view'][$eventId] = TRUE;
+        if (($permissionType == CRM_Core_Permission::EDIT) && CRM_Core_Permission::check('edit all events', $userId)) {
+          Civi::$statics[__CLASS__]["perm_$userId"]['edit'][$eventId] = TRUE;
+          Civi::$statics[__CLASS__]["perm_$userId"]['view'][$eventId] = TRUE;
         }
-        elseif (in_array($eventId, CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_event', $allEvents, $createdEvents))) {
-          Civi::$statics[__CLASS__]['permission']['edit'][$eventId] = TRUE;
-          Civi::$statics[__CLASS__]['permission']['view'][$eventId] = TRUE;
+        elseif (in_array($eventId, CRM_ACL_API::group(CRM_Core_Permission::EDIT, $userId, 'civicrm_event', $allEvents, $createdEvents))) {
+          Civi::$statics[__CLASS__]["perm_$userId"]['edit'][$eventId] = TRUE;
+          Civi::$statics[__CLASS__]["perm_$userId"]['view'][$eventId] = TRUE;
         }
-        return Civi::$statics[__CLASS__]['permission']['edit'][$eventId];
+        return Civi::$statics[__CLASS__]["perm_$userId"]['edit'][$eventId];
 
       case CRM_Core_Permission::VIEW:
-        if (isset(Civi::$statics[__CLASS__]['permission']['view'][$eventId])) {
-          return Civi::$statics[__CLASS__]['permission']['view'][$eventId];
+        if (isset(Civi::$statics[__CLASS__]["perm_$userId"]['view'][$eventId])) {
+          return Civi::$statics[__CLASS__]["perm_$userId"]['view'][$eventId];
         }
-        Civi::$statics[__CLASS__]['permission']['view'][$eventId] = FALSE;
+        Civi::$statics[__CLASS__]["perm_$userId"]['view'][$eventId] = FALSE;
 
         [$allEvents, $createdEvents] = self::checkPermissionGetInfo($eventId);
-        if (CRM_Core_Permission::check('access CiviEvent')) {
-          if (in_array($eventId, CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_event', $allEvents, array_keys($createdEvents)))) {
+        if (CRM_Core_Permission::check('access CiviEvent', $userId)) {
+          if (in_array($eventId, CRM_ACL_API::group(CRM_Core_Permission::VIEW, $userId, 'civicrm_event', $allEvents, array_keys($createdEvents)))) {
             // User created this event so has permission to view it
-            return Civi::$statics[__CLASS__]['permission']['view'][$eventId] = TRUE;
+            return Civi::$statics[__CLASS__]["perm_$userId"]['view'][$eventId] = TRUE;
           }
-          if (CRM_Core_Permission::check('view event participants')) {
+          if (CRM_Core_Permission::check('view event participants', $userId)) {
             // User has permission to view all events
             // use case: allow "view all events" but NOT "edit all events"
             // so for a normal site allow users with these two permissions to view all events AND
             // at the same time also allow any hook to override if needed.
-            if (in_array($eventId, CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_event', $allEvents, array_keys($allEvents)))) {
-              Civi::$statics[__CLASS__]['permission']['view'][$eventId] = TRUE;
+            if (in_array($eventId, CRM_ACL_API::group(CRM_Core_Permission::VIEW, $userId, 'civicrm_event', $allEvents, array_keys($allEvents)))) {
+              Civi::$statics[__CLASS__]["perm_$userId"]['view'][$eventId] = TRUE;
             }
           }
         }
-        return Civi::$statics[__CLASS__]['permission']['view'][$eventId];
+        return Civi::$statics[__CLASS__]["perm_$userId"]['view'][$eventId];
 
       case CRM_Core_Permission::DELETE:
-        if (isset(Civi::$statics[__CLASS__]['permission']['delete'][$eventId])) {
-          return Civi::$statics[__CLASS__]['permission']['delete'][$eventId];
+        if (isset(Civi::$statics[__CLASS__]["perm_$userId"]['delete'][$eventId])) {
+          return Civi::$statics[__CLASS__]["perm_$userId"]['delete'][$eventId];
         }
-        Civi::$statics[__CLASS__]['permission']['delete'][$eventId] = FALSE;
-        if (CRM_Core_Permission::check('delete in CiviEvent')) {
-          Civi::$statics[__CLASS__]['permission']['delete'][$eventId] = TRUE;
+        Civi::$statics[__CLASS__]["perm_$userId"]['delete'][$eventId] = FALSE;
+        if (CRM_Core_Permission::check('delete in CiviEvent', $userId)) {
+          Civi::$statics[__CLASS__]["perm_$userId"]['delete'][$eventId] = TRUE;
         }
-        return Civi::$statics[__CLASS__]['permission']['delete'][$eventId];
+        return Civi::$statics[__CLASS__]["perm_$userId"]['delete'][$eventId];
 
       default:
         return FALSE;
@@ -2203,6 +2205,35 @@ WHERE  ce.loc_block_id = $locBlockId";
     }
 
     return Civi::$statics[__CLASS__]['permissions'];
+  }
+
+  /**
+   * @param string $entityName
+   * @param string $action
+   * @param array $record
+   * @param int $userID
+   * @return bool
+   * @see CRM_Core_DAO::checkAccess
+   */
+  public static function _checkAccess(string $entityName, string $action, array $record, $userID): bool {
+    switch ($action) {
+      case 'create':
+        return CRM_Core_Permission::check('access CiviEvent', $userID);
+
+      case 'get':
+        $actionType = CRM_Core_Permission::VIEW;
+        break;
+
+      case 'delete':
+        $actionType = CRM_Core_Permission::DELETE;
+        break;
+
+      default:
+        $actionType = CRM_Core_Permission::EDIT;
+        break;
+    }
+
+    return self::checkPermission($record['id'], $actionType, $userID);
   }
 
   /**

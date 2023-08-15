@@ -3365,6 +3365,7 @@ SELECT contact_id
    * Given an incomplete record, attempt to fill missing field values from the database
    */
   public static function fillValues(array $existingValues, $fieldsToRetrieve): array {
+    $entityFields = static::getSupportedFields();
     $idField = static::$_primaryKey[0];
     // Ensure primary key is set
     $existingValues += [$idField => NULL];
@@ -3378,25 +3379,25 @@ SELECT contact_id
     }
     $idValue = $existingValues[$idField] ?? NULL;
     foreach ($fieldsToRetrieve as $fieldName) {
+      $fieldMeta = $entityFields[$fieldName] ?? ['type' => NULL];
       if (!array_key_exists($fieldName, $existingValues)) {
-        $fieldMeta = static::getSupportedFields()[$fieldName] ?? ['type' => NULL];
         $existingValues[$fieldName] = NULL;
         if ($idValue) {
           $existingValues[$fieldName] = self::getFieldValue(static::class, $idValue, $fieldName, $idField);
         }
-        if (isset($existingValues[$fieldName])) {
-          if (!empty($fieldMeta['serialize'])) {
-            self::unSerializeField($existingValues[$fieldName], $fieldMeta['serialize']);
-          }
-          elseif ($fieldMeta['type'] === CRM_Utils_Type::T_BOOLEAN) {
-            $existingValues[$fieldName] = (bool) $existingValues[$fieldName];
-          }
-          elseif ($fieldMeta['type'] === CRM_Utils_Type::T_INT) {
-            $existingValues[$fieldName] = (int) $existingValues[$fieldName];
-          }
-          elseif ($fieldMeta['type'] === CRM_Utils_Type::T_FLOAT) {
-            $existingValues[$fieldName] = (float) $existingValues[$fieldName];
-          }
+      }
+      if (isset($existingValues[$fieldName])) {
+        if (!empty($fieldMeta['serialize']) && !is_array($existingValues[$fieldName])) {
+          $existingValues[$fieldName] = self::unSerializeField($existingValues[$fieldName], $fieldMeta['serialize']);
+        }
+        elseif ($fieldMeta['type'] === CRM_Utils_Type::T_BOOLEAN) {
+          $existingValues[$fieldName] = (bool) $existingValues[$fieldName];
+        }
+        elseif ($fieldMeta['type'] === CRM_Utils_Type::T_INT) {
+          $existingValues[$fieldName] = (int) $existingValues[$fieldName];
+        }
+        elseif ($fieldMeta['type'] === CRM_Utils_Type::T_FLOAT) {
+          $existingValues[$fieldName] = (float) $existingValues[$fieldName];
         }
       }
     }
