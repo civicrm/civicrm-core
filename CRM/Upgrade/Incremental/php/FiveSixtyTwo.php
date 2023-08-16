@@ -23,9 +23,8 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
 
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '5.62.alpha1') {
-      $rawComponentLists = CRM_Core_DAO::executeQuery('SELECT value, count(*) c FROM civicrm_setting WHERE name = "enable_components" GROUP BY value')
-        ->fetchMap('value', 'value');
-      $distinctComponentLists = array_unique(array_map(function(string $serializedList) {
+      $rawComponentLists = static::findEffectiveComponentsByDomain()->execute()->fetchMap('value', 'value');
+      $distinctComponentLists = array_unique(array_map(function(?string $serializedList) {
         $list = \CRM_Utils_String::unserialize($serializedList);
         sort($list);
         return implode(',', $list);
@@ -127,13 +126,28 @@ class CRM_Upgrade_Incremental_php_FiveSixtyTwo extends CRM_Upgrade_Incremental_B
    *   Ex: ['CiviEvent', 'CiviMail']
    */
   public static function findAllEnabledComponents(): array {
-    $raw = CRM_Core_DAO::executeQuery('SELECT domain_id, value FROM civicrm_setting WHERE name = "enable_components"')
-      ->fetchMap('domain_id', 'value');
+    $raw = static::findEffectiveComponentsByDomain()->execute()->fetchMap('domain_id', 'value');
     $all = [];
     foreach ($raw as $value) {
       $all = array_unique(array_merge($all, \CRM_Utils_String::unserialize($value)));
     }
     return array_values($all);
+  }
+
+  /**
+   * @return \CRM_Utils_SQL_Select
+   *   SQL Query. Each row has a `domain_id,value` with the de-facto value of the `enable_component`
+   *   setting in that domain.
+   */
+  private static function findEffectiveComponentsByDomain(): CRM_Utils_SQL_Select {
+    // Traditional list of components, as it existed circa 5.61.
+    $defaults = ['CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'];
+
+    return CRM_Utils_SQL_Select::from('civicrm_domain d')
+      ->join('civicrm_setting s', 'LEFT JOIN civicrm_setting s ON (d.id = s.domain_id AND s.name = "enable_components")')
+      ->select('d.id as domain_id, coalesce(s.value, @DEFAULT) as value')
+      ->param(['DEFAULT' => \serialize($defaults)]);
+
   }
 
 }
