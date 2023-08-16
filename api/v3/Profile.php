@@ -575,7 +575,9 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour, 
           }
         }
       }
-      $profileFields[$profileID][$fieldName] = array_merge($entityGetFieldsResult[$realName], $profileFields[$profileID][$entityfield]);
+      if (!empty($entityGetFieldsResult[$realName])) {
+        $profileFields[$profileID][$fieldName] = array_merge($entityGetFieldsResult[$realName], $profileFields[$profileID][$entityfield]);
+      }
       if (!isset($profileFields[$profileID][$fieldName]['api.aliases'])) {
         $profileFields[$profileID][$fieldName]['api.aliases'] = [];
       }
