@@ -4,7 +4,10 @@ namespace Civi\Api4\Generic\Traits;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
+use Civi\Api4\Query\SqlEquation;
 use Civi\Api4\Query\SqlExpression;
+use Civi\Api4\Query\SqlField;
+use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\Utils\CoreUtil;
 
@@ -45,6 +48,11 @@ trait SavedSearchInspectorTrait {
   private $_searchEntityFields;
 
   /**
+   * @var array
+   */
+  private $_joinMap;
+
+  /**
    * If SavedSearch is supplied as a string, this will load it as an array
    * @param int|null $id
    * @throws UnauthorizedException
@@ -66,7 +74,7 @@ trait SavedSearchInspectorTrait {
       $this->savedSearch['api_params'] += ['version' => 4, 'select' => [], 'where' => []];
     }
     // Reset internal cached metadata
-    $this->_selectQuery = $this->_selectClause = $this->_searchEntityFields = NULL;
+    $this->_selectQuery = $this->_selectClause = $this->_searchEntityFields = $this->_joinMap = NULL;
     $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
   }
 
@@ -118,11 +126,12 @@ trait SavedSearchInspectorTrait {
   }
 
   /**
-   * @param $joinAlias
+   * @param string $joinAlias
+   *   Alias of the join, with or without the trailing dot
    * @return array{entity: string, alias: string, table: string, bridge: string|NULL}|NULL
    */
-  protected function getJoin($joinAlias) {
-    return $this->getQuery() ? $this->getQuery()->getExplicitJoin($joinAlias) : NULL;
+  protected function getJoin(string $joinAlias) {
+    return $this->getQuery() ? $this->getQuery()->getExplicitJoin(rtrim($joinAlias, '.')) : NULL;
   }
 
   /**
@@ -358,6 +367,69 @@ trait SavedSearchInspectorTrait {
     ) {
       throw new UnauthorizedException('Access denied');
     }
+  }
+
+  /**
+   * @param \Civi\Api4\Query\SqlExpression $expr
+   * @return string
+   */
+  protected function getColumnLabel(SqlExpression $expr) {
+    if ($expr instanceof SqlFunction) {
+      $args = [];
+      foreach ($expr->getArgs() as $arg) {
+        foreach ($arg['expr'] ?? [] as $ex) {
+          $args[] = $this->getColumnLabel($ex);
+        }
+      }
+      return '(' . $expr->getTitle() . ')' . ($args ? ' ' . implode(',', array_filter($args)) : '');
+    }
+    if ($expr instanceof SqlEquation) {
+      $args = [];
+      foreach ($expr->getArgs() as $arg) {
+        if (is_array($arg) && !empty($arg['expr'])) {
+          $args[] = $this->getColumnLabel(SqlExpression::convert($arg['expr']));
+        }
+      }
+      return '(' . implode(',', array_filter($args)) . ')';
+    }
+    elseif ($expr instanceof SqlField) {
+      $field = $this->getField($expr->getExpr());
+      $label = '';
+      if (!empty($field['explicit_join'])) {
+        $label = $this->getJoinLabel($field['explicit_join']) . ': ';
+      }
+      if (!empty($field['implicit_join']) && empty($field['custom_field_id'])) {
+        $field = $this->getField(substr($expr->getAlias(), 0, -1 - strlen($field['name'])));
+      }
+      return $label . $field['label'];
+    }
+    else {
+      return NULL;
+    }
+  }
+
+  /**
+   * @param string $joinAlias
+   * @return string
+   */
+  protected function getJoinLabel($joinAlias) {
+    if (!isset($this->_joinMap)) {
+      $this->_joinMap = [];
+      $joinCount = [$this->savedSearch['api_entity'] => 1];
+      foreach ($this->savedSearch['api_params']['join'] ?? [] as $join) {
+        [$entityName, $alias] = explode(' AS ', $join[0]);
+        $num = '';
+        if (!empty($joinCount[$entityName])) {
+          $num = ' ' . (++$joinCount[$entityName]);
+        }
+        else {
+          $joinCount[$entityName] = 1;
+        }
+        $label = CoreUtil::getInfoItem($entityName, 'title');
+        $this->_joinMap[$alias] = $label . $num;
+      }
+    }
+    return $this->_joinMap[$joinAlias];
   }
 
 }

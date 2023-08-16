@@ -273,12 +273,16 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testDefault($targetDate, $setupFuncs, $expectMessages) {
+  public function testDefault(string $targetDate, string $setupFuncs, array $expectMessages) {
     $this->targetDate = $targetDate;
 
     foreach (explode(' ', $setupFuncs) as $setupFunc) {
       $this->{$setupFunc}();
     }
+    $this->runScheduleAndExpectMessages($expectMessages);
+  }
+
+  public function runScheduleAndExpectMessages(array $expectMessages): void {
     $this->schedule->save();
 
     $actualMessages = [];

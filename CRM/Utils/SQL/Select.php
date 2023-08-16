@@ -647,4 +647,11 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
       $freeDAO, $i18nRewrite, $trapException);
   }
 
+  /**
+   * @return string
+   */
+  public function getFrom(): string {
+    return $this->from;
+  }
+
 }
