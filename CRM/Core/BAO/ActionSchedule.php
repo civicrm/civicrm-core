@@ -540,7 +540,7 @@ FROM civicrm_action_schedule cas
   protected static function createMailingActivity($tokenRow, $mapping, $contactID, $entityID, $caseID) {
     $session = CRM_Core_Session::singleton();
 
-    if ($mapping->getEntityTable() == 'civicrm_membership') {
+    if ($mapping->getEntityName() === 'Membership') {
       // @todo - not required with api
       $activityTypeID
         = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Membership Renewal Reminder');
@@ -585,7 +585,7 @@ FROM civicrm_action_schedule cas
         'casActionScheduleId' => $actionSchedule->id,
         'casMailingJoinType' => ($actionSchedule->limit_to == 2) ? 'LEFT JOIN' : 'INNER JOIN',
         'casMappingId' => $mapping->getId(),
-        'casMappingEntity' => $mapping->getEntityTable(),
+        'casMappingEntity' => $mapping->getEntityTable($actionSchedule),
         'casEntityJoinExpr' => 'e.id = IF(reminder.entity_table = "civicrm_contact", reminder.contact_id, reminder.entity_id)',
       ]);
 

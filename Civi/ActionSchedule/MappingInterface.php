@@ -38,9 +38,10 @@ interface MappingInterface extends SpecProviderInterface {
 
   /**
    * Name of the table belonging to the main entity e.g. `civicrm_activity`
+   * @param \CRM_Core_DAO_ActionSchedule $actionSchedule
    * @return string
    */
-  public function getEntityTable(): string;
+  public function getEntityTable(\CRM_Core_DAO_ActionSchedule $actionSchedule): string;
 
   /**
    * Main entity name e.g. `Activity`

@@ -350,8 +350,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   public function checkActive(TokenProcessor $processor) {
     return ((!empty($processor->context['actionMapping'])
         // This makes the 'schema context compulsory - which feels accidental
-        // since recent discu
-      && $processor->context['actionMapping']->getEntityTable()) || in_array($this->getEntityIDField(), $processor->context['schema'])) && in_array($this->getApiEntityName(), array_keys(\Civi::service('action_object_provider')->getEntities()));
+      && $processor->context['actionMapping']->getEntityName()) || in_array($this->getEntityIDField(), $processor->context['schema'])) && in_array($this->getApiEntityName(), array_keys(\Civi::service('action_object_provider')->getEntities()));
   }
 
   /**
@@ -360,7 +359,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
    */
   public function alterActionScheduleQuery(MailingQueryEvent $e): void {
-    if ($e->mapping->getEntityTable() !== $this->getExtendableTableName()) {
+    if ($e->mapping->getEntityTable($e->actionSchedule) !== $this->getExtendableTableName()) {
       return;
     }
     $e->query->select('e.id AS tokenContext_' . $this->getEntityIDField());
