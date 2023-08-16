@@ -22,24 +22,28 @@ class CRM_Utils_Check_Component_PriceFields extends CRM_Utils_Check_Component {
    * @return CRM_Utils_Check_Message[]
    */
   public function checkPriceFields() {
-    $sql = "SELECT DISTINCT ps.title as ps_title, ps.id as ps_id, psf.label as psf_label
-      FROM civicrm_price_set ps
-      INNER JOIN civicrm_price_field psf ON psf.price_set_id = ps.id
-      INNER JOIN civicrm_price_field_value pfv ON pfv.price_field_id = psf.id
-      LEFT JOIN civicrm_financial_type cft ON cft.id = pfv.financial_type_id
-      WHERE cft.id IS NULL OR cft.is_active = 0";
-    $dao = CRM_Core_DAO::executeQuery($sql);
     $count = 0;
     $html = '';
     $messages = [];
-    while ($dao->fetch()) {
-      $count++;
-      $url = CRM_Utils_System::url('civicrm/admin/price/field', [
-        'reset' => 1,
-        'action' => 'browse',
-        'sid' => $dao->ps_id,
-      ]);
-      $html .= "<tr><td>$dao->ps_title</td><td>$dao->psf_label</td><td><a href='$url'>" . ts('View Price Set Fields') . '</a></td></tr>';
+    foreach (['civicrm_contribution_page', 'civicrm_event'] as $publicPage) {
+      $sql = "SELECT DISTINCT ps.title as ps_title, ps.id as ps_id, psf.label as psf_label
+        FROM civicrm_price_set ps
+        INNER JOIN civicrm_price_field psf ON psf.price_set_id = ps.id
+        INNER JOIN civicrm_price_field_value pfv ON pfv.price_field_id = psf.id
+        LEFT JOIN civicrm_financial_type cft ON cft.id = pfv.financial_type_id
+        JOIN civicrm_price_set_entity pse ON pse.entity_table = '$publicPage' AND pse.price_set_id = ps.id
+        JOIN $publicPage pp ON pse.entity_id = pp.id ANd pp.is_active = 1
+        WHERE cft.id IS NULL OR cft.is_active = 0";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      while ($dao->fetch()) {
+        $count++;
+        $url = CRM_Utils_System::url('civicrm/admin/price/field', [
+          'reset' => 1,
+          'action' => 'browse',
+          'sid' => $dao->ps_id,
+        ]);
+        $html .= "<tr><td>$dao->ps_title</td><td>$dao->psf_label</td><td><a href='$url'>" . ts('View Price Set Fields') . '</a></td></tr>';
+      }
     }
     if ($count > 0) {
       $msg = '<p>' . ts('The following Price Set Fields use disabled or invalid financial types and need to be fixed if they are to still be used.') . '<p>'
