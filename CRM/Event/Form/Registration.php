@@ -297,8 +297,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         ));
         $this->assignPaymentProcessor($isPayLater);
       }
-      //init event fee.
-      self::initEventFee($this, $this->_eventId);
+
+      $discountId = $this->getDiscountID();
+      self::initEventFee($this, $this->_eventId, TRUE, $discountId);
 
       // get the profile ids
       $ufJoinParams = [
@@ -570,18 +571,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $eventID
    * @param bool $doNotIncludeExpiredFields
    *   See CRM-16456.
+   * @param int|null $discountId
+   *   ID of any discount in use.
    *
    * @throws \CRM_Core_Exception
    */
-  public static function initEventFee(&$form, $eventID, $doNotIncludeExpiredFields = TRUE) {
+  public static function initEventFee(&$form, $eventID, $doNotIncludeExpiredFields = TRUE, $discountId = NULL) {
     // get price info
 
     // retrive all active price set fields.
-    $discountId = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
-    if (property_exists($form, '_discountId') && $form->_discountId) {
-      $discountId = $form->_discountId;
-    }
-
     if ($discountId) {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
     }
@@ -892,7 +890,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $participantParams['custom'] = [];
     foreach ($form->_params as $paramName => $paramValue) {
       if (strpos($paramName, 'custom_') === 0) {
-        list($customFieldID, $customValueID) = CRM_Core_BAO_CustomField::getKeyID($paramName, TRUE);
+        [$customFieldID, $customValueID] = CRM_Core_BAO_CustomField::getKeyID($paramName, TRUE);
         CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $participantParams['custom'], $paramValue, 'Participant', $customValueID);
 
       }
@@ -1715,6 +1713,23 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     return CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $this->getEventID(),
       FALSE, NULL, FALSE, TRUE
     );
+  }
+
+  /**
+   * Get the discount ID.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function getDiscountID(): ?int {
+    $id = CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event');
+    return $id ?: NULL;
   }
 
 }
