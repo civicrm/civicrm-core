@@ -25,7 +25,7 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
       [
         'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
         'max_expr' => 1,
-        'must_be' => ['SqlField', 'SqlFunction'],
+        'must_be' => ['SqlField', 'SqlFunction', 'SqlEquation'],
         'optional' => FALSE,
       ],
       [
@@ -52,26 +52,27 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
   /**
    * Reformat result as array if using default separator
    *
+   * @param string|null $dataType
+   * @param array $values
+   * @param string $key
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
-   * @param string $value
-   * @param string $dataType
-   * @return string|array
    */
-  public function formatOutputValue($value, &$dataType) {
+  public function formatOutputValue(?string &$dataType, array &$values, string $key): void {
     $exprArgs = $this->getArgs();
     // By default, values are split into an array and formatted according to the field's dataType
     if (isset($exprArgs[2]['expr'][0]->expr) && $exprArgs[2]['expr'][0]->expr === \CRM_Core_DAO::VALUE_SEPARATOR) {
-      $value = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $value);
-      // If the first expression is another sqlFunction, allow it to control the dataType
-      if ($exprArgs[0]['expr'][0] instanceof SqlFunction) {
-        $exprArgs[0]['expr'][0]->formatOutputValue(NULL, $dataType);
+      $values[$key] = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $values[$key]);
+      // If the first expression is a SqlFunction/SqlEquation, allow it to control the dataType
+      if (method_exists($exprArgs[0]['expr'][0], 'formatOutputValue')) {
+        foreach (array_keys($values[$key]) as $index) {
+          $exprArgs[0]['expr'][0]->formatOutputValue($dataType, $values[$key], $index);
+        }
       }
     }
     // If using custom separator, preserve raw string
     else {
       $dataType = 'String';
     }
-    return $value;
   }
 
   /**

@@ -109,34 +109,32 @@ abstract class SqlFunction extends SqlExpression {
   /**
    * Set $dataType and convert value by suffix
    *
+   * @param string|null $dataType
+   * @param array $values
+   * @param string $key
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
-   * @param string $value
-   * @param string $dataType
-   * @return string
    */
-  public function formatOutputValue($value, &$dataType) {
+  public function formatOutputValue(?string &$dataType, array &$values, string $key): void {
     if (static::$dataType) {
       $dataType = static::$dataType;
     }
-    if (isset($value) && $this->suffix && $this->suffix !== 'id') {
+    if (isset($values[$key]) && $this->suffix && $this->suffix !== 'id') {
       $dataType = 'String';
+      $value =& $values[$key];
       $option = $this->getOptions()[$value] ?? NULL;
       // Option contains an array of suffix keys
       if (is_array($option)) {
-        return $option[$this->suffix] ?? NULL;
+        $value = $option[$this->suffix] ?? NULL;
       }
       // Flat arrays are name/value pairs
       elseif ($this->suffix === 'label') {
-        return $option;
+        $value = $option;
       }
-      elseif ($this->suffix === 'name') {
-        return $value;
-      }
-      else {
-        return NULL;
+      // Name needs no transformation, and any other suffix is invalid
+      elseif ($this->suffix !== 'name') {
+        $value = NULL;
       }
     }
-    return $value;
   }
 
   /**

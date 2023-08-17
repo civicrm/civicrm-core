@@ -237,9 +237,10 @@ class FormattingUtil {
       $baseName = $fieldName ? \CRM_Utils_Array::first(explode(':', $fieldName)) : NULL;
       $field = $fields[$fieldName] ?? $fields[$baseName] ?? NULL;
       $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
-      // Allow Sql Functions to do special formatting and/or alter the $dataType
+      // Allow Sql Functions to do alter the value and/or $dataType
       if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {
-        $result[$key] = $value = $fieldExpr->formatOutputValue($value, $dataType);
+        $fieldExpr->formatOutputValue($dataType, $result, $key);
+        $value = $result[$key];
       }
       if (!empty($field['output_formatters'])) {
         self::applyFormatters($result, $fieldName, $field, $value);

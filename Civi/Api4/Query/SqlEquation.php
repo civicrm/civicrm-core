@@ -133,11 +133,10 @@ class SqlEquation extends SqlExpression {
    * Change $dataType according to operator used in equation
    *
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
-   * @param string $value
-   * @param string $dataType
-   * @return string
+   * @param string|null $dataType
+   * @param array $values
    */
-  public function formatOutputValue($value, &$dataType) {
+  public function formatOutputValue(?string &$dataType, array &$values) {
     foreach (self::$comparisonOperators as $op) {
       if (strpos($this->expr, " $op ")) {
         $dataType = 'Boolean';
@@ -148,7 +147,6 @@ class SqlEquation extends SqlExpression {
         $dataType = 'Float';
       }
     }
-    return $value;
   }
 
   public static function getTitle(): string {
