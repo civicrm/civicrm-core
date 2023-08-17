@@ -44,6 +44,11 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFive extends CRM_Upgrade_Incremental_
     $this->addTask('Update New Price Set path', 'updateNewPriceSetPath');
   }
 
+  public function upgrade_5_65_beta1($rev): void {
+    // This index isn't really needed, and it was only created on some sites. See: dev/core#4472
+    $this->addTask('Drop "civicrm_acl.index_priority"', 'dropIndex', 'civicrm_acl', 'index_priority');
+  }
+
   /**
    * dev/financial#216 Remove the Create/Edit Batch Activity Types if they were
    * never used. Otherwise we leave them there for now, and extension could
