@@ -241,15 +241,19 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       }
     }
     if (!empty($params['member_is_active'])) {
-
-      // don't allow price set w/ membership signup, CRM-5095
-      if ($contributionPageId && ($setID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $contributionPageId, NULL, 1))) {
-
-        $extends = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'extends');
-        if ($extends != CRM_Core_Component::getComponentID('CiviMember')) {
-          $errors['member_is_active'] = ts('You cannot enable both Membership Signup and a Contribution Price Set on the same online contribution page.');
-          return $errors;
-        }
+      // Don't allow Contribution price set w/ membership signup, CRM-5095.
+      $priceSetExtendsMembership = \Civi\Api4\PriceSetEntity::get(FALSE)
+        ->addSelect('id')
+        ->addJoin('PriceSet AS price_set', 'LEFT', ['price_set_id', '=', 'price_set.id'])
+        ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+        ->addWhere('entity_id', '=', $contributionPageId)
+        ->addWhere('price_set.extends:name', 'CONTAINS', 'CiviMember')
+        ->addWhere('price_set.is_quick_config', '=', 0)
+        ->execute()
+        ->first();
+      if (!$priceSetExtendsMembership) {
+        $errors['member_is_active'] = ts('You cannot enable both Membership Signup and a Contribution Price Set on the same online contribution page.');
+        return $errors;
       }
 
       if (!empty($params['member_price_set_id'])) {
