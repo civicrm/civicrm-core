@@ -1349,7 +1349,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     if (!empty($params['send_receipt'])) {
-      $result = $this->sendReceipts($params, $contributionParams['total_amount'], $customFields, $participants, $lineItem[0], $line, $value, $additionalParticipantDetails);
+      $result = $this->sendReceipts($params, $contributionParams['total_amount'], $customFields, $participants, $lineItem[0], $additionalParticipantDetails);
     }
 
     // set the participant id if it is not set
@@ -2105,14 +2105,12 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @param array $customFields
    * @param array $participants
    * @param $lineItem
-   * @param $line
-   * @param $value
    * @param $additionalParticipantDetails
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function sendReceipts($params, $total_amount, array $customFields, array $participants, $lineItem, $line, $value, $additionalParticipantDetails): array {
+  protected function sendReceipts($params, $total_amount, array $customFields, array $participants, $lineItem, $additionalParticipantDetails): array {
     $sent = [];
     $notSent = [];
     $this->assign('module', 'Event Registration');
