@@ -248,6 +248,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         ->addWhere('entity_table', '=', 'civicrm_contribution_page')
         ->addWhere('entity_id', '=', $contributionPageId)
         ->addWhere('price_set.extends:name', 'CONTAINS', 'CiviMember')
+        ->addWhere('price_set.is_quick_config', '=', 0)
         ->execute()
         ->first();
       if (!$priceSetExtendsMembership) {

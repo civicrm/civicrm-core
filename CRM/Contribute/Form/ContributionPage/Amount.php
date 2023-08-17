@@ -382,7 +382,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     if ($priceSetId) {
       // don't allow price set w/ membership.
       if ($hasMembershipBlk) {
-        $errors['price_set_id'] = ts('You cannot enable both Membership Signup and a Contribution Price Set on the same online contribution page');
+        $errors['price_set_id'] = ts('You cannot enable both Membership Signup and a Contribution Price Set on the same online contribution page.');
       }
     }
     else {
