@@ -160,11 +160,11 @@ WHERE  v.option_group_id = g.id
       $query .= $condition;
     }
 
-    $query .= " ORDER BY v.`%2`";
+    $query .= " ORDER BY %2";
 
     $p = [
       1 => [$name, 'String'],
-      2 => [$orderBy, 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
+      2 => ['v.' . $orderBy, 'MysqlOrderBy'],
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $p);
 
