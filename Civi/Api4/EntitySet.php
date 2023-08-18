@@ -48,7 +48,9 @@ class EntitySet extends Generic\AbstractEntity {
   }
 
   public static function permissions() {
-    return [];
+    return [
+      'get' => [],
+    ];
   }
 
   /**
