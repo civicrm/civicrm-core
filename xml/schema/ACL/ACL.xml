@@ -161,8 +161,4 @@
       <type>Number</type>
     </html>
   </field>
-  <index>
-    <name>index_priority</name>
-    <fieldName>priority</fieldName>
-  </index>
 </table>
