@@ -359,6 +359,16 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'petition_sign', 'type' => 'subject'],
         ],
       ],
+      [
+        'version' => '5.66.alpha1',
+        'upgrade_descriptor' => ts('Remove numbered Participant headings'),
+        'templates' => [
+          ['name' => 'event_online_receipt', 'type' => 'html'],
+          ['name' => 'event_online_receipt', 'type' => 'text'],
+          ['name' => 'event_offline_receipt', 'type' => 'html'],
+          ['name' => 'event_offline_receipt', 'type' => 'text'],
+        ],
+      ],
     ];
   }
 

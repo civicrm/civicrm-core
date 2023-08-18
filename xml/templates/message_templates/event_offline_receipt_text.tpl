@@ -219,6 +219,11 @@
 {/if}
 {/if} {* End of conditional section for Paid events *}
 
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
+
+{ts}Participant Information{/ts}
+
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 {if !empty($customPre)}
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
@@ -249,7 +254,7 @@
 {foreach from=$customProfile item=value key=customName}
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
-{ts 1=$customName+1}Participant Information - Participant %1{/ts}
+{ts}Participant Information{/ts}
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
