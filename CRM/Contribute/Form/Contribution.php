@@ -542,7 +542,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       $this->set('priceSetId', $this->_priceSetId);
-      CRM_Price_BAO_PriceSet::buildPriceSet($this);
+      CRM_Price_BAO_PriceSet::buildPriceSet($this, 'contribution', FALSE);
 
       // get only price set form elements.
       if ($getOnlyPriceSetElements) {
