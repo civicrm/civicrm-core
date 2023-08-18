@@ -101,6 +101,29 @@ return [
               'label' => E::ts('Submission Status'),
               'sortable' => TRUE,
             ],
+            [
+              'size' => 'btn-xs',
+              'links' => [
+                [
+                  'path' => '',
+                  'icon' => 'fa-check-square-o',
+                  'text' => E::ts('Process'),
+                  'style' => 'default',
+                  'condition' => [
+                    'status_id:label',
+                    '=',
+                    'Pending',
+                  ],
+                  'task' => 'process',
+                  'entity' => 'AfformSubmission',
+                  'action' => '',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                ],
+              ],
+              'type' => 'buttons',
+              'alignment' => '',
+            ],
           ],
           'sort' => [
             [
