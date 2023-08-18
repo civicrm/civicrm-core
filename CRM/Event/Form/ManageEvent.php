@@ -203,7 +203,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
           'reset=1'
         );
       }
-      CRM_Utils_System::appendBreadCrumb($breadCrumb);
+      CRM_Utils_System::appendBreadCrumb([$breadCrumb]);
     }
     else {
       CRM_Utils_System::appendBreadCrumb([
