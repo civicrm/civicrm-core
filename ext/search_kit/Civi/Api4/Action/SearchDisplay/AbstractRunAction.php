@@ -574,6 +574,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       return TRUE;
     }
+    // Convert the conditional value of 'current_domain' into an actual value that filterCompare can work with
+    if ($item['condition'][2] === 'current_domain') {
+      if (str_ends_with($item['condition'][0], ':label') !== FALSE) {
+        $item['condition'][2] = \CRM_Core_BAO_Domain::getDomain()->name;
+      }
+      else {
+        $item['condition'][2] = \CRM_Core_Config::domainID();
+      }
+    }
     return self::filterCompare($data, $item['condition']);
   }
 

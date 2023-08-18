@@ -7,6 +7,7 @@ use Civi\Api4\CustomField;
 use Civi\Api4\Contact;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
+use Civi\Api4\Mailing;
 
 /**
  * @group headless
@@ -203,6 +204,244 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
     $result = civicrm_api4($entity, $action, $params);
     $resultData = $result[0]['data']['Foods.I_Like:label'];
     $this->assertTrue(implode(', ', $resultData) === $result[0]['columns'][1]['val']);
+  }
+
+  public function testDomainConditional(): void {
+    Mailing::create()->setValues([
+      'title' => 'Test Mailing' . __FUNCTION__,
+      'body_html' => 'Test content',
+    ])->execute();
+    $entity = 'SearchDisplay';
+    $action = 'run';
+    $params = [
+      'return' => 'page:1',
+      'savedSearch' => [
+        'id' => 2,
+        'name' => 'Test_Mailing',
+        'label' => 'Test Mailing',
+        'form_values' => NULL,
+        'mapping_id' => NULL,
+        'search_custom_id' => NULL,
+        'api_entity' => 'Mailing',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'name',
+            'domain_id:label',
+          ],
+          'orderBy' => [],
+          'where' => [],
+          'groupBy' => [],
+          'join' => [],
+          'having' => [],
+        ],
+        'created_id' => 203,
+        'modified_id' => 203,
+        'expires_date' => NULL,
+        'created_date' => '2022-08-12 13:49:17',
+        'modified_date' => '2022-08-12 17:18:24',
+        'description' => NULL,
+        'tag_id' => [],
+        'groups' => [],
+        'displays' => [
+          [
+            'id' => 2,
+            'name' => 'Test_Mailing_Table_1',
+            'label' => 'Test Mailing Table 1',
+            'saved_search_id' => 2,
+            'type' => 'table',
+            'settings' => [
+              'description' => NULL,
+              'sort' => [],
+              'limit' => 50,
+              'pager' => [],
+              'placeholder' => 5,
+              'columns' => [
+                [
+                  'type' => 'field',
+                  'key' => 'id',
+                  'dataType' => 'Integer',
+                  'label' => 'Mailing ID',
+                  'sortable' => TRUE,
+                ],
+                [
+                  'type' => 'field',
+                  'key' => 'name',
+                  'dataType' => 'String',
+                  'label' => 'Mailing Name',
+                  'sortable' => TRUE,
+                ],
+                [
+                  'type' => 'field',
+                  'key' => 'domain_id:label',
+                  'dataType' => 'Integer',
+                  'label' => 'Domain',
+                  'sortable' => TRUE,
+                ],
+                [
+                  'text' => '',
+                  'style' => 'default',
+                  'size' => 'btn-xs',
+                  'icon' => 'fa-bars',
+                  'links' => [
+                    [
+                      'entity' => 'Mailing',
+                      'action' => 'view',
+                      'join' => '',
+                      'target' => 'crm-popup',
+                      'icon' => 'fa-external-link',
+                      'text' => 'View Mailing',
+                      'style' => 'default',
+                      'path' => '',
+                      'task' => '',
+                      'condition' => [
+                        'domain_id:label',
+                        '=',
+                        'current_domain',
+                      ],
+                    ],
+                    [
+                      'entity' => 'Mailing',
+                      'action' => 'update',
+                      'join' => '',
+                      'target' => 'crm-popup',
+                      'icon' => 'fa-pencil',
+                      'text' => 'Update Mailing',
+                      'style' => 'default',
+                      'path' => '',
+                      'task' => '',
+                      'condition' => [],
+                    ],
+                    [
+                      'entity' => 'Mailing',
+                      'action' => 'preview',
+                      'join' => '',
+                      'target' => 'crm-popup',
+                      'icon' => 'fa-eye',
+                      'text' => 'Preview Mailing',
+                      'style' => 'default',
+                      'path' => '',
+                      'task' => '',
+                      'condition' => [],
+                    ],
+                  ],
+                  'type' => 'menu',
+                  'alignment' => 'text-right',
+                ],
+              ],
+              'actions' => TRUE,
+              'classes' => [
+                'table',
+                'table-striped',
+              ],
+            ],
+            'acl_bypass' => FALSE,
+          ],
+        ],
+      ],
+      'display' => [
+        'id' => 2,
+        'name' => 'Test_Mailing_Table_1',
+        'label' => 'Test Mailing Table 1',
+        'saved_search_id' => 2,
+        'type' => 'table',
+        'settings' => [
+          'description' => NULL,
+          'sort' => [],
+          'limit' => 50,
+          'pager' => [],
+          'placeholder' => 5,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'dataType' => 'Integer',
+              'label' => 'Mailing ID',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'name',
+              'dataType' => 'String',
+              'label' => 'Mailing Name',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'domain_id:label',
+              'dataType' => 'Integer',
+              'label' => 'Domain',
+              'sortable' => TRUE,
+            ],
+            [
+              'text' => '',
+              'style' => 'default',
+              'size' => 'btn-xs',
+              'icon' => 'fa-bars',
+              'links' => [
+                [
+                  'entity' => 'Mailing',
+                  'action' => 'view',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-external-link',
+                  'text' => 'View Mailing',
+                  'style' => 'default',
+                  'path' => '',
+                  'task' => '',
+                  'condition' => [
+                    'domain_id:label',
+                    '=',
+                    'current_domain',
+                  ],
+                ],
+                [
+                  'entity' => 'Mailing',
+                  'action' => 'update',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-pencil',
+                  'text' => 'Update Mailing',
+                  'style' => 'default',
+                  'path' => '',
+                  'task' => '',
+                  'condition' => [],
+                ],
+                [
+                  'entity' => 'Mailing',
+                  'action' => 'preview',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-eye',
+                  'text' => 'Preview Mailing',
+                  'style' => 'default',
+                  'path' => '',
+                  'task' => '',
+                  'condition' => [],
+                ],
+              ],
+              'type' => 'menu',
+              'alignment' => 'text-right',
+            ],
+          ],
+          'actions' => TRUE,
+          'classes' => [
+            'table',
+            'table-striped',
+          ],
+        ],
+        'acl_bypass' => FALSE,
+      ],
+      'limit' => 50,
+      'seed' => 1660599799146,
+      'filters' => [],
+      'afform' => NULL,
+      'debug' => TRUE,
+      'checkPermissions' => TRUE,
+    ];
+    $result = civicrm_api4($entity, $action, $params);
+    $this->assertCount(3, $result[0]['columns'][3]['links']);
   }
 
 }
