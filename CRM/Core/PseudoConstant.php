@@ -1539,7 +1539,7 @@ WHERE  id = %1
     ];
     // Add orderColumn param
     if (!empty($params['orderColumn'])) {
-      $queryParams[4] = [$params['orderColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES];
+      $queryParams[4] = [$params['orderColumn'], 'MysqlOrderBy'];
       $order = 'ORDER BY %4';
     }
     // Support no sorting if $params[orderColumn] is FALSE

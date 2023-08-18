@@ -443,7 +443,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
 
       case 'file_id':
         $dao = CRM_Core_DAO::executeQuery("SELECT entity_id, file_id FROM civicrm_entity_file WHERE entity_table = 'civicrm_activity' AND entity_id IN (%1)",
-          [1 => [implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES]]);
+          [1 => [implode(',', array_keys($activities)), 'CommaSeparatedIntegers']]);
         while ($dao->fetch()) {
           $activities[$dao->entity_id]['file_id'][] = $dao->file_id;
         }
@@ -451,7 +451,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
 
       case 'case_id':
         $dao = CRM_Core_DAO::executeQuery("SELECT activity_id, case_id FROM civicrm_case_activity WHERE activity_id IN (%1)",
-          [1 => [implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES]]);
+          [1 => [implode(',', array_keys($activities)), 'CommaSeparatedIntegers']]);
         while ($dao->fetch()) {
           $activities[$dao->activity_id]['case_id'][] = $dao->case_id;
           $caseIds[$dao->case_id] = $dao->case_id;
