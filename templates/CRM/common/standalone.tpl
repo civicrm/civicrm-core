@@ -38,6 +38,12 @@
       </ol></nav>
     {/if}
 
+    {if $standaloneErrors}
+      <div class="standalone-errors">
+        <ul>{$standaloneErrors}</ul>
+      </div>
+    {/if}
+
     {if $pageTitle}
       <div class="crm-title">
         <h1 class="title">{if $isDeleted}<del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
