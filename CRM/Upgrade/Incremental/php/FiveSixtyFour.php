@@ -63,6 +63,11 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFour extends CRM_Upgrade_Incremental_
     }
   }
 
+  public function upgrade_5_64_1($rev): void {
+    // This index isn't really needed, and it was only created on some sites. See: dev/core#4472
+    $this->addTask('Drop "civicrm_acl.index_priority"', 'dropIndex', 'civicrm_acl', 'index_priority');
+  }
+
   public static function updateLogging($ctx): bool {
     if (\Civi::settings()->get('logging')) {
       $dsn = defined('CIVICRM_LOGGING_DSN') ? CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN) : CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
