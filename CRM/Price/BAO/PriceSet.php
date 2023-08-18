@@ -793,23 +793,18 @@ WHERE  id = %1";
    *
    * @param CRM_Core_Form $form
    * @param string|null $component
+   * @param bool $validFieldsOnly
    *
    * @return void
+   * @throws \CRM_Core_Exception
    */
-  public static function buildPriceSet(&$form, $component = NULL) {
+  public static function buildPriceSet(&$form, $component = NULL, $validFieldsOnly = TRUE) {
     $priceSetId = $form->get('priceSetId');
     if (!$priceSetId) {
       return;
     }
 
-    $validFieldsOnly = TRUE;
     $className = CRM_Utils_System::getClassName($form);
-    if (in_array($className, [
-      'CRM_Contribute_Form_Contribution',
-      'CRM_Member_Form_Membership',
-    ])) {
-      $validFieldsOnly = FALSE;
-    }
 
     $priceSet = self::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
     $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
@@ -840,10 +835,6 @@ WHERE  id = %1";
     }
     $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetId;
     $form->assign('priceSet', $form->_priceSet);
-
-    if ($className == 'CRM_Member_Form_Membership') {
-      $component = 'membership';
-    }
 
     if ($className == 'CRM_Contribute_Form_Contribution_Main') {
       $feeBlock = &$form->_values['fee'];

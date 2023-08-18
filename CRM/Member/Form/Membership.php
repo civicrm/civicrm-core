@@ -336,7 +336,7 @@ DESC limit 1");
       }
 
       $this->set('priceSetId', $this->_priceSetId);
-      CRM_Price_BAO_PriceSet::buildPriceSet($this);
+      CRM_Price_BAO_PriceSet::buildPriceSet($this, 'membership', FALSE);
 
       $optionsMembershipTypes = [];
       foreach ($this->_priceSet['fields'] as $pField) {
