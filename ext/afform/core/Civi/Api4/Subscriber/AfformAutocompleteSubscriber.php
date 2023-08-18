@@ -30,7 +30,7 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
    */
   public static function getSubscribedEvents() {
     return [
-      'civi.api.prepare' => ['onApiPrepare', -20],
+      'civi.api.prepare' => ['onApiPrepare', 200],
     ];
   }
 

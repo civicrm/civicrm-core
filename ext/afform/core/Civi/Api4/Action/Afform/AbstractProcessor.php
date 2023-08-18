@@ -31,13 +31,6 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected $args = [];
 
   /**
-   * Used by prefill action to indicate if the entire form or just one entity is being filled.
-   * @var string
-   * @options form,entity
-   */
-  protected $fillMode = 'form';
-
-  /**
    * @var array
    */
   protected $_afform;
@@ -84,11 +77,12 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     foreach ($sortedEntities as $entityName) {
       $entity = $this->_formDataModel->getEntity($entityName);
       $this->_entityIds[$entityName] = [];
-      $idField = CoreUtil::getIdFieldName($entity['type']);
-      if (!empty($entity['actions']['update'])) {
+      $matchField = $this->matchField ?? CoreUtil::getIdFieldName($entity['type']);
+      $matchFieldDefn = $this->_formDataModel->getField($entity['type'], $matchField, 'create');
+      if (!empty($entity['actions'][$matchFieldDefn['input_attrs']['autofill']])) {
         if (
           !empty($this->args[$entityName]) &&
-          (!empty($entity['url-autofill']) || isset($entity['fields'][$idField]))
+          (!empty($entity['url-autofill']) || isset($entity['fields'][$matchField]))
         ) {
           $ids = (array) $this->args[$entityName];
           $this->loadEntity($entity, $ids);

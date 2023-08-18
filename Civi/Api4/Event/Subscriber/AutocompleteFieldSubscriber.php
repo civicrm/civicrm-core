@@ -26,7 +26,7 @@ class AutocompleteFieldSubscriber extends AutoService implements EventSubscriber
    */
   public static function getSubscribedEvents() {
     return [
-      'civi.api.prepare' => ['onApiPrepare', -50],
+      'civi.api.prepare' => ['onApiPrepare', 150],
     ];
   }
 

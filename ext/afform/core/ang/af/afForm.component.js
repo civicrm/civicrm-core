@@ -42,13 +42,13 @@
       };
       // With no arguments this will prefill the entire form based on url args
       // With selectedEntity, selectedIndex & selectedId provided this will prefill a single entity
-      this.loadData = function(selectedEntity, selectedIndex, selectedId) {
+      this.loadData = function(selectedEntity, selectedIndex, selectedId, selectedField) {
         var toLoad = 0,
           params = {name: ctrl.getFormMeta().name, args: {}};
         // Load single entity
         if (selectedEntity) {
-          toLoad = selectedId;
-          params.fillMode = 'entity';
+          toLoad = 1;
+          params.matchField = selectedField;
           params.args[selectedEntity] = {};
           params.args[selectedEntity][selectedIndex] = selectedId;
         }

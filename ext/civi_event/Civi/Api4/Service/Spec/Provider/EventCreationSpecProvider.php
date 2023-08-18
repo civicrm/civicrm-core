@@ -30,10 +30,13 @@ class EventCreationSpecProvider extends \Civi\Core\Service\AutoService implement
     $spec->getFieldByName('start_date')->setRequiredIf('empty($values.is_template)');
     $spec->getFieldByName('template_title')->setRequiredIf('!empty($values.is_template)');
 
-    $template_id = new FieldSpec('template_id', 'Event', 'Integer');
-    $template_id
-      ->setTitle('Template Id')
-      ->setDescription('Template on which to base this new event');
+    $template_id = (new FieldSpec('template_id', 'Event', 'Integer'))
+      ->setTitle(ts('Event Template'))
+      ->setDescription(ts('Template on which to base this new event'))
+      ->setInputType('EntityRef')
+      // Afform-only (so far) metadata tells the form this field is used to create a new entity rather than update
+      ->setInputAttr('autofill', 'create')
+      ->setFkEntity('Event');
     $spec->addFieldSpec($template_id);
   }
 
