@@ -35,13 +35,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   protected $_requireApprovalMsg;
 
   /**
-   * Deprecated parameter that we hope to remove.
-   *
-   * @var bool
-   */
-  public $_quickConfig;
-
-  /**
    * Skip duplicate check.
    *
    * This can be set using hook_civicrm_buildForm() to override the registration dupe check.
@@ -596,10 +589,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
       //format price set fields across option full.
       self::formatFieldsForOptionFull($form);
-
-      if (!empty($form->_priceSet['is_quick_config'])) {
-        $form->_quickConfig = $form->_priceSet['is_quick_config'];
-      }
       $form->add('hidden', 'priceSetId', $form->_priceSetId);
 
       // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions

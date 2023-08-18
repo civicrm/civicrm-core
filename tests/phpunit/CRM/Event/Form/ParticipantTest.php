@@ -598,8 +598,7 @@ London,',
    */
   public function testSubmitPendingAddPayment(bool $isQuickConfig): void {
     $mailUtil = new CiviMailUtils($this, TRUE);
-    $form = $this->getForm(['is_monetary' => 1, 'start_date' => '2023-02-15 15:00', 'end_date' => '2023-02-15 18:00']);
-    $this->callAPISuccess('PriceSet', 'create', ['is_quick_config' => $isQuickConfig, 'id' => $this->getPriceSetID('PaidEvent')]);
+    $form = $this->getForm(['is_monetary' => 1, 'start_date' => '2023-02-15 15:00', 'end_date' => '2023-02-15 18:00'], [], $isQuickConfig);
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $form->postProcess();
     $this->callAPISuccess('Payment', 'create', [
