@@ -86,6 +86,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $sorter = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
     \Civi::dispatcher()->dispatch('civi.afform.sort.prefill', $sorter);
     $sortedEntities = $sorter->getSortedEnties();
+
+    // if submission id is passed then we should display the submission data
+    if (!empty($this->args['sid'])) {
+      $this->prePopulateSubmissionData($sortedEntities);
+      return;
+    }
+
     foreach ($sortedEntities as $entityName) {
       $entity = $this->_formDataModel->getEntity($entityName);
       $this->_entityIds[$entityName] = [];
@@ -102,6 +109,25 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       }
       $event = new AfformPrefillEvent($this->_afform, $this->_formDataModel, $this, $entity['type'], $entityName, $this->_entityIds);
       \Civi::dispatcher()->dispatch('civi.afform.prefill', $event);
+    }
+  }
+
+  /**
+   * Load the data from submission table
+   */
+  protected function prePopulateSubmissionData($sortedEntities) {
+    // if submission id is passed then get the data from submission
+    $afformSubmissionData = \Civi\Api4\AfformSubmission::get(TRUE)
+      ->addSelect('data')
+      ->addWhere('id', '=', $this->args['sid'])
+      ->execute()->first();
+
+    foreach ($sortedEntities as $entityName) {
+      foreach ($afformSubmissionData['data'] as $entity => $data) {
+        if ($entity == $entityName) {
+          $this->_entityValues[$entityName] = $data;
+        }
+      }
     }
   }
 
