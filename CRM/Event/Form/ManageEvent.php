@@ -191,35 +191,28 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     // Set Done button URL and breadcrumb. Templates go back to Manage Templates,
     // otherwise go to Manage Event for new event or ManageEventEdit if event if exists.
-    $breadCrumb = [];
     if (!$this->_isTemplate) {
+      $breadCrumb = ['title' => ts('Manage Events')];
       if ($this->_id) {
-        $this->_doneUrl = CRM_Utils_System::url(CRM_Utils_System::currentPath(),
+        $breadCrumb['url'] = CRM_Utils_System::url(CRM_Utils_System::currentPath(),
           "action=update&reset=1&id={$this->_id}"
         );
       }
       else {
-        $this->_doneUrl = CRM_Utils_System::url('civicrm/event/manage',
+        $breadCrumb['url'] = CRM_Utils_System::url('civicrm/event/manage',
           'reset=1'
         );
-        $breadCrumb = [
-          [
-            'title' => ts('Manage Events'),
-            'url' => $this->_doneUrl,
-          ],
-        ];
       }
+      CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
     else {
-      $this->_doneUrl = CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1');
-      $breadCrumb = [
+      CRM_Utils_System::appendBreadCrumb([
         [
           'title' => ts('Manage Event Templates'),
-          'url' => $this->_doneUrl,
+          'url' => CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'),
         ],
-      ];
+      ]);
     }
-    CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
   /**
