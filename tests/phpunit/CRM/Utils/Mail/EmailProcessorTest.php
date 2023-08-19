@@ -30,6 +30,11 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
         'protocol' => 'Localdir',
         'source' => __DIR__ . '/data/mail',
         'domain' => 'example.com',
+        'is_active' => 1,
+        'activity_type_id' => 'Inbound Email',
+        'activity_source' => 'from',
+        'activity_targets' => 'to,cc,bcc',
+        'activity_assignees' => 'from',
       ],
     ]);
   }
@@ -49,6 +54,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
       'civicrm_contact',
       'civicrm_email',
       'civicrm_activity',
+      'civicrm_activity_contact',
     ]);
   }
 
@@ -242,6 +248,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
         'domain' => 'example.com',
         'is_default' => '0',
         'is_contact_creation_disabled_if_no_match' => TRUE,
+        'is_non_case_email_skipped' => FALSE,
       ],
     ]);
   }
@@ -258,6 +265,80 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $result = civicrm_api3('Contact', 'get', [
       'sequential' => 1,
       'email' => "from@test.test",
+    ]);
+    $this->assertEmpty($result['values']);
+  }
+
+  /**
+   * Set up mail account with non-default activity options.
+   * return $params array
+   */
+  public function setUpNonDefaultActivityOptions() {
+    $this->enableCiviCampaign();
+    $campaign = $this->civicrm_api('Campaign', 'create', [
+      'version' => $this->_apiversion,
+      'title' => 'inbound email campaign',
+    ]);
+
+    $this->callAPISuccess('MailSettings', 'get', [
+      'api.MailSettings.create' => [
+        'name' => 'mailbox',
+        'protocol' => 'Localdir',
+        'source' => __DIR__ . '/data/mail',
+        'domain' => 'example.com',
+        'is_default' => '0',
+        'is_contact_creation_disabled_if_no_match' => FALSE,
+        'is_non_case_email_skipped' => FALSE,
+        'activity_type_id' => 3,
+        'activity_source' => 'to',
+        'activity_targets' => 'from',
+        'activity_assignees' => 'cc',
+        'activity_status' => 'Scheduled',
+        'campaign_id' => $campaign['id'],
+      ],
+    ]);
+
+    return ['campaign_id' => $campaign['id']];
+  }
+
+  /**
+   * Test email processing with non-default activity options.
+   */
+  public function testInboundProcessingNonDefaultActivityOptions() {
+    $params = $this->setUpNonDefaultActivityOptions();
+    $mail = 'test_non_default_email.eml';
+
+    copy(__DIR__ . '/data/inbound/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->callAPISuccess('job', 'fetch_activities', []);
+    $result = civicrm_api3('Activity', 'get', [
+      'sequential' => 1,
+      'subject' => ['LIKE' => "%An email with two recipients%"],
+      'return' => ["assignee_contact_id", "target_contact_id", "activity_type_id", "status_id", "source_contact_name", "campaign_id"],
+    ]);
+
+    $activity = $result['values'][0];
+    $this->assertEquals(3, $activity['activity_type_id']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Scheduled'), $activity['status_id']);
+    $this->assertEquals('to@test.test', $activity['source_contact_name']);
+    $assigneeID = $activity['assignee_contact_id'][0];
+    $this->assertEquals('cc@test.test', $activity['assignee_contact_name'][$assigneeID]);
+    $targetID = $activity['target_contact_id'][0];
+    $this->assertEquals('from@test.test', $activity['target_contact_name'][$targetID]);
+    $this->assertEquals($params['campaign_id'], $activity['campaign_id']);
+  }
+
+  /**
+   * Test not creating a contact for an email field that is not used.
+   */
+  public function testInboundProcessingNoUnusedContacts() {
+    $params = $this->setUpNonDefaultActivityOptions();
+    $mail = 'test_non_default_email.eml';
+
+    copy(__DIR__ . '/data/inbound/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->callAPISuccess('job', 'fetch_activities', []);
+    $result = civicrm_api3('Contact', 'get', [
+      'sequential' => 1,
+      'email' => "bcc@test.test",
     ]);
     $this->assertEmpty($result['values']);
   }

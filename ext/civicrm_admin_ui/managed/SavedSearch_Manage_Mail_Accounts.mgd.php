@@ -2,6 +2,7 @@
 
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
+// This SearchDisplay shows an editable-in-place field for Enabled? for all rows, including the bounce processing mail account, which cannot actually be disabled (you can change it to No, but it won't actually be disabled). So this is FIXME for when we can set rows to edit-in-place conditionally.
 return [
   [
     'name' => 'SavedSearch_Mail_Accounts',

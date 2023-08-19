@@ -13,7 +13,8 @@
 <div id="mSettings">
   <div class="form-item">
     {strip}
-      <table cellpadding="0" cellspacing="0" border="0" class="row-highlight">
+    {include file="CRM/common/enableDisableApi.tpl"}
+      <table cellpadding="0" cellspacing="0" border="0" class="selector row-highlight">
         <thead class="sticky">
             <th>{ts}Name{/ts}</th>
             <th>{ts}Server{/ts}</th>
@@ -29,7 +30,7 @@
             <th></th>
         </thead>
         {foreach from=$rows item=row}
-          <tr id='rowid{$row.id}' class="crm-mailSettings {cycle values="odd-row,even-row"}">
+          <tr id='mail_settings-{$row.id}' class="crm-entity {cycle values="odd-row,even-row"} {if NOT $row.is_active} disabled{/if}">
               <td class="crm-mailSettings-name">{$row.name}</td>
               <td class="crm-mailSettings-server">{$row.server}</td>
               <td class="crm-mailSettings-username">{$row.username}</td>
