@@ -95,8 +95,6 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
       'postal_code' => '01903',
       'country_id' => 1228,
       'state_province_id' => 1029,
-      'geo_code_1' => '18.219023',
-      'geo_code_2' => '-105.00973',
       'manual_geo_code' => '0',
     ], $address);
 
