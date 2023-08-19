@@ -106,6 +106,39 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['January', 'February', 'March', 'April'], $agg['months']);
   }
 
+  public function testGroupConcatUnique(): void {
+    $cid1 = $this->createTestRecord('Contact')['id'];
+    $cid2 = $this->createTestRecord('Contact')['id'];
+
+    $this->saveTestRecords('Address', [
+      'records' => [
+        ['contact_id' => $cid1, 'city' => 'A', 'location_type_id' => 1],
+        ['contact_id' => $cid1, 'city' => 'A', 'location_type_id' => 2],
+        ['contact_id' => $cid1, 'city' => 'B', 'location_type_id' => 3],
+      ],
+    ]);
+    $this->saveTestRecords('Email', [
+      'records' => [
+        ['contact_id' => $cid1, 'email' => 'test1@example.org', 'location_type_id' => 1],
+        ['contact_id' => $cid1, 'email' => 'test2@example.org', 'location_type_id' => 2],
+      ],
+    ]);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('GROUP_CONCAT(UNIQUE address.id) AS address_id')
+      ->addSelect('GROUP_CONCAT(UNIQUE address.city) AS address_city')
+      ->addSelect('GROUP_CONCAT(UNIQUE email.email) AS email')
+      ->addGroupBy('id')
+      ->addJoin('Address AS address', 'LEFT', ['id', '=', 'address.contact_id'])
+      ->addJoin('Email AS email', 'LEFT', ['id', '=', 'email.contact_id'])
+      ->addOrderBy('id')
+      ->addWhere('id', 'IN', [$cid1, $cid2])
+      ->execute();
+
+    $this->assertEquals(['A', 'A', 'B'], $result[0]['address_city']);
+    $this->assertEquals(['test1@example.org', 'test2@example.org'], $result[0]['email']);
+  }
+
   public function testGroupHaving(): void {
     $cid = Contact::create(FALSE)->addValue('first_name', 'donor')->execute()->first()['id'];
     Contribution::save(FALSE)

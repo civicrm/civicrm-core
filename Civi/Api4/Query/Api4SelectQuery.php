@@ -198,7 +198,7 @@ class Api4SelectQuery extends Api4Query {
           throw new \CRM_Core_Exception('Cannot use existing field name as alias');
         }
         $this->selectAliases[$alias] = $expr->getExpr();
-        $this->query->select($expr->render($this) . " AS `$alias`");
+        $this->query->select($expr->render($this, TRUE));
       }
     }
   }

@@ -232,6 +232,10 @@ class FormattingUtil {
       }
     }
     foreach ($result as $key => $value) {
+      // Skip null values or values that have already been unset by `formatOutputValue` functions
+      if (!isset($result[$key])) {
+        continue;
+      }
       $fieldExpr = SqlExpression::convert($selectAliases[$key] ?? $key);
       $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields() ?? '');
       $baseName = $fieldName ? \CRM_Utils_Array::first(explode(':', $fieldName)) : NULL;

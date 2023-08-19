@@ -119,7 +119,7 @@ class Api4EntitySetQuery extends Api4Query {
       $expr = SqlExpression::convert($item, TRUE);
       $alias = $expr->getAlias();
       $this->selectAliases[$alias] = $expr->getExpr();
-      $this->query->select($expr->render($this) . " AS `$alias`");
+      $this->query->select($expr->render($this, TRUE));
     }
   }
 

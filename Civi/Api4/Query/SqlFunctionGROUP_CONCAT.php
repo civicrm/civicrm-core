@@ -11,6 +11,8 @@
 
 namespace Civi\Api4\Query;
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Sql function
  */
@@ -23,7 +25,7 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
+        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct Value'), 'UNIQUE' => ts('Unique Record')],
         'max_expr' => 1,
         'must_be' => ['SqlField', 'SqlFunction', 'SqlEquation'],
         'optional' => FALSE,
@@ -68,6 +70,17 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
           $exprArgs[0]['expr'][0]->formatOutputValue($dataType, $values[$key], $index);
         }
       }
+      // Perform deduping by unique id
+      if ($this->args[0]['prefix'] === ['UNIQUE'] && isset($values["_$key"])) {
+        $ids = \CRM_Utils_Array::explodePadded($values["_$key"]);
+        unset($values["_$key"]);
+        foreach ($ids as $index => $id) {
+          if (in_array($id, array_slice($ids, 0, $index))) {
+            unset($values[$key][$index]);
+          }
+        }
+        $values[$key] = array_values($values[$key]);
+      }
     }
     // If using custom separator, preserve raw string
     else {
@@ -87,6 +100,42 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
    */
   public static function getDescription(): string {
     return ts('All values in the grouping.');
+  }
+
+  public function render(Api4Query $query, bool $includeAlias = FALSE): string {
+    $result = '';
+    // Handle pseudo-prefix `UNIQUE` which is like `DISTINCT` but based on the record id rather than the field value
+    if ($this->args[0]['prefix'] === ['UNIQUE']) {
+      $this->args[0]['prefix'] = [];
+      $expr = $this->args[0]['expr'][0];
+      $field = $query->getField($expr->getFields()[0]);
+      if ($field) {
+        $idField = CoreUtil::getIdFieldName($field['entity']);
+        $idFieldKey = substr($expr->getFields()[0], 0, 0 - strlen($field['name'])) . $idField;
+        // Keep the ordering consistent
+        if (empty($this->args[1]['prefix'])) {
+          $this->args[1] = [
+            'prefix' => ['ORDER BY'],
+            'expr' => [SqlExpression::convert($idFieldKey)],
+            'suffix' => [],
+          ];
+        }
+        // Already a unique field, so DISTINCT will work fine
+        if ($field['name'] === $idField) {
+          $this->args[0]['prefix'] = ['DISTINCT'];
+        }
+        // Add a unique field on which to dedupe in postprocessing (@see self::formatOutputValue)
+        elseif ($includeAlias) {
+          $orderByKey = $this->args[1]['expr'][0]->getFields()[0];
+          $extraSelectAlias = '_' . $this->getAlias();
+          $extraSelect = SqlExpression::convert("GROUP_CONCAT($idFieldKey ORDER BY $orderByKey) AS $extraSelectAlias", TRUE);
+          $query->selectAliases[$extraSelectAlias] = $extraSelect->getExpr();
+          $result .= $extraSelect->render($query, TRUE) . ',';
+        }
+      }
+    }
+    $result .= parent::render($query, $includeAlias);
+    return $result;
   }
 
 }

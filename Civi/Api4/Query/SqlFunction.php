@@ -141,9 +141,10 @@ abstract class SqlFunction extends SqlExpression {
    * Render the expression for insertion into the sql query
    *
    * @param \Civi\Api4\Query\Api4Query $query
+   * @param bool $includeAlias
    * @return string
    */
-  public function render(Api4Query $query): string {
+  public function render(Api4Query $query, bool $includeAlias = FALSE): string {
     $output = '';
     foreach ($this->args as $arg) {
       $rendered = $this->renderArg($arg, $query);
@@ -151,7 +152,7 @@ abstract class SqlFunction extends SqlExpression {
         $output .= (strlen($output) ? ' ' : '') . $rendered;
       }
     }
-    return $this->renderExpression($output);
+    return $this->renderExpression($output) . ($includeAlias ? " AS `{$this->getAlias()}`" : '');
   }
 
   /**
@@ -160,7 +161,7 @@ abstract class SqlFunction extends SqlExpression {
    * @param string $output
    * @return string
    */
-  protected function renderExpression($output): string {
+  protected function renderExpression(string $output): string {
     return $this->getName() . '(' . $output . ')';
   }
 
