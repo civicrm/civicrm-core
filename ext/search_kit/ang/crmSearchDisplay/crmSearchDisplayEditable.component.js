@@ -6,8 +6,8 @@
 
   angular.module('crmSearchDisplay').component('crmSearchDisplayEditable', {
     bindings: {
-      row: '<',
-      col: '<',
+      row: '=',
+      col: '=',
       cancel: '&',
       doSave: '&'
     },
@@ -54,10 +54,11 @@
           ctrl.cancel();
           return;
         }
+        ctrl.col.edit.value = ctrl.col.val = ctrl.value;
         var record = _.cloneDeep(col.edit.record);
         record[col.edit.value_key] = ctrl.value;
-        $('input', $element).attr('disabled', true);
-        ctrl.doSave({apiCall: [col.edit.entity, col.edit.action, {values: record}]});
+        ctrl.doSave({value: ctrl.value, record: record});
+        $scope.timeout();
       };
 
       function loadOptions() {

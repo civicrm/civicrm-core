@@ -201,6 +201,12 @@
       },
       formatFieldValue: function(colData) {
         return angular.isArray(colData.val) ? colData.val.join(', ') : colData.val;
+      },
+
+      updateRow: function(value, record, row, col) {
+        record[col.edit.value_key] = value;
+        crmApi4(col.edit.entity, col.edit.action, {values: record});
+        this.editing = false;
       }
     };
   });
