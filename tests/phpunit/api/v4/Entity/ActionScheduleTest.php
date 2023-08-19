@@ -28,12 +28,12 @@ class ActionScheduleTest extends Api4TestBase {
       ->execute()
       ->indexBy('name');
 
-    $this->assertContains(['id' => '1', 'name' => 'activity_type', 'label' => 'Activity', 'icon' => 'fa-tasks'], $fields['mapping_id']['options']);
-    $this->assertContains(['id' => 'contribpage', 'name' => 'contribpage', 'label' => 'Contribution Page', 'icon' => 'fa-credit-card'], $fields['mapping_id']['options']);
+    $this->assertContainsEquals(['id' => '1', 'name' => 'activity_type', 'label' => 'Activity', 'icon' => 'fa-tasks'], $fields['mapping_id']['options']);
+    $this->assertContainsEquals(['id' => 'contribpage', 'name' => 'contribpage', 'label' => 'Contribution Page', 'icon' => 'fa-credit-card'], $fields['mapping_id']['options']);
 
-    $this->assertContains(['id' => 'day', 'name' => 'day', 'label' => 'days'], $fields['start_action_unit']['options']);
-    $this->assertContains(['id' => 'week', 'name' => 'week', 'label' => 'weeks'], $fields['repetition_frequency_unit']['options']);
-    $this->assertContains(['id' => 'month', 'name' => 'month', 'label' => 'months'], $fields['end_frequency_unit']['options']);
+    $this->assertContainsEquals(['id' => 'day', 'name' => 'day', 'label' => 'days'], $fields['start_action_unit']['options']);
+    $this->assertContainsEquals(['id' => 'week', 'name' => 'week', 'label' => 'weeks'], $fields['repetition_frequency_unit']['options']);
+    $this->assertContainsEquals(['id' => 'month', 'name' => 'month', 'label' => 'months'], $fields['end_frequency_unit']['options']);
 
     $this->assertEquals('manual', $fields['recipient']['options'][0]['name']);
     $this->assertEquals('group', $fields['recipient']['options'][1]['name']);
