@@ -68,8 +68,7 @@ function standaloneErrorHandler(
     int $errno,
     string $errstr,
     ?string $errfile,
-    ?int $errline,
-    ?array $errcontext) {
+    ?int $errline) {
   static $handlingError = FALSE;
   if ($handlingError) {
     throw new \RuntimeException("Died: error was thrown during error handling");
