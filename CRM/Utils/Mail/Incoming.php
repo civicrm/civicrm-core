@@ -289,10 +289,12 @@ class CRM_Utils_Mail_Incoming {
    * @param $mail
    * @param $createContact
    * @param $requireContact
+   * @param array $emailFields
+   *   Which fields to process and create contacts for of from, to, cc, bcc
    *
    * @return array
    */
-  public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE) {
+  public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE, $emailFields = ['from', 'to', 'cc', 'bcc']) {
 
     $config = CRM_Core_Config::singleton();
 
@@ -308,18 +310,14 @@ class CRM_Utils_Mail_Incoming {
       }
     }
 
-    $params['from'] = [];
-    self::parseAddress($mail->from, $field, $params['from'], $mail, $createContact);
-
-    // we definitely need a contact id for the from address
-    // if we dont have one, skip this email
-    if ($requireContact && empty($params['from']['id'])) {
-      return NULL;
-    }
-
-    $emailFields = ['to', 'cc', 'bcc'];
     foreach ($emailFields as $field) {
-      $value = $mail->$field;
+      // to, bcc, cc are arrays of objects, but from is an object, so make it an array of one object so we can handle it the same
+      if ($field === 'from') {
+        $value = [$mail->$field];
+      }
+      else {
+        $value = $mail->$field;
+      }
       self::parseAddresses($value, $field, $params, $mail, $createContact);
     }
 
@@ -391,7 +389,6 @@ class CRM_Utils_Mail_Incoming {
    */
   public static function parseAddresses(&$addresses, $token, &$params, &$mail, $createContact = TRUE) {
     $params[$token] = [];
-
     foreach ($addresses as $address) {
       $subParam = [];
       self::parseAddress($address, $params, $subParam, $mail, $createContact);

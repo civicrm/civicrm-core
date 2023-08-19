@@ -36,7 +36,6 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
    * Browse all mail settings.
    */
   public function browse() {
-    //get all mail settings.
     $allMailSettings = [];
     $mailSetting = new CRM_Core_DAO_MailSettings();
 
@@ -45,20 +44,19 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
     //multi-domain support for mail settings. CRM-5244
     $mailSetting->domain_id = CRM_Core_Config::domainID();
 
-    //find all mail settings.
     $mailSetting->find();
     while ($mailSetting->fetch()) {
       //replace protocol value with name
       $mailSetting->protocol = $allProtocols[$mailSetting->protocol] ?? NULL;
       CRM_Core_DAO::storeValues($mailSetting, $allMailSettings[$mailSetting->id]);
 
-      //form all action links
       $action = array_sum(array_keys($this->links()));
 
-      // disallow the DELETE action for the default set of settings
       if ($mailSetting->is_default) {
-        $action &= ~CRM_Core_Action::DELETE;
+        $action -= CRM_Core_Action::DELETE;
+        $action -= CRM_Core_Action::DISABLE;
       }
+      $action -= ($mailSetting->is_active) ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
 
       //add action links.
       $allMailSettings[$mailSetting->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,

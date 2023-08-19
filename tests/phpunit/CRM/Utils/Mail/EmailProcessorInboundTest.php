@@ -27,6 +27,11 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
       // a little weird - is_default=0 means for inbound email processing
       'is_default' => '0',
       'domain_id' => 1,
+      'is_active' => 1,
+      'activity_type_id' => 'Inbound Email',
+      'activity_source' => 'from',
+      'activity_targets' => 'to,cc,bcc',
+      'activity_assignees' => 'from',
     ])['id'];
   }
 
