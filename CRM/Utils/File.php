@@ -794,6 +794,11 @@ HTACCESS;
         return FALSE;
       }
     }
+
+    // windows fix
+    $parent = str_replace(DIRECTORY_SEPARATOR, '/', $parent);
+    $child = str_replace(DIRECTORY_SEPARATOR, '/', $child);
+
     $parentParts = explode('/', rtrim($parent, '/'));
     $childParts = explode('/', rtrim($child, '/'));
     while (($parentPart = array_shift($parentParts)) !== NULL) {
