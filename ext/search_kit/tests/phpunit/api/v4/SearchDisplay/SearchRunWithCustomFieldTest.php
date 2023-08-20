@@ -360,9 +360,9 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
       'value_key' => 'meeting_phone.sub_field',
       'record' => ['id' => $activity[0]['id']],
       'action' => 'update',
-      'value' => 'Abc',
+      'value_path' => 'meeting_phone.sub_field',
     ];
-    $expectedSubjectEdit = ['value_key' => 'subject', 'value' => $subject] + $expectedCustomFieldEdit;
+    $expectedSubjectEdit = ['value_key' => 'subject', 'value_path' => 'subject'] + $expectedCustomFieldEdit;
 
     // First Activity
     $this->assertEquals($expectedSubjectEdit, $result[0]['columns'][0]['edit']);
@@ -372,7 +372,6 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     // Second Activity
     $expectedSubjectEdit['record']['id'] = $activity[1]['id'];
     $expectedCustomFieldEdit['record']['id'] = $activity[1]['id'];
-    $expectedCustomFieldEdit['value'] = NULL;
     $this->assertEquals($expectedSubjectEdit, $result[1]['columns'][0]['edit']);
     $this->assertEquals($expectedCustomFieldEdit, $result[1]['columns'][1]['edit']);
     $this->assertEquals($activityTypes['Phone Call'], $result[1]['data']['activity_type_id']);
