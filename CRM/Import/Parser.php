@@ -2219,7 +2219,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
     //check if external identifier exists in database
     if ($contactID && $foundContact['id'] !== $contactID) {
-      throw new CRM_Core_Exception(ts('Existing external ID does not match the imported contact ID.'), CRM_Import_Parser::ERROR);
+      throw new CRM_Core_Exception(
+        ts('Imported external ID already belongs to an existing contact with a different contact ID than the imported contact ID or than the contact ID of the contact matched on the entity imported.'),
+        CRM_Import_Parser::ERROR);
     }
     return (int) $foundContact['id'];
   }
