@@ -155,7 +155,7 @@ return [
     'name' => 'sort_name_format',
     'type' => 'String',
     'html_type' => 'textarea',
-    'default' => '{contact.last_name}{, }{contact.first_name}',
+    'default' => '{contact.last_name}{, }{contact.first_name}{ }{contact.individual_suffix}',
     'add' => '4.1',
     'title' => ts('Individual Sort Name Format'),
     'is_domain' => 1,
