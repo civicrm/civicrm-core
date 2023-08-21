@@ -345,6 +345,11 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       CRM_Core_DAO::executeQuery($query);
     }
 
+    // Clear the Redis prev-next cache, if there is one.
+    // Since we truncated the civicrm_cache table it is logical to also remove
+    // the same from the Redis cache here.
+    \Civi::service('prevnext')->deleteItem();
+
     // also delete all the import and export temp tables
     self::clearTempTables();
   }
