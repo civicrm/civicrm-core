@@ -560,7 +560,7 @@
                 false,
                 true,
                 ['id', 'name', 'label'],
-                ['id', 'name', 'label', 'abbr', 'description', 'color', 'icon']
+                CRM.vars.api4.suffixes
               ];
               format = 'json';
               defaultVal = false;

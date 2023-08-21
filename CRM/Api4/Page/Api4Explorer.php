@@ -30,6 +30,7 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
       'docs' => \Civi\Api4\Utils\ReflectionUtils::parseDocBlock($apiDoc->getDocComment()),
       'functions' => CoreUtil::getSqlFunctions(),
       'authxEnabled' => $extensions->isActiveModule('authx'),
+      'suffixes' => \Civi\Api4\Utils\FormattingUtil::$pseudoConstantSuffixes,
       'restUrl' => rtrim(CRM_Utils_System::url('civicrm/ajax/api4/CRMAPI4ENTITY/CRMAPI4ACTION', NULL, TRUE, NULL, FALSE, TRUE), '/'),
     ];
     Civi::resources()
