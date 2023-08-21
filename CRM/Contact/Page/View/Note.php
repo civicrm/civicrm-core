@@ -50,10 +50,10 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   /**
    * called when action is browse.
    */
-  public function browse() {
+  public function browse(): void {
     $note = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_contact';
-    $note->entity_id = $this->_contactId;
+    $note->entity_id = $this->getContactID();
 
     $note->orderBy('modified_date desc');
 
@@ -80,7 +80,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
           $action,
           [
             'id' => $note->id,
-            'cid' => $this->_contactId,
+            'cid' => $this->getContactID(),
           ],
           ts('more'),
           FALSE,
@@ -123,7 +123,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
     );
     $this->assign('commentAction', $commentAction);
 
-    $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('note', $this->_contactId);
+    $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('note', $this->getContactID());
   }
 
   /**
@@ -135,8 +135,9 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
 
     // set the userContext stack
     $session = CRM_Core_Session::singleton();
+    $contactID = $this->getContactID();
     $url = CRM_Utils_System::url('civicrm/contact/view',
-      'action=browse&selectedChild=note&cid=' . $this->_contactId
+      'action=browse&selectedChild=note&cid=' . $contactID
     );
     $session->pushUserContext($url);
 
@@ -250,6 +251,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
         'url' => 'civicrm/contact/view/note',
         'qs' => 'action=add&reset=1&cid=%%cid%%&parentId=%%id%%&selectedChild=note',
         'title' => ts('Add Comment'),
+        'weight' => -5,
       ],
       CRM_Core_Action::DELETE => [
         'name' => ts('Delete'),
@@ -266,7 +268,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    *
    * @return array[]
    */
-  public static function commentLinks() {
+  public static function commentLinks(): array {
     return [
       CRM_Core_Action::VIEW => [
         'name' => ts('View'),
@@ -290,6 +292,20 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
         'weight' => 100,
       ],
     ];
+  }
+
+  /**
+   * Get the relevant contact ID.
+   *
+   * @api supported to be accessed from outside of core.
+   *
+   * @return int
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public function getContactID(): int {
+    return (int) CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
   }
 
 }
