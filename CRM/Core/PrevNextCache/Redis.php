@@ -37,10 +37,9 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
 
   /**
    * CRM_Core_PrevNextCache_Redis constructor.
-   *
    * @param array $settings
    */
-  public function __construct(array $settings) {
+  public function __construct($settings) {
     $this->redis = CRM_Utils_Cache_Redis::connect($settings);
     $this->prefix = $settings['prefix'] ?? '';
     $this->prefix .= \CRM_Utils_Cache::DELIMITER . 'prevnext' . \CRM_Utils_Cache::DELIMITER;
@@ -57,16 +56,23 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     return self::TTL;
   }
 
-  public function fillWithSql($cacheKey, $sql, $sqlParams = []): bool {
+  public function fillWithSql($cacheKey, $sql, $sqlParams = []) {
     $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams, FALSE);
 
     [$allKey, $dataKey, , $maxScore] = $this->initCacheKey($cacheKey);
-
+    $first = TRUE;
     while ($dao->fetch()) {
       [, $entity_id, $data] = array_values($dao->toArray());
       $maxScore++;
       $this->redis->zAdd($allKey, $maxScore, $entity_id);
+      if ($first) {
+        $this->redis->expire($allKey, $this->getTTL());
+      }
       $this->redis->hSet($dataKey, $entity_id, $data);
+      if ($first) {
+        $this->redis->expire($dataKey, $this->getTTL());
+      }
+      $first = FALSE;
     }
 
     return TRUE;
@@ -74,11 +80,18 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
 
   public function fillWithArray($cacheKey, $rows) {
     [$allKey, $dataKey, , $maxScore] = $this->initCacheKey($cacheKey);
-
+    $first = TRUE;
     foreach ($rows as $row) {
       $maxScore++;
       $this->redis->zAdd($allKey, $maxScore, $row['entity_id1']);
+      if ($first) {
+        $this->redis->expire($allKey, $this->getTTL());
+      }
       $this->redis->hSet($dataKey, $row['entity_id1'], $row['data']);
+      if ($first) {
+        $this->redis->expire($dataKey, $this->getTTL());
+      }
+      $first = FALSE;
     }
 
     return TRUE;
@@ -94,9 +107,14 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     $selKey = $this->key($cacheKey, 'sel');
 
     if ($action === 'select') {
+      $first = TRUE;
       foreach ((array) $ids as $id) {
         $score = $this->redis->zScore($allKey, $id);
         $this->redis->zAdd($selKey, $score, $id);
+        if ($first) {
+          $this->redis->expire($selKey, $this->getTTL());
+        }
+        $first = FALSE;
       }
     }
     elseif ($action === 'unselect' && $ids === NULL) {
@@ -124,16 +142,14 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
       }
       return [$cacheKey => $result];
     }
-    elseif ($action === 'getall') {
+    if ($action === 'getall') {
       $result = [];
       foreach ($this->redis->zRange($allKey, 0, -1) as $entity_id) {
         $result[$entity_id] = 1;
       }
       return [$cacheKey => $result];
     }
-    else {
-      throw new \CRM_Core_Exception("Unrecognized action: $action");
-    }
+    throw new \CRM_Core_Exception("Unrecognized action: $action");
   }
 
   public function getPositions($cacheKey, $id1) {
@@ -242,10 +258,6 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     $allKey = $this->key($cacheKey, 'all');
     $selKey = $this->key($cacheKey, 'sel');
     $dataKey = $this->key($cacheKey, 'data');
-
-    $this->redis->expire($allKey, $this->getTTL());
-    $this->redis->expire($dataKey, $this->getTTL());
-    $this->redis->expire($selKey, $this->getTTL());
 
     $maxScore = 0;
     foreach ($this->redis->zRange($allKey, -1, -1, TRUE) as $lastElem => $lastScore) {
