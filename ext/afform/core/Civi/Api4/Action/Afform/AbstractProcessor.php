@@ -117,10 +117,20 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function prePopulateSubmissionData($sortedEntities) {
     // if submission id is passed then get the data from submission
-    $afformSubmissionData = \Civi\Api4\AfformSubmission::get(TRUE)
+    // we should prepopulate only pending submissions
+    $afformSubmissionData = \Civi\Api4\AfformSubmission::get(FALSE)
       ->addSelect('data')
       ->addWhere('id', '=', $this->args['sid'])
+      ->addWhere('afform_name', '=', $this->name)
+      ->addWhere('status_id:name', '=', 'Pending')
       ->execute()->first();
+
+    // do nothing and return early for invalid submission id
+    if (empty($afformSubmissionData)) {
+      // unset sid from args
+      $this->args['sid'] = NULL;
+      return;
+    }
 
     foreach ($sortedEntities as $entityName) {
       foreach ($afformSubmissionData['data'] as $entity => $data) {

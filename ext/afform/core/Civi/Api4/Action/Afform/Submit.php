@@ -42,8 +42,8 @@ class Submit extends AbstractProcessor {
     }
 
     // Save submission record
-    if (!empty($this->_afform['create_submission'])) {
-      $status = 'Processed';
+    $status = 'Processed';
+    if (!empty($this->_afform['create_submission']) && empty($this->args['sid'])) {
       if (!empty($this->_afform['manual_processing'])) {
         $status = 'Pending';
       }
@@ -56,8 +56,8 @@ class Submit extends AbstractProcessor {
         ->execute()->first();
     }
 
-    // let's not save the data in other CiviCRM table if email verification is needed.
-    if (!empty($this->_afform['manual_processing'])) {
+    // let's not save the data in other CiviCRM table if manual verification is needed.
+    if (!empty($this->_afform['manual_processing']) && empty($this->args['sid'])) {
       return [];
     }
 
@@ -67,9 +67,15 @@ class Submit extends AbstractProcessor {
     $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
     // Update submission record with entity IDs.
     if (!empty($this->_afform['create_submission'])) {
+      $submissionId = $submission['id'];
+      if (!empty($this->args['sid'])) {
+        $submissionId = $this->args['sid'];
+      }
+
       AfformSubmission::update(FALSE)
-        ->addWhere('id', '=', $submission['id'])
+        ->addWhere('id', '=', $submissionId)
         ->addValue('data', $submissionData)
+        ->addValue('status_id:name', $status)
         ->execute();
     }
 
