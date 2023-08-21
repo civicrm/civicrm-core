@@ -15,6 +15,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/pledges/what-is-civipledge/
  * @searchable primary
+ * @searchFields contact_id.display_name,amount
  * @since 5.35
  * @package Civi\Api4
  */

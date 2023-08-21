@@ -82,6 +82,15 @@ class CoreUtil {
   }
 
   /**
+   * Get name of field(s) to display in search context
+   * @param string $entityName
+   * @return array
+   */
+  public static function getSearchFields(string $entityName): array {
+    return self::getInfoItem($entityName, 'search_fields') ?: [];
+  }
+
+  /**
    * Get table name of given entity
    *
    * @param string $entityName

@@ -37,7 +37,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       'columns' => [
         [
           'type' => 'field',
-          'key' => 'display_name',
+          'key' => 'sort_name',
           'icons' => [
             ['field' => 'contact_sub_type:icon'],
             ['field' => 'contact_type:icon'],

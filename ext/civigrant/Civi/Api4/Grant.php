@@ -18,6 +18,7 @@ namespace Civi\Api4;
  * @see https://docs.civicrm.org/user/en/latest/grants/what-is-civigrant/
  *
  * @searchable primary
+ * @searchFields contact_id.sort_name,grant_type_id:label
  * @since 5.33
  * @package Civi\Api4
  */

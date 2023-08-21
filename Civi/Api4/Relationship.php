@@ -15,6 +15,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/relationships/
  * @searchable none
+ * @searchFields contact_id_a.sort_name,relationship_type_id.label_a_b,contact_id_b.sort_name
  * @since 5.19
  * @package Civi\Api4
  */

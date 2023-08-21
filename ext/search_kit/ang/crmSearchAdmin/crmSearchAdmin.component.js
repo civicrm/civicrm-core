@@ -61,7 +61,7 @@
       if (!this.savedSearch.id) {
         var defaults = {
           version: 4,
-          select: getDefaultSelect(),
+          select: searchMeta.getEntity(ctrl.savedSearch.api_entity).default_columns,
           orderBy: {},
           where: [],
         };
@@ -329,8 +329,15 @@
           params.push(condition);
         });
         ctrl.savedSearch.api_params.join.push(params);
-        if (entity.label_field && $scope.controls.joinType !== 'EXCLUDE') {
-          ctrl.savedSearch.api_params.select.push(join.alias + '.' + entity.label_field);
+        if (entity.search_fields && $scope.controls.joinType !== 'EXCLUDE') {
+          // Add columns for newly-joined entity
+          entity.search_fields.forEach((fieldName) => {
+            // Try to avoid adding duplicate columns
+            const simpleName = _.last(fieldName.split('.'));
+            if (!ctrl.savedSearch.api_params.select.join(',').includes(simpleName)) {
+              ctrl.savedSearch.api_params.select.push(join.alias + '.' + fieldName);
+            }
+          });
         }
         loadFieldOptions();
       }
@@ -534,16 +541,6 @@
     $scope.fieldsForHaving = function() {
       return {results: ctrl.getSelectFields()};
     };
-
-    // Sets the default select clause based on commonly-named fields
-    function getDefaultSelect() {
-      var entity = searchMeta.getEntity(ctrl.savedSearch.api_entity);
-      return _.transform(entity.fields, function(defaultSelect, field) {
-        if (field.name === 'id' || field.name === entity.label_field) {
-          defaultSelect.push(field.name);
-        }
-      });
-    }
 
     this.getAllFields = function(suffix, allowedTypes, disabledIf, topJoin) {
       disabledIf = disabledIf || _.noop;
