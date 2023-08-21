@@ -173,9 +173,12 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     }
     elseif ($id !== NULL && $cacheKey !== NULL) {
       // Delete a specific contact, within a specific cache.
-      $this->redis->zRem($this->key($cacheKey, 'all'), $id);
-      $this->redis->zRem($this->key($cacheKey, 'sel'), $id);
-      $this->redis->hDel($this->key($cacheKey, 'data'), $id);
+      $deleted = $this->redis->zRem($this->key($cacheKey, 'all'), $id);
+      if ($deleted) {
+        // If they were in the 'all' key they might be in the more specific 'sel' and 'data' keys.
+        $this->redis->zRem($this->key($cacheKey, 'sel'), $id);
+        $this->redis->hDel($this->key($cacheKey, 'data'), $id);
+      }
     }
     elseif ($id !== NULL && $cacheKey === NULL) {
       // Delete a specific contact, across all prevnext caches.
