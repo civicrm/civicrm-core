@@ -200,6 +200,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
   }
 
   public function testAutocompletePager() {
+    \Civi::settings()->set('search_autocomplete_count', 10);
     MockBasicEntity::delete()->addWhere('identifier', '>', 0)->execute();
     $sampleData = [];
     foreach (range(1, 21) as $num) {
