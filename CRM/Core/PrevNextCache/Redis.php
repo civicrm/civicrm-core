@@ -23,7 +23,7 @@
  */
 class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
 
-  const TTL = 21600;
+  private const TTL = 21600;
 
   /**
    * @var Redis
@@ -37,15 +37,27 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
 
   /**
    * CRM_Core_PrevNextCache_Redis constructor.
+   *
    * @param array $settings
    */
-  public function __construct($settings) {
+  public function __construct(array $settings) {
     $this->redis = CRM_Utils_Cache_Redis::connect($settings);
     $this->prefix = $settings['prefix'] ?? '';
     $this->prefix .= \CRM_Utils_Cache::DELIMITER . 'prevnext' . \CRM_Utils_Cache::DELIMITER;
   }
 
-  public function fillWithSql($cacheKey, $sql, $sqlParams = []) {
+  /**
+   * Get the time-to-live.
+   *
+   * This is likely to be made configurable in future.
+   *
+   * @return int
+   */
+  public function getTTL() : int {
+    return self::TTL;
+  }
+
+  public function fillWithSql($cacheKey, $sql, $sqlParams = []): bool {
     $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams, FALSE);
 
     [$allKey, $dataKey, , $maxScore] = $this->initCacheKey($cacheKey);
@@ -89,7 +101,7 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     }
     elseif ($action === 'unselect' && $ids === NULL) {
       $this->redis->del($selKey);
-      $this->redis->expire($selKey, self::TTL);
+      $this->redis->expire($selKey, $this->getTTL());
     }
     elseif ($action === 'unselect' && $ids !== NULL) {
       foreach ((array) $ids as $id) {
@@ -231,9 +243,9 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     $selKey = $this->key($cacheKey, 'sel');
     $dataKey = $this->key($cacheKey, 'data');
 
-    $this->redis->expire($allKey, self::TTL);
-    $this->redis->expire($dataKey, self::TTL);
-    $this->redis->expire($selKey, self::TTL);
+    $this->redis->expire($allKey, $this->getTTL());
+    $this->redis->expire($dataKey, $this->getTTL());
+    $this->redis->expire($selKey, $this->getTTL());
 
     $maxScore = 0;
     foreach ($this->redis->zRange($allKey, -1, -1, TRUE) as $lastElem => $lastScore) {
