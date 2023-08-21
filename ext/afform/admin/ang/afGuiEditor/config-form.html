@@ -140,7 +140,7 @@
           <input type="checkbox" ng-model="editor.afform.manual_processing" ng-click="editor.toggleManualProcessing()" ng-class="{'disabled': !!editor.afform.allow_verification_by_email}">
           {{:: ts('Verify submission before processing') }}
         </label>
-        <p class="help-block">{{:: ts('The data will be processed manually using Form Sumbission action.') }}</p>
+        <p class="help-block">{{:: ts('The data will need to be processed manually using Form Submission action.') }}</p>
       </div>
 
       <div class="form-group" ng-if="!!editor.afform.manual_processing">
@@ -148,7 +148,7 @@
           <input type="checkbox" ng-model="editor.afform.allow_verification_by_email" ng-click="editor.toggleEmailVerification()">
           {{:: ts('Allow verification by email') }}
         </label>
-        <p class="help-block">{{:: ts('The data will be processed and stored in CiviCRM after email verfication. Email field is required if you enable this setting.') }}</p>
+        <p class="help-block">{{:: ts('The data can be processed via email verification. Email field should be included in the form for this functionality.') }}</p>
         <div class="form-inline" ng-if="editor.afform.allow_verification_by_email">
           <label>{{:: ts('Email template') }}</label>
           <input class="form-control" crm-autocomplete="'MessageTemplate'" ng-model="editor.afform.email_confirmation_template_id" auto-open="true" placeholder="{{:: ts('- select -') }}">
