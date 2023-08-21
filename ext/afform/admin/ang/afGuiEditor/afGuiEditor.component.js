@@ -409,7 +409,7 @@
         } else {
           editor.afform.create_submission = true;
         }
-      }
+      };
 
       this.toggleEmailVerification = function() {
         if (editor.afform.allow_verification_by_email) {
@@ -418,7 +418,7 @@
           editor.afform.create_submission = true;
           editor.afform.manual_processing = true;
         }
-      }
+      };
 
       function loadNavigationMenu() {
         if ('navigationMenu' in editor) {

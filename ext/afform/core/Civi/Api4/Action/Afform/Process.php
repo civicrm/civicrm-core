@@ -3,7 +3,6 @@
 namespace Civi\Api4\Action\Afform;
 
 use Civi\Api4\AfformSubmission;
-use Civi\Afform\Event\AfformSubmitEvent;
 
 /**
  * Class Process

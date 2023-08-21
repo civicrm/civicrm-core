@@ -14,11 +14,11 @@
         select: ["afform_name"],
         where: [["id", "=", id]],
       }).then(function(afformSubmissions) {
-        ctrl.afformName = afformSubmissions[0]['afform_name'];
+        ctrl.afformName = afformSubmissions[0].afform_name;
       }, function(error) {
         ctrl.onError();
       });
-    }
+    };
 
     this.processData = function() {
       _.each(ctrl.ids, function(id) {
@@ -28,12 +28,12 @@
           name: ctrl.afformName
         }).then(function(result) {
         }, function(failure) {
-          ctrl.onError()
+          ctrl.onError();
         });
       });
 
       ctrl.onSuccess();
-    }
+    };
 
     this.save = function() {
       // get the afform name
