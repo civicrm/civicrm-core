@@ -44,7 +44,7 @@ class Submit extends AbstractProcessor {
     // Save submission record
     if (!empty($this->_afform['create_submission'])) {
       $status = 'Processed';
-      if (!empty($this->_afform['require_email_confirmation'])) {
+      if (!empty($this->_afform['manual_processing'])) {
         $status = 'Pending';
       }
 
@@ -57,7 +57,7 @@ class Submit extends AbstractProcessor {
     }
 
     // let's not save the data in other CiviCRM table if email verification is needed.
-    if (!empty($this->_afform['require_email_confirmation'])) {
+    if (!empty($this->_afform['manual_processing'])) {
       return [];
     }
 

@@ -241,8 +241,16 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Boolean',
         ],
         [
-          'name' => 'require_email_confirmation',
+          'name' => 'manual_processing',
           'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'allow_verification_by_email',
+          'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'email_confirmation_template_id',
+          'data_type' => 'Integer',
         ],
         [
           'name' => 'navigation',
