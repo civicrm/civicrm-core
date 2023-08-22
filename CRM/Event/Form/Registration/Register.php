@@ -540,7 +540,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *   Form object.
    * @param bool $required
    *   True if you want to add formRule.
-   * @param null $discountId
+   * @param int|null $discountId
    *   Discount id for the event.
    * @param int|null $priceSetID
    *
