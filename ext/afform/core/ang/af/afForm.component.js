@@ -67,10 +67,13 @@
         }
         if (toLoad) {
           crmApi4('Afform', 'prefill', params)
-            .then(function(result) {
-              _.each(result, function(item) {
-                data[item.name] = data[item.name] || {};
-                _.extend(data[item.name], item.values, schema[item.name].data || {});
+            .then((result) => {
+              result.forEach((item) => {
+                // Use _.each() because item.values could be cast as an object if array keys are not sequential
+                _.each(item.values, (values, index) => {
+                  data[item.name][index].joins = {};
+                  angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name].data || {})});
+                });
               });
             });
         }
