@@ -1435,7 +1435,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $form->assign('priceSet', $form->_priceSet ?? NULL);
       }
       else {
-        CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->getDiscountID());
+        CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->getDiscountID(), $this->getPriceSetID());
       }
       $lineItem = [];
       $totalTaxAmount = 0;
