@@ -1641,7 +1641,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       $comparisonValue = $this->getComparisonValue($importedValue);
       return $options[$comparisonValue] ?? 'invalid_import_value';
     }
-    if (!empty($fieldMetadata['FKClassName']) || !empty($fieldMetadata['pseudoconstant']['prefetch'])) {
+    if (!empty($fieldMetadata['FKClassName']) || ($fieldMetadata['pseudoconstant']['prefetch'] ?? NULL) === 'disabled') {
       // @todo - make this generic - for fields where getOptions doesn't fetch
       // getOptions does not retrieve these fields with high potential results
       if ($fieldName === 'event_id') {

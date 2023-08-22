@@ -37,7 +37,7 @@
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
-      <prefetch>FALSE</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
   </field>
   <foreignKey>

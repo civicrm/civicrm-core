@@ -25,12 +25,18 @@ use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\EntityTag;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
 class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
+
+  public function setUp(): void {
+    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    parent::setUp();
+  }
 
   public function testOptionsAreReturned() {
     $fields = Contact::getFields(FALSE)
@@ -88,11 +94,11 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     }
   }
 
-  public function testPreloadFalse() {
+  public function testPrefetchDisabled() {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
     Campaign::create()->setValues(['name' => 'Big Campaign', 'title' => 'Biggie'])->execute();
-    // The campaign_id field has preload = false in the schema,
+    // The campaign_id field has prefetch = disabled in the schema,
     // Which means the options will NOT load but suffixes are still available
     $fields = Contribution::getFields(FALSE)
       ->setLoadOptions(['name', 'label'])
@@ -146,6 +152,65 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('name', '=', 'employer_id')
       ->execute()->single();
     $this->assertEquals(['contact_type' => 'Organization'], $field['input_attrs']['filter']);
+  }
+
+  public function testTopSortFields(): void {
+    $sampleFields = [
+      [
+        'name' => 'd',
+        'title' => 'Fourth',
+        'input_attrs' => [
+          'control_field' => 'a',
+        ],
+      ],
+      [
+        'name' => 'a',
+        'title' => 'Third',
+        'input_attrs' => [
+          'control_field' => 'c',
+        ],
+      ],
+      [
+        'name' => 'b',
+        'title' => 'First',
+      ],
+      [
+        'name' => 'c',
+        'title' => 'Second',
+        'input_attrs' => [
+          'control_field' => 'b',
+        ],
+      ],
+    ];
+    CoreUtil::topSortFields($sampleFields);
+    $this->assertEquals(['First', 'Second', 'Third', 'Fourth'], array_column($sampleFields, 'title'));
+  }
+
+  public function entityFieldsWithDependencies(): array {
+    return [
+      ['Contact', ['contact_type', 'contact_sub_type']],
+      ['Case', ['case_type_id', 'status_id']],
+      ['EntityTag', ['entity_table', 'tag_id']],
+      ['Address', ['country_id', 'state_province_id', 'county_id']],
+      ['ActionSchedule', ['mapping_id', 'entity_value', 'entity_status']],
+      ['CustomGroup', ['extends', 'extends_entity_column_id', 'extends_entity_column_value']],
+    ];
+  }
+
+  /**
+   * @dataProvider entityFieldsWithDependencies
+   */
+  public function testTopSortEntityFields(string $entityName, array $orderedFieldNames): void {
+    $entityFields = (array) civicrm_api4($entityName, 'getFields', [
+      'checkPermissions' => FALSE,
+      'where' => [['name', 'IN', $orderedFieldNames]],
+    ]);
+    // Try sorting with different starting orders; the outcome should always be the same
+    $entityFields2 = array_reverse($entityFields);
+    CoreUtil::topSortFields($entityFields);
+    CoreUtil::topSortFields($entityFields2);
+    $this->assertEquals($orderedFieldNames, array_column($entityFields, 'name'));
+    $this->assertEquals($orderedFieldNames, array_column($entityFields2, 'name'));
   }
 
 }

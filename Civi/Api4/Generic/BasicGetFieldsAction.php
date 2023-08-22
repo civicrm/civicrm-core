@@ -364,6 +364,10 @@ class BasicGetFieldsAction extends BasicGetAction {
         'default_value' => FALSE,
       ],
       [
+        'name' => 'permission',
+        'data_type' => 'Array',
+      ],
+      [
         'name' => 'output_formatters',
         'data_type' => 'Array',
         '@internal' => TRUE,
