@@ -574,7 +574,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function getCMSPermissionsUrlParams() {
     if ($this->missingStandaloneExtension()) {
-      return ['ufAccessURL' => '/fixme/standalone/permissions/url/params'];
+      return ['ufAccessURL' => '/civicrm/admin/roles'];
     }
     return Security::singleton()->getCMSPermissionsUrlParams();
   }

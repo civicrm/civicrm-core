@@ -16,8 +16,8 @@
     "redirect": null,
     "create_submission": false,
     "navigation": {
-        "parent": "Administer",
-        "label": "Administer User Accounts",
+        "parent": "Users and Permissions",
+        "label": "User Accounts",
         "weight": 0
     }
 }
