@@ -70,7 +70,7 @@ class SubmitFile extends AbstractProcessor {
     $joinIndex = (int) $this->joinIndex;
     $idField = CoreUtil::getIdFieldName($apiEntity);
     if ($this->joinEntity) {
-      $entityId = $this->_entityIds[$this->modelName][$entityIndex]['_joins'][$this->joinEntity][$joinIndex][$idField] ?? NULL;
+      $entityId = $this->_entityIds[$this->modelName][$entityIndex]['joins'][$this->joinEntity][$joinIndex][$idField] ?? NULL;
     }
     else {
       $entityId = $this->_entityIds[$this->modelName][$entityIndex][$idField] ?? NULL;

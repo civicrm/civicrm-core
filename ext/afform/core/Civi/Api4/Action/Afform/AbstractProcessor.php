@@ -50,7 +50,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Each key in the array corresponds to the name of an entity,
    * and the value is an array of arrays
    * (because of `<af-repeat>` all entities are treated as if they may be multi)
-   * E.g. $entityIds['Individual1'] = [['id' => 1, '_joins' => ['Email' => [['id' => 1], ['id' => 2]]];
+   * E.g. $entityIds['Individual1'] = [['id' => 1, 'joins' => ['Email' => [['id' => 1], ['id' => 2]]];
    *
    * @var array
    */
@@ -122,10 +122,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       ->addSelect('data')
       ->addWhere('id', '=', $this->args['sid'])
       ->addWhere('afform_name', '=', $this->name)
-      ->addWhere('status_id:name', '=', 'Pending')
       ->execute()->first();
 
-    // do nothing and return early for invalid submission id
+    // do nothing and return early
     if (empty($afformSubmissionData)) {
       // unset sid from args
       $this->args['sid'] = NULL;
@@ -183,7 +182,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
             'limit' => !empty($join['af-repeat']) ? $join['max'] ?? 0 : 1,
             'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
           ]));
-          $this->_entityIds[$entity['name']][$index]['_joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($data['joins'][$joinEntity], [$joinIdField]);
+          $this->_entityIds[$entity['name']][$index]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($data['joins'][$joinEntity], [$joinIdField]);
         }
         $this->_entityValues[$entity['name']][$index] = $data;
       }
@@ -390,9 +389,10 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       foreach ($value as $idx => $val) {
         $idData = $ids[$name][$idx] ?? [];
         if (!$isJoin) {
-          $idData['_joins'] = $this->combineValuesAndIds($val['joins'] ?? [], $idData['_joins'] ?? [], TRUE);
+          $idData['joins'] = $this->combineValuesAndIds($val['joins'] ?? [], $idData['joins'] ?? [], TRUE);
         }
-        $item = array_merge($isJoin ? $val : ($val['fields'] ?? []), $idData);
+        // $item = array_merge($isJoin ? $val : ($val['fields'] ?? []), $idData);
+        $item = array_merge(($val ?? []), $idData);
         $combined[$name][$idx] = $item;
       }
     }

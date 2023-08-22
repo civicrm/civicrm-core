@@ -393,11 +393,11 @@ EOHTML;
     $this->assertEquals($contact['id'], $submission['data']['Individual1'][0]['id']);
     $this->assertEquals($contact['org.id'], $submission['data']['Organization1'][0]['id']);
     $this->assertEquals('Organization1', $submission['data']['Individual1'][0]['employer_id']);
-    $this->assertEquals($contact['email_primary'], $submission['data']['Individual1'][0]['_joins']['Email'][0]['id']);
-    $this->assertEquals($individualEmail, $submission['data']['Individual1'][0]['_joins']['Email'][0]['email']);
-    $this->assertEquals($locationType, $submission['data']['Individual1'][0]['_joins']['Email'][0]['location_type_id']);
-    $this->assertEquals($orgEmail, $submission['data']['Organization1'][0]['_joins']['Email'][0]['email']);
-    $this->assertEquals($locationType, $submission['data']['Organization1'][0]['_joins']['Email'][0]['location_type_id']);
+    $this->assertEquals($contact['email_primary'], $submission['data']['Individual1'][0]['joins']['Email'][0]['id']);
+    $this->assertEquals($individualEmail, $submission['data']['Individual1'][0]['joins']['Email'][0]['email']);
+    $this->assertEquals($locationType, $submission['data']['Individual1'][0]['joins']['Email'][0]['location_type_id']);
+    $this->assertEquals($orgEmail, $submission['data']['Organization1'][0]['joins']['Email'][0]['email']);
+    $this->assertEquals($locationType, $submission['data']['Organization1'][0]['joins']['Email'][0]['location_type_id']);
   }
 
   public function testDedupeIndividual(): void {
