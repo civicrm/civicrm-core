@@ -30,7 +30,8 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
   public function upgrade_5_66_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     // These run after the sql file
-    $this->addTask('Make ActionSchedule.name required', 'alterColumn', 'civicrm_action_schedule', 'name', "varchar(64) NOT NULL COMMENT 'Name of the action(reminder)'");
+    $this->addTask('Make Discount.entity_table required', 'alterColumn', 'civicrm_discount', 'entity_table', "varchar(64) NOT NULL COMMENT 'Name of the action(reminder)'");
+    $this->addTask('Make ActionSchedule.name required', 'alterColumn', 'civicrm_action_schedule', 'name', "varchar(64) NOT NULL COMMENT 'physical tablename for entity being joined to discount, e.g. civicrm_event'");
     $this->addTask(ts('Create index %1', [1 => 'civicrm_action_schedule.UI_name']), 'addIndex', 'civicrm_action_schedule', 'name', 'UI');
     $this->addTask('Add fields to civicrm_mail_settings to allow more flexibility for email to activity', 'addMailSettingsFields');
   }

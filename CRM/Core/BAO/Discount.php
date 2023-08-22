@@ -94,6 +94,17 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   }
 
   /**
+   * Whitelist of possible values for the entity_table field
+   *
+   * @return array
+   */
+  public static function entityTables(): array {
+    return [
+      'civicrm_event' => ts('Event'),
+    ];
+  }
+
+  /**
    * Determine in which discount set the registration date falls.
    *
    * @param int $entityID
