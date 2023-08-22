@@ -32,6 +32,21 @@ class Submit extends AbstractProcessor {
     // preprocess submitted values
     $entityValues = $this->preprocessSubmittedValues($this->values);
 
+    // get the submission information if we have submission id.
+    // currently we don't support processing of already processed forms
+    // return validation error in those cases
+    if (!empty($this->args['sid'])) {
+      $afformSubmissionData = \Civi\Api4\AfformSubmission::get(FALSE)
+        ->addWhere('id', '=', $this->args['sid'])
+        ->addWhere('afform_name', '=', $this->name)
+        ->addWhere('status_id:name', '=', 'Processed')
+        ->execute()->count();
+
+      if ($afformSubmissionData > 0) {
+        throw new \CRM_Core_Exception(ts('Submission is already processed.'));
+      }
+    }
+
     // Call validation handlers
     $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this, $entityValues);
     \Civi::dispatcher()->dispatch('civi.afform.validate', $event);

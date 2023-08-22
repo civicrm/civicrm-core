@@ -126,8 +126,6 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
 
     // do nothing and return early
     if (empty($afformSubmissionData)) {
-      // unset sid from args
-      $this->args['sid'] = NULL;
       return;
     }
 
@@ -171,7 +169,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     foreach ($ids as $index => $id) {
       $this->_entityIds[$entity['name']][$index] = [
         $idField => isset($result[$id]) ? $id : NULL,
-        '_joins' => [],
+        'joins' => [],
       ];
       if (isset($result[$id])) {
         $data = ['fields' => $result[$id]];
