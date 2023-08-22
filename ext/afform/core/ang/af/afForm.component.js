@@ -98,11 +98,11 @@
       };
 
       function displaySubmitButton(args) {
-        if (args['sid'] && args['sid'].length > 0) {
+        if (args.sid && args.sid.length > 0) {
           return false;
         }
         return true;
-      };
+      }
 
       // Used when submitting file fields
       this.fileUploader = new FileUploader({
