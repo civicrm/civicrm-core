@@ -83,6 +83,16 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
     return $optionGroupIDs;
   }
 
+  public static function buildOptions($fieldName, $context = NULL, $values = []) {
+    // Special logic for fields whose options depend on context or properties
+    if ($fieldName === 'price_set_id' && !empty($values['entity_table']) && !empty($values['entity_id'])) {
+      $priceSetIds = self::getOptionGroup($values['entity_id'], $values['entity_table']);
+      $params = ['condition' => ['id IN (' . implode(',', $priceSetIds) . ')']];
+      return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+    }
+    return parent::buildOptions($fieldName, $context, $values);
+  }
+
   /**
    * Determine in which discount set the registration date falls.
    *

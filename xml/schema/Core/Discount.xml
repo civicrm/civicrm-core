@@ -65,6 +65,7 @@
     <html>
       <label>Price Set</label>
       <type>Select</type>
+      <controlField>entity_id</controlField>
     </html>
     <add>4.3</add>
   </field>
