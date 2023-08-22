@@ -25,7 +25,7 @@ return [
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'number',
-    'default' => 10,
+    'default' => 15,
     'add' => '4.3',
     'title' => ts('Autocomplete Results'),
     'is_domain' => 1,
