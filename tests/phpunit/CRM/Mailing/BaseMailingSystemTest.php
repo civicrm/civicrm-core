@@ -82,10 +82,10 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertEquals("Mr. Foo{$offset} Anderson II", $message->to[0]->name);
       $this->assertEquals("mail{$offset}@nul.example.com", $message->to[0]->email);
 
-      $this->assertRegExp('#^text/plain; charset=utf-8#', $message->headers['Content-Type']);
-      $this->assertRegExp(';^b\.[\d\.a-f]+@chaos.org$;', $message->headers['Return-Path']);
-      $this->assertRegExp(';^b\.[\d\.a-f]+@chaos.org$;', $message->headers['X-CiviMail-Bounce'][0]);
-      $this->assertRegExp(';^\<mailto:u\.[\d\.a-f]+@chaos.org\>$;', $message->headers['List-Unsubscribe'][0]);
+      $this->assertMatchesRegularExpression('#^text/plain; charset=utf-8#', $message->headers['Content-Type']);
+      $this->assertMatchesRegularExpression(';^b\.[\d\.a-f]+@chaos.org$;', $message->headers['Return-Path']);
+      $this->assertMatchesRegularExpression(';^b\.[\d\.a-f]+@chaos.org$;', $message->headers['X-CiviMail-Bounce'][0]);
+      $this->assertMatchesRegularExpression(';^\<mailto:u\.[\d\.a-f]+@chaos.org\>$;', $message->headers['List-Unsubscribe'][0]);
       $this->assertEquals('bulk', $message->headers['Precedence'][0]);
     }
   }
@@ -107,7 +107,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertTrue($message->body instanceof ezcMailText);
 
       $this->assertEquals('plain', $message->body->subType);
-      $this->assertRegExp(
+      $this->assertMatchesRegularExpression(
         ";" .
         // Default header
         "Sample Header for TEXT formatted content.\n" .
@@ -140,7 +140,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       [$textPart, $htmlPart] = $message->body->getParts();
 
       $this->assertEquals('html', $htmlPart->subType);
-      $this->assertRegExp(
+      $this->assertMatchesRegularExpression(
         ";" .
         // Default header
         "Sample Header for HTML formatted content.\n" .
@@ -156,7 +156,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       );
 
       $this->assertEquals('plain', $textPart->subType);
-      $this->assertRegExp(
+      $this->assertMatchesRegularExpression(
         ";" .
         // Default header
         "Sample Header for TEXT formatted content.\n" .
@@ -197,7 +197,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       [$textPart, $htmlPart] = $message->body->getParts();
 
       $this->assertEquals('html', $htmlPart->subType);
-      $this->assertRegExp(
+      $this->assertMatchesRegularExpression(
         ";" .
         // body_html
         "<p>You can go to <a href=['\"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+&amp\\;qid=\d+['\"] rel='nofollow'>Google</a>" .
@@ -212,7 +212,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       );
 
       $this->assertEquals('plain', $textPart->subType);
-      $this->assertRegExp(
+      $this->assertMatchesRegularExpression(
         ";" .
         //  body_html, filtered
         "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
@@ -342,13 +342,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       if ($htmlUrlRegex) {
         $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'htmlUrlRegex' => $htmlUrlRegex, 'htmlPart' => $htmlPart->text], 1);
         $this->assertEquals('html', $htmlPart->subType, "Should have HTML part in case: $caseName");
-        $this->assertRegExp($htmlUrlRegex, $htmlPart->text, "Should have correct HTML in case: $caseName");
+        $this->assertMatchesRegularExpression($htmlUrlRegex, $htmlPart->text, "Should have correct HTML in case: $caseName");
       }
 
       if ($textUrlRegex) {
         $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'textUrlRegex' => $textUrlRegex, 'textPart' => $textPart->text], 1);
         $this->assertEquals('plain', $textPart->subType, "Should have text part in case: $caseName");
-        $this->assertRegExp($textUrlRegex, $textPart->text, "Should have correct text in case: $caseName");
+        $this->assertMatchesRegularExpression($textUrlRegex, $textPart->text, "Should have correct text in case: $caseName");
       }
     }
   }

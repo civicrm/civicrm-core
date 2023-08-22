@@ -1431,8 +1431,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
 
     $origTimestamps = CRM_Contact_BAO_Contact::getTimestamps($contactId);
-    $this->assertRegexp('/^\d\d\d\d-\d\d-\d\d /', $origTimestamps['created_date']);
-    $this->assertRegexp('/^\d\d\d\d-\d\d-\d\d /', $origTimestamps['modified_date']);
+    $this->assertMatchesRegularExpression('/^\d\d\d\d-\d\d-\d\d /', $origTimestamps['created_date']);
+    $this->assertMatchesRegularExpression('/^\d\d\d\d-\d\d-\d\d /', $origTimestamps['modified_date']);
     $this->assertTrue($origTimestamps['created_date'] <= $origTimestamps['modified_date']);
 
     $prevTimestamps = $origTimestamps;
@@ -1442,8 +1442,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
       $callback($contactId);
       $newTimestamps = CRM_Contact_BAO_Contact::getTimestamps($contactId);
-      $this->assertRegexp('/^\d\d\d\d-\d\d-\d\d /', $newTimestamps['created_date'], "Malformed created_date (after $callbackName)");
-      $this->assertRegexp('/^\d\d\d\d-\d\d-\d\d /', $newTimestamps['modified_date'], "Malformed modified_date (after $callbackName)");
+      $this->assertMatchesRegularExpression('/^\d\d\d\d-\d\d-\d\d /', $newTimestamps['created_date'], "Malformed created_date (after $callbackName)");
+      $this->assertMatchesRegularExpression('/^\d\d\d\d-\d\d-\d\d /', $newTimestamps['modified_date'], "Malformed modified_date (after $callbackName)");
       $this->assertEquals($origTimestamps['created_date'], $newTimestamps['created_date'], "Changed created_date (after $callbackName)");
       $this->assertTrue($prevTimestamps['modified_date'] < $newTimestamps['modified_date'], "Misordered modified_date (after $callbackName)");
 

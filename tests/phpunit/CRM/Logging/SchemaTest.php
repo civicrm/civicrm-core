@@ -59,7 +59,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     Civi::settings()->set('logging', TRUE);
     $log_table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE log_civicrm_acl');
     while ($log_table->fetch()) {
-      $this->assertRegexp('/ENGINE=InnoDB/', $log_table->Create_Table);
+      $this->assertMatchesRegularExpression('/ENGINE=InnoDB/', $log_table->Create_Table);
     }
   }
 
@@ -71,7 +71,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     Civi::settings()->set('logging', TRUE);
     $log_table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE log_civicrm_acl');
     while ($log_table->fetch()) {
-      $this->assertRegexp('/ENGINE=MyISAM/', $log_table->Create_Table);
+      $this->assertMatchesRegularExpression('/ENGINE=MyISAM/', $log_table->Create_Table);
     }
   }
 
@@ -110,19 +110,19 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('ALTER TABLE log_civicrm_acl ENGINE ARCHIVE');
     $log_table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE log_civicrm_acl');
     while ($log_table->fetch()) {
-      $this->assertRegexp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
+      $this->assertMatchesRegularExpression('/ENGINE=ARCHIVE/', $log_table->Create_Table);
     }
     // engine should not change by default
     $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => FALSE]);
     $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
     while ($log_table->fetch()) {
-      $this->assertRegExp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
+      $this->assertMatchesRegularExpression('/ENGINE=ARCHIVE/', $log_table->Create_Table);
     }
     // update with forceEngineMigration should convert to InnoDB
     $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => TRUE]);
     $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
     while ($log_table->fetch()) {
-      $this->assertRegExp('/ENGINE=InnoDB/', $log_table->Create_Table);
+      $this->assertMatchesRegularExpression('/ENGINE=InnoDB/', $log_table->Create_Table);
     }
   }
 
@@ -423,8 +423,8 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE civicrm_test_table");
     $dao->fetch();
     // using regex since not sure it's always int(10), so accept int(10), int(11), integer, etc...
-    $this->assertRegExp('/`id` int(.*) unsigned NOT NULL AUTO_INCREMENT/', $dao->Create_Table);
-    $this->assertRegExp('/`activity_id` int(.*) unsigned NOT NULL/', $dao->Create_Table);
+    $this->assertMatchesRegularExpression('/`id` int(.*) unsigned NOT NULL AUTO_INCREMENT/', $dao->Create_Table);
+    $this->assertMatchesRegularExpression('/`activity_id` int(.*) unsigned NOT NULL/', $dao->Create_Table);
     $this->assertStringContainsString('`texty` varchar(255)', $dao->Create_Table);
     $this->assertStringContainsString('ENGINE=InnoDB', $dao->Create_Table);
     $this->assertStringContainsString('FOREIGN KEY (`activity_id`) REFERENCES `civicrm_activity` (`id`) ON DELETE CASCADE', $dao->Create_Table);
@@ -434,8 +434,8 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $dao->fetch();
     $this->assertStringNotContainsString('AUTO_INCREMENT', $dao->Create_Table);
     // This seems debatable whether `id` should lose its NOT NULL status
-    $this->assertRegExp('/`id` int(.*) unsigned DEFAULT NULL/', $dao->Create_Table);
-    $this->assertRegExp('/`activity_id` int(.*) unsigned DEFAULT NULL/', $dao->Create_Table);
+    $this->assertMatchesRegularExpression('/`id` int(.*) unsigned DEFAULT NULL/', $dao->Create_Table);
+    $this->assertMatchesRegularExpression('/`activity_id` int(.*) unsigned DEFAULT NULL/', $dao->Create_Table);
     $this->assertStringContainsString('`texty` varchar(255)', $dao->Create_Table);
     $this->assertStringContainsString('ENGINE=InnoDB', $dao->Create_Table);
     $this->assertStringNotContainsString('FOREIGN KEY', $dao->Create_Table);

@@ -48,7 +48,7 @@ class CryptoJwtTest extends \CiviUnitTestCase {
       $this->fail('Expected decode to fail with exception');
     }
     catch (CryptoException $e) {
-      $this->assertRegExp(';Expired token;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Expired token;', $e->getMessage());
     }
   }
 
@@ -89,7 +89,7 @@ class CryptoJwtTest extends \CiviUnitTestCase {
         $this->fail('Expected decode to fail with exception');
       }
       catch (CryptoException $e) {
-        $this->assertRegExp(';Signature verification failed;', $e->getMessage());
+        $this->assertMatchesRegularExpression(';Signature verification failed;', $e->getMessage());
       }
     }
   }

@@ -313,7 +313,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
         $this->assertEquals($expectMessage['to'], $actualMessage['to'], $errorText);
       }
       if (isset($expectMessage['subject'])) {
-        $this->assertRegExp($expectMessage['subject'], $actualMessage['subject'], $errorText);
+        $this->assertMatchesRegularExpression($expectMessage['subject'], $actualMessage['subject'], $errorText);
       }
     }
   }

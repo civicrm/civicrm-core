@@ -126,7 +126,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     // check that contribution page ID isn't changed
     $this->assertEquals($contributionPageID1, $contribution['contribution_page_id']);
     // check that paid later information is present in contribution's source
-    $this->assertRegExp("/Paid later via page ID: $contributionPageID2/", $contribution['contribution_source']);
+    $this->assertMatchesRegularExpression("/Paid later via page ID: $contributionPageID2/", $contribution['contribution_source']);
     // check that contribution status is changed to 'Completed' from 'Pending'
     $this->assertEquals('Completed', $contribution['contribution_status']);
 

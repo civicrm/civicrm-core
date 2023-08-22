@@ -87,7 +87,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
       $this->fail('Should fail without error policy');
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertRegExp('/Invalid error mode/', $e->getMessage());
+      $this->assertMatchesRegularExpression('/Invalid error mode/', $e->getMessage());
     }
 
     $q2 = Civi::queue('test/complete/2', [
@@ -386,7 +386,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
       $this->fail('Queue lookup should fail. There is neither pre-existing registration nor new details.');
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertRegExp(';Missing field "type";', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Missing field "type";', $e->getMessage());
     }
   }
 

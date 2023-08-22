@@ -156,7 +156,7 @@ trait HttpTestTrait {
     }
 
     $response = $this->resolveResponse($response);
-    $this->assertRegexp($regexp, (string) $response->getBody(),
+    $this->assertMatchesRegularExpression($regexp, (string) $response->getBody(),
       $message . 'Response body does not match pattern' . $this->formatFailure($response));
     return $this;
   }
