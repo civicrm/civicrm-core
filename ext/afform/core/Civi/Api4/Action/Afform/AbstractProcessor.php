@@ -102,7 +102,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   public function loadEntity(array $entity, array $ids) {
     // Limit number of records based on af-repeat settings
     // If 'min' is set then it is repeatable, and max will either be a number or NULL for unlimited.
-    $ids = array_slice($ids, 0, isset($entity['min']) ? $entity['max'] : 1);
+    if (isset($entity['min']) && isset($entity['max'])) {
+      foreach (array_keys($ids) as $index) {
+        if ($index >= $entity['max']) {
+          unset($ids[$index]);
+        }
+      }
+    }
 
     $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
     $idField = CoreUtil::getIdFieldName($entity['type']);
