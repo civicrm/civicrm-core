@@ -392,6 +392,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     ];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
 
+    $this->assertEquals($contacts[0], $result[0]['key']);
+
     // Contact 1 first name can be updated
     $this->assertEquals('One', $result[0]['columns'][0]['val']);
     $this->assertEquals($contacts[0], $result[0]['columns'][0]['edit']['record']['id']);
@@ -1342,6 +1344,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // Second Individual
     $expectedFirstNameEdit['record']['id'] = $contact[1]['id'];
     $expectedFirstNameEdit['value'] = NULL;
+    $this->assertEquals($contact[1]['id'], $result[1]['key']);
     $this->assertEquals($expectedFirstNameEdit, $result[1]['columns'][0]['edit']);
     $this->assertTrue(!isset($result[1]['columns'][1]['edit']));
     $this->assertTrue(!isset($result[1]['columns'][2]['edit']));
@@ -1576,6 +1579,49 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('fa-user', $result[1]['columns'][0]['icons'][0]['class']);
     $this->assertEquals('Starry', $result[2]['columns'][0]['val']);
     $this->assertEquals('fa-star', $result[2]['columns'][0]['icons'][0]['class']);
+  }
+
+  public function testKeyIsReturned(): void {
+    $id = $this->createTestRecord('Email')['id'];
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Email',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['email'],
+          'where' => [
+            ['id', 'IN', [$id]],
+          ],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'limit' => 20,
+          'pager' => TRUE,
+          'actions' => TRUE,
+          'columns' => [
+            [
+              'key' => 'email',
+              'label' => 'Email',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $this->assertEquals($id, $result[0]['key']);
   }
 
 }
