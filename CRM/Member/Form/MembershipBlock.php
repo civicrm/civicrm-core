@@ -242,16 +242,16 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
     }
     if (!empty($params['member_is_active'])) {
       // Don't allow Contribution price set w/ membership signup, CRM-5095.
-      $priceSetExtendsMembership = \Civi\Api4\PriceSetEntity::get(FALSE)
+      $priceSetNotExtendingMembership = \Civi\Api4\PriceSetEntity::get(FALSE)
         ->addSelect('id')
         ->addJoin('PriceSet AS price_set', 'LEFT', ['price_set_id', '=', 'price_set.id'])
         ->addWhere('entity_table', '=', 'civicrm_contribution_page')
         ->addWhere('entity_id', '=', $contributionPageId)
-        ->addWhere('price_set.extends:name', 'CONTAINS', 'CiviMember')
+        ->addWhere('price_set.extends:name', 'NOT CONTAINS', 'CiviMember')
         ->addWhere('price_set.is_quick_config', '=', 0)
         ->execute()
         ->first();
-      if (!$priceSetExtendsMembership) {
+      if ($priceSetNotExtendingMembership) {
         $errors['member_is_active'] = ts('You cannot enable both Membership Signup and a Contribution Price Set on the same online contribution page.');
         return $errors;
       }
