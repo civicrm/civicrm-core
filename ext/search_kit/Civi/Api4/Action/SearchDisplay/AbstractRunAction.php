@@ -87,6 +87,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   private $entityActions;
 
+  private $editableInfo = [];
+
   /**
    * Override execute method to change the result object type
    * @return \Civi\Api4\Result\SearchDisplayRunResult
@@ -805,7 +807,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, nullable: bool, fk_entity: string, value_key: string, value_path: string, id_key: string, id_path: string, explicit_join: string, grouping_fields: array}|null
    */
   private function getEditableInfo($key) {
-    $result = NULL;
+    if (array_key_exists($key, $this->editableInfo)) {
+      return $this->editableInfo[$key];
+    }
     // Strip pseudoconstant suffix
     [$key] = explode(':', $key);
     $field = $this->getField($key);
@@ -813,9 +817,19 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!empty($field['implicit_join']) && empty($field['custom_field_id'])) {
       return $this->getEditableInfo(substr($key, 0, -1 - strlen($field['name'])));
     }
+    $result = NULL;
     if ($field) {
+      // Reload field with correct action because `$this->getField()` uses 'get' as the action
+      // TODO: Load options if pseudoconstant is dynamic (`ControlField` present)
+      $createModeField = civicrm_api4($field['entity'], 'getFields', [
+        'where' => [['name', '=', $field['name']]],
+        'checkPermissions' => FALSE,
+        'action' => 'create',
+      ])->first() ?? [];
+      // Merge with the augmented metadata like `explicit_join`
+      $field = $createModeField + $field;
       $idKey = CoreUtil::getIdFieldName($field['entity']);
-      $path = ($field['explicit_join'] ? $field['explicit_join'] . '.' : '');
+      $path = (!empty($field['explicit_join']) ? $field['explicit_join'] . '.' : '');
       $idPath = $path . $idKey;
       // Hack to support editing relationships
       if ($field['entity'] === 'RelationshipCache') {
@@ -846,7 +860,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         }
       }
     }
-    return $result;
+    return $this->editableInfo[$key] = $result;
   }
 
   /**
