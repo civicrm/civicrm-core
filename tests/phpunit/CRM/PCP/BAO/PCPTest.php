@@ -32,7 +32,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   public function testAddPCPBlock() {
 
     $params = $this->pcpBlockParams();
-    $pcpBlock = CRM_PCP_BAO_PCPBlock::create($params);
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord($params);
 
     $this->assertInstanceOf('CRM_PCP_DAO_PCPBlock', $pcpBlock, 'Check for created object');
     $this->assertEquals($params['entity_table'], $pcpBlock->entity_table, 'Check for entity table.');
@@ -58,13 +58,13 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
 
   public function testAddPCPNoStatus() {
     $blockParams = $this->pcpBlockParams();
-    $pcpBlock = CRM_PCP_BAO_PCPBlock::create($blockParams);
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord($blockParams);
 
     $params = $this->pcpParams();
     $params['pcp_block_id'] = $pcpBlock->id;
     unset($params['status_id']);
 
-    $pcp = CRM_PCP_BAO_PCP::create($params);
+    $pcp = CRM_PCP_BAO_PCP::writeRecord($params);
 
     $this->assertInstanceOf('CRM_PCP_DAO_PCP', $pcp, 'Check for created object');
     $this->assertEquals($params['contact_id'], $pcp->contact_id, 'Check for entity table.');
@@ -83,7 +83,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
 
     $pcp = CRM_Core_DAO::createTestObject('CRM_PCP_DAO_PCP');
     $pcpId = $pcp->id;
-    CRM_PCP_BAO_PCP::deleteById($pcpId);
+    CRM_PCP_BAO_PCP::deleteRecord(['id' => $pcpId]);
     $this->assertDBRowNotExist('CRM_PCP_DAO_PCP', $pcpId, 'Database check PCP deleted successfully.');
   }
 
@@ -93,7 +93,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testGetPcpDashboardInfo() {
-    $block = CRM_PCP_BAO_PCPBlock::create($this->pcpBlockParams());
+    $block = CRM_PCP_BAO_PCPBlock::writeRecord($this->pcpBlockParams());
     $contactID = $this->individualCreate();
     $submitParams = [
       'id' => 1,
@@ -129,7 +129,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     // Reset the cache otherwise our hook will not be called
     CRM_PCP_BAO_PCP::$_pcpLinks = NULL;
 
-    $block = CRM_PCP_BAO_PCPBlock::create($this->pcpBlockParams());
+    $block = CRM_PCP_BAO_PCPBlock::writeRecord($this->pcpBlockParams());
     $contactID = $this->individualCreate();
     $contributionPage = $this->callAPISuccessGetSingle('ContributionPage', []);
     $pcp = $this->callAPISuccess('Pcp', 'create', ['contact_id' => $contactID, 'title' => 'pcp', 'page_id' => $contributionPage['id'], 'pcp_block_id' => $block->id, 'is_active' => TRUE, 'status_id' => 'Approved']);
@@ -172,7 +172,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
    */
   public function testGatherMessageValuesForPCP() {
     // set up a pcp page
-    $block = CRM_PCP_BAO_PCPBlock::create($this->pcpBlockParams());
+    $block = CRM_PCP_BAO_PCPBlock::writeRecord($this->pcpBlockParams());
     // The owner of the pcp, who gets the soft credit
     $contact_owner = $this->individualCreate([], 0, TRUE);
     $contributionPage = $this->callAPISuccessGetSingle('ContributionPage', []);

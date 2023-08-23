@@ -89,7 +89,7 @@ trait CRMTraits_PCP_PCPTestTrait {
     $params = array_merge($this->pcpParams(), $params);
     $params['pcp_block_id']  = PCPBlock::create()->setValues($blockParams)->execute()->first()['id'];
 
-    $pcp = CRM_PCP_BAO_PCP::create($params);
+    $pcp = CRM_PCP_BAO_PCP::writeRecord($params);
     return (int) $pcp->id;
   }
 
