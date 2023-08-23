@@ -2290,7 +2290,7 @@ ORDER BY civicrm_email.is_primary DESC";
 
           // if auth source is not checksum / login && $value is blank, do not proceed - CRM-10128
           if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
-            ($value == '' || !isset($value))
+            ($value == '' || !isset($value) || (is_array($value) && empty($value)))
           ) {
             continue;
           }
