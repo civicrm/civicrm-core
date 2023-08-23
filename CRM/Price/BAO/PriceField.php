@@ -309,20 +309,20 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         ]);
 
         $extra = [];
-        if (!empty($qf->_membershipBlock) && $isQuickConfig && $field->name == 'other_amount') {
-          $useRequired = 0;
-        }
-        elseif (!empty($fieldOptions[$optionKey]['label'])) {
+        if (!empty($fieldOptions[$optionKey]['label'])) {
           //check for label.
           $label = $fieldOptions[$optionKey]['label'];
-          if ($isQuickConfig && $field->name === 'contribution_amount' && strtolower($fieldOptions[$optionKey]['name']) == 'other_amount') {
-            $label .= '  ' . $currencySymbol;
-            $qf->assign('priceset', $elementName);
-            $extra = [
-              'onclick' => 'useAmountOther();',
-              'autocomplete' => 'off',
-            ];
+        }
+        if ($isQuickConfig && $field->name === 'other_amount') {
+          if (!empty($qf->_membershipBlock)) {
+            $useRequired = 0;
           }
+          $label .= '  ' . $currencySymbol;
+          $qf->assign('priceset', $elementName);
+          $extra = [
+            'onclick' => 'useAmountOther();',
+            'autocomplete' => 'off',
+          ];
         }
 
         $element = &$qf->add('text', $elementName, $label,
