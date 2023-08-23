@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
+class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP implements \Civi\Core\HookInterface {
 
   /**
    * The action links that we need to display for the browse screen.
@@ -24,31 +24,29 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
   public static $_pcpLinks = NULL;
 
   /**
-   * Add or update either a Personal Campaign Page OR a PCP Block.
-   *
-   * @param array $params
-   *   Values to create the pcp.
-   *
-   * @return object
+   * @deprecated
+   * @return CRM_PCP_DAO_PCP
    */
   public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
+  }
 
-    $dao = new CRM_PCP_DAO_PCP();
-    $dao->copyValues($params);
-
-    // ensure we set status_id since it is a not null field
-    // we should change the schema and allow this to be null
-    if (!$dao->id && !isset($dao->status_id)) {
-      $dao->status_id = 0;
+  /**
+   * Callback for hook_civicrm_pre().
+   *
+   * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
+    if ($event->action === 'create') {
+      // For some reason `status_id` is allowed to be empty
+      // FIXME: Why?
+      $event->params['status_id'] = $event->params['status_id'] ?? 0;
+      // Supply default for `currency`
+      $event->params['currency'] = $event->params['currency'] ?? Civi::settings()->get('defaultCurrency');
     }
-
-    // set currency for CRM-1496
-    if (!isset($dao->currency)) {
-      $dao->currency = CRM_Core_Config::singleton()->defaultCurrency;
-    }
-
-    $dao->save();
-    return $dao;
   }
 
   /**
@@ -341,24 +339,12 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
   }
 
   /**
-   * Delete the campaign page.
-   *
+   * @deprecated
    * @param int $id
-   *   Campaign page id.
    */
   public static function deleteById($id) {
-    CRM_Utils_Hook::pre('delete', 'Campaign', $id);
-
-    $transaction = new CRM_Core_Transaction();
-
-    // delete from pcp table
-    $pcp = new CRM_PCP_DAO_PCP();
-    $pcp->id = $id;
-    $pcp->delete();
-
-    $transaction->commit();
-
-    CRM_Utils_Hook::post('delete', 'Campaign', $id, $pcp);
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return self::deleteRecord(['id' => $id]);
   }
 
   /**

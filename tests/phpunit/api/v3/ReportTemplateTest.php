@@ -1444,7 +1444,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     // pcpBLockParams creates a contribution page and returns the parameters
     // necessary to create a PBP Block.
     $blockParams = $this->pcpBlockParams();
-    $pcpBlock = CRM_PCP_BAO_PCPBlock::create($blockParams);
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord($blockParams);
 
     // Keep track of the contribution page id created. We will use this
     // contribution page id for all the PCP pages.
@@ -1458,7 +1458,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $pcpParams['pcp_block_id'] = $pcpBlock->id;
     $pcpParams['page_id'] = $contribution_page_id;
     $pcpParams['page_type'] = 'contribute';
-    $pcp1 = CRM_PCP_BAO_PCP::create($pcpParams);
+    $pcp1 = CRM_PCP_BAO_PCP::writeRecord($pcpParams);
 
     // Nice work. Now, let's create a second PCP page.
     $pcpParams = $this->pcpParams();
@@ -1469,7 +1469,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $pcpParams['pcp_block_id'] = $pcpBlock->id;
     $pcpParams['page_id'] = $contribution_page_id;
     $pcpParams['page_type'] = 'contribute';
-    $pcp2 = CRM_PCP_BAO_PCP::create($pcpParams);
+    $pcp2 = CRM_PCP_BAO_PCP::writeRecord($pcpParams);
 
     // Get soft credit types, with the name column as the key.
     $soft_credit_types = CRM_Core_PseudoConstant::get('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', ['flip' => TRUE, 'labelColumn' => 'name']);
