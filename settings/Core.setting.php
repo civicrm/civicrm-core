@@ -99,7 +99,7 @@ return [
     'pseudoconstant' => [
       'optionGroupName' => 'address_options',
     ],
-    'default' => '12345689101112',
+    'default' => '1234568910',
     'add' => '4.1',
     'title' => ts('Address Fields'),
     'is_domain' => 1,
