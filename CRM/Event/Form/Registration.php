@@ -298,8 +298,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $this->assignPaymentProcessor($isPayLater);
       }
 
-      $discountId = $this->getDiscountID();
-      self::initEventFee($this, $this->_eventId, TRUE, $discountId);
+      $priceSetID = $this->getPriceSetID();
+      if ($priceSetID) {
+        self::initEventFee($this, $this->_eventId, TRUE, $priceSetID);
+      }
 
       // get the profile ids
       $ufJoinParams = [
@@ -571,41 +573,18 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $eventID
    * @param bool $doNotIncludeExpiredFields
    *   See CRM-16456.
-   * @param int|null $discountId
-   *   ID of any discount in use.
+   * @param int|null $priceSetId
+   *   ID of the price set in use.
    *
    * @throws \CRM_Core_Exception
    */
-  public static function initEventFee(&$form, $eventID, $doNotIncludeExpiredFields = TRUE, $discountId = NULL) {
-    // get price info
-
-    // retrive all active price set fields.
-    if ($discountId) {
-      $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
-    }
-    else {
-      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID);
+  public static function initEventFee(&$form, $eventID, $doNotIncludeExpiredFields, $priceSetId): void {
+    if (!$priceSetId) {
+      CRM_Core_Error::deprecatedWarning('this should not be reachable');
+      return;
     }
     self::initSet($form, $doNotIncludeExpiredFields, $priceSetId);
 
-    if (property_exists($form, '_context') && ($form->_context == 'standalone'
-        || $form->_context == 'participant')
-    ) {
-      $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($eventID, 'civicrm_event');
-      if (is_array($discountedEvent)) {
-        foreach ($discountedEvent as $key => $priceSetId) {
-          $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId);
-          $priceSet = $priceSet[$priceSetId] ?? NULL;
-          $form->_values['discount'][$key] = $priceSet['fields'] ?? NULL;
-          $fieldID = key($form->_values['discount'][$key]);
-          $form->_values['discount'][$key][$fieldID]['name'] = CRM_Core_DAO::getFieldValue(
-            'CRM_Price_DAO_PriceSet',
-            $priceSetId,
-            'title'
-          );
-        }
-      }
-    }
     $eventFee = $form->_values['fee'] ?? NULL;
     if (!is_array($eventFee) || empty($eventFee)) {
       $form->_values['fee'] = [];
@@ -674,7 +653,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $required = TRUE;
       }
 
-      $form->_priceSetId = $priceSetId;
       $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, $required, $doNotIncludeExpiredFields);
       $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
       $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
@@ -713,8 +691,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       if ($optionsMaxValueTotal) {
         $form->_priceSet['optionsMaxValueDetails'] = $optionsMaxValueDetails;
       }
-
-      $form->set('priceSetId', $form->_priceSetId);
       $form->set('priceSet', $form->_priceSet);
     }
   }
@@ -1730,6 +1706,31 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   protected function getDiscountID(): ?int {
     $id = CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event');
     return $id ?: NULL;
+  }
+
+  /**
+   * Get the price set ID for the event.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public function getPriceSetID(): ?int {
+    if ($this->_priceSetId === NULL) {
+      if ($this->getDiscountID()) {
+        $this->_priceSetId = (int) CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $this->getDiscountID(), 'price_set_id');
+      }
+      else {
+        $this->_priceSetId = (int) CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->getEventID());
+      }
+      $this->set('priceSetId', $this->_priceSetId);
+    }
+    return $this->_priceSetId ?: NULL;
   }
 
 }

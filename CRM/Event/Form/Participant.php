@@ -1428,14 +1428,31 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       //retrieve custom information
       $form->_values = [];
-      CRM_Event_Form_Registration::initEventFee($form, $event['id'], FALSE, $form->getDiscountID());
+      CRM_Event_Form_Registration::initEventFee($form, $event['id'], FALSE, $this->getPriceSetID());
+      if ($form->_context === 'standalone' || $form->_context === 'participant') {
+        $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($event['id'], 'civicrm_event');
+        if (is_array($discountedEvent)) {
+          foreach ($discountedEvent as $key => $discountedPriceSetID) {
+            $discountedPriceSet = CRM_Price_BAO_PriceSet::getSetDetail($discountedPriceSetID);
+            $discountedPriceSet = $discountedPriceSet[$discountedPriceSetID] ?? NULL;
+            $form->_values['discount'][$key] = $discountedPriceSet['fields'] ?? NULL;
+            $fieldID = key($form->_values['discount'][$key]);
+            // @todo  - this may be unused.
+            $form->_values['discount'][$key][$fieldID]['name'] = CRM_Core_DAO::getFieldValue(
+              'CRM_Price_DAO_PriceSet',
+              $discountedPriceSetID,
+              'title'
+            );
+          }
+        }
+      }
       //if payment done, no need to build the fee block.
       if (!empty($form->_paymentId)) {
         //fix to display line item in update mode.
         $form->assign('priceSet', $form->_priceSet ?? NULL);
       }
       else {
-        CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->getDiscountID());
+        CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->getDiscountID(), $this->getPriceSetID());
       }
       $lineItem = [];
       $totalTaxAmount = 0;

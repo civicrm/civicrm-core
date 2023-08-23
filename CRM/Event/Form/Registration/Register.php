@@ -423,7 +423,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // build amount only when needed, skip incase of event full and waitlisting is enabled
       // and few other conditions check preProcess()
       if (!$this->_noFees) {
-        self::buildAmount($this);
+        self::buildAmount($this, TRUE, NULL, $this->_priceSetId);
       }
       if (!$this->showPaymentOnConfirm) {
         CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
@@ -540,12 +540,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *   Form object.
    * @param bool $required
    *   True if you want to add formRule.
-   * @param int $discountId
+   * @param int|null $discountId
    *   Discount id for the event.
+   * @param int|null $priceSetID
    *
    * @throws \CRM_Core_Exception
    */
-  public static function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
+  public static function buildAmount(&$form, $required = TRUE, $discountId = NULL, $priceSetID = NULL) {
     $feeFields = $form->_values['fee'] ?? NULL;
 
     if (is_array($feeFields)) {
@@ -578,11 +579,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $className = CRM_Utils_System::getClassName($form);
 
     //build the priceset fields.
-    if (isset($form->_priceSetId) && $form->_priceSetId) {
+    if ($priceSetID) {
 
       //format price set fields across option full.
       self::formatFieldsForOptionFull($form);
-      $form->add('hidden', 'priceSetId', $form->_priceSetId);
+      // This is probably not required now - normally loaded from event ....
+      $form->add('hidden', 'priceSetId', $priceSetID);
 
       // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
       $adminFieldVisible = FALSE;
@@ -650,10 +652,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           }
         }
       }
-      $form->_priceSet['id'] = $form->_priceSet['id'] ?? $form->_priceSetId;
+      $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetID;
       $form->assign('priceSet', $form->_priceSet);
     }
     else {
+      // Is this reachable?
       $eventFeeBlockValues = $elements = $elementJS = [];
       foreach ($form->_feeBlock as $fee) {
         if (is_array($fee)) {

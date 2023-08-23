@@ -124,7 +124,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $params = ['id' => $this->_participantId];
 
     CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
-    $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->_eventId);
 
     $priceSetValues = CRM_Event_Form_EventFees::setDefaultPriceSet($this->_participantId, $this->_eventId, FALSE);
     $priceFieldId = (array_keys($this->_values['fee']));
@@ -172,8 +171,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     //retrieve custom information
     $this->_values = [];
 
-    CRM_Event_Form_Registration::initEventFee($this, $event['id'], $this->_action !== CRM_Core_Action::UPDATE, $this->getDiscountID());
-    CRM_Event_Form_Registration_Register::buildAmount($this, TRUE);
+    CRM_Event_Form_Registration::initEventFee($this, $event['id'], $this->_action !== CRM_Core_Action::UPDATE, $this->getPriceSetID());
+    CRM_Event_Form_Registration_Register::buildAmount($this, TRUE, NULL, $this->getPriceSetID());
 
     if (!CRM_Utils_System::isNull($this->_values['line_items'] ?? NULL)) {
       $lineItem[] = $this->_values['line_items'];
@@ -424,6 +423,32 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $this->_eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_participantId, 'event_id');
     }
     return $this->_eventId;
+  }
+
+  /**
+   * Get the price set ID for the event.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public function getPriceSetID(): ?int {
+    if ($this->getDiscountID()) {
+      $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $this->getDiscountID(), 'price_set_id');
+    }
+    else {
+      $priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->getEventID());
+    }
+    // Currently some extensions, eg. civi-discount, might look for this. Once we can be
+    // sure all financial forms have the api-supported function `getPriceSetID` we can
+    // add some noise to attempts to get it & move people over.
+    $this->set('priceSetId', $priceSetID);
+    return $priceSetID;
   }
 
 }
