@@ -642,6 +642,7 @@ AND    u.status = 1
 
     // CRM-8655: Backdrop wasn't available during bootstrap, so
     // hook_civicrm_config() never executes.
+    // FIXME: This call looks redundant with the earlier call in the same function. Consider removing it.
     CRM_Utils_Hook::config($config);
 
     return FALSE;
