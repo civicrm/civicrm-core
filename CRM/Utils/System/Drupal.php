@@ -513,7 +513,7 @@ AND    u.status = 1
     // all the modules that are listening on it, does not apply
     // to J! and WP as yet
     // CRM-8655
-    CRM_Utils_Hook::config($config);
+    CRM_Utils_Hook::config($config, ['uf' => TRUE]);
 
     if (!$loadUser) {
       return TRUE;
