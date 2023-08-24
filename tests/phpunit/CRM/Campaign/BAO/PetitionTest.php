@@ -19,6 +19,11 @@ use Civi\Api4\MessageTemplate;
  */
 class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    parent::setUp();
+  }
+
   public function tearDown(): void {
     $this->revertTemplateToReservedTemplate();
     parent::tearDown();
