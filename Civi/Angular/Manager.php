@@ -56,7 +56,7 @@ class Manager {
    */
   public function __construct($res, \CRM_Utils_Cache_Interface $cache = NULL) {
     $this->res = $res;
-    $this->cache = $cache ? $cache : new \CRM_Utils_Cache_ArrayCache([]);
+    $this->cache = $cache ?: new \CRM_Utils_Cache_ArrayCache([]);
   }
 
   /**

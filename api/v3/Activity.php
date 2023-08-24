@@ -641,7 +641,7 @@ function _civicrm_api3_activity_check_params(&$params) {
   $activityTypeId = $params['activity_type_id'] ?? NULL;
 
   if ($activityName || $activityLabel) {
-    $activityTypeIdInList = array_search(($activityName ? $activityName : $activityLabel), $activityTypes);
+    $activityTypeIdInList = array_search(($activityName ?: $activityLabel), $activityTypes);
 
     if (!$activityTypeIdInList) {
       $errorString = $activityName ? "Invalid Activity Name : $activityName" : "Invalid Activity Type Label";

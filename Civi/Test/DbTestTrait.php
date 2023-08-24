@@ -111,7 +111,7 @@ trait DbTestTrait {
    * @param null $message
    */
   public function assertDBRowNotExist($daoName, $id, $message = NULL) {
-    $message = $message ? $message : "$daoName (#$id) should not exist";
+    $message = $message ?: "$daoName (#$id) should not exist";
     $value = \CRM_Core_DAO::getFieldValue($daoName, $id, 'id', 'id', TRUE);
     $this->assertNull($value, $message);
   }
@@ -123,7 +123,7 @@ trait DbTestTrait {
    * @param null $message
    */
   public function assertDBRowExist($daoName, $id, $message = NULL) {
-    $message = $message ? $message : "$daoName (#$id) should exist";
+    $message = $message ?: "$daoName (#$id) should exist";
     $value = \CRM_Core_DAO::getFieldValue($daoName, $id, 'id', 'id', TRUE);
     $this->assertEquals($id, $value, $message);
   }
