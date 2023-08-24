@@ -2579,10 +2579,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
         );
       }
       $form->add('checkbox', "{$prefix}updateTemplate", ts('Update Template'), NULL);
-
-      $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), NULL, FALSE,
-        ['onclick' => "showSaveDetails(this, '{$prefix}');"]
-      );
+      $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), ['onclick' => "showSaveDetails(this, '{$prefix}');"]);
       $form->add('text', "{$prefix}saveTemplateName", ts('Template Title'));
     }
 
