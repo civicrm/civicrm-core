@@ -147,8 +147,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'columns' => $columns,
         'cssClass' => implode(' ', $style),
       ];
-      if (isset($data[$keyName])) {
-        $row['key'] = $data[$keyName];
+      if (isset($record[$keyName])) {
+        $row['key'] = $record[$keyName];
       }
       $rows[] = $row;
     }
