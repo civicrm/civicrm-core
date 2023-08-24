@@ -12,8 +12,10 @@
 namespace Civi\Afform;
 
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
 use CRM_Afform_ExtensionUtil as E;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Every afform with the property `is_token=true` should have a corresponding
@@ -21,8 +23,21 @@ use CRM_Afform_ExtensionUtil as E;
  *
  * @see MockPublicFormTest
  * @package Civi\Afform
+ * @service civi.afform.tokens
  */
-class Tokens {
+class Tokens extends AutoService implements EventSubscriberInterface {
+
+  public static function getSubscribedEvents(): array {
+    if (!\CRM_Extension_System::singleton()->getMapper()->isActiveModule('authx')) {
+      return [];
+    }
+
+    return [
+      'hook_civicrm_alterMailContent' => 'applyCkeditorWorkaround',
+      'hook_civicrm_tokens' => 'hook_civicrm_tokens',
+      'hook_civicrm_tokenValues' => 'hook_civicrm_tokenValues',
+    ];
+  }
 
   /**
    * CKEditor makes it hard to set an `href` to a token, so we often get
