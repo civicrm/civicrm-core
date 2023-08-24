@@ -34,6 +34,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
+   * @internal
+   * @return bool
+   */
+  public function isLoaded(): bool {
+    return class_exists('JFactory');
+  }
+
+  /**
    * @inheritDoc
    */
   public function createUser(&$params, $mailParam) {
