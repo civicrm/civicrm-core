@@ -43,11 +43,11 @@
       // With no arguments this will prefill the entire form based on url args
       // With selectedEntity, selectedIndex & selectedId provided this will prefill a single entity
       this.loadData = function(selectedEntity, selectedIndex, selectedId, selectedField) {
-        var toLoad = 0,
-          params = {name: ctrl.getFormMeta().name, args: {}};
+        let toLoad = false;
+        const params = {name: ctrl.getFormMeta().name, args: {}};
         // Load single entity
         if (selectedEntity) {
-          toLoad = 1;
+          toLoad = !!selectedId;
           params.matchField = selectedField;
           params.args[selectedEntity] = {};
           params.args[selectedEntity][selectedIndex] = selectedId;
@@ -57,7 +57,7 @@
           args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
           _.each(schema, function (entity, entityName) {
             if (args[entityName] || entity.actions.update) {
-              toLoad++;
+              toLoad = true;
             }
             if (args[entityName] && typeof args[entityName] === 'string') {
               args[entityName] = args[entityName].split(',');
@@ -67,19 +67,23 @@
         }
         if (toLoad) {
           crmApi4('Afform', 'prefill', params)
-            .then(function(result) {
-              _.each(result, function(item) {
-                data[item.name] = data[item.name] || {};
-                _.extend(data[item.name], item.values, schema[item.name].data || {});
+            .then((result) => {
+              result.forEach((item) => {
+                // Use _.each() because item.values could be cast as an object if array keys are not sequential
+                _.each(item.values, (values, index) => {
+                  data[item.name][index].joins = {};
+                  angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name].data || {})});
+                });
               });
             });
         }
         // Clear existing contact selection
         else if (selectedEntity) {
-          data[selectedEntity][selectedIndex].fields = {};
-          if (data[selectedEntity][selectedIndex].joins) {
-            data[selectedEntity][selectedIndex].joins = {};
-          }
+          // Delete object keys without breaking object references
+          Object.keys(data[selectedEntity][selectedIndex].fields).forEach(key => delete data[selectedEntity][selectedIndex].fields[key]);
+          // Fill pre-set values
+          angular.merge(data[selectedEntity][selectedIndex].fields, _.cloneDeep(schema[selectedEntity].data || {}));
+          data[selectedEntity][selectedIndex].joins = {};
         }
       };
 
