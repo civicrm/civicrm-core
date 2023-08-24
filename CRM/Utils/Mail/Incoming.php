@@ -377,7 +377,7 @@ class CRM_Utils_Mail_Incoming {
       $createContact,
       $mail
     );
-    $subParam['id'] = $contactID ? $contactID : NULL;
+    $subParam['id'] = $contactID ?: NULL;
   }
 
   /**

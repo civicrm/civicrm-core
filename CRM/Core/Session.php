@@ -325,7 +325,7 @@ class CRM_Core_Session {
     $ts = $this->get($name, 'timer');
     if (!$ts || $ts < time() - $expire) {
       $this->set($name, time(), 'timer');
-      return $ts ? $ts : 'not set';
+      return $ts ?: 'not set';
     }
     return FALSE;
   }
@@ -502,7 +502,7 @@ class CRM_Core_Session {
         'text' => $text,
         'title' => $title,
         'type' => $type,
-        'options' => $options ? $options : NULL,
+        'options' => $options ?: NULL,
       ];
     }
   }

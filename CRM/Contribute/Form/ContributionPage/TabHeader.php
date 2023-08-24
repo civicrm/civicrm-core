@@ -179,7 +179,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       }
     }
 
-    $current = $current ? $current : 'settings';
+    $current = $current ?: 'settings';
     return $current;
   }
 

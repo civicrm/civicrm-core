@@ -226,7 +226,7 @@ class CRM_Core_Page_AJAX_Location {
         }
         $fld = "address[1][{$element}]";
         $value = $location['address'][1][$element] ?? NULL;
-        $value = $value ? $value : "";
+        $value = $value ?: "";
         $result[str_replace([
           '][',
           '[',
@@ -244,7 +244,7 @@ class CRM_Core_Page_AJAX_Location {
       for ($i = 1; $i < 3; $i++) {
         $fld = "{$block}[{$i}][{$element}]";
         $value = $location[$block][$i][$element] ?? NULL;
-        $value = $value ? $value : "";
+        $value = $value ?: "";
         $result[str_replace([
           '][',
           '[',

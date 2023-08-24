@@ -1135,7 +1135,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
     // retrieve contact id in case of Profile context
     $id = CRM_Utils_Request::retrieve('id', 'Positive');
-    $cid = $cid ? $cid : $id;
+    $cid = $cid ?: $id;
     if ($action & CRM_Core_Action::DELETE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
         CRM_Contact_BAO_Contact::deleteContactImage($cid);

@@ -489,7 +489,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Fudge some extra types that quickform doesn't support
     $inputType = $type;
     if ($type == 'wysiwyg' || in_array($type, self::$html5Types)) {
-      $attributes = ($attributes ? $attributes : []) + ['class' => ''];
+      $attributes = ($attributes ?: []) + ['class' => ''];
       $attributes['class'] = ltrim($attributes['class'] . " crm-form-$type");
       if ($type == 'wysiwyg' && isset($attributes['preset'])) {
         $attributes['data-preset'] = $attributes['preset'];
@@ -1397,7 +1397,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function &addRadio($name, $title, $values, $attributes = [], $separator = NULL, $required = FALSE, $optionAttributes = []) {
     $options = [];
-    $attributes = $attributes ? $attributes : [];
+    $attributes = $attributes ?: [];
     $allowClear = !empty($attributes['allowClear']);
     unset($attributes['allowClear']);
     $attributes['id_suffix'] = $name;

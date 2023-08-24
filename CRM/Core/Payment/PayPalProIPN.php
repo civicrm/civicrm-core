@@ -480,7 +480,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     ];
     foreach ($lookup as $name => $paypalName) {
       $value = $this->retrieve($paypalName, 'String', FALSE);
-      $input[$name] = $value ? $value : NULL;
+      $input[$name] = $value ?: NULL;
     }
 
     $input['is_test'] = $this->retrieve('test_ipn', 'Integer', FALSE);

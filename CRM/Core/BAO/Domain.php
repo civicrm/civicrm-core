@@ -273,7 +273,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
         $title, 'id', 'title', TRUE
       );
     }
-    return $groupID ? $groupID : FALSE;
+    return $groupID ?: FALSE;
   }
 
   /**

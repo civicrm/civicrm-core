@@ -138,7 +138,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
       $fileName = $this->_customClass->templateFile();
     }
 
-    return $fileName ? $fileName : parent::getTemplateFileName();
+    return $fileName ?: parent::getTemplateFileName();
   }
 
   public function postProcess() {

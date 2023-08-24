@@ -345,14 +345,14 @@ function civicrm_api3_custom_value_gettree($params) {
   $result = [];
   foreach ($tree as $group) {
     $result[$group['name']] = [];
-    $groupToReturn = $toReturn['custom_group'] ? $toReturn['custom_group'] : array_keys($group);
+    $groupToReturn = $toReturn['custom_group'] ?: array_keys($group);
     foreach ($groupToReturn as $item) {
       $result[$group['name']][$item] = $group[$item] ?? NULL;
     }
     $result[$group['name']]['fields'] = [];
     foreach ($group['fields'] as $fieldInfo) {
       $field = ['value' => NULL];
-      $fieldToReturn = $toReturn['custom_field'] ? $toReturn['custom_field'] : array_keys($fieldInfo);
+      $fieldToReturn = $toReturn['custom_field'] ?: array_keys($fieldInfo);
       foreach ($fieldToReturn as $item) {
         $field[$item] = $fieldInfo[$item] ?? NULL;
       }

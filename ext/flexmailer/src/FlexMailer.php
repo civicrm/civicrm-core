@@ -133,7 +133,7 @@ class FlexMailer {
    */
   public function __construct($context = array(), EventDispatcherInterface $dispatcher = NULL) {
     $this->context = $context;
-    $this->dispatcher = $dispatcher ? $dispatcher : \Civi::service('dispatcher');
+    $this->dispatcher = $dispatcher ?: \Civi::service('dispatcher');
   }
 
   /**

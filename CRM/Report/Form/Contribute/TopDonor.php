@@ -362,7 +362,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         }
       }
 
-      $pageId = $pageId ? $pageId : 1;
+      $pageId = $pageId ?: 1;
       $this->set(CRM_Utils_Pager::PAGE_ID, $pageId);
       $offset = ($pageId - 1) * $rowCount;
 

@@ -522,7 +522,7 @@ class CRM_Core_Menu {
           'id', 'name'
         );
       }
-      $menu[$path]['component_id'] = $componentId ? $componentId : NULL;
+      $menu[$path]['component_id'] = $componentId ?: NULL;
       $cache[$compPath] = $menu[$path]['component_id'];
     }
   }

@@ -397,7 +397,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       $activityStatus = array_flip($activityStatus);
       $this->_params = [
         'name' => "survey_{$survey->id}",
-        'title' => $params['report_title'] ? $params['report_title'] : $this->_values['title'],
+        'title' => $params['report_title'] ?: $this->_values['title'],
         'status_id_op' => 'eq',
         // reserved status
         'status_id_value' => $activityStatus['Scheduled'],
