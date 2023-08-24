@@ -90,7 +90,7 @@ EOHTML;
       ->execute()
       ->indexBy('name');
     $this->assertEquals('Logged In', $prefill['me']['values'][0]['fields']['first_name']);
-    $this->assertRegExp('/^User/', $prefill['me']['values'][0]['fields']['last_name']);
+    $this->assertMatchesRegularExpression('/^User/', $prefill['me']['values'][0]['fields']['last_name']);
 
     $submission = [
       ['fields' => ['first_name' => 'Firsty', 'last_name' => 'Lasty']],

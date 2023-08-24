@@ -48,11 +48,11 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       $this->assertEquals('/one/auth', $url['path']);
       \parse_str($url['query'], $actualQuery);
       $this->assertEquals('code', $actualQuery['response_type']);
-      $this->assertRegExp(';^[cs]_[a-zA-Z0-9]+$;', $actualQuery['state']);
+      $this->assertMatchesRegularExpression(';^[cs]_[a-zA-Z0-9]+$;', $actualQuery['state']);
       $this->assertEquals('scope-1-foo,scope-1-bar', $actualQuery['scope']);
       // ? // $this->assertEquals('auto', $actualQuery['approval_prompt']);
       $this->assertEquals('example-id', $actualQuery['client_id']);
-      $this->assertRegExp(';civicrm/oauth-client/return;', $actualQuery['redirect_uri']);
+      $this->assertMatchesRegularExpression(';civicrm/oauth-client/return;', $actualQuery['redirect_uri']);
     }
   }
 

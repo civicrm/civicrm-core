@@ -925,8 +925,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $case_1 = $this->callAPISuccess('Case', 'getsingle', [
       'id' => $case_created['id'],
     ]);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['created_date']);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['modified_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['created_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['modified_date']);
     $this->assertApproxEquals(strtotime($case_1['created_date']), strtotime($case_1['modified_date']), 2);
 
     $activity_1 = $this->callAPISuccess('activity', 'getsingle', [
@@ -935,8 +935,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
         'limit' => 1,
       ],
     ]);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['created_date']);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['modified_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['created_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['modified_date']);
     $this->assertApproxEquals(strtotime($activity_1['created_date']), strtotime($activity_1['modified_date']), 2);
 
     usleep(1.5 * 1000000);
@@ -948,8 +948,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $activity_2 = $this->callAPISuccess('activity', 'getsingle', [
       'id' => $activity_1['id'],
     ]);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['created_date']);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['modified_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['created_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['modified_date']);
     $this->assertNotEquals($activity_2['created_date'], $activity_2['modified_date']);
 
     $this->assertEquals($activity_1['created_date'], $activity_2['created_date']);
@@ -960,8 +960,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $case_2 = $this->callAPISuccess('Case', 'getsingle', [
       'id' => $case_created['id'],
     ]);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['created_date']);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['modified_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['created_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['modified_date']);
     $this->assertEquals($case_1['created_date'], $case_2['created_date']);
     $this->assertNotEquals($case_2['created_date'], $case_2['modified_date']);
   }

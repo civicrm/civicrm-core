@@ -196,7 +196,7 @@ function deep_copy(array $srcDirs, string $targetDir): void {
 
 function phpunit(array $args = []) {
   $argString = implode(' ' , array_map('escapeshellarg', $args));
-  $phpunit = getenv('PHPUNIT') ?: 'phpunit8';
+  $phpunit = getenv('PHPUNIT') ?: 'phpunit9';
   passthru_ok($phpunit . ' ' . $argString);
 }
 

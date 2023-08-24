@@ -170,7 +170,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(95.00, $contribution['net_amount']);
     $this->assertEquals(23456, $contribution['trxn_id']);
     $this->assertEquals(78910, $contribution['invoice_id']);
-    $this->assertRegExp('/INV_\d+/', $contribution['invoice_number']);
+    $this->assertMatchesRegularExpression('/INV_\d+/', $contribution['invoice_number']);
     $this->assertEquals('SSF', $contribution['contribution_source']);
     $this->assertEquals('Completed', $contribution['contribution_status']);
     // Create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id).

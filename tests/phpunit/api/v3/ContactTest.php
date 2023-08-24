@@ -617,7 +617,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'id' => $contactId,
       'api_key' => 'defg4321',
     ]);
-    $this->assertRegExp(';Permission denied to modify api key;', $result['error_message']);
+    $this->assertMatchesRegularExpression(';Permission denied to modify api key;', $result['error_message']);
 
     // Return everything -- because permissions are not being checked
     $config->userPermissionClass->permissions = [];
@@ -2650,7 +2650,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPIFailure('Contact', 'get', [
       'id' => '@user:exampleUser',
     ]);
-    $this->assertRegExp('/cannot be resolved to a contact ID/', $result['error_message']);
+    $this->assertMatchesRegularExpression('/cannot be resolved to a contact ID/', $result['error_message']);
   }
 
   /**

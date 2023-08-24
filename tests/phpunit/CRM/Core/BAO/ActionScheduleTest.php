@@ -1053,7 +1053,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       }
 
       foreach ($patterns as $field => $pattern) {
-        $this->assertRegExp($pattern, $messageArray[$field],
+        $this->assertMatchesRegularExpression($pattern, $messageArray[$field],
           "Check that '$field'' matches regex. " . print_r(['expected' => $patterns, 'actual' => $messageArray], 1));
       }
     }
