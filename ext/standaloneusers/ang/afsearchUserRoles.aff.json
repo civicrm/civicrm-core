@@ -6,7 +6,7 @@
     "server_route": "civicrm/admin/roles",
     "permission": "cms:administer users",
     "navigation": {
-        "parent": "Administer",
+        "parent": "Users and Permissions",
         "label": "User Roles",
         "weight": 0
     },
