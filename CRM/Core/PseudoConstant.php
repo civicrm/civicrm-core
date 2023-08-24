@@ -801,7 +801,7 @@ WHERE  id = %1";
    */
   public static function allGroup($groupType = NULL, $excludeHidden = TRUE) {
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
-    $groupKey = ($groupType ? $groupType : 'null') . !empty($excludeHidden);
+    $groupKey = ($groupType ?: 'null') . !empty($excludeHidden);
 
     if (!isset(Civi::$statics[__CLASS__]['groups']['allGroup'][$groupKey])) {
       self::populate(Civi::$statics[__CLASS__]['groups']['allGroup'][$groupKey], 'CRM_Contact_DAO_Group', FALSE, 'title', 'is_active', $condition);

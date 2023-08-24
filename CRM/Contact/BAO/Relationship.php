@@ -2040,7 +2040,7 @@ AND cc.sort_name LIKE '%$name%'";
    */
   public static function isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $updatedRelTypeID = NULL) {
     $existingTypeID = (int) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Relationship', $relationshipId, 'relationship_type_id');
-    $updatedRelTypeID = $updatedRelTypeID ? $updatedRelTypeID : $existingTypeID;
+    $updatedRelTypeID = $updatedRelTypeID ?: $existingTypeID;
     $currentEmployerID = (int) civicrm_api3('Contact', 'getvalue', ['return' => 'current_employer_id', 'id' => $params['contact_id_a']]);
 
     if ($currentEmployerID !== (int) $params['contact_id_b'] || !self::isRelationshipTypeCurrentEmployer($existingTypeID)) {

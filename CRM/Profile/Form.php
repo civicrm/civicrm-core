@@ -770,7 +770,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
           $return = TRUE;
           if (!$statusMessage) {
             $statusMessage = ts("This profile is configured for contact type '%1'. It cannot be used to edit contacts of other types.",
-                [1 => $profileSubType ? $profileSubType : $profileType]);
+                [1 => $profileSubType ?: $profileType]);
           }
         }
       }
@@ -1367,7 +1367,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
-    return $fileName ? $fileName : parent::getTemplateFileName();
+    return $fileName ?: parent::getTemplateFileName();
   }
 
   /**
@@ -1378,7 +1378,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
-    return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
+    return $fileName ?: parent::overrideExtraTemplateFileName();
   }
 
   /**

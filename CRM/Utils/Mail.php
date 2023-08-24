@@ -43,8 +43,8 @@ class CRM_Utils_Mail {
         throw new CRM_Core_Exception(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
       }
 
-      $params['host'] = $mailingInfo['smtpServer'] ? $mailingInfo['smtpServer'] : 'localhost';
-      $params['port'] = $mailingInfo['smtpPort'] ? $mailingInfo['smtpPort'] : 25;
+      $params['host'] = $mailingInfo['smtpServer'] ?: 'localhost';
+      $params['port'] = $mailingInfo['smtpPort'] ?: 25;
 
       if ($mailingInfo['smtpAuth']) {
         $params['username'] = $mailingInfo['smtpUsername'];

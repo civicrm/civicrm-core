@@ -227,7 +227,7 @@ WHERE      e.id = %1
       }
     }
 
-    $current = $current ? $current : 'settings';
+    $current = $current ?: 'settings';
     return $current;
   }
 

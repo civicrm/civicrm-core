@@ -225,10 +225,10 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
     $startDateRelative = $this->_params["start_date_relative"] ?? NULL;
 
     $startedDateSql = $this->dateClause('start_date', $startDateRelative, $startDateFrom, $startDateTo);
-    $startedDateSql = $startedDateSql ? $startedDateSql : " ( 1 ) ";
+    $startedDateSql = $startedDateSql ?: " ( 1 ) ";
 
     $cancelledDateSql = $this->dateClause('cancel_date', $startDateRelative, $startDateFrom, $startDateTo);
-    $cancelledDateSql = $cancelledDateSql ? $cancelledDateSql : " ( cancel_date IS NOT NULL ) ";
+    $cancelledDateSql = $cancelledDateSql ?: " ( cancel_date IS NOT NULL ) ";
 
     $started = $cancelled = $active = $total = 0;
 

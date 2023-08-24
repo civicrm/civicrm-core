@@ -439,7 +439,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           $actionMask,
           [
             'mid' => $row['id'],
-            'hashOrMid' => $hash ? $hash : $row['id'],
+            'hashOrMid' => $hash ?: $row['id'],
           ],
           "more",
           FALSE,

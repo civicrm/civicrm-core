@@ -3711,7 +3711,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         unset($_POST['crmPID_B'], $_POST['crmPID']);
       }
 
-      $pageId = $pageId ? $pageId : 1;
+      $pageId = $pageId ?: 1;
       $this->set(CRM_Utils_Pager::PAGE_ID, $pageId);
       $offset = ($pageId - 1) * $rowCount;
 
@@ -5118,7 +5118,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param string $table
    */
   public function setEntityRefDefaults(&$field, $table) {
-    $field['attributes'] = $field['attributes'] ? $field['attributes'] : [];
+    $field['attributes'] = $field['attributes'] ?: [];
     $field['attributes'] += [
       'entity' => CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table),
       'multiple' => TRUE,

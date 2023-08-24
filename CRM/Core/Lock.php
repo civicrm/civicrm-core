@@ -175,7 +175,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
       $query = "SELECT GET_LOCK( %1, %2 )";
       $params = [
         1 => [$this->_id, 'String'],
-        2 => [$timeout ? $timeout : $this->_timeout, 'Integer'],
+        2 => [$timeout ?: $this->_timeout, 'Integer'],
       ];
       $res = CRM_Core_DAO::singleValueQuery($query, $params);
       if ($res) {

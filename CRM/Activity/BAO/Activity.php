@@ -922,7 +922,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $details = "-ALTERNATIVE ITEM 0-\n{$html}{$additionalDetails}\n-ALTERNATIVE ITEM 1-\n{$text}{$additionalDetails}\n-ALTERNATIVE END-\n";
     }
     else {
-      $details = $html ? $html : $text;
+      $details = $html ?: $text;
       $details .= $additionalDetails;
     }
 
@@ -1703,7 +1703,7 @@ WHERE      activity.id IN ($activityIds)";
         'parent_id'
       );
 
-      $parentActivities[$activityId] = $parentId ? $parentId : FALSE;
+      $parentActivities[$activityId] = $parentId ?: FALSE;
     }
 
     return $parentActivities[$activityId];
