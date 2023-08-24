@@ -1430,7 +1430,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   public function entityCustomGroupWithSingleFieldCreate($function, $filename): array {
     $params = ['title' => $function];
     $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
-    $params['extends'] = $entity ? $entity : 'Contact';
+    $params['extends'] = $entity ?: 'Contact';
     $customGroup = $this->customGroupCreate($params);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'label' => $function]);
     CRM_Core_PseudoConstant::flush();
@@ -1453,7 +1453,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   public function entityCustomGroupWithSingleStringMultiSelectFieldCreate($function, $filename) {
     $params = ['title' => $function];
     $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
-    $params['extends'] = $entity ? $entity : 'Contact';
+    $params['extends'] = $entity ?: 'Contact';
     $customGroup = $this->customGroupCreate($params);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'label' => $function, 'html_type' => 'Multi-Select', 'default_value' => 1]);
     CRM_Core_PseudoConstant::flush();
