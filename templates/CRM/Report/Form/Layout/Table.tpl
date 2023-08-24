@@ -99,7 +99,10 @@
                     {assign var=fieldClass value=$field|cat:"_class"}
                     <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
                         {if array_key_exists($fieldLink, $row) && $row.$fieldLink}
-                            <a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}"  {if array_key_exists($fieldClass, $row)} class="{$row.$fieldClass}"{/if}>
+                            <a href="{$row.$fieldLink}"
+                               {if array_key_exists($fieldHover, $row)}title="{$row.$fieldHover|escape}"{/if}
+                               {if array_key_exists($fieldClass, $row)}class="{$row.$fieldClass}"{/if}
+                            >
                         {/if}
 
                         {if is_array($row.$field)}
