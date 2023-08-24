@@ -518,7 +518,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'contact_id' => $contactIDs['carol'],
     ]);
     // END SAMPLE DATA
-    unset(Civi::$statics['CRM_Core_Permission_Base']);
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', [
       'mailing_id' => $mail['id'],
@@ -733,7 +732,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'group_type' => 'Include',
     ];
     $this->callAPISuccess('MailingGroup', 'create', $mgParams);
-    unset(Civi::$statics['CRM_Core_Permission_Base']);
+    unset(Civi::$statics['CRM_ACL_API']);
 
     //Include previous mail in the mailing group.
     $mail2 = $this->callAPISuccess('mailing', 'create', $this->_params);

@@ -672,7 +672,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Group', ['check_permissions' => 1], 0);
     $this->hookClass->setHook('civicrm_aclGroup', [$this, 'aclGroupOnly']);
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclGroupContactsOnly']);
-    unset(Civi::$statics['CRM_ACL_API']['group_permission']);
+    unset(Civi::$statics['CRM_ACL_API']);
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
       'gid_value' => [$this->aclGroupID],

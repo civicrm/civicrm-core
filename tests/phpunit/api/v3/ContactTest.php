@@ -4590,7 +4590,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'group_id' => $create_group['id'],
       ];
       $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
-      unset(Civi::$statics['CRM_Core_Permission_Base']);
+      unset(Civi::$statics['CRM_ACL_API']);
       $contact_get = $this->callAPISuccess('contact', 'get', ['group' => $title, 'return' => 'group']);
       $this->assertEquals(1, $contact_get['count']);
       $this->assertEquals($created_contact_id, $contact_get['id']);
@@ -4633,7 +4633,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'created_id' => $created_contact_id,
       ];
       $create_group = $this->callAPISuccess('Group', 'create', $group_params);
-      unset(Civi::$statics['CRM_Core_Permission_Base']);
+      unset(Civi::$statics['CRM_ACL_API']);
       $createdGroupsIds[] = $create_group['id'];
       $createdGroupTitles[] = $title;
       // Add contact to the new group.
@@ -4700,7 +4700,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ];
       $this->callAPISuccess('GroupContact', 'create', $group_contact_params);
     }
-    unset(Civi::$statics['CRM_Core_Permission_Base']);
+    unset(Civi::$statics['CRM_ACL_API']);
     $contact_get = $this->callAPISuccess('contact', 'get', ['group' => [$createdGroupTitles[0] => 1], 'return' => 'group']);
     $this->assertEquals(1, $contact_get['count']);
     $this->assertEquals($created_contact_id, $contact_get['id']);
