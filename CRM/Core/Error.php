@@ -468,8 +468,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param string $name name of debug section
    * @param mixed $variable reference to variables that we need a trace of
-   * @param bool $log should we log or return the output
-   * @param bool $html whether to generate a HTML-escaped output
+   * @param bool $log should we call error_log and echo a reference, or return the output
+   * @param bool $html whether to generate a HTML-escaped output (not relevant if $log is truthy)
    * @param bool $checkPermission should we check permissions before displaying output
    *                useful when we die during initialization and permissioning
    *                subsystem is not initialized - CRM-13765
@@ -483,6 +483,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if ($variable === NULL) {
       $variable = $name;
       $name = NULL;
+    }
+
+    if ($log) {
+      // We don't want html crud in our text file logs.
+      $html = FALSE;
     }
 
     $out = print_r($variable, TRUE);
@@ -504,7 +509,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $log &&
       (!$checkPermission || CRM_Core_Permission::check('view debug output'))
     ) {
-      echo $out;
+      $unique = substr(md5(random_bytes(32)), 0, 12);
+      error_log("errorID:$unique\n$out");
+      echo "Critical error. Please see server logs for errorID:$unique";
     }
 
     return $out;
