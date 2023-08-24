@@ -791,7 +791,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $result = civicrm_api($Entity, 'Get', ['version' => 3]);
     $this->assertEquals(1, $result['is_error']);
     // $this->assertStringContainsString("API ($Entity, Get) does not exist", $result['error_message']);
-    $this->assertRegExp('/API (.*) does not exist/', $result['error_message']);
+    $this->assertMatchesRegularExpression('/API (.*) does not exist/', $result['error_message']);
   }
 
   /**

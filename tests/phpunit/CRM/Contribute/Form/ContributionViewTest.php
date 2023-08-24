@@ -71,7 +71,7 @@ class CRM_Contribute_Form_ContributionViewTest extends CiviUnitTestCase {
     unset($_GET['id'], $_REQUEST['id']);
     unset($_GET['cid'], $_REQUEST['cid']);
 
-    $this->assertRegExp('/Contribution Total:\s+\$10\.00/', $contents);
+    $this->assertMatchesRegularExpression('/Contribution Total:\s+\$10\.00/', $contents);
     $this->assertStringContainsString('Mr. Anthony Anderson II', $contents);
   }
 

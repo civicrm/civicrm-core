@@ -840,7 +840,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       $this->fail('Expected unquoted parameter to fail');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertRegExp(';Malformed token param;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Malformed token param;', $e->getMessage());
     }
   }
 

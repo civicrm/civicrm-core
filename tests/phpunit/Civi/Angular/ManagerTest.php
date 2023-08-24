@@ -99,7 +99,7 @@ class ManagerTest extends \CiviUnitTestCase {
    */
   public function testGetPartials() {
     $partials = $this->angular->getPartials('crmMailing');
-    $this->assertRegExp('/ng-form="crmMailingSubform">/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
+    $this->assertMatchesRegularExpression('/ng-form="crmMailingSubform">/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
     // If crmMailing changes, feel free to use a different example.
   }
 
@@ -110,7 +110,7 @@ class ManagerTest extends \CiviUnitTestCase {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', [$this, 'hook_civicrm_alterAngular']);
 
     $partials = $this->angular->getPartials('crmMailing');
-    $this->assertRegExp('/ng-form="crmMailingSubform" cat-stevens="ts\\(\'wild world\'\\)">/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
+    $this->assertMatchesRegularExpression('/ng-form="crmMailingSubform" cat-stevens="ts\\(\'wild world\'\\)">/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
     // If crmMailing changes, feel free to use a different example.
   }
 
@@ -118,11 +118,11 @@ class ManagerTest extends \CiviUnitTestCase {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_angularModules', [$this, 'hook_civicrm_angularModules_fooBar']);
 
     $paths = $this->angular->getResources(['fooBar'], 'js', 'path');
-    $this->assertRegExp('/visual-bundle.[a-z0-9]+.js/', $paths[0]);
-    $this->assertRegExp('/crossfilter/', file_get_contents($paths[0]));
+    $this->assertMatchesRegularExpression('/visual-bundle.[a-z0-9]+.js/', $paths[0]);
+    $this->assertMatchesRegularExpression('/crossfilter/', file_get_contents($paths[0]));
 
-    $this->assertRegExp('/Common.js/', $paths[1]);
-    $this->assertRegExp('/console/', file_get_contents($paths[1]));
+    $this->assertMatchesRegularExpression('/Common.js/', $paths[1]);
+    $this->assertMatchesRegularExpression('/console/', file_get_contents($paths[1]));
   }
 
   /**

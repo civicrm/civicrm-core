@@ -81,8 +81,8 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
   private function assertNotAuthorized(Psr\Http\Message\ResponseInterface $result, $directive) {
     $contents = $result->getBody()->getContents();
     $this->assertEquals(403, $result->getStatusCode());
-    $this->assertRegExp(';You are not authorized to access;', $contents);
-    $this->assertNotRegExp(';' . preg_quote("<$directive>", ';') . ';', $contents);
+    $this->assertMatchesRegularExpression(';You are not authorized to access;', $contents);
+    $this->assertDoesNotMatchRegularExpression(';' . preg_quote("<$directive>", ';') . ';', $contents);
   }
 
   /**
@@ -93,8 +93,8 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
   private function assertOpensPage(Psr\Http\Message\ResponseInterface $result, $directive) {
     $contents = $result->getBody()->getContents();
     $this->assertEquals(200, $result->getStatusCode());
-    $this->assertNotRegExp(';You are not authorized to access;', $contents);
-    $this->assertRegExp(';' . preg_quote("<$directive>", ';') . ';', $contents);
+    $this->assertDoesNotMatchRegularExpression(';You are not authorized to access;', $contents);
+    $this->assertMatchesRegularExpression(';' . preg_quote("<$directive>", ';') . ';', $contents);
   }
 
 }

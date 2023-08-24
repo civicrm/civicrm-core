@@ -608,7 +608,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       $loginArgs = ['principal' => [$principalField => $principalValue]];
       $report = $withCv(sprintf('try { return authx_login(%s); } catch (Exception $e) { return [get_class($e), $e->getMessage()]; }', var_export($loginArgs, 1)));
       $this->assertTrue(isset($report[0], $report[1]), "authx_login() should fail with invalid credentials ($principalField=>$principalValue). Received array: " . json_encode($report));
-      $this->assertRegExp($expectExceptionMessage, $report[1], "Invalid principal ($principalField=>$principalValue) should generate exception.");
+      $this->assertMatchesRegularExpression($expectExceptionMessage, $report[1], "Invalid principal ($principalField=>$principalValue) should generate exception.");
       $this->assertEquals($expectExceptionClass, $report[0], "Invalid principal ($principalField=>$principalValue) should generate exception.");
     }
   }
@@ -636,7 +636,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       $this->fail('Untrusted sessions should require authentication credentials');
     }
     catch (JsonRpcMethodException $e) {
-      $this->assertRegExp(';not trusted;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';not trusted;', $e->getMessage());
     }
 
     $login = $rpc->call('login', ['cred' => $this->credJwt($this->getDemoCID())]);

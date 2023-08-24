@@ -92,8 +92,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     $result = $this->callAPISuccess('mailing', 'create', $params);
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-    $this->assertRegexp('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
-    $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 

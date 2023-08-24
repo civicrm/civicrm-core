@@ -302,8 +302,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
     $this->assertStringContainsString("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
-    $this->assertRegexp('!>Forward this email</a>!', $previewResult['values']['body_html']);
-    $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!>Forward this email</a>!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
@@ -678,7 +678,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $submitParams['id'] = $id;
     if ($expectedFailure) {
       $submitResult = $this->callAPIFailure('mailing', 'submit', $submitParams);
-      $this->assertRegExp($expectedFailure, $submitResult['error_message']);
+      $this->assertMatchesRegularExpression($expectedFailure, $submitResult['error_message']);
     }
     else {
       $submitResult = $this->callAPIAndDocument('Mailing', 'submit', $submitParams, __FUNCTION__, __FILE__);
@@ -1077,7 +1077,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
       $this->callAPISuccess('mailing', 'create', $this->_params + ['id' => $mail['id'], 'modified_date' => '2 seconds ago']);
     }
     catch (Exception $e) {
-      $this->assertRegExp("/Failure in api call for mailing create:  Mailing has not been saved, Content maybe out of date, please refresh the page and try again/", $e->getMessage());
+      $this->assertMatchesRegularExpression("/Failure in api call for mailing create:  Mailing has not been saved, Content maybe out of date, please refresh the page and try again/", $e->getMessage());
     }
   }
 
