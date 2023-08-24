@@ -583,52 +583,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       CRM_Core_Error::deprecatedWarning('this should not be reachable');
       return;
     }
-    self::initSet($form, $doNotIncludeExpiredFields, $priceSetId);
-
-    $eventFee = $form->_values['fee'] ?? NULL;
-    if (!is_array($eventFee) || empty($eventFee)) {
-      $form->_values['fee'] = [];
-    }
-
-    //fix for non-upgraded price sets.CRM-4256.
-    if (isset($form->_isPaidEvent)) {
-      $isPaidEvent = $form->_isPaidEvent;
-    }
-    else {
-      $isPaidEvent = $form->_values['event']['is_monetary'] ?? NULL;
-    }
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-      && !empty($form->_values['fee'])
-    ) {
-      foreach ($form->_values['fee'] as $k => $fees) {
-        foreach ($fees['options'] as $options) {
-          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
-            unset($form->_values['fee'][$k]);
-          }
-        }
-      }
-    }
-    if ($isPaidEvent && empty($form->_values['fee'])) {
-      if (!in_array(CRM_Utils_System::getClassName($form), ['CRM_Event_Form_Participant', 'CRM_Event_Form_Task_Register'])) {
-        CRM_Core_Error::statusBounce(ts('No Fee Level(s) or Price Set is configured for this event.<br />Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $form->_eventId)]));
-      }
-    }
-  }
-
-  /**
-   * Initiate price set such that various non-BAO things are set on the form.
-   *
-   * This function is not really a BAO function so the location is misleading.
-   *
-   * @param CRM_Core_Form $form
-   *   Form entity id.
-   * @param bool $doNotIncludeExpiredFields
-   * @param int $priceSetId
-   *   Price Set ID
-   *
-   * @todo - removed unneeded code from previously-shared function
-   */
-  private static function initSet($form, $doNotIncludeExpiredFields = FALSE, $priceSetId = NULL) {
     //check if price set is is_config
     if (is_numeric($priceSetId)) {
       if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config') && $form->getVar('_name') != 'Participant') {
@@ -692,6 +646,35 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $form->_priceSet['optionsMaxValueDetails'] = $optionsMaxValueDetails;
       }
       $form->set('priceSet', $form->_priceSet);
+    }
+
+    $eventFee = $form->_values['fee'] ?? NULL;
+    if (!is_array($eventFee) || empty($eventFee)) {
+      $form->_values['fee'] = [];
+    }
+
+    //fix for non-upgraded price sets.CRM-4256.
+    if (isset($form->_isPaidEvent)) {
+      $isPaidEvent = $form->_isPaidEvent;
+    }
+    else {
+      $isPaidEvent = $form->_values['event']['is_monetary'] ?? NULL;
+    }
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+      && !empty($form->_values['fee'])
+    ) {
+      foreach ($form->_values['fee'] as $k => $fees) {
+        foreach ($fees['options'] as $options) {
+          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+            unset($form->_values['fee'][$k]);
+          }
+        }
+      }
+    }
+    if ($isPaidEvent && empty($form->_values['fee'])) {
+      if (!in_array(CRM_Utils_System::getClassName($form), ['CRM_Event_Form_Participant', 'CRM_Event_Form_Task_Register'])) {
+        CRM_Core_Error::statusBounce(ts('No Fee Level(s) or Price Set is configured for this event.<br />Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $form->_eventId)]));
+      }
     }
   }
 
