@@ -17,6 +17,11 @@
  */
 class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    parent::setUp();
+  }
+
   /**
    * Test Petition Email Sending using Domain tokens
    */
