@@ -208,7 +208,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @var int
    */
-  public $_paymentId = NULL;
+  public $_paymentId;
 
   /**
    * @var null
@@ -282,8 +282,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   public function preProcess() {
     parent::preProcess();
-    $this->_showFeeBlock = $_GET['eventId'] ?? NULL;
-    $this->assign('showFeeBlock', FALSE);
     $this->assign('feeBlockPaid', FALSE);
 
     // @todo eliminate this duplication.
@@ -327,13 +325,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->assign('participantMode', $this->_mode);
 
-    $this->assign('showFeeBlock', $this->_showFeeBlock);
-    if ($this->_showFeeBlock) {
-      $isMonetary = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_showFeeBlock, 'is_monetary');
-      if ($isMonetary) {
+    $isOverloadFeesMode = $this->isOverloadFeesMode();
+    $this->assign('showFeeBlock', $isOverloadFeesMode);
+    if ($isOverloadFeesMode) {
+      if (CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $_GET['eventId'], 'is_monetary')) {
         $this->assign('feeBlockPaid', TRUE);
       }
-      return CRM_Event_Form_EventFees::preProcess($this);
+      CRM_Event_Form_EventFees::preProcess($this);
+      return;
     }
 
     $this->assignUrlPath();
@@ -422,7 +421,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @throws \CRM_Core_Exception
    */
   public function setDefaultValues(): array {
-    if ($this->_showFeeBlock) {
+    if ($this->isOverloadFeesMode()) {
       return CRM_Event_Form_EventFees::setDefaultValues($this);
     }
 
@@ -582,7 +581,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
     $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
 
-    if ($this->_showFeeBlock) {
+    if ($this->isOverloadFeesMode()) {
       return $this->buildEventFeeForm($this);
     }
 
@@ -626,7 +625,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     if ($this->_single) {
       $contactField = $this->addEntityRef('contact_id', ts('Participant'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
-      if ($this->_context != 'standalone') {
+      if ($this->_context !== 'standalone') {
         $contactField->freeze();
       }
     }
@@ -828,7 +827,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // For single additions - show validation error if the contact has already been registered
     // for this event.
     if (($self->_action & CRM_Core_Action::ADD)) {
-      if ($self->_context == 'standalone') {
+      if ($self->_context === 'standalone') {
         $contactId = $values['contact_id'] ?? NULL;
       }
       else {
@@ -1215,7 +1214,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
         foreach ($recordContribution as $f) {
           $contributionParams[$f] = $this->_params[$f] ?? NULL;
-          if ($f == 'trxn_id') {
+          if ($f === 'trxn_id') {
             $this->assign('trxn_id', $contributionParams[$f]);
           }
         }
@@ -1304,7 +1303,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     ) {
       foreach ($this->_contactIds as $num => $contactID) {
         foreach ($this->_lineItem as $key => $value) {
-          if (is_array($value) && $value != 'skip') {
+          if (is_array($value) && $value !== 'skip') {
             foreach ($value as $lineKey => $line) {
               //10117 update the line items for participants if contribution amount is recorded
               if ($this->isQuickConfig() && !empty($params['total_amount']) &&
@@ -2333,6 +2332,25 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    */
   public function isQuickConfig(): bool {
     return $this->getPriceSetID() && CRM_Price_BAO_PriceSet::isQuickConfig($this->getPriceSetID());
+  }
+
+  /**
+   * Is the form being accessed in overload fees mode.
+   *
+   * Overload fees mode is when we are accessing the same form for a different
+   * purpose - to load the fees via ajax. We have historically fixed this for
+   * some forms by creating a new form class to move the functionality to and
+   * updating the path to call that (e.g CRM_Financial_Form_Payment was historically
+   * split in this way).
+   *
+   * This is much cleaner but the trap to be
+   * aware of is that the fields must be added to the quick form. It does require
+   * a bit of UI testing to do this. For now, adding comment...
+   *
+   * @return bool
+   */
+  protected function isOverloadFeesMode(): bool {
+    return (bool) ($_GET['eventId'] ?? NULL);
   }
 
 }
