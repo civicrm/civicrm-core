@@ -166,11 +166,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
 
-    //Is a repeating event
-    if ($this->_isRepeatingEvent) {
-      $isRepeatingEntity = TRUE;
-      $this->assign('isRepeatingEntity', $isRepeatingEntity);
-    }
+    $this->assign('isRepeatingEntity', $this->_isRepeatingEvent);
 
     // CRM-16776 - show edit/copy/create buttons for Profiles if user has required permission.
     $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
