@@ -497,6 +497,10 @@ class CRM_Core_CodeGen_Specification {
       if (!isset($field['pseudoconstant']['optionEditPath']) && !empty($field['pseudoconstant']['optionGroupName'])) {
         $field['pseudoconstant']['optionEditPath'] = 'civicrm/admin/options/' . $field['pseudoconstant']['optionGroupName'];
       }
+      // Set suffixes if explicitly declared
+      if (!empty($fieldXML->pseudoconstant->suffixes)) {
+        $field['pseudoconstant']['suffixes'] = explode(',', $this->value('suffixes', $fieldXML->pseudoconstant));
+      }
       // For now, fields that have option lists that are not in the db can simply
       // declare an empty pseudoconstant tag and we'll add this placeholder.
       // That field's BAO::buildOptions fn will need to be responsible for generating the option list

@@ -132,6 +132,7 @@
     </html>
     <pseudoconstant>
       <callback>CRM_Core_BAO_UserJob::getTypes</callback>
+      <suffixes>name,label,url</suffixes>
     </pseudoconstant>
     <add>5.50</add>
   </field>

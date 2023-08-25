@@ -63,6 +63,7 @@
     <add>1.1</add>
     <pseudoconstant>
       <callback>CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions</callback>
+      <suffixes>name,label,grouping</suffixes>
     </pseudoconstant>
     <html>
       <type>Select</type>
@@ -76,6 +77,7 @@
     <comment>FK to civicrm_option_value.id (for option group custom_data_type.)</comment>
     <pseudoconstant>
       <callback>CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions</callback>
+      <suffixes>name,label,grouping</suffixes>
     </pseudoconstant>
     <add>2.2</add>
     <html>

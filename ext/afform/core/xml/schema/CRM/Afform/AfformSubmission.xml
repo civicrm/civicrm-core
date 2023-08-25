@@ -52,6 +52,7 @@
     <add>5.41</add>
     <pseudoconstant>
       <callback>CRM_Afform_BAO_AfformSubmission::getAllAfformsByName</callback>
+      <suffixes>name,label,description,abbr,icon,url</suffixes>
     </pseudoconstant>
   </field>
 

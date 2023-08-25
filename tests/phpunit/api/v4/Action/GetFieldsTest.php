@@ -21,11 +21,14 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
+use Civi\Api4\Address;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
+use Civi\Api4\UserJob;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\TransactionalInterface;
 
@@ -139,11 +142,25 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
   public function testGetSuffixes() {
     $actFields = Activity::getFields(FALSE)
       ->execute()->indexBy('name');
-
     $this->assertEquals(['name', 'label', 'description'], $actFields['engagement_level']['suffixes']);
     $this->assertEquals(['name', 'label', 'description', 'icon'], $actFields['activity_type_id']['suffixes']);
     $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['status_id']['suffixes']);
     $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['tags']['suffixes']);
+
+    $addressFields = Address::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertEquals(['label', 'abbr'], $addressFields['country_id']['suffixes']);
+    $this->assertEquals(['label', 'abbr'], $addressFields['county_id']['suffixes']);
+    $this->assertEquals(['label', 'abbr'], $addressFields['state_province_id']['suffixes']);
+
+    $customGroupFields = CustomGroup::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertEquals(['name', 'label', 'grouping'], $customGroupFields['extends']['suffixes']);
+    $this->assertEquals(['name', 'label', 'grouping'], $customGroupFields['extends_entity_column_id']['suffixes']);
+
+    $userJobFields = UserJob::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertEquals(['name', 'label', 'url'], $userJobFields['job_type']['suffixes']);
   }
 
   public function testDynamicFks() {

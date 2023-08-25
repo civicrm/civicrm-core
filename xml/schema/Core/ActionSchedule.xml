@@ -379,6 +379,7 @@
     </html>
     <pseudoconstant>
       <callback>CRM_Core_BAO_ActionSchedule::getMappingOptions</callback>
+      <suffixes>name,label,icon</suffixes>
     </pseudoconstant>
     <comment>Name/ID of the mapping to use on this table</comment>
     <add>3.4</add>
