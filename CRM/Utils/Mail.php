@@ -358,16 +358,6 @@ class CRM_Utils_Mail {
   }
 
   /**
-   * @param $to
-   * @param $headers
-   * @param $message
-   * @deprecated
-   */
-  public static function logger(&$to, &$headers, &$message) {
-    CRM_Utils_Mail_Logger::log($to, $headers, $message);
-  }
-
-  /**
    * Get the email address itself from a formatted full name + address string
    *
    * Ugly but working.
