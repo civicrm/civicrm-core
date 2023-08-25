@@ -44,7 +44,7 @@ use Civi\Api4\UFGroup;
 use Civi\Core\Transaction\Manager;
 use Civi\Payment\System;
 use Civi\Api4\OptionValue;
-use Civi\Test\Api3DocTrait;
+use Civi\Test\Api3TestTrait;
 use Civi\Test\ContactTestTrait;
 use Civi\Test\DbTestTrait;
 use Civi\Test\EventTestTrait;
@@ -79,7 +79,7 @@ define('API_LATEST_VERSION', 3);
  */
 class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
-  use Api3DocTrait;
+  use Api3TestTrait;
   use EventTestTrait;
   use GenericAssertionsTrait;
   use DbTestTrait;

@@ -1068,20 +1068,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test using example code.
-   */
-  public function testContributionCreateExample() {
-    //make sure at least on page exists since there is a truncate in tear down
-    $this->callAPISuccess('contribution_page', 'create', $this->pageParams);
-    require_once 'api/v3/examples/Contribution/Create.ex.php';
-    $result = contribution_create_example();
-    $id = $result['id'];
-    $expectedResult = contribution_create_expectedresult();
-    $this->checkArrayEquals($expectedResult, $result);
-    $this->contributionDelete($id);
-  }
-
-  /**
    * Function tests that additional financial records are created when fee amount is recorded.
    */
   public function testCreateContributionWithFee() {

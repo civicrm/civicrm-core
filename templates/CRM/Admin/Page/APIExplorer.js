@@ -809,36 +809,6 @@
   }
 
   /**
-   * Fetch list of example files for a given entity
-   */
-  function getExamples() {
-    CRM.utils.setOptions($('#example-action').prop('disabled', true).addClass('loading'), []);
-    $.getJSON(CRM.url('civicrm/ajax/apiexample', {entity: $(this).val()}))
-      .then(function(result) {
-        CRM.utils.setOptions($('#example-action').prop('disabled', false).removeClass('loading'), result);
-      });
-  }
-
-  /**
-   * Fetch and display an example file
-   */
-  function getExample() {
-    var
-      entity = $('#example-entity').val(),
-      action = $('#example-action').val();
-    if (entity && action) {
-      $('#example-result').block();
-      $.get(CRM.url('civicrm/ajax/apiexample', {file: entity + '/' + action}))
-        .then(function(result) {
-          $('#example-result').unblock().text(result);
-          prettyPrint('#example-result');
-        });
-    } else {
-      $('#example-result').text($('#example-result').attr('placeholder'));
-    }
-  }
-
-  /**
    * Fetch entity docs & actions
    */
   function getDocEntity() {
@@ -1002,7 +972,7 @@
     });
 
     // Initialize widgets
-    $('#api-entity, #example-entity, #doc-entity').crmSelect2({
+    $('#api-entity, #doc-entity').crmSelect2({
       // Add strikethough class to selection to indicate deprecated apis
       formatSelection: function(option) {
         return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
@@ -1051,8 +1021,6 @@
         items: '.api-chain-row, .api-param-row'
       });
     $('#api-join').on('change', 'input', onSelectJoin);
-    $('#example-entity').on('change', getExamples);
-    $('#example-action').on('change', getExample);
     $('#doc-entity').on('change', getDocEntity);
     $('#doc-action').on('change', getDocAction);
     $('#api-params-add').on('click', function(e) {

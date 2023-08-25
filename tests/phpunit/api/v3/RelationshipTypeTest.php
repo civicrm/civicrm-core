@@ -76,19 +76,6 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test  using example code.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testRelationshipTypeCreateExample($version) {
-    $this->_apiversion = $version;
-    require_once 'api/v3/examples/RelationshipType/Create.ex.php';
-    $result = relationship_type_create_example();
-    $expectedResult = relationship_type_create_expectedresult();
-    $this->assertAPISuccess($result);
-  }
-
-  /**
    * Check if required fields are not passed.
    * @param int $version
    * @dataProvider versionThreeAndFour

@@ -73,16 +73,6 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $this->assertDBState('CRM_Financial_DAO_PaymentProcessorType', $result['id'], $params);
   }
 
-  /**
-   * Test  using example code.
-   */
-  public function testPaymentProcessorTypeCreateExample() {
-    require_once 'api/v3/examples/PaymentProcessorType/Create.ex.php';
-    $result = payment_processor_type_create_example();
-    $expectedResult = payment_processor_type_create_expectedresult();
-    $this->assertAPISuccess($result);
-  }
-
   ///////////////// civicrm_payment_processor_type_delete methods
 
   /**
