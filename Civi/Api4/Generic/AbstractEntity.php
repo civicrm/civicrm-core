@@ -74,7 +74,7 @@ abstract class AbstractEntity {
    *
    * @return string
    */
-  protected static function getEntityName() {
+  public static function getEntityName(): string {
     return self::stripNamespace(static::class);
   }
 

@@ -28,7 +28,7 @@ class CiviCase extends Generic\DAOEntity {
    *
    * @return string
    */
-  protected static function getEntityName() {
+  public static function getEntityName(): string {
     return 'Case';
   }
 
