@@ -2,6 +2,7 @@
 
 namespace Civi\PhpStorm;
 
+use Civi\Api4\Provider\ActionObjectProvider;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -26,7 +27,15 @@ class Generator {
     //  - '[civicrm.root]/.phpstorm.meta.php'
     $file = \Civi::paths()->getPath('[civicrm.files]/.phpstorm.meta.php');
 
-    $data = static::renderMetadata(static::findServices($container));
+    $override = [
+      '\Civi::service()' => static::findServices($container),
+    ];
+    $expectedArguments = [
+      array_merge(['\civicrm_api4()', 0], static::getApi4Entities()),
+      array_merge(['\civicrm_api4()', 1], static::getApi4Actions()),
+    ];
+
+    $data = static::renderMetadata($expectedArguments, $override);
     file_put_contents($file, $data);
   }
 
@@ -49,15 +58,60 @@ class Generator {
     return $services;
   }
 
-  private static function renderMetadata(array $services): string {
+  private static function getApi4Entities(): array {
+    /*
+     * FIXME: Getting all API entities requires the container to be built, at this stage it's not,
+     * in fact the `action_object_provider` service doesn't even seem to exist at this stage,
+     * as it's not included in the overrides.
+     *
+     * This file-scanning method doesn't include dynamic entities (e.g. from multi-record custom fields)
+     * but it's better than nothing:
+     */
+    $provider = new ActionObjectProvider();
+    $entityNames = [];
+    foreach ($provider->getAllApiClasses() as $className) {
+      $entityNames[] = "'" . $className::getEntityName() . "'";
+    }
+    natcasesort($entityNames);
+    return $entityNames;
+  }
+
+  private static function getApi4Actions(): array {
+    /*
+     * FIXME: PHPSTORM_META doesn't seem to support compound dynamic arguments
+     * so even if you give it separate lists like
+     * ```
+     * expectedArguments(\civicrm_api4('Contact'), 1, 'a', 'b');
+     * expectedArguments(\civicrm_api4('Case'), 1, 'c', 'd');
+     * ```
+     * It doesn't differentiate them and always offers a,b,c,d for every entity.
+     * If they ever fix that upstream we could fetch a different list of actions per entity,
+     * but for now there's no point.
+     */
+    $hardcodedList = ['get', 'save', 'create', 'update', 'delete', 'replace', 'revert', 'export', 'autocomplete', 'getFields', 'getActions', 'checkAccess'];
+    $actionNames = [];
+    foreach ($hardcodedList as $actionName) {
+      $actionNames[] = "'" . $actionName . "'";
+    }
+    return $actionNames;
+  }
+
+  private static function renderMetadata(array $expectedArguments, array $overrides): string {
     ob_start();
     try {
       printf('<' . "?php\n");
-      printf("namespace PHPSTORM_META {\n");
-      printf("override(\Civi::service(), map(\n");
-      echo str_replace('\\\\', '\\', var_export($services, 1));
-      // PhpStorm 2022.3.1: 'Civi\\Foo' doesn't work, but 'Civi\Foo' does.
-      printf(");\n");
+      printf("namespace PHPSTORM_META {\n\n");
+      printf("exitPoint(\CRM_Utils_System::civiExit());\n\n");
+      foreach ($expectedArguments as $functionArgs) {
+        printf("expectedArguments(%s);\n", implode(', ', $functionArgs));
+      }
+      echo "\n";
+      foreach ($overrides as $name => $map) {
+        printf("override(%s, map(", $name);
+        // PhpStorm 2022.3.1: 'Civi\\Foo' doesn't work, but 'Civi\Foo' does.
+        echo str_replace('\\\\', '\\', var_export($map, 1));
+        printf("));\n\n");
+      }
       printf("}\n");
     }
     finally {
