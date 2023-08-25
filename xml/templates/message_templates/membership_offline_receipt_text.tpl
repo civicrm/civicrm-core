@@ -1,7 +1,7 @@
 {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 
-{if $receipt_text}
-{$receipt_text}
+{if $userTextPlain}
+{$userTextPlain}
 {else}{ts}Thank you for this contribution.{/ts}{/if}
 
 {if !$isShowLineItems}

@@ -21,8 +21,8 @@
   <tr>
    <td>
      {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
-    {if !empty($receipt_text)}
-     <p>{$receipt_text|htmlize}</p>
+    {if $userText}
+     <p>{$userText}</p>
     {/if}
     {if {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
       <p>{contribution.pay_later_receipt}</p>

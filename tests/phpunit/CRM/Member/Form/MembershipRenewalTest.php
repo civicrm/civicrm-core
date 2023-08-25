@@ -298,7 +298,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $form->_mode = 'test';
     $form->_contactID = $this->_individualId;
 
-    $form->testSubmit();
+    $form->postProcess();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['contact_id' => $this->_individualId]);
     $this->assertEquals(1, $contributionRecur['is_email_receipt']);
@@ -631,6 +631,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $form->_mode = $mode;
     $form->setEntityId($this->_membershipID);
     $form->preProcess();
+    $form->buildForm();
     return $form;
   }
 
