@@ -34,7 +34,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
    */
   public function testCreateCountry() {
 
-    $result = $this->callAPIAndDocument('country', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('country', 'create', $this->_params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
 
@@ -48,7 +48,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('country', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('country', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('country', 'delete', ['id' => $create['id']]);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('country', 'get', [
       'id' => $create['id'],
@@ -81,7 +81,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     $params = [
       'iso_code' => $this->_params['iso_code'],
     ];
-    $result = $this->callAPIAndDocument('Country', 'Get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Country', 'Get', $params);
     $this->assertEquals($country['values'][$country['id']]['name'], $result['values'][$country['id']]['name']);
     $this->assertEquals($country['values'][$country['id']]['iso_code'], $result['values'][$country['id']]['iso_code']);
   }

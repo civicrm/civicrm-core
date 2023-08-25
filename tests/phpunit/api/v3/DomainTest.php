@@ -72,7 +72,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   public function testGet(): void {
 
     $params = ['sequential' => 1];
-    $result = $this->callAPIAndDocument('domain', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('domain', 'get', $params);
 
     $this->assertIsArray($result);
 
@@ -148,7 +148,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    * Test civicrm_domain_create.
    */
   public function testCreate() {
-    $result = $this->callAPIAndDocument('domain', 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('domain', 'create', $this->params);
     $this->assertEquals($result['count'], 1);
     $this->assertNotNull($result['id']);
     $this->assertEquals($result['values'][$result['id']]['name'], $this->params['name']);

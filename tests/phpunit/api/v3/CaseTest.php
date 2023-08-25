@@ -163,7 +163,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     // Test using name instead of value.
     unset($params['case_type_id']);
     $params['case_type'] = $this->caseType;
-    $result = $this->callAPIAndDocument('case', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('case', 'create', $params);
     $id = $result['id'];
 
     // Check result
@@ -217,7 +217,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $result = $this->callAPISuccess($this->_entity, 'get', [
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],

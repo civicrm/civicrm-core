@@ -108,21 +108,21 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
     $this->assertTrue(is_numeric($this->_case['id']));
     $this->assertTrue(is_numeric($this->_otherActivity['id']));
 
-    $getByCaseId = $this->callAPIAndDocument('Activity', 'get', [
+    $getByCaseId = $this->callAPISuccess('Activity', 'get', [
       'case_id' => $this->_case['id'],
-    ], __FUNCTION__, __FILE__);
+    ]);
     $this->assertNotEmpty($getByCaseId['values']);
     $getByCaseId_ids = array_keys($getByCaseId['values']);
 
-    $getByCaseNotNull = $this->callAPIAndDocument('Activity', 'get', [
+    $getByCaseNotNull = $this->callAPISuccess('Activity', 'get', [
       'case_id' => ['IS NOT NULL' => 1],
-    ], __FUNCTION__, __FILE__);
+    ]);
     $this->assertNotEmpty($getByCaseNotNull['values']);
     $getByCaseNotNull_ids = array_keys($getByCaseNotNull['values']);
 
-    $getByCaseNull = $this->callAPIAndDocument('Activity', 'get', [
+    $getByCaseNull = $this->callAPISuccess('Activity', 'get', [
       'case_id' => ['IS NULL' => 1],
-    ], __FUNCTION__, __FILE__);
+    ]);
     $this->assertNotEmpty($getByCaseNull['values']);
     $getByCaseNull_ids = array_keys($getByCaseNull['values']);
 

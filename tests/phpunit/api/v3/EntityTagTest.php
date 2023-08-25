@@ -134,7 +134,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $paramsEntity = [
       'contact_id' => $this->_individualID,
     ];
-    $result = $this->callAPIAndDocument('entity_tag', 'get', $paramsEntity, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('entity_tag', 'get', $paramsEntity);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals($this->_tagID, $result['values'][$result['id']]['tag_id']);
   }
@@ -247,7 +247,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
       'tag_id' => $this->_tagID,
     ];
 
-    $result = $this->callAPIAndDocument('entity_tag', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('entity_tag', 'delete', $params);
     $this->assertEquals($result['removed'], 1);
   }
 

@@ -87,7 +87,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $params = [
       'id' => $softContribution['id'],
     ];
-    $softContribution = $this->callAPIAndDocument('contribution_soft', 'get', $params, __FUNCTION__, __FILE__);
+    $softContribution = $this->callAPISuccess('contribution_soft', 'get', $params);
     $this->assertEquals(1, $softContribution['count']);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['contribution_id'], $this->_contributionId);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['contact_id'], $this->_softIndividual1Id);
@@ -191,7 +191,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
       'soft_credit_type_id' => 5,
     ];
 
-    $softContribution = $this->callAPIAndDocument('contribution_soft', 'create', $params, __FUNCTION__, __FILE__);
+    $softContribution = $this->callAPISuccess('contribution_soft', 'create', $params);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['contribution_id'], $this->_contributionId);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['contact_id'], $this->_softIndividual1Id);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['amount'], '10');
@@ -293,7 +293,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $params = [
       'id' => $softContributionID,
     ];
-    $this->callAPIAndDocument('contribution_soft', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('contribution_soft', 'delete', $params);
   }
 
   ///////////////// civicrm_contribution_search methods

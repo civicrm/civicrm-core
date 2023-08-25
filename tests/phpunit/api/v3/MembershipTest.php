@@ -102,7 +102,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $params = [
       'id' => $membershipID,
     ];
-    $this->callAPIAndDocument('membership', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('membership', 'delete', $params);
     $this->assertDBRowNotExist('CRM_Member_DAO_Membership', $membershipID);
   }
 
@@ -140,7 +140,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $contribParams = [
       'id' => $ContributionCreate['values'][0]['id'],
     ];
-    $this->callAPIAndDocument('membership', 'delete', $memParams, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('membership', 'delete', $memParams);
     $this->assertDBRowNotExist('CRM_Member_DAO_Membership', $membershipID);
     $this->assertDBRowExist('CRM_Contribute_DAO_Contribution', $ContributionCreate['values'][0]['id']);
     $this->callAPISuccess('Contribution', 'delete', $contribParams);
@@ -381,7 +381,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
     $getParams = ['membership_type_id' => $params['membership_type_id'], 'return' => 'custom_' . $ids['custom_field_id']];
-    $check = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
+    $check = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $this->assertEquals('custom string', $check['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
   }
 
@@ -435,7 +435,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Memberships expected.
    */
   public function testGetOnlyActive() {
-    $description = "Demonstrates use of 'filter' active_only' param.";
     $this->_membershipID = $this->contactMembershipCreate($this->_params);
     $params = [
       'contact_id' => $this->_contactID,
@@ -452,7 +451,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       ],
     ];
 
-    $membership = $this->callAPIAndDocument('membership', 'get', $params, __FUNCTION__, __FILE__, $description, 'FilterIsCurrent');
+    $membership = $this->callAPISuccess('membership', 'get', $params);
     $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID);
     $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID);
 
@@ -863,7 +862,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $result = $this->callAPIAndDocument('membership', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('membership', 'create', $params);
     $this->getAndCheck($params, $result['id'], $this->_entity);
     $this->assertNotNull($result['id']);
     $this->assertEquals($this->_contactID, $result['values'][$result['id']]['contact_id'], " in line " . __LINE__);
@@ -902,7 +901,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
 
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, NULL, 'CreateWithCustomData');
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $check = $this->callAPISuccess($this->_entity, 'get', [
       'id' => $result['id'],
       'contact_id' => $this->_contactID,
@@ -918,15 +917,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
     // Create a new membership, but don't assign anything to the custom field.
-    $params = $this->_params;
-    $result = $this->callAPIAndDocument(
-      $this->_entity,
-      'create',
-      $params,
-      __FUNCTION__,
-      __FILE__,
-      NULL,
-      'SearchWithCustomData');
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
 
     // search memberships with CRM-16036 as custom field value.
     // Since we did not touch the custom field of any membership,
@@ -1080,7 +1071,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, NULL, 'UpdateCustomData');
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $result = $this->callAPISuccess($this->_entity, 'create', [
       'id' => $result['id'],
       'custom_' . $ids['custom_field_id'] => "new custom",

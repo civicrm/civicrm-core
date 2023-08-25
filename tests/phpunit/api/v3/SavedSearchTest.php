@@ -51,8 +51,8 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
    */
   public function testCreateSavedSearch(): void {
     $contactID = $this->createLoggedInUser();
-    $result = $this->callAPIAndDocument(
-        $this->_entity, 'create', $this->params, __FUNCTION__, __FILE__)['values'];
+    $result = $this->callAPISuccess(
+        $this->_entity, 'create', $this->params)['values'];
     $this->assertCount(1, $result);
     $savedSearch = reset($result);
 
@@ -79,8 +79,8 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
         $this->_entity, 'create', $this->params);
 
     // Act:
-    $get_result = $this->callAPIAndDocument(
-        $this->_entity, 'get', ['id' => $create_result['id']], __FUNCTION__, __FILE__);
+    $get_result = $this->callAPISuccess(
+        $this->_entity, 'get', ['id' => $create_result['id']]);
 
     // Assert:
     $this->assertEquals(1, $get_result['count']);

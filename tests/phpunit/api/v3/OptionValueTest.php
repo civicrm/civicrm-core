@@ -71,8 +71,6 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
    * Test offset param.
    */
   public function testGetSingleValueOptionValueSort() {
-    $description = "Demonstrates use of Sort param (available in many api functions). Also, getsingle.";
-    $subfile = 'SortOption';
     $result = $this->callAPISuccess('option_value', 'getsingle', [
       'option_group_id' => 1,
       'options' => [
@@ -87,7 +85,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
         'limit' => 1,
       ],
     ];
-    $result2 = $this->callAPIAndDocument('option_value', 'getsingle', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result2 = $this->callAPISuccess('option_value', 'getsingle', $params);
     $this->assertGreaterThan($result['label'], $result2['label']);
   }
 
@@ -115,7 +113,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
 
   public function testGetOptionGroup() {
     $params = ['option_group_id' => 1];
-    $result = $this->callAPIAndDocument('option_value', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('option_value', 'get', $params);
     $this->assertGreaterThan(1, $result['count']);
   }
 

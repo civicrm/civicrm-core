@@ -64,7 +64,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    */
   public function testCreateAddress($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument('Address', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Address', 'create', $this->_params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], 'address');
@@ -82,9 +82,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'location_type_id' => $this->_locationTypeID,
       'contact_id' => $this->_contactID,
     ];
-    $subfile = "AddressParse";
-    $description = "Demonstrates Use of address parsing param.";
-    $result = $this->callAPIAndDocument('address', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('address', 'create', $params);
     $this->assertEquals(54, $result['values'][$result['id']]['street_number']);
     $this->assertEquals('A', $result['values'][$result['id']]['street_number_suffix']);
     $this->assertEquals('Excelsior Ave.', $result['values'][$result['id']]['street_name']);
@@ -119,7 +117,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['location_type_id']);
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result['values'][$result['id']]['location_type_id']);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
   }
@@ -270,7 +268,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('address', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('address', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('address', 'delete', ['id' => $create['id']]);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('address', 'get', [
       'location_type_id' => $this->_locationTypeID,
@@ -292,7 +290,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'street_name' => $address['values'][$address['id']]['street_name'],
       'return' => ['location_type_id', 'is_primary', 'street_address'],
     ];
-    $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Address', 'Get', $params);
     $this->assertEquals($address['values'][$address['id']]['location_type_id'], $result['values'][$address['id']]['location_type_id']);
     $this->assertEquals($address['values'][$address['id']]['is_primary'], $result['values'][$address['id']]['is_primary']);
     $this->assertEquals($address['values'][$address['id']]['street_address'], $result['values'][$address['id']]['street_address']);
@@ -323,8 +321,6 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $create = $this->callAPISuccess('address', 'create', $this->_params);
     $this->callAPISuccess('address', 'create', array_merge($this->_params, ['street_address' => 'yzy']));
-    $subfile = "AddressSort";
-    $description = 'Demonstrates Use of sort filter.';
     $params = [
       'options' => [
         'sort' => 'street_address DESC',
@@ -333,7 +329,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'sequential' => 1,
       'return' => 'street_address',
     ];
-    $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('Address', 'Get', $params);
     $this->assertEquals(2, $result['count']);
     $this->assertEquals('Ambachtstraat 23', $result['values'][1]['street_address']);
   }
@@ -346,14 +342,12 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   public function testGetAddressLikeSuccess($version) {
     $this->_apiversion = $version;
     $this->callAPISuccess('address', 'create', $this->_params);
-    $subfile = 'AddressLike';
-    $description = 'Demonstrates Use of Like.';
     $params = [
       'street_address' => ['LIKE' => '%mb%'],
       'sequential' => 1,
       'return' => 'street_address',
     ];
-    $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('Address', 'Get', $params);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals('Ambachtstraat 23', $result['values'][0]['street_address']);
   }

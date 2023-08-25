@@ -63,7 +63,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'billing_mode' => 'form',
       'is_recur' => 0,
     ];
-    $result = $this->callAPIAndDocument('PaymentProcessorType', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('PaymentProcessorType', 'create', $params);
     $this->assertNotNull($result['values'][0]['id']);
 
     // mutate $params to match expected return value
@@ -129,7 +129,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
    */
   public function testPaymentProcessorTypeDelete($version) {
     $this->_apiversion = $version;
-    $this->callAPIAndDocument('PaymentProcessorType', 'delete', ['id' => $this->paymentProcessorTypeCreate()], __FUNCTION__, __FILE__);
+    $this->callAPISuccess('PaymentProcessorType', 'delete', ['id' => $this->paymentProcessorTypeCreate()]);
   }
 
   ///////////////// civicrm_payment_processor_type_update

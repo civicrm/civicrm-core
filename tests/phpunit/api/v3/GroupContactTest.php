@@ -96,7 +96,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $this->contactID,
     ];
-    $result = $this->callAPIAndDocument('group_contact', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_contact', 'get', $params);
     foreach ($result['values'] as $v) {
       $this->assertEquals($v['title'], $this->groups[$v['group_id']]['title']);
       $this->assertEquals($v['visibility'], $this->groups[$v['group_id']]['visibility']);
@@ -105,14 +105,12 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   }
 
   public function testGetGroupID() {
-    $description = "Get all from group and display contacts.";
-    $subfile = "GetWithGroupID";
     $params = [
       'group_id' => $this->groupID1,
       'api.group.get' => 1,
       'sequential' => 1,
     ];
-    $result = $this->callAPIAndDocument('group_contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('group_contact', 'get', $params);
     foreach ($result['values'][0]['api.group.get']['values'] as $values) {
       $key = $values['id'];
       $this->assertEquals($values['title'], $this->groups[$key]['title']);
@@ -139,7 +137,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'group_id' => $this->groupID1,
     ];
 
-    $result = $this->callAPIAndDocument('GroupContact', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('GroupContact', 'create', $params);
     $this->assertEquals(1, $result['not_added']);
     $this->assertEquals(1, $result['added']);
     $this->assertEquals(2, $result['total_count']);
@@ -154,7 +152,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'group_id' => $this->groupID1,
     ];
 
-    $result = $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_contact', 'delete', $params);
     $this->assertEquals(1, $result['removed']);
     $this->assertEquals(1, $result['total_count']);
   }
@@ -165,7 +163,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'id' => $result['id'],
       'skip_undelete' => TRUE,
     ];
-    $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('group_contact', 'delete', $params);
     $result = $this->callAPISuccess('group_contact', 'get', $params);
     $this->assertEquals(0, $result['count']);
     $this->assertArrayNotHasKey('id', $result);

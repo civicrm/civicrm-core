@@ -98,7 +98,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $params = [
       'pledge_id' => $this->_pledge['id'],
     ];
-    $result = $this->callAPIAndDocument('pledge', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('pledge', 'get', $params);
     $pledge = $result['values'][$this->_pledge['id']];
     $this->assertEquals($this->_individualId, $pledge['contact_id']);
     $this->assertEquals($this->_pledge['id'], $pledge['pledge_id']);
@@ -167,7 +167,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
 
     $this->assertEquals(2, $allPledges, 'Check we have 2 pledges to place with in line ' . __LINE__);
     $pledgeGetParams['pledge_start_date_high'] = date('YmdHis', strtotime('2 days ago'));
-    $earlyPledge = $this->callAPIAndDocument('pledge', 'get', $pledgeGetParams, __FUNCTION__, __FILE__, "demonstrates high date filter", "GetFilterHighDate");
+    $earlyPledge = $this->callAPISuccess('pledge', 'get', $pledgeGetParams);
     $this->assertEquals(1, $earlyPledge['count'], ' check only one returned with start date filter in line ' . __LINE__);
     $this->assertEquals($oldPledge['id'], $earlyPledge['id'], ' check correct pledge returned ' . __LINE__);
   }
@@ -246,7 +246,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
 
   public function testCreatePledge() {
 
-    $result = $this->callAPIAndDocument('pledge', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('pledge', 'create', $this->_params);
     $this->assertEquals($result['values'][0]['amount'], 100.00);
     $this->assertEquals($result['values'][0]['installments'], 5);
     $this->assertEquals($result['values'][0]['frequency_unit'], 'year');
@@ -505,7 +505,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $params = [
       'pledge_id' => $pledgeID,
     ];
-    $this->callAPIAndDocument('pledge', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('pledge', 'delete', $params);
   }
 
   /**
@@ -517,7 +517,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $params = [
       'id' => $pledgeID,
     ];
-    $this->callAPIAndDocument('pledge', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('pledge', 'delete', $params);
   }
 
   /**

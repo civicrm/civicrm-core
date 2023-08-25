@@ -64,7 +64,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
       'id' => $this->tagID,
       'name' => $this->tag['name'],
     ];
-    $result = $this->callAPIAndDocument('tag', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('tag', 'get', $params);
     $this->assertEquals($this->tag['description'], $result['values'][$this->tagID]['description']);
     $this->assertEquals($this->tag['name'], $result['values'][$this->tagID]['name']);
   }
@@ -76,15 +76,13 @@ class api_v3_TagTest extends CiviUnitTestCase {
    */
   public function testGetReturnArray($version) {
     $this->_apiversion = $version;
-    $description = "Demonstrates use of Return as an array.";
-    $subfile = "GetReturnArray";
 
     $params = [
       'id' => $this->tagID,
       'name' => $this->tag['name'],
       'return' => ['name'],
     ];
-    $result = $this->callAPIAndDocument('tag', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('tag', 'get', $params);
     $this->assertTrue(empty($result['values'][$this->tagID]['description']));
     $this->assertEquals($this->tag['name'], $result['values'][$this->tagID]['name']);
   }
@@ -126,7 +124,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
       'name' => 'Super Heros',
       'description' => 'Outside undie-wearers',
     ];
-    $result = $this->callAPIAndDocument('tag', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('tag', 'create', $params);
     $this->assertNotNull($result['id']);
     $params['used_for'] = 'civicrm_contact';
     $this->getAndCheck($params, $result['id'], 'tag');
@@ -191,24 +189,22 @@ class api_v3_TagTest extends CiviUnitTestCase {
     $params = [
       'id' => $this->tagID,
     ];
-    $result = $this->callAPIAndDocument('tag', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('tag', 'delete', $params);
     unset($this->ids['tag']);
   }
 
   public function testTagGetfields() {
-    $description = "Demonstrate use of getfields to interrogate api.";
     $params = ['action' => 'create'];
-    $result = $this->callAPIAndDocument('tag', 'getfields', $params, __FUNCTION__, __FILE__, $description, NULL);
+    $result = $this->callAPISuccess('tag', 'getfields', $params);
     $this->assertEquals('civicrm_contact', $result['values']['used_for']['api.default']);
   }
 
   public function testTagGetList() {
-    $description = "Demonstrates use of api.getlist for autocomplete and quicksearch applications.";
     $params = [
       'input' => $this->tag['name'],
       'extra' => ['used_for'],
     ];
-    $result = $this->callAPIAndDocument('tag', 'getlist', $params, __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess('tag', 'getlist', $params);
     $this->assertEquals($this->tag['id'], $result['values'][0]['id']);
     $this->assertEquals($this->tag['description'], $result['values'][0]['description'][0]);
     $this->assertEquals($this->tag['used_for'], $result['values'][0]['extra']['used_for']);

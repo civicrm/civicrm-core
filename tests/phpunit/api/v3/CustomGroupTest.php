@@ -137,7 +137,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $result = $this->callAPIAndDocument('custom_group', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($result['id']);
     $this->assertEquals($result['values'][$result['id']]['extends'], 'Individual');
   }
@@ -334,7 +334,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $params = [
       'id' => $customGroup['id'],
     ];
-    $result = $this->callAPIAndDocument('custom_group', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('custom_group', 'delete', $params);
     $this->assertAPISuccess($result);
   }
 
@@ -345,7 +345,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $params = [];
-    $result = $this->callAPIAndDocument($this->_entity, 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'get', $params);
     $values = $result['values'][$result['id']];
     foreach ($this->_params as $key => $value) {
       if ($key == 'weight') {

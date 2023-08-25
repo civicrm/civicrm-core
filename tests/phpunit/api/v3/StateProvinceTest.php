@@ -33,7 +33,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
    * @dataProvider versionThreeAndFour
    */
   public function testCreateStateProvince() {
-    $result = $this->callAPIAndDocument('StateProvince', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('StateProvince', 'create', $this->_params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('StateProvince', 'delete', ['id' => $result['id']]);
@@ -47,7 +47,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
     $create = $this->callAPISuccess('StateProvince', 'create', $this->_params);
 
     // Delete
-    $result = $this->callAPIAndDocument('StateProvince', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('StateProvince', 'delete', ['id' => $create['id']]);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('StateProvince', 'get', [
       'id' => $create['id'],
@@ -80,7 +80,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
     $params = [
       'name' => $this->_params['name'],
     ];
-    $result = $this->callAPIAndDocument('StateProvince', 'Get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('StateProvince', 'Get', $params);
     $this->assertEquals($province['values'][$province['id']]['name'], $result['values'][$province['id']]['name']);
     $this->assertEquals($province['values'][$province['id']]['abbreviation'], $result['values'][$province['id']]['abbreviation']);
   }

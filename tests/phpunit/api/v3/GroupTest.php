@@ -127,7 +127,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params = [
       'name' => "Test Group 1",
     ];
-    $group = $this->callAPIAndDocument('group', 'get', $params, __FUNCTION__, __FILE__);
+    $group = $this->callAPISuccess('group', 'get', $params);
     $group = $group['values'];
 
     foreach ($group as $v) {
@@ -308,9 +308,8 @@ class api_v3_GroupTest extends CiviUnitTestCase {
    */
   public function testgetfields($version) {
     $this->_apiversion = $version;
-    $description = "Demonstrate use of getfields to interrogate api.";
     $params = ['action' => 'create'];
-    $result = $this->callAPIAndDocument('group', 'getfields', $params, __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess('group', 'getfields', $params);
     $this->assertEquals('is_active', $result['values']['is_active']['name']);
   }
 

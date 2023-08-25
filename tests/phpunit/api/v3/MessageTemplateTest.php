@@ -38,7 +38,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
    * Test create function succeeds.
    */
   public function testCreate(): void {
-    $result = $this->callAPIAndDocument('MessageTemplate', 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('MessageTemplate', 'create', $this->params);
     $this->getAndCheck($this->params, $result['id'], $this->entity);
   }
 
@@ -51,10 +51,10 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
    * behaviours
    */
   public function testGet(): void {
-    $result = $this->callAPIAndDocument('MessageTemplate', 'get', [
+    $result = $this->callAPISuccess('MessageTemplate', 'get', [
       'workflow_name' => 'contribution_invoice_receipt',
       'is_default' => 1,
-    ], __FUNCTION__, __FILE__);
+    ]);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
@@ -64,7 +64,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
    */
   public function testDelete(): void {
     $entity = $this->createTestEntity('MessageTemplate', $this->params);
-    $this->callAPIAndDocument('MessageTemplate', 'delete', ['id' => $entity['id']], __FUNCTION__, __FILE__);
+    $this->callAPISuccess('MessageTemplate', 'delete', ['id' => $entity['id']]);
     $checkDeleted = $this->callAPISuccess($this->entity, 'get', [
       'id' => $entity['id'],
     ]);

@@ -47,7 +47,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   public function testCreateMailSettings($version) {
     $this->_apiversion = $version;
     $this->callAPISuccessGetCount('mail_settings', [], 1);
-    $result = $this->callAPIAndDocument('MailSettings', 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('MailSettings', 'create', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('MailSettings', 'delete', ['id' => $result['id']]);
@@ -80,8 +80,8 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
    */
   public function testGetMailSettings($version) {
     $this->_apiversion = $version;
-    $this->callAPIAndDocument('MailSettings', 'create', $this->params, __FUNCTION__, __FILE__);
-    $result = $this->callAPIAndDocument('MailSettings', 'get', $this->params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('MailSettings', 'create', $this->params);
+    $result = $this->callAPISuccess('MailSettings', 'get', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('MailSettings', 'delete', ['id' => $result['id']]);
@@ -95,10 +95,10 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
    */
   public function testDeleteMailSettings($version) {
     $this->_apiversion = $version;
-    $this->callAPIAndDocument('MailSettings', 'create', $this->params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('MailSettings', 'create', $this->params);
     $entity = $this->callAPISuccess('MailSettings', 'get', $this->params);
     $this->assertEquals('setting.com', $entity['values'][$entity['id']]['domain']);
-    $this->callAPIAndDocument('MailSettings', 'delete', ['id' => $entity['id']], __FUNCTION__, __FILE__);
+    $this->callAPISuccess('MailSettings', 'delete', ['id' => $entity['id']]);
     $checkDeleted = $this->callAPISuccess('MailSettings', 'get', []);
     $this->assertEquals('EXAMPLE.ORG', $checkDeleted['values'][$checkDeleted['id']]['domain']);
   }
@@ -112,14 +112,12 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
    */
   public function testGetMailSettingsChainDelete($version) {
     $this->_apiversion = $version;
-    $description = "Demonstrates get + delete in the same call.";
-    $subFile = 'ChainedGetDelete';
     $params = [
       'name' => "delete this setting",
       'api.MailSettings.delete' => 1,
     ];
     $this->callAPISuccess('MailSettings', 'create', ['name' => "delete this setting"] + $this->params);
-    $result = $this->callAPIAndDocument('MailSettings', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('MailSettings', 'get', $params);
     $this->assertEquals(0, $this->callAPISuccess('MailSettings', 'getcount', ['name' => "delete this setting"]));
   }
 

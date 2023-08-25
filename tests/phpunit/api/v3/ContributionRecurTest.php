@@ -65,7 +65,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $this->callAPISuccess($this->_entity, 'create', $this->params);
     $getParams = ['amount' => '500'];
-    $result = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $this->assertEquals(1, $result['count']);
   }
 
