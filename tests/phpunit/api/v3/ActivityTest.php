@@ -470,21 +470,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_activity_create() using example code.
-   */
-  public function testActivityCreateExample() {
-    require_once 'api/v3/examples/Activity/Create.ex.php';
-    $result = activity_create_example();
-    $expectedResult = activity_create_expectedresult();
-    // Compare everything *except* timestamps.
-    unset($result['values'][1]['created_date']);
-    unset($result['values'][1]['modified_date']);
-    unset($expectedResult['values'][1]['created_date']);
-    unset($expectedResult['values'][1]['modified_date']);
-    $this->assertEquals($result, $expectedResult);
-  }
-
-  /**
    * Test civicrm_activity_create() with valid parameters and custom data.
    */
   public function testActivityCreateCustomSubType() {

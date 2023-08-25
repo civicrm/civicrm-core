@@ -1579,11 +1579,7 @@ class CRM_Contact_BAO_Query {
    *   4 => null
    *  );
    *
-   * There are some examples of the syntax in
-   * https://github.com/civicrm/civicrm-core/tree/master/api/v3/examples/Relationship
-   *
    * More notes at CRM_Core_DAO::createSQLFilter
-   *
    * and a list of supported operators in CRM_Core_DAO
    *
    * @param array $formValues

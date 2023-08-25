@@ -143,6 +143,17 @@ trait Api3TestTrait {
   }
 
   /**
+   * @deprecated
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @return array|int
+   */
+  public function callAPIAndDocument($entity, $action, $params) {
+    return $this->callAPISuccess($entity, $action, $params);
+  }
+
+  /**
    * wrap api functions.
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    *
