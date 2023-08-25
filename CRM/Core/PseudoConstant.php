@@ -1531,7 +1531,7 @@ WHERE  id = %1
     }
     // Filter domain specific options
     if (in_array('domain_id', $availableFields)) {
-      $wheres[] = 'domain_id = ' . CRM_Core_Config::domainID() . ' OR  domain_id is NULL';
+      $wheres[] = '(domain_id = ' . CRM_Core_Config::domainID() . ' OR  domain_id is NULL)';
     }
     $queryParams = [
       1 => [$params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
