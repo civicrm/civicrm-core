@@ -19,8 +19,17 @@ class PhpStormCompilePass implements CompilerPassInterface {
       return;
     }
 
+    $services = $this->findServices($container);
+    $caches = [];
+    foreach ($services as $serviceId => $type) {
+      if (preg_match('/^cache\./', $serviceId)) {
+        $caches[substr($serviceId, 6)] = $type;
+      }
+    }
+
     $builder = new PhpStormMetadata('services', __CLASS__);
-    $builder->addOverrideMap('\Civi::service()', $this->findServices($container));
+    $builder->addOverrideMap('\Civi::service()', $services);
+    $builder->addOverrideMap('\Civi::cache()', $caches);
     $builder->write();
   }
 
