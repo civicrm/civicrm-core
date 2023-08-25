@@ -94,6 +94,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
         'ActionSchedule',
         $format['id']
       );
+      $format = array_merge(['class' => ''], $format);
     }
 
     $this->assign('rows', $reminderList);
