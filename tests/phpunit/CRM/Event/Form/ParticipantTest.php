@@ -105,7 +105,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     $priceSetID = $this->ids['PriceSet']['PaidEvent'];
     $eventFeeBlock = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID)[$priceSetID]['fields'];
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $eventFeeBlock, $lineItem);
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $eventFeeBlock);
     // Check that no payment records have been created.
     // In https://lab.civicrm.org/dev/financial/issues/94 we had an issue where payments were created when none happened.
     $payments = $this->callAPISuccess('Payment', 'get', [])['values'];
@@ -147,9 +147,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'price_' . $this->ids['PriceField']['second_text_field'] => 1,
     ];
     $participant = $this->callAPISuccess('Participant', 'get', []);
-    $lineItem = CRM_Price_BAO_LineItem::getLineItems($participant['id'], 'participant');
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $priceSetBlock, $lineItem);
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $priceSetBlock);
 
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', [])['values'];
     $sum = 0;
@@ -363,7 +362,7 @@ London,',
         'confirm_email_text' => "Just do it\n Now",
         'is_show_location' => TRUE,
       ], $eventParams), ['is_quick_config' => $isQuickConfig]);
-      $submittedValues = array_merge($this->getRecordContributionParams('Partially paid', 'Pending'), $submittedValues);
+      $submittedValues = array_merge($this->getRecordContributionParams('Partially paid'), $submittedValues);
     }
     else {
       $event = $this->eventCreateUnpaid($eventParams);
@@ -616,7 +615,7 @@ London,',
    * @param bool $isAmountPaidOnForm
    *   Was the amount paid entered on the form (if so this should be on the receipt)
    */
-  protected function assertPartialPaymentResult(bool $isQuickConfig, CiviMailUtils $mut, $isAmountPaidOnForm = TRUE): void {
+  protected function assertPartialPaymentResult(bool $isQuickConfig, CiviMailUtils $mut, bool $isAmountPaidOnForm = TRUE): void {
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $expected = [
@@ -791,7 +790,7 @@ London,',
     $form->transferParticipantRegistration($toContactId, $participantId);
     $mut->checkAllMailLog(['Default Domain Name Anthony']);
     $mut->clearMessages();
-    $this->revertTemplateToReservedTemplate('event_online_receipt', 'html');
+    $this->revertTemplateToReservedTemplate();
 
     //Assert participant is transferred to $toContactId.
     $participant = $this->callAPISuccess('Participant', 'getsingle', [
