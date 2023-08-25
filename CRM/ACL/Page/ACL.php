@@ -115,6 +115,9 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
           $acl[$dao->id]['object'] = $event[$acl[$dao->id]['object_id']] ?? NULL;
           $acl[$dao->id]['object_name'] = ts('Event');
           break;
+
+        default:
+          $acl[$dao->id]['object'] = $acl[$dao->id]['object_name'] = NULL;
       }
 
       // form all action links
