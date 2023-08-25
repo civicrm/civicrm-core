@@ -2,6 +2,7 @@
 
 namespace Civi\PhpStorm;
 
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -9,13 +10,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @link https://www.jetbrains.com/help/phpstorm/2021.3/ide-advanced-metadata.html
  */
-class Generator {
+class PhpStormCompilePass implements CompilerPassInterface {
 
   /**
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
    * @return void
    */
-  public static function generate(ContainerBuilder $container): void {
+  public function process(ContainerBuilder $container): void {
     if (defined('CIVICRM_TEST')) {
       return;
     }
