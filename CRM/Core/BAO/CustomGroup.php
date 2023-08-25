@@ -1796,7 +1796,7 @@ ORDER BY civicrm_custom_group.weight,
         if ($value !== NULL) {
           $formValues[$properties['element_name']] = $value;
         }
-        elseif (isset($submittedValues[$properties['element_name']])) {
+        elseif (isset($submittedValues[$properties['element_name']]) && $properties['data_type'] !== 'File') {
           $properties['element_value'] = $submittedValues[$properties['element_name']];
         }
         unset($properties['customValue']);
