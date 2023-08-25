@@ -11,12 +11,10 @@
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
 {else}
-  {if empty($component)}
-    {capture assign=schedRemindersDocLink}{docURL page="user/email/scheduled-reminders/"}{/capture}
-    <div class="help">
-      {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
-    </div>
-  {/if}
+  {capture assign=schedRemindersDocLink}{docURL page="user/email/scheduled-reminders/"}{/capture}
+  <div class="help">
+    {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
+  </div>
   <div class="crm-content-block crm-block">
   {if $rows}
     <div id="reminder">
