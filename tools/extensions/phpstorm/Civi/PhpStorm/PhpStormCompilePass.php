@@ -7,8 +7,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Generate metadata about dynamic CiviCRM services for use by PhpStorm.
- *
- * @link https://www.jetbrains.com/help/phpstorm/2021.3/ide-advanced-metadata.html
  */
 class PhpStormCompilePass implements CompilerPassInterface {
 
@@ -21,17 +19,12 @@ class PhpStormCompilePass implements CompilerPassInterface {
       return;
     }
 
-    // Not 100% sure which is better. These trade-off in edge-cases of writability and readability.
-    //  - '[civicrm.files]/.phpstorm.meta.php'
-    //  - '[civicrm.compile]/.phpstorm.meta.php'
-    //  - '[civicrm.root]/.phpstorm.meta.php'
-    $file = \Civi::paths()->getPath('[civicrm.files]/.phpstorm.meta.php');
-
-    $data = static::renderMetadata(static::findServices($container));
-    file_put_contents($file, $data);
+    $builder = new PhpStormMetadata('services', __CLASS__);
+    $builder->addOverrideMap('\Civi::service()', $this->findServices($container));
+    $builder->write();
   }
 
-  private static function findServices(ContainerBuilder $c): array {
+  private function findServices(ContainerBuilder $c): array {
     $aliases = $c->getAliases();
     $services = [];
     foreach ($c->getServiceIds() as $serviceId) {
@@ -48,22 +41,6 @@ class PhpStormCompilePass implements CompilerPassInterface {
       }
     }
     return $services;
-  }
-
-  private static function renderMetadata(array $services): string {
-    ob_start();
-    try {
-      printf('<' . "?php\n");
-      printf("namespace PHPSTORM_META {\n");
-      printf("override(\Civi::service(), map(\n");
-      echo str_replace('\\\\', '\\', var_export($services, 1));
-      // PhpStorm 2022.3.1: 'Civi\\Foo' doesn't work, but 'Civi\Foo' does.
-      printf(");\n");
-      printf("}\n");
-    }
-    finally {
-      return ob_get_clean();
-    }
   }
 
 }
