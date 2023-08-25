@@ -293,4 +293,13 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     return $name . ' (' . $entity . '.' . $action . ')';
   }
 
+  /**
+   * Override parent to do nothing - since we don't use this array.
+   *
+   * @return array
+   */
+  protected function retrieveValues(): array {
+    return [];
+  }
+
 }

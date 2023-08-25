@@ -18,7 +18,7 @@
 {elseif $action eq 4}
   <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
-        {ts 1=$jobName}Are you sure you would like to execute %1 job?{/ts}
+        {ts 1=$jobName|escape:html}Are you sure you would like to execute %1 job?{/ts}
   </div>
 {else}
   <div class="help">
