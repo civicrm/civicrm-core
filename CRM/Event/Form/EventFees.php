@@ -66,6 +66,9 @@ class CRM_Event_Form_EventFees {
       if (!empty($details[$form->_eventId]['financial_type_id'])) {
         $defaults[$form->_pId]['financial_type_id'] = $details[$form->_eventId]['financial_type_id'];
       }
+      if (!empty($details[$form->_eventId]['confirm_email_text'])) {
+        $defaults[$form->_pId]['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
+      }
     }
 
     if ($form->_pId) {
@@ -93,11 +96,6 @@ class CRM_Event_Form_EventFees {
     }
     else {
       $defaults[$form->_pId]['send_receipt'] = (strtotime(CRM_Utils_Array::value('start_date', $details[$form->_eventId])) >= time()) ? 1 : 0;
-      if ($form->_eventId && !empty($details[$form->_eventId]['confirm_email_text'])) {
-        //set receipt text
-        $defaults[$form->_pId]['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
-      }
-
       $defaults[$form->_pId]['receive_date'] = date('Y-m-d H:i:s');
     }
 
