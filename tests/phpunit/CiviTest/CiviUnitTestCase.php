@@ -2954,6 +2954,12 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public function getFormObject(string $class, array $formValues = [], ?string $pageName = '', array $searchFormValues = [], $controller = NULL) {
     $_POST = $formValues;
+    if ($pageName) {
+      throw new CRM_Core_Exception('when is this present');
+    }
+    if ($searchFormValues) {
+      throw new CRM_Core_Exception('when is this hit');
+    }
     /** @var CRM_Core_Form $form */
     $form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -3088,6 +3094,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $_SESSION['_' . $form->controller->_name . '_container']['values']['Search'] = $searchFormValues;
     }
     if (isset($formValues['_qf_button_name'])) {
+      throw new CRM_Core_Exception('when is this hit');
       $_SESSION['_' . $form->controller->_name . '_container']['_qf_button_name'] = $formValues['_qf_button_name'];
     }
     return $form;
