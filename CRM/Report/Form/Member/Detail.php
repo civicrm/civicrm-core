@@ -379,18 +379,13 @@ HERESQL;
     }
   }
 
-  public function getOperationPair($type = "string", $fieldName = NULL) {
+  public function getOperationPair($type = 'string', $fieldName = NULL) {
     //re-name IS NULL/IS NOT NULL for clarity
     if ($fieldName === 'owner_membership_id') {
       $result = [];
+      $result[''] = ts('Any');
       $result['nll'] = ts('Primary members only');
       $result['nnll'] = ts('Non-primary members only');
-      $options = parent::getOperationPair($type, $fieldName);
-      foreach ($options as $key => $label) {
-        if (!array_key_exists($key, $result)) {
-          $result[$key] = $label;
-        }
-      }
     }
     else {
       $result = parent::getOperationPair($type, $fieldName);
