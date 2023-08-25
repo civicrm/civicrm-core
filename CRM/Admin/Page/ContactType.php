@@ -71,6 +71,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
         'ContactType',
         $value['id']
       );
+      $rows[$key] = array_merge(['class' => ''], $rows[$key]);
     }
     $this->assign('rows', $rows);
   }
