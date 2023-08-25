@@ -32,3 +32,10 @@ function phpstorm_metadata_dir(): string {
 function phpstorm_civicrm_container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
   $container->addCompilerPass(new \Civi\PhpStorm\PhpStormCompilePass(), PassConfig::TYPE_AFTER_REMOVING, 2000);
 }
+
+function phpstorm_civicrm_uninstall() {
+  $dir = phpstorm_metadata_dir();
+  if (file_exists($dir)) {
+    CRM_Utils_File::cleanDir($dir, TRUE);
+  }
+}
