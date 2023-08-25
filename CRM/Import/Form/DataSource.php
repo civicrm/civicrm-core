@@ -86,7 +86,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
     $this->assign('urlPath', 'civicrm/import/datasource');
     $this->assign('urlPathVar', 'snippet=4&user_job_id=' . $this->get('user_job_id'));
     if ($this->isImportDataUploaded()) {
-      $this->add('checkbox', 'use_existing_upload', ts('Use data already uploaded'), NULL, FALSE, [
+      $this->add('checkbox', 'use_existing_upload', ts('Use data already uploaded'), [
         'onChange' => "
           CRM.$('.crm-import-datasource-form-block-dataSource').toggle();
           CRM.$('#data-source-form-block').toggle()",
