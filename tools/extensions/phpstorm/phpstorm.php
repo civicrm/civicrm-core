@@ -34,6 +34,15 @@ function phpstorm_civicrm_container(\Symfony\Component\DependencyInjection\Conta
   $container->addCompilerPass(new \Civi\PhpStorm\PhpStormCompilePass(), PassConfig::TYPE_AFTER_REMOVING, 2000);
 }
 
+function phpstorm_civicrm_managed(&$entities, $modules) {
+  // We don't currently have an event for extensions to join the "system flush" operation. Apply Skullduggery method.
+  // This gives a useful baseline event for most generators -- but it's _not_ for "services", and each generator may be supplemented
+  // by other events.
+  if ($modules === NULL && !defined('CIVICRM_TEST')) {
+    Civi::dispatcher()->dispatch('civi.phpstorm.flush');
+  }
+}
+
 function phpstorm_civicrm_uninstall() {
   $dir = phpstorm_metadata_dir();
   if (file_exists($dir)) {
