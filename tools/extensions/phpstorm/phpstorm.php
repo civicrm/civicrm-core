@@ -27,7 +27,7 @@ function phpstorm_metadata_dir(): string {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
 function phpstorm_civicrm_config(&$config): void {
- _phpstorm_civix_civicrm_config($config);
+  _phpstorm_civix_civicrm_config($config);
 }
 
 function phpstorm_civicrm_container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
