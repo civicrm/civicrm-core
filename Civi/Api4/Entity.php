@@ -75,6 +75,11 @@ class Entity extends Generic\AbstractEntity {
       'description' => 'Field to show when displaying a record',
     ],
     [
+      'name' => 'search_fields',
+      'data_type' => 'Array',
+      'description' => 'Fields to show in search context',
+    ],
+    [
       'name' => 'icon_field',
       'data_type' => 'Array',
       'description' => 'Field(s) which contain the icon for a record, listed in order of precedence',

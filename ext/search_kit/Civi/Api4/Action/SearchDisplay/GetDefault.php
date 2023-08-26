@@ -195,7 +195,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
     if ($clause['expr'] instanceof SqlField || $clause['expr'] instanceof SqlFunctionGROUP_CONCAT) {
       $field = \CRM_Utils_Array::first($clause['fields'] ?? []);
       if ($field &&
-        CoreUtil::getInfoItem($field['entity'], 'label_field') === $field['name'] &&
+        in_array($field['name'], array_merge(CoreUtil::getSearchFields($field['entity']), [CoreUtil::getInfoItem($field['entity'], 'label_field')]), TRUE) &&
         !empty(CoreUtil::getInfoItem($field['entity'], 'paths')['view'])
       ) {
         $col['link'] = [

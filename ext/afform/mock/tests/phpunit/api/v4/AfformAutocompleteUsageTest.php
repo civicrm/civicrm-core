@@ -68,8 +68,8 @@ EOHTML;
       ->execute();
 
     $this->assertCount(2, $result);
-    $this->assertEquals('A ' . $lastName, $result[0]['label']);
-    $this->assertEquals('B ' . $lastName, $result[1]['label']);
+    $this->assertEquals($lastName . ', A', $result[0]['label']);
+    $this->assertEquals($lastName . ', B', $result[1]['label']);
 
     // Ensure form validates submission, restricting it to contacts A & B
     $values = [
@@ -168,8 +168,8 @@ EOHTML;
       ->execute();
 
     $this->assertCount(2, $result);
-    $this->assertEquals('A ' . $lastName, $result[0]['label']);
-    $this->assertEquals('B ' . $lastName, $result[1]['label']);
+    $this->assertEquals($lastName . ', A', $result[0]['label']);
+    $this->assertEquals($lastName . ', B', $result[1]['label']);
 
     // Ensure form validates submission, restricting it to contacts A & B
     $values = [
@@ -262,8 +262,8 @@ EOHTML;
       ->execute();
 
     $this->assertCount(2, $result);
-    $this->assertEquals('A ' . $lastName, $result[0]['label']);
-    $this->assertEquals('C ' . $lastName, $result[1]['label']);
+    $this->assertEquals($lastName . ', A', $result[0]['label']);
+    $this->assertEquals($lastName . ', C', $result[1]['label']);
 
     // Ensure form validates submission, restricting it to contacts A & C
     $values = [

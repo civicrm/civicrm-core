@@ -135,11 +135,11 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->execute();
 
     // Contacts will be returned in order by sort_name
-    $this->assertStringStartsWith('Both', $result[0]['label']);
+    $this->assertStringEndsWith('Both', $result[0]['label']);
     $this->assertEquals('fa-star', $result[0]['icon']);
-    $this->assertStringStartsWith('No icon', $result[1]['label']);
+    $this->assertStringEndsWith('No icon', $result[1]['label']);
     $this->assertEquals('fa-user', $result[1]['icon']);
-    $this->assertStringStartsWith('Starry', $result[2]['label']);
+    $this->assertStringEndsWith('Starry', $result[2]['label']);
     $this->assertEquals('fa-star', $result[2]['icon']);
   }
 

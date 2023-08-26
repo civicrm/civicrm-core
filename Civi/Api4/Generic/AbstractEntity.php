@@ -177,7 +177,10 @@ abstract class AbstractEntity {
         $info[$field['name']] = $val;
       }
     }
-
+    // search_fields defaults to label_field
+    if (empty($info['search_fields']) && !empty($info['label_field'])) {
+      $info['search_fields'] = [$info['label_field']];
+    }
     if ($dao) {
       $info['description'] = $dao::getEntityDescription() ?? $info['description'] ?? NULL;
     }
