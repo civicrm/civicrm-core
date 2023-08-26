@@ -68,7 +68,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'is_active' => 1,
       'sequential' => 1,
     ];
-    $result = $this->callAPIAndDocument('relationship_type', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('relationship_type', 'create', $params);
     $this->assertNotNull($result['values'][0]['id']);
     unset($params['sequential']);
     //assertDBState compares expected values in $result to actual values in the DB
@@ -128,7 +128,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     $params = [
       'id' => $id,
     ];
-    $result = $this->callAPIAndDocument('relationship_type', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('relationship_type', 'delete', $params);
     $this->assertAPIDeleted('relationship_type', $id);
   }
 

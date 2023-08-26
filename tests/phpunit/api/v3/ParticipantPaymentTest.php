@@ -88,10 +88,10 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    * Check with valid array.
    */
   public function testPaymentCreate(): void {
-    $this->callAPIAndDocument('ParticipantPayment', 'create', [
+    $this->callAPISuccess('ParticipantPayment', 'create', [
       'participant_id' => $this->participantID,
       'contribution_id' => $this->contributionCreate(['contact_id' => $this->individualCreate()]),
-    ], __FUNCTION__, __FILE__);
+    ]);
   }
 
   /**
@@ -227,7 +227,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = [
       'id' => $participantPaymentID,
     ];
-    $this->callAPIAndDocument('participantPayment', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('participantPayment', 'delete', $params);
   }
 
   /**
@@ -243,7 +243,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contributionID,
     ];
 
-    $result = $this->callAPIAndDocument('participantPayment', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('participantPayment', 'get', $params);
     $this->assertEquals($result['values'][$result['id']]['participant_id'], $this->participantID4, 'Check Participant Id');
     $this->assertEquals($result['values'][$result['id']]['contribution_id'], $contributionID, 'Check Contribution Id');
   }

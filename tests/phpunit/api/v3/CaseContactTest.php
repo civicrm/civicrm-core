@@ -49,9 +49,9 @@ class api_v3_CaseContactTest extends CiviCaseTestCase {
   }
 
   public function testCaseContactGet() {
-    $result = $this->callAPIAndDocument('CaseContact', 'get', [
+    $result = $this->callAPISuccess('CaseContact', 'get', [
       'contact_id' => $this->contactID,
-    ], __FUNCTION__, __FILE__);
+    ]);
     $this->assertEquals($this->case['id'], $result['id']);
   }
 
@@ -60,7 +60,7 @@ class api_v3_CaseContactTest extends CiviCaseTestCase {
    */
   public function testCaseContactCreate() {
     $params = $this->params;
-    $result = $this->callAPIAndDocument('CaseContact', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('CaseContact', 'create', $params);
     $id = $result['id'];
 
     // Check result

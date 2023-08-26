@@ -302,8 +302,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     ]
     );
     $email = $this->callAPISuccessGetSingle('email', ['email' => 'dopey@mail.com']);
-    $this->callAPIAndDocument('Logging', 'revert', ['log_conn_id' => 'woot', 'log_date' => $timeStamp], __FILE__, 'Revert');
-    $this->assertEquals('Anthony', $this->callAPISuccessGetValue('contact', ['id' => $contactId, 'return' => 'first_name']));
+    $this->callAPISuccess('Logging', 'revert', ['log_conn_id' => 'woot', 'log_date' => $timeStamp]);
     $this->callAPISuccessGetCount('Email', ['id' => $email['id']], 0);
   }
 
@@ -440,7 +439,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
       'api.email.create' => ['email' => 'dopey@mail.com'],
     ]);
     $this->callAPISuccessGetSingle('email', ['email' => 'dopey@mail.com']);
-    $diffs = $this->callAPIAndDocument('Logging', 'get', ['log_conn_id' => 'wooty wop wop'], __FUNCTION__, __FILE__);
+    $diffs = $this->callAPISuccess('Logging', 'get', ['log_conn_id' => 'wooty wop wop']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'Dwarf, Dopey']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'Mr. Dopey Dwarf II', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'display_name']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email']);

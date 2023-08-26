@@ -120,7 +120,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
    */
   public function testUFGroupCreate($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument('uf_group', 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('uf_group', 'create', $this->params);
     $this->assertAPISuccess($result);
     $this->assertEquals($result['values'][$result['id']]['add_to_group_id'], $this->params['add_contact_to_group']);
     $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $this->params['group']);
@@ -201,7 +201,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = ['id' => $result['id']];
-    $result = $this->callAPIAndDocument('uf_group', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('uf_group', 'get', $params);
     $this->assertEquals($result['values'][$result['id']]['add_to_group_id'], $this->params['add_contact_to_group']);
     $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $this->params['group']);
     foreach ($this->params as $key => $value) {
@@ -237,7 +237,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $ufGroup = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = ['id' => $ufGroup['id']];
     $this->assertEquals(1, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
-    $result = $this->callAPIAndDocument('uf_group', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('uf_group', 'delete', $params);
     $this->assertEquals(0, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
   }
 

@@ -685,8 +685,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
-    $description = 'This demonstrates setting a custom field through the API.';
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
     $check = $this->callAPISuccess($this->_entity, 'get', [
       'return.custom_' . $ids['custom_field_id'] => 1,
@@ -1303,14 +1302,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
-    $description = 'This demonstrates setting a custom field through the API.';
-    $subFile = 'CustomFieldGet';
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
-    $check = $this->callAPIAndDocument($this->_entity, 'get', [
+    $check = $this->callAPISuccess($this->_entity, 'get', [
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
-    ], __FUNCTION__, __FILE__, $description, $subFile);
+    ]);
 
     $this->assertEquals('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
     $fields = ($this->callAPISuccess('contact', 'getfields', $params));
@@ -1347,11 +1344,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
-    $description = 'This demonstrates setting a custom field through the API.';
-    $subFile = 'CustomFieldGetReturnSyntaxVariation';
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $params = ['return' => 'custom_' . $ids['custom_field_id'], 'id' => $result['id']];
-    $check = $this->callAPIAndDocument($this->_entity, 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $check = $this->callAPISuccess($this->_entity, 'get', $params);
 
     $this->assertEquals('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
     $this->customFieldDelete($ids['custom_field_id']);
@@ -1453,8 +1448,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateIndividualWithContributionDottedSyntax(): void {
-    $description = 'This demonstrates the syntax to create 2 chained entities.';
-    $subFile = 'ChainTwoWebsites';
     $params = [
       'first_name' => 'abc3',
       'last_name' => 'xyz3',
@@ -1482,9 +1475,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ],
     ];
 
-    $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'create', $params);
 
-    // checking child function result not covered in callAPIAndDocument
+    // checking child function result not covered in callAPISuccess
     $this->assertAPISuccess($result['values'][$result['id']]['api.website.create']);
     $this->assertEquals('https://chained.org', $result['values'][$result['id']]['api.website.create.2']['values'][0]['url']);
     $this->assertEquals('https://civicrm.org', $result['values'][$result['id']]['api.website.create']['values'][0]['url']);
@@ -1529,9 +1522,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ],
     ];
 
-    $description = 'Demonstrates creating two websites as an array.';
-    $subFile = 'ChainTwoWebsitesSyntax2';
-    $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'create', $params);
 
     // the callAndDocument doesn't check the chained call
     $this->assertEquals(0, $result['values'][$result['id']]['api.website.create'][0]['is_error']);
@@ -2108,7 +2099,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = [
       'id' => $contactID,
     ];
-    $this->callAPIAndDocument('contact', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('contact', 'delete', $params);
   }
 
   /**
@@ -2308,7 +2299,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = [
       'email' => 'man2@yahoo.com',
     ];
-    $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('contact', 'get', $params);
     $this->assertEquals('man2@yahoo.com', $result['values'][$result['id']]['email']);
 
     $this->callAPISuccess('contact', 'delete', $contact);
@@ -2704,8 +2695,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
 
     $moreIDs = $this->CustomGroupMultipleCreateWithFields();
-    $description = "This demonstrates the usage of chained api functions.\nIn this case no notes or custom fields have been created.";
-    $subFile = 'APIChainedArray';
     $params = [
       'first_name' => 'abc3',
       'last_name' => 'xyz3',
@@ -2754,7 +2743,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.CustomValue.get' => 1,
       'api.Note.get' => 1,
     ];
-    $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'Get', $params);
     // delete the contact
     $this->callAPISuccess('contact', 'delete', $result);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -2816,8 +2805,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testGetIndividualWithChainedArraysFormats(): void {
-    $description = "This demonstrates the usage of chained api functions.\nIn this case no notes or custom fields have been created.";
-    $subFile = 'APIChainedArrayFormats';
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
 
@@ -2867,7 +2854,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.Note.get' => 1,
       'api.Membership.getCount' => [],
     ];
-    $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'Get', $params);
     $this->assertEquals(2, $result['values'][$result['id']]['api.Contribution.getCount']);
     $this->assertEquals(0, $result['values'][$result['id']]['api.Note.get']['is_error']);
     $this->assertEquals('https://civicrm.org', $result['values'][$result['id']]['api.website.getValue']);
@@ -2890,8 +2877,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'title' => 'another group',
       'name' => 'another name',
     ]);
-    $description = 'This demonstrates the usage of chained api functions with multiple custom fields.';
-    $subFile = 'APIChainedArrayMultipleCustom';
     $params = [
       'first_name' => 'abc3',
       'last_name' => 'xyz3',
@@ -2952,7 +2937,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.Contribution.getCount' => [],
       'api.CustomValue.get' => 1,
     ];
-    $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'Get', $params);
 
     $this->customGroupDelete($ids['custom_group_id']);
     $this->customGroupDelete($moreIDs['custom_group_id']);
@@ -2970,9 +2955,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testChainingValuesCreate(): void {
-    $description = "This demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
-      2 child functions - one receives values from the parent (Contact) and the other child (Tag).";
-    $subFile = 'APIChainedArrayValuesFromSiblingFunction';
     $params = [
       'display_name' => 'batman',
       'contact_type' => 'Individual',
@@ -2983,7 +2965,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ],
       'api.entity_tag.create' => ['tag_id' => '$value.api.tag.create'],
     ];
-    $result = $this->callAPIAndDocument('Contact', 'Create', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'Create', $params);
     $this->assertEquals(0, $result['values'][$result['id']]['api.entity_tag.create']['is_error']);
   }
 
@@ -2998,11 +2980,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testContactGetFormatIsSuccessTrue(int $version): void {
     $this->_apiversion = $version;
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
-    $description = "This demonstrates use of the 'format.is_success' param.
-    This param causes only the success or otherwise of the function to be returned as BOOLEAN";
-    $subFile = 'FormatIsSuccess_True';
     $params = ['id' => $contactID, 'format.is_success' => 1];
-    $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'Get', $params);
     $this->assertEquals(1, $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
@@ -3017,11 +2996,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testContactCreateFormatIsSuccessFalse(int $version): void {
     $this->_apiversion = $version;
 
-    $description = "This demonstrates use of the 'format.is_success' param.
-    This param causes only the success or otherwise of the function to be returned as BOOLEAN";
-    $subFile = 'FormatIsSuccess_Fail';
     $params = ['id' => 500, 'format.is_success' => 1];
-    $result = $this->callAPIAndDocument('Contact', 'Create', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'Create', $params);
     $this->assertEquals(0, $result);
   }
 
@@ -3097,11 +3073,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testContactGetSingleEntityArray(int $version): void {
     $this->_apiversion = $version;
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
-    $description = "This demonstrates use of the 'format.single_entity_array' param.
-      This param causes the only contact to be returned as an array without the other levels.
-      It will be ignored if there is not exactly 1 result";
-    $subFile = 'GetSingleContact';
-    $result = $this->callAPIAndDocument('Contact', 'GetSingle', ['id' => $contactID], __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'GetSingle', ['id' => $contactID]);
     $this->assertEquals('Mr. Test Contact II', $result['display_name']);
     $this->callAPISuccess('Contact', 'Delete', ['id' => $contactID]);
   }
@@ -3117,11 +3089,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testContactGetFormatCountOnly(int $version): void {
     $this->_apiversion = $version;
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
-    $description = "This demonstrates use of the 'getCount' action.
-      This param causes the count of the only function to be returned as an integer.";
     $params = ['id' => $contactID];
-    $result = $this->callAPIAndDocument('Contact', 'GetCount', $params, __FUNCTION__, __FILE__, $description,
-      'GetCountContact');
+    $result = $this->callAPISuccess('Contact', 'GetCount', $params);
     $this->assertEquals('1', $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
@@ -3137,12 +3106,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testContactGetFormatIDOnly(int $version): void {
     $this->_apiversion = $version;
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
-    $description = "This demonstrates use of the 'format.id_only' param.
-      This param causes the id of the only entity to be returned as an integer.
-      It will be ignored if there is not exactly 1 result";
-    $subFile = 'FormatOnlyID';
     $params = ['id' => $contactID, 'format.only_id' => 1];
-    $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'Get', $params);
     $this->assertEquals($contactID, $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
@@ -3158,12 +3123,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testContactGetFormatSingleValue(int $version): void {
     $this->_apiversion = $version;
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
-    $description = "This demonstrates use of the 'format.single_value' param.
-      This param causes only a single value of the only entity to be returned as an string.
-      It will be ignored if there is not exactly 1 result";
-    $subFile = 'FormatSingleValue';
     $params = ['id' => $contactID, 'return' => 'display_name'];
-    $result = $this->callAPIAndDocument('Contact', 'getvalue', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Contact', 'getvalue', $params);
     $this->assertEquals('Mr. Test Contact II', $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
@@ -4027,8 +3988,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test contact getactions.
    */
   public function testGetActions(): void {
-    $description = 'Getting the available actions for an entity.';
-    $result = $this->callAPIAndDocument($this->_entity, 'getactions', [], __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess($this->_entity, 'getactions', []);
     $expected = [
       'create',
       'delete',
@@ -4446,7 +4406,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $this->assertEquals($contactIDs[1], $result['values'][0]['id']);
     }
 
-    $result = $this->callAPIAndDocument('Contact', 'getmergedfrom', ['contact_id' => $contactIDs[1]], __FUNCTION__, __FILE__)['values'];
+    $result = $this->callAPISuccess('Contact', 'getmergedfrom', ['contact_id' => $contactIDs[1]])['values'];
     $mergedContactIDs = array_merge(array_diff($contactIDs, [$contactIDs[1]]));
     $this->assertEquals($mergedContactIDs, array_keys($result));
   }
@@ -4614,8 +4574,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testContactGetWithGroupTitleMultipleGroups(): void {
-    $description = 'Get all from group and display contacts.';
-    $subFile = 'GroupFilterUsingContactAPI';
     $contact_params = [
       'contact_type' => 'Individual',
       'first_name' => 'Test2',
@@ -4650,7 +4608,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     foreach ($createdGroupsIds as $id) {
       $this->assertContains((string) $id, $contact_groups);
     }
-    $this->callAPIAndDocument('contact', 'get', ['group' => ['IN' => $createdGroupTitles]], __FUNCTION__, __FILE__, $description, $subFile);
+    $this->callAPISuccess('contact', 'get', ['group' => ['IN' => $createdGroupTitles]]);
     $contact_get2 = $this->callAPISuccess('contact', 'get', ['group' => ['IN' => $createdGroupTitles], 'return' => 'group']);
     $this->assertEquals($created_contact_id, $contact_get2['id']);
     $contact_groups2 = explode(',', $contact_get2['values'][$created_contact_id]['groups']);
@@ -4765,10 +4723,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testLoggedInUserAPISupportToken(): void {
-    $description = 'Get contact id of the current logged in user';
-    $subFile = 'ContactIDOfLoggedInUserContactAPI';
     $cid = $this->createLoggedInUser();
-    $contact = $this->callAPIAndDocument('contact', 'get', ['id' => 'user_contact_id'], __FUNCTION__, __FILE__, $description, $subFile);
+    $contact = $this->callAPISuccess('contact', 'get', ['id' => 'user_contact_id']);
     $this->assertEquals($cid, $contact['id']);
   }
 
@@ -4934,7 +4890,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test getunique api call for Contact entity
    */
   public function testContactGetUnique(): void {
-    $result = $this->callAPIAndDocument($this->_entity, 'getunique', [], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'getunique', []);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(['external_identifier'], $result['values']['UI_external_identifier']);
   }

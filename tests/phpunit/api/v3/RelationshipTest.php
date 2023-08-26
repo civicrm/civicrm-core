@@ -335,7 +335,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'note' => 'note',
     ];
 
-    $result = $this->callAPIAndDocument('Relationship', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Relationship', 'create', $params);
     $relationParams = [
       'id' => $result['id'],
     ];
@@ -480,7 +480,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id']);
 
     $getParams = ['id' => $result['id']];
-    $check = $this->callAPIAndDocument($this->entity, 'get', $getParams, __FUNCTION__, __FILE__);
+    $check = $this->callAPISuccess($this->entity, 'get', $getParams);
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
@@ -536,7 +536,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('relationship', 'create', $params);
     $params = ['id' => $result['id']];
-    $this->callAPIAndDocument('relationship', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('relationship', 'delete', $params);
   }
 
   ///////////////// civicrm_relationship_update methods
@@ -834,9 +834,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $rel1 = $this->callAPISuccess('relationship', 'create', $this->_params);
 
     $getParams = ['filters' => ['is_current' => 1]];
-    $description = "Demonstrates is_current filter.";
-    $subfile = 'filterIsCurrent';
-    $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('relationship', 'get', $getParams);
     $this->assertEquals($result['count'], 1);
     $this->AssertEquals($rel1['id'], $result['id']);
 
@@ -910,37 +908,28 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => ['IN' => [$relationType2, $relationType3]],
     ];
 
-    $description = "Demonstrates use of IN filter.";
-    $subfile = 'INRelationshipType';
-
-    $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('relationship', 'get', $getParams);
     $this->assertEquals($result['count'], 2);
     $this->AssertEquals([$rel2['id'], $rel3['id']], array_keys($result['values']));
 
-    $description = "Demonstrates use of NOT IN filter.";
-    $subfile = 'NotInRelationshipType';
     $getParams = [
       'relationship_type_id' => ['NOT IN' => [$relationType2, $relationType3]],
     ];
-    $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('relationship', 'get', $getParams);
     $this->assertEquals($result['count'], 2);
     $this->assertEquals([$rel1['id'], $rel4['id']], array_keys($result['values']));
 
-    $description = 'Demonstrates use of BETWEEN filter.';
-    $subfile = 'BetweenRelationshipType';
     $getParams = [
       'relationship_type_id' => ['BETWEEN' => [$relationType2, $relationType4]],
     ];
-    $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('relationship', 'get', $getParams);
     $this->assertEquals($result['count'], 3);
     $this->AssertEquals([$rel2['id'], $rel3['id'], $rel4['id']], array_keys($result['values']));
 
-    $description = 'Demonstrates use of Not BETWEEN filter.';
-    $subfile = 'NotBetweenRelationshipType';
     $getParams = [
       'relationship_type_id' => ['NOT BETWEEN' => [$relationType2, $relationType4]],
     ];
-    $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('relationship', 'get', $getParams);
     $this->assertEquals($result['count'], 1);
     $this->assertEquals([$rel1['id']], array_keys($result['values']));
 

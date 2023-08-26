@@ -120,7 +120,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
   }
 
   public function testCreatePriceFieldValue() {
-    $result = $this->callAPIAndDocument('PriceFieldValue', 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('PriceFieldValue', 'create', $this->params);
     $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
@@ -133,7 +133,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $getParams = [
       'name' => 'contribution_amount',
     ];
-    $getResult = $this->callAPIAndDocument('PriceFieldValue', 'get', $getParams, __FUNCTION__, __FILE__);
+    $getResult = $this->callAPISuccess('PriceFieldValue', 'get', $getParams);
     $this->assertEquals(1, $getResult['count']);
     $this->callAPISuccess('price_field_value', 'delete', ['id' => $createResult['id']]);
   }
@@ -142,7 +142,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $startCount = $this->callAPISuccess('PriceFieldValue', 'getcount', []);
     $createResult = $this->callAPISuccess('PriceFieldValue', 'create', $this->params);
     $deleteParams = ['id' => $createResult['id']];
-    $deleteResult = $this->callAPIAndDocument('PriceFieldValue', 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $deleteResult = $this->callAPISuccess('PriceFieldValue', 'delete', $deleteParams);
 
     $endCount = $this->callAPISuccess('PriceFieldValue', 'getcount', []);
     $this->assertEquals($startCount, $endCount);
@@ -164,7 +164,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'is_active' => 1,
       'financial_type_id' => 2,
     ];
-    $result = $this->callAPIAndDocument('PriceFieldValue', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('PriceFieldValue', 'create', $params);
     $this->assertEquals($result['values'][$result['id']]['membership_num_terms'], 2);
     $this->assertEquals(1, $result['count']);
     $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $result['id']]);

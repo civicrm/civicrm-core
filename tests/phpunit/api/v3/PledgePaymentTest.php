@@ -43,7 +43,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
   public function testGetPledgePayment(): void {
     $params = [];
-    $result = $this->callAPIAndDocument('PledgePayment', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('PledgePayment', 'get', $params);
     $this->assertEquals(5, $result['count']);
   }
 
@@ -174,7 +174,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'status_id' => 1,
       'actual_amount' => 20,
     ];
-    $result = $this->callAPIAndDocument('PledgePayment', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('PledgePayment', 'create', $params);
 
     //check existing updated not new one created - 'create' means add contribution_id in this context
     $afterAdd = $this->callAPISuccess('PledgePayment', 'get', []);
@@ -309,7 +309,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'status_id' => 1,
     ];
 
-    $result = $this->callAPIAndDocument('PledgePayment', 'update', $updateParams, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('PledgePayment', 'update', $updateParams);
     $this->getAndCheck(array_merge($params, $updateParams), $result['id'], $this->_entity);
   }
 
@@ -327,7 +327,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $deleteParams = [
       'id' => $pledgePayment['id'],
     ];
-    $this->callAPIAndDocument('PledgePayment', 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('PledgePayment', 'delete', $deleteParams);
   }
 
   public function testGetFields(): void {

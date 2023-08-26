@@ -60,7 +60,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $params = [
       'name' => 'test status',
     ];
-    $result = $this->callAPIAndDocument('membership_status', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('membership_status', 'get', $params);
     $this->assertEquals($result['values'][$this->_membershipStatusID]['name'], "test status", "In line " . __LINE__);
   }
 
@@ -92,7 +92,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $params = [
       'name' => 'test membership status',
     ];
-    $result = $this->callAPIAndDocument('membership_status', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('membership_status', 'create', $params);
 
     $this->assertNotNull($result['id']);
     $this->membershipStatusDelete($result['id']);

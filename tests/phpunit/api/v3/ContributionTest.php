@@ -158,7 +158,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => array_merge(['invoice_number', 'contribution_source'], array_keys($p)),
     ];
 
-    $contributions = $this->callAPIAndDocument('Contribution', 'get', $params, __FUNCTION__, __FILE__);
+    $contributions = $this->callAPISuccess('Contribution', 'get', $params);
 
     $this->assertEquals(1, $contributions['count']);
     $contribution = $contributions['values'][$contributions['id']];
@@ -470,7 +470,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
 
-    $result = $this->callAPIAndDocument($this->entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->entity, 'create', $params);
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id']);
     $check = $this->callAPISuccess($this->entity, 'get', [
       'return.custom_' . $ids['custom_field_id'] => 1,
@@ -567,9 +567,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ],
     ];
 
-    $description = 'Create Contribution with Nested Line Items.';
-    $subFile = 'CreateWithNestedLineItems';
-    $contribution = $this->callAPIAndDocument('Contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $contribution['id'],
@@ -932,8 +930,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateContributionWithNote(): void {
-    $description = 'Demonstrates creating contribution with Note Entity.';
-    $subFile = 'ContributionCreateWithNote';
     $params = [
       'contact_id' => $this->individualID,
       'receive_date' => '2012-01-01',
@@ -950,7 +946,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'note' => 'my contribution note',
     ];
 
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $result = $this->callAPISuccess('note', 'get', [
       'entity_table' => 'civicrm_contribution',
       'entity_id' => $contribution['id'],
@@ -994,8 +990,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * This is the test for creating soft credits.
    */
   public function testCreateContributionWithSoftCredit() {
-    $description = 'Demonstrates creating contribution with SoftCredit.';
-    $subfile = 'ContributionCreateWithSoftCredit';
     $contact2 = $this->callAPISuccess('Contact', 'create', [
       'display_name' => 'superman',
       'contact_type' => 'Individual',
@@ -1007,7 +1001,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ];
 
     $params = $this->_params + ['soft_credit' => [1 => $softParams]];
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $result = $this->callAPISuccess('contribution', 'get', ['return' => 'soft_credit', 'sequential' => 1]);
 
     $this->assertEquals($softParams['contact_id'], $result['values'][0]['soft_credit'][1]['contact_id']);
@@ -1019,8 +1013,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   public function testCreateContributionWithSoftCreditDefaults() {
-    $description = 'Demonstrates creating contribution with Soft Credit defaults for amount and type.';
-    $subfile = 'ContributionCreateWithSoftCreditDefaults';
     $contact2 = $this->callAPISuccess('Contact', 'create', [
       'display_name' => 'superman',
       'contact_type' => 'Individual',
@@ -1028,7 +1020,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = $this->_params + [
       'soft_credit_to' => $contact2['id'],
     ];
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $result = $this->callAPISuccess('contribution', 'get', ['return' => 'soft_credit', 'sequential' => 1]);
 
     $this->assertEquals($contact2['id'], $result['values'][0]['soft_credit'][1]['contact_id']);
@@ -1044,8 +1036,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test creating contribution with Soft Credit by passing in honor_contact_id.
    */
   public function testCreateContributionWithHonoreeContact() {
-    $description = 'Demonstrates creating contribution with Soft Credit by passing in honor_contact_id.';
-    $subfile = 'ContributionCreateWithHonoreeContact';
     $contact2 = $this->callAPISuccess('Contact', 'create', [
       'display_name' => 'superman',
       'contact_type' => 'Individual',
@@ -1053,7 +1043,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = $this->_params + [
       'honor_contact_id' => $contact2['id'],
     ];
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $result = $this->callAPISuccess('contribution', 'get', ['return' => 'soft_credit', 'sequential' => 1]);
 
     $this->assertEquals($contact2['id'], $result['values'][0]['soft_credit'][1]['contact_id']);
@@ -1204,7 +1194,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     ];
 
-    $contribution = $this->callAPIAndDocument('Contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
     $contribution = $contribution['values'][$contribution['id']];
     $this->assertEquals($contribution['contact_id'], $this->individualID);
     $this->assertEquals($contribution['total_amount'], 100.00);
@@ -1913,7 +1903,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = [
       'id' => $contributionID,
     ];
-    $this->callAPIAndDocument('contribution', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('contribution', 'delete', $params);
   }
 
   /**
@@ -4734,7 +4724,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test getunique api call for Contribution entity
    */
   public function testContributionGetUnique(): void {
-    $result = $this->callAPIAndDocument($this->entity, 'getunique', [], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->entity, 'getunique', []);
     $this->assertEquals(2, $result['count']);
     $this->assertEquals(['trxn_id'], $result['values']['UI_contrib_trxn_id']);
     $this->assertEquals(['invoice_id'], $result['values']['UI_contrib_invoice_id']);

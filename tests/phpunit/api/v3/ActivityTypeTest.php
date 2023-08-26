@@ -46,7 +46,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
    */
   public function testActivityTypeGet() {
     $params = [];
-    $result = $this->callAPIAndDocument('activity_type', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('activity_type', 'get', $params);
     $this->assertEquals($result['values']['1'], 'Meeting');
   }
 
@@ -62,7 +62,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
       'is_optgroup' => 1,
       'is_default' => 0,
     ];
-    $result = $this->callAPIAndDocument('activity_type', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('activity_type', 'create', $params);
   }
 
   /**

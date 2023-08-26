@@ -219,32 +219,31 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Test getrows on Mailing Opened report.
    */
   public function testReportTemplateGetRowsMailingUniqueOpened(): void {
-    $description = 'Retrieve rows from a mailing opened report template.';
     $this->loadXMLDataSet(__DIR__ . '/../../CRM/Mailing/BAO/queryDataset.xml');
 
     // Check total rows without distinct
     global $_REQUEST;
     $_REQUEST['distinct'] = 0;
-    $result = $this->callAPIAndDocument('report_template', 'getrows', [
+    $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
-    ], __FUNCTION__, __FILE__, $description, 'Getrows');
+    ]);
     $this->assertEquals(14, $result['count']);
 
     // Check total rows with distinct
     $_REQUEST['distinct'] = 1;
-    $result = $this->callAPIAndDocument('report_template', 'getrows', [
+    $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
-    ], __FUNCTION__, __FILE__, $description, 'Getrows');
+    ]);
     $this->assertEquals(5, $result['count']);
 
     // Check total rows with distinct by passing NULL value to distinct parameter
     $_REQUEST['distinct'] = NULL;
-    $result = $this->callAPIAndDocument('report_template', 'getrows', [
+    $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
-    ], __FUNCTION__, __FILE__, $description, 'Getrows');
+    ]);
     $this->assertEquals(5, $result['count']);
   }
 
@@ -326,13 +325,12 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if (strpos($reportID, 'logging') === 0) {
       Civi::settings()->set('logging', 1);
     }
-    $description = "Get Statistics from a report (note there isn't much data to get in the test DB).";
     if ($reportID === 'contribute/summary') {
       $this->hookClass->setHook('civicrm_alterReportVar', [$this, 'alterReportVarHook']);
     }
-    $this->callAPIAndDocument('report_template', 'getstatistics', [
+    $this->callAPISuccess('report_template', 'getstatistics', [
       'report_id' => $reportID,
-    ], __FUNCTION__, __FILE__, $description, 'Getstatistics');
+    ]);
   }
 
   /**

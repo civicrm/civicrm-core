@@ -72,7 +72,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $customField = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
     $customField['label'] = 'Name2';
     $customFieldEdited = $this->callAPISuccess('custom_field', 'create', $customField);
 
@@ -370,17 +370,13 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'options' => ['get_options' => 'custom_' . $customField['id']],
       'action' => 'create',
     ];
-    $description = "Demonstrates retrieving metadata with custom field options.";
-    $subfile = "GetFieldsOptions";
-    $fields = $this->callAPIAndDocument('contact', 'getfields', $getFieldsParams, __FUNCTION__, 'ContactTest.php', $description, $subfile);
+    $fields = $this->callAPISuccess('Contact', 'getfields', $getFieldsParams);
     $this->assertArrayHasKey('options', $fields['values']['custom_' . $customField['id']]);
     $this->assertEquals('Label1', $fields['values']['custom_' . $customField['id']]['options'][1]);
     $getOptionsArray = [
       'field' => 'custom_' . $customField['id'],
     ];
-    $description = "Demonstrates retrieving options for a custom field.";
-    $subfile = "GetOptions";
-    $result = $this->callAPIAndDocument('contact', 'getoptions', $getOptionsArray, __FUNCTION__, 'ContactTest.php', $description, '');
+    $result = $this->callAPISuccess('Contact', 'getoptions', $getOptionsArray);
     $this->assertEquals('Label1', $result['values'][1]);
   }
 
@@ -406,7 +402,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $params = [
       'id' => $customField['id'],
     ];
-    $result = $this->callAPIAndDocument('custom_field', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('custom_field', 'delete', $params);
 
     $this->assertAPISuccess($result);
   }

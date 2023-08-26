@@ -87,7 +87,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   public function testMailerCreateSuccess(int $version): void {
     $this->_apiversion = $version;
     $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
-    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign'], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign']);
     $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals(1, $jobs['count']);
     // return isn't working on this in getAndCheck so lets not check it for now
@@ -118,7 +118,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $this->_params['body_html'] = 'I am completed so it does not matter if there is an opt out link since I have already been sent by another system';
     $this->_params['is_completed'] = 1;
-    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now']);
     $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals(1, $jobs['count']);
     $this->assertEquals('Complete', $jobs['values'][$jobs['id']]['status']);
@@ -132,7 +132,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    */
   public function testMailerCreateSuccessNoCreatedID(): void {
     unset($this->_params['created_id']);
-    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now']);
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
   }
 
@@ -371,7 +371,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'mailing' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing'),
       'group' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_group'),
     ];
-    $create = $this->callAPIAndDocument('Mailing', 'create', $params, __FUNCTION__, __FILE__);
+    $create = $this->callAPISuccess('Mailing', 'create', $params);
     // 'Preview should not create any mailing records'
     $this->assertDBQuery($maxIDs['mailing'], 'SELECT MAX(id) FROM civicrm_mailing');
     // 'Preview should not create any mailing_group records'
@@ -681,7 +681,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       $this->assertMatchesRegularExpression($expectedFailure, $submitResult['error_message']);
     }
     else {
-      $submitResult = $this->callAPIAndDocument('Mailing', 'submit', $submitParams, __FUNCTION__, __FILE__);
+      $submitResult = $this->callAPISuccess('Mailing', 'submit', $submitParams);
       $this->assertIsNumeric($submitResult['id']);
       $this->assertIsNumeric($submitResult['values'][$id]['scheduled_id']);
       $this->assertEquals($submitParams['scheduled_date'], $submitResult['values'][$id]['scheduled_date']);
@@ -824,7 +824,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    */
   public function testMailerDeleteSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $this->callAPIAndDocument($this->_entity, 'delete', ['id' => $result['id']], __FUNCTION__, __FILE__);
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
     $this->assertAPIDeleted($this->_entity, $result['id']);
   }
 
@@ -832,9 +832,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    * Test Mailing.gettokens.
    */
   public function testMailGetTokens() {
-    $description = 'Demonstrates fetching tokens for one or more entities (in this case "Contact" and "Mailing").
-      Optionally pass sequential=1 to have output ready-formatted for the select2 widget.';
-    $result = $this->callAPIAndDocument($this->_entity, 'gettokens', ['entity' => ['Contact', 'Mailing']], __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess($this->_entity, 'gettokens', ['entity' => ['Contact', 'Mailing']]);
     $this->assertContains('Contact Type', $result['values']);
 
     // Check that passing "sequential" correctly outputs a hierarchical array
@@ -872,7 +870,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $this->callAPISuccess('Mailing', 'get');
     $createId = $create['id'];
     $this->createLoggedInUser();
-    $clone = $this->callAPIAndDocument('Mailing', 'clone', ['id' => $create['id']], __FUNCTION__, __FILE__);
+    $clone = $this->callAPISuccess('Mailing', 'clone', ['id' => $create['id']]);
     $cloneId = $clone['id'];
 
     $this->assertNotEquals($createId, $cloneId, 'Create and clone should return different records');

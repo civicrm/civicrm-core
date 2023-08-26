@@ -105,7 +105,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contact',
       'entity_id' => $entityId,
     ];
-    $this->callAPIAndDocument('note', 'get', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('note', 'get', $params);
   }
 
   /**
@@ -159,7 +159,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   public function testCreate($version) {
     $this->_apiversion = $version;
 
-    $result = $this->callAPIAndDocument('note', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('note', 'create', $this->_params);
     $this->assertEquals($result['values'][$result['id']]['note'], 'Hello!!! m testing Note');
     $this->assertEquals(date('Y-m-d', strtotime($this->_createdDate)), date('Y-m-d', strtotime($result['values'][$result['id']]['created_date'])));
     $this->assertEquals(date('Y-m-d', strtotime($this->_createdDate)), date('Y-m-d', strtotime($result['values'][$result['id']]['note_date'])));
@@ -301,7 +301,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'id' => $additionalNote['id'],
     ];
 
-    $this->callAPIAndDocument('note', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('note', 'delete', $params);
   }
 
   public function testNoteJoin() {

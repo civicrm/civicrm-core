@@ -58,7 +58,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
     $paramsGet = [
       'organization_id' => $result['id'],
     ];
-    $result = $this->callAPIAndDocument('group_organization', 'get', $paramsGet, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_organization', 'get', $paramsGet);
   }
 
   /**
@@ -119,7 +119,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
       'organization_id' => $this->_orgID,
       'group_id' => $this->_groupID,
     ];
-    $result = $this->callAPIAndDocument('group_organization', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_organization', 'create', $params);
   }
 
   /**
@@ -189,7 +189,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
     $params = [
       'id' => $result['id'],
     ];
-    $result = $this->callAPIAndDocument('group_organization', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_organization', 'delete', $params);
   }
 
   /**

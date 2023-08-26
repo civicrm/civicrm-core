@@ -52,7 +52,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
 
   public function testGetOptionGroupByName() {
     $params = ['name' => 'preferred_communication_method'];
-    $result = $this->callAPIAndDocument('option_group', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('option_group', 'get', $params);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(1, $result['id']);
   }
@@ -81,7 +81,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
         'format.only_id' => 1,
       ],
     ];
-    $result = $this->callAPIAndDocument('OptionGroup', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('OptionGroup', 'create', $params);
     $this->assertEquals('civicrm_event.amount.560', $result['values'][0]['name']);
     $this->assertTrue(is_int($result['values'][0]['api.OptionValue.create']));
     $this->assertGreaterThan(0, $result['values'][0]['api.OptionValue.create']);
@@ -149,7 +149,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
    */
   public function testDeleteOptionGroup() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $this->callAPIAndDocument('OptionGroup', 'delete', ['id' => $result['id']], __FUNCTION__, __FILE__);
+    $this->callAPISuccess('OptionGroup', 'delete', ['id' => $result['id']]);
   }
 
   /**

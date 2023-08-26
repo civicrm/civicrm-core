@@ -45,7 +45,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $this->assertEquals('abc', Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
 
     $params = [];
-    $this->callAPIAndDocument('system', 'flush', $params, __FUNCTION__, __FILE__, 'Flush all system caches', 'Flush');
+    $this->callAPISuccess('system', 'flush', $params);
 
     $this->assertNull(Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
   }
