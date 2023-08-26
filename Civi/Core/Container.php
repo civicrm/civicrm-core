@@ -248,11 +248,23 @@ class Container {
     $container->setDefinition('crypto.jwt', new Definition('Civi\Crypto\CryptoJwt', []))
       ->setPublic(TRUE);
 
+    $bootServiceTypes = [
+      'cache.settings' => \CRM_Utils_Cache_Interface::class,
+      'dispatcher.boot' => CiviEventDispatcher::class,
+      'lockManager' => LockManager::class,
+      'paths' => Paths::class,
+      'runtime' => \CRM_Core_Config_Runtime::class,
+      'settings_manager' => SettingsManager::class,
+      'userPermissionClass' => \CRM_Core_Permission_Base::class,
+      'userSystem' => \CRM_Utils_System_Base::class,
+    ];
     if (empty(\Civi::$statics[__CLASS__]['boot'])) {
       throw new \RuntimeException('Cannot initialize container. Boot services are undefined.');
     }
     foreach (\Civi::$statics[__CLASS__]['boot'] as $bootService => $def) {
-      $container->setDefinition($bootService, new Definition())->setSynthetic(TRUE)->setPublic(TRUE);
+      $container->setDefinition($bootService, new Definition($bootServiceTypes[$bootService] ?? NULL))
+        ->setSynthetic(TRUE)
+        ->setPublic(TRUE);
     }
 
     // Expose legacy singletons as services in the container.
