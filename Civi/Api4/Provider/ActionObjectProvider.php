@@ -172,7 +172,7 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
    * Scan all api directories to discover entities
    * @return \Civi\Api4\Generic\AbstractEntity[]
    */
-  private function getAllApiClasses() {
+  public function getAllApiClasses(): array {
     $classNames = [];
     $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
