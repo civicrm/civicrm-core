@@ -24,6 +24,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\TransactionalInterface;
@@ -77,6 +78,20 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('name', 'CONTAINS', 'campaign')
       ->execute();
     $this->assertCount(1, $fields);
+  }
+
+  public function testEmailFields() {
+    $getFields = Email::getFields(FALSE)
+      ->setAction('get')
+      ->execute()->indexBy('name');
+
+    $this->assertEquals('Text', $getFields['email']['input_type']);
+
+    $createFields = Email::getFields(FALSE)
+      ->setAction('create')
+      ->execute()->indexBy('name');
+
+    $this->assertEquals('Email', $createFields['email']['input_type']);
   }
 
   public function testInternalPropsAreHidden() {
