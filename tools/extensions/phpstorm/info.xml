@@ -34,5 +34,6 @@
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
     <mixin>smarty-v2@1.0.1</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
   </mixins>
 </extension>
