@@ -133,18 +133,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_renderer;
 
   /**
-   * An array to hold a list of datefields on the form
-   * so that they can be converted to ISO in a consistent manner
-   *
-   * @var array
-   *
-   * e.g on a form declare $_dateFields = array(
-   *  'receive_date' => array('default' => 'now'),
-   *  );
-   */
-  protected $_dateFields = [];
-
-  /**
    * Cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
@@ -2467,7 +2455,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return int
    * @throws \CRM_Core_Exception
    */
-  public function  getRequestedContactID(): ?int {
+  public function getRequestedContactID(): ?int {
     if (isset($this->_params) && !empty($this->_params['select_contact_id'])) {
       return (int) $this->_params['select_contact_id'];
     }
