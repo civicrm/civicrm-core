@@ -115,17 +115,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_paymentProcessorID;
 
   /**
-   * Is pay later enabled for the form.
-   *
-   * As part of trying to consolidate various payment pages we store processors here & have functions
-   * at this level to manage them. An alternative would be to have a separate Form that is inherited
-   * by all forms that allow payment processing.
-   *
-   * @var int
-   */
-  protected $_is_pay_later_enabled;
-
-  /**
    * The renderer used for this form
    *
    * @var object
