@@ -2467,7 +2467,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return int
    * @throws \CRM_Core_Exception
    */
-  public function getRequestedContactID(): ?int {
+  public function  getRequestedContactID(): ?int {
     if (isset($this->_params) && !empty($this->_params['select_contact_id'])) {
       return (int) $this->_params['select_contact_id'];
     }
