@@ -38,7 +38,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
   /**
    *  CRM-19325: Test CRM_Contribute_Form_Search batch filters
    */
-  public function testBatchFilter() {
+  public function testBatchFilter(): void {
     $this->quickCleanup($this->_tablesToTruncate);
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);
@@ -155,7 +155,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
   /**
    *  CRM-20286: Test CRM_Contribute_Form_Search Card type filters
    */
-  public function testCardTypeFilter() {
+  public function testCardTypeFilter(): void {
     $this->quickCleanup($this->_tablesToTruncate);
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);
@@ -257,7 +257,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
   /**
    *  CRM-20391: Test CRM_Contribute_Form_Search Card Number filters
    */
-  public function testCardNumberFilter() {
+  public function testCardNumberFilter(): void {
     $this->quickCleanup($this->_tablesToTruncate);
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);
@@ -354,7 +354,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
   /**
    *  Test contact contributions.
    */
-  public function testContributionSearchWithContactID() {
+  public function testContributionSearchWithContactID(): void {
     $contactID = $this->individualCreate([], 1);
     $fv = ['contact_id' => $contactID];
     $queryParams = CRM_Contact_BAO_Query::convertFormValues($fv);
@@ -415,7 +415,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
    *
    * @throws CRM_Core_Exception
    */
-  public function testCancelledFilter() {
+  public function testCancelledFilter(): void {
     $this->quickCleanup($this->_tablesToTruncate);
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);

@@ -175,7 +175,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * to (1) create 'foo' entity, (2) create 'bar' entity', (3) remove 'foo'
    * entity
    */
-  public function testAddRemoveEntitiesModule_UpdateAlways_DeleteAlways() {
+  public function testAddRemoveEntitiesModule_UpdateAlways_DeleteAlways(): void {
     // create first managed entity ('foo')
     $this->managedEntities = [$this->fixtures['com.example.one-foo']];
     $me = new CRM_Core_ManagedEntities($this->modules);
@@ -627,7 +627,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Pre-existing implementations may over-report (ie return entities despite the `$modules` filter).
    * This test ensures that the framework respects the `$modules` filter (even if specific implementations don't).
    */
-  public function testHookManaged_FilterModule() {
+  public function testHookManaged_FilterModule(): void {
     $this->managedEntities = [
       $this->fixtures['com.example.one-bar'],
       $this->fixtures['com.example.two-CustomGroup'],

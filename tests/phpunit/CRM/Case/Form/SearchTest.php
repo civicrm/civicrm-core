@@ -22,7 +22,7 @@ class CRM_Case_Form_SearchTest extends CiviCaseTestCase {
    * variable so it has a typo in CRM_Case_Form_Search::preProcess(), and then
    * this test will throw an exception.
    */
-  public function testOpeningFindCaseForm() {
+  public function testOpeningFindCaseForm(): void {
     $form = new CRM_Case_Form_Search();
     $form->controller = new CRM_Case_Controller_Search('Find Cases');
 

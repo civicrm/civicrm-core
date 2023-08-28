@@ -1632,7 +1632,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * In this example, the event 'title' is subject to encoding, but the
    * event 'description' is not.
    */
-  public function testEncodeDecodeConsistency() {
+  public function testEncodeDecodeConsistency(): void {
     // Create example
     $createResult = civicrm_api('Event', 'Create', [
       'version' => 3,

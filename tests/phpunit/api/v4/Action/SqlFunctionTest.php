@@ -31,7 +31,7 @@ use Civi\Test\TransactionalInterface;
  */
 class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testGetFunctions() {
+  public function testGetFunctions(): void {
     $functions = array_column(CoreUtil::getSqlFunctions(), NULL, 'name');
     $this->assertArrayHasKey('SUM', $functions);
     $this->assertArrayNotHasKey('', $functions);
@@ -43,7 +43,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(12, $functions['MONTH']['options'][11]['id']);
   }
 
-  public function testGroupAggregates() {
+  public function testGroupAggregates(): void {
     $cid = Contact::create(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];
     Contribution::save(FALSE)
       ->setDefaults(['contact_id' => $cid, 'financial_type_id:name' => 'Donation'])
@@ -102,7 +102,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains('1, ' . $cid . ', 100.00', $agg['GROUP_CONCAT:financial_type_id_contact_id_total_amount']);
   }
 
-  public function testGroupHaving() {
+  public function testGroupHaving(): void {
     $cid = Contact::create(FALSE)->addValue('first_name', 'donor')->execute()->first()['id'];
     Contribution::save(FALSE)
       ->setDefaults(['contact_id' => $cid, 'financial_type_id' => 1])
@@ -152,7 +152,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(400, $result[0]['SUM:total_amount']);
   }
 
-  public function testComparisonFunctions() {
+  public function testComparisonFunctions(): void {
     $cid = Contact::create(FALSE)
       ->addValue('first_name', 'hello')
       ->execute()->first()['id'];
@@ -212,7 +212,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(456, $result[$aids[2]]['ifnull_duration_2']);
   }
 
-  public function testStringFunctions() {
+  public function testStringFunctions(): void {
     $sampleData = [
       ['first_name' => 'abc', 'middle_name' => 'Q', 'last_name' => 'tester1', 'source' => '123'],
     ];
@@ -240,7 +240,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('est', $result['sub_last']);
   }
 
-  public function testDateFunctions() {
+  public function testDateFunctions(): void {
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
       ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => '2009-11-11'],
@@ -285,7 +285,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('Friday', $result[1]['day_name']);
   }
 
-  public function testIncorrectNumberOfArguments() {
+  public function testIncorrectNumberOfArguments(): void {
     try {
       Activity::get(FALSE)
         ->addSelect('IF(is_deleted) AS whoops')
@@ -317,7 +317,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     }
   }
 
-  public function testCurrentDate() {
+  public function testCurrentDate(): void {
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
       ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now'],
@@ -343,7 +343,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(2, $result);
   }
 
-  public function testRandFunction() {
+  public function testRandFunction(): void {
     Contact::save(FALSE)
       ->setRecords(array_fill(0, 6, []))
       ->execute();
@@ -363,7 +363,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertGreaterThanOrEqual($result[4]['rand'], $result[5]['rand']);
   }
 
-  public function testDateInWhereClause() {
+  public function testDateInWhereClause(): void {
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
       ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => '2009-11-11'],

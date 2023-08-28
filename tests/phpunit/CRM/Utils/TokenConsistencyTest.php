@@ -1069,7 +1069,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     ]);
   }
 
-  public function testEscaping() {
+  public function testEscaping(): void {
     $autoClean = [];
     $create = function(string $entity, array $record = []) use (&$autoClean) {
       // It's convenient to use createTestObject(), but it doesn't reproduce the normal escaping rules from QuickForm/APIv3/APIv4.

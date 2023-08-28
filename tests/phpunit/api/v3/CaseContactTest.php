@@ -48,7 +48,7 @@ class api_v3_CaseContactTest extends CiviCaseTestCase {
     ];
   }
 
-  public function testCaseContactGet() {
+  public function testCaseContactGet(): void {
     $result = $this->callAPISuccess('CaseContact', 'get', [
       'contact_id' => $this->contactID,
     ]);
@@ -58,7 +58,7 @@ class api_v3_CaseContactTest extends CiviCaseTestCase {
   /**
    * Test create function with valid parameters.
    */
-  public function testCaseContactCreate() {
+  public function testCaseContactCreate(): void {
     $params = $this->params;
     $result = $this->callAPISuccess('CaseContact', 'create', $params);
     $id = $result['id'];

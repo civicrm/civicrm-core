@@ -36,7 +36,7 @@ class SpecGathererTest extends Api4TestBase {
   use TableDropperTrait;
   use OptionCleanupTrait;
 
-  public function testBasicFieldsGathering() {
+  public function testBasicFieldsGathering(): void {
     $gatherer = new SpecGatherer();
     $specs = $gatherer->getSpec('Contact', 'get', FALSE);
     $contactDAO = CoreUtil::getBAOFromApiName('Contact');
@@ -47,7 +47,7 @@ class SpecGathererTest extends Api4TestBase {
     $this->assertEmpty(array_diff_key($contactFieldNames, $specFieldNames));
   }
 
-  public function testWithSpecProvider() {
+  public function testWithSpecProvider(): void {
     $gather = new SpecGatherer();
 
     $provider = $this->prophesize(SpecProviderInterface::class);

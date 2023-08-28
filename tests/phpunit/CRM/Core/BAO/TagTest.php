@@ -44,7 +44,7 @@ class CRM_Core_BAO_TagTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetTreeWithoutFilters() {
+  public function testGetTreeWithoutFilters(): void {
     $bao = new CRM_Core_BAO_Tag();
 
     $tree = $bao->getTree();
@@ -112,7 +112,7 @@ class CRM_Core_BAO_TagTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetTreeWithFilters() {
+  public function testGetTreeWithFilters(): void {
     $bao = new CRM_Core_BAO_Tag();
 
     $tree = $bao->getTree('civicrm_contact', TRUE);

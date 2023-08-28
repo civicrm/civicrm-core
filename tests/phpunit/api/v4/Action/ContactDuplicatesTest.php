@@ -27,7 +27,7 @@ use Civi\Api4\Contact;
  */
 class ContactDuplicatesTest extends CustomTestBase {
 
-  public function testGetDuplicatesUnsupervised() {
+  public function testGetDuplicatesUnsupervised(): void {
     $email = uniqid('test@');
 
     $testContacts = $this->saveTestRecords('Contact', [
@@ -44,7 +44,7 @@ class ContactDuplicatesTest extends CustomTestBase {
     $this->assertNotContains($testContacts[3], $found);
   }
 
-  public function testGetFieldsForContactGetDuplicatesAction() {
+  public function testGetFieldsForContactGetDuplicatesAction(): void {
     $fields = Contact::getFields(FALSE)
       ->setAction('getDuplicates')
       ->execute()
@@ -54,7 +54,7 @@ class ContactDuplicatesTest extends CustomTestBase {
     $this->assertEquals('Email', $fields['email_primary.email']['entity']);
   }
 
-  public function testGetRuleGroupNames() {
+  public function testGetRuleGroupNames(): void {
     $this->createTestRecord('DedupeRuleGroup', [
       'contact_type' => 'Individual',
       'name' => 'houseRule',
@@ -77,7 +77,7 @@ class ContactDuplicatesTest extends CustomTestBase {
     $this->assertContains('houseRule', $meta['params']['dedupeRule']['options']);
   }
 
-  public function testDedupeWithCustomFields() {
+  public function testDedupeWithCustomFields(): void {
     $customGroup = $this->createTestRecord('CustomGroup', ['name' => 'test1']);
 
     $customFieldText = $this->createTestRecord('CustomField', [

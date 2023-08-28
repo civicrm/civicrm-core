@@ -33,7 +33,7 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
   /**
    * Create() method (create Contribution Page with Honor block)
    */
-  public function testCreateHonor() {
+  public function testCreateHonor(): void {
     CRM_Core_I18n::singleton()->setLocale('en_US');
 
     $params = [

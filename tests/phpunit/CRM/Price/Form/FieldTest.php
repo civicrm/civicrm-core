@@ -29,7 +29,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     ]);
   }
 
-  public function testPublicFieldWithOnlyAdminOptionsIsNotAllowed() {
+  public function testPublicFieldWithOnlyAdminOptionsIsNotAllowed(): void {
     $this->publicFieldParams['option_label'][1] = 'Admin Price';
     $this->publicFieldParams['option_amount'][1] = 10;
     $this->publicFieldParams['option_visibility_id'][1] = $this->visibilityOptionsKeys['admin'];
@@ -43,7 +43,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $this->assertTrue(array_key_exists('visibility_id', $validationResult));
   }
 
-  public function testAdminFieldDoesNotAllowPublicOptions() {
+  public function testAdminFieldDoesNotAllowPublicOptions(): void {
     $this->adminFieldParams['option_label'][1] = 'Admin Price';
     $this->adminFieldParams['option_amount'][1] = 10;
     $this->adminFieldParams['option_visibility_id'][1] = $this->visibilityOptionsKeys['public'];
@@ -119,7 +119,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testPriceFieldFormRuleOnMembership() {
+  public function testPriceFieldFormRuleOnMembership(): void {
     $membershipTypeID = $this->membershipTypeCreate();
     $membershipTypeID2 = $this->membershipTypeCreate(['member_of_contact_id' => $this->setupIDs['contact']]);
 
@@ -305,7 +305,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
   /**
    * Test end date not allowed with only 'time' part.
    */
-  public function testEndDateWithoutDateNotAllowed() {
+  public function testEndDateWithoutDateNotAllowed(): void {
     $form = new CRM_Price_Form_Field();
     $form->_action = CRM_Core_Action::ADD;
     $values = $this->initializeFieldParameters([
@@ -318,7 +318,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
   /**
    * Test end date must be after start date.
    */
-  public function testEndDateBeforeStartDateNotAllowed() {
+  public function testEndDateBeforeStartDateNotAllowed(): void {
     $form = new CRM_Price_Form_Field();
     $form->_action = CRM_Core_Action::ADD;
     $values = $this->initializeFieldParameters([

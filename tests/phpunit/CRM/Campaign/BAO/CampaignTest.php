@@ -17,7 +17,7 @@
  */
 class CRM_Campaign_BAO_CampaignTest extends CiviUnitTestCase {
 
-  public function testCampaignSummary() {
+  public function testCampaignSummary(): void {
     $loggedInContact = $this->createLoggedInUser();
     $contact = $this->individualCreate();
     $this->callAPISuccess('Campaign', 'create', [

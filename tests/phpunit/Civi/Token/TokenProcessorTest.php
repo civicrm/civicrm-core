@@ -856,7 +856,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   // *
   // * Ex: $tokenContext['oldSmartyVar'] = 'new_entity.new_field';
   // */
-  //  public function testSmartyTokenAlias_Contact() {
+  //  public function testSmartyTokenAlias_Contact(): void {
   //    $alice = $this->individualCreate(['first_name' => 'Alice']);
   //    $bob = $this->individualCreate(['first_name' => 'Bob']);
   //    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());

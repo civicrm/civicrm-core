@@ -6,7 +6,7 @@
  */
 class CRM_Core_MenuTest extends CiviUnitTestCase {
 
-  public function testReadXML() {
+  public function testReadXML(): void {
     $xmlString = '<?xml version="1.0" encoding="iso-8859-1" ?>
     <menu>
       <item>
@@ -31,7 +31,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $this->assertTrue(!isset($menu['civicrm/foo/bar']['ids_arguments']));
   }
 
-  public function testReadXML_IDS() {
+  public function testReadXML_IDS(): void {
     $xmlString = '<?xml version="1.0" encoding="iso-8859-1" ?>
     <menu>
       <item>
@@ -69,7 +69,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
    * Check that novel data elements in the menu are correctly
    * stored and loaded.
    */
-  public function testModuleData() {
+  public function testModuleData(): void {
     CRM_Core_Menu::store(TRUE);
     $item = CRM_Core_Menu::get('civicrm/case');
     $this->assertFalse(isset($item['ids_arguments']['exceptions']));

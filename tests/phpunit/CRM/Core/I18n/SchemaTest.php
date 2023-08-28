@@ -105,7 +105,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     }
   }
 
-  public function testSchemaBuild() {
+  public function testSchemaBuild(): void {
     $this->enableMultilingual();
     $inUseCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
     $testCreateTable = CRM_Core_DAO::executeQuery("show create table civicrm_price_set", [], TRUE, NULL, FALSE, FALSE);
@@ -115,7 +115,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     }
   }
 
-  public function testMultilingualCustomFieldCreation() {
+  public function testMultilingualCustomFieldCreation(): void {
     $this->enableMultilingual(['en_US' => 'fr_CA']);
     $id = $this->customGroupCreate()['id'];
     $this->customFieldCreate(['custom_group_id' => $id]);

@@ -66,14 +66,14 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   /**
    * Test civicrm_membership_payment_create with empty params.
    */
-  public function testCreateEmptyParams() {
+  public function testCreateEmptyParams(): void {
     $this->callAPIFailure('membership_payment', 'create', [], 'Mandatory key(s) missing from params array: membership_id, contribution_id');
   }
 
   /**
    * Test civicrm_membership_payment_create - success expected.
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -104,7 +104,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   /**
    * Test civicrm_membershipPayment_get - success expected.
    */
-  public function testGet() {
+  public function testGet(): void {
     $contactId = $this->individualCreate();
     $params = [
       'contact_id' => $contactId,

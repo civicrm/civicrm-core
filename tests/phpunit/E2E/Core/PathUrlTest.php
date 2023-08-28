@@ -16,7 +16,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   /**
    * `CRM_Utils_System::url()` should generate working URLs.
    */
-  public function testSystemRouter() {
+  public function testSystemRouter(): void {
     $this->assertUrlContentRegex(';class="CRM_Mailing_Form_Subscribe";',
       \CRM_Utils_System::url('civicrm/mailing/subscribe', 'reset=1', TRUE, NULL, FALSE, TRUE));
   }
@@ -24,7 +24,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   /**
    * `Civi::paths()->getUrl()` should generate working URLs.
    */
-  public function testPaths_getUrl() {
+  public function testPaths_getUrl(): void {
     $p = \Civi::paths();
 
     $this->assertUrlContentRegex(';MIT-LICENSE.txt;',
@@ -38,7 +38,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   /**
    * `Civi::paths()->getPath()` should generate working paths.
    */
-  public function testPaths_getPath() {
+  public function testPaths_getPath(): void {
     $p = \Civi::paths();
 
     $this->assertFileContentRegex(';MIT-LICENSE.txt;',
@@ -52,7 +52,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   /**
    * `Civi::paths()->getVariable()` should generate working paths+URLs.
    */
-  public function testPaths_getVariable() {
+  public function testPaths_getVariable(): void {
     $pathAndUrl = ['cms.root', 'civicrm.root', 'civicrm.packages', 'civicrm.files'];
     $pathOnly = ['civicrm.private', 'civicrm.log', 'civicrm.compile'];
     $urlOnly = [];
@@ -91,7 +91,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   /**
    * @link https://lab.civicrm.org/dev/core/issues/1637
    */
-  public function testGetUrl_WpAdmin() {
+  public function testGetUrl_WpAdmin(): void {
     $config = \CRM_Core_Config::singleton();
     if ($config->userFramework !== 'WordPress') {
       $this->markTestSkipped('This test only applies to WP sites.');

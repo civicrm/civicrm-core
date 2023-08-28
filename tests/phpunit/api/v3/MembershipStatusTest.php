@@ -46,7 +46,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   /**
    * Test civicrm_membership_status_get with empty params.
    */
-  public function testGetEmptyParams() {
+  public function testGetEmptyParams(): void {
     $result = $this->callAPISuccess('membership_status', 'get', []);
     // It should be 8 statuses, 7 default from mysql_data
     // plus one test status added in setUp
@@ -56,7 +56,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   /**
    * Test civicrm_membership_status_get. Success expected.
    */
-  public function testGet() {
+  public function testGet(): void {
     $params = [
       'name' => 'test status',
     ];
@@ -67,7 +67,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   /**
    * Test civicrm_membership_status_get. Success expected.
    */
-  public function testGetLimit() {
+  public function testGetLimit(): void {
     $result = $this->callAPISuccess('membership_status', 'get', []);
     $this->assertGreaterThan(1, $result['count'], "Check more than one exists In line " . __LINE__);
     $params['option.limit'] = 1;
@@ -88,7 +88,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $this->callAPIFailure('MembershipStatus', 'create', $params, 'Mandatory key(s) missing from params array: name');
   }
 
-  public function testCreate() {
+  public function testCreate(): void {
     $params = [
       'name' => 'test membership status',
     ];
@@ -98,7 +98,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $this->membershipStatusDelete($result['id']);
   }
 
-  public function testUpdate() {
+  public function testUpdate(): void {
     $params = [
       'name' => 'test membership status',
     ];
@@ -124,12 +124,12 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $this->callAPIFailure('membership_status', 'delete', []);
   }
 
-  public function testDeleteWithMissingRequired() {
+  public function testDeleteWithMissingRequired(): void {
     $params = ['title' => 'Does not make sense'];
     $result = $this->callAPIFailure('membership_status', 'delete', $params);
   }
 
-  public function testDelete() {
+  public function testDelete(): void {
     $membershipID = $this->membershipStatusCreate();
     $params = [
       'id' => $membershipID,
@@ -140,7 +140,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   /**
    * Test that after checking the person as 'Deceased', the Membership is also 'Deceased' both through inline and normal edit.
    */
-  public function testDeceasedMembershipInline() {
+  public function testDeceasedMembershipInline(): void {
     $contactID = $this->individualCreate();
     $params = [
       'contact_id' => $contactID,

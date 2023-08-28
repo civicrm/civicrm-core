@@ -4,14 +4,14 @@
  * Class CRM_Utils_RestTest
  * @group headless
  */
-class CRM_Utils_RestTest extends CiviUnitTestCase  {
+class CRM_Utils_RestTest extends CiviUnitTestCase {
 
-  public function setUp() :void {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
   }
 
-  public function testProcessMultiple() {
+  public function testProcessMultiple(): void {
     $_SERVER['REQUEST_METHOD'] = 'POST';
     $input = [
       'cow' => [
@@ -40,7 +40,7 @@ class CRM_Utils_RestTest extends CiviUnitTestCase  {
   /**
    * Check that check_permissions passed in in chained api calls is ignored.
    */
-  public function testSecurityIssue116() {
+  public function testSecurityIssue116(): void {
     $this->hookClass->setHook('civicrm_alterAPIPermissions', [$this, 'alterAPIPermissions']);
 
     $config = CRM_Core_Config::singleton();
@@ -55,7 +55,7 @@ class CRM_Utils_RestTest extends CiviUnitTestCase  {
       'name' => 'test',
       'domain_id' => 1,
     ])['id'];
-    $params = [ 'id' => $jobLogID, 'version' => 3, 'sequential' => 1, 'check_permissions' => 0 ];
+    $params = ['id' => $jobLogID, 'version' => 3, 'sequential' => 1, 'check_permissions' => 0];
     $args = ['civicrm', 'JobLog', 'get'];
 
     // Check we can load the email without checking perms.
@@ -96,7 +96,7 @@ class CRM_Utils_RestTest extends CiviUnitTestCase  {
     // Try create call AND using different api chain syntax.
     unset($params['api.contact.get']);
     $params['api_contact_create'] = [
-      ['contact_type' => 'Individual', 'display_name' => 'Sad Face', 'check_permissions' => 0]
+      ['contact_type' => 'Individual', 'display_name' => 'Sad Face', 'check_permissions' => 0],
     ];
     $output = CRM_Utils_REST::process($args, $params);
     $this->assertEquals(1, $output['is_error']);
@@ -111,7 +111,8 @@ class CRM_Utils_RestTest extends CiviUnitTestCase  {
         'id' => $contactID,
         'check_permissions' => 0,
         'return' => 'display_name',
-      ]];
+      ],
+    ];
     $output = CRM_Utils_REST::process($args, $params);
     $this->assertEquals($jobLogID, $output['id']);
     $chain = $output['values'][0]['api.job_log.get'];
@@ -128,4 +129,5 @@ class CRM_Utils_RestTest extends CiviUnitTestCase  {
       $permissions['job_log']['get'] = [];
     }
   }
+
 }

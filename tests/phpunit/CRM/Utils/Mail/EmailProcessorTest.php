@@ -61,7 +61,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test the job processing function works and processes a bounce.
    */
-  public function testBounceProcessing() {
+  public function testBounceProcessing(): void {
     $this->setUpMailing();
 
     copy(__DIR__ . '/data/bounces/bounce_no_verp.txt', __DIR__ . '/data/mail/bounce_no_verp.txt');
@@ -74,7 +74,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test the job processing function can handle invalid characters.
    */
-  public function testBounceProcessingInvalidCharacter() {
+  public function testBounceProcessingInvalidCharacter(): void {
     $this->setUpMailing();
     $mail = 'test_invalid_character.eml';
 
@@ -87,7 +87,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test that the job processing function can handle incoming utf8mb4 characters.
    */
-  public function testBounceProcessingUTF8mb4() {
+  public function testBounceProcessingUTF8mb4(): void {
     $this->setUpMailing();
     $mail = 'test_utf8mb4_character.txt';
 
@@ -102,7 +102,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
    *
    * Sample taken from https://www.phpclasses.org/browse/file/14672.html
    */
-  public function testProcessingMultipartRelatedEmail() {
+  public function testProcessingMultipartRelatedEmail(): void {
     $this->setUpMailing();
     $mail = 'test_sample_message.eml';
 
@@ -117,7 +117,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
    *
    * Sample anonymized from an email that broke bounce processing at Wikimedia
    */
-  public function testProcessingNestedMultipartEmail() {
+  public function testProcessingNestedMultipartEmail(): void {
     $this->setUpMailing();
     $mail = 'test_nested_message.eml';
 
@@ -142,7 +142,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
    *
    * For not however, we are testing absence of mysql error in conjunction with CRM-20016.
    */
-  public function testBounceProcessingDeletedEmail() {
+  public function testBounceProcessingDeletedEmail(): void {
     $this->setUpMailing();
     $this->callAPISuccess('Email', 'get', [
       'contact_id' => $this->contactID,
@@ -206,7 +206,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test case email processing when is_non_case_email_skipped is enabled.
    */
-  public function testInboundProcessingCaseEmail() {
+  public function testInboundProcessingCaseEmail(): void {
     $this->setUpSkipNonCasesEmail();
     $mail = 'test_cases_email.eml';
 
@@ -222,7 +222,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test non case email processing when is_non_case_email_skipped is enabled.
    */
-  public function testInboundProcessingNonCaseEmail() {
+  public function testInboundProcessingNonCaseEmail(): void {
     $this->setUpSkipNonCasesEmail();
     $mail = 'test_non_cases_email.eml';
 
@@ -256,7 +256,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test case email processing when is_non_case_email_skipped is enabled.
    */
-  public function testInboundProcessingDoNotCreateContact() {
+  public function testInboundProcessingDoNotCreateContact(): void {
     $this->setUpDoNotCreateContact();
     $mail = 'test_non_cases_email.eml';
 
@@ -304,7 +304,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test email processing with non-default activity options.
    */
-  public function testInboundProcessingNonDefaultActivityOptions() {
+  public function testInboundProcessingNonDefaultActivityOptions(): void {
     $params = $this->setUpNonDefaultActivityOptions();
     $mail = 'test_non_default_email.eml';
 
@@ -330,7 +330,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test not creating a contact for an email field that is not used.
    */
-  public function testInboundProcessingNoUnusedContacts() {
+  public function testInboundProcessingNoUnusedContacts(): void {
     $params = $this->setUpNonDefaultActivityOptions();
     $mail = 'test_non_default_email.eml';
 

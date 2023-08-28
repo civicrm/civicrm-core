@@ -61,14 +61,14 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Check with empty array.
    */
-  public function testCaseTypeCreateEmpty() {
+  public function testCaseTypeCreateEmpty(): void {
     $this->callAPIFailure('CaseType', 'create', []);
   }
 
   /**
    * Check if required fields are not passed.
    */
-  public function testCaseTypeCreateWithoutRequired() {
+  public function testCaseTypeCreateWithoutRequired(): void {
     $params = [
       'name' => 'this case should fail',
     ];
@@ -86,7 +86,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    *
    * Success expected.
    */
-  public function testCaseTypeCreate() {
+  public function testCaseTypeCreate(): void {
     // Create Case Type.
     $params = [
       'title' => 'Application',
@@ -107,7 +107,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Create a case with an invalid name.
    */
-  public function testCaseTypeCreate_invalidName() {
+  public function testCaseTypeCreate_invalidName(): void {
     // Create Case Type
     $params = [
       'title' => 'Application',
@@ -123,7 +123,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Test update (create with id) function with valid parameters.
    */
-  public function testCaseTypeUpdate() {
+  public function testCaseTypeUpdate(): void {
     // Create Case Type
     $params = [
       'title' => 'Application',
@@ -149,7 +149,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Test delete function with valid parameters.
    */
-  public function testCaseTypeDelete_New() {
+  public function testCaseTypeDelete_New(): void {
     // Create Case Type.
     $params = [
       'title' => 'Application',
@@ -172,7 +172,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    *
    * Success expected.
    */
-  public function testCaseTypeCreateWithDefinition() {
+  public function testCaseTypeCreateWithDefinition(): void {
     // Create Case Type
     $params = self::APPLICATION_WITH_DEFINITION_PARAMS;
     $result = $this->callAPISuccess('CaseType', 'create', $params);
@@ -191,7 +191,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Create a CaseType+case then delete the CaseType.
    */
-  public function testCaseTypeDelete_InUse() {
+  public function testCaseTypeDelete_InUse(): void {
     // Create Case Type
     $params = self::APPLICATION_WITH_DEFINITION_PARAMS;
     $createCaseType = $this->callAPISuccess('CaseType', 'create', $params);
@@ -224,7 +224,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    *
    * @throws \Exception
    */
-  public function testCaseStatusByCaseType() {
+  public function testCaseStatusByCaseType(): void {
     $statusName = md5(mt_rand());
     $template = $this->callAPISuccess('CaseType', 'getsingle', ['id' => $this->caseTypeId]);
     unset($template['id']);
@@ -241,7 +241,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     $this->assertEquals($template['definition']['statuses'], array_values($result['values']));
   }
 
-  public function testDefinitionGroups() {
+  public function testDefinitionGroups(): void {
     $gid1 = $this->groupCreate(['name' => 'testDefinitionGroups1', 'title' => 'testDefinitionGroups1']);
     $gid2 = $this->groupCreate(['name' => 'testDefinitionGroups2', 'title' => 'testDefinitionGroups2']);
     $def = self::APPLICATION_WITH_DEFINITION_PARAMS;

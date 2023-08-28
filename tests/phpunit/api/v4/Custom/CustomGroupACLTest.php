@@ -38,7 +38,7 @@ class CustomGroupACLTest extends CustomTestBase {
     \CRM_Core_DAO::executeQuery('TRUNCATE civicrm_acl_contact_cache');
   }
 
-  public function testViewEditCustomGroupACLs() {
+  public function testViewEditCustomGroupACLs(): void {
     $groups = ['readWrite' => 'Edit', 'readOnly' => 'View', 'superSecret' => NULL];
     $v3 = [];
 

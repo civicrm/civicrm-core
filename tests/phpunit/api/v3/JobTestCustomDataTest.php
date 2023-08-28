@@ -214,7 +214,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    *
    * Test CRM-18674 date custom field handling.
    */
-  public function testBatchMergeDateCustomFieldHandling() {
+  public function testBatchMergeDateCustomFieldHandling(): void {
     $customFieldLabel = 'custom_' . $this->customFieldID;
     $contactID = $this->individualCreate();
     $this->individualCreate([$customFieldLabel => '2012-12-03']);
@@ -229,7 +229,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    *
    * Test CRM-18674 date custom field handling.
    */
-  public function testBatchMergeDateCustomFieldHandlingIsView() {
+  public function testBatchMergeDateCustomFieldHandlingIsView(): void {
     $this->customFieldCreate([
       'label' => 'OnlyView',
       'custom_group_id' => $this->customGroupID,
@@ -247,7 +247,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   /**
    * Check we get a conflict on the custom field.
    */
-  public function testBatchMergeDateCustomFieldConflict() {
+  public function testBatchMergeDateCustomFieldConflict(): void {
     $customFieldLabel = 'custom_' . $this->customFieldID;
     $contactID = $this->individualCreate([$customFieldLabel => '2012-11-03']);
     $this->individualCreate([$customFieldLabel => '2013-11-03']);
@@ -261,7 +261,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   /**
    * Check we get a conflict on the custom field.
    */
-  public function testBatchMergeDateCustomFieldNoConflict() {
+  public function testBatchMergeDateCustomFieldNoConflict(): void {
     $customFieldLabel = 'custom_' . $this->customFieldID;
     $contactID = $this->individualCreate([$customFieldLabel => '2012-11-03']);
     $this->individualCreate([$customFieldLabel => '2012-11-03']);
@@ -275,7 +275,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   /**
    * Check we get a no conflict on the custom field & integer merges.
    */
-  public function testBatchMergeIntCustomFieldNoConflict() {
+  public function testBatchMergeIntCustomFieldNoConflict(): void {
     $customFieldLabel = 'custom_' . $this->customIntFieldID;
     $contactID = $this->individualCreate([]);
     $this->individualCreate([$customFieldLabel => 20]);
@@ -289,7 +289,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   /**
    * Check we get a conflict on the integer custom field.
    */
-  public function testBatchMergeIntCustomFieldConflict() {
+  public function testBatchMergeIntCustomFieldConflict(): void {
     $customFieldLabel = 'custom_' . $this->customIntFieldID;
     $contactID = $this->individualCreate([$customFieldLabel => 20]);
     $this->individualCreate([$customFieldLabel => 1]);
@@ -303,7 +303,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   /**
    * Check we get a conflict on the integer custom field when the conflicted field is 0.
    */
-  public function testBatchMergeIntCustomFieldConflictZero() {
+  public function testBatchMergeIntCustomFieldConflictZero(): void {
     $customFieldLabel = 'custom_' . $this->customIntFieldID;
     $contactID = $this->individualCreate([$customFieldLabel => 0]);
     $this->individualCreate([$customFieldLabel => 20]);
@@ -319,7 +319,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    *
    * Test CRM-18674 date custom field handling.
    */
-  public function testBatchMergeDateCustomFieldConflictAndNoCheckPerms() {
+  public function testBatchMergeDateCustomFieldConflictAndNoCheckPerms(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_cache");
     CRM_Utils_System::flushCache();
@@ -338,7 +338,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    *
    * Test CRM-18674 date custom field handling.
    */
-  public function testBatchMergeDateCustomFieldNoConflictAndNoCheckPerms() {
+  public function testBatchMergeDateCustomFieldNoConflictAndNoCheckPerms(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_cache");
     CRM_Utils_System::flushCache();
@@ -357,7 +357,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    *
    * Test CRM-19113 custom data lost when permissions in play.
    */
-  public function testBatchMergeIntCustomFieldNoConflictAndNoCheckPerms() {
+  public function testBatchMergeIntCustomFieldNoConflictAndNoCheckPerms(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_cache");
     CRM_Utils_System::flushCache();
@@ -378,7 +378,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   /**
    * Check we get a conflict on the customs field when the data conflicts for booleans.
    */
-  public function testBatchMergeCustomFieldConflicts() {
+  public function testBatchMergeCustomFieldConflicts(): void {
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 0]);
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
     $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
@@ -389,7 +389,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   /**
    * Check we get a conflict on the customs field when the data conflicts for booleans (reverse).
    */
-  public function testBatchMergeCustomFieldConflictsReverse() {
+  public function testBatchMergeCustomFieldConflictsReverse(): void {
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 0]);
     $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
@@ -402,7 +402,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testBatchMergeCustomFieldNoConflictsOneBlank() {
+  public function testBatchMergeCustomFieldNoConflictsOneBlank(): void {
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
     $this->individualCreate();
     $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
@@ -415,7 +415,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testBatchMergeCustomFieldNoConflictsOneBlankReverse() {
+  public function testBatchMergeCustomFieldNoConflictsOneBlankReverse(): void {
     $contactID = $this->individualCreate();
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
     $result = $this->callAPISuccess('Job', 'process_batch_merge', []);

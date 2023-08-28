@@ -29,7 +29,7 @@ use Civi\Test\TransactionalInterface;
  */
 class TagTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testTagFilter() {
+  public function testTagFilter(): void {
     // Ensure bypassing permissions works correctly by giving none to the logged-in user
     $this->createLoggedInUser();
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];

@@ -30,7 +30,7 @@ class CustomEntityReferenceTest extends CustomTestBase {
   /**
    * Ensure custom fields of type EntityReference correctly apply filters
    */
-  public function testEntityReferenceCustomField() {
+  public function testEntityReferenceCustomField(): void {
     $subject = uniqid();
     CustomGroup::create()->setValues([
       'title' => 'EntityRefFields',

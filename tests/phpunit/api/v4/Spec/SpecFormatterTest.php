@@ -42,7 +42,7 @@ class SpecFormatterTest extends Api4TestBase {
     $this->assertEquals($expectedType, $field->getDataType());
   }
 
-  public function testCustomFieldWillBeReturned() {
+  public function testCustomFieldWillBeReturned(): void {
     $customGroupId = 1432;
     $customFieldId = 3333;
     $name = 'MyFancyField';

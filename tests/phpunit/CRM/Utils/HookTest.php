@@ -50,7 +50,7 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
   /**
    * Verify that runHooks() is reentrant by invoking one hook which calls another hooks
    */
-  public function testRunHooks_reentrancy() {
+  public function testRunHooks_reentrancy(): void {
     $arg1 = 'whatever';
     $null = NULL;
     $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_outer', 1, $arg1, $null, $null, $null, $null, $null);
@@ -70,7 +70,7 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
   /**
    * Verify that the results of runHooks() are correctly merged
    */
-  public function testRunHooks_merge() {
+  public function testRunHooks_merge(): void {
     $null = NULL;
     $result = $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_merge', 0, $null, $null, $null, $null, $null, $null);
     $this->assertEquals(

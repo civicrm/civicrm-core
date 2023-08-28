@@ -60,7 +60,7 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
   /**
    * Test the Additional Details pane loads for recurring contributions.
    */
-  public function testAdditionalDetails() {
+  public function testAdditionalDetails(): void {
     $this->addContribution();
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($this->getContributionRecurID());
     $_GET['q'] = $_REQUEST['q'] = 'civicrm/contact/view/contribution';

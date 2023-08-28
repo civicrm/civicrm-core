@@ -79,7 +79,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     };
   }
 
-  public function testValidateFail() {
+  public function testValidateFail(): void {
     /** @var \Civi\WorkflowMessage\WorkflowMessageInterface $ex */
     $ex = static::createExample();
     $ex->import('modelProps', [
@@ -107,7 +107,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $this->assertEquals($expected, $errors);
   }
 
-  public function testValidatePass() {
+  public function testValidatePass(): void {
     /** @var \Civi\WorkflowMessage\WorkflowMessageInterface $ex */
     $ex = static::createExample();
     $ex->import('modelProps', [
@@ -125,7 +125,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
   /**
    * Assert that "getFields()" provides metadata from properties/docblocks.
    */
-  public function testGetFields() {
+  public function testGetFields(): void {
     /** @var \Civi\WorkflowMessage\WorkflowMessageInterface $ex */
     $ex = static::createExample();
     $fields = $ex->getFields();
@@ -155,7 +155,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
   /**
    * Assert that getters/setters work on class fields.
    */
-  public function testGetSetClassFields() {
+  public function testGetSetClassFields(): void {
     /** @var \Civi\WorkflowMessage\WorkflowMessageInterface $ex */
     $ex = static::createExample();
 
@@ -171,7 +171,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
   /**
    * Assert that import()/export() work on standard fields.
    */
-  public function testImportExportStandardField() {
+  public function testImportExportStandardField(): void {
     /** @var \Civi\WorkflowMessage\WorkflowMessageInterface $ex */
     $ex = static::createExample();
 
@@ -202,7 +202,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
   /**
    * Assert that unrecognized fields are preserved in the round-trip from import=>export.
    */
-  public function testImportExportExtraField() {
+  public function testImportExportExtraField(): void {
     /** @var \Civi\WorkflowMessage\WorkflowMessageInterface $ex */
     $ex = static::createExample();
 
@@ -217,7 +217,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
   /**
    * Assert that
    */
-  public function testImportExportUnmappedField() {
+  public function testImportExportUnmappedField(): void {
     /** @var \Civi\WorkflowMessage\WorkflowMessageInterface $ex */
     $ex = static::createExample();
 
@@ -265,7 +265,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $this->assertTrue(!isset($envelope['myProtectedInt']));
   }
 
-  public function testExampleRender() {
+  public function testExampleRender(): void {
     $hookCount = 0;
     $rand = rand(0, 1000);
     $cid = $this->individualCreate(['first_name' => 'Foo', 'last_name' => 'Bar' . $rand, 'prefix_id' => NULL, 'suffix_id' => NULL]);
@@ -285,7 +285,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $this->assertEquals('Hello Foo Bar' . $rand, $rendered['subject']);
   }
 
-  public function testImpromptuRender() {
+  public function testImpromptuRender(): void {
     $hookCount = 0;
     $rand = rand(0, 1000);
     $cid = $this->individualCreate(['first_name' => 'Foo', 'last_name' => 'Bar' . $rand, 'prefix_id' => NULL, 'suffix_id' => NULL]);
@@ -345,7 +345,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $this->assertStringContainsString('Thank you for signing The Fake Petition', $rendered['text']);
   }
 
-  //public function testImpromptuTokens() {
+  //public function testImpromptuTokens(): void {
   //  /** @var \Civi\WorkflowMessage\GenericWorkflowMessage $ex */
   //  $ex = WorkflowMessage::create('some_impromptu_wf', [
   //    'envelope' => [

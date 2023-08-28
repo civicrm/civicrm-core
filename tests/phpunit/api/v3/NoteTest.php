@@ -269,7 +269,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    *
    * Error expected.
    */
-  public function testDeleteWithEmptyParams() {
+  public function testDeleteWithEmptyParams(): void {
     $this->callAPIFailure('note', 'delete', [], 'Mandatory key(s) missing from params array: id');
   }
 
@@ -304,7 +304,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->callAPISuccess('note', 'delete', $params);
   }
 
-  public function testNoteJoin() {
+  public function testNoteJoin(): void {
     $org = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Organization',
       'organization_name' => 'Org123',

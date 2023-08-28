@@ -34,7 +34,7 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
    * passed to the function this test is testing. So there's no form or ajax
    * being tested here, just the final act of filing the activity.
    */
-  public function testConvertToCaseActivity() {
+  public function testConvertToCaseActivity(): void {
     $activity = $this->callAPISuccess('Activity', 'create', [
       'source_contact_id' => $this->loggedInUser,
       'activity_type_id' => 'Meeting',
@@ -71,7 +71,7 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
   /**
    * Similar to testConvertToCaseActivity above but for copy-to-case.
    */
-  public function testCopyToCase() {
+  public function testCopyToCase(): void {
     $case1 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => $this->target,
       'case_type_id' => 'housing_support',
@@ -125,7 +125,7 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
   /**
    * Similar to testCopyToCase above but for move-to-case.
    */
-  public function testMoveToCase() {
+  public function testMoveToCase(): void {
     $case1 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => $this->target,
       'case_type_id' => 'housing_support',
@@ -179,7 +179,7 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
   /**
    * Check if the selected filters are saved.
    */
-  public function testPreserveFilters() {
+  public function testPreserveFilters(): void {
     \Civi::settings()->set('preserve_activity_tab_filter', '1');
 
     // Simulate visiting activity tab with all the filters set to something

@@ -44,7 +44,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   /**
    * Test that enabling a valid component works.
    */
-  public function testEnableComponentValid() {
+  public function testEnableComponentValid(): void {
     CRM_Core_Config::singleton(TRUE, TRUE);
     $result = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
     $this->assertTrue($result);
@@ -53,7 +53,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   /**
    * Test that we get a success result if we try to enable an enabled component.
    */
-  public function testEnableComponentAlreadyPresent() {
+  public function testEnableComponentAlreadyPresent(): void {
     CRM_Core_Config::singleton(TRUE, TRUE);
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
     $result = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
@@ -63,7 +63,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   /**
    * Test that we get a false result if we try to enable an invalid component.
    */
-  public function testEnableComponentInvalid() {
+  public function testEnableComponentInvalid(): void {
     CRM_Core_Config::singleton(TRUE, TRUE);
     $result = CRM_Core_BAO_ConfigSetting::enableComponent('CiviFake');
     $this->assertFalse($result);
@@ -82,7 +82,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testHandlingOfContributionInvoiceSetting() {
+  public function testHandlingOfContributionInvoiceSetting(): void {
     $contributionSettings = [
       'invoice_prefix' => 'G_',
       'credit_notes_prefix' => 'XX_',
@@ -117,7 +117,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    * Ensure that overrides in $civicrm_setting apply when
    * using getItem($group,$name).
    */
-  public function testGetItem_Override() {
+  public function testGetItem_Override(): void {
     global $civicrm_setting;
     $civicrm_setting[CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME]['imageUploadDir'] = '/test/override';
     Civi::service('settings_manager')->useMandatory();
@@ -140,7 +140,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery($query);
   }
 
-  public function testDefaults() {
+  public function testDefaults(): void {
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "max_attachments"');
     Civi::service('settings_manager')->flush();
     $this->assertEquals(3, Civi::settings()->get('max_attachments'));
@@ -154,7 +154,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    * are very similar, but they exercise different codepaths. The first uses the API
    * and setItems [plural]; the second uses setItem [singular].
    */
-  public function testOnChange() {
+  public function testOnChange(): void {
     global $_testOnChange_hookCalls;
     $this->setMockSettingsMetaData([
       'onChangeExample' => [
@@ -213,7 +213,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    * Test to set isProductionEnvironment
    *
    */
-  public function testSetCivicrmEnvironment() {
+  public function testSetCivicrmEnvironment(): void {
     Civi::settings()->set('environment', 'Staging');
     $values = Civi::settings()->get('environment');
     $this->assertEquals('Staging', $values);
@@ -227,7 +227,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   /**
    * Test that options defined as a pseudoconstant can be converted to options.
    */
-  public function testPseudoConstants() {
+  public function testPseudoConstants(): void {
     $this->contributionPageCreate();
     $metadata = \Civi\Core\SettingsMetadata::getMetadata(['name' => ['default_invoice_page']], NULL, TRUE);
     $this->assertEquals('Test Contribution Page', $metadata['default_invoice_page']['options'][1]);

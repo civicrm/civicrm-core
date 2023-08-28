@@ -30,7 +30,7 @@ use Civi\Api4\OptionValue;
  */
 class CreateCustomValueTest extends CustomTestBase {
 
-  public function testGetWithCustomData() {
+  public function testGetWithCustomData(): void {
     $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
 
     $customGroup = CustomGroup::create(FALSE)
@@ -77,7 +77,7 @@ class CreateCustomValueTest extends CustomTestBase {
   /**
    * Test setting/getting a multivalue customfield with date+time
    */
-  public function testCustomDataWithDateTime() {
+  public function testCustomDataWithDateTime(): void {
     CustomGroup::create(FALSE)
       ->addValue('title', 'MyContactDateFields')
       ->addValue('name', 'MyContactDateFields')

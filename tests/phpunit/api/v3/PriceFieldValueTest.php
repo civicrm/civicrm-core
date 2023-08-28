@@ -119,7 +119,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testCreatePriceFieldValue() {
+  public function testCreatePriceFieldValue(): void {
     $result = $this->callAPISuccess('PriceFieldValue', 'create', $this->params);
     $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count']);
@@ -138,7 +138,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $this->callAPISuccess('price_field_value', 'delete', ['id' => $createResult['id']]);
   }
 
-  public function testDeletePriceFieldValue() {
+  public function testDeletePriceFieldValue(): void {
     $startCount = $this->callAPISuccess('PriceFieldValue', 'getcount', []);
     $createResult = $this->callAPISuccess('PriceFieldValue', 'create', $this->params);
     $deleteParams = ['id' => $createResult['id']];
@@ -153,7 +153,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values']['max_value']['type']);
   }
 
-  public function testCreatePriceFieldValuewithMultipleTerms() {
+  public function testCreatePriceFieldValuewithMultipleTerms(): void {
     $params = [
       'price_field_id' => $this->priceFieldID2,
       'membership_type_id' => $this->membershipTypeID,
@@ -170,7 +170,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $result['id']]);
   }
 
-  public function testGetPriceFieldValuewithMultipleTerms() {
+  public function testGetPriceFieldValuewithMultipleTerms(): void {
     $params2 = [
       'price_field_id' => $this->priceFieldID2,
       'membership_type_id' => $this->membershipTypeID,

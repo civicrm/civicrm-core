@@ -26,7 +26,7 @@ use Civi\Api4\CustomGroup;
  */
 class CustomGroupTest extends CustomTestBase {
 
-  public function testUpdateCustomGroup() {
+  public function testUpdateCustomGroup(): void {
     $customGroup1 = $this->createTestRecord('CustomGroup', [
       'extends' => 'Contribution',
       'weight' => 1,
@@ -51,7 +51,7 @@ class CustomGroupTest extends CustomTestBase {
     $this->assertEquals('Contribution', $groups[1]['extends']);
   }
 
-  public function testGetExtendsEntityColumnValuePseudoconstant() {
+  public function testGetExtendsEntityColumnValuePseudoconstant(): void {
     $activityTypeName = uniqid();
     $activityType = $this->createTestRecord('OptionValue', [
       'option_group_id:name' => 'activity_type',

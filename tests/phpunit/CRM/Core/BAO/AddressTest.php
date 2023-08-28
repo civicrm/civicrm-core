@@ -27,7 +27,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * Create() method (create and update modes)
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $contactId = $this->individualCreate();
 
     $params = [];
@@ -91,7 +91,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * Add() method ( )
    */
-  public function testAdd() {
+  public function testAdd(): void {
     $contactId = $this->individualCreate();
 
     $fixParams = [
@@ -133,7 +133,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * Add 2 billing addresses using the `CRM_Core_BAO_Address::legacyCreate` mode
    * Only the first array will remain as primary/billing due to the nature of how `legacyCreate` works
    */
-  public function testMultipleBillingAddressesLegacymode() {
+  public function testMultipleBillingAddressesLegacymode(): void {
     $contactId = $this->individualCreate();
 
     $entityBlock = ['contact_id' => $contactId];
@@ -193,7 +193,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * Using the `CRM_Core_BAO_Address::add` mode
    *
    */
-  public function testMultipleBillingAddressesCurrentmode() {
+  public function testMultipleBillingAddressesCurrentmode(): void {
     $contactId = $this->individualCreate();
 
     $entityBlock = ['contact_id' => $contactId];
@@ -263,7 +263,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * AllAddress() method ( )
    */
-  public function testallAddress() {
+  public function testallAddress(): void {
     $contactId = $this->individualCreate();
 
     $fixParams = [
@@ -325,7 +325,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * AllAddress() method ( ) with null value
    */
-  public function testnullallAddress() {
+  public function testnullallAddress(): void {
     $contactId = $this->individualCreate();
 
     $fixParams = [
@@ -365,7 +365,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * GetValues() method (get Address fields)
    */
-  public function testGetValues() {
+  public function testGetValues(): void {
     $contactId = $this->individualCreate();
 
     $params = [];
@@ -432,7 +432,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testParseStreetAddressIfEnabled() {
+  public function testParseStreetAddressIfEnabled(): void {
     // Turn off address standardization. Parsing should work without it.
     Civi::settings()->set('address_standardization_provider', NULL);
 
@@ -464,7 +464,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * ParseStreetAddress() method (get street address parsed)
    */
-  public function testParseStreetAddress() {
+  public function testParseStreetAddress(): void {
 
     // valid Street address to be parsed ( without locale )
     $street_address = "54A Excelsior Ave. Apt 1C";
@@ -580,7 +580,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * Address of Contact C should reflect contact A's address change
    * Also, Contact C's address' master_id should be Contact A's address id.
    */
-  public function testSharedAddressChaining1() {
+  public function testSharedAddressChaining1(): void {
     $contactIdA = $this->individualCreate([], 0);
     $contactIdB = $this->individualCreate([], 1);
     $contactIdC = $this->individualCreate([], 2);
@@ -640,7 +640,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * Address of Contact C should reflect contact B's address change
    * Also, Contact C's address' master_id should be Contact B's address id.
    */
-  public function testSharedAddressChaining2() {
+  public function testSharedAddressChaining2(): void {
     $contactIdA = $this->individualCreate([], 0);
     $contactIdB = $this->individualCreate([], 1);
     $contactIdC = $this->individualCreate([], 2);
@@ -706,7 +706,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * 3. Use contact A's address for contact A's address
    * An error should be given, and master_id should remain the same.
    */
-  public function testSharedAddressChaining3() {
+  public function testSharedAddressChaining3(): void {
     $contactIdA = $this->individualCreate([], 0);
 
     $addressParamsA = [
@@ -737,7 +737,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * 1. test the creation of the shared address with custom field
    * 2. test the update of the custom field in the master
    */
-  public function testSharedAddressCustomField() {
+  public function testSharedAddressCustomField(): void {
 
     $this->createCustomGroupWithFieldOfType(['extends' => 'Address'], 'text');
     $customField = $this->getCustomFieldName('text');
@@ -784,7 +784,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * Pinned countries with Default country
    */
-  public function testPinnedCountriesWithDefaultCountry() {
+  public function testPinnedCountriesWithDefaultCountry(): void {
     // Guyana, Netherlands, United States
     $pinnedCountries = ['1093', '1152', '1228'];
 
@@ -808,7 +808,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * Pinned countries with out Default country
    */
-  public function testPinnedCountriesWithOutDefaultCountry() {
+  public function testPinnedCountriesWithOutDefaultCountry(): void {
     // Guyana, Netherlands, United States
     $pinnedCountries = ['1093', '1152', '1228'];
 
@@ -833,7 +833,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * Test dev/core#2379 fix - geocodes shouldn't be > 14 characters.
    */
-  public function testLongGeocodes() {
+  public function testLongGeocodes(): void {
     $contactId = $this->individualCreate();
 
     $fixParams = [

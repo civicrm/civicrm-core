@@ -14,7 +14,7 @@ class CRM_Utils_PDF_UtilsTest extends CiviUnitTestCase {
   /**
    * Test user-supplied settings for DOMPDF
    */
-  public function testDOMPDFSettings() {
+  public function testDOMPDFSettings(): void {
     $old_setting = \Civi::settings()->get('dompdf_log_output_file');
 
     $log_file = tempnam(sys_get_temp_dir(), 'pdf');

@@ -35,14 +35,14 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
     $this->browser->setGuzzleClient($this->getGuzzleClient());
   }
 
-  public function testDisabled() {
+  public function testDisabled(): void {
     $this->browser = new CRM_Extension_Browser(FALSE, '/index.html');
     $this->assertEquals(FALSE, $this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->assertEquals([], $this->browser->getExtensions());
   }
 
-  public function testGetExtensions_good() {
+  public function testGetExtensions_good(): void {
     $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
     $this->assertEquals(TRUE, $this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
@@ -57,7 +57,7 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
     $this->assertEquals('http://example.com/test.crm.extension.browsertest.b-1.2.zip', $exts['test.crm.extension.browsertest.b']->downloadUrl);
   }
 
-  public function testGetExtension_good() {
+  public function testGetExtension_good(): void {
     $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
     $this->assertEquals(TRUE, $this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
@@ -67,7 +67,7 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
     $this->assertEquals('http://example.com/test.crm.extension.browsertest.b-1.2.zip', $info->downloadUrl);
   }
 
-  public function testGetExtension_nonexistent() {
+  public function testGetExtension_nonexistent(): void {
     $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
     $this->assertEquals(TRUE, $this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());

@@ -125,7 +125,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   /**
    * FIXME: Api4
    */
-  public function testCreateAddressTooLongSuffix() {
+  public function testCreateAddressTooLongSuffix(): void {
     $params = $this->_params;
     $params['street_number_suffix'] = 'really long string';
     $this->callAPIFailure('address', 'create', $params);
@@ -432,7 +432,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    * @link https://chat.civicrm.org/civicrm/pl/zcq3jkg69jdt5g4aqze6bbe9pc
    * FIXME: Api4
    */
-  public function testCreateDuplicateLocationTypes() {
+  public function testCreateDuplicateLocationTypes(): void {
     $address1 = $this->callAPISuccess('address', 'create', $this->_params);
     $address2 = $this->callAPISuccess('address', 'create', [
       'location_type_id' => $this->_locationTypeID,
@@ -451,7 +451,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'delete', ['id' => $address2['id']]);
   }
 
-  public function testGetWithJoin() {
+  public function testGetWithJoin(): void {
     $cid = $this->individualCreate([
       'api.Address.create' => [
         'street_address' => __FUNCTION__,
@@ -472,7 +472,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    *
    * @see https://lab.civicrm.org/dev/core/issues/725
    */
-  public function testCreateAddressStateProvinceIDCorrectForCountry() {
+  public function testCreateAddressStateProvinceIDCorrectForCountry(): void {
     $params = $this->_params;
     $params['sequential'] = 1;
     // United States country id
@@ -578,7 +578,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'getoptions', ['field' => 'country_id']);
   }
 
-  public function testBuildCountyWithDodgeStateProvinceFiltering() {
+  public function testBuildCountyWithDodgeStateProvinceFiltering(): void {
     $result = $this->callAPIFailure('Address', 'getoptions', [
       'field' => 'county_id',
       'state_province_id' => "abcd;ef",
@@ -591,7 +591,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals('San Francisco', $goodResult['values'][4]);
   }
 
-  public function testGetOptionsAbbr() {
+  public function testGetOptionsAbbr(): void {
     $result = $this->callAPISuccess('Address', 'getoptions', [
       'field' => 'country_id',
       'context' => 'abbreviate',

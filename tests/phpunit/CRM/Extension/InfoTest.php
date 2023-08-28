@@ -23,7 +23,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testGood_file() {
+  public function testGood_file(): void {
     $this->file = tempnam(sys_get_temp_dir(), 'infoxml-');
     file_put_contents($this->file, "<extension key='test.foo' type='module'><file>foo</file><typeInfo><extra>zamboni</extra></typeInfo></extension>");
 
@@ -33,7 +33,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertEquals('zamboni', $info->typeInfo['extra']);
   }
 
-  public function testBad_file() {
+  public function testBad_file(): void {
     // <file> vs file>
     $this->file = tempnam(sys_get_temp_dir(), 'infoxml-');
     file_put_contents($this->file, "<extension key='test.foo' type='module'>file>foo</file></extension>");
@@ -48,7 +48,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertTrue(is_object($exc));
   }
 
-  public function testGood_string() {
+  public function testGood_string(): void {
     $data = "<extension key='test.foo' type='module'><file>foo</file><typeInfo><extra>zamboni</extra></typeInfo></extension>";
 
     $info = CRM_Extension_Info::loadFromString($data);
@@ -59,7 +59,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertEquals([], $info->requires);
   }
 
-  public function testGood_string_extras() {
+  public function testGood_string_extras(): void {
     $data = "<extension key='test.bar' type='module'><file>testbar</file>
       <classloader>
         <psr4 prefix=\"Civi\\\" path=\"Civi\"/>
@@ -115,7 +115,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertEquals($expectMaintainer, $info->maintainer);
   }
 
-  public function testBad_string() {
+  public function testBad_string(): void {
     // <file> vs file>
     $data = "<extension key='test.foo' type='module'>file>foo</file></extension>";
 
@@ -129,7 +129,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertTrue(is_object($exc));
   }
 
-  public function test_requirements() {
+  public function test_requirements(): void {
     // Quicksearch requirement should get filtered out per extension-compatibility.json
     $data = "<extension key='test.foo' type='module'><file>foo</file><requires><ext>example.test</ext><ext>com.ixiam.modules.quicksearch</ext></requires></extension>";
 

@@ -49,7 +49,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testHookData() {
+  public function testHookData(): void {
     $hookCount = 0;
 
     // Step 1: `create()` a record for Ms. Alice Alison.
@@ -131,7 +131,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals(3, $hookCount);
   }
 
-  public function testRaiseError() {
+  public function testRaiseError(): void {
     $this->setValidator(function (ValidateValuesEvent $e) use (&$hookCount) {
       $this->assertWellFormedEvent($e);
       if ($e->getEntityName() !== 'Contact') {

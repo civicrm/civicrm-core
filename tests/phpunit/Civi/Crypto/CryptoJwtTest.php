@@ -28,7 +28,7 @@ class CryptoJwtTest extends \CiviUnitTestCase {
     JWT::$timestamp = NULL;
   }
 
-  public function testSignVerifyExpire() {
+  public function testSignVerifyExpire(): void {
     /** @var \Civi\Crypto\CryptoJwt $cryptoJwt */
     $cryptoJwt = \Civi::service('crypto.jwt');
 
@@ -94,7 +94,7 @@ class CryptoJwtTest extends \CiviUnitTestCase {
     }
   }
 
-  public function testSuiteToAlg() {
+  public function testSuiteToAlg(): void {
     $this->assertEquals('HS256', Invasive::call([CryptoJwt::class, 'suiteToAlg'], ['jwt-hs256']));
     $this->assertEquals(NULL, Invasive::call([CryptoJwt::class, 'suiteToAlg'], ['aes-cbc']));
   }

@@ -52,7 +52,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   /**
    * Test civicrm_constant_get( ) for unknown constant
    */
-  public function testUnknownConstant() {
+  public function testUnknownConstant(): void {
     $result = $this->callAPIFailure('constant', 'get', [
       'name' => 'thisTypeDoesNotExist',
     ]);
@@ -61,7 +61,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   /**
    * Test civicrm_constant_get( 'activityStatus' )
    */
-  public function testActivityStatus() {
+  public function testActivityStatus(): void {
 
     $result = $this->callAPISuccess('constant', 'get', [
       'name' => 'activityStatus',
@@ -77,7 +77,7 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   /**
    * Test civicrm_constant_get( 'activityType' )
    */
-  public function testActivityType() {
+  public function testActivityType(): void {
     $result = $this->callAPISuccess('constant', 'get', [
       'name' => 'activityType',
     ]);

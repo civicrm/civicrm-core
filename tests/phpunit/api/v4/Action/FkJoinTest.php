@@ -51,7 +51,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
    * Fetch all phone call activities. Expects a single activity
    * loaded from the data set.
    */
-  public function testThreeLevelJoin() {
+  public function testThreeLevelJoin(): void {
     $this->createTestRecord('Activity', [
       'activity_type_id:name' => 'Phone Call',
     ]);
@@ -63,7 +63,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $results);
   }
 
-  public function testOptionalJoin() {
+  public function testOptionalJoin(): void {
     $contact1 = $this->createTestRecord('Contact');
     $contact2 = $this->createTestRecord('Contact');
 
@@ -91,7 +91,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($contact1['id'], $contacts[1]['id']);
   }
 
-  public function testRequiredJoin() {
+  public function testRequiredJoin(): void {
     $contact1 = $this->createTestRecord('Contact');
     $contact2 = $this->createTestRecord('Contact');
 
@@ -129,7 +129,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('1', $contacts[0]['phone.location_type_id']);
   }
 
-  public function testImplicitJoinOnExplicitJoin() {
+  public function testImplicitJoinOnExplicitJoin(): void {
     $contact1 = $this->createTestRecord('Contact');
     $this->createTestRecord('Address', [
       'contact_id' => $contact1['id'],
@@ -145,7 +145,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('US', $contacts[0]['address.country_id.iso_code']);
   }
 
-  public function testExcludeJoin() {
+  public function testExcludeJoin(): void {
     $contact1 = $this->createTestRecord('Contact');
     $this->createTestRecord('Address', [
       'contact_id' => $contact1['id'],
@@ -158,7 +158,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains($contact1['id'], $contacts);
   }
 
-  public function testInvalidJoinAlias() {
+  public function testInvalidJoinAlias(): void {
     // Not allowed to use same alias as the base table
     try {
       Contact::get(FALSE)->addJoin('Address AS a')->execute();
@@ -192,7 +192,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     Contact::get(FALSE)->addJoin("Address AS $okAlias")->execute();
   }
 
-  public function testJoinToTheSameTableTwice() {
+  public function testJoinToTheSameTableTwice(): void {
     $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'Aaa')
       ->addChain('email1', Email::create()->setValues(['email' => 'yoohoo@yahoo.test', 'contact_id' => '$id', 'location_type_id:name' => 'Home']))
@@ -231,7 +231,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('1@test.test', $contacts[4]['primary_email.email']);
   }
 
-  public function testBridgeJoinTags() {
+  public function testBridgeJoinTags(): void {
     $tag1 = Tag::create(FALSE)
       ->addValue('name', uniqid('join1'))
       ->execute()
@@ -297,7 +297,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(1, (int) $reverse[$tag3]['contacts']);
   }
 
-  public function testBridgeJoinRelationshipContactActivity() {
+  public function testBridgeJoinRelationshipContactActivity(): void {
     $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'Aaa')
       ->addChain('activity', Activity::create()
@@ -416,7 +416,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     }
   }
 
-  public function testJoinToEmployerId() {
+  public function testJoinToEmployerId(): void {
     $employer = Contact::create(FALSE)
       ->addValue('contact_type', 'Organization')
       ->addValue('organization_name', 'TesterCo')
@@ -445,7 +445,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('TesterCo', $emailGet['contact_id.employer_id.display_name']);
   }
 
-  public function testJoinWithExpression() {
+  public function testJoinWithExpression(): void {
 
     $contact1 = $this->createTestRecord('Contact');
     $contact2 = $this->createTestRecord('Contact');
@@ -465,7 +465,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('654321', $contacts[0]['phone.phone']);
   }
 
-  public function testJoinCaseRoles() {
+  public function testJoinCaseRoles(): void {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
 
     $contactID = $this->createTestRecord('Contact')['id'];

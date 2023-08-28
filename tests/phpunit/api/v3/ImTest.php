@@ -100,7 +100,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
   /**
    * Skip api4 test - delete behaves differently
    */
-  public function testDeleteImInvalid() {
+  public function testDeleteImInvalid(): void {
     $this->callAPISuccess(self::ENTITY, 'create', $this->params);
     $deleteParams = ['id' => 600];
     $this->callAPIFailure(self::ENTITY, 'delete', $deleteParams);

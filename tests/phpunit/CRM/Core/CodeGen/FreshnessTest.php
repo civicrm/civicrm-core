@@ -9,7 +9,7 @@
  */
 class CRM_Core_CodeGen_FreshnessTest extends CiviUnitTestCase {
 
-  public function testDAOs() {
+  public function testDAOs(): void {
     $tasks = $this->findTasks('CRM_Core_CodeGen_DAO');
     $names = [];
     foreach ($tasks as $task) {
@@ -23,7 +23,7 @@ class CRM_Core_CodeGen_FreshnessTest extends CiviUnitTestCase {
       'Expect the list of tables to include civicrm_contact');
   }
 
-  public function testReflection() {
+  public function testReflection(): void {
     $tasks = $this->findTasks('CRM_Core_CodeGen_Reflection');
     $this->assertEquals(1, count($tasks), 'Expect to find one Reflection task');
     foreach ($tasks as $task) {

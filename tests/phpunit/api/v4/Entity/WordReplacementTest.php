@@ -27,7 +27,7 @@ use Civi\Test\TransactionalInterface;
  */
 class WordReplacementTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testDefaults() {
+  public function testDefaults(): void {
     $create = \Civi\Api4\WordReplacement::create(FALSE)
       ->addValue('find_word', 'Foo')
       ->addValue('replace_word', 'Bar')

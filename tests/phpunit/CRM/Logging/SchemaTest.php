@@ -145,7 +145,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
    *
    * (At point of writing this the modification was leaking to the mailing table).
    */
-  public function testTriggers() {
+  public function testTriggers(): void {
     $customGroup = $this->entityCustomGroupWithSingleFieldCreate('Contact', 'ContactTest....');
     Civi::service('sql_triggers')->rebuild();
     $log_table = CRM_Core_DAO::executeQuery("SHOW TRIGGERS WHERE `Trigger` LIKE 'civicrm_value_contact_{$customGroup['custom_group_id']}_after_insert%'");
@@ -160,7 +160,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   /**
    * Test that autoincrement keys are handled sensibly in logging table reconciliation.
    */
-  public function testAutoIncrementNonIdColumn() {
+  public function testAutoIncrementNonIdColumn(): void {
     CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_table` (
       test_id  int(10) unsigned NOT NULL AUTO_INCREMENT,
       PRIMARY KEY (`test_id`)
@@ -212,7 +212,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   /**
    * Test logging trigger definition
    */
-  public function testTriggerInfo() {
+  public function testTriggerInfo(): void {
     $info = [];
     $schema = new CRM_Logging_Schema();
     Civi::settings()->set('logging', TRUE);
@@ -281,7 +281,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertEquals('date', $ci['test_date']['DATA_TYPE']);
   }
 
-  public function testIndexes() {
+  public function testIndexes(): void {
     $schema = new CRM_Logging_Schema();
     $indexes = $schema->getIndexesForTable('civicrm_contact');
     $this->assertContains('PRIMARY', $indexes);
@@ -290,7 +290,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertContains('index_sort_name', $indexes);
   }
 
-  public function testLengthChange() {
+  public function testLengthChange(): void {
     CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_length_change` (
       test_id int(10) unsigned NOT NULL AUTO_INCREMENT,
       test_integer int(4) NULL,

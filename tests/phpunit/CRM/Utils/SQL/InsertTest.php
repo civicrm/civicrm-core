@@ -11,7 +11,7 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
     $this->useTransaction();
   }
 
-  public function testRow_twice() {
+  public function testRow_twice(): void {
     $insert = CRM_Utils_SQL_Insert::into('foo')
       ->row(['first' => '1', 'second' => '2'])
       ->row(['second' => '2b', 'first' => '1b']);
@@ -23,7 +23,7 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
     $this->assertLike($expected, $insert->toSQL());
   }
 
-  public function testRows() {
+  public function testRows(): void {
     $insert = CRM_Utils_SQL_Insert::into('foo')
       ->row(['first' => '1', 'second' => '2'])
       ->rows([
@@ -43,7 +43,7 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
     $this->assertLike($expected, $insert->toSQL());
   }
 
-  public function testLiteral() {
+  public function testLiteral(): void {
     $insert = CRM_Utils_SQL_Insert::into('foo')
       ->allowLiterals()
       ->row(['first' => new CRM_Utils_SQL_Literal('1+1'), 'second' => '2'])
@@ -56,7 +56,7 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
     $this->assertLike($expected, $insert->toSQL());
   }
 
-  public function testInsertIgnore() {
+  public function testInsertIgnore(): void {
     $insert = CRM_Utils_SQL_Insert::into('foo', 'INSERT IGNORE INTO')
       ->allowLiterals()
       ->row(['first' => new CRM_Utils_SQL_Literal('1+1'), 'second' => '2'])

@@ -143,7 +143,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('fa-star', $result[2]['icon']);
   }
 
-  public function testAutocompleteValidation() {
+  public function testAutocompleteValidation(): void {
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
       [
@@ -199,7 +199,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertCount(1, $result);
   }
 
-  public function testAutocompletePager() {
+  public function testAutocompletePager(): void {
     \Civi::settings()->set('search_autocomplete_count', 10);
     MockBasicEntity::delete()->addWhere('identifier', '>', 0)->execute();
     $sampleData = [];
@@ -234,7 +234,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals(1, $result3->countMatched());
   }
 
-  public function testAutocompleteWithDifferentKey() {
+  public function testAutocompleteWithDifferentKey(): void {
     $label = \CRM_Utils_String::createRandom(10, implode('', range('a', 'z')));
     $sample = $this->saveTestRecords('SavedSearch', [
       'records' => [

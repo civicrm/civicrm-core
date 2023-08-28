@@ -449,7 +449,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertEquals($loggedInUser, $createResult['values'][$fileId]['created_id']);
   }
 
-  public function testCreateShouldKeepCreatedIdEmptyIfTheresNoLoggedInUser() {
+  public function testCreateShouldKeepCreatedIdEmptyIfTheresNoLoggedInUser(): void {
     $testEntityClass = 'CRM_Activity_DAO_Activity';
     $entity = CRM_Core_DAO::createTestObject($testEntityClass);
     $entity_table = CRM_Core_DAO_AllCoreTables::getTableForClass($testEntityClass);
@@ -467,7 +467,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertEmpty($createResult['values'][$fileId]['created_id']);
   }
 
-  public function testCreateShouldNotUpdateTheCreatedId() {
+  public function testCreateShouldNotUpdateTheCreatedId(): void {
     $testEntityClass = 'CRM_Activity_DAO_Activity';
     $entity = CRM_Core_DAO::createTestObject($testEntityClass);
     $entity_table = CRM_Core_DAO_AllCoreTables::getTableForClass($testEntityClass);

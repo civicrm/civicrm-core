@@ -114,7 +114,7 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
     $this->assertEquals('INC', $result['account_type_code'], 'Financial account created is not an income account.');
   }
 
-  public function testMatchFinancialTypeOptions() {
+  public function testMatchFinancialTypeOptions(): void {
     // Just a string name, should be simple to match on
     $nonNumericOption = $this->callAPISuccess('FinancialType', 'create', [
       'name' => 'StringName',

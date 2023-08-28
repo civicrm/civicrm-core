@@ -50,7 +50,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ->execute();
   }
 
-  public function testDisabledFields() {
+  public function testDisabledFields(): void {
     // Create a custom group with one enabled and one disabled field
     CustomGroup::create(FALSE)
       ->addValue('extends', 'Activity')
@@ -81,7 +81,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertNotContains('act_test_grp.disabled_field', $getFields);
   }
 
-  public function testCustomGetFieldsWithContactSubType() {
+  public function testCustomGetFieldsWithContactSubType(): void {
     ContactType::create(FALSE)
       ->addValue('name', $this->subTypeName)
       ->addValue('label', $this->subTypeName)
@@ -156,7 +156,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertArrayHasKey('always.on', $groupFields);
   }
 
-  public function testCustomGetFieldsForParticipantSubTypes() {
+  public function testCustomGetFieldsForParticipantSubTypes(): void {
     $event1 = Event::create(FALSE)
       ->addValue('title', 'Test1')
       ->addValue('event_type_id:name', 'Meeting')

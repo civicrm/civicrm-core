@@ -27,7 +27,7 @@ use Civi\Api4\CustomGroup;
  */
 class ExportCustomGroupTest extends CustomTestBase {
 
-  public function testExportCustomGroupWithFieldOptions() {
+  public function testExportCustomGroupWithFieldOptions(): void {
     $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
 
     $customGroup = CustomGroup::create(FALSE)

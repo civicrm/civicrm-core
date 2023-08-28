@@ -99,7 +99,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
   /**
    * Test retrieval of metadata.
    */
-  public function testGetMetadata() {
+  public function testGetMetadata(): void {
     $result = $this->callAPISuccess($this->_entity, 'get', [
       'options' => [
         'metadata' => ['fields'],

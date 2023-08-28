@@ -20,7 +20,7 @@ class CRM_Contact_Form_Task_UseraddTest extends CiviUnitTestCase {
    * In unit tests, the CMS user creation will always fail, but that's
    * ok because that's what we're testing here.
    */
-  public function testUserCreateFail() {
+  public function testUserCreateFail(): void {
     $form = new CRM_Contact_Form_Task_Useradd();
     // We don't need to set params or anything because we're testing fail,
     // which the user creation will do in unit tests no matter what we set.

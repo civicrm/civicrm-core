@@ -101,7 +101,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   /**
    * Check with incorrect required fields.
    */
-  public function testRelationshipTypeDeleteWithIncorrectData() {
+  public function testRelationshipTypeDeleteWithIncorrectData(): void {
     $params = [
       'id' => 'abcd',
       'name_b_a' => 'Relation 2 delete with incorrect',

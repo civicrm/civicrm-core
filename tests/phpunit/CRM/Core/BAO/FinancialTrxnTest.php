@@ -27,7 +27,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $contactId = $this->individualCreate();
     $financialTypeId = 1;
     $contributionID = $this->contributionCreate([
@@ -193,7 +193,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testUpdateCreditCardDetails() {
+  public function testUpdateCreditCardDetails(): void {
     $cid = $this->individualCreate();
     $params = [
       'contact_id' => $cid,
@@ -229,7 +229,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetContributionBalance() {
+  public function testGetContributionBalance(): void {
     //create the contribution that isn't paid yet
     $contactId = $this->individualCreate();
     $params = [
@@ -259,7 +259,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testFeeAmountTrxns() {
+  public function testFeeAmountTrxns(): void {
     $contactId = $this->individualCreate();
 
     // Get the expected financial account of a payment made with a credit card.

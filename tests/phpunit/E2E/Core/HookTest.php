@@ -17,7 +17,7 @@ class HookTest extends \CiviEndToEndTestCase {
    *
    * This uses the canonical form, `CRM_Utils_Hook::invoke(string[] $names...)`
    */
-  public function testSymfonyListener_names() {
+  public function testSymfonyListener_names(): void {
     $calls = 0;
     $hookExample = function ($e) use (&$calls) {
       $calls++;

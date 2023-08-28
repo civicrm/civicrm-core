@@ -40,7 +40,7 @@ class ManagerTest extends \CiviUnitTestCase {
   /**
    * Modules appear to be well-defined.
    */
-  public function testGetModules() {
+  public function testGetModules(): void {
     $modules = $this->angular->getModules();
 
     $counts = [
@@ -97,7 +97,7 @@ class ManagerTest extends \CiviUnitTestCase {
   /**
    * Get HTML fragments from an example module.
    */
-  public function testGetPartials() {
+  public function testGetPartials(): void {
     $partials = $this->angular->getPartials('crmMailing');
     $this->assertMatchesRegularExpression('/ng-form="crmMailingSubform">/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
     // If crmMailing changes, feel free to use a different example.
@@ -106,7 +106,7 @@ class ManagerTest extends \CiviUnitTestCase {
   /**
    * Get HTML fragments from an example module. The HTML is modified via hook.
    */
-  public function testGetPartials_Hooked() {
+  public function testGetPartials_Hooked(): void {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', [$this, 'hook_civicrm_alterAngular']);
 
     $partials = $this->angular->getPartials('crmMailing');
@@ -114,7 +114,7 @@ class ManagerTest extends \CiviUnitTestCase {
     // If crmMailing changes, feel free to use a different example.
   }
 
-  public function testGetJs_Asset() {
+  public function testGetJs_Asset(): void {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_angularModules', [$this, 'hook_civicrm_angularModules_fooBar']);
 
     $paths = $this->angular->getResources(['fooBar'], 'js', 'path');
@@ -128,7 +128,7 @@ class ManagerTest extends \CiviUnitTestCase {
   /**
    * Get a translatable string from an example module.
    */
-  public function testGetStrings() {
+  public function testGetStrings(): void {
     $strings = $this->angular->getStrings('crmMailing');
     $this->assertTrue(in_array('Save Draft', $strings));
     $this->assertFalse(in_array('wild world', $strings));
@@ -138,7 +138,7 @@ class ManagerTest extends \CiviUnitTestCase {
   /**
    * Get a translatable string from an example module. The HTML is modified via hook.
    */
-  public function testGetStrings_Hooked() {
+  public function testGetStrings_Hooked(): void {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', [$this, 'hook_civicrm_alterAngular']);
 
     $strings = $this->angular->getStrings('crmMailing');
@@ -149,7 +149,7 @@ class ManagerTest extends \CiviUnitTestCase {
   /**
    * Get the list of dependencies for an Angular module.
    */
-  public function testGetRequires() {
+  public function testGetRequires(): void {
     $requires = $this->angular->getResources(['crmMailing'], 'requires', 'requires');
     $this->assertTrue(in_array('ngRoute', $requires['crmMailing']));
     $this->assertFalse(in_array('crmCatStevens', $requires['crmMailing']));
@@ -159,7 +159,7 @@ class ManagerTest extends \CiviUnitTestCase {
   /**
    * Get the list of dependencies for an Angular module. It can be modified via hook.
    */
-  public function testGetRequires_Hooked() {
+  public function testGetRequires_Hooked(): void {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', [$this, 'hook_civicrm_alterAngular']);
 
     $requires = $this->angular->getResources(['crmMailing'], 'requires', 'requires');
@@ -171,7 +171,7 @@ class ManagerTest extends \CiviUnitTestCase {
   /**
    * Get the full, recursive list of dependencies for a set of Angular modules.
    */
-  public function testResolveDeps() {
+  public function testResolveDeps(): void {
     // If crmMailing changes, feel free to use a different example.
     $expected = [
       'angularFileUpload',

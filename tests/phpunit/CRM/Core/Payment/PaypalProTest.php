@@ -39,7 +39,7 @@ class CRM_Core_Payment_PaypalProTest extends CiviUnitTestCase {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    * @throws \CRM_Core_Exception
    */
-  public function testSinglePayment() {
+  public function testSinglePayment(): void {
     $this->setupMockHandler();
     $params = $this->getBillingParams();
     $params['amount'] = 5.24;

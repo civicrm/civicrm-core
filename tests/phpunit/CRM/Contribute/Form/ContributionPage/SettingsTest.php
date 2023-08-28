@@ -19,7 +19,7 @@ class CRM_Contribute_Form_ContributionPage_SettingsTest extends CiviUnitTestCase
   /**
    * Test correct form submission.
    */
-  public function testValidFormSubmission() {
+  public function testValidFormSubmission(): void {
     $values = $this->getCorrectFormFields();
     $form = new CRM_Contribute_Form_ContributionPage_Settings();
     $validationResult = \CRM_Contribute_Form_ContributionPage_Settings::formRule($values, [], $form);
@@ -29,7 +29,7 @@ class CRM_Contribute_Form_ContributionPage_SettingsTest extends CiviUnitTestCase
   /**
    * Test end date not allowed with only 'time' part.
    */
-  public function testEndDateWithoutDateNotAllowed() {
+  public function testEndDateWithoutDateNotAllowed(): void {
     $values = $this->getCorrectFormFields();
     $values['end_date'] = '00:01';
     $form = new CRM_Contribute_Form_ContributionPage_Settings();
@@ -40,7 +40,7 @@ class CRM_Contribute_Form_ContributionPage_SettingsTest extends CiviUnitTestCase
   /**
    * Test end date must be after start date.
    */
-  public function testEndDateBeforeStartDateNotAllowed() {
+  public function testEndDateBeforeStartDateNotAllowed(): void {
     $values = $this->getCorrectFormFields();
     $values['end_date'] = '1900-01-01 00:00';
     $form = new CRM_Contribute_Form_ContributionPage_Settings();

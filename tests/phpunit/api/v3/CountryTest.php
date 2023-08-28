@@ -32,7 +32,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   /**
    * @dataProvider versionThreeAndFour
    */
-  public function testCreateCountry() {
+  public function testCreateCountry(): void {
 
     $result = $this->callAPISuccess('country', 'create', $this->_params);
     $this->assertEquals(1, $result['count']);
@@ -44,7 +44,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   /**
    * @dataProvider versionThreeAndFour
    */
-  public function testDeleteCountry() {
+  public function testDeleteCountry(): void {
     //create one
     $create = $this->callAPISuccess('country', 'create', $this->_params);
 
@@ -60,7 +60,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
    * Test civicrm_phone_get with empty params.
    * @dataProvider versionThreeAndFour
    */
-  public function testGetEmptyParams() {
+  public function testGetEmptyParams(): void {
     $result = $this->callAPISuccess('Country', 'Get', []);
   }
 
@@ -68,7 +68,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
    * Test civicrm_phone_get with wrong params.
    * @dataProvider versionThreeAndFour
    */
-  public function testGetWrongParams() {
+  public function testGetWrongParams(): void {
     $this->callAPIFailure('Country', 'Get', ['id' => 'abc']);
   }
 
@@ -76,7 +76,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
    * Test civicrm_phone_get - success expected.
    * @dataProvider versionThreeAndFour
    */
-  public function testGet() {
+  public function testGet(): void {
     $country = $this->callAPISuccess('Country', 'create', $this->_params);
     $params = [
       'iso_code' => $this->_params['iso_code'],
@@ -93,7 +93,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
    * We check on the iso code (there should be only one iso code
    * @dataProvider versionThreeAndFour
    */
-  public function testCreateDuplicateFail() {
+  public function testCreateDuplicateFail(): void {
     $params = $this->_params;
     unset($params['id']);
     $this->callAPISuccess('country', 'create', $params);
@@ -108,7 +108,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
    * Test that the list of states is in the correct format when chaining
    * and using sequential.
    */
-  public function testCountryStateChainSequential() {
+  public function testCountryStateChainSequential(): void {
     // first without specifying
     $result = $this->callAPISuccess('Country', 'getsingle', [
       'iso_code' => 'US',

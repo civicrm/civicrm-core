@@ -295,7 +295,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testFormRulePermanentOverrideWithNoStatus() {
+  public function testFormRulePermanentOverrideWithNoStatus(): void {
     $params = [
       'join_date' => date('Y-m-d'),
       'membership_type_id' => [$this->ids['contact']['organization'], $this->ids['membership_type']['AnnualFixed']],
@@ -308,7 +308,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->assertTrue(array_key_exists('status_id', $rc));
   }
 
-  public function testFormRuleUntilDateOverrideWithValidOverrideEndDate() {
+  public function testFormRuleUntilDateOverrideWithValidOverrideEndDate(): void {
     $params = [
       'join_date' => date('Y-m-d'),
       'membership_type_id' => [$this->ids['contact']['organization'], $this->ids['membership_type']['AnnualFixed']],
@@ -364,7 +364,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    * Test CRM_Member_Form_Membership::formRule() with a join date of today and a rolling membership type.
    */
-  public function testFormRuleRollingJoinToday() {
+  public function testFormRuleRollingJoinToday(): void {
     $params = [
       'join_date' => date('Y-m-d'),
       'start_date' => '',
@@ -383,7 +383,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of one month ago and a rolling membership type
    */
-  public function testFormRuleRollingJoin1MonthAgo() {
+  public function testFormRuleRollingJoin1MonthAgo(): void {
     $unixNow = time();
     $unix1MAgo = $unixNow - (31 * 24 * 60 * 60);
     $params = [
@@ -403,7 +403,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    *  Test CRM_Member_Form_Membership::formRule() with a join date of six months ago and a rolling membership type.
    */
-  public function testFormRuleRollingJoin6MonthsAgo() {
+  public function testFormRuleRollingJoin6MonthsAgo(): void {
     $unixNow = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
     $params = [
@@ -424,7 +424,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of one year+ ago and a rolling membership type
    */
-  public function testFormRuleRollingJoin1YearAgo() {
+  public function testFormRuleRollingJoin1YearAgo(): void {
     $unixNow = time();
     $unix1YAgo = $unixNow - (370 * 24 * 60 * 60);
     $params = [
@@ -445,7 +445,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of two years ago and a rolling membership type
    */
-  public function testFormRuleRollingJoin2YearsAgo() {
+  public function testFormRuleRollingJoin2YearsAgo(): void {
     $unixNow = time();
     $unix2YAgo = $unixNow - (2 * 365 * 24 * 60 * 60);
     $params = [
@@ -467,7 +467,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * The setup is a join date of six months ago and a fixed membership type.
    */
-  public function testFormRuleFixedJoin6MonthsAgo() {
+  public function testFormRuleFixedJoin6MonthsAgo(): void {
     $unixNow = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
     $params = [

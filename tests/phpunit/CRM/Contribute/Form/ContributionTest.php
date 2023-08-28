@@ -2048,7 +2048,7 @@ Paid By: Check',
   /**
    * Test formRule
    */
-  public function testContributionFormRule() {
+  public function testContributionFormRule(): void {
     $fields = [
       'contact_id' => $this->_individualId,
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),

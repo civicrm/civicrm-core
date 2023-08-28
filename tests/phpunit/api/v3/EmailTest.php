@@ -443,7 +443,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testEmailOnHold() {
+  public function testEmailOnHold(): void {
     $params = [
       'contact_id' => $this->_contactID,
       'email' => 'api@a-team.com',
@@ -480,7 +480,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSetBulkEmail() {
+  public function testSetBulkEmail(): void {
     $individualID = $this->individualCreate([]);
     $email = $this->callAPISuccessGetSingle('Email', ['contact_id' => $individualID]);
     $this->assertEquals(0, $email['is_bulkmail']);
@@ -498,7 +498,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetlist() {
+  public function testGetlist(): void {
     $name = 'Scarabée';
     $emailMatchContactID = $this->individualCreate(['last_name' => $name, 'email' => 'bob@bob.com']);
     $emailMatchEmailID = $this->callAPISuccessGetValue('Email', ['return' => 'id', 'contact_id' => $emailMatchContactID]);

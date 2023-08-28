@@ -73,7 +73,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    *
    * @todo - this might be better broken down into more smaller tests
    */
-  public function testGetContributionSoft() {
+  public function testGetContributionSoft(): void {
     //We don't test for PCP fields because there's no PCP API, so we can't create campaigns.
     $p = [
       'contribution_id' => $this->_contributionId,
@@ -141,19 +141,19 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   /**
    * civicrm_contribution_soft.
    */
-  public function testCreateEmptyParamsContributionSoft() {
+  public function testCreateEmptyParamsContributionSoft(): void {
     $this->callAPIFailure('contribution_soft', 'create', [],
       'Mandatory key(s) missing from params array: contribution_id, amount, contact_id'
     );
   }
 
-  public function testCreateParamsWithoutRequiredKeysContributionSoft() {
+  public function testCreateParamsWithoutRequiredKeysContributionSoft(): void {
     $this->callAPIFailure('contribution_soft', 'create', [],
       'Mandatory key(s) missing from params array: contribution_id, amount, contact_id'
     );
   }
 
-  public function testCreateContributionSoftInvalidContact() {
+  public function testCreateContributionSoftInvalidContact(): void {
     $params = [
       'contact_id' => 999,
       'contribution_id' => $this->_contributionId,
@@ -166,7 +166,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     );
   }
 
-  public function testCreateContributionSoftInvalidContributionId() {
+  public function testCreateContributionSoftInvalidContributionId(): void {
     $params = [
       'contribution_id' => 999999,
       'contact_id' => $this->_softIndividual1Id,
@@ -182,7 +182,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   /**
    * Function tests that additional financial records are created when fee amount is recorded.
    */
-  public function testCreateContributionSoft() {
+  public function testCreateContributionSoft(): void {
     $params = [
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
@@ -203,7 +203,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    * To Update Soft Contribution.
    *
    */
-  public function testCreateUpdateContributionSoft() {
+  public function testCreateUpdateContributionSoft(): void {
     //create a soft credit
     $params = [
       'contribution_id' => $this->_contributionId,
@@ -267,19 +267,19 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    * civicrm_contribution_soft_delete methods.
    *
    */
-  public function testDeleteEmptyParamsContributionSoft() {
+  public function testDeleteEmptyParamsContributionSoft(): void {
     $params = [];
     $this->callAPIFailure('contribution_soft', 'delete', $params);
   }
 
-  public function testDeleteWrongParamContributionSoft() {
+  public function testDeleteWrongParamContributionSoft(): void {
     $params = [
       'contribution_source' => 'SSF',
     ];
     $this->callAPIFailure('contribution_soft', 'delete', $params);
   }
 
-  public function testDeleteContributionSoft() {
+  public function testDeleteContributionSoft(): void {
     //create a soft credit
     $params = [
       'contribution_id' => $this->_contributionId,
@@ -302,7 +302,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
    * Test civicrm_contribution_search with empty params.
    * All available contributions expected.
    */
-  public function testSearchEmptyParams() {
+  public function testSearchEmptyParams(): void {
     $p = [
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,
@@ -324,7 +324,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   /**
    * Test civicrm_contribution_soft_search. Success expected.
    */
-  public function testSearch() {
+  public function testSearch(): void {
     $p1 = [
       'contribution_id' => $this->_contributionId,
       'contact_id' => $this->_softIndividual1Id,

@@ -67,7 +67,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   /**
    * Generate a fully-formatted mailing with standard email headers.
    */
-  public function testBasicHeaders() {
+  public function testBasicHeaders(): void {
     $allMessages = $this->runMailingSuccess([
       'subject' => 'Accidents in cars cause children for {contact.display_name}!',
       'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
@@ -93,7 +93,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   /**
    * Generate a fully-formatted mailing (with body_text content).
    */
-  public function testText() {
+  public function testText(): void {
     $allMessages = $this->runMailingSuccess([
       'subject' => 'Accidents in cars cause children for {contact.display_name}!',
       'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
@@ -123,7 +123,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   /**
    * Generate a fully-formatted mailing (with body_html content).
    */
-  public function testHtmlWithOpenTracking() {
+  public function testHtmlWithOpenTracking(): void {
     $allMessages = $this->runMailingSuccess([
       'subject' => 'Example Subject',
       'body_html' => '<p>You can go to <a href="http://example.net/first?{contact.checksum}">Google</a> or <a href="{action.optOutUrl}">opt out</a>.</p>',
@@ -180,7 +180,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   /**
    * Generate a fully-formatted mailing (with body_html content).
    */
-  public function testHtmlWithOpenAndUrlTracking() {
+  public function testHtmlWithOpenAndUrlTracking(): void {
     $allMessages = $this->runMailingSuccess([
       'subject' => 'Example Subject',
       'body_html' => '<p>You can go to <a href="http://example.net">Google</a> or <a href="{action.optOutUrl}">opt out</a>.</p>',

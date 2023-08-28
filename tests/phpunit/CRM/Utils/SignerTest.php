@@ -20,7 +20,7 @@ class CRM_Utils_SignerTest extends CiviUnitTestCase {
     $this->useTransaction();
   }
 
-  public function testSignValidate() {
+  public function testSignValidate(): void {
     $cases = [];
     $cases[] = [
       'signParams' => [

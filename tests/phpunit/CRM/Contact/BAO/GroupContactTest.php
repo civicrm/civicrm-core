@@ -20,7 +20,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    * Test case for add( ).
    */
-  public function testAdd() {
+  public function testAdd(): void {
 
     //creates a test group contact by recursively creation
     //lets create 10 groupContacts for fun
@@ -40,7 +40,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    * Test case for getGroupId( )
    */
-  public function testGetGroupId() {
+  public function testGetGroupId(): void {
 
     //creates a test groupContact object
     //force group_id to 1 so we can compare
@@ -62,7 +62,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testContactSearchByParentGroup() {
+  public function testContactSearchByParentGroup(): void {
     // create a parent group
     $parentGroup = $this->callAPISuccess('Group', 'create', [
       'title' => 'Parent Group',
@@ -160,7 +160,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    *  CRM-19698: Test case for combine contact search in regular and smart group
    */
-  public function testContactCombineGroupSearch() {
+  public function testContactCombineGroupSearch(): void {
     // create regular group based
     $regularGroup = $this->callAPISuccess('Group', 'create', [
       'title' => 'Regular Group',
@@ -236,7 +236,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
   /**
    *  CRM-19333: Test case for contact search on basis of group type
    */
-  public function testbyGroupType() {
+  public function testbyGroupType(): void {
     $groupTypes = CRM_Core_BAO_OptionValue::getOptionValuesAssocArrayFromName('group_type');
     $mailingListGT = array_search('Mailing List', $groupTypes);
     $accessControlGT = array_search('Access Control', $groupTypes);

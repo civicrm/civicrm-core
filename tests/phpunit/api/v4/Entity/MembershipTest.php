@@ -29,7 +29,7 @@ use Civi\Test\TransactionalInterface;
  */
 class MembershipTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testUpdateWeights() {
+  public function testUpdateWeights(): void {
     $getValues = function($domain) {
       return MembershipType::get(FALSE)
         ->addWhere('domain_id.name', '=', $domain)

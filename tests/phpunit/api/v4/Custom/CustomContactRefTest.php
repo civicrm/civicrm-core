@@ -28,7 +28,7 @@ use Civi\Api4\CustomGroup;
  */
 class CustomContactRefTest extends CustomTestBase {
 
-  public function testGetWithJoin() {
+  public function testGetWithJoin(): void {
     $firstName = uniqid('fav');
 
     $customGroup = CustomGroup::create(FALSE)
@@ -118,7 +118,7 @@ class CustomContactRefTest extends CustomTestBase {
     $this->assertCount(2, $result);
   }
 
-  public function testCurrentUser() {
+  public function testCurrentUser(): void {
     $currentUser = $this->createLoggedInUser();
 
     $customGroup = CustomGroup::create(FALSE)

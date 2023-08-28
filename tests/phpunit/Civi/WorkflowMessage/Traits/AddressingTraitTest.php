@@ -39,7 +39,7 @@ class AddressingTraitTest extends \CiviUnitTestCase {
   /**
    * Set email addresses using fluent methods (setTo(), setCc(), etc).
    */
-  public function testFluentSetup() {
+  public function testFluentSetup(): void {
     $wfm = $this->createExample()
       // Setters support array or string inputs. All address fields support the same formats.
       ->setTo(['name' => 'Foo', 'email' => 'foo@example.com'])
@@ -59,7 +59,7 @@ class AddressingTraitTest extends \CiviUnitTestCase {
   /**
    * Set email addresses using fluent methods (setTo(), setCc(), etc).
    */
-  public function testFluentAdder() {
+  public function testFluentAdder(): void {
     $wfm = $this->createExample()
       // Setters support array or string inputs. All address fields support the same formats.
       ->setCc([['email' => 'cc1@example.com'], ['name' => 'Bob', 'email' => 'cc2@example.com']])
@@ -72,7 +72,7 @@ class AddressingTraitTest extends \CiviUnitTestCase {
   /**
    * Set email addresses using model-properties.
    */
-  public function testModelPropsSetup() {
+  public function testModelPropsSetup(): void {
     $wfm = $this->createExample()
       ->import('modelProps', [
         // modelProps support array or string inputs. All address fields support the same formats.
@@ -94,7 +94,7 @@ class AddressingTraitTest extends \CiviUnitTestCase {
   /**
    * Set email addresses using sendTemplate()'s envelope format.
    */
-  public function testEnvelopeSetup() {
+  public function testEnvelopeSetup(): void {
     $ex = $this->createExample();
 
     $envelopeArray = [
@@ -121,7 +121,7 @@ class AddressingTraitTest extends \CiviUnitTestCase {
     }
   }
 
-  public function testSingularValues() {
+  public function testSingularValues(): void {
     $ex = $this->createExample();
 
     $singularFields = ['to', 'from', 'replyTo', 'cc', 'bcc'];
@@ -170,7 +170,7 @@ class AddressingTraitTest extends \CiviUnitTestCase {
     }
   }
 
-  public function testPluralValues() {
+  public function testPluralValues(): void {
     $ex = $this->createExample();
 
     $pluralFields = ['cc', 'bcc'];

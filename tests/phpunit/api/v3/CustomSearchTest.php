@@ -13,7 +13,7 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  public function testCustomSearch() {
+  public function testCustomSearch(): void {
     $result = $this->callAPISuccess('CustomSearch', 'create', [
       'label' => 'Invalid, overwritten',
       'description' => 'Longish description of the example search form',

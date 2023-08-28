@@ -147,7 +147,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   /**
    * Test civicrm_domain_create.
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $result = $this->callAPISuccess('domain', 'create', $this->params);
     $this->assertEquals($result['count'], 1);
     $this->assertNotNull($result['id']);
@@ -186,7 +186,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    *
    * See CRM-17430.
    */
-  public function testCreateDomainResult() {
+  public function testCreateDomainResult(): void {
     // First create a domain.
     $domain_result = $this->callAPISuccess('Domain', 'create', $this->params);
     $result_value = CRM_Utils_Array::first($domain_result['values']);

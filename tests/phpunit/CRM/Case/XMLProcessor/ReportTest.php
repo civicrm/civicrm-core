@@ -80,7 +80,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
    * This is similar to testGetCaseReport but test with a timeline that
    * does have Meeting in it.
    */
-  public function testGetCaseReportWithMeetingInTimeline() {
+  public function testGetCaseReportWithMeetingInTimeline(): void {
     $client_id = $this->individualCreate([
       'first_name' => 'Casey',
       'middle_name' => '',
