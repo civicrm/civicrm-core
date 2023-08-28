@@ -18,11 +18,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    */
   protected $_permissionedDisabledGroup;
 
-  /**
-   * @var CRM_Utils_Hook_UnitTests
-   */
-  public $hookClass;
-
   protected $_params = [];
 
   public function setUp(): void {
