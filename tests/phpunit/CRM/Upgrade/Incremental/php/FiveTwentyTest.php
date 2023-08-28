@@ -11,7 +11,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyTest extends CiviCaseTestCase {
    * Test that the upgrade task changes the direction but only
    * for bidirectional relationship types that are b_a.
    */
-  public function testChangeCaseTypeAutoassignee() {
+  public function testChangeCaseTypeAutoassignee(): void {
 
     // We don't know what the ids are for the relationship types since it
     // seems to depend what ran before us, so retrieve them first and go by
@@ -191,7 +191,7 @@ ENDXML;
    * Test that the upgrade task converts case role <name>'s that
    * are labels to their name.
    */
-  public function testConvertRoleLabelsToNames() {
+  public function testConvertRoleLabelsToNames(): void {
 
     // We don't know what the ids are for the relationship types since it
     // seems to depend what ran before us, so retrieve them first and go by

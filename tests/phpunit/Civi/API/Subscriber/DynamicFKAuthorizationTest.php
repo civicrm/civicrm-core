@@ -216,7 +216,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
    * Test whether trusted API calls bypass the permission check
    *
    */
-  public function testNotDelegated() {
+  public function testNotDelegated(): void {
     $entity = 'FakeFile';
     $action = 'create';
     $params = [

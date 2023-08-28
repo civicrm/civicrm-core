@@ -119,7 +119,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
    * Test civicrm_tag_create - success expected.
    * Skipping v4 because used_for is an array
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $params = [
       'name' => 'Super Heros',
       'description' => 'Outside undie-wearers',
@@ -137,7 +137,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
    *
    * Skipping v4 because used_for is an array
    */
-  public function testCreateEntitySpecificTag() {
+  public function testCreateEntitySpecificTag(): void {
     $params = [
       'name' => 'New Tag4',
       'description' => 'This is description for New Activity tag',
@@ -193,13 +193,13 @@ class api_v3_TagTest extends CiviUnitTestCase {
     unset($this->ids['tag']);
   }
 
-  public function testTagGetfields() {
+  public function testTagGetfields(): void {
     $params = ['action' => 'create'];
     $result = $this->callAPISuccess('tag', 'getfields', $params);
     $this->assertEquals('civicrm_contact', $result['values']['used_for']['api.default']);
   }
 
-  public function testTagGetList() {
+  public function testTagGetList(): void {
     $params = [
       'input' => $this->tag['name'],
       'extra' => ['used_for'],

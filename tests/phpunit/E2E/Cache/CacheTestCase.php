@@ -29,7 +29,7 @@ abstract class E2E_Cache_CacheTestCase extends CiviSimpleCacheTest implements \C
     parent::setUpBeforeClass();
   }
 
-  public function testBasicUsageWithLongKey() {
+  public function testBasicUsageWithLongKey(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }

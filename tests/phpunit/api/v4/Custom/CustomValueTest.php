@@ -32,7 +32,7 @@ class CustomValueTest extends CustomTestBase {
   /**
    * Test CustomValue::GetFields/Get/Create/Update/Replace/Delete
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
 
     $group = uniqid('groupc');
@@ -282,7 +282,7 @@ class CustomValueTest extends CustomTestBase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testEntityRefresh() {
+  public function testEntityRefresh(): void {
     $groupName = uniqid('groupc');
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));

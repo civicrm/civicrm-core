@@ -53,7 +53,7 @@ class MagicGetterSetterTest extends \CiviUnitTestCase {
     };
   }
 
-  public function testExample() {
+  public function testExample(): void {
     $ex = $this->createExample();
     $this->assertEquals(NULL, $ex->setProtectedField(NULL)->getProtectedField());
     $this->assertEquals('apple', $ex->setProtectedField('apple')->getProtectedField());
@@ -107,7 +107,7 @@ class MagicGetterSetterTest extends \CiviUnitTestCase {
     }
   }
 
-  public function testImplIndependence() {
+  public function testImplIndependence(): void {
     $ex1 = $this->createExample();
     $ex2 = $this->createAltExample();
     $ex3 = $this->createEmptyExample();

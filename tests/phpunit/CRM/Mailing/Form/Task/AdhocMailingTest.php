@@ -22,7 +22,7 @@ class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  public function testCreateHiddenGroupFromSearchBuilder() {
+  public function testCreateHiddenGroupFromSearchBuilder(): void {
     $this->createLoggedInUser();
     $formValues = [
       'entryURL' => 'http://dmaster.local/civicrm/contact/search/builder?reset=1',

@@ -64,7 +64,7 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
     $this->assertEquals(1, count($rows), 'Exactly one row should be returned for given price field value.');
   }
 
-  public function testSearchWithPricelabelChange() {
+  public function testSearchWithPricelabelChange(): void {
     $this->callAPISuccess('PriceFieldValue', 'create', [
       'label' => 'Radio Label C',
       'id' => $this->participantPrice['id'],

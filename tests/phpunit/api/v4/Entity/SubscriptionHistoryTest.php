@@ -28,7 +28,7 @@ use api\v4\Api4TestBase;
  */
 class SubscriptionHistoryTest extends Api4TestBase {
 
-  public function testGet() {
+  public function testGet(): void {
     $contact = $this->createTestRecord('Contact');
     $group = $this->createTestRecord('Group');
     $timeAdded = time();
@@ -76,7 +76,7 @@ class SubscriptionHistoryTest extends Api4TestBase {
     $this->assertLessThanOrEqual(time(), strtotime($historyDeleted->single()['date']));
   }
 
-  public function testGetPermissions() {
+  public function testGetPermissions(): void {
     $this->createLoggedInUser();
 
     $contact = $this->createTestRecord('Contact');

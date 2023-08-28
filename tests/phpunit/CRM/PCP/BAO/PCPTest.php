@@ -29,7 +29,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testAddPCPBlock() {
+  public function testAddPCPBlock(): void {
 
     $params = $this->pcpBlockParams();
     $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord($params);
@@ -50,13 +50,13 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreatePCP() {
+  public function testCreatePCP(): void {
     $params = $this->pcpParams();
     $pcpID = $this->createPCPBlock($params);
     $this->getAndCheck($params, $pcpID, 'Pcp');
   }
 
-  public function testAddPCPNoStatus() {
+  public function testAddPCPNoStatus(): void {
     $blockParams = $this->pcpBlockParams();
     $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord($blockParams);
 
@@ -79,7 +79,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     $this->assertEquals($params['is_active'], $pcp->is_active, 'Check for is_active.');
   }
 
-  public function testDeletePCP() {
+  public function testDeletePCP(): void {
 
     $pcp = CRM_Core_DAO::createTestObject('CRM_PCP_DAO_PCP');
     $pcpId = $pcp->id;
@@ -92,7 +92,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetPcpDashboardInfo() {
+  public function testGetPcpDashboardInfo(): void {
     $block = CRM_PCP_BAO_PCPBlock::writeRecord($this->pcpBlockParams());
     $contactID = $this->individualCreate();
     $submitParams = [
@@ -123,7 +123,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   /**
    * Test that hook_civicrm_links is called.
    */
-  public function testPcpInfoLinksHook() {
+  public function testPcpInfoLinksHook(): void {
     Civi::dispatcher()->addListener('hook_civicrm_links', [$this, 'hookLinks']);
 
     // Reset the cache otherwise our hook will not be called
@@ -170,7 +170,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
    * Test that CRM_Contribute_BAO_Contribution::_gatherMessageValues() works
    * with PCP.
    */
-  public function testGatherMessageValuesForPCP() {
+  public function testGatherMessageValuesForPCP(): void {
     // set up a pcp page
     $block = CRM_PCP_BAO_PCPBlock::writeRecord($this->pcpBlockParams());
     // The owner of the pcp, who gets the soft credit

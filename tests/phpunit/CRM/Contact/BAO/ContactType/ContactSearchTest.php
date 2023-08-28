@@ -164,7 +164,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
    *
    * Success expected.
    */
-  public function testSearchWithType() {
+  public function testSearchWithType(): void {
 
     // for type:Individual
     $params = ['contact_type' => 'Individual', 'version' => 3];
@@ -229,7 +229,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
    *
    * Success expected.
    */
-  public function testSearchWithSubype() {
+  public function testSearchWithSubype(): void {
 
     // for subtype:Student
     $params = ['contact_sub_type' => $this->student, 'version' => 3];
@@ -277,7 +277,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
    *
    * Success expected.
    */
-  public function testSearchWithTypeSubype() {
+  public function testSearchWithTypeSubype(): void {
 
     // for type:individual subtype:Student
     $params = ['contact_sub_type' => $this->student, 'version' => 3];

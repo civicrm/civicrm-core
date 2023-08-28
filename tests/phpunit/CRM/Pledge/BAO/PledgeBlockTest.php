@@ -35,7 +35,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   /**
    *  create() and deletepledgeblock() method
    */
-  public function testCreateAndDeletePledgeBlock() {
+  public function testCreateAndDeletePledgeBlock(): void {
 
     $pledgeFrequencyUnit = [
       'week' => 1,
@@ -68,7 +68,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   /**
    * Add() method (add and edit modes of pledge block)
    */
-  public function testAddPledgeBlock() {
+  public function testAddPledgeBlock(): void {
 
     $pledgeFrequencyUnit = [
       'week' => 1,
@@ -117,7 +117,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   /**
    * Retrieve() and getPledgeBlock() method of  pledge block
    */
-  public function testRetrieveAndGetPledgeBlock() {
+  public function testRetrieveAndGetPledgeBlock(): void {
 
     $pledgeFrequencyUnit = [
       'week' => 1,

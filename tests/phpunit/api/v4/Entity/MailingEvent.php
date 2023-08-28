@@ -26,7 +26,7 @@ use Civi\Test\TransactionalInterface;
  */
 class MailingEventTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testMailingStats() {
+  public function testMailingStats(): void {
     $cid1 = $this->createTestRecord('Contact')['id'];
     $cid2 = $this->createTestRecord('Contact')['id'];
     $eid1 = $this->createTestRecord('Email', ['contact_id' => $cid1])['id'];

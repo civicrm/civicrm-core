@@ -25,7 +25,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_crypto', [$this, 'registerExampleKeys']);
   }
 
-  public function testIsPlainText() {
+  public function testIsPlainText(): void {
     $token = \Civi::service('crypto.token');
 
     $this->assertFalse($token->isPlainText(chr(2)));
@@ -37,7 +37,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $this->assertTrue($token->isPlainText("\n"));
   }
 
-  public function testDecryptInvalid() {
+  public function testDecryptInvalid(): void {
     $cryptoToken = \Civi::service('crypto.token');
     try {
       $cryptoToken->decrypt(chr(2) . 'CTK0' . chr(2));
@@ -92,7 +92,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $this->assertEquals($inputText, $actualText);
   }
 
-  public function testRekeyCiphertext() {
+  public function testRekeyCiphertext(): void {
     /** @var \Civi\Crypto\CryptoRegistry $cryptoRegistry */
     $cryptoRegistry = \Civi::service('crypto.registry');
     /** @var \Civi\Crypto\CryptoToken $cryptoToken */
@@ -118,7 +118,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $this->assertEquals('hello world', $cryptoToken->decrypt($third));
   }
 
-  public function testRekeyUpgradeDowngradePlaintext() {
+  public function testRekeyUpgradeDowngradePlaintext(): void {
     /** @var \Civi\Crypto\CryptoRegistry $cryptoRegistry */
     $cryptoRegistry = \Civi::service('crypto.registry');
     /** @var \Civi\Crypto\CryptoToken $cryptoToken */
@@ -152,7 +152,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
 
   }
 
-  public function testReadPlainTextWithoutRegistry() {
+  public function testReadPlainTextWithoutRegistry(): void {
     // This is performance optimization - don't initialize crypto.registry unless
     // you actually need it.
     $this->assertFalse(\Civi::container()->initialized('crypto.registry'));

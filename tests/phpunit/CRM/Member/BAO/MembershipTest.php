@@ -330,7 +330,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
-  public function testGetAllContactMembership() {
+  public function testGetAllContactMembership(): void {
     $lifetimeTypeId = $this->membershipTypeCreate([
       'name' => 'Lifetime',
       'duration_unit' => 'lifetime',
@@ -928,7 +928,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertMembershipExists($relatedMembership2['id']);
   }
 
-  public function testRelatedMembershipWithContactReferenceCustomField() {
+  public function testRelatedMembershipWithContactReferenceCustomField(): void {
     $relatedContactId = $this->individualCreate();
     $customContactId = $this->individualCreate();
     $membershipOrganizationId = $this->organizationCreate();

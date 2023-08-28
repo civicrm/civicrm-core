@@ -72,7 +72,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test that logging is successfully enabled and disabled.
    */
-  public function testEnableDisableLoggingWithTriggerHook() {
+  public function testEnableDisableLoggingWithTriggerHook(): void {
     $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'innodbLogTableSpec']);
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->checkINNODBLogTableCreated();
@@ -92,7 +92,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    *
    * The settings for unique id will not be set.
    */
-  public function testEnableLoggingLegacyLogTableExists() {
+  public function testEnableLoggingLegacyLogTableExists(): void {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->checkTriggersCreated(FALSE);
@@ -103,7 +103,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Check we can update legacy log tables using the api function.
    */
-  public function testUpdateLegacyLogTable() {
+  public function testUpdateLegacyLogTable(): void {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->callAPISuccess('System', 'updatelogtables', []);
@@ -119,7 +119,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Check if we can create missing log tables using api.
    */
-  public function testCreateMissingLogTables() {
+  public function testCreateMissingLogTables(): void {
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("DROP TABLE log_civicrm_contact");
     $this->callAPISuccess('System', 'createmissinglogtables', []);
@@ -131,7 +131,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Check we can update legacy log tables using the api function.
    */
-  public function testUpdateLogTableHookINNODB() {
+  public function testUpdateLogTableHookINNODB(): void {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'innodbLogTableSpec']);
@@ -287,7 +287,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be reverted.
    */
-  public function testRevert() {
+  public function testRevert(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     // Pause for one second here to ensure the timestamps between the first create action
@@ -309,7 +309,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be reverted.
    */
-  public function testRevertNoDate() {
+  public function testRevertNoDate(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     // Pause for one second here to ensure the timestamps between the first create action
@@ -335,7 +335,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testRevertRestrictedTables() {
+  public function testRevertRestrictedTables(): void {
 
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'temp name'");
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
@@ -380,7 +380,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be reverted.
    */
-  public function testRevertNoDateNotUnique() {
+  public function testRevertNoDateNotUnique(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'Wopity woot'");
@@ -402,7 +402,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be retrieved.
    */
-  public function testGet() {
+  public function testGet(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty woot'");
@@ -425,7 +425,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be retrieved without log_date being required.
    */
-  public function testGetNoDate() {
+  public function testGetNoDate(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty wop wop'");

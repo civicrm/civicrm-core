@@ -28,7 +28,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
    * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
    * DAO fields having a <pseudoconstant> tag in the XML schema.
    */
-  public function testOptionValues() {
+  public function testOptionValues(): void {
 
     // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
@@ -975,7 +975,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     }
   }
 
-  public function testContactTypes() {
+  public function testContactTypes(): void {
     $byName = [
       'Individual' => 'Individual',
       'Household' => 'Household',
@@ -1004,7 +1004,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     $this->assertEquals(array_flip($byId), $result);
   }
 
-  public function testGetTaxRates() {
+  public function testGetTaxRates(): void {
     $contact = $this->createLoggedInUser();
     $financialType = $this->callAPISuccess('financial_type', 'create', [
       'name' => 'Test taxable financial Type',

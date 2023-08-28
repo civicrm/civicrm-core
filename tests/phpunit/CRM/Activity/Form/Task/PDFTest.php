@@ -92,7 +92,7 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testCreateDocumentCustomFieldTokens() {
+  public function testCreateDocumentCustomFieldTokens(): void {
     // Set up custom group, and field
     // returns custom_group_id, custom_field_id, custom_field_option_group_id, custom_field_group_options
     $cg = $this->entityCustomGroupWithSingleStringMultiSelectFieldCreate("MyCustomField", "ActivityTest.php");

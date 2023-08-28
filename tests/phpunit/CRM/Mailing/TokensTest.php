@@ -68,7 +68,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
   /**
    * Check that mailing-tokens are generated (given a mailing DAO as input).
    */
-  public function testTokensWithMailingObject() {
+  public function testTokensWithMailingObject(): void {
     // We only need one case to see that the mailing-object works as
     // an alternative to the mailing-id.
     $inputTemplateFormat = 'text/plain';

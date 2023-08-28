@@ -79,7 +79,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
   /**
    * Test the Qill for activity Date time.
    */
-  public function testQill() {
+  public function testQill(): void {
     foreach ($this->getSearchCriteria() as $test_name => $data) {
       $selector = new CRM_Activity_Selector_Search($data['search_criteria']);
       $this->assertEquals($data['expected_qill'], $selector->getQILL(), "Failed for data set: $test_name");

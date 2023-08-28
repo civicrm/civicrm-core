@@ -31,7 +31,7 @@ class CustomValuePerformanceTest extends CustomTestBase {
 
   use QueryCounterTrait;
 
-  public function testQueryCount() {
+  public function testQueryCount(): void {
 
     $this->markTestIncomplete();
 

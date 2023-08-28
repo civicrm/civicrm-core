@@ -208,7 +208,7 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
     return $es;
   }
 
-  public function testValidatePhpType() {
+  public function testValidatePhpType(): void {
 
     // This test runs much faster as one test-func rather than data-provider func.
     foreach ($this->getPhpTypeExamples() as $exampleId => $example) {

@@ -50,7 +50,7 @@ class QueueTest extends Api4TestBase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testBasicLinearPolling() {
+  public function testBasicLinearPolling(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
@@ -104,7 +104,7 @@ class QueueTest extends Api4TestBase {
     $this->assertQueueStats(0, 0, 0, $queue);
   }
 
-  public function testBasicParallelPolling() {
+  public function testBasicParallelPolling(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
     $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
@@ -143,7 +143,7 @@ class QueueTest extends Api4TestBase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testBatchParallelPolling() {
+  public function testBatchParallelPolling(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
     \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
     $queue = \Civi::queue($queueName, [
@@ -189,7 +189,7 @@ class QueueTest extends Api4TestBase {
     }
   }
 
-  public function testSelect() {
+  public function testSelect(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
     $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
@@ -206,7 +206,7 @@ class QueueTest extends Api4TestBase {
     $this->assertFalse(isset($first['run_as']));
   }
 
-  public function testSelectRunAs() {
+  public function testSelectRunAs(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_select';
     $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
@@ -222,7 +222,7 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals(['contactId' => 99, 'domainId' => 1], $first['run_as']);
   }
 
-  public function testEmptyPoll() {
+  public function testEmptyPoll(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
     $queue = \Civi::queue($queueName, ['type' => 'Sql', 'runner' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
@@ -321,7 +321,7 @@ class QueueTest extends Api4TestBase {
    * Add a task. The task-running agent is a bit delinquent... so it forgets the first
    * few tasks. But the third one works!
    */
-  public function testRetryWithDelinquencyAndSuccess() {
+  public function testRetryWithDelinquencyAndSuccess(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
@@ -417,7 +417,7 @@ class QueueTest extends Api4TestBase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testUserJobQueue_Completion() {
+  public function testUserJobQueue_Completion(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_userjob';
 
     $firedQueueStatus = [];
@@ -473,7 +473,7 @@ class QueueTest extends Api4TestBase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testServiceQueue_NeverComplete() {
+  public function testServiceQueue_NeverComplete(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_service';
 
     $firedQueueStatus = [];

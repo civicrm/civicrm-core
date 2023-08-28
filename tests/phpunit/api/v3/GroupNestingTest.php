@@ -73,7 +73,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGet() {
+  public function testGet(): void {
     $params = [
       'parent_group_id' => $this->ids['Group']['parent'],
       'child_group_id' => $this->ids['Group']['child'],
@@ -96,7 +96,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGetWithChildGroupId() {
+  public function testGetWithChildGroupId(): void {
     $params = [
       'child_group_id' => $this->ids['Group']['child3'],
     ];
@@ -125,7 +125,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGetWithParentGroupId() {
+  public function testGetWithParentGroupId(): void {
     $params = [
       'parent_group_id' => $this->ids['Group']['parent'],
     ];
@@ -162,7 +162,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGetEmptyResults() {
+  public function testGetEmptyResults(): void {
     $params = [
       'parent_group_id' => $this->ids['Group']['parent'],
       'child_group_id' => 700,
@@ -177,7 +177,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $params = [
       'parent_group_id' => $this->ids['Group']['parent'],
       'child_group_id' => $this->ids['Group']['child2'],
@@ -192,7 +192,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testDelete() {
+  public function testDelete(): void {
     $params = [
       'parent_group_id' => $this->ids['Group']['parent'],
       'child_group_id' => $this->ids['Group']['child'],
@@ -211,7 +211,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testDeleteWithEmptyParams() {
+  public function testDeleteWithEmptyParams(): void {
     $this->callAPIFailure('group_nesting', 'delete', []);
   }
 

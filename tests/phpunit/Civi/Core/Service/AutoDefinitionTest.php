@@ -36,7 +36,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
   /**
    * A property with the `@inject` annotation will receive a service with the matching name.
    */
-  public function testInjectEponymousProperty() {
+  public function testInjectEponymousProperty(): void {
     $this->useExampleService(
       /**
        * @service TestEponymousProperty
@@ -59,7 +59,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
   /**
    * A property with the `@inject` annotation can be private.
    */
-  public function testInjectPrivateProperty() {
+  public function testInjectPrivateProperty(): void {
     $this->useExampleService(
       /**
        * @service TestInjectPrivateProperty
@@ -84,7 +84,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
   /**
    * A property with `@inject <my.service.name>` will receive the named service.
    */
-  public function testInjectNamedProperty() {
+  public function testInjectNamedProperty(): void {
     $this->useExampleService(
       /**
        * @service TestNamedProperty
@@ -109,7 +109,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
    * A method `setFooBar()` with `@inject <my.service.name>` will be called during initialization
    * with the requested service.
    */
-  public function testInjectSetter() {
+  public function testInjectSetter(): void {
     $this->useExampleService(
       /**
        * @service TestInjectSetter
@@ -146,7 +146,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
   /**
    * A constructor with `@inject <my.service.name>` will be called with the requested service.
    */
-  public function testInjectConstructor() {
+  public function testInjectConstructor(): void {
     $this->useExampleService(
       /**
        * @service TestInjectConstructor
@@ -188,7 +188,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
    * Note, however, that upstream doesn't guarantee the sequence over the long-term.
    * If it changes, you may need to update the test.
    */
-  public function testInjectionSequence() {
+  public function testInjectionSequence(): void {
     $this->useExampleService(
       /**
        * @service TestInjectionSequence
@@ -274,7 +274,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
    * In this example, we create two services (each with a different factory method, and each
    * with a different kind of data).
    */
-  public function testFactoryMethods() {
+  public function testFactoryMethods(): void {
     $this->useExampleService(
       new class() {
 
@@ -326,7 +326,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
    * What happens if you have multiple `@service` definitions (one on the class, one on a factory-method)?
    * You get multiple services.
    */
-  public function testClassAndFactoryMix() {
+  public function testClassAndFactoryMix(): void {
     $this->useExampleService(
       /**
        * @service TestClassAndFactoryMix.normal
@@ -380,7 +380,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
    *
    * In this example, we make two instances. Each instance has a different value for `$myName`.
    */
-  public function testTwoManualServices() {
+  public function testTwoManualServices(): void {
     $this->useCustomContainer(function(ContainerBuilder $container) {
       $exemplar = new class() implements AutoServiceInterface {
 

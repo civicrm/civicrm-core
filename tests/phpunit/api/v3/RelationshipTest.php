@@ -668,7 +668,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * does not.
    * FIXME: Api4
    */
-  public function testRelationshipCreateDuplicateWithCustomFields3() {
+  public function testRelationshipCreateDuplicateWithCustomFields3(): void {
     $this->createCustomGroupWithFieldsOfAllTypes();
 
     $custom_params_1 = [
@@ -698,7 +698,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   /**
    * Check with valid params array.
    */
-  public function testRelationshipsGet() {
+  public function testRelationshipsGet(): void {
     $relParams = [
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
@@ -941,7 +941,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   /**
    * Check with invalid relationshipType Id.
    */
-  public function testRelationshipTypeAddInvalidId() {
+  public function testRelationshipTypeAddInvalidId(): void {
     $relTypeParams = [
       'id' => 'invalid',
       'name_a_b' => 'Relation 1 for delete',
@@ -956,7 +956,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   /**
    * Check with valid data with contact_b.
    */
-  public function testGetRelationshipWithContactB() {
+  public function testGetRelationshipWithContactB(): void {
     $relParams = [
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
@@ -1097,7 +1097,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * We should get 1 result without or with correct relationship type id & 0 with
    * an incorrect one
    */
-  public function testGetRelationshipByTypeArrayReciprocal() {
+  public function testGetRelationshipByTypeArrayReciprocal(): void {
     $this->callAPISuccess($this->entity, 'create', $this->_params);
     $org3 = $this->organizationCreate();
     // lets just assume built in ones aren't being messed with!
@@ -1382,7 +1382,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testDisableExpiredRelationships() {
+  public function testDisableExpiredRelationships(): void {
     // Step 1: Create a current employer relationship with Org A
     $params = [
       'relationship_type_id' => '5',
@@ -1451,7 +1451,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * of something. It's now mostly testing a different variation of
    * relationship + the default in api3 being to not check permissions.
    */
-  public function testCreateWithLesserPermissions() {
+  public function testCreateWithLesserPermissions(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
     $params = [
       'contact_id_a' => $this->_cId_a,

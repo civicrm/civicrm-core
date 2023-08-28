@@ -39,7 +39,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     parent::setUp();
   }
 
-  public function testOptionsAreReturned() {
+  public function testOptionsAreReturned(): void {
     $fields = Contact::getFields(FALSE)
       ->execute()
       ->indexBy('name');
@@ -54,7 +54,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertFalse($fields['first_name']['options']);
   }
 
-  public function testContactGetFields() {
+  public function testContactGetFields(): void {
     $fields = Contact::getFields(FALSE)
       ->execute()
       ->indexBy('name');
@@ -67,7 +67,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['name', 'label', 'icon'], $fields['contact_sub_type']['suffixes']);
   }
 
-  public function testComponentFields() {
+  public function testComponentFields(): void {
     \CRM_Core_BAO_ConfigSetting::disableComponent('CiviCampaign');
     $fields = \Civi\Api4\Event::getFields()
       ->addWhere('name', 'CONTAINS', 'campaign')
@@ -80,7 +80,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $fields);
   }
 
-  public function testEmailFields() {
+  public function testEmailFields(): void {
     $getFields = Email::getFields(FALSE)
       ->setAction('get')
       ->execute()->indexBy('name');
@@ -94,7 +94,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('Email', $createFields['email']['input_type']);
   }
 
-  public function testInternalPropsAreHidden() {
+  public function testInternalPropsAreHidden(): void {
     // Public getFields should not contain @internal props
     $fields = Contact::getFields(FALSE)
       ->execute();
@@ -109,7 +109,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     }
   }
 
-  public function testPrefetchDisabled() {
+  public function testPrefetchDisabled(): void {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
     Campaign::create()->setValues(['name' => 'Big Campaign', 'title' => 'Biggie'])->execute();
@@ -122,7 +122,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['name', 'label'], $fields['campaign_id']['suffixes']);
   }
 
-  public function testRequiredAndNullableAndDeprecated() {
+  public function testRequiredAndNullableAndDeprecated(): void {
     $actFields = Activity::getFields(FALSE)
       ->setAction('create')
       ->execute()->indexBy('name');
@@ -136,7 +136,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($actFields['phone_id']['deprecated']);
   }
 
-  public function testGetSuffixes() {
+  public function testGetSuffixes(): void {
     $actFields = Activity::getFields(FALSE)
       ->execute()->indexBy('name');
 
@@ -146,7 +146,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['name', 'label', 'description', 'color'], $actFields['tags']['suffixes']);
   }
 
-  public function testDynamicFks() {
+  public function testDynamicFks(): void {
     $tagFields = EntityTag::getFields(FALSE)
       ->execute()->indexBy('name');
     $this->assertEmpty($tagFields['entity_id']['fk_entity']);

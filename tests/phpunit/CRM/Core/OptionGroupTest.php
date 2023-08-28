@@ -25,7 +25,7 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
   /**
    * Ensure only one option value exists after calling ensureOptionValueExists.
    */
-  public function testWeightOptionGroup() {
+  public function testWeightOptionGroup(): void {
     $values = [];
     $options1 = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, NULL, 'label', FALSE);
     $options2 = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, NULL, 'label', FALSE, FALSE, 'value', 'name');
@@ -91,7 +91,7 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
     $this->assertEquals($actual, $clean);
   }
 
-  public function testDomainSpecificValueCache() {
+  public function testDomainSpecificValueCache(): void {
     $original_domain = \CRM_Core_Config::domainID();
     $domainIDs = [];
     $optionValues = [];

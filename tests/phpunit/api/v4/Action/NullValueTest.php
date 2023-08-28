@@ -35,7 +35,7 @@ class NullValueTest extends Api4TestBase implements TransactionalInterface {
     parent::setUp();
   }
 
-  public function testStringNull() {
+  public function testStringNull(): void {
     $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Joseph')
       ->addValue('last_name', 'null')
@@ -47,7 +47,7 @@ class NullValueTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('Joseph Null', $contact['display_name']);
   }
 
-  public function testSettingToNull() {
+  public function testSettingToNull(): void {
     $contact = Contact::create(FALSE)
       ->addValue('first_name', 'ILoveMy')
       ->addValue('last_name', 'LastName')
@@ -68,7 +68,7 @@ class NullValueTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('ILoveMy', $contact['display_name']);
   }
 
-  public function testSaveWithReload() {
+  public function testSaveWithReload(): void {
     $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Firsty')
       ->addValue('last_name', 'Lasty')

@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ActivityTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testActivityContactVirtualFields() {
+  public function testActivityContactVirtualFields(): void {
     $c = $this->saveTestRecords('Contact', ['records' => 5])->column('id');
 
     $sourceContactId = $c[2];

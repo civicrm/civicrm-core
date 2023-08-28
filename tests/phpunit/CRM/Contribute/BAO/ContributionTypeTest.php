@@ -28,7 +28,7 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
   /**
    * Check method add()
    */
-  public function testAdd() {
+  public function testAdd(): void {
     $params = [
       'name' => 'Donations',
       'is_deductible' => 0,

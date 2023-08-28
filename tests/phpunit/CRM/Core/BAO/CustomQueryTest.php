@@ -27,7 +27,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearchCustomDataDateRelative() {
+  public function testSearchCustomDataDateRelative(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
     $dateCustomField = $this->customFieldCreate([
       'custom_group_id' => $ids['custom_group_id'],
@@ -99,7 +99,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testSearchCustomDataDateHighLow() {
+  public function testSearchCustomDataDateHighLow(): void {
     $this->createCustomGroupWithFieldOfType([], 'date');
     $dateCustomFieldName = $this->getCustomFieldName('date');
     // Assigning the relevant form value to be within a custom key is normally done in
@@ -132,7 +132,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testSearchCustomDataDateLowWithPermsInPlay() {
+  public function testSearchCustomDataDateLowWithPermsInPlay(): void {
     $this->createLoggedInUser();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts', 'access all custom data'];
     $this->createCustomGroupWithFieldOfType([], 'date');
@@ -166,7 +166,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearchCustomDataDateFromTo() {
+  public function testSearchCustomDataDateFromTo(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
     $dateCustomField = $this->customFieldCreate([
       'custom_group_id' => $ids['custom_group_id'],
@@ -203,7 +203,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearchCustomDataFromTo() {
+  public function testSearchCustomDataFromTo(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
     $datas = [
       'Int' => 2,
@@ -247,7 +247,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testLocalizedSearchCustomDataFromTo() {
+  public function testLocalizedSearchCustomDataFromTo(): void {
     $this->setMonetaryDecimalPoint(',');
     $this->setMonetaryThousandSeparator('.');
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
@@ -299,7 +299,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearchCustomDataFromAndTo() {
+  public function testSearchCustomDataFromAndTo(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
     $dataSet = [
       'Date' => ['value' => '2015-06-06', 'sql_string' => '"20150606235959"', 'qill_string' => "'June 6th, 2015 11:59 PM'", 'qill_string_greater' => "'June 6th, 2015 12:00 AM'"],
@@ -374,7 +374,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testLocalizedSearchCustomDataFromAndTo() {
+  public function testLocalizedSearchCustomDataFromAndTo(): void {
     $this->setMonetaryDecimalPoint(',');
     $this->setMonetaryThousandSeparator('.');
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
@@ -455,7 +455,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearchCustomDataDateEquals() {
+  public function testSearchCustomDataDateEquals(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
     $dateCustomField = $this->customFieldCreate([
       'custom_group_id' => $ids['custom_group_id'],
@@ -487,7 +487,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testAddressCustomFields() {
+  public function testAddressCustomFields(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Address'], 'int');
     $individualID = $this->individualCreate();
     $this->callAPISuccess('Address', 'create', [

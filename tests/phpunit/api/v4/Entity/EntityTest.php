@@ -27,7 +27,7 @@ use api\v4\Api4TestBase;
  */
 class EntityTest extends Api4TestBase {
 
-  public function testEntityGet() {
+  public function testEntityGet(): void {
     \CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $result = Entity::get(FALSE)
       ->execute()
@@ -48,7 +48,7 @@ class EntityTest extends Api4TestBase {
     $this->assertEquals(['contact_id.sort_name', 'event_id.title'], $result['Participant']['search_fields']);
   }
 
-  public function testEntity() {
+  public function testEntity(): void {
     $result = Entity::getActions(FALSE)
       ->execute()
       ->indexBy('name');
@@ -58,7 +58,7 @@ class EntityTest extends Api4TestBase {
       "Entity entity has more than basic actions");
   }
 
-  public function testEntityComponent() {
+  public function testEntityComponent(): void {
     \CRM_Core_BAO_ConfigSetting::disableComponent('CiviEvent');
     $result = Entity::get(FALSE)
       ->execute()

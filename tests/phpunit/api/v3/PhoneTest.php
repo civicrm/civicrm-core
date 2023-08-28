@@ -111,7 +111,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
   /**
    * Test civicrm_phone_get with wrong params.
    */
-  public function testGetWrongParams() {
+  public function testGetWrongParams(): void {
     $this->callAPIFailure('Phone', 'Get', ['contact_id' => 'abc']);
     $this->callAPIFailure('Phone', 'Get', ['location_type_id' => 'abc']);
     $this->callAPIFailure('Phone', 'Get', ['phone_type_id' => 'abc']);

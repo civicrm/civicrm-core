@@ -31,7 +31,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
   /**
    * Test creating location block.
    */
-  public function testCreateLocBlock() {
+  public function testCreateLocBlock(): void {
     $email = $this->callAPISuccess('email', 'create', [
       'contact_id' => 'null',
       'email' => 'test@loc.block',
@@ -61,7 +61,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
   /**
    * Test creating location block entities.
    */
-  public function testCreateLocBlockEntities() {
+  public function testCreateLocBlockEntities(): void {
     $params = [
       'email' => [
         'location_type_id' => 1,

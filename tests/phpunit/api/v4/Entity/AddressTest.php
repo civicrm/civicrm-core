@@ -40,7 +40,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
   /**
    * Check that 2 addresses for the same contact can't both be primary
    */
-  public function testPrimary() {
+  public function testPrimary(): void {
     $cid = Contact::create(FALSE)->addValue('first_name', uniqid())->execute()->single()['id'];
 
     $a1 = Address::create(FALSE)
@@ -66,7 +66,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($addresses[1]['is_primary']);
   }
 
-  public function testSearchProximity() {
+  public function testSearchProximity(): void {
     $cid = $this->createTestRecord('Contact')['id'];
     $sampleData = [
       ['geo_code_1' => 20, 'geo_code_2' => 20],
@@ -91,7 +91,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains($addreses[3], $result);
   }
 
-  public function testMasterAddressJoin() {
+  public function testMasterAddressJoin(): void {
     $contact = $this->createTestRecord('Contact');
     $master = $this->createTestRecord('Address', [
       'contact_id' => $contact['id'],

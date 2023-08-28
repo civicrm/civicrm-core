@@ -111,7 +111,7 @@ DELETE FROM civicrm_contact_type
    * Methods create relationshipType with valid data.
    * success expected
    */
-  public function testRelationshipTypeAddIndiviParent() {
+  public function testRelationshipTypeAddIndiviParent(): void {
     //check Individual to Parent RelationshipType
     $params = [
       'name_a_b' => 'indivToparent',
@@ -128,7 +128,7 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($result->id);
   }
 
-  public function testRelationshipTypeAddSponcorIndivi() {
+  public function testRelationshipTypeAddSponcorIndivi(): void {
     //check Sponcor to Individual RelationshipType
     $params = [
       'name_a_b' => 'SponsorToIndiv',
@@ -145,7 +145,7 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($result->id);
   }
 
-  public function testRelationshipTypeAddStudentSponcor() {
+  public function testRelationshipTypeAddStudentSponcor(): void {
     //check Student to Sponcer RelationshipType
     $params = [
       'name_a_b' => 'StudentToSponser',
@@ -164,7 +164,7 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($result->id);
   }
 
-  public function testGetAnyToAnyRelTypes() {
+  public function testGetAnyToAnyRelTypes(): void {
     // Create an any to any relationship.
     $relTypeParams = [
       'name_a_b' => 'MookieIs',

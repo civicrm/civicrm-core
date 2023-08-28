@@ -38,14 +38,14 @@ class api_v3_MappingFieldTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testCreateMappingField() {
+  public function testCreateMappingField(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
-  public function testGetMappingField() {
+  public function testGetMappingField(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPISuccess($this->_entity, 'get', $this->params);
     $this->assertEquals(1, $result['count']);
@@ -53,7 +53,7 @@ class api_v3_MappingFieldTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
   }
 
-  public function testDeleteMappingField() {
+  public function testDeleteMappingField(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = ['id' => $result['id']];
     $result = $this->callAPISuccess($this->_entity, 'delete', $deleteParams);
@@ -61,7 +61,7 @@ class api_v3_MappingFieldTest extends CiviUnitTestCase {
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
-  public function testDeleteMappingFieldInvalid() {
+  public function testDeleteMappingFieldInvalid(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = ['id' => 600];
     $result = $this->callAPIFailure($this->_entity, 'delete', $deleteParams);

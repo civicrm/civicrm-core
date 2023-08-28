@@ -27,7 +27,7 @@ use Civi\Api4\MockArrayEntity;
  */
 class GetFromArrayTest extends Api4TestBase {
 
-  public function testArrayGetWithLimit() {
+  public function testArrayGetWithLimit(): void {
     $result = MockArrayEntity::get()
       ->setOffset(2)
       ->setLimit(2)
@@ -40,7 +40,7 @@ class GetFromArrayTest extends Api4TestBase {
     $this->assertCount(5, $result);
   }
 
-  public function testArrayGetWithSort() {
+  public function testArrayGetWithSort(): void {
     $result = MockArrayEntity::get()
       ->addOrderBy('field1', 'DESC')
       ->execute();
@@ -59,7 +59,7 @@ class GetFromArrayTest extends Api4TestBase {
     $this->assertEquals([3, 1, 2, 5, 4], array_column((array) $result, 'field1'));
   }
 
-  public function testArrayGetWithSelect() {
+  public function testArrayGetWithSelect(): void {
     $result = MockArrayEntity::get()
       ->addSelect('field1')
       ->addSelect('f*3')
@@ -85,7 +85,7 @@ class GetFromArrayTest extends Api4TestBase {
     ], (array) $result);
   }
 
-  public function testArrayGetWithWhere() {
+  public function testArrayGetWithWhere(): void {
     $result = MockArrayEntity::get()
       ->addWhere('field2', '=', 'yack')
       ->execute();
@@ -168,7 +168,7 @@ class GetFromArrayTest extends Api4TestBase {
     $this->assertEquals([1, 2, 5], array_column((array) $result, 'field1'));
   }
 
-  public function testArrayGetWithNestedWhereClauses() {
+  public function testArrayGetWithNestedWhereClauses(): void {
     $result = MockArrayEntity::get()
       ->addClause('OR', ['field2', 'LIKE', '%ra'], ['field2', 'LIKE', 'x ray'])
       ->execute();

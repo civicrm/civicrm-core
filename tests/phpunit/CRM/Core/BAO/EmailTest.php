@@ -21,7 +21,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $contactId = $this->individualCreate();
     $params = [
       'email' => 'jane.doe@example.com',
@@ -59,7 +59,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testHoldEmail() {
+  public function testHoldEmail(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -154,7 +154,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testAllEmails() {
+  public function testAllEmails(): void {
     $contactParams = [
       'first_name' => 'Alan',
       'last_name' => 'Smith',
@@ -182,7 +182,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetFromEmail() {
+  public function testGetFromEmail(): void {
     $this->createLoggedInUser();
     $fromEmails = CRM_Core_BAO_Email::getFromEmail();
     $emails = array_values($fromEmails);

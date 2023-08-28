@@ -456,7 +456,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    *
    * Test all pseudoConstant, stateProvince, country.
    */
-  public function testResolveDefaults() {
+  public function testResolveDefaults(): void {
     $params = [];
 
     $params['address'][1] = [
@@ -1033,7 +1033,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test case for getContactDetails( ).
    */
-  public function testGetContactDetails() {
+  public function testGetContactDetails(): void {
     //get the contact params
     $params = $this->contactParams();
 
@@ -1147,7 +1147,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test case for displayName( ).
    */
-  public function testDisplayName() {
+  public function testDisplayName(): void {
     //get the contact params
     $params = $this->contactParams();
 
@@ -1174,7 +1174,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Test case for getDisplayAndImage( ).
    */
-  public function testGetDisplayAndImage() {
+  public function testGetDisplayAndImage(): void {
     //get the contact params
     $params = $this->contactParams();
 
@@ -1347,7 +1347,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   /**
    * Ensure that civicrm_contact.modified_date is updated when manipulating an email.
    */
-  public function testTimestampsPhone() {
+  public function testTimestampsPhone(): void {
     $test = $this;
     $this->_testTimestamps([
       'INSERT' => function ($contactId) use ($test) {

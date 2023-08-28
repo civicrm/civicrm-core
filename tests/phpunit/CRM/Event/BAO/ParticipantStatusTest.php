@@ -20,7 +20,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   /**
    *  create() and deleteParticipantStatusType() method
    */
-  public function testCreateAndDelete() {
+  public function testCreateAndDelete(): void {
 
     // create using required params
     $params = [
@@ -47,7 +47,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   /**
    *  add() method (add and edit modes of participant status type)
    */
-  public function testAddStatusType() {
+  public function testAddStatusType(): void {
 
     $params = [
       'name' => 'testStatus',
@@ -86,7 +86,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   /**
    * Retrieve() method of participant status type
    */
-  public function testRetrieveStatusType() {
+  public function testRetrieveStatusType(): void {
 
     $params = [
       'name' => 'testStatus',

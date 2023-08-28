@@ -133,7 +133,7 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
   /**
    * Make sure pageRun hook is only invoked once.
    */
-  public function testPagesCallPageRunOnce() {
+  public function testPagesCallPageRunOnce(): void {
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pageRun', [$this, 'onPageRun']);
     $_REQUEST = ['action' => 'browse'];
     foreach ($this->basicPages as $pageName) {

@@ -27,7 +27,7 @@ use api\v4\Api4TestBase;
  */
 class RouteTest extends Api4TestBase {
 
-  public function testGet() {
+  public function testGet(): void {
     $result = Route::get()->addWhere('path', '=', 'civicrm/admin')->execute();
     $this->assertEquals(1, $result->count());
 

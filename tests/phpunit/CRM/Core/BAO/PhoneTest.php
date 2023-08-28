@@ -18,7 +18,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
   /**
    * Add() method (create and update modes)
    */
-  public function testAdd() {
+  public function testAdd(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -59,7 +59,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
   /**
    * AllPhones() method - get all Phones for our contact, with primary Phone first.
    */
-  public function testAllPhones() {
+  public function testAllPhones(): void {
     $contactParams = [
       'first_name' => 'Alan',
       'last_name' => 'Smith',

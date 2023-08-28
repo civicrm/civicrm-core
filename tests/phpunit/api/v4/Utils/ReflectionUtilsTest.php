@@ -31,7 +31,7 @@ class ReflectionUtilsTest extends Api4TestBase {
   /**
    * Test that class annotations are returned across @inheritDoc
    */
-  public function testGetDocBlockForClass() {
+  public function testGetDocBlockForClass(): void {
     $grandChild = new MockV4ReflectionGrandchild();
     $reflection = new \ReflectionClass($grandChild);
     $doc = ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => "Test"]);
@@ -51,7 +51,7 @@ This is the base class.';
   /**
    * Test that property annotations are returned across @inheritDoc
    */
-  public function testGetDocBlockForProperty() {
+  public function testGetDocBlockForProperty(): void {
     $grandChild = new MockV4ReflectionGrandchild();
     $reflection = new \ReflectionClass($grandChild);
     $doc = ReflectionUtils::getCodeDocs($reflection->getProperty('foo'), 'Property');
@@ -109,7 +109,7 @@ This is the base class.';
     $this->assertEquals($expected, ReflectionUtils::parseDocBlock($input));
   }
 
-  public function testIsMethodDeprecated() {
+  public function testIsMethodDeprecated(): void {
     $mockClass = 'api\v4\Mock\MockV4ReflectionGrandchild';
     $this->assertTrue(ReflectionUtils::isMethodDeprecated($mockClass, 'deprecatedFn'));
     $this->assertFalse(ReflectionUtils::isMethodDeprecated($mockClass, 'nonDeprecatedFn'));

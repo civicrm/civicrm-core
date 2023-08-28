@@ -29,7 +29,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testGetDeletedContacts() {
+  public function testGetDeletedContacts(): void {
     $last_name = uniqid('deleteContactTest');
 
     $bob = Contact::create()
@@ -59,7 +59,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains($del['id'], $contacts->column('id'));
   }
 
-  public function testGetWithLimit() {
+  public function testGetWithLimit(): void {
     $last_name = uniqid('getWithLimitTest');
 
     $bob = Contact::create()
@@ -137,7 +137,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     }
   }
 
-  public function testEmptyAndNullOperators() {
+  public function testEmptyAndNullOperators(): void {
     $last_name = uniqid(__FUNCTION__);
 
     $bob = Contact::create()
@@ -199,7 +199,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayHasKey($jan['id'], (array) $result);
   }
 
-  public function testRegexpOperators() {
+  public function testRegexpOperators(): void {
     $last_name = uniqid(__FUNCTION__);
 
     $alice = Contact::create()
@@ -230,7 +230,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayHasKey($jane['id'], (array) $result);
   }
 
-  public function testGetRelatedWithSubType() {
+  public function testGetRelatedWithSubType(): void {
     $org = Contact::create(FALSE)
       ->addValue('contact_type', 'Organization')
       ->addValue('organization_name', 'Run Amok')
@@ -294,7 +294,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['Student'], $result['Contact_RelationshipCache_Contact_01.contact_sub_type:label']);
   }
 
-  public function testGetWithWhereExpression() {
+  public function testGetWithWhereExpression(): void {
     $last_name = uniqid(__FUNCTION__);
 
     $alice = Contact::create()
@@ -354,7 +354,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
   /**
    *
    */
-  public function testGetWithCount() {
+  public function testGetWithCount(): void {
     $myName = uniqid('count');
     for ($i = 1; $i <= 20; ++$i) {
       $this->createTestRecord('Contact', [
@@ -375,7 +375,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
   }
 
-  public function testGetWithPrimaryEmailPhoneIMAddress() {
+  public function testGetWithPrimaryEmailPhoneIMAddress(): void {
     $lastName = uniqid(__FUNCTION__);
     $email = uniqid() . '@example.com';
     $phone = uniqid('phone');
@@ -408,7 +408,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNull($results[2]['address_primary.city']);
   }
 
-  public function testBasicContactACLs() {
+  public function testBasicContactACLs(): void {
     $this->createLoggedInUser();
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access CiviCRM',

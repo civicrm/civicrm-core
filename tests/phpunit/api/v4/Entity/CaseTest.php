@@ -34,7 +34,7 @@ class CaseTest extends Api4TestBase {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
-  public function testCreateUsingLoggedInUser() {
+  public function testCreateUsingLoggedInUser(): void {
     $uid = $this->createLoggedInUser();
 
     $contactID = $this->createTestRecord('Contact')['id'];
@@ -53,7 +53,7 @@ class CaseTest extends Api4TestBase {
     $this->assertEquals($contactID, $relationships[0]['contact_id_a']);
   }
 
-  public function testCgExtendsObjects() {
+  public function testCgExtendsObjects(): void {
     $this->createTestRecord('CaseType', [
       'title' => 'Test Case Type',
       'name' => 'test_case_type1',

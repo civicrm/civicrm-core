@@ -23,7 +23,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   /**
    * Check method add()
    */
-  public function testAdd() {
+  public function testAdd(): void {
     list($financialAccount, $financialType, $financialAccountType) = $this->createFinancialAccount(
       'Revenue',
       'Income Account is'
@@ -41,7 +41,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   /**
    * Check method retrieve()
    */
-  public function testRetrieve() {
+  public function testRetrieve(): void {
     list($financialAccount, $financialType, $financialAccountType) = $this->createFinancialAccount(
       'Asset',
       'Asset Account is'
@@ -63,7 +63,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   /**
    * Check method getInstrumentFinancialAccount()
    */
-  public function testGetInstrumentFinancialAccount() {
+  public function testGetInstrumentFinancialAccount(): void {
     $paymentInstrumentValue = 1;
     list($financialAccount, $financialType, $financialAccountType) = $this->createFinancialAccount(
       'Asset'
@@ -90,7 +90,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   /**
    * Test validate account relationship with financial account type.
    */
-  public function testValidateRelationship() {
+  public function testValidateRelationship(): void {
     $params = ['labelColumn' => 'name'];
     $financialAccount = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
     $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);

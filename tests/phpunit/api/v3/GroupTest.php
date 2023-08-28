@@ -179,7 +179,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
    * Test Group create with Group Type and Parent
    * FIXME: Api4
    */
-  public function testGroupCreateWithTypeAndParent() {
+  public function testGroupCreateWithTypeAndParent(): void {
     $params = [
       'name' => 'Test Group type',
       'title' => 'Test Group Type',
@@ -313,7 +313,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->assertEquals('is_active', $result['values']['is_active']['name']);
   }
 
-  public function testIllegalParentsParams() {
+  public function testIllegalParentsParams(): void {
     $params = [
       'title' => 'Test illegal Group',
       'domain_id' => 1,

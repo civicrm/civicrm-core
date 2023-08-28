@@ -25,7 +25,7 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
   /**
    * Return widget Javascript.
    */
-  public function testWidget() {
+  public function testWidget(): void {
     if (CIVICRM_UF !== 'Drupal8') {
       $endpoints['traditional'] = CRM_Core_Resources::singleton()->getUrl('civicrm', 'extern/widget.php');
     }

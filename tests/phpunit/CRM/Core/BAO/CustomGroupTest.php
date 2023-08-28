@@ -30,7 +30,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test getTree().
    */
-  public function testGetTree() {
+  public function testGetTree(): void {
     $customGroup = $this->CustomGroupCreate();
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $result = CRM_Core_BAO_CustomGroup::getTree('Individual', NULL, $customGroup['id']);
@@ -43,7 +43,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * Note that the function seems to support a range of formats so 3 are tested. Yay for
    * inconsistency.
    */
-  public function testGetTreeContactSubType() {
+  public function testGetTreeContactSubType(): void {
     $contactType = $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization']);
     $customGroup = $this->CustomGroupCreate(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank']]);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
@@ -67,7 +67,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test calling getTree for a custom field extending a renamed contact type.
    */
-  public function testGetTreeContactSubTypeForNameChangedContactType() {
+  public function testGetTreeContactSubTypeForNameChangedContactType(): void {
     $contactType = $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization']);
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact_type SET label = "boo" WHERE name = "Organization"');
     $customGroup = $this->CustomGroupCreate(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank']]);
@@ -81,7 +81,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test calling getTree for a custom field extending a disabled contact type.
    */
-  public function testGetTreeContactSubTypeForDisabledChangedContactType() {
+  public function testGetTreeContactSubTypeForDisabledChangedContactType(): void {
     $contactType = $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization']);
     $customGroup = $this->CustomGroupCreate(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank']]);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
@@ -95,7 +95,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test calling GetTree for a custom field extending multiple subTypes.
    */
-  public function testGetTreetContactSubTypeForMultipleSubTypes() {
+  public function testGetTreetContactSubTypeForMultipleSubTypes(): void {
     $contactType1 = $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization']);
     $contactType2 = $this->callAPISuccess('ContactType', 'create', ['name' => 'Small Bank', 'label' => 'smallee', 'parent_id' => 'Organization']);
     $customGroup = $this->CustomGroupCreate(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank', 'Small_Bank']]);
@@ -110,7 +110,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test calling GetTree for a custom field that extends a non numerical Event Type.
    */
-  public function testGetTreeEventSubTypeAlphabetical() {
+  public function testGetTreeEventSubTypeAlphabetical(): void {
     $eventType = $this->callAPISuccess('OptionValue', 'Create', ['option_group_id' => 'event_type', 'value' => 'meeting', 'label' => 'Meeting']);
     $customGroup = $this->CustomGroupCreate(['extends' => 'Event', 'extends_entity_column_value' => ['Meeting']]);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
@@ -126,7 +126,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * Note that the function seems to support a range of formats so 3 are tested. Yay for
    * inconsistency.
    */
-  public function testGetTreeCampaignSubType() {
+  public function testGetTreeCampaignSubType(): void {
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;
     $this->campaignCreate();
     $this->campaignCreate();
@@ -143,7 +143,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test calling getTree with contact subtype data.
    */
-  public function testGetTreeActivitySubType() {
+  public function testGetTreeActivitySubType(): void {
     $customGroup = $this->CustomGroupCreate(['extends' => 'Activity', 'extends_entity_column_value' => 1]);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $result = CRM_Core_BAO_CustomGroup::getTree('Activity', NULL, NULL, NULL, 1);
@@ -162,7 +162,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test retrieve() with Inalid Params
    */
-  public function testRetrieveInvalidParams() {
+  public function testRetrieveInvalidParams(): void {
     $params = ['id' => 99];
     $customGroup = CRM_Core_BAO_CustomGroup::retrieve($params, $dafaults);
     $this->assertNull($customGroup, 'Check that no custom Group is retreived');
@@ -171,7 +171,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test retrieve()
    */
-  public function testRetrieve() {
+  public function testRetrieve(): void {
     $customGroupTitle = 'Custom Group';
     $groupParams = [
       'title' => $customGroupTitle,
@@ -193,7 +193,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test getGroupDetail() with Empty Params
    */
-  public function testGetGroupDetailEmptyParams() {
+  public function testGetGroupDetailEmptyParams(): void {
     $customGroupId = [];
     $customGroup = CRM_Core_BAO_CustomGroup::getGroupDetail($customGroupId);
     $this->assertTrue(empty($customGroup), 'Check that no custom Group  details is retreived');
@@ -202,7 +202,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test getGroupDetail with Invalid Params.
    */
-  public function testGetGroupDetailInvalidParams() {
+  public function testGetGroupDetailInvalidParams(): void {
     $customGroupId = 99;
     $customGroup = CRM_Core_BAO_CustomGroup::getGroupDetail($customGroupId);
     $this->assertTrue(empty($customGroup), 'Check that no custom Group  details is retreived');
@@ -211,7 +211,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test getGroupDetail().
    */
-  public function testGetGroupDetail() {
+  public function testGetGroupDetail(): void {
     $customGroupTitle = 'My Custom Group';
     $groupParams = [
       'title' => $customGroupTitle,
@@ -262,7 +262,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test getTitle() with Invalid Params()
    */
-  public function testGetTitleWithInvalidParams() {
+  public function testGetTitleWithInvalidParams(): void {
     $params = 99;
     $customGroupTitle = CRM_Core_BAO_CustomGroup::getTitle($params);
 
@@ -272,7 +272,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test getTitle()
    */
-  public function testGetTitle() {
+  public function testGetTitle(): void {
     $customGroupTitle = 'Custom Group';
     $groupParams = [
       'title' => $customGroupTitle,
@@ -297,7 +297,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test deleteGroup.
    */
-  public function testDeleteGroup() {
+  public function testDeleteGroup(): void {
     $customGroupTitle = 'My Custom Group';
     $groupParams = [
       'title' => $customGroupTitle,
@@ -362,7 +362,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCheckCustomField() {
+  public function testCheckCustomField(): void {
     $groupParams = [
       'title' => 'My Custom Group',
       'name' => 'my_custom_group',
@@ -425,7 +425,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertEquals(empty($activeGroups), TRUE, 'Check that Emprt params are retreived');
   }
 
-  public function testGetActiveGroups() {
+  public function testGetActiveGroups(): void {
     $contactId = $this->individualCreate();
     $customGroupTitle = 'Custom Group';
     $groupParams = [
@@ -514,7 +514,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test isGroupEmpty()
    */
-  public function testIsGroupEmpty() {
+  public function testIsGroupEmpty(): void {
     $customGroupTitle = 'Test Custom Group';
     $groupParams = [
       'title' => $customGroupTitle,
@@ -536,7 +536,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test getGroupTitles() with Invalid Params()
    */
-  public function testGetGroupTitlesWithInvalidParams() {
+  public function testGetGroupTitlesWithInvalidParams(): void {
     $params = [99];
     $groupTitles = CRM_Core_BAO_CustomGroup::getGroupTitles($params);
     $this->assertTrue(empty($groupTitles), 'Check that no titles are received');
@@ -545,7 +545,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test getGroupTitles()
    */
-  public function testGetGroupTitles() {
+  public function testGetGroupTitles(): void {
     $groupParams = [
       'title' => 'Test Group',
       'name' => 'test_custom_group',
@@ -581,7 +581,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test that passed dates are extracted from the url when processing custom data.
    */
-  public function testExtractGetParamsReturnsDates() {
+  public function testExtractGetParamsReturnsDates(): void {
     // Create a custom group to contain the custom field.
     $groupParams = [
       'title' => 'My Custom Group',
@@ -657,7 +657,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertEquals($expectedName, $group->name);
   }
 
-  public function testCustomGroupExtends() {
+  public function testCustomGroupExtends(): void {
     $extends = \CRM_Core_SelectValues::customGroupExtends();
     $this->assertArrayHasKey('Contribution', $extends);
     $this->assertArrayHasKey('Case', $extends);
@@ -671,7 +671,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('ParticipantEventType', $extends);
   }
 
-  public function testMapTableName() {
+  public function testMapTableName(): void {
     $this->assertEquals('civicrm_case', CRM_Core_BAO_CustomGroup::mapTableName('Case'));
     $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Contact'));
     $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Individual'));

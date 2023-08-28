@@ -34,13 +34,13 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  public function testCreateParticipantStatusType() {
+  public function testCreateParticipantStatusType(): void {
     $result = $this->callAPISuccess('participant_status_type', 'create', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
-  public function testGetParticipantStatusType() {
+  public function testGetParticipantStatusType(): void {
     $result = $this->callAPISuccess('participant_status_type', 'create', $this->params);
     $this->assertEquals(1, $result['count']);
 
@@ -50,7 +50,7 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
     $this->id = $result['id'];
   }
 
-  public function testDeleteParticipantStatusType() {
+  public function testDeleteParticipantStatusType(): void {
 
     $ParticipantStatusType = $this->callAPISuccess('ParticipantStatusType', 'Create', $this->params);
     $entity = $this->callAPISuccess('participant_status_type', 'get', []);

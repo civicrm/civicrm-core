@@ -62,7 +62,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
    * because it was also being used as a limit for backend processes. So we
    * test 4, which is bigger than 3 (unless running on a 2-bit CPU).
    */
-  public function testFetchActivitiesWithManyAttachments() {
+  public function testFetchActivitiesWithManyAttachments(): void {
     $mail = 'test_message_many_attachments.eml';
 
     // paranoid check that settings are the standard defaults
@@ -151,7 +151,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
   /**
    * test hook_civicrm_emailProcessor
    */
-  public function testHookEmailProcessor() {
+  public function testHookEmailProcessor(): void {
     $this->hookClass->setHook('civicrm_emailProcessor', [$this, 'hookImplForEmailProcessor']);
 
     copy(__DIR__ . '/data/inbound/test_hook.eml', __DIR__ . '/data/mail/test_hook.eml');
@@ -220,7 +220,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
   /**
    * test hook_civicrm_emailProcessorContact with catchall
    */
-  public function testHookEmailProcessorContactCatchall() {
+  public function testHookEmailProcessorContactCatchall(): void {
     $this->hookClass->setHook('civicrm_emailProcessorContact', [$this, 'hookImplForEmailProcessorContact']);
 
     // org with same domain as data fixture's email
@@ -239,7 +239,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
   /**
    * test hook_civicrm_emailProcessorContact with catchall but matching individual
    */
-  public function testHookEmailProcessorContactCatchallWithMatch() {
+  public function testHookEmailProcessorContactCatchallWithMatch(): void {
     $this->hookClass->setHook('civicrm_emailProcessorContact', [$this, 'hookImplForEmailProcessorContact']);
 
     // org with same domain as data fixture's email
@@ -265,7 +265,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
    * here the presence of the matching individual is irrelevant - it will always
    * file on the org.
    */
-  public function testHookEmailProcessorContactAlwaysWithMatch() {
+  public function testHookEmailProcessorContactAlwaysWithMatch(): void {
     $this->hookClass->setHook('civicrm_emailProcessorContact', [$this, 'hookImplForEmailProcessorContact']);
 
     // org with same domain as data fixture's email

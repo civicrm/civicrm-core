@@ -228,7 +228,7 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
    * Checks that, if the payment processor doesn't declare a field
    * as needed, the field shouldn't be considered mandatory.
    */
-  public function testPaymentProcessorWithCustomRequirements() {
+  public function testPaymentProcessorWithCustomRequirements(): void {
     $canBeHiddenWithTheCustomProfile = $this->checkPaymentProcessorWithProfile(
       "PaymentProcessorWithCustomBillingRequirements",
       "custom"

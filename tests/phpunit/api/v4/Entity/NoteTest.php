@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  */
 class NoteTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testDeleteWithChildren() {
+  public function testDeleteWithChildren(): void {
     $c1 = $this->createTestRecord('Contact');
 
     $text = uniqid(__FUNCTION__, TRUE);
@@ -75,7 +75,7 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $existing);
   }
 
-  public function testJoinNotesFromContact() {
+  public function testJoinNotesFromContact(): void {
     $userId = $this->createLoggedInUser();
     $c1 = $this->createTestRecord('Contact');
     $c2 = $this->createTestRecord('Contact');

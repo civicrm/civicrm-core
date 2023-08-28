@@ -571,7 +571,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCaseDetailsCaseTypeHeader() {
+  public function testCaseDetailsCaseTypeHeader(): void {
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'case/detail',
       'fields' => ['subject' => 1, 'client_sort_name' => 1],
@@ -590,7 +590,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionDetailSoftCredits() {
+  public function testContributionDetailSoftCredits(): void {
     $contactID = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
@@ -612,7 +612,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionDetailSoftCreditsOnly() {
+  public function testContributionDetailSoftCreditsOnly(): void {
     $contactID = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
@@ -704,7 +704,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryWithTwoGroups() {
+  public function testContributionSummaryWithTwoGroups(): void {
     $groupID = $this->setUpPopulatedGroup();
     $groupID2 = $this->setUpPopulatedSmartGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
@@ -721,7 +721,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryGroupByContributionStatus() {
+  public function testContributionSummaryGroupByContributionStatus(): void {
     $params = [
       'report_id' => 'contribute/summary',
       'fields' => ['total_amount' => 1, 'country_id' => 1],
@@ -739,7 +739,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryGroupByYearFrequency() {
+  public function testContributionSummaryGroupByYearFrequency(): void {
     $params = [
       'report_id' => 'contribute/summary',
       'fields' => ['total_amount' => 1, 'country_id' => 1],

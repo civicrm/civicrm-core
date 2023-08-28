@@ -84,7 +84,7 @@ DELETE FROM civicrm_contact_type
    *
    * Success expected
    */
-  public function testCreateContact() {
+  public function testCreateContact(): void {
     //check for Type:Individual
     $params = [
       'first_name' => 'Anne',
@@ -167,7 +167,7 @@ DELETE FROM civicrm_contact_type
    *
    * Success expected.
    */
-  public function testUpdateContactNoSubtypeToValid() {
+  public function testUpdateContactNoSubtypeToValid(): void {
     $params = [
       'first_name' => 'Anne',
       'last_name' => 'Grant',
@@ -223,7 +223,7 @@ DELETE FROM civicrm_contact_type
    * Update the contact with subtype to another valid subtype.
    * success expected
    */
-  public function testUpdateContactSubtype() {
+  public function testUpdateContactSubtype(): void {
     $params = [
       'first_name' => 'Anne',
       'last_name' => 'Grant',
@@ -313,7 +313,7 @@ DELETE FROM civicrm_contact_type
    *
    * Success expected
    */
-  public function testCRM19133() {
+  public function testCRM19133(): void {
     $subtypesToPreserve = [$this->student, $this->parent];
 
     // Create custom group that extends student and parent subtype
