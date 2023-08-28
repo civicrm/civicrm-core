@@ -253,7 +253,7 @@ WHERE  inst.report_id = %1";
           // Remove HTML, unencode entities, and escape quotation marks.
           $value = str_replace('"', '""', html_entity_decode(strip_tags($value), ENT_QUOTES | ENT_HTML401));
 
-          if (CRM_Utils_Array::value('type', $form->_columnHeaders[$v]) & 4) {
+          if (($form->_columnHeaders[$v]['type'] ?? 0) & 4) {
             if (($form->_columnHeaders[$v]['group_by'] ?? NULL) == 'MONTH' ||
               ($form->_columnHeaders[$v]['group_by'] ?? NULL) == 'QUARTER'
             ) {

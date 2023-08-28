@@ -1378,9 +1378,7 @@ WHERE civicrm_event.is_active = 1
             while ($grp->fetch()) {
               $grpTitles[] = $grp->title;
             }
-            if (!empty($grpTitles) &&
-              CRM_Utils_Array::value('title', CRM_Utils_Array::value('group', $fields))
-            ) {
+            if (!empty($grpTitles) && !empty($fields['group']['title'])) {
               $values[$fields['group']['title']] = implode(', ', $grpTitles);
             }
             unset($fields['group']);

@@ -236,7 +236,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('operatorType', $field) & CRM_Report_Form::OP_DATE
+          if (($field['operatorType'] ?? 0) & CRM_Report_Form::OP_DATE
           ) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;

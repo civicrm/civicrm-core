@@ -1026,7 +1026,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           if (isset($field['default'])) {
-            if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
+            if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE
             ) {
               if (is_array($field['default'])) {
                 $this->_defaults["{$fieldName}_from"] = $field['default']['from'] ?? NULL;
@@ -6066,7 +6066,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *   Relevant where clause.
    */
   protected function generateFilterClause($field, $fieldName) {
-    if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+    if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
       if (($field['operatorType'] ?? NULL) ==
         CRM_Report_Form::OP_MONTH
       ) {

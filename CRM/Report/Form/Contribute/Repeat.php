@@ -395,7 +395,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
 
     foreach ($this->_columns['civicrm_contribution']['filters'] as $fieldName => $field) {
       $clause = NULL;
-      if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+      if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
         $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
         $from = $this->_params["{$fieldName}_from"] ?? NULL;
         $to = $this->_params["{$fieldName}_to"] ?? NULL;
