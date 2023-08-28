@@ -917,12 +917,12 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
         $jsSet = TRUE;
 
-        if (CRM_Utils_Array::value($i, CRM_Utils_Array::value($x, $mappingOperator))) {
-          $defaults["operator[$x][$i]"] = $mappingOperator[$x][$i] ?? NULL;
+        if (!empty($mappingOperator[$x][$i])) {
+          $defaults["operator[$x][$i]"] = $mappingOperator[$x][$i];
         }
 
         if (isset($mappingValue[$x][$i])) {
-          $defaults["value[$x][$i]"] = $mappingValue[$x][$i] ?? NULL;
+          $defaults["value[$x][$i]"] = $mappingValue[$x][$i];
         }
       }
     }

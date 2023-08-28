@@ -103,7 +103,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     for ($index = 1; $index <= $maxIndex; $index++) {
       if (array_key_exists('option_amount', $params) &&
         array_key_exists($index, $params['option_amount']) &&
-        (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) || !empty($params['is_quick_config'])) &&
+        (!empty($params['option_label'][$index]) || !empty($params['is_quick_config'])) &&
         !CRM_Utils_System::isNull($params['option_amount'][$index])
       ) {
         $options = [
@@ -128,7 +128,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $options['is_default'] = !empty($defaultArray[$params['membership_type_id'][$index]]) ? $defaultArray[$params['membership_type_id'][$index]] : 0;
         }
 
-        if (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_financial_type_id', $params))) {
+        if (!empty($params['option_financial_type_id'][$index])) {
           $options['financial_type_id'] = $params['option_financial_type_id'][$index];
         }
         elseif (!empty($params['financial_type_id'])) {
