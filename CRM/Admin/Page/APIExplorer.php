@@ -21,29 +21,6 @@
 class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
 
   /**
-   * Return unique paths for checking for examples.
-   * @return array
-   */
-  private static function uniquePaths() {
-    // Ensure that paths with trailing slashes are properly dealt with
-    $paths = explode(PATH_SEPARATOR, get_include_path());
-    foreach ($paths as $id => $rawPath) {
-      $pathParts = explode(DIRECTORY_SEPARATOR, $rawPath);
-      foreach ($pathParts as $partId => $part) {
-        if (empty($part)) {
-          unset($pathParts[$partId]);
-        }
-      }
-      $newRawPath = implode(DIRECTORY_SEPARATOR, $pathParts);
-      if ($newRawPath != $rawPath) {
-        $paths[$id] = DIRECTORY_SEPARATOR . $newRawPath;
-      }
-    }
-    $paths = array_unique($paths);
-    return $paths;
-  }
-
-  /**
    * Run page.
    *
    * @return string
@@ -56,23 +33,6 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
       ->addVars('explorer', ['max_joins' => \Civi\API\Api3SelectQuery::MAX_JOINS]);
 
     $this->assign('operators', CRM_Core_DAO::acceptedSQLOperators());
-
-    // List example directories
-    // use get_include_path to ensure that extensions are captured.
-    $examples = [];
-    $paths = self::uniquePaths();
-    foreach ($paths as $path) {
-      $dir = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples';
-      if (\CRM_Utils_File::isDir($dir)) {
-        foreach (scandir($dir) as $item) {
-          if ($item && strpos($item, '.') === FALSE && array_search($item, $examples) === FALSE) {
-            $examples[] = $item;
-          }
-        }
-      }
-    }
-    sort($examples);
-    $this->assign('examples', $examples);
 
     return parent::run();
   }
