@@ -11,6 +11,7 @@
 {* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller*}
 {* @var blockId Contains the current block id, and assigned in the CRM/Contact/Form/Location.php file *}
 
+{* note this is only called from CRM_Contact_Form_Contact in core so the className if clauses are not needed & should be phased out *}
 {if !$addBlock}
   <tr>
     <td>{ts}Phone{/ts}</td>
