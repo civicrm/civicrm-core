@@ -33,10 +33,15 @@
         <div class="description">{ts}You can also include general email and/or phone contact information in mailings.{/ts} {help id="additional-contact"}</div>
         <table class="form-layout-compressed">
             {* Display the email block *}
-            {include file="CRM/Contact/Form/Edit/Email.tpl" blockId=1}
-
-            {* Display the phone block *}
-            {include file="CRM/Contact/Form/Edit/Phone.tpl" blockId=1}
+          <tr>
+            <td>{ts}Email{/ts}</td>
+            <td>{$form.email.1.email.html|crmAddClass:email}</td>
+          </tr>
+          <tr>
+            <td>{ts}Phone{/ts}</td>
+            <td>{$form.phone.1.phone.html}<span class="crm-phone-ext">{ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.1.phone_ext.html|crmAddClass:four}&nbsp;</span></td>
+            <td colspan="2">{$form.phone.1.phone_type_id.html}</td>
+          </tr>
         </table>
 
     <div class="spacer"></div>
