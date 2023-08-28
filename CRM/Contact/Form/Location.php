@@ -33,8 +33,7 @@ class CRM_Contact_Form_Location {
       $form->set($form->_addBlockName . '_Block_Count', $additionalblockCount);
     }
 
-    if (is_a($form, 'CRM_Event_Form_ManageEvent_Location')
-    || is_a($form, 'CRM_Contact_Form_Domain')) {
+    if (is_a($form, 'CRM_Event_Form_ManageEvent_Location')) {
       $form->_blocks = [
         'Address' => ts('Address'),
         'Email' => ts('Email'),
