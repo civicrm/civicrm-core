@@ -118,8 +118,6 @@ if (file_exists(findStandaloneSettings())) {
   invoke();
 }
 else {
-  $coreUrl = '/assets/civicrm/core';
-
   \Civi\Setup::assertProtocolCompatibility(1.0);
 
   \Civi\Setup::init([
@@ -127,8 +125,10 @@ else {
     'cms'     => 'Standalone',
     'srcPath' => $civiCorePath,
   ]);
-  $ctrl = \Civi\Setup::instance()->createController()->getCtrl();
 
+  $coreUrl = \Civi\Setup::instance()->getModel()->mandatorySettings['userFrameworkResourceURL'];
+
+  $ctrl = \Civi\Setup::instance()->createController()->getCtrl();
   $ctrl->setUrls([
     // The URL of this setup controller. May be used for POST-backs
     'ctrl'             => '/civicrm', /* @todo this had url('civicrm') ? */
