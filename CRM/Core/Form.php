@@ -115,34 +115,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_paymentProcessorID;
 
   /**
-   * Is pay later enabled for the form.
-   *
-   * As part of trying to consolidate various payment pages we store processors here & have functions
-   * at this level to manage them. An alternative would be to have a separate Form that is inherited
-   * by all forms that allow payment processing.
-   *
-   * @var int
-   */
-  protected $_is_pay_later_enabled;
-
-  /**
    * The renderer used for this form
    *
    * @var object
    */
   protected $_renderer;
-
-  /**
-   * An array to hold a list of datefields on the form
-   * so that they can be converted to ISO in a consistent manner
-   *
-   * @var array
-   *
-   * e.g on a form declare $_dateFields = array(
-   *  'receive_date' => array('default' => 'now'),
-   *  );
-   */
-  protected $_dateFields = [];
 
   /**
    * Cache the smarty template for efficiency reasons
@@ -2467,7 +2444,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return int
    * @throws \CRM_Core_Exception
    */
-  public function  getRequestedContactID(): ?int {
+  public function getRequestedContactID(): ?int {
     if (isset($this->_params) && !empty($this->_params['select_contact_id'])) {
       return (int) $this->_params['select_contact_id'];
     }
