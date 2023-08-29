@@ -375,20 +375,28 @@ class CoreUtil {
    */
   public static function getSqlFunctions(): array {
     $fns = [];
-    foreach (glob(\Civi::paths()->getPath('[civicrm.root]/Civi/Api4/Query/SqlFunction*.php')) as $file) {
-      $matches = [];
-      if (preg_match('/(SqlFunction[A-Z_]+)\.php$/', $file, $matches)) {
-        $className = '\Civi\Api4\Query\\' . $matches[1];
-        if (is_subclass_of($className, '\Civi\Api4\Query\SqlFunction')) {
-          $fns[] = [
-            'name' => $className::getName(),
-            'title' => $className::getTitle(),
-            'description' => $className::getDescription(),
-            'params' => $className::getParams(),
-            'category' => $className::getCategory(),
-            'dataType' => $className::getDataType(),
-            'options' => CoreUtil::formatOptionList($className::getOptions(), ['id', 'name', 'label']),
-          ];
+    $path = 'Civi/Api4/Query/SqlFunction*.php';
+    // Search CiviCRM core + all active extensions
+    $directories = [\Civi::paths()->getPath("[civicrm.root]/$path")];
+    foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
+      $directories[] = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath'])) . $path;
+    }
+    foreach ($directories as $directory) {
+      foreach (glob($directory) as $file) {
+        $matches = [];
+        if (preg_match('/(SqlFunction[A-Z_]+)\.php$/', $file, $matches)) {
+          $className = '\Civi\Api4\Query\\' . $matches[1];
+          if (is_subclass_of($className, '\Civi\Api4\Query\SqlFunction')) {
+            $fns[] = [
+              'name' => $className::getName(),
+              'title' => $className::getTitle(),
+              'description' => $className::getDescription(),
+              'params' => $className::getParams(),
+              'category' => $className::getCategory(),
+              'dataType' => $className::getDataType(),
+              'options' => CoreUtil::formatOptionList($className::getOptions(), ['id', 'name', 'label']),
+            ];
+          }
         }
       }
     }
