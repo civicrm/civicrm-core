@@ -46,7 +46,7 @@
 {if '{contribution.receipt_date}'}
 {ts}Receipt Date{/ts}: {contribution.receipt_date|crmDate:"shortdate"}
 {/if}
-{if '{contribution.payment_instrument_id}' and empty($formValues.hidden_CreditCard)}
+{if {contribution.payment_instrument_id|boolean}}
 {ts}Paid By{/ts}: {contribution.payment_instrument_id:label}
 {if '{contribution.check_number}'}
 {ts}Check Number{/ts}: {contribution.check_number}
