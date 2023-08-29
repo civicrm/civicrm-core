@@ -181,8 +181,10 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   foreach ($afforms as $afform) {
     $summaryContactType = $afform['summary_contact_type'] ?? [];
     if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
+      // Convention is to name the afform like "afformTabMyInfo" which gets the tab name "my_info"
+      $tabId = CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $afform['name']));
       $tabs[] = [
-        'id' => $afform['name'],
+        'id' => $tabId,
         'title' => $afform['title'],
         'weight' => $weight++,
         'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
