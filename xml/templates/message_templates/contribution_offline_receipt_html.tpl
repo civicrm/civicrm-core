@@ -163,7 +163,7 @@
       </tr>
      {/if}
 
-     {if '{contribution.payment_instrument_id}' and empty($formValues.hidden_CreditCard)}
+     {if {contribution.payment_instrument_id|boolean}}
       <tr>
        <td {$labelStyle}>
         {ts}Paid By{/ts}
