@@ -18,6 +18,7 @@
 
 namespace api\v4\Entity;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Contact;
 use api\v4\Api4TestBase;
 use Civi\Api4\Relationship;
@@ -33,6 +34,8 @@ use DateTime;
  * @group headless
  */
 class RelationshipTest extends Api4TestBase implements TransactionalInterface {
+
+  use \Civi\Test\ACLPermissionTrait;
 
   /**
    * Test relationship cache tracks created relationships.
@@ -149,6 +152,51 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(TRUE, $cacheRecord['is_active']);
     $this->assertEquals($today->format('Y-m-d'), $cacheRecord['start_date']);
     $this->assertEquals($future->format('Y-m-d'), $cacheRecord['end_date']);
+  }
+
+  public function testRelationshipCheckAccess(): void {
+    $cid = $this->saveTestRecords('Contact', ['records' => 4])->column('id');
+    $this->allowedContacts = array_slice($cid, 1);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_aclWhereClause', [$this, 'aclWhereMultipleContacts']);
+    $check = Relationship::checkAccess()
+      ->setAction('create')
+      ->setValues([
+        'contact_id_a' => $cid[0],
+        'contact_id_b' => $cid[1],
+        'relationship_type_id' => 1,
+      ])
+      ->execute()->first();
+    $this->assertFalse($check['access']);
+
+    try {
+      Relationship::create()->setValues([
+        'contact_id_a' => $cid[1],
+        'contact_id_b' => $cid[0],
+        'relationship_type_id' => 1,
+      ])->execute();
+      $this->fail();
+    }
+    catch (UnauthorizedException $e) {
+      Relationship::create(FALSE)->setValues([
+        'contact_id_a' => $cid[1],
+        'contact_id_b' => $cid[0],
+        'relationship_type_id' => 1,
+      ])->execute();
+    }
+    Relationship::create()->setValues([
+      'contact_id_a' => $cid[1],
+      'contact_id_b' => $cid[2],
+      'relationship_type_id' => 1,
+    ])->execute();
+
+    $this->assertCount(2, Relationship::get(FALSE)->addWhere('contact_id_a', '=', $cid[1])->execute());
+    $this->assertCount(1, Relationship::get()->addWhere('contact_id_a', '=', $cid[1])->execute());
+
+    Relationship::delete()
+      ->addWhere('contact_id_a', '=', $cid[1])
+      ->execute()->single();
+
   }
 
 }

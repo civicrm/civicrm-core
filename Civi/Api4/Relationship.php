@@ -30,4 +30,16 @@ class Relationship extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * @return array
+   */
+  public static function permissions(): array {
+    return [
+      'meta' => ['access CiviCRM'],
+      // get managed by CRM_Core_BAO::addSelectWhereClause
+      // create/update/delete managed by CRM_Contact_BAO_Relationship::_checkAccess
+      'default' => [],
+    ];
+  }
+
 }

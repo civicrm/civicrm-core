@@ -9,13 +9,13 @@ use Civi\Api4\OptionValue;
  */
 class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
+  use Civi\Test\ACLPermissionTrait;
+
   private $allowedContactsACL = [];
 
   private $loggedInUserId = NULL;
 
   private $someContacts = [];
-
-  protected $allowedContacts = [];
 
   /**
    * Set up for test.
