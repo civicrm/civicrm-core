@@ -579,18 +579,17 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['hidden_AdditionalDetail'] = 1;
     }
 
-    $paneNames = [];
     if (empty($this->_payNow)) {
-      $paneNames[ts('Additional Details')] = 'AdditionalDetail';
-    }
+      $allPanes = [ts('Additional Details') => $this->generatePane('AdditionalDetail', $defaults)];
+      //Add Premium pane only if Premium is exists.
+      $dao = new CRM_Contribute_DAO_Product();
+      $dao->is_active = 1;
 
-    //Add Premium pane only if Premium is exists.
-    $dao = new CRM_Contribute_DAO_Product();
-    $dao->is_active = 1;
-
-    if ($dao->find(TRUE) && empty($this->_payNow)) {
-      $paneNames[ts('Premium Information')] = 'Premium';
+      if ($dao->find(TRUE)) {
+        $allPanes[ts('Premium Information')] = $this->generatePane('Premium', $defaults);
+      }
     }
+    $this->assign('allPanes', $allPanes ?: []);
 
     $this->payment_instrument_id = $defaults['payment_instrument_id'] ?? $this->getDefaultPaymentInstrumentId();
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->payment_instrument_id);
@@ -614,13 +613,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $this->addPaymentProcessorSelect(FALSE, $buildRecurBlock);
 
-    foreach ($paneNames as $name => $type) {
-      $allPanes[$name] = $this->generatePane($type, $defaults);
-    }
-
     $qfKey = $this->controller->_key;
     $this->assign('qfKey', $qfKey);
-    $this->assign('allPanes', $allPanes);
 
     $this->addFormRule(['CRM_Contribute_Form_Contribution', 'formRule'], $this);
     $this->assign('formType', $this->_formType);
@@ -1380,8 +1374,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * This appears to mean 'there is a pane to show'.
    *
    * @param string $type
-   *   Type of Pane - this is generally used to determine the function name used to build it
-   *   - e.g CreditCard, AdditionalDetail
+   *   Type of Pane - only options are AdditionalDetail or Premium
    * @param array $defaults
    *
    * @return array
@@ -1395,16 +1388,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $urlParams .= "&mode={$this->_mode}";
     }
 
-    $open = 'false';
-    if ($type == 'CreditCard' ||
-      $type == 'DirectDebit'
-    ) {
-      $open = 'true';
-    }
-
     $pane = [
       'url' => CRM_Utils_System::url('civicrm/contact/view/contribution', $urlParams),
-      'open' => $open,
+      'open' => 'false',
       'id' => $type,
     ];
 
@@ -1415,18 +1401,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('showAdditionalInfo', TRUE);
       $pane['open'] = 'true';
     }
-
-    if ($type == 'CreditCard' || $type == 'DirectDebit') {
-      // @todo would be good to align tpl name with form name...
-      // @todo document why this hidden variable is required.
-      $this->add('hidden', 'hidden_' . $type, 1);
-      return $pane;
-    }
-    else {
-      $additionalInfoFormFunction = 'build' . $type;
-      CRM_Contribute_Form_AdditionalInfo::$additionalInfoFormFunction($this);
-      return $pane;
-    }
+    $additionalInfoFormFunction = 'build' . $type;
+    CRM_Contribute_Form_AdditionalInfo::$additionalInfoFormFunction($this);
+    return $pane;
   }
 
   /**

@@ -101,7 +101,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     $params = array_merge($billingParams, [
       'qfKey' => '08ed21c7ca00a1f7d32fff2488596ef7_4454',
-      'hidden_CreditCard' => 1,
       'is_recur' => 1,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
@@ -226,7 +225,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     $params = [
       'qfKey' => '00ed21c7ca00a1f7d555555596ef7_4454',
-      'hidden_CreditCard' => 1,
       'billing_first_name' => $firstName,
       'billing_middle_name' => '',
       'billing_last_name' => $lastName,
