@@ -492,7 +492,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
           $page->run();
         }
       }
-      $this->assign('multiRecordFieldListing', $multiRecordFieldListing);
 
       // is profile double-opt in?
       if (!empty($this->_fields['group']) &&
@@ -521,7 +520,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
       }
     }
-
+    $this->assign('multiRecordFieldListing', $multiRecordFieldListing ?? NULL);
     if (!is_array($this->_fields)) {
       CRM_Core_Session::setStatus(ts('This feature is not currently available.'), ts('Sorry'), 'error');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
