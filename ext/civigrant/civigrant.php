@@ -39,7 +39,7 @@ function civigrant_civicrm_summaryActions(&$menu, $cid) {
     'weight' => 26,
     'ref' => 'new-grant',
     'key' => 'grant',
-    'tab' => 'afsearchGrants',
+    'tab' => 'grant',
     'href' => CRM_Utils_System::url('civicrm/contact/view/grant',
       'reset=1&action=add&context=grant'
     ),
