@@ -312,8 +312,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // also keep the convention.
     $this->assign('contactId', $this->_contactId);
 
-    // location blocks.
-    CRM_Contact_Form_Location::preProcess($this);
+    $this->preProcessLocation();
 
     // retain the multiple count custom fields value
     if (!empty($_POST['hidden_custom'])) {
@@ -373,6 +372,29 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
     }
     $this->assign('paramSubType', $paramSubType ?? '');
+  }
+
+  private function preProcessLocation() {
+    $this->_addBlockName = CRM_Utils_Request::retrieve('block', 'String');
+    $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive');
+
+    $this->assign('addBlock', FALSE);
+    if ($this->_addBlockName && $additionalblockCount) {
+      $this->assign('addBlock', TRUE);
+      $this->assign('blockName', $this->_addBlockName);
+      $this->assign('blockId', $additionalblockCount);
+      $this->set($this->_addBlockName . '_Block_Count', $additionalblockCount);
+    }
+
+    $this->assign('blocks', $this->_blocks);
+    $this->assign('className', 'CRM_Contact_Form_Contact');
+
+    // get address sequence.
+    if (!$addressSequence = $this->get('addressSequence')) {
+      $addressSequence = CRM_Core_BAO_Address::addressSequence();
+      $this->set('addressSequence', $addressSequence);
+    }
+    $this->assign('addressSequence', $addressSequence);
   }
 
   /**

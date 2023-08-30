@@ -17,34 +17,6 @@
 class CRM_Contact_Form_Location {
 
   /**
-   * Set variables up before form is built.
-   *
-   * @param CRM_Core_Form $form
-   */
-  public static function preProcess($form) {
-    $form->_addBlockName = CRM_Utils_Request::retrieve('block', 'String');
-    $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive');
-
-    $form->assign('addBlock', FALSE);
-    if ($form->_addBlockName && $additionalblockCount) {
-      $form->assign('addBlock', TRUE);
-      $form->assign('blockName', $form->_addBlockName);
-      $form->assign('blockId', $additionalblockCount);
-      $form->set($form->_addBlockName . '_Block_Count', $additionalblockCount);
-    }
-
-    $form->assign('blocks', $form->_blocks);
-    $form->assign('className', CRM_Utils_System::getClassName($form));
-
-    // get address sequence.
-    if (!$addressSequence = $form->get('addressSequence')) {
-      $addressSequence = CRM_Core_BAO_Address::addressSequence();
-      $form->set('addressSequence', $addressSequence);
-    }
-    $form->assign('addressSequence', $addressSequence);
-  }
-
-  /**
    * Build the form object.
    *
    * @param CRM_Core_Form $form
