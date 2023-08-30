@@ -447,7 +447,9 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "Text",
           ],
           'pay_later_receipt' => [
-            'type' => "Text",
+            'type' => "RichTextEditor",
+            'rows' => "8",
+            'cols' => "60",
           ],
           'initial_amount_label' => [
             'label' => "Initial Amount Label",
