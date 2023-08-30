@@ -1070,28 +1070,14 @@ United States', $tokenProcessor->getRow(0)->render('message'));
   }
 
   public function testEscaping(): void {
-    $autoClean = [];
-    $create = function(string $entity, array $record = []) use (&$autoClean) {
-      // It's convenient to use createTestObject(), but it doesn't reproduce the normal escaping rules from QuickForm/APIv3/APIv4.
-      CRM_Utils_API_HTMLInputCoder::singleton()->encodeRow($record);
-      $dao = CRM_Core_DAO::createTestObject(CRM_Core_DAO_AllCoreTables::getFullName($entity), $record);
-
-      // We're not using transactions, and truncating 'contact' seems problematic, so we roll up our sleeves and cleanup each record...
-      $autoClean[] = CRM_Utils_AutoClean::with(function() use ($entity, $dao) {
-        CRM_Core_DAO::deleteTestObjects(CRM_Core_DAO_AllCoreTables::getFullName($entity), ['id' => $dao->id]);
-      });
-
-      return $dao;
-    };
-
     $context = [];
-    $context['contactId'] = $create('Contact', [
+    $context['contactId'] = $this->individualCreate([
       'first_name' => '<b>ig</b>illy brackets',
-    ])->id;
-    $context['eventId'] = $create('Event', [
+    ]);
+    $context['eventId'] = $this->eventCreateUnpaid([
       'title' => 'The Webinar',
       'description' => '<p>Some online webinar thingy.</p> <p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>',
-    ])->id;
+    ])['id'];
 
     $messages = $expected = [];
 
