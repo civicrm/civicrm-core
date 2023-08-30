@@ -219,6 +219,17 @@ class Afform extends Generic\AbstractEntity {
           'title' => E::ts('Post-Submit Page'),
         ],
         [
+          'name' => 'submit_enabled',
+          'title' => E::ts('Allow Submissions'),
+          'data_type' => 'Boolean',
+          'default_value' => TRUE,
+        ],
+        [
+          'name' => 'submit_limit',
+          'title' => E::ts('Maximum Submissions'),
+          'data_type' => 'Integer',
+        ],
+        [
           'name' => 'create_submission',
           'title' => E::ts('Log Submissions'),
           'data_type' => 'Boolean',
