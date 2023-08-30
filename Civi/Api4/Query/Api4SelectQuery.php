@@ -46,7 +46,7 @@ class Api4SelectQuery extends Api4Query {
   public $forceSelectId = TRUE;
 
   /**
-   * @var array
+   * @var array{entity: string, alias: string, table: string, on: array, bridge: string|NULL}[]
    */
   private $explicitJoins = [];
 
@@ -897,17 +897,41 @@ class Api4SelectQuery extends Api4Query {
 
   /**
    * @param string $alias
-   * @return array{entity: string, alias: string, table: string, bridge: string|NULL}|NULL
+   * @return array{entity: string, alias: string, table: string, on: array, bridge: string|NULL}|NULL
    */
   public function getExplicitJoin($alias) {
     return $this->explicitJoins[$alias] ?? NULL;
   }
 
   /**
-   * @return array{entity: string, alias: string, table: string, bridge: string|NULL}[]
+   * @return array{entity: string, alias: string, table: string, on: array, bridge: string|NULL}[]
    */
-  public function getExplicitJoins() {
+  public function getExplicitJoins(): array {
     return $this->explicitJoins;
+  }
+
+  /**
+   * If a join is based on another join, return the name of the other.
+   *
+   * @param string $joinAlias
+   * @return string|null
+   */
+  public function getJoinParent(string $joinAlias): ?string {
+    $join = $this->getExplicitJoin($joinAlias);
+    foreach ($join['on'] ?? [] as $clause) {
+      $prefix = $join['alias'] . '.';
+      if (
+        count($clause) === 3 && $clause[1] === '=' &&
+        (str_starts_with($clause[0], $prefix) || str_starts_with($clause[2], $prefix))
+      ) {
+        $otherField = str_starts_with($clause[0], $prefix) ? $clause[2] : $clause[0];
+        [$otherJoin] = explode('.', $otherField);
+        if (str_contains($otherField, '.') && $this->getExplicitJoin($otherJoin)) {
+          return $otherJoin;
+        }
+      }
+    }
+    return NULL;
   }
 
   /**
