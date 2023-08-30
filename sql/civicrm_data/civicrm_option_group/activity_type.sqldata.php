@@ -469,5 +469,13 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'is_reserved' => 1,
       'component_id' => 2,
     ],
+    [
+      'label' => ts('Case Client was removed from Case'),
+      'value' => 55,
+      'name' => 'Case Client Removed',
+      'description' => ts('Case client was removed from a case'),
+      'component_id' => 7,
+      'icon' => 'fa-trash',
+    ],
   ])
   ->syncColumns('fill', ['value' => 'weight']);

@@ -575,11 +575,11 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->assertEquals(
       [
         13 => 'Open Case',
-        55 => 'Medical evaluation',
-        56 => 'Mental health evaluation',
-        57 => 'Secure temporary housing',
-        60 => 'Income and benefits stabilization',
-        58 => 'Long-term housing plan',
+        56 => 'Medical evaluation',
+        57 => 'Mental health evaluation',
+        58 => 'Secure temporary housing',
+        61 => 'Income and benefits stabilization',
+        59 => 'Long-term housing plan',
         14 => 'Follow up',
         15 => 'Change Case Type',
         16 => 'Change Case Status',
@@ -611,11 +611,11 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->assertEquals(
       [
         13 => 'Open Case',
-        55 => 'Medical evaluation changed',
-        56 => 'Mental health evaluation',
-        57 => 'Secure temporary housing',
-        60 => 'Income and benefits stabilization',
-        58 => 'Long-term housing plan',
+        56 => 'Medical evaluation changed',
+        57 => 'Mental health evaluation',
+        58 => 'Secure temporary housing',
+        61 => 'Income and benefits stabilization',
+        59 => 'Long-term housing plan',
         14 => 'Follow up',
         15 => 'Change Case Type',
         16 => 'Change Case Status',
