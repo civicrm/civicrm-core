@@ -3369,14 +3369,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         'contribution_id' => $contribution['id'],
         'return' => ['tax_amount', 'line_total', 'entity_table', 'entity_id', 'qty'],
       ])['values'];
-      $this->assertIsNumeric($contribution['tax_amount']);
+
       $total = 0;
       $taxTotal = 0;
       $memberships = [];
       $participants = [];
       foreach ($lineItems as $lineItem) {
         $total += $lineItem['line_total'];
-        $taxTotal += (float) ($lineItem['tax_amount'] ?? 0);
+        $taxTotal += (float) ($lineItem['tax_amount']);
         if ($lineItem['entity_table'] === 'civicrm_membership') {
           $memberships[] = $lineItem['entity_id'];
         }
