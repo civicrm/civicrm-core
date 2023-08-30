@@ -375,18 +375,17 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   private function preProcessLocation() {
-    $this->_addBlockName = CRM_Utils_Request::retrieve('block', 'String');
+    $blockName = CRM_Utils_Request::retrieve('block', 'String');
     $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive');
 
     $this->assign('addBlock', FALSE);
-    if ($this->_addBlockName && $additionalblockCount) {
+    if ($blockName && $additionalblockCount) {
       $this->assign('addBlock', TRUE);
-      $this->assign('blockName', $this->_addBlockName);
+      $this->assign('blockName', $blockName);
       $this->assign('blockId', $additionalblockCount);
-      $this->set($this->_addBlockName . '_Block_Count', $additionalblockCount);
+      $this->set($blockName . '_Block_Count', $additionalblockCount);
     }
 
-    $this->assign('blocks', $this->_blocks);
     $this->assign('className', 'CRM_Contact_Form_Contact');
 
     // get address sequence.
@@ -560,7 +559,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    */
   public function addRules() {
     // skip adding formRules when custom data is build
-    if ($this->_addBlockName || ($this->_action & CRM_Core_Action::DELETE)) {
+    if ($this->isAjaxMode() || ($this->_action & CRM_Core_Action::DELETE)) {
       return;
     }
 
@@ -578,6 +577,38 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if (array_key_exists('CommunicationPreferences', $this->_editOptions)) {
       $this->addFormRule(['CRM_Contact_Form_Edit_CommunicationPreferences', 'formRule'], $this);
     }
+  }
+
+  /**
+   * Is the form being run in an ajax overload way.
+   *
+   * Overloading of existing forms to return ajax forms is an anti-pattern. We
+   * have removed it in some places (eg, the Payment_Form) & added separate paths.
+   *
+   * If someone does separate this out, care needs to be taken to ensure that fields added in the ajax mode
+   * are also added to the parent form, when separating them. ie it is important to check the
+   * ajax-loaded fields are in the forms values retrieved from quick form as
+   * quick form will filter out POST values that have not been added to the
+   * quick form object..
+   *
+   * @return bool
+   */
+  public function isAjaxMode(): bool {
+    return (bool) $this->getAjaxBlockName();
+  }
+
+  /**
+   * Get the name of any overload block being used.
+   *
+   * This would either be 'CustomData' or a location entity
+   * (Phone, Address, Email, etc).
+   *
+   * @return string
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getAjaxBlockName(): string {
+    return (string) (CRM_Utils_Request::retrieve('type', 'String') ? 'CustomData' : CRM_Utils_Request::retrieve('block', 'String'));
   }
 
   /**
@@ -741,8 +772,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     //load form for child blocks
-    if ($this->_addBlockName) {
-      $className = 'CRM_Contact_Form_Edit_' . $this->_addBlockName;
+    if ($this->isAjaxMode()) {
+      $className = 'CRM_Contact_Form_Edit_' . $this->getAjaxBlockName();
       return $className::buildQuickForm($this);
     }
 
