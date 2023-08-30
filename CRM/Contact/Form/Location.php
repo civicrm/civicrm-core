@@ -25,6 +25,7 @@ class CRM_Contact_Form_Location {
    * @param CRM_Core_Form $form
    */
   public static function buildQuickForm(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('internal core function, take a copy');
     // required for subsequent AJAX requests.
     $ajaxRequestBlocks = [];
     $generateAjaxRequest = 0;
