@@ -99,9 +99,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     if ($this->_id) {
       $this->_isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
       $this->assign('eventId', $this->_id);
-      if (!empty($this->_addBlockName) && empty($this->_addProfileBottom) && empty($this->_addProfileBottomAdd)) {
-        $this->add('hidden', 'id', $this->_id);
-      }
       $this->_single = TRUE;
 
       $eventInfo = \Civi\Api4\Event::get(FALSE)
