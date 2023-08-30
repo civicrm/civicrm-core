@@ -1090,7 +1090,14 @@ United States', $tokenProcessor->getRow(0)->render('message'));
 
     // The `description` does allow HTML. Any funny characters are filtered out of text.
     $messages['event_text'] = 'You signed up for this event: {event.title}: {event.description}';
-    $expected['event_text'] = 'You signed up for this event: The Webinar: Some online webinar thingy. Attendees will need to install the TeleFoo app.';
+    $expected['event_text'] = 'You signed up for this event: The Webinar: Some online webinar thingy.
+
+Attendees will need to install the TeleFoo [1] app.
+
+
+Links:
+------
+[1] http://telefoo.example.com';
 
     $messages['event_html'] = '<p>You signed up for this event:</p> <h3>{event.title}</h3> {event.description}';
     $expected['event_html'] = '<p>You signed up for this event:</p> <h3>The Webinar</h3> <p>Some online webinar thingy.</p> <p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>';
