@@ -75,7 +75,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     }
 
     //location blocks.
-    CRM_Contact_Form_Location::preProcess($this);
+    $this->assign('addressSequence', CRM_Core_BAO_Address::addressSequence());
   }
 
   /**
