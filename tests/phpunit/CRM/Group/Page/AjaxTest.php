@@ -531,6 +531,15 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test sorting, including with smart group.
+   */
+  public function testSmartGroupSort(): void {
+    $this->smartGroupCreate();
+    $this->_params['sort'] = 'count asc';
+    CRM_Contact_BAO_Group::getGroupList($this->_params);
+  }
+
+  /**
    * Don't populate smart group cache when building Group list.
    *
    * It takes forever, especially if you have lots of smart groups.
