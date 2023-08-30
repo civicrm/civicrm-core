@@ -13,12 +13,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
+ *
+ * @deprecated in CiviCRM 5.66, will be removed around CiviCRM 5.76.
  */
 class CRM_Contact_Form_Location {
 
   /**
    * Build the form object.
    *
+   * @deprecated in CiviCRM 5.66, will be removed around CiviCRM 5.76.
    * @param CRM_Core_Form $form
    */
   public static function buildQuickForm(&$form) {
