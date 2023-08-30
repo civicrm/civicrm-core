@@ -1025,6 +1025,12 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // CRM-16905 - Sort by count cannot be done with sql
     if (!empty($params['sort']) && strpos($params['sort'], 'count') === 0) {
       usort($values, function($a, $b) {
+        if ($a['count'] === 'unknown') {
+          return -1;
+        }
+        if ($b['count'] === 'unknown') {
+          return 1;
+        }
         return $a['count'] - $b['count'];
       });
       if (strpos($params['sort'], 'desc')) {
