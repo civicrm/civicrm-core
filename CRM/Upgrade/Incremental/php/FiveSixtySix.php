@@ -29,6 +29,8 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
    */
   public function upgrade_5_66_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Make Contribution.tax_amount required', 'alterColumn', 'civicrm_contribution', 'tax_amount', "decimal(20,2) DEFAULT 0 NOT NULL COMMENT 'Total tax amount of this contribution.',");
+    $this->addTask('Make Contribution.tax_amount required', 'alterColumn', 'civicrm_line_item', 'tax_amount', "decimal(20,2) DEFAULT 0 NOT NULL COMMENT 'tax of each item''");
     // These run after the sql file
     $this->addTask('Make Discount.entity_table required', 'alterColumn', 'civicrm_discount', 'entity_table', "varchar(64) NOT NULL COMMENT 'Name of the action(reminder)'");
     $this->addTask('Make ActionSchedule.name required', 'alterColumn', 'civicrm_action_schedule', 'name', "varchar(64) NOT NULL COMMENT 'physical tablename for entity being joined to discount, e.g. civicrm_event'");

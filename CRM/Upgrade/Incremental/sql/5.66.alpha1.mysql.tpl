@@ -8,3 +8,6 @@ WHERE a2.name = a1.name AND a2.id > a1.id;
 
 {* Set default value for Discount.entity_table *}
 UPDATE `civicrm_discount` SET `entity_table` = 'civicrm_event' WHERE `entity_table` IS NULL;
+
+UPDATE civicrm_contribution SET tax_amount = 0 WHERE tax_amount IS NULL;
+UPDATE civicrm_line_item SET tax_amount = 0 WHERE tax_amount IS NULL;
