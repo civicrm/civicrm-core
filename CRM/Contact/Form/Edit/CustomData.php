@@ -31,9 +31,8 @@ class CRM_Contact_Form_Edit_CustomData {
     $customDataType = CRM_Utils_Request::retrieve('type', 'String');
 
     if ($customDataType) {
-      $form->_addBlockName = 'CustomData';
-      $form->assign("addBlock", TRUE);
-      $form->assign("blockName", $form->_addBlockName);
+      $form->assign('addBlock', TRUE);
+      $form->assign('blockName', 'CustomData');
     }
 
     CRM_Custom_Form_CustomData::preProcess($form, NULL, NULL, NULL,
