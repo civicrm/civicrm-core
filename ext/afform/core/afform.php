@@ -171,7 +171,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   if ($tabsetName !== 'civicrm/contact/view') {
     return;
   }
-  $contactTypes = array_merge([$context['contact_type']] ?? [], $context['contact_sub_type'] ?? []);
+  $contactTypes = array_merge((array) ($context['contact_type'] ?? []), $context['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get(FALSE)
     ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
     ->addWhere('contact_summary', '=', 'tab')
