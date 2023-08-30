@@ -140,6 +140,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       'email_greeting_custom' => '',
       'addressee_custom' => '',
       'communication_style_display' => '',
+      'email_greeting_display' => '',
+      'postal_greeting_display' => '',
       // for Demographics.tpl
       'age' => ['y' => '', 'm' => ''],
       'birth_date' => '',
