@@ -57,14 +57,14 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
       'is_credit_card_only' => '',
     ];
 
-    $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
+    $contributionPage = CRM_Contribute_BAO_ContributionPage::create($params);
 
     // The BAO does not save these
-    $params['id'] = $contributionpage->id;
+    $params['id'] = $contributionPage->id;
     $params['honor_block_title'] = 'In Honor Title EN';
     $params['honor_block_text'] = 'In Honor Text EN';
 
-    $form = $this->getFormObject('CRM_Contribute_Form_ContributionPage_Settings', $params, 'Settings');
+    $form = $this->getFormObject('CRM_Contribute_Form_ContributionPage_Settings', $params);
     $form->postProcess();
 
     // Now update the page with In Honor (soft credit) text in French
@@ -73,11 +73,11 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
     $params['honor_block_title'] = 'In Honor Title FR';
     $params['honor_block_text'] = 'In Honor Text FR';
 
-    $form = $this->getFormObject('CRM_Contribute_Form_ContributionPage_Settings', $params, 'Settings');
+    $form = $this->getFormObject('CRM_Contribute_Form_ContributionPage_Settings', $params);
     $form->postProcess();
 
     $uf = $this->callAPISuccess('UFJoin', 'getsingle', [
-      'entity_id' => $contributionpage->id,
+      'entity_id' => $contributionPage->id,
       'module' => 'soft_credit',
     ]);
 
@@ -88,7 +88,7 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
     $this->assertEquals('In Honor Title FR', $json['soft_credit']['fr_FR']['honor_block_title']);
     $this->assertEquals('In Honor Text FR', $json['soft_credit']['fr_FR']['honor_block_text']);
 
-    $this->callAPISuccess('ContributionPage', 'delete', ['id' => $contributionpage->id]);
+    $this->callAPISuccess('ContributionPage', 'delete', ['id' => $contributionPage->id]);
   }
 
 }

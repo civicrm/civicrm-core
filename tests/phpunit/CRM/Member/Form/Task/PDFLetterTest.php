@@ -79,7 +79,7 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
     }
 
     /** @var CRM_Member_Form_Task_PDFLetter $form */
-    $form = $this->getFormObject('CRM_Member_Form_Task_PDFLetter', [
+    $form = $this->getSearchFormObject('CRM_Member_Form_Task_PDFLetter', [
       'subject' => '{contact.first_name} {membership.source}',
       'html_message' => $htmlMessage,
     ], NULL, $searchFormValues);

@@ -1636,7 +1636,7 @@ $text
       'campaign_id' => $campaign_id,
       'from_email_address' => 'from@example.com',
       'to' => $contactId1 . '::email@example.com,' . $contactId2 . '::email2@example.com',
-    ], '', []);
+    ]);
     $form->set('cid', $contactId1 . ',' . $contactId2);
     $form->buildForm();
     $form->postProcess();
@@ -1702,7 +1702,7 @@ $textValue
         'name' => $fileUri,
       ],
       'attachDesc_1' => '',
-    ], NULL, []);
+    ]);
     $form->set('cid', $contactId1 . ',' . $contactId2 . ',' . $contactId3);
     $form->buildForm();
     $form->postProcess();
@@ -1752,7 +1752,6 @@ $textValue
     $subject = __FUNCTION__ . ' subject';
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
-    $userID = $loggedInUser;
 
     $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
     $fileName = 'test_email_create.txt';
@@ -1775,7 +1774,7 @@ $textValue
         'name' => $fileUri,
       ],
       'attachDesc_1' => '',
-    ], NULL, []);
+    ]);
     $form->set('cid', $contactId1 . ',' . $contactId2);
     $form->buildForm();
     $form->postProcess();
