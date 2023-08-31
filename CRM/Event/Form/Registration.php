@@ -301,6 +301,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $priceSetID = $this->getPriceSetID();
       if ($priceSetID) {
         self::initEventFee($this, $this->_eventId, TRUE, $priceSetID);
+        $this->assign('quickConfig', $this->isQuickConfig());
       }
 
       // get the profile ids
@@ -583,15 +584,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       CRM_Core_Error::deprecatedWarning('this should not be reachable');
       return;
     }
-    //check if price set is is_config
-    if (is_numeric($priceSetId)) {
-      if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config') && $form->getVar('_name') != 'Participant') {
-        $form->assign('quickConfig', 1);
-      }
-      else {
-        $form->assign('quickConfig', 0);
-      }
-    }
+
     // get price info
     if ($priceSetId) {
       if ($form->_action & CRM_Core_Action::UPDATE) {
@@ -1714,6 +1707,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->set('priceSetId', $this->_priceSetId);
     }
     return $this->_priceSetId ?: NULL;
+  }
+
+  /**
+   * Is the price set quick config.
+   *
+   * @return bool
+   */
+  public function isQuickConfig(): bool {
+    return $this->getPriceSetID() && CRM_Price_BAO_PriceSet::isQuickConfig($this->getPriceSetID());
   }
 
 }

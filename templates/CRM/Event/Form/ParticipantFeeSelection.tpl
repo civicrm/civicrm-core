@@ -114,7 +114,7 @@ CRM.$(function($) {
       <table class='form-layout'>
         <tr class="crm-event-eventfees-form-block-price_set_amount">
           <td class="label" style="padding-top: 10px;">{$form.amount.label}</td>
-          <td class="view-value"><table class="form-layout">{include file="CRM/Price/Form/PriceSet.tpl" extends="Event" noCalcValueDisplay=0 context="participant"}</table></td>
+          <td class="view-value"><table class="form-layout">{include file="CRM/Price/Form/PriceSet.tpl" extends="Event" hideTotal=false context="participant"}</table></td>
         </tr>
      {if $paymentInfo}
        <tr><td></td><td>
@@ -126,7 +126,7 @@ CRM.$(function($) {
          </div>
          <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div class='content'><strong id='balance-fee'></strong></div>
           </div>
-       {include file='CRM/Price/Form/Calculate.tpl' currencySymbol=$currencySymbol noCalcValueDisplay=1 displayOveride='true'}
+       {include file='CRM/Price/Form/Calculate.tpl' currencySymbol=$currencySymbol hideTotal=1 displayOveride='true'}
        {/if}
       </table>
     </fieldset>

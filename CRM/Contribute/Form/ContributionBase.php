@@ -359,7 +359,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       CRM_Core_Error::deprecatedFunctionWarning('forms require a price set ID');
     }
     $this->_priceSet = $this->get('priceSet');
-
+    $this->assign('quickConfig', $this->isQuickConfig());
     if (!$this->_values) {
       // get all the values from the dao object
       $this->_values = [];
@@ -410,7 +410,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       ));
 
       $this->assignPaymentProcessor($isPayLater);
-      $this->assign('quickConfig', $this->isQuickConfig());
       // get price info
       // CRM-5095
       $this->initSet($this);

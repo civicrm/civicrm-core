@@ -47,7 +47,7 @@
           {/if}
         {/foreach}
       {/if}
-      {include file="CRM/Price/Form/PriceSet.tpl" extends="Membership"}
+      {include file="CRM/Price/Form/PriceSet.tpl" extends="Membership" hideTotal=$quickConfig}
     </fieldset>
   </div>
   {literal}
