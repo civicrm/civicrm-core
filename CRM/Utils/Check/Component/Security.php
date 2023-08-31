@@ -287,10 +287,6 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
         "{$packages_path}/OpenFlashChart/php-ofc-library/ofc_upload_image.php",
         \Psr\Log\LogLevel::CRITICAL,
       ],
-      [
-        "{$packages_path}/html2text/class.html2text.inc",
-        \Psr\Log\LogLevel::CRITICAL,
-      ],
     ];
     foreach ($files as $file) {
       if (file_exists($file[0])) {
