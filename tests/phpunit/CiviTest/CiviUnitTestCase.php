@@ -2923,28 +2923,18 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $formValues
    *
-   * @param string|null $pageName
-   *
-   * @param array $searchFormValues
-   *   Values for the search form if the form is a task eg.
-   *   for selected ids 6 & 8:
-   *   [
-   *      'radio_ts' => 'ts_sel',
-   *      'task' => CRM_Member_Task::PDF_LETTER,
-   *      'mark_x_6' => 1,
-   *      'mark_x_8' => 1,
-   *   ]
-   * @param \HTML_QuickForm_Controller|null $controller
+   * @param array $urlParameters
    *
    * @return \CRM_Core_Form|CRM_Event_Form_Registration_Register
    *
    * @noinspection PhpReturnDocTypeMismatchInspection
    */
-  public function getFormObject(string $class, array $formValues = [], ?string $pageName = '', array $searchFormValues = [], $controller = NULL) {
+  public function getFormObject(string $class, array $formValues = [], array $urlParameters = []) {
     $_POST = $formValues;
     /** @var CRM_Core_Form $form */
     $form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_REQUEST += $urlParameters;
     switch ($class) {
       case 'CRM_Event_Cart_Form_Checkout_Payment':
       case 'CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices':
@@ -3061,23 +3051,60 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         break;
 
       case strpos($class, '_Form_') !== FALSE:
-        $form->controller = new CRM_Core_Controller_Simple($class, $pageName);
+        $form->controller = new CRM_Core_Controller_Simple($class, $form->getName());
         break;
 
       default:
         $form->controller = new CRM_Core_Controller();
     }
-    if (!$pageName) {
-      $pageName = $form->getName();
-    }
+
     $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
-    $_SESSION['_' . $form->controller->_name . '_container']['values'][$pageName] = $formValues;
-    if ($searchFormValues) {
-      $_SESSION['_' . $form->controller->_name . '_container']['values']['Search'] = $searchFormValues;
-    }
+    $_SESSION['_' . $form->controller->_name . '_container']['values'][$form->getName()] = $formValues;
     if (isset($formValues['_qf_button_name'])) {
       $_SESSION['_' . $form->controller->_name . '_container']['_qf_button_name'] = $formValues['_qf_button_name'];
     }
+    return $form;
+  }
+
+  /**
+   * Instantiate form object.
+   *
+   * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
+   *
+   * @param string $class
+   *   Name of form class.
+   *
+   * @param array $formValues
+   * @param string|null $pageName
+   * @param array $searchFormValues
+   *   Values for the search form if the form is a task eg.
+   *   for selected ids 6 & 8:
+   *   [
+   *      'radio_ts' => 'ts_sel',
+   *      'task' => CRM_Member_Task::PDF_LETTER,
+   *      'mark_x_6' => 1,
+   *      'mark_x_8' => 1,
+   *   ]
+   *
+   * @return \CRM_Core_Form
+   *
+   * @noinspection PhpReturnDocTypeMismatchInspection
+   */
+  public function getSearchFormObject(string $class, array $formValues = [], ?string $pageName = 'Search', array $searchFormValues = []) {
+    $_POST = $formValues;
+    /** @var CRM_Core_Form $form */
+    $form = new $class();
+    $pageName = $pageName ?: $form->getName();
+    if (strpos($class, 'Search') !== FALSE) {
+      $form->controller = new CRM_Contact_Controller_Search();
+    }
+    else {
+      $form->controller = new CRM_Core_Controller_Simple($class, $pageName);
+    }
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_SESSION['_' . $form->controller->_name . '_container']['values']['Search'] = $searchFormValues;
+    $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
+    $_SESSION['_' . $form->controller->_name . '_container']['values'][$pageName] = $formValues;
     return $form;
   }
 

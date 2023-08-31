@@ -49,7 +49,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
     $_REQUEST['id'] = $participantID;
     $_REQUEST['cid'] = $contactID;
     /** @var CRM_Event_Form_Task_Badge $form */
-    $form = $this->getFormObject(
+    $form = $this->getSearchFormObject(
       'CRM_Event_Form_Task_Badge',
       ['badge_id' => 1],
       NULL,
