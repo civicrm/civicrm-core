@@ -181,6 +181,7 @@
             return !(defn.options || defn.data_type === 'Boolean');
 
           case 'DisplayOnly':
+          case 'Hidden':
             return true;
 
           default:

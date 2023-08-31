@@ -219,6 +219,11 @@ class CRM_Core_SelectValues {
         'name' => 'Link',
         'label' => ts('Link'),
       ],
+      [
+        'id' => 'Hidden',
+        'name' => 'Hidden',
+        'label' => ts('Hidden'),
+      ],
     ];
   }
 

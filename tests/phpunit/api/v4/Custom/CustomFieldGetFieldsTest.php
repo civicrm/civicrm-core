@@ -52,7 +52,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ->execute();
   }
 
-  public function testDisabledFields(): void {
+  public function testDisabledAndHiddenFields(): void {
     // Create a custom group with one enabled and one disabled field
     CustomGroup::create(FALSE)
       ->addValue('extends', 'Activity')
@@ -62,14 +62,20 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       'records' => [
         ['label' => 'enabled_field'],
         ['label' => 'disabled_field', 'is_active' => FALSE],
+        ['label' => 'hidden_field', 'html_type' => 'Hidden'],
       ],
       'defaults' => ['custom_group_id.name' => 'act_test_grp'],
     ]);
 
-    // Only the enabled field shows up
-    $getFields = Activity::getFields(FALSE)->execute()->column('name');
-    $this->assertContains('act_test_grp.enabled_field', $getFields);
-    $this->assertNotContains('act_test_grp.disabled_field', $getFields);
+    // Only the enabled fields show up
+    $getFields = Activity::getFields(FALSE)->execute()->indexBy('name');
+    $this->assertArrayHasKey('act_test_grp.enabled_field', $getFields);
+    $this->assertArrayHasKey('act_test_grp.hidden_field', $getFields);
+    $this->assertArrayNotHasKey('act_test_grp.disabled_field', $getFields);
+
+    // Hidden field does not have option lists
+    $this->assertFalse($getFields['act_test_grp.hidden_field']['options']);
+    $this->assertNull($getFields['act_test_grp.hidden_field']['suffixes']);
 
     // Disable the entire custom group
     CustomGroup::update(FALSE)

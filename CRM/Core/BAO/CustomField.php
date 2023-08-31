@@ -1132,6 +1132,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
         $qf->assign('customUrls', $customUrls);
         break;
+
+      case 'Hidden':
+        $element = $qf->add('hidden', $elementName);
+        break;
     }
 
     switch ($field->data_type) {
@@ -2221,7 +2225,7 @@ WHERE  id IN ( %1, %2 )
 
     // create any option group & values if required
     $allowedOptionTypes = ['String', 'Int', 'Float', 'Money'];
-    if ($htmlType !== 'Text' && in_array($dataType, $allowedOptionTypes, TRUE)) {
+    if (!in_array($htmlType, ['Text', 'Hidden'], TRUE) && in_array($dataType, $allowedOptionTypes, TRUE)) {
       //CRM-16659: if option_value then create an option group for this custom field.
       // An option_type of 2 would be a 'message' from the form layer not to handle
       // the option_values key. If not set then it is not ignored.
