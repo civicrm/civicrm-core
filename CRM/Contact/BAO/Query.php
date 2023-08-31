@@ -6133,7 +6133,6 @@ AND   displayRelType.is_active = 1
       if (!empty($value['table'])) {
         $regex = "/({$value['table']}\.|{$name})/";
         if (preg_match($regex, $sort)) {
-          $this->_elemnt[$value['element']] = 1;
           $this->_select[$value['element']] = $value['select'];
           $this->_pseudoConstantsSelect[$name]['sorting'] = 1;
           $present[$value['table']] = $value['join'];
