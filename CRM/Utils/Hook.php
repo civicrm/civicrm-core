@@ -414,7 +414,7 @@ abstract class CRM_Utils_Hook {
    *   The unique identifier for the object.
    * @param array $links
    *   (optional) the links array (introduced in v3.2).
-   * @param int $mask
+   * @param int|null $mask
    *   (optional) the bitmask to show/hide links.
    * @param array $values
    *   (optional) the values to fill the links.
