@@ -90,8 +90,8 @@
         <a ng-if="afform.submission_count" ng-href="{{:: crmUrl('civicrm/admin/afform/submissions#/?name=' + afform.name) }}">
           {{:: afform.submission_count === 1 ? ts('1 Submission') : ts('%1 Submissions', {1: afform.submission_count}) }}
         </a>
-        <div ng-if="afform.last_submission">
-          {{:: ts('Last submitted: %1', {1: afform.last_submission}) }}
+        <div ng-if="afform.submission_date">
+          {{:: ts('Last submitted: %1', {1: afform.submission_date}) }}
         </div>
       </td>
       <td>
