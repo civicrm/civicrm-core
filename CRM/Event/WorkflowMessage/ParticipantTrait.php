@@ -103,13 +103,14 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
         $this->setContributionID($lineItem['contribution_id']);
       }
       else {
-        // no ts() since this should be rare
-        CRM_Core_Session::setStatus('There might be a data problem, contribution id could not be loaded from the line item');
         // It might be bad data on the site - let's do a noisy fall back to participant payment
         // (the relationship between contribution & participant should be in the line item but
         // some integrations might mess this up - if they are not using the order api).
+        // Note that for free events there won't be a participant payment either hence moving the status message into the if statement.
         $participantPayment = civicrm_api3('ParticipantPayment', 'get', ['participant_id' => $participantID])['values'];
         if (!empty($participantPayment)) {
+          // no ts() since this should be rare
+          CRM_Core_Session::setStatus('There might be a data problem, contribution id could not be loaded from the line item');
           $participantPayment = reset($participantPayment);
           $this->setContributionID((int) $participantPayment['contribution_id']);
         }
