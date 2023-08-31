@@ -21,6 +21,13 @@
  */
 class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
+    if ($rev === '5.66.alpha1') {
+      $preUpgradeMessage .= '<p>' . ts('If your site uses custom code to inject tracking fields into messages, it may need updating. See <a %1>this issue for details</a>.',
+          [1 => 'href="https://github.com/civicrm/civicrm-core/pull/27233" target="_blank"']) . '</p>';
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
