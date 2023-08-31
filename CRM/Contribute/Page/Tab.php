@@ -55,7 +55,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('View Recurring Payment'),
         'url' => 'civicrm/contact/view/contributionrecur',
         'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
-        'weight' => -20,
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
       ],
     ];
 
@@ -77,6 +77,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('Edit Recurring Payment'),
         'url' => 'civicrm/contribute/updaterecur',
         'qs' => "reset=1&action=update&crid=%%crid%%&cid=%%cid%%&context={$context}",
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
       ];
     }
 
@@ -85,6 +86,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       'title' => ts('Cancel'),
       'url' => 'civicrm/contribute/unsubscribe',
       'qs' => 'reset=1&crid=%%crid%%&cid=%%cid%%&context=' . $context,
+      'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
     ];
 
     if ($paymentProcessorObj->supports('UpdateSubscriptionBillingInfo')) {
@@ -93,6 +95,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('Change Billing Details'),
         'url' => 'civicrm/contribute/updatebilling',
         'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
+        'weight' => 110,
       ];
     }
     if (!empty($templateContribution['id']) && $paymentProcessorObj->supportsEditRecurringContribution()) {
@@ -103,6 +106,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('View Template Contribution'),
         'url' => 'civicrm/contact/view/contribution',
         'qs' => "reset=1&id={$templateContribution['id']}&cid=%%cid%%&action=view&context={$context}&force_create_template=1",
+        'weight' => 120,
       ];
     }
 
