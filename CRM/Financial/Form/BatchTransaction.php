@@ -74,7 +74,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
    * Build the form object.
    */
   public function buildQuickForm() {
-    if ($this->_batchStatus == 'Closed') {
+    if ($this->_batchStatus === 'Closed') {
       $this->add('xbutton', 'export_batch', ts('Export Batch'), ['type' => 'submit']);
     }
 
@@ -166,12 +166,14 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
           'url' => 'civicrm/contact/view/contribution',
           'qs' => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
           'title' => ts('View Contribution'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         'assign' => [
           'name' => ts('Assign'),
           'ref' => 'disable-action',
           'title' => ts('Assign Transaction'),
           'extra' => 'onclick = "assignRemove( %%id%%,\'' . 'assign' . '\' );"',
+          'weight' => 50,
         ],
       ];
     }
