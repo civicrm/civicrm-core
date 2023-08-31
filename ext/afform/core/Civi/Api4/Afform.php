@@ -278,6 +278,14 @@ class Afform extends Generic\AbstractEntity {
           'readonly' => TRUE,
         ];
         $fields[] = [
+          'name' => 'submit_currently_open',
+          'type' => 'Extra',
+          'data_type' => 'Boolean',
+          'input_type' => 'Select',
+          'description' => 'Based on settings and current submission count, is the form open for submissions',
+          'readonly' => TRUE,
+        ];
+        $fields[] = [
           'name' => 'has_local',
           'type' => 'Extra',
           'data_type' => 'Boolean',
