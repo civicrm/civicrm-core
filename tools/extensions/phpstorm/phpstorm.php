@@ -4,7 +4,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 require_once 'phpstorm.civix.php';
 // phpcs:disable
-use CRM_Phpstorm_ExtensionUtil as E;
+use CRM_PhpStorm_ExtensionUtil as E;
 // phpcs:enable
 
 /**
