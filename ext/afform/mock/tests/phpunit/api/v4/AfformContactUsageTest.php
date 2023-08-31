@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/AfformTestCase.php';
+require_once __DIR__ . '/AfformUsageTestCase.php';
 
 /**
  * Test case for Afform.prefill and Afform.submit.
@@ -494,6 +496,67 @@ EOHTML;
       $this->assertEquals('Email is a required field.', $e->getErrorData()['validation'][0]);
     }
 
+  }
+
+  public function testSubmissionLimit() {
+    $this->useValues([
+      'layout' => self::$layouts['aboutMe'],
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'create_submission' => TRUE,
+      'submit_limit' => 3,
+    ]);
+
+    $cid = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
+
+    $submitValues = [
+      ['fields' => ['first_name' => 'Firsty', 'last_name' => 'Lasty']],
+    ];
+
+    // Submit twice
+    Civi\Api4\Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['me' => $submitValues])
+      ->execute();
+    Civi\Api4\Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['me' => $submitValues])
+      ->execute();
+
+    // Autofilling form works because limit hasn't been reached
+    Civi\Api4\Afform::prefill()->setName($this->formName)->execute();
+
+    // Last time
+    Civi\Api4\Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['me' => $submitValues])
+      ->execute();
+
+    // Stats should report that we've reached the submission limit
+    $stats = \Civi\Api4\Afform::get(FALSE)
+      ->addSelect('submit_enabled', 'submission_count', 'submit_currently_open')
+      ->addWhere('name', '=', $this->formName)
+      ->execute()->single();
+    $this->assertTrue($stats['submit_enabled']);
+    $this->assertFalse($stats['submit_currently_open']);
+    $this->assertEquals(3, $stats['submission_count']);
+
+    // Prefilling and submitting are no longer allowed.
+    try {
+      Civi\Api4\Afform::prefill()->setName($this->formName)->execute();
+      $this->fail();
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+    }
+    try {
+      Civi\Api4\Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['me' => $submitValues])
+        ->execute();
+      $this->fail();
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+    }
   }
 
 }

@@ -5,8 +5,10 @@ namespace Civi\Api4\Action\Afform;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Afform\FormDataModel;
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Utils\CoreUtil;
+use CRM_Afform_ExtensionUtil as E;
 
 /**
  * Shared functionality for form submission pre & post processing.
@@ -60,8 +62,14 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @throws \CRM_Core_Exception
    */
   public function _run(Result $result) {
-    // This will throw an exception if the form doesn't exist or user lacks permission
-    $this->_afform = (array) civicrm_api4('Afform', 'get', ['where' => [['name', '=', $this->name]]], 0);
+    $this->_afform = civicrm_api4('Afform', 'get', [
+      'where' => [['name', '=', $this->name], ['submit_currently_open', '=', TRUE]],
+    ])->first();
+    if (!$this->_afform) {
+      // Either the form doesn't exist, user lacks permission,
+      // or submit_currently_open = false.
+      throw new UnauthorizedException(E::ts('You do not have permission to submit this form'));
+    }
     $this->_formDataModel = new FormDataModel($this->_afform['layout']);
     $this->loadEntities();
     $result->exchangeArray($this->processForm());
