@@ -747,14 +747,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Create test Authorize.net instance.
    *
    * @param array $params
+   * @param string $identifier
    *
    * @return int
    */
-  public function paymentProcessorAuthorizeNetCreate(array $params = []): int {
+  public function paymentProcessorAuthorizeNetCreate(array $params = [], string $identifier = 'authorize_net'): int {
     $params = array_merge([
       'name' => 'Authorize',
       'domain_id' => CRM_Core_Config::domainID(),
-      'payment_processor_type_id' => 'AuthNet',
+      'payment_processor_type_id:name' => 'AuthNet',
       'title' => 'AuthNet',
       'is_active' => 1,
       'is_default' => 0,
@@ -768,8 +769,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'billing_mode' => 1,
     ], $params);
 
-    $result = $this->callAPISuccess('PaymentProcessor', 'create', $params);
-    $this->ids['PaymentProcessor']['authorize_net'] = (int) $result['id'];
+    $result = $this->createTestEntity('PaymentProcessor', $params, $identifier);
     return (int) $result['id'];
   }
 
@@ -815,19 +815,19 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'domain_id' => 1,
       'name' => 'Dummy',
       'title' => 'Dummy',
-      'payment_processor_type_id' => 'Dummy',
+      'payment_processor_type_id:name' => 'Dummy',
       'financial_account_id' => 12,
       'is_test' => TRUE,
       'is_active' => 1,
       'user_name' => '',
-      'url_site' => 'http://dummy.com',
-      'url_recur' => 'http://dummy.com',
+      'url_site' => 'https://dummy.com',
+      'url_recur' => 'https://dummy.com',
       'billing_mode' => 1,
       'sequential' => 1,
-      'payment_instrument_id' => 'Debit Card',
+      'payment_instrument_id:name' => 'Debit Card',
     ];
     $processorParams = array_merge($processorParams, $params);
-    $processor = $this->callAPISuccess('PaymentProcessor', 'create', $processorParams);
+    $processor = $this->createTestEntity('PaymentProcessor', $processorParams, 'dummy');
     return $processor['id'];
   }
 
@@ -2128,10 +2128,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * & the best protection against that is the functions this class affords
    *
    * @param array $params
+   * @param string $identifier
    *
    * @return int $result['id'] payment processor id
    */
-  public function paymentProcessorCreate($params = []) {
+  public function paymentProcessorCreate(array $params = [], $identifier = 'test'): int {
     $params = array_merge([
       'title' => $params['name'] ?? 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
@@ -2150,7 +2151,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'financial_type_id' => 1,
       'financial_account_id' => 12,
       // Credit card = 1 so can pass 'by accident'.
-      'payment_instrument_id' => 'Debit Card',
+      'payment_instrument_id:name' => 'Debit Card',
     ], $params);
     if (!is_numeric($params['payment_processor_type_id'])) {
       // really the api should handle this through getoptions but it's not exactly api call so lets just sort it
@@ -2160,7 +2161,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         'return' => 'id',
       ], 'integer');
     }
-    $result = $this->callAPISuccess('payment_processor', 'create', $params);
+    $result = $this->createTestEntity('PaymentProcessor', $params, $identifier);
     return $result['id'];
   }
 
@@ -2184,20 +2185,23 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $recurParams (Optional)
    * @param array $contributionParams (Optional)
+   * @param string $identifier
    */
-  public function setupRecurringPaymentProcessorTransaction(array $recurParams = [], array $contributionParams = []): void {
-    $this->ids['campaign'][0] = $this->callAPISuccess('Campaign', 'create', ['title' => 'get the money'])['id'];
+  public function setupRecurringPaymentProcessorTransaction(array $recurParams = [], array $contributionParams = [], string $identifier = 'default'): void {
+    if (empty($this->ids['Campaign'][$identifier]) && CRM_Core_Component::isEnabled('CiviCampaign')) {
+      $this->createTestEntity('Campaign', ['title' => 'get the money', 'name' => 'money'], $identifier)['id'];
+    }
     $contributionParams = array_merge([
       'total_amount' => '200',
       'invoice_id' => 'xyz',
       'financial_type_id' => 'Donation',
       'contact_id' => $this->ids['Contact']['individual_0'],
       'contribution_page_id' => $this->ids['ContributionPage'][0] ?? NULL,
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->ids['PaymentProcessor']['test'],
       'receive_date' => '2019-07-25 07:34:23',
       'skipCleanMoney' => TRUE,
       'amount_level' => 'expensive',
-      'campaign_id' => $this->ids['campaign'][0],
+      'campaign_id' => $this->ids['Campaign'][$identifier] ?? NULL,
       'source' => 'Online Contribution: Page name',
     ], $contributionParams);
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
@@ -2209,14 +2213,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'frequency_interval' => 1,
       'contribution_status_id' => 2,
       'invoice_id' => $contributionParams['invoice_id'],
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->ids['PaymentProcessor']['test'],
       // processor provided ID - use contact ID as proxy.
       'processor_id' => $this->ids['Contact']['individual_0'],
       'api.Order.create' => $contributionParams,
     ], $recurParams))['values'][0];
-    $this->ids['ContributionRecur']['default'] = $this->_contributionRecurID = $contributionRecur['id'];
-    $this->ids['Contribution']['default'] = $this->_contributionID = $contributionRecur['api.Order.create']['id'];
-    $this->ids['Contribution'][0] = $this->_contributionID;
+    $this->ids['ContributionRecur'][$identifier] = $contributionRecur['id'];
+    $this->ids['Contribution'][$identifier] = $this->ids['Contribution'][0] = $contributionRecur['api.Order.create']['id'];
   }
 
   /**
