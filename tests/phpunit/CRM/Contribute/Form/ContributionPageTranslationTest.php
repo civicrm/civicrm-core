@@ -27,6 +27,7 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
     if ($dbLocale) {
       $this->disableMultilingual();
     }
+    $this->quickCleanup(['civicrm_contribution_page']);
     parent::tearDown();
   }
 
@@ -87,8 +88,6 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
     $this->assertEquals('In Honor Text EN', $json['soft_credit']['en_US']['honor_block_text']);
     $this->assertEquals('In Honor Title FR', $json['soft_credit']['fr_FR']['honor_block_title']);
     $this->assertEquals('In Honor Text FR', $json['soft_credit']['fr_FR']['honor_block_text']);
-
-    $this->callAPISuccess('ContributionPage', 'delete', ['id' => $contributionPage->id]);
   }
 
 }
