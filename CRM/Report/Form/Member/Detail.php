@@ -119,6 +119,12 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'default_weight' => '1',
             'default_order' => 'ASC',
           ],
+          'membership_start_date' => [
+            'title' => ts('Membership Start Date'),
+          ],
+          'membership_end_date' => [
+            'title' => ts('Membership End Date'),
+          ],
         ],
         'grouping' => 'member-fields',
         'group_bys' => [
