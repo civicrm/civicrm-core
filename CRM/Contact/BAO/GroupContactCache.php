@@ -174,7 +174,7 @@ AND (
       if ($startTime) {
         $took = microtime(TRUE) - $startTime;
         if ($took > 5) {
-          Civi::log()->warning("Updating smart group $groupID took over 5s (" . number_format($took, 3) . ")");
+          Civi::log()->warning("Updating smart group $groupID took over 5s (" . number_format($took, 3) . "s)");
         }
       }
     }
@@ -736,7 +736,7 @@ ORDER BY   gc.contact_id, g.children
    * @param ?float $startTime
    *   A float from microtime() for when we began work updating this group.
    */
-  private static function updateCacheFromTempTable(CRM_Utils_SQL_TempTable $groupContactsTempTable, array $groupIDs, ?float $startTime): void {
+  private static function updateCacheFromTempTable(CRM_Utils_SQL_TempTable $groupContactsTempTable, array $groupIDs, ?float $startTime = NULL): void {
     $tempTable = $groupContactsTempTable->getName();
 
     // @fixme: GROUP BY is here to guard against having duplicate contacts in the temptable.
