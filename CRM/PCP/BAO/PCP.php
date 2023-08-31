@@ -284,6 +284,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
           'url' => 'civicrm/contribute/campaign',
           'qs' => 'action=add&reset=1&pageId=%%pageId%%&component=%%pageComponent%%',
           'title' => ts('Configure'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ],
       ];
 
@@ -293,36 +294,42 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
           'url' => 'civicrm/pcp/info',
           'qs' => 'action=update&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
           'title' => ts('Configure'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DETACH => [
           'name' => ts('Tell Friends'),
           'url' => 'civicrm/friend',
           'qs' => 'eid=%%pcpId%%&blockId=%%pcpBlock%%&reset=1&pcomponent=pcp&component=%%pageComponent%%',
           'title' => ts('Tell Friends'),
+          'weight' => -15,
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('URL for this Page'),
           'url' => 'civicrm/pcp/info',
           'qs' => 'reset=1&id=%%pcpId%%&component=%%pageComponent%%',
           'title' => ts('URL for this Page'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::BROWSE => [
           'name' => ts('Update Contact Information'),
           'url' => 'civicrm/pcp/info',
           'qs' => 'action=browse&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
           'title' => ts('Update Contact Information'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'url' => 'civicrm/pcp',
           'qs' => 'action=enable&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
           'title' => ts('Enable'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'url' => 'civicrm/pcp',
           'qs' => 'action=disable&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
           'title' => ts('Disable'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
@@ -330,6 +337,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
           'qs' => 'action=delete&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'title' => ts('Delete'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
 
