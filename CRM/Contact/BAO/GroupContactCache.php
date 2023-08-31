@@ -162,21 +162,28 @@ AND (
    * @param array $groupID
    * @param bool $processed
    *   Whether the cache data was recently modified.
+   * @param ?float $startTime
+   *   A float from microtime() for when we began work updating this group.
    */
-  protected static function updateCacheTime($groupID, $processed) {
+  protected static function updateCacheTime($groupID, $processed, ?float $startTime = NULL) {
     // only update cache entry if we had any values
+    $took = $now = 'null';
     if ($processed) {
       // also update the group with cache date information
       $now = date('YmdHis');
-    }
-    else {
-      $now = 'null';
+      if ($startTime) {
+        $took = microtime(TRUE) - $startTime;
+        if ($took > 5) {
+          Civi::log()->warning("Updating smart group $groupID took over 5s (" . number_format($took, 3) . ")");
+        }
+      }
     }
 
     $groupIDs = implode(',', $groupID);
     $sql = "
 UPDATE civicrm_group
-SET    cache_date = $now
+SET    cache_date = $now,
+       cache_fill_took = $took
 WHERE  id IN ( $groupIDs )
 ";
     CRM_Core_DAO::executeQuery($sql);
@@ -353,14 +360,16 @@ WHERE  id IN ( $groupIDs )
 
     $lockedGroups = self::getLocksForRefreshableGroupsTo([$groupID]);
     foreach ($lockedGroups as $groupID) {
+      $startTime = microtime(TRUE);
       $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('gccache')
         ->setMemory();
       self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
       self::clearGroupContactCache([$groupID]);
-      self::updateCacheFromTempTable($groupContactsTempTable, [$groupID]);
+      self::updateCacheFromTempTable($groupContactsTempTable, [$groupID], $startTime);
       self::releaseGroupLocks([$groupID]);
       $groupContactsTempTable->drop();
+
     }
     return in_array($groupID, $lockedGroups);
   }
@@ -649,6 +658,7 @@ ORDER BY   gc.contact_id, g.children
         ->setMemory();
       $lockedGroups = self::getLocksForRefreshableGroupsTo($smartGroups);
       if (!empty($lockedGroups)) {
+        $startTime = microtime(TRUE);
         self::buildGroupContactTempTable($lockedGroups, $groupContactsTempTable);
         // Note in theory we could do this transfer from the temp
         // table to the group_contact_cache table out-of-process - possibly by
@@ -664,7 +674,7 @@ ORDER BY   gc.contact_id, g.children
         // we could throw a try-catch around this line since best-effort would
         // be good enough & potentially improve user experience.
         self::clearGroupContactCache($lockedGroups);
-        self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups);
+        self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups, $startTime);
         self::releaseGroupLocks($lockedGroups);
         $groupContactsTempTable->drop();
       }
@@ -723,8 +733,10 @@ ORDER BY   gc.contact_id, g.children
    *
    * @param \CRM_Utils_SQL_TempTable $groupContactsTempTable
    * @param array $groupIDs
+   * @param ?float $startTime
+   *   A float from microtime() for when we began work updating this group.
    */
-  private static function updateCacheFromTempTable(CRM_Utils_SQL_TempTable $groupContactsTempTable, array $groupIDs): void {
+  private static function updateCacheFromTempTable(CRM_Utils_SQL_TempTable $groupContactsTempTable, array $groupIDs, ?float $startTime): void {
     $tempTable = $groupContactsTempTable->getName();
 
     // @fixme: GROUP BY is here to guard against having duplicate contacts in the temptable.
@@ -736,7 +748,7 @@ ORDER BY   gc.contact_id, g.children
         GROUP BY contact_id,group_id
       ");
     foreach ($groupIDs as $groupID) {
-      self::updateCacheTime([$groupID], TRUE);
+      self::updateCacheTime([$groupID], TRUE, $startTime);
     }
   }
 
