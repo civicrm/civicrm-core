@@ -1,5 +1,3 @@
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-block crm-event-thankyou-form-block">
   <p>
     {ts}This is your receipt of payment made for the following event registration.{/ts}

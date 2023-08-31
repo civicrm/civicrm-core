@@ -229,9 +229,7 @@ You were registered by: {$payer.name}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {foreach from=$customPr item=customValue key=customName}
-{if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
  {$customName}: {$customValue}
-{/if}
 {/foreach}
 {/foreach}
 {/if}
@@ -244,9 +242,7 @@ You were registered by: {$payer.name}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {foreach from=$customPos item=customValue key=customName}
-{if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
  {$customName}: {$customValue}
-{/if}
 {/foreach}
 {/foreach}
 {/if}

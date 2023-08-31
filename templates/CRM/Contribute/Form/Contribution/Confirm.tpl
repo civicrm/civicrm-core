@@ -11,8 +11,6 @@
   {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block" data-page-id="{$contributionPageID}" data-page-template="confirm">
   <div class="help">
     <p>{ts}Please verify the information below carefully. Click <strong>Go Back</strong> if you need to make changes.{/ts}
