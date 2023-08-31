@@ -1185,8 +1185,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test that Payment.create uses the to_account of the payment processor.
    */
   public function testPaymentWithProcessorWithOddFinancialAccount(): void {
-    $processor = $this->dummyProcessorCreate(['financial_account_id' => 'Deposit Bank Account', 'payment_instrument_id' => 'Cash']);
-    $processor2 = $this->dummyProcessorCreate(['financial_account_id' => 'Payment Processor Account', 'name' => 'p2', 'payment_instrument_id' => 'EFT']);
+    $processor = $this->dummyProcessorCreate(['financial_account_id:name' => 'Deposit Bank Account', 'payment_instrument_id:name' => 'Cash']);
+    $processor2 = $this->dummyProcessorCreate(['financial_account_id:name' => 'Payment Processor Account', 'name' => 'p2', 'payment_instrument_id:name' => 'EFT']);
     $contributionParams = [
       'total_amount' => 100,
       'currency' => 'USD',

@@ -21,7 +21,7 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
    */
   public function testSelectorGetRows(): void {
     $contactID = $this->individualCreate();
-    $this->_paymentProcessorID = $this->paymentProcessorCreate();
+    $this->paymentProcessorCreate();
     $this->setupMembershipRecurringPaymentProcessorTransaction();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $contactID]);
     $membershipID = (int) $membership['id'];
