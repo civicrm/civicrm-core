@@ -2008,10 +2008,10 @@ class CRM_Utils_Date {
     }
     $thisYear = date('Y');
     if (isset($field['start_date_years'])) {
-      $extra['minDate'] = date('Y-m-d', strtotime('-' . ($thisYear - $field['start_date_years']) . ' years'));
+      $extra['minDate'] = date('Y-m-d', strtotime((-1 * ($thisYear - $field['start_date_years'])) . ' years'));
     }
     if (isset($field['end_date_years'])) {
-      $extra['maxDate'] = date('Y-m-d', strtotime('-' . ($thisYear - $field['end_date_years']) . ' years'));
+      $extra['maxDate'] = date('Y-m-d', strtotime((-1 * ($thisYear - $field['end_date_years'])) . ' years'));
     }
     return $extra;
   }
