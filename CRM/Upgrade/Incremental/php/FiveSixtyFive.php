@@ -41,6 +41,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFive extends CRM_Upgrade_Incremental_
 
     $this->addTask('Update ActionSchedule.limit_to column', 'alterColumn', 'civicrm_action_schedule', 'limit_to', "int COMMENT 'Is this the recipient criteria limited to OR in addition to?'");
     $this->addTask('Remove Batch Create/Edit Activity Types', 'removeFinancialBatchActivityTypes');
+    $this->addTask('Add cache_fill_took column to Group table', 'addColumn', 'civicrm_group', 'cache_fill_took', "DECIMAL(10,3) COMMENT 'Seconds taken to fill smart group cache'", FALSE);
     $this->addTask('Update New Price Set path', 'updateNewPriceSetPath');
   }
 
