@@ -173,11 +173,12 @@ AND (
       $now = date('YmdHis');
       if ($startTime) {
         $took = microtime(TRUE) - $startTime;
-        if (defined('CIVICRM_SLOW_SMART_GROUP_SECONDS') && $took > CIVICRM_SLOW_SMART_GROUP_SECONDS) {
+        $maxTime = CRM_Utils_Constant::value('CIVICRM_SLOW_SMART_GROUP_SECONDS');
+        if ($maxTime && $took > $maxTime) {
           Civi::log()->warning(
             "Updating smart group $groupID took over "
-            . CIVICRM_SLOW_SMART_GROUP_SECONDS
-            . "s (" . number_format($took, 3) . "s)"
+            . $maxTime
+            . "s defined by CIVICRM_SLOW_SMART_GROUP_SECONDS (took " . number_format($took, 3) . "s)"
           );
         }
       }
