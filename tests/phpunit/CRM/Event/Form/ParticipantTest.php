@@ -74,7 +74,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'register_date' => date('Ymd'),
       'status_id' => 5,
       'role_id' => 1,
-      'event_id' => $form->_eventId,
+      'event_id' => $form->getEventID(),
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
       'is_pay_later' => 1,
@@ -186,15 +186,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   public function testSubmitWithPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1], [], TRUE);
-    $form->_mode = 'Live';
+    $_REQUEST['mode'] = 'live';
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    $form->submit($this->getSubmitParamsForCreditCardPayment($paymentProcessorID));
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
+    $form->postProcess();
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $this->assertEquals('2018-09-04 00:00:00', $participant['participant_register_date']);
     $this->assertEquals('Offline Registration for Event: Annual CiviCRM meet by: ', $participant['participant_source']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertEquals(1550.55, $contribution['total_amount']);
+    $this->assertEquals(20, $contribution['total_amount']);
     $this->assertEquals('Debit Card', $contribution['payment_instrument']);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', []);
     $expected = [
@@ -202,8 +202,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_participant',
       'qty' => 1,
       'label' => 'Family Deal',
-      'unit_price' => 1550.55,
-      'line_total' => 1550.55,
+      'unit_price' => 20,
+      'line_total' => 20,
       'participant_count' => 0,
       'price_field_id' => $this->getPriceFieldID(),
       'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
@@ -227,16 +227,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   public function testSubmitWithFailedPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1], [], TRUE);
-    $form->_mode = 'Live';
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    Civi\Payment\System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
+    $_REQUEST['mode'] = 'live';
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
 
-    $form->_fromEmails = [
-      'from_email_id' => ['abc@gmail.com' => 1],
-    ];
+    Civi\Payment\System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
     try {
-      $form->submit($this->getSubmitParamsForCreditCardPayment($paymentProcessorID));
+      $form->postProcess();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       return;
@@ -250,7 +247,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *
    * @dataProvider getThousandSeparators
-   * @throws \Exception
+   * @throws CRM_Core_Exception
    */
   public function testParticipantOfflineReceipt(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
@@ -290,15 +287,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     // Use the email created as the from email ensuring we are passing a numeric from to test dev/core#1069
     $this->setCurrencySeparators($thousandSeparator);
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us'], [], TRUE);
-    $form->_mode = 'Live';
-    $form->_fromEmails = [
-      'from_email_id' => [$email['id'] => 1],
-    ];
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
+    $_REQUEST['mode'] = 'Live';
     $submitParams = $this->getSubmitParamsForCreditCardPayment($paymentProcessorID);
     $submitParams['from_email_address'] = $email['id'];
-    $form->submit($submitParams);
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us'], $submitParams, TRUE);
+    $form->postProcess();
     $participantID = Participant::get()->addWhere('event_id', '=', $this->getEventID('PaidEvent'))->execute()->first()['id'];
     //Check if type is correctly populated in mails.
     //Also check the string email is present not numeric from.
@@ -314,15 +308,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'participant.status_id:name:::Registered',
       'testloggedinreceiptemail@civicrm.org',
       'event.pay_later_receipt:::pay us',
-      $this->formatMoneyInput(1550.55),
+      $this->formatMoneyInput(20.00),
       'event.loc_block_id.phone_id.phone:::1235',
       'event.loc_block_id.phone_id.phone_type_id:label:::Mobile',
       'event.loc_block_id.phone_id.phone_ext:::456',
       'event.confirm_email_text::Just do it',
-      'contribution.total_amount:::' . Civi::format()->money(1550.55),
-      'contribution.total_amount|raw:::1550.55',
-      'contribution.paid_amount:::' . Civi::format()->money(1550.55),
-      'contribution.paid_amount|raw:::1550.55',
+      'contribution.total_amount:::' . Civi::format()->money(20.00),
+      'contribution.total_amount|raw:::20.00',
+      'contribution.paid_amount:::' . Civi::format()->money(20.00),
+      'contribution.paid_amount|raw:::20.00',
       'contribution.balance_amount:::' . Civi::format()->money(0),
       'contribution.balance_amount|raw is zero:::Yes',
       'contribution.balance_amount|raw string is zero:::Yes',
@@ -484,8 +478,6 @@ London,',
     return [
       'register_date' => '2018-09-04',
       'status_id' => 1,
-      'role_id' => 1,
-      'event_id' => $this->getEventID('PaidEvent'),
       'credit_card_number' => 4444333322221111,
       'cvv2' => 123,
       'credit_card_exp_date' => [
@@ -502,14 +494,10 @@ London,',
       'billing_postal_code-5' => 10545,
       'billing_country_id-5' => 1228,
       'payment_processor_id' => $paymentProcessorID,
-      'priceSetId' => $this->getPriceSetID('PaidEvent'),
-      $this->getPriceFieldKey()  => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
-      'amount_level' => 'Too much',
-      'fee_amount' => $this->formatMoneyInput(1550.55),
-      'total_amount' => $this->formatMoneyInput(1550.55),
       'from_email_address' => '"FIXME" <info@EXAMPLE.ORG>',
       'send_receipt' => 1,
       'receipt_text' => '',
+      'source' => '',
     ];
   }
 
