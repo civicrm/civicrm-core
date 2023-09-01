@@ -228,19 +228,9 @@ br.clear {
   border-color: red;
   color: red;
 }
-#sidebar-left,
-#sidebar-right {
-  background-color: #ddd;
-  width: 16em;
-  /* padding in px not ex because IE messes up 100% width tables otherwise */
-  padding: 20px;
-  vertical-align: top;
+#crm-content {
+    padding: 1rem;
 }
-
-#content-right {
-  background-color: #ffffff;
-}
-
 #footer {
   padding: 1em;
   font-size: 0.8em;
@@ -413,11 +403,6 @@ body.ui-dialog-open #status {
 
 /* Joomla 4 */
 
-@media (min-width: 768px) {
-  body.admin.com_civicrm.layout-default #crm-container {
-    padding-top: 2rem;
-  }
-}
 body.admin.com_civicrm.layout-default #subhead-container {
   display: none;
 }
