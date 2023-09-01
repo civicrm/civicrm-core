@@ -662,7 +662,6 @@ ORDER BY   gc.contact_id, g.children
         ->setMemory();
       $lockedGroups = self::getLocksForRefreshableGroupsTo($smartGroups);
       if (!empty($lockedGroups)) {
-        $startTime = microtime(TRUE);
         self::buildGroupContactTempTable($lockedGroups, $groupContactsTempTable);
         // Note in theory we could do this transfer from the temp
         // table to the group_contact_cache table out-of-process - possibly by
@@ -678,7 +677,7 @@ ORDER BY   gc.contact_id, g.children
         // we could throw a try-catch around this line since best-effort would
         // be good enough & potentially improve user experience.
         self::clearGroupContactCache($lockedGroups);
-        self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups, $startTime);
+        self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups);
         self::releaseGroupLocks($lockedGroups);
         $groupContactsTempTable->drop();
       }
