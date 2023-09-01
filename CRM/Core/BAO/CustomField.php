@@ -1060,17 +1060,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fieldAttributes['api']['fieldName'] = $field->getEntity() . '.' . $groupName . '.' . $field->name;
           $element = $qf->addAutocomplete($elementName, $label, $fieldAttributes, $useRequired && !$search);
         }
+        // Autocomplete for field with option values
         else {
-          // FIXME: This won't work with customFieldOptions hook
-          $fieldAttributes += [
-            'entity' => 'OptionValue',
-            'placeholder' => $placeholder,
-            'multiple' => $search ? TRUE : !empty($field->serialize),
-            'api' => [
-              'params' => ['option_group_id' => $field->option_group_id, 'is_active' => 1],
-            ],
-          ];
-          $element = $qf->addEntityRef($elementName, $label, $fieldAttributes, $useRequired && !$search);
+          $fieldAttributes['entity'] = 'OptionValue';
+          $fieldAttributes['placeholder'] = $placeholder;
+          $fieldAttributes['api']['fieldName'] = $field->getEntity() . '.' . $groupName . '.' . $field->name;
+          $fieldAttributes['select']['multiple'] = $search ? TRUE : !empty($field->serialize);
+          $fieldAttributes['select']['minimumInputLength'] = 0;
+          $element = $qf->addAutocomplete($elementName, $label, $fieldAttributes, $useRequired && !$search);
         }
 
         $qf->assign('customUrls', $customUrls);
