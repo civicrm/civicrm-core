@@ -4,6 +4,7 @@ use Civi\Api4\Address;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Participant;
 use Civi\Api4\Phone;
+use Civi\Test\FormTrait;
 
 /**
  *  Test CRM_Event_Form_Registration functions.
@@ -15,10 +16,11 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_PriceSetTrait;
+  use FormTrait;
 
-  public function setUp(): void {
-    parent::setUp();
-    $this->useTransaction();
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
@@ -74,7 +76,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'register_date' => date('Ymd'),
       'status_id' => 5,
       'role_id' => 1,
-      'event_id' => $form->_eventId,
+      'event_id' => $form->getEventID(),
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
       'is_pay_later' => 1,
