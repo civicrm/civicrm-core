@@ -378,8 +378,11 @@ London,',
    * @throws \CRM_Core_Exception
    */
   protected function createParticipantRecordsFromTwoFieldPriceSet(): void {
-    // Create financial type - Event Fee 2
-    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
+    $submittedValues['contact_id'] = $this->ids['Contact']['event'] = $this->individualCreate();
+    $event = $this->eventCreatePaid([
+      'confirm_email_text' => "Just do it\n Now",
+      'is_show_location' => TRUE,
+    ]);
 
     $textFieldsToCreate = [['amount' => 10, 'label' => 'First Text field'], ['amount' => 55, 'label' => 'Second Text field']];
     foreach ($textFieldsToCreate as $fieldToCreate) {
@@ -401,52 +404,13 @@ London,',
       $this->ids['PriceField'][strtolower($fieldParams['name'])] = $textPriceFieldID = $this->callAPISuccess('PriceField', 'create', $fieldParams)['id'];
       $this->ids['PriceFieldValue'][strtolower($fieldParams['name'])] = (int) $this->callAPISuccess('PriceFieldValue', 'getsingle', ['price_field_id' => $textPriceFieldID])['id'];
     }
-
-    $form->_lineItem = [
-      0 => [
-        13 => [
-          'price_field_id' => $this->ids['PriceField']['second_text_field'],
-          'price_field_value_id' => $this->ids['PriceFieldValue']['second_text_field'],
-          'label' => 'Event Fee 1',
-          'field_title' => 'Event Fee 1',
-          'description' => NULL,
-          'qty' => 1,
-          'unit_price' => 55.00,
-          'line_total' => 55.,
-          'participant_count' => 0,
-          'max_value' => NULL,
-          'membership_type_id' => NULL,
-          'membership_num_terms' => NULL,
-          'auto_renew' => NULL,
-          'html_type' => 'Text',
-          'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
-          'tax_amount' => NULL,
-          'non_deductible_amount' => '0.00',
-        ],
-        14 => [
-          'price_field_id' => $this->ids['PriceField']['first_text_field'],
-          'price_field_value_id' => $this->ids['PriceFieldValue']['first_text_field'],
-          'label' => 'Event Fee 2',
-          'field_title' => 'Event Fee 2',
-          'description' => NULL,
-          'qty' => 1,
-          'unit_price' => 10.00,
-          'line_total' => 10,
-          'participant_count' => 0,
-          'max_value' => NULL,
-          'membership_type_id' => NULL,
-          'membership_num_terms' => NULL,
-          'auto_renew' => NULL,
-          'html_type' => 'Text',
-          'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
-          'tax_amount' => NULL,
-          'non_deductible_amount' => '0.00',
-        ],
-      ],
-    ];
-    $form->setAction(CRM_Core_Action::ADD);
-    $form->_priceSetId = $this->getPriceSetID('PaidEvent');
-
+    $submittedValues = array_merge($this->getRecordContributionParams('Partially paid'), $submittedValues);
+    $submittedValues['event_id'] = $event['id'];
+    $_REQUEST['cid'] = $submittedValues['contact_id'];
+    /** @var CRM_Event_Form_Participant $form */
+    $form = $this->getFormObject('CRM_Event_Form_Participant', $submittedValues);
+    $form->preProcess();
+    $form->buildForm();
     $form->submit([
       'register_date' => date('Ymd'),
       'receive_date' => '2018-09-01',
