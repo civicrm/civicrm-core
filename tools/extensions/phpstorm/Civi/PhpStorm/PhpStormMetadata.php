@@ -98,6 +98,9 @@ class PhpStormMetadata {
    */
   public function write(): void {
     $path = phpstorm_metadata_dir();
+    if ($path === NULL) {
+      return;
+    }
 
     if (file_exists($path) && !is_dir($path)) {
       unlink($path);
