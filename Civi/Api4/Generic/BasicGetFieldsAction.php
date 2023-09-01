@@ -327,8 +327,10 @@ class BasicGetFieldsAction extends BasicGetAction {
           'Location' => ts('Address Location'),
           'Number' => ts('Number'),
           'Radio' => ts('Radio Buttons'),
+          'RichTextEditor' => ts('Rich Text Editor'),
           'Select' => ts('Select'),
-          'Text' => ts('Text'),
+          'Text' => ts('Single-Line Text'),
+          'TextArea' => ts('Multi-Line Text'),
         ],
       ],
       [
