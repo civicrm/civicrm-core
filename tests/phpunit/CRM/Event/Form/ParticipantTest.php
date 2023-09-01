@@ -5,6 +5,9 @@ use Civi\Api4\LineItem;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Participant;
 use Civi\Api4\Phone;
+use Civi\Test\FormTrait;
+use Civi\Test\FormWrapper;
+use Civi\Test\FormWrappers\EventFormParticipant;
 
 /**
  *  Test CRM_Event_Form_Registration functions.
@@ -14,6 +17,7 @@ use Civi\Api4\Phone;
  */
 class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
+  use FormTrait;
   use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_PriceSetTrait;
 
@@ -33,10 +37,9 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'register_date' => date('Ymd'),
       'status_id' => 1,
       'role_id' => 1,
-    ]);
-    $form->postProcess();
+    ])->postProcess();
     $this->assertEquals($this->getEventID(), $form->getEventID());
-    $this->callAPISuccessGetSingle('Participant', []);
+    $this->callAPISuccessGetSingle('Participant', ['id' => $form->getParticipantID()]);
   }
 
   /**
@@ -326,11 +329,11 @@ London,',
    * @param array $submittedValues
    * @param bool $isQuickConfig
    *
-   * @return CRM_Event_Form_Participant
+   * @return \Civi\Test\FormWrappers\EventFormParticipant
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE): CRM_Event_Form_Participant {
+  protected function getForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE): EventFormParticipant {
     $submittedValues['contact_id'] = $this->ids['Contact']['event'] = $this->individualCreate();
 
     if (!empty($eventParams['is_monetary'])) {
@@ -348,12 +351,7 @@ London,',
       $event = $this->eventCreateUnpaid($eventParams);
     }
     $submittedValues['event_id'] = $event['id'];
-    $_REQUEST['cid'] = $submittedValues['contact_id'];
-    /** @var CRM_Event_Form_Participant $form */
-    $form = $this->getFormObject('CRM_Event_Form_Participant', $submittedValues);
-    $form->preProcess();
-    $form->buildForm();
-    return $form;
+    return $this->getTestForm('CRM_Event_Form_Participant', $submittedValues, ['cid' => $submittedValues['contact_id']])->processForm(FormWrapper::BUILT);
   }
 
   /**
