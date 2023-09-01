@@ -107,7 +107,7 @@ trait EventTestTrait {
   }
 
   /**
-   * Create a paid event.
+   * Create an unpaid event.
    *
    * @param array $eventParameters
    *   Values to
