@@ -4,7 +4,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 require_once 'phpstorm.civix.php';
 // phpcs:disable
-use CRM_Phpstorm_ExtensionUtil as E;
+use CRM_PhpStorm_ExtensionUtil as E;
 // phpcs:enable
 
 /**
@@ -17,8 +17,28 @@ use CRM_Phpstorm_ExtensionUtil as E;
  *
  * @return string
  */
-function phpstorm_metadata_dir(): string {
-  return \Civi::paths()->getPath('[civicrm.files]/.phpstorm.meta.php');
+function phpstorm_metadata_dir(): ?string {
+  $candidates = _phpstorm_metadata_dirs();
+  foreach ($candidates as $candidate) {
+    if (file_exists($candidate) && is_writable($candidate)) {
+      return $candidate;
+    }
+    if (!file_exists($candidate) && is_writable(dirname($candidate))) {
+      return $candidate;
+    }
+  }
+  \Civi::log()->error("Failed to find writeable folder for PhpStorm metadata. Candidates: " . implode(",", $candidates));
+  return NULL;
+}
+
+function _phpstorm_metadata_dirs(): array {
+  $dirs = [];
+  if (CRM_Utils_Constant::value('CIVICRM_PHPSTORM_METADATA')) {
+    $dirs[] = CRM_Utils_Constant::value('CIVICRM_PHPSTORM_METADATA');
+  }
+  $dirs[] = E::path('.phpstorm.meta.php');
+  $dirs[] = \Civi::paths()->getPath('[civicrm.files]/.phpstorm.meta.php');
+  return $dirs;
 }
 
 /**
@@ -43,9 +63,20 @@ function phpstorm_civicrm_managed(&$entities, $modules) {
   }
 }
 
-function phpstorm_civicrm_uninstall() {
-  $dir = phpstorm_metadata_dir();
-  if (file_exists($dir)) {
-    CRM_Utils_File::cleanDir($dir, TRUE);
+function phpstorm_civicrm_enable(): void {
+  // Remove any stale files from old versions.
+  _phpstorm_cleanup();
+}
+
+function phpstorm_civicrm_uninstall(): void {
+  _phpstorm_cleanup();
+}
+
+function _phpstorm_cleanup(): void {
+  $dirs = _phpstorm_metadata_dirs();
+  foreach ($dirs as $dir) {
+    if (file_exists($dir)) {
+      CRM_Utils_File::cleanDir($dir, TRUE);
+    }
   }
 }

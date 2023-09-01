@@ -70,6 +70,7 @@ tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html
 tools/tests/reports/testdox.txt
 tools/extensions/org.civicrm.contactlayout
+tools/extensions/phpstorm/.phpstorm.meta.php
 l10n
 vendor
 civicrm.settings.php

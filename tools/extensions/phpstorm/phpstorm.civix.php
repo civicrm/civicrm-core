@@ -6,10 +6,10 @@
  * The ExtensionUtil class provides small stubs for accessing resources of this
  * extension.
  */
-class CRM_Phpstorm_ExtensionUtil {
+class CRM_PhpStorm_ExtensionUtil {
   const SHORT_NAME = 'phpstorm';
   const LONG_NAME = 'phpstorm';
-  const CLASS_PREFIX = 'CRM_Phpstorm';
+  const CLASS_PREFIX = 'CRM_PhpStorm';
 
   /**
    * Translate a string using the extension's domain.
@@ -77,7 +77,7 @@ class CRM_Phpstorm_ExtensionUtil {
 
 }
 
-use CRM_Phpstorm_ExtensionUtil as E;
+use CRM_PhpStorm_ExtensionUtil as E;
 
 /**
  * (Delegated) Implements hook_civicrm_config().

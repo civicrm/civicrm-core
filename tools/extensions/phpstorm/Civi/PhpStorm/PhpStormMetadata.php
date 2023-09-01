@@ -70,6 +70,15 @@ class PhpStormMetadata {
 
   /**
    * @param string $for
+   * @return $this
+   */
+  public function addExitPoint(string $for) {
+    $this->buffer .= "exitPoint($for);\n";
+    return $this;
+  }
+
+  /**
+   * @param string $for
    * @param array $map
    *   Array(string $parameterId => string $className)
    *
@@ -89,6 +98,9 @@ class PhpStormMetadata {
    */
   public function write(): void {
     $path = phpstorm_metadata_dir();
+    if ($path === NULL) {
+      return;
+    }
 
     if (file_exists($path) && !is_dir($path)) {
       unlink($path);
