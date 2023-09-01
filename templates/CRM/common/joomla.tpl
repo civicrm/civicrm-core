@@ -60,5 +60,4 @@
     {/if}
     {/crmRegion}
   </div>
-</div>
 </div> {* end crm-container div *}
