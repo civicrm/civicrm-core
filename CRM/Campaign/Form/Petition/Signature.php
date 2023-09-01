@@ -117,6 +117,13 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   protected $_image_URL;
 
   /**
+   * Prevent double clicks from creating duplicate or blank records.
+   *
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    */
   public function __construct() {
     parent::__construct();
