@@ -32,10 +32,13 @@ function phpstorm_metadata_dir(): ?string {
 }
 
 function _phpstorm_metadata_dirs(): array {
-  return [
-    E::path('.phpstorm.meta.php'),
-    \Civi::paths()->getPath('[civicrm.files]/.phpstorm.meta.php'),
-  ];
+  $dirs = [];
+  if (CRM_Utils_Constant::value('CIVICRM_PHPSTORM_METADATA')) {
+    $dirs[] = CRM_Utils_Constant::value('CIVICRM_PHPSTORM_METADATA');
+  }
+  $dirs[] = E::path('.phpstorm.meta.php');
+  $dirs[] = \Civi::paths()->getPath('[civicrm.files]/.phpstorm.meta.php');
+  return $dirs;
 }
 
 /**
