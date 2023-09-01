@@ -523,12 +523,6 @@ class CRM_Core_ManagedEntities {
    */
   protected function getDeclarations($modules = NULL): array {
     $declarations = [];
-    // Exclude components if given a module name.
-    if (!$modules || $modules === ['civicrm']) {
-      foreach (CRM_Core_Component::getEnabledComponents() as $component) {
-        $declarations = array_merge($declarations, $component->getManagedEntities());
-      }
-    }
     CRM_Utils_Hook::managed($declarations, $modules);
     $this->validate($declarations);
     foreach (array_keys($declarations) as $name) {
