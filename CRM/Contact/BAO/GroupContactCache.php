@@ -173,8 +173,12 @@ AND (
       $now = date('YmdHis');
       if ($startTime) {
         $took = microtime(TRUE) - $startTime;
-        if ($took > 5) {
-          Civi::log()->warning("Updating smart group $groupID took over 5s (" . number_format($took, 3) . "s)");
+        if (defined('CIVICRM_SLOW_SMART_GROUP_SECONDS') && $took > CIVICRM_SLOW_SMART_GROUP_SECONDS) {
+          Civi::log()->warning(
+            "Updating smart group $groupID took over "
+            . CIVICRM_SLOW_SMART_GROUP_SECONDS
+            . "s (" . number_format($took, 3) . "s)"
+          );
         }
       }
     }
