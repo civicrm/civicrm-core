@@ -119,11 +119,17 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'default_weight' => '1',
             'default_order' => 'ASC',
           ],
+          'status_id' => [
+            'title' => ts('Membership Status'),
+          ],
           'membership_start_date' => [
             'title' => ts('Membership Start Date'),
           ],
           'membership_end_date' => [
             'title' => ts('Membership End Date'),
+          ],
+          'contribution_recur_id' => [
+            'title' => ts('Auto-renew'),
           ],
         ],
         'grouping' => 'member-fields',
@@ -239,6 +245,12 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => [0 => ts('None'), -1 => ts('Ended')] + CRM_Contribute_BAO_ContributionRecur::buildOptions('contribution_status_id', 'search'),
             'type' => CRM_Utils_Type::T_INT,
+          ],
+        ],
+        'order_bys' => [
+          'autorenew_status_id' => [
+            'name' => 'contribution_status_id',
+            'title' => ts('Auto-Renew Subscription Status'),
           ],
         ],
         'grouping' => 'member-fields',
