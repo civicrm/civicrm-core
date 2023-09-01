@@ -722,4 +722,37 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ], $submitValues));
   }
 
+  public function testRegistrationWithoutCiviContributeEnabled(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $event = $this->eventCreateUnpaid([
+      'has_waitlist' => 1,
+      'max_participants' => 1,
+      'start_date' => 20351021,
+      'end_date' => 20351023,
+      'registration_end_date' => 20351015,
+    ]);
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviContribute');
+    $this->submitForm(
+      $event['id'], [
+        [
+          'first_name' => 'Bruce No Contribute',
+          'last_name' => 'Wayne',
+          'email-Primary' => 'bruce@gotham.com',
+          'is_primary' => 1,
+          'is_pay_later' => 0,
+          'campaign_id' => NULL,
+          'defaultRole' => 1,
+          'participant_role_id' => '1',
+          'button' => '_qf_Register_upload',
+        ],
+      ]
+    );
+    $mut->checkMailLog([
+      'Dear Bruce No Contribute,  Thank you for your registration.  This is a confirmation that your registration has been received and your status has been updated to Registered.',
+    ]);
+    $mut->stop();
+    $mut->clearMessages();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
+  }
+
 }
