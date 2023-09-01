@@ -114,7 +114,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
         $participantPayment = civicrm_api3('ParticipantPayment', 'get', ['participant_id' => $participantID])['values'];
         if (!empty($participantPayment)) {
           // no ts() since this should be rare
-          CRM_Core_Session::setStatus('There might be a data problem, contribution id could not be loaded from the line item');
+          CRM_Core_Error::deprecatedWarning('There might be a data problem, contribution id could not be loaded from the line item');
           $participantPayment = reset($participantPayment);
           $this->setContributionID((int) $participantPayment['contribution_id']);
         }
