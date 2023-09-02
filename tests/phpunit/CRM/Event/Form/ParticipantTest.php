@@ -17,9 +17,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_PriceSetTrait;
 
-  public function setUp(): void {
-    parent::setUp();
-    $this->useTransaction();
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    $this->revertTemplateToReservedTemplate();
+    parent::tearDown();
   }
 
   /**
