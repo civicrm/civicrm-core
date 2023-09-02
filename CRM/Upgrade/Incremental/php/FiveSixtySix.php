@@ -146,41 +146,47 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
     return TRUE;
   }
 
+  /**
+   * Convert `quicksearch_options` setting to use new APIv4 field names
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
   public static function updateQuicksearchOptions($ctx): bool {
-    $map = [
-      'sort_name' => 'sort_name',
-      'contact_id' => 'id',
-      'external_identifier' => 'external_identifier',
-      'first_name' => 'first_name',
-      'last_name' => 'last_name',
-      'email' => 'email_primary.email',
-      'phone_numeric' => 'phone_primary.phone_numeric',
-      'street_address' => 'address_primary.street_address',
-      'city' => 'address_primary.city',
-      'postal_code' => 'address_primary.postal_code',
-      'job_title' => 'job_title',
-    ];
-    $custom = civicrm_api4('CustomField', 'get', [
-      'checkPermissions' => FALSE,
-      'select' => ['name', 'label', 'custom_group_id.name', 'custom_group_id.title', 'option_group_id'],
-      'where' => [
-        ['custom_group_id.extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes())],
-        ['data_type', 'NOT IN', ['ContactReference', 'Date', 'File']],
-        ['custom_group_id.is_active', '=', TRUE],
-        ['is_active', '=', TRUE],
-        ['is_searchable', '=', TRUE],
-      ],
-    ]);
-    foreach ($custom as $field) {
-      $map['custom_' . $field['name']] = $field['custom_group_id.name'] . '.' . $field['name'] . ($field['option_group_id'] ? ':label' : '');
-    }
-
     $oldOpts = Civi::settings()->get('quicksearch_options');
     if ($oldOpts) {
+      // Map old quicksearch options to new APIv4 format
+      $map = [
+        'sort_name' => 'sort_name',
+        'contact_id' => 'id',
+        'external_identifier' => 'external_identifier',
+        'first_name' => 'first_name',
+        'last_name' => 'last_name',
+        'email' => 'email_primary.email',
+        'phone_numeric' => 'phone_primary.phone_numeric',
+        'street_address' => 'address_primary.street_address',
+        'city' => 'address_primary.city',
+        'postal_code' => 'address_primary.postal_code',
+        'job_title' => 'job_title',
+      ];
+
       $newOpts = [];
       foreach ($oldOpts as $oldOpt) {
-        // In case the upgrade has run already, check new and old options
-        if (in_array($oldOpt, $map) || array_key_exists($oldOpt, $map)) {
+        // Convert custom fields
+        if (str_starts_with($oldOpt, 'custom_')) {
+          $fieldName = substr($oldOpt, 7);
+          try {
+            $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldName, 'option_group_id', 'name');
+            $customGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldName, 'custom_group_id', 'name');
+            $customGroupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'name');
+            $newOpts[] = $customGroupName . '.' . $fieldName . ($optionGroupId ? ':label' : '');
+          }
+          catch (CRM_Core_Exception $e) {
+            // Field not found or something... just drop it
+          }
+        }
+        // Core fields. In case the upgrade has run already, check new and old options
+        elseif (in_array($oldOpt, $map) || array_key_exists($oldOpt, $map)) {
           $newOpts[] = $map[$oldOpt] ?? $oldOpt;
         }
       }
