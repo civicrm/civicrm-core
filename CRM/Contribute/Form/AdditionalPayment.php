@@ -368,11 +368,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $session = CRM_Core_Session::singleton();
 
     // we need to retrieve email address
-    if ($this->_context == 'standalone' && !empty($this->_params['is_email_receipt'])) {
-      list($this->userDisplayName,
+    if ($this->_context === 'standalone' && !empty($this->_params['is_email_receipt'])) {
+      list($displayName,
         $this->userEmail
         ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
-      $this->assign('displayName', $this->userDisplayName);
+      $this->assign('displayName', $displayName);
     }
 
     $this->_params['amount'] = $this->_params['total_amount'];

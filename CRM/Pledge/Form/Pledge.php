@@ -79,9 +79,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       return;
     }
 
-    $this->userDisplayName = $this->userEmail = NULL;
+    $displayName = $this->userEmail = NULL;
     if ($this->_contactID) {
-      [$this->userDisplayName, $this->userEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+      [$displayName, $this->userEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
     }
 
     $this->setPageTitle(ts('Pledge'));

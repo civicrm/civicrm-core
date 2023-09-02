@@ -631,7 +631,7 @@ London,',
 
     $mut->checkMailLog([
       'From: "FIXME" <info@EXAMPLE.ORG>',
-      'To: Anthony Anderson <anthony_anderson@civicrm.org>',
+      'To: "Mr. Anthony Anderson II" <anthony_anderson@civicrm.org>',
       'Subject: Event Confirmation - Annual CiviCRM meet - Mr. Anthony Anderson II',
       'Dear Anthony,Contact the Development Department if you need to make any changes to your registration.',
       'Event Information and Location',
