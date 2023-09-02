@@ -20,7 +20,7 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
   /**
    * Log out.
    */
-  public function logout() {
+  public static function logout() {
     Security::singleton()->logoutUser();
     // Dump them back on the log-IN page.
     CRM_Utils_System::redirect('/civicrm/login?justLoggedOut');
