@@ -1131,10 +1131,11 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    */
   public static function processImage() {
     $action = CRM_Utils_Request::retrieve('action', 'String');
+    $pcp = CRM_Utils_Request::retrieve('confirmed', 'String');
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
     // retrieve contact id in case of Profile context
     $id = CRM_Utils_Request::retrieve('id', 'Positive');
-    $formName = $cid ? 'CRM_Contact_Form_Contact' : 'CRM_Profile_Form_Edit';
+    $formName = $pcp ? 'CRM_PCP_Form_PCPAccount' : ($cid ? 'CRM_Contact_Form_Contact' : 'CRM_Profile_Form_Edit');
     $cid = $cid ? $cid : $id;
     if ($action & CRM_Core_Action::DELETE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
