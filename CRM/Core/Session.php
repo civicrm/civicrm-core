@@ -130,7 +130,9 @@ class CRM_Core_Session {
     if (!isset($this->_session)) {
       // CRM-9483
       if (!isset($_SESSION) && PHP_SAPI !== 'cli') {
-        if ($isRead) {
+        // Standalone does not do lazy sessions and this causes problems with
+        // reading the locale set in the session (lcMessages in ConfigSetting)
+        if ($isRead && CIVICRM_UF !== 'Standalone') {
           return;
         }
         CRM_Core_Config::singleton()->userSystem->sessionStart();
