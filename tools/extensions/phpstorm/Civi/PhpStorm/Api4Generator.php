@@ -2,6 +2,7 @@
 
 namespace Civi\PhpStorm;
 
+use Civi\Api4\Entity;
 use Civi\Core\Service\AutoService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -30,14 +31,28 @@ class Api4Generator extends AutoService implements EventSubscriberInterface {
      * but for now there's no point.
      */
 
-    $entities = \Civi\Api4\Entity::get(FALSE)->addSelect('name')->execute()->column('name');
+    $entities = Entity::get(FALSE)->addSelect('name')->execute()->column('name');
     $actions = ['get', 'save', 'create', 'update', 'delete', 'replace', 'revert', 'export', 'autocomplete', 'getFields', 'getActions', 'checkAccess'];
+    $properties = Entity::getFields(FALSE)->addOrderBy('name')->execute()->column('name');
 
     $builder = new PhpStormMetadata('api4', __CLASS__);
     $builder->registerArgumentsSet('api4Entities', ...$entities);
     $builder->registerArgumentsSet('api4Actions', ...$actions);
+    $builder->registerArgumentsSet('api4Properties', ...$properties);
     $builder->addExpectedArguments('\civicrm_api4()', 0, 'api4Entities');
     $builder->addExpectedArguments('\civicrm_api4()', 1, 'api4Actions');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getBAOFromApiName()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getApiClass()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getInfoItem()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getInfoItem()', 1, 'api4Properties');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getIdFieldName()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getSearchFields()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getTableName()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getCustomGroupExtends()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getRefCount()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::checkAccessDelegated()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::checkAccessDelegated()', 1, 'api4Actions');
+    $builder->addExpectedArguments('\Civi\API\EntityLookupTrait::define()', 0, 'api4Entities');
     $builder->write();
   }
 
