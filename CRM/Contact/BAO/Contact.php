@@ -1131,7 +1131,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    */
   public static function processImage() {
     $action = CRM_Utils_Request::retrieve('action', 'String');
-    $pcp = CRM_Utils_Request::retrieve('confirmed', 'String');
+    $pcp = CRM_Utils_Request::retrieve('pcp', 'String');
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
     // retrieve contact id in case of Profile context
     $id = CRM_Utils_Request::retrieve('id', 'Positive');
