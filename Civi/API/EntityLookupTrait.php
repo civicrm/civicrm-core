@@ -57,6 +57,11 @@ trait EntityLookupTrait {
     if (!isset($this->entityLookupValues[$nickname])) {
       throw new \CRM_Core_Exception(sprintf('Cannot lookup entity "%s" before it has been defined.', $nickname));
     }
+    // Simply return an id - no need for any queries
+    if (isset($this->entityLookupDefinitions[$nickname]['identifier'][$fieldName])) {
+      return $this->entityLookupDefinitions[$nickname]['identifier'][$fieldName];
+    }
+    // Return stored value from previous lookup
     if (array_key_exists($fieldName, $this->entityLookupValues[$nickname])) {
       return $this->entityLookupValues[$nickname][$fieldName];
     }
@@ -69,13 +74,15 @@ trait EntityLookupTrait {
     foreach ($this->entityLookupDefinitions[$nickname]['identifier'] as $key => $val) {
       $params['where'][] = [$key, '=', $val];
     }
+    // Initial load - prefetch all core fields to reduce # of subsequent queries
     if (!$this->entityLookupValues[$nickname]) {
       $params['select'][] = '*';
+      // Contact email is commonly needed by forms so prefetch it as well
       if ($entityName === 'Contact') {
         $params['select'][] = 'email_primary.*';
       }
     }
-    // If requesting a join or a custom field, fetch them all by replacing the last part with a *
+    // If requesting a join or a custom field, prefetch all using `select 'join_entity.*'`
     if (str_contains($fieldName, '.')) {
       $parts = explode('.', $fieldName);
       $parts[count($parts) - 1] = '*';
