@@ -17,9 +17,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_PriceSetTrait;
 
-  public function setUp(): void {
-    parent::setUp();
-    $this->useTransaction();
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    $this->revertTemplateToReservedTemplate();
+    parent::tearDown();
   }
 
   /**
@@ -256,18 +257,11 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'location_type_id' => 1,
     ]);
 
-    //Get workflow id of event_offline receipt.
-    $workflowId = $this->callAPISuccess('OptionValue', 'get', [
-      'return' => ['id'],
-      'option_group_id' => 'msg_tpl_workflow_event',
-      'name' => 'event_offline_receipt',
-    ]);
-
     //Modify html to contain event_type_id token.
     $result = $this->callAPISuccess('MessageTemplate', 'get', [
       'sequential' => 1,
       'return' => ['id', 'msg_html'],
-      'workflow_id' => $workflowId['id'],
+      'workflow_name' => 'event_offline_receipt',
       'is_default' => 1,
     ]);
     $oldMsg = $result['values'][0]['msg_html'];
