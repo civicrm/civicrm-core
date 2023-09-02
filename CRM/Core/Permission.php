@@ -996,9 +996,6 @@ class CRM_Core_Permission {
       'get' => [],
       // managed by _civicrm_api3_check_edit_permissions
       'update' => [],
-      'getquick' => [
-        ['access CiviCRM', 'access AJAX API'],
-      ],
       'duplicatecheck' => [
         'access CiviCRM',
       ],

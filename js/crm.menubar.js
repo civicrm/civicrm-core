@@ -288,15 +288,21 @@
             var
               option = $('input[name=quickSearchField]:checked'),
               params = {
-                name: request.term,
-                field_name: option.val()
+                formName: 'crmMenubar',
+                fieldName: 'crm-qsearch-input',
+                filters: {},
               };
-            CRM.api3('contact', 'getquick', params).done(function(result) {
+            if (option.val() === 'sort_name') {
+              params.input = request.term;
+            } else {
+              params.filters[option.val()] = request.term;
+            }
+            CRM.api4('Contact', 'autocomplete', params).then(function(result) {
               var ret = [];
-              if (result.values.length > 0) {
+              if (result.length > 0) {
                 $('#crm-qsearch-input').autocomplete('widget').menu('option', 'disabled', false);
-                $.each(result.values, function(k, v) {
-                  ret.push({value: v.id, label: v.data});
+                $.each(result, function(key, item) {
+                  ret.push({value: item.id, label: item.label});
                 });
               } else {
                 $('#crm-qsearch-input').autocomplete('widget').menu('option', 'disabled', true);

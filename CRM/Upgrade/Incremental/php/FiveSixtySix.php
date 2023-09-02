@@ -38,6 +38,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
     $this->addTask('Add fields to civicrm_mail_settings to allow more flexibility for email to activity', 'addMailSettingsFields');
     $this->addTask('Update afform tab names', 'updateAfformTabs');
     $this->addTask('Add in Client Removed Activity Type', 'addCaseClientRemovedActivity');
+    $this->addTask('Update quicksearch options to v4 format', 'updateQuicksearchOptions');
   }
 
   /**
@@ -142,6 +143,52 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
       'component_id' => CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_component WHERE name = 'CiviCase'"),
       'icon' => 'fa-trash',
     ]);
+    return TRUE;
+  }
+
+  public static function updateQuicksearchOptions($ctx): bool {
+    $map = [
+      'sort_name' => 'sort_name',
+      'contact_id' => 'id',
+      'external_identifier' => 'external_identifier',
+      'first_name' => 'first_name',
+      'last_name' => 'last_name',
+      'email' => 'email_primary.email',
+      'phone_numeric' => 'phone_primary.phone_numeric',
+      'street_address' => 'address_primary.street_address',
+      'city' => 'address_primary.city',
+      'postal_code' => 'address_primary.postal_code',
+      'job_title' => 'job_title',
+    ];
+    $custom = civicrm_api4('CustomField', 'get', [
+      'checkPermissions' => FALSE,
+      'select' => ['name', 'label', 'custom_group_id.name', 'custom_group_id.title', 'option_group_id'],
+      'where' => [
+        ['custom_group_id.extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes())],
+        ['data_type', 'NOT IN', ['ContactReference', 'Date', 'File']],
+        ['custom_group_id.is_active', '=', TRUE],
+        ['is_active', '=', TRUE],
+        ['is_searchable', '=', TRUE],
+      ],
+    ]);
+    foreach ($custom as $field) {
+      $map['custom_' . $field['name']] = $field['custom_group_id.name'] . '.' . $field['name'] . ($field['option_group_id'] ? ':label' : '');
+    }
+
+    $oldOpts = Civi::settings()->get('quicksearch_options');
+    if ($oldOpts) {
+      $newOpts = [];
+      foreach ($oldOpts as $oldOpt) {
+        // In case the upgrade has run already, check new and old options
+        if (in_array($oldOpt, $map) || array_key_exists($oldOpt, $map)) {
+          $newOpts[] = $map[$oldOpt] ?? $oldOpt;
+        }
+      }
+      Civi::settings()->set('quicksearch_options', $newOpts);
+    }
+    else {
+      Civi::settings()->revert('quicksearch_options');
+    }
     return TRUE;
   }
 
