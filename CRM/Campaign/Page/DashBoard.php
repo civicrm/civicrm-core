@@ -318,7 +318,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         $surveysData[$sid]['is_default'] = boolval($surveysData[$sid]['is_default']);
 
         if ($surveysData[$sid]['result_id']) {
-          $resultSet = '<a href= "javascript:displayResultSet( ' . $sid . ',' . "'" . $surveysData[$sid]['title'] . "'" . ', ' . $surveysData[$sid]['result_id'] . ' )" title="' . ts('view result set') . '">' . ts('Result Set') . '</a>';
+          $resultSet = '<a href= "javascript:displayResultSet( ' . $sid . ', ' . htmlspecialchars(json_encode($surveysData[$sid]['title'])) . ', ' . $surveysData[$sid]['result_id'] . ' )" title="' . ts('view result set', ['escape' => 'htmlattribute']) . '">' . ts('Result Set') . '</a>';
           $surveysData[$sid]['result_id'] = $resultSet;
         }
         else {
