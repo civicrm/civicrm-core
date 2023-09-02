@@ -183,7 +183,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
       foreach ($groupTree as $values) {
         $query = "DELETE FROM %1 WHERE entity_id = %2";
         CRM_Core_DAO::executeQuery($query, [
-          1 => [$values['table_name'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
+          1 => [$values['table_name'], 'MysqlColumnNameOrAlias'],
           2 => [$event->id, 'Integer'],
         ]);
       }

@@ -1534,13 +1534,13 @@ WHERE  id = %1
       $wheres[] = 'domain_id = ' . CRM_Core_Config::domainID() . ' OR  domain_id is NULL';
     }
     $queryParams = [
-      1 => [$params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
-      2 => [$params['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
-      3 => [$pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
+      1 => [$params['keyColumn'], 'MysqlColumnNameOrAlias'],
+      2 => [$params['labelColumn'], 'MysqlColumnNameOrAlias'],
+      3 => [$pseudoconstant['table'], 'MysqlColumnNameOrAlias'],
     ];
     // Add orderColumn param
     if (!empty($params['orderColumn'])) {
-      $queryParams[4] = [$params['orderColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES];
+      $queryParams[4] = [$params['orderColumn'], 'MysqlOrderBy'];
       $order = 'ORDER BY %4';
     }
     // Support no sorting if $params[orderColumn] is FALSE
