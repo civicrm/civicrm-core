@@ -309,7 +309,7 @@
                 var label = option.closest('label').text();
                 var msg = ts('%1 not found.', {1: label});
                 // Remind user they are not searching by contact name (unless they enter a number)
-                if (params.field_name !== 'sort_name' && !(/[\d].*/.test(params.name))) {
+                if (option.val() !== 'sort_name' && !(/[\d].*/.test(params.name))) {
                   msg += ' ' + ts('Did you mean to search by Name/Email instead?');
                 }
                 ret.push({value: '0', label: msg});
