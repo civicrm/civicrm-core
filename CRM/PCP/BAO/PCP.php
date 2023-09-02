@@ -93,13 +93,13 @@ ORDER BY page_type, page_id';
     $params = [1 => [$contactId, 'Integer']];
     $pcpInfoDao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $links = self::pcpLinks();
-    $hide = $mask = array_sum(array_keys($links['all']));
     $approved = CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCP', 'status_id', 'Approved');
     $contactPCPPages = [];
     $pcpInfo = [];
 
     while ($pcpInfoDao->fetch()) {
+      $links = self::pcpLinks($pcpInfoDao->id);
+      $hide = $mask = array_sum(array_keys($links['all']));
       $mask = $hide;
       if ($links) {
         $replace = [
@@ -274,6 +274,9 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    *   (reference) of action links
    */
   public static function &pcpLinks($pcpId = NULL) {
+    if (!$pcpId) {
+      CRM_Core_Error::deprecatedWarning('pcpId should be provided to render links');
+    }
     if (!(self::$_pcpLinks)) {
       $deleteExtra = ts('Are you sure you want to delete this Personal Campaign Page?') . '\n' . ts('This action cannot be undone.');
 
