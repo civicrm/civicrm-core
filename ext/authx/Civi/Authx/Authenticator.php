@@ -50,17 +50,18 @@ class Authenticator extends AutoService implements HookInterface {
         _authx_redact(['_authx']);
       }
       elseif (!empty($params['_authxSes'])) {
-        $this->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
+        $this->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey, 'redirect' => $params['_authxRedir'] ?? '']);
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+          _authx_redact(['_authxRedir']);
           _authx_reload(implode('/', $e->args), $_SERVER['QUERY_STRING']);
         }
         else {
-          _authx_redact(['_authx', '_authxSes']);
+          _authx_redact(['_authx', '_authxSes', '_authxRedir']);
         }
       }
       else {
-        $this->auth($e, ['flow' => 'param', 'cred' => $params['_authx'], 'siteKey' => $siteKey]);
-        _authx_redact(['_authx']);
+        $this->auth($e, ['flow' => 'param', 'cred' => $params['_authx'], 'siteKey' => $siteKey, 'redirect' => $params['_authxRedir'] ?? '']);
+        _authx_redact(['_authx', '_authxRedir']);
       }
     }
   }
@@ -98,6 +99,8 @@ class Authenticator extends AutoService implements HookInterface {
    *   - bool $useSession (default FALSE)
    *     If TRUE, then the authentication should be persistent (in a session variable).
    *     If FALSE, then the authentication should be ephemeral (single page-request).
+   *   - string redirect (optional)
+   *     The URL to redirect to if authentication fails
    *
    *   And then ONE of these properties to describe the user/principal:
    *
@@ -125,6 +128,7 @@ class Authenticator extends AutoService implements HookInterface {
       'cred' => $details['cred'] ?? NULL,
       'siteKey' => $details['siteKey'] ?? NULL,
       'useSession' => $details['useSession'] ?? FALSE,
+      'redirect' => $details['redirect'] ?? '',
     ]);
 
     if (isset($tgt->cred)) {
@@ -190,6 +194,9 @@ class Authenticator extends AutoService implements HookInterface {
     \Civi::dispatcher()->dispatch('civi.authx.checkCredential', $checkEvent);
 
     if ($checkEvent->getRejection()) {
+      if ($tgt->redirect) {
+        _authx_reload($tgt->redirect, 'msg="' . $checkEvent->getRejection() . '"');
+      }
       $this->reject($checkEvent->getRejection());
     }
 
@@ -390,6 +397,13 @@ class AuthenticatorTarget {
    * @var array|null
    */
   public $jwt = NULL;
+
+  /**
+   * URL to redirect to if authentication fails
+   *
+   * @var string
+   */
+  public $redirect;
 
   /**
    * @param array $args

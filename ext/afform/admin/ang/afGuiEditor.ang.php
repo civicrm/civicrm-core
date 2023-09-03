@@ -14,4 +14,7 @@ return [
   'exports' => [
     'af-gui-editor' => 'E',
   ],
+  'permissions' => [
+    'all CiviCRM permissions and ACLs',
+  ],
 ];

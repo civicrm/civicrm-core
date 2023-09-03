@@ -196,8 +196,8 @@ class Tokens extends AutoService implements EventSubscriberInterface {
    * @throws \Civi\Crypto\Exception\CryptoException
    */
   public static function createUrl($afform, $contactId): string {
-    $expires = \CRM_Utils_Time::time() +
-      (\Civi::settings()->get('checksum_timeout') * 24 * 60 * 60);
+    $timeout = $afform['authx_timeout'] ?? \Civi::settings()->get('checksum_timeout');
+    $expires = \CRM_Utils_Time::time() + $timeout * 24 * 60 * 60;
 
     /** @var \Civi\Crypto\CryptoJwt $jwt */
     $jwt = \Civi::service('crypto.jwt');
@@ -209,7 +209,8 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     ]);
 
     $url = \CRM_Utils_System::url($afform['server_route'],
-      ['_authx' => $bearerToken, '_authxSes' => 1],
+      ['_authx' => $bearerToken, '_authxSes' => 1] +
+        (!empty($afform['authx_redirect']) ? ['_authxRedir' => $afform['authx_redirect']] : []),
       TRUE,
       NULL,
       FALSE,
