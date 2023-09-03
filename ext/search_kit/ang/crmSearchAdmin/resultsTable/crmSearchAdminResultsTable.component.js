@@ -43,10 +43,12 @@
 
       // Add callbacks for pre & post run
       this.onPreRun.push(function(apiCalls) {
-        apiCalls.run.debug = true;
+        // So the raw SQL can be shown in the "Query Info" tab
+        apiCalls.run[2].debug = true;
       });
 
       this.onPostRun.push(function(apiResults) {
+        // Add debug output (e.g. raw SQL) to the "Query Info" tab
         ctrl.debug = _.extend(_.pick(ctrl.debug, 'apiParams'), apiResults.run.debug);
       });
 
