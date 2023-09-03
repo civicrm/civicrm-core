@@ -1530,11 +1530,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testContributionCurrency():void {
+    $cid = $this->saveTestRecords('Contact', ['records' => 3])->column('id');
     $contributions = $this->saveTestRecords('Contribution', [
       'records' => [
-        ['total_amount' => 100, 'currency' => 'GBP'],
-        ['total_amount' => 200, 'currency' => 'USD'],
-        ['total_amount' => 500, 'currency' => 'JPY'],
+        ['total_amount' => 100, 'currency' => 'GBP', 'contact_id' => $cid[0]],
+        ['total_amount' => 200, 'currency' => 'USD', 'contact_id' => $cid[1]],
+        ['total_amount' => 500, 'currency' => 'JPY', 'contact_id' => $cid[2]],
       ],
     ]);
 
@@ -1545,6 +1546,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
         'api_entity' => 'Contribution',
         'api_params' => [
           'version' => 4,
+          // Include `id` column so the `sort` works
           'select' => ['total_amount', 'id'],
           'where' => [['id', 'IN', $contributions->column('id')]],
         ],
@@ -1588,15 +1590,41 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertEquals('JPY', $result[0]['data']['contribution_id.currency']);
     $this->assertEquals('¥500', $result[0]['columns'][0]['val']);
+
+    // Now try it via joins
+    $params['savedSearch'] = [
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['line_item.line_total', 'id'],
+        'where' => [['contribution.id', 'IN', $contributions->column('id')]],
+        'join' => [
+          ['Contribution AS contribution', 'INNER', ['id', '=', 'contribution.contact_id']],
+          ['LineItem AS line_item', 'INNER', ['contribution.id', '=', 'line_item.contribution_id']],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(3, $result);
+
+    // The parent join should have been used rather than adding an unnecessary implicit join
+    $this->assertEquals('GBP', $result[2]['data']['contribution.currency']);
+    $this->assertEquals('£100.00', $result[2]['columns'][0]['val']);
+
+    $this->assertEquals('USD', $result[1]['data']['contribution.currency']);
+    $this->assertEquals('$200.00', $result[1]['columns'][0]['val']);
+
+    $this->assertEquals('JPY', $result[0]['data']['contribution.currency']);
+    $this->assertEquals('¥500', $result[0]['columns'][0]['val']);
   }
 
   public function testContributionAggregateCurrency():void {
     $contributions = $this->saveTestRecords('Contribution', [
       'records' => [
         ['total_amount' => 100, 'currency' => 'GBP'],
-        ['total_amount' => 200, 'currency' => 'USD'],
+        ['total_amount' => 150, 'currency' => 'USD'],
         ['total_amount' => 500, 'currency' => 'JPY'],
-        ['total_amount' => 200, 'currency' => 'USD'],
+        ['total_amount' => 250, 'currency' => 'USD'],
       ],
     ]);
 
@@ -1631,6 +1659,41 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('USD', $result[2]['data']['currency']);
     $this->assertEquals('$400.00', $result[2]['columns'][0]['val']);
     $this->assertEquals(2, $result[2]['columns'][1]['val']);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['SUM(line_item.line_total) AS total', 'id'],
+          'where' => [['id', 'IN', $contributions->column('id')]],
+          'groupBy' => ['id'],
+          'join' => [
+            ['LineItem AS line_item', 'INNER', ['id', '=', 'line_item.contribution_id']],
+          ],
+        ],
+      ],
+      'display' => NULL,
+      'sort' => [['id', 'ASC']],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(4, $result);
+
+    // Currency should have been used to format the aggregated values
+    $this->assertEquals('GBP', $result[0]['data']['currency']);
+    $this->assertEquals('£100.00', $result[0]['columns'][0]['val']);
+
+    $this->assertEquals('USD', $result[1]['data']['currency']);
+    $this->assertEquals('$150.00', $result[1]['columns'][0]['val']);
+
+    $this->assertEquals('JPY', $result[2]['data']['currency']);
+    $this->assertEquals('¥500', $result[2]['columns'][0]['val']);
+
+    $this->assertEquals('USD', $result[3]['data']['currency']);
+    $this->assertEquals('$250.00', $result[3]['columns'][0]['val']);
   }
 
   public function testSelectEquations() {
