@@ -48,6 +48,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
     $this->addTask('Update afform tab names', 'updateAfformTabs');
     $this->addTask('Add in Client Removed Activity Type', 'addCaseClientRemovedActivity');
     $this->addTask('Update quicksearch options to v4 format', 'updateQuicksearchOptions');
+    $this->addTask('Add cache_fill_took column to Group table', 'addColumn', 'civicrm_group', 'cache_fill_took', "DECIMAL(10,3) COMMENT 'Seconds taken to fill smart group cache'", FALSE);
   }
 
   /**

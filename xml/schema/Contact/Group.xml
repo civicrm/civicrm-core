@@ -183,7 +183,7 @@
     <comment>Seconds taken to fill smart group cache</comment>
     <required>false</required>
     <readonly>true</readonly>
-    <add>5.65</add>
+    <add>5.66</add>
   </field>
   <field>
     <name>refresh_date</name>
