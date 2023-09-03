@@ -53,6 +53,9 @@ trait AfformSaveTrait {
 
     $meta = $item + (array) $orig;
     unset($meta['layout'], $meta['name']);
+    if (isset($meta['permission']) && is_string($meta['permission'])) {
+      $meta['permission'] = explode(',', $meta['permission']);
+    }
     if (!empty($meta)) {
       $metaPath = $scanner->createSiteLocalPath($item['name'], \CRM_Afform_AfformScanner::METADATA_FILE);
       \CRM_Utils_File::createDir(dirname($metaPath));

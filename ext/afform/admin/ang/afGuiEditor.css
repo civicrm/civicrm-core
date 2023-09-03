@@ -346,6 +346,13 @@ body.af-gui-dragging {
   color: #0071bd;
 }
 
+#afGuiEditor #af_config_form_permission {
+  width: calc(100% - 55px);
+}
+#afGuiEditor #af_config_form_permission_operator {
+  width: 45px;
+}
+
 #afGuiEditor .af-gui-layout-icon {
   width: 12px;
   height: 11px;
