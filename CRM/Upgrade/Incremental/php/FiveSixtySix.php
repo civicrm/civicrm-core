@@ -36,6 +36,8 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
     $this->addTask('Make ActionSchedule.name required', 'alterColumn', 'civicrm_action_schedule', 'name', "varchar(64) NOT NULL COMMENT 'physical tablename for entity being joined to discount, e.g. civicrm_event'");
     $this->addTask(ts('Create index %1', [1 => 'civicrm_action_schedule.UI_name']), 'addIndex', 'civicrm_action_schedule', 'name', 'UI');
     $this->addTask('Add fields to civicrm_mail_settings to allow more flexibility for email to activity', 'addMailSettingsFields');
+    $this->addTask('Move serialized contents of civicrm_survey.recontact_interval into civicrm_option_value.filter', 'migrateRecontactInterval');
+    $this->addTask('Drop column civicrm_survey.recontact_interval', 'dropColumn', 'civicrm_survey', 'recontact_interval');
     $this->addTask('Update afform tab names', 'updateAfformTabs');
     $this->addTask('Add in Client Removed Activity Type', 'addCaseClientRemovedActivity');
     $this->addTask('Update quicksearch options to v4 format', 'updateQuicksearchOptions');
@@ -143,6 +145,33 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
       'component_id' => CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_component WHERE name = 'CiviCase'"),
       'icon' => 'fa-trash',
     ]);
+    return TRUE;
+  }
+
+  /**
+   * Move serialized contents of Survey.recontact_interval into OptionValue.filter
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function migrateRecontactInterval($ctx): bool {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_survey', 'recontact_interval')) {
+      // Upgrade has already run, nothing to do.
+      return TRUE;
+    }
+    $surveys = CRM_Core_DAO::executeQuery('SELECT result_id, recontact_interval FROM civicrm_survey')->fetchAll();
+    foreach ($surveys as $survey) {
+      if (empty($survey['recontact_interval']) || empty($survey['result_id'])) {
+        continue;
+      }
+      foreach (unserialize($survey['recontact_interval']) as $label => $interval) {
+        CRM_Core_DAO::executeQuery('UPDATE civicrm_option_value SET filter = %1 WHERE option_group_id = %2 AND label = %3', [
+          1 => [$interval, 'Integer'],
+          2 => [$survey['result_id'], 'Positive'],
+          3 => [$label, 'String'],
+        ]);
+      }
+    }
     return TRUE;
   }
 
