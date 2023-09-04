@@ -22,8 +22,8 @@
    <td>
     {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
 
-    {if {event.confirm_email_text|boolean} AND (empty($isOnWaitlist) AND empty($isRequireApproval))}
-     <p>{event.confirm_email_text}</p>
+    {if !empty($event.confirm_email_text) AND (empty($isOnWaitlist) AND empty($isRequireApproval))}
+     <p>{$event.confirm_email_text}</p>
     {/if}
 
     {if !empty($isOnWaitlist)}
