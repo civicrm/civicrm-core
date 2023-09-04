@@ -54,7 +54,7 @@ trait Api3TestTrait {
         unset($expected[$value]);
       }
     }
-    $this->assertEquals($result, $expected, "api result array comparison failed " . $prefix . print_r($result, TRUE) . ' was compared to ' . print_r($expected, TRUE));
+    $this->assertEquals($result, $expected, 'api result array comparison failed ' . $prefix . print_r($result, TRUE) . ' was compared to ' . print_r($expected, TRUE));
   }
 
   /**
