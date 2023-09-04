@@ -17,6 +17,9 @@
   <releaseDate>2021-02-11</releaseDate>
   <version>5.67.alpha1</version>
   <develStage>stable</develStage>
+  <tags>
+    <tag>mgmt:required</tag>
+  </tags>
   <compatibility>
     <ver>5.67</ver>
   </compatibility>

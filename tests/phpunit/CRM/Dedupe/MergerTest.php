@@ -1270,6 +1270,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_address' => [
         0 => 'contact_id',
       ],
+      'civicrm_afform_submission' => [
+        0 => 'contact_id',
+      ],
       'civicrm_batch' => [
         0 => 'created_id',
         1 => 'modified_id',

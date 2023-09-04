@@ -29,6 +29,8 @@ class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_67_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addExtensionTask('Enable Authx extension', ['authx'], 1101);
+    $this->addExtensionTask('Enable Afform extension', ['org.civicrm.afform'], 1102);
   }
 
 }
