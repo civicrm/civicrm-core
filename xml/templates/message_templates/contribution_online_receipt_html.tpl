@@ -151,13 +151,13 @@
       </tr>
      {/if}
 
-     {if !empty($is_monetary) and !empty($trxn_id)}
+     {if {contribution.trxn_id|boolean}}
       <tr>
        <td {$labelStyle}>
         {ts}Transaction #{/ts}
        </td>
        <td {$valueStyle}>
-        {$trxn_id}
+         {contribution.trxn_id}
        </td>
       </tr>
      {/if}
