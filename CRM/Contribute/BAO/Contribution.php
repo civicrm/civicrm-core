@@ -2063,7 +2063,10 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       LEFT JOIN civicrm_participant         p    ON pp.participant_id  = p.id
       LEFT JOIN civicrm_membership          m    ON m.id  = mp.membership_id
       LEFT JOIN civicrm_pledge_payment      pgp  ON pgp.contribution_id  = c.id
-      WHERE     c.id = $contributionId";
+      WHERE     c.id = $contributionId
+      -- only get the primary recipient
+      AND (p.registered_by_id IS NULL OR p.registered_by_id = 0)
+      ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
     $componentDetails = [];

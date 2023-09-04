@@ -2767,6 +2767,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @noinspection PhpDocMissingThrowsInspection
    */
   protected function addTaxAccountToFinancialType(int $financialTypeID, array $accountParams = []): CRM_Financial_DAO_EntityFinancialAccount {
+    Civi::settings()->set('invoicing', TRUE);
+    unset(\Civi::$statics['CRM_Price_BAO_PriceField']);
     $params = array_merge([
       'name' => 'Sales tax account - test - ' . $financialTypeID,
       'financial_account_type_id' => key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' ")),
