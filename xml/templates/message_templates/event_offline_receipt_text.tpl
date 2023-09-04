@@ -219,58 +219,6 @@
 {/if}
 {/if} {* End of conditional section for Paid events *}
 
-{if !empty($customPre)}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
-
-{$customPre_grouptitle}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
-
-{foreach from=$customPre item=value key=customName}
-  {$customName}: {$value}
-{/foreach}
-{/if}
-
-{if !empty($customPost)}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
-
-{$customPost_grouptitle}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
-
-{foreach from=$customPost item=value key=customName}
-  {$customName}: {$value}
-{/foreach}
-{/if}
-{if !empty($customProfile)}
-
-{foreach from=$customProfile item=value key=customName}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
-
-{ts 1=$customName+1}Participant Information - Participant %1{/ts}
-
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
-
-{foreach from=$value item=val key=field}
-{if $field eq 'additionalCustomPre' or $field eq 'additionalCustomPost' }
-{if $field eq 'additionalCustomPre' }
-----------------------------------------------------------{if !empty($pricesetFieldsCount) }--------------------{/if}
-
-{$additionalCustomPre_grouptitle}
-----------------------------------------------------------{if !empty($pricesetFieldsCount) }--------------------{/if}
-
-{else}
-----------------------------------------------------------{if !empty($pricesetFieldsCount) }--------------------{/if}
-
-{$additionalCustomPost_grouptitle}
-----------------------------------------------------------{if !empty($pricesetFieldsCount) }--------------------{/if}
-
-{/if}
-{foreach from=$val item=v key=f}
-{$f}: {$v}
-{/foreach}
-{/if}
-{/foreach}
-{/foreach}
-{/if}
 {if !empty($customGroup)}
 {foreach from=$customGroup item=value key=customName}
 =========================================================={if !empty($pricesetFieldsCount) }===================={/if}
