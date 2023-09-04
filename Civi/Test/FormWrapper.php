@@ -28,7 +28,7 @@ class FormWrapper {
   /**
    * @var \CRM_Core_Form[]
    */
-  protected $subsequentForms;
+  protected $subsequentForms = [];
 
   private $output;
 
