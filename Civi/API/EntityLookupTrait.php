@@ -45,6 +45,26 @@ trait EntityLookupTrait {
   }
 
   /**
+   * Check if an entity can be looked up
+   *
+   * @param string $nickname
+   * @return bool
+   */
+  public function isDefined(string $nickname): bool {
+    return !is_null($this->getDefinition($nickname));
+  }
+
+  /**
+   * Retrieve entity definition (entityName string, identifier [keys/values])
+   *
+   * @param string $nickname
+   * @return array{entityName: string, identifier: array}|null
+   */
+  protected function getDefinition(string $nickname): ?array {
+    return $this->entityLookupDefinitions[$nickname] ?? NULL;
+  }
+
+  /**
    * Retrieve a field value for a defined entity
    *
    * @param string $nickname
@@ -54,31 +74,31 @@ trait EntityLookupTrait {
    * @throws \CRM_Core_Exception
    */
   public function lookup(string $nickname, string $fieldName) {
-    if (!isset($this->entityLookupValues[$nickname])) {
+    $definition = $this->getDefinition($nickname);
+    if (!$definition) {
       throw new \CRM_Core_Exception(sprintf('Cannot lookup entity "%s" before it has been defined.', $nickname));
     }
     // Simply return an id - no need for any queries
-    if (isset($this->entityLookupDefinitions[$nickname]['identifier'][$fieldName])) {
-      return $this->entityLookupDefinitions[$nickname]['identifier'][$fieldName];
+    if (isset($definition['identifier'][$fieldName])) {
+      return $definition['identifier'][$fieldName];
     }
     // Return stored value from previous lookup
     if (array_key_exists($fieldName, $this->entityLookupValues[$nickname])) {
       return $this->entityLookupValues[$nickname][$fieldName];
     }
-    $entityName = $this->entityLookupDefinitions[$nickname]['entityName'];
     $params = [
       'select' => [$fieldName],
       'where' => [],
       'checkPermissions' => FALSE,
     ];
-    foreach ($this->entityLookupDefinitions[$nickname]['identifier'] as $key => $val) {
+    foreach ($definition['identifier'] as $key => $val) {
       $params['where'][] = [$key, '=', $val];
     }
     // Initial load - prefetch all core fields to reduce # of subsequent queries
     if (!$this->entityLookupValues[$nickname]) {
       $params['select'][] = '*';
       // Contact email is commonly needed by forms so prefetch it as well
-      if ($entityName === 'Contact') {
+      if ($definition['entityName'] === 'Contact') {
         $params['select'][] = 'email_primary.*';
       }
     }
@@ -88,7 +108,7 @@ trait EntityLookupTrait {
       $parts[count($parts) - 1] = '*';
       $params['select'][] = implode('.', $parts);
     }
-    $retrieved = civicrm_api4($entityName, 'get', $params)->single();
+    $retrieved = civicrm_api4($definition['entityName'], 'get', $params)->single();
     $this->entityLookupValues[$nickname] += $retrieved;
     return $this->entityLookupValues[$nickname][$fieldName] ?? NULL;
   }
