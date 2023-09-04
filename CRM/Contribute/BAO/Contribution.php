@@ -2533,9 +2533,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $this->loadRelatedObjects($paymentProcessorID, $ids);
     $paymentProcessor = $this->_relatedObjects['paymentProcessor'] ?? NULL;
+    $eventID = isset($ids['event']) ? (int) $ids['event'] : NULL;
+    $participantID = isset($ids['participant']) ? (int) $ids['participant'] : NULL;
 
     //not really sure what params might be passed in but lets merge em into values
-    $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $values);
+    $values = array_merge($this->_gatherMessageValues($values, $eventID, $participantID), $values);
     $values['is_email_receipt'] = !$returnMessageText;
     foreach (['receipt_date', 'cc_receipt', 'bcc_receipt', 'receipt_from_name', 'receipt_from_email', 'receipt_text', 'pay_later_receipt'] as $fld) {
       if (!empty($input[$fld])) {
@@ -2569,7 +2571,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if ($this->_component === 'event') {
-      $eventID = $this->_relatedObjects['participant']->event_id;
       $eventParams = ['id' => $eventID];
       $values['event'] = [];
 
@@ -2610,7 +2611,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
 
       return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
-        $this->_relatedObjects['participant']->id, $this->is_test, $returnMessageText
+        $participantID, $this->is_test, $returnMessageText
       );
     }
     else {
@@ -2686,16 +2687,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * as part of CRM-9996 refactoring as a step towards simplifying the composeMessage function
    * Values related to the contribution in question are gathered
    *
-   * @param array $input
-   *   Input into function (probably from payment processor).
    * @param array $values
-   * @param array $ids
-   *   The set of ids related to the input.
+   * @param int|null $eventID
+   * @param int|null $participantID
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function _gatherMessageValues($input, &$values, $ids = []) {
+  public function _gatherMessageValues($values, ?int $eventID, ?int $participantID) {
     // set display address of contributor
     $values['billingName'] = '';
     if ($this->address_id) {
@@ -2771,11 +2770,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       );
       // if this is onbehalf of contribution then set related contact
       if (!empty($relatedContact['individual_id'])) {
-        $values['related_contact'] = $ids['related_contact'] = $relatedContact['individual_id'];
+        $values['related_contact'] = $relatedContact['individual_id'];
       }
     }
     else {
-      $values = array_merge($values, $this->loadEventMessageTemplateParams((int) $ids['event'], (int) $this->_relatedObjects['participant']->id, $this->id));
+      $values = array_merge($values, $this->loadEventMessageTemplateParams($eventID, $participantID, $this->id));
     }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', NULL, $this->id);
