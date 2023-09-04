@@ -195,8 +195,7 @@ class CRM_Utils_Request {
    * @throws \CRM_Core_Exception
    */
   public static function retrieveValue($name, $type, $defaultValue = NULL, $isRequired = FALSE, $method = 'REQUEST') {
-    $null = NULL;
-    return CRM_Utils_Request::retrieve((string) $name, (string) $type, $null, (bool) $isRequired, $defaultValue, $method, TRUE);
+    return CRM_Utils_Request::retrieve((string) $name, (string) $type, NULL, (bool) $isRequired, NULL, $method) ?? $defaultValue;
   }
 
   /**
