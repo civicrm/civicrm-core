@@ -120,10 +120,10 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
   private function insertStatusLabels(&$contribution) {
     $contribution['contribution_status_label'] = $contribution['contribution_status'];
 
-    if ($contribution['is_pay_later'] && CRM_Utils_Array::value('contribution_status', $contribution) == 'Pending') {
+    if ($contribution['is_pay_later'] && ($contribution['contribution_status'] ?? NULL) == 'Pending') {
       $contribution['contribution_status_label'] .= ' (' . ts('Pay Later') . ')';
     }
-    elseif (CRM_Utils_Array::value('contribution_status', $contribution) == 'Pending') {
+    elseif (($contribution['contribution_status'] ?? NULL) == 'Pending') {
       $contribution['contribution_status_label'] .= ' (' . ts('Incomplete Transaction') . ')';
     }
   }
@@ -169,7 +169,7 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
     );
 
     $isPayLater = FALSE;
-    if ($contribution['is_pay_later'] && CRM_Utils_Array::value('contribution_status', $contribution) == 'Pending') {
+    if ($contribution['is_pay_later'] && ($contribution['contribution_status'] ?? NULL) == 'Pending') {
       $isPayLater = TRUE;
 
       $links[CRM_Core_Action::ADD] = [

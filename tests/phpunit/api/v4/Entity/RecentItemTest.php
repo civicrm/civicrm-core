@@ -33,7 +33,7 @@ class RecentItemTest extends Api4TestBase implements TransactionalInterface {
   /**
    *
    */
-  public function testRecentContact() {
+  public function testRecentContact(): void {
     $cid = Contact::create(FALSE)
       ->addValue('first_name', 'Hello')
       ->execute()->single()['id'];

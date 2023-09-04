@@ -14,8 +14,6 @@
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 {*CRM-4320*}
 {if $statusMessage}
     <div class="messages status no-popup">
@@ -55,7 +53,7 @@
 </div>
 
 <div id="crm-submit-buttons" class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl"}
+    {include file="CRM/common/formButtons.tpl" location=''}
 </div>
 </div>
 

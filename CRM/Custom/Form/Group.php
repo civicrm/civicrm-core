@@ -25,7 +25,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_id;
+  public $_id;
 
   /**
    *  set is empty or not.
@@ -48,6 +48,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
+    $this->preventAjaxSubmit();
     Civi::resources()->addScriptFile('civicrm', 'js/jquery/jquery.crmIconPicker.js');
 
     // current set id
@@ -378,6 +379,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
 
     $result = civicrm_api3('CustomGroup', 'create', $params);
     $group = $result['values'][$result['id']];
+    $this->_id = $result['id'];
 
     // reset the cache
     Civi::cache('fields')->flush();
@@ -401,7 +403,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // prompt Drupal Views users to update $db_prefix in settings.php, if necessary
     global $db_prefix;
     $config = CRM_Core_Config::singleton();
-    if (is_array($db_prefix) && $config->userSystem->is_drupal && module_exists('views')) {
+    if (is_array($db_prefix) && $config->userSystem->viewsExists()) {
       // get table_name for each custom group
       $tables = [];
       $sql = "SELECT table_name FROM civicrm_custom_group WHERE is_active = 1";

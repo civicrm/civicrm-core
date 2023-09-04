@@ -1,29 +1,12 @@
 <?php
-
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright Chirojeugd-Vlaanderen vzw 2015                           |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -37,12 +20,11 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
   protected $params;
   protected $id;
   protected $_entity;
-  public $DBResetRequired = FALSE;
 
   public function setUp(): void {
     parent::setUp();
 
-    // The line below makes it unneccessary to do cleanup after a test,
+    // The line below makes it unnecessary to do cleanup after a test,
     // because the transaction of the test will be rolled back.
     // see http://forum.civicrm.org/index.php/topic,35627.0.html
     $this->useTransaction();
@@ -69,8 +51,8 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
    */
   public function testCreateSavedSearch(): void {
     $contactID = $this->createLoggedInUser();
-    $result = $this->callAPIAndDocument(
-        $this->_entity, 'create', $this->params, __FUNCTION__, __FILE__)['values'];
+    $result = $this->callAPISuccess(
+        $this->_entity, 'create', $this->params)['values'];
     $this->assertCount(1, $result);
     $savedSearch = reset($result);
 
@@ -89,8 +71,6 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
   /**
    * Create a saved search, retrieve it again, and check for ID and one of
    * the field values.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateAndGetSavedSearch(): void {
     // Arrange:
@@ -99,8 +79,8 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
         $this->_entity, 'create', $this->params);
 
     // Act:
-    $get_result = $this->callAPIAndDocument(
-        $this->_entity, 'get', ['id' => $create_result['id']], __FUNCTION__, __FILE__);
+    $get_result = $this->callAPISuccess(
+        $this->_entity, 'get', ['id' => $create_result['id']]);
 
     // Assert:
     $this->assertEquals(1, $get_result['count']);
@@ -115,16 +95,14 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
   /**
    * Create a saved search, and test whether it can be used for a smart
    * group.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateSavedSearchWithSmartGroup(): void {
     // First create a volunteer for the default organization
 
     [$contact_id, $params] = $this->setupContactInSmartGroup();
 
-    $create_result = $this->callAPIAndDocument(
-        $this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $create_result = $this->callAPISuccess(
+        'SavedSearch', 'create', $params);
 
     $created_search = CRM_Utils_Array::first($create_result['values']);
     $group_id = $created_search['api.Group.create']['id'];
@@ -141,13 +119,8 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
    * Create a saved search, and test whether it can be used for a smart
    * group. Also check that when the Group is deleted the associated saved
    * search gets deleted.
-   *
-   * @dataProvider versionThreeAndFour
-   * @throws \CRM_Core_Exception
    */
-  public function testSavedSearchIsDeletedWhenSmartGroupIs($apiVersion): void {
-    $this->_apiVersion = $apiVersion;
-    // First create a volunteer for the default organization
+  public function testSavedSearchIsDeletedWhenSmartGroupIs(): void {
 
     [$contact_id, $params] = $this->setupContactInSmartGroup();
 
@@ -156,11 +129,11 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
     $created_search = CRM_Utils_Array::first($create_result['values']);
     $group_id = $created_search['api.Group.create']['id'];
 
-    $get_result = $this->callAPISuccess('Contact', 'get', ['group' => $group_id]);
+    $result = $this->callAPISuccess('Contact', 'get', ['group' => $group_id]);
 
     // Expect our contact to be there.
-    $this->assertEquals(1, $get_result['count']);
-    $this->assertEquals($contact_id, $get_result['values'][$contact_id]['id']);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals($contact_id, $result['values'][$contact_id]['id']);
 
     $this->callAPISuccess('Group', 'delete', ['id' => $group_id]);
     $savedSearch = $this->callAPISuccess('SavedSearch', 'get', ['id' => $created_search['id']]);
@@ -168,27 +141,12 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
-   */
-  public function testDeleteSavedSearch(): void {
-    // Create saved search, delete it again, and try to get it
-    $create_result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $delete_params = ['id' => $create_result['id']];
-    $this->callAPIAndDocument(
-        $this->_entity, 'delete', $delete_params, __FUNCTION__, __FILE__);
-    $get_result = $this->callAPISuccess($this->_entity, 'get', []);
-
-    $this->assertEquals(0, $get_result['count']);
-  }
-
-  /**
    * @return array
-   * @throws \CRM_Core_Exception
    */
   protected function setupContactInSmartGroup(): array {
     $result = $this->callAPISuccess('Contact', 'create', [
       'first_name' => 'Joe',
-      'last_name' => 'Schmoe',
+      'last_name' => 'Schmidt',
       'contact_type' => 'Individual',
       'api.Relationship.create' => [
         'contact_id_a' => '$value.id',

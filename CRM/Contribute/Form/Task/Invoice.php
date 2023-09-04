@@ -138,7 +138,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $this->preventAjaxSubmit();
     $this->assign('isAdmin', CRM_Core_Permission::check('administer CiviCRM'));
 
-    $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE);
+    $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE, ['class' => 'crm-select2 huge']);
     if ($this->_selectedOutput != 'email') {
       $this->addElement('radio', 'output', NULL, ts('Email Invoice'), 'email_invoice');
       $this->addElement('radio', 'output', NULL, ts('PDF Invoice'), 'pdf_invoice');
@@ -149,13 +149,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $this->addRule('from_email_address', ts('From Email Address is required'), 'required');
     }
 
-    $attributes = ['class' => 'huge'];
     $this->addEntityRef('cc_id', ts('CC'), [
       'entity' => 'Email',
       'multiple' => TRUE,
     ]);
-    $this->add('text', 'subject', ts('Subject'), $attributes + ['placeholder' => ts('Optional')]);
-    $this->add('wysiwyg', 'email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), [
+    $this->add('text', 'subject', ts('Replace Subject'), ['class' => 'huge', 'placeholder' => ts('Optional')]);
+    $this->add('wysiwyg', 'email_comment', ts('Additional Message'), [
       'rows' => 2,
       'cols' => 40,
     ]);
@@ -233,10 +232,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $refundedStatusId = CRM_Utils_Array::key('Refunded', $contributionStatusID);
     $cancelledStatusId = CRM_Utils_Array::key('Cancelled', $contributionStatusID);
     $pendingStatusId = CRM_Utils_Array::key('Pending', $contributionStatusID);
-    $pdfFormat = CRM_Core_BAO_PdfFormat::getByName('default_invoice_pdf_format');
-
+    $pdfFormat = CRM_Core_BAO_MessageTemplate::getPDFFormatForTemplate('contribution_invoice_receipt');
     foreach ($elementDetails as $contributionID => $detail) {
-      $input = $ids = [];
+      $input = [];
       if (in_array($detail['contact'], $excludedContactIDs)) {
         continue;
       }

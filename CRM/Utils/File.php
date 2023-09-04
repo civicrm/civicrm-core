@@ -371,8 +371,9 @@ class CRM_Utils_File {
       }
       Civi::$statics[__CLASS__]['file_extensions'] = $extensions;
     }
+    $restricted = CRM_Utils_Constant::value('CIVICRM_RESTRICTED_UPLOADS', '/(php|php\d|phtml|phar|pl|py|cgi|asp|js|sh|exe|pcgi\d)/i');
     // support lower and uppercase file extensions
-    return (bool) isset(Civi::$statics[__CLASS__]['file_extensions'][strtolower($ext)]);
+    return (bool) isset(Civi::$statics[__CLASS__]['file_extensions'][strtolower($ext)]) && !preg_match($restricted, strtolower($ext));
   }
 
   /**
@@ -416,16 +417,16 @@ class CRM_Utils_File {
     $uniqID = md5(uniqid(rand(), TRUE));
     $info = pathinfo($name);
     $basename = substr($info['basename'],
-      0, -(strlen(CRM_Utils_Array::value('extension', $info, '')) + (CRM_Utils_Array::value('extension', $info, '') == '' ? 0 : 1))
+      0, -(strlen($info['extension'] ?? '') + (($info['extension'] ?? '') == '' ? 0 : 1))
     );
-    if (!self::isExtensionSafe(CRM_Utils_Array::value('extension', $info, ''))) {
+    if (!self::isExtensionSafe($info['extension'] ?? '')) {
       // munge extension so it cannot have an embbeded dot in it
       // The maximum length of a filename for most filesystems is 255 chars.
       // We'll truncate at 240 to give some room for the extension.
-      return CRM_Utils_String::munge("{$basename}_" . CRM_Utils_Array::value('extension', $info) . "_{$uniqID}", '_', 240) . ".unknown";
+      return CRM_Utils_String::munge("{$basename}_" . ($info['extension'] ?? '') . "_{$uniqID}", '_', 240) . ".unknown";
     }
     else {
-      return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . CRM_Utils_Array::value('extension', $info);
+      return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . ($info['extension'] ?? '');
     }
   }
 
@@ -793,6 +794,11 @@ HTACCESS;
         return FALSE;
       }
     }
+
+    // windows fix
+    $parent = str_replace(DIRECTORY_SEPARATOR, '/', $parent);
+    $child = str_replace(DIRECTORY_SEPARATOR, '/', $child);
+
     $parentParts = explode('/', rtrim($parent, '/'));
     $childParts = explode('/', rtrim($child, '/'));
     while (($parentPart = array_shift($parentParts)) !== NULL) {

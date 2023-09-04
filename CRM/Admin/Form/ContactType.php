@@ -32,7 +32,6 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setPageTitle(ts('Contact Type'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -117,11 +116,11 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
     CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $isDelete = CRM_Contact_BAO_ContactType::del($this->_id);
-      if ($isDelete) {
+      try {
+        CRM_Contact_BAO_ContactType::deleteRecord(['id' => $this->_id]);
         CRM_Core_Session::setStatus(ts('Selected contact type has been deleted.'), ts('Record Deleted'), 'success');
       }
-      else {
+      catch (CRM_Core_Exception $e) {
         CRM_Core_Session::setStatus(ts("Selected contact type can not be deleted. Make sure contact type doesn't have any associated custom data or group."), ts('Sorry'), 'error');
       }
       return;
@@ -142,7 +141,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
       $params['image_URL'] = '';
     }
 
-    $contactType = CRM_Contact_BAO_ContactType::add($params);
+    $contactType = CRM_Contact_BAO_ContactType::writeRecord($params);
     CRM_Core_Session::setStatus(ts("The Contact Type '%1' has been saved.",
       [1 => $contactType->label]
     ), ts('Saved'), 'success');

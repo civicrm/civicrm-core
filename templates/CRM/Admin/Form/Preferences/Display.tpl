@@ -9,7 +9,6 @@
 *}
 {* this template is used for editing Site Preferences  *}
 <div class="crm-block crm-form-block crm-preferences-display-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout">
     <tr class="crm-preferences-display-form-block-contact_view_options">
       <td class="label">{$form.contact_view_options.label}</td>

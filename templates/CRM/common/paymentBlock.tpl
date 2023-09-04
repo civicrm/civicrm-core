@@ -9,6 +9,7 @@
 *}
 {literal}
 <script type="text/javascript">
+{/literal}{if !$isBackOffice}{literal}
   /**
    * Show or hide payment options.
    *
@@ -68,40 +69,42 @@
     showHidePayment(isHide);
   }
   skipPaymentMethod();
+{/literal}{/if}{literal}
 
   CRM.$(function($) {
     function buildPaymentBlock(type) {
       var $form = $('#billing-payment-block').closest('form');
       {/literal}
-      {if $contributionPageID}
-        {capture assign='contributionPageID'}id={$contributionPageID}&{/capture}
+      {if !$isBackOffice && $contributionPageID}
+        {capture assign='contributionPageID'}&id={$contributionPageID}{/capture}
       {else}
-        {capture assign='pageID'}{/capture}
+        {capture assign='contributionPageID'}{/capture}
       {/if}
-      {if $custom_pre_id}
-        {capture assign='preProfileID'}pre_profile_id={$custom_pre_id}&{/capture}
+      {if !$isBackOffice && $custom_pre_id}
+        {capture assign='preProfileID'}&pre_profile_id={$custom_pre_id}{/capture}
       {else}
         {capture assign='preProfileID'}{/capture}
       {/if}
       {if $urlPathVar}
-        {capture assign='urlPathVar'}{$urlPathVar}&{/capture}
+        {capture assign='urlPathVar'}&{$urlPathVar}{/capture}
       {else}
         {capture assign='urlPathVar'}{/capture}
       {/if}
-      {if $billing_profile_id}
-        {capture assign='profilePathVar'}billing_profile_id={$billing_profile_id}&{/capture}
+      {* Billing profile ID is only ever set on front end forms, to force entering address for pay later. *}
+      {if !$isBackOffice && $billing_profile_id}
+        {capture assign='profilePathVar'}&billing_profile_id={$billing_profile_id}{/capture}
       {else}
         {capture assign='profilePathVar'}{/capture}
       {/if}
 
-      {capture assign='isBackOfficePathVar'}&is_back_office={$isBackOffice}&{/capture}
+      {capture assign='isBackOfficePathVar'}&is_back_office={$isBackOffice}{/capture}
 
       var payment_instrument_id = $('#payment_instrument_id').val();
 
       var currency = '{$currency}';
       currency = currency == '' ? $('#currency').val() : currency;
 
-      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="formName=`$form.formName``$urlPathVar``$isBackOfficePathVar``$profilePathVar``$contributionPageID``$preProfileID`processor_id="}" + type;
+      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="formName=`$form.formName``$urlPathVar``$isBackOfficePathVar``$profilePathVar``$contributionPageID``$preProfileID`"}";
       {literal}
       if (typeof(CRM.vars) != "undefined") {
         if (typeof(CRM.vars.coreForm) != "undefined") {
@@ -114,7 +117,7 @@
           }
         }
       }
-      dataUrl =  dataUrl + "&payment_instrument_id=" + payment_instrument_id + "&currency=" + currency;
+      dataUrl = dataUrl + "&processor_id=" + type + "&payment_instrument_id=" + payment_instrument_id + "&currency=" + currency;
 
       // Processors like pp-express will hide the form submit buttons, so re-show them when switching
       $('.crm-submit-buttons', $form).show().find('input').prop('disabled', true);

@@ -20,7 +20,7 @@ class CRM_Report_Utils_ReportTest extends CiviUnitTestCase {
   /**
    * Test makeCsv
    */
-  public function testMakeCsv() {
+  public function testMakeCsv(): void {
     $form = new CRM_Report_Form();
     $form->_columnHeaders = [
       'civicrm_activity_activity_type_id' => [

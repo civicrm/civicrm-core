@@ -47,9 +47,7 @@
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-title">
       <td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='title' id=$eventID}{/if}</td>
-      <td>{$form.title.html}<br />
-        <span class="description"> {ts}Please use only alphanumeric, spaces, hyphens and dashes for event names.{/ts}
-      </span></td>
+      <td>{$form.title.html}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-summary">
       <td class="label">{$form.summary.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='summary' id=$eventID}{/if}</td>
@@ -91,7 +89,7 @@
     </tr>
     <tr id="id-waitlist-text" class="crm-event-manage-eventinfo-form-block-waitlist_text">
       {if !empty($form.waitlist_text)}
-        <td class="label">{$form.waitlist_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='waitlist_text' id=$eventID}{/if}<br />{help id="id-help-waitlist_text"}</td>
+        <td class="label">{$form.waitlist_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='waitlist_text' id=$eventID} {/if}{help id="id-help-waitlist_text"}</td>
         <td>{$form.waitlist_text.html}</td>
       {/if}
     </tr>
@@ -112,7 +110,7 @@
       <td>{$form.is_active.html} {$form.is_active.label}</td>
     </tr>
 
-    {if $eventID}
+    {if $eventID AND !$isTemplate}
       <tr class="crm-event-manage-eventinfo-form-block-info_link">
         <td>&nbsp;</td>
         <td class="description">
@@ -125,10 +123,6 @@
         </td>
       </tr>
     {/if}
-    <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-    </tr>
   </table>
   {include file="CRM/common/customDataBlock.tpl"}
   <div class="crm-submit-buttons">

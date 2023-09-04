@@ -36,7 +36,7 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
   /**
    * Perform permission-checks using "on-behalf-of" mechanics.
    */
-  public function testPermissionLookup() {
+  public function testPermissionLookup(): void {
     $name = 'cv';
     $this->assertNotEmpty($this->findCommand($name), 'The command "$name" does not appear in the PATH.');
     $perms = ['administer CiviCRM', 'profile edit', 'sign CiviCRM Petition'];

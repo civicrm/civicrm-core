@@ -54,6 +54,13 @@ class Download extends AbstractRunAction {
     $apiParams =& $this->_apiParams;
     $settings = $this->display['settings'];
 
+    // checking permissions for menu, link or button columns is costly, so remove them early
+    foreach ($this->display['settings']['columns'] as $index => $col) {
+      if (empty($col['key'])) {
+        unset($this->display['settings']['columns'][$index]);
+      }
+    }
+
     // Displays are only exportable if they have actions enabled
     if (empty($settings['actions'])) {
       \CRM_Utils_System::permissionDenied();
@@ -75,9 +82,7 @@ class Download extends AbstractRunAction {
     $columns = [];
     foreach ($this->display['settings']['columns'] as $index => $col) {
       $col += ['type' => NULL, 'label' => '', 'rewrite' => FALSE];
-      if (!empty($col['key'])) {
-        $columns[$index] = $col;
-      }
+      $columns[$index] = $col;
       // Convert html to plain text
       if ($col['type'] === 'html') {
         foreach ($rows as $i => $row) {
@@ -109,6 +114,23 @@ class Download extends AbstractRunAction {
     }
 
     \CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Return raw value if it is a single date, otherwise return parent
+   * {@inheritDoc}
+   */
+  protected function formatViewValue($key, $rawValue, $data, $dataType) {
+    if (is_array($rawValue)) {
+      return parent::formatViewValue($key, $rawValue, $data, $dataType);
+    }
+
+    if (($dataType === 'Date' || $dataType === 'Timestamp') && in_array($this->format, ['csv', 'xlsx', 'ods'])) {
+      return $rawValue;
+    }
+    else {
+      return parent::formatViewValue($key, $rawValue, $data, $dataType);
+    }
   }
 
   /**

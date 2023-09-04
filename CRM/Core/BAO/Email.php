@@ -24,64 +24,56 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email implements Civi\Core\HookInt
   use CRM_Contact_AccessTrait;
 
   /**
-   * Create email address.
-   *
-   * Note that the create function calls 'add' but  has more business logic.
+   * @deprecated
    *
    * @param array $params
-   *   Input parameters.
-   *
-   * @return object
+   * @return CRM_Core_BAO_Email
+   * @throws CRM_Core_Exception
    */
   public static function create($params) {
-    CRM_Core_BAO_Block::handlePrimary($params, get_class());
+    // FIXME: switch CRM_Core_BAO_Block::create to call writeRecord (once Address, IM, Phone create functions go through it)
+    // then this can be uncommented:
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
+  }
 
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Email', CRM_Utils_Array::value('id', $params), $params);
+  /**
+   * Event fired before modifying an Email.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (in_array($event->action, ['create', 'edit'])) {
+      CRM_Core_BAO_Block::handlePrimary($event->params, __CLASS__);
 
-    $email = new CRM_Core_DAO_Email();
-    $email->copyValues($params);
-    if (!empty($email->email)) {
-      // lower case email field to optimize queries
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $email->email = $strtolower($email->email);
-    }
+      if (!empty($event->params['email'])) {
+        // lower case email field to optimize queries
+        $event->params['email'] = mb_strtolower($event->params['email']);
+      }
 
-    //
-    // Since we're setting bulkmail for 1 of this contact's emails, first reset
-    // all their other emails to is_bulkmail false. We shouldn't set the current
-    // email to false even though we are about to reset it to avoid
-    // contaminating the changelog if logging is enabled.  (only 1 email
-    // address can have is_bulkmail = true)
-    //
-    // Note setting a the is_bulkmail to '' in $params results in $email->is_bulkmail === 'null'.
-    // @see https://lab.civicrm.org/dev/core/-/issues/2254
-    //
-    if ($email->is_bulkmail == 1 && !empty($params['contact_id']) && !self::isMultipleBulkMail()) {
-      $sql = "
+      // Since we're setting bulkmail for 1 of this contact's emails, first reset
+      // all their other emails to is_bulkmail false. We shouldn't set the current
+      // email to false even though we are about to reset it to avoid
+      // contaminating the changelog if logging is enabled.  (only 1 email
+      // address can have is_bulkmail = true)
+      //
+      // Note setting a the is_bulkmail to '' in $params results in $email->is_bulkmail === 'null'.
+      // @see https://lab.civicrm.org/dev/core/-/issues/2254
+      //
+      if (!empty($event->params['is_bulkmail']) && !empty($event->params['contact_id']) && !self::isMultipleBulkMail()) {
+        $sql = "
 UPDATE civicrm_email
 SET    is_bulkmail = 0
-WHERE  contact_id = {$params['contact_id']}
+WHERE  contact_id = {$event->params['contact_id']}
 ";
-      if ($hook === 'edit') {
-        $sql .= " AND id <> {$params['id']}";
+        if ($event->action === 'edit') {
+          $sql .= " AND id <> {$event->params['id']}";
+        }
+        CRM_Core_DAO::executeQuery($sql);
       }
-      CRM_Core_DAO::executeQuery($sql);
+
+      // handle if email is on hold
+      self::holdEmail($event->params);
     }
-
-    // handle if email is on hold
-    self::holdEmail($email);
-
-    $email->save();
-
-    $contactId = (int) ($email->contact_id ?? CRM_Core_DAO::getFieldValue(__CLASS__, $email->id, 'contact_id'));
-    if ($contactId && $email->is_primary) {
-      $address = $email->email ?? CRM_Core_DAO::getFieldValue(__CLASS__, $email->id, 'email');
-      self::updateContactName($contactId, $address);
-    }
-
-    CRM_Utils_Hook::post($hook, 'Email', $email->id, $email);
-    return $email;
   }
 
   /**
@@ -89,24 +81,31 @@ WHERE  contact_id = {$params['contact_id']}
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
-    if ($event->action !== 'delete' && !empty($event->object->is_primary) && !empty($event->object->contact_id)) {
+    $email = $event->object;
+    if ($event->action !== 'delete' && !empty($email->is_primary) && !empty($email->contact_id)) {
       // update the UF user email if that has changed
-      CRM_Core_BAO_UFMatch::updateUFName($event->object->contact_id);
+      CRM_Core_BAO_UFMatch::updateUFName($email->contact_id);
+    }
+    if (in_array($event->action, ['create', 'edit'])) {
+      $contactId = (int) ($email->contact_id ?? CRM_Core_DAO::getFieldValue(__CLASS__, $email->id, 'contact_id'));
+      $isPrimary = ($email->is_primary ?? CRM_Core_DAO::getFieldValue(__CLASS__, $email->id, 'is_primary'));
+      if ($contactId && $isPrimary) {
+        $address = $email->email ?? CRM_Core_DAO::getFieldValue(__CLASS__, $email->id, 'email');
+        self::updateContactName($contactId, $address);
+      }
     }
   }
 
   /**
-   * Takes an associative array and adds email.
+   * @deprecated
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return object
-   *   CRM_Core_BAO_Email object on success, null otherwise
+   * @return CRM_Core_BAO_Email
+   * @throws CRM_Core_Exception
    */
-  public static function add(&$params) {
-    CRM_Core_Error::deprecatedFunctionWarning('apiv4 create');
-    return self::create($params);
+  public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
@@ -230,26 +229,26 @@ ORDER BY e.is_primary DESC, email_id ASC ";
   }
 
   /**
-   * Set / reset hold status for an email
+   * Set / reset hold status for an email prior to saving
    *
-   * @param object $email
-   *   Email object.
+   * @param array $email
+   *   Email params to be saved.
    */
-  public static function holdEmail(&$email) {
-    if ($email->id && $email->on_hold === NULL) {
+  public static function holdEmail(array &$email) {
+    if (!empty($email['id']) && !isset($email['on_hold'])) {
       // email is being updated but no change to on_hold.
       return;
     }
-    if ($email->on_hold === 'null' || $email->on_hold === NULL) {
+    if (!isset($email['on_hold']) || $email['on_hold'] === 'null') {
       // legacy handling, deprecated.
-      $email->on_hold = 0;
+      $email['on_hold'] = 0;
     }
-    $email->on_hold = (int) $email->on_hold;
+    $email['on_hold'] = (int) $email['on_hold'];
 
     //check for update mode
-    if ($email->id) {
-      $params = [1 => [$email->id, 'Integer']];
-      if ($email->on_hold) {
+    if (!empty($email['id'])) {
+      $params = [1 => [$email['id'], 'Integer']];
+      if ($email['on_hold']) {
         $sql = "
 SELECT id
 FROM   civicrm_email
@@ -257,11 +256,11 @@ WHERE  id = %1
 AND    hold_date IS NULL
 ";
         if (CRM_Core_DAO::singleValueQuery($sql, $params)) {
-          $email->hold_date = date('YmdHis');
-          $email->reset_date = 'null';
+          $email['hold_date'] = date('YmdHis');
+          $email['reset_date'] = 'null';
         }
       }
-      elseif ($email->on_hold === 0) {
+      elseif ($email['on_hold'] === 0) {
         // we do this lookup to see if reset_date should be changed.
         $sql = "
 SELECT id
@@ -272,16 +271,14 @@ AND    reset_date IS NULL
 ";
         if (CRM_Core_DAO::singleValueQuery($sql, $params)) {
           //set reset date only if it is not set and if hold date is set
-          $email->on_hold = FALSE;
-          $email->hold_date = 'null';
-          $email->reset_date = date('YmdHis');
+          $email['on_hold'] = FALSE;
+          $email['hold_date'] = 'null';
+          $email['reset_date'] = date('YmdHis');
         }
       }
     }
-    else {
-      if ($email->on_hold) {
-        $email->hold_date = date('YmdHis');
-      }
+    elseif ($email['on_hold']) {
+      $email['hold_date'] = date('YmdHis');
     }
   }
 
@@ -355,6 +352,7 @@ AND    reset_date IS NULL
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 

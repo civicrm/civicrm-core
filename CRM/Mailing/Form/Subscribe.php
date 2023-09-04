@@ -89,8 +89,8 @@ ORDER BY title";
       while ($dao->fetch()) {
         $row = [];
         $row['id'] = $dao->id;
-        $row['title'] = $dao->frontend_title ?? $dao->title;
-        $row['description'] = $dao->frontend_description ?? $dao->description;
+        $row['title'] = $dao->frontend_title;
+        $row['description'] = $dao->frontend_description;
         $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $row['id'];
         $this->addElement('checkbox',
           $row['checkbox'],

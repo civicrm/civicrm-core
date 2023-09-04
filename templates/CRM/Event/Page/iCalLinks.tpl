@@ -9,7 +9,7 @@
 *}
 {* Display icons / links for ical download and feed for EventInfo.tpl, ThankYou.tpl, DashBoard.tpl, and ManageEvent.tpl *}
   {foreach from=$iCal item="iCalItem"}
-  <a href="{$iCalItem.url}" {if !empty($event)} class="crm-event-feed-link"{/if}>
+  <a href="{$iCalItem.url}" {if $isShowICalIconsInline} class="crm-event-feed-link"{/if}>
     <span class="fa-stack" aria-hidden="true"><i class="crm-i fa-calendar-o fa-stack-2x"></i><i style="top: 15%;" class="crm-i {$iCalItem.icon} fa-stack-1x"></i></span>
     <span class="label">{$iCalItem.text}</span>
   </a>

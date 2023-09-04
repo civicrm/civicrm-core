@@ -227,8 +227,7 @@ class CRM_Utils_VersionCheck {
    */
   private function getExtensionStats() {
     // Core components
-    $config = CRM_Core_Config::singleton();
-    foreach ($config->enableComponents as $comp) {
+    foreach (Civi::settings()->get('enable_components') as $comp) {
       $this->stats['extensions'][] = [
         'name' => 'org.civicrm.component.' . strtolower($comp),
         'enabled' => 1,

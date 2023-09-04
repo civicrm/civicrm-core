@@ -17,7 +17,7 @@
  */
 class CRM_Contact_Page_DedupeExceptionTest extends CiviUnitTestCase {
 
-  public function testGetDedupeExceptions() {
+  public function testGetDedupeExceptions(): void {
     $contact1      = $this->individualCreate();
     $contact2      = $this->individualCreate();
     $exception     = $this->callAPISuccess('Exception', 'create', [

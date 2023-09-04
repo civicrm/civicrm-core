@@ -18,13 +18,17 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   protected $entity = 'Participant';
 
   /**
+   * @var int
+   */
+  protected $userJobID;
+
+  /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    */
   public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
     $this->quickCleanup([
-      'civicrm_event',
-      'civicrm_participant',
       'civicrm_contact',
       'civicrm_email',
       'civicrm_user_job',
@@ -110,9 +114,11 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 
   /**
    * Test that an external id will not match to a deleted contact..
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testImportWithExternalID() :void {
-    $this->eventCreate(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
     $this->individualCreate(['external_identifier' => 'ref-77', 'is_deleted' => TRUE]);
     $this->importCSV('participant_with_ext_id.csv', [
       ['name' => 'event_id'],
@@ -127,6 +133,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'status_id'],
       ['name' => 'register_date'],
       ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
@@ -134,9 +141,51 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that imports work generally.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportParticipant() :void {
+    $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'checkbox');
+    $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
+    $this->importCSV('participant_with_ext_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'external_identifier'],
+      ['name' => 'fee_amount'],
+      ['name' => 'fee_currency'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+      ['name' => $this->getCustomFieldName('checkbox')],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $result = $this->callAPISuccess('Participant', 'get', [
+      'contact_id' => $contactID,
+      'sequential' => TRUE,
+    ])['values'][0];
+
+    $this->assertEquals($row['event_title'], $result['event_title']);
+    $this->assertEquals($row['fee_amount'], $result['participant_fee_amount']);
+    $this->assertEquals($row['participant_source'], $result['participant_source']);
+    $this->assertEquals($row['participant_status'], $result['participant_status']);
+    $this->assertEquals('2022-12-07 00:00:00', $result['participant_register_date']);
+    $this->assertEquals(['Attendee', 'Volunteer'], $result['participant_role']);
+    $this->assertEquals(0, $result['participant_is_pay_later']);
+    $this->assertEquals(['P', 'M'], array_keys($result[$this->getCustomFieldName('checkbox')]));
+  }
+
+  /**
    * @param array $submittedValues
    *
    * @return int
+   * @throws \CRM_Core_Exception
    */
   protected function getUserJobID(array $submittedValues = []): int {
     $userJobID = UserJob::create()->setValues([

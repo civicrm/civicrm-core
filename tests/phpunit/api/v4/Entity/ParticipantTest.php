@@ -39,7 +39,7 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
     $this->cleanup($cleanup_params);
   }
 
-  public function testGetActions() {
+  public function testGetActions(): void {
     $result = Participant::getActions(FALSE)
       ->execute()
       ->indexBy('name');
@@ -51,7 +51,7 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString($whereDescription, $getParams['where']['description']);
   }
 
-  public function testGet() {
+  public function testGet(): void {
     $rows = $this->getRowCount('civicrm_participant');
     if ($rows > 0) {
       $this->fail('Participant table must be empty');

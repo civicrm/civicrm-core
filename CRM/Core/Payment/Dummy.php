@@ -168,6 +168,21 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
+   * Does this processor support pre-approval.
+   *
+   * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
+   *
+   * Currently Paypal express supports this, with a redirect to paypal after the 'Main' form is submitted in the
+   * contribution page. This token can then be processed at the confirm phase. Although this flow 'looks' like the
+   * 'notify' flow a key difference is that in the notify flow they don't have to return but in this flow they do.
+   *
+   * @return bool
+   */
+  protected function supportsPreApproval(): bool {
+    return $this->supports['PreApproval'] ?? FALSE;
+  }
+
+  /**
    * Set the return value of support functions. By default it is TRUE
    *
    */
@@ -260,6 +275,21 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *   Assoc array of input parameters for this transaction.
    */
   public function doRefund(&$params) {}
+
+  /**
+   * Function to action pre-approval if supported
+   *
+   * @param array $params
+   *   Parameters from the form
+   *
+   * This function returns an array which should contain
+   *   - pre_approval_parameters (this will be stored on the calling form & available later)
+   *   - redirect_url (if set the browser will be redirected to this.
+   */
+  public function doPreApproval(&$params): void {
+    // We set this here to allow the test to check what is set.
+    \Civi::$statics[__CLASS__][__FUNCTION__] = $params;
+  }
 
   /**
    * This function checks to see if we have the right config values.

@@ -90,9 +90,11 @@ class ChainSubscriber implements EventSubscriberInterface {
       $result = ['values' => [0 => $oldResult]];
     }
 
+    // Keys which should not be assumed to be chain calls
+    $blacklist = ['api.has_parent', 'api_params'];
     // Scan the params for chain calls.
     foreach ($params as $field => $newparams) {
-      if ((is_array($newparams) || $newparams === 1) && $field <> 'api.has_parent' && substr($field, 0, 3) == 'api') {
+      if ((is_array($newparams) || $newparams === 1) && !in_array($field, $blacklist, TRUE) && substr($field, 0, 3) == 'api') {
         // This param is a chain call, e.g. api.<entity>.<action>
 
         // 'api.participant.delete' => 1 is a valid options - handle 1

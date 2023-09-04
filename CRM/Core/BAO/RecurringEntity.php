@@ -149,6 +149,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
    * @return CRM_Core_DAO_RecurringEntity
    */
   public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -1013,7 +1014,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
           $concatStartActionDateBits = $startActionDate1 . strtoupper(substr($startActionDate[1], 0, 2));
           $r->byday([$concatStartActionDateBits]);
         }
-        elseif ($scheduleReminderDetails['limit_to']) {
+        elseif ($scheduleReminderDetails['limit_to'] == 1) {
           $r->bymonthday([$scheduleReminderDetails['limit_to']]);
         }
       }
@@ -1223,7 +1224,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
       return $this->recursion->getNextOccurrence($occurDate, $strictly_after);
     }
     catch (Exception $exception) {
-      CRM_Core_Session::setStatus(ts($exception->getMessage()));
+      CRM_Core_Session::setStatus(_ts($exception->getMessage()));
     }
     return FALSE;
   }

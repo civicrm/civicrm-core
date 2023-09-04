@@ -95,6 +95,14 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     return $exs;
   }
 
+  public function getFlowTypes() {
+    $exs = [];
+    $exs[] = ['param'];
+    $exs[] = ['header'];
+    $exs[] = ['xheader'];
+    return $exs;
+  }
+
   public function testAnonymous(): void {
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
@@ -168,6 +176,49 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     if (!in_array('sendsExcessCookies', $this->quirks)) {
       $this->assertNoCookies($response);
     }
+  }
+
+  /**
+   * Send a request using a jwt that can't be decoded at all. Assert that it fails
+   *
+   * @param string $flowType
+   *   The "flow" determines how the credential is added on top of the base-request (e.g. adding a parameter or header).
+   *
+   * @dataProvider getFlowTypes
+   */
+  public function testInvalidJwt($flowType): void {
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+
+    $cred = $this->credJwt('Bearer thisisnotavalidjwt');
+
+    $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
+    /** @var \Psr\Http\Message\RequestInterface $request */
+    $request = $this->$flowFunc($this->requestMyContact(), $cred);
+
+    \Civi::settings()->set("authx_{$flowType}_cred", ['jwt']);
+    $response = $http->send($request);
+    $this->assertNotAuthenticated('prohibit', $response);
+  }
+
+  /**
+   * Send a request using a jwt that has expired. Assert that it fails
+   *
+   * @param string $flowType
+   *   The "flow" determines how the credential is added on top of the base-request (e.g. adding a parameter or header).
+   *
+   * @dataProvider getFlowTypes
+   */
+  public function testExpiredJwt($flowType): void {
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+
+    $cred = $this->credJwt($this->getDemoCID(), TRUE);
+    $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
+    /** @var \Psr\Http\Message\RequestInterface $request */
+    $request = $this->$flowFunc($this->requestMyContact(), $cred);
+
+    \Civi::settings()->set("authx_{$flowType}_cred", ['jwt']);
+    $response = $http->send($request);
+    $this->assertNotAuthenticated('prohibit', $response);
   }
 
   /**
@@ -557,7 +608,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       $loginArgs = ['principal' => [$principalField => $principalValue]];
       $report = $withCv(sprintf('try { return authx_login(%s); } catch (Exception $e) { return [get_class($e), $e->getMessage()]; }', var_export($loginArgs, 1)));
       $this->assertTrue(isset($report[0], $report[1]), "authx_login() should fail with invalid credentials ($principalField=>$principalValue). Received array: " . json_encode($report));
-      $this->assertRegExp($expectExceptionMessage, $report[1], "Invalid principal ($principalField=>$principalValue) should generate exception.");
+      $this->assertMatchesRegularExpression($expectExceptionMessage, $report[1], "Invalid principal ($principalField=>$principalValue) should generate exception.");
       $this->assertEquals($expectExceptionClass, $report[0], "Invalid principal ($principalField=>$principalValue) should generate exception.");
     }
   }
@@ -585,7 +636,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       $this->fail('Untrusted sessions should require authentication credentials');
     }
     catch (JsonRpcMethodException $e) {
-      $this->assertRegExp(';not trusted;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';not trusted;', $e->getMessage());
     }
 
     $login = $rpc->call('login', ['cred' => $this->credJwt($this->getDemoCID())]);
@@ -780,12 +831,12 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     return 'Bearer ' . $api_key;
   }
 
-  public function credJwt($cid) {
+  public function credJwt($cid, $expired = FALSE) {
     if (empty(\Civi::service('crypto.registry')->findKeysByTag('SIGN'))) {
       $this->markTestIncomplete('Cannot test JWT. No CIVICRM_SIGN_KEYS are defined.');
     }
     $token = \Civi::service('crypto.jwt')->encode([
-      'exp' => time() + 60 * 60,
+      'exp' => $expired ? time() - 60 * 60 : time() + 60 * 60,
       'sub' => "cid:$cid",
       'scope' => 'authx',
     ]);

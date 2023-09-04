@@ -1,8 +1,25 @@
-<li ng-if="!$ctrl.fieldDefn.is_id">
+<li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
   <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Type:') }}</label>
     <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">
       <option ng-repeat="type in $ctrl.inputTypes" value="{{ type.name }}">{{ type.label }}</option>
+    </select>
+  </div>
+</li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'Number' && $ctrl.fieldDefn.data_type === 'Float'">
+  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label>{{:: ts('Decimal places:') }}</label>
+    <select class="form-control" ng-model="getSet('input_attrs.step')" ng-model-options="{getterSetter: true}" title="{{:: ts('Decimal places') }}">
+      <option ng-value="1">0</option>
+      <option ng-value=".1">1</option>
+      <option ng-value=".01">2</option>
+      <option ng-value=".001">3</option>
+      <option ng-value=".0001">4</option>
+      <option ng-value=".00001">5</option>
+      <option ng-value=".000001">6</option>
+      <option ng-value=".0000001">7</option>
+      <option ng-value=".00000001">8</option>
+      <option ng-value=".000000001">9</option>
     </select>
   </div>
 </li>
@@ -33,7 +50,7 @@
     {{:: ts('Required') }}
   </a>
 </li>
-<li ng-if="!$ctrl.fieldDefn.is_id">
+<li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
   <a href ng-click="toggleDefaultValue(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Pre-fill this field with a value') }}">
     <i class="crm-i fa-{{ $ctrl.hasDefaultValue ? 'check-' : '' }}square-o"></i>
     {{:: ts('Default value') }}
@@ -74,6 +91,22 @@
     <i class="crm-i fa-{{ !$ctrl.node.defn.search_range ? '' : 'check-' }}square-o"></i>
     {{:: ts('Search by range') }}
   </a>
+</li>
+<li ng-if="$ctrl.isSearch()" ng-click="$event.stopPropagation()">
+  <div href class="af-gui-field-select-in-dropdown">
+    <label>{{:: ts('Operator:') }}</label>
+    <select class="form-control" ng-model="getSetOperator" ng-model-options="{getterSetter: true}" title="{{:: ts('Set the search operator for this field or allow the user to select it on the form') }}">
+      <option value="">{{:: ts('Auto') }}</option>
+      <option value="_EXPOSE_">{{:: ts('User Select') }}</option>
+      <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
+    </select>
+  </div>
+  <div href class="af-gui-field-select-in-dropdown" ng-if="$ctrl.getSet('expose_operator')">
+    <label>{{:: ts('Default:') }}</label>
+    <select class="form-control" ng-model="getSet('search_operator')" ng-model-options="{getterSetter: true}" title="{{:: ts('Default search operator for the user to select') }}">
+      <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
+    </select>
+  </div>
 </li>
 <li role="separator" class="divider" ng-if="hasOptions()"></li>
 <li ng-if="hasOptions()" ng-click="$event.stopPropagation()">

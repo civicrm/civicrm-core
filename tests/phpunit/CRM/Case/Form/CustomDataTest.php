@@ -38,7 +38,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
 
     // set up case and set the custom field initial value
     $client_id = $this->individualCreate([], 0, TRUE);
-    $caseObj = $this->createCase($client_id, $this->_loggedInUser);
+    $caseObj = $this->createCase($client_id, $this->getLoggedInUser());
     if (isset($input['custom_field_oldvalue'])) {
       $this->callAPISuccess('CustomValue', 'create', [
         "custom_{$custom_field['id']}" => $input['custom_field_oldvalue'],
@@ -349,21 +349,23 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
 
     // Create a case and set the custom field to something
     $individual = $this->individualCreate();
-    $caseObj = $this->createCase($individual, $this->_loggedInUser);
+    $caseObj = $this->createCase($individual, $this->getLoggedInUser());
     $caseId = $caseObj->id;
     $this->callAPISuccess('CustomValue', 'create', [
       "custom_{$customField['id']}" => 'immutable text',
       'entity_id' => $caseId,
     ]);
 
-    // run the form
+    // Run the form.
+    $_REQUEST = [
+      'cid' => $individual,
+      'groupID' => $this->custom_group['id'],
+      'entityID' => $caseId,
+      // Sub-type is the case type.
+      'subType' => 1,
+    ];
     $form = new CRM_Case_Form_CustomData();
     $form->controller = new CRM_Core_Controller_Simple('CRM_Case_Form_CustomData', 'Case Data');
-    $form->set('groupID', $this->custom_group['id']);
-    $form->set('entityID', $caseId);
-    // this is case type
-    $form->set('subType', 1);
-    $form->set('cid', $individual);
     $form->buildForm();
     ob_start();
     $form->controller->_actions['display']->perform($form, 'display');

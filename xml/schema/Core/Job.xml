@@ -7,6 +7,12 @@
   <comment>Scheduled job.</comment>
   <add>4.1</add>
   <log>false</log>
+  <paths>
+    <add>civicrm/admin/job/add?reset=1&amp;action=add</add>
+    <delete>civicrm/admin/job/edit?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <update>civicrm/admin/job/edit?reset=1&amp;action=update&amp;id=[id]</update>
+    <browse>civicrm/admin/job</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Job ID</title>
@@ -35,6 +41,7 @@
     <comment>Which Domain is this scheduled job for</comment>
     <html>
       <label>Domain</label>
+      <type>Select</type>
     </html>
     <add>4.1</add>
   </field>
@@ -88,6 +95,9 @@
     <length>255</length>
     <comment>Title of the job</comment>
     <add>4.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>description</name>
@@ -96,6 +106,11 @@
     <length>255</length>
     <comment>Description of the job</comment>
     <add>4.1</add>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
   </field>
   <field>
     <name>api_entity</name>

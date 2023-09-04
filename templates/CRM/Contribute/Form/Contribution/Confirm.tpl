@@ -11,8 +11,6 @@
   {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block" data-page-id="{$contributionPageID}" data-page-template="confirm">
   <div class="help">
     <p>{ts}Please verify the information below carefully. Click <strong>Go Back</strong> if you need to make changes.{/ts}
@@ -26,7 +24,7 @@
     <div class="bold pay_later_receipt-section">{$pay_later_receipt}</div>
   {/if}
 
-  {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="confirmContribution"}
+  {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl"}
 
   {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $isDisplayLineItems and $lineItem ) }
     <div class="crm-group amount_display-group">
@@ -243,25 +241,25 @@
             {$paymentFieldsetLabel}
           </div>
         {/if}
-        {if in_array('bank_account_number', $form)}
+        {if in_array('bank_account_number', $form) && $bank_account_number}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br/>
             {ts}Bank Account Number{/ts}: {$bank_account_number}<br/>
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br/>
             {ts}Bank Name{/ts}: {$bank_name}<br/>
           </div>
-          {if $contributeMode eq 'direct'}
+          {if $paymentAgreementText}
             <div class="crm-group debit_agreement-group">
               <div class="header-dark">
-                {ts}Agreement{/ts}
+                {$paymentAgreementTitle}
               </div>
               <div class="display-block">
-                {ts}Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.{/ts}
+                {$paymentAgreementText}
               </div>
             </div>
           {/if}
         {/if}
-        {if in_array('credit_card_number', $form)}
+        {if in_array('credit_card_number', $form) && $credit_card_number}
           <div class="crm-section no-label credit_card_details-section">
             <div class="content">{$credit_card_type}</div>
             <div class="content">{$credit_card_number}</div>

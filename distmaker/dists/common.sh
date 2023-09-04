@@ -10,6 +10,11 @@ function dm_reset_dirs() {
   mkdir -p "$@"
 }
 
+function dm_rsync() {
+  # ${DM_RSYNC:-rsync} -avC "$@"
+  ${DM_RSYNC:-rsync} -aC "$@"
+}
+
 ## Assert that a folder contains no symlinks
 ##
 ## ex: dev/core#1393, dev/core#1990
@@ -31,7 +36,7 @@ function dm_install_dir() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  ${DM_RSYNC:-rsync} -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
+  dm_rsync --exclude=.git --exclude=.svn "$from/./"  "$to/./"
 }
 
 ## Copy listed files
@@ -68,7 +73,7 @@ function dm_install_bower() {
   done
 
   [ ! -d "$to" ] && mkdir "$to"
-  ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
+  dm_rsync $excludes_rsync "$repo/./" "$to/./"
 }
 
 ## Copy all core files
@@ -77,7 +82,7 @@ function dm_install_core() {
   local repo="$1"
   local to="$2"
 
-  for dir in ang css i js PEAR templates bin CRM api extern Reports install mixin settings Civi partials release-notes xml setup ; do
+  for dir in ang css i js PEAR templates bin CRM api extern Reports install mixin settings Civi partials release-notes xml setup sql/civicrm_data ; do
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
@@ -112,7 +117,7 @@ function dm_install_coreext() {
 
   for relext in "$@" ; do
     [ ! -d "$to/ext/$relext" ] && mkdir -p "$to/ext/$relext"
-    ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/ext/$relext/./" "$to/ext/$relext/./"
+    dm_rsync $excludes_rsync --include=core "$repo/ext/$relext/./" "$to/ext/$relext/./"
   done
 }
 
@@ -140,7 +145,7 @@ function dm_install_packages() {
   ##   packages/Files packages/PHP packages/Text
 
   [ ! -d "$to" ] && mkdir "$to"
-  ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/./" "$to/./"
+  dm_rsync $excludes_rsync --include=core "$repo/./" "$to/./"
 }
 
 ## Copy Drupal-integration module
@@ -202,7 +207,7 @@ function dm_install_vendor() {
   done
 
   [ ! -d "$to" ] && mkdir "$to"
-  ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
+  dm_rsync $excludes_rsync "$repo/./" "$to/./"
   ## We don't this use CLI script in production, and the symlink breaks D7/BD URL installs
   dm_remove_files "$to" "bin/pscss" "bin/cssmin"
 }
@@ -215,7 +220,7 @@ function dm_install_wordpress() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  ${DM_RSYNC:-rsync} -avC \
+  dm_rsync \
     --exclude=.git \
     --exclude=.svn \
     --exclude=civicrm.config.php.wordpress \
@@ -258,6 +263,10 @@ function civicrmVersion( ) {
 ## Perform a hard checkout on a given report
 ## usage: dm_git_checkout <repo_path> <tree-ish>
 function dm_git_checkout() {
+  if [ -n "$DM_KEEP_GIT" ]; then
+    echo "Skip git checkout ($1 => $2)"
+    return
+  fi
   pushd "$1"
     git checkout .
     git checkout "$2"
@@ -267,6 +276,9 @@ function dm_git_checkout() {
 ## Download a Civi extension
 ## usage: dm_install_cvext <full-ext-key> <target-path>
 function dm_install_cvext() {
+  if [ -n "$DM_SKIP_EXT" ]; then
+    return
+  fi
   # cv dl -b '@https://civicrm.org/extdir/ver=4.7.25|cms=Drupal/com.iatspayments.civicrm.xml' --destination=$PWD/iatspayments
   cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION|cms=Drupal/$1.xml" --to="$2"
 }

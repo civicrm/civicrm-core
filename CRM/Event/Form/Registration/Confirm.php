@@ -97,6 +97,25 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->set('params', $this->_params);
   }
 
+  public function setDefaultValues() {
+    if (!$this->showPaymentOnConfirm) {
+      return [];
+    }
+    // Set default payment processor as default payment_processor radio button value
+    if (!empty($this->_paymentProcessors)) {
+      foreach ($this->_paymentProcessors as $pid => $value) {
+        if (!empty($value['is_default'])) {
+          $defaults['payment_processor_id'] = $pid;
+          break;
+        }
+      }
+    }
+    if (!empty($this->_values['event']['is_pay_later']) && empty($this->_defaults['payment_processor_id'])) {
+      $defaults['is_pay_later'] = 1;
+    }
+    return $defaults ?? [];
+  }
+
   /**
    * Pre process function for Paypal Express confirm.
    * @todo this is just a step in refactor as payment processor specific code does not belong in generic forms
@@ -253,6 +272,17 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('amounts', $this->_amount);
       $this->assign('totalAmount', $this->_totalAmount);
       $this->set('totalAmount', $this->_totalAmount);
+
+      $showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
+      $this->assign('showPaymentOnConfirm', $showPaymentOnConfirm);
+      if ($showPaymentOnConfirm) {
+        $isPayLater = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'is_pay_later');
+        $this->setPayLaterLabel($isPayLater ? $this->_values['event']['pay_later_text'] : '');
+        $this->_paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_values['event']['payment_processor'] ?? NULL);
+        $this->assignPaymentProcessor($isPayLater);
+        CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+        $this->addPaymentProcessorFieldsToForm();
+      }
     }
 
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
@@ -275,7 +305,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     //consider total amount.
     $this->assign('isAmountzero', $this->_totalAmount <= 0);
 
-    $contribButton = ts('Continue');
+    $contribButton = ts('Register');
     $this->addButtons([
       [
         'type' => 'back',
@@ -317,7 +347,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     $this->setDefaults($defaults);
-    $this->freeze();
+    $showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
+    if (!$showPaymentOnConfirm) {
+      $this->freeze();
+    }
 
     //lets give meaningful status message, CRM-4320.
     $this->assign('isOnWaitlist', $this->_allowWaitlist);
@@ -357,6 +390,21 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         CRM_Core_Session::setStatus(ts('Please note that the options which are marked or selected are sold out for participant being viewed.'), ts('Sold out:'), 'error');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "_qf_Register_display=true&qfKey={$fields['qfKey']}"));
       }
+    }
+
+    if ($form->showPaymentOnConfirm && empty($form->_requireApproval) && !empty($form->_totalAmount)
+      && $form->_totalAmount > 0 && !isset($fields['payment_processor_id'])
+    ) {
+      $errors['payment_processor_id'] = ts('Please select a Payment Method');
+    }
+
+    if ($form->showPaymentOnConfirm) {
+      CRM_Core_Payment_Form::validatePaymentInstrument(
+        $fields['payment_processor_id'],
+        $fields,
+        $errors,
+        (!$form->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
+      );
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -1156,7 +1204,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    *
    * @param CRM_Event_Form_Registration_Confirm $form
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public static function assignProfiles($form) {
     $participantParams = $form->_params;

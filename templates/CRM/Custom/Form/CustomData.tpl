@@ -9,11 +9,12 @@
 *}
 {* Custom Data form*}
 {foreach from=$groupTree item=cd_edit key=group_id name=custom_sets}
+    {* Note this `if` looks like it's needlessly assigning a var but it's also used in the included file Edit/CustomData.tpl *}
     {if $cd_edit.is_multiple and $multiRecordDisplay eq 'single'}
-      {assign var="isSingleRecordEdit" value=TRUE}
+      {assign var="isSingleRecordEdit" value=true}
     {else}
       {* always assign to prevent leakage*}
-      {assign var="isSingleRecordEdit" value=''}
+      {assign var="isSingleRecordEdit" value=false}
     {/if}
     {if $isSingleRecordEdit}
       <div class="custom-group custom-group-{$cd_edit.name}">

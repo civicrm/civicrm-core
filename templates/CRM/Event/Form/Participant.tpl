@@ -15,7 +15,7 @@
 {* Main event form template *}
 {else}
   <div class="crm-block crm-form-block crm-participant-form-block">
-    {if $newCredit AND $action EQ 1 AND $participantMode EQ null}
+    {if $action EQ 1 AND ($context EQ 'participant' OR $context EQ 'standalone') AND $newCredit AND $participantMode EQ null}
       <div class="action-link css_right crm-link-credit-card-mode">
         {if $contactId}
           {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
@@ -33,13 +33,6 @@
       {/if}
       <div id="eventFullMsg" class="messages status no-popup" style="display:none;"></div>
 
-
-      {if $action eq 1 AND $paid}
-        <div class="help">
-          {ts}If you are accepting offline payment from this participant, check <strong>Record Payment</strong>. You will be able to fill in the payment information, and optionally send a receipt.{/ts}
-        </div>
-      {/if}
-
       {if $action eq 8} {* If action is Delete *}
         <div class="crm-participant-form-block-delete messages status no-popup">
           <div class="crm-content">
@@ -56,12 +49,13 @@
           {$form.delete_participant.html}
         {/if}
         {else} {* If action is other than Delete *}
-        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
-          <tr class="crm-participant-form-contact-id">
-            <td class="label">{$form.contact_id.label}</td>
-            <td>{$form.contact_id.html}</td>
-          </tr>
+          {if $context EQ 'standalone' OR $context EQ 'participant' OR $action EQ 2}
+            <tr class="crm-participant-form-contact-id">
+              <td class="label">{$form.contact_id.label}</td>
+              <td>{$form.contact_id.html}</td>
+            </tr>
+          {/if}
           {if $action EQ 2}
             {if $additionalParticipants} {* Display others registered by this participant *}
               <tr class="crm-participant-form-block-additionalParticipants">
@@ -85,12 +79,7 @@
           {/if}
           <tr class="crm-participant-form-block-event_id">
             <td class="label">{$form.event_id.label}</td>
-            <td class="view-value">
-              {$form.event_id.html}
-              {if $is_test}
-                {ts}(test){/ts}
-              {/if}
-            </td>
+            <td class="view-value">{$form.event_id.html}</td>
           </tr>
 
         {* CRM-7362 --add campaign *}
@@ -111,8 +100,7 @@
             </td>
           </tr>
           <tr class="crm-participant-form-block-source">
-            <td class="label">{$form.source.label}</td><td>{$form.source.html|crmAddClass:huge}<br />
-            <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
+            <td class="label">{$form.source.label}</td><td>{$form.source.html|crmAddClass:huge}</td>
           </tr>
           {if $participantMode}
             <tr class="crm-participant-form-block-payment_processor_id">
@@ -148,7 +136,7 @@
         </div>
       {/if}
 
-      {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
+      {if $action eq 2 and $accessContribution and $rows.0.contribution_id}
       {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
       {/if}
 
@@ -162,7 +150,7 @@
     {/if}
 
     {*include custom data js file*}
-    {include file="CRM/common/customData.tpl"}
+    {include file="CRM/common/customData.tpl" groupID=''}
 
     <script type="text/javascript">
       {literal}
@@ -274,25 +262,25 @@
 
   {/if}
 
+  {if $action NEQ 8}
+  <script type="text/javascript">
+    {literal}
 
-<script type="text/javascript">
-  {literal}
-
-  sendNotification();
-  function sendNotification() {
-    var notificationStatusIds = {/literal}"{$notificationStatusIds}"{literal};
-    notificationStatusIds = notificationStatusIds.split(',');
-    if (cj.inArray(cj('.crm-participant-form-block-status_id select#status_id option:selected').val(), notificationStatusIds) > -1) {
-      cj("#notify").show();
-      cj("#is_notify").prop('checked', false);
+    sendNotification();
+    function sendNotification() {
+      var notificationStatusIds = {/literal}"{$notificationStatusIds}"{literal};
+      notificationStatusIds = notificationStatusIds.split(',');
+      if (cj.inArray(cj('.crm-participant-form-block-status_id select#status_id option:selected').val(), notificationStatusIds) > -1) {
+        cj("#notify").show();
+      }
+      else {
+        cj("#notify").hide();
+        cj("#is_notify").prop('checked', false);
+      }
     }
-    else {
-      cj("#notify").hide();
-      cj("#is_notify").prop('checked', false);
-    }
-  }
 
-  {/literal}
-</script>
+    {/literal}
+  </script>
+  {/if}
 
 {/if} {* end of main event block*}

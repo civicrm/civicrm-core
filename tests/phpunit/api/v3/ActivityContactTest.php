@@ -47,11 +47,11 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
   public function testCreateActivityContact($version) {
     $this->_apiversion = $version;
 
-    $result = $this->callAPIAndDocument('ActivityContact', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('ActivityContact', 'create', $this->_params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
 
-    $result = $this->callAPIAndDocument('ActivityContact', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('ActivityContact', 'create', $this->_params);
     $this->assertEquals(1, $result['count']);
 
     $this->callAPISuccess('activity_contact', 'delete', ['id' => $result['id']]);
@@ -68,7 +68,7 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('activity_contact', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('activity_contact', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('activity_contact', 'delete', ['id' => $create['id']]);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('activity_contact', 'get', [
       'id' => $create['id'],
@@ -115,7 +115,7 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
    * Test civicrm_activity_contact_get with wrong params.
    * FIXME: Api4
    */
-  public function testGetWrongParams() {
+  public function testGetWrongParams(): void {
     $this->callAPIFailure('ActivityContact', 'Get', ['contact_id' => 'abc']);
     $this->callAPIFailure('ActivityContact', 'Get', ['activity_id' => 'abc']);
     $this->callAPIFailure('ActivityContact', 'Get', ['record_type_id' => 'abc']);

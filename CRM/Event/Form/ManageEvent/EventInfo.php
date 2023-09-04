@@ -208,11 +208,6 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
       $errors[$validateDates['key']] = $validateDates['message'];
     }
 
-    //CRM-4286
-    if (strstr($values['title'], '/')) {
-      $errors['title'] = ts("Please do not use '/' in Event Title.");
-    }
-
     return $errors;
   }
 

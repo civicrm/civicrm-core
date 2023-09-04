@@ -11,6 +11,7 @@
     <add>civicrm/admin/financial/financialAccount/edit?action=add&amp;reset=1</add>
     <update>civicrm/admin/financial/financialAccount/edit?action=update&amp;id=[id]&amp;reset=1</update>
     <delete>civicrm/admin/financial/financialAccount/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+    <browse>civicrm/admin/financial/financialAccount</browse>
   </paths>
   <field>
     <name>id</name>

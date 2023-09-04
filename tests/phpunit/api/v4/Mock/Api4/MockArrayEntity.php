@@ -21,7 +21,7 @@ namespace Civi\Api4;
 /**
  * MockArrayEntity entity.
  *
- * @method Generic\BasicGetAction get()
+ * @method static Generic\BasicGetAction get()
  *
  * @package Civi\Api4
  */

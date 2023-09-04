@@ -32,6 +32,8 @@ namespace Civi\Setup;
  *   Ex: ['::abcd1234ABCD9876'].
  * @property string[] $signKeys
  *   Ex: ['jwt-hs256::abcd1234ABCD9876'].
+ * @property string $deployID
+ *   Ex: '1234ABCD9876'.
  * @property string|NULL $lang
  *   The language of the default dataset.
  *   Ex: 'fr_FR'.

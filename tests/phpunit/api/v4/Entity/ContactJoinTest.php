@@ -31,7 +31,7 @@ use Civi\Api4\Phone;
  */
 class ContactJoinTest extends Api4TestBase {
 
-  public function testContactJoin() {
+  public function testContactJoin(): void {
     $contact = $this->createTestRecord('Contact', [
       'first_name' => uniqid(),
       'last_name' => uniqid(),
@@ -53,7 +53,7 @@ class ContactJoinTest extends Api4TestBase {
     }
   }
 
-  public function testJoinToPCMWillReturnArray() {
+  public function testJoinToPCMWillReturnArray(): void {
     $contact = $this->createTestRecord('Contact', [
       'preferred_communication_method' => [1, 2, 3],
       'contact_type' => 'Individual',
@@ -70,7 +70,7 @@ class ContactJoinTest extends Api4TestBase {
     $this->assertCount(3, $fetchedContact["preferred_communication_method"]);
   }
 
-  public function testJoinToPCMOptionValueWillShowLabel() {
+  public function testJoinToPCMOptionValueWillShowLabel(): void {
     $options = OptionValue::get()
       ->addWhere('option_group_id:name', '=', 'preferred_communication_method')
       ->execute()
@@ -104,7 +104,7 @@ class ContactJoinTest extends Api4TestBase {
     $this->assertEquals($labels, $fetchedContact['preferred_communication_method:label']);
   }
 
-  public function testCreateWithPrimaryAndBilling() {
+  public function testCreateWithPrimaryAndBilling(): void {
     $contact = $this->createTestRecord('Contact', [
       'email_primary.email' => 'a@test.com',
       'email_billing.email' => 'b@test.com',
@@ -117,6 +117,7 @@ class ContactJoinTest extends Api4TestBase {
       ->execute();
     $this->assertCount(1, $addr);
     $this->assertEquals('Hello', $contact['address_billing.city']);
+    $this->assertEquals(1001, $contact['address_billing.state_province_id']);
     $this->assertEquals(1228, $contact['address_billing.country_id']);
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
@@ -126,7 +127,34 @@ class ContactJoinTest extends Api4TestBase {
     $this->assertEquals('b@test.com', $contact['email_billing.email']);
   }
 
-  public function testUpdateDeletePrimaryAndBilling() {
+  /**
+   * This is the same as testCreateWithPrimaryAndBilling, but the ambiguous
+   * state "AK" is resolved within a different country "NG".
+   */
+  public function testCreateWithPrimaryAndBilling_Nigeria(): void {
+    $contact = $this->createTestRecord('Contact', [
+      'email_primary.email' => 'a@test.com',
+      'email_billing.email' => 'b@test.com',
+      'address_billing.city' => 'Hello',
+      'address_billing.state_province_id:abbr' => 'AK',
+      'address_billing.country_id:abbr' => 'NG',
+    ]);
+    $addr = Address::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(1, $addr);
+    $this->assertEquals('Hello', $contact['address_billing.city']);
+    $this->assertEquals(3885, $contact['address_billing.state_province_id']);
+    $this->assertEquals(1157, $contact['address_billing.country_id']);
+    $emails = Email::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(2, $emails);
+    $this->assertEquals('a@test.com', $contact['email_primary.email']);
+    $this->assertEquals('b@test.com', $contact['email_billing.email']);
+  }
+
+  public function testUpdateDeletePrimaryAndBilling(): void {
     $contact = $this->createTestRecord('Contact', [
       'phone_primary.phone' => '12345',
       'phone_billing.phone' => '54321',

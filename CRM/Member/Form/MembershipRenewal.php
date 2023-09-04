@@ -345,7 +345,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->add('text', 'total_amount', ts('Amount'));
       $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
 
-      $this->add('datepicker', 'receive_date', ts('Received'), [], FALSE, ['time' => TRUE]);
+      $this->add('datepicker', 'receive_date', ts('Contribution Date'), [], FALSE, ['time' => TRUE]);
 
       $this->add('select', 'payment_instrument_id', ts('Payment Method'),
         ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument(),
@@ -431,7 +431,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // We process both the dates before comparison using CRM utils so that they are in same date format
     if (isset($params['renewal_date'])) {
       if ($params['renewal_date'] < $joinDate) {
-        $errors['renewal_date'] = ts('Renewal date must be the same or later than Member since (Join Date).');
+        $errors['renewal_date'] = ts('Renewal date must be the same or later than Member Since.');
       }
     }
 
@@ -567,7 +567,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     // chk for renewal for multiple terms CRM-8750
     $numRenewTerms = 1;
-    if (is_numeric(CRM_Utils_Array::value('num_terms', $this->_params))) {
+    if (is_numeric($this->_params['num_terms'] ?? '')) {
       $numRenewTerms = $this->_params['num_terms'];
     }
 
@@ -684,8 +684,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $this->_params,
         $this->_bltID
       ));
-      $this->assign('contributeMode', 'direct');
-      $this->assign('isAmountzero', 0);
+
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
       if ($this->_mode === 'test') {
@@ -704,7 +703,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
         'modelProps' => [
           'receiptText' => $this->getSubmittedValue('receipt_text'),
-          'contactId' => $this->_receiptContactId,
+          'contactID' => $this->_receiptContactId,
           'contributionID' => $this->getContributionID(),
           'membershipID' => $this->_membershipId,
         ],

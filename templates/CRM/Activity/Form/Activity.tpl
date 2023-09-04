@@ -16,10 +16,6 @@
     {/if}
     <div class="crm-block crm-form-block crm-activity-form-block">
   {/if}
-  {if !$action or ( $action eq 1 ) or ( $action eq 2 ) }
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-  {/if}
-
   {if $action eq 8} {* Delete action. *}
   <table class="form-layout">
   <tr>
@@ -138,7 +134,7 @@
       <td class="view-value">
       {$form.details.html}
       </td>
-    {elseif $activityTypeNameAndLabel.machineName eq "Inbound Email"}
+    {elseif $activityTypeNameAndLabel.machineName eq "Inbound Email" && $form.details.value|crmStripAlternatives|strip_tags eq $form.details.value|crmStripAlternatives}
       <td class="view-value">
        {$form.details.html|crmStripAlternatives|nl2br}
       </td>

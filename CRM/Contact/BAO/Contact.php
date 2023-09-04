@@ -298,7 +298,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
 
     $params['contact_id'] = $contact->id;
 
-    if (Civi::settings()->get('is_enabled')) {
+    if (!$isEdit && Civi::settings()->get('is_enabled')) {
       // Enabling multisite causes the contact to be added to the domain group.
       $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
       if (!empty($domainGroupID)) {
@@ -1135,7 +1135,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
     // retrieve contact id in case of Profile context
     $id = CRM_Utils_Request::retrieve('id', 'Positive');
-    $cid = $cid ? $cid : $id;
+    $cid = $cid ?: $id;
     if ($action & CRM_Core_Action::DELETE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
         CRM_Contact_BAO_Contact::deleteContactImage($cid);
@@ -1145,36 +1145,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
         CRM_Utils_System::redirect($toUrl);
       }
     }
-  }
-
-  /**
-   * Function to set is_delete true or restore deleted contact.
-   *
-   * @param CRM_Contact_DAO_Contact $contact
-   *   Contact DAO object.
-   * @param bool $restore
-   *   True to set the is_delete = 1 else false to restore deleted contact,
-   *   i.e. is_delete = 0
-   *
-   * @deprecated
-   *
-   * @return bool
-   * @throws \CRM_Core_Exception
-   */
-  public static function contactTrashRestore($contact, $restore = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use the api');
-
-    if ($restore) {
-      CRM_Core_Error::deprecatedFunctionWarning('Use contact.create to restore - this does nothing much');
-      // @todo deprecate calling contactDelete with the intention to restore.
-      $updateParams = [
-        'id' => $contact->id,
-        'is_deleted' => FALSE,
-      ];
-      self::create($updateParams);
-      return TRUE;
-    }
-    return self::contactTrash($contact);
   }
 
   /**
@@ -2574,15 +2544,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       $values['preferred_communication_method'] = $preffComm;
       $values['preferred_communication_method_display'] = $temp['preferred_communication_method_display'] ?? NULL;
 
-      if ($contact->preferred_mail_format) {
-        $preferredMailingFormat = CRM_Core_SelectValues::pmf();
-        $values['preferred_mail_format'] = $preferredMailingFormat[$contact->preferred_mail_format];
-      }
-
-      // get preferred languages
-      if (!empty($contact->preferred_language)) {
-        $values['preferred_language'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $contact->preferred_language);
-      }
+      $values['preferred_language'] = empty($contact->preferred_language) ? NULL : CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $contact->preferred_language);
 
       // Calculating Year difference
       if ($contact->birth_date) {
@@ -2842,7 +2804,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
     $menu = [
       'view' => [
         'title' => ts('View Contact'),
-        'weight' => 0,
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         'ref' => 'view-contact',
         'class' => 'no-popup',
         'key' => 'view',
@@ -2850,7 +2812,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       ],
       'add' => [
         'title' => ts('Edit Contact'),
-        'weight' => 0,
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         'ref' => 'edit-contact',
         'class' => 'no-popup',
         'key' => 'add',
@@ -2858,7 +2820,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       ],
       'delete' => [
         'title' => ts('Delete Contact'),
-        'weight' => 0,
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         'ref' => 'delete-contact',
         'key' => 'delete',
         'permissions' => ['access deleted contacts', 'delete contacts'],
@@ -2995,7 +2957,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'key' => 'print',
         'tab' => 'print',
         'href' => CRM_Utils_System::url('civicrm/contact/view/print',
-          "reset=1&print=1"
+          'reset=1&print=1'
         ),
         'class' => 'print',
         'icon' => 'crm-i fa-print',
@@ -3094,6 +3056,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
             'ref' => $values['ref'],
             'class' => $values['class'] ?? NULL,
             'key' => $values['key'],
+            'weight' => $values['weight'],
           ];
           continue;
         }
@@ -3111,6 +3074,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
           'tab' => $values['tab'] ?? NULL,
           'class' => $values['class'] ?? NULL,
           'key' => $values['key'],
+          'weight' => $values['weight'],
         ];
       }
       else {
@@ -3134,6 +3098,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
             'class' => $value['class'] ?? NULL,
             'icon' => $value['icon'] ?? NULL,
             'key' => $value['key'],
+            'weight' => $value['weight'],
           ];
         }
       }

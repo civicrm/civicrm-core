@@ -68,16 +68,6 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
    */
   public function preProcess() {
     $this->preventAjaxSubmit();
-
-    //special case for custom search, directly give option to download csv file
-    $customSearchID = $this->get('customSearchID');
-    if ($customSearchID) {
-      CRM_Export_BAO_Export::exportCustom($this->get('customSearchClass'),
-        $this->get('formValues'),
-        $this->get(CRM_Utils_Sort::SORT_ORDER)
-      );
-    }
-
     $this->_selectAll = FALSE;
     $this->_exportMode = self::CONTACT_EXPORT;
     $this->_componentIds = [];
@@ -99,7 +89,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
 
     $count = 0;
     $this->_matchingContacts = FALSE;
-    if (CRM_Utils_Array::value('radio_ts', $values) == 'ts_sel') {
+    if (($values['radio_ts'] ?? NULL) == 'ts_sel') {
       foreach ($values as $key => $value) {
         if (strstr($key, 'mark_x')) {
           $count++;
@@ -242,7 +232,7 @@ FROM   {$this->_componentTable}
   public static function formRule($params, $files, $self) {
     $errors = [];
 
-    if (CRM_Utils_Array::value('mergeOption', $params) == self::EXPORT_MERGE_SAME_ADDRESS &&
+    if (($params['mergeOption'] ?? NULL) == self::EXPORT_MERGE_SAME_ADDRESS &&
       $self->_matchingContacts
     ) {
       $greetings = [
@@ -253,7 +243,7 @@ FROM   {$this->_componentTable}
       foreach ($greetings as $key => $value) {
         $otherOption = $params[$key] ?? NULL;
 
-        if ((CRM_Utils_Array::value($otherOption, $self->_greetingOptions[$key]) == ts('Other')) && empty($params[$value])) {
+        if ((($self->_greetingOptions[$key][$otherOption] ?? NULL) == ts('Other')) && empty($params[$value])) {
 
           $label = ucwords(str_replace('_', ' ', $key));
           $errors[$value] = ts('Please enter a value for %1 (when merging contacts), or select a pre-configured option from the list.', [1 => $label]);
@@ -272,8 +262,8 @@ FROM   {$this->_componentTable}
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
     $exportOption = $params['exportOption'];
-    $mergeSameAddress = CRM_Utils_Array::value('mergeOption', $params) == self::EXPORT_MERGE_SAME_ADDRESS ? 1 : 0;
-    $mergeSameHousehold = CRM_Utils_Array::value('mergeOption', $params) == self::EXPORT_MERGE_HOUSEHOLD ? 1 : 0;
+    $mergeSameAddress = ($params['mergeOption'] ?? NULL) == self::EXPORT_MERGE_SAME_ADDRESS ? 1 : 0;
+    $mergeSameHousehold = ($params['mergeOption'] ?? NULL) == self::EXPORT_MERGE_HOUSEHOLD ? 1 : 0;
 
     $this->set('mergeSameAddress', $mergeSameAddress);
     $this->set('mergeSameHousehold', $mergeSameHousehold);
@@ -389,7 +379,7 @@ FROM   {$this->_componentTable}
       $options[$key] = ["$greetingCount" => ts('List of names')];
 
       foreach ($params as $id => $field) {
-        if (CRM_Utils_Array::value('filter', $field) == 4) {
+        if (($field['filter'] ?? NULL) == 4) {
           $options[$key][++$greetingCount] = $field['label'];
         }
       }

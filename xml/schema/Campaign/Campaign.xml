@@ -47,9 +47,10 @@
     <add>3.3</add>
   </field>
   <index>
-    <name>UI_campaign_name</name>
+    <name>UI_name</name>
     <fieldName>name</fieldName>
-    <add>5.34</add>
+    <unique>true</unique>
+    <add>5.63</add>
   </index>
   <field>
     <name>title</name>
@@ -126,9 +127,9 @@
     <add>3.3</add>
   </field>
   <index>
-    <name>UI_campaign_type_id</name>
+    <name>index_campaign_type_id</name>
     <fieldName>campaign_type_id</fieldName>
-    <add>3.3</add>
+    <add>5.63</add>
   </index>
 
   <field>
@@ -148,9 +149,9 @@
     <add>3.3</add>
   </field>
   <index>
-    <name>UI_campaign_status_id</name>
+    <name>index_status_id</name>
     <fieldName>status_id</fieldName>
-    <add>3.3</add>
+    <add>5.63</add>
   </index>
 
   <field>
@@ -232,12 +233,15 @@
   <field>
     <name>created_date</name>
     <type>datetime</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <readonly>true</readonly>
     <title>Campaign Created Date</title>
     <comment>Date and time that Campaign was created.</comment>
     <add>3.3</add>
     <html>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
+      <label>Created Date</label>
     </html>
   </field>
 

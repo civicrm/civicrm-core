@@ -44,7 +44,7 @@ class CRM_Utils_Mail_Logger {
    * @param string[] $headers
    * @param string $message
    */
-  public static function log(&$to, &$headers, &$message) {
+  private static function log($to, $headers, $message) {
     if (is_array($to)) {
       $toString = implode(', ', $to);
       $fileName = $to[0];
@@ -52,7 +52,7 @@ class CRM_Utils_Mail_Logger {
     else {
       $toString = $fileName = $to;
     }
-    $content = "To: " . $toString . "\n";
+    $content = 'To: ' . $toString . "\n";
     foreach ($headers as $key => $val) {
       $content .= "$key: $val\n";
     }

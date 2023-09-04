@@ -8,20 +8,13 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is for configuring Scheduled Reminders *}
-{if !empty($setTab) and $setTab eq 1}
-  {if !empty($component) and $component eq 'event'}
-     {include file="CRM/Event/Form/ManageEvent/Tab.tpl"}
-  {/if}
-{else}
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
 {else}
-  {if empty($component)}
-    {capture assign=schedRemindersDocLink}{docURL page="user/email/scheduled-reminders/"}{/capture}
-    <div class="help">
-      {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
-    </div>
-  {/if}
+  {capture assign=schedRemindersDocLink}{docURL page="user/email/scheduled-reminders/"}{/capture}
+  <div class="help">
+    {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
+  </div>
   <div class="crm-content-block crm-block">
   {if $rows}
     <div id="reminder">
@@ -34,14 +27,7 @@
     </div>
   {/if}
   <div class="action-link">
-    {assign var='link' value="civicrm/admin/scheduleReminders"}
-    {if !empty($component)}
-      {assign var='urlParams' value="action=add&context=$component&compId=$id&reset=1"}
-    {else}
-      {assign var='urlParams' value="action=add&reset=1"}
-    {/if}
-    {crmButton p=$link q=$urlParams id="newScheduleReminder"  icon="plus-circle"}{ts}Add Reminder{/ts}{/crmButton}
+    {crmButton p=$addNewLink id="newScheduleReminder" icon="plus-circle"}{ts}Add Reminder{/ts}{/crmButton}
   </div>
   </div>
-{/if}
 {/if}

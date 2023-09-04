@@ -49,7 +49,15 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testRunAllNormal() {
+  /**
+   * Test that the queue is not left in a state where another run causes an exception.
+   */
+  public function testRunAllTwice(): void {
+    $this->runAQueue();
+    $this->runAQueue();
+  }
+
+  public function testRunAllNormal(): void {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
       ['CRM_Queue_RunnerTest', '_recordValue'],
@@ -85,7 +93,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    *
    * One of the tasks will insert more TODOs at the start of the list.
    */
-  public function testRunAll_AddMore() {
+  public function testRunAll_AddMore(): void {
     // Prepare a list of tasks with an error in the middle.
     $this->queue->createItem(new CRM_Queue_Task(
       ['CRM_Queue_RunnerTest', '_recordValue'],
@@ -120,7 +128,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * Run a series of tasks; when one throws an
    * exception, ignore it and continue
    */
-  public function testRunAll_Continue_Exception() {
+  public function testRunAll_Continue_Exception(): void {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
       ['CRM_Queue_RunnerTest', '_recordValue'],
@@ -157,7 +165,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * Run a series of tasks; when one throws an exception,
    * abort processing and return it to the queue.
    */
-  public function testRunAll_Abort_Exception() {
+  public function testRunAll_Abort_Exception(): void {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
       ['CRM_Queue_RunnerTest', '_recordValue'],
@@ -195,7 +203,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * Run a series of tasks; when one returns false,
    * abort processing and return it to the queue.
    */
-  public function testRunAll_Abort_False() {
+  public function testRunAll_Abort_False(): void {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
       ['CRM_Queue_RunnerTest', '_recordValue'],
@@ -282,6 +290,30 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
       ]);
     }
     return TRUE;
+  }
+
+  protected function runAQueue(): void {
+    $this->queueService = CRM_Queue_Service::singleton(TRUE);
+    $queueName = 'seeing-double';
+    $queue = \Civi::queue($queueName, [
+      'type' => 'Sql',
+      'runner' => 'task',
+      'retry_limit' => 3,
+      'retry_interval' => 20,
+      'error' => 'abort',
+    ]);
+    // prepare a list of tasks with an error in the middle
+    $queue->createItem(new CRM_Queue_Task(
+      ['CRM_Queue_RunnerTest', '_recordValue'],
+      ['a'],
+      'Add "a"'
+    ));
+    // run the list of tasks
+    $runner = new CRM_Queue_Runner([
+      'queue' => $queue,
+      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+    ]);
+    $runner->runAll();
   }
 
 }

@@ -24,7 +24,6 @@
         {ts 1=$msg_title|escape}Do you want to delete the message template '%1'?{/ts}
       </div>
     {else}
-      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">
         <tr>
           <td class="label-left">{$form.msg_title.label}</td>

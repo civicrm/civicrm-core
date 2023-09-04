@@ -54,6 +54,9 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ],
   [
@@ -78,6 +81,7 @@ return [
           'pager' => [
             'show_count' => TRUE,
             'expose_limit' => TRUE,
+            'hide_single' => TRUE,
           ],
           'placeholder' => 5,
           'sort' => [
@@ -158,6 +162,24 @@ return [
                   'target' => 'crm-popup',
                 ],
                 [
+                  'task' => 'enable',
+                  'entity' => 'FinancialType',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-on',
+                  'text' => E::ts('Enable'),
+                  'style' => 'default',
+                  'condition' => ['is_active', '=', FALSE],
+                ],
+                [
+                  'task' => 'disable',
+                  'entity' => 'FinancialType',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-off',
+                  'text' => E::ts('Disable'),
+                  'style' => 'default',
+                  'condition' => ['is_active', '=', TRUE],
+                ],
+                [
                   'icon' => 'fa-trash',
                   'text' => E::ts('Delete'),
                   'style' => 'danger',
@@ -187,6 +209,10 @@ return [
           ],
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ],

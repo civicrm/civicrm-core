@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of Gender
+ * Page for displaying list of report options
  */
 class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
 

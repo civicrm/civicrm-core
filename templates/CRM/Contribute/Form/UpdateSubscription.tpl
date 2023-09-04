@@ -18,7 +18,6 @@
       {/if}
     </div>
   {/if}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $form.amount.frozen}
   <div class="help">
     {icon icon="fa-info-circle"}{/icon}

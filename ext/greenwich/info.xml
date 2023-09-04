@@ -15,13 +15,13 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2020-07-21</releaseDate>
-  <version>5.60.alpha1</version>
+  <version>5.66.alpha1</version>
   <tags>
     <tag>mgmt:hidden</tag>
   </tags>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.60</ver>
+    <ver>5.66</ver>
   </compatibility>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
@@ -29,6 +29,6 @@
   </classloader>
   <civix>
     <namespace>CRM/Greenwich</namespace>
-    <format>22.12.1</format>
+    <format>23.02.0</format>
   </civix>
 </extension>

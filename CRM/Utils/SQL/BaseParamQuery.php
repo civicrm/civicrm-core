@@ -138,14 +138,7 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
     }
   }
 
-  /**
-   * @param string|null $value
-   * @return string
-   *   SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
-   */
-  public function escapeString($value) {
-    return $value === NULL ? 'NULL' : '"' . CRM_Core_DAO::escapeString($value) . '"';
-  }
+  use CRM_Utils_SQL_EscapeStringTrait;
 
   /**
    * Set one (or multiple) parameters to interpolate into the query.

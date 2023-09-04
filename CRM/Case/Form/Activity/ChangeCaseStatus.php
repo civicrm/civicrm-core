@@ -129,7 +129,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
   public static function beginPostProcess(&$form, &$params) {
     $params['id'] = $params['case_id'] ?? NULL;
 
-    if (CRM_Utils_Array::value('updateLinkedCases', $params) === '1') {
+    if (($params['updateLinkedCases'] ?? NULL) === '1') {
       $caseID = CRM_Utils_Array::first($form->_caseId);
       $cases = CRM_Case_BAO_Case::getRelatedCases($caseID);
 

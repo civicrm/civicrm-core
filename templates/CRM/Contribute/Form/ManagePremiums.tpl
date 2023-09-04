@@ -17,7 +17,6 @@
   {elseif $action eq 1024}
      {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="previewPremium"}
   {else}
-     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {crmRegion name="contribute-form-managepremiums-standard-fields"}
   <table class="form-layout-compressed">
      <tr class="crm-contribution-form-block-name">

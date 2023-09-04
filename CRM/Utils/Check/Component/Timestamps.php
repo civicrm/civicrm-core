@@ -58,7 +58,7 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
           1 => 'target="_blank" href="https://dev.mysql.com/doc/refman/8.0/en/mysql-tzinfo-to-sql.html"',
         ]),
         ts('MySQL Timezone Problem'),
-        \Psr\Log\LogLevel::WARNING,
+        \Psr\Log\LogLevel::NOTICE,
         'fa-clock-o'
       );
     }

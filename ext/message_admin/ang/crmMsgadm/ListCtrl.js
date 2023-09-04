@@ -32,13 +32,17 @@
     });
 
     var $ctrl = this;
-    $ctrl.records = _.map(
-      [].concat(prefetch.records, _.map(prefetch.translations || [], simpleKeys)),
-      function(r) {
-        r._is_translation = (r.tx_language !== undefined);
-        return r;
-      }
-    );
+    var allRecords = [].concat(prefetch.records, _.map(prefetch.translations || [], simpleKeys));
+    $ctrl.records = _.map(allRecords, function(r) {
+      r._is_translation = (r.tx_language !== undefined);
+
+      // If there is a translation in the system-default-locale, then it replaces the "Standard" tpl as the primary/visible item entry.
+      const defaultLocaleTpl = _.find(allRecords, {workflow_name: r.workflow_name, tx_language: CRM.config.lcMessages});
+      r._is_primary = defaultLocaleTpl ? (r === defaultLocaleTpl) : (!r._is_translation);
+      r._is_visible = (r._is_translation || r._is_primary);
+
+      return r;
+    });
 
     function findTranslations(record) {
       return _.reduce($ctrl.records, function(existing, rec){

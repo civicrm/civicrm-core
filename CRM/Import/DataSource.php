@@ -375,7 +375,7 @@ abstract class CRM_Import_DataSource {
    */
   protected function getTableName(): ?string {
     // The old name is still stored...
-    $tableName = $this->getDataSourceMetadata()['table_name'];
+    $tableName = $this->getDataSourceMetadata()['table_name'] ?? NULL;
     if (!$tableName) {
       return NULL;
     }

@@ -37,7 +37,7 @@
       </tr>
       <tr class="crm-grant-form-block-amount_requested">
          <td class="label">{$form.amount_requested.label}</td>
-         <td>{$form.amount_requested.html}<br /><span class="description">{ts}Amount requested for grant in original currency (if different).{/ts}</span></td>
+         <td>{$form.amount_requested.html}</td>
       </tr>
       <tr class="crm-grant-form-block-amount_granted">
          <td class="label">{$form.amount_granted.label}</td>
@@ -50,16 +50,12 @@
       <tr class="crm-grant-form-block-decision_date">
          <td class="label">{$form.decision_date.label}</td>
          <td>
-           {$form.decision_date.html}<br />
-           <span class="description">{ts}Date on which the grant decision was finalized.{/ts}</span>
-         </td>
+           {$form.decision_date.html}</td>
       </tr>
       <tr class="crm-grant-form-block-money_transfer_date">
         <td class="label">{$form.money_transfer_date.label}</td>
         <td>
-          {$form.money_transfer_date.html}<br />
-          <span class="description">{ts}Date on which the grant money was transferred.{/ts}</span>
-        </td>
+          {$form.money_transfer_date.html}</td>
       </tr>
       <tr class="crm-grant-form-block-grant_due_date">
         <td class="label">{$form.grant_due_date.label}</td>

@@ -21,7 +21,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $contactId = $this->individualCreate();
     $params = [
       'email' => 'jane.doe@example.com',
@@ -30,7 +30,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    CRM_Core_BAO_Email::create($params);
+    CRM_Core_BAO_Email::writeRecord($params);
 
     $emailId = $this->assertDBNotNull('CRM_Core_DAO_Email', 'jane.doe@example.com', 'id', 'email',
       'Database check for created email address.'
@@ -44,7 +44,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
       'on_hold' => 1,
     ];
 
-    CRM_Core_BAO_Email::create($params);
+    CRM_Core_BAO_Email::writeRecord($params);
 
     $isBulkMail = $this->assertDBNotNull('CRM_Core_DAO_Email', $emailId, 'is_bulkmail', 'id',
       'Database check on updated email record.'
@@ -59,7 +59,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testHoldEmail() {
+  public function testHoldEmail(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -69,7 +69,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    CRM_Core_BAO_Email::create($params);
+    CRM_Core_BAO_Email::writeRecord($params);
 
     $emailId = $this->assertDBNotNull('CRM_Core_DAO_Email', 'jane.doe@example.com', 'id', 'email',
       'Database check for created email address.'
@@ -82,7 +82,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
       'on_hold' => 1,
     ];
 
-    CRM_Core_BAO_Email::create($params);
+    CRM_Core_BAO_Email::writeRecord($params);
 
     // Use assertDBNotNull to get back value of hold_date and check if it's in the current year.
     // NOTE: The assertEquals will fail IF this test is run just as the year is changing (low likelihood).
@@ -105,7 +105,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
       'on_hold' => 2,
     ];
 
-    CRM_Core_BAO_Email::create($params);
+    CRM_Core_BAO_Email::writeRecord($params);
 
     // Use assertDBNotNull to get back value of hold_date and check that it's in the current year.
     // NOTE: The assertEquals will fail IF this test is run just as the year is changing (low likelihood).
@@ -128,7 +128,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
       'on_hold' => 'null',
     ];
 
-    CRM_Core_BAO_Email::create($params);
+    CRM_Core_BAO_Email::writeRecord($params);
     $this->assertDBCompareValue('CRM_Core_DAO_Email', $emailId, 'on_hold', 'id', 0,
       'Check if on_hold=0 in updated email record.'
     );
@@ -154,7 +154,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testAllEmails() {
+  public function testAllEmails(): void {
     $contactParams = [
       'first_name' => 'Alan',
       'last_name' => 'Smith',
@@ -182,7 +182,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetFromEmail() {
+  public function testGetFromEmail(): void {
     $this->createLoggedInUser();
     $fromEmails = CRM_Core_BAO_Email::getFromEmail();
     $emails = array_values($fromEmails);

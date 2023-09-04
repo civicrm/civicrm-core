@@ -134,7 +134,10 @@ class CRM_Utils_Address_BatchUpdate {
       $clause[] = '( a.country_id is not null )';
     }
 
-    $whereClause = implode(' AND ', $clause);
+    $whereClause = '';
+    if (!empty($clause)) {
+      $whereClause = 'WHERE ' . implode(' AND ', $clause);
+    }
 
     $query = "
       SELECT c.id,
@@ -152,7 +155,7 @@ class CRM_Utils_Address_BatchUpdate {
         ON a.country_id = o.id
       LEFT JOIN civicrm_state_province s
         ON a.state_province_id = s.id
-      WHERE {$whereClause}
+      {$whereClause}
       ORDER BY a.id
     ";
 

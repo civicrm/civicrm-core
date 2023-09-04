@@ -4,6 +4,7 @@
   <base>CRM/Core</base>
   <class>Worldregion</class>
   <name>civicrm_worldregion</name>
+  <entity>WorldRegion</entity>
   <add>1.8</add>
   <field>
     <name>id</name>

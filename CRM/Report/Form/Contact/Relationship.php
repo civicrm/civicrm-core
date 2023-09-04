@@ -443,7 +443,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         foreach ($table['filters'] as $fieldName => $field) {
 
           $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
@@ -562,10 +562,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
     $isStatusFilter = FALSE;
     $relStatus = NULL;
-    if (CRM_Utils_Array::value('is_active_value', $this->_params) == '1') {
+    if (($this->_params['is_active_value'] ?? NULL) == '1') {
       $relStatus = ts('Is equal to Active');
     }
-    elseif (CRM_Utils_Array::value('is_active_value', $this->_params) == '0') {
+    elseif (($this->_params['is_active_value'] ?? NULL) == '0') {
       $relStatus = ts('Is equal to Inactive');
     }
     if (!empty($statistics['filters'])) {
@@ -573,7 +573,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         // For displaying relationship type filter.
         if ($value['title'] == 'Relationship') {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
-          $op = CRM_Utils_Array::value('relationship_type_id_op', $this->_params) == 'in' ? ts('Is one of') . ' ' : ts('Is not one of') . ' ';
+          $op = ($this->_params['relationship_type_id_op'] ?? NULL) == 'in' ? ts('Is one of') . ' ' : ts('Is not one of') . ' ';
           $relationshipTypes = [];
           foreach ($this->_params['relationship_type_id_value'] as $relationship) {
             $relationshipTypes[] = $relTypes[$relationship]['label_' . $this->relationType];
@@ -752,13 +752,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       // Handle permissioned relationships
       if (array_key_exists('civicrm_relationship_is_permission_a_b', $row)) {
         $rows[$rowNum]['civicrm_relationship_is_permission_a_b']
-          = ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_a_b']));
+          = _ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_a_b']));
         $entryFound = TRUE;
       }
 
       if (array_key_exists('civicrm_relationship_is_permission_b_a', $row)) {
         $rows[$rowNum]['civicrm_relationship_is_permission_b_a']
-          = ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_b_a']));
+          = _ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_b_a']));
         $entryFound = TRUE;
       }
 

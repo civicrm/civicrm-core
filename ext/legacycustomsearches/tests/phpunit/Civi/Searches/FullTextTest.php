@@ -29,12 +29,6 @@ use PHPUnit\Framework\TestCase;
  */
 class FullTextTest extends TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
 
-  /**
-   * Entity ids created as part of test
-   * @var array
-   */
-  protected $ids;
-
   use Test\ContactTestTrait;
   use Test\Api3TestTrait;
 
@@ -51,6 +45,8 @@ class FullTextTest extends TestCase implements HeadlessInterface, HookInterface,
 
   /**
    * Test ACL contacts are filtered properly.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testFilterACLContacts(): void {
     $userId = $this->createLoggedInUser();

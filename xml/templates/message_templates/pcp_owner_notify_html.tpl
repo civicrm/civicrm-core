@@ -19,7 +19,7 @@
     {/if}
   </p>
   <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
-    <tr><td>{ts}Received{/ts}:</td><td> {$receive_date|crmDate}</td></tr>
+    <tr><td>{ts}Contribution Date{/ts}:</td><td> {$receive_date|crmDate}</td></tr>
     <tr><td>{ts}Amount{/ts}:</td><td> {$total_amount|crmMoney:$currency}</td></tr>
     <tr><td>{ts}Name{/ts}:</td><td> {$donors_display_name}</td></tr>
     <tr><td>{ts}Email{/ts}:</td><td> {$donors_email}</td></tr>

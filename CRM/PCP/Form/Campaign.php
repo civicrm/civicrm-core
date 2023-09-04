@@ -227,7 +227,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
     $params['id'] = $this->_pageId;
 
-    $pcp = CRM_PCP_BAO_PCP::create($params);
+    $pcp = CRM_PCP_BAO_PCP::writeRecord($params);
 
     // add attachments as needed
     CRM_Core_BAO_File::formatAttachment($params,
@@ -333,7 +333,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     // send email notification to supporter, if initial setup / add mode.
     if (!$this->_pageId) {
       CRM_PCP_BAO_PCP::sendStatusUpdate($pcp->id, $statusId, TRUE, $this->_component);
-      if ($approvalMessage && CRM_Utils_Array::value('status_id', $params) == 1) {
+      if ($approvalMessage && ($params['status_id'] ?? NULL) == 1) {
         $notifyStatus .= ts(' You will receive a second email as soon as the review process is complete.');
       }
     }

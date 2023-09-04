@@ -15,10 +15,10 @@
     <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2021-05-23</releaseDate>
-  <version>5.60.alpha1</version>
+  <version>5.66.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.60</ver>
+    <ver>5.66</ver>
   </compatibility>
   <comments>This is the version of CKEditor that originally shipped with CiviCRM core</comments>
   <classloader>
@@ -27,9 +27,11 @@
   </classloader>
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Ckeditor4</namespace>
-    <format>22.10.0</format>
+    <format>23.02.0</format>
   </civix>
+  <upgrader>CRM_Ckeditor4_Upgrader</upgrader>
 </extension>

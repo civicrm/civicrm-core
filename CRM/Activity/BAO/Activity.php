@@ -255,11 +255,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array $params
    *   Associated array of the submitted values.
    *
+   * @return CRM_Activity_DAO_Activity
    * @throws CRM_Core_Exception
-   *
-   * @return CRM_Activity_BAO_Activity|null|object
    */
-  public static function create(&$params) {
+  public static function create(array &$params) {
     // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
     unset($params['created_date']);
     unset($params['modified_date']);
@@ -317,13 +316,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     // start transaction
     $transaction = new CRM_Core_Transaction();
-
     $result = $activity->save();
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $result;
-    }
 
     $activityId = $activity->id;
     $activityRecordTypes = [
@@ -463,7 +456,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         );
       }
       else {
-        $q = "action=view&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . CRM_Utils_Array::value('source_contact_id', $params) . "&context=home";
+        $q = "action=view&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . ($params['source_contact_id'] ?? '') . "&context=home";
         if ($activity->activity_type_id != CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email')) {
           $url = CRM_Utils_System::url('civicrm/activity', $q);
           if ($activity->activity_type_id == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Print PDF Letter')) {
@@ -473,13 +466,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           }
           else {
             $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/activity/add',
-              "action=update&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . CRM_Utils_Array::value('source_contact_id', $params) . "&context=home"
+              "action=update&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . ($params['source_contact_id'] ?? '') . "&context=home"
             );
           }
 
           if (CRM_Core_Permission::check("delete activities")) {
             $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/activity',
-              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . CRM_Utils_Array::value('source_contact_id', $params) . "&context=home"
+              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . ($params['source_contact_id'] ?? '') . "&context=home"
             );
           }
         }
@@ -487,7 +480,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           $url = CRM_Utils_System::url('civicrm/activity/view', $q);
           if (CRM_Core_Permission::check('delete activities')) {
             $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/activity',
-              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . CRM_Utils_Array::value('source_contact_id', $params) . "&context=home"
+              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . ($params['source_contact_id'] ?? '') . "&context=home"
             );
           }
         }
@@ -522,12 +515,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
-    // Add to case
-    if (isset($params['case_id'])) {
-      CRM_Case_BAO_Case::updateCaseActivity($activity->id, $params['case_id']);
-    }
-
-    CRM_Utils_Hook::post($action, 'Activity', $activity->id, $activity);
+    CRM_Utils_Hook::post($action, 'Activity', $activity->id, $activity, $params);
     return $result;
   }
 
@@ -934,7 +922,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $details = "-ALTERNATIVE ITEM 0-\n{$html}{$additionalDetails}\n-ALTERNATIVE ITEM 1-\n{$text}{$additionalDetails}\n-ALTERNATIVE END-\n";
     }
     else {
-      $details = $html ? $html : $text;
+      $details = $html ?: $text;
       $details .= $additionalDetails;
     }
 
@@ -1629,6 +1617,7 @@ WHERE      activity.id IN ($activityIds)";
     //CRM-4027
     if ($targetContactID) {
       $activityParams['target_contact_id'][] = $targetContactID;
+      $activityParams['target_contact_id'] = array_unique($activityParams['target_contact_id'], SORT_NUMERIC);
     }
     // @todo - use api - remove lots of wrangling above. Remove deprecated fatal & let form layer
     // deal with any exceptions.
@@ -1714,7 +1703,7 @@ WHERE      activity.id IN ($activityIds)";
         'parent_id'
       );
 
-      $parentActivities[$activityId] = $parentId ? $parentId : FALSE;
+      $parentActivities[$activityId] = $parentId ?: FALSE;
     }
 
     return $parentActivities[$activityId];

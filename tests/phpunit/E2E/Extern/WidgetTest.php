@@ -25,7 +25,7 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
   /**
    * Return widget Javascript.
    */
-  public function testWidget() {
+  public function testWidget(): void {
     if (CIVICRM_UF !== 'Drupal8') {
       $endpoints['traditional'] = CRM_Core_Resources::singleton()->getUrl('civicrm', 'extern/widget.php');
     }
@@ -100,7 +100,7 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
    *   Array of contribution page
    */
   public function contributionPageCreate($params = []) {
-    $this->_pageParams = array_merge([
+    $pageParams = array_merge([
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'USD',
@@ -111,7 +111,7 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
       'max_amount' => 1000,
       'goal_amount' => '10000',
     ], $params);
-    return $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
+    return $this->callAPISuccess('contribution_page', 'create', $pageParams);
   }
 
 }

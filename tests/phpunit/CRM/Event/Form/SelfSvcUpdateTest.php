@@ -23,6 +23,7 @@ class CRM_Event_Form_SelfSvcUpdateTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Event_Form_SelfSvcUpdate', [
       'email' => 'new@example.org',
       'action' => 2,
+      'is_confirmation_email' => 1,
     ]);
     $form->buildForm();
     $form->postProcess();

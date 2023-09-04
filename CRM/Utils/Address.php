@@ -47,7 +47,6 @@ class CRM_Utils_Address {
     $mailing = FALSE,
     $tokenFields = NULL
   ) {
-    static $config = NULL;
     $mailing = FALSE;
 
     if (!$format) {
@@ -136,7 +135,6 @@ class CRM_Utils_Address {
         'contact.birth_date' => $fields['birth_date'] ?? NULL,
         'contact.gender' => $fields['gender'] ?? NULL,
         'contact.is_opt_out' => $fields['is_opt_out'] ?? NULL,
-        'contact.preferred_mail_format' => $fields['preferred_mail_format'] ?? NULL,
         'contact.phone' => $fields['phone'] ?? NULL,
         'contact.home_URL' => $fields['home_URL'] ?? NULL,
         'contact.contact_source' => $fields['contact_source'] ?? NULL,
@@ -168,12 +166,10 @@ class CRM_Utils_Address {
         'contact.world_region' => "<span class=\"region\">" . $fields['world_region'] . "</span>",
       ];
 
-      // erase all empty ones, so we dont get blank lines
+      // Erase all empty ones, so we don't get blank lines
       foreach (array_keys($replacements) as $key) {
         $exactKey = substr($key, 0, 8) == 'contact.' ? substr($key, 8) : $key;
-        if ($key != 'contact.postal_code' &&
-          CRM_Utils_Array::value($exactKey, $fields) == NULL
-        ) {
+        if ($key !== 'contact.postal_code' && empty($fields[$exactKey])) {
           $replacements[$key] = '';
         }
       }
@@ -245,7 +241,6 @@ class CRM_Utils_Address {
     else {
       // remove \n from each line and only add at the end
       // this hack solves formatting issue, when we convert nl2br
-      $lines = [];
       $count = 1;
       $finalFormatted = NULL;
       $formattedArray = explode("\n", $formatted);
@@ -277,12 +272,12 @@ class CRM_Utils_Address {
    *
    * @param array $fields
    *   The address fields.
-   * @param string $format
-   *   The desired address format.
+   * @param null $format
+   *   Unused var.
    * @param bool $microformat
-   *   If true indicates, the address to be built in hcard-microformat standard.
+   *   Unused var.
    * @param bool $mailing
-   *   If true indicates, the call has been made from mailing label.
+   *   Unused var.
    * @param null $tokenFields
    *
    * @return string
@@ -296,11 +291,7 @@ class CRM_Utils_Address {
     $mailing = FALSE,
     $tokenFields = NULL
   ) {
-    static $config = NULL;
-
-    $format = Civi::settings()->get('mailing_format');
-
-    $formatted = $format;
+    $formatted = Civi::settings()->get('mailing_format');
 
     $fullPostalCode = $fields['postal_code'] ?? NULL;
     if (!empty($fields['postal_code_suffix'])) {
@@ -377,7 +368,6 @@ class CRM_Utils_Address {
       'contact.birth_date' => $fields['birth_date'] ?? NULL,
       'contact.gender' => $fields['gender'] ?? NULL,
       'contact.is_opt_out' => $fields['is_opt_out'] ?? NULL,
-      'contact.preferred_mail_format' => $fields['preferred_mail_format'] ?? NULL,
       'contact.phone' => $fields['phone'] ?? NULL,
       'contact.home_URL' => $fields['home_URL'] ?? NULL,
       'contact.contact_source' => $fields['contact_source'] ?? NULL,

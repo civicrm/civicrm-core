@@ -23,6 +23,7 @@ class CRM_OAuth_MailSetup {
           'title' => sprintf('%s (ID #%s)', $provider['title'] ?? $provider['name'] ?? ts('OAuth2'), $client['id']),
           'callback' => ['CRM_OAuth_MailSetup', 'setup'],
           'oauth_client_id' => $client['id'],
+          'prompt' => $provider['options']['prompt'] ?? NULL,
         ];
       }
     }
@@ -46,7 +47,7 @@ class CRM_OAuth_MailSetup {
       ->addWhere('id', '=', $setupAction['oauth_client_id'])
       ->setStorage('OAuthSysToken')
       ->setTag('MailSettings:setup')
-      ->setPrompt('select_account')
+      ->setPrompt($setupAction['prompt'] ?? 'select_account')
       ->execute()
       ->single();
 
@@ -89,7 +90,7 @@ class CRM_OAuth_MailSetup {
       'info'
     );
 
-    $nextUrl = CRM_Utils_System::url('civicrm/admin/mailSettings', [
+    $nextUrl = CRM_Utils_System::url('civicrm/admin/mailSettings/edit', [
       'action' => 'update',
       'id' => $mailSettings['id'],
       'reset' => 1,

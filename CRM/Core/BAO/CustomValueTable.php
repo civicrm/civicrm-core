@@ -203,6 +203,14 @@ class CRM_Core_BAO_CustomValueTable {
               }
               break;
 
+            case 'EntityReference':
+              $type = 'Integer';
+              if ($value == NULL || $value === '') {
+                $type = 'Timestamp';
+                $value = NULL;
+              }
+              break;
+
             case 'RichTextEditor':
               $type = 'String';
               break;
@@ -235,13 +243,13 @@ class CRM_Core_BAO_CustomValueTable {
 
           $fieldExtends = $field['extends'] ?? NULL;
           if (
-            CRM_Utils_Array::value('entity_table', $field) === 'civicrm_contact'
+            ($field['entity_table'] ?? NULL) === 'civicrm_contact'
             || $fieldExtends === 'Contact'
             || $fieldExtends === 'Individual'
             || $fieldExtends === 'Organization'
             || $fieldExtends === 'Household'
           ) {
-            $paramFieldsExtendContactForEntities[$entityID]['custom_' . CRM_Utils_Array::value('custom_field_id', $field)] = $field['custom_field_id'] ?? NULL;
+            $paramFieldsExtendContactForEntities[$entityID]['custom_' . ($field['custom_field_id'] ?? '')] = $field['custom_field_id'] ?? NULL;
           }
         }
 
@@ -315,6 +323,7 @@ class CRM_Core_BAO_CustomValueTable {
       // the below three are FK's, and have constraints added to them
 
       case 'ContactReference':
+      case 'EntityReference':
       case 'StateProvince':
       case 'Country':
       case 'File':
@@ -744,9 +753,8 @@ AND    cf.id IN ( $fieldIDList )
     }
 
     $default = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
-    if (!($type = CRM_Utils_Array::value('entityType', $params)) ||
-      in_array($params['entityType'], $default)
-    ) {
+    $type = $params['entityType'] ?? NULL;
+    if (!$type || in_array($params['entityType'], $default)) {
       $type = NULL;
     }
     else {

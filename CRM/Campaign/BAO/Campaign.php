@@ -38,14 +38,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       if (empty($params['created_id'])) {
         $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
-
-      if (empty($params['created_date'])) {
-        $params['created_date'] = date('YmdHis');
-      }
-
-      if (empty($params['name'])) {
-        $params['name'] = CRM_Utils_String::titleToVar($params['title'], 64);
-      }
     }
 
     /** @var \CRM_Campaign_DAO_Campaign $campaign */
@@ -77,6 +69,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * @return bool|int
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     try {
       self::deleteRecord(['id' => $id]);
     }
@@ -87,19 +80,13 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
@@ -383,7 +370,7 @@ INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id 
     if (array_key_exists('is_active', $params)) {
       $active = "( campaign.is_active = 1 )";
       if (!empty($params['is_active'])) {
-        $active = "( campaign.is_active = 0 OR campaign.is_active IS NULL )";
+        $active = "campaign.is_active = 0";
       }
       $where[] = $active;
     }
@@ -480,17 +467,13 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Campaign', $id, 'is_active', $is_active);
   }
 

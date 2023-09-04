@@ -35,13 +35,13 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
     $this->_pages = [];
 
     $this->_pages['CRM_Activity_Form_Search'] = NULL;
-    list($task) = $this->taskName($controller, 'Search');
+    [$task] = $this->taskName($controller, 'Search');
     $this->_task = $task;
     foreach ($task as $t) {
       $this->_pages[$t] = NULL;
     }
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
   /**

@@ -16,94 +16,67 @@
  * @group headless
  */
 class api_v3_MailingGroupTest extends CiviUnitTestCase {
-  protected $_groupID;
-  protected $_email;
-  protected $_apiversion;
 
   public function setUp(): void {
     parent::setUp();
-    $this->useTransaction(TRUE);
-    $this->_apiversion = 3;
-    $this->_groupID = $this->groupCreate();
-    $this->_email = 'test@test.test';
-  }
-
-  /**
-   * Test civicrm_mailing_group_event_subscribe with wrong params.
-   */
-  public function testMailerGroupSubscribeWrongParams() {
-    $params = [
-      'email' => $this->_email,
-      'group_id' => 'Wrong Group ID',
-      'contact_id' => '2121',
-      'time_stamp' => '20111111010101',
-      'hash' => 'sasa',
-    ];
-    $this->callAPIFailure('mailing_event_subscribe', 'create', $params);
+    $this->useTransaction();
   }
 
   /**
    * Test civicrm_mailing_group_event_subscribe with given contact ID.
    */
-  public function testMailerGroupSubscribeGivenContactId() {
+  public function testMailerGroupSubscribeGivenContactID(): void {
+    $mailUtil = new CiviMailUtils($this);
+    $email = 'test@example.org';
     $params = [
       'first_name' => 'Test',
       'last_name' => 'Test',
-      'email' => $this->_email,
+      'email' => $email,
       'contact_type' => 'Individual',
     ];
     $contactID = $this->individualCreate($params);
 
     $params = [
-      'email' => $this->_email,
-      'group_id' => $this->_groupID,
+      'email' => $email,
+      'group_id' => $this->groupCreate(),
       'contact_id' => $contactID,
       'hash' => 'b15de8b64e2cec34',
       'time_stamp' => '20101212121212',
     ];
-    $result = $this->callAPIAndDocument('mailing_event_subscribe', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('MailingEventSubscribe', 'create', $params);
     $this->assertEquals($result['values'][$result['id']]['contact_id'], $contactID);
-
-    $this->contactDelete($contactID);
+    $mailUtil->checkAllMailLog(['You have a pending subscription to the Public group name mailing list']);
   }
 
   /**
    * Test civicrm_mailing_group_event_unsubscribe with wrong params.
    */
-  public function testMailerGroupUnsubscribeWrongParams() {
-    $params = [
+  public function testMailerGroupUnsubscribeWrongParams(): void {
+    $this->callAPIFailure('MailingEventUnsubscribe', 'create', [
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
       'hash' => 'Wrong Hash',
       'time_stamp' => '20101212121212',
-    ];
-
-    $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
+    ]);
   }
 
   /**
    * Test civicrm_mailing_group_event_domain_unsubscribe with wrong params.
    */
-  public function testMailerGroupDomainUnsubscribeWrongParams() {
-    $params = [
+  public function testMailerGroupDomainUnsubscribeWrongParams(): void {
+    $this->callAPIFailure('MailingEventUnsubscribe', 'create', [
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
       'hash' => 'Wrong Hash',
       'org_unsubscribe' => 1,
       'time_stamp' => '20101212121212',
-    ];
-
-    $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
+    ]);
   }
-
-  /**
-   * Test civicrm_mailing_group_event_resubscribe with wrong params type.
-   */
 
   /**
    * Test civicrm_mailing_group_event_resubscribe with wrong params.
    */
-  public function testMailerGroupResubscribeWrongParams() {
+  public function testMailerGroupResubscribeWrongParams(): void {
     $params = [
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
@@ -115,15 +88,19 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_mailing_group_event_subscribe and civicrm_mailing_event_confirm functions - success expected.
+   * Test civicrm_mailing_group_event_subscribe and
+   * civicrm_mailing_event_confirm functions - success expected.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testMailerProcess() {
+  public function testMailerProcess(): void {
+    $email = 'test@example.org';
     $this->callAPISuccess('MailSettings', 'create', [
       'domain_id' => 1,
-      'name' => "my mail setting",
+      'name' => 'my mail setting',
       'domain' => 'setting.com',
       'localpart' => 'civicrm+',
-      'server' => "localhost",
+      'server' => 'localhost',
       'username' => 'sue',
       'password' => 'pass',
       'is_default' => 1,
@@ -133,14 +110,14 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $params = [
       'first_name' => 'Test',
       'last_name' => 'Test',
-      'email' => $this->_email,
+      'email' => $email,
       'contact_type' => 'Individual',
     ];
     $contactID = $this->individualCreate($params);
 
     $params = [
-      'email' => $this->_email,
-      'group_id' => $this->_groupID,
+      'email' => $email,
+      'group_id' => $this->groupCreate(),
       'contact_id' => $contactID,
       'hash' => 'b15de8b64e2cec34',
       'time_stamp' => '20101212121212',

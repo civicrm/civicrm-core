@@ -86,11 +86,18 @@
 - github      : allinappli
   name        : ALL IN APPLI
 
+- github      : allinappliadmin
+  name        : ALL IN APPLI admin
+
 - github      : Anatoleallain
   name        : Anatole
 
 - github      : andyburnsco
   name        : Andy Burns
+
+- github      : anemirovsky
+  name        : Anthony Nemirovsky
+  organization: Giant Rabbit
 
 - github      : amsharma9
   name        : Amal Sharma
@@ -121,6 +128,9 @@
   organization: CompuCorp
 
 - name        : Anne Smale
+
+- github      : anthonyblond
+  name        : Anthony Blond
 
 - github      : anthonylindsay
   name        : Anthony Lindsay
@@ -198,6 +208,9 @@
 - github      : bjendres
   name        : Björn Endres
   organization: SYSTOPIA Organisationsberatung
+
+- github      : BeccaTregenna
+  name        : Becca Tregenna
 
 - name        : Ben Jarlett
 
@@ -291,6 +304,10 @@
   name        : Coleman Watts
   organization: CiviCRM
 
+- github      : composerjk
+  name        : Jeff Kellem
+  organization: ASMAC (American Society of Music Arrangers and Composers)
+
 - github      : com2
   name        : René Nieuwburg
   organization: Comunica2
@@ -356,6 +373,8 @@
 
 - github      : dereklewis123
   name        : Derek Lewis
+
+- github      : destrieux
 
 - github      : detsieber
   name        : Detlev Sieber
@@ -543,6 +562,8 @@
   name        : Gemma Potaka
   organization: Fuzion
 
+- github      : gibsonoliver
+
 - github      : ginkgofjg
   name        : Frank Gómez
   organization: Ginkgo Street Labs
@@ -560,6 +581,9 @@
 
 - name        : Graham Smith
   organization: Edinburgh College
+
+- github      : GreysonStalcup
+  name        : Greyson Stalcup
 
 - name        : Guillaume Rischard
   github      : grischard
@@ -628,6 +652,10 @@
 
 - name        : Holly Hanks
   organization: AGH Strategies
+
+- github      : howardshand
+  name        : Howard Shand
+  organization: The University of the West Indies
 
 - name        : Hugo do Carmo
 
@@ -725,6 +753,8 @@
 - github      : jitendrapurohit
   name        : Jitendra Purohit
   organization: Fuzion
+
+- github      : jmacarthur98
 
 - github      : jmcclelland
   name        : Jamie McClelland
@@ -861,7 +891,7 @@
   name        : Tony Maynard-Smith
 
 - github      : larssandergreen
-  name        : Lars Sanders-Green
+  name        : Lars Sander-Green
   organization: Wildsight
 
 - github      : laryn
@@ -947,6 +977,13 @@
 
 - github      : mariav0
   name        : Maria
+
+- github      : marcusjwilson
+  name        : Marcus J Wilson
+  organization: Pooka & Co
+
+- github      : mark-rodgers
+  name        : Mark Rodgers
 
 - github      : MarshCastle
   name        : Martin Castle
@@ -1136,6 +1173,10 @@
 - github      : octo-happiness
   name        : Octo Happiness
 
+- github      : olayiwola-compucorp
+  name        : Olayiwola Odunsi
+  organization: Compuco
+
 - github      : olivierh65
   name        : Olivier Hertrich
 
@@ -1209,6 +1250,8 @@
   name        : Peter Davis
   organization: Fuzion
 
+- github      : peth-systopia
+
 - github      : pillarsdotnet
   name        : Bob Vincent
 
@@ -1234,6 +1277,9 @@
 - github      : quicksketch
   name        : Nate Lampton
   organization: Lullabot
+
+- github      : quimgil
+  name        : Quim Gil
 
 - name        : Rareș Pamfil
 
@@ -1333,6 +1379,8 @@
   organization: Coop SymbioTIC
 
 - github      : sebalis
+  name        : Sebastian Lisken
+  organization: civiservice.de
 
 - github      : simonjohnparker
   name        : Simon John Parker
@@ -1372,7 +1420,7 @@
 
 - github      : semseysandor
   name        : Sandor Semsey
-  organization: ES-Progress
+  organization: Reflexive Communications
 
 - name        : Shailesh Lende
 
@@ -1448,6 +1496,10 @@
 
 - github      : tapashdatta
 
+- github      : tbember
+  name        : Tiago Bember
+  organization: Giant Rabbit
+
 - github      : TBSliver
   name        : Tom Bloor
 
@@ -1473,6 +1525,9 @@
 - github      : tobiaslounsbury
   name        : Tobias Lounsbury
 
+- github      : TobiasVoigt
+  name        : Tobias Voigt
+
 - name        : Thomas Mannell
   organization: Registered Nurses' Association of Ontario
 
@@ -1485,6 +1540,10 @@
 - github      : tommybobo
   name        : Tommy Bobo
   organization: AGH Strategies
+
+- github      : tpokorra
+  name        : Timotheus Pokorra
+  organization: Hostsharing eG
 
 - github      : triprems
   name        : William Rems
@@ -1512,6 +1571,10 @@
 - github      : twomice
   name        : Allen Shaw
   organization: Joinery
+
+- github      : TychoSchottelius
+  name        : Tycho Schottelius
+  organization: Systopia
 
 - github      : ufundo
   name        : Benjamin W
@@ -1584,6 +1647,8 @@
 - name        : William Gordon
   organization: British Humanist Association
 
+- github      : WebmasterBouclier
+
 - github      : webmaster-cses-org-uk
   name        : Adam Wood
   organization: CSES (Chelmsford Science and Engineering Society)
@@ -1606,6 +1671,8 @@
 
 - name        : Philipp Michael
   organization: XIMA
+
+- github      : xavi-xaloc
 
 - github      : xurizaemon
   name        : Chris Burgess
@@ -1646,3 +1713,9 @@
 - github      : jofranz
   name        : Johannes Franz
   organization: SYSTOPIA
+
+- github      : mikeybeck
+  name        : Mike Beck
+  organization: Fuzion
+
+- github      : ziljah

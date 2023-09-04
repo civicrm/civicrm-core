@@ -21,83 +21,72 @@ namespace api\v4\Entity;
 use Civi\Api4\Contact;
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
-use Civi\Api4\ActivityContact;
 use Civi\Test\TransactionalInterface;
 
 /**
- * Assert that updating an activity does not affect the targets.
- *
- * This test was written specifically to test
- * https://lab.civicrm.org/dev/core/-/issues/1428
- *
  * @group headless
  */
 class ActivityTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testActivityUpdate() {
+  public function testActivityContactVirtualFields(): void {
+    $c = $this->saveTestRecords('Contact', ['records' => 5])->column('id');
 
-    $meetingActivityTypeID = \Civi\Api4\OptionValue::get()
-      ->addSelect('value')
-      ->addWhere('option_group_id:name', '=', 'activity_type')
-      ->addWhere('name', '=', 'Meeting')
-      ->execute()->first()['value'];
+    $sourceContactId = $c[2];
+    $targetContactIds = [$c[0], $c[1]];
+    $assigneeContactIds = [$c[3], $c[4]];
 
-    $domainContactID = \CRM_Core_BAO_Domain::getDomain()->contact_id;
-    $c1 = Contact::create(FALSE)->addValue('first_name', '1')->execute()->first()['id'];
-    $c2 = Contact::create(FALSE)->addValue('first_name', '2')->execute()->first()['id'];
+    // Test that we can write to and read from the virtual fields.
+    $activityID = $this->createTestRecord('Activity', [
+      'target_contact_id' => $targetContactIds,
+      'source_contact_id' => $sourceContactId,
+      'subject' => '1234',
+    ])['id'];
 
-    $activityID = Activity::create(FALSE)
-      ->setValues([
-        'target_contact_id'   => [$c1],
-        'assignee_contact_id' => [$c2],
-        'activity_type_id'    => $meetingActivityTypeID,
-        'source_contact_id'   => $domainContactID,
-        'subject'             => 'test activity',
-      ])->execute()->first()['id'];
-
-    // Activity create does not return a full record, so get the ID then do another get call...
     $activity = Activity::get(FALSE)
-      ->addSelect('id', 'subject', 'activity_type_id')
+      ->addSelect('source_contact_id', 'target_contact_id', 'assignee_contact_id')
       ->addWhere('id', '=', $activityID)
       ->execute()->first();
-    $this->assertEquals($meetingActivityTypeID, $activity['activity_type_id']);
-    $this->assertEquals('test activity', $activity['subject']);
+    $this->assertEquals($sourceContactId, $activity['source_contact_id']);
+    $this->assertEquals($targetContactIds, $activity['target_contact_id']);
+    // This field was not set
+    $this->assertNull($activity['assignee_contact_id']);
 
-    // Now check we have the correct target and assignees.
-    $activityContacts = ActivityContact::get(FALSE)
-      ->addWhere('activity_id', '=', $activityID)
-      ->execute()
-      ->indexBy('contact_id')->column('record_type_id');
-
-    // 1 is assignee
-    // 2 is added
-    // 3 is target/with
-    $expectedActivityContacts = [$c1 => 3, $c2 => 1, $domainContactID => 2];
-    ksort($expectedActivityContacts);
-    ksort($activityContacts);
-    $this->assertEquals($expectedActivityContacts, $activityContacts, "ActivityContacts not as expected.");
-
-    // Test we can update the activity.
+    // Update to set assignee_contact_id
     Activity::update(FALSE)
       ->addWhere('id', '=', $activityID)
-      ->addValue('subject', 'updated subject')
+      ->addValue('assignee_contact_id', $assigneeContactIds)
       ->execute();
 
-    // Repeat the tests.
+    // Affirm that assignee_contact_id was set and other fields remain unchanged
     $activity = Activity::get(FALSE)
-      ->addSelect('id', 'subject', 'activity_type_id')
+      ->addSelect('source_contact_id', 'target_contact_id', 'assignee_contact_id')
       ->addWhere('id', '=', $activityID)
-      ->execute()->first();
-    $this->assertEquals($meetingActivityTypeID, $activity['activity_type_id']);
-    $this->assertEquals('updated subject', $activity['subject'], "Activity subject was not updated correctly by Activity::update.");
+      ->execute()->single();
+    $this->assertEquals($sourceContactId, $activity['source_contact_id']);
+    $this->assertEquals($targetContactIds, $activity['target_contact_id']);
+    $this->assertEquals($assigneeContactIds, $activity['assignee_contact_id']);
 
-    // Now check we have the correct target and assignees.
-    $activityContacts = ActivityContact::get(FALSE)
-      ->addWhere('activity_id', '=', $activityID)
-      ->execute()
-      ->indexBy('contact_id')->column('record_type_id');
-    ksort($activityContacts);
-    $this->assertEquals($expectedActivityContacts, $activityContacts, "ActivityContacts not as expected after update.");
+    // Sanity check for https://lab.civicrm.org/dev/core/-/issues/1428
+    // Updating nothing should change nothing.
+    Activity::update(FALSE)
+      ->addWhere('id', '=', $activityID)
+      ->addValue('subject', '1234')
+      ->execute();
+
+    // Try fetching virtual fields via a join when Activity is not the primary entity
+    $contactGet = Contact::get(FALSE)
+      ->addSelect('activity.subject', 'activity.source_contact_id', 'activity.target_contact_id', 'activity.assignee_contact_id')
+      ->addWhere('id', '=', $sourceContactId)
+      ->addJoin('Activity AS activity', 'INNER', 'ActivityContact',
+        ['id', '=', 'activity.contact_id'],
+        ['activity.record_type_id:name', '=', '"Activity Source"']
+      )
+      ->execute()->single();
+    $this->assertEquals('1234', $contactGet['activity.subject']);
+    $this->assertEquals($sourceContactId, $contactGet['activity.source_contact_id']);
+    $this->assertEquals($targetContactIds, $contactGet['activity.target_contact_id']);
+    $this->assertEquals($assigneeContactIds, $contactGet['activity.assignee_contact_id']);
+
   }
 
 }

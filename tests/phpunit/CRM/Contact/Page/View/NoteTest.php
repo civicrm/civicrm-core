@@ -18,28 +18,28 @@
  */
 class CRM_Contact_Page_View_NoteTest extends CiviUnitTestCase {
 
-  public function testNoContactIdNote() {
-    $contactId = $this->individualCreate();
+  public function testNoContactIDNote(): void {
+    $contactID = $this->individualCreate();
     foreach ([1, 2, 3, 4, 5] as $noteID) {
       $note = new CRM_Core_DAO_Note();
-      $note->entity_id = $contactId;
+      $note->entity_id = $contactID;
       $note->subject = 'Test Note ' . $noteID;
       $note->note = 'Test Note from Tests';
       $note->entity_table = 'civicrm_contact';
-      if ($noteID == 5) {
-        $note->contact_id = $contactId;
+      if ($noteID === 5) {
+        $note->contact_id = $contactID;
       }
       $note->save();
     }
+    $_REQUEST['cid'] = $contactID;
     $page = new CRM_Contact_Page_View_Note();
-    $page->_contactId = $contactId;
-    $page->_permission = CRM_Core_PERMISSION::EDIT;
+    $page->_permission = CRM_Core_Permission::EDIT;
     $page->browse();
-    $this->assertEquals(count($page->values), 5);
+    $this->assertCount(5, $page->values);
     foreach ($page->values as $note) {
-      $this->assertEquals($note['entity_id'], $contactId);
-      if ($note['id'] == 5) {
-        $this->assertEquals($note['createdBy'], 'Mr. Anthony Anderson II');
+      $this->assertEquals($note['entity_id'], $contactID);
+      if ((int) $note['id'] === 5) {
+        $this->assertEquals('Mr. Anthony Anderson II', $note['createdBy']);
       }
     }
   }

@@ -14,7 +14,7 @@
     <label for="afform-list-filter">{{:: ts('Filter:') }}</label>
     <input class="form-control" type="search" id="afform-list-filter" ng-model="$ctrl.searchAfformList" placeholder="&#xf002">
     <div class="btn-group pull-right" ng-if="types[$ctrl.tab].options !== false" af-gui-menu>
-      <a ng-if="types[$ctrl.tab].default" href="{{ types[$ctrl.tab].default }}" class="btn btn-primary">
+      <a ng-if="types[$ctrl.tab].default" ng-href="{{ types[$ctrl.tab].default }}" class="btn btn-primary">
         {{ ts('New %1', {1: types[$ctrl.tab].label }) }}
       </a>
       <button type="button" ng-click="$ctrl.createLinks()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -28,7 +28,7 @@
           <a href ng-if="types[$ctrl.tab].options && !types[$ctrl.tab].options.length">{{:: ts('None Found') }}</a>
         </li>
         <li ng-repeat="link in types[$ctrl.tab].options | filter:searchCreateLinks" class="{{:: link.class }}">
-          <a ng-if=":: link.url" href="{{:: link.url }}">
+          <a ng-if=":: link.url" ng-href="{{:: link.url }}">
             <i class="crm-i {{:: link.icon }}"></i>
             {{:: link.label }}
           </a>
@@ -98,8 +98,8 @@
         {{:: afform['base_module:label'] }}
       </td>
       <td class="text-right">
-        <a ng-if="afform.type !== 'system'" href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>
-        <a ng-if="afform.type !== 'system'" href="#/clone/{{:: afform.name }}" class="btn btn-xs btn-secondary">{{:: ts('Clone') }}</a>
+        <a ng-if="afform.type !== 'system'" ng-href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>
+        <a ng-if="afform.type !== 'system'" ng-href="#/clone/{{:: afform.name }}" class="btn btn-xs btn-secondary">{{:: ts('Clone') }}</a>
         <a href ng-if="afform.has_local" class="btn btn-xs btn-{{ afform.has_base ? 'warning' : 'danger' }}" crm-confirm="{type: afform.has_base ? 'revert' : 'delete', obj: afform}" on-yes="$ctrl.revert(afform)">
           {{ afform.has_base ? ts('Revert') : ts('Delete') }}
         </a>

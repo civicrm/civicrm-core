@@ -35,17 +35,29 @@
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
   </item>
   <item>
+     <path>civicrm/acl/edit</path>
+     <title>Manage ACLs</title>
+     <page_callback>CRM_ACL_Form_ACL</page_callback>
+     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/acl/delete</path>
+     <title>Manage ACLs</title>
+     <page_callback>CRM_ACL_Form_ACL</page_callback>
+     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
+  </item>
+  <item>
      <path>civicrm/acl/entityrole</path>
      <title>Assign Users to ACL Roles</title>
      <page_callback>CRM_ACL_Page_EntityRole</page_callback>
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/acl/basic</path>
-     <title>ACL</title>
-     <page_callback>CRM_ACL_Page_ACLBasic</page_callback>
+     <path>civicrm/acl/entityrole/edit</path>
+     <title>Assign Users to ACL Roles</title>
+     <page_callback>CRM_ACL_Form_EntityRole</page_callback>
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>
+  </item>>
   <item>
      <path>civicrm/file</path>
      <title>Browse Uploaded files</title>
@@ -94,11 +106,6 @@
      <page_callback>CRM_Admin_Page_APIExplorer</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <title>CiviCRM API v3</title>
-  </item>
-  <item>
-     <path>civicrm/ajax/apiexample</path>
-     <page_callback>CRM_Admin_Page_APIExplorer::getExampleFile</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/ajax/apidoc</path>

@@ -7,6 +7,13 @@
   <add>1.8</add>
   <log>true</log>
   <component>CiviContribute</component>
+  <paths>
+    <add>civicrm/admin/price/add?reset=1&amp;action=add</add>
+    <update>civicrm/admin/price/edit?reset=1&amp;action=update&amp;sid=[id]</update>
+    <delete>civicrm/admin/price/edit?reset=1&amp;action=delete&amp;sid=[id]</delete>
+    <preview>civicrm/admin/price/edit?reset=1&amp;action=preview&amp;sid=[id]</preview>
+    <browse>civicrm/admin/price</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Price Set</title>
@@ -134,10 +141,9 @@
     <required>true</required>
     <comment>What components are using this price set?</comment>
     <pseudoconstant>
-      <table>civicrm_component</table>
-      <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <callback>CRM_Price_BAO_PriceSet::getExtendsOptions</callback>
     </pseudoconstant>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>3.1</add>
     <html>
       <type>Text</type>

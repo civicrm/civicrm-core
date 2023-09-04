@@ -97,7 +97,7 @@
   start_date:::{$start_date}
   end_date:::{$end_date}
   {/if}
-  {if !empty($is_deductible)}
+  {if $is_deductible}
   is_deductible:::{$is_deductible}
   {/if}
   {if !empty($contact_email)}
@@ -170,12 +170,6 @@
  {foreach from=$customPost item=customValue key=customName}
     customPost: customName:::$customName
     customPost: customValue:::$customValue
- {/foreach}
- {/if}
- {if !empty($trackingFields)}
- {foreach from=$trackingFields item=trackingValue key=trackingName}
-   trackingName:::$trackingName
-   trackingValue:::$trackingValue
  {/foreach}
  {/if}
 

@@ -118,7 +118,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'currency' => 'NZD',
       'financial_type_id' => 1,
     ];
-    $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
+    $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $this->assertEquals(1, $getResult['count']);
   }
 
@@ -561,7 +561,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
 
     $submitParams = $this->getSubmitParamsContributionPlusMembership();
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page'], 'return' => 'contact_id'])['values'];
     $this->assertCount(2, $contributions);
     $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['return' => ['contribution_id', 'membership_id']]);
@@ -786,7 +786,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
    */
-  //public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPaymentDifferentFrequency() {
+  //public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPaymentDifferentFrequency(): void {
   //  $this->doSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment(array('duration_unit' => 'year', 'recur_frequency_unit' => 'month'));
   //}
 
@@ -828,7 +828,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'frequency_unit' => $this->params['recur_frequency_unit'],
     ]);
 
-    $this->callAPIAndDocument('ContributionPage', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
@@ -956,7 +956,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'frequency_unit' => $this->params['recur_frequency_unit'],
     ];
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
@@ -1058,7 +1058,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
     ]);
 
-    $this->callAPIAndDocument('ContributionPage', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
     $contributions = $this->callAPISuccess('contribution', 'get', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
@@ -1118,7 +1118,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'frequency_unit' => $this->params['recur_frequency_unit'],
     ]);
 
-    $this->callAPIAndDocument('ContributionPage', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 2,
@@ -1526,7 +1526,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'pledge_block_id' => (int) $this->_ids['pledge_block_id'],
     ];
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
 
     // Check if contribution created.
     $contribution = $this->callAPISuccess('contribution', 'getsingle', [
@@ -1596,7 +1596,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', $params);
     $this->assertEquals(2, $pledgePayment['values'][2]['status_id']);
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
 
     // Check if contribution created.
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', [

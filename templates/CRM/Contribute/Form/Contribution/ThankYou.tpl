@@ -11,8 +11,6 @@
   {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-thankyou-form-block" data-page-id="{$contributionPageID}" data-page-template="thankyou">
   {if $thankyou_text}
     <div id="thankyou_text" class="crm-section thankyou_text-section">
@@ -72,7 +70,7 @@
   </div>
   <div class="spacer"></div>
 
-  {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="thankContribution"}
+  {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl"}
 
   {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $priceSetID and $lineItem ) }
     <div class="crm-group amount_display-group">
@@ -281,7 +279,7 @@
     {/if}
   {/if}
 
-  {if $contributeMode eq 'direct' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 )}
+  {if in_array('credit_card_number', $form) || in_array('bank_account_number', $form) && ($amount GT 0 OR $minimum_fee GT 0)}
     {crmRegion name="contribution-thankyou-billing-block"}
       <div class="crm-group credit_card-group">
         {if $paymentFieldsetLabel}
@@ -289,7 +287,7 @@
             {$paymentFieldsetLabel}
           </div>
         {/if}
-        {if $paymentProcessor.payment_type == 2}
+          {if in_array('bank_account_number', $form) && $bank_account_number}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br />
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br />

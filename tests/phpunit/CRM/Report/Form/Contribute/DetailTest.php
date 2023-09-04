@@ -264,7 +264,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
   /**
    * Make sure the civicrm_alterReportVar hook for contribute detail report work well.
    */
-  public function testContributeDetailReportWithNewColumnFromCustomTable() {
+  public function testContributeDetailReportWithNewColumnFromCustomTable(): void {
     $this->quickCleanup($this->_tablesToTruncate);
 
     $solParams = [

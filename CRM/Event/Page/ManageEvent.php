@@ -227,6 +227,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     // assign vars to templates
     $this->assign('action', $action);
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks());
+    $this->assign('isShowICalIconsInline', FALSE);
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0, 'REQUEST'
     );
@@ -311,7 +312,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     $params = [];
     $whereClause = $this->whereClause($params, TRUE, $this->_force);
     // because is_template != 1 would be to simple
-    $whereClause .= ' AND (is_template = 0 OR is_template IS NULL)';
+    $whereClause .= ' AND is_template = 0';
 
     $this->pager($whereClause, $params);
 
@@ -343,9 +344,6 @@ ORDER BY start_date desc
     while ($pcpDao->fetch()) {
       $eventPCPS[$pcpDao->entity_id] = $pcpDao->entity_id;
     }
-    $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
-      'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
-    ]));
     $eventType = CRM_Core_OptionGroup::values('event_type');
     while ($dao->fetch()) {
       if (in_array($dao->id, $permittedEventsByAction[CRM_Core_Permission::VIEW])) {
@@ -424,7 +422,7 @@ ORDER BY start_date desc
 
         //show campaigns on selector.
         $manageEvent[$dao->id]['campaign'] = $allCampaigns[$dao->campaign_id] ?? NULL;
-        $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mapping->getId());
+        $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
         $manageEvent[$dao->id]['is_pcp_enabled'] = $eventPCPS[$dao->id] ?? NULL;
         $manageEvent[$dao->id]['event_type'] = $eventType[$manageEvent[$dao->id]['event_type_id']] ?? NULL;
         $manageEvent[$dao->id]['is_repeating_event'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_RecurringEntity', $dao->id, 'parent_id', 'entity_id');
@@ -535,12 +533,14 @@ ORDER BY start_date desc
       }
       else {
         $curDate = date('YmdHis');
-        $clauses[] = "(end_date >= {$curDate} OR end_date IS NULL)";
+        $dayBefore = date_sub(date_create(), date_interval_create_from_date_string("1 day"))->format('YmdHis');
+        $clauses[] = "(end_date >= {$curDate} OR (end_date IS NULL AND start_date >= {$dayBefore}))";
       }
     }
     else {
       $curDate = date('YmdHis');
-      $clauses[] = "(end_date >= {$curDate} OR end_date IS NULL)";
+      $dayBefore = date_sub(date_create(), date_interval_create_from_date_string("1 day"))->format('YmdHis');
+      $clauses[] = "(end_date >= {$curDate} OR (end_date IS NULL AND start_date >= {$dayBefore}))";
     }
 
     if ($sortBy &&

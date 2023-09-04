@@ -44,7 +44,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     // "null" value for example is passed by dedupe merge in order to empty.
     // Display name computation shouldn't consider such values.
     foreach (['first_name', 'middle_name', 'last_name', 'nick_name', 'formal_title', 'birth_date', 'deceased_date'] as $displayField) {
-      if (CRM_Utils_Array::value($displayField, $params) == "null") {
+      if (($params[$displayField] ?? NULL) == "null") {
         $params[$displayField] = '';
       }
     }
@@ -246,98 +246,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       if (!empty($$value)) {
         $contact->$name = $$value;
       }
-    }
-
-    $format = CRM_Utils_Date::getDateFormat('birth');
-    if ($date = CRM_Utils_Array::value('birth_date', $params)) {
-      if (in_array($format, [
-        'dd-mm',
-        'mm/dd',
-      ])) {
-        $separator = '/';
-        if ($format == 'dd-mm') {
-          $separator = '-';
-        }
-        $date = $date . $separator . '1902';
-      }
-      elseif (in_array($format, [
-        'yy-mm',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'M yy',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'yy',
-      ])) {
-        $date = $date . '-01-01';
-      }
-      $processedDate = CRM_Utils_Date::processDate($date);
-      $existing = substr(str_replace('-', '', $contact->birth_date), 0, 8) . '000000';
-      // By adding this check here we can rip out this whole routine in a few
-      // months after confirming it actually does nothing, ever.
-      if ($existing !== $processedDate) {
-        CRM_Core_Error::deprecatedWarning('birth_date formatting should happen before BAO is hit');
-        $contact->birth_date = $processedDate;
-      }
-    }
-    elseif ($contact->birth_date) {
-      if ($contact->birth_date !== CRM_Utils_Date::isoToMysql($contact->birth_date)) {
-        CRM_Core_Error::deprecatedWarning('birth date formatting should happen before BAO is hit');
-      }
-      $contact->birth_date = CRM_Utils_Date::isoToMysql($contact->birth_date);
-    }
-
-    if ($date = CRM_Utils_Array::value('deceased_date', $params)) {
-      if (in_array($format, [
-        'dd-mm',
-        'mm/dd',
-      ])) {
-        $separator = '/';
-        if ($format == 'dd-mm') {
-          $separator = '-';
-        }
-        $date = $date . $separator . '1902';
-      }
-      elseif (in_array($format, [
-        'yy-mm',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'M yy',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'yy',
-      ])) {
-        $date = $date . '-01-01';
-      }
-      $processedDate = CRM_Utils_Date::processDate($date);
-      $existing = substr(str_replace('-', '', $contact->deceased_date), 0, 8) . '000000';
-      // By adding this check here we can rip out this whole routine in a few
-      // months after confirming it actually does nothing, ever.
-      if ($existing !== $processedDate) {
-        CRM_Core_Error::deprecatedWarning('deceased formatting should happen before BAO is hit');
-      }
-      $contact->deceased_date = CRM_Utils_Date::processDate($date);
-    }
-    elseif ($contact->deceased_date) {
-      if ($contact->deceased_date !== CRM_Utils_Date::isoToMysql($contact->deceased_date)) {
-        CRM_Core_Error::deprecatedWarning('deceased date formatting should happen before BAO is hit');
-      }
-      $contact->deceased_date = CRM_Utils_Date::isoToMysql($contact->deceased_date);
-    }
-
-    if ($middle_name = CRM_Utils_Array::value('middle_name', $params)) {
-      if ($middle_name !== $contact->middle_name) {
-        CRM_Core_Error::deprecatedWarning('random magic is deprecated - how could this be true');
-      }
-      $contact->middle_name = $middle_name;
     }
 
     return $contact;

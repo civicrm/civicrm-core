@@ -145,9 +145,11 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $this->assign('price', TRUE);
     }
 
-    $this->addField('price_set_id', [
-      'entity' => 'PriceField',
+    $this->addSelect('price_set_id', [
+      'entity' => 'PriceSet',
+      'option_url' => 'civicrm/admin/price',
       'options' => $price,
+      'label' => ts('Price Set'),
       'onchange' => "showHideAmountBlock( this.value, 'price_set_id' );",
     ]);
 
@@ -173,7 +175,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
         );
         $this->add('datepicker', 'pledge_calendar_date', ts('Specific Calendar Date'), [], FALSE, ['time' => FALSE]);
         $month = CRM_Utils_Date::getCalendarDayOfMonth();
-        $this->add('select', 'pledge_calendar_month', ts('Specific day of Month'), $month);
+        $this->add('select', 'pledge_calendar_month', ts('Specific day of Month'), $month, FALSE, ['class' => 'crm-select2 eight']);
         $pledgeDefaults = [
           'contribution_date' => ts('Day of Contribution'),
           'calendar_date' => ts('Specific Calendar Date'),
@@ -309,14 +311,19 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     $membershipBlock->is_active = 1;
     $hasMembershipBlk = FALSE;
     if ($membershipBlock->find(TRUE)) {
-      if (!empty($fields['amount_block_is_active']) &&
-        ($setID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $self->_id, NULL, 1))
-      ) {
-        $extends = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'extends');
-        if ($extends && $extends == CRM_Core_Component::getComponentID('CiviMember')) {
-          $errors['amount_block_is_active'] = ts('You cannot use a Membership Price Set when the Contribution Amounts section is enabled. Click the Memberships tab above, and select your Membership Price Set on that form. Membership Price Sets may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription) or an additional voluntary contribution.');
-          return $errors;
-        }
+      // Don't allow Contribution price set w/ membership signup, CRM-5095.
+      $priceSetExtendsMembership = \Civi\Api4\PriceSetEntity::get(FALSE)
+        ->addSelect('id')
+        ->addJoin('PriceSet AS price_set', 'LEFT', ['price_set_id', '=', 'price_set.id'])
+        ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+        ->addWhere('entity_id', '=', $self->_id)
+        ->addWhere('price_set.extends:name', 'CONTAINS', 'CiviMember')
+        ->addWhere('price_set.is_quick_config', '=', 0)
+        ->execute()
+        ->first();
+      if (!empty($fields['amount_block_is_active']) && $priceSetExtendsMembership) {
+        $errors['amount_block_is_active'] = ts('You cannot use a Membership Price Set when the Contribution Amounts section is enabled. Click the Memberships tab above, and select your Membership Price Set on that form. Membership Price Sets may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription) or an additional voluntary contribution.');
+        return $errors;
       }
       $hasMembershipBlk = TRUE;
       if ($membershipBlock->is_separate_payment && empty($fields['amount_block_is_active'])) {
@@ -371,10 +378,11 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     // don't allow price set w/ membership signup, CRM-5095
-    if ($priceSetId = CRM_Utils_Array::value('price_set_id', $fields)) {
+    $priceSetId = $fields['price_set_id'] ?? NULL;
+    if ($priceSetId) {
       // don't allow price set w/ membership.
       if ($hasMembershipBlk) {
-        $errors['price_set_id'] = ts('You cannot enable both a Contribution Price Set and Membership Signup on the same online contribution page.');
+        $errors['price_set_id'] = ts('You cannot enable both Membership Signup and a Contribution Price Set on the same online contribution page.');
       }
     }
     else {
@@ -619,7 +627,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
               $priceSetId = $usedPriceSetId;
             }
             else {
-              if ($priceFieldId = CRM_Utils_Array::value('price_field_id', $params)) {
+              $priceFieldId = $params['price_field_id'] ?? NULL;
+              if ($priceFieldId) {
                 foreach ($params['price_field_value'] as $arrayID => $fieldValueID) {
                   if (empty($params['label'][$arrayID]) && empty($params['value'][$arrayID]) && !empty($fieldValueID)) {
                     CRM_Price_BAO_PriceFieldValue::setIsActive($fieldValueID, '0');
@@ -686,7 +695,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
               CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
 
-              if (!$priceFieldID = CRM_Utils_Array::value('id', $editedResults)) {
+              $priceFieldID = $editedResults['id'] ?? NULL;
+              if (!$priceFieldID) {
                 $fieldParams = [
                   'name' => 'other_amount',
                   'label' => ts('Other Amount'),

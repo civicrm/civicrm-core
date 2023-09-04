@@ -11,12 +11,7 @@
 <h3>{ts}Find Contribution Pages{/ts}</h3>
 <table class="form-layout-compressed">
     <tr>
-        <td>{$form.title.html}
-            <div class="description font-italic">
-                {ts}Complete OR partial Contribution Page title.{/ts}
-            </div>
-        </td>
-
+        <td>{$form.title.html}</td>
         <td>
             <label>{ts}Financial Type{/ts}</label>
             <div class="listing-box">
@@ -34,5 +29,5 @@
     campaignTrClass='' campaignTdClass=''}
 
  </table>
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+ <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 </div>

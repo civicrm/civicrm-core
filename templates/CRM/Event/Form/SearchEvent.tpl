@@ -17,9 +17,6 @@
         <td>
           <label>{$form.title.label}</label>
           {$form.title.html|crmAddClass:twenty}
-          <div class="description font-italic">
-                 {ts}Complete OR partial Event name.{/ts}
-          </div>
         </td>
         <td><label>{ts}Event Type{/ts}</label>
           {$form.event_type_id.html}
@@ -47,7 +44,7 @@
     {* campaign in event search *}
     {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
     campaignTrClass='crm-event-searchevent-form-block-campaign_id' campaignTdClass=''}
-    <td class="right">{include file="CRM/common/formButtons.tpl"}</td>
+    <td class="right">{include file="CRM/common/formButtons.tpl" location=''}</td>
   </table>
     </div>
   </div>

@@ -92,8 +92,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     $result = $this->callAPISuccess('mailing', 'create', $params);
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-    $this->assertRegexp('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
-    $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
@@ -118,19 +118,19 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     parent::testUrlTracking($inputHtml, $htmlUrlRegex, $textUrlRegex, $params);
   }
 
-  public function testBasicHeaders() {
+  public function testBasicHeaders(): void {
     parent::testBasicHeaders();
   }
 
-  public function testText() {
+  public function testText(): void {
     parent::testText();
   }
 
-  public function testHtmlWithOpenTracking() {
+  public function testHtmlWithOpenTracking(): void {
     parent::testHtmlWithOpenTracking();
   }
 
-  public function testHtmlWithOpenAndUrlTracking() {
+  public function testHtmlWithOpenAndUrlTracking(): void {
     parent::testHtmlWithOpenAndUrlTracking();
   }
 
@@ -138,7 +138,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
    * Test to check Activity being created on mailing Job.
    *
    */
-  public function testMailingActivityCreate() {
+  public function testMailingActivityCreate(): void {
     $subject = uniqid('testMailingActivityCreate');
     $this->runMailingSuccess([
       'subject' => $subject,

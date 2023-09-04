@@ -47,7 +47,7 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
     $contribution1 = $this->contributionCreate(['contact_id' => $contact2, 'invoice_number' => 'soy']);
     $contribution2 = $this->contributionCreate(['total_amount' => 999, 'contact_id' => $contact1, 'invoice_number' => 'saucy']);
     $contribution3 = $this->contributionCreate(['total_amount' => 999, 'contact_id' => $contact1, 'invoice_number' => 'ranch']);
-    $form = $this->getFormObject('CRM_Contribute_Form_Task_Email', [
+    $form = $this->getSearchFormObject('CRM_Contribute_Form_Task_Email', [
       'cc_id' => '',
       'bcc_id' => '',
       'to' => implode(',', [
@@ -58,7 +58,7 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
       'text_message' => '{contribution.financial_type_id:label} {contribution.invoice_number}',
       'html_message' => '{domain.name}',
       'from_email_address' => $emailID,
-    ], [], [
+    ], NULL, [
       'radio_ts' => 'ts_sel',
       'task' => CRM_Core_Task::TASK_EMAIL,
       'mark_x_' . $contribution1 => 1,

@@ -82,6 +82,9 @@ if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
  * Database URL format:
  *      define( 'CIVICRM_DSN', 'mysql://crm_db_username:crm_db_password@db_server/crm_database?new_link=true');
  *
+ * See https://docs.civicrm.org/installation/en/latest/general/mysql_tls/#dsn-settings for how to append
+ * ssl options to the Database URL.
+ *
  * Drupal and CiviCRM can share the same database, or can be installed into separate databases.
  * Backdrop CMS and CiviCRM can also share the same database, or can be installed into separate databases.
  *
@@ -332,6 +335,12 @@ if (!defined('CIVICRM_SITE_KEY')) {
 if (!defined('CIVICRM_CRED_KEYS') ) {
   define( '_CIVICRM_CRED_KEYS', '%%credKeys%%');
   define( 'CIVICRM_CRED_KEYS', _CIVICRM_CRED_KEYS === '%%' . 'credKeys' . '%%' ? '' : _CIVICRM_CRED_KEYS );
+  // Some old installers may not set a decent value, and this extra complexity is a failsafe.
+  // Feel free to simplify post-install.
+}
+if (!defined('CIVICRM_DEPLOY_ID') ) {
+  define( '_CIVICRM_DEPLOY_ID', '%%deployID%%');
+  define( 'CIVICRM_DEPLOY_ID', _CIVICRM_DEPLOY_ID === '%%' . 'deployID' . '%%' ? '' : _CIVICRM_DEPLOY_ID );
   // Some old installers may not set a decent value, and this extra complexity is a failsafe.
   // Feel free to simplify post-install.
 }
@@ -599,11 +608,6 @@ if (!defined('CIVICRM_CLEANURL')) {
   else {
     define('CIVICRM_CLEANURL', 0);
   }
-}
-
-// force PHP to auto-detect Mac line endings
-if (version_compare(PHP_VERSION, '8.1') < 0) {
-  ini_set('auto_detect_line_endings', '1');
 }
 
 // make sure the memory_limit is at least 64 MB

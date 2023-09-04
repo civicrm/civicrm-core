@@ -7,25 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{capture assign=multiURL}{crmURL p="civicrm/import/custom" q="reset=1"}{/capture}
-{htxt id='choose-data-source-intro-title'}
-  {ts}Import Wizard{/ts}
-{/htxt}
-{htxt id='choose-data-source-intro'}
-  <p>
-    {ts}The Import Wizard allows you to easily upload contact records from other applications into CiviCRM. For example, if your organization has contacts in MS Access&copy; or Excel&copy;, and you want to start using CiviCRM to store these contacts, you can 'import' them here.{/ts}
-  </p>
-  <p>
-    {ts}You can import records from a <strong>comma-separated-values format (CSV)</strong> file, or using a <strong>SQL query</strong>. See "Choose Data Source" help below for more information.{/ts}
-  </p>
-  <p>
-    {ts}After importing contacts, you may also want to import <strong>contributions, membership info and/or event participation</strong> data for these contacts. If so, first make sure that the corresponding CiviCRM component is enabled from Administer CiviCRM &raquo; System Settings &raquo; Enable CiviCRM Components. Enable CiviContribute, CiviMember, and/or CiviEvent. Then navigate to the Import option found in each component's menu (e.g. CiviContribute &raquo; Import Contributions).{/ts}
-  </p>
-  <p>
-    {ts 1=$multiURL}If you need to import <strong>Multi-value Custom Data</strong> for contacts (such as employment or education history), you will need to do that as a separate step from <a href="%1">here</a>.{/ts}
-  </p>
-{/htxt}
-
 {htxt id='contact-type-title'}
   {ts}Contact Type{/ts}
 {/htxt}
@@ -65,6 +46,9 @@
       {ts}<strong>No Duplicate Checking:</strong> Inserts all valid records without comparing them to existing contact records for possible duplicates.{/ts}
     </li>
   </ul>
+  <p>
+    {ts}You can only match imported data directly to existing Contact IDs in Update, Fill or No Duplicate Checking modes.{/ts}
+  </p>
 {/htxt}
 
 {htxt id='data-source-selection-title'}

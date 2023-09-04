@@ -42,7 +42,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
     $this->ids['Contact']['individual'] = $this->individualCreate();
-    $this->ids['Contact']['organization'] = $this->organizationCreate(NULL);
+    $this->organizationCreate();
 
     $this->ids['PaymentProcessor'] = $this->paymentProcessorCreate();
     $this->params = [
@@ -73,7 +73,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     // Financial Account with 20% tax rate
     $financialAccount = $this->callAPISuccess('financial_account', 'create', [
       'name' => 'vat full tax rate account',
-      'contact_id' => $this->ids['Contact']['organization'],
+      'contact_id' => $this->ids['Contact']['organization_0'],
       'financial_account_type_id' => 2,
       'is_tax' => 1,
       'tax_rate' => 20.00,
@@ -100,7 +100,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     // Financial type with 5% tax rate
     $financialAccountHalfTax = [
       'name' => 'vat half tax_rate account',
-      'contact_id' => $this->ids['Contact']['organization'],
+      'contact_id' => $this->ids['Contact']['organization_0'],
       'financial_account_type_id' => 2,
       'is_tax' => 1,
       'tax_rate' => 5.00,

@@ -19,8 +19,6 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   protected $optionGroup;
 
-  public $DBResetRequired = FALSE;
-
   /**
    * @throws \CRM_Core_Exception
    */
@@ -88,7 +86,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testCreateCustomValue() {
+  public function testCreateCustomValue(): void {
     $this->_populateOptionAndCustomGroup();
     $this->_customField = $this->customFieldCreate(['custom_group_id' => $this->ids['string']['custom_group_id']]);
     $this->_customFieldID = $this->_customField['id'];
@@ -340,7 +338,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testAlterOptionValue() {
+  public function testAlterOptionValue(): void {
     $this->_populateOptionAndCustomGroup('string');
 
     $selectField = $this->customFieldCreate([
@@ -421,7 +419,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals([$params[$radioName], $params[$controlFieldName]], $result[$multiSelectName]);
   }
 
-  public function testGettree() {
+  public function testGettree(): void {
     $cg = $this->callAPISuccess('CustomGroup', 'create', [
       'title' => 'TestGettree',
       'extends' => 'Individual',
@@ -478,7 +476,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   }
 
-  public function testGettree_getfields() {
+  public function testGettree_getfields(): void {
     $fields = $this->callAPISuccess('CustomValue', 'getfields', ['api_action' => 'gettree']);
     $fields = $fields['values'];
     $this->assertTrue((bool) $fields['entity_id']['api.required']);
@@ -562,7 +560,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    * Test that specific custom values can be retrieved while using return with comma separated values as genererated by the api explorer.
    * ['return' => 'custom_1,custom_2']
    */
-  public function testGetCustomValueReturnMultipleApiExplorer() {
+  public function testGetCustomValueReturnMultipleApiExplorer(): void {
     [$cid, $customFieldValues] = $this->_testGetCustomValueMultiple();
     $result = $this->callAPISuccess('CustomValue', 'get', [
       'return' => implode(',', array_keys($customFieldValues)),
@@ -575,7 +573,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    * Test that specific custom values can be retrieved while using return with array style syntax.
    * ['return => ['custom_1', 'custom_2']]
    */
-  public function testGetCustomValueReturnMultipleArray() {
+  public function testGetCustomValueReturnMultipleArray(): void {
     [$cid, $customFieldValues] = $this->_testGetCustomValueMultiple();
     $result = $this->callAPISuccess('CustomValue', 'get', [
       'return' => array_keys($customFieldValues),
@@ -588,7 +586,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    * Test that specific custom values can be retrieved while using a list of return parameters.
    * [['return.custom_1' => '1'], ['return.custom_2' => '1']]
    */
-  public function testGetCustomValueReturnMultipleList() {
+  public function testGetCustomValueReturnMultipleList(): void {
     [$cid, $customFieldValues] = $this->_testGetCustomValueMultiple();
     $returnArray = [];
     foreach ($customFieldValues as $field => $value) {
@@ -602,7 +600,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    * Test getdisplayvalue api and verify if it returns
    * the custom text for display.
    */
-  public function testGetDisplayValue() {
+  public function testGetDisplayValue(): void {
     [$cid, $customFieldValues] = $this->_testGetCustomValueMultiple();
     foreach ($customFieldValues as $field => $value) {
       [, $customFieldID] = explode("_", $field);

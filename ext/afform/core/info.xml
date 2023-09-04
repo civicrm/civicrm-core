@@ -13,15 +13,15 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2020-01-09</releaseDate>
-  <version>5.60.alpha1</version>
+  <version>5.66.alpha1</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>5.60</ver>
+    <ver>5.66</ver>
   </compatibility>
   <comments>The Form Core extension is required to use any dynamic form. To administer and edit forms, also install the FormBuilder extension.</comments>
   <civix>
     <namespace>CRM/Afform</namespace>
-    <format>22.12.1</format>
+    <format>23.02.1</format>
   </civix>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
@@ -34,6 +34,8 @@
     <mixin>ang-php@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.1</mixin>
+    <mixin>entity-types-php@1.0.0</mixin>
   </mixins>
   <upgrader>CRM_Afform_Upgrader</upgrader>
 </extension>

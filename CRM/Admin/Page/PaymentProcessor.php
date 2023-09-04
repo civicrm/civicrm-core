@@ -23,13 +23,6 @@ use Civi\Api4\PaymentProcessor;
 class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string
@@ -37,42 +30,6 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
    */
   public function getBAOName() {
     return 'CRM_Financial_BAO_PaymentProcessor';
-  }
-
-  /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      self::$_links = [
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/paymentProcessor/edit',
-          'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit Payment Processor'),
-        ],
-        CRM_Core_Action::DISABLE => [
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Payment Processor'),
-        ],
-        CRM_Core_Action::ENABLE => [
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Payment Processor'),
-        ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/paymentProcessor/edit',
-          'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete Payment Processor'),
-        ],
-      ];
-    }
-    return self::$_links;
   }
 
   /**
@@ -87,7 +44,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
     CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
     $breadCrumb = [
       [
-        'title' => ts('Administration'),
+        'title' => ts('Administer'),
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),

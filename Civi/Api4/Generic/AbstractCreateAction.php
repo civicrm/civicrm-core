@@ -26,31 +26,14 @@ use Civi\Api4\Utils\CoreUtil;
  */
 abstract class AbstractCreateAction extends AbstractAction {
 
+  use Traits\GetSetValueTrait;
+
   /**
    * Field values to set for the new $ENTITY.
    *
    * @var array
    */
   protected $values = [];
-
-  /**
-   * @param string $fieldName
-   * @return mixed|null
-   */
-  public function getValue(string $fieldName) {
-    return $this->values[$fieldName] ?? NULL;
-  }
-
-  /**
-   * Add a field value.
-   * @param string $fieldName
-   * @param mixed $value
-   * @return $this
-   */
-  public function addValue(string $fieldName, $value) {
-    $this->values[$fieldName] = $value;
-    return $this;
-  }
 
   /**
    * @throws \CRM_Core_Exception

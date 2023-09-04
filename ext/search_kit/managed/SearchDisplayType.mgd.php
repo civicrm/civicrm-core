@@ -109,4 +109,25 @@ return [
       'match' => ['option_group_id', 'name'],
     ],
   ],
+  [
+    'name' => 'SearchDisplayType:entity',
+    'entity' => 'OptionValue',
+    'cleanup' => 'always',
+    'update' => 'always',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'search_display_type',
+        'value' => 'entity',
+        'name' => 'crm-search-display-entity',
+        'label' => E::ts('DB Entity'),
+        'description' => E::ts('Saves the search results in a database table which can be accessed with SearchKit, the API, or SQL-based tools.'),
+        'icon' => 'fa-database',
+        'is_reserved' => TRUE,
+        'is_active' => TRUE,
+        'domain_id' => NULL,
+      ],
+      'match' => ['option_group_id', 'name'],
+    ],
+  ],
 ];

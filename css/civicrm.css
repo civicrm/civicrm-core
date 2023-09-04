@@ -200,6 +200,7 @@ input.crm-form-checkbox + label {
   width: 15em;
 }
 .crm-container .huge,
+input.crm-form-autocomplete,
 input.crm-form-entityref {
   width: 25em;
 }
@@ -696,8 +697,17 @@ input.crm-form-entityref {
   color: #3e3e3e;
 }
 
+.crm-container .status.crm-status-none {
+  background-color: inherit;
+}
+
 .crm-container .crm-footer {
   font-size: 0.8em;
+}
+
+.crm-footer .status {
+  padding: 4px;
+  border: 0px;
 }
 
 #civicrm-footer {
@@ -1460,10 +1470,6 @@ input.crm-form-entityref {
   margin: 0 8px 0 0;
   padding: 0;
   list-style: none;
-}
-
-#crm-container .crm-actions-ribbon li.crm-delete-action {
-  margin-left: 30px;
 }
 
 #crm-container .crm-actions-ribbon li.crm-previous-action,
@@ -3365,6 +3371,7 @@ span.crm-select-item-color {
 }
 
 /* in place edit  */
+.crm-container .crm-editable-disabled,
 .crm-container .crm-editable-enabled {
   padding-left: 2px;
   border: 2px dashed transparent;
@@ -3386,6 +3393,7 @@ span.crm-select-item-color {
 .crm-container span.crm-editable-textarea-enabled {
   width: 96%;
 }
+.crm-container span.crm-editable-disabled,
 .crm-container span.crm-editable-enabled {
   display: inline-block !important;
   padding-right: 2px;

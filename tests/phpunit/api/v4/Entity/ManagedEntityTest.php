@@ -49,7 +49,14 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
 
   public function setUp(): void {
     $this->_managedEntities = [];
+    // Ensure exceptions get thrown
+    \Civi::settings()->set('debug_enabled', TRUE);
     parent::setUp();
+  }
+
+  public function tearDown(): void {
+    \Civi::settings()->revert('debug_enabled');
+    parent::tearDown();
   }
 
   public function setUpHeadless(): CiviEnvBuilder {
@@ -523,13 +530,9 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // Refresh managed entities with module active
     $allModules = [
       new CRM_Core_Module('unit.test.fake.ext', TRUE),
-      // We can't wip out this enabled module as it still have declared
-      // managed entities & the test will fail if we pretend it doesn't exist
-      // here but still let it declare entities.
-      new CRM_Core_Module('legacycustomsearches', TRUE),
-      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
-    (new CRM_Core_ManagedEntities($allModules))->reconcile();
+    $modulesToReconcile = ['unit.test.fake.ext'];
+    (new CRM_Core_ManagedEntities($allModules))->reconcile($modulesToReconcile);
 
     $nav = Navigation::get(FALSE)
       ->addWhere('name', '=', 'Test_Parent')
@@ -572,15 +575,10 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // Refresh managed entities with module disabled
     $allModules = [
       new CRM_Core_Module('unit.test.fake.ext', FALSE),
-      // We can't wip out this enabled module as it still have declared
-      // managed entities & the test will fail if we pretend it doesn't exist
-      // here but still let it declare entities.
-      new CRM_Core_Module('legacycustomsearches', TRUE),
-      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     // If module is disabled it will not run hook_civicrm_managed.
     $this->_managedEntities = [];
-    (new CRM_Core_ManagedEntities($allModules))->reconcile();
+    (new CRM_Core_ManagedEntities($allModules))->reconcile($modulesToReconcile);
 
     // Children's weight should have been unaffected, but they should be disabled
     $children = Navigation::get(FALSE)
@@ -600,14 +598,9 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // Refresh managed entities with module active
     $allModules = [
       new CRM_Core_Module('unit.test.fake.ext', TRUE),
-      // We can't wip out this enabled module as it still have declared
-      // managed entities & the test will fail if we pretend it doesn't exist
-      // here but still let it declare entities.
-      new CRM_Core_Module('legacycustomsearches', TRUE),
-      new CRM_Core_Module('org.civicrm.search_kit', TRUE),
     ];
     $this->_managedEntities = $managedEntities;
-    (new CRM_Core_ManagedEntities($allModules))->reconcile();
+    (new CRM_Core_ManagedEntities($allModules))->reconcile($modulesToReconcile);
 
     // Children's weight should have been unaffected, but they should be enabled
     $children = Navigation::get(FALSE)
@@ -681,13 +674,15 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     ];
     $this->_managedEntities = [$managed];
 
+    \CRM_Core_Session::singleton()->getStatus(TRUE);
+    $this->assertEquals([], \CRM_Core_Session::singleton()->getStatus());
+
     // Without "match" in the params, it will try and fail to add a duplicate managed record
-    try {
-      CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
-    }
-    catch (\Exception $e) {
-    }
-    $this->assertStringContainsString('already exists', $e->getMessage());
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    $status = \CRM_Core_Session::singleton()->getStatus(TRUE);
+    $this->assertStringContainsString('already exists', $status[0]['text']);
+    $this->assertEquals('error', $status[0]['type']);
 
     // Now reconcile using a match param
     $managed['params']['match'] = ['name'];

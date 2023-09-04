@@ -36,10 +36,14 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
    */
   public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()
+      ->install('org.civicrm.search_kit')
       ->installMe(__DIR__)
       ->apply();
   }
 
+  /**
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
   public function tearDown():void {
     CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS abc');
     parent::tearDown();
@@ -52,9 +56,9 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
    */
   public function testApiActions():void {
     $this->createUserJobTable();
-    $userJobID = UserJob::create()->setValues([
+    $userJobParameters = [
       'metadata' => [
-        'DataSource' => ['table_name' => 'abc', 'column_headers' => ['External Identifier', 'Amount Given', 'Date Received', 'Financial Type', 'In honor']],
+        'DataSource' => ['table_name' => 'abc', 'column_headers' => ['External Identifier', 'Amount Given', 'Contribution Date', 'Financial Type', 'In honor']],
         'submitted_values' => [
           'contactType' => 'Individual',
           'contactSubType' => '',
@@ -73,7 +77,8 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
       ],
       'status_id:name' => 'draft',
       'job_type' => 'contribution_import',
-    ])->execute()->first()['id'];
+    ];
+    $userJobID = UserJob::create()->setValues($userJobParameters)->execute()->first()['id'];
     $importFields = Import::getFields($userJobID)->execute();
     $this->assertEquals('abc', $importFields[0]['table_name']);
     $this->assertEquals('_id', $importFields[0]['column_name']);
@@ -135,13 +140,25 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     $imported = Import::import($userJobID)->addWhere('_id', '=', $rowID)->setLimit(1)->execute()->first();
     $this->assertEquals('ERROR', $imported['_status']);
     $this->assertEquals('No matching Contact found', $imported['_status_message']);
+
+    // Update the table with a new table name & check the api still works.
+    // This relies on the change in table name being detected & caches being
+    // flushed.
+    CRM_Core_DAO::executeQuery('DROP TABLE abc');
+    $this->createUserJobTable('xyz');
+    $userJobParameters['metadata']['DataSource']['table_name'] = 'xyz';
+    UserJob::update(FALSE)->addWhere('id', '=', $userJobID)->setValues($userJobParameters)->execute();
+    // This is our new table, with nothing in it, but we if we api-call & don't get an exception so we are winning.
+    Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->addWhere('_id', '=', $rowID)->execute()->first();
   }
 
   /**
    * Create a table for our Import api.
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  private function createUserJobTable(): void {
-    CRM_Core_DAO::executeQuery("CREATE TABLE IF NOT EXISTS `abc` (
+  private function createUserJobTable($tableName = 'abc'): void {
+    CRM_Core_DAO::executeQuery("CREATE TABLE IF NOT EXISTS `" . $tableName . "` (
       `external_identifier` text DEFAULT NULL,
       `amount_given` text DEFAULT NULL,
       `receive_date` text DEFAULT NULL,

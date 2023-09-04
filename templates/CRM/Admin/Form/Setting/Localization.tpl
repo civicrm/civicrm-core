@@ -12,7 +12,6 @@
   {docURL page="i18n Administrator's Guide: Using CiviCRM in your own language" resource="wiki"}
 </div>
 <div class="crm-block crm-form-block crm-localization-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"} </div>
     <h3>{ts}Language and Currency{/ts}</h3>
         <table class="form-layout-compressed">
             <tr class="crm-localization-form-block-lcMessages">

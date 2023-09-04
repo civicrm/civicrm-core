@@ -58,22 +58,22 @@ class BasicCustomFieldTest extends CustomTestBase {
       'first_name' => 'Johann',
       'last_name' => 'Tester',
       'contact_type' => 'Individual',
-      'MyIndividualFields.FavColor' => 'Red',
+      'MyIndividualFields.FavColor' => '<Red>',
     ])['id'];
 
     $contact = Contact::get(FALSE)
       ->addSelect('first_name')
       ->addSelect('MyIndividualFields.FavColor')
       ->addWhere('id', '=', $contactId)
-      ->addWhere('MyIndividualFields.FavColor', '=', 'Red')
+      ->addWhere('MyIndividualFields.FavColor', '=', '<Red>')
       ->execute()
       ->first();
 
-    $this->assertEquals('Red', $contact['MyIndividualFields.FavColor']);
+    $this->assertEquals('<Red>', $contact['MyIndividualFields.FavColor']);
 
     Contact::update()
       ->addWhere('id', '=', $contactId)
-      ->addValue('MyIndividualFields.FavColor', 'Blue')
+      ->addValue('MyIndividualFields.FavColor', 'Blue&Pink')
       ->execute();
 
     $contact = Contact::get(FALSE)
@@ -82,7 +82,7 @@ class BasicCustomFieldTest extends CustomTestBase {
       ->execute()
       ->first();
 
-    $this->assertEquals('Blue', $contact['MyIndividualFields.FavColor']);
+    $this->assertEquals('Blue&Pink', $contact['MyIndividualFields.FavColor']);
 
     // Try setting to null
     Contact::update()
@@ -116,20 +116,20 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertArrayNotHasKey('MyIndividualFields.FavColor', $contact);
   }
 
-  public function testWithTwoFields() {
+  public function testWithTwoFields(): void {
     $optionGroupCount = OptionGroup::get(FALSE)->selectRowCount()->execute()->count();
 
-    // First custom set
+    // First custom set - use underscores in the names to ensure the API doesn't have a problem with them
     CustomGroup::create(FALSE)
       ->addValue('title', 'MyContactFields')
       ->addValue('extends', 'Contact')
       ->addChain('field1', CustomField::create()
-        ->addValue('label', 'FavColor')
+        ->addValue('label', '_Color')
         ->addValue('custom_group_id', '$id')
         ->addValue('html_type', 'Text')
         ->addValue('data_type', 'String'))
       ->addChain('field2', CustomField::create()
-        ->addValue('label', 'FavFood')
+        ->addValue('label', '_Food')
         ->addValue('custom_group_id', '$id')
         ->addValue('html_type', 'Text')
         ->addValue('data_type', 'String'))
@@ -137,15 +137,15 @@ class BasicCustomFieldTest extends CustomTestBase {
 
     // Second custom set
     CustomGroup::create(FALSE)
-      ->addValue('title', 'MyContactFields2')
+      ->addValue('title', 'MyContactFields_')
       ->addValue('extends', 'Contact')
       ->addChain('field1', CustomField::create()
-        ->addValue('label', 'FavColor')
+        ->addValue('label', '_Color')
         ->addValue('custom_group_id', '$id')
         ->addValue('html_type', 'Text')
         ->addValue('data_type', 'String'))
       ->addChain('field2', CustomField::create()
-        ->addValue('label', 'FavFood')
+        ->addValue('label', '_Food')
         ->addValue('custom_group_id', '$id')
         ->addValue('html_type', 'Text')
         ->addValue('is_required', TRUE)
@@ -157,81 +157,81 @@ class BasicCustomFieldTest extends CustomTestBase {
 
     // Check getFields output
     $fields = Contact::getFields(FALSE)->execute()->indexBy('name');
-    $this->assertFalse($fields['MyContactFields2.FavColor']['required']);
-    $this->assertTRUE($fields['MyContactFields2.FavColor']['nullable']);
+    $this->assertFalse($fields['MyContactFields_._Color']['required']);
+    $this->assertTRUE($fields['MyContactFields_._Color']['nullable']);
     // Custom fields are never actually *required* in the api, even if is_required = true
-    $this->assertFalse($fields['MyContactFields2.FavFood']['required']);
+    $this->assertFalse($fields['MyContactFields_._Food']['required']);
     // But the api will report is_required as not nullable
-    $this->assertFalse($fields['MyContactFields2.FavFood']['nullable']);
+    $this->assertFalse($fields['MyContactFields_._Food']['nullable']);
 
     $contactId1 = $this->createTestRecord('Contact', [
       'first_name' => 'Johann',
       'last_name' => 'Tester',
-      'MyContactFields.FavColor' => 'Red',
-      'MyContactFields.FavFood' => 'Cherry',
+      'MyContactFields._Color' => 'Red',
+      'MyContactFields._Food' => 'Cherry',
     ])['id'];
 
     $contactId2 = $this->createTestRecord('Contact', [
       'first_name' => 'MaryLou',
       'last_name' => 'Tester',
-      'MyContactFields.FavColor' => 'Purple',
-      'MyContactFields.FavFood' => 'Grapes',
+      'MyContactFields._Color' => 'Purple',
+      'MyContactFields._Food' => 'Grapes',
     ])['id'];
 
     $contact = Contact::get(FALSE)
       ->addSelect('first_name')
-      ->addSelect('MyContactFields.FavColor')
-      ->addSelect('MyContactFields.FavFood')
+      ->addSelect('MyContactFields._Color')
+      ->addSelect('MyContactFields._Food')
       ->addWhere('id', '=', $contactId1)
-      ->addWhere('MyContactFields.FavColor', '=', 'Red')
-      ->addWhere('MyContactFields.FavFood', '=', 'Cherry')
+      ->addWhere('MyContactFields._Color', '=', 'Red')
+      ->addWhere('MyContactFields._Food', '=', 'Cherry')
       ->execute()
       ->first();
-    $this->assertArrayHasKey('MyContactFields.FavColor', $contact);
-    $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
+    $this->assertArrayHasKey('MyContactFields._Color', $contact);
+    $this->assertEquals('Red', $contact['MyContactFields._Color']);
 
     // By default custom fields are not returned
     $contact = Contact::get(FALSE)
       ->addWhere('id', '=', $contactId1)
-      ->addWhere('MyContactFields.FavColor', '=', 'Red')
-      ->addWhere('MyContactFields.FavFood', '=', 'Cherry')
+      ->addWhere('MyContactFields._Color', '=', 'Red')
+      ->addWhere('MyContactFields._Food', '=', 'Cherry')
       ->execute()
       ->first();
-    $this->assertArrayNotHasKey('MyContactFields.FavColor', $contact);
+    $this->assertArrayNotHasKey('MyContactFields._Color', $contact);
 
     // Update 2nd set and ensure 1st hasn't changed
     Contact::update()
       ->addWhere('id', '=', $contactId1)
-      ->addValue('MyContactFields2.FavColor', 'Orange')
-      ->addValue('MyContactFields2.FavFood', 'Tangerine')
+      ->addValue('MyContactFields_._Color', 'Orange')
+      ->addValue('MyContactFields_._Food', 'Tangerine')
       ->execute();
     $contact = Contact::get(FALSE)
-      ->addSelect('MyContactFields.FavColor', 'MyContactFields2.FavColor', 'MyContactFields.FavFood', 'MyContactFields2.FavFood')
+      ->addSelect('MyContactFields._Color', 'MyContactFields_._Color', 'MyContactFields._Food', 'MyContactFields_._Food')
       ->addWhere('id', '=', $contactId1)
       ->execute()
       ->first();
-    $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
-    $this->assertEquals('Orange', $contact['MyContactFields2.FavColor']);
-    $this->assertEquals('Cherry', $contact['MyContactFields.FavFood']);
-    $this->assertEquals('Tangerine', $contact['MyContactFields2.FavFood']);
+    $this->assertEquals('Red', $contact['MyContactFields._Color']);
+    $this->assertEquals('Orange', $contact['MyContactFields_._Color']);
+    $this->assertEquals('Cherry', $contact['MyContactFields._Food']);
+    $this->assertEquals('Tangerine', $contact['MyContactFields_._Food']);
 
     // Update 1st set and ensure 2st hasn't changed
     Contact::update()
       ->addWhere('id', '=', $contactId1)
-      ->addValue('MyContactFields.FavColor', 'Blue')
+      ->addValue('MyContactFields._Color', 'Blue')
       ->execute();
     $contact = Contact::get(FALSE)
       ->addSelect('custom.*')
       ->addWhere('id', '=', $contactId1)
       ->execute()
       ->first();
-    $this->assertEquals('Blue', $contact['MyContactFields.FavColor']);
-    $this->assertEquals('Orange', $contact['MyContactFields2.FavColor']);
-    $this->assertEquals('Cherry', $contact['MyContactFields.FavFood']);
-    $this->assertEquals('Tangerine', $contact['MyContactFields2.FavFood']);
+    $this->assertEquals('Blue', $contact['MyContactFields._Color']);
+    $this->assertEquals('Orange', $contact['MyContactFields_._Color']);
+    $this->assertEquals('Cherry', $contact['MyContactFields._Food']);
+    $this->assertEquals('Tangerine', $contact['MyContactFields_._Food']);
 
     $search = Contact::get(FALSE)
-      ->addClause('OR', ['MyContactFields.FavColor', '=', 'Blue'], ['MyContactFields.FavFood', '=', 'Grapes'])
+      ->addClause('OR', ['MyContactFields._Color', '=', 'Blue'], ['MyContactFields._Food', '=', 'Grapes'])
       ->addSelect('id')
       ->addOrderBy('id')
       ->execute()
@@ -240,7 +240,7 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertEquals([$contactId1, $contactId2], array_keys((array) $search));
 
     $search = Contact::get(FALSE)
-      ->addClause('NOT', ['MyContactFields.FavColor', '=', 'Purple'], ['MyContactFields.FavFood', '=', 'Grapes'])
+      ->addClause('NOT', ['MyContactFields._Color', '=', 'Purple'], ['MyContactFields._Food', '=', 'Grapes'])
       ->addSelect('id')
       ->addOrderBy('id')
       ->execute()
@@ -249,7 +249,7 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertNotContains($contactId2, array_keys((array) $search));
 
     $search = Contact::get(FALSE)
-      ->addClause('NOT', ['MyContactFields.FavColor', '=', 'Purple'], ['MyContactFields.FavFood', '=', 'Grapes'])
+      ->addClause('NOT', ['MyContactFields._Color', '=', 'Purple'], ['MyContactFields._Food', '=', 'Grapes'])
       ->addSelect('id')
       ->addOrderBy('id')
       ->execute()
@@ -259,7 +259,7 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertNotContains($contactId2, array_keys((array) $search));
 
     $search = Contact::get(FALSE)
-      ->setWhere([['NOT', ['OR', [['MyContactFields.FavColor', '=', 'Blue'], ['MyContactFields.FavFood', '=', 'Grapes']]]]])
+      ->setWhere([['NOT', ['OR', [['MyContactFields._Color', '=', 'Blue'], ['MyContactFields._Food', '=', 'Grapes']]]]])
       ->addSelect('id')
       ->addOrderBy('id')
       ->execute()
@@ -269,7 +269,7 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertNotContains($contactId2, array_keys((array) $search));
   }
 
-  public function testRelationshipCacheCustomFields() {
+  public function testRelationshipCacheCustomFields(): void {
     $cgName = uniqid('RelFields');
 
     $customGroup = CustomGroup::create(FALSE)
@@ -340,7 +340,7 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertEquals('Buddy', $result["relative.$cgName.PetName"]);
   }
 
-  public function testMultipleJoinsToCustomTable() {
+  public function testMultipleJoinsToCustomTable(): void {
     $cgName = uniqid('My');
 
     CustomGroup::create(FALSE)
@@ -419,7 +419,37 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertEquals($optionGroupCount, OptionGroup::get(FALSE)->selectRowCount()->execute()->count());
   }
 
-  public function testUpdateWeights() {
+  /**
+   * Pseudoconstant lookups that are passed an empty string return NULL, not an empty string.
+   * @throws \CRM_Core_Exception
+   */
+  public function testPseudoConstantCreate(): void {
+    $optionGroupId = $this->createTestRecord('OptionGroup')['id'];
+    $this->createTestRecord('OptionValue', ['option_group_id' => $optionGroupId]);
+
+    $customGroup = CustomGroup::create(FALSE)
+      ->addValue('title', 'MyIndividualFields')
+      ->addValue('extends', 'Individual')
+      ->execute()
+      ->first();
+
+    CustomField::create(FALSE)
+      ->addValue('label', 'FavMovie')
+      ->addValue('custom_group_id', $customGroup['id'])
+      ->addValue('html_type', 'Select')
+      ->addValue('data_type', 'String')
+      ->addValue('option_group_id', $optionGroupId)
+      ->execute();
+
+    Contact::create(FALSE)
+      ->addValue('first_name', 'Johann')
+      ->addValue('last_name', 'Tester')
+      ->addValue('contact_type', 'Individual')
+      ->addValue('MyIndividualFields.FavMovie:label', '')
+      ->execute();
+  }
+
+  public function testUpdateWeights(): void {
     $getValues = function($groupName) {
       return CustomField::get(FALSE)
         ->addWhere('custom_group_id.name', '=', $groupName)
@@ -530,7 +560,7 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertEquals('2025-06-11 12:15:30', $contact["$cgName.DateTime"]);
   }
 
-  public function testExtendsIdFilter() {
+  public function testExtendsIdFilter(): void {
     $fieldUnfiltered = \Civi\Api4\CustomGroup::getFields(FALSE)
       ->setLoadOptions(['id', 'name', 'grouping'])
       ->addWhere('name', '=', 'extends_entity_column_id')
@@ -557,7 +587,7 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertFalse($fieldFilteredByContact['options']);
   }
 
-  public function testExtendsMetadata() {
+  public function testExtendsMetadata(): void {
     $field = \Civi\Api4\CustomGroup::getFields(FALSE)
       ->setLoadOptions(['id', 'name', 'grouping'])
       ->addWhere('name', '=', 'extends')
@@ -589,7 +619,7 @@ class BasicCustomFieldTest extends CustomTestBase {
         ->addValue('html_type', 'Text')
       )
       ->execute()->single();
-    $this->assertContains($financialType['id'], $contributionGroup['extends_entity_column_value']);
+    $this->assertContainsEquals($financialType['id'], $contributionGroup['extends_entity_column_value']);
 
     $getFieldsWithTestType = Contribution::getFields(FALSE)
       ->addValue('financial_type_id:name', 'Test_Type')
@@ -604,7 +634,7 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertArrayNotHasKey('Contribution_Fields.Dummy', $getFieldsWithoutTestType);
   }
 
-  public function testExtendsParticipantMetadata() {
+  public function testExtendsParticipantMetadata(): void {
     $event1 = $this->createTestRecord('Event', [
       'event_type_id:name' => 'Fundraiser',
       'title' => 'Test Fun Event',
@@ -648,6 +678,60 @@ class BasicCustomFieldTest extends CustomTestBase {
     $roleOptions = array_column($field['options'], 'name');
     $this->assertContains('Volunteer', $roleOptions);
     $this->assertContains('Attendee', $roleOptions);
+  }
+
+  /**
+   * Ensure rich-text html fields store html correctly
+   */
+  public function testRichTextHTML(): void {
+    $cgName = uniqid('My');
+
+    $custom = CustomGroup::create(FALSE)
+      ->addValue('title', $cgName)
+      ->addValue('extends', 'Contact')
+      ->addChain('field1', CustomField::create()
+        ->addValue('label', 'RichText')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'RichTextEditor')
+        ->addValue('data_type', 'Memo'),
+      0)
+      ->addChain('field2', CustomField::create()
+        ->addValue('label', 'TextArea')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'TextArea')
+        ->addValue('data_type', 'Memo'),
+      0)
+      ->execute()->first();
+
+    $cid = $this->createTestRecord('Contact', [
+      'first_name' => 'One',
+      'last_name' => 'Tester',
+      "$cgName.RichText" => '<em>Hello</em><br />APIv4 & RichText!',
+      "$cgName.TextArea" => '<em>Hello</em><br />APIv4 & TextArea!',
+    ])['id'];
+    $contact = Contact::get(FALSE)
+      ->addSelect('custom.*')
+      ->addWhere('id', '=', $cid)
+      ->execute()->first();
+    $this->assertEquals('<em>Hello</em><br />APIv4 & RichText!', $contact["$cgName.RichText"]);
+    $this->assertEquals('<em>Hello</em><br />APIv4 & TextArea!', $contact["$cgName.TextArea"]);
+
+    // The html should have been stored unescaped
+    $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$custom['field1']['column_name']} FROM {$custom['table_name']}");
+    $this->assertEquals('<em>Hello</em><br />APIv4 & RichText!', $dbVal);
+    $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$custom['field2']['column_name']} FROM {$custom['table_name']}");
+    $this->assertEquals('<em>Hello</em><br />APIv4 & TextArea!', $dbVal);
+
+    // APIv3 should work the same way
+    civicrm_api3('Contact', 'create', [
+      'id' => $cid,
+      "custom_{$custom['field1']['id']}" => '<em>Hello</em><br />APIv3 & RichText!',
+      "custom_{$custom['field2']['id']}" => '<em>Hello</em><br />APIv3 & TextArea!',
+    ]);
+    $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$custom['field1']['column_name']} FROM {$custom['table_name']}");
+    $this->assertEquals('<em>Hello</em><br />APIv3 & RichText!', $dbVal);
+    $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$custom['field2']['column_name']} FROM {$custom['table_name']}");
+    $this->assertEquals('<em>Hello</em><br />APIv3 & TextArea!', $dbVal);
   }
 
 }

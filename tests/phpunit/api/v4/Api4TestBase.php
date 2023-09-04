@@ -63,7 +63,7 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
   /**
    * Quick clean by emptying tables created for the test.
    *
-   * @param array $params
+   * @param array{tablesToTruncate: array} $params
    */
   public function cleanup(array $params): void {
     $params += [
@@ -100,6 +100,13 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
     $session = \CRM_Core_Session::singleton();
     $session->set('userID', $contactID);
     return $contactID;
+  }
+
+  public function userLogout() {
+    \CRM_Core_Session::singleton()->reset();
+    UFMatch::delete(FALSE)
+      ->addWhere('uf_name', '=', 'superman')
+      ->execute();
   }
 
 }

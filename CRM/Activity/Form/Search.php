@@ -53,13 +53,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_prefix = 'activity_';
 
   /**
-   * The saved search ID retrieved from the GET vars.
-   *
-   * @var int
-   */
-  protected $_ssID;
-
-  /**
    * @return string
    */
   public function getDefaultEntity(): string {
@@ -176,11 +169,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     if (isset($this->_ssID) && empty($_POST)) {
       // if we are editing / running a saved search and the form has not been posted
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
-    }
-
-    // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['activity_test']) && $this->_force) {
-      $this->_formValues['activity_test'] = 0;
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);

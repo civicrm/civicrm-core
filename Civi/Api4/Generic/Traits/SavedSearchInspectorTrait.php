@@ -46,13 +46,14 @@ trait SavedSearchInspectorTrait {
 
   /**
    * If SavedSearch is supplied as a string, this will load it as an array
+   * @param int|null $id
+   * @throws UnauthorizedException
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function loadSavedSearch() {
-    if (is_string($this->savedSearch)) {
+  protected function loadSavedSearch(int $id = NULL) {
+    if ($id || is_string($this->savedSearch)) {
       $this->savedSearch = SavedSearch::get(FALSE)
-        ->addWhere('name', '=', $this->savedSearch)
+        ->addWhere($id ? 'id' : 'name', '=', $id ?: $this->savedSearch)
         ->execute()->single();
     }
     if (is_array($this->savedSearch)) {
@@ -64,6 +65,8 @@ trait SavedSearchInspectorTrait {
       ];
       $this->savedSearch['api_params'] += ['version' => 4, 'select' => [], 'where' => []];
     }
+    // Reset internal cached metadata
+    $this->_selectQuery = $this->_selectClause = $this->_searchEntityFields = NULL;
     $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
   }
 
@@ -84,6 +87,11 @@ trait SavedSearchInspectorTrait {
       $this->display = \Civi\Api4\SearchDisplay::getDefault(FALSE)
         ->addSelect('*', 'type:name')
         ->setSavedSearch($this->savedSearch)
+        ->setContext([
+          'filters' => $this->filters ?? NULL,
+          'formName' => $this->formName ?? NULL,
+          'fieldName' => $this->fieldName ?? NULL,
+        ])
         // Set by AutocompleteAction
         ->setType($this->_displayType ?? 'table')
         ->execute()->first();
@@ -330,6 +338,9 @@ trait SavedSearchInspectorTrait {
    * @return array
    */
   protected function getTokens(string $str): array {
+    if (strpos($str, '[') === FALSE) {
+      return [];
+    }
     $tokens = [];
     preg_match_all('/\\[([^]]+)\\]/', $str, $tokens);
     return array_unique($tokens[1]);

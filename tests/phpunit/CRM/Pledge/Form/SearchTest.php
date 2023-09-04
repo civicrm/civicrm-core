@@ -8,8 +8,7 @@ class CRM_Pledge_Form_SearchTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    $this->individualID = $this->individualCreate();
-    $this->pledgeCreate(['contact_id' => $this->individualID]);
+    $this->pledgeCreate(['contact_id' => $this->individualCreate()]);
   }
 
   public function tearDown(): void {
@@ -25,7 +24,7 @@ class CRM_Pledge_Form_SearchTest extends CiviUnitTestCase {
   /**
    *  Test submitted the search form.
    */
-  public function testSearch() {
+  public function testSearch(): void {
     $form = new CRM_Pledge_Form_Search();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Pledge_Controller_Search();

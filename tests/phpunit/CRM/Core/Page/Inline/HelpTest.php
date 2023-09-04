@@ -12,6 +12,7 @@ class CRM_Core_Page_Inline_HelpTest extends CiviUnitTestCase {
   public function fileTestCases(): array {
     $cases = [];
     $cases['relative paths are allowed'] = ['CRM/Admin/Form/Setting/Url', TRUE];
+    $cases['sometimes civi does this on windows'] = ['CRM\\Admin\\Form\\Setting\\Url', TRUE];
     $cases['absolute path are not allowed'] = [\Civi::paths()->getPath('[civicrm.root]/tests/phpunit/CiviTest/test'), FALSE];
     $cases['valid but uses disallowed ..'] = ['CRM/Admin/Form/../Form/Setting/Url', FALSE];
     $cases[] = ['.dot/not/allowed', FALSE];

@@ -175,7 +175,7 @@ SELECT v.id
   public static function updateCiviACL(&$params, $op) {
     $dao = new CRM_ACL_DAO_ACL();
 
-    $dao->object_table = 'civicrm_saved_search';
+    $dao->object_table = 'civicrm_group';
     $dao->object_id = $params['civicrm_group_id'];
 
     if ($op == 'delete') {

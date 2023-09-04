@@ -176,7 +176,7 @@ class CRM_Campaign_BAO_Query {
 
       case 'campaign_search_voter_for':
         if (in_array($value, ['release', 'interview'])) {
-          $query->_where[$grouping][] = '(civicrm_activity.is_deleted = 0 OR civicrm_activity.is_deleted IS NULL)';
+          $query->_where[$grouping][] = 'civicrm_activity.is_deleted = 0';
         }
         return;
 

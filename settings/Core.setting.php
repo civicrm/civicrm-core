@@ -99,7 +99,7 @@ return [
     'pseudoconstant' => [
       'optionGroupName' => 'address_options',
     ],
-    'default' => '12345689101112',
+    'default' => '1234568910',
     'add' => '4.1',
     'title' => ts('Address Fields'),
     'is_domain' => 1,
@@ -321,6 +321,7 @@ return [
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'validate_callback' => 'CRM_Admin_Form_Setting_Search::enableOptionOne',
+    'settings_pages' => ['search' => ['weight' => 80]],
   ],
   'contact_reference_options' => [
     'group_name' => 'CiviCRM Preferences',
@@ -340,6 +341,7 @@ return [
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'validate_callback' => 'CRM_Admin_Form_Setting_Search::enableOptionOne',
+    'settings_pages' => ['search' => ['weight' => 90]],
   ],
   'contact_smart_group_display' => [
     'group_name' => 'CiviCRM Preferences',
@@ -792,14 +794,15 @@ return [
     'default' => NULL,
     'add' => '4.4',
     'title' => ts('Enable Components'),
-    'is_domain' => '1',
+    'is_domain' => 0,
     'is_contact' => 0,
     'description' => NULL,
     'help_text' => NULL,
     'on_change' => [
       'CRM_Case_Info::onToggleComponents',
-      'CRM_Core_Component::flushEnabledComponents',
-      'call://resources/resetCacheCode',
+    ],
+    'post_change' => [
+      'CRM_Core_Component::onToggleComponents',
     ],
     'pseudoconstant' => [
       'callback' => 'CRM_Core_SelectValues::getComponentSelectValues',
@@ -839,13 +842,13 @@ return [
     'is_contact' => 0,
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
-    'help_text' => ts('(EXPERIMENTAL) If the MySQL user does not have permission to administer triggers, then you must create the triggers outside CiviCRM. No support is provided for this configuration.'),
+    'help_text' => ts('If the MySQL user does not have permission to administer triggers, then you must create the triggers outside CiviCRM. No support is provided for this configuration.'),
     'name' => 'logging_no_trigger_permission',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'html_type' => '',
     'default' => 0,
-    'title' => ts('(EXPERIMENTAL) MySQL user does not have trigger permissions'),
+    'title' => ts('MySQL user does not have trigger permissions'),
     'description' => ts('Set this when you intend to manage trigger creation outside of CiviCRM'),
   ],
   'logging' => [
@@ -1005,6 +1008,24 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Utils_Recent::getProviders',
     ],
+  ],
+  'import_batch_size' => [
+    'name' => 'import_batch_size',
+    'type' => 'Integer',
+    'default' => 50,
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'html_attributes' => [
+      'size' => 2,
+      'maxlength' => 3,
+    ],
+    'add' => '5.62',
+    'title' => ts('Import Batch Size'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Number of records to process at once during import.'),
+    'help_text' => ts('If your imports time out, reduce this number. You can increase it for better import performance on servers with longer timeouts.'),
+    'settings_pages' => 'misc',
   ],
   'dedupe_default_limit' => [
     'group_name' => 'CiviCRM Preferences',

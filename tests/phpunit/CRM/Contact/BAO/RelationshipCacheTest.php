@@ -18,15 +18,15 @@
 class CRM_Contact_BAO_RelationshipCacheTest extends CiviUnitTestCase {
 
   protected function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
 
   /**
    * Whenever one `Relationship` is created, there should be two corresponding
    * `RelationshipCache` records.
    */
-  public function testRelationshipCache() {
+  public function testRelationshipCache(): void {
     // add a new type
     $relationship_type_id_1 = $this->relationshipTypeCreate([
       'name_a_b' => 'Praegustator is',

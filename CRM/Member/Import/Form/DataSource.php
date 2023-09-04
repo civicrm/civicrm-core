@@ -20,10 +20,6 @@
  */
 class CRM_Member_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/member/import';
-
-  const IMPORT_ENTITY = 'Membership';
-
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
    *

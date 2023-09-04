@@ -5,6 +5,7 @@ use Civi\Core\Compiler\AutoServiceScannerPass;
 use Civi\Core\Compiler\EventScannerPass;
 use Civi\Core\Compiler\SpecProviderPass;
 use Civi\Core\Event\EventScanner;
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Lock\LockManager;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -247,11 +248,23 @@ class Container {
     $container->setDefinition('crypto.jwt', new Definition('Civi\Crypto\CryptoJwt', []))
       ->setPublic(TRUE);
 
+    $bootServiceTypes = [
+      'cache.settings' => \CRM_Utils_Cache_Interface::class,
+      'dispatcher.boot' => CiviEventDispatcher::class,
+      'lockManager' => LockManager::class,
+      'paths' => Paths::class,
+      'runtime' => \CRM_Core_Config_Runtime::class,
+      'settings_manager' => SettingsManager::class,
+      'userPermissionClass' => \CRM_Core_Permission_Base::class,
+      'userSystem' => \CRM_Utils_System_Base::class,
+    ];
     if (empty(\Civi::$statics[__CLASS__]['boot'])) {
       throw new \RuntimeException('Cannot initialize container. Boot services are undefined.');
     }
     foreach (\Civi::$statics[__CLASS__]['boot'] as $bootService => $def) {
-      $container->setDefinition($bootService, new Definition())->setSynthetic(TRUE)->setPublic(TRUE);
+      $container->setDefinition($bootService, new Definition($bootServiceTypes[$bootService] ?? NULL))
+        ->setSynthetic(TRUE)
+        ->setPublic(TRUE);
     }
 
     // Expose legacy singletons as services in the container.
@@ -345,9 +358,9 @@ class Container {
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
-    foreach (['Activity', 'Contact', 'Contribute', 'Event', 'Mailing', 'Member', 'Case'] as $comp) {
-      $container->setDefinition('crm_' . strtolower($comp) . '_tokens', new Definition(
-        "CRM_{$comp}_Tokens",
+    foreach (['Activity', 'Contact', 'Contribute', 'Event', 'Mailing', 'Member', 'Case', 'Pledge'] as $component) {
+      $container->setDefinition('crm_' . strtolower($component) . '_tokens', new Definition(
+        "CRM_{$component}_Tokens",
         []
       ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     }
@@ -361,6 +374,14 @@ class Container {
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     $container->setDefinition('crm_contribution_recur_tokens', new Definition(
       'CRM_Contribute_RecurTokens',
+      []
+    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    $container->setDefinition('crm_contribution_recur_tokens', new Definition(
+      'CRM_Contribute_RecurTokens',
+      []
+    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    $container->setDefinition('crm_survey_tokens', new Definition(
+      'CRM_Campaign_SurveyTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     $container->setDefinition('crm_group_tokens', new Definition(
@@ -391,6 +412,11 @@ class Container {
       'registerApiProvider',
       [new Reference('action_object_provider')]
     );
+
+    $container->setDefinition('esm.loader', new Definition(
+      'object',
+      [new Reference('service_container')]
+    ))->setFactory([new Reference(self::SELF), 'createEsmLoader'])->setPublic(TRUE);
 
     \CRM_Utils_Hook::container($container);
 
@@ -426,7 +452,6 @@ class Container {
 
     $dispatcher->addListener('civi.api4.validate', $aliasMethodEvent('civi.api4.validate', 'getEntityName'), 100);
     $dispatcher->addListener('civi.api4.authorizeRecord', $aliasMethodEvent('civi.api4.authorizeRecord', 'getEntityName'), 100);
-    $dispatcher->addListener('civi.api4.entityTypes', ['\Civi\Api4\Provider\CustomEntityProvider', 'addCustomEntities'], 100);
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
@@ -464,12 +489,6 @@ class Container {
       'CRM_Core_LegacyErrorHandler',
       'handleException',
     ], -200);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Activity_ActionMapping', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Contact_ActionMapping', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Contribute_ActionMapping_ByPage', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Contribute_ActionMapping_ByType', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Event_ActionMapping', 'onRegisterActionMappings']);
-    $dispatcher->addListener('civi.actionSchedule.getMappings', ['CRM_Member_ActionMapping', 'onRegisterActionMappings']);
 
     return $dispatcher;
   }
@@ -572,6 +591,27 @@ class Container {
         : $container->get('prevnext.driver.sql');
     }
     return $container->get('prevnext.driver.' . $setting);
+  }
+
+  /**
+   * Determine which component will load ECMAScript Modules.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @return \object
+   */
+  public static function createEsmLoader($container): object {
+    $name = \Civi::settings()->get('esm_loader');
+    if ($name === 'auto') {
+      $name = 'shim-fast';
+      \Civi::dispatcher()->dispatch('civi.esm.loader.default', GenericHookEvent::create(['default' => &$name]));
+    }
+    if ($container->has("esm.loader.$name")) {
+      return $container->get("esm.loader.$name");
+    }
+    else {
+      \Civi::log()->warning('Invalid ESM loader: {name}', ['name' => $name]);
+      return $container->get("esm.loader.browser");
+    }
   }
 
   /**

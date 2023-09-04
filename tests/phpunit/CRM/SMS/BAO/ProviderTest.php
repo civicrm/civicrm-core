@@ -45,7 +45,7 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
   /**
    * CRM-19961 Check that when saving and updating a SMS provider with domain as NULL that it stays null
    */
-  public function testCreateAndUpdateProvider() {
+  public function testCreateAndUpdateProvider(): void {
     $values = [
       'domain_id' => NULL,
       'title' => 'test SMS provider',
@@ -72,7 +72,7 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
    * @see https://issues.civicrm.org/jira/browse/CRM-20989
    * Add unit test to ensure that filtering by domain works in get Active Providers
    */
-  public function testActiveProviderCount() {
+  public function testActiveProviderCount(): void {
     $values = [
       'domain_id' => NULL,
       'title' => 'test SMS provider',
@@ -97,7 +97,7 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
   /**
    * CRM-19961 Check that when a domain is not passed when saving it defaults to current domain when create
    */
-  public function testCreateWithoutDomain() {
+  public function testCreateWithoutDomain(): void {
     $values = [
       'title' => 'test SMS provider',
       'username' => 'test',

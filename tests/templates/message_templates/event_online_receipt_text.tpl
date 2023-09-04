@@ -34,7 +34,7 @@ pay_later_receipt:::{$pay_later_receipt}
 {/if}
 event.event_title:::{$event.event_title}
 event.event_start_date:::{$event.event_start_date|crmDate:"%A"}
-event.event_end_date:::{$event.event_end_date|crmDate:"%Y%m%d"}
+event.event_end_date:::{event.end_date|crmDate:"%Y%m%d"}
 {if isset($event.is_monetary)}
 event.is_monetary:::{$event.is_monetary}
 {/if}
@@ -56,7 +56,7 @@ location.phone.1.phone_type_display:::{$location.phone.1.phone_type_display}
 location.phone.1.phone_ext:::{$location.phone.1.phone_ext}
 location.email.1.email:::{$location.email.1.email}
 {/if}
-{if !empty($event.is_public)}
+{if {event.is_public|boolean}}
 event.is_public:::{$event.is_public}
 {/if}
 {if !empty($payer.name)}

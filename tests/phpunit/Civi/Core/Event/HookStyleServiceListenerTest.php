@@ -17,7 +17,7 @@ class HookStyleServiceListenerTest extends \CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testDispatch() {
+  public function testDispatch(): void {
     $changeMe = $rand = rand(0, 16384);
 
     $this->useCustomContainer(function (ContainerBuilder $container) use ($rand) {

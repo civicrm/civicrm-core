@@ -9,13 +9,13 @@ use Civi\Api4\OptionValue;
  */
 class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
+  use Civi\Test\ACLPermissionTrait;
+
   private $allowedContactsACL = [];
 
   private $loggedInUserId = NULL;
 
   private $someContacts = [];
-
-  protected $allowedContacts = [];
 
   /**
    * Set up for test.
@@ -56,7 +56,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -178,9 +178,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test Assigning a target contact but then the logged in user cannot see the contact
+   * Test Assigning a target contact but then the logged in user cannot see the
+   * contact
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testTargetContactNotavaliable() {
+  public function testTargetContactNotAvaliable(): void {
     $contactId = $this->individualCreate();
     $params = [
       'first_name' => 'liz',
@@ -210,9 +213,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activityGetParams = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $activityGetParams += ['contact_id' => $contactId];
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($activityGetParams);
-    // Aseert that we have sensible data to display in the contact tab
+    // Assert that we have sensible data to display in the contact tab
     $this->assertEquals('Anderson, Anthony', $activities['data'][0]['source_contact_name']);
-    // Note that becasue there is a target contact but it is not accessable the output is an empty string not n/a
+    // Note that because there is a target contact but it is not accessible the output is an empty string not n/a
     $this->assertEquals('', $activities['data'][0]['target_contact_name']);
     // verify that doing the underlying query shows we get a target contact_id
     $this->assertEquals(1, CRM_Activity_BAO_Activity::getActivities(['contact_id' => $contactId])[1]['target_contact_count']);
@@ -223,7 +226,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Check for errors when viewing a contact's activity tab when there
    * is an activity that doesn't have a target (With Contact).
    */
-  public function testActivitySelectorNoTargets() {
+  public function testActivitySelectorNoTargets(): void {
     $contact_id = $this->individualCreate([], 0, TRUE);
     $activity = $this->callAPISuccess('activity', 'create', [
       'source_contact_id' => $contact_id,
@@ -255,7 +258,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testDeleteActivity() {
+  public function testDeleteActivity(): void {
     $contactId = $this->individualCreate();
     $params = [
       'first_name' => 'liz',
@@ -319,7 +322,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test case for deleteActivityContact() method.
    */
-  public function testDeleteActivityTarget() {
+  public function testDeleteActivityTarget(): void {
     $contactId = $this->individualCreate();
     $params = [
       'first_name' => 'liz',
@@ -405,12 +408,16 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method for getting count.
    *
    */
-  public function testGetActivitiesCountForAdminDashboard() {
+  public function testGetActivitiesCountForAdminDashboard(): void {
     // Reset to default
     $this->setShowCaseActivitiesInCore(FALSE);
     $this->setUpForActivityDashboardTests();
     $this->addCaseWithActivity();
-    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'access all cases and activities',
+    ];
 
     $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($this->_params);
     $this->assertEquals(8, $activityCount);
@@ -427,7 +434,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method for getting count
    *
    */
-  public function testGetActivitiesCountforNonAdminDashboard() {
+  public function testGetActivitiesCountforNonAdminDashboard(): void {
     // Reset to default
     $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
@@ -463,7 +470,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method for getting count
    *
    */
-  public function testGetActivitiesCountforContactSummary() {
+  public function testGetActivitiesCountforContactSummary(): void {
     // Reset to default
     $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
@@ -495,7 +502,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * CRM-18706 - Test Include/Exclude Activity Filters
    */
-  public function testActivityFilters() {
+  public function testActivityFilters(): void {
     $this->createTestActivities();
     Civi::settings()->set('preserve_activity_tab_filter', 1);
     $this->createLoggedInUser();
@@ -543,7 +550,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method for getting count
    */
-  public function testGetActivitiesCountforContactSummaryWithNoActivities() {
+  public function testGetActivitiesCountforContactSummaryWithNoActivities(): void {
     $this->createTestActivities();
 
     $params = [
@@ -565,7 +572,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesForAdminDashboard() {
+  public function testGetActivitiesForAdminDashboard(): void {
     $this->setShowCaseActivitiesInCore(FALSE);
     $this->setUpForActivityDashboardTests();
     $this->addCaseWithActivity();
@@ -600,7 +607,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesForAdminDashboardNoViewContacts() {
+  public function testGetActivitiesForAdminDashboardNoViewContacts(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $this->setUpForActivityDashboardTests();
     foreach ([CRM_Activity_BAO_Activity::getActivities($this->_params)] as $activities) {
@@ -612,7 +619,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesForAdminDashboardAclLimitedViewContacts() {
+  public function testGetActivitiesForAdminDashboardAclLimitedViewContacts(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $this->allowedContacts = [1, 3, 4, 5];
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereMultipleContacts']);
@@ -623,7 +630,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesforNonAdminDashboard() {
+  public function testGetActivitiesforNonAdminDashboard(): void {
     $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
     $this->addCaseWithActivity();
@@ -678,7 +685,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test target contact count.
    */
-  public function testTargetCountforContactSummary() {
+  public function testTargetCountforContactSummary(): void {
     $targetCount = 5;
     $contactId = $this->individualCreate();
     $targetContactIDs = [];
@@ -707,7 +714,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesforContactSummaryWithSortOptions() {
+  public function testGetActivitiesforContactSummaryWithSortOptions(): void {
     $this->createTestActivities();
     $params = [
       'contact_id' => 9,
@@ -731,7 +738,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesForContactSummary() {
+  public function testGetActivitiesForContactSummary(): void {
     // Reset to default
     $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
@@ -800,7 +807,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesforContactSummaryWithActivities() {
+  public function testGetActivitiesforContactSummaryWithActivities(): void {
     // Reset to default
     $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
@@ -1138,7 +1145,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testEmailAddressOfActivityCopy() {
+  public function testEmailAddressOfActivityCopy(): void {
     // Case 1: assert the 'From' Email Address of source Actvity Contact ID
     // create activity with source contact ID which has email address
     $assigneeContactId = $this->individualCreate();
@@ -1229,7 +1236,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'sort_name' => '',
       'display_name' => '',
       'do_not_email' => '',
-      'preferred_mail_format' => '',
       'is_deceased' => '',
       'email' => '',
       'on_hold' => '',
@@ -1567,7 +1573,7 @@ $text
     }
   }
 
-  public function testSendEmailWithCaseId() {
+  public function testSendEmailWithCaseId(): void {
     $caseTest = new CiviCaseTestCase();
     $caseTest->setUp();
     // Create a contact and contactDetails array.
@@ -1630,7 +1636,7 @@ $text
       'campaign_id' => $campaign_id,
       'from_email_address' => 'from@example.com',
       'to' => $contactId1 . '::email@example.com,' . $contactId2 . '::email2@example.com',
-    ], [], []);
+    ]);
     $form->set('cid', $contactId1 . ',' . $contactId2);
     $form->buildForm();
     $form->postProcess();
@@ -1658,8 +1664,6 @@ $textValue
   /**
    * Same as testSendEmailWillReplaceTokensUniquelyForEachContact but with
    * 3 recipients and an attachment.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSendEmailWillReplaceTokensUniquelyForEachContact3(): void {
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
@@ -1698,7 +1702,7 @@ $textValue
         'name' => $fileUri,
       ],
       'attachDesc_1' => '',
-    ], [], []);
+    ]);
     $form->set('cid', $contactId1 . ',' . $contactId2 . ',' . $contactId3);
     $form->buildForm();
     $form->postProcess();
@@ -1728,7 +1732,7 @@ $textValue
   /**
    * Checks that attachments are not duplicated for activities.
    */
-  public function testSendEmailDoesNotDuplicateAttachmentFileIdsForActivitiesCreated() {
+  public function testSendEmailDoesNotDuplicateAttachmentFileIDsForActivitiesCreated(): void {
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
     $contactId2 = $this->individualCreate(['last_name' => 'Pink']);
 
@@ -1748,10 +1752,9 @@ $textValue
     $subject = __FUNCTION__ . ' subject';
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
-    $userID = $loggedInUser;
 
     $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
-    $fileName = "test_email_create.txt";
+    $fileName = 'test_email_create.txt';
     $fileUri = "{$filepath}/{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', $fileName);
@@ -1771,7 +1774,7 @@ $textValue
         'name' => $fileUri,
       ],
       'attachDesc_1' => '',
-    ], [], []);
+    ]);
     $form->set('cid', $contactId1 . ',' . $contactId2);
     $form->buildForm();
     $form->postProcess();

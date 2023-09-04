@@ -11,9 +11,10 @@
       parent: '^crmSearchAdminDisplay'
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayList.html',
-    controller: function($scope, searchMeta) {
+    controller: function($scope, searchMeta, crmUiHelp) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+      $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Display'});
 
       this.getColTypes = function() {
         return ctrl.parent.colTypes;

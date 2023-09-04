@@ -7,37 +7,14 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $action eq 8}
-  <h3>{ts}Delete Report Template{/ts}</h3>
-{elseif $action eq 2}
-  <h3>{ts}Edit Report Template{/ts}</h3>
-{else}
-  <h3>{ts}New Report Template{/ts}</h3>
-{/if}
 <div class="crm-block crm-form-block crm-report-register-form-block">
   {if $action eq 8}
-  <table class="form-layout">
-    <tr class="buttons">
-      <td><div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-      </td>
-      <td></td>
-    </tr>
-    <tr>
-      <td colspan=2>
-        <div class="messages status no-popup">
-          {icon icon="fa-info-circle"}{/icon}
-          {ts}WARNING: Deleting this option will result in the loss of all Report related records which use the option. This may mean the loss of a substantial amount of data, and the action cannot be undone. Do you want to continue?{/ts}
-        </div>
-      </td>
-    </tr>
-    {else}
-
+    <div class="messages status no-popup">
+      {icon icon="fa-info-circle"}{/icon}
+      {ts}WARNING: Deleting this option will result in the loss of all Report related records which use the option. This may mean the loss of a substantial amount of data, and the action cannot be undone. Do you want to continue?{/ts}
+    </div>
+  {else}
     <table class="form-layout">
-      <tr class="buttons crm-report-register-form-block-buttons">
-        <td><div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-        </td>
-        <td></td>
-      </tr>
       <tr class="crm-report-register-form-block-label">
         <td class="label">{$form.label.label}</td>
         <td class="view-value">{$form.label.html} <br /><span class="description">{ts}Report title appear in the display screen.{/ts}</span>
@@ -71,11 +48,7 @@
         <td class="label">{$form.is_active.label}</td>
         <td class="view-value">{$form.is_active.html}</td>
       </tr>
-      {/if}
-      <tr class="buttons crm-report-register-form-block-buttons">
-        <td><div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-        </td>
-        <td></td>
-      </tr>
     </table>
+  {/if}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>

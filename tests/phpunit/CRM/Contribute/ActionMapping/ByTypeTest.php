@@ -180,8 +180,10 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Create a contribution record for Alice with type "Member Dues".
    */
   public function addAliceDues(): void {
-    $this->enableCiviCampaign();
-    $campaignID = $this->campaignCreate();
+    $campaignID = $this->campaignCreate([
+      'title' => 'Campaign',
+      'name' => 'big_campaign',
+    ]);
     $this->ids['Contribution']['alice'] = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['alice']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
@@ -227,7 +229,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Schedule message delivery for contributions of type "Member Dues".
    */
   public function scheduleForDues() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+    $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded([1]);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded([1]);
@@ -237,7 +239,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Schedule message delivery for contributions of type "Donation".
    */
   public function scheduleForDonation() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+    $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded([2]);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
@@ -247,7 +249,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Schedule message delivery for any contribution, regardless of type.
    */
   public function scheduleForAny() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+    $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded(NULL);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
@@ -257,7 +259,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Schedule message delivery to the 'soft credit' assignee.
    */
   public function scheduleForSoftCreditor() {
-    $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
+    $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded(NULL);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
@@ -395,7 +397,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
         'financial_type_id:label' => 'Financial Type',
         'contribution_page_id:label' => 'Contribution Page',
         'payment_instrument_id:label' => 'Payment Method',
-        'receive_date' => 'Date Received',
+        'receive_date' => 'Contribution Date',
         'non_deductible_amount' => 'Non-deductible Amount',
         'total_amount' => 'Total Amount',
         'fee_amount' => 'Fee Amount',
@@ -424,6 +426,18 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
         'paid_amount' => 'Amount Paid',
         'balance_amount' => 'Balance',
         'tax_exclusive_amount' => 'Tax Exclusive Amount',
+        'contribution_recur_id.id' => 'Recurring Contribution ID',
+        'contribution_recur_id.contact_id' => 'Contact ID',
+        'contribution_recur_id.amount' => 'Amount',
+        'contribution_recur_id.currency' => 'Currency',
+        'contribution_recur_id.frequency_unit' => 'Frequency Unit',
+        'contribution_recur_id.frequency_interval' => 'Interval (number of units)',
+        'contribution_recur_id.start_date' => 'Start Date',
+        'contribution_recur_id.cancel_date' => 'Cancel Date',
+        'contribution_recur_id.cancel_reason' => 'Cancellation Reason',
+        'contribution_recur_id.end_date' => 'Recurring Contribution End Date',
+        'contribution_recur_id.financial_type_id' => 'Financial Type ID',
+        'contribution_recur_id.campaign_id' => 'Campaign ID',
       ], $comparison);
   }
 

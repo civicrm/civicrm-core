@@ -30,7 +30,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_gid;
+  public $_gid;
 
   /**
    * The field id, used when editing the field
@@ -99,6 +99,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     }
 
     if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved')) {
+      // I think this does not have ts() because the only time you would see
+      // this is if you manually made a url you weren't supposed to.
       CRM_Core_Error::statusBounce("You cannot add or edit fields in a reserved custom field-set.");
     }
 
@@ -227,6 +229,14 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     ];
 
     $this->add('checkbox', 'serialize', ts('Multi-Select'));
+
+    $this->addAutocomplete('fk_entity', ts('Entity'), [
+      'class' => 'twenty',
+      // Don't allow entity to be changed once field is created
+      'disabled' => $this->_action == CRM_Core_Action::UPDATE && !empty($this->_values['fk_entity']),
+      'entity' => 'Entity',
+      'select' => ['minimumInputLength' => 0],
+    ]);
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->freeze('data_type');
@@ -613,6 +623,12 @@ SELECT count(*)
       }
     }
 
+    if ($dataType === 'EntityReference' && $self->_action == CRM_Core_Action::ADD) {
+      if (empty($fields['fk_entity'])) {
+        $errors['fk_entity'] = ts('Selecting an entity is required');
+      }
+    }
+
     if ($dataType == 'Date') {
       if (!$fields['date_format']) {
         $errors['date_format'] = ts('Please select a date format.');
@@ -799,7 +815,8 @@ AND    option_group_id = %2";
     }
 
     // If switching to a new option list, validate existing data
-    if (empty($errors) && $self->_id && in_array($htmlType, self::$htmlTypesWithOptions)) {
+    if (empty($errors) && $self->_id && in_array($htmlType, self::$htmlTypesWithOptions) &&
+      !in_array($dataType, ['Boolean', 'Country', 'StateProvince', 'ContactReference', 'EntityReference'])) {
       $oldHtmlType = $self->_values['html_type'];
       $oldOptionGroup = $self->_values['option_group_id'];
       if ($oldHtmlType === 'Text' || $oldOptionGroup != $fields['option_group_id'] || $fields['option_type'] == 1) {
@@ -846,14 +863,16 @@ AND    option_group_id = %2";
 
     $filter = 'null';
     if ($params['data_type'] == 'ContactReference' && !empty($params['filter_selected'])) {
-      if ($params['filter_selected'] == 'Advance' && trim(CRM_Utils_Array::value('filter', $params))) {
+      if ($params['filter_selected'] == 'Advance' && trim($params['filter'] ?? '')) {
         $filter = trim($params['filter']);
       }
       elseif ($params['filter_selected'] == 'Group' && !empty($params['group_id'])) {
         $filter = 'action=lookup&group=' . implode(',', $params['group_id']);
       }
     }
-    $params['filter'] = $filter;
+    if ($params['data_type'] !== 'EntityReference') {
+      $params['filter'] = $filter;
+    }
 
     // fix for CRM-316
     $oldWeight = NULL;

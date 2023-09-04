@@ -35,59 +35,12 @@ function financialacls_civicrm_install() {
 }
 
 /**
- * Implements hook_civicrm_postInstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
- */
-function financialacls_civicrm_postInstall() {
-  _financialacls_civix_civicrm_postInstall();
-}
-
-/**
- * Implements hook_civicrm_uninstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
- */
-function financialacls_civicrm_uninstall() {
-  _financialacls_civix_civicrm_uninstall();
-}
-
-/**
  * Implements hook_civicrm_enable().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
  */
 function financialacls_civicrm_enable() {
   _financialacls_civix_civicrm_enable();
-}
-
-/**
- * Implements hook_civicrm_disable().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
- */
-function financialacls_civicrm_disable() {
-  _financialacls_civix_civicrm_disable();
-}
-
-/**
- * Implements hook_civicrm_upgrade().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
- */
-function financialacls_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _financialacls_civix_civicrm_upgrade($op, $queue);
-}
-
-/**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function financialacls_civicrm_entityTypes(&$entityTypes) {
-  _financialacls_civix_civicrm_entityTypes($entityTypes);
 }
 
 /**
@@ -419,17 +372,6 @@ function financialacls_toggle() {
   unset(\Civi::$statics['CRM_Financial_BAO_FinancialType']);
 }
 
-// --- Functions below this ship commented out. Uncomment as required. ---
-
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess
- */
-//function financialacls_civicrm_preProcess($formName, &$form) {
-//
-//}
-
 /**
  * Require financial acl permissions for financial screens.
  *
@@ -443,18 +385,26 @@ function financialacls_civicrm_alterMenu(array &$menu): void {
 }
 
 /**
- * Implements hook_civicrm_navigationMenu().
+ * Hide edit/enable/disable links for memberships of a given Financial Type
+ * Note: The $objectID param can be an int, string or null, hence not typed
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
+ * Implements hook_civicrm_links()
  */
-//function financialacls_civicrm_navigationMenu(&$menu) {
-//  _financialacls_civix_insert_navigation_menu($menu, 'Mailings', array(
-//    'label' => E::ts('New subliminal message'),
-//    'name' => 'mailing_subliminal_message',
-//    'url' => 'civicrm/mailing/subliminal',
-//    'permission' => 'access CiviMail',
-//    'operator' => 'OR',
-//    'separator' => 0,
-//  ));
-//  _financialacls_civix_navigationMenu($menu);
-//}
+function financialacls_civicrm_links(string $op, ?string $objectName, $objectID, array &$links, ?int &$mask, array &$values) {
+  if ($objectName === 'MembershipType') {
+    $financialType = CRM_Core_PseudoConstant::getName('CRM_Member_BAO_MembershipType', 'financial_type_id', CRM_Member_BAO_MembershipType::getMembershipType($objectID)['financial_type_id']);
+    $hasEditPermission = CRM_Core_Permission::check('edit contributions of type ' . $financialType);
+    $hasDeletePermission = CRM_Core_Permission::check('delete contributions of type ' . $financialType);
+    if (!$hasDeletePermission || !$hasEditPermission) {
+      foreach ($links as $index => $link) {
+        if (!$hasEditPermission && in_array($link['name'], ['Edit', 'Enable', 'Disable'], TRUE)) {
+          unset($links[$index]);
+        }
+        if (!$hasDeletePermission && $link['name'] === 'Delete') {
+          unset($links[$index]);
+        }
+      }
+    }
+  }
+
+}

@@ -209,8 +209,8 @@
           <th class='link'>{ts}Contributor's Name{/ts}</th>
           <th class="currency">{ts}Amount{/ts}</th>
           <th>{ts}Financial Type{/ts}</th>
-          <th>{ts}Source{/ts}</th>
-          <th class="received_date">{ts}Received{/ts}</th>
+          <th>{ts}Contribution Source{/ts}</th>
+          <th class="received_date">{ts}Contribution Date{/ts}</th>
           <th>{ts}Status{/ts}</th>
           {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>
@@ -265,7 +265,7 @@
           <th>{ts}Fee Level{/ts}</th>
           <th class="currency">{ts}Fee Amount{/ts}</th>
           <th class="register_date">{ts}Register Date{/ts}</th>
-          <th>{ts}Source{/ts}</th>
+          <th>{ts}Participant Source{/ts}</th>
           <th>{ts}Status{/ts}</th>
           <th>{ts}Role{/ts}</th>
           {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
@@ -320,8 +320,8 @@
           <th>{ts}Membership Type{/ts}</th>
           <th class="currency">{ts}Membership Fee{/ts}</th>
           <th class="start_date">{ts}Membership Start Date{/ts}</th>
-          <th class="end_date">{ts}Membership End Date{/ts}</th>
-          <th>{ts}Source{/ts}</th>
+          <th class="end_date">{ts}Membership Expiration Date{/ts}</th>
+          <th>{ts}Membership Source{/ts}</th>
           <th>{ts}Status{/ts}</th>
           {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>

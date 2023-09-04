@@ -20,10 +20,8 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
    *
    * (these are denoted as 'quickConfig' in the code - but quickConfig is only supposed to refer to the
    * configuration interface - there should be no different post process.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testGetAmountLevelTextAmount() {
+  public function testGetAmountLevelTextAmount(): void {
     $priceSetID = $this->eventPriceSetCreate(9);
     $priceSet = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($priceSetID);
     $field = reset($priceSet['fields']);
@@ -37,21 +35,19 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-20237 Test that Copied price set does not generate long name and unneded information
-   *
-   * @throws \CRM_Core_Exception
+   * CRM-20237 Test that Copied price set does not generate long name and unnecessary information
    */
-  public function testCopyPriceSet() {
+  public function testCopyPriceSet(): void {
     $priceSetID = $this->eventPriceSetCreate(9);
     $oldPriceSetInfo = $this->callAPISuccess('PriceSet', 'getsingle', ['id' => $priceSetID]);
     $newPriceSet = CRM_Price_BAO_PriceSet::copy($priceSetID);
-    $this->assertEquals(substr($oldPriceSetInfo['name'], 0, 20) . 'price_set_' . $newPriceSet->id, $newPriceSet->name);
+    $this->assertEquals('Price_Set_Copy_id_' . $newPriceSet->id . '_', $newPriceSet->name);
     $this->assertEquals($oldPriceSetInfo['title'] . ' [Copy id ' . $newPriceSet->id . ']', $newPriceSet->title);
     $new2PriceSet = CRM_Price_BAO_PriceSet::copy($newPriceSet->id);
-    $this->assertEquals(substr($newPriceSet->name, 0, 20) . 'price_set_' . $new2PriceSet->id, $new2PriceSet->name);
+    $this->assertEquals('Price_Set_Copy_id_' . $new2PriceSet->id . '_', $new2PriceSet->name);
     $this->assertEquals($oldPriceSetInfo['title'] . ' [Copy id ' . $new2PriceSet->id . ']', $new2PriceSet->title);
-    $oldPriceField = $this->callAPISuccess('priceField', 'getsingle', ['price_set_id' => $priceSetID]);
-    $oldPriceFieldValue = $this->callAPISuccess('priceFieldValue', 'getsingle', ['price_field_id' => $oldPriceField['id']]);
+    $oldPriceField = $this->callAPISuccess('PriceField', 'getsingle', ['price_set_id' => $priceSetID]);
+    $oldPriceFieldValue = $this->callAPISuccess('PriceFieldValue', 'getsingle', ['price_field_id' => $oldPriceField['id']]);
     $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $oldPriceFieldValue['id']]);
     $this->callAPISuccess('PriceField', 'delete', ['id' => $oldPriceField['id']]);
     $this->callAPISuccess('PriceSet', 'delete', ['id' => $priceSetID]);
@@ -73,7 +69,7 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetMembershipCount() {
+  public function testGetMembershipCount(): void {
     // create two organisations
     $organization1 = $this->organizationCreate();
     $organization2 = $this->organizationCreate();

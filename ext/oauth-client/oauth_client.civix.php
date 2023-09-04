@@ -92,9 +92,6 @@ function _oauth_client_civix_civicrm_config($config = NULL) {
   $configured = TRUE;
 
   $extRoot = __DIR__ . DIRECTORY_SEPARATOR;
-  $extDir = $extRoot . 'templates';
-  CRM_Core_Smarty::singleton()->addTemplateDir($extDir);
-
   $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
   // Based on <compatibility>, this does not currently require mixin/polyfill.php.
@@ -200,31 +197,4 @@ function _oauth_client_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parent
       _oauth_client_civix_fixNavigationMenuItems($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
     }
   }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_entityTypes().
- *
- * Find any *.entityType.php files, merge their content, and return.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function _oauth_client_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, [
-    'CRM_OAuth_DAO_OAuthClient' => [
-      'name' => 'OAuthClient',
-      'class' => 'CRM_OAuth_DAO_OAuthClient',
-      'table' => 'civicrm_oauth_client',
-    ],
-    'CRM_OAuth_DAO_OAuthContactToken' => [
-      'name' => 'OAuthContactToken',
-      'class' => 'CRM_OAuth_DAO_OAuthContactToken',
-      'table' => 'civicrm_oauth_contact_token',
-    ],
-    'CRM_OAuth_DAO_OAuthSysToken' => [
-      'name' => 'OAuthSysToken',
-      'class' => 'CRM_OAuth_DAO_OAuthSysToken',
-      'table' => 'civicrm_oauth_systoken',
-    ],
-  ]);
 }

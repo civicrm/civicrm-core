@@ -205,7 +205,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *   The row number to start from.
    * @param int $rowCount
    *   The number of rows to return.
-   * @param string $sort
+   * @param string|CRM_Utils_Sort $sort
    *   The sql string that describes the sort order.
    * @param string $output
    *   What should the result set include (web/email/csv).
@@ -261,11 +261,11 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
 
       $row['target_contact_name'] = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], $targetID);
       $row['assignee_contact_name'] = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], $assigneeID);
-      list($row['source_contact_name'], $row['source_contact_id']) = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], $sourceID, TRUE);
+      [$row['source_contact_name'], $row['source_contact_id']] = CRM_Activity_BAO_ActivityContact::getNames($row['activity_id'], $sourceID, TRUE);
       $row['source_contact_name'] = implode(',', array_values($row['source_contact_name']));
       $row['source_contact_id'] = implode(',', $row['source_contact_id']);
 
-      if ($this->_context == 'search') {
+      if ($this->_context === 'search') {
         $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->activity_id;
       }
       $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
@@ -291,10 +291,10 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         $accessMailingReport = TRUE;
       }
       $activityActions = new CRM_Activity_Selector_Activity($result->contact_id, NULL);
-      $actionLinks = $activityActions->actionLinks($activityTypeId,
-        CRM_Utils_Array::value('source_record_id', $row),
+      $actionLinks = $activityActions::actionLinks($activityTypeId,
+        $row['source_record_id'] ?? NULL,
         $accessMailingReport,
-        CRM_Utils_Array::value('activity_id', $row),
+        $row['activity_id'] ?? NULL,
         $this->_key,
         $this->_compContext
       );
@@ -303,6 +303,10 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
           'id' => $result->activity_id,
           'cid' => $contactId,
           'cxt' => $this->_context,
+          // Parameter for hook locked in by CRM_Activity_Selector_SearchTest
+          // Any additional parameters added should follow apiv4 style
+          // and be added to the test.
+          'activity_type_id' => $row['activity_type_id'],
         ],
         ts('more'),
         FALSE,
@@ -315,7 +319,8 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
       $row['campaign'] = $allCampaigns[$result->activity_campaign_id] ?? NULL;
       $row['campaign_id'] = $result->activity_campaign_id;
 
-      if ($engagementLevel = CRM_Utils_Array::value('activity_engagement_level', $row)) {
+      $engagementLevel = $row['activity_engagement_level'] ?? NULL;
+      if ($engagementLevel) {
         $row['activity_engagement_level'] = CRM_Utils_Array::value($engagementLevel,
           $engagementLevels, $engagementLevel
         );

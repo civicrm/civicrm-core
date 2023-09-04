@@ -87,7 +87,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
     $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix) {
-    $params = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6);
+    $params = [&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6];
 
     $fResult2 = $fResult3 = NULL;
 

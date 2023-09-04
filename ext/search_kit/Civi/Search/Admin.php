@@ -51,6 +51,10 @@ class Admin {
       'modules' => $extensions,
       'defaultContactType' => \CRM_Contact_BAO_ContactType::basicTypeInfo()['Individual']['name'] ?? NULL,
       'defaultDistanceUnit' => \CRM_Utils_Address::getDefaultDistanceUnit(),
+      'jobFrequency' => \Civi\Api4\Job::getFields()
+        ->addWhere('name', '=', 'run_frequency')
+        ->setLoadOptions(['id', 'label'])
+        ->execute()->first()['options'],
       'tags' => Tag::get()
         ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
@@ -87,6 +91,7 @@ class Admin {
       '>=' => '≥',
       '<=' => '≤',
       'CONTAINS' => E::ts('Contains'),
+      'NOT CONTAINS' => E::ts("Doesn't Contain"),
       'IN' => E::ts('Is One Of'),
       'NOT IN' => E::ts('Not One Of'),
       'LIKE' => E::ts('Is Like'),
@@ -126,7 +131,7 @@ class Admin {
   public static function getSchema(): array {
     $schema = [];
     $entities = Entity::get()
-      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
+      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'search_fields', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
       ->addWhere('searchable', '!=', 'none')
       ->addOrderBy('title_plural')
       ->setChain([
@@ -149,7 +154,7 @@ class Admin {
             'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
             'where' => [['deprecated', '=', FALSE], ['name', 'NOT IN', ['api_key', 'hash']]],
             'orderBy' => ['label'],
-          ]);
+          ])->indexBy('name');
         }
         catch (\CRM_Core_Exception $e) {
           \Civi::log()->warning('Entity could not be loaded', ['entity' => $entity['name']]);
@@ -165,6 +170,22 @@ class Admin {
           }
           $entity['fields'][] = $field;
         }
+        $defaultColumns = CoreUtil::getSearchFields($entity['name']);
+        // Add grouping fields like "event_type_id" + status_id + description if available
+        $grouping = (array) (CoreUtil::getCustomGroupExtends($entity['name'])['grouping'] ?? ['financial_type_id']);
+        foreach ($grouping as $fieldName) {
+          if (!empty($getFields[$fieldName]['options'])) {
+            $defaultColumns[] = "$fieldName:label";
+          }
+        }
+        $statusField = $getFields['status_id'] ?? $getFields[strtolower($entity['name']) . '_status_id'] ?? NULL;
+        if (!empty($statusField['options'])) {
+          $defaultColumns[] = $statusField['name'] . ':label';
+        }
+        if (isset($getFields['description'])) {
+          $defaultColumns[] = 'description';
+        }
+        $entity['default_columns'] = array_values(array_unique($defaultColumns));
         $params = $entity['get'][0];
         // Entity must support at least these params or it is too weird for search kit
         if (!array_diff(['select', 'where', 'orderBy', 'limit', 'offset'], array_keys($params))) {
@@ -188,27 +209,33 @@ class Admin {
   private static function addImplicitFKFields(array $schema):array {
     foreach ($schema as &$entity) {
       if ($entity['searchable'] !== 'bridge') {
-        foreach (array_reverse($entity['fields'], TRUE) as $index => $field) {
-          if (!empty($field['fk_entity']) && !$field['options'] && !empty($schema[$field['fk_entity']]['label_field'])) {
-            $isCustom = strpos($field['name'], '.');
-            // Custom fields: append "Contact ID" to original field label
-            if ($isCustom) {
-              $entity['fields'][$index]['label'] .= ' ' . E::ts('Contact ID');
+        foreach (array_reverse($entity['fields'] ?? [], TRUE) as $index => $field) {
+          if (!empty($field['fk_entity']) && !$field['options'] && !$field['suffixes'] && !empty($schema[$field['fk_entity']]['search_fields'])) {
+            $labelFields = array_unique(array_merge($schema[$field['fk_entity']]['search_fields'], (array) ($schema[$field['fk_entity']]['label_field'] ?? [])));
+            foreach ($labelFields as $labelField) {
+              $isCustom = strpos($field['name'], '.');
+              // Custom fields: append "Contact ID" etc. to original field label
+              if ($isCustom) {
+                $idField = array_column($schema[$field['fk_entity']]['fields'], NULL, 'name')['id'];
+                $entity['fields'][$index]['label'] .= ' ' . $idField['title'];
+              }
+              // DAO fields: use title instead of label since it represents the id (title usually ends in ID but label does not)
+              else {
+                $entity['fields'][$index]['label'] = $field['title'];
+              }
+              // Add the label field from the other entity to this entity's list of fields
+              $newField = \CRM_Utils_Array::findAll($schema[$field['fk_entity']]['fields'], ['name' => $labelField])[0] ?? NULL;
+              if ($newField) {
+                $newField['name'] = $field['name'] . '.' . $labelField;
+                $newField['label'] = $field['label'] . ' ' . $newField['label'];
+                array_splice($entity['fields'], $index + 1, 0, [$newField]);
+              }
             }
-            // DAO fields: use title instead of label since it represents the id (title usually ends in ID but label does not)
-            else {
-              $entity['fields'][$index]['label'] = $field['title'];
-            }
-            // Add the label field from the other entity to this entity's list of fields
-            $newField = \CRM_Utils_Array::findAll($schema[$field['fk_entity']]['fields'], ['name' => $schema[$field['fk_entity']]['label_field']])[0];
-            $newField['name'] = $field['name'] . '.' . $schema[$field['fk_entity']]['label_field'];
-            $newField['label'] = $field['label'] . ' ' . $newField['label'];
-            array_splice($entity['fields'], $index, 0, [$newField]);
           }
         }
         // Useful address fields (see ContactSchemaMapSubscriber)
         if ($entity['name'] === 'Contact') {
-          $addressFields = ['city', 'state_province_id', 'country_id'];
+          $addressFields = ['city', 'state_province_id', 'country_id', 'street_address', 'postal_code', 'supplemental_address_1'];
           foreach ($addressFields as $fieldName) {
             foreach (['primary', 'billing'] as $type) {
               $newField = \CRM_Utils_Array::findAll($schema['Address']['fields'], ['name' => $fieldName])[0];
@@ -365,6 +392,24 @@ class Admin {
             }
           }
         }
+        // Custom EntityRef joins
+        foreach ($fields as $field) {
+          if ($field['type'] === 'Custom' && $field['input_type'] === 'EntityRef') {
+            $targetEntity = $allowedEntities[$field['fk_entity']];
+            // Add the EntityRef join
+            [, $bareFieldName] = explode('.', $field['name']);
+            $alias = $entity['name'] . '_' . $field['fk_entity'] . '_' . $bareFieldName;
+            $joins[$entity['name']][] = [
+              'label' => $entity['title'] . ' ' . $field['title'],
+              'description' => $field['description'],
+              'entity' => $field['fk_entity'],
+              'conditions' => self::getJoinConditions($field['name'], $alias . '.id'),
+              'defaults' => [],
+              'alias' => $alias,
+              'multi' => FALSE,
+            ];
+          }
+        }
       }
     }
     return $joins;
@@ -458,7 +503,7 @@ class Admin {
    * @return array
    */
   private static function getSqlFunctions():array {
-    $functions = \CRM_Api4_Page_Api4Explorer::getSqlFunctions();
+    $functions = CoreUtil::getSqlFunctions();
     // Add faux function "e" for SqlEquations
     $functions[] = [
       'name' => 'e',
@@ -466,6 +511,7 @@ class Admin {
       'description' => ts('Add, subtract, multiply, divide'),
       'category' => SqlFunction::CATEGORY_MATH,
       'data_type' => 'Number',
+      'options' => FALSE,
       'params' => [
         [
           'label' => ts('Value'),

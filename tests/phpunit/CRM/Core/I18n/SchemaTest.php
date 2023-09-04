@@ -19,7 +19,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
    * Test tables to translate
    * @return array
    */
-  public static function translateTables() {
+  public static function translateTables(): array {
     $tables = [];
     $tables[] = ['civicrm_option_group', 'civicrm_option_group_en_US'];
     $tables[] = ['civicrm_events_in_carts', 'civicrm_events_in_carts'];
@@ -41,9 +41,8 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
    * @param string $expectedRewrite
    *
    * @dataProvider translateTables
-   * @throws \CRM_Core_Exception
    */
-  public function testI18nSchemaRewrite($table, $expectedRewrite) {
+  public function testI18nSchemaRewrite(string $table, string $expectedRewrite): void {
     $this->enableMultilingual();
     $domains = $this->callAPISuccess('Domain', 'get')['values'];
     $this->assertGreaterThan(1, count($domains));
@@ -59,7 +58,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     }
     global $dbLocale;
     $dbLocale = '_en_US';
-    // Test problematic queriy as per CRM-20427
+    // Test problematic query as per CRM-20427
     $query = "Select * FROM {$table}";
     $new_query = CRM_Core_I18n_Schema::rewriteQuery($query);
     $this->assertEquals("Select * FROM {$expectedRewrite}", $new_query);
@@ -67,7 +66,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     $query2 = "Select * FROM {$table} LIMIT 1";
     $new_query2 = CRM_Core_I18n_Schema::rewriteQuery($query2);
     $this->assertEquals("Select * FROM {$expectedRewrite} LIMIT 1", $new_query2);
-    // Test query where there is a 2nd table that shouldn't be re-wrten
+    // Test query where there is a 2nd table that shouldn't be re-writen
     $query3 = "SELECT * FROM {$table} JOIN civicrm_contact LIMIT 1";
     $new_query3 = CRM_Core_I18n_Schema::rewriteQuery($query3);
     $this->assertEquals("SELECT * FROM {$expectedRewrite} JOIN civicrm_contact LIMIT 1", $new_query3);
@@ -84,7 +83,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     // Test Currently skipped for civicrm_option_group and civicrm_event due to issues with the regex.
     // Agreed as not a blocker for CRM-20427 as an issue previously.
     if (!$skip_tests) {
-      $query6 = "SELECT " . '"' . "Fixed the the {$table} ticket" . '"';
+      $query6 = 'SELECT ' . '"' . "Fixed the the {$table} ticket" . '"';
       $new_query6 = CRM_Core_I18n_Schema::rewriteQuery($query6);
       $this->assertEquals($query6, $new_query6);
     }
@@ -92,30 +91,33 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     $query7 = "SELECT * FROM civicrm_foo WHERE foo_id = (SELECT value FROM {$table})";
     $new_query7 = CRM_Core_I18n_Schema::rewriteQuery($query7);
     $this->assertEquals("SELECT * FROM civicrm_foo WHERE foo_id = (SELECT value FROM {$expectedRewrite})", $new_query7);
-    // Test differern verbs
+    // Test different verbs
     $query8 = "DELETE FROM {$table}";
     $new_query8 = CRM_Core_I18n_Schema::rewriteQuery($query8);
     $this->assertEquals("DELETE FROM {$expectedRewrite}", $new_query8);
     // Test Currently skipped for civicrm_option_group and civicrm_event due to issues with the regex.
     // Agreed as not a blocker for CRM-20427 as an issue previously
     if (!$skip_tests) {
-      $query9 = 'INSERT INTO ' . "{$table}" . ' (foo, bar) VALUES (123, "' . "Just a {$table} string" . '")';
+      $query9 = 'INSERT INTO ' . $table . ' (foo, bar) VALUES (123, "' . "Just a {$table} string" . '")';
       $new_query9 = CRM_Core_I18n_Schema::rewriteQuery($query9);
-      $this->assertEquals('INSERT INTO ' . "{$expectedRewrite}" . ' (foo, bar) VALUES (123, "' . "Just a {$table} string" . '")', $new_query9);
+      $this->assertEquals('INSERT INTO ' . $expectedRewrite . ' (foo, bar) VALUES (123, "' . "Just a {$table} string" . '")', $new_query9);
     }
   }
 
-  public function testSchemaBuild() {
+  /**
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public function testSchemaBuild(): void {
     $this->enableMultilingual();
     $inUseCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
-    $testCreateTable = CRM_Core_DAO::executeQuery("show create table civicrm_price_set", [], TRUE, NULL, FALSE, FALSE);
+    $testCreateTable = CRM_Core_DAO::executeQuery('SHOW create table civicrm_price_set', [], TRUE, NULL, FALSE, FALSE);
     while ($testCreateTable->fetch()) {
-      $this->assertStringContainsString("`title_en_US` varchar(255) COLLATE {$inUseCollation} NOT NULL COMMENT 'Displayed title for the Price Set.'", $testCreateTable->Create_Table);
+      $this->assertStringContainsString("`title_en_US` varchar(255) COLLATE {$inUseCollation} NOT NULL DEFAULT '' COMMENT 'Displayed title for the Price Set.'", $testCreateTable->Create_Table);
       $this->assertStringContainsString("`help_pre_en_US` text COLLATE {$inUseCollation} COMMENT 'Description and/or help text to display before fields in form.'", $testCreateTable->Create_Table);
     }
   }
 
-  public function testMultilingualCustomFieldCreation() {
+  public function testMultilingualCustomFieldCreation(): void {
     $this->enableMultilingual(['en_US' => 'fr_CA']);
     $id = $this->customGroupCreate()['id'];
     $this->customFieldCreate(['custom_group_id' => $id]);

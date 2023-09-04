@@ -33,10 +33,13 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $raw;
   protected $tables = [];
   protected $interval = '10 SECOND';
+  protected $dblimit;
+  protected $dboffset;
 
   protected $altered_name;
   protected $altered_by;
   protected $altered_by_id;
+  protected $layout;
 
   /**
    * detail/summary report ids
@@ -80,7 +83,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     CRM_Utils_System::resetBreadCrumb();
     $breadcrumb = [
       [
-        'title' => ts('Home'),
+        'title' => ts('Home', ['context' => 'menu']),
         'url' => CRM_Utils_System::url(),
       ],
       [
@@ -452,7 +455,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         unset($_POST['crmPID_B'], $_POST['crmPID']);
       }
 
-      $pageId = $pageId ? $pageId : 1;
+      $pageId = $pageId ?: 1;
       $offset = ($pageId - 1) * $rowCount;
 
       $offset = CRM_Utils_Type::escape($offset, 'Int');

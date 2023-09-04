@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/login</path>
+    <page_callback>CRM_Standaloneusers_Page_Login</page_callback>
+    <title>Login</title>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/logout</path>
+    <page_callback>CRM_Standaloneusers_Page_Login::logout</page_callback>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+</menu>

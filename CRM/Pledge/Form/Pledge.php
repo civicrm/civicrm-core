@@ -24,7 +24,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public $_action;
 
   /**
-   * The id of the pledge that we are proceessing.
+   * The id of the pledge that we are processing.
    *
    * @var int
    */
@@ -60,7 +60,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
+  public function preProcess(): void {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 'add'
@@ -111,7 +111,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * Set default values for the form.
    * The default values are retrieved from the database.
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $defaults = $this->_values;
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -181,8 +181,10 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons([
           [
@@ -200,7 +202,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     $contactField = $this->addEntityRef('contact_id', ts('Pledge by'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
-    if ($this->_context != 'standalone') {
+    if ($this->_context !== 'standalone') {
       $contactField->freeze();
     }
 
@@ -246,8 +248,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->assign('isPending', $this->_isPending);
 
     $js = [
-      'onblur' => "calculatedPaymentAmount( );",
-      'onkeyup' => "calculatedPaymentAmount( );",
+      'onblur' => 'calculatedPaymentAmount( );',
+      'onkeyup' => 'calculatedPaymentAmount( );',
     ];
 
     $amount = $this->addMoney('amount', ts('Total Pledge Amount'), TRUE,
@@ -273,7 +275,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $frequencyUnit = $this->add('select', 'frequency_unit',
       ts('Frequency'),
       ['' => ts('- select -')] + $freqUnitsDisplay,
-      TRUE
+      TRUE,
+      ['class' => 'crm-select2 eight']
     );
 
     $frequencyDay = $this->add('number', 'frequency_day', ts('Payments are due on the'), $attributes['frequency_day'], TRUE);
@@ -281,7 +284,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $this->add('text', 'eachPaymentAmount', ts('each'), [
       'size' => 10,
-      'style' => "background-color:#EBECE4",
+      'style' => 'background-color:#EBECE4',
       // WTF, preserved because its inexplicable
       0 => 'READONLY',
     ]);
@@ -309,7 +312,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->assign('eachPaymentAmount', $eachPaymentAmount);
     }
 
-    if (CRM_Utils_Array::value('status_id', $this->_values) !=
+    if (($this->_values['status_id'] ?? NULL) !=
       CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Cancelled')
     ) {
 
@@ -317,7 +320,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         ['onclick' => "showHideByValue( 'is_acknowledge', '', 'acknowledgeDate', 'table-row', 'radio', true); showHideByValue( 'is_acknowledge', '', 'fromEmail', 'table-row', 'radio', false );"]
       );
 
-      $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
+      $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails, FALSE, ['class' => 'crm-select2 huge']);
     }
 
     $this->add('datepicker', 'acknowledge_date', ts('Acknowledgment Date'), [], FALSE, ['time' => FALSE]);
@@ -325,7 +328,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->add('select', 'financial_type_id',
       ts('Financial Type'),
       ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::financialType(),
-      TRUE
+      TRUE,
+      ['class' => 'crm-select2']
     );
 
     // CRM-7362 --add campaigns.
@@ -341,7 +345,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $pledgePages[$value['entity_id']] = $pages[$value['entity_id']];
     }
     $this->add('select', 'contribution_page_id', ts('Self-service Payments Page'),
-      ['' => ts('- select -')] + $pledgePages
+      ['' => ts('- select -')] + $pledgePages,
+      FALSE,
+      ['class' => 'crm-select2']
     );
 
     $mailingInfo = Civi::settings()->get('mailing_backend');
@@ -356,13 +362,13 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         [
           'type' => 'upload',
           'name' => ts('Save'),
-          'js' => ['onclick' => "return verify( );"],
+          'js' => ['onclick' => 'return verify( );'],
           'isDefault' => TRUE,
         ],
         [
           'type' => 'upload',
           'name' => ts('Save and New'),
-          'js' => ['onclick' => "return verify( );"],
+          'js' => ['onclick' => 'return verify( );'],
           'subName' => 'new',
         ],
         [
@@ -388,7 +394,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * @param self $self
    *
    *
-   * @return bool|array
+   * @return array
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
@@ -401,12 +407,12 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $errors['installments'] = ts('Installments should be greater than zero.');
     }
 
-    if ($fields['frequency_unit'] != 'week') {
+    if ($fields['frequency_unit'] !== 'week') {
       if ($fields['frequency_day'] > 31 || $fields['frequency_day'] == 0) {
         $errors['frequency_day'] = ts('Please enter a valid frequency day ie. 1 through 31.');
       }
     }
-    elseif ($fields['frequency_unit'] == 'week') {
+    elseif ($fields['frequency_unit'] === 'week') {
       if ($fields['frequency_day'] > 7 || $fields['frequency_day'] == 0) {
         $errors['frequency_day'] = ts('Please enter a valid frequency day ie. 1 through 7.');
       }
@@ -532,7 +538,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       // send Acknowledgment mail.
       CRM_Pledge_BAO_Pledge::sendAcknowledgment($this, $params);
 
-      $statusMsg .= ' ' . ts("An acknowledgment email has been sent to %1.<br />", [1 => $this->userEmail]);
+      $statusMsg .= ' ' . ts('An acknowledgment email has been sent to %1.<br />', [1 => $this->userEmail]);
       // get the first valid payment id.
       $nextPaymentID = PledgePayment::get()
         ->addWhere('pledge_id', '=', $pledgeID)
@@ -542,12 +548,12 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       if ($nextPaymentID) {
         $urlParams = "reset=1&action=add&cid={$this->_contactID}&ppid={$nextPaymentID}&context=pledge";
         $contribURL = CRM_Utils_System::url('civicrm/contact/view/contribution', $urlParams);
-        $urlParams .= "&mode=live";
+        $urlParams .= '&mode=live';
         $creditURL = CRM_Utils_System::url('civicrm/contact/view/contribution', $urlParams);
 
         // check if we can process credit card payment.
         $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
-          "billing_mode IN ( 1, 3 )"
+          'billing_mode IN ( 1, 3 )'
         );
         if (count($processors) > 0) {
           $statusMsg .= ' ' . ts("If a payment is due now, you can record <a href='%1'>a check, EFT, or cash payment for this pledge</a> OR <a href='%2'>submit a credit card payment</a>.", [
@@ -563,8 +569,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     CRM_Core_Session::setStatus($statusMsg, ts('Payment Due'), 'info');
 
     $buttonName = $this->controller->getButtonName();
-    if ($this->_context == 'standalone') {
-      if ($buttonName == $this->getButtonName('upload', 'new')) {
+    if ($this->_context === 'standalone') {
+      if ($buttonName === $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/pledge/add',
           'reset=1&action=add&context=standalone'
         ));
@@ -575,7 +581,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         ));
       }
     }
-    elseif ($buttonName == $this->getButtonName('upload', 'new')) {
+    elseif ($buttonName === $this->getButtonName('upload', 'new')) {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/pledge',
         "reset=1&action=add&context=pledge&cid={$this->_contactID}"
       ));

@@ -21,7 +21,8 @@ namespace Civi\Api4\Query;
 abstract class SqlExpression {
 
   /**
-   * @var array
+   * Field names used in this expression
+   * @var string[]
    */
   protected $fields = [];
 
@@ -88,7 +89,7 @@ abstract class SqlExpression {
       $className = 'SqlEquation';
     }
     // If there are brackets but not the first character, we have a function
-    elseif ($bracketPos && $lastChar === ')') {
+    elseif ($bracketPos && preg_match('/^\w+\(.*\)(:[a-z]+)?$/', $expr)) {
       $fnName = substr($expr, 0, $bracketPos);
       if ($fnName !== strtoupper($fnName)) {
         throw new \CRM_Core_Exception('Sql function must be uppercase.');
@@ -101,6 +102,9 @@ abstract class SqlExpression {
     }
     elseif ($expr === 'NULL') {
       $className = 'SqlNull';
+    }
+    elseif ($expr === 'TRUE' || $expr === 'FALSE') {
+      $className = 'SqlBool';
     }
     elseif ($expr === '*') {
       $className = 'SqlWild';
@@ -140,10 +144,10 @@ abstract class SqlExpression {
   /**
    * Renders expression to a sql string, replacing field names with column names.
    *
-   * @param \Civi\Api4\Query\Api4SelectQuery $query
+   * @param \Civi\Api4\Query\Api4Query $query
    * @return string
    */
-  abstract public function render(Api4SelectQuery $query): string;
+  abstract public function render(Api4Query $query): string;
 
   /**
    * @return string
@@ -224,7 +228,7 @@ abstract class SqlExpression {
   protected function captureExpressions(string &$arg, array $mustBe, int $max) {
     $captured = [];
     $arg = ltrim($arg);
-    while ($arg) {
+    while (strlen($arg)) {
       $item = $this->captureExpression($arg);
       $arg = ltrim(substr($arg, strlen($item)));
       $expr = self::convert($item, FALSE, $mustBe);

@@ -150,9 +150,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->contactID2 = $this->individualCreate($contact2Params);
     $this->contactID3 = $this->individualCreate(['first_name' => 'bobby', 'email' => 'c@d.com']);
     $this->contactID4 = $this->individualCreate(['first_name' => 'bobbynita', 'email' => 'c@de.com']);
-
-    $session = CRM_Core_Session::singleton();
-    $session->set('dateTypes', 1);
   }
 
   /**
@@ -161,6 +158,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_campaign']);
     $this->relationshipTypeDelete($this->relationshipTypeID);
     if ($this->callAPISuccessGetCount('membership', ['id' => $this->membershipTypeID])) {
       $this->membershipTypeDelete(['id' => $this->membershipTypeID]);

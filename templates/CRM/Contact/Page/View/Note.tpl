@@ -44,7 +44,6 @@
         {/if}
 {elseif $action eq 1 or $action eq 2} {* action is add or update *}
   <div class="crm-block crm-form-block crm-note-form-block">
-    <div class="content crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout">
             <tr>
                 <td class="label">{$form.subject.label}</td>
@@ -83,7 +82,7 @@
 {/if}
 {if ($action eq 8)}
 <div class=status>{ts 1=$notes.$id.note}Are you sure you want to delete the note '%1'?{/ts}</div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 
 {/if}
 

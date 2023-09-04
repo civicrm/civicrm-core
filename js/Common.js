@@ -351,7 +351,7 @@ if (!CRM.vars) CRM.vars = {};
    * @returns {*}
    */
   CRM.utils.adjustDialogDefaults = function(settings) {
-    settings = $.extend({width: '65%', height: '65%', modal: true}, settings || {});
+    settings = $.extend({width: '65%', height: '40%', modal: true}, settings || {});
     // Support relative height
     if (typeof settings.height === 'string' && settings.height.indexOf('%') > 0) {
       settings.height = parseInt($(window).height() * (parseFloat(settings.height)/100), 10);
@@ -1133,6 +1133,9 @@ if (!CRM.vars) CRM.vars = {};
       }
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
+      $('.crm-form-autocomplete:not(.select2-offscreen, .select2-container)[data-api-entity]', e.target).each(function() {
+        $(this).crmAutocomplete($(this).data('apiEntity'), $(this).data('apiParams'), $(this).data('selectParams'));
+      });
       $('select.crm-chain-select-control', e.target).off('.chainSelect').on('change.chainSelect', chainSelect);
       $('.crm-form-text[data-crm-datepicker]', e.target).each(function() {
         $(this).crmDatepicker($(this).data('crmDatepicker'));

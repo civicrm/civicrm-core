@@ -64,6 +64,9 @@
         if (!allowedOps && _.includes(['Boolean', 'Float', 'Date'], field.data_type)) {
           allowedOps = ['=', '!=', '<', '>', '<=', '>=', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'IS EMPTY', 'IS NOT EMPTY'];
         }
+        if (!allowedOps && (field.data_type === 'Array' || field.serialize)) {
+          allowedOps = ['CONTAINS', 'NOT CONTAINS', 'IS EMPTY', 'IS NOT EMPTY'];
+        }
         if (!allowedOps) {
           return CRM.crmSearchAdmin.operators;
         }

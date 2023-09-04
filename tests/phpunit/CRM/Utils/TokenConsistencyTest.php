@@ -46,7 +46,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
    * Post test cleanup.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_case', 'civicrm_case_type', 'civicrm_participant', 'civicrm_event'], TRUE);
+    $this->quickCleanup(['civicrm_case', 'civicrm_case_type'], TRUE);
     $this->quickCleanUpFinancialEntities();
 
     // WORKAROUND: CRM_Event_Tokens copies `civicrm_event` data into metadata cache. That should probably change, but that's a different scope-of-work.
@@ -273,6 +273,24 @@ case.custom_1 :' . '
   }
 
   /**
+   * Test the standard new location token format - which matches apiv4 return properties.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testLocationTokens(): void {
+    $contactID = $this->individualCreate(['email' => 'me@example.com']);
+    Address::create()->setValues([
+      'contact_id' => $contactID,
+      'is_primary' => TRUE,
+      'street_address' => 'Heartbreak Hotel',
+      'supplemental_address_1' => 'Lonely Street',
+    ])->execute();
+    $text = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address}';
+    $text = $this->renderText(['contactId' => $contactID], $text);
+    $this->assertEquals('Anthony me@example.com Heartbreak Hotel', $text);
+  }
+
+  /**
    * Test tokens in 2 ways to ensure consistent handling.
    *
    * 1) as part of the greeting processing
@@ -458,9 +476,35 @@ contribution_recur.payment_instrument_id:name :Check
   }
 
   /**
+   * Test balance token works can be rendered as raw & boolean.
+   *
+   * This is a stand in for money tokens in general but as a pseudo-field
+   * it has some added charm.
+   */
+  public function testContributionBalanceToken(): void {
+    $contributionID = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'contribution_status_id' => 'Pending']);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contributionID,
+      'total_amount' => 1,
+    ]);
+    $text = $this->renderText(['contributionId' => $contributionID],
+      '{contribution.balance_amount} {contribution.balance_amount|raw} {contribution.balance_amount|boolean} {contribution.tax_amount|boolean}'
+    );
+    $this->assertEquals('$99.00 99.00 1 0', $text);
+  }
+
+  /**
+   * Test tokens can be capitalized.
+   */
+  public function testCapitalize(): void {
+    $this->individualCreate(['first_name' => 'bob m smith']);
+    $text = $this->renderText(['contactId' => $this->ids['Contact']['individual_0']], '{contact.first_name|capitalize}');
+    $this->assertEquals('Bob M Smith', $text);
+  }
+
+  /**
    * Test that membership tokens are consistently rendered.
    *
-   * @throws \CRM_Core_Exception
    */
   public function testMembershipTokenConsistency(): void {
     $this->createLoggedInUser();
@@ -502,12 +546,43 @@ contribution_recur.payment_instrument_id:name :Check
     $tokens = $tokenProcessor->listTokens();
     // Add in custom tokens as token processor supports these.
     $expectedTokens = array_merge($expectedTokens, $this->getTokensAdvertisedByTokenProcessorButNotLegacy());
-    $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens()), $tokens);
+    $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens(), $this->getRecurEntityTokens('membership')), $tokens);
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
     $tokenProcessor->addRow(['membershipId' => $this->getMembershipID()]);
     $tokenProcessor->evaluate();
     $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
 
+  }
+
+  public function testPledgeTokens(): void {
+    $pledgeID = $this->pledgeCreate(['contact_id' => $this->individualCreate(), 'create_date' => '2022-04-07', 'start_date' => '2022-04-07']);
+    $tokenProcessor = $this->getTokenProcessor(['schema' => ['pledgeId']]);
+    $list = $tokenProcessor->listTokens();
+    $this->assertEquals(array_merge($this->getPledgeTokens(), $this->getDomainTokens()), $list);
+    $tokenString = implode(', ', array_keys($this->getPledgeTokens()));
+    $tokenProcessor->addMessage('text', $tokenString, 'text/plain');
+    $tokenProcessor->addRow(['pledgeId' => $pledgeID]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals($this->getExpectedPledgeTokenOutput(), $tokenProcessor->getRow(0)->render('text'));
+  }
+
+  public function getExpectedPledgeTokenOutput(): string {
+    return '$100.00, US Dollar, year, 5, 15, 5, April 7th, 2022, April 7th, 2022, , ';
+  }
+
+  public function getPledgeTokens(): array {
+    return [
+      '{pledge.amount}' => 'Total Pledged',
+      '{pledge.currency:label}' => 'Pledge Currency',
+      '{pledge.frequency_unit:label}' => 'Pledge Frequency Unit',
+      '{pledge.frequency_interval}' => 'Pledge Frequency Interval',
+      '{pledge.frequency_day}' => 'Pledge day',
+      '{pledge.installments}' => 'Pledge Number of Installments',
+      '{pledge.start_date}' => 'Pledge Start Date',
+      '{pledge.create_date}' => 'Pledge Made',
+      '{pledge.cancel_date}' => 'Pledge Cancelled Date',
+      '{pledge.end_date}' => 'Pledge End Date',
+    ];
   }
 
   /**
@@ -518,7 +593,7 @@ contribution_recur.payment_instrument_id:name :Check
   public function getTokensAdvertisedByTokenProcessorButNotLegacy(): array {
     return [
       '{membership.custom_1}' => 'Enter text here :: Group with field text',
-      '{membership.source}' => 'Source',
+      '{membership.source}' => 'Membership Source',
       '{membership.status_override_end_date}' => 'Status Override End Date',
     ];
   }
@@ -560,7 +635,7 @@ contribution_recur.payment_instrument_id:name :Check
    *
    * @return string
    */
-  protected function getExpectedParticipantTokenOutput(int $participantCreatedID = NULL): string {
+  protected function getExpectedParticipantTokenOutput(): string {
     return "participant.status_id :2
 participant.role_id :1
 participant.register_date :February 19th, 2007
@@ -569,7 +644,7 @@ participant.fee_level :steep
 participant.fee_amount :$50.00
 participant.registered_by_id :
 participant.transferred_to_contact_id :
-participant.created_id :{$participantCreatedID}
+participant.created_id :{$this->ids['Contact']['logged_in']}
 participant.role_id:label :Attendee
 participant.balance :
 participant.custom_2 :99999
@@ -590,22 +665,22 @@ participant.must_wait :
    * @return string
    */
   protected function getExpectedEventTokenOutput(): string {
-    return 'event.id :' . $this->ids['event'][0] . '
+    return 'event.id :' . $this->ids['Event'][0] . '
 event.title :Annual CiviCRM meet
 event.start_date :October 21st, 2008
 event.end_date :October 23rd, 2008
 event.event_type_id:label :Conference
 event.summary :If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now
-event.contact_email :event@example.com
-event.contact_phone :456 789
+event.loc_block_id.email_id.email :event@example.com
+event.loc_block_id.phone_id.phone :456 789
 event.description :event description
-event.location :15 Walton St
+event.location :15 Walton St<br />
 Emerald City, Maine 90210
-
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
-event.pay_later_receipt :
+event.pay_later_receipt :Please transfer funds to our bank account.
 event.custom_1 :my field
+event.confirm_email_text :
 ';
   }
 
@@ -649,7 +724,7 @@ December 21st, 2007
     $this->assertEquals(array_merge($tokens, $this->getEventTokens(), $this->getDomainTokens()), $tokenProcessor->listTokens());
 
     $this->callAPISuccess('job', 'send_reminder', []);
-    $expected = $this->getExpectedParticipantTokenOutput(3);
+    $expected = $this->getExpectedParticipantTokenOutput();
     $mut->checkMailLog([$expected]);
 
     $tokenProcessor->addMessage('html', $this->getTokenString(array_keys($this->getParticipantTokens())), 'text/plain');
@@ -765,7 +840,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       $this->fail('Expected unquoted parameter to fail');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertRegExp(';Malformed token param;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Malformed token param;', $e->getMessage());
     }
   }
 
@@ -804,27 +879,24 @@ United States', $tokenProcessor->getRow(0)->render('message'));
    */
   public function testEventTokenConsistency(): void {
     $mut = new CiviMailUtils($this);
+    $this->createLoggedInUser();
     $this->setupParticipantScheduledReminder();
 
     $tokens = array_merge($this->getEventTokens());
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
-      'controller' => __CLASS__,
-      'smarty' => FALSE,
-      'schema' => ['eventId'],
-    ]);
+    $tokenProcessor = $this->getTokenProcessor(['schema' => ['eventId']]);
     $this->assertEquals(array_merge($tokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
 
     $expectedEventString = $this->getExpectedEventTokenOutput();
     $this->callAPISuccess('job', 'send_reminder', []);
-    $expectedParticipantString = $this->getExpectedParticipantTokenOutput(5);
+    $expectedParticipantString = $this->getExpectedParticipantTokenOutput();
     $toCheck = array_merge(explode("\n", $expectedEventString), explode("\n", $expectedParticipantString));
     $toCheck[] = $expectedEventString;
     $toCheck[] = $expectedParticipantString;
     $mut->checkMailLog($toCheck);
     $tokens = array_keys($this->getEventTokens());
     $html = $this->getTokenString($tokens);
-    $tokenProcessor->addMessage('html', $html, 'text/plain');
-    $tokenProcessor->addRow(['eventId' => $this->ids['event'][0]]);
+    $tokenProcessor->addMessage('html', $html, 'text/html');
+    $tokenProcessor->addRow(['eventId' => $this->ids['Event'][0]]);
     $tokenProcessor->evaluate();
     $this->assertEquals($expectedEventString, $tokenProcessor->getRow(0)->render('html'));
   }
@@ -853,8 +925,8 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     ]);
     $html = $this->getTokenString(array_keys($this->getEventTokens()));
 
-    $tokenProcessor->addMessage('html', $html, 'text/plain');
-    $tokenProcessor->addRow(['eventId' => $this->ids['event'][0]]);
+    $tokenProcessor->addMessage('html', $html, 'text/html');
+    $tokenProcessor->addRow(['eventId' => $this->ids['Event'][0]]);
     $tokenProcessor->evaluate();
     $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
 
@@ -899,14 +971,36 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{event.end_date}' => 'Event End Date',
       '{event.event_type_id:label}' => 'Type',
       '{event.summary}' => 'Event Summary',
-      '{event.contact_email}' => 'Event Contact Email',
-      '{event.contact_phone}' => 'Event Contact Phone',
+      '{event.loc_block_id.email_id.email}' => 'Event Contact Email',
+      '{event.loc_block_id.phone_id.phone}' => 'Event Contact Phone',
       '{event.description}' => 'Event Description',
       '{event.location}' => 'Event Location',
       '{event.info_url}' => 'Event Info URL',
       '{event.registration_url}' => 'Event Registration URL',
       '{event.pay_later_receipt}' => 'Pay Later Receipt Text',
       '{event.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
+      '{event.confirm_email_text}' => 'Confirmation Email Text',
+    ];
+  }
+
+  /**
+   * @param string $entity
+   *
+   * @return string[]
+   */
+  protected function getRecurEntityTokens($entity): array {
+    return [
+      '{' . $entity . '.contribution_recur_id.id}' => 'Recurring Contribution ID',
+      '{' . $entity . '.contribution_recur_id.contact_id}' => 'Contact ID',
+      '{' . $entity . '.contribution_recur_id.amount}' => 'Amount',
+      '{' . $entity . '.contribution_recur_id.currency}' => 'Currency',
+      '{' . $entity . '.contribution_recur_id.frequency_unit}' => 'Frequency Unit',
+      '{' . $entity . '.contribution_recur_id.frequency_interval}' => 'Interval (number of units)',
+      '{' . $entity . '.contribution_recur_id.start_date}' => 'Start Date',
+      '{' . $entity . '.contribution_recur_id.cancel_date}' => 'Cancel Date',
+      '{' . $entity . '.contribution_recur_id.cancel_reason}' => 'Cancellation Reason',
+      '{' . $entity . '.contribution_recur_id.end_date}' => 'Recurring Contribution End Date',
+      '{' . $entity . '.contribution_recur_id.financial_type_id}' => 'Financial Type ID',
     ];
   }
 
@@ -954,7 +1048,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
         'phone_id' => $phoneID,
       ],
     ])->execute()->first()['id'];
-    $this->ids['event'][0] = $this->eventCreate([
+    $this->ids['Event'][0] = $this->eventCreateUnpaid([
       'description' => 'event description',
       'end_date' => 20081023,
       'registration_end_date' => 20081015,
@@ -965,39 +1059,25 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     // this prevents things working just because the id 'happens to be valid'
     $this->participantCreate([
       'register_date' => '2020-01-01',
-      'event_id' => $this->ids['event'][0],
+      'event_id' => $this->ids['Event'][0],
     ]);
     $this->ids['participant'][0] = $this->participantCreate([
-      'event_id' => $this->ids['event'][0],
+      'event_id' => $this->ids['Event'][0],
       'fee_amount' => 50,
       'fee_level' => 'steep',
       $this->getCustomFieldName('participant_int') => '99999',
     ]);
   }
 
-  public function testEscaping() {
-    $autoClean = [];
-    $create = function(string $entity, array $record = []) use (&$autoClean) {
-      // It's convenient to use createTestObject(), but it doesn't reproduce the normal escaping rules from QuickForm/APIv3/APIv4.
-      CRM_Utils_API_HTMLInputCoder::singleton()->encodeRow($record);
-      $dao = CRM_Core_DAO::createTestObject(CRM_Core_DAO_AllCoreTables::getFullName($entity), $record);
-
-      // We're not using transactions, and truncating 'contact' seems problematic, so we roll up our sleeves and cleanup each record...
-      $autoClean[] = CRM_Utils_AutoClean::with(function() use ($entity, $dao) {
-        CRM_Core_DAO::deleteTestObjects(CRM_Core_DAO_AllCoreTables::getFullName($entity), ['id' => $dao->id]);
-      });
-
-      return $dao;
-    };
-
+  public function testEscaping(): void {
     $context = [];
-    $context['contactId'] = $create('Contact', [
+    $context['contactId'] = $this->individualCreate([
       'first_name' => '<b>ig</b>illy brackets',
-    ])->id;
-    $context['eventId'] = $create('Event', [
+    ]);
+    $context['eventId'] = $this->eventCreateUnpaid([
       'title' => 'The Webinar',
       'description' => '<p>Some online webinar thingy.</p> <p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>',
-    ])->id;
+    ])['id'];
 
     $messages = $expected = [];
 
@@ -1018,6 +1098,38 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $rendered = CRM_Core_TokenSmarty::render($messages, $context);
 
     $this->assertEquals($expected, $rendered);
+  }
+
+  /**
+   * @param array $override
+   *
+   * @return \Civi\Token\TokenProcessor
+   */
+  protected function getTokenProcessor(array $override): TokenProcessor {
+    return new TokenProcessor(\Civi::dispatcher(), array_merge([
+      'controller' => __CLASS__,
+    ], $override));
+  }
+
+  /**
+   * Render the text via the token processor.
+   *
+   * @param array $rowContext
+   * @param string $text
+   * @param array $context
+   *
+   * @return string
+   */
+  protected function renderText(array $rowContext, string $text, array $context = []): string {
+    $context['schema'] = $context['schema'] ?? [];
+    foreach (array_keys($rowContext) as $key) {
+      $context['schema'][] = $key;
+    }
+    $tokenProcessor = $this->getTokenProcessor($context);
+    $tokenProcessor->addRow($rowContext);
+    $tokenProcessor->addMessage('text', $text, 'text/html');
+    $tokenProcessor->evaluate();
+    return $tokenProcessor->getRow(0)->render('text');
   }
 
 }

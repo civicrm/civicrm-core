@@ -56,6 +56,9 @@ class CRM_Core_I18n {
 
       case 'js':
         return substr(json_encode($text, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), 1, -1);
+
+      case 'htmlattribute':
+        return htmlspecialchars($text, ENT_QUOTES);
     }
     return $text;
   }
@@ -524,7 +527,7 @@ class CRM_Core_I18n {
 
     foreach ($array as & $value) {
       if ($value) {
-        $value = ts($value, $params);
+        $value = _ts($value, $params);
       }
     }
   }
@@ -541,8 +544,11 @@ class CRM_Core_I18n {
         $this->localizeTitles($value);
         $array[$key] = $value;
       }
-      elseif ((string ) $key == 'title') {
-        $array[$key] = ts($value, ['context' => 'menu']);
+      else {
+        $key = (string) $key;
+        if ($key == 'title' || $key == 'desc') {
+          $array[$key] = _ts($value, ['context' => 'menu']);
+        }
       }
     }
   }
@@ -768,7 +774,7 @@ class CRM_Core_I18n {
    */
   public static function getLocale() {
     global $tsLocale;
-    return $tsLocale ? $tsLocale : 'en_US';
+    return $tsLocale ?: 'en_US';
   }
 
   /**
@@ -799,12 +805,15 @@ class CRM_Core_I18n {
  * Short-named function for string translation, defined in global scope so it's available everywhere.
  *
  * @param string $text
- *   String string for translating.
+ *   String for translating.
+ *   Ex: 'Hello, %1!'
  * @param array $params
- *   Array an array of additional parameters.
- *
+ *   An array of additional parameters, as per `crm_translate()`.
+ *   Ex: [1 => 'Dave']
  * @return string
- *   the translated string
+ *   The translated string
+ *   Ex: '¡Buenos días Dave!`
+ * @see \CRM_Core_I18n::crm_translate()
  */
 function ts($text, $params = []) {
   static $bootstrapReady = FALSE;
@@ -840,4 +849,22 @@ function ts($text, $params = []) {
   else {
     return $i18n->crm_translate($text, $params);
   }
+}
+
+/**
+ * Alternate name for `ts()`
+ *
+ * This is functionally equivalent to `ts()`. However, regular `ts()` is subject to extra linting
+ * rules. Using `_ts()` can bypass the linting rules for the rare cases where you really want
+ * special/dynamic values.
+ *
+ * @param array ...$args
+ * @return string
+ * @see ts()
+ * @see \CRM_Core_I18n::crm_translate()
+ * @internal
+ */
+function _ts(...$args) {
+  $f = 'ts';
+  return $f(...$args);
 }

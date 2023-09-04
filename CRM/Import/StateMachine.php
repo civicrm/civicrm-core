@@ -36,7 +36,7 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
       $classType . '_Form_Preview' => NULL,
     ];
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
 }

@@ -33,7 +33,7 @@
   </tr>
 </table>
 <table style="width:100%; max-width:500px; border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
-  {if '{contribution.total_amount|raw}' !== '0.00'}
+  {if {contribution.total_amount|boolean}}
     <tr>
       <th {$headerStyle}>
         {ts}Contribution Information{/ts}
@@ -48,7 +48,7 @@
               <th>{ts}Item{/ts}</th>
               <th>{ts}Qty{/ts}</th>
               <th>{ts}Each{/ts}</th>
-              {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+              {if $isShowTax && {contribution.tax_amount|boolean}}
                 <th>{ts}Subtotal{/ts}</th>
                 <th>{ts}Tax Rate{/ts}</th>
                 <th>{ts}Tax Amount{/ts}</th>
@@ -60,7 +60,7 @@
                 <td>{$line.title}</td>
                 <td>{$line.qty}</td>
                 <td>{$line.unit_price|crmMoney:$currency}</td>
-                {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+                {if $isShowTax && {contribution.tax_amount|boolean}}
                   <td>{$line.unit_price*$line.qty|crmMoney:$currency}</td>
                   {if $line.tax_rate || $line.tax_amount != ""}
                     <td>{$line.tax_rate|string_format:"%.2f"}%</td>
@@ -79,7 +79,7 @@
         </td>
       </tr>
 
-      {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+      {if $isShowTax && {contribution.tax_amount|boolean}}
         <tr>
           <td {$labelStyle}>
             {ts} Amount before Tax : {/ts}
@@ -116,7 +116,7 @@
         </td>
       </tr>
     {else}
-      {if '{contribution.tax_amount|raw}' !== '0.00'}
+      {if {contribution.tax_amount|boolean}}
         <tr>
           <td {$labelStyle}>
             {ts}Total Tax Amount{/ts}
@@ -391,7 +391,7 @@
         </td>
        </tr>
       {/if}
-      {if !empty($is_deductible) AND !empty($price)}
+      {if $is_deductible AND !empty($price)}
         <tr>
          <td colspan="2" {$valueStyle}>
           <p>{ts 1=$price|crmMoney:$currency}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
@@ -407,7 +407,6 @@
        </th>
       </tr>
       {foreach from=$customPre item=customValue key=customName}
-       {if (!empty($trackingFields) and ! in_array($customName, $trackingFields)) or empty($trackingFields)}
         <tr>
          <td {$labelStyle}>
           {$customName}
@@ -416,7 +415,6 @@
           {$customValue}
          </td>
         </tr>
-       {/if}
       {/foreach}
      {/if}
 
@@ -427,7 +425,6 @@
        </th>
       </tr>
       {foreach from=$customPost item=customValue key=customName}
-       {if (!empty($trackingFields) and ! in_array($customName, $trackingFields)) or empty($trackingFields)}
         <tr>
          <td {$labelStyle}>
           {$customName}
@@ -436,7 +433,6 @@
           {$customValue}
          </td>
         </tr>
-       {/if}
       {/foreach}
      {/if}
 

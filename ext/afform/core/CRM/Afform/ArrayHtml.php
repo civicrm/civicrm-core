@@ -111,7 +111,7 @@ class CRM_Afform_ArrayHtml {
         continue;
       }
       if (!preg_match('/^[a-zA-Z0-9\-]+$/', $attrName)) {
-        throw new \RuntimeException("Malformed HTML attribute");
+        throw new \RuntimeException("Malformed HTML attribute $attrName → $attrValue");
       }
 
       $type = $this->pickAttrType($tag, $attrName);

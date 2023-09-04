@@ -156,9 +156,9 @@ class CRM_Core_SelectValues {
    */
   public static function eventDate() {
     return [
-      'start_date' => ts('start date'),
-      'end_date' => ts('end date'),
-      'join_date' => ts('member since'),
+      'start_date' => ts('Membership Start Date'),
+      'end_date' => ts('Membership Expiration Date'),
+      'join_date' => ts('Member Since'),
     ];
   }
 
@@ -486,6 +486,19 @@ class CRM_Core_SelectValues {
       $addr = array_merge(['' => ts('- select -')], CRM_Utils_System::getPluginList('CRM/Utils/Address', '.php', ['BatchUpdate']));
     }
     return $addr;
+  }
+
+  public static function smsProvider(): array {
+    $providers = CRM_SMS_BAO_Provider::getProviders(NULL, NULL, TRUE, 'is_default desc, title');
+    $result = [];
+    foreach ($providers as $provider) {
+      $result[] = [
+        'id' => $provider['id'],
+        'name' => $provider['name'],
+        'label' => $provider['title'],
+      ];
+    }
+    return $result;
   }
 
   /**
@@ -1105,28 +1118,34 @@ class CRM_Core_SelectValues {
     $includeEmail = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']);
     $options = [
       'sort_name' => $includeEmail ? ts('Name/Email') : ts('Name'),
-      'contact_id' => ts('Contact ID'),
+      'id' => ts('Contact ID'),
       'external_identifier' => ts('External ID'),
       'first_name' => ts('First Name'),
       'last_name' => ts('Last Name'),
-      'email' => ts('Email'),
-      'phone_numeric' => ts('Phone'),
-      'street_address' => ts('Street Address'),
-      'city' => ts('City'),
-      'postal_code' => ts('Postal Code'),
+      'email_primary.email' => ts('Email'),
+      'phone_primary.phone_numeric' => ts('Phone'),
+      'address_primary.street_address' => ts('Street Address'),
+      'address_primary.city' => ts('City'),
+      'address_primary.postal_code' => ts('Postal Code'),
       'job_title' => ts('Job Title'),
     ];
-    $custom = civicrm_api3('CustomField', 'get', [
-      'return' => ['name', 'label', 'custom_group_id.title'],
-      'custom_group_id.extends' => ['IN' => array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes())],
-      'data_type' => ['NOT IN' => ['ContactReference', 'Date', 'File']],
-      'custom_group_id.is_active' => 1,
-      'is_active' => 1,
-      'is_searchable' => 1,
-      'options' => ['sort' => ['custom_group_id.weight', 'weight'], 'limit' => 0],
+    $custom = civicrm_api4('CustomField', 'get', [
+      'checkPermissions' => FALSE,
+      'select' => ['name', 'label', 'custom_group_id.name', 'custom_group_id.title', 'option_group_id'],
+      'where' => [
+        ['custom_group_id.extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes())],
+        ['data_type', 'NOT IN', ['ContactReference', 'Date', 'File']],
+        ['custom_group_id.is_active', '=', TRUE],
+        ['is_active', '=', TRUE],
+        ['is_searchable', '=', TRUE],
+      ],
+      'orderBy' => [
+        'custom_group_id.weight' => 'ASC',
+        'weight' => 'ASC',
+      ],
     ]);
-    foreach ($custom['values'] as $field) {
-      $options['custom_' . $field['name']] = $field['custom_group_id.title'] . ': ' . $field['label'];
+    foreach ($custom as $field) {
+      $options[$field['custom_group_id.name'] . '.' . $field['name'] . ($field['option_group_id'] ? ':label' : '')] = $field['custom_group_id.title'] . ': ' . $field['label'];
     }
     return $options;
   }
@@ -1193,6 +1212,13 @@ class CRM_Core_SelectValues {
     ];
   }
 
+  public static function beforeAfter() {
+    return [
+      'before' => ts('Before'),
+      'after' => ts('After'),
+    ];
+  }
+
   /**
    * Columns from the option_value table which may or may not be used by each option_group.
    *
@@ -1208,6 +1234,25 @@ class CRM_Core_SelectValues {
       'icon' => 'icon',
       'color' => 'color',
     ];
+  }
+
+  /**
+   * Callback for Role.permissions pseudoconstant values.
+   *
+   * Permissions for Civi Standalone, not used by CMS-based systems.
+   *
+   * @return array
+   */
+  public static function permissions() {
+    $perms = $options = [];
+    \CRM_Utils_Hook::permissionList($perms);
+
+    foreach ($perms as $machineName => $details) {
+      if (!empty($details['is_active'])) {
+        $options[$machineName] = $details['title'];
+      }
+    }
+    return $options;
   }
 
 }

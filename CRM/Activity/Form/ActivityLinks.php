@@ -44,11 +44,11 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
 
     foreach ($allTypes as $act) {
       $url = 'civicrm/activity/add';
-      if ($act['name'] == 'Email') {
+      if ($act['name'] === 'Email') {
         if (!CRM_Utils_Mail::validOutBoundMail() || !$contactId) {
           continue;
         }
-        list($name, $email, $doNotEmail, $onHold, $isDeceased) = CRM_Contact_BAO_Contact::getContactDetails($contactId);
+        [, $email, $doNotEmail, , $isDeceased] = CRM_Contact_BAO_Contact::getContactDetails($contactId);
         if (!$doNotEmail && $email && !$isDeceased) {
           $url = 'civicrm/activity/email/add';
           $act['label'] = ts('Send an Email');
@@ -57,7 +57,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
           continue;
         }
       }
-      elseif ($act['name'] == 'SMS') {
+      elseif ($act['name'] === 'SMS') {
         if (!$contactId || !CRM_SMS_BAO_Provider::activeProviderCount() || !CRM_Core_Permission::check('send SMS')) {
           continue;
         }

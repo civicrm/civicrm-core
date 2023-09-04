@@ -62,11 +62,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
   public $_grid;
 
   /**
-   * Name of button for saving matching contacts.
-   * @var string
-   */
-  protected $_duplicateButtonName;
-  /**
    * The title of the category we are editing.
    *
    * @var string
@@ -206,7 +201,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $form->_id = $ids[0];
       }
       else {
-        if ($form->_context == 'dialog') {
+        if ($form->isEntityReferenceContactCreateMode()) {
           $contactLinks = CRM_Contact_BAO_Contact_Utils::formatContactIDSToLinks($ids, TRUE, TRUE);
 
           $duplicateContactsLinks = '<div class="matching-contacts-found">';
@@ -249,9 +244,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
           $errors['_qf_default'] = $duplicateContactsLinks;
 
-          // let smarty know that there are duplicates
-          $template = CRM_Core_Smarty::singleton();
-          $template->assign('isDuplicate', 1);
+          // The button 'Save Matching Contact' is added in buildForm
+          // but we only decide here whether ot not to show it - ie
+          // if validation failed due to there being duplicates.
+          CRM_Core_Smarty::singleton()->assign('showSaveDuplicateButton', 1);
         }
         else {
           $errors['_qf_default'] = ts('A record already exists with the same information.');
@@ -259,6 +255,18 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
     return $errors;
+  }
+
+  /**
+   * Is this being called from an entity reference field.
+   *
+   * E.g clicking on 'New Organization' from the employer field
+   * would create a link with the context = 'dialog' in the url.
+   *
+   * @return bool
+   */
+  public function isEntityReferenceContactCreateMode(): bool {
+    return $this->_context === 'dialog';
   }
 
   /**
@@ -329,7 +337,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('Proper action not specified for this custom value record profile'));
       }
     }
-    $this->_duplicateButtonName = $this->getButtonName('upload', 'duplicate');
 
     $gids = explode(',', (CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0) ?? ''));
 
@@ -485,7 +492,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
           $page->run();
         }
       }
-      $this->assign('multiRecordFieldListing', $multiRecordFieldListing);
 
       // is profile double-opt in?
       if (!empty($this->_fields['group']) &&
@@ -514,7 +520,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
       }
     }
-
+    $this->assign('multiRecordFieldListing', $multiRecordFieldListing ?? NULL);
     if (!is_array($this->_fields)) {
       CRM_Core_Session::setStatus(ts('This feature is not currently available.'), ts('Sorry'), 'error');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
@@ -541,7 +547,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if ($this->_isContactActivityProfile) {
         $contactFields = $activityFields = [];
         foreach ($this->_fields as $fieldName => $field) {
-          if (CRM_Utils_Array::value('field_type', $field) == 'Activity') {
+          if (($field['field_type'] ?? NULL) == 'Activity') {
             $activityFields[$fieldName] = $field;
           }
           else {
@@ -597,7 +603,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
           if ($htmlType == 'File') {
             $entityId = $this->_id;
-            if (CRM_Utils_Array::value('field_type', $field) == 'Activity' &&
+            if (($field['field_type'] ?? NULL) == 'Activity' &&
               $this->_activityId
             ) {
               $entityId = $this->_activityId;
@@ -632,7 +638,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $htmlType = $field['html_type'];
           if ((!isset($this->_defaults[$name]) || $htmlType == 'File') &&
-            (CRM_Utils_Array::value('field_type', $field) != 'Activity')
+            (($field['field_type'] ?? NULL) != 'Activity')
           ) {
             CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID,
               $name,
@@ -644,7 +650,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
           if ($htmlType == 'File') {
             $entityId = $this->_id;
-            if (CRM_Utils_Array::value('field_type', $field) == 'Activity' && $this->_activityId) {
+            if (($field['field_type'] ?? NULL) == 'Activity' && $this->_activityId) {
               $entityId = $this->_activityId;
             }
             $url = CRM_Core_BAO_CustomField::getFileURL($entityId, $customFieldID);
@@ -763,7 +769,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
           $return = TRUE;
           if (!$statusMessage) {
             $statusMessage = ts("This profile is configured for contact type '%1'. It cannot be used to edit contacts of other types.",
-                [1 => $profileSubType ? $profileSubType : $profileType]);
+                [1 => $profileSubType ?: $profileType]);
           }
         }
       }
@@ -897,10 +903,14 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $this->freeze();
     }
 
-    if ($this->_context == 'dialog') {
+    // Assign FALSE, here - this is overwritten during form validation
+    // if duplicates are found during submit.
+    CRM_Core_Smarty::singleton()->assign('showSaveDuplicateButton', FALSE);
+
+    if ($this->isEntityReferenceContactCreateMode()) {
       $this->addElement(
         'xbutton',
-        $this->_duplicateButtonName,
+        $this->getButtonName('upload', 'duplicate'),
         ts('Save Matching Contact'),
         [
           'type' => 'submit',
@@ -1046,7 +1056,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
-      if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
+      $greetingType = $fields[$greeting] ?? NULL;
+      if ($greetingType) {
         $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greeting . '_id', 'Customized');
         if ($customizedValue == $greetingType && empty($fields[$greeting . '_custom'])) {
           $errors[$greeting . '_custom'] = ts('Custom  %1 is a required field if %1 is of type Customized.',
@@ -1073,7 +1084,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $returnProperties = ['is_multiple', 'table_name'];
         CRM_Core_DAO::commonRetrieve("CRM_Core_DAO_CustomGroup", $filterParams, $returnValues, $returnProperties);
         if (!empty($returnValues['is_multiple'])) {
-          if ($tableName = CRM_Utils_Array::value('table_name', $returnValues)) {
+          $tableName = $returnValues['table_name'] ?? NULL;
+          if ($tableName) {
             $sql = "DELETE FROM {$tableName} WHERE id = %1 AND entity_id = %2";
             $sqlParams = [
               1 => [$this->_recordId, 'Integer'],
@@ -1241,7 +1253,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     if (($this->_mode & self::MODE_EDIT) && $this->_activityId && $this->_isContactActivityProfile) {
       $profileFields = $activityParams = [];
       foreach ($this->_fields as $fieldName => $field) {
-        if (CRM_Utils_Array::value('field_type', $field) == 'Activity') {
+        if (($field['field_type'] ?? NULL) == 'Activity') {
           if (isset($params[$fieldName])) {
             $activityParams[$fieldName] = $params[$fieldName];
           }
@@ -1354,7 +1366,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
-    return $fileName ? $fileName : parent::getTemplateFileName();
+    return $fileName ?: parent::getTemplateFileName();
   }
 
   /**
@@ -1365,7 +1377,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
-    return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
+    return $fileName ?: parent::overrideExtraTemplateFileName();
   }
 
   /**

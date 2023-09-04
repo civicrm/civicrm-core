@@ -36,7 +36,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     $baseDir = JPATH_SITE;
     $userParams = JComponentHelper::getParams('com_users');
 
@@ -72,7 +72,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $values['name'] = $fullname;
     $values['username'] = trim($params['cms_name']);
     $values['password1'] = $values['password2'] = $params['cms_pass'];
-    $values['email1'] = $values['email2'] = trim($params[$mail]);
+    $values['email1'] = $values['email2'] = trim($params[$mailParam]);
 
     $lang = JFactory::getLanguage();
     $lang->load('com_users', $baseDir);
@@ -261,8 +261,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE,
-    $htmlize = TRUE
+    $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
     $separator = '&';
@@ -968,7 +967,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
    *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
    */
-  public function getCiviSourceStorage() {
+  public function getCiviSourceStorage():array {
     global $civicrm_root;
     if (!defined('CIVICRM_UF_BASEURL')) {
       throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
@@ -1015,6 +1014,33 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       'ufAccessURL' => $ufAccessURL,
       'jAccessParams' => $jAccessParams,
     ];
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getContactDetailsFromUser($uf_match):array {
+    $contactParameters = [];
+    $user = $uf_match['user'];
+    $contactParameters['email'] = $user->email;
+    if ($user->name) {
+      CRM_Utils_String::extractName($user->name, $contactParameters);
+    }
+
+    return $contactParameters;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function modifyStandaloneProfile($profile, $params):string {
+    $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $params['gid'] . '&amp;reset=1';
+    $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
+
+    // FIXME: (CRM-3587) hack to make standalone profile work
+    // in Joomla without administrator login.
+    $profile = str_replace('/administrator/', '/index.php', $profile);
+    return $profile;
   }
 
 }

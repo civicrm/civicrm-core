@@ -111,7 +111,8 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
         }
       }
 
-      if ($emails = CRM_Utils_Array::value('notify_email', $params)) {
+      $emails = $params['notify_email'] ?? NULL;
+      if ($emails) {
         $emailArray = explode(',', $emails);
         foreach ($emailArray as $email) {
           if ($email && !CRM_Utils_Rule::email(trim($email))) {
@@ -150,7 +151,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     $params['is_approval_needed'] = CRM_Utils_Array::value('is_approval_needed', $params, FALSE);
     $params['is_tellfriend_enabled'] = CRM_Utils_Array::value('is_tellfriend_enabled', $params, FALSE);
 
-    CRM_PCP_BAO_PCPBlock::create($params);
+    CRM_PCP_BAO_PCPBlock::writeRecord($params);
 
     parent::endPostProcess();
   }

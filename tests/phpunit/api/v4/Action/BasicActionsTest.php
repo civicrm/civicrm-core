@@ -25,6 +25,7 @@ use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HookInterface;
+use Civi\Test\Invasive;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -54,14 +55,14 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     }
   }
 
-  public function testGetInfo() {
+  public function testGetInfo(): void {
     $info = MockBasicEntity::getInfo();
     $this->assertEquals('MockBasicEntity', $info['name']);
     $this->assertEquals(['identifier'], $info['primary_key']);
     $this->assertEquals('identifier', CoreUtil::getIdFieldName('MockBasicEntity'));
   }
 
-  public function testCrud() {
+  public function testCrud(): void {
     MockBasicEntity::delete()->addWhere('identifier', '>', 0)->execute();
 
     $id1 = MockBasicEntity::create()->addValue('foo', 'one')->execute()->first()['identifier'];
@@ -130,7 +131,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('one updated', $result->first()['foo']);
   }
 
-  public function testReplace() {
+  public function testReplace(): void {
     $objects = [
       ['group' => 'one', 'color' => 'red'],
       ['group' => 'one', 'color' => 'blue'],
@@ -162,7 +163,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('two', $newObjects[$objects[3]['identifier']]['group']);
   }
 
-  public function testBatchFrobnicate() {
+  public function testBatchFrobnicate(): void {
     $objects = [
       ['group' => 'one', 'color' => 'red', 'number' => 10],
       ['group' => 'one', 'color' => 'blue', 'number' => 20],
@@ -176,7 +177,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals([400, 1600], \CRM_Utils_Array::collect('frobnication', (array) $result));
   }
 
-  public function testGetFields() {
+  public function testGetFields(): void {
     $getFields = MockBasicEntity::getFields()->execute()->indexBy('name');
 
     $this->assertCount(8, $getFields);
@@ -223,7 +224,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('yellow', $getFields['fruit']['options'][2]['color']);
   }
 
-  public function testItemsToGet() {
+  public function testItemsToGet(): void {
     $get = MockBasicEntity::get()
       ->addWhere('color', 'NOT IN', ['yellow'])
       ->addWhere('color', 'IN', ['red', 'blue'])
@@ -232,48 +233,46 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->addWhere('size', 'LIKE', 'big')
       ->addWhere('shape', 'LIKE', '%a');
 
-    $itemsToGet = new \ReflectionMethod($get, '_itemsToGet');
-    $itemsToGet->setAccessible(TRUE);
+    $itemsToGet = [$get, '_itemsToGet'];
 
-    $this->assertEquals(['red', 'blue'], $itemsToGet->invoke($get, 'color'));
-    $this->assertEquals(['one'], $itemsToGet->invoke($get, 'group'));
-    $this->assertEquals(['big'], $itemsToGet->invoke($get, 'size'));
-    $this->assertEmpty($itemsToGet->invoke($get, 'shape'));
-    $this->assertEmpty($itemsToGet->invoke($get, 'weight'));
+    $this->assertEquals(['red', 'blue'], Invasive::call($itemsToGet, ['color']));
+    $this->assertEquals(['one'], Invasive::call($itemsToGet, ['group']));
+    $this->assertEquals(['big'], Invasive::call($itemsToGet, ['size']));
+    $this->assertEmpty(Invasive::call($itemsToGet, ['shape']));
+    $this->assertEmpty(Invasive::call($itemsToGet, ['weight']));
   }
 
-  public function testFieldsToGet() {
+  public function testFieldsToGet(): void {
     $get = MockBasicEntity::get()
       ->addWhere('color', '!=', 'green');
 
-    $isFieldSelected = new \ReflectionMethod($get, '_isFieldSelected');
-    $isFieldSelected->setAccessible(TRUE);
+    $isFieldSelected = [$get, '_isFieldSelected'];
 
     // If no "select" is set, should always return true
-    $this->assertTrue($isFieldSelected->invoke($get, 'color'));
-    $this->assertTrue($isFieldSelected->invoke($get, 'shape'));
-    $this->assertTrue($isFieldSelected->invoke($get, 'size', 'color', 'shape'));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['color']));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['shape']));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['size', 'color', 'shape']));
 
     // With a non-empty "select" fieldsToSelect() will return fields needed to evaluate each clause.
     $get->addSelect('identifier');
-    $this->assertTrue($isFieldSelected->invoke($get, 'color', 'shape', 'size'));
-    $this->assertTrue($isFieldSelected->invoke($get, 'identifier'));
-    $this->assertFalse($isFieldSelected->invoke($get, 'shape', 'size', 'weight'));
-    $this->assertFalse($isFieldSelected->invoke($get, 'group'));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['color', 'shape', 'size']));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['identifier']));
+    $this->assertFalse(Invasive::call($isFieldSelected, ['shape', 'size', 'weight']));
+    $this->assertFalse(Invasive::call($isFieldSelected, ['group']));
 
     $get->addClause('OR', ['shape', '=', 'round'], ['AND', [['size', '=', 'big'], ['weight', '!=', 'small']]]);
-    $this->assertTrue($isFieldSelected->invoke($get, 'color'));
-    $this->assertTrue($isFieldSelected->invoke($get, 'identifier'));
-    $this->assertTrue($isFieldSelected->invoke($get, 'shape'));
-    $this->assertTrue($isFieldSelected->invoke($get, 'size'));
-    $this->assertTrue($isFieldSelected->invoke($get, 'group', 'weight'));
-    $this->assertFalse($isFieldSelected->invoke($get, 'group'));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['color']));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['identifier']));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['shape']));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['size']));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['group', 'weight']));
+    $this->assertFalse(Invasive::call($isFieldSelected, ['group']));
 
     $get->addOrderBy('group');
-    $this->assertTrue($isFieldSelected->invoke($get, 'group'));
+    $this->assertTrue(Invasive::call($isFieldSelected, ['group']));
   }
 
-  public function testWildcardSelect() {
+  public function testWildcardSelect(): void {
     $records = [
       ['group' => 'one', 'color' => 'red', 'shape' => 'round', 'size' => 'med', 'weight' => 10],
       ['group' => 'two', 'color' => 'blue', 'shape' => 'round', 'size' => 'med', 'weight' => 20],
@@ -292,7 +291,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals(['shape', 'size', 'weight'], array_keys($result));
   }
 
-  public function testEmptyAndNullOperators() {
+  public function testEmptyAndNullOperators(): void {
     $records = [
       ['id' => NULL],
       ['color' => '', 'weight' => 0],
@@ -337,7 +336,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertArrayHasKey($records[2]['identifier'], (array) $result);
   }
 
-  public function testContainsOperator() {
+  public function testContainsOperators(): void {
     $records = [
       ['group' => 'one', 'fruit:name' => ['apple', 'pear'], 'weight' => 11],
       ['group' => 'two', 'fruit:name' => ['pear', 'banana'], 'weight' => 12],
@@ -351,9 +350,20 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('one', $result->first()['group']);
 
     $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS', 'apple')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('two', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'CONTAINS', 'pear')
       ->execute();
     $this->assertCount(2, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS', 'pear')
+      ->execute();
+    $this->assertCount(0, $result);
 
     $result = MockBasicEntity::get()
       ->addWhere('group', 'CONTAINS', 'o')
@@ -361,9 +371,19 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertCount(2, $result);
 
     $result = MockBasicEntity::get()
+      ->addWhere('group', 'NOT CONTAINS', 'w')
+      ->execute();
+    $this->assertCount(1, $result);
+
+    $result = MockBasicEntity::get()
       ->addWhere('weight', 'CONTAINS', 1)
       ->execute();
     $this->assertCount(2, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('weight', 'NOT CONTAINS', 2)
+      ->execute();
+    $this->assertCount(1, $result);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:label', 'CONTAINS', 'Banana')
@@ -372,13 +392,25 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('two', $result->first()['group']);
 
     $result = MockBasicEntity::get()
+      ->addWhere('fruit:label', 'NOT CONTAINS', 'Banana')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('one', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
       ->addWhere('weight', 'CONTAINS', 2)
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals('two', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('weight', 'NOT CONTAINS', 2)
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('one', $result->first()['group']);
   }
 
-  public function testRegexpOperators() {
+  public function testRegexpOperators(): void {
     $records = [
       ['color' => 'red'],
       ['color' => 'blue'],
@@ -400,7 +432,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('red', $result[0]['color']);
   }
 
-  public function testPseudoconstantMatch() {
+  public function testPseudoconstantMatch(): void {
     $records = [
       ['group:label' => 'First', 'shape' => 'round', 'fruit:name' => 'banana'],
       ['group:name' => 'two', 'shape' => 'square', 'fruit:label' => 'Pear'],

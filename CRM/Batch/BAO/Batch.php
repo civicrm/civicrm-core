@@ -18,7 +18,7 @@
 /**
  * Batch BAO class.
  */
-class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
+class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\HookInterface {
 
   /**
    * Cache for the current batch object.
@@ -34,19 +34,29 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   public static $_exportFormat = NULL;
 
   /**
-   * Create a new batch.
-   *
+   * @deprecated
    * @param array $params
-   *
-   * @return object
-   *   $batch batch object
-   * @throws \Exception
+   * @return CRM_Batch_DAO_Batch
    */
   public static function create(&$params) {
-    if (empty($params['id']) && empty($params['name'])) {
-      $params['name'] = CRM_Utils_String::titleToVar($params['title'] ?? 'batch_ref_' . random_int(0, 100000));
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   *
+   * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
+    if ($event->action === 'create') {
+      // Supply defaults for `title`
+      if (empty($event->params['title'])) {
+        $event->params['title'] = $event->params['name'] ?? self::generateBatchName();
+      }
+    }
   }
 
   /**
@@ -611,9 +621,9 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     $session = CRM_Core_Session::singleton();
     $params['modified_date'] = date('YmdHis');
     $params['modified_id'] = $session->get('userID');
-    foreach ($batchIds as $key => $value) {
-      $params['id'] = $ids['batchID'] = $value;
-      self::create($params, $ids);
+    foreach ($batchIds as $id) {
+      $params['id'] = $id;
+      self::writeRecord($params);
     }
     $url = CRM_Utils_System::url('civicrm/financial/financialbatches', "reset=1&batchStatus={$params['status_id']}");
     CRM_Utils_System::redirect($url);

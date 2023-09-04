@@ -13,6 +13,7 @@
     <add>civicrm/admin/financial/financialType/edit?action=add&amp;reset=1</add>
     <update>civicrm/admin/financial/financialType/edit?action=update&amp;id=[id]&amp;reset=1</update>
     <delete>civicrm/admin/financial/financialType/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+    <browse>civicrm/admin/financial/financialType</browse>
   </paths>
   <field>
     <name>id</name>

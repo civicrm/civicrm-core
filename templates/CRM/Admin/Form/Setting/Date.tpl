@@ -12,7 +12,6 @@
     {ts 1=$crmURL}Use this screen to configure default formats for date display and date input fields throughout your site. Settings use standard POSIX specifiers. New installations are preconfigured with standard United States formats. You can override this default setting and define the range of allowed dates for specific field types at <a href="%1">Administer > Customize Data and Screens > Date Preferences</a>{/ts} {help id='date-format'}
 </div>
 <div class="crm-block crm-form-block crm-date-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 <fieldset><legend>{ts}Date Display{/ts}</legend>
    <table class="form-layout-compressed">
        <tr class="crm-date-form-block-dateformatDatetime">

@@ -723,6 +723,7 @@ class CRM_Utils_Token {
    * @deprecated
    */
   public static function parseThroughSmarty($tokenHtml, $entity, $entityType = 'contact') {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the tokens to the template
@@ -859,6 +860,8 @@ class CRM_Utils_Token {
   /**
    * Replace subscription-confirmation-request tokens
    *
+   * @deprecated
+   *
    * @param string $str
    *   The string with tokens to be replaced.
    * @param string $group
@@ -871,6 +874,7 @@ class CRM_Utils_Token {
    *   The processed string
    */
   public static function &replaceSubscribeTokens($str, $group, $url, $html) {
+    CRM_Core_Error::deprecatedFunctionWarning('use token processor');
     if (self::token_match('subscribe', 'group', $str)) {
       self::token_replace('subscribe', 'group', $group, $str);
     }
@@ -925,6 +929,8 @@ class CRM_Utils_Token {
   /**
    * Replace welcome/confirmation tokens
    *
+   * @deprecated since 5.65 will be removed around 5.71
+   *
    * @param string $str
    *   The string with tokens to be replaced.
    * @param string $group
@@ -936,6 +942,7 @@ class CRM_Utils_Token {
    *   The processed string
    */
   public static function &replaceWelcomeTokens($str, $group, $html) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     if (self::token_match('welcome', 'group', $str)) {
       self::token_replace('welcome', 'group', $group, $str);
     }
@@ -1710,7 +1717,7 @@ class CRM_Utils_Token {
         else {
           $entity = 'Contact';
         }
-        $sorted[ts($entity)][] = ['id' => $k, 'text' => $v];
+        $sorted[_ts($entity)][] = ['id' => $k, 'text' => $v];
       }
     }
 
@@ -1723,12 +1730,15 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
    * @param $value
    * @param $token
    *
    * @return bool|int|mixed|string|null
    */
   protected static function convertPseudoConstantsUsingMetadata($value, $token) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     // Convert pseudoconstants using metadata
     if ($value && is_numeric($value)) {
       $allFields = CRM_Contact_BAO_Contact::exportableFields('All');
@@ -1762,6 +1772,11 @@ class CRM_Utils_Token {
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
           'receipt_text_renewal' => 'receipt_text',
+          '$isAmountZero' => 'no longer available / relevant',
+        ],
+        'event_offline_receipt' => [
+          '$contributeMode' => 'no longer available / relevant',
+          '$isAmountZero' => 'no longer available / relevant',
         ],
         'pledge_acknowledgement' => [
           '$domain' => 'no longer available / relevant',

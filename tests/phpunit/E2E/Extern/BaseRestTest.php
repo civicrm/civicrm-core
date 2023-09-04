@@ -256,7 +256,7 @@ abstract class E2E_Extern_BaseRestTest extends CiviEndToEndTestCase {
    * Submit a request with an API key that exists but does not correspond to.
    * a real user. Submit in "?entity=X&action=X" notation
    */
-  public function testNotCMSUser_entityAction() {
+  public function testNotCMSUser_entityAction(): void {
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     //Create contact with api_key
@@ -289,7 +289,7 @@ abstract class E2E_Extern_BaseRestTest extends CiviEndToEndTestCase {
    * Submit a request with an API key that exists but does not correspond to.
    * a real user. Submit in "?entity=X&action=X" notation
    */
-  public function testGetCorrectUserBack() {
+  public function testGetCorrectUserBack(): void {
     $this->updateAdminApiKey();
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
@@ -314,7 +314,7 @@ abstract class E2E_Extern_BaseRestTest extends CiviEndToEndTestCase {
    * Submit a request with an API key that exists but does not correspond to
    * a real user. Submit in "?q=civicrm/$entity/$action" notation
    */
-  public function testNotCMSUser_q() {
+  public function testNotCMSUser_q(): void {
     if (!$this->isOldQSupported()) {
       $this->markTestSkipped('rest.php?q=civicrm/ENTITY/ACTION is not supported here');
     }

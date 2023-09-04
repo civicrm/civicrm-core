@@ -111,51 +111,53 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
 
     $event = $this->eventCreatePaid([]);
 
-    $individualOneId = $this->individualCreate();
-    $individualTwoId = $this->individualCreate();
-    $contactIds = [$individualOneId, $individualTwoId];
+    $individualOneID = $this->individualCreate();
+    $individualTwoID = $this->individualCreate();
 
-    $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event['id']);
+    $priceSetId = $this->ids['PriceSet']['PaidEvent'];
     $priceField = $this->callAPISuccess('PriceField', 'get', ['price_set_id' => $priceSetId]);
     $priceFieldValues = $this->callAPISuccess('PriceFieldValue', 'get', [
       'sequential' => 1,
       'price_field_id' => $priceField['id'],
     ]);
 
-    $lineItemParams = [];
-    foreach ($priceFieldValues['values'] as $key => $priceFieldValue) {
-      $lineItemParams[] = [
+    $lineItemParams = [
+      [
         'line_item' => [
-          $priceFieldValue['id'] => [
+          $this->ids['PriceField']['PaidEvent'] => [
             'price_field_id' => $priceField['id'],
-            'label' => $priceFieldValue['label'],
-            'financial_type_id' => $priceFieldValue['financial_type_id'],
-            'price_field_value_id' => $priceFieldValue['id'],
+            'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_standard'],
             'qty' => 1,
-            'field_title' => $priceFieldValue['label'],
-            'unit_price' => $priceFieldValue['amount'],
-            'line_total' => $priceFieldValue['amount'],
             'entity_table' => 'civicrm_participant',
           ],
         ],
         // participant params
         'params' => [
-          'contact_id' => $contactIds[$key],
+          'contact_id' => $individualOneID,
           'event_id' => $event['id'],
           'status_id' => 1,
-          'price_set_id' => $priceSetId,
-          'participant_fee_amount' => $priceFieldValue['amount'],
-          'participant_fee_level' => $priceFieldValue['label'],
         ],
-      ];
-    }
+      ],
+      [
+        'line_item' => [
+          $this->ids['PriceField']['PaidEvent'] => [
+            'price_field_id' => $priceField['id'],
+            'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
+            'qty' => 1,
+            'entity_table' => 'civicrm_participant',
+          ],
+        ],
+        // participant params
+        'params' => [
+          'contact_id' => $individualTwoID,
+          'event_id' => $event['id'],
+          'status_id' => 1,
+        ],
+      ],
+    ];
 
     $orderParams = [
-      'contact_id' => $individualOneId,
-      'total_amount' => array_reduce($priceFieldValues['values'], function($total, $priceFieldValue) {
-        $total += $priceFieldValue['amount'];
-        return $total;
-      }),
+      'contact_id' => $individualOneID,
       'financial_type_id' => $priceFieldValues['values'][0]['financial_type_id'],
       'currency' => 'USD',
       'line_items' => $lineItemParams,
@@ -168,7 +170,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
       'forPage' => 1,
     ];
 
-    $invoiceHTML = CRM_Contribute_Form_Task_Invoice::printPDF([$order['id']], $pdfParams, [$individualOneId]);
+    $invoiceHTML = CRM_Contribute_Form_Task_Invoice::printPDF([$order['id']], $pdfParams, [$individualOneID]);
 
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $order['id']]);
 

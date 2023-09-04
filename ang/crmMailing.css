@@ -23,17 +23,6 @@
   text-align: center;
 }
 
-span.crmMailing-include {
-  color: #060;
-}
-span.crmMailing-exclude {
-  color: #600;
-  text-decoration: line-through;
-}
-span.crmMailing-mandatory {
-  color: #866304;
-}
-
 .crmMailing input[name=preview_test_email],
 .crmMailing-preview select[name=preview_test_group] {
   width: 80%;
@@ -53,12 +42,9 @@ span.crmMailing-mandatory {
 .crmMailing .preview-contact {
   border-right: 1px solid black;
 }
-.crmMailing .preview-group,
-.crmMailing .preview-contact {
-}
 
 .crmMailing .crmMailing-schedule-outer {
-  width: 98%
+  width: 98%;
 }
 .crmMailing .crmMailing-schedule-inner {
   width: 40em;
@@ -79,8 +65,8 @@ input[name=preview_test_email]::-webkit-input-placeholder {
 input[name=preview_test_email]:-ms-input-placeholder {
   text-align: center;
 }
-.crmMailing-active {
-}
+
+/* .crmMailing-active {} */
 .crmMailing-inactive {
   text-decoration: line-through;
 }

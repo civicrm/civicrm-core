@@ -18,9 +18,23 @@
  */
 class CRM_Core_ScheduledJob {
 
+  /**
+   * @var int
+   * @deprecated
+   */
   public $version = 3;
 
+  /**
+   * @var int
+   */
+  public $id;
+
   public $name = NULL;
+
+  /**
+   * @var string
+   */
+  public $parameters = '';
 
   public $apiParams = [];
 
@@ -30,31 +44,16 @@ class CRM_Core_ScheduledJob {
    * @param array $params
    */
   public function __construct($params) {
+    // Fixme - setting undeclared class properties!
     foreach ($params as $name => $param) {
       $this->$name = $param;
     }
 
-    // version is set to 3 by default - if different number
-    // defined in params, it's replaced later on, however,
-    // it's practically useles, since it seems none of api v2
-    // will work properly in cron job setup. It might become
-    // useful when/if api v4 starts to emerge and will need
-    // testing in the cron job setup. To permanenty require
-    // hardcoded api version, it's enough to move below line
-    // under following if block.
-    $this->apiParams = ['version' => $this->version];
-
-    if (!empty($this->parameters)) {
-      $lines = explode("\n", $this->parameters);
-
-      foreach ($lines as $line) {
-        $pair = explode("=", $line);
-        if ($pair === FALSE || count($pair) != 2 || trim($pair[0]) == '' || trim($pair[1]) == '') {
-          $this->remarks[] .= 'Malformed parameters!';
-          break;
-        }
-        $this->apiParams[trim($pair[0])] = trim($pair[1]);
-      }
+    try {
+      $this->apiParams = CRM_Core_BAO_Job::parseParameters($this->parameters);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->remarks[] = $e->getMessage();
     }
   }
 
@@ -135,9 +134,6 @@ class CRM_Core_ScheduledJob {
     $nextTime = strtotime($offset, $lastTime);
 
     return ($now >= $nextTime);
-  }
-
-  public function __destruct() {
   }
 
 }

@@ -93,7 +93,7 @@ class CRM_Custom_Page_AJAX {
   /**
    * Get list of Multi Record Fields.
    */
-  public static function getMultiRecordFieldList() {
+  public static function getMultiRecordFieldList(): void {
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams(0, 10);
     $params['cid'] = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
@@ -118,7 +118,7 @@ class CRM_Custom_Page_AJAX {
       $obj->_DTparams['sort'] = $params['sortBy'];
     }
 
-    list($fields, $attributes) = $obj->browse();
+    [$fields, $attributes] = $obj->browse();
 
     // format params and add class attributes
     $fieldList = [];

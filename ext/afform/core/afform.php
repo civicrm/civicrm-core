@@ -58,13 +58,6 @@ function afform_civicrm_config(&$config) {
   $dispatcher->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
   $dispatcher->addListener('hook_civicrm_check', ['\Civi\Afform\StatusChecks', 'hook_civicrm_check']);
   $dispatcher->addListener('civi.afform.get', ['\Civi\Api4\Action\Afform\Get', 'getCustomGroupBlocks']);
-
-  // Register support for email tokens
-  if (CRM_Extension_System::singleton()->getMapper()->isActiveModule('authx')) {
-    $dispatcher->addListener('hook_civicrm_alterMailContent', ['\Civi\Afform\Tokens', 'applyCkeditorWorkaround']);
-    $dispatcher->addListener('hook_civicrm_tokens', ['\Civi\Afform\Tokens', 'hook_civicrm_tokens']);
-    $dispatcher->addListener('hook_civicrm_tokenValues', ['\Civi\Afform\Tokens', 'hook_civicrm_tokenValues']);
-  }
 }
 
 /**
@@ -178,7 +171,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   if ($tabsetName !== 'civicrm/contact/view') {
     return;
   }
-  $contactTypes = array_merge([$context['contact_type']] ?? [], $context['contact_sub_type'] ?? []);
+  $contactTypes = array_merge((array) ($context['contact_type'] ?? []), $context['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get(FALSE)
     ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
     ->addWhere('contact_summary', '=', 'tab')
@@ -188,8 +181,10 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   foreach ($afforms as $afform) {
     $summaryContactType = $afform['summary_contact_type'] ?? [];
     if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
+      // Convention is to name the afform like "afformTabMyInfo" which gets the tab name "my_info"
+      $tabId = CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $afform['name']));
       $tabs[] = [
-        'id' => $afform['name'],
+        'id' => $tabId,
         'title' => $afform['title'],
         'weight' => $weight++,
         'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
@@ -361,17 +356,6 @@ function _afform_get_partials($moduleName, $module) {
 }
 
 /**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_entityTypes
- */
-function afform_civicrm_entityTypes(&$entityTypes) {
-  _afform_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
  * Implements hook_civicrm_buildAsset().
  */
 function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
@@ -516,26 +500,6 @@ function _afform_angular_module_name($fileBaseName, $format = 'camel') {
 
     default:
       throw new \Exception("Unrecognized format");
-  }
-}
-
-/**
- * Implements hook_civicrm_alterApiRoutePermissions().
- *
- * @see CRM_Utils_Hook::alterApiRoutePermissions
- */
-function afform_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action) {
-  if ($entity == 'Afform') {
-    // These actions should be accessible to anonymous users; permissions are checked internally
-    $allowedActions = ['prefill', 'submit', 'submitFile', 'getOptions'];
-    if (in_array($action, $allowedActions, TRUE)) {
-      $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
-    }
-  }
-  // This is temporarily stuck here, but probably belongs in core (until this hook is finally abolished)
-  elseif ($action === 'autocomplete') {
-    // Autocomplete widget must be accessible by anonymous users. Permissions are checked internally.
-    $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
   }
 }
 

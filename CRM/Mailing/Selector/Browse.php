@@ -439,7 +439,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           $actionMask,
           [
             'mid' => $row['id'],
-            'hashOrMid' => $hash ? $hash : $row['id'],
+            'hashOrMid' => $hash ?: $row['id'],
           ],
           "more",
           FALSE,
@@ -582,7 +582,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         $clauses[] = "civicrm_mailing.is_archived = 1";
       }
       else {
-        $clauses[] = "(civicrm_mailing.is_archived IS NULL OR civicrm_mailing.is_archived = 0)";
+        $clauses[] = "civicrm_mailing.is_archived = 0";
       }
     }
 
@@ -615,12 +615,12 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $params[5] = [$createdId, 'Integer'];
     }
 
-    $campainIds = $this->_parent->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campainIds)) {
-      if (!is_array($campainIds)) {
+    $campaignIds = $this->_parent->get('campaign_id');
+    if (!CRM_Utils_System::isNull($campaignIds)) {
+      if (!is_array($campaignIds)) {
         $campaignIds = [$campaignIds];
       }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campaignIds)) . ' ) )';
     }
 
     if ($language = $this->_parent->get('language')) {

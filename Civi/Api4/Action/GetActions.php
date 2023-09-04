@@ -35,7 +35,7 @@ class GetActions extends BasicGetAction {
     $entityReflection = new \ReflectionClass($className);
     foreach ($entityReflection->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC) as $method) {
       $actionName = $method->getName();
-      if ($actionName != 'permissions' && $actionName != 'getInfo' && $actionName[0] != '_') {
+      if (!in_array($actionName, ['permissions', 'getInfo', 'getEntityName'], TRUE) && !str_starts_with($actionName, '_')) {
         $this->loadAction($actionName, $method);
       }
     }
@@ -79,7 +79,8 @@ class GetActions extends BasicGetAction {
     try {
       if (!isset($this->_actions[$actionName]) && (!$this->_actionsToGet || in_array($actionName, $this->_actionsToGet))) {
         $action = \Civi\API\Request::create($this->getEntityName(), $actionName, ['version' => 4]);
-        if (is_object($action) && (!$this->checkPermissions || $action->isAuthorized(\CRM_Core_Session::singleton()->getLoggedInContactID()))) {
+        $authorized = !$this->checkPermissions || \Civi::service('civi_api_kernel')->runAuthorize($this->getEntityName(), $actionName, ['version' => 4]);
+        if (is_object($action) && $authorized) {
           $this->_actions[$actionName] = ['name' => $actionName];
           if ($this->_isFieldSelected('description', 'comment', 'see')) {
             $vars = ['entity' => $this->getEntityName(), 'action' => $actionName];
@@ -93,7 +94,7 @@ class GetActions extends BasicGetAction {
               if (strpos($method->getDocComment(), '@inheritDoc') !== FALSE && !empty($methodDocs['comment']) && !empty($actionDocs['comment'])) {
                 $methodDocs['comment'] .= "\n\n" . $actionDocs['comment'];
               }
-              $actionDocs = array_filter($methodDocs) + $actionDocs;
+              $actionDocs = array_filter($methodDocs) + $actionDocs + ['deprecated' => FALSE];
             }
             $this->_actions[$actionName] += $actionDocs;
           }
@@ -130,6 +131,10 @@ class GetActions extends BasicGetAction {
         'name' => 'params',
         'description' => 'List of all accepted parameters',
         'data_type' => 'Array',
+      ],
+      [
+        'name' => 'deprecated',
+        'data_type' => 'Boolean',
       ],
     ];
   }

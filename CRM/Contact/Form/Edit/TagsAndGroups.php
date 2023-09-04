@@ -168,7 +168,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         $fName = $fieldName;
       }
 
-      $contactGroup = CRM_Contact_BAO_GroupContact::getContactGroup($id, 'Added', NULL, FALSE, TRUE);
+      $contactGroup = CRM_Contact_BAO_GroupContact::getContactGroup($id, 'Added', NULL, FALSE, TRUE, FALSE, TRUE, NULL, TRUE);
       if ($contactGroup) {
         if ($groupElementType == 'select') {
           $defaults[$fName] = implode(',', CRM_Utils_Array::collect('group_id', $contactGroup));

@@ -115,34 +115,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_paymentProcessorID;
 
   /**
-   * Is pay later enabled for the form.
-   *
-   * As part of trying to consolidate various payment pages we store processors here & have functions
-   * at this level to manage them. An alternative would be to have a separate Form that is inherited
-   * by all forms that allow payment processing.
-   *
-   * @var int
-   */
-  protected $_is_pay_later_enabled;
-
-  /**
    * The renderer used for this form
    *
    * @var object
    */
   protected $_renderer;
-
-  /**
-   * An array to hold a list of datefields on the form
-   * so that they can be converted to ISO in a consistent manner
-   *
-   * @var array
-   *
-   * e.g on a form declare $_dateFields = array(
-   *  'receive_date' => array('default' => 'now'),
-   *  );
-   */
-  protected $_dateFields = [];
 
   /**
    * Cache the smarty template for efficiency reasons
@@ -199,10 +176,54 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $exportedValues = [];
 
   /**
+   * The contact ID that has been authenticated and can be used for checking permissions.
+   *
+   * It could be a combination of cid in the url plus a checksum or the logged in user.
+   * Importantly it can be used to run permission checks on.
+   *
+   * @var int
+   */
+  private $authenticatedContactID;
+
+  /**
    * @return string
    */
   public function getContext() {
     return $this->context;
+  }
+
+  /**
+   * Get values submitted by the user.
+   *
+   * Compared with $this->controller->exportValues this has a couple of changes
+   * 1) any fields declared in $this->submittableMoneyFields will be de-formatted first.
+   * 2) it is possible to store access fields from related forms if they
+   * are declared in `getSubmittableFields()`. This is notably used in imports
+   * to combine fields from the various screens & save the resulting 'submitted_values'
+   * to the UserJob.
+   *
+   * @return array
+   */
+  public function getSubmittedValues(): array {
+    $values = [];
+    foreach (array_keys($this->getSubmittableFields()) as $key) {
+      $values[$key] = $this->getSubmittedValue($key);
+    }
+    return $values;
+  }
+
+  /**
+   * Get the fields that can be submitted in this form flow.
+   *
+   * To make fields in related forms (ie within the same wizard like
+   * Contribution_Main and Contribution_Confirm) accessible you can override
+   * this function as CRM_Import_Forms does.
+   *
+   * @return string[]
+   */
+  protected function getSubmittableFields(): array {
+    $fieldNames = array_keys($this->controller->exportValues($this->_name));
+    return array_fill_keys($fieldNames, $this->_name);
   }
 
   /**
@@ -291,6 +312,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // See CRM_Activity_Form_ActivityTest:testInboundEmailDisplaysWithLineBreaks.
     'footer_status_severity',
   ];
+
+  /**
+   * Name of action button
+   *
+   * @var string
+   */
+  protected $_actionButtonName;
 
   /**
    * Constructor for the basic form page.
@@ -438,7 +466,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Fudge some extra types that quickform doesn't support
     $inputType = $type;
     if ($type == 'wysiwyg' || in_array($type, self::$html5Types)) {
-      $attributes = ($attributes ? $attributes : []) + ['class' => ''];
+      $attributes = ($attributes ?: []) + ['class' => ''];
       $attributes['class'] = ltrim($attributes['class'] . " crm-form-$type");
       if ($type == 'wysiwyg' && isset($attributes['preset'])) {
         $attributes['data-preset'] = $attributes['preset'];
@@ -449,8 +477,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Like select but accepts rich array data (with nesting, colors, icons, etc) as option list.
     if ($inputType == 'select2') {
       $type = 'text';
-      $options = $attributes;
-      $attributes = ($extra ? $extra : []) + ['class' => ''];
+      $options = [];
+      foreach ($attributes as $option) {
+        // Transform options from api4.getFields format
+        $option['text'] = $option['text'] ?? $option['label'];
+        unset($option['label']);
+        $options[] = $option;
+      }
+      $attributes = ($extra ?: []) + ['class' => ''];
       $attributes['class'] = ltrim($attributes['class'] . " crm-select2 crm-form-select2");
       $attributes['data-select-params'] = json_encode(['data' => $options, 'multiple' => !empty($attributes['multiple'])]);
       unset($attributes['multiple']);
@@ -508,7 +542,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($extra['option_context']);
     }
 
-    $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
+    // Allow disabled to be a boolean
+    if (isset($attributes['disabled']) && $attributes['disabled'] === FALSE) {
+      unset($attributes['disabled']);
+    }
+
+    if ($type === 'checkbox') {
+      $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), NULL, $attributes);
+    }
+    else {
+      $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
+    }
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
     }
@@ -689,7 +733,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->buildQuickForm();
 
     $defaults = $this->setDefaultValues();
-    unset($defaults['qfKey']);
+    if (isset($defaults['qfKey'])) {
+      unset($defaults['qfKey']);
+    }
 
     if (!empty($defaults)) {
       $this->setDefaults($defaults);
@@ -943,7 +989,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   protected function prepareParamsForPaymentProcessor($params) {
     // also add location name to the array
-    $params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
+    $params["address_name-{$this->_bltID}"] = ($params['billing_first_name'] ?? '') . ' ' . ($params['billing_middle_name'] ?? '') . ' ' . ($params['billing_last_name'] ?? '');
     $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
     // Add additional parameters that the payment processors are used to receiving.
     if (!empty($params["billing_state_province_id-{$this->_bltID}"])) {
@@ -1151,7 +1197,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * If renderer is not set create one and initialize it.
    *
-   * @return object
+   * @return CRM_Core_Form_Renderer
    */
   public function &getRenderer() {
     if (!isset($this->_renderer)) {
@@ -1328,7 +1374,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function &addRadio($name, $title, $values, $attributes = [], $separator = NULL, $required = FALSE, $optionAttributes = []) {
     $options = [];
-    $attributes = $attributes ? $attributes : [];
+    $attributes = $attributes ?: [];
     $allowClear = !empty($attributes['allowClear']);
     unset($attributes['allowClear']);
     $attributes['id_suffix'] = $name;
@@ -1539,8 +1585,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     );
     $attributes = ['formatType' => 'searchDate'];
     $extra = ['time' => $isDateTime];
-    $this->add('datepicker', $fieldName . $from, ts($fromLabel), $attributes, $required, $extra);
-    $this->add('datepicker', $fieldName . $to, ts($toLabel), $attributes, $required, $extra);
+    $this->add('datepicker', $fieldName . $from, _ts($fromLabel), $attributes, $required, $extra);
+    $this->add('datepicker', $fieldName . $to, _ts($toLabel), $attributes, $required, $extra);
   }
 
   /**
@@ -1631,7 +1677,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       [, $id] = explode('_', $name);
       $label = $props['label'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
       $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
-      if (CRM_Utils_Array::value('context', $props) != 'search') {
+      if (($props['context'] ?? NULL) != 'search') {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
       }
     }
@@ -1641,14 +1687,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       foreach ($info['values'] as $uniqueName => $fieldSpec) {
         if (
           $uniqueName === $props['field'] ||
-          CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
+          ($fieldSpec['name'] ?? NULL) === $props['field'] ||
           in_array($props['field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, []))
         ) {
           break;
         }
       }
-      $label = $props['label'] ?? $fieldSpec['title'];
-      if (CRM_Utils_Array::value('context', $props) != 'search') {
+      $label = $props['label'] ?? $fieldSpec['html']['label'] ?? $fieldSpec['title'];
+      if (($props['context'] ?? NULL) != 'search') {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
       }
     }
@@ -1742,13 +1788,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // Core field - get metadata.
-    $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
-    $fieldSpec = $fieldSpec['values'];
-    $fieldSpecLabel = $fieldSpec['html']['label'] ?? CRM_Utils_Array::value('title', $fieldSpec);
-    $label = CRM_Utils_Array::value('label', $props, $fieldSpecLabel);
+    $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props)['values'];
+    $label = $props['label'] ?? $fieldSpec['html']['label'] ?? $fieldSpec['title'];
 
     $widget = $props['type'] ?? $fieldSpec['html']['type'];
-    if ($widget == 'TextArea' && $context == 'search') {
+    if (in_array($widget, ['TextArea', 'Email'], TRUE) && $context == 'search') {
+      // Don't require a full email to be entered in search mode.
+      // See https://lab.civicrm.org/dev/core/-/issues/4430.
       $widget = 'Text';
     }
 
@@ -1771,6 +1817,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       if ($context == 'search') {
         $widget = $widget == 'Select2' ? $widget : 'Select';
         $props['multiple'] = CRM_Utils_Array::value('multiple', $props, TRUE);
+      }
+      elseif (!empty($fieldSpec['serialize'])) {
+        $props['multiple'] = TRUE;
       }
 
       // Add data for popup link.
@@ -2204,6 +2253,38 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * @param string $name
+   * @param string $label
+   * @param array $props
+   * @param bool $required
+   *
+   * @return HTML_QuickForm_Element
+   */
+  public function addAutocomplete(string $name, string $label = '', array $props = [], bool $required = FALSE) {
+    $props += [
+      'entity' => 'Contact',
+      'api' => [],
+      'select' => [],
+    ];
+    $props['api'] += [
+      'formName' => 'qf:' . get_class($this),
+    ];
+    // If fieldName is missing and no default entity is set for the form, this will throw an excption.
+    // In that case, you should explicitly supply api.fieldName in the format `EntityName.field_name`
+    // because without it autocompleteSubscribers can't do their job.
+    if (empty($props['api']['fieldName'])) {
+      $props['api']['fieldName'] = $this->getDefaultEntity() . '.' . $name;
+    }
+    $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-autocomplete');
+    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
+    $props['data-select-params'] = json_encode($props['select']);
+    $props['data-api-params'] = json_encode($props['api']);
+    $props['data-api-entity'] = $props['entity'];
+    CRM_Utils_Array::remove($props, 'select', 'api', 'entity');
+    return $this->add('text', $name, $label, $props, $required);
+  }
+
+  /**
    * Create a single or multiple entity ref field.
    * @param string $name
    * @param string $label
@@ -2296,71 +2377,124 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public static function validateMandatoryFields($fields, $values, &$errors) {
     foreach ($fields as $name => $fld) {
-      if (!empty($fld['is_required']) && CRM_Utils_System::isNull(CRM_Utils_Array::value($name, $values))) {
+      if (!empty($fld['is_required']) && CRM_Utils_System::isNull($values[$name] ?? NULL)) {
         $errors[$name] = ts('%1 is a required field.', [1 => $fld['title']]);
       }
     }
   }
 
   /**
-   * Get contact if for a form object. Prioritise
-   *   - cid in URL if 0 (on behalf on someoneelse)
-   *      (@todo consider setting a variable if onbehalf for clarity of downstream 'if's
-   *   - logged in user id if it matches the one in the cid in the URL
-   *   - contact id validated from a checksum from a checksum
-   *   - cid from the url if the caller has ACL permission to view
-   *   - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
+   * Get contact iD for a form object.
+   *
+   * This checks the requestedContactID and returns it if
+   * - it is the number 0 (relevant for online contribution & event forms).
+   * - it is the logged in user
+   * - it is validated by a checksum in the url.
+   * - it is a contact that the logged in user has permission to view
+   *
+   * Failing that it returns the logged in user, if any. This is may be useful
+   * for users taking actions from their contact dashboard (although usually one
+   * of the variants above would be hit).
    *
    * @return NULL|int
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function setContactID() {
-    $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    if (isset($this->_params) && !empty($this->_params['select_contact_id'])) {
-      $tempID = $this->_params['select_contact_id'];
-    }
-    if (isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
-      // event form stores as an indexed array, contribution form not so much...
-      $tempID = $this->_params[0]['select_contact_id'];
-    }
+    $requestedContactID = $this->getRequestedContactID();
 
     // force to ignore the authenticated user
-    if ($tempID === '0' || $tempID === 0) {
+    if ($requestedContactID === 0) {
       // we set the cid on the form so that this will be retained for the Confirm page
       // in the multi-page form & prevent us returning the $userID when this is called
       // from that page
       // we don't really need to set it when $tempID is set because the params have that stored
       $this->set('cid', 0);
-      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $tempID]);
-      return (int) $tempID;
+      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => $requestedContactID]);
+      return (int) $requestedContactID;
     }
 
-    $userID = CRM_Core_Session::getLoggedInContactID();
-
-    if (!is_null($tempID) && $tempID === $userID) {
-      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $tempID]);
-      return (int) $userID;
-    }
-
-    //check if this is a checksum authentication
-    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
-    if ($userChecksum) {
-      //check for anonymous user.
-      $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
-      if ($validUser) {
-        CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $tempID]);
-        CRM_Core_Resources::singleton()->addVars('coreForm', ['checksum' => $userChecksum]);
-        return $tempID;
+    if ($requestedContactID === $this->getAuthenticatedContactID()) {
+      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => $requestedContactID]);
+      // Check if this is a checksum authentication.
+      if ($this->getAuthenticatedCheckSumContactID()) {
+        CRM_Core_Resources::singleton()->addVars('coreForm', ['checksum' => CRM_Utils_Request::retrieve('cs', 'String', $this)]);
       }
+      return $requestedContactID;
     }
+
     // check if user has permission, CRM-12062
-    elseif ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
-      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $tempID]);
-      return $tempID;
+    if ($requestedContactID && CRM_Contact_BAO_Contact_Permission::allow($requestedContactID)) {
+      CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $requestedContactID]);
+      return $requestedContactID;
     }
+    $userID = CRM_Core_Session::getLoggedInContactID();
     if (is_numeric($userID)) {
       CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $userID]);
     }
     return is_numeric($userID) ? $userID : NULL;
+  }
+
+  /**
+   * Get the contact ID that has been requested (via url or form value).
+   *
+   * Ideally the forms would override this so only the cid in the url
+   * would be checked in the shared form function.
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  public function getRequestedContactID(): ?int {
+    if (isset($this->_params) && !empty($this->_params['select_contact_id'])) {
+      return (int) $this->_params['select_contact_id'];
+    }
+    if (isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
+      // Event form stores as an indexed array, contribution form not so much...
+      return (int) $this->_params[0]['select_contact_id'];
+    }
+    $urlContactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    return is_numeric($urlContactID) ? (int) $urlContactID : NULL;
+  }
+
+  /**
+   * Get the authenticated contact ID.
+   *
+   * This is either
+   *  - a contact ID authenticated by checksum
+   *  - the logged in user
+   *  - 0 for none.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getAuthenticatedContactID() : int {
+    if ($this->authenticatedContactID === NULL) {
+      $this->authenticatedContactID = $this->getAuthenticatedCheckSumContactID();
+      if (!$this->authenticatedContactID) {
+        $this->authenticatedContactID = (int) CRM_Core_Session::getLoggedInContactID();
+      }
+    }
+    return $this->authenticatedContactID;
+  }
+
+  /**
+   * Get the contact ID authenticated as a valid by checksum.
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function getAuthenticatedCheckSumContactID(): int {
+    $requestedContactID = $this->getRequestedContactID();
+    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
+    if ($userChecksum && CRM_Contact_BAO_Contact_Utils::validChecksum($requestedContactID, $userChecksum)) {
+      return $requestedContactID;
+    }
+    return 0;
   }
 
   /**
@@ -2613,6 +2747,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header');
     }
+  }
+
+  /**
+   * Push path to the userContext (defaults to current url path).
+   *
+   * This is like a save point :-). The next status bounce will
+   * return the browser to this url unless another is added.
+   *
+   * @param string $path
+   *   Path string e.g. `civicrm/foo/bar?reset=1`, defaults to current path.
+   */
+  protected function pushUrlToUserContext(string $path = NULL): void {
+    $url = CRM_Utils_System::url($path ?: CRM_Utils_System::currentPath() . '?reset=1',
+      '', FALSE, NULL, FALSE);
+    CRM_Core_Session::singleton()->pushUserContext($url);
   }
 
   /**

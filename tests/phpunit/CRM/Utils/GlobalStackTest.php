@@ -7,15 +7,15 @@
 class CRM_Utils_GlobalStackTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
    * Temporarily override global variables and ensure that the variable data.
    * is set as expected (before/during/after the override).
    */
-  public function testPushPop() {
+  public function testPushPop(): void {
     global $_FOO, $_EXTRA;
 
     $_FOO['bar'] = 1;

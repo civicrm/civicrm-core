@@ -96,7 +96,7 @@ class CRM_Core_Form_RecurringEntity {
     // Assign variables
     $entityType = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($entityTable);
     $tpl = CRM_Core_Smarty::singleton();
-    $tpl->assign('recurringEntityType', ts($entityType));
+    $tpl->assign('recurringEntityType', _ts($entityType));
     $tpl->assign('currentEntityId', self::$_entityId);
     $tpl->assign('entityTable', self::$_entityTable);
     $tpl->assign('scheduleReminderId', self::$_scheduleReminderID);
@@ -134,7 +134,7 @@ class CRM_Core_Form_RecurringEntity {
         $defaults['ends'] = 2;
       }
       $defaults['limit_to'] = self::$_scheduleReminderDetails->limit_to;
-      if (self::$_scheduleReminderDetails->limit_to) {
+      if (self::$_scheduleReminderDetails->limit_to == 1) {
         $defaults['repeats_by'] = 1;
       }
       if (self::$_scheduleReminderDetails->entity_status) {
@@ -327,7 +327,7 @@ class CRM_Core_Form_RecurringEntity {
       $params['entity_id'] = self::$_entityId;
     }
     //Process this function only when you get this variable
-    if (CRM_Utils_Array::value('allowRepeatConfigToSubmit', $params) == 1) {
+    if (($params['allowRepeatConfigToSubmit'] ?? NULL) == 1) {
       if (!empty($params['entity_table']) && !empty($params['entity_id']) && $type) {
         $params['used_for'] = $type;
         if (empty($params['parent_entity_id'])) {
@@ -346,10 +346,10 @@ class CRM_Core_Form_RecurringEntity {
 
         //Delete repeat configuration and rebuild
         if (!empty($params['id'])) {
-          CRM_Core_BAO_ActionSchedule::del($params['id']);
+          CRM_Core_BAO_ActionSchedule::deleteRecord($params);
           unset($params['id']);
         }
-        $actionScheduleObj = CRM_Core_BAO_ActionSchedule::add($dbParams);
+        $actionScheduleObj = CRM_Core_BAO_ActionSchedule::writeRecord($dbParams);
 
         //exclude dates
         $excludeDateList = [];
@@ -364,7 +364,7 @@ class CRM_Core_Form_RecurringEntity {
             'name'
           );
           if ($optionGroupIdExists) {
-            CRM_Core_BAO_OptionGroup::del($optionGroupIdExists);
+            CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $optionGroupIdExists]);
           }
           $optionGroupParams = [
             'name' => $type . '_repeat_exclude_dates_' . $actionScheduleObj->entity_value,

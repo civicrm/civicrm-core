@@ -116,9 +116,9 @@ class BasicGetAction extends AbstractGetAction {
           }
         }
       }
+      // Swap raw values with pseudoconstants
+      FormattingUtil::formatOutputValues($values, $fields, $this->getActionName());
     }
-    // Swap raw values with pseudoconstants
-    FormattingUtil::formatOutputValues($records, $fields, $this->getActionName());
   }
 
 }

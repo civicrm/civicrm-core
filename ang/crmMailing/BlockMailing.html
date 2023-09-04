@@ -36,9 +36,7 @@ It could perhaps be thinned by 30-60% by making more directives.
         </select>
       </div>
     </div>
-    <div crm-ui-field="{name: 'subform.recipients', title: ts('Recipients'), required: true}">
-      <div crm-mailing-block-recipients="{name: 'recipients', id: 'subform.recipients'}" crm-mailing="mailing" cm-ui-id="subform.recipients"></div>
-    </div>
+    <div crm-mailing-block-recipients-multiline="{name: 'recipients'}" crm-mailing="mailing"></div>
     <span ng-controller="EditUnsubGroupCtrl">
       <div crm-ui-field="{name: 'subform.baseGroup', title: ts('Unsubscribe Group')}" ng-if="isUnsubGroupRequired(mailing)">
         <input

@@ -23,7 +23,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *
    * @var string[]
    */
-  protected $submittableFields = ['skipColumnHeader', 'uploadField'];
+  protected $submittableFields = ['skipColumnHeader', 'uploadFile', 'fieldSeparator'];
 
   /**
    * Provides information about the data source.
@@ -56,7 +56,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
     $form->assign('uploadSize', $uploadSize);
     $form->add('File', 'uploadFile', ts('Import Data File'), NULL, TRUE);
-    $form->addElement('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2]);
+    $form->add('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2], TRUE);
     $form->setMaxFileSize($uploadFileSize);
     $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
       1 => $uploadSize,

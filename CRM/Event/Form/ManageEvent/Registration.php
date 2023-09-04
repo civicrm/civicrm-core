@@ -47,7 +47,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $urlParams = "id={$this->_id}&addProfileBottom=1&qfKey={$this->controller->_key}";
     $this->assign('addProfileParams', $urlParams);
 
-    if ($addProfileBottom = CRM_Utils_Array::value('custom_post_id_multiple', $_POST)) {
+    $addProfileBottom = $_POST['custom_post_id_multiple'] ?? NULL;
+    if ($addProfileBottom) {
       foreach (array_keys($addProfileBottom) as $profileNum) {
         self::buildMultipleProfileBottom($this, $profileNum);
       }
@@ -59,7 +60,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $urlParamsAdd = "id={$this->_id}&addProfileBottomAdd=1&qfKey={$this->controller->_key}";
     $this->assign('addProfileParamsAdd', $urlParamsAdd);
 
-    if ($addProfileBottomAdd = CRM_Utils_Array::value('additional_custom_post_id_multiple', $_POST)) {
+    $addProfileBottomAdd = $_POST['additional_custom_post_id_multiple'] ?? NULL;
+    if ($addProfileBottomAdd) {
       foreach (array_keys($addProfileBottomAdd) as $profileNum) {
         self::buildMultipleProfileBottom($this, $profileNum, 'additional_', ts('Profile for Additional Participants'));
       }
@@ -260,7 +262,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       '' => ts('- Unsupervised rule -'),
     ];
     $dedupeRules += CRM_Dedupe_BAO_DedupeRuleGroup::getByType('Individual');
-    $this->add('select', 'dedupe_rule_group_id', ts('Duplicate matching rule'), $dedupeRules);
+    $this->add('select', 'dedupe_rule_group_id', ts('Duplicate matching rule'), $dedupeRules, FALSE, ['class' => 'crm-select2 huge']);
 
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     if (in_array('Awaiting approval', $participantStatuses) and in_array('Pending from approval', $participantStatuses) and in_array('Rejected', $participantStatuses)) {
@@ -444,7 +446,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       if (($values['registration_link_text'] ?? '') === '') {
         $errorMsg['registration_link_text'] = ts('Please enter Registration Link Text');
       }
-      if (($values['confirm_title'] ?? '') === '') {
+      // Check if the confirm text is set if we have enabled the confirmation page or page is monetary which forces the confirm page.
+      if (($values['confirm_title'] ?? '') === '' && (!empty($values['is_confirm_enabled']) || CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_id, 'is_monetary'))) {
         $errorMsg['confirm_title'] = ts('Please enter a Title for the registration Confirmation Page');
       }
       if (($values['thankyou_title'] ?? '') === '') {
@@ -761,7 +764,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @param string $field
    */
   public static function addMultipleProfiles(&$profileIds, $values, $field) {
-    if ($multipleProfiles = CRM_Utils_Array::value($field, $values)) {
+    $multipleProfiles = $values[$field] ?? NULL;
+    if ($multipleProfiles) {
       foreach ($multipleProfiles as $profileId) {
         $profileIds[] = $profileId;
       }
@@ -849,7 +853,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           $ufAdd[1] = $params['custom_pre_id'];
           $wtAdd = 1;
         }
-        elseif (CRM_Utils_Array::value('additional_custom_pre_id', $params) == 'none') {
+        elseif (($params['additional_custom_pre_id'] ?? NULL) == 'none') {
         }
         else {
           $ufAdd[1] = $params['additional_custom_pre_id'];
@@ -861,7 +865,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         if (empty($params['additional_custom_post_id'])) {
           $ufAdd[2] = $params['custom_post_id'];
         }
-        elseif (CRM_Utils_Array::value('additional_custom_post_id', $params) == 'none') {
+        elseif (($params['additional_custom_post_id'] ?? NULL) == 'none') {
         }
         else {
           $ufAdd[2] = $params['additional_custom_post_id'];

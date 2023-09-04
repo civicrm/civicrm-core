@@ -29,7 +29,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
     $this->source = $this->individualCreate();
   }
 
-  public function testActivityCreate() {
+  public function testActivityCreate(): void {
     Civi::settings()->set('activity_assignee_notification', TRUE);
     //Reset filter to none.
     Civi::settings()->set('do_not_notify_assignees_for', []);
@@ -61,7 +61,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
     $this->assertEmpty($msg);
   }
 
-  public function testActivityDelete() {
+  public function testActivityDelete(): void {
     // Set the parameters of the test.
     $numberOfSingleActivitiesToCreate = 3;
     $numberOfRepeatingActivitiesToCreate = 6;
@@ -99,6 +99,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
     // Create the repeating activity's schedule.
     $actionScheduleParams = [
+      'title' => 'RepeatingActSchedule',
       'used_for' => 'civicrm_activity',
       'entity_value' => $repeatingActivityBao->id,
       'start_action_date' => $repeatingActivityBao->activity_date_time,
@@ -106,7 +107,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
       'repetition_frequency_interval' => 1,
       'start_action_offset' => $numberOfRepeatingActivitiesToCreate - 1,
     ];
-    $actionScheduleBao = CRM_Core_BAO_ActionSchedule::add($actionScheduleParams);
+    $actionScheduleBao = CRM_Core_BAO_ActionSchedule::writeRecord($actionScheduleParams);
 
     // Create the activity's repeats.
     $recurringEntityBao = new CRM_Core_BAO_RecurringEntity();
@@ -157,7 +158,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
   /**
    * Test deleting an activity that has an attachment.
    */
-  public function testActivityDeleteWithAttachment() {
+  public function testActivityDeleteWithAttachment(): void {
     $loggedInUser = $this->createLoggedInUser();
     // Create an activity
     $activity = $this->callAPISuccess('Activity', 'create', [
@@ -241,7 +242,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
   /**
    * This is a bit messed up having a variable called name that means label but we don't want to fix it because it's a form member variable _activityTypeName that might be used in form hooks, so just make sure it doesn't flip between name and label. dev/core#1116
    */
-  public function testActivityTypeNameIsReallyLabel() {
+  public function testActivityTypeNameIsReallyLabel(): void {
     $form = new CRM_Activity_Form_Activity();
 
     // the actual value is irrelevant we just need something for the tested function to act on
@@ -275,7 +276,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
    *
    * See also testActivityTypeNameIsReallyLabel()
    */
-  public function testActivityTypeAssignment() {
+  public function testActivityTypeAssignment(): void {
     $form = new CRM_Activity_Form_Activity();
 
     $form->_currentlyViewedContactId = $this->source;

@@ -1,0 +1,7 @@
+<select class="form-control api4-sets-type" ng-model="$ctrl.set[0]" placeholder="{{:: ts('Type') }}" >
+  <option value="UNION DISTINCT">UNION DISTINCT</option>
+  <option value="UNION ALL">UNION ALL</option>
+</select>
+<input class="form-control" ng-model="$ctrl.set[1]" crm-ui-select="{data: $ctrl.entities, allowClear: true, placeholder: 'None'}" />
+<input class="form-control api4-sets-action" readonly value="get" >
+<input class="form-control api4-sets-params" ng-model="$ctrl.set[3]" placeholder="{{:: ts('Params') }}" >

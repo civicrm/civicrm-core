@@ -27,8 +27,15 @@ class SqlString extends SqlExpression {
     $this->expr = str_replace(['\\\\', "\\$quot", $backslash], [$backslash, $quot, '\\\\'], $str);
   }
 
-  public function render(Api4SelectQuery $query): string {
+  public function render(Api4Query $query): string {
     return '"' . \CRM_Core_DAO::escapeString($this->expr) . '"';
+  }
+
+  /**
+   * @return string
+   */
+  public function getExpr(): string {
+    return '"' . $this->expr . '"';
   }
 
   public static function getTitle(): string {

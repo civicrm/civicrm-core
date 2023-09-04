@@ -10,6 +10,7 @@
       page: 1,
       rowCount: null,
       // Arrays may contain callback functions for various events
+      onInitialize: [],
       onChangeFilters: [],
       onPreRun: [],
       onPostRun: [],
@@ -26,12 +27,18 @@
         for (var p=0; p < placeholderCount; ++p) {
           this.placeholders.push({});
         }
+        _.each(ctrl.onInitialize, function(callback) {
+          callback.call(ctrl, $scope, $element);
+        });
 
-        this.getResults = _.debounce(function() {
+        // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 300ms
+        this.getResultsPronto = _.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});
+        // _.debounce used here to schedule a search if nothing else happens for 600ms: useful for auto-searching on typing
+        this.getResultsSoon = _.debounce(function() {
           $scope.$apply(function() {
             ctrl.runSearch();
           });
-        }, 800);
+        }, 600);
 
         // Update totalCount variable if used.
         // Integrations can pass in `total-count="somevar" to keep track of the number of results returned
@@ -53,7 +60,7 @@
         // Popup forms in this display or surrounding Afform trigger a refresh
         $element.closest('form').on('crmPopupFormSuccess', function() {
           ctrl.rowCount = null;
-          ctrl.getResults();
+          ctrl.getResultsPronto();
         });
 
         function onChangeFilters() {
@@ -63,7 +70,7 @@
             callback.call(ctrl);
           });
           if (!ctrl.settings.button) {
-            ctrl.getResults();
+            ctrl.getResultsSoon();
           }
         }
 
@@ -71,16 +78,16 @@
           ctrl.page = 1;
           // Only refresh if search has already been run
           if (ctrl.results) {
-            ctrl.getResults();
+            ctrl.getResultsSoon();
           }
         }
 
         if (this.afFieldset) {
           $scope.$watch(this.afFieldset.getFieldData, onChangeFilters, true);
           // Add filter title to Afform
-          this.onPostRun.push(function(results) {
-            if (results.labels && results.labels.length && $scope.$parent.addTitle) {
-              $scope.$parent.addTitle(results.labels.join(' '));
+          this.onPostRun.push(function(apiResults) {
+            if (apiResults.run.labels && apiResults.run.labels.length && $scope.$parent.addTitle) {
+              $scope.$parent.addTitle(apiResults.run.labels.join(' '));
             }
           });
         }
@@ -131,7 +138,7 @@
       onClickSearchButton: function() {
         this.rowCount = null;
         this.page = 1;
-        this.getResults();
+        this.getResultsPronto();
       },
 
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
@@ -142,17 +149,17 @@
         if (!statusParams) {
           this.loading = true;
         }
+        apiCalls = apiCalls || {};
+        apiCalls.run = ['SearchDisplay', 'run', apiParams];
         _.each(ctrl.onPreRun, function(callback) {
-          callback.call(ctrl, apiParams);
+          callback.call(ctrl, apiCalls);
         });
-        apiCalls = apiCalls || [];
-        apiCalls.push(['SearchDisplay', 'run', apiParams]);
         var apiRequest = crmApi4(apiCalls);
         apiRequest.then(function(apiResults) {
           if (requestId < ctrl._runCount) {
             return; // Another request started after this one
           }
-          ctrl.results = _.last(apiResults);
+          ctrl.results = apiResults.run;
           ctrl.editing = ctrl.loading = false;
           // Update rowCount if running for the first time or during an update op
           if (!ctrl.rowCount || editedRow) {
@@ -165,9 +172,17 @@
                 ctrl.rowCount = result.count;
               });
             }
+            // If there are no results on initial load, open the "addNew" link if configured as "autoOpen"
+            if (!ctrl.results.length && requestId === 1 && ctrl.settings.addButton && ctrl.settings.addButton.autoOpen) {
+              CRM.loadForm(ctrl.getButtonUrl())
+                .on('crmFormSuccess', function() {
+                  ctrl.rowCount = null;
+                  ctrl.getResultsPronto();
+                });
+            }
           }
           _.each(ctrl.onPostRun, function(callback) {
-            callback.call(ctrl, ctrl.results, 'success', editedRow);
+            callback.call(ctrl, apiResults, 'success', editedRow);
           });
         }, function(error) {
           if (requestId < ctrl._runCount) {

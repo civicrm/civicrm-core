@@ -52,6 +52,7 @@
     <add>5.41</add>
     <pseudoconstant>
       <callback>CRM_Afform_BAO_AfformSubmission::getAllAfformsByName</callback>
+      <suffixes>name,label,description,abbr,icon,url</suffixes>
     </pseudoconstant>
   </field>
 
@@ -74,6 +75,22 @@
     <default>CURRENT_TIMESTAMP</default>
     <readonly>true</readonly>
     <add>5.41</add>
+  </field>
+
+  <field>
+    <name>status_id</name>
+    <title>Submission Status</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <html>
+      <type>Select</type>
+    </html>
+    <pseudoconstant>
+      <optionGroupName>afform_submission_status</optionGroupName>
+    </pseudoconstant>
+    <comment>fk to Afform Submission Status options in civicrm_option_values</comment>
+    <default>1</default>
+    <add>5.66</add>
   </field>
 
 </table>

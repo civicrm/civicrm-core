@@ -38,6 +38,10 @@ class CustomFieldSpec extends FieldSpec {
         $dataType = 'Integer';
         break;
 
+      case 'EntityReference':
+        $dataType = 'Integer';
+        break;
+
       case 'File':
       case 'StateProvince':
       case 'Country':

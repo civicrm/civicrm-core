@@ -19,13 +19,13 @@ class SqlField extends SqlExpression {
   public $supportsExpansion = TRUE;
 
   protected function initialize() {
-    if ($this->alias && $this->alias !== $this->expr) {
+    if ($this->alias && $this->alias !== $this->expr && !strpos($this->expr, ':')) {
       throw new \CRM_Core_Exception("Aliasing field names is not allowed, only expressions can have an alias.");
     }
     $this->fields[] = $this->expr;
   }
 
-  public function render(Api4SelectQuery $query): string {
+  public function render(Api4Query $query): string {
     $field = $query->getField($this->expr, TRUE);
     if (!empty($field['sql_renderer'])) {
       $renderer = $field['sql_renderer'];

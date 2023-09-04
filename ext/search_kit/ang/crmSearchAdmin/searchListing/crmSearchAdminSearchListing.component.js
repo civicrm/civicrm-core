@@ -11,7 +11,7 @@
     controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
-        ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplaySortableTrait),
+        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait)),
         afformLoad;
 
       this.searchDisplayPath = CRM.url('civicrm/search');
@@ -38,11 +38,13 @@
             'modified_id.display_name',
             'created_date',
             'modified_date',
+            'expires_date',
             'has_base',
             'base_module:label',
             'local_modified_date',
             'DATE(created_date) AS date_created',
             'DATE(modified_date) AS date_modified',
+            'DATE(expires_date) AS expires',
             'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
             'GROUP_CONCAT(display.label ORDER BY display.id) AS display_label',
             'GROUP_CONCAT(display.type:icon ORDER BY display.id) AS display_icon',
@@ -56,7 +58,7 @@
             ['Group AS group', 'LEFT', ['id', '=', 'group.saved_search_id']],
             ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
           ],
-          where: [['api_entity', 'IS NOT NULL']],
+          where: [['api_entity', 'IS NOT NULL'], ['is_current', '=', true]],
           groupBy: ['id']
         }
       };
@@ -85,8 +87,8 @@
         }));
       }
 
-      this.onPostRun.push(function(result) {
-        _.each(result, function(row) {
+      this.onPostRun.push(function(apiResults) {
+        _.each(apiResults.run, function(row) {
           row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
           // If main entity doesn't exist, no can edit
           if (!row.data['api_entity:label']) {
@@ -159,7 +161,7 @@
 
       this.deleteSearch = function(row) {
         ctrl.runSearch(
-          [['SavedSearch', 'delete', {where: [['id', '=', row.key]]}]],
+          {deleteSearch: ['SavedSearch', 'delete', {where: [['id', '=', row.key]]}]},
           {start: ts('Deleting...'), success: ts('Search Deleted')},
           row
         );
@@ -167,13 +169,13 @@
 
       this.revertSearch = function(row) {
         ctrl.runSearch(
-          [['SavedSearch', 'revert', {
+          {revertSearch: ['SavedSearch', 'revert', {
             where: [['id', '=', row.key]],
             chain: {
               revertDisplays: ['SearchDisplay', 'revert', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', true]]}],
               deleteDisplays: ['SearchDisplay', 'delete', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', false]]}]
             }
-          }]],
+          }]},
           {start: ts('Reverting...'), success: ts('Search Reverted')},
           row
         );
@@ -271,6 +273,13 @@
             })
           );
         }
+        ctrl.display.settings.columns.push(
+          searchMeta.fieldToColumn('expires_date', {
+            label: ts('Expires'),
+            title: '[expires_date]',
+            rewrite: '[expires]'
+          })
+        );
         ctrl.display.settings.columns.push({
           type: 'include',
           alignment: 'text-right',

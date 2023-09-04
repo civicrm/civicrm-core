@@ -177,6 +177,7 @@
     <default>NULL</default>
     <comment>FK to civicrm_case</comment>
     <html>
+      <type>EntityRef</type>
       <label>Case</label>
     </html>
     <add>2.2</add>

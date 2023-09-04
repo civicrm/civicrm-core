@@ -27,34 +27,23 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
   public static $_billingLocationType = NULL;
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_LocationType', $id, 'is_active', $is_active);
   }
 
@@ -91,27 +80,13 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
    * Add a Location Type.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
    *
-   *
-   * @return object
+   * @deprecated
+   * @return CRM_Core_DAO_LocationType
    */
   public static function create(&$params) {
-    if (empty($params['id'])) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
-    }
-
-    $locationType = new CRM_Core_DAO_LocationType();
-    $locationType->copyValues($params);
-    if (!empty($params['is_default'])) {
-      $query = "UPDATE civicrm_location_type SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query);
-    }
-
-    $locationType->save();
-    return $locationType;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
@@ -121,6 +96,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
    * @deprecated
    */
   public static function del($locationTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     static::deleteRecord(['id' => $locationTypeId]);
   }
 
@@ -139,6 +115,14 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
         ]);
       }
     }
+    elseif (in_array($event->action, ['create', 'edit'])) {
+      if (!empty($event->params['is_default'])) {
+        $query = "UPDATE civicrm_location_type SET is_default = 0";
+        CRM_Core_DAO::executeQuery($query);
+      }
+    }
+    // Todo: This was moved from CRM_Admin_Form_LocationType::postProcess but is probably unnecessarily broad.
+    CRM_Utils_System::flushCache();
   }
 
 }

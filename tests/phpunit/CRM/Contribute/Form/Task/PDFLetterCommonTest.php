@@ -159,7 +159,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     ];
 
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter');
-    [$contributions, $contacts] = $form->buildContributionArray('contact_id', $contributionIDs, $returnProperties, TRUE, TRUE, $messageToken, 'test', '**', FALSE);
+    [$contributions, $contacts] = $form->buildContributionArray('contact_id', $contributionIDs, $returnProperties, $messageToken, '**', FALSE);
 
     $this->assertEquals('Anthony', $contacts[$this->_individualId]['first_name']);
     $this->assertEquals('Donation', $contributions[$result['id']]['financial_type']);

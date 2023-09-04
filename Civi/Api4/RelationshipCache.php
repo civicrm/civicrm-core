@@ -14,6 +14,7 @@ namespace Civi\Api4;
  * RelationshipCache - readonly table to facilitate joining and finding contacts by relationship.
  *
  * @searchable secondary
+ * @searchFields near_contact_id.sort_name,near_relation:label,far_contact_id.sort_name
  * @see \Civi\Api4\Relationship
  * @ui_join_filters near_relation
  * @since 5.29

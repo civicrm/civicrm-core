@@ -21,22 +21,33 @@
 class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
   /**
-   *  Indicate if this form should warn users of unsaved changes
+   * Indicate if this form should warn users of unsaved changes
    * @var bool
    */
   protected $unsavedChangesWarn = FALSE;
 
   /**
-   * Pre processing.
+   * Dedupe rule group ID.
+   *
+   * @var int
    */
-  public function preProcess() {
-    $this->rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
+  protected $dedupeRuleGroupID;
+
+  /**
+   * Pre processing.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function preProcess(): void {
+    $this->dedupeRuleGroupID = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
   }
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
 
     $groupList = ['' => ts('- All Contacts -')] + CRM_Core_PseudoConstant::nestedGroup();
 
@@ -67,7 +78,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
    *
    * @return array
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $this->_defaults['limit'] = Civi::settings()->get('dedupe_default_limit');
     return $this->_defaults;
   }
@@ -75,14 +86,14 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
   /**
    * Process the form submission.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $values = $this->exportValues();
     if (!empty($_POST['_qf_DedupeFind_submit'])) {
       //used for cancel button
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/deduperules', 'reset=1'));
       return;
     }
-    $url = CRM_Utils_System::url('civicrm/contact/dedupefind', "reset=1&action=update&rgid={$this->rgid}");
+    $url = CRM_Utils_System::url('civicrm/contact/dedupefind', 'reset=1&action=update&rgid=' . $this->getDedupeRuleGroupID());
     if ($values['group_id']) {
       $url .= "&gid={$values['group_id']}";
     }
@@ -92,6 +103,18 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
     }
 
     CRM_Utils_System::redirect($url);
+  }
+
+  /**
+   * Get the rule group ID passed in by the url.
+   *
+   * @todo  - could this ever really be NULL - the retrieveValue does not
+   * use $abort so maybe.
+   *
+   * @return int|null
+   */
+  public function getDedupeRuleGroupID(): ?int {
+    return $this->dedupeRuleGroupID;
   }
 
 }

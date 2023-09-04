@@ -84,7 +84,7 @@ use CRM_Search_ExtensionUtil as E;
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config
  */
-function _search_kit_civix_civicrm_config(&$config = NULL) {
+function _search_kit_civix_civicrm_config($config = NULL) {
   static $configured = FALSE;
   if ($configured) {
     return;
@@ -92,9 +92,9 @@ function _search_kit_civix_civicrm_config(&$config = NULL) {
   $configured = TRUE;
 
   $extRoot = __DIR__ . DIRECTORY_SEPARATOR;
-
   $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
+  // Based on <compatibility>, this does not currently require mixin/polyfill.php.
 }
 
 /**
@@ -104,35 +104,7 @@ function _search_kit_civix_civicrm_config(&$config = NULL) {
  */
 function _search_kit_civix_civicrm_install() {
   _search_kit_civix_civicrm_config();
-  if ($upgrader = _search_kit_civix_upgrader()) {
-    $upgrader->onInstall();
-  }
-}
-
-/**
- * Implements hook_civicrm_postInstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
- */
-function _search_kit_civix_civicrm_postInstall() {
-  _search_kit_civix_civicrm_config();
-  if ($upgrader = _search_kit_civix_upgrader()) {
-    if (is_callable([$upgrader, 'onPostInstall'])) {
-      $upgrader->onPostInstall();
-    }
-  }
-}
-
-/**
- * Implements hook_civicrm_uninstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
- */
-function _search_kit_civix_civicrm_uninstall(): void {
-  _search_kit_civix_civicrm_config();
-  if ($upgrader = _search_kit_civix_upgrader()) {
-    $upgrader->onUninstall();
-  }
+  // Based on <compatibility>, this does not currently require mixin/polyfill.php.
 }
 
 /**
@@ -142,56 +114,7 @@ function _search_kit_civix_civicrm_uninstall(): void {
  */
 function _search_kit_civix_civicrm_enable(): void {
   _search_kit_civix_civicrm_config();
-  if ($upgrader = _search_kit_civix_upgrader()) {
-    if (is_callable([$upgrader, 'onEnable'])) {
-      $upgrader->onEnable();
-    }
-  }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_disable().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
- * @return mixed
- */
-function _search_kit_civix_civicrm_disable(): void {
-  _search_kit_civix_civicrm_config();
-  if ($upgrader = _search_kit_civix_upgrader()) {
-    if (is_callable([$upgrader, 'onDisable'])) {
-      $upgrader->onDisable();
-    }
-  }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_upgrade().
- *
- * @param $op string, the type of operation being performed; 'check' or 'enqueue'
- * @param $queue CRM_Queue_Queue, (for 'enqueue') the modifiable list of pending up upgrade tasks
- *
- * @return mixed
- *   based on op. for 'check', returns array(boolean) (TRUE if upgrades are pending)
- *   for 'enqueue', returns void
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
- */
-function _search_kit_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  if ($upgrader = _search_kit_civix_upgrader()) {
-    return $upgrader->onUpgrade($op, $queue);
-  }
-}
-
-/**
- * @return CRM_Search_Upgrader
- */
-function _search_kit_civix_upgrader() {
-  if (!file_exists(__DIR__ . '/CRM/Search/Upgrader.php')) {
-    return NULL;
-  }
-  else {
-    return CRM_Search_Upgrader_Base::instance();
-  }
+  // Based on <compatibility>, this does not currently require mixin/polyfill.php.
 }
 
 /**
@@ -274,26 +197,4 @@ function _search_kit_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parentID
       _search_kit_civix_fixNavigationMenuItems($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
     }
   }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_entityTypes().
- *
- * Find any *.entityType.php files, merge their content, and return.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function _search_kit_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, [
-    'CRM_Search_DAO_SearchDisplay' => [
-      'name' => 'SearchDisplay',
-      'class' => 'CRM_Search_DAO_SearchDisplay',
-      'table' => 'civicrm_search_display',
-    ],
-    'CRM_Search_DAO_SearchSegment' => [
-      'name' => 'SearchSegment',
-      'class' => 'CRM_Search_DAO_SearchSegment',
-      'table' => 'civicrm_search_segment',
-    ],
-  ]);
 }

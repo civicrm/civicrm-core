@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{$config->lcMessages|substr:0:2}">
+<!DOCTYPE html >
+<html lang="{$config->lcMessages|substr:0:2}">
  <head>
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -24,20 +24,23 @@
   <title>{$docTitle}</title>
 </head>
 <body>
-
   {if $config->debug}
   {include file="CRM/common/debug.tpl"}
   {/if}
 
   <div id="crm-container" class="crm-container" lang="{$config->lcMessages|substr:0:2}" xml:lang="{$config->lcMessages|substr:0:2}">
     {if $breadcrumb}
-      <div class="breadcrumb">
+      <nav aria-label="{ts}Breadcrumb{/ts}" class="breadcrumb"><ol>
+        <li><a href="/civicrm/dashboard?reset=1" >{ts}Home{/ts}</a></li>
         {foreach from=$breadcrumb item=crumb key=key}
-          {if $key != 0}
-            &raquo;
-          {/if}
-          <a href="{$crumb.url}">{$crumb.title}</a>
+          <li><a href="{$crumb.url}">{$crumb.title}</a></li>
         {/foreach}
+      </ol></nav>
+    {/if}
+
+    {if $standaloneErrors}
+      <div class="standalone-errors">
+        <ul>{$standaloneErrors}</ul>
       </div>
     {/if}
 

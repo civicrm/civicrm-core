@@ -31,7 +31,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testMenuItemWillBeCreatedAndDeleted() {
+  public function testMenuItemWillBeCreatedAndDeleted(): void {
     ContactType::create(FALSE)
       ->addValue('name', 'Tester')
       ->addValue('label', 'Tester')
@@ -40,6 +40,15 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
     // Menu item should have been auto-created
     $this->assertCount(1, Navigation::get(FALSE)->addWhere('name', '=', 'New Tester')->execute());
 
+    ContactType::update(FALSE)
+      ->addWhere('name', '=', 'Tester')
+      ->addValue('label', 'Tested')
+      ->execute();
+
+    // Menu item should have been updated
+    $nav = Navigation::get(FALSE)->addWhere('name', '=', 'New Tester')->execute()->single();
+    $this->assertEquals('New Tested', $nav['label']);
+
     ContactType::delete(FALSE)
       ->addWhere('name', '=', 'Tester')
       ->execute();
@@ -47,7 +56,7 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(0, Navigation::get(FALSE)->addWhere('name', '=', 'New Tester')->execute());
   }
 
-  public function testSubTypeWillBeRemovedFromExistingContacts() {
+  public function testSubTypeWillBeRemovedFromExistingContacts(): void {
     foreach (['TesterA', 'TesterB'] as $name) {
       ContactType::create(FALSE)
         ->addValue('name', $name)
@@ -70,7 +79,7 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['TesterB'], Contact::get(FALSE)->addWhere('id', '=', $c2)->execute()->first()['contact_sub_type']);
   }
 
-  public function testGetReturnsFieldsAppropriateToEachContactType() {
+  public function testGetReturnsFieldsAppropriateToEachContactType(): void {
     $indiv = Contact::create()
       ->setValues(['first_name' => 'Joe', 'last_name' => 'Tester', 'prefix_id:label' => 'Dr.', 'contact_type' => 'Individual'])
       ->addChain('email', Email::create()->setValues(['contact_id' => '$id', 'email' => 'ind@example.com']))

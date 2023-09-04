@@ -37,7 +37,6 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setPageTitle(ts('Location Type'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -65,8 +64,8 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
     $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'description'));
 
-    $this->add('checkbox', 'is_active', ts('Enabled?'));
-    $this->add('checkbox', 'is_default', ts('Default?'));
+    $this->add('advcheckbox', 'is_active', ts('Enabled?'));
+    $this->add('advcheckbox', 'is_default', ts('Default?'));
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_reserved')) {
@@ -82,38 +81,19 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache();
-
+    // Delete action
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_BAO_LocationType::del($this->_id);
+      CRM_Core_BAO_LocationType::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected Location type has been deleted.'), ts('Record Deleted'), 'success');
       return;
     }
-
-    // store the submitted values in an array
+    // Create or update actions
     $params = $this->exportValues();
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-
-    // action is taken depending upon the mode
-    $locationType = new CRM_Core_DAO_LocationType();
-    $locationType->name = $params['name'];
-    $locationType->display_name = $params['display_name'];
-    $locationType->vcard_name = $params['vcard_name'];
-    $locationType->description = $params['description'];
-    $locationType->is_active = $params['is_active'];
-    $locationType->is_default = $params['is_default'];
-
-    if ($params['is_default']) {
-      $query = "UPDATE civicrm_location_type SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query);
-    }
-
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $locationType->id = $this->_id;
+      $params['id'] = $this->_id;
     }
 
-    $locationType->save();
+    $locationType = CRM_Core_BAO_LocationType::writeRecord($params);
 
     CRM_Core_Session::setStatus(ts("The location type '%1' has been saved.",
       [1 => $locationType->name]

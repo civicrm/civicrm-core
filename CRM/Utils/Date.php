@@ -83,20 +83,20 @@ class CRM_Utils_Date {
     $date['d'] = sprintf('%02d', $date['d']);
 
     $time = '';
-    if (CRM_Utils_Array::value('H', $date) != NULL ||
-      CRM_Utils_Array::value('h', $date) != NULL ||
-      CRM_Utils_Array::value('i', $date) != NULL ||
-      CRM_Utils_Array::value('s', $date) != NULL
+    if (!empty($date['H']) ||
+      !empty($date['h']) ||
+      !empty($date['i']) ||
+      !empty($date['s'])
     ) {
       // we have time too..
       if (!empty($date['h'])) {
-        if (CRM_Utils_Array::value('A', $date) == 'PM' or CRM_Utils_Array::value('a', $date) == 'pm') {
+        if (($date['A'] ?? NULL) == 'PM' or ($date['a'] ?? NULL) == 'pm') {
           if ($date['h'] != 12) {
             $date['h'] = $date['h'] + 12;
           }
         }
-        if ((CRM_Utils_Array::value('A', $date) == 'AM' or CRM_Utils_Array::value('a', $date) == 'am') &&
-          CRM_Utils_Array::value('h', $date) == 12
+        if ((($date['A'] ?? NULL) == 'AM' or ($date['a'] ?? NULL) == 'am') &&
+          ($date['h'] ?? NULL) == 12
         ) {
           $date['h'] = '00';
         }
@@ -1987,6 +1987,7 @@ class CRM_Utils_Date {
           $field['smarty_view_format'] = $dateAttributes['smarty_view_format'];
         }
         $field['datepicker']['extra'] = self::getDatePickerExtra($field);
+        $field['datepicker']['extra']['time'] = $fieldMetaData['type'] == CRM_Utils_Type::T_TIMESTAMP;
         $field['datepicker']['attributes'] = self::getDatePickerAttributes($field);
       }
     }
@@ -2008,10 +2009,10 @@ class CRM_Utils_Date {
     }
     $thisYear = date('Y');
     if (isset($field['start_date_years'])) {
-      $extra['minDate'] = date('Y-m-d', strtotime('-' . ($thisYear - $field['start_date_years']) . ' years'));
+      $extra['minDate'] = date('Y-m-d', strtotime((-1 * ($thisYear - $field['start_date_years'])) . ' years'));
     }
     if (isset($field['end_date_years'])) {
-      $extra['maxDate'] = date('Y-m-d', strtotime('-' . ($thisYear - $field['end_date_years']) . ' years'));
+      $extra['maxDate'] = date('Y-m-d', strtotime((-1 * ($thisYear - $field['end_date_years'])) . ' years'));
     }
     return $extra;
   }

@@ -55,9 +55,19 @@
     <name>job_id</name>
     <title>Job ID</title>
     <type>int unsigned</type>
-    <comment>Pointer to job id - not a FK though, just for logging purposes</comment>
+    <comment>Pointer to job id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.1</add>
   </field>
+  <foreignKey>
+    <name>job_id</name>
+    <table>civicrm_job</table>
+    <key>id</key>
+    <add>5.60</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
   <field>
     <name>name</name>
     <title>Job Name</title>

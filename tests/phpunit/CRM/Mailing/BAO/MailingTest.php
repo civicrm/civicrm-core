@@ -163,7 +163,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   /**
    * Test verify that a disabled mailing group doesn't prvent access to the mailing generated with the group.
    */
-  public function testGetMailingDisabledGroup() {
+  public function testGetMailingDisabledGroup(): void {
     $this->prepareForACLs();
     $this->createLoggedInUser();
     // create hook to build ACL where clause which choses $this->allowedContactId as the only contact to be considered as mail recipient
@@ -225,6 +225,9 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * @param array $currentGroups
    */
   public function hook_civicrm_aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
+    if ($tableName !== 'civicrm_group') {
+      return;
+    }
     //don't use api - you will get a loop
     $sql = " SELECT * FROM civicrm_group";
     $groups = [];
@@ -405,7 +408,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   /**
    * Test That No BUlk Emails User Optt Out is resepected when constructing a mailing
    */
-  public function testGetReceipientNoBulkEmails() {
+  public function testGetReceipientNoBulkEmails(): void {
     // Set up groups; 3 standard, 4 smart
     $groupIDs = [];
     $params = [
@@ -448,7 +451,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   /**
    * Test CRM_Mailing_BAO_Mailing::getRecipients() on sms mode
    */
-  public function testgetRecipientsSMS() {
+  public function testgetRecipientsSMS(): void {
     // Tests for SMS bulk mailing recipients
     // +CRM-21320 Ensure primary mobile number is selected over non-primary
     // +core/384 Ensure that a secondary mobile number is selected if the primary can not receive SMS
@@ -579,7 +582,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    *  1. In the first call we will modify the mailing filter to include only deceased recipients
    *  2. In the second call we will check if only deceased recipient is populated in MailingRecipient table
    */
-  public function testAlterMailingRecipientsHook() {
+  public function testAlterMailingRecipientsHook(): void {
     $groupID = $this->groupCreate();
     $this->tagCreate(['name' => 'Tagged']);
 

@@ -7,8 +7,11 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{* The price field can be used somewhere but not necessarily in a page/event. In that case we still want to display some message. *}
+{assign var='showGenericMessage' value=true}
 {foreach from=$contexts item=context}
 {if $context EQ "Event"}
+  {assign var='showGenericMessage' value=false}
     {if $action eq 8}
         {ts}If you no longer want to use this price set, click the event title below, and modify the fees for that event.{/ts}
     {else}
@@ -34,6 +37,7 @@
 </table>
 {/if}
 {if $context EQ "Contribution"}
+  {assign var='showGenericMessage' value=false}
     {if $action eq 8}
         {ts}If you no longer want to use this price set, click the contribution page title below, and modify the Amounts or Membership tab configuration.{/ts}
     {else}
@@ -57,6 +61,7 @@
 </table>
 {/if}
 {if $context EQ "EventTemplate"}
+  {assign var='showGenericMessage' value=false}
   {if $action eq 8}
     {ts}If you no longer want to use this price set, click the event template title below, and modify the fees for that event.{/ts}
   {else}
@@ -79,3 +84,9 @@
 </table>
 {/if}
 {/foreach}
+{if $showGenericMessage}
+  {if $action neq 8}
+    {* We don't have to do anything for delete action because the calling tpl already displays something. *}
+    {ts}This price set is used by at least one contribution, but is not used by any active events or contribution pages or event templates.{/ts}
+  {/if}
+{/if}

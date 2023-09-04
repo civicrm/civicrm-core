@@ -544,7 +544,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   public function doPaymentPayPalButton(&$params) {
     $args = [];
 
-    $result = $this->setStatusPaymentPending([]);
+    $result = [];
 
     $this->initialize($args, 'DoDirectPayment');
 
@@ -571,7 +571,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     // add CiviCRM BN code
     $args['BUTTONSOURCE'] = 'CiviCRM_SP';
 
-    if (CRM_Utils_Array::value('is_recur', $params) == 1) {
+    if (($params['is_recur'] ?? NULL) == 1) {
       $start_time = strtotime(date('m/d/Y'));
       $start_date = date('Y-m-d\T00:00:00\Z', $start_time);
 
@@ -601,12 +601,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $params['recurr_profile_id'] = NULL;
 
-    if (CRM_Utils_Array::value('is_recur', $params) == 1) {
+    if (($params['is_recur'] ?? NULL) == 1) {
       $params['recurr_profile_id'] = $apiResult['profileid'];
     }
 
     /* Success */
-    $result = $this->setStatusPaymentCompleted($result);
     $doQueryParams = [
       'gross_amount' => $apiResult['amt'] ?? NULL,
       'trxn_id' => $apiResult['transactionid'] ?? NULL,

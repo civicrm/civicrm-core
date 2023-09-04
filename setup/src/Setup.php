@@ -54,7 +54,8 @@ class Setup {
    *
    * @param array $modelValues
    *   List of default configuration options.
-   *   Recommended fields: 'srcPath', 'cms'
+   *   - cms: string name
+   *   - srcPath: Path to CiviCRM-core source tree, i.e. .../vendor/civicrm/civicrm-core/
    * @param callable $pluginCallback
    *   Function which manipulates the list of plugin files.
    *   Use this to add, remove, or re-order callbacks.
@@ -76,7 +77,7 @@ class Setup {
       '/^civi\.setupui\./' => 'run',
       '/./' => 'fail',
     ]);
-    self::$instance->log = $log ? $log : new NullLogger();
+    self::$instance->log = $log ?: new NullLogger();
 
     $pluginDir = dirname(__DIR__) . '/plugins';
     $pluginFiles = array();

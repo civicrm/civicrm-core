@@ -54,7 +54,7 @@
 </table>
 
 <div class="form-item">
-     <span class="element-right">{include file="CRM/common/formButtons.tpl"}</span>
+     <span class="element-right">{include file="CRM/common/formButtons.tpl" location=''}</span>
 </div>
 
 {else}

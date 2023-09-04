@@ -372,11 +372,13 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
       }
 
       // handle contribution status id
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_contribution_status_id', $row)) {
+      $value = $row['civicrm_contribution_recur_contribution_status_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_recur_contribution_status_id'] = $contributionStatus[$value];
       }
 
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_amount', $row)) {
+      $value = $row['civicrm_contribution_recur_amount'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_recur_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_amount'], $rows[$rowNum]['civicrm_contribution_recur_currency']);
       }
 

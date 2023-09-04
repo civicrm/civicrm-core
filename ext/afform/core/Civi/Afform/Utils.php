@@ -12,6 +12,8 @@
 
 namespace Civi\Afform;
 
+use CRM_Afform_ExtensionUtil as E;
+
 /**
  *
  * @package Civi\Afform
@@ -47,6 +49,33 @@ class Utils {
     }
     // Return the list of entities ordered by weight
     return $sorter->sort();
+  }
+
+  /**
+   * Subset of APIv4 operators that are appropriate for use on Afforms
+   *
+   * This list may be further reduced by fields which declare a limited number of
+   * operators in their metadata.
+   *
+   * @return array
+   */
+  public static function getSearchOperators() {
+    return [
+      '=' => '=',
+      '!=' => '≠',
+      '>' => '>',
+      '<' => '<',
+      '>=' => '≥',
+      '<=' => '≤',
+      'CONTAINS' => E::ts('Contains'),
+      'NOT CONTAINS' => E::ts("Doesn't Contain"),
+      'IN' => E::ts('Is One Of'),
+      'NOT IN' => E::ts('Not One Of'),
+      'LIKE' => E::ts('Is Like'),
+      'NOT LIKE' => E::ts('Not Like'),
+      'REGEXP' => E::ts('Matches Pattern'),
+      'NOT REGEXP' => E::ts("Doesn't Match Pattern"),
+    ];
   }
 
 }

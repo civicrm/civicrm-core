@@ -47,6 +47,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('context', $context);
 
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks($this->_id));
+    $this->assign('isShowICalIconsInline', TRUE);
 
     // Sometimes we want to suppress the Event Full msg
     $noFullMsg = CRM_Utils_Request::retrieve('noFullMsg', 'String', $this, FALSE, 'false');
@@ -113,7 +114,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
           foreach ($priceSetFields as $fid => $fieldValues) {
             if (!is_array($fieldValues['options']) ||
               empty($fieldValues['options']) ||
-              (CRM_Utils_Array::value('visibility_id', $fieldValues) != array_search('public', $visibility) && $adminFieldVisible == FALSE)
+              (($fieldValues['visibility_id'] ?? NULL) != array_search('public', $visibility) && $adminFieldVisible == FALSE)
             ) {
               continue;
             }
@@ -131,7 +132,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             }
 
             foreach ($fieldValues['options'] as $optionId => $optionVal) {
-              if (CRM_Utils_Array::value('visibility_id', $optionVal) != array_search('public', $visibility) &&
+              if (($optionVal['visibility_id'] ?? NULL) != array_search('public', $visibility) &&
                 $adminFieldVisible == FALSE
               ) {
                 continue;

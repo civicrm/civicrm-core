@@ -171,9 +171,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'skipLineItem' => $params['skipLineItem'] ?? 0,
     ];
 
-    if ($paymentProcessorOutcome) {
-      $contributionParams['payment_processor'] = $paymentProcessorOutcome['payment_processor'] ?? NULL;
-    }
     if (!empty($params["is_email_receipt"])) {
       $contributionParams += [
         'receipt_date' => $receiptDate,
@@ -280,10 +277,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->setFormAmountFields($this->_params['priceSetId']);
     }
 
-    if (!empty($this->get('tax_amount'))) {
-      CRM_Core_Error::deprecatedWarning('tax_amount should be not passed in');
-      $this->_params['tax_amount'] = $this->get('tax_amount');
-    }
     $this->_useForMember = $this->get('useForMember');
 
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
@@ -568,8 +561,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->buildCustom($this->_values['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
     }
 
-    $this->_separateMembershipPayment = $this->get('separateMembershipPayment');
-    $this->assign('is_separate_payment', $this->_separateMembershipPayment);
+    $this->_separateMembershipPayment = $this->isSeparateMembershipPayment();
+    $this->assign('is_separate_payment', $this->isSeparateMembershipPayment());
 
     $this->assign('priceSetID', $this->_priceSetId);
 
@@ -676,7 +669,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ($this->_membershipBlock) {
       $this->_currentMemberships = [];
 
-      $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
+      $membershipTypeIds = $membershipTypes = [];
       $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember);
 
       $autoRenewMembershipTypeOptions = [];
@@ -702,9 +695,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       if (!empty($membershipTypeIds)) {
         //set status message if wrong membershipType is included in membershipBlock
-        if (isset($this->_mid) && !$membershipPriceset) {
+        if ($this->getRenewalMembershipID() && !$membershipPriceset) {
           $membershipTypeID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-            $this->_mid,
+            $this->getRenewalMembershipID(),
             'membership_type_id'
           );
           if (!in_array($membershipTypeID, $membershipTypeIds)) {
@@ -749,52 +742,35 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           elseif ($memType['is_active']) {
 
             if ($allowAutoRenewOpt) {
-              $javascriptMethod = ['onclick' => "return showHideAutoRenew( this.value );"];
               $isAvailableAutoRenew = $this->_membershipBlock['auto_renew'][$value] ?? 1;
               $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $memType['auto_renew'] * $isAvailableAutoRenew;
-              $allowAutoRenewMembership = TRUE;
             }
             else {
-              $javascriptMethod = NULL;
               $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = 0;
             }
 
-            //add membership type.
-            $radio[$memType['id']] = NULL;
-            $radioOptAttrs[$memType['id']] = $javascriptMethod;
             if ($cid) {
-              $membership = new CRM_Member_DAO_Membership();
-              $membership->contact_id = $cid;
-              $membership->membership_type_id = $memType['id'];
-
               //show current membership, skip pending and cancelled membership records,
               //because we take first membership record id for renewal
-              $membership->whereAdd('status_id != 5 AND status_id !=6');
+              $membership = \Civi\Api4\Membership::get(FALSE)
+                ->addSelect('end_date', 'membership_type_id', 'membership_type_id.duration_unit:name')
+                ->addWhere('contact_id', '=', $cid)
+                ->addWhere('membership_type_id', '=', $memType['id'])
+                ->addWhere('status_id:name', 'NOT IN', ['Cancelled', 'Pending'])
+                ->addWhere('is_test', '=', (bool) $isTest)
+                ->addOrderBy('end_date', 'DESC')
+                ->execute()
+                ->first();
 
-              if (!is_null($isTest)) {
-                $membership->is_test = $isTest;
-              }
-
-              //CRM-4297
-              $membership->orderBy('end_date DESC');
-
-              if ($membership->find(TRUE)) {
-                if (!$membership->end_date) {
-                  unset($radio[$memType['id']]);
-                  unset($radioOptAttrs[$memType['id']]);
-                  $this->assign('islifetime', TRUE);
-                  continue;
-                }
+              if ($membership && $membership['membership_type_id.duration_unit:name'] !== 'lifetime') {
                 $this->assign('renewal_mode', TRUE);
-                $this->_currentMemberships[$membership->membership_type_id] = $membership->membership_type_id;
-                $memType['current_membership'] = $membership->end_date;
+                $this->_currentMemberships[$membership['membership_type_id']] = $membership['membership_type_id'];
+                $memType['current_membership'] = $membership['end_date'];
                 if (!$endDate) {
                   $endDate = $memType['current_membership'];
-                  $this->_defaultMemTypeId = $memType['id'];
                 }
                 if ($memType['current_membership'] < $endDate) {
                   $endDate = $memType['current_membership'];
-                  $this->_defaultMemTypeId = $memType['id'];
                 }
               }
             }
@@ -1082,9 +1058,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!isset($params['is_email_receipt']) && $isEmailReceipt) {
       $params['is_email_receipt'] = $isEmailReceipt;
     }
+    // We may no longer need to set params['is_recur'] - it used to be used in processRecurringContribution
     $params['is_recur'] = $isRecur;
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
-    $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType);
+    $recurringContributionID = !$isRecur ? NULL : self::processRecurringContribution($form, $params, [
+      'contact_id' => $contactID,
+      'financial_type_id' => $financialType->id,
+    ]);
 
     $now = date('YmdHis');
     $receiptDate = $params['receipt_date'] ?? NULL;
@@ -1095,9 +1075,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (isset($params['amount'])) {
       $contributionParams = array_merge(self::getContributionParams(
         $params, $financialType->id,
-        $result, $receiptDate,
+        NULL, $receiptDate,
         $recurringContributionID), $contributionParams
       );
+
+      $contributionParams['payment_processor'] = $result ? ($result['payment_processor'] ?? NULL) : NULL;
       $contributionParams['non_deductible_amount'] = self::getNonDeductibleAmount($params, $financialType, TRUE, $form);
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
@@ -1187,24 +1169,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param CRM_Core_Form $form
    * @param array $params
-   * @param int $contactID
-   * @param string $contributionType
+   * @param array $recurParams
    *
    * @return int|null
    */
-  public static function processRecurringContribution($form, $params, $contactID, $contributionType) {
+  public static function processRecurringContribution($form, $params, $recurParams) {
 
-    if (empty($params['is_recur'])) {
-      return NULL;
-    }
-
-    $recurParams = ['contact_id' => $contactID];
     $recurParams['amount'] = $params['amount'] ?? NULL;
     $recurParams['auto_renew'] = $params['auto_renew'] ?? NULL;
     $recurParams['frequency_unit'] = $params['frequency_unit'] ?? NULL;
     $recurParams['frequency_interval'] = $params['frequency_interval'] ?? NULL;
     $recurParams['installments'] = $params['installments'] ?? NULL;
-    $recurParams['financial_type_id'] = $params['financial_type_id'] ?? NULL;
     $recurParams['currency'] = $params['currency'] ?? NULL;
     $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
 
@@ -1238,7 +1213,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['is_email_receipt'] = (bool) ($params['is_email_receipt'] ?? FALSE);
     // We set trxn_id=invoiceID specifically for paypal IPN. It is reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['processor_id'] = $recurParams['trxn_id'] = ($params['trxn_id'] ?? $params['invoiceID']);
-    $recurParams['financial_type_id'] = $contributionType->id;
 
     $campaignId = $params['campaign_id'] ?? $form->_values['campaign_id'] ?? NULL;
     $recurParams['campaign_id'] = $campaignId;
@@ -1446,7 +1420,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //enabled and contribution amount is not selected. fix for CRM-3010
       $isPaidMembership = TRUE;
     }
-    $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction($this->_id);
+    $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction();
 
     if ($this->isFormSupportsNonMembershipContributions()) {
       $financialTypeID = $this->_values['financial_type_id'];
@@ -1604,7 +1578,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $membershipSource = $form->_params['membership_source'];
         }
         elseif ((isset($form->_values['title']) && !empty($form->_values['title'])) || (isset($form->_values['frontend_title']) && !empty($form->_values['frontend_title']))) {
-          $title = !empty($form->_values['frontend_title']) ? $form->_values['frontend_title'] : $form->_values['title'];
+          $title = $form->_values['frontend_title'];
           $membershipSource = ts('Online Contribution:') . ' ' . $title;
         }
         $isPayLater = NULL;
@@ -1728,8 +1702,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
                 'is_transactional' => FALSE,
                 'fee_amount' => $result['result']['fee_amount'] ?? NULL,
                 'receive_date' => $result['result']['receive_date'] ?? NULL,
-                'card_type_id' => $result['result']['card_type_id'] ?? NULL,
-                'pan_truncation' => $result['result']['pan_truncation'] ?? NULL,
+                'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
+                'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
               ]);
             }
             catch (CRM_Core_Exception $e) {
@@ -1911,16 +1885,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * contribution
    * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferCheckout style)
    *
-   * @param int $formID
+   * @todo - this is confusing - does isSeparateMembershipPayment need to
+   * check both conditions, making this redundant, or are there 2 legit
+   * variations here?
    *
    * @return bool
    */
-  protected function isSeparateMembershipTransaction($formID): bool {
-    $memBlockDetails = CRM_Member_BAO_Membership::getMembershipBlock($formID);
-    if (!empty($memBlockDetails['is_separate_payment']) && $this->isFormSupportsNonMembershipContributions()) {
-      return TRUE;
-    }
-    return FALSE;
+  protected function isSeparateMembershipTransaction(): bool {
+    return $this->isSeparateMembershipPayment() && $this->isFormSupportsNonMembershipContributions();
   }
 
   /**
@@ -2004,7 +1976,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->_id = $params['id'];
 
     CRM_Contribute_BAO_ContributionPage::setValues($form->_id, $form->_values);
-    $form->_separateMembershipPayment = CRM_Contribute_BAO_ContributionPage::getIsMembershipPayment($form->_id);
+    $form->_separateMembershipPayment = $form->isSeparateMembershipPayment();
     //this way the mocked up controller ignores the session stuff
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Contribute_Controller_Contribution();
@@ -2015,12 +1987,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $order = new CRM_Financial_BAO_Order();
     $order->setPriceSetIDByContributionPageID($params['id']);
     $order->setPriceSelectionFromUnfilteredInput($params);
-    if (isset($params['amount']) && !CRM_Contribute_BAO_ContributionPage::getIsMembershipPayment($form->_id)) {
+    if (isset($params['amount']) && !$form->isSeparateMembershipPayment()) {
       // @todo deprecate receiving amount, calculate on the form.
       $order->setOverrideTotalAmount((float) $params['amount']);
     }
     $amount = $order->getTotalAmount();
-    if ($form->_separateMembershipPayment) {
+    if ($form->isSeparateMembershipPayment()) {
       $amount -= $order->getMembershipTotalAmount();
     }
     $form->_amount = $params['amount'] = $form->_params['amount'] = $amount;
@@ -2147,7 +2119,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     // add a description field at the very beginning
-    $title = !empty($this->_values['frontend_title']) ? $this->_values['frontend_title'] : $this->_values['title'];
+    $title = $this->_values['frontend_title'];
     $this->_params['description'] = ts('Online Contribution') . ': ' . (!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $title);
 
     $this->_params['accountingCode'] = $this->_values['accountingCode'] ?? NULL;
@@ -2409,8 +2381,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
               'is_transactional' => FALSE,
               'fee_amount' => $result['fee_amount'] ?? NULL,
               'receive_date' => $result['receive_date'] ?? NULL,
-              'card_type_id' => $result['card_type_id'] ?? NULL,
-              'pan_truncation' => $result['pan_truncation'] ?? NULL,
+              'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
+              'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
             ]);
           }
           catch (CRM_Core_Exception $e) {
@@ -2675,20 +2647,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isRecur
   ): array {
     $form = $this;
-    CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
-    $isPaymentTransaction = self::isPaymentTransaction($form);
+    CRM_Core_Payment_Form::mapParams($this->_bltID, $form->_params, $paymentParams, TRUE);
+    $isPaymentTransaction = self::isPaymentTransaction($this);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
-    if ($financialType->is_deductible) {
-      $form->assign('is_deductible', TRUE);
-      $form->set('is_deductible', TRUE);
-    }
+    $this->assign('is_deductible', $financialType->is_deductible);
 
     // add some financial type details to the params list
     // if folks need to use it
-    $paymentParams['financial_type_id'] = $paymentParams['financialTypeID'] = $financialType->id;
+    $paymentParams['financial_type_id'] = $paymentParams['financialTypeID'] = $financialTypeID;
     //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
     $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $financialType->name;
     //CRM-11456

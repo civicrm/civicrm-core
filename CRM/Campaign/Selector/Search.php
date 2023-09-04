@@ -249,7 +249,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   /**
    * @param $sort
    */
-  public function buildPrevNextCache($sort) {
+  private function buildPrevNextCache($sort) {
     //for prev/next pagination
     $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 

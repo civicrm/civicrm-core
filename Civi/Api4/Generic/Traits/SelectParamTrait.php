@@ -52,7 +52,7 @@ trait SelectParamTrait {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function expandSelectClauseWildcards() {
+  public function expandSelectClauseWildcards() {
     if (!$this->select) {
       $this->select = ['*'];
     }

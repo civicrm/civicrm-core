@@ -25,6 +25,7 @@
         this.field = {
           data_type: col.edit.data_type,
           input_type: col.edit.input_type,
+          entity: col.edit.entity,
           name: col.edit.value_key,
           options: col.edit.options,
           fk_entity: col.edit.fk_entity,

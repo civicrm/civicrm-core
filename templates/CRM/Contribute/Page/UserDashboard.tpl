@@ -16,7 +16,7 @@
                 <tr class="columnheader">
                     <th>{ts}Total Amount{/ts}</th>
                     <th>{ts}Financial Type{/ts}</th>
-                    <th>{ts}Received date{/ts}</th>
+                    <th>{ts}Contribution Date{/ts}</th>
                     <th>{ts}Receipt Sent{/ts}</th>
                     <th>{ts}Balance{/ts}</th>
                     <th>{ts}Status{/ts}</th>
@@ -91,7 +91,7 @@
                     <th>{ts}Amount{/ts}</th>
                     <th>{ts}Type{/ts}</th>
                     <th>{ts}Financial Type{/ts}</th>
-                    <th>{ts}Received date{/ts}</th>
+                    <th>{ts}Contribution Date{/ts}</th>
                     <th>{ts}Receipt Sent{/ts}</th>
                     <th>{ts}Status{/ts}</th>
                 </tr>

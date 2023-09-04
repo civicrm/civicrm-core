@@ -39,9 +39,6 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
 
-    $this->_onPopupClose = CRM_Utils_Request::retrieve('onPopupClose', 'String', $this);
-    $this->assign('onPopupClose', $this->_onPopupClose);
-
     //set the context for the profile
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
@@ -149,8 +146,8 @@ SELECT module,is_reserved
     $this->assign('recentlyViewed', FALSE);
 
     if ($this->_context !== 'dialog') {
-      $this->_postURL = $this->_ufGroup['post_URL'];
-      $this->_cancelURL = $this->_ufGroup['cancel_URL'];
+      $this->_postURL = $this->_ufGroup['post_url'];
+      $this->_cancelURL = $this->_ufGroup['cancel_url'];
 
       $gidString = $this->_gid;
       if (!empty($this->_profileIds)) {

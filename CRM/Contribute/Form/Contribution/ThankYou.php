@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Membership;
+
 /**
  * Form for thank-you / success page - 3rd step of online contribution process.
  */
@@ -41,8 +43,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->_params = $this->get('params');
     $this->_lineItem = $this->get('lineItem');
     $this->_useForMember = $this->get('useForMember');
-    $is_deductible = $this->get('is_deductible');
-    $this->assign('is_deductible', $is_deductible);
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->_values));
     $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->_values));
     $this->assign('thankyou_footer', CRM_Utils_Array::value('thankyou_footer', $this->_values));
@@ -311,7 +311,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     if ($this->_membershipBlock) {
       $this->_currentMemberships = [];
 
-      $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
+      $membershipTypeIds = $membershipTypes = [];
       $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember);
 
       $autoRenewMembershipTypeOptions = [];
@@ -337,9 +337,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
       if (!empty($membershipTypeIds)) {
         //set status message if wrong membershipType is included in membershipBlock
-        if (isset($this->_mid) && !$membershipPriceset) {
+        if ($this->getRenewalMembershipID() && !$membershipPriceset) {
           $membershipTypeID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-            $this->_mid,
+            $this->getRenewalMembershipID(),
             'membership_type_id'
           );
           if (!in_array($membershipTypeID, $membershipTypeIds)) {
@@ -374,52 +374,36 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
           elseif ($memType['is_active']) {
 
             if ($allowAutoRenewOpt) {
-              $javascriptMethod = ['onclick' => "return showHideAutoRenew( this.value );"];
               $isAvailableAutoRenew = $this->_membershipBlock['auto_renew'][$value] ?? 1;
               $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $memType['auto_renew'] * $isAvailableAutoRenew;
-              $allowAutoRenewMembership = TRUE;
             }
             else {
-              $javascriptMethod = NULL;
               $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = 0;
             }
 
             //add membership type.
-            $radio[$memType['id']] = NULL;
-            $radioOptAttrs[$memType['id']] = $javascriptMethod;
             if ($cid) {
-              $membership = new CRM_Member_DAO_Membership();
-              $membership->contact_id = $cid;
-              $membership->membership_type_id = $memType['id'];
-
               //show current membership, skip pending and cancelled membership records,
               //because we take first membership record id for renewal
-              $membership->whereAdd('status_id != 5 AND status_id !=6');
+              $membership = Membership::get(FALSE)
+                ->addSelect('end_date', 'membership_type_id', 'membership_type_id.duration_unit:name')
+                ->addWhere('contact_id', '=', $cid)
+                ->addWhere('membership_type_id', '=', $memType['id'])
+                ->addWhere('status_id:name', 'NOT IN', ['Cancelled', 'Pending'])
+                ->addWhere('is_test', '=', (bool) $isTest)
+                ->addOrderBy('end_date', 'DESC')
+                ->execute()
+                ->first();
 
-              if (!is_null($isTest)) {
-                $membership->is_test = $isTest;
-              }
-
-              //CRM-4297
-              $membership->orderBy('end_date DESC');
-
-              if ($membership->find(TRUE)) {
-                if (!$membership->end_date) {
-                  unset($radio[$memType['id']]);
-                  unset($radioOptAttrs[$memType['id']]);
-                  $this->assign('islifetime', TRUE);
-                  continue;
-                }
+              if ($membership && $membership['membership_type_id.duration_unit:name'] !== 'lifetime') {
                 $this->assign('renewal_mode', TRUE);
-                $this->_currentMemberships[$membership->membership_type_id] = $membership->membership_type_id;
-                $memType['current_membership'] = $membership->end_date;
+                $this->_currentMemberships[$membership['membership_type_id']] = $membership['membership_type_id'];
+                $memType['current_membership'] = $membership['end_date'];
                 if (!$endDate) {
                   $endDate = $memType['current_membership'];
-                  $this->_defaultMemTypeId = $memType['id'];
                 }
                 if ($memType['current_membership'] < $endDate) {
                   $endDate = $memType['current_membership'];
-                  $this->_defaultMemTypeId = $memType['id'];
                 }
               }
             }

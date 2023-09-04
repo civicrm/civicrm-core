@@ -16,7 +16,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   /**
    * `CRM_Utils_System::url()` should generate working URLs.
    */
-  public function testSystemRouter() {
+  public function testSystemRouter(): void {
     $this->assertUrlContentRegex(';class="CRM_Mailing_Form_Subscribe";',
       \CRM_Utils_System::url('civicrm/mailing/subscribe', 'reset=1', TRUE, NULL, FALSE, TRUE));
   }
@@ -24,7 +24,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   /**
    * `Civi::paths()->getUrl()` should generate working URLs.
    */
-  public function testPaths_getUrl() {
+  public function testPaths_getUrl(): void {
     $p = \Civi::paths();
 
     $this->assertUrlContentRegex(';MIT-LICENSE.txt;',
@@ -38,7 +38,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   /**
    * `Civi::paths()->getPath()` should generate working paths.
    */
-  public function testPaths_getPath() {
+  public function testPaths_getPath(): void {
     $p = \Civi::paths();
 
     $this->assertFileContentRegex(';MIT-LICENSE.txt;',
@@ -52,7 +52,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   /**
    * `Civi::paths()->getVariable()` should generate working paths+URLs.
    */
-  public function testPaths_getVariable() {
+  public function testPaths_getVariable(): void {
     $pathAndUrl = ['cms.root', 'civicrm.root', 'civicrm.packages', 'civicrm.files'];
     $pathOnly = ['civicrm.private', 'civicrm.log', 'civicrm.compile'];
     $urlOnly = [];
@@ -64,7 +64,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
 
     foreach (array_merge($urlOnly, $pathAndUrl) as $var) {
       $url = \Civi::paths()->getVariable($var, 'url');
-      $this->assertRegExp(';^https?:;', $url, "The URL for $var should resolve a URL.");
+      $this->assertMatchesRegularExpression(';^https?:;', $url, "The URL for $var should resolve a URL.");
     }
   }
 
@@ -73,9 +73,9 @@ class PathUrlTest extends \CiviEndToEndTestCase {
    * @param string $url
    */
   private function assertUrlContentRegex($expectContentRegex, $url) {
-    $this->assertRegexp(';^https?:;', $url, "The URL ($url) should be absolute.");
+    $this->assertMatchesRegularExpression(';^https?:;', $url, "The URL ($url) should be absolute.");
     $content = file_get_contents($url);
-    $this->assertRegexp($expectContentRegex, $content);
+    $this->assertMatchesRegularExpression($expectContentRegex, $content);
   }
 
   /**
@@ -85,13 +85,13 @@ class PathUrlTest extends \CiviEndToEndTestCase {
   private function assertFileContentRegex($expectContentRegex, $file) {
     $this->assertFileExists($file);
     $content = file_get_contents($file);
-    $this->assertRegexp($expectContentRegex, $content);
+    $this->assertMatchesRegularExpression($expectContentRegex, $content);
   }
 
   /**
    * @link https://lab.civicrm.org/dev/core/issues/1637
    */
-  public function testGetUrl_WpAdmin() {
+  public function testGetUrl_WpAdmin(): void {
     $config = \CRM_Core_Config::singleton();
     if ($config->userFramework !== 'WordPress') {
       $this->markTestSkipped('This test only applies to WP sites.');
@@ -103,7 +103,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
     // WORKAROUND: There's some issue where the URL gets a diff value in WP E2E env
     // than in normal WP env. The `cv url` command seems to behave more
     // representatively, though this technique is harder to inspect with xdebug.
-    $url = cv('url civicrm/contribute?reset=1');
+    $url = cv('url civicrm/contribute?reset=1 --entry=backend');
     // $url = \CRM_Utils_System::url('civicrm/contribute', 'reset=1', TRUE, NULL, FALSE);
 
     $parts = parse_url($url);

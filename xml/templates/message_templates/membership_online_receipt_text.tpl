@@ -17,7 +17,7 @@
 {ts}Membership Type{/ts}: {$membership_name}
 {if $mem_start_date}{ts}Membership Start Date{/ts}: {$mem_start_date|crmDate}
 {/if}
-{if $mem_end_date}{ts}Membership End Date{/ts}: {$mem_end_date|crmDate}
+{if $mem_end_date}{ts}Membership Expiration Date{/ts}: {$mem_end_date|crmDate}
 {/if}
 
 {/if}
@@ -60,7 +60,7 @@
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
 {/if}
 {capture assign=ts_start_date}{ts}Membership Start Date{/ts}{/capture}
-{capture assign=ts_end_date}{ts}Membership End Date{/ts}{/capture}
+{capture assign=ts_end_date}{ts}Membership Expiration Date{/ts}{/capture}
 {$ts_item|string_format:"%-30s"} {$ts_total|string_format:"%10s"} {if !empty($dataArray)} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {$ts_total|string_format:"%10s"} {/if} {$ts_start_date|string_format:"%20s"} {$ts_end_date|string_format:"%20s"}
 --------------------------------------------------------------------------------------------------
 
@@ -70,7 +70,7 @@
 {/foreach}
 
 {if !empty($dataArray)}
-{ts}Amount before Tax{/ts}: {$amount-$totalTaxAmount|crmMoney:$currency}
+{ts}Amount before Tax:{/ts} {$amount-$totalTaxAmount|crmMoney:$currency}
 
 {foreach from=$dataArray item=value key=priceset}
 {if $priceset || $priceset == 0}
@@ -210,7 +210,7 @@
   {$contact_phone}
 {/if}
 {/if}
-{if !empty($is_deductible) AND !empty($price)}
+{if $is_deductible AND !empty($price)}
 
 {ts 1=$price|crmMoney}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}{/if}
 {/if}
@@ -221,9 +221,7 @@
 
 ===========================================================
 {foreach from=$customPre item=customValue key=customName}
-{if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
  {$customName}: {$customValue}
-{/if}
 {/foreach}
 {/if}
 
@@ -234,8 +232,6 @@
 
 ===========================================================
 {foreach from=$customPost item=customValue key=customName}
-{if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
  {$customName}: {$customValue}
-{/if}
 {/foreach}
 {/if}

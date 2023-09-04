@@ -50,17 +50,12 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     $userID = CRM_Core_Session::getLoggedInContactID();
 
     $userChecksum = $this->getUserChecksum();
-    $validUser = FALSE;
-    if ($userChecksum) {
-      $this->assign('userChecksum', $userChecksum);
-      $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contactId, $userChecksum);
-      $this->_isChecksumUser = $validUser;
-    }
+    $this->assign('userChecksum', $userChecksum);
 
     if (!$this->_contactId) {
       $this->_contactId = $userID;
     }
-    elseif ($this->_contactId != $userID && !$validUser) {
+    elseif ($this->_contactId != $userID && !$userChecksum) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::VIEW)) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this contact.'));
       }
@@ -73,14 +68,17 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * Heart of the viewing process.
    *
-   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
+   * The runner gets all the meta data for the contact and calls the
+   * appropriate type of page to view.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     if (!$this->_contactId) {
       throw new CRM_Core_Exception(ts('You must be logged in to view this page.'));
     }
 
-    list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_contactId);
+    [$displayName, $contactImage] = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_contactId);
 
     $this->set('displayName', $displayName);
     $this->set('contactImage', $contactImage);
@@ -92,6 +90,8 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
   /**
    * Build user dashboard.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildUserDashBoard() {
     //build component selectors
@@ -154,7 +154,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       $this->assign('pcpInfo', $pcpInfo);
     }
 
-    if (!empty($dashboardOptions['Assigned Activities']) && empty($this->_isChecksumUser)) {
+    if (!empty($dashboardOptions['Assigned Activities']) && !$this->getUserChecksum()) {
       // Assigned Activities section
       $dashboardElements[] = [
         'class' => 'crm-dashboard-assignedActivities',
@@ -246,11 +246,12 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * Get the user checksum from the url to use in links.
    *
-   * @return string
+   * @return string|false
+   * @throws \CRM_Core_Exception
    */
   protected function getUserChecksum() {
     $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
-    if (empty($userID) && $this->_contactId) {
+    if ($this->_contactId && CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contactId, $userChecksum)) {
       return $userChecksum;
     }
     return FALSE;

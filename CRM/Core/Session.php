@@ -325,7 +325,7 @@ class CRM_Core_Session {
     $ts = $this->get($name, 'timer');
     if (!$ts || $ts < time() - $expire) {
       $this->set($name, time(), 'timer');
-      return $ts ? $ts : 'not set';
+      return $ts ?: 'not set';
     }
     return FALSE;
   }
@@ -431,13 +431,13 @@ class CRM_Core_Session {
    * @param bool $reset
    *   Should we reset the status variable?.
    *
-   * @return string
+   * @return array
    *   the status message if any
    */
-  public function getStatus($reset = FALSE) {
+  public function getStatus($reset = FALSE) : array {
     $this->initialize();
 
-    $status = NULL;
+    $status = [];
     if (array_key_exists('status', $this->_session[$this->_key])) {
       $status = $this->_session[$this->_key]['status'];
     }
@@ -502,7 +502,7 @@ class CRM_Core_Session {
         'text' => $text,
         'title' => $title,
         'type' => $type,
-        'options' => $options ? $options : NULL,
+        'options' => $options ?: NULL,
       ];
     }
   }

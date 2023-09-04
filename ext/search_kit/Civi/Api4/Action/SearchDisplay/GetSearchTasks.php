@@ -9,6 +9,8 @@ use Civi\Api4\Entity;
 /**
  * Load the available tasks for a given entity.
  *
+ * @method $this setDisplay(array|string $display)
+ * @method array|string|null getDisplay()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
@@ -22,19 +24,18 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
   protected $display;
 
   /**
-   * Name of entity
-   * @var string
-   * @required
-   */
-  protected $entity;
-
-  /**
    * @param \Civi\Api4\Generic\Result $result
    * @throws \CRM_Core_Exception
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
+    $this->loadSavedSearch();
+    $this->loadSearchDisplay();
+
     // Adding checkPermissions filters out actions the user is not allowed to perform
-    $entity = Entity::get($this->checkPermissions)->addWhere('name', '=', $this->entity)
+    $entityName = $this->savedSearch['api_entity'];
+    // Hack to support relationships
+    $entityName = ($entityName === 'RelationshipCache') ? 'Relationship' : $entityName;
+    $entity = Entity::get($this->checkPermissions)->addWhere('name', '=', $entityName)
       ->addSelect('name', 'title_plural')
       ->setChain([
         'actions' => ['$name', 'getActions', ['where' => [['name', 'IN', ['update', 'delete']]]], 'name'],
@@ -45,9 +46,6 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     if (!$entity) {
       return;
     }
-
-    $this->loadSavedSearch();
-    $this->loadSearchDisplay();
 
     $tasks = [$entity['name'] => []];
 
@@ -135,6 +133,24 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ];
     }
 
+    /*
+     * ENTITY-SPECIFIC TASKS BELOW
+     * FIXME: Move these somewhere?
+     */
+
+    if ($entity['name'] === 'Group') {
+      $tasks['Group']['refresh'] = [
+        'title' => E::ts('Refresh Group Cache'),
+        'icon' => 'fa-refresh',
+        'apiBatch' => [
+          'action' => 'refresh',
+          'runMsg' => E::ts('Refreshing %1 %2...'),
+          'successMsg' => E::ts('%1 %2 Refreshed.'),
+          'errorMsg' => E::ts('An error occurred while attempting to refresh %1 %2.'),
+        ],
+      ];
+    }
+
     if ($entity['name'] === 'Contact') {
       // Add contact tasks which support standalone mode
       $contactTasks = $this->checkPermissions ? \CRM_Contact_Task::permissionedTaskTitles(\CRM_Core_Permission::getPermission()) : NULL;
@@ -193,7 +209,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       // FIXME: tasks() function always checks permissions, should respect `$this->checkPermissions`
       foreach (\CRM_Contribute_Task::tasks() as $id => $task) {
         if (!empty($task['url'])) {
-          $key = \CRM_Core_Key::get('CRM_Contribute_Controller_Task', TRUE);
+          $path = explode('?', $task['url'], 2)[0];
+          $menu = \CRM_Core_Menu::get($path);
+          $key = \CRM_Core_Key::get($menu['page_callback'], TRUE);
+
           $tasks[$entity['name']]['contribution.' . $id] = [
             'title' => $task['title'],
             'icon' => $task['icon'] ?? 'fa-gear',
@@ -211,9 +230,9 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     // 2. To allow tasks to be added/removed per search display
     //    Note: Use Events::W_LATE to do so after the tasks are filtered per search-display settings.
     // 3. To get a full list of Angular modules which provide tasks.
-    //    Note: That's why this hook needs the base-level array and not just the array of tasks for `$this->entity`.
+    //    Note: That's why this hook needs the base-level array and not just the array of tasks for `$entity`.
     //    Although it may seem wasteful to have extensions add tasks for all possible entities and then
-    //    discard most of it (all but the ones relevant to `$this->entity`), it's necessary to do it this way
+    //    discard most of it (all but the ones relevant to `$entity`), it's necessary to do it this way
     //    so that they can be declared as angular dependencies - see search_kit_civicrm_angularModules().
     $null = NULL;
     $checkPermissions = $this->checkPermissions;
@@ -225,6 +244,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
 
     foreach ($tasks[$entity['name']] as $name => &$task) {
       $task['name'] = $name;
+      $task['entity'] = $entity['name'];
       // Add default for number of rows action requires
       $task += ['number' => '> 0'];
     }
@@ -251,7 +271,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'name' => 'icon',
       ],
       [
-        'number' => 'icon',
+        'name' => 'number',
+      ],
+      [
+        'name' => 'entity',
       ],
       [
         'name' => 'apiBatch',

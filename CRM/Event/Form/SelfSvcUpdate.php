@@ -110,7 +110,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $participant = $values = [];
     $this->_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
     $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
-    $this->isBackoffice = CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, FALSE, 'REQUEST') ?? FALSE;
+    $this->isBackoffice = (CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, FALSE, 'REQUEST') && CRM_Core_Permission::check('edit event participants')) ?? FALSE;
     $params = ['id' => $this->_participant_id];
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
     $this->_part_values = $values[$this->_participant_id];
@@ -167,6 +167,10 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
         'name' => ts('Submit'),
       ],
     ]);
+    if ($this->isBackoffice && $this->_contact_email) {
+      $isConfirmationEmail = $this->addElement('checkbox', 'is_confirmation_email', ts('Send confirmation email?'));
+      $isConfirmationEmail->setValue(1);
+    }
     $this->addFormRule(['CRM_Event_Form_SelfSvcUpdate', 'formRule'], $this);
     parent::buildQuickForm();
   }
@@ -283,14 +287,19 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $eventDetails[$this->_event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
 
     //send a 'cancelled' email to user, and cc the event's cc_confirm email
-    CRM_Event_BAO_Participant::sendTransitionParticipantMail($this->_participant_id,
-      $participantDetails[$this->_participant_id],
-      $eventDetails[$this->_event_id],
-      NULL,
-      'Cancelled'
-    );
-    $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contact_name]);
-    $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', [1 => $this->_contact_email]);
+    $statusMsg = ts('Event registration for %1 has been cancelled.', [1 => $this->_contact_name]);
+    if (empty($this->isBackoffice) || array_key_exists('is_confirmation_email', $params)) {
+      $emailSent = FALSE;
+      $emailSent = CRM_Event_BAO_Participant::sendTransitionParticipantMail($this->_participant_id,
+        $participantDetails[$this->_participant_id],
+        $eventDetails[$this->_event_id],
+        NULL,
+        'Cancelled'
+      );
+      if ($emailSent) {
+        $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', [1 => $this->_contact_email]);
+      }
+    }
     CRM_Core_Session::setStatus($statusMsg, ts('Thanks'), 'success');
     if (!empty($this->isBackoffice)) {
       return;

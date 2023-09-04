@@ -36,7 +36,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->student = $params['name'];
 
     $params = [
@@ -46,7 +46,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->parent = $params['name'];
 
     $params = [
@@ -56,7 +56,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->sponsor = $params['name'];
 
     $params = [
@@ -66,7 +66,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->team = $params['name'];
   }
 
@@ -84,7 +84,7 @@ DELETE FROM civicrm_contact_type
    *
    * Success expected
    */
-  public function testCreateContact() {
+  public function testCreateContact(): void {
     //check for Type:Individual
     $params = [
       'first_name' => 'Anne',
@@ -167,7 +167,7 @@ DELETE FROM civicrm_contact_type
    *
    * Success expected.
    */
-  public function testUpdateContactNoSubtypeToValid() {
+  public function testUpdateContactNoSubtypeToValid(): void {
     $params = [
       'first_name' => 'Anne',
       'last_name' => 'Grant',
@@ -223,7 +223,7 @@ DELETE FROM civicrm_contact_type
    * Update the contact with subtype to another valid subtype.
    * success expected
    */
-  public function testUpdateContactSubtype() {
+  public function testUpdateContactSubtype(): void {
     $params = [
       'first_name' => 'Anne',
       'last_name' => 'Grant',
@@ -313,7 +313,7 @@ DELETE FROM civicrm_contact_type
    *
    * Success expected
    */
-  public function testCRM19133() {
+  public function testCRM19133(): void {
     $subtypesToPreserve = [$this->student, $this->parent];
 
     // Create custom group that extends student and parent subtype

@@ -17,18 +17,30 @@ use Civi\Api4\SubscriptionHistory;
  */
 class api_v3_GroupContactTest extends CiviUnitTestCase {
 
-  protected $_contactId;
-  protected $_contactId1;
+  /**
+   * @var int
+   */
+  protected $contactID;
 
   /**
    * @var int
    */
-  protected $_groupId1;
+  protected $contactID1;
+
+  /**
+   * @var array
+   */
+  protected $groups;
 
   /**
    * @var int
    */
-  protected $_groupId2;
+  protected $groupID1;
+
+  /**
+   * @var int
+   */
+  protected $groupID2;
 
   /**
    * Set up for group contact tests.
@@ -37,16 +49,16 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
-    $this->_contactId = $this->individualCreate();
+    $this->contactID = $this->individualCreate();
 
-    $this->_groupId1 = $this->groupCreate();
+    $this->groupID1 = $this->groupCreate();
 
     $this->callAPISuccess('group_contact', 'create', [
-      'contact_id' => $this->_contactId,
-      'group_id' => $this->_groupId1,
+      'contact_id' => $this->contactID,
+      'group_id' => $this->groupID1,
     ]);
 
-    $this->_groupId2 = $this->groupCreate([
+    $this->groupID2 = $this->groupCreate([
       'name' => 'Test Group 2',
       'domain_id' => 1,
       'title' => 'New Test Group2 Created',
@@ -55,13 +67,13 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
     ]);
 
-    $this->_group = [
-      $this->_groupId1 => [
+    $this->groups = [
+      $this->groupID1 => [
         'title' => 'New Test Group Created',
         'visibility' => 'Public Pages',
         'in_method' => 'API',
       ],
-      $this->_groupId2 => [
+      $this->groupID2 => [
         'title' => 'New Test Group2 Created',
         'visibility' => 'User and User Admin Only',
         'in_method' => 'API',
@@ -80,31 +92,29 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   /**
    * Test GroupContact.get by ID.
    */
-  public function testGet() {
+  public function testGet(): void {
     $params = [
-      'contact_id' => $this->_contactId,
+      'contact_id' => $this->contactID,
     ];
-    $result = $this->callAPIAndDocument('group_contact', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_contact', 'get', $params);
     foreach ($result['values'] as $v) {
-      $this->assertEquals($v['title'], $this->_group[$v['group_id']]['title']);
-      $this->assertEquals($v['visibility'], $this->_group[$v['group_id']]['visibility']);
-      $this->assertEquals($v['in_method'], $this->_group[$v['group_id']]['in_method']);
+      $this->assertEquals($v['title'], $this->groups[$v['group_id']]['title']);
+      $this->assertEquals($v['visibility'], $this->groups[$v['group_id']]['visibility']);
+      $this->assertEquals($v['in_method'], $this->groups[$v['group_id']]['in_method']);
     }
   }
 
-  public function testGetGroupID() {
-    $description = "Get all from group and display contacts.";
-    $subfile = "GetWithGroupID";
+  public function testGetGroupID(): void {
     $params = [
-      'group_id' => $this->_groupId1,
+      'group_id' => $this->groupID1,
       'api.group.get' => 1,
       'sequential' => 1,
     ];
-    $result = $this->callAPIAndDocument('group_contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('group_contact', 'get', $params);
     foreach ($result['values'][0]['api.group.get']['values'] as $values) {
       $key = $values['id'];
-      $this->assertEquals($values['title'], $this->_group[$key]['title']);
-      $this->assertEquals($values['visibility'], $this->_group[$key]['visibility']);
+      $this->assertEquals($values['title'], $this->groups[$key]['title']);
+      $this->assertEquals($values['visibility'], $this->groups[$key]['visibility']);
     }
   }
 
@@ -112,7 +122,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
    * Test group contact create.
    */
   public function testCreate(): void {
-    $this->_contactId1 = $this->individualCreate([
+    $this->contactID1 = $this->individualCreate([
       'first_name' => 'Amiteshwar',
       'middle_name' => 'L.',
       'last_name' => 'Prasad',
@@ -122,12 +132,12 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ]);
     $params = [
-      'contact_id' => $this->_contactId,
-      'contact_id.2' => $this->_contactId1,
-      'group_id' => $this->_groupId1,
+      'contact_id' => $this->contactID,
+      'contact_id.2' => $this->contactID1,
+      'group_id' => $this->groupID1,
     ];
 
-    $result = $this->callAPIAndDocument('GroupContact', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('GroupContact', 'create', $params);
     $this->assertEquals(1, $result['not_added']);
     $this->assertEquals(1, $result['added']);
     $this->assertEquals(2, $result['total_count']);
@@ -138,22 +148,22 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
    */
   public function testDelete(): void {
     $params = [
-      'contact_id' => $this->_contactId,
-      'group_id' => $this->_groupId1,
+      'contact_id' => $this->contactID,
+      'group_id' => $this->groupID1,
     ];
 
-    $result = $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_contact', 'delete', $params);
     $this->assertEquals(1, $result['removed']);
     $this->assertEquals(1, $result['total_count']);
   }
 
-  public function testDeletePermanent() {
-    $result = $this->callAPISuccess('group_contact', 'get', ['contact_id' => $this->_contactId]);
+  public function testDeletePermanent(): void {
+    $result = $this->callAPISuccess('group_contact', 'get', ['contact_id' => $this->contactID]);
     $params = [
       'id' => $result['id'],
       'skip_undelete' => TRUE,
     ];
-    $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('group_contact', 'delete', $params);
     $result = $this->callAPISuccess('group_contact', 'get', $params);
     $this->assertEquals(0, $result['count']);
     $this->assertArrayNotHasKey('id', $result);
@@ -163,10 +173,10 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
    * CRM-19496 When id is used rather than contact_id and group_id ensure that remove function still works.
    *
    */
-  public function testDeleteWithId() {
+  public function testDeleteWithId(): void {
     $groupContactParams = [
-      'contact_id' => $this->_contactId,
-      'group_id' => $this->_groupId1,
+      'contact_id' => $this->contactID,
+      'group_id' => $this->groupID1,
     ];
     $groupContact = $this->callAPISuccess('group_contact', 'get', $groupContactParams);
     $params = [
@@ -182,10 +192,10 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
    * CRM-19496 When id is used rather than contact_id and group_id ensure that remove function still works.
    *
    */
-  public function testDeleteAndReAddWithId() {
+  public function testDeleteAndReAddWithId(): void {
     $groupContactParams = [
-      'contact_id' => $this->_contactId,
-      'group_id' => $this->_groupId1,
+      'contact_id' => $this->contactID,
+      'group_id' => $this->groupID1,
     ];
     $groupContact = $this->callAPISuccess('group_contact', 'get', $groupContactParams);
     $params = [
@@ -221,7 +231,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
     ]);
     $groupContactCreateParams = [
-      'contact_id' => $this->_contactId,
+      'contact_id' => $this->contactID,
       'group_id' => $groupId3,
       'status' => 'Pending',
     ];
@@ -231,7 +241,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       ->addSelect('*')
       ->addWhere('group_id', '=', $groupId3)
       ->addWhere('status', '=', 'Pending')
-      ->addWhere('contact_id', '=', $this->_contactId)
+      ->addWhere('contact_id', '=', $this->contactID)
       ->execute();
     $this->assertCount(1, $history);
     if ($version === 3) {
@@ -248,7 +258,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   /**
    * CRM-19979 test that group cotnact delete action works when contact is in status of pendin and is a permanent delete.
    */
-  public function testPermanentDeleteWithPending() {
+  public function testPermanentDeleteWithPending(): void {
     $groupId3 = $this->groupCreate([
       'name' => 'Test Group 3',
       'domain_id' => 1,
@@ -258,7 +268,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
     ]);
     $groupContactCreateParams = [
-      'contact_id' => $this->_contactId,
+      'contact_id' => $this->contactID,
       'group_id' => $groupId3,
       'status' => 'Pending',
     ];
@@ -275,14 +285,14 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
    *
    * Test illustrates this (& ensures once fixed it will stay fixed).
    */
-  public function testAccurateCountWithSmartGroups() {
+  public function testAccurateCountWithSmartGroups(): void {
     $childGroupID = $this->groupCreate([
       'name' => 'Child group',
       'domain_id' => 1,
       'title' => 'Child group',
       'description' => 'Child group',
       'is_active' => 1,
-      'parents' => $this->_groupId1,
+      'parents' => $this->groupID1,
       'visibility' => 'User and User Admin Only',
     ]);
 
@@ -290,15 +300,15 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'name' => 'Individuals',
       'title' => 'Individuals',
       'is_active' => 1,
-      'parents' => $this->_groupId1,
+      'parents' => $this->groupID1,
       'formValues' => ['contact_type' => 'Goat'],
     ];
     $smartGroup2 = CRM_Contact_BAO_Group::createSmartGroup($params);
 
-    $this->callAPISuccess('GroupContact', 'create', ['contact_id' => $this->_contactId, 'status' => 'Added', 'group_id' => $this->_groupId2]);
-    $this->callAPISuccess('GroupContact', 'create', ['contact_id' => $this->_contactId, 'status' => 'Added', 'group_id' => $smartGroup2->id]);
-    $this->callAPISuccess('GroupContact', 'create', ['contact_id' => $this->_contactId, 'status' => 'Added', 'group_id' => $childGroupID]);
-    $groups = $this->callAPISuccess('GroupContact', 'get', ['contact_id' => $this->_contactId]);
+    $this->callAPISuccess('GroupContact', 'create', ['contact_id' => $this->contactID, 'status' => 'Added', 'group_id' => $this->groupID2]);
+    $this->callAPISuccess('GroupContact', 'create', ['contact_id' => $this->contactID, 'status' => 'Added', 'group_id' => $smartGroup2->id]);
+    $this->callAPISuccess('GroupContact', 'create', ['contact_id' => $this->contactID, 'status' => 'Added', 'group_id' => $childGroupID]);
+    $groups = $this->callAPISuccess('GroupContact', 'get', ['contact_id' => $this->contactID]);
 
     // Although the contact is actually hard-added to 4 groups the smart groups are conventionally not returned by the api or displayed
     // on the main part of the groups tab on the contact (which calls the same function. So, 3 groups is an OK number to return.

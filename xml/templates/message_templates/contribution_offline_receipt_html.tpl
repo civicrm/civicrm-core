@@ -21,11 +21,7 @@
   <tr>
    <td>
     {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
-    {if !empty($formValues.receipt_text)}
-     <p>{$formValues.receipt_text|htmlize}</p>
-    {else}
      <p>{ts}Below you will find a receipt for this contribution.{/ts}</p>
-    {/if}
    </td>
   </tr>
   <tr>
@@ -63,7 +59,7 @@
            <th>{ts}Item{/ts}</th>
            <th>{ts}Qty{/ts}</th>
            <th>{ts}Each{/ts}</th>
-           {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+           {if $isShowTax && {contribution.tax_amount|boolean}}
              <th>{ts}Subtotal{/ts}</th>
              <th>{ts}Tax Rate{/ts}</th>
              <th>{ts}Tax Amount{/ts}</th>
@@ -81,7 +77,7 @@
             <td>
              {$line.unit_price|crmMoney:'{contribution.currency}'}
             </td>
-            {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+            {if $isShowTax && {contribution.tax_amount|boolean}}
               <td>
                 {$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'}
               </td>
@@ -107,13 +103,13 @@
        </tr>
 
      {/if}
-     {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+     {if $isShowTax && {contribution.tax_amount|boolean}}
        <tr>
          <td {$labelStyle}>
            {ts} Amount before Tax : {/ts}
          </td>
          <td {$valueStyle}>
-           {$formValues.total_amount-$totalTaxAmount|crmMoney:'{contribution.currency}'}
+           {contribution.tax_exclusive_amount}
          </td>
        </tr>
 
@@ -148,7 +144,7 @@
      {if '{contribution.receive_date}'}
        <tr>
        <td {$labelStyle}>
-        {ts}Date Received{/ts}
+        {ts}Contribution Date{/ts}
        </td>
        <td {$valueStyle}>
          {contribution.receive_date|crmDate:"shortdate"}
@@ -167,7 +163,7 @@
       </tr>
      {/if}
 
-     {if '{contribution.payment_instrument_id}' and empty($formValues.hidden_CreditCard)}
+     {if {contribution.payment_instrument_id|boolean}}
       <tr>
        <td {$labelStyle}>
         {ts}Paid By{/ts}

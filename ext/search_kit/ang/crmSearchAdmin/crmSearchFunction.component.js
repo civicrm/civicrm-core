@@ -186,6 +186,10 @@
           ctrl.expr += args.join('');
           ctrl.expr += ')';
           if (ctrl.mode === 'select') {
+            // Add pseudoconstant suffix if function has an option list
+            if (ctrl.fn.options) {
+              ctrl.expr += ':label';
+            }
             ctrl.expr += ' AS ' + makeAlias();
           }
         } else {

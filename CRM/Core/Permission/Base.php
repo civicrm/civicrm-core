@@ -143,14 +143,14 @@ class CRM_Core_Permission_Base {
   public function group($groupType = NULL, $excludeHidden = TRUE) {
     $userId = CRM_Core_Session::getLoggedInContactID();
     $domainId = CRM_Core_Config::domainID();
-    if (!isset(Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId])) {
-      Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId] = Civi::$statics[__CLASS__]['editPermissionedGroups_' . $domainId . '_' . $userId] = [];
+    if (!isset(Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId])) {
+      Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId] = Civi::$statics['CRM_ACL_API']['editPermissionedGroups_' . $domainId . '_' . $userId] = [];
     }
 
-    $groupKey = $groupType ? $groupType : 'all';
+    $groupKey = $groupType ?: 'all';
 
-    if (!isset(Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey])) {
-      Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = Civi::$statics[__CLASS__]['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = [];
+    if (!isset(Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey])) {
+      Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = Civi::$statics['CRM_ACL_API']['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = [];
 
       $groups = CRM_Core_PseudoConstant::allGroup($groupType, $excludeHidden);
 
@@ -159,38 +159,38 @@ class CRM_Core_Permission_Base {
         // immediately rather than dilute it further
         $this->_editAdminUser = $this->_viewAdminUser = TRUE;
         $this->_editPermission = $this->_viewPermission = TRUE;
-        Civi::$statics[__CLASS__]['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
-        Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
-        return Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey];
+        Civi::$statics['CRM_ACL_API']['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
+        Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
+        return Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey];
       }
       elseif ($this->check('view all contacts')) {
         $this->_viewAdminUser = TRUE;
         $this->_viewPermission = TRUE;
-        Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
+        Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
       }
 
-      $ids = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_saved_search', $groups);
+      $ids = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_group', $groups);
       if (!empty($ids)) {
         foreach (array_values($ids) as $id) {
-          $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
-          Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey][$id] = $title;
+          $title = $groups[$id] ?? CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
+          Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey][$id] = $title;
           $this->_viewPermission = TRUE;
         }
       }
 
-      $ids = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_saved_search', $groups);
+      $ids = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_group', $groups);
       if (!empty($ids)) {
         foreach (array_values($ids) as $id) {
-          $title = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
-          Civi::$statics[__CLASS__]['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey][$id] = $title;
-          Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey][$id] = $title;
+          $title = $groups[$id] ?? CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'title');
+          Civi::$statics['CRM_ACL_API']['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey][$id] = $title;
+          Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey][$id] = $title;
           $this->_editPermission = TRUE;
           $this->_viewPermission = TRUE;
         }
       }
     }
 
-    return Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey];
+    return Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey];
   }
 
   /**
@@ -209,7 +209,7 @@ class CRM_Core_Permission_Base {
   public function groupClause($type, &$tables, &$whereTables) {
     $userId = CRM_Core_Session::getLoggedInContactID();
     $domainId = CRM_Core_Config::domainID();
-    if (!isset(Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId])) {
+    if (!isset(Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId])) {
       $this->group();
     }
 
@@ -219,18 +219,18 @@ class CRM_Core_Permission_Base {
       if ($this->_editAdminUser) {
         $clause = ' ( 1 ) ';
       }
-      elseif (empty(Civi::$statics[__CLASS__]['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey])) {
+      elseif (empty(Civi::$statics['CRM_ACL_API']['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey])) {
         $clause = ' ( 0 ) ';
       }
       else {
         $clauses = [];
-        $groups = implode(', ', Civi::$statics[__CLASS__]['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey]);
-        $clauses[] = ' ( civicrm_group_contact.group_id IN ( ' . implode(', ', array_keys(Civi::$statics[__CLASS__]['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey])) . " ) AND civicrm_group_contact.status = 'Added' ) ";
+        $groups = implode(', ', Civi::$statics['CRM_ACL_API']['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey]);
+        $clauses[] = ' ( civicrm_group_contact.group_id IN ( ' . implode(', ', array_keys(Civi::$statics['CRM_ACL_API']['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey])) . " ) AND civicrm_group_contact.status = 'Added' ) ";
         $tables['civicrm_group_contact'] = 1;
         $whereTables['civicrm_group_contact'] = 1;
 
         // foreach group that is potentially a saved search, add the saved search clause
-        foreach (array_keys(Civi::$statics[__CLASS__]['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey]) as $id) {
+        foreach (array_keys(Civi::$statics['CRM_ACL_API']['editPermissionedGroups_' . $domainId . '_' . $userId][$groupKey]) as $id) {
           $group = new CRM_Contact_DAO_Group();
           $group->id = $id;
           if ($group->find(TRUE) && $group->saved_search_id) {
@@ -250,13 +250,13 @@ class CRM_Core_Permission_Base {
       if ($this->_viewAdminUser) {
         $clause = ' ( 1 ) ';
       }
-      elseif (empty(Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey])) {
+      elseif (empty(Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey])) {
         $clause = ' ( 0 ) ';
       }
       else {
         $clauses = [];
-        $groups = implode(', ', Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey]);
-        $clauses[] = ' civicrm_group.id IN (' . implode(', ', array_keys(Civi::$statics[__CLASS__]['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey])) . " )  ";
+        $groups = implode(', ', Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey]);
+        $clauses[] = ' civicrm_group.id IN (' . implode(', ', array_keys(Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey])) . " )  ";
         $tables['civicrm_group'] = 1;
         $whereTables['civicrm_group'] = 1;
         $clause = ' ( ' . implode(' OR ', $clauses) . ' ) ';

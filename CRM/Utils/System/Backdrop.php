@@ -23,12 +23,12 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     $form_state = form_state_defaults();
 
     $form_state['input'] = [
       'name' => $params['cms_name'],
-      'mail' => $params[$mail],
+      'mail' => $params[$mailParam],
       'op' => 'Create new account',
     ];
 
@@ -490,7 +490,7 @@ AND    u.status = 1
     global $language;
 
     $langcode = substr($civicrm_language, 0, 2);
-    $languages = language_list(FALSE, TRUE);
+    $languages = language_list();
 
     if (isset($languages[$langcode])) {
       $language = $languages[$langcode];
@@ -605,8 +605,8 @@ AND    u.status = 1
     $uid = $params['uid'] ?? NULL;
     if (!$uid) {
       // Load the user we need to check Backdrop permissions.
-      $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));
-      $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $_REQUEST));
+      $name = !empty($params['name']) ? $params['name'] : trim($_REQUEST['name'] ?? '');
+      $pass = !empty($params['pass']) ? $params['pass'] : trim($_REQUEST['pass'] ?? '');
 
       if ($name) {
         $uid = user_authenticate($name, $pass);
@@ -1155,6 +1155,45 @@ AND    u.status = 1
     }
 
     return $text;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    $ret = FALSE;
+
+    if (!$print) {
+      if ($maintenance) {
+        backdrop_set_breadcrumb('');
+        backdrop_maintenance_theme();
+        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+          CRM_Utils_System::addHTMLHead($region->render(''));
+        }
+        print theme('maintenance_page', ['content' => $content]);
+        exit();
+      }
+      $ret = TRUE;
+    }
+    $out = $content;
+
+    if ($ret) {
+      return $out;
+    }
+    else {
+      print $out;
+      return NULL;
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function ipAddress():?string {
+    // Backdrop function handles the server being behind a proxy securely. We
+    // still have legacy ipn methods that reach this point without bootstrapping
+    // hence the check that the fn exists.
+    return function_exists('ip_address') ? ip_address() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
   }
 
 }

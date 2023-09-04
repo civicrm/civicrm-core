@@ -30,7 +30,7 @@ use Civi\Api4\Tag;
  */
 class GetExtraFieldsTest extends Api4TestBase {
 
-  public function testGetFieldsByContactType() {
+  public function testGetFieldsByContactType(): void {
     $getFields = Contact::getFields(FALSE)->addSelect('name')->addWhere('type', '=', 'Field');
 
     $baseFields = array_column(\CRM_Contact_BAO_Contact::fields(), 'name');
@@ -61,7 +61,7 @@ class GetExtraFieldsTest extends Api4TestBase {
     $this->assertContains('household_name', $householdFields);
   }
 
-  public function testGetOptionsAddress() {
+  public function testGetOptionsAddress(): void {
     $getFields = Address::getFields(FALSE)->addWhere('name', '=', 'state_province_id')->setLoadOptions(TRUE);
 
     $usOptions = $getFields->setValues(['country_id' => 1228])->execute()->first();
@@ -75,7 +75,7 @@ class GetExtraFieldsTest extends Api4TestBase {
     $this->assertContains('Alberta', $caOptions['options']);
   }
 
-  public function testGetFkFields() {
+  public function testGetFkFields(): void {
     $fields = \Civi\Api4\Participant::getFields()
       ->setLoadOptions(TRUE)
       ->addWhere('name', 'IN', ['event_id', 'event_id.created_id', 'contact_id.gender_id', 'event_id.created_id.sort_name'])
@@ -89,7 +89,7 @@ class GetExtraFieldsTest extends Api4TestBase {
     $this->assertGreaterThan(1, count($fields['contact_id.gender_id']['options']));
   }
 
-  public function testGetTagsFromFilterField() {
+  public function testGetTagsFromFilterField(): void {
     $actTag = Tag::create(FALSE)
       ->addValue('name', uniqid('act'))
       ->addValue('used_for', 'civicrm_activity')

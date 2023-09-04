@@ -330,7 +330,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
-  public function testGetAllContactMembership() {
+  public function testGetAllContactMembership(): void {
     $lifetimeTypeId = $this->membershipTypeCreate([
       'name' => 'Lifetime',
       'duration_unit' => 'lifetime',
@@ -466,10 +466,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * Renew membership with change in membership type.
    *
-   * @fixme Note that this test fails when today is August 29 2019 (and maybe
-   *   other years?): Verify correct end date is calculated after membership
-   *   renewal Failed asserting that two strings are equal.
-   *   Expected-'2021-03-01' Actual+'2021-02-28'
    * @throws \CRM_Core_Exception
    */
   public function testRenewMembership(): void {
@@ -672,7 +668,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testMembershipPaymentForSingleContributionMultipleMembership(): void {
     $membershipTypeID1 = $this->membershipTypeCreate(['name' => 'Parent']);
     $membershipTypeID2 = $this->membershipTypeCreate(['name' => 'Child']);
-    $financialTypeId = $this->getFinancialTypeId('Member Dues');
+    $financialTypeId = $this->getFinancialTypeID('Member Dues');
     $priceSet = $this->callAPISuccess('price_set', 'create', [
       'is_quick_config' => 0,
       'extends' => 'CiviMember',
@@ -928,7 +924,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertMembershipExists($relatedMembership2['id']);
   }
 
-  public function testRelatedMembershipWithContactReferenceCustomField() {
+  public function testRelatedMembershipWithContactReferenceCustomField(): void {
     $relatedContactId = $this->individualCreate();
     $customContactId = $this->individualCreate();
     $membershipOrganizationId = $this->organizationCreate();

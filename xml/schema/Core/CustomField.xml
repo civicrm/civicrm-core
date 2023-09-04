@@ -13,7 +13,7 @@
     <update>civicrm/admin/custom/group/field/update?action=update&amp;reset=1&amp;id=[id]&amp;gid=[custom_group_id]</update>
     <preview>civicrm/admin/custom/group/preview?reset=1&amp;fid=[id]</preview>
     <delete>civicrm/admin/custom/group/field/delete?reset=1&amp;id=[id]</delete>
-    <move>civicrm/admin/custom/group/field/move?reset=1&amp;fid=[id]</move>
+    <detach>civicrm/admin/custom/group/field/move?reset=1&amp;fid=[id]</detach>
   </paths>
   <field>
     <name>id</name>
@@ -71,6 +71,9 @@
     <localizable>true</localizable>
     <comment>Text for form field label (also friendly name for administering this custom property).</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>data_type</name>
@@ -169,7 +172,7 @@
     <type>varchar</type>
     <title>Custom Field Formatting</title>
     <length>64</length>
-    <comment>Optional format instructions for specific field types, like date types.</comment>
+    <comment>Unused</comment>
     <add>1.1</add>
     <drop>5.59</drop>
   </field>
@@ -186,8 +189,9 @@
     <type>varchar</type>
     <title>Custom Field Javascript</title>
     <length>255</length>
-    <comment>Optional scripting attributes for field.</comment>
+    <comment>Unused</comment>
     <add>1.1</add>
+    <drop>5.61</drop>
   </field>
   <field>
     <name>is_active</name>
@@ -331,6 +335,15 @@
     <required>true</required>
     <comment>Should the multi-record custom field values be displayed in tab table listing</comment>
     <add>4.5</add>
+  </field>
+  <field>
+    <name>fk_entity</name>
+    <type>varchar</type>
+    <title>Entity</title>
+    <length>255</length>
+    <default>NULL</default>
+    <comment>Name of entity being referenced.</comment>
+    <add>5.60</add>
   </field>
   <index>
     <name>UI_label_custom_group_id</name>

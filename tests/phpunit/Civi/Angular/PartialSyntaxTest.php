@@ -30,8 +30,8 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
    * @inheritDoc
    */
   protected function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->createLoggedInUser();
     $this->res = \CRM_Core_Resources::singleton();
     $this->angular = new Manager($this->res);
@@ -61,12 +61,16 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
       '<div foo="ts(\'Hello world\')\"></div>',
     ];
     $cases[5] = [
-      '<a href="{{foo}}" title="{{bar}}"></a>',
-      '<a href="{{foo}}" title="{{bar}}"></a>',
+      '<a ng-href="{{foo}}" title="{{bar}}"></a>',
+      '<a ng-href="{{foo}}" title="{{bar}}"></a>',
     ];
     $cases[6] = [
       '<div ng-if="a && b"></div>',
       '<div ng-if="a && b"></div>',
+    ];
+    $cases[7] = [
+      '<div double="{a: \'abc\', &quot;b.c&quot;: \'b&c\'}" single=\'{"foo": &quot;bar&quot;}\'></div>',
+      '<div double="{a: \'abc\', &quot;b.c&quot;: \'b&c\'}" single=\'{"foo": "bar"}\'></div>',
     ];
 
     return $cases;
@@ -84,7 +88,7 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
 
   /**
    */
-  public function testAllPartials() {
+  public function testAllPartials(): void {
     $this->markTestIncomplete('checkConsistentHtml gives too many false-positive errors to be useful in a unit test.');
 
     $coder = new \Civi\Angular\Coder();

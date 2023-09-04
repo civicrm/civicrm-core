@@ -313,13 +313,8 @@
     var cacheKey = {/literal}'{$cacheKey|escape}'{literal};
 
     var dataUrl = {/literal}"{crmURL p='civicrm/ajax/toggleDedupeSelect' h=0 q='snippet=4'}"{literal};
-    var rgid = {/literal}"{$rgid}"{literal};
-    var gid = {/literal}"{$gid}"{literal};
 
-    rgid = rgid.length > 0 ? rgid : 0;
-    gid  = gid.length > 0 ? gid : 0;
-
-    CRM.$.post(dataUrl, {pnid: id, rgid: rgid, gid: gid, is_selected: is_selected, cacheKey : cacheKey}, function (data) {
+    CRM.$.post(dataUrl, {pnid: id, is_selected: is_selected, cacheKey : cacheKey}, function (data) {
       // nothing to do for now
     }, 'json');
   }

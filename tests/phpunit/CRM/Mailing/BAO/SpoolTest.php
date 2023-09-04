@@ -27,7 +27,7 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
   /**
    * Basic send.
    */
-  public function testSend() {
+  public function testSend(): void {
     $contact_params_1 = [
       'first_name' => substr(sha1(rand()), 0, 7),
       'last_name' => 'Anderson',

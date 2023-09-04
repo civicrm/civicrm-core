@@ -47,6 +47,10 @@
       <labelColumn>display_name</labelColumn>
     </pseudoconstant>
     <comment>Which Location does this email belong to.</comment>
+    <html>
+      <label>Location Type</label>
+      <type>Select</type>
+    </html>
     <add>2.0</add>
   </field>
   <index>
@@ -84,7 +88,7 @@
   </field>
   <field>
     <name>is_primary</name>
-    <title>Primary ID</title>
+    <title>Is Primary</title>
     <type>boolean</type>
     <default>0</default>
     <required>true</required>

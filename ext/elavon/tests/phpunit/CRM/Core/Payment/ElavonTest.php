@@ -114,6 +114,7 @@ class CRM_Core_Payment_ElavonTest extends \PHPUnit\Framework\TestCase implements
   public function setUpElavonProcessor(): void {
     $params = [
       'name' => 'demo',
+      'title' => 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
       'payment_processor_type_id' => 'Elavon',
       'is_active' => 1,

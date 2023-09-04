@@ -95,7 +95,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
    */
   public function browse() {
     // get all custom groups sorted by weight
-    $customGroup = [];
+    $customGroups = [];
     $dao = new CRM_Core_DAO_CustomGroup();
     $dao->is_reserved = FALSE;
     $dao->orderBy('weight, title');
@@ -105,8 +105,8 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     $customGroupStyle = CRM_Core_SelectValues::customGroupStyle();
     while ($dao->fetch()) {
       $id = $dao->id;
-      $customGroup[$id] = ['class' => ''];
-      CRM_Core_DAO::storeValues($dao, $customGroup[$id]);
+      $customGroups[$id] = ['class' => ''];
+      CRM_Core_DAO::storeValues($dao, $customGroups[$id]);
       // form all action links
       $action = array_sum(array_keys(self::actionLinks()));
 
@@ -117,19 +117,20 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
       else {
         $action -= CRM_Core_Action::DISABLE;
       }
-      $customGroup[$id]['order'] = $customGroup[$id]['weight'];
-      $customGroup[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
+      $customGroups[$id]['order'] = $customGroups[$id]['weight'];
+      $customGroups[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
         ['id' => $id],
         ts('more'),
         FALSE,
-        'customGroup.row.actions',
+        'customGroups.row.actions',
         'CustomGroup',
         $id
       );
-      if (!empty($customGroup[$id]['style'])) {
-        $customGroup[$id]['style_display'] = $customGroupStyle[$customGroup[$id]['style']];
+      if (!empty($customGroups[$id]['style'])) {
+        $customGroups[$id]['style_display'] = $customGroupStyle[$customGroups[$id]['style']];
       }
-      $customGroup[$id]['extends_display'] = $customGroupExtends[$customGroup[$id]['extends']];
+      $customGroups[$id]['extends_display'] = $customGroupExtends[$customGroups[$id]['extends']];
+      $customGroups[$id]['extends_entity_column_value'] = $customGroups[$id]['extends_entity_column_value'] ?? NULL;
     }
 
     // FIXME: This hardcoded array is mostly redundant with CRM_Core_BAO_CustomGroup::getSubTypes
@@ -170,10 +171,10 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
 
     CRM_Core_BAO_CustomGroup::getExtendedObjectTypes($subTypes);
 
-    foreach ($customGroup as $key => $values) {
-      $subValue = $customGroup[$key]['extends_entity_column_value'] ?? NULL;
-      $subName = $customGroup[$key]['extends_entity_column_id'] ?? NULL;
-      $type = $customGroup[$key]['extends'] ?? NULL;
+    foreach ($customGroups as $key => $values) {
+      $subValue = $values['extends_entity_column_value'];
+      $subName = $customGroups[$key]['extends_entity_column_id'] ?? NULL;
+      $type = $customGroups[$key]['extends'] ?? NULL;
       if ($subValue) {
         $subValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
           substr($subValue, 1, -1)
@@ -203,21 +204,21 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
             }
           }
         }
-        $customGroup[$key]["extends_entity_column_value"] = $colValue;
+        $customGroups[$key]['extends_entity_column_value'] = $colValue;
       }
       else {
         if (isset($subTypes[$type]) && is_array($subTypes[$type])) {
-          $customGroup[$key]["extends_entity_column_value"] = ts("Any");
+          $customGroups[$key]["extends_entity_column_value"] = ts("Any");
         }
       }
     }
 
     $returnURL = CRM_Utils_System::url('civicrm/admin/custom/group');
-    CRM_Utils_Weight::addOrder($customGroup, 'CRM_Core_DAO_CustomGroup',
+    CRM_Utils_Weight::addOrder($customGroups, 'CRM_Core_DAO_CustomGroup',
       'id', $returnURL
     );
 
-    $this->assign('rows', $customGroup);
+    $this->assign('rows', $customGroups);
   }
 
 }

@@ -9,13 +9,15 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Participant;
+
 /**
  *  Test various payment forms.
  *
  * This class is intended to be a place to build out testing of various forms - with the
  * hope being to ensure all payment forms are consistently tested and to refine
  * helper functions into a trait that could be available to
- * extensions for testing - notably the eventcart which ideally should interact with core
+ * extensions for testing - notably the event cart which ideally should interact with core
  * through approved interfaces - ideally even in tests.
  *
  * An approved interface would sit in the Civi directory and would at minimum support some functions
@@ -24,7 +26,7 @@
  * - allowing us to easily check payment forms work with the core processors which cover a reasonable amount of the
  * expectations held by non-core processors .
  *
- * Note that this tests eventcart but is not in eventcart because I want to be sure about whether the
+ * Note that this tests event cart but is not in event cart because I want to be sure about whether the
  * traits supporting it make sense before making them available to extensions.
  */
 class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
@@ -36,7 +38,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testEventPaymentForms() {
+  public function testEventPaymentForms(): void {
     $this->createAuthorizeNetProcessor();
     $processors = [$this->ids['PaymentProcessor']['anet']];
     $eventID = $this->eventCreatePaid([
@@ -52,7 +54,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
         'controller' => [],
         'submitValues' => [
           'event' => [$eventID => ['participant' => [1 => ['email' => 'bob@example.com']]]],
-          'event_' . $eventID . '_price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value'][0],
+          'event_' . $eventID . '_price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
         ],
         'REQUEST' => [],
       ],
@@ -92,13 +94,13 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
         $qfKey = $form->controller->_key;
       }
     }
-    $participant = \Civi\Api4\Participant::get(FALSE)
+    $participant = Participant::get(FALSE)
       ->addWhere('status_id:name', '=', 'Registered')
       ->execute()
       ->first();
     $this->assertEquals($cart->id, $participant['cart_id']);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'), $participant['status_id']);
-    $this->assertRequestValid(['x_city' => 'The+Shire', 'x_state' => 'IL', 'x_amount' => 1.0]);
+    $this->assertRequestValid(['x_city' => 'The+Shire', 'x_state' => 'IL', 'x_amount' => 300.0]);
   }
 
 }

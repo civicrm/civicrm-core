@@ -56,7 +56,12 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    */
   public function onRender(TokenRenderEvent $e): void {
     $useSmarty = !empty($e->context['smarty']);
-    $e->string = $e->getTokenProcessor()->visitTokens($e->string, function() {
+    $e->string = $e->getTokenProcessor()->visitTokens($e->string, function($token = NULL, $entity = NULL, $field = NULL, $filterParams = NULL) {
+      if ($filterParams && $filterParams[0] === 'boolean') {
+        // This token was missed during primary rendering, and it's supposed to be coerced to boolean.
+        // Treat an unknown token as false-y.
+        return 0;
+      }
       // For historical consistency, we filter out unrecognized tokens.
       return '';
     });
@@ -72,7 +77,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {
         $tokenParts = explode('|', $tokenName);
         $modifier = $tokenParts[1] ?? '';
-        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenParts[0]), $e->context['locale'] ?? NULL);
+        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenParts[0]), '');
         if ($smartyVars[$smartyName] instanceof \Brick\Money\Money) {
           // TODO: We should reuse the filters from TokenProcessor::filterTokenValue()
           if ($modifier === 'crmMoney') {

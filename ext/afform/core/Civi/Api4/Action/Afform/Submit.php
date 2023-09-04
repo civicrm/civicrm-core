@@ -68,6 +68,7 @@ class Submit extends AbstractProcessor {
     \Civi::dispatcher()->dispatch('civi.afform.validate', $event);
     $errors = $event->getErrors();
     if ($errors) {
+      \Civi::log('afform')->error('Afform Validation errors: ' . print_r($errors, TRUE));
       throw new \CRM_Core_Exception(ts('Validation Error', ['plural' => '%1 Validation Errors', 'count' => count($errors)]), 0, ['validation' => $errors]);
     }
 
@@ -202,9 +203,15 @@ class Submit extends AbstractProcessor {
       return NULL;
     }
     $fullDefn = FormDataModel::getField($apiEntity, $fieldName, 'create');
+
+    // we don't need to validate the file fields as it's handled separately
+    if ($fullDefn['input_type'] === 'File') {
+      return NULL;
+    }
+
     $isRequired = $attributes['defn']['required'] ?? $fullDefn['required'] ?? FALSE;
     if ($isRequired) {
-      $label = $attributes['defn']['label'] ?? $fullDefn['label'];
+      $label = $attributes['defn']['label'] ?? $fullDefn['label'] ?? $fieldName;
       return E::ts('%1 is a required field.', [1 => $label]);
     }
     return NULL;
@@ -324,6 +331,7 @@ class Submit extends AbstractProcessor {
       catch (\CRM_Core_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
         // intentionally left blank. Other times it's a real error the user should know about.
+        \Civi::log('afform')->debug("Silently ignoring exception in Afform processGenericEntity call: " . $e->getMessage());
       }
     }
   }
@@ -338,50 +346,55 @@ class Submit extends AbstractProcessor {
     // Prevent processGenericEntity
     $event->stopPropagation();
     $api4 = $event->getSecureApi4();
-    $relationship = $event->records[0]['fields'] ?? [];
-    if (empty($relationship['contact_id_a']) || empty($relationship['contact_id_b']) || empty($relationship['relationship_type_id'])) {
-      return;
-    }
-    $relationshipType = RelationshipType::get(FALSE)
-      ->addWhere('id', '=', $relationship['relationship_type_id'])
-      ->execute()->single();
-    $isReciprocal = $relationshipType['label_a_b'] == $relationshipType['label_b_a'];
-    $isActive = !isset($relationship['is_active']) || !empty($relationship['is_active']);
-    // Each contact id could be multivalued (e.g. using `af-repeat`)
-    foreach ((array) $relationship['contact_id_a'] as $contact_id_a) {
-      foreach ((array) $relationship['contact_id_b'] as $contact_id_b) {
-        $params = $relationship;
-        $params['contact_id_a'] = $contact_id_a;
-        $params['contact_id_b'] = $contact_id_b;
-        // Check for existing relationships (if allowed)
-        if (!empty($event->getEntity()['actions']['update'])) {
-          $where = [
-            ['is_active', '=', $isActive],
-            ['relationship_type_id', '=', $relationship['relationship_type_id']],
-          ];
-          // Reciprocal relationship types need an extra check
-          if ($isReciprocal) {
-            $where[] = ['OR',
-              ['AND', ['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]],
-              ['AND', ['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]],
+    // Iterate through multiple relationships (if using af-repeat)
+    foreach ($event->records as $relationship) {
+      $relationship = $relationship['fields'] ?? [];
+      if (empty($relationship['contact_id_a']) || empty($relationship['contact_id_b']) || empty($relationship['relationship_type_id'])) {
+        return;
+      }
+      $relationshipType = RelationshipType::get(FALSE)
+        ->addWhere('id', '=', $relationship['relationship_type_id'])
+        ->execute()->single();
+      $isReciprocal = $relationshipType['label_a_b'] == $relationshipType['label_b_a'];
+      $isActive = !isset($relationship['is_active']) || !empty($relationship['is_active']);
+      // Each contact id could be multivalued (e.g. using `af-repeat`)
+      foreach ((array) $relationship['contact_id_a'] as $contact_id_a) {
+        foreach ((array) $relationship['contact_id_b'] as $contact_id_b) {
+          $params = $relationship;
+          $params['contact_id_a'] = $contact_id_a;
+          $params['contact_id_b'] = $contact_id_b;
+          // Check for existing relationships (if allowed)
+          if (!empty($event->getEntity()['actions']['update'])) {
+            $where = [
+              ['is_active', '=', $isActive],
+              ['relationship_type_id', '=', $relationship['relationship_type_id']],
             ];
+            // Reciprocal relationship types need an extra check
+            if ($isReciprocal) {
+              $where[] = [
+                'OR', [
+                  ['AND', [['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]]],
+                  ['AND', [['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]]],
+                ],
+              ];
+            }
+            else {
+              $where[] = ['contact_id_a', '=', $contact_id_a];
+              $where[] = ['contact_id_b', '=', $contact_id_b];
+            }
+            $existing = $api4('Relationship', 'get', ['where' => $where])->first();
+            if ($existing) {
+              $params['id'] = $existing['id'];
+              unset($params['contact_id_a'], $params['contact_id_b']);
+              // If this is a flipped reciprocal relationship, also flip the permissions
+              $params['is_permission_a_b'] = $relationship['is_permission_b_a'] ?? NULL;
+              $params['is_permission_b_a'] = $relationship['is_permission_a_b'] ?? NULL;
+            }
           }
-          else {
-            $where[] = ['contact_id_a', '=', $contact_id_a];
-            $where[] = ['contact_id_b', '=', $contact_id_b];
-          }
-          $existing = $api4('Relationship', 'get', ['where' => $where])->first();
-          if ($existing) {
-            $params['id'] = $existing['id'];
-            unset($params['contact_id_a'], $params['contact_id_b']);
-            // If this is a flipped reciprocal relationship, also flip the permissions
-            $params['is_permission_a_b'] = $relationship['is_permission_b_a'] ?? NULL;
-            $params['is_permission_b_a'] = $relationship['is_permission_a_b'] ?? NULL;
-          }
+          $api4('Relationship', 'save', [
+            'records' => [$params],
+          ]);
         }
-        $api4('Relationship', 'save', [
-          'records' => [$params],
-        ]);
       }
     }
   }

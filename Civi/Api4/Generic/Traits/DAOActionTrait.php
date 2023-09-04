@@ -140,7 +140,9 @@ trait DAOActionTrait {
     }
 
     \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
-    FormattingUtil::formatOutputValues($result, $this->entityFields());
+    foreach ($result as &$row) {
+      FormattingUtil::formatOutputValues($row, $this->entityFields());
+    }
     return $result;
   }
 
@@ -240,14 +242,14 @@ trait DAOActionTrait {
         continue;
       }
 
-      // Null and empty string are interchangeable as far as the custom bao understands
-      if (NULL === $value) {
-        $value = '';
-      }
-
       if ($field['suffix']) {
         $options = FormattingUtil::getPseudoconstantList($field, $name, $params, $this->getActionName());
         $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
+      }
+
+      // Null and empty string are interchangeable as far as the custom bao understands
+      if (NULL === $value) {
+        $value = '';
       }
 
       if ($field['html_type'] === 'CheckBox') {

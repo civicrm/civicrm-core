@@ -64,7 +64,7 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * CRM-20412: Test accurate count for unique open details
    */
-  public function testOpenedMailingQuery() {
+  public function testOpenedMailingQuery(): void {
 
     $this->loadXMLDataSet(dirname(__FILE__) . '/queryDataset.xml');
     // ensure that total unique opened mail count is same while
@@ -79,15 +79,15 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * CRM-21194: Test accurate count for unique trackable URLs
    */
-  public function testTrackableUrlMailingQuery() {
+  public function testTrackableUrlMailingQuery(): void {
     $this->loadXMLDataSet(dirname(__FILE__) . '/queryDataset.xml');
 
     // ensure that total unique clicked mail count is same while
     //   fetching rows and row count for mailing_id = 14 and
     //   trackable_url_id 12
-    $totalDistinctTrackableUrlCount = CRM_Mailing_Event_BAO_MailingEventClickThrough::getTotalCount(14, NULL, TRUE, 13);
-    $totalTrackableUrlCount = CRM_Mailing_Event_BAO_MailingEventClickThrough::getTotalCount(14, NULL, FALSE, 13);
-    $totalTrackableUrlMail = CRM_Mailing_Event_BAO_MailingEventClickThrough::getRows(14, NULL, TRUE, 13);
+    $totalDistinctTrackableUrlCount = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTotalCount(14, NULL, TRUE, 13);
+    $totalTrackableUrlCount = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTotalCount(14, NULL, FALSE, 13);
+    $totalTrackableUrlMail = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getRows(14, NULL, TRUE, 13);
 
     $this->assertEquals(3, $totalDistinctTrackableUrlCount, "Accurately display distinct count of unique trackable URLs");
     $this->assertEquals(4, $totalTrackableUrlCount, "Accurately display count of unique trackable URLs");

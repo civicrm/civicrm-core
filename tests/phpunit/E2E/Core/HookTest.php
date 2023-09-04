@@ -17,7 +17,7 @@ class HookTest extends \CiviEndToEndTestCase {
    *
    * This uses the canonical form, `CRM_Utils_Hook::invoke(string[] $names...)`
    */
-  public function testSymfonyListener_names() {
+  public function testSymfonyListener_names(): void {
     $calls = 0;
     $hookExample = function ($e) use (&$calls) {
       $calls++;
@@ -45,8 +45,9 @@ class HookTest extends \CiviEndToEndTestCase {
    * @return mixed
    */
   private function hookStub($names, &$a, $b) {
+    $null = NULL;
     return \CRM_Utils_Hook::singleton()
-      ->invoke($names, $a, $b, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject,
+      ->invoke($names, $a, $b, $null, $null, $null, $null,
         'civicrm_e2eHookExample');
   }
 

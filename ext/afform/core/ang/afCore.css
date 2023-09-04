@@ -30,6 +30,10 @@ af-form {
   display: block;
 }
 
+#bootstrap-theme .input-group .crm-af-field {
+  display: inline-block;
+}
+
 [af-repeat-item] {
   position: relative;
 }

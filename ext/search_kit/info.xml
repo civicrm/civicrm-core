@@ -15,13 +15,13 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2021-01-06</releaseDate>
-  <version>5.60.alpha1</version>
+  <version>5.66.alpha1</version>
   <develStage>stable</develStage>
   <tags>
     <tag>mgmt:required</tag>
   </tags>
   <compatibility>
-    <ver>5.60</ver>
+    <ver>5.66</ver>
   </compatibility>
   <comments>Click on the chat link above to discuss development, report problems or ask questions.</comments>
   <classloader>
@@ -39,6 +39,6 @@
   </mixins>
   <civix>
     <namespace>CRM/Search</namespace>
-    <format>22.10.0</format>
+    <format>23.02.0</format>
   </civix>
 </extension>

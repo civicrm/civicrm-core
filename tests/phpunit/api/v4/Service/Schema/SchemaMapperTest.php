@@ -29,7 +29,7 @@ use api\v4\Api4TestBase;
  */
 class SchemaMapperTest extends Api4TestBase {
 
-  public function testWillHaveNoPathWithNoTables() {
+  public function testWillHaveNoPathWithNoTables(): void {
     $map = new SchemaMap();
     try {
       $map->getLink('foo', 'bar');
@@ -40,7 +40,7 @@ class SchemaMapperTest extends Api4TestBase {
     $this->assertStringContainsString('not found', $exception->getMessage());
   }
 
-  public function testWillHavePathWithSingleJump() {
+  public function testWillHavePathWithSingleJump(): void {
     $phoneTable = new Table('civicrm_phone');
     $locationTable = new Table('civicrm_location_type');
     $link = new Joinable('civicrm_location_type', 'id', 'location');
@@ -52,7 +52,7 @@ class SchemaMapperTest extends Api4TestBase {
     $this->assertNotEmpty($map->getLink('civicrm_phone', 'location'));
   }
 
-  public function testCircularReferenceWillNotBreakIt() {
+  public function testCircularReferenceWillNotBreakIt(): void {
     $contactTable = new Table('contact');
     $carTable = new Table('car');
     $carLink = new Joinable('car', 'id');
@@ -66,7 +66,7 @@ class SchemaMapperTest extends Api4TestBase {
     $this->assertEmpty($map->getLink('contact', 'foo'));
   }
 
-  public function testCannotGoOverJoinLimit() {
+  public function testCannotGoOverJoinLimit(): void {
     $first = new Table('first');
     $second = new Table('second');
     $third = new Table('third');

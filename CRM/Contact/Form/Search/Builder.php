@@ -473,7 +473,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         elseif (in_array(substr($field, 0, 3), [
           'is_',
           'do_',
-        ]) || CRM_Utils_Array::value('data_type', $info) == 'Boolean'
+        ]) || ($info['data_type'] ?? NULL) == 'Boolean'
         ) {
           $options[$field] = 'yesno';
           if ($entity != 'contact') {
@@ -685,9 +685,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     ];
 
     if (isset($mappingId)) {
-      list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingImProvider,
-        $mappingRelation, $mappingOperator, $mappingValue
-        ) = $this->getMappingFields($mappingId);
+      [$mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $mappingRelation, $mappingOperator, $mappingValue] = $this->getMappingFields($mappingId);
 
       $blkCnt = count($mappingName);
       if ($blkCnt >= $blockCount) {
@@ -919,12 +917,12 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
         $jsSet = TRUE;
 
-        if (CRM_Utils_Array::value($i, CRM_Utils_Array::value($x, $mappingOperator))) {
-          $defaults["operator[$x][$i]"] = $mappingOperator[$x][$i] ?? NULL;
+        if (!empty($mappingOperator[$x][$i])) {
+          $defaults["operator[$x][$i]"] = $mappingOperator[$x][$i];
         }
 
         if (isset($mappingValue[$x][$i])) {
-          $defaults["value[$x][$i]"] = $mappingValue[$x][$i] ?? NULL;
+          $defaults["value[$x][$i]"] = $mappingValue[$x][$i];
         }
       }
     }

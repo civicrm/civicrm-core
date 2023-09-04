@@ -120,7 +120,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    $result = $this->callAPIAndDocument('profile', 'get', $params, __FUNCTION__, __FILE__)['values'];
+    $result = $this->callAPISuccess('profile', 'get', $params)['values'];
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result[$this->_profileID]), ' error message: ' . "missing/mismatching value for $profileField");
     }
@@ -304,11 +304,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   public function testGetFields(): void {
     $this->createIndividualProfile();
     $this->addCustomFieldToProfile($this->_profileID);
-    $result = $this->callAPIAndDocument('profile', 'getfields', [
+    $result = $this->callAPISuccess('profile', 'getfields', [
       'action' => 'submit',
       'profile_id' => $this->_profileID,
-    ], __FUNCTION__, __FILE__,
-      'demonstrates retrieving profile fields passing in an id');
+    ]);
     $this->assertArrayKeyExists('first_name', $result['values']);
     $this->assertEquals('2', $result['values']['first_name']['type']);
     $this->assertEquals('Email', $result['values']['email-primary']['title']);
@@ -438,7 +437,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ], $updateParams);
 
-    $this->callAPIAndDocument('profile', 'submit', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('profile', 'submit', $params);
 
     $getParams = [
       'profile_id' => $this->_profileID,
@@ -674,7 +673,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'state_province-1' => '1000',
     ];
 
-    $result = $this->callAPIAndDocument('profile', 'apply', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('profile', 'apply', $params);
 
     // Expected field values
     $expected['contact'] = [
@@ -976,7 +975,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $keys = array_keys($contact['values']);
     $contactId = array_pop($keys);
 
-    $this->assertEquals(0, $contact['values'][$contactId]['api.address.create']['is_error'], ' error message: ' . CRM_Utils_Array::value('error_message', $contact['values'][$contactId]['api.address.create'])
+    $this->assertEquals(0, $contact['values'][$contactId]['api.address.create']['is_error'], ' error message: ' . ($contact['values'][$contactId]['api.address.create']['error_message'] ?? '')
     );
 
     $activityParams = [

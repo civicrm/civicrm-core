@@ -70,7 +70,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     $this->getElement('buttons')->setElements($buttons);
 
     if (!empty($setStatus)) {
-      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', array('expires' => 0));
+      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
     }
   }
 
@@ -101,13 +101,13 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
       else {
         $session = CRM_Core_Session::singleton();
         $userID = $session->get('userID');
-        list($toDisplayName, $toEmail) = CRM_Contact_BAO_Contact::getContactDetails($userID);
+        [$toDisplayName, $toEmail] = CRM_Contact_BAO_Contact::getContactDetails($userID);
 
         //get the default domain email address.CRM-4250
-        list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+        [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
-        if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
-          $fixUrl = CRM_Utils_System::url("civicrm/admin/options/from_email_address", 'action=update&reset=1');
+        if (!$domainEmailAddress || $domainEmailAddress === 'info@EXAMPLE.ORG') {
+          $fixUrl = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'action=update&reset=1');
           CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; System Settings &raquo; Option Groups &raquo; From Email Address</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
         }
         if (!$toEmail) {
@@ -256,7 +256,13 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
         $this->_defaults = $mailingBackend;
 
         if (!empty($this->_defaults['smtpPassword'])) {
-          $this->_defaults['smtpPassword'] = \Civi::service('crypto.token')->decrypt($this->_defaults['smtpPassword']);
+          try {
+            $this->_defaults['smtpPassword'] = \Civi::service('crypto.token')->decrypt($this->_defaults['smtpPassword']);
+          }
+          catch (Exception $e) {
+            Civi::log()->error($e->getMessage());
+            CRM_Core_Session::setStatus(ts('Unable to retrieve the encrypted password. Please check your configured encryption keys. The error message is: %1', [1 => $e->getMessage()]), ts("Encryption key error"), "error");
+          }
         }
       }
       else {

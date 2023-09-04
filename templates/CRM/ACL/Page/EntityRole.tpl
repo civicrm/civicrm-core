@@ -7,7 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/ACL/Header.tpl" step=2}
+{if $action neq 8}
+  {include file="CRM/ACL/Header.tpl" step=2}
+{/if}
 
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/ACL/Form/EntityRole.tpl"}

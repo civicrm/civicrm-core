@@ -193,7 +193,7 @@ function civicrm_api3_profile_submit($params) {
     $contactEntities = ['contact', 'individual', 'organization', 'household'];
     $locationEntities = ['email', 'address', 'phone', 'website', 'im'];
 
-    $entity = strtolower(CRM_Utils_Array::value('entity', $field, ''));
+    $entity = strtolower($field['entity'] ?? '');
     if ($entity && !in_array($entity, array_merge($contactEntities, $locationEntities))) {
       switch ($entity) {
         case 'note':
@@ -575,7 +575,9 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour, 
           }
         }
       }
-      $profileFields[$profileID][$fieldName] = array_merge($entityGetFieldsResult[$realName], $profileFields[$profileID][$entityfield]);
+      if (!empty($entityGetFieldsResult[$realName])) {
+        $profileFields[$profileID][$fieldName] = array_merge($entityGetFieldsResult[$realName], $profileFields[$profileID][$entityfield]);
+      }
       if (!isset($profileFields[$profileID][$fieldName]['api.aliases'])) {
         $profileFields[$profileID][$fieldName]['api.aliases'] = [];
       }
@@ -629,8 +631,19 @@ function _civicrm_api3_order_by_weight($a, $b) {
  */
 function _civicrm_api3_map_profile_fields_to_entity(&$field) {
   $entity = $field['field_type'];
-  $contactTypes = civicrm_api3('contact', 'getoptions', ['field' => 'contact_type']);
-  if (in_array($entity, $contactTypes['values'])) {
+  // let's get the contact types and subtypes so that we can change the entity
+  // of such fields to 'contact'
+  $result = civicrm_api3('ContactType', 'get', [
+    'return' => ["name"],
+    'options' => ['limit' => 0],
+  ]);
+
+  $contactTypes = [];
+  foreach ($result['values'] as $type) {
+    $contactTypes[$type['id']] = $type['name'];
+  }
+
+  if (in_array($entity, $contactTypes)) {
     $entity = 'contact';
   }
   $entity = _civicrm_api_get_entity_name_from_camel($entity);

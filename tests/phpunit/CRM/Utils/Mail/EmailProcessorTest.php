@@ -30,6 +30,11 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
         'protocol' => 'Localdir',
         'source' => __DIR__ . '/data/mail',
         'domain' => 'example.com',
+        'is_active' => 1,
+        'activity_type_id' => 'Inbound Email',
+        'activity_source' => 'from',
+        'activity_targets' => 'to,cc,bcc',
+        'activity_assignees' => 'from',
       ],
     ]);
   }
@@ -49,13 +54,14 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
       'civicrm_contact',
       'civicrm_email',
       'civicrm_activity',
+      'civicrm_activity_contact',
     ]);
   }
 
   /**
    * Test the job processing function works and processes a bounce.
    */
-  public function testBounceProcessing() {
+  public function testBounceProcessing(): void {
     $this->setUpMailing();
 
     copy(__DIR__ . '/data/bounces/bounce_no_verp.txt', __DIR__ . '/data/mail/bounce_no_verp.txt');
@@ -68,7 +74,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test the job processing function can handle invalid characters.
    */
-  public function testBounceProcessingInvalidCharacter() {
+  public function testBounceProcessingInvalidCharacter(): void {
     $this->setUpMailing();
     $mail = 'test_invalid_character.eml';
 
@@ -81,7 +87,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test that the job processing function can handle incoming utf8mb4 characters.
    */
-  public function testBounceProcessingUTF8mb4() {
+  public function testBounceProcessingUTF8mb4(): void {
     $this->setUpMailing();
     $mail = 'test_utf8mb4_character.txt';
 
@@ -96,7 +102,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
    *
    * Sample taken from https://www.phpclasses.org/browse/file/14672.html
    */
-  public function testProcessingMultipartRelatedEmail() {
+  public function testProcessingMultipartRelatedEmail(): void {
     $this->setUpMailing();
     $mail = 'test_sample_message.eml';
 
@@ -111,7 +117,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
    *
    * Sample anonymized from an email that broke bounce processing at Wikimedia
    */
-  public function testProcessingNestedMultipartEmail() {
+  public function testProcessingNestedMultipartEmail(): void {
     $this->setUpMailing();
     $mail = 'test_nested_message.eml';
 
@@ -136,7 +142,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
    *
    * For not however, we are testing absence of mysql error in conjunction with CRM-20016.
    */
-  public function testBounceProcessingDeletedEmail() {
+  public function testBounceProcessingDeletedEmail(): void {
     $this->setUpMailing();
     $this->callAPISuccess('Email', 'get', [
       'contact_id' => $this->contactID,
@@ -200,7 +206,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test case email processing when is_non_case_email_skipped is enabled.
    */
-  public function testInboundProcessingCaseEmail() {
+  public function testInboundProcessingCaseEmail(): void {
     $this->setUpSkipNonCasesEmail();
     $mail = 'test_cases_email.eml';
 
@@ -216,7 +222,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test non case email processing when is_non_case_email_skipped is enabled.
    */
-  public function testInboundProcessingNonCaseEmail() {
+  public function testInboundProcessingNonCaseEmail(): void {
     $this->setUpSkipNonCasesEmail();
     $mail = 'test_non_cases_email.eml';
 
@@ -242,6 +248,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
         'domain' => 'example.com',
         'is_default' => '0',
         'is_contact_creation_disabled_if_no_match' => TRUE,
+        'is_non_case_email_skipped' => FALSE,
       ],
     ]);
   }
@@ -249,7 +256,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   /**
    * Test case email processing when is_non_case_email_skipped is enabled.
    */
-  public function testInboundProcessingDoNotCreateContact() {
+  public function testInboundProcessingDoNotCreateContact(): void {
     $this->setUpDoNotCreateContact();
     $mail = 'test_non_cases_email.eml';
 
@@ -258,6 +265,80 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $result = civicrm_api3('Contact', 'get', [
       'sequential' => 1,
       'email' => "from@test.test",
+    ]);
+    $this->assertEmpty($result['values']);
+  }
+
+  /**
+   * Set up mail account with non-default activity options.
+   * return $params array
+   */
+  public function setUpNonDefaultActivityOptions() {
+    $this->enableCiviCampaign();
+    $campaign = $this->civicrm_api('Campaign', 'create', [
+      'version' => $this->_apiversion,
+      'title' => 'inbound email campaign',
+    ]);
+
+    $this->callAPISuccess('MailSettings', 'get', [
+      'api.MailSettings.create' => [
+        'name' => 'mailbox',
+        'protocol' => 'Localdir',
+        'source' => __DIR__ . '/data/mail',
+        'domain' => 'example.com',
+        'is_default' => '0',
+        'is_contact_creation_disabled_if_no_match' => FALSE,
+        'is_non_case_email_skipped' => FALSE,
+        'activity_type_id' => 3,
+        'activity_source' => 'to',
+        'activity_targets' => 'from',
+        'activity_assignees' => 'cc',
+        'activity_status' => 'Scheduled',
+        'campaign_id' => $campaign['id'],
+      ],
+    ]);
+
+    return ['campaign_id' => $campaign['id']];
+  }
+
+  /**
+   * Test email processing with non-default activity options.
+   */
+  public function testInboundProcessingNonDefaultActivityOptions(): void {
+    $params = $this->setUpNonDefaultActivityOptions();
+    $mail = 'test_non_default_email.eml';
+
+    copy(__DIR__ . '/data/inbound/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->callAPISuccess('job', 'fetch_activities', []);
+    $result = civicrm_api3('Activity', 'get', [
+      'sequential' => 1,
+      'subject' => ['LIKE' => "%An email with two recipients%"],
+      'return' => ["assignee_contact_id", "target_contact_id", "activity_type_id", "status_id", "source_contact_name", "campaign_id"],
+    ]);
+
+    $activity = $result['values'][0];
+    $this->assertEquals(3, $activity['activity_type_id']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Scheduled'), $activity['status_id']);
+    $this->assertEquals('to@test.test', $activity['source_contact_name']);
+    $assigneeID = $activity['assignee_contact_id'][0];
+    $this->assertEquals('cc@test.test', $activity['assignee_contact_name'][$assigneeID]);
+    $targetID = $activity['target_contact_id'][0];
+    $this->assertEquals('from@test.test', $activity['target_contact_name'][$targetID]);
+    $this->assertEquals($params['campaign_id'], $activity['campaign_id']);
+  }
+
+  /**
+   * Test not creating a contact for an email field that is not used.
+   */
+  public function testInboundProcessingNoUnusedContacts(): void {
+    $params = $this->setUpNonDefaultActivityOptions();
+    $mail = 'test_non_default_email.eml';
+
+    copy(__DIR__ . '/data/inbound/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->callAPISuccess('job', 'fetch_activities', []);
+    $result = civicrm_api3('Contact', 'get', [
+      'sequential' => 1,
+      'email' => "bcc@test.test",
     ]);
     $this->assertEmpty($result['values']);
   }

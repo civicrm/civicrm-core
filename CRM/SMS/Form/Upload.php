@@ -56,7 +56,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       // We don't want to retrieve template details once it is
       // set in session.
       $templateId = $this->get('template');
-      $this->assign('templateSelected', $templateId ? $templateId : 0);
+      $this->assign('templateSelected', $templateId ?: 0);
       if (isset($defaults['msg_template_id']) && !$templateId) {
         $defaults['SMStemplate'] = $defaults['msg_template_id'];
         $messageTemplate = new CRM_Core_DAO_MessageTemplate();
@@ -310,7 +310,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
     }
 
-    if (($params['upload_type'] || file_exists(CRM_Utils_Array::value('tmp_name', $files['textFile']))) ||
+    if (($params['upload_type'] || file_exists($files['textFile']['tmp_name'] ?? '')) ||
       (!$params['upload_type'] && $params['text_message'])
     ) {
 

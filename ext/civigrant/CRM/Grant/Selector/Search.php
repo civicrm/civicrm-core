@@ -174,12 +174,14 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
           'url' => 'civicrm/contact/view/grant',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=grant' . $extraParams,
           'title' => ts('View Grant'),
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/view/grant',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Edit Grant'),
+          'weight' => -10,
         ],
       ];
 
@@ -190,6 +192,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
             'url' => 'civicrm/contact/view/grant',
             'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=grant' . $extraParams,
             'title' => ts('Delete Grant'),
+            'weight' => 100,
           ],
         ];
         self::$_links = self::$_links + $delLink;

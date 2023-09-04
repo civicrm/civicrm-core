@@ -122,7 +122,7 @@
     </tr>
     <tr ng-controller="ViewRecipCtrl">
       <td>{{:: ts('Recipients') }}</td>
-      <td ng-repeat="am in getActiveMailings()">
+      <td colspan="2" ng-repeat="am in getActiveMailings()|limitTo:1">
         <div ng-show="getIncludesAsString(am.mailing)">
           <strong>{{:: ts('Include:') }}</strong> {{getIncludesAsString(am.mailing)}}
         </div>

@@ -55,7 +55,6 @@
     {crmButton target="_blank" p="civicrm/admin/contribute/settings" q="reset=1&action=update&id=`$contributionPageID`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
     <div class='clear'></div>
   {/if}
-  {include file="CRM/common/TrackingFields.tpl"}
 
   <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block" data-page-id="{$contributionPageID}" data-page-template="main">
 
@@ -76,9 +75,9 @@
       <div class="help">{ts}You have a current Lifetime Membership which does not need to be renewed.{/ts}</div>
     {/if}
 
-    {if !empty($useForMember) && !$ccid}
+    {if $isShowMembershipBlock && !$ccid}
       <div class="crm-public-form-item crm-section">
-        {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="makeContribution"}
+        {include file="CRM/Contribute/Form/Contribution/MainMembershipBlock.tpl"}
       </div>
     {elseif !empty($ccid)}
       {if $lineItem && $priceSetID && !$is_quick_config}
@@ -218,7 +217,7 @@
         {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
       </div>
 
-      {if $isHonor}
+      {if array_key_exists('pcp_display_in_roll', $form)}
         <fieldset class="crm-public-form-item crm-group pcp-group">
           <div class="crm-public-form-item crm-section pcp-section">
             <div class="crm-public-form-item crm-section display_in_roll-section">
@@ -287,15 +286,6 @@
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
     </div>
 
-    {if $is_monetary and $form.bank_account_number}
-      <div id="payment_notice">
-        <fieldset class="crm-public-form-item crm-group payment_notice-group">
-          <legend>{ts}Agreement{/ts}</legend>
-          {ts}Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.{/ts}
-        </fieldset>
-      </div>
-    {/if}
-
     <div id="crm-submit-buttons" class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
@@ -306,8 +296,8 @@
     {/if}
   </div>
   <script type="text/javascript">
-    {if $isHonor}
-    pcpAnonymous();
+    {if array_key_exists('pcp_display_in_roll', $form)}
+      pcpAnonymous();
     {/if}
 
     {literal}

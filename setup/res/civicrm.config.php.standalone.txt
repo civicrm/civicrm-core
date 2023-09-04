@@ -1,0 +1,13 @@
+<?php
+
+/*
+This is just a flag file? Not really used?
+
+$settingsFile = __DIR__ . '/data/civicrm.settings.php';
+define('CIVICRM_SETTINGS_PATH', $settingsFile);
+$error = @include_once($settingsFile);
+if ($error == false) {
+  echo "Could not load the settings file at: {$settingsFile}\n";
+  exit();
+}
+ */

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceSetEntity;
+
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -18,10 +20,10 @@
  */
 class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
+  use CRMTraits_Financial_PriceSetTrait;
+
   /**
    * Clean up DB.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -36,7 +38,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    */
   public function testPayNowPayment(): void {
     $individualID = $this->individualCreate();
-    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE]);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
 
     // create a contribution page which is later used to make pay-later contribution
@@ -57,8 +59,29 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $contributionPageID2 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
 
     /** @var CRM_Contribute_Form_Contribution_Confirm $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Confirm');
-    $form->_id = $contributionPageID2;
+    $_REQUEST['id'] = $contributionPageID2;
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Confirm', [
+      'contribution_id' => $contribution['id'],
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      $this->getPriceFieldLabelForContributionPage($contributionPageID2) => 100,
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+      'year' => 2021,
+      'month' => 2,
+      'currencyID' => 'USD',
+      'is_pay_later' => 0,
+      'is_quick_config' => 1,
+      'description' => $contribution['values'][$contribution['id']]['source'],
+      'skipLineItem' => 0,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+    ]);
 
     $form->_paymentProcessor = [
       'id' => $paymentProcessorID,
@@ -67,35 +90,11 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'is_recur' => FALSE,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit card'),
     ];
-    $form->_values = [
-      'id' => $contributionPageID2,
-    ];
-    $form->_params = [
-      'contribution_id' => $contribution['id'],
-      'credit_card_number' => 4111111111111111,
-      'cvv2' => 234,
-      'credit_card_exp_date' => [
-        'M' => 2,
-        'Y' => CRM_Utils_Time::date('Y') + 1,
-      ],
-      'credit_card_type' => 'Visa',
-      'email-5' => 'test@test.com',
-      'total_amount' => 100.00,
-      'payment_processor_id' => $paymentProcessorID,
-      'amount' => 100,
-      'tax_amount' => 0.00,
-      'year' => 2021,
-      'month' => 2,
-      'currencyID' => 'USD',
-      'is_pay_later' => 0,
-      'invoiceID' => '6e443672a9bb2198cc12f076aed70e7a',
-      'is_quick_config' => 1,
-      'description' => $contribution['values'][$contribution['id']]['source'],
-      'skipLineItem' => 0,
-      'frequency_interval' => 1,
-      'frequency_unit' => 'month',
-    ];
-
+    $form->preProcess();
+    $form->buildQuickForm();
+    // Hack cos we are not going via postProcess (although we should fix the test to
+    // do that).
+    $form->_params['amount'] = 100;
     $processConfirmResult = $form->processConfirm(
       $form->_params,
       $individualID,
@@ -127,7 +126,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     // check that contribution page ID isn't changed
     $this->assertEquals($contributionPageID1, $contribution['contribution_page_id']);
     // check that paid later information is present in contribution's source
-    $this->assertRegExp("/Paid later via page ID: $contributionPageID2/", $contribution['contribution_source']);
+    $this->assertMatchesRegularExpression("/Paid later via page ID: $contributionPageID2/", $contribution['contribution_source']);
     // check that contribution status is changed to 'Completed' from 'Pending'
     $this->assertEquals('Completed', $contribution['contribution_status']);
 
@@ -186,16 +185,70 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals([$organizationID], $activity['target_contact_id']);
     $this->assertEquals($individualID, $activity['source_contact_id']);
+    $assignedVariables = $form->get_template_vars();
+    $this->assertFalse($assignedVariables['is_separate_payment']);
   }
 
   /**
+   * Test the confirm form with a separate membership payment configured.
+   */
+  public function testSeparatePaymentConfirm(): void {
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE]);
+    $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+    $this->setUpMembershipBlockPriceSet(['minimum_fee' => 100]);
+    $this->callAPISuccess('membership_block', 'create', [
+      'entity_id' => $contributionPageID,
+      'entity_table' => 'civicrm_contribution_page',
+      'is_required' => TRUE,
+      'is_active' => TRUE,
+      'is_separate_payment' => TRUE,
+      'membership_type_default' => $this->ids['MembershipType'],
+    ]);
+    /** @var CRM_Contribute_Form_Contribution_Confirm $form */
+    $_REQUEST['id'] = $contributionPageID;
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Confirm', [
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      $this->getPriceFieldLabelForContributionPage($contributionPageID) => 100,
+      'priceSetId' => $this->ids['PriceSet']['contribution_page' . $contributionPageID],
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+      'year' => 2021,
+      'month' => 2,
+    ]);
+    // @todo - the way amount is handled is crazy so we have to set here
+    // but it should be calculated from submit variables.
+    $form->set('amount', 100);
+    $form->preProcess();
+    $form->buildQuickForm();
+    $form->postProcess();
+    $financialTrxnId = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_id' => $form->_contributionID, 'entity_table' => 'civicrm_contribution', 'sequential' => 1])['values'][0]['financial_trxn_id'];
+    $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', [
+      'id' => $financialTrxnId,
+    ])['values'][$financialTrxnId];
+    $this->assertEquals('1111', $financialTrxn['pan_truncation']);
+    $this->assertEquals(1, $financialTrxn['card_type_id']);
+    $assignedVariables = $form->get_template_vars();
+    $this->assertTrue($assignedVariables['is_separate_payment']);
+  }
+
+  /**
+   * Create a basic contribution page.
+   *
    * @param array $params
    *
-   * @return mixed
-   * @throws \CRM_Core_Exception
+   * @return int
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   protected function createContributionPage(array $params): int {
-    return (int) $this->callAPISuccess('ContributionPage', 'create', array_merge([
+    $contributionPageID = (int) $this->callAPISuccess('ContributionPage', 'create', array_merge([
       'title' => 'Test Contribution Page',
       'financial_type_id' => 'Campaign Contribution',
       'currency' => 'USD',
@@ -205,6 +258,12 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'min_amount' => 20,
       'max_amount' => 2000,
     ], $params))['id'];
+    PriceSetEntity::create(FALSE)->setValues([
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contributionPageID,
+      'price_set_id:name' => 'default_contribution_amount',
+    ])->execute();
+    return $contributionPageID;
   }
 
 }

@@ -286,48 +286,15 @@ class CRM_Utils_Mail_Incoming {
   }
 
   /**
-   * @param $file
-   *
-   * @return array
-   * @throws Exception
-   */
-  public function &parse(&$file) {
-
-    // check that the file exists and has some content
-    if (!file_exists($file) ||
-      !trim(file_get_contents($file))
-    ) {
-      return CRM_Core_Error::createAPIError(ts('%1 does not exists or is empty',
-        [1 => $file]
-      ));
-    }
-
-    // explode email to digestable format
-    $set = new ezcMailFileSet([$file]);
-    $parser = new ezcMailParser();
-    $mail = $parser->parseMail($set);
-
-    if (!$mail) {
-      return CRM_Core_Error::createAPIError(ts('%1 could not be parsed',
-        [1 => $file]
-      ));
-    }
-
-    // since we only have one fileset
-    $mail = $mail[0];
-
-    $mailParams = self::parseMailingObject($mail);
-    return $mailParams;
-  }
-
-  /**
    * @param $mail
    * @param $createContact
    * @param $requireContact
+   * @param array $emailFields
+   *   Which fields to process and create contacts for of from, to, cc, bcc
    *
    * @return array
    */
-  public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE) {
+  public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE, $emailFields = ['from', 'to', 'cc', 'bcc']) {
 
     $config = CRM_Core_Config::singleton();
 
@@ -343,18 +310,14 @@ class CRM_Utils_Mail_Incoming {
       }
     }
 
-    $params['from'] = [];
-    self::parseAddress($mail->from, $field, $params['from'], $mail, $createContact);
-
-    // we definitely need a contact id for the from address
-    // if we dont have one, skip this email
-    if ($requireContact && empty($params['from']['id'])) {
-      return NULL;
-    }
-
-    $emailFields = ['to', 'cc', 'bcc'];
     foreach ($emailFields as $field) {
-      $value = $mail->$field;
+      // to, bcc, cc are arrays of objects, but from is an object, so make it an array of one object so we can handle it the same
+      if ($field === 'from') {
+        $value = [$mail->$field];
+      }
+      else {
+        $value = $mail->$field;
+      }
       self::parseAddresses($value, $field, $params, $mail, $createContact);
     }
 
@@ -400,7 +363,7 @@ class CRM_Utils_Mail_Incoming {
    * @param $mail
    * @param $createContact
    */
-  public static function parseAddress(&$address, &$params, &$subParam, &$mail, $createContact = TRUE) {
+  private static function parseAddress(&$address, &$params, &$subParam, &$mail, $createContact = TRUE) {
     // CRM-9484
     if (empty($address->email)) {
       return;
@@ -414,7 +377,7 @@ class CRM_Utils_Mail_Incoming {
       $createContact,
       $mail
     );
-    $subParam['id'] = $contactID ? $contactID : NULL;
+    $subParam['id'] = $contactID ?: NULL;
   }
 
   /**
@@ -426,7 +389,6 @@ class CRM_Utils_Mail_Incoming {
    */
   public static function parseAddresses(&$addresses, $token, &$params, &$mail, $createContact = TRUE) {
     $params[$token] = [];
-
     foreach ($addresses as $address) {
       $subParam = [];
       self::parseAddress($address, $params, $subParam, $mail, $createContact);

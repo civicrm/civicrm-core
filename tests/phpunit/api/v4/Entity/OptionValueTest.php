@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  */
 class OptionValueTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testNullDefault() {
+  public function testNullDefault(): void {
     OptionGroup::create(FALSE)
       ->addValue('name', 'myTestGroup')
       ->addValue('title', 'myTestGroup')
@@ -55,7 +55,7 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue(OptionValue::get(FALSE)->addWhere('id', '=', $defaultId)->execute()->first()['is_default']);
   }
 
-  public function testUpdateWeights() {
+  public function testUpdateWeights(): void {
     $getValues = function($groupName) {
       return OptionValue::get(FALSE)
         ->addWhere('option_group_id.name', '=', $groupName)

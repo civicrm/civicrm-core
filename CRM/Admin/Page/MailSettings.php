@@ -23,13 +23,6 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
   public $useLivePageJS = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string
@@ -40,38 +33,9 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      // helper variable for nicer formatting
-      self::$_links = [
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/mailSettings',
-          'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit Mail Settings'),
-        ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/mailSettings',
-          'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete Mail Settings'),
-        ],
-      ];
-    }
-
-    return self::$_links;
-  }
-
-  /**
    * Browse all mail settings.
    */
   public function browse() {
-    //get all mail settings.
     $allMailSettings = [];
     $mailSetting = new CRM_Core_DAO_MailSettings();
 
@@ -80,20 +44,19 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
     //multi-domain support for mail settings. CRM-5244
     $mailSetting->domain_id = CRM_Core_Config::domainID();
 
-    //find all mail settings.
     $mailSetting->find();
     while ($mailSetting->fetch()) {
       //replace protocol value with name
       $mailSetting->protocol = $allProtocols[$mailSetting->protocol] ?? NULL;
       CRM_Core_DAO::storeValues($mailSetting, $allMailSettings[$mailSetting->id]);
 
-      //form all action links
       $action = array_sum(array_keys($this->links()));
 
-      // disallow the DELETE action for the default set of settings
       if ($mailSetting->is_default) {
-        $action &= ~CRM_Core_Action::DELETE;
+        $action -= CRM_Core_Action::DELETE;
+        $action -= CRM_Core_Action::DISABLE;
       }
+      $action -= ($mailSetting->is_active) ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
 
       //add action links.
       $allMailSettings[$mailSetting->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,

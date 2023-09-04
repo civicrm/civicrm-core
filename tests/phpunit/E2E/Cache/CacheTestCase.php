@@ -14,7 +14,7 @@
  *
  * @group e2e
  */
-abstract class E2E_Cache_CacheTestCase extends \Cache\IntegrationTests\SimpleCacheTest implements \Civi\Test\EndToEndInterface {
+abstract class E2E_Cache_CacheTestCase extends CiviSimpleCacheTest implements \Civi\Test\EndToEndInterface {
 
   const MAX_KEY = 255;
 
@@ -29,7 +29,7 @@ abstract class E2E_Cache_CacheTestCase extends \Cache\IntegrationTests\SimpleCac
     parent::setUpBeforeClass();
   }
 
-  public function testBasicUsageWithLongKey() {
+  public function testBasicUsageWithLongKey(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }

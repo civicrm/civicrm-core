@@ -21,17 +21,10 @@
 class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Core\HookInterface {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
@@ -341,17 +334,13 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Survey', $id, 'is_active', $is_active);
   }
 
@@ -363,6 +352,7 @@ SELECT  survey.id    as id,
    * @return mixed|null
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     if (!$id) {
       return NULL;
     }
@@ -513,7 +503,7 @@ INNER JOIN  civicrm_activity_contact activityTarget
 INNER JOIN  civicrm_activity_contact activityAssignment
   ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
      WHERE  activity.source_record_id = %1
-     AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 ) ";
+     AND  activity.is_deleted = 0 ";
     if (!empty($interviewerId)) {
       $query .= "AND activityAssignment.contact_id = %2 ";
       $params[2] = [$interviewerId, 'Integer'];
@@ -608,7 +598,7 @@ INNER JOIN  civicrm_activity_contact activityAssignment
 INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a.id )
      WHERE  activity.source_record_id = %1
        AND  activity.activity_type_id = %2
-       AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 )
+       AND  activity.is_deleted = 0
             $whereClause";
 
     $params = [
@@ -847,8 +837,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       return NULL;
     }
 
-    static $ufIds = [];
-    if (!array_key_exists($surveyId, $ufIds)) {
+    static $ufIDs = [];
+    if (!array_key_exists($surveyId, $ufIDs)) {
       //get the profile id.
       $ufJoinParams = [
         'entity_id' => $surveyId,
@@ -859,14 +849,14 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       list($first, $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       if ($first) {
-        $ufIds[$surveyId] = [$first];
+        $ufIDs[$surveyId] = [$first];
       }
       if ($second) {
-        $ufIds[$surveyId][] = array_shift($second);
+        $ufIDs[$surveyId][] = array_shift($second);
       }
     }
 
-    return $ufIds[$surveyId] ?? NULL;
+    return $ufIDs[$surveyId] ?? NULL;
   }
 
   /**

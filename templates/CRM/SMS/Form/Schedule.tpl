@@ -24,7 +24,7 @@
   </div>
   <div class="description">{ts}Set a date and time when you want CiviSMS to start sending this Mass SMS.{/ts}</div>
 </div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 
 {if $preview}
 <div class="crm-accordion-wrapper crm-plain_text_sms-accordion collapsed">

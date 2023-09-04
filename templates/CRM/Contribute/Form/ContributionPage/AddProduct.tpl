@@ -52,7 +52,7 @@
   </div>
 {else}
   <div class="crm-done-button">
-      {include file="CRM/common/formButtons.tpl"}
+      {include file="CRM/common/formButtons.tpl" location=''}
   </div>
 {/if} {* $action ne view *}
 </div>

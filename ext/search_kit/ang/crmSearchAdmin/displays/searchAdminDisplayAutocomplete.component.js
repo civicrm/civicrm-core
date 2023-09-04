@@ -26,8 +26,9 @@
             sort: ctrl.parent.getDefaultSort(),
             columns: []
           };
-          var labelField = searchMeta.getEntity(ctrl.apiEntity).label_field;
-          _.each([labelField, 'description'], function(field) {
+          var searchFields = searchMeta.getEntity(ctrl.apiEntity).search_fields || [];
+          searchFields.push('description');
+          searchFields.forEach((field) => {
             if (_.includes(ctrl.parent.savedSearch.api_params.select, field)) {
               ctrl.display.settings.columns.push(searchMeta.fieldToColumn(field, {}));
             }

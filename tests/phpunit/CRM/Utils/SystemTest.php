@@ -8,11 +8,11 @@
 class CRM_Utils_SystemTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
-  public function testUrlQueryString() {
+  public function testUrlQueryString(): void {
     $config = CRM_Core_Config::singleton();
     $this->assertTrue($config->userSystem instanceof CRM_Utils_System_UnitTests);
     $expected = '/index.php?q=civicrm/foo/bar&foo=ab&bar=cd%26ef';
@@ -20,7 +20,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testUrlQueryArray() {
+  public function testUrlQueryArray(): void {
     $config = CRM_Core_Config::singleton();
     $this->assertTrue($config->userSystem instanceof CRM_Utils_System_UnitTests);
     $expected = '/index.php?q=civicrm/foo/bar&foo=ab&bar=cd%26ef';
@@ -31,7 +31,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testEvalUrl() {
+  public function testEvalUrl(): void {
     $this->assertEquals(FALSE, CRM_Utils_System::evalUrl(FALSE));
     $this->assertEquals('http://example.com/', CRM_Utils_System::evalUrl('http://example.com/'));
     $this->assertEquals('http://example.com/?cms=UnitTests', CRM_Utils_System::evalUrl('http://example.com/?cms={uf}'));
@@ -118,7 +118,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   /**
    * Test extern url.
    */
-  public function testExternUrl() {
+  public function testExternUrl(): void {
     $siteKey = mt_rand();
     $apiKey = mt_rand();
     $restUrl = CRM_Utils_System::externUrl('extern/rest', "entity=Contact&action=get&key=$siteKey&api_key=$apiKey");
@@ -190,7 +190,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   /**
    * Demonstrate the, um, "flexibility" of isNull
    */
-  public function testIsNull() {
+  public function testIsNull(): void {
     $this->assertTrue(CRM_Utils_System::isNull(NULL));
     $this->assertTrue(CRM_Utils_System::isNull(''));
     $this->assertTrue(CRM_Utils_System::isNull('null'));
@@ -283,7 +283,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   /**
    * Test that flushing cache clears the asset cache.
    */
-  public function testFlushCacheClearsAssetCache() {
+  public function testFlushCacheClearsAssetCache(): void {
     // We need to get the file path for the folder and there isn't a public
     // method to get it, so create a file in the folder using public methods,
     // then get the path from that, then flush the cache, then check if the

@@ -30,7 +30,7 @@
 
 {foreach from=$form.buttons item=button key=key name=btns}
   {if $key|substring:0:4 EQ '_qf_'}
-    {if !empty($location)}
+    {if $location}
       {$form.buttons.$key.html|crmReplace:id:"$key-$location"}
     {else}
       {$form.buttons.$key.html}

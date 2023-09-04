@@ -21,34 +21,37 @@
   <div class='clear'></div>
 {/if}
 
-<div id="intro" class="crm-section">{$petition.instructions}</div>
-<div class="crm-block crm-petition-form-block">
-
-{if $duplicate == "confirmed"}
-  <p>
-  {ts}You have already signed this petition.{/ts}
-  </p>
-{/if}
-{if $duplicate == "unconfirmed"}
-  <p>{ts}You have already signed this petition but you still <b>need to verify your email address</b>.{/ts}<br/> {ts}Please check your email inbox for the confirmation email. If you don't find it, verify if it isn't in your spam folder.{/ts}</p>
-{/if}
-{if $duplicate}
-  <p>{ts}Thank you for your support.{/ts}</p>
-  {if $is_share}
-    {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl" petition_id=$survey_id petitionTitle=$petitionTitle}
-  {/if}
+{if ! $isActive}
+  <p>{ts}Petition is no longer active.{/ts}</p>
 {else}
-  <div class="crm-section crm-petition-contact-profile">
-    {include file="CRM/UF/Form/Block.tpl" fields=$petitionContactProfile hideFieldset=true}
-  </div>
+  <div id="intro" class="crm-section">{$petition.instructions}</div>
+  <div class="crm-block crm-petition-form-block">
 
-  <div class="crm-section crm-petition-activity-profile">
-    {include file="CRM/UF/Form/Block.tpl" fields=$petitionActivityProfile hideFieldset=true}
-  </div>
+  {if $duplicate == "confirmed"}
+    <p>
+    {ts}You have already signed this petition.{/ts}
+    </p>
+  {/if}
+  {if $duplicate == "unconfirmed"}
+    <p>{ts}You have already signed this petition but you still <b>need to verify your email address</b>.{/ts}<br/> {ts}Please check your email inbox for the confirmation email. If you don't find it, verify if it isn't in your spam folder.{/ts}</p>
+  {/if}
+  {if $duplicate}
+    <p>{ts}Thank you for your support.{/ts}</p>
+    {if $is_share}
+      {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl" petition_id=$survey_id petitionTitle=$petitionTitle}
+    {/if}
+  {else}
+    <div class="crm-section crm-petition-contact-profile">
+      {include file="CRM/UF/Form/Block.tpl" fields=$petitionContactProfile hideFieldset=true}
+    </div>
 
-  <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="bottom"}
-  </div>
+    <div class="crm-section crm-petition-activity-profile">
+      {include file="CRM/UF/Form/Block.tpl" fields=$petitionActivityProfile hideFieldset=true}
+    </div>
+
+    <div class="crm-submit-buttons">
+      {include file="CRM/common/formButtons.tpl" location="bottom"}
+    </div>
+  {/if}
 {/if}
-
 </div>

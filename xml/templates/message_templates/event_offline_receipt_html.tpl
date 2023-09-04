@@ -23,19 +23,15 @@
     {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
 
     {if !empty($event.confirm_email_text) AND (empty($isOnWaitlist) AND empty($isRequireApproval))}
-     <p>{$event.confirm_email_text|htmlize}</p>
+     <p>{$event.confirm_email_text}</p>
     {/if}
 
     {if !empty($isOnWaitlist)}
-     <p>{ts}You have been added to the WAIT LIST for this event.{/ts}</p>
-     {if !empty($isPrimary)}
-       <p>{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}</p>
-     {/if}
+      <p>{ts}You have been added to the WAIT LIST for this event.{/ts}</p>
+      <p>{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}</p>
     {elseif !empty($isRequireApproval)}
-     <p>{ts}Your registration has been submitted.{/ts}</p>
-     {if !empty($isPrimary)}
+      <p>{ts}Your registration has been submitted.{/ts}</p>
       <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
-     {/if}
     {elseif $is_pay_later}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
@@ -53,7 +49,7 @@
      <tr>
       <td colspan="2" {$valueStyle}>
        {event.title}<br />
-       {event.start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+       {event.start_date|crmDate}{if {event.end_date|boolean}}-{if '{event.end_date|crmDate:"%Y%m%d"}' === '{event.start_date|crmDate:"%Y%m%d"}'}{event.end_date|crmDate:"Time"}{else}{event.end_date}{/if}{/if}
       </td>
      </tr>
 
@@ -76,43 +72,68 @@
       </tr>
      {/if}
 
-     {if !empty($location.phone.1.phone) || !empty($location.email.1.email)}
+     {if {event.loc_block_id.phone_id.phone|boolean} || {event.loc_block_id.email_id.email|boolean}}
       <tr>
        <td colspan="2" {$labelStyle}>
         {ts}Event Contacts:{/ts}
        </td>
       </tr>
-      {foreach from=$location.phone item=phone}
-       {if $phone.phone}
+
+       {if {event.loc_block_id.phone_id.phone|boolean}}
         <tr>
          <td {$labelStyle}>
-          {if $phone.phone_type}
-           {$phone.phone_type_display}
+          {if {event.loc_block_id.phone_id.phone_type_id|boolean}}
+            {event.loc_block_id.phone_id.phone_type_id:label}
           {else}
            {ts}Phone{/ts}
           {/if}
          </td>
          <td {$valueStyle}>
-          {$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
+          {event.loc_block_id.phone_id.phone} {if {event.loc_block_id.phone_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_id.phone_ext}{/if}
          </td>
         </tr>
        {/if}
-      {/foreach}
-      {foreach from=$location.email item=eventEmail}
-       {if $eventEmail.email}
+         {if {event.loc_block_id.phone_2_id.phone|boolean}}
+           <tr>
+             <td {$labelStyle}>
+                 {if {event.loc_block_id.phone_2_id.phone_type_id|boolean}}
+                     {event.loc_block_id.phone_2_id.phone_type_id:label}
+                 {else}
+                     {ts}Phone{/ts}
+                 {/if}
+             </td>
+             <td {$valueStyle}>
+                 {event.loc_block_id.phone_2_id.phone} {if {event.loc_block_id.phone_2_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_2_id.phone_ext}{/if}
+             </td>
+           </tr>
+         {/if}
+
+
+       {if {event.loc_block_id.email_id.email|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Email{/ts}
          </td>
          <td {$valueStyle}>
-          {$eventEmail.email}
+             {event.loc_block_id.email_id.email}
          </td>
         </tr>
        {/if}
-      {/foreach}
+
+       {if {event.loc_block_id.email_2_id.email|boolean}}
+         <tr>
+           <td {$labelStyle}>
+               {ts}Email{/ts}
+           </td>
+           <td {$valueStyle}>
+               {event.loc_block_id.email_2_id.email}
+           </td>
+         </tr>
+       {/if}
+
      {/if}
 
-     {if !empty($event.is_public)}
+     {if {event.is_public|boolean}}
       <tr>
        <td colspan="2" {$valueStyle}>
         {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
@@ -141,7 +162,7 @@
      {/if}
 
 
-     {if !empty($event.is_monetary)}
+     {if {event.is_monetary|boolean}}
 
       <tr>
        <th {$headerStyle}>
@@ -152,7 +173,6 @@
       {if !empty($lineItem)}
        {foreach from=$lineItem item=value key=priceset}
         {if $value neq 'skip'}
-         {if !empty($isPrimary)}
           {if $lineItem|@count GT 1} {* Header for multi participant registration cases. *}
            <tr>
             <td colspan="2" {$labelStyle}>
@@ -160,7 +180,7 @@
             </td>
            </tr>
           {/if}
-         {/if}
+
          <tr>
           <td colspan="2" {$valueStyle}>
            <table>
@@ -234,9 +254,6 @@
            {if $priceset || $priceset == 0}
             <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
             <td>&nbsp;{$value|crmMoney:$currency}</td>
-           {else}
-            <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
-            <td>&nbsp;{$value|crmMoney:$currency}</td>
            {/if}
           </tr>
         {/foreach}
@@ -262,29 +279,26 @@
         </td>
        </tr>
       {/if}
-      {if !empty($isPrimary)}
-       <tr>
-        <td {$labelStyle}>
-        {if isset($balanceAmount)}
-           {ts}Total Paid{/ts}
+      {if {event.is_monetary|boolean}}
+       {if {contribution.balance_amount|boolean}}
+         <tr>
+           <td {$labelStyle}>{ts}Total Paid{/ts}</td>
+           <td {$valueStyle}>
+             {if {contribution.paid_amount|boolean}}{contribution.paid_amount|crmMoney}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+           </td>
+          </tr>
+          <tr>
+           <td {$labelStyle}>{ts}Balance{/ts}</td>
+           <td {$valueStyle}>{contribution.balance_amount}</td>
+         </tr>
         {else}
-           {ts}Total Amount{/ts}
-         {/if}
-        </td>
-        <td {$valueStyle}>
-         {if !empty($totalAmount)}{$totalAmount|crmMoney}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
-        </td>
-       </tr>
-      {if isset($balanceAmount)}
-       <tr>
-        <td {$labelStyle}>
-         {ts}Balance{/ts}
-        </td>
-        <td {$valueStyle}>
-         {$balanceAmount|crmMoney}
-        </td>
-       </tr>
-      {/if}
+         <tr>
+           <td {$labelStyle}>{ts}Total Amount{/ts}</td>
+           <td {$valueStyle}>
+               {if {contribution.total_amount|boolean}}{contribution.total_amount|crmMoney}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+           </td>
+         </tr>
+       {/if}
        {if !empty($pricesetFieldsCount) }
      <tr>
        <td {$labelStyle}>
@@ -315,13 +329,13 @@
         </tr>
        {/if}
 
-       {if $register_date}
+       {if {participant.register_date|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Registration Date{/ts}
          </td>
          <td {$valueStyle}>
-          {$register_date|crmDate}
+           {participant.register_date}
          </td>
         </tr>
        {/if}
@@ -413,79 +427,6 @@
       {/if}
 
      {/if} {* End of conditional section for Paid events *}
-
-     {if !empty($customPre)}
-      <tr>
-       <th {$headerStyle}>
-        {$customPre_grouptitle}
-       </th>
-      </tr>
-      {foreach from=$customPre item=value key=customName}
-       {if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
-        <tr>
-         <td {$labelStyle}>
-          {$customName}
-         </td>
-         <td {$valueStyle}>
-          {$value}
-         </td>
-        </tr>
-       {/if}
-      {/foreach}
-     {/if}
-
-     {if !empty($customPost)}
-      <tr>
-       <th {$headerStyle}>
-        {$customPost_grouptitle}
-       </th>
-      </tr>
-      {foreach from=$customPost item=value key=customName}
-       {if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
-        <tr>
-         <td {$labelStyle}>
-          {$customName}
-         </td>
-         <td {$valueStyle}>
-          {$value}
-         </td>
-        </tr>
-       {/if}
-      {/foreach}
-     {/if}
-
-     {if !empty($customProfile)}
-      {foreach from=$customProfile item=value key=customName}
-       <tr>
-        <th {$headerStyle}>
-         {ts 1=$customName+1}Participant Information - Participant %1{/ts}
-        </th>
-       </tr>
-       {foreach from=$value item=val key=field}
-        {if $field eq 'additionalCustomPre' or $field eq 'additionalCustomPost'}
-         <tr>
-          <td colspan="2" {$labelStyle}>
-           {if $field eq 'additionalCustomPre'}
-            {$additionalCustomPre_grouptitle}
-           {else}
-            {$additionalCustomPost_grouptitle}
-           {/if}
-          </td>
-         </tr>
-         {foreach from=$val item=v key=f}
-          <tr>
-           <td {$labelStyle}>
-            {$f}
-           </td>
-           <td {$valueStyle}>
-            {$v}
-           </td>
-          </tr>
-         {/foreach}
-        {/if}
-       {/foreach}
-      {/foreach}
-     {/if}
 
      {if !empty($customGroup)}
       {foreach from=$customGroup item=value key=customName}

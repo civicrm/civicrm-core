@@ -28,29 +28,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method setIsActive().
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSetIsActive(): void {
-    $financialTypeID = FinancialType::create()->setValues([
-      'name' => 'Donations',
-      'is_deductible' => 0,
-      'is_active' => 1,
-    ])->execute()->first()['id'];
-    $result = CRM_Financial_BAO_FinancialType::setIsActive($financialTypeID, 0);
-    $this->assertEquals(TRUE, $result, 'Verify financial type record updated for is_active.');
-    $isActive = $this->assertDBNotNull(
-      'CRM_Financial_DAO_FinancialType',
-      $financialTypeID,
-      'is_active',
-      'id',
-      'Database check on updated for financial type is_active.'
-    );
-    $this->assertEquals(0, $isActive, 'Verify financial types is_active.');
-  }
-
-  /**
    * Delete test for testGitLabIssue1108.
    *
    * @dataProvider getBooleanDataProvider

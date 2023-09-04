@@ -17,8 +17,6 @@
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
   {/if}
 
-  {include file="CRM/common/TrackingFields.tpl"}
-
   <div class="crm-event-id-{$event.id} crm-block crm-event-register-form-block">
 
     {* moved to tpl since need to show only for primary participant page *}
@@ -43,14 +41,14 @@
     {/if}
     {/crmRegion}
 
-    {if $event.intro_text}
+    {if array_key_exists('intro_text', $event)}
       <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
         <p>{$event.intro_text}</p>
       </div>
     {/if}
 
     {include file="CRM/common/cidzero.tpl"}
-    {if $pcpSupporterText}
+    {if $pcp AND $pcpSupporterText}
       <div class="crm-public-form-item crm-section pcpSupporterText-section">
         <div class="content">{$pcpSupporterText}</div>
       </div>
@@ -132,7 +130,7 @@
       </fieldset>
     {/if}
 
-    {if $priceSet}
+    {if $priceSet && !$showPaymentOnConfirm}
       {include file='CRM/Core/BillingBlockWrapper.tpl'}
     {/if}
 
@@ -144,7 +142,7 @@
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
 
-    {if $event.footer_text}
+    {if array_key_exists('footer_text', $event)}
       <div id="footer_text" class="crm-public-form-item crm-section event_footer_text-section">
         <p>{$event.footer_text}</p>
       </div>
@@ -170,6 +168,7 @@
   {literal}
 
   CRM.$(function($) {
+    toggleAdditionalParticipants();
     $('#additional_participants').change(function() {
       toggleAdditionalParticipants();
       allowParticipant();
@@ -177,14 +176,18 @@
 
     function toggleAdditionalParticipants() {
       var submit_button = $("#crm-submit-buttons > button").html();
-      var review_translated = '{/literal}{ts escape="js"}Review{/ts}{literal}';
+      {/literal}{if $event.is_monetary || $event.is_confirm_enabled}{literal}
+        var next_translated = '{/literal}{ts escape="js"}Review{/ts}{literal}';
+      {/literal}{else}{literal}
+        var next_translated = '{/literal}{ts escape="js"}Register{/ts}{literal}';
+      {/literal}{/if}{literal}
       var continue_translated = '{/literal}{ts escape="js"}Continue{/ts}{literal}';
       if ($('#additional_participants').val()) {
         $("#additionalParticipantsDescription").show();
-        $("#crm-submit-buttons > button").html(submit_button.replace(review_translated, continue_translated));
+        $("#crm-submit-buttons > button").html(submit_button.replace(next_translated, continue_translated));
       } else {
         $("#additionalParticipantsDescription").hide();
-        $("#crm-submit-buttons > button").html(submit_button.replace(continue_translated, review_translated));
+        $("#crm-submit-buttons > button").html(submit_button.replace(continue_translated, next_translated));
       }
     }
   });

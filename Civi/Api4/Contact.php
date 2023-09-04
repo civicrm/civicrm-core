@@ -21,6 +21,7 @@ namespace Civi\Api4;
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/contacts/
  * @searchable primary
  * @orderBy sort_name
+ * @searchFields sort_name
  * @iconField contact_sub_type:icon,contact_type:icon
  * @since 5.19
  * @package Civi\Api4

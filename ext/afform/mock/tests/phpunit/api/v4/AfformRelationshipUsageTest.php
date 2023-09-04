@@ -12,7 +12,7 @@ class api_v4_AfformRelationshipUsageTest extends api_v4_AfformUsageTestCase {
   /**
    * Tests creating a relationship between multiple contacts
    */
-  public function testCreateContactsWithRelationships(): void {
+  public function testCreateContactsWithPresetRelationships(): void {
     $layout = <<<EOHTML
 <af-form ctrl="afform">
   <af-entity data="{contact_type: 'Individual', source: 'Test Rel'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
@@ -53,13 +53,90 @@ EOHTML;
 
     $saved = Relationship::get(FALSE)
       ->addWhere('contact_id_b.last_name', '=', $lastName)
-      ->addSelect('contact_id_a.first_name', 'is_active')
+      ->addSelect('contact_id_a.first_name', 'is_active', 'relationship_type_id')
       ->addOrderBy('contact_id_a.first_name')
       ->execute();
 
     $this->assertCount(2, $saved);
     $this->assertEquals('Firsty2', $saved[0]['contact_id_a.first_name']);
     $this->assertEquals('Firsty3', $saved[1]['contact_id_a.first_name']);
+    $this->assertEquals(1, $saved[0]['relationship_type_id']);
+    $this->assertEquals(1, $saved[1]['relationship_type_id']);
+  }
+
+  /**
+   * Tests creating multiple relationships using af-repeat
+   */
+  public function testCreateContactsWithMultipleRelationships(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual', source: 'Test Rel'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity security="FBAC" type="Relationship" name="Relationship1" label="Relationship 1" actions="{create: true, update: true}" data="{contact_id_b: ['Individual1'], contact_id_a: ['Org1']}" />
+  <af-entity data="{contact_type: 'Organization', source: 'Test Rel'}" type="Contact" name="Org1" label="Org" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <afblock-name-individual></afblock-name-individual>
+  </fieldset>
+  <fieldset af-fieldset="Relationship1" class="af-container" af-repeat="Add" min="1">
+    <af-field name="relationship_type_id"></af-field>
+  </fieldset>
+  <fieldset af-fieldset="Org1" class="af-container" af-title="Org 1">
+    <afblock-name-organization></afblock-name-organization>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $types = [
+      uniqid(__FUNCTION__),
+      uniqid(__FUNCTION__),
+    ];
+    $typeIds = [];
+
+    foreach ($types as $type) {
+      $typeIds[] = \Civi\Api4\RelationshipType::create(FALSE)
+        ->addValue('contact_type_a', 'Organization')
+        ->addValue('contact_type_b', 'Individual')
+        ->addValue('name_a_b', $type)
+        ->addValue('name_b_a', "$type of")
+        ->execute()->first()['id'];
+    }
+
+    $lastName = uniqid(__FUNCTION__);
+
+    $submission = [
+      'Individual1' => [
+        ['fields' => ['first_name' => 'Firsty', 'last_name' => $lastName]],
+      ],
+      'Org1' => [
+        ['fields' => ['organization_name' => "Hello $lastName"]],
+      ],
+      'Relationship1' => [
+        ['fields' => ['relationship_type_id' => $typeIds[0]]],
+        ['fields' => ['relationship_type_id' => $typeIds[1]]],
+      ],
+    ];
+
+    Civi\Api4\Afform::submit()
+      ->setName($this->formName)
+      ->setValues($submission)
+      ->execute();
+
+    $saved = Relationship::get(FALSE)
+      ->addWhere('contact_id_b.last_name', '=', $lastName)
+      ->addSelect('contact_id_a.organization_name', 'is_active', 'relationship_type_id')
+      ->addOrderBy('relationship_type_id')
+      ->execute();
+
+    $this->assertEquals("Hello $lastName", $saved[0]['contact_id_a.organization_name']);
+    $this->assertEquals($typeIds[0], $saved[0]['relationship_type_id']);
+    $this->assertEquals("Hello $lastName", $saved[1]['contact_id_a.organization_name']);
+    $this->assertEquals($typeIds[1], $saved[1]['relationship_type_id']);
+    $this->assertCount(2, $saved);
   }
 
   public function testPrefillContactsByRelationship(): void {

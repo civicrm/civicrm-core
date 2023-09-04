@@ -59,13 +59,13 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       self::$_actionLinks = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit Price Field'),
-          'url' => 'civicrm/admin/price/field',
+          'url' => 'civicrm/admin/price/field/edit',
           'qs' => 'action=update&reset=1&sid=%%sid%%&fid=%%fid%%',
           'title' => ts('Edit Price'),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview Field'),
-          'url' => 'civicrm/admin/price/field',
+          'url' => 'civicrm/admin/price/field/edit',
           'qs' => 'action=preview&reset=1&sid=%%sid%%&fid=%%fid%%',
           'title' => ts('Preview Price'),
         ],
@@ -81,7 +81,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/price/field',
+          'url' => 'civicrm/admin/price/field/edit',
           'qs' => 'action=delete&reset=1&sid=%%sid%%&fid=%%fid%%',
           'title' => ts('Delete Price'),
         ],
@@ -230,12 +230,8 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     );
 
     if ($this->_sid) {
-      $usedByDefaults = [
-        'civicrm_event' => FALSE,
-        'civicrm_contribution_page' => FALSE,
-      ];
       $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($this->_sid);
-      $this->assign('usedBy', array_intersect_key($usedByDefaults, $usedBy));
+      $this->assign('usedBy', $usedBy);
       $this->_isSetReserved = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
       $this->assign('isReserved', $this->_isSetReserved);
 

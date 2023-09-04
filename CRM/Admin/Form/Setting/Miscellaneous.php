@@ -42,6 +42,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'remote_profile_submissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'allow_alert_autodismissal' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'prevNextBackend' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'import_batch_size' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
   ];
 
   /**
@@ -61,7 +62,9 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
       'recentItemsMaxCount',
       'recentItemsProviders',
       'dedupe_default_limit',
+      'esm_loader',
       'prevNextBackend',
+      'import_batch_size',
     ]);
   }
 
@@ -113,7 +116,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     }
 
     if (!empty($fields['wkhtmltopdfPath'])) {
-      // check and ensure that thi leads to the wkhtmltopdf binary
+      // check and ensure that this path leads to the wkhtmltopdf binary
       // and it is a valid executable binary
       // Only check the first space separated piece to allow for a value
       // such as /usr/bin/xvfb-run -- wkhtmltopdf (CRM-13292)

@@ -152,15 +152,23 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $defaults['trxn_date'] = date('Y-m-d H:i:s');
     }
 
-    if ($this->isARefund() && $this->amountDue < 0) {
-      $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency(abs($this->amountDue));
+    if ($this->isARefund()) {
+      if ($this->amountDue < 0) {
+        $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency(abs($this->amountDue));
+      }
     }
-    elseif ($this->_owed && $this->amountDue > 0) {
+    elseif ($this->_owed) {
       $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_owed);
     }
 
     // Set $newCredit variable in template to control whether link to credit card mode is included
     $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
+
+    $defaults['payment_instrument_id'] = \Civi\Api4\Contribution::get(FALSE)
+      ->addSelect('payment_instrument_id')
+      ->addWhere('id', '=', $this->_contributionId)
+      ->execute()->first()['payment_instrument_id'];
+
     return $defaults;
   }
 
@@ -183,7 +191,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer'));
-    $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, NULL);
+    $this->addPaymentProcessorSelect(FALSE);
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialTrxn');
 
@@ -201,11 +209,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
     }
 
-    $this->add('select', 'from_email_address', ts('Receipt From'), CRM_Financial_BAO_Payment::getValidFromEmailsForPayment($eventID ?? NULL));
+    $this->add('select', 'from_email_address', ts('Receipt From'), CRM_Financial_BAO_Payment::getValidFromEmailsForPayment($eventID ?? NULL), FALSE, ['class' => 'crm-select2 huge']);
 
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
-    $this->addField('trxn_date', ['entity' => 'FinancialTrxn', 'label' => $this->isARefund() ? ts('Refund Date') : ts('Date Received'), 'context' => 'Contribution'], FALSE, FALSE);
+    $this->addField('trxn_date', ['entity' => 'FinancialTrxn', 'label' => $this->isARefund() ? ts('Refund Date') : ts('Contribution Date'), 'context' => 'Contribution'], FALSE, FALSE);
 
     if ($this->_contactId && $this->_id) {
       if ($this->_component == 'event') {
@@ -228,7 +236,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         ts('Payment Method'),
         ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument(),
         TRUE,
-        ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);"]
+        ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);", 'class' => 'crm-select2']
       );
 
       $this->add('text', 'check_number', ts('Check Number'), $attributes['financial_trxn_check_number']);
@@ -238,9 +246,12 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         $attributes['fee_amount']
       );
       $this->addRule('fee_amount', ts('Please enter a valid monetary value for Fee Amount.'), 'money');
+      $buttonName = $this->isARefund() ? ts('Record Refund') : ts('Record Payment');
+    }
+    else {
+      $buttonName = ts('Submit Payment');
     }
 
-    $buttonName = $this->isARefund() ? ts('Record Refund') : ts('Record Payment');
     $this->addButtons([
       [
         'type' => 'upload',

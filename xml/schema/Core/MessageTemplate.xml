@@ -141,6 +141,9 @@
       <optionGroupName>pdf_format</optionGroupName>
       <keyColumn>id</keyColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>3.4</add>
   </field>
 </table>

@@ -127,11 +127,10 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
 
     $form->add('select', 'contribution_page_id',
-      ts('Online Contribution Page'),
-      [
-        '' => ts('- select -'),
-      ] +
-      CRM_Contribute_PseudoConstant::contributionPage()
+      ts('Contribution Page'),
+      ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::contributionPage(),
+      FALSE,
+      ['class' => 'crm-select2']
     );
 
     $form->add('textarea', 'note', ts('Notes'), ["rows" => 4, "cols" => 60]);
@@ -256,7 +255,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $noteID = [];
     if ($contributionNoteID) {
       $noteID = ["id" => $contributionNoteID];
-      $noteParams['note'] = $noteParams['note'] ? $noteParams['note'] : "null";
+      $noteParams['note'] = $noteParams['note'] ?: "null";
     }
     CRM_Core_BAO_Note::add($noteParams, $noteID);
   }

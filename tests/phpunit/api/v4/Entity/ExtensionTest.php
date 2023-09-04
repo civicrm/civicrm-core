@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ExtensionTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testGet() {
+  public function testGet(): void {
     $moduleTest = Extension::get(FALSE)
       ->addWhere('key', '=', 'test.extension.manager.moduletest')
       ->execute()->single();

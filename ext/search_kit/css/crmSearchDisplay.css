@@ -20,6 +20,10 @@
   width: 60px;
 }
 
+#bootstrap-theme .crm-search-display button.dropdown-toggle {
+  white-space: nowrap;
+}
+
 /* Loading placeholders */
 #bootstrap-theme .crm-search-loading-placeholder {
   height: 2em;
@@ -47,4 +51,8 @@
   to {
     left: 100%;
   }
+}
+
+#bootstrap-theme .crm-search-display ul.pagination > li {
+  margin: 0;
 }

@@ -124,7 +124,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
       self::$participantStatus = [];
     }
 
-    $index = $cond ? $cond : 'No Condition';
+    $index = $cond ?: 'No Condition';
     $index = "{$index}_{$retColumn}";
     if (empty(self::$participantStatus[$index])) {
       self::$participantStatus[$index] = [];
@@ -183,7 +183,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *   array reference of all participant roles if any
    */
   public static function &participantRole($id = NULL, $cond = NULL) {
-    $index = $cond ? $cond : 'No Condition';
+    $index = $cond ?: 'No Condition';
     if (empty(self::$participantRole[$index])) {
       self::$participantRole[$index] = [];
 

@@ -55,7 +55,7 @@ class CRM_Core_Invoke {
       return NULL;
     }
     // CRM-15901: Turn off PHP errors display for all ajax calls
-    if (CRM_Utils_Array::value(1, $args) == 'ajax' || !empty($_REQUEST['snippet'])) {
+    if (($args[1] ?? NULL) == 'ajax' || !empty($_REQUEST['snippet'])) {
       ini_set('display_errors', 0);
     }
 
@@ -249,7 +249,7 @@ class CRM_Core_Invoke {
         CRM_Utils_System::setTitle($item['title']);
       }
 
-      if (isset($item['breadcrumb']) && !isset($item['is_public'])) {
+      if (isset($item['breadcrumb']) && empty($item['is_public'])) {
         CRM_Utils_System::appendBreadCrumb($item['breadcrumb']);
       }
 

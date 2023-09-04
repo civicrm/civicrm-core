@@ -39,17 +39,17 @@ class CRM_Utils_Check_Component_PriceFields extends CRM_Utils_Check_Component {
         'action' => 'browse',
         'sid' => $dao->ps_id,
       ]);
-      $html .= "<tr><td>$dao->ps_title</td><td>$dao->psf_label</td><td><a href='$url'>View Price Set Fields</a></td></tr>";
+      $html .= "<tr><td>$dao->ps_title</td><td>$dao->psf_label</td><td><a href='$url'>" . ts('View Price Set Fields') . '</a></td></tr>';
     }
     if ($count > 0) {
-      $msg = "<p>the following Price Set Fields use disabled or invalid financial types and need to be fixed if they are to still be used.<p>
-          <p><table><thead><tr><th>Price Set</th><th>Price Set Field</th><th>Action Link</th>
-          </tr></thead><tbody>
-          $html
-          </tbody></table></p>";
+      $msg = '<p>' . ts('The following Price Set Fields use disabled or invalid financial types and need to be fixed if they are to still be used.') . '<p>'
+        . '<p><table><thead><tr><th>' . ts('Price Set') . '</th><th>' . ts('Price Set Field') . '</th><th>' . ts('Action') . '</th>'
+        . '</tr></thead><tbody>'
+        . $html
+        . '</tbody></table></p>';
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-       ts($msg),
+       $msg,
        ts('Invalid Price Fields'),
        \Psr\Log\LogLevel::WARNING,
        'fa-lock'

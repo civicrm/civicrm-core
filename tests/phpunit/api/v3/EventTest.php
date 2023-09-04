@@ -92,18 +92,15 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
-    $tablesToTruncate = [
-      'civicrm_participant',
-      'civicrm_event',
-    ];
-    $this->quickCleanup($tablesToTruncate, TRUE);
+    $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup([], TRUE);
     parent::tearDown();
   }
 
   /**
    * civicrm_event_get methods.
    */
-  public function testGetEventById() {
+  public function testGetEventById(): void {
     $params = [
       'id' => $this->_events[1]['id'],
     ];
@@ -114,7 +111,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   /**
    * Test getLocationEvents() function invokes selectWhereClause() hook
    */
-  public function testGetEventWithPermissionHook() {
+  public function testGetEventWithPermissionHook(): void {
     $address = $this->callAPISuccess('address', 'create', [
       'contact_id' => 'null',
       'location_type_id' => 1,
@@ -137,14 +134,14 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(0, count($result));
   }
 
-  public function testGetEventByEventTitle() {
+  public function testGetEventByEventTitle(): void {
 
     $params = [
       'event_title' => 'Annual CiviCRM meet',
       'sequential' => TRUE,
     ];
 
-    $result = $this->callAPIAndDocument('event', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('event', 'get', $params);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals($result['values'][0]['id'], $this->_eventIds[0]);
   }
@@ -165,7 +162,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   /**
    * Skip api4 - this api uses deprecated query syntax
    */
-  public function testGetEventByIdSort() {
+  public function testGetEventByIdSort(): void {
     $params = [
       'return.sort' => 'id ASC',
       'return.max_results' => 1,
@@ -199,7 +196,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    */
 
   /*
-  public function testGetIdOfEventByEventTitle() {
+  public function testGetIdOfEventByEventTitle(): void {
   $params = array(      'title' => 'Annual CiviCRM meet',
   'return' => 'id'
   );
@@ -212,7 +209,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Test 'is.Current' option. Existing event is 'old' so only current should be returned
    * FIXME: Api4
    */
-  public function testGetIsCurrent() {
+  public function testGetIsCurrent(): void {
     $params = [
       'isCurrent' => 1,
     ];
@@ -222,9 +219,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ];
     $currentEventParams = array_merge($this->_params[1], $currentEventParams);
     $currentEvent = $this->callAPISuccess('Event', 'Create', $currentEventParams);
-    $description = "Demonstrates use of is.Current option.";
-    $subfile = "IsCurrentOption";
-    $result = $this->callAPIAndDocument('Event', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('Event', 'Get', $params);
     $allEvents = $this->callAPISuccess('Event', 'Get', []);
     $this->callAPISuccess('Event', 'Delete', ['id' => $currentEvent['id']]);
     $this->assertEquals(1, $result['count'], 'confirm only one event found in line ' . __LINE__);
@@ -236,7 +231,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * There has been a schema change & the api needs to buffer developers from it
    * FIXME: Api4
    */
-  public function testGetPaymentProcessorId() {
+  public function testGetPaymentProcessorId(): void {
     $params = $this->_params[0];
     $params['payment_processor_id'] = 1;
     $params['sequential'] = 1;
@@ -263,7 +258,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Test 'is_full' option.
    * FIXME: Api4
    */
-  public function testGetSingleReturnIsFull() {
+  public function testGetSingleReturnIsFull(): void {
     $contactID = $this->individualCreate();
     $params = [
       'id' => $this->_eventIds[0],
@@ -277,8 +272,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ];
 
     $currentEvent = $this->callAPISuccess('Event', 'getsingle', $getEventParams);
-    $description = "Demonstrates use of return is_full .";
-    $subfile = "IsFullOption";
     $this->assertEquals(0, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
     $this->assertEquals(1, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
     $participant = $this->callAPISuccess('Participant', 'create', [
@@ -287,7 +280,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'contact_id' => $contactID,
       'event_id' => $this->_eventIds[0],
     ]);
-    $currentEvent = $this->callAPIAndDocument('Event', 'getsingle', $getEventParams, __FUNCTION__, __FILE__, $description, $subfile);
+    $currentEvent = $this->callAPISuccess('Event', 'getsingle', $getEventParams);
     $this->assertEquals(1, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
     $this->assertEquals(0, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
 
@@ -299,7 +292,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    *
    * We need to ensure this is supported as an alias for financial_type_id.
    */
-  public function testCreateGetEventLegacyContributionTypeID() {
+  public function testCreateGetEventLegacyContributionTypeID(): void {
     $contributionTypeArray = ['contribution_type_id' => 3];
     if (isset($this->_params[0]['financial_type_id'])) {
       //in case someone edits $this->_params & invalidates this test :-)
@@ -359,7 +352,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Even if there is no loc block, at least the event should be returned.
    * http://forum.civicrm.org/index.php/topic,36113.0.html
    */
-  public function testChainingGetNonExistingLocBlock() {
+  public function testChainingGetNonExistingLocBlock(): void {
     $params = $this->_params[0];
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
@@ -389,7 +382,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params = $this->_params[0];
     $params['custom_' . $ids['custom_field_id']] = "custom string";
 
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
     $check = $this->callAPISuccess($this->_entity, 'get', [
       'return.custom_' . $ids['custom_field_id'] => 1,
@@ -456,7 +449,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * https://issues.civicrm.org/jira/browse/CRM-16036
    * FIXME: Api4
    */
-  public function testEventGetCustomContactRefFieldCRM16036() {
+  public function testEventGetCustomContactRefFieldCRM16036(): void {
     // Create some contact.
     $test_contact_name = 'Contact, Test';
     $contact_save_result = $this->callAPISuccess('contact', 'create', [
@@ -465,11 +458,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'display_name' => $test_contact_name,
     ]);
     $contact_id = $contact_save_result['id'];
-
-    // I have no clue what this $subfile is about. I just copied it from another
-    // unit test.
-    $subfile = 'ContactRefCustomField';
-    $description = "Demonstrates get with Contact Reference Custom Field.";
 
     // Create a custom group, and add a custom contact reference field.
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -493,13 +481,13 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params['event_type_id'] = 1;
     $params['custom_' . $customField['id']] = "$contact_id";
 
-    $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $this->callAPISuccess($this->_entity, 'create', $params);
 
     // Retrieve the activity, search for the contact.
-    $result = $this->callAPIAndDocument($this->_entity, 'get', [
+    $result = $this->callAPISuccess($this->_entity, 'get', [
       'return.custom_' . $customField['id'] => 1,
       'custom_' . $customField['id'] => $contact_id,
-    ], __FUNCTION__, __FILE__, $description, $subfile);
+    ]);
 
     $this->assertEquals($test_contact_name, $result['values'][$result['id']]['custom_' . $customField['id']]);
     $this->assertEquals($contact_id, $result['values'][$result['id']]['custom_' . $customField['id'] . "_id"], ' in line ' . __LINE__);
@@ -558,7 +546,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * CiviCRM to return 0 results.
    * Of course, CRM-16168 should also be fixed for this test to pass.
    */
-  public function testEventSearchCustomFieldWithChainedCall() {
+  public function testEventSearchCustomFieldWithChainedCall(): void {
     // Create a custom group, and add a custom contact reference field.
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $custom_field_id = $ids['custom_field_id'];
@@ -593,7 +581,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Test that an event with a price set can be created.
    * FIXME: Api4
    */
-  public function testCreatePaidEvent() {
+  public function testCreatePaidEvent(): void {
     //@todo alter API so that an integer is converted to an array
     $priceSetParams = ['price_set_id' => (array) 1, 'is_monetary' => 1];
     $result = $this->callAPISuccess('Event', 'Create', array_merge($this->_params[0], $priceSetParams));
@@ -648,7 +636,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    */
   public function testCreateEventSuccess($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument('Event', 'Create', $this->_params[0], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Event', 'Create', $this->_params[0]);
     $this->assertArrayHasKey('id', $result['values'][$result['id']]);
     $result = $this->callAPISuccess($this->_entity, 'Get', ['id' => $result['id']]);
     $this->callAPISuccess($this->_entity, 'Delete', ['id' => $result['id']]);
@@ -662,7 +650,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Test that passing in Unique field names works.
    * Skip api4 which doesn't use unique names
    */
-  public function testCreateEventSuccessUniqueFieldNames() {
+  public function testCreateEventSuccessUniqueFieldNames(): void {
     $this->_params[0]['event_start_date'] = $this->_params[0]['start_date'];
     unset($this->_params[1]['start_date']);
     $this->_params[0]['event_title'] = $this->_params[0]['title'];
@@ -717,7 +705,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params = [
       'id' => $this->_eventIds[0],
     ];
-    $this->callAPIAndDocument('Event', 'Delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('Event', 'Delete', $params);
   }
 
   /**
@@ -809,7 +797,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    *
    * return.offset and return.max_results test (CRM-5266)
    */
-  public function testSearchWithOffsetAndMaxResults() {
+  public function testSearchWithOffsetAndMaxResults(): void {
     $maxEvents = 5;
     $events = [];
     while ($maxEvents > 0) {
@@ -864,7 +852,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
    */
   public function testgetfields($version) {
     $this->_apiversion = $version;
-    $description = "Demonstrate use of getfields to interrogate api.";
     $params = ['action' => 'create'];
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals('is_active', $result['values']['is_active']['name']);
@@ -873,8 +860,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   /**
    * Test api_action param also works.
    */
-  public function testgetfieldsRest() {
-    $description = "Demonstrate use of getfields to interrogate api.";
+  public function testgetfieldsRest(): void {
     $params = ['api_action' => 'create'];
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['is_active']['api.default']);
@@ -883,8 +869,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   /**
    * Skip api4 - output is different
    */
-  public function testgetfieldsGet() {
-    $description = "Demonstrate use of getfields to interrogate api.";
+  public function testgetfieldsGet(): void {
     $params = ['action' => 'get'];
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals('title', $result['values']['event_title']['name']);
@@ -893,8 +878,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   /**
    * Skip api4 - output is different
    */
-  public function testgetfieldsDelete() {
-    $description = "Demonstrate use of getfields to interrogate api.";
+  public function testgetfieldsDelete(): void {
     $params = ['action' => 'delete'];
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['id']['api.required']);
@@ -919,18 +903,31 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'event_full_text' => 'Sorry! We are already full',
     ];
     $templateResult = $this->callAPISuccess('Event', 'create', ['is_template' => 1, 'template_title' => 'Test tpl'] + $templateParams);
-    $eventResult = $this->callAPISuccess('Event', 'create', [
-      'template_id' => $templateResult['id'],
+
+    $newEventParams = [
       'title' => 'Clone1',
       'start_date' => '2018-06-25 16:00:00',
-    ]);
+      'description' => 'This is a really special edition of this event series with its own description',
+    ];
+    $eventResult = $this->callAPISuccess('Event', 'create', ['template_id' => $templateResult['id']] + $newEventParams);
     $eventResult = $this->callAPISuccess('Event', 'getsingle', ['id' => $eventResult['id']]);
-    foreach ($templateParams as $param => $value) {
+
+    // check fields set on creation are set from the instance values
+    foreach ($newEventParams as $param => $value) {
       $this->assertEquals($value, $eventResult[$param], print_r($eventResult, 1));
     }
+
+    // check unset fields are populated from the template values
+    $fieldsPopulatedFromTemplate = array_diff(array_keys($templateParams), array_keys($newEventParams));
+    foreach ($fieldsPopulatedFromTemplate as $param) {
+      $this->assertEquals($templateParams[$param], $eventResult[$param], print_r($eventResult, 1));
+    }
+
+    // check the newly created event is an event, not a template
+    $this->assertEquals(0, $eventResult['is_template'], print_r($eventResult, 1));
   }
 
-  public function testGetListLeadingZero() {
+  public function testGetListLeadingZero(): void {
     $this->callAPISuccess('Event', 'create', [
       'title' => "0765",
       'start_date' => "2022-04-04",

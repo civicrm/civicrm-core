@@ -18,7 +18,7 @@ class CRM_Core_Smarty_plugins_CrmUpperTest extends CiviUnitTestCase {
   /**
    * Test accents with upper
    */
-  public function testUpper() {
+  public function testUpper(): void {
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{assign var="nom" value="Pièrre"}{$nom|crmUpper}');
     $this->assertEquals('PIÈRRE', $actual);

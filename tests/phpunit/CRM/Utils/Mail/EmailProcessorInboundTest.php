@@ -27,7 +27,14 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
       // a little weird - is_default=0 means for inbound email processing
       'is_default' => '0',
       'domain_id' => 1,
+      'is_active' => 1,
+      'activity_type_id' => 'Inbound Email',
+      'activity_source' => 'from',
+      'activity_targets' => 'to,cc,bcc',
+      'activity_assignees' => 'from',
     ])['id'];
+    $this->callAPISuccess('Tag', 'create', ['name' => 'FileToOrgAlways']);
+    $this->callAPISuccess('Tag', 'create', ['name' => 'FileToOrgCatchallForDomain']);
   }
 
   public function tearDown(): void {
@@ -35,7 +42,16 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
     $this->callAPISuccess('MailSettings', 'delete', [
       'id' => $this->mailSettingsId,
     ]);
-    $this->quickCleanup(['civicrm_file', 'civicrm_entity_file']);
+    $this->quickCleanup([
+      'civicrm_file',
+      'civicrm_entity_file',
+      'civicrm_activity',
+      'civicrm_activity_contact',
+      'civicrm_entity_tag',
+      'civicrm_tag',
+      'civicrm_email',
+      'civicrm_contact',
+    ]);
     parent::tearDown();
   }
 
@@ -46,7 +62,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
    * because it was also being used as a limit for backend processes. So we
    * test 4, which is bigger than 3 (unless running on a 2-bit CPU).
    */
-  public function testFetchActivitiesWithManyAttachments() {
+  public function testFetchActivitiesWithManyAttachments(): void {
     $mail = 'test_message_many_attachments.eml';
 
     // paranoid check that settings are the standard defaults
@@ -117,6 +133,155 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
     // reset in case it was different from defaults
     Civi::settings()->set('max_attachments', $currentUIMax);
     Civi::settings()->set('max_attachments_backend', $currentBackendMax);
+  }
+
+  /**
+   * hook implementation for testHookEmailProcessor
+   */
+  public function hookImplForEmailProcessor($type, &$params, $mail, &$result, $action = NULL) {
+    if ($type !== 'activity') {
+      return;
+    }
+    // change the activity type depending on subject
+    if (strpos($mail->subject, 'for hooks') !== FALSE) {
+      $this->callAPISuccess('Activity', 'create', ['id' => $result['id'], 'activity_type_id' => 'Phone Call']);
+    }
+  }
+
+  /**
+   * test hook_civicrm_emailProcessor
+   */
+  public function testHookEmailProcessor(): void {
+    $this->hookClass->setHook('civicrm_emailProcessor', [$this, 'hookImplForEmailProcessor']);
+
+    copy(__DIR__ . '/data/inbound/test_hook.eml', __DIR__ . '/data/mail/test_hook.eml');
+    $this->callAPISuccess('Job', 'fetch_activities', []);
+
+    // The activity type should be changed.
+    $activity = $this->callAPISuccess('Activity', 'getsingle', ['subject' => 'This is for hooks']);
+    $this->assertEquals(
+      CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Phone Call'),
+      $activity['activity_type_id']
+    );
+
+    // Now repeat with a different subject, and the type should be the default.
+    copy(__DIR__ . '/data/inbound/test_non_cases_email.eml', __DIR__ . '/data/mail/test_non_cases_email.eml');
+    $this->callAPISuccess('Job', 'fetch_activities', []);
+    $activity = $this->callAPISuccess('Activity', 'getsingle', ['subject' => 'Love letter']);
+    $this->assertEquals(
+      CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email'),
+      $activity['activity_type_id']
+    );
+  }
+
+  /**
+   * This hook is the example from the docs, which at one time was
+   * being used in production.
+   * If an org is specially tagged and has the same domain, then file
+   * on that org, otherwise if an individual had matched already, then use
+   * that, otherwise if there is an org specially tagged
+   * as a "catchall" for the domain, then use that.
+   * The use case is where you get emails from billing@acme.com, sales@acme.com,
+   * info@acme.com, do-not-reply@acme.com, the
+   * account-rep-of-the-week@acme.com, etc and these are really all the same
+   * org contact as far as you are concerned. However for some orgs you want it
+   * all filed on one contact no matter what, and for others you only want that
+   * as a fallback if it doesn't match an individual first.
+   */
+  public function hookImplForEmailProcessorContact($email, $contactID, &$result) {
+    list($mailName, $mailDomain) = CRM_Utils_System::explode('@', $email, 2);
+    if (empty($mailDomain)) {
+      return;
+    }
+    $org = \Civi\Api4\Contact::get(FALSE)
+      ->addWhere('email_primary.email', 'LIKE', '%@' . $mailDomain)
+      ->addWhere('tags:name', 'IN', ['FileToOrgAlways'])
+      ->addWhere('contact_type:name', '=', 'Organization')
+      ->execute()->first();
+    if ($org['id'] ?? NULL) {
+      $result = ['contactID' => $org['id'], 'action' => CRM_Utils_Mail_Incoming::EMAILPROCESSOR_OVERRIDE];
+      return;
+    }
+    if ($contactID) {
+      return;
+    }
+    $org = \Civi\Api4\Contact::get(FALSE)
+      ->addWhere('email_primary.email', 'LIKE', '%@' . $mailDomain)
+      ->addWhere('tags:name', 'IN', ['FileToOrgCatchallForDomain'])
+      ->addWhere('contact_type:name', '=', 'Organization')
+      ->execute()->first();
+    if ($org['id'] ?? NULL) {
+      $result = ['contactID' => $org['id'], 'action' => CRM_Utils_Mail_Incoming::EMAILPROCESSOR_OVERRIDE];
+      return;
+    }
+    $result = ['action' => CRM_Utils_Mail_Incoming::EMAILPROCESSOR_CREATE_INDIVIDUAL];
+  }
+
+  /**
+   * test hook_civicrm_emailProcessorContact with catchall
+   */
+  public function testHookEmailProcessorContactCatchall(): void {
+    $this->hookClass->setHook('civicrm_emailProcessorContact', [$this, 'hookImplForEmailProcessorContact']);
+
+    // org with same domain as data fixture's email
+    $catchall_id = $this->organizationCreate(['organization_name' => 'Paradox Unlimited Ltd.', 'email' => 'info@paradox.biz']);
+    $tag = $this->callAPISuccess('Tag', 'getsingle', ['name' => 'FileToOrgCatchallForDomain', 'return' => ['id']]);
+    $this->callAPISuccess('EntityTag', 'create', ['entity_table' => 'civicrm_contact', 'entity_id' => $catchall_id, 'tag_id' => $tag['id']]);
+
+    copy(__DIR__ . '/data/inbound/test_hook.eml', __DIR__ . '/data/mail/test_hook.eml');
+    $this->callAPISuccess('Job', 'fetch_activities', []);
+
+    // The source contact should be our catchall not the original From contact.
+    $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $catchall_id]);
+    $this->assertEquals('This is for hooks', $activity['subject']);
+  }
+
+  /**
+   * test hook_civicrm_emailProcessorContact with catchall but matching individual
+   */
+  public function testHookEmailProcessorContactCatchallWithMatch(): void {
+    $this->hookClass->setHook('civicrm_emailProcessorContact', [$this, 'hookImplForEmailProcessorContact']);
+
+    // org with same domain as data fixture's email
+    $catchall_id = $this->organizationCreate(['organization_name' => 'Paradox Unlimited Ltd.', 'email' => 'info@paradox.biz']);
+    $tag = $this->callAPISuccess('Tag', 'getsingle', ['name' => 'FileToOrgCatchallForDomain', 'return' => ['id']]);
+    $this->callAPISuccess('EntityTag', 'create', ['entity_table' => 'civicrm_contact', 'entity_id' => $catchall_id, 'tag_id' => $tag['id']]);
+
+    // individual with same email as the data fixture's email.
+    $contact_id = $this->individualCreate(['email' => 'billing@paradox.biz']);
+
+    copy(__DIR__ . '/data/inbound/test_hook.eml', __DIR__ . '/data/mail/test_hook.eml');
+    $this->callAPISuccess('Job', 'fetch_activities', []);
+
+    // The source contact should be our individual not the catchall
+    $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $contact_id]);
+    $this->assertEquals('This is for hooks', $activity['subject']);
+  }
+
+  /**
+   * test hook_civicrm_emailProcessorContact with Always and matching individual
+   *
+   * The difference from testHookEmailProcessorContactCatchallWithMatch is
+   * here the presence of the matching individual is irrelevant - it will always
+   * file on the org.
+   */
+  public function testHookEmailProcessorContactAlwaysWithMatch(): void {
+    $this->hookClass->setHook('civicrm_emailProcessorContact', [$this, 'hookImplForEmailProcessorContact']);
+
+    // org with same domain as data fixture's email
+    $catchall_id = $this->organizationCreate(['organization_name' => 'Paradox Unlimited Ltd.', 'email' => 'info@paradox.biz']);
+    $tag = $this->callAPISuccess('Tag', 'getsingle', ['name' => 'FileToOrgAlways', 'return' => ['id']]);
+    $this->callAPISuccess('EntityTag', 'create', ['entity_table' => 'civicrm_contact', 'entity_id' => $catchall_id, 'tag_id' => $tag['id']]);
+
+    // individual with same email as the data fixture's email.
+    $contact_id = $this->individualCreate(['email' => 'billing@paradox.biz']);
+
+    copy(__DIR__ . '/data/inbound/test_hook.eml', __DIR__ . '/data/mail/test_hook.eml');
+    $this->callAPISuccess('Job', 'fetch_activities', []);
+
+    // The source contact should be the org not the individual
+    $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $catchall_id]);
+    $this->assertEquals('This is for hooks', $activity['subject']);
   }
 
 }

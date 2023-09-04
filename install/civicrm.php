@@ -197,7 +197,7 @@ function civicrm_config(&$config) {
   // Ex: $extraSettings[] = '$civicrm_settings["domain"]["foo"] = "bar";';
   $extraSettings = [];
 
-  $params = array(
+  $params = [
     'crmRoot' => $crmPath,
     'templateCompileDir' => $compileDir,
     'frontEnd' => 0,
@@ -209,7 +209,7 @@ function civicrm_config(&$config) {
     // SSL connection to MySQL is needed.
     'dbSSL' => '',
     'CMSdbSSL' => '',
-  );
+  ];
 
   $params['baseURL'] = $config['base_url'] ?? civicrm_cms_base();
   if ($installType == 'drupal' && defined('VERSION')) {

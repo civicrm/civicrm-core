@@ -15,9 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-// we should consider moving these to the settings table
-// before the 4.1 release
-define('EMAIL_ACTIVITY_TYPE_ID', NULL);
+// we should consider moving this to the settings table
 define('MAIL_BATCH_SIZE', 50);
 
 /**
@@ -55,6 +53,7 @@ class CRM_Utils_Mail_EmailProcessor {
     $dao = new CRM_Core_DAO_MailSettings();
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->is_default = FALSE;
+    $dao->is_active = TRUE;
     $dao->find();
     $found = FALSE;
     while ($dao->fetch()) {
@@ -94,14 +93,10 @@ class CRM_Utils_Mail_EmailProcessor {
   public static function _process($civiMail, $dao, $is_create_activities) {
     // 0 = activities; 1 = bounce;
     $usedfor = $dao->is_default;
-
-    $emailActivityTypeId
-      = (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID)
-      ? EMAIL_ACTIVITY_TYPE_ID
-      : CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email');
-
-    if (!$emailActivityTypeId) {
-      throw new CRM_Core_Exception(ts('Could not find a valid Activity Type ID for Inbound Email'));
+    if ($usedfor == 0) {
+      // create an array of all of to, from, cc, bcc that are in use for this Mail Account, so we don't create contacts for emails we aren't adding to the activity
+      $emailFields = array_filter(array_unique(array_merge(explode(",", $dao->activity_targets), explode(",", $dao->activity_assignees), explode(",", $dao->activity_source))));
+      $createContact = !($dao->is_contact_creation_disabled_if_no_match ?? FALSE);
     }
 
     $config = CRM_Core_Config::singleton();
@@ -206,22 +201,14 @@ class CRM_Utils_Mail_EmailProcessor {
 
           // if its the activities that needs to be processed ..
           try {
-            $createContact = !($dao->is_contact_creation_disabled_if_no_match ?? FALSE);
-            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE);
+            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE, $emailFields);
           }
           catch (Exception $e) {
             echo $e->getMessage();
             $store->markIgnored($key);
             continue;
           }
-
-          $params = self::deprecated_activity_buildmailparams($mailParams, $emailActivityTypeId);
-
-          $params['version'] = 3;
-          if (!empty($dao->activity_status)) {
-            $params['status_id'] = $dao->activity_status;
-          }
-
+          $params = self::deprecated_activity_buildmailparams($mailParams, $dao);
           $result = civicrm_api('activity', 'create', $params);
 
           if ($result['is_error']) {
@@ -507,32 +494,36 @@ class CRM_Utils_Mail_EmailProcessor {
 
   /**
    * @param array $result
-   * @param int $activityTypeID
+   * @param CRM_Core_DAO_MailSettings $dao
    *
    * @return array
    *   <type> $params
    */
-  protected static function deprecated_activity_buildmailparams($result, $activityTypeID) {
-    // get ready for collecting data about activity to be created
+  protected static function deprecated_activity_buildmailparams($result, $dao) {
     $params = [];
+    $params['version'] = 3;
 
-    $params['activity_type_id'] = $activityTypeID;
+    // if we don't cast to int (the dao gives a string), then the Inbound Email Activity 1.0 extension won't work, will be fixed in next version to use a non-strict comparison
+    $params['activity_type_id'] = (int) $dao->activity_type_id;
+    $params['campaign_id'] = $dao->campaign_id;
+    $params['status_id'] = $dao->activity_status;
+    $params['source_contact_id'] = $result[$dao->activity_source][0]['id'];
 
-    $params['status_id'] = 'Completed';
-    if (!empty($result['from']['id'])) {
-      $params['source_contact_id'] = $params['assignee_contact_id'] = $result['from']['id'];
-    }
-    $params['target_contact_id'] = [];
-    $keys = ['to', 'cc', 'bcc'];
-    foreach ($keys as $key) {
-      if (is_array($result[$key])) {
-        foreach ($result[$key] as $key => $keyValue) {
-          if (!empty($keyValue['id'])) {
-            $params['target_contact_id'][] = $keyValue['id'];
+    $activityContacts = ['target_contact_id' => 'activity_targets', 'assignee_contact_id' => 'activity_assignees'];
+    foreach ($activityContacts as $activityContact => $daoName) {
+      $params[$activityContact] = [];
+      $keys = array_filter(explode(",", $dao->$daoName));
+      foreach ($keys as $key) {
+        if (is_array($result[$key])) {
+          foreach ($result[$key] as $key => $keyValue) {
+            if (!empty($keyValue['id'])) {
+              $params[$activityContact][] = $keyValue['id'];
+            }
           }
         }
       }
     }
+
     $params['subject'] = $result['subject'];
     $params['activity_date_time'] = $result['date'];
     $params['details'] = $result['body'];

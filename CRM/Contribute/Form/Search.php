@@ -75,6 +75,8 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->_done = FALSE;
 
     parent::preProcess();
+    // For contributionTotals.tpl
+    $this->addExpectedSmartyVariables(['annual']);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Contribute_Selector_Search($this->_queryParams,
@@ -251,11 +253,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->fixFormValues();
 
-    // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['contribution_test']) && $this->_force && !empty($this->_context) && $this->_context === 'dashboard') {
-      // @todo - stop changing formValues - respect submitted form values, change a working array.
-      $this->_formValues['contribution_test'] = 0;
-    }
     // We don't show template records in summaries or dashboards
     if (empty($this->_formValues['is_template']) && $this->_force && !empty($this->_context) && ($this->_context === 'dashboard' || $this->_context === 'contribution')) {
       // @todo - stop changing formValues - respect submitted form values, change a working array.

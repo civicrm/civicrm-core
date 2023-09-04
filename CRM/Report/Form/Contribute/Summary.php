@@ -117,7 +117,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
           ],
-          'contribution_source' => ['title' => ts('Source')],
+          'contribution_source' => ['title' => ts('Contribution Source')],
           'currency' => [
             'required' => TRUE,
             'no_display' => TRUE,
@@ -284,6 +284,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'batch_id' => ['title' => ts('Batch Title')],
         ],
       ],
+      'civicrm_pledge_payment' => [
+        'dao' => 'CRM_Pledge_DAO_PledgePayment',
+        'filters' => [
+          'contribution_id' => [
+            'title' => ts('Contribution is a pledge payment'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ],
+        ],
+      ],
       'civicrm_contribution_soft' => [
         'dao' => 'CRM_Contribute_DAO_ContributionSoft',
         'fields' => [
@@ -356,7 +365,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       if (array_key_exists('group_bys', $table)) {
         foreach ($table['group_bys'] as $fieldName => $field) {
           if (!empty($this->_params['group_bys'][$fieldName])) {
-            switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
+            switch ($this->_params['group_bys_freq'][$fieldName] ?? NULL) {
               case 'YEARWEEK':
                 $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY) AS {$tableName}_{$fieldName}_start";
                 $select[] = "YEARWEEK({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";
@@ -527,6 +536,13 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $this->joinPhoneFromContact();
     $this->joinEmailFromContact();
 
+    //for pledge payment
+    if ($this->isTableSelected('civicrm_pledge_payment')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_pledge_payment {$this->_aliases['civicrm_pledge_payment']} ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_pledge_payment']}.contribution_id
+      ";
+    }
+
     //for contribution batches
     if ($this->isTableSelected('civicrm_batch')) {
       $this->_from .= "
@@ -605,7 +621,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
 
     $softCredit = $this->_params['fields']['soft_amount'] ?? NULL;
-    $onlySoftCredit = $softCredit && !CRM_Utils_Array::value('total_amount', $this->_params['fields']);
+    $onlySoftCredit = $softCredit && empty($this->_params['fields']['total_amount']);
     if (!isset($this->_groupByArray['civicrm_contribution_currency'])) {
       $this->_groupByArray['civicrm_contribution_currency'] = 'currency';
     }
@@ -748,6 +764,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $statistics['counts']['count'] = [
         'title' => ts('Total Contributions'),
         'value' => $count,
+        'type' => CRM_Utils_Type::T_INT,
       ];
       $statistics['counts']['avg'] = [
         'title' => ts('Average'),
@@ -774,6 +791,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       $statistics['counts']['soft_count'] = [
         'title' => ts('Total Soft Credits'),
         'value' => $softCount,
+        'type' => CRM_Utils_Type::T_INT,
       ];
       $statistics['counts']['soft_avg'] = [
         'title' => ts('Average Soft Credit'),
@@ -960,7 +978,8 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       }
 
       // convert contribution status id to status name
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
+      $value = $row['civicrm_contribution_contribution_status_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
         $entryFound = TRUE;
       }
@@ -970,7 +989,8 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_page_id', $row)) {
+      $value = $row['civicrm_contribution_contribution_page_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_contribution_page_id'] = $contributionPages[$value];
         $entryFound = TRUE;
       }

@@ -31,7 +31,7 @@ class MenuXmlTest extends \PHPUnit\Framework\Assert {
     $this->url = cv('url civicrm/shimmy/foobar');
     $this->assertTrue(is_string($this->url));
     $response = file_get_contents($this->url);
-    $this->assertRegExp(';hello world;', $response);
+    $this->assertMatchesRegularExpression(';hello world;', $response);
   }
 
   public function testDisabled($cv): void {
@@ -40,8 +40,8 @@ class MenuXmlTest extends \PHPUnit\Framework\Assert {
 
     $this->assertNotEmpty($this->url);
     $response = file_get_contents($this->url, FALSE, stream_context_create(['http' => ['ignore_errors' => TRUE]]));
-    $this->assertNotRegExp(';hello world;', $response);
-    $this->assertNotRegExp(';HTTP.*200.*;', $http_response_header[0]);
+    $this->assertDoesNotMatchRegularExpression(';hello world;', $response);
+    $this->assertDoesNotMatchRegularExpression(';HTTP.*200.*;', $http_response_header[0]);
   }
 
   public function testUninstalled($cv): void {

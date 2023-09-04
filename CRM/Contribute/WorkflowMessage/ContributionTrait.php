@@ -1,8 +1,10 @@
 <?php
 
+use Civi\Api4\Membership;
+
 /**
  * @method array getContribution()
- * @method ?int getContributionID()
+ * @method int|null getContributionID()
  * @method $this setContributionID(?int $contributionId)
  */
 trait CRM_Contribute_WorkflowMessage_ContributionTrait {
@@ -17,9 +19,9 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
 
   /**
    * @var int
-   * @scope tokenContext as contributionId
+   * @scope tokenContext as contributionId, tplParams as contributionID
    */
-  public $contributionId;
+  public $contributionID;
 
   /**
    * Is the site configured such that tax should be displayed.
@@ -65,9 +67,14 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * @return \CRM_Financial_BAO_Order|null
    */
   private function getOrder(): ?CRM_Financial_BAO_Order {
-    if (!$this->order && $this->contributionId) {
+    if (!$this->order && $this->contributionID) {
       $this->order = new CRM_Financial_BAO_Order();
-      $this->order->setTemplateContributionID($this->contributionId);
+      $this->order->setTemplateContributionID($this->contributionID);
+      if (!empty($this->eventID)) {
+        // Temporary support for tests that are making a mess of this.
+        // It should always be possible to get this from the line items.
+        $this->order->setPriceSetIDByEventPageID($this->eventID);
+      }
     }
     return $this->order;
   }
@@ -87,6 +94,7 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * Get bool for whether a line item breakdown be displayed.
    *
    * @return bool
+   * @noinspection PhpUnused
    */
   public function getIsShowLineItems(): bool {
     if (isset($this->isShowLineItems)) {
@@ -107,6 +115,7 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * Get the line items.
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function getLineItems(): array {
     if (isset($this->lineItems)) {
@@ -119,13 +128,23 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
       // always have the contribution ID available as well as migrated ones.
       return [];
     }
-    return $order->getLineItems();
+    $lineItems = $order->getLineItems();
+    foreach ($lineItems as $index => $lineItem) {
+      if ($lineItem['entity_table'] === 'civicrm_membership' && !empty($lineItem['entity_id'])) {
+        // Add in some per line membership details. This could also go in the Order class?
+        $lineItems[$index]['membership'] = Membership::get(FALSE)->addWhere('id', '=', $lineItem['entity_id'])->addSelect('start_date', 'end_date')->execute()->first();
+      }
+    }
+    return $lineItems;
   }
 
   /**
    * Get the line items.
    *
    * @return array
+   * @throws \CRM_Core_Exception
+   *
+   * @noinspection PhpUnused
    */
   public function getTaxRateBreakdown(): array {
     if (isset($this->taxRateBreakdown)) {
@@ -133,11 +152,20 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
     }
     $this->taxRateBreakdown = [];
     foreach ($this->getLineItems() as $lineItem) {
-      $this->taxRateBreakdown[$lineItem['tax_rate']] = [
-        'amount' => $lineItem['tax_amount'] ?? 0,
-        'rate' => $lineItem['tax_rate'],
-        'percentage' => sprintf('%.2f', $lineItem['tax_rate']),
-      ];
+      if (!isset($this->taxRateBreakdown[$lineItem['tax_rate']])) {
+        $this->taxRateBreakdown[$lineItem['tax_rate']] = [
+          'amount' => 0,
+          'rate' => $lineItem['tax_rate'],
+          'percentage' => sprintf('%.2f', $lineItem['tax_rate']),
+        ];
+      }
+      $this->taxRateBreakdown[$lineItem['tax_rate']]['amount'] += $lineItem['tax_amount'] ?? 0;
+    }
+    // Remove the rates with no value.
+    foreach ($this->taxRateBreakdown as $rate => $details) {
+      if ($details['amount'] === 0.0) {
+        unset($this->taxRateBreakdown[$rate]);
+      }
     }
     if (array_keys($this->taxRateBreakdown) === [0]) {
       // If the only tax rate charged is 0% then no tax breakdown is returned.
@@ -156,7 +184,7 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   public function setContribution(array $contribution): self {
     $this->contribution = $contribution;
     if (!empty($contribution['id'])) {
-      $this->contributionId = $contribution['id'];
+      $this->contributionID = $contribution['id'];
     }
     return $this;
   }
@@ -184,9 +212,21 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * and tax are a package.
    *
    * @param array $export
+   *
+   * @noinspection PhpUnused
    */
   protected function exportExtraTplParams(array &$export): void {
     $export['isShowTax'] = (bool) Civi::settings()->get('invoicing');
+  }
+
+  /**
+   * Specify any tokens that should be exported as smarty variables.
+   *
+   * @param array $export
+   */
+  protected function exportExtraTokenContext(array &$export): void {
+    $export['smartyTokenAlias']['currency'] = 'contribution.currency';
+    $export['smartyTokenAlias']['taxTerm'] = 'domain.tax_term';
   }
 
 }
