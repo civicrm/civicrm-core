@@ -140,17 +140,6 @@ abstract class CRM_Core_Component_Info {
   abstract public function getInfo();
 
   /**
-   * Get a list of entities to register via API.
-   *
-   * @return array
-   *   list of entities; same format as CRM_Utils_Hook::managedEntities(&$entities)
-   * @see CRM_Utils_Hook::managedEntities
-   */
-  public function getManagedEntities() {
-    return [];
-  }
-
-  /**
    * Provides permissions that are unwise for Anonymous Roles to have.
    *
    * @return array

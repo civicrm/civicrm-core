@@ -523,16 +523,18 @@ class CRM_Core_ManagedEntities {
    */
   protected function getDeclarations($modules = NULL): array {
     $declarations = [];
-    // Exclude components if given a module name.
-    if (!$modules || $modules === ['civicrm']) {
-      foreach (CRM_Core_Component::getEnabledComponents() as $component) {
-        $declarations = array_merge($declarations, $component->getManagedEntities());
-      }
-    }
     CRM_Utils_Hook::managed($declarations, $modules);
     $this->validate($declarations);
-    foreach (array_keys($declarations) as $name) {
-      $declarations[$name] += ['name' => $name];
+    // FIXME: Some well-meaning developer added this a long time ago to support associative arrays
+    // that use the array index as the declaration name. But it probably never worked, because by the time it gets to this point,
+    // lots of implementations of `hook_civicrm_managed()` would have run `$declarations = array_merge($declarations, [...])`
+    // which would have reset the indexes.
+    // Adding a noisy deprecation notice for now, then we should remove this block:
+    foreach ($declarations as $index => $declaration) {
+      if (empty($declaration['name'])) {
+        CRM_Core_Error::deprecatedWarning(sprintf('Managed entity "%s" declared by extension "%s" without a name.', $index, $declaration['module']));
+        $declarations[$index] += ['name' => $index];
+      }
     }
     return $declarations;
   }
