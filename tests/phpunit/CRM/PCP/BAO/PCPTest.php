@@ -234,24 +234,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
       'receipt_from_email' => 'donationFake@civicrm.org',
       'contribution_status' => 'Completed',
     ];
-    $gathered_values = $contribution_bao->_gatherMessageValues(
-      [
-        'payment_processor_id' => $payment_processor['id'],
-        'is_email_receipt' => TRUE,
-      ],
-      $values,
-      [
-        'component' => 'contribute',
-        'contact_id' => $contact_contributor,
-        'contact' => $contact_contributor,
-        'financialType' => $contribution['values'][$contribution['id']]['financial_type_id'],
-        'contributionType' => $contribution['values'][$contribution['id']]['contribution_type_id'],
-        'contributionPage' => $contributionPage['id'],
-        'membership' => [],
-        'paymentProcessor' => $payment_processor['id'],
-        'contribution' => $contribution['id'],
-      ]
-    );
+    $gathered_values = $contribution_bao->_gatherMessageValues($values, NULL, NULL);
 
     $this->assertEquals([
       'receipt_from_name' => 'CiviCRM Fundraising Dept.',
