@@ -481,12 +481,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     foreach ($participantPayments as $payment) {
       civicrm_api3('ParticipantPayment', 'create', ['id' => $payment['id'], 'participant_id' => $participant->id]);
     }
-    //send a confirmation email to the new participant
-    $this->participantTransfer($participant);
-    //now update registered_by_id
-    $query = "UPDATE civicrm_participant cp SET cp.registered_by_id = %1 WHERE  cp.id = ({$participant->id})";
-    $params = [1 => [$fromParticipantID, 'Integer']];
-    CRM_Core_DAO::executeQuery($query, $params);
     //copy line items to new participant
     $line_items = CRM_Price_BAO_LineItem::getLineItems($fromParticipantID);
     foreach ($line_items as $id => $item) {
@@ -504,6 +498,12 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       $prevFinancialItem['entity_id'] = $tolineItem->id;
       CRM_Financial_BAO_FinancialItem::create($prevFinancialItem);
     }
+    //send a confirmation email to the new participant
+    $this->participantTransfer($participant);
+    //now update registered_by_id
+    $query = "UPDATE civicrm_participant cp SET cp.registered_by_id = %1 WHERE  cp.id = ({$participant->id})";
+    CRM_Core_DAO::executeQuery($query, [1 => [$fromParticipantID, 'Integer']]);
+
     //now cancel the from participant record, leaving the original line-item(s)
     $value_from = [];
     $value_from['id'] = $fromParticipantID;
