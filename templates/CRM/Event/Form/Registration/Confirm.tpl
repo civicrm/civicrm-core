@@ -11,8 +11,6 @@
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-event-id-{$event.id} crm-block crm-event-confirm-form-block">
     <div class="messages status section continue_message-section"><p>
     {if $isOnWaitlist}

@@ -172,12 +172,6 @@
     customPost: customValue:::$customValue
  {/foreach}
  {/if}
- {if !empty($trackingFields)}
- {foreach from=$trackingFields item=trackingValue key=trackingName}
-   trackingName:::$trackingName
-   trackingValue:::$trackingValue
- {/foreach}
- {/if}
 
 </body>
 </html>

@@ -226,9 +226,7 @@
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
 {foreach from=$customPre item=value key=customName}
-{if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
-{$customName}: {$value}
-{/if}
+  {$customName}: {$value}
 {/foreach}
 {/if}
 
@@ -239,9 +237,7 @@
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
 {foreach from=$customPost item=value key=customName}
-{if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
-{$customName}: {$value}
-{/if}
+  {$customName}: {$value}
 {/foreach}
 {/if}
 {if !empty($customProfile)}

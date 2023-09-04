@@ -17,8 +17,6 @@
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
   {/if}
 
-  {include file="CRM/common/TrackingFields.tpl"}
-
   <div class="crm-event-id-{$event.id} crm-block crm-event-register-form-block">
 
     {* moved to tpl since need to show only for primary participant page *}

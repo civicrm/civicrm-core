@@ -422,12 +422,10 @@
 {foreach from=$customPre item=customPr key=i}
    <tr> <th {$headerStyle}>{$customPre_grouptitle.$i}</th></tr>
    {foreach from=$customPr item=customValue key=customName}
-   {if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
      <tr>
          <td {$labelStyle}>{$customName}</td>
          <td {$valueStyle}>{$customValue}</td>
      </tr>
-   {/if}
    {/foreach}
 {/foreach}
 {/if}
@@ -436,13 +434,11 @@
 {foreach from=$customPost item=customPos key=j}
    <tr> <th {$headerStyle}>{$customPost_grouptitle.$j}</th></tr>
    {foreach from=$customPos item=customValue key=customName}
-   {if (!empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
      <tr>
          <td {$labelStyle}>{$customName}</td>
          <td {$valueStyle}>{$customValue}</td>
      </tr>
-{/if}
-{/foreach}
+   {/foreach}
 {/foreach}
 {/if}
 

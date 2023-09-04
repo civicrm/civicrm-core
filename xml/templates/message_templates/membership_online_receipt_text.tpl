@@ -221,9 +221,7 @@
 
 ===========================================================
 {foreach from=$customPre item=customValue key=customName}
-{if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
  {$customName}: {$customValue}
-{/if}
 {/foreach}
 {/if}
 
@@ -234,8 +232,6 @@
 
 ===========================================================
 {foreach from=$customPost item=customValue key=customName}
-{if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
  {$customName}: {$customValue}
-{/if}
 {/foreach}
 {/if}

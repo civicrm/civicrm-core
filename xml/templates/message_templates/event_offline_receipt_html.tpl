@@ -435,7 +435,6 @@
        </th>
       </tr>
       {foreach from=$customPre item=value key=customName}
-       {if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
         <tr>
          <td {$labelStyle}>
           {$customName}
@@ -444,7 +443,6 @@
           {$value}
          </td>
         </tr>
-       {/if}
       {/foreach}
      {/if}
 
@@ -455,7 +453,6 @@
        </th>
       </tr>
       {foreach from=$customPost item=value key=customName}
-       {if ( !empty($trackingFields) and ! in_array( $customName, $trackingFields ) ) or empty($trackingFields)}
         <tr>
          <td {$labelStyle}>
           {$customName}
@@ -464,7 +461,6 @@
           {$value}
          </td>
         </tr>
-       {/if}
       {/foreach}
      {/if}
 
