@@ -4,4 +4,4 @@
     <label>{{ opt.label }}</label>
   </li>
 </ul>
-<input type="checkbox" disabled ng-if="!$ctrl.getOptions()" >
+<input type="checkbox" ng-if="!$ctrl.getOptions()" ng-checked="defaultValueContains('1')" ng-click="toggleDefaultValueItem('1') ">
