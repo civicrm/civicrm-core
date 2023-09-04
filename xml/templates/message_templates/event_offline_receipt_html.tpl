@@ -269,13 +269,13 @@
         </tr>
        {/foreach}
       {/if}
-      {if $totalTaxAmount}
+      {if {contribution.tax_amount|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}Total Tax Amount{/ts}
         </td>
         <td {$valueStyle}>
-         {$totalTaxAmount|crmMoney:$currency}
+          {contribution.tax_amount}
         </td>
        </tr>
       {/if}
@@ -284,7 +284,7 @@
          <tr>
            <td {$labelStyle}>{ts}Total Paid{/ts}</td>
            <td {$valueStyle}>
-             {if {contribution.paid_amount|boolean}}{contribution.paid_amount|crmMoney}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+             {contribution.paid_amount} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
            </td>
           </tr>
           <tr>
@@ -295,7 +295,7 @@
          <tr>
            <td {$labelStyle}>{ts}Total Amount{/ts}</td>
            <td {$valueStyle}>
-               {if {contribution.total_amount|boolean}}{contribution.total_amount|crmMoney}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+             {contribution.total_amount} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
            </td>
          </tr>
        {/if}

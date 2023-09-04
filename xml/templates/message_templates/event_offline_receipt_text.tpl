@@ -139,14 +139,14 @@
 {/foreach}
 {/if}
 
-{if $totalTaxAmount}
-{ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
+{if {contribution.tax_amount|boolean}}
+{ts}Total Tax Amount{/ts}: {contribution.tax_amount}
 {/if}
 {if {event.is_monetary|boolean}}
 
-{if {contribution.balance_amount|boolean}}{ts}Total Paid{/ts}: {if {contribution.paid_amount|boolean}}{contribution.paid_amount}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+{if {contribution.balance_amount|boolean}}{ts}Total Paid{/ts}: {contribution.paid_amount} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
 {ts}Balance{/ts}: {contribution.balance_amount}
-{else}{ts}Total Amount{/ts}: {if {contribution.total_amount|boolean}}{contribution.total_amount}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+{else}{ts}Total Amount{/ts}: {contribution.total_amount}  {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
 {/if}
 
 {if !empty($pricesetFieldsCount) }
