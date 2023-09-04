@@ -1794,13 +1794,13 @@ WHERE  civicrm_contact.id = %1 ";
   }
 
   /**
-   * Get the display name, primary email and location type of a contact.
+   * Get the display name, primary email and if they should not be emailed (do not email, on hold or deceased).
    *
    * @param int $id
    *   Id of the contact.
    *
    * @return array
-   *   Array of display_name, email if found, do_not_email or (null,null,null)
+   *   Array of display_name, email if found, (bool) should not be emailed or (null,null,null)
    */
   public static function getContactDetails($id) {
     // check if the contact type
@@ -1832,9 +1832,9 @@ ORDER BY civicrm_email.is_primary DESC";
       $doNotEmail = (bool) $dao->do_not_email;
       $onHold = (bool) $dao->on_hold;
       $isDeceased = (bool) $dao->is_deceased;
-      return [$name, $email, $doNotEmail, $onHold, $isDeceased];
+      return [$name, $email, $doNotEmail || $onHold || $isDeceased];
     }
-    return [NULL, NULL, NULL, NULL, NULL];
+    return [NULL, NULL, NULL];
   }
 
   /**
@@ -2462,7 +2462,7 @@ WHERE      civicrm_openid.openid = %1";
    *   Contact id.
    * @param bool $polite
    *   Whether to only pull an email if it's okay to send to it--that is, if it
-   *   is not on_hold and the contact is not do_not_email.
+   *   is not on_hold, the contact is not do_not_email and the contact is not deceased.
    *
    * @return string
    *   Email address if present else null
@@ -2478,7 +2478,8 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
     if ($polite) {
       $query .= '
       AND civicrm_contact.do_not_email = 0
-      AND civicrm_email.on_hold = 0';
+      AND civicrm_email.on_hold = 0
+      AND civicrm_contact.is_deceased = 0';
     }
     $p = [1 => [$contactID, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $p);
