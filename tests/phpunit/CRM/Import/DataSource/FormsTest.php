@@ -165,7 +165,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
     $templateJob = UserJob::get()
       ->addWhere('is_template', '=', 1)
       ->execute()
-      ->first();;
+      ->first();
     $this->assertNotEmpty($templateJob);
     $this->assertArrayNotHasKey('table_name', $templateJob['metadata']['DataSource']);
     $mapping = Mapping::get()
