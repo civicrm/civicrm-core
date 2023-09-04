@@ -1043,6 +1043,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
       }
       elseif (empty($params['priceSetId'])) {
+        CRM_Core_Error::deprecatedWarning('unreachable code price set is always set here - passed as a hidden field although we could just load...');
         if (!empty($params['amount'])) {
           $params['amount'] = $this->_values['fee'][$params['amount']]['value'];
         }

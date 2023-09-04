@@ -673,6 +673,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
         }
         elseif (empty($params['priceSetId'])) {
+          CRM_Core_Error::deprecatedWarning('unreachable code, prices set always passed as hidden field for monetary events');
           $params['amount'] = $this->_values['fee'][$params['amount']]['value'];
         }
         else {

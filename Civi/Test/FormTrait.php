@@ -11,6 +11,7 @@
 
 namespace Civi\Test;
 
+use Civi\Test\FormWrappers\EventFormOnline;
 use Civi\Test\FormWrappers\EventFormParticipant;
 
 /**
@@ -28,6 +29,9 @@ trait FormTrait {
   public function getTestForm($formName, $submittedValues, array $urlParameters = []) {
     if ($formName === 'CRM_Event_Form_Participant') {
       return new EventFormParticipant($formName, $submittedValues, $urlParameters);
+    }
+    if ($formName === 'CRM_Event_Form_Registration_Register') {
+      return new EventFormOnline($formName, $submittedValues, $urlParameters);
     }
     return new FormWrapper($formName, $submittedValues, $urlParameters);
   }

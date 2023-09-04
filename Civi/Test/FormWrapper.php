@@ -16,16 +16,6 @@ use Civi\Api4\Utils\ReflectionUtils;
 class FormWrapper {
 
   /**
-   * @var string
-   */
-  private $formName;
-
-  /**
-   * @var array
-   */
-  private $urlParameters;
-
-  /**
    * @var array
    */
   private $formValues;
@@ -34,6 +24,11 @@ class FormWrapper {
    * @var \CRM_Core_Form
    */
   protected $form;
+
+  /**
+   * @var \CRM_Core_Form[]
+   */
+  protected $subsequentForms;
 
   private $output;
 
@@ -62,9 +57,8 @@ class FormWrapper {
    * @param array $urlParameters
    */
   public function __construct(string $formName, array $formValues = [], array $urlParameters = []) {
-    $this->formName = $formName;
-    $this->urlParameters = $urlParameters;
     $this->formValues = $formValues;
+    $this->setFormObject($formName, $this->formValues, $urlParameters);
   }
 
   /**
@@ -75,7 +69,6 @@ class FormWrapper {
    * @return \Civi\Test\FormWrapper
    */
   public function processForm(int $state = self::SUBMITTED): self {
-    $this->setFormObject($this->formName, $this->formValues, $this->urlParameters);
     if ($state > self::CONSTRUCTED) {
       $this->form->preProcess();
     }
@@ -87,7 +80,29 @@ class FormWrapper {
     }
     if ($state > self::VALIDATED) {
       $this->form->postProcess();
+      foreach ($this->subsequentForms as $form) {
+        $form->preProcess();
+        $form->buildForm();
+        $form->postProcess();
+      }
     }
+    return $this;
+  }
+
+  /**
+   * Add another form to process.
+   *
+   * @param string $formName
+   * @param array $formValues
+   *
+   * @return $this
+   */
+  public function addSubsequentForm(string $formName, array $formValues = []): FormWrapper {
+    /* @var \CRM_Core_Form */
+    $form = new $formName();
+    $form->controller = $this->form->controller;
+    $_SESSION['_' . $this->form->controller->_name . '_container']['values'][$form->getName()] = $formValues;
+    $this->subsequentForms[$form->getName()] = $form;
     return $this;
   }
 
@@ -139,7 +154,7 @@ class FormWrapper {
    *
    * @param array $urlParameters
    */
-  private function setFormObject(string $class, array $formValues = [], array $urlParameters = []) {
+  private function setFormObject(string $class, array $formValues = [], array $urlParameters = []): void {
     $_POST = $formValues;
     $this->form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
