@@ -2498,22 +2498,17 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   messages
    * @throws \CRM_Core_Exception
    */
-  public function composeMessageArray(&$input, &$ids, &$values, $returnMessageText = TRUE) {
+  public function composeMessageArray($input, $ids, $values = [], $returnMessageText = TRUE) {
     $ids = array_merge(self::getComponentDetails($this->id), $ids);
     if (empty($ids['contact']) && isset($this->contact_id)) {
       $ids['contact'] = $this->contact_id;
     }
-
-    if (empty($this->_component)) {
-      if (!empty($ids['event'])) {
-        $this->_component = 'event';
-      }
-      else {
-        $this->_component = $input['component'] ?? 'contribute';
-      }
+    if (!empty($ids['event'])) {
+      $this->_component = 'event';
     }
-    // @todo remove strtolower - check consistency
-    $this->_component = strtolower($this->_component);
+    else {
+      $this->_component = 'contribute';
+    }
 
     // If the object is not fully populated then make sure it is - this is a more about legacy paths & cautious
     // refactoring than anything else, and has unit test coverage.
