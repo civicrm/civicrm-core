@@ -149,7 +149,7 @@ class CRM_Afform_AfformScanner {
       'is_dashlet' => FALSE,
       'is_public' => FALSE,
       'is_token' => FALSE,
-      'permission' => 'access CiviCRM',
+      'permission' => ['access CiviCRM'],
       'type' => 'system',
     ];
 
@@ -157,7 +157,7 @@ class CRM_Afform_AfformScanner {
     if ($metaFile !== NULL) {
       $r = array_merge($defaults, json_decode(file_get_contents($metaFile), 1));
       // Previous revisions of GUI allowed permission==''. array_merge() doesn't catch all forms of missing-ness.
-      if ($r['permission'] === '') {
+      if (empty($r['permission'])) {
         $r['permission'] = $defaults['permission'];
       }
       return $r;

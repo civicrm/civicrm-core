@@ -136,6 +136,8 @@
           editor.searchDisplays = getSearchDisplaysOnForm();
         }
 
+        editor.afform.permission_operator = editor.afform.permission_operator || 'AND';
+
         // Initialize undo history
         undoAction = 'initialLoad';
         undoHistory = [{

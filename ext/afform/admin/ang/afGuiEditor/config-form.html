@@ -22,8 +22,17 @@
     <label for="af_config_form_permission">
       {{:: ts('Permission') }}
     </label>
-    <input ng-model="editor.afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions}" >
-    <p class="help-block">{{:: ts('What permission is required to use this form?') }}</p>
+    <div class="form-inline" >
+      <input ng-model="editor.afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions, multiple: true}" ng-list >
+      <select ng-model="editor.afform.permission_operator" class="form-control" id="af_config_form_permission_operator" >
+        <option value="AND">{{:: ts('And') }}</option>
+        <option value="OR">{{:: ts('Or') }}</option>
+      </select>
+    </div>
+    <p class="help-block">
+      {{:: ts('What permission is required to use this form?') }}
+      {{:: ts('Join multiple permissions with "And" to require all, or "Or" to require at least one.') }}
+    </p>
   </div>
 
   <!-- Placement options do not apply to blocks -->

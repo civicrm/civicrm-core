@@ -31,10 +31,10 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
   public function getBasicDirectives() {
     return [
-      ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page', 'permission' => 'access Foobar', 'is_dashlet' => TRUE]],
-      ['mockBareFile', ['title' => '', 'description' => '', 'permission' => 'access CiviCRM', 'is_dashlet' => FALSE]],
-      ['mockFoo', ['title' => '', 'description' => '', 'permission' => 'access CiviCRM']],
-      ['mock-weird-name', ['title' => 'Weird Name', 'description' => '', 'permission' => 'access CiviCRM']],
+      ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page', 'permission' => ['access Foobar'], 'is_dashlet' => TRUE]],
+      ['mockBareFile', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM'], 'is_dashlet' => FALSE]],
+      ['mockFoo', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM']]],
+      ['mock-weird-name', ['title' => 'Weird Name', 'description' => '', 'permission' => ['access CiviCRM']]],
     ];
   }
 
@@ -85,7 +85,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $result = Civi\Api4\Afform::update()
       ->addWhere('name', '=', $formName)
       ->addValue('description', 'The temporary description')
-      ->addValue('permission', 'access foo')
+      ->addValue('permission', ['access foo', 'access bar'])
       ->addValue('is_dashlet', empty($originalMetadata['is_dashlet']))
       ->execute();
     $this->assertEquals($formName, $result[0]['name'], $message);
@@ -100,7 +100,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals('The temporary description', $get($result[0], 'description'), $message);
     $this->assertEquals(empty($originalMetadata['is_dashlet']), $get($result[0], 'is_dashlet'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
-    $this->assertEquals('access foo', $get($result[0], 'permission'), $message);
+    $this->assertEquals(['access foo', 'access bar'], $get($result[0], 'permission'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_local'), $message);

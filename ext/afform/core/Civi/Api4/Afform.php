@@ -190,6 +190,12 @@ class Afform extends Generic\AbstractEntity {
         ],
         [
           'name' => 'permission',
+          'data_type' => 'Array',
+        ],
+        [
+          'name' => 'permission_operator',
+          'data_type' => 'String',
+          'options' => \CRM_Core_SelectValues::andOr(),
         ],
         [
           'name' => 'redirect',

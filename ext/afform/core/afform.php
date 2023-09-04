@@ -136,8 +136,8 @@ function afform_civicrm_managed(&$entities, $modules) {
           'values' => [
             'name' => $afform['name'],
             'label' => $afform['navigation']['label'] ?: $afform['title'],
-            'permission' => (array) $afform['permission'],
-            'permission_operator' => 'OR',
+            'permission' => $afform['permission'],
+            'permission_operator' => $afform['permission_operator'] ?? 'AND',
             'weight' => $afform['navigation']['weight'] ?? 0,
             'url' => $afform['server_route'],
             'is_active' => 1,
@@ -443,14 +443,21 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
   if (preg_match('/^@afform:(.*)/', $permission, $m)) {
     $name = $m[1];
 
-    $afform = \Civi\Api4\Afform::get()
-      ->setCheckPermissions(FALSE)
+    $afform = \Civi\Api4\Afform::get(FALSE)
       ->addWhere('name', '=', $name)
-      ->setSelect(['permission'])
+      ->addSelect('permission', 'permission_operator')
       ->execute()
       ->first();
+    // No permissions found... this shouldn't happen but just in case, set default.
+    if ($afform && empty($afform['permission'])) {
+      $afform['permission'] = ['access CiviCRM'];
+    }
     if ($afform) {
-      $granted = CRM_Core_Permission::check($afform['permission'], $contactId);
+      $check = (array) $afform['permission'];
+      if ($afform['permission_operator'] === 'OR') {
+        $check = [$check];
+      }
+      $granted = CRM_Core_Permission::check($check, $contactId);
     }
   }
 }
