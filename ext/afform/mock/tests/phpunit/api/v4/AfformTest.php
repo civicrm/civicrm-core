@@ -31,10 +31,10 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
   public function getBasicDirectives() {
     return [
-      ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page', 'permission' => ['access Foobar'], 'is_dashlet' => TRUE]],
-      ['mockBareFile', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM'], 'is_dashlet' => FALSE]],
-      ['mockFoo', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM']]],
-      ['mock-weird-name', ['title' => 'Weird Name', 'description' => '', 'permission' => ['access CiviCRM']]],
+      ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page', 'permission' => ['access Foobar'], 'is_dashlet' => TRUE, 'submit_enabled' => TRUE]],
+      ['mockBareFile', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM'], 'is_dashlet' => FALSE, 'submit_enabled' => TRUE]],
+      ['mockFoo', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM']], 'submit_enabled' => TRUE],
+      ['mock-weird-name', ['title' => 'Weird Name', 'description' => '', 'permission' => ['access CiviCRM']], 'submit_enabled' => TRUE],
     ];
   }
 

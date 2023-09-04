@@ -123,25 +123,46 @@
 
   <!--  Submit actions are only applicable to form types with a submit button (exclude blocks and search forms) -->
   <fieldset ng-if=":: editor.afform.type === 'form'">
-    <legend>{{:: ts('Submit Actions') }}</legend>
+    <legend class="form-inline">
+      {{:: ts('Submissions') }}
+    </legend>
 
-    <div class="form-group" >
-      <label>
-        <input type="checkbox" ng-model="editor.afform.create_submission" >
-        {{:: ts('Log Submissions') }}
+    <p class="form-inline">
+      <label class="radio">
+        <input class="crm-form-radio" type="radio" name="submit_enabled" ng-model="editor.afform.submit_enabled" ng-value="true">
+        {{:: ts('Open') }}
       </label>
-      <p class="help-block">{{:: ts('Keep a log of the date, time, user, and items saved by each form submission.') }}</p>
-    </div>
+      <label class="radio">
+        <input class="crm-form-radio" type="radio" name="submit_enabled" ng-model="editor.afform.submit_enabled" ng-value="false">
+        {{:: ts('Closed') }}
+      </label>
+    </p>
 
-    <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}">
-      <label for="af_config_redirect">
-        {{:: ts('Post-Submit Page') }}
-      </label>
-      <div class="input-group">
-        <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
-        <af-gui-token-select class="input-group-addon" model="editor.afform" field="redirect"></af-gui-token-select>
+    <div ng-if="editor.afform.submit_enabled">
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" ng-model="editor.afform.create_submission" >
+          {{:: ts('Log Submissions') }}
+        </label>
+        <p class="help-block">{{:: ts('Keep a log of the date, time, user, and items saved by each form submission.') }}</p>
       </div>
-      <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
+
+      <div class="form-inline" ng-if="editor.afform.create_submission">
+        <label for="submit_limit">{{:: ts('Maximum Submissions') }}</label>
+        <input type="number" min="1" step="1" id="submit_limit" ng-model="editor.afform.submit_limit" placeholder="{{:: ts('Unlimited') }}">
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}">
+        <label for="af_config_redirect">
+          {{:: ts('Post-Submit Page') }}
+        </label>
+        <div class="input-group">
+          <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
+          <af-gui-token-select class="input-group-addon" model="editor.afform" field="redirect"></af-gui-token-select>
+        </div>
+        <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
+      </div>
     </div>
   </fieldset>
 </ng-form>

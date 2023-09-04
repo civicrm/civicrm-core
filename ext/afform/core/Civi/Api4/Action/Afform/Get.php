@@ -99,6 +99,20 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       }
     }
 
+    // Fetch submission aggregates in bulk
+    if ($afforms && $this->_isFieldSelected('submission_count', 'submission_date', 'submit_currently_open')) {
+      $afformSubmissions = \Civi\Api4\AfformSubmission::get(FALSE)
+        ->addSelect('afform_name', 'COUNT(id) AS count', 'MAX(submission_date) AS date')
+        ->addWhere('afform_name', 'IN', array_keys($afforms))
+        ->addGroupBy('afform_name')
+        ->execute()->indexBy('afform_name');
+      foreach ($afforms as $name => $record) {
+        $afforms[$name]['submission_count'] = $afformSubmissions[$name]['count'] ?? 0;
+        $afforms[$name]['submission_date'] = $afformSubmissions[$name]['date'] ?? NULL;
+        $afforms[$name]['submit_currently_open'] = ($record['submit_enabled'] ?? TRUE) && (empty($record['submit_limit']) || $record['submit_limit'] > $afforms[$name]['submission_count']);
+      }
+    }
+
     return $afforms;
   }
 
