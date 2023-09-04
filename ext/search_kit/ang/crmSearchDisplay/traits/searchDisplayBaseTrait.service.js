@@ -45,7 +45,7 @@
         // FIXME: Additional hack to directly update tabHeader for contact summary tab. It would be better to
         // decouple the contactTab code into a separate directive that checks totalCount.
         var contactTab = $element.closest('.crm-contact-page .ui-tabs-panel').attr('id');
-        if (contactTab || typeof ctrl.totalCount !== 'undefined') {
+        if (contactTab || ctrl.hasOwnProperty('totalCount')) {
           $scope.$watch('$ctrl.rowCount', function(rowCount) {
             // Update totalCount only if no user filters are set
             if (typeof rowCount === 'number' && angular.equals({}, ctrl.getAfformFilters())) {
