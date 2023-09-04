@@ -5,6 +5,18 @@
  */
 class CRM_Core_FormTest extends CiviUnitTestCase {
 
+  private $originalRequest;
+
+  public function setUp(): void {
+    $this->originalRequest = $_REQUEST;
+    parent::setUp();
+  }
+
+  public function tearDown(): void {
+    $_REQUEST = $this->originalRequest;
+    parent::tearDown();
+  }
+
   /**
    * Simulate opening various forms. All we're looking to do here is
    * see if any warnings or notices come up, the equivalent of red boxes
@@ -14,6 +26,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
    * @param string $url
    *
    * @dataProvider formList
+   * @throws \CRM_Core_Exception
    */
   public function testOpeningForms(string $url): void {
     $this->createLoggedInUser();
@@ -32,10 +45,6 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
     ob_start();
     CRM_Core_Invoke::runItem($item);
     ob_end_clean();
-
-    foreach ($parsed as $param => $dontcare) {
-      unset($_REQUEST[$param]);
-    }
   }
 
   /**
@@ -101,10 +110,6 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
     ob_start();
     CRM_Core_Invoke::runItem($item);
     ob_end_clean();
-
-    unset($_REQUEST['reset']);
-    unset($_REQUEST['action']);
-    unset($_REQUEST['sid']);
 
     $this->callAPISuccess('PriceSet', 'delete', ['id' => $priceSetId]);
   }
