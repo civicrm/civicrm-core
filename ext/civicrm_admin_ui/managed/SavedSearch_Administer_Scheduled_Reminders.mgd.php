@@ -32,7 +32,9 @@ return [
             'absolute_date',
           ],
           'orderBy' => [],
-          'where' => [],
+          'where' => [
+            ['used_for', 'IS EMPTY'],
+          ],
           'groupBy' => [],
           'join' => [],
           'having' => [],
