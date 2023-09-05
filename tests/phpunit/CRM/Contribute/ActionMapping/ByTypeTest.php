@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\ActionSchedule\AbstractMappingTest;
 use Civi\Api4\Contribution;
 use Civi\Token\TokenProcessor;
 
@@ -23,7 +24,7 @@ use Civi\Token\TokenProcessor;
  * @see \Civi\ActionSchedule\AbstractMappingTest
  * @group headless
  */
-class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\AbstractMappingTest {
+class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
 
   /**
    * Generate a list of test cases, where each is a distinct combination of
@@ -38,7 +39,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    *        - recipients: array of emails
    *        - subject: regex
    */
-  public function createTestCases() {
+  public function createTestCases(): array {
     $cs = [];
 
     $cs[] = [
@@ -211,7 +212,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   /**
    * Create a contribution record for Bob with type "Donation".
    */
-  public function addBobDonation() {
+  public function addBobDonation(): void {
     $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['bob']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
@@ -228,7 +229,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   /**
    * Schedule message delivery for contributions of type "Member Dues".
    */
-  public function scheduleForDues() {
+  public function scheduleForDues(): void {
     $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded([1]);
@@ -238,7 +239,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   /**
    * Schedule message delivery for contributions of type "Donation".
    */
-  public function scheduleForDonation() {
+  public function scheduleForDonation(): void {
     $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded([2]);
@@ -248,7 +249,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   /**
    * Schedule message delivery for any contribution, regardless of type.
    */
-  public function scheduleForAny() {
+  public function scheduleForAny(): void {
     $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded(NULL);
@@ -258,7 +259,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   /**
    * Schedule message delivery to the 'soft credit' assignee.
    */
-  public function scheduleForSoftCreditor() {
+  public function scheduleForSoftCreditor(): void {
     $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded(NULL);
@@ -438,6 +439,10 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
         'contribution_recur_id.end_date' => 'Recurring Contribution End Date',
         'contribution_recur_id.financial_type_id' => 'Financial Type ID',
         'contribution_recur_id.campaign_id' => 'Campaign ID',
+        'contribution_page_id.frontend_title' => 'Public Title',
+        'contribution_page_id.pay_later_text' => 'Pay Later Text',
+        'contribution_page_id.pay_later_receipt' => 'Pay Later Receipt',
+        'contribution_page_id.receipt_text' => 'Receipt Text',
       ], $comparison);
   }
 

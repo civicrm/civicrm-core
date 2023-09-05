@@ -201,6 +201,44 @@ case.custom_1 :' . '
   }
 
   /**
+   * Test contribution tokens pulled from the contribution page.
+   */
+  public function testContributionPageTokens(): void {
+    $tokenValues = [
+      'frontend_title' => 'public title',
+      'pay_later_text' => 'pay later text',
+      'pay_later_receipt' => '<p>first line</p><p>second line</p>',
+      'is_share' => TRUE,
+      'receipt_text' => "Text in\n non html",
+    ];
+    $tokens = [];
+    foreach (array_keys($tokenValues) as $token) {
+      $tokens[] = '{contribution.contribution_page_id.' . $token . '}';
+    }
+    $tokenString = trim($this->getTokenString($tokens));
+    $this->contributionPageCreate($tokenValues);
+
+    $tokenProcessor = $this->getTokenProcessor(['schema' => ['contributionId']]);
+    $tokenProcessor->addMessage('text', $tokenString, 'text/plain');
+    $tokenProcessor->addMessage('html', $tokenString, 'text/html');
+    $tokenProcessor->addRow(['contributionId' => $this->contributionCreate(['contribution_page_id' => $this->ids['ContributionPage']['test'], 'contact_id' => $this->individualCreate()])]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals('contribution.contribution_page_id.frontend_title :public title
+contribution.contribution_page_id.pay_later_text :pay later text
+contribution.contribution_page_id.pay_later_receipt :<p>first line</p><p>second line</p>
+contribution.contribution_page_id.is_share :1
+contribution.contribution_page_id.receipt_text :Text in
+ non html', $tokenProcessor->getRow(0)->render('html'));
+    $this->assertEquals('contribution.contribution_page_id.frontend_title :public title
+contribution.contribution_page_id.pay_later_text :pay later text
+contribution.contribution_page_id.pay_later_receipt :first linesecond line
+contribution.contribution_page_id.is_share :1
+contribution.contribution_page_id.receipt_text :Text in
+ non html', $tokenProcessor->getRow(0)->render('text'));
+
+  }
+
+  /**
    * Test that contribution recur tokens are consistently rendered.
    */
   public function testContributionRecurTokenRaw(): void {

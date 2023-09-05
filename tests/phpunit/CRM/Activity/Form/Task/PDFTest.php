@@ -18,8 +18,6 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
 
   /**
    * Test create a document with basic tokens.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateDocumentBasicTokens(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');

@@ -138,7 +138,21 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         Civi::log()->info('invalid date token');
       }
     }
+    if ($this->isHTMLTextField($field)) {
+      return $row->format('text/html')->tokens($entity, $field, (string) $fieldValue);
+    }
     $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
+  }
+
+  /**
+   * Is the text stored in html format.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isHTMLTextField(string $fieldName): bool {
+    return ($this->getMetadataForField($fieldName)['input_type'] ?? NULL) === 'RichTextEditor';
   }
 
   /**
