@@ -52,8 +52,8 @@
 
 {ts}Date{/ts}: {$receive_date|crmDate}
 {/if}
-{if !empty($is_monetary) and !empty($trxn_id)}
-{ts}Transaction #{/ts}: {$trxn_id}
+{if {contribution.trxn_id|boolean}}
+{ts}Transaction #{/ts}: {contribution.trxn_id}
 {/if}
 
 {if !empty($is_recur)}
