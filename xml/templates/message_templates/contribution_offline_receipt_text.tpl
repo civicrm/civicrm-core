@@ -1,6 +1,9 @@
 {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 
-{ts}Below you will find a receipt for this contribution.{/ts}
+{if {contribution.contribution_page_id.receipt_text|boolean}}
+{contribution.contribution_page_id.receipt_text}
+{else}{ts}Below you will find a receipt for this contribution.{/ts}
+{/if}
 
 ===========================================================
 {ts}Contribution Information{/ts}
