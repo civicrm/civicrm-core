@@ -16,6 +16,7 @@
  */
 
 use Civi\ActionSchedule\Event\MappingRegisterEvent;
+use Civi\ActionSchedule\MappingBase;
 use Civi\Core\HookInterface;
 
 /**
@@ -86,10 +87,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
    */
   public static function getEntityValueOptions(string $fieldName, array $params): array {
     $values = self::fillValues($params['values'], ['mapping_id']);
-    if (!$values['mapping_id']) {
-      return [];
-    }
-    return self::getMapping($values['mapping_id'])->getValueLabels();
+    $mapping = self::getMapping($values['mapping_id']);
+    return $mapping ? $mapping->getValueLabels() : [];
   }
 
   /**
@@ -98,10 +97,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
    */
   public static function getLimitToOptions(string $fieldName, array $params): ?array {
     $values = self::fillValues($params['values'], ['mapping_id']);
-    if (!$values['mapping_id']) {
-      return Civi\ActionSchedule\MappingBase::getLimitToOptions();
-    }
-    return self::getMapping($values['mapping_id'])::getLimitToOptions();
+    $mapping = self::getMapping($values['mapping_id']);
+    return $mapping ? $mapping::getLimitToOptions() : MappingBase::getLimitToOptions();
   }
 
   /**
@@ -110,10 +107,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
    */
   public static function getRecipientOptions(string $fieldName, array $params): ?array {
     $values = self::fillValues($params['values'], ['mapping_id']);
-    if (!$values['mapping_id']) {
-      return Civi\ActionSchedule\MappingBase::getRecipientTypes();
-    }
-    return self::getMapping($values['mapping_id'])::getRecipientTypes();
+    $mapping = self::getMapping($values['mapping_id']);
+    return $mapping ? $mapping::getRecipientTypes() : MappingBase::getRecipientTypes();
   }
 
   /**
@@ -122,10 +117,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
    */
   public static function getRecipientListingOptions(string $fieldName, array $params): ?array {
     $values = self::fillValues($params['values'], ['mapping_id', 'recipient']);
-    if (!$values['mapping_id']) {
-      return [];
-    }
-    return self::getMapping($values['mapping_id'])->getRecipientListing($values['recipient']);
+    $mapping = self::getMapping($values['mapping_id']);
+    return $mapping ? $mapping->getRecipientListing($values['recipient']) : [];
   }
 
   /**
@@ -134,10 +127,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
    */
   public static function getEntityStatusOptions(string $fieldName, array $params): array {
     $values = self::fillValues($params['values'], ['mapping_id', 'entity_value']);
-    if (!$values['mapping_id']) {
-      return [];
-    }
-    return self::getMapping($values['mapping_id'])->getStatusLabels($values['entity_value']);
+    $mapping = self::getMapping($values['mapping_id']);
+    return $mapping ? $mapping->getStatusLabels($values['entity_value']) : [];
   }
 
   /**
@@ -146,10 +137,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
    */
   public static function getActionDateOptions(string $fieldName, array $params): array {
     $values = self::fillValues($params['values'], ['mapping_id', 'entity_value']);
-    if (!$values['mapping_id']) {
-      return [];
-    }
-    return self::getMapping($values['mapping_id'])->getDateFields($values['entity_value']);
+    $mapping = self::getMapping($values['mapping_id']);
+    return $mapping ? $mapping->getDateFields($values['entity_value']) : [];
   }
 
   /**
