@@ -144,13 +144,6 @@
     <weight>660</weight>
   </item>
   <item>
-    <path>civicrm/mailing/preview</path>
-    <title>Preview Mailing</title>
-    <page_callback>CRM_Mailing_Page_Preview</page_callback>
-    <access_arguments>access CiviMail;approve mailings;create mailings;schedule mailings</access_arguments>
-    <weight>670</weight>
-  </item>
-  <item>
     <path>civicrm/mailing/report</path>
     <title>Mailing Report</title>
     <page_callback>CRM_Mailing_Page_Report</page_callback>
