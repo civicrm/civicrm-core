@@ -387,7 +387,7 @@ class CRM_Utils_Mail_Incoming {
    * @param $mail
    * @param $createContact
    */
-  public static function parseAddresses(&$addresses, $token, &$params, &$mail, $createContact = TRUE) {
+  private static function parseAddresses(&$addresses, $token, &$params, &$mail, $createContact = TRUE) {
     $params[$token] = [];
     foreach ($addresses as $address) {
       $subParam = [];
