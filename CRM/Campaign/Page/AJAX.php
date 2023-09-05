@@ -91,27 +91,14 @@ class CRM_Campaign_Page_AJAX {
 
     $id = CRM_Utils_Request::retrieve('option_group_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $status = 'fail';
-    $opValues = [];
 
     if ($id) {
-      $groupParams['id'] = $id;
-      CRM_Core_OptionValue::getValues($groupParams, $opValues);
-    }
-
-    $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
-    if ($surveyId) {
-      $survey = new CRM_Campaign_DAO_Survey();
-      $survey->id = $surveyId;
-      $survey->result_id = $id;
-      if ($survey->find(TRUE)) {
-        if ($survey->recontact_interval) {
-          $recontactInterval = CRM_Utils_String::unserialize($survey->recontact_interval);
-          foreach ($opValues as $opValId => $opVal) {
-            if (is_numeric($recontactInterval[$opVal['label']])) {
-              $opValues[$opValId]['interval'] = $recontactInterval[$opVal['label']];
-            }
-          }
-        }
+      $opValues = \Civi\Api4\OptionValue::get(FALSE)
+        ->addWhere('option_group_id', '=', $id)
+        ->addOrderBy('weight')
+        ->execute()->indexBy('id');
+      foreach ($opValues as $id => $value) {
+        $opValues[$id]['interval'] = $value['filter'];
       }
     }
 
