@@ -6,7 +6,7 @@ use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 
 class OAuthTokenFacade {
 
-  const STORAGE_TYPES = ';^OAuth(Sys|Contact)Token$;';
+  const STORAGE_TYPES = ';^OAuth(Sys|Contact|Session)Token$;';
 
   /**
    * Request and store a token.
