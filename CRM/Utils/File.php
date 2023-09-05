@@ -90,12 +90,12 @@ class CRM_Utils_File {
    * @param bool $rmdir
    * @param bool $verbose
    *
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
+  public static function cleanDir(string $target, bool $rmdir = TRUE, bool $verbose = TRUE) {
     static $exceptions = ['.', '..'];
-    if ($target == '' || $target == '/' || !$target) {
-      throw new Exception("Overly broad deletion");
+    if (!$target || $target === '/') {
+      throw new CRM_Core_Exception('Overly broad deletion');
     }
 
     if ($dh = @opendir($target)) {
@@ -894,8 +894,8 @@ HTACCESS;
       case 'image/x-png':
       case 'image/png':
       case 'image/jpg':
-        list($imageWidth, $imageHeight) = getimagesize($path);
-        list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
+        [$imageWidth, $imageHeight] = getimagesize($path);
+        [$imageThumbWidth, $imageThumbHeight] = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
         $url = "<a href=\"$url\" class='crm-image-popup'>
           <img src=\"$url\" width=$imageThumbWidth height=$imageThumbHeight/>
           </a>";
