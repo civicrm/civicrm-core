@@ -95,8 +95,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->assign('action', $this->_action);
 
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
-    if ($this->_id) {
+    if ($this->getEventID()) {
       $this->_isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
       $this->assign('eventId', $this->_id);
       $this->_single = TRUE;
@@ -384,6 +383,17 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public static function addProfileEditScripts() {
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
     CRM_UF_Page_ProfileEditor::registerSchemas(['IndividualModel', 'ParticipantModel']);
+  }
+
+  /**
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getEventID() {
+    if (!$this->_id) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
+    }
+    return $this->_id ? (int) $this->_id : NULL;
   }
 
 }

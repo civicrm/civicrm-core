@@ -10,7 +10,6 @@
 {* Step 1 of New Event Wizard, and Edit Event Info form. *}
 
 <div class="crm-block crm-form-block crm-event-manage-eventinfo-form-block">
-  {assign var=eventID value=$id}
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="top"}
   </div>
@@ -42,7 +41,7 @@
       </td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-participant_listing_id">
-      <td class="label">{$form.participant_listing_id.label} {help id="id-listing" isTemplate=$isTemplate action=$action entityId=$entityId}</td>
+      <td class="label">{$form.participant_listing_id.label} {help id="id-listing" isTemplate=$isTemplate action=$action entityId=$eventID}</td>
       <td>{$form.participant_listing_id.html}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-title">
