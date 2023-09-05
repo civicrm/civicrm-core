@@ -26,6 +26,8 @@ class SpecFormatter {
   public static function arrayToField(array $data, $entity) {
     $dataTypeName = self::getDataType($data);
 
+    $hasDefault = isset($data['default']) && $data['default'] !== '';
+    // Custom field
     if (!empty($data['custom_group_id'])) {
       $field = new CustomFieldSpec($data['name'], $entity, $dataTypeName);
       if (strpos($entity, 'Custom_') !== 0) {
@@ -57,13 +59,14 @@ class SpecFormatter {
       }
       $field->setReadonly($data['is_view']);
     }
+    // Core field
     else {
       $name = $data['name'] ?? NULL;
       $field = new FieldSpec($name, $entity, $dataTypeName);
       $field->setType('Field');
       $field->setColumnName($name);
       $field->setNullable(empty($data['required']));
-      $field->setRequired(!empty($data['required']) && empty($data['default']));
+      $field->setRequired(!empty($data['required']) && !$hasDefault && $name !== 'id');
       $field->setTitle($data['title'] ?? NULL);
       $field->setLabel($data['html']['label'] ?? NULL);
       $field->setLocalizable($data['localizable'] ?? FALSE);
@@ -93,8 +96,10 @@ class SpecFormatter {
       }
       $field->setReadonly(!empty($data['readonly']));
     }
+    if ($hasDefault) {
+      $field->setDefaultValue(FormattingUtil::convertDataType($data['default'], $dataTypeName));
+    }
     $field->setSerialize($data['serialize'] ?? NULL);
-    $field->setDefaultValue($data['default'] ?? NULL);
     $field->setDescription($data['description'] ?? NULL);
     $field->setDeprecated($data['deprecated'] ?? FALSE);
     self::setInputTypeAndAttrs($field, $data, $dataTypeName);
