@@ -90,7 +90,7 @@ class CRM_Utils_Mail_EmailProcessor {
    * @throws Exception
    * @throws CRM_Core_Exception
    */
-  public static function _process($civiMail, $dao, $is_create_activities) {
+  private static function _process($civiMail, $dao, $is_create_activities) {
     // 0 = activities; 1 = bounce;
     $usedfor = $dao->is_default;
     if ($usedfor == 0) {
