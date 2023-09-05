@@ -1320,12 +1320,11 @@ if (!CRM.vars) CRM.vars = {};
       }
     }
     return (deferred || new $.Deferred())
-      .done(function(data) {
+      .then(function(data) {
         // If the server returns an error msg call the error handler
         var status = $.isPlainObject(data) && (data.is_error || data.status === 'error') ? 'error' : 'success';
         handle(status, data);
-      })
-      .fail(function(data) {
+      }, function(data) {
         handle('error', data);
       });
   };

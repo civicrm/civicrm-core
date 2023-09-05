@@ -553,7 +553,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('String', $result[0]['columns'][0]['edit']['data_type']);
     $this->assertEquals('first_name', $result[0]['columns'][0]['edit']['value_key']);
     $this->assertEquals('update', $result[0]['columns'][0]['edit']['action']);
-    $this->assertEquals('One', $result[0]['columns'][0]['edit']['value']);
+    $this->assertEquals('One', $result[0]['data'][$result[0]['columns'][0]['edit']['value_path']]);
 
     // Contact 1 email can be updated
     $this->assertEquals('testmail@unit.test', $result[0]['columns'][1]['val']);
@@ -563,7 +563,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('String', $result[0]['columns'][1]['edit']['data_type']);
     $this->assertEquals('email', $result[0]['columns'][1]['edit']['value_key']);
     $this->assertEquals('update', $result[0]['columns'][1]['edit']['action']);
-    $this->assertEquals('testmail@unit.test', $result[0]['columns'][1]['edit']['value']);
+    $this->assertEquals('testmail@unit.test', $result[0]['data'][$result[0]['columns'][1]['edit']['value_path']]);
 
     // Contact 1 - new phone can be created
     $this->assertNull($result[0]['columns'][2]['val']);
@@ -573,7 +573,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('String', $result[0]['columns'][2]['edit']['data_type']);
     $this->assertEquals('phone', $result[0]['columns'][2]['edit']['value_key']);
     $this->assertEquals('create', $result[0]['columns'][2]['edit']['action']);
-    $this->assertNull($result[0]['columns'][2]['edit']['value']);
+    $this->assertEquals('Contact_Phone_contact_id_01.phone', $result[0]['columns'][2]['edit']['value_path']);
 
     // Contact 2 first name can be added
     $this->assertNull($result[1]['columns'][0]['val']);
@@ -583,7 +583,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('String', $result[1]['columns'][0]['edit']['data_type']);
     $this->assertEquals('first_name', $result[1]['columns'][0]['edit']['value_key']);
     $this->assertEquals('update', $result[1]['columns'][0]['edit']['action']);
-    $this->assertNull($result[1]['columns'][0]['edit']['value']);
+    $this->assertEquals('first_name', $result[1]['columns'][0]['edit']['value_path']);
 
     // Contact 2 - new email can be created
     $this->assertNull($result[1]['columns'][1]['val']);
@@ -593,7 +593,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('String', $result[1]['columns'][1]['edit']['data_type']);
     $this->assertEquals('email', $result[1]['columns'][1]['edit']['value_key']);
     $this->assertEquals('create', $result[1]['columns'][1]['edit']['action']);
-    $this->assertNull($result[1]['columns'][1]['edit']['value']);
+    $this->assertEquals('Contact_Email_contact_id_01.email', $result[1]['columns'][1]['edit']['value_path']);
 
     // Contact 2 phone can be updated
     $this->assertEquals('123456', $result[1]['columns'][2]['val']);
@@ -603,7 +603,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('String', $result[1]['columns'][2]['edit']['data_type']);
     $this->assertEquals('phone', $result[1]['columns'][2]['edit']['value_key']);
     $this->assertEquals('update', $result[1]['columns'][2]['edit']['action']);
-    $this->assertEquals('123456', $result[1]['columns'][2]['edit']['value']);
+    $this->assertEquals('123456', $result[1]['data'][$result[0]['columns'][2]['edit']['value_path']]);
   }
 
   /**
@@ -1499,7 +1499,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       'value_key' => 'first_name',
       'record' => ['id' => $contact[0]['id']],
       'action' => 'update',
-      'value' => 'One',
+      'value_path' => 'first_name',
     ];
     // Ensure first_name is editable but not organization_name or household_name
     $this->assertEquals($expectedFirstNameEdit, $result[0]['columns'][0]['edit']);
@@ -1508,7 +1508,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     // Second Individual
     $expectedFirstNameEdit['record']['id'] = $contact[1]['id'];
-    $expectedFirstNameEdit['value'] = NULL;
     $this->assertEquals($contact[1]['id'], $result[1]['key']);
     $this->assertEquals($expectedFirstNameEdit, $result[1]['columns'][0]['edit']);
     $this->assertTrue(!isset($result[1]['columns'][1]['edit']));
@@ -1517,6 +1516,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // Third contact: Organization
     $expectedFirstNameEdit['record']['id'] = $contact[2]['id'];
     $expectedFirstNameEdit['value_key'] = 'organization_name';
+    $expectedFirstNameEdit['value_path'] = 'organization_name';
     $this->assertTrue(!isset($result[2]['columns'][0]['edit']));
     $this->assertEquals($expectedFirstNameEdit, $result[2]['columns'][1]['edit']);
     $this->assertTrue(!isset($result[2]['columns'][2]['edit']));
@@ -1524,6 +1524,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // Third contact: Household
     $expectedFirstNameEdit['record']['id'] = $contact[3]['id'];
     $expectedFirstNameEdit['value_key'] = 'household_name';
+    $expectedFirstNameEdit['value_path'] = 'household_name';
     $this->assertTrue(!isset($result[3]['columns'][0]['edit']));
     $this->assertTrue(!isset($result[3]['columns'][1]['edit']));
     $this->assertEquals($expectedFirstNameEdit, $result[3]['columns'][2]['edit']);

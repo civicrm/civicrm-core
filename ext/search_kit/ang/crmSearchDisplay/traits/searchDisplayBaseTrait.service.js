@@ -201,6 +201,9 @@
       },
       formatFieldValue: function(colData) {
         return angular.isArray(colData.val) ? colData.val.join(', ') : colData.val;
+      },
+      isEditing: function(rowIndex, colIndex) {
+        return this.editing && this.editing[0] === rowIndex && this.editing[1] === colIndex;
       }
     };
   });

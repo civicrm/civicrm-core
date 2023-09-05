@@ -710,7 +710,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   /**
    * @param array $column
    * @param array $data
-   * @return array{entity: string, action: string, input_type: string, data_type: string, options: bool, serialize: bool, nullable: bool, fk_entity: string, value_key: string, record: array, value: mixed}|null
+   * @return array{entity: string, action: string, input_type: string, data_type: string, options: bool, serialize: bool, nullable: bool, fk_entity: string, value_key: string, record: array, value_path: string}|null
    */
   private function formatEditableColumn($column, $data) {
     $editable = $this->getEditableInfo($column['key']);
@@ -719,7 +719,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!empty($data[$editable['id_path']])) {
       $editable['action'] = 'update';
       $editable['record'][$editable['id_key']] = $data[$editable['id_path']];
-      $editable['value'] = $data[$editable['value_path']];
       // Ensure field is appropriate to this entity sub-type
       $field = $this->getField($column['key']);
       $entityValues = FormattingUtil::filterByPath($data, $editable['id_path'], $editable['id_key']);
@@ -730,7 +729,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     // Generate params to create new record, if applicable
     elseif ($editable['explicit_join'] && !$this->getJoin($editable['explicit_join'])['bridge']) {
       $editable['action'] = 'create';
-      $editable['value'] = NULL;
       $editable['nullable'] = FALSE;
       // Get values for creation from the join clause
       $join = $this->getQuery()->getExplicitJoin($editable['explicit_join']);
@@ -780,8 +778,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'values' => $entityValues,
       ], 0)['access'];
       if ($access) {
+        // Add currency formatting info
+        if ($editable['data_type'] === 'Money') {
+          $currencyField = $this->getCurrencyField($column['key']);
+          $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : NULL;
+          $editable['currency_format'] = \Civi::format()->money(1234.56, $currency);
+        }
         // Remove info that's for internal use only
-        \CRM_Utils_Array::remove($editable, 'id_key', 'id_path', 'value_path', 'explicit_join', 'grouping_fields');
+        \CRM_Utils_Array::remove($editable, 'id_key', 'id_path', 'explicit_join', 'grouping_fields');
         return $editable;
       }
     }
