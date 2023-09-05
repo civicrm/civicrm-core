@@ -330,6 +330,82 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
   }
 
+  private function preProcessPledge(): void {
+    //get the payment values associated with given pledge payment id OR check for payments due.
+    $this->_pledgeValues = [];
+    if ($this->_ppID) {
+      $payParams = ['id' => $this->_ppID];
+
+      CRM_Pledge_BAO_PledgePayment::retrieve($payParams, $this->_pledgeValues['pledgePayment']);
+      $this->_pledgeID = $this->_pledgeValues['pledgePayment']['pledge_id'] ?? NULL;
+      $paymentStatusID = $this->_pledgeValues['pledgePayment']['status_id'] ?? NULL;
+      $this->_id = $this->_pledgeValues['pledgePayment']['contribution_id'] ?? NULL;
+
+      //get all status
+      $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+      if (!($paymentStatusID == array_search('Pending', $allStatus) || $paymentStatusID == array_search('Overdue', $allStatus))) {
+        CRM_Core_Error::statusBounce(ts("Pledge payment status should be 'Pending' or  'Overdue'."));
+      }
+
+      //get the pledge values associated with given pledge payment.
+
+      $ids = [];
+      $pledgeParams = ['id' => $this->_pledgeID];
+      CRM_Pledge_BAO_Pledge::getValues($pledgeParams, $this->_pledgeValues, $ids);
+      $this->assign('ppID', $this->_ppID);
+    }
+    else {
+      // Not making a pledge payment, so if adding a new contribution we should check if pledge payment(s) are due for this contact so we can alert the user. CRM-5206
+      if (isset($this->_contactID)) {
+        $contactPledges = CRM_Pledge_BAO_Pledge::getContactPledges($this->_contactID);
+
+        if (!empty($contactPledges)) {
+          $payments = $paymentsDue = NULL;
+          $multipleDue = FALSE;
+          foreach ($contactPledges as $key => $pledgeId) {
+            $payments = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeId);
+            if ($payments) {
+              if ($paymentsDue) {
+                $multipleDue = TRUE;
+                break;
+              }
+              else {
+                $paymentsDue = $payments;
+              }
+            }
+          }
+          if ($multipleDue) {
+            // Show link to pledge tab since more than one pledge has a payment due
+            $pledgeTab = CRM_Utils_System::url('civicrm/contact/view',
+              "reset=1&force=1&cid={$this->_contactID}&selectedChild=pledge"
+            );
+            CRM_Core_Session::setStatus(ts('This contact has pending or overdue pledge payments. <a href="%1">Click here to view their Pledges tab</a> and verify whether this contribution should be applied as a pledge payment.', [1 => $pledgeTab]), ts('Notice'), 'alert');
+          }
+          elseif ($paymentsDue) {
+            // Show user link to oldest Pending or Overdue pledge payment
+            $ppAmountDue = CRM_Utils_Money::format($payments['amount'], $payments['currency']);
+            $ppSchedDate = CRM_Utils_Date::customFormat(CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment', $payments['id'], 'scheduled_date'));
+            if ($this->_mode) {
+              $ppUrl = CRM_Utils_System::url('civicrm/contact/view/contribution',
+                "reset=1&action=add&cid={$this->_contactID}&ppid={$payments['id']}&context=pledge&mode=live"
+              );
+            }
+            else {
+              $ppUrl = CRM_Utils_System::url('civicrm/contact/view/contribution',
+                "reset=1&action=add&cid={$this->_contactID}&ppid={$payments['id']}&context=pledge"
+              );
+            }
+            CRM_Core_Session::setStatus(ts('This contact has a pending or overdue pledge payment of %2 which is scheduled for %3. <a href="%1">Click here to enter a pledge payment</a>.', [
+              1 => $ppUrl,
+              2 => $ppAmountDue,
+              3 => $ppSchedDate,
+            ]), ts('Notice'), 'alert');
+          }
+        }
+      }
+    }
+  }
+
   /**
    * Set default values.
    *
