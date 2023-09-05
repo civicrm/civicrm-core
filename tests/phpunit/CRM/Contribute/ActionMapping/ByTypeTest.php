@@ -185,6 +185,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
       'title' => 'Campaign',
       'name' => 'big_campaign',
     ]);
+    $contributionPage = $this->contributionPageCreate(['receipt_text' => 'Thank you!']);
     $this->ids['Contribution']['alice'] = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['alice']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
@@ -199,6 +200,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
       'cancel_date' => '2021-08-09',
       'contribution_status_id' => 1,
       'campaign_id' => $campaignID,
+      'contribution_page_id' => $contributionPage['id'],
       'soft_credit' => [
         '1' => [
           'contact_id' => $this->contacts['carol']['id'],
@@ -321,7 +323,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
       balance_amount = {contribution.balance_amount}
       campaign_id = {contribution.campaign_id}
       campaign name = {contribution.campaign_id:name}
-      campaign label = {contribution.campaign_id:label}';
+      campaign label = {contribution.campaign_id:label}
+      receipt text = {contribution.contribution_page_id.receipt_text}';
 
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
@@ -350,6 +353,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
       'campaign_id = 1',
       'campaign name = big_campaign',
       'campaign label = Campaign',
+      'receipt text = Thank you!',
     ];
     $this->mut->checkMailLog($expected);
 
