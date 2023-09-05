@@ -188,10 +188,16 @@ class TokenRow {
       'id' => $entityID,
     ]);
     $fieldValue = \CRM_Utils_Array::value($customFieldName, $record, '');
-
+    $originalValue = $fieldValue;
     // format the raw custom field value into proper display value
     if (isset($fieldValue)) {
       $fieldValue = (string) \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
+    }
+    // This is a bit of a clumsy wy of detecting a link field but if you look into the displayValue
+    // function you will understand.... By assigning the url as a plain token the text version can
+    // use it as plain text (not html re-converted which kinda works but not in subject lines)
+    if (is_string($fieldValue) && is_string($originalValue) && strpos($fieldValue, '<a href') !== FALSE && strpos($originalValue, '<a href') === FALSE) {
+      $this->format('text/plain')->tokens($entity, $customFieldName, $originalValue);
     }
 
     return $this->format('text/html')->tokens($entity, $customFieldName, $fieldValue);
@@ -292,7 +298,8 @@ class TokenRow {
         foreach ($htmlTokens as $entity => $values) {
           foreach ($values as $field => $value) {
             if (!$value instanceof \DateTime && !$value instanceof Money) {
-              $value = html_entity_decode(strip_tags($value));
+              // rtrim removes trailing lines from <p> tags.
+              $value = rtrim(\CRM_Utils_String::htmlToText($value));
             }
             if (!isset($textTokens[$entity][$field])) {
               $textTokens[$entity][$field] = $value;
