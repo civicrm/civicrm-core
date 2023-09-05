@@ -227,11 +227,13 @@ case.custom_1 :' . '
 contribution.contribution_page_id.pay_later_text :pay later text
 contribution.contribution_page_id.pay_later_receipt :<p>first line</p><p>second line</p>
 contribution.contribution_page_id.is_share :1
-contribution.contribution_page_id.receipt_text :Text in
+contribution.contribution_page_id.receipt_text :Text in<br />
  non html', $tokenProcessor->getRow(0)->render('html'));
     $this->assertEquals('contribution.contribution_page_id.frontend_title :public title
 contribution.contribution_page_id.pay_later_text :pay later text
-contribution.contribution_page_id.pay_later_receipt :first linesecond line
+contribution.contribution_page_id.pay_later_receipt :first line
+
+second line
 contribution.contribution_page_id.is_share :1
 contribution.contribution_page_id.receipt_text :Text in
  non html', $tokenProcessor->getRow(0)->render('text'));
