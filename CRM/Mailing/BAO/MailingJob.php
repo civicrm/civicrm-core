@@ -365,20 +365,18 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   /**
    * Split the parent job into n number of child job based on an offset.
    * If null or 0 , we create only one child job
+   *
    * @param int $offset
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function split_job($offset = 200) {
+  public function split_job($offset = 200): void {
     $recipient_count = CRM_Mailing_BAO_MailingRecipients::mailingSize($this->mailing_id);
-
-    $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
-
-    $dao = new CRM_Core_DAO();
-
-    $sql = "
+    $sql = '
 INSERT INTO civicrm_mailing_job
 (`mailing_id`, `scheduled_date`, `status`, `job_type`, `parent_id`, `job_offset`, `job_limit`)
 VALUES (%1, %2, %3, %4, %5, %6, %7)
-";
+';
     $params = [
       1 => [$this->mailing_id, 'Integer'],
       2 => [$this->scheduled_date, 'String'],
@@ -398,9 +396,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     }
     else {
       // Creating 'child jobs'
-      $scheduled_unixtime = strtotime($this->scheduled_date);
-      for ($i = 0, $s = 0; $i < $recipient_count; $i = $i + $offset, $s++) {
-        $params[2][0] = date('Y-m-d H:i:s', $scheduled_unixtime + $s);
+      $scheduled_unix_time = strtotime($this->scheduled_date);
+      for ($i = 0, $s = 0; $i < $recipient_count; $i += $offset, $s++) {
+        $params[2][0] = date('Y-m-d H:i:s', $scheduled_unix_time + $s);
         $params[6][0] = $i;
         $params[7][0] = $offset;
         CRM_Core_DAO::executeQuery($sql, $params);
