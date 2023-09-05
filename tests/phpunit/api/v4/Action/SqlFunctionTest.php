@@ -49,9 +49,9 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->setDefaults(['contact_id' => $cid, 'financial_type_id:name' => 'Donation'])
       ->setRecords([
         ['total_amount' => 100, 'receive_date' => '2020-01-01'],
-        ['total_amount' => 200, 'receive_date' => '2020-01-01'],
-        ['total_amount' => 300, 'receive_date' => '2020-01-01', 'financial_type_id:name' => 'Member Dues'],
-        ['total_amount' => 400, 'receive_date' => '2020-01-01', 'financial_type_id:name' => 'Event Fee'],
+        ['total_amount' => 200, 'receive_date' => '2020-02-01'],
+        ['total_amount' => 300, 'receive_date' => '2020-03-01', 'financial_type_id:name' => 'Member Dues'],
+        ['total_amount' => 400, 'receive_date' => '2020-04-01', 'financial_type_id:name' => 'Event Fee'],
       ])
       ->execute();
 
@@ -89,17 +89,54 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       $this->assertTrue(is_int($type));
     }
 
-    // Test GROUP_CONCAT with a CONCAT as well
+    // Test GROUP_CONCAT with functions
     $agg = Contribution::get(FALSE)
       ->addGroupBy('contact_id')
       ->addWhere('contact_id', '=', $cid)
       ->addSelect("GROUP_CONCAT(CONCAT(financial_type_id, ', ', contact_id, ', ', total_amount))")
+      ->addSelect("GROUP_CONCAT((financial_type_id = 1)) AS is_donation")
+      ->addSelect("GROUP_CONCAT(MONTH(receive_date):label) AS months")
       ->addSelect('COUNT(*) AS count')
       ->execute()
       ->first();
 
     $this->assertTrue(4 === $agg['count']);
     $this->assertContains('1, ' . $cid . ', 100.00', $agg['GROUP_CONCAT:financial_type_id_contact_id_total_amount']);
+    $this->assertEquals([TRUE, TRUE, FALSE, FALSE], $agg['is_donation']);
+    $this->assertEquals(['January', 'February', 'March', 'April'], $agg['months']);
+  }
+
+  public function testGroupConcatUnique(): void {
+    $cid1 = $this->createTestRecord('Contact')['id'];
+    $cid2 = $this->createTestRecord('Contact')['id'];
+
+    $this->saveTestRecords('Address', [
+      'records' => [
+        ['contact_id' => $cid1, 'city' => 'A', 'location_type_id' => 1],
+        ['contact_id' => $cid1, 'city' => 'A', 'location_type_id' => 2],
+        ['contact_id' => $cid1, 'city' => 'B', 'location_type_id' => 3],
+      ],
+    ]);
+    $this->saveTestRecords('Email', [
+      'records' => [
+        ['contact_id' => $cid1, 'email' => 'test1@example.org', 'location_type_id' => 1],
+        ['contact_id' => $cid1, 'email' => 'test2@example.org', 'location_type_id' => 2],
+      ],
+    ]);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('GROUP_CONCAT(UNIQUE address.id) AS address_id')
+      ->addSelect('GROUP_CONCAT(UNIQUE address.city) AS address_city')
+      ->addSelect('GROUP_CONCAT(UNIQUE email.email) AS email')
+      ->addGroupBy('id')
+      ->addJoin('Address AS address', 'LEFT', ['id', '=', 'address.contact_id'])
+      ->addJoin('Email AS email', 'LEFT', ['id', '=', 'email.contact_id'])
+      ->addOrderBy('id')
+      ->addWhere('id', 'IN', [$cid1, $cid2])
+      ->execute();
+
+    $this->assertEquals(['A', 'A', 'B'], $result[0]['address_city']);
+    $this->assertEquals(['test1@example.org', 'test2@example.org'], $result[0]['email']);
   }
 
   public function testGroupHaving(): void {

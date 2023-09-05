@@ -108,7 +108,7 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
-    $query = \CRM_Utils_SQL_Select::from("{$this->getEntityTable()} e")->param($defaultParams);
+    $query = \CRM_Utils_SQL_Select::from("civicrm_activity e")->param($defaultParams);
     $query['casAddlCheckFrom'] = 'civicrm_activity e';
     $query['casContactIdField'] = 'r.contact_id';
     $query['casEntityIdField'] = 'e.id';

@@ -145,9 +145,12 @@ abstract class SqlExpression {
    * Renders expression to a sql string, replacing field names with column names.
    *
    * @param \Civi\Api4\Query\Api4Query $query
+   * @param bool $includeAlias
    * @return string
    */
-  abstract public function render(Api4Query $query): string;
+  public function render(Api4Query $query, bool $includeAlias = FALSE): string {
+    return $this->expr . ($includeAlias ? " AS `{$this->getAlias()}`" : '');
+  }
 
   /**
    * @return string
