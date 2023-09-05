@@ -29,3 +29,19 @@ function scheduled_communications_civicrm_install(): void {
 function scheduled_communications_civicrm_enable(): void {
   _scheduled_communications_civix_civicrm_enable();
 }
+
+/**
+ * Implements hook_civicrm_post().
+ */
+function scheduled_communications_civicrm_post($op, $entity, $id, $object): void {
+  // Delete scheduled communications linked to a deleted saved search
+  if ($entity === 'SavedSearch' && $op === 'delete' && $id) {
+    civicrm_api4('ActionSchedule', 'delete', [
+      'checkPermissions' => FALSE,
+      'where' => [
+        ['mapping_id', '=', 'saved_search'],
+        ['entity_value', '=', $id],
+      ],
+    ]);
+  }
+}
