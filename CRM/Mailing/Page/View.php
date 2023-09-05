@@ -20,13 +20,6 @@
  */
 class CRM_Mailing_Page_View extends CRM_Core_Page {
 
-  /**
-   * Signal to Flexmailer that this version of the class is usable.
-   *
-   * @var bool
-   */
-  const USES_MAILING_PREVIEW_API = 1;
-
   protected $_mailingID;
   protected $_mailing;
   protected $_contactID;
