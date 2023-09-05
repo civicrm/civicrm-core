@@ -38,7 +38,7 @@ class CRM_Utils_Mail_EmailProcessor {
     $dao->find();
 
     while ($dao->fetch()) {
-      self::_process(TRUE, $dao, $is_create_activities);
+      self::_process($dao, (bool) $is_create_activities);
     }
   }
 
@@ -58,7 +58,7 @@ class CRM_Utils_Mail_EmailProcessor {
     $found = FALSE;
     while ($dao->fetch()) {
       $found = TRUE;
-      self::_process(FALSE, $dao, TRUE);
+      self::_process($dao, TRUE);
     }
     if (!$found) {
       throw new CRM_Core_Exception(ts('No mailboxes have been configured for Email to Activity Processing'));
@@ -67,7 +67,6 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * @param $civiMail
    * @param CRM_Core_DAO_MailSettings $dao
    * @param bool $is_create_activities
    *   Create activities.
@@ -75,7 +74,7 @@ class CRM_Utils_Mail_EmailProcessor {
    * @throws Exception
    * @throws CRM_Core_Exception
    */
-  private static function _process($civiMail, $dao, $is_create_activities) {
+  private static function _process($dao, bool $is_create_activities) {
     // 0 = activities; 1 = bounce;
     $usedfor = $dao->is_default;
     if ($usedfor == 0) {
