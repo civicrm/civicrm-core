@@ -103,11 +103,6 @@ class CRM_Utils_Mail_EmailProcessor {
     $verpSeparator = preg_quote($config->verpSeparator ?? '');
     $twoDigitStringMin = $verpSeparator . '(\d+)' . $verpSeparator . '(\d+)';
     $twoDigitString = $twoDigitStringMin . $verpSeparator;
-    $threeDigitString = $twoDigitString . '(\d+)' . $verpSeparator;
-
-    // FIXME: legacy regexen to handle CiviCRM 2.1 address patterns, with domain id and possible VERP part
-    $commonRegex = '/^' . preg_quote($dao->localpart ?? '') . '(b|bounce|c|confirm|o|optOut|r|reply|re|e|resubscribe|u|unsubscribe)' . $threeDigitString . '([0-9a-f]{16})(-.*)?@' . preg_quote($dao->domain ?? '') . '$/';
-    $subscrRegex = '/^' . preg_quote($dao->localpart ?? '') . '(s|subscribe)' . $twoDigitStringMin . '@' . preg_quote($dao->domain ?? '') . '$/';
 
     // a common-for-all-actions regex to handle CiviCRM 2.2 address patterns
     $regex = '/^' . preg_quote($dao->localpart ?? '') . '(b|c|e|o|r|u)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain ?? '') . '$/';
@@ -141,30 +136,21 @@ class CRM_Utils_Mail_EmailProcessor {
         if ($usedfor == 1) {
           foreach ($mail->to as $address) {
             if (preg_match($regex, ($address->email ?? ''), $matches)) {
-              [$match, $action, $job, $queue, $hash] = $matches;
-              break;
-              // FIXME: the below elseifs should be dropped when we drop legacy support
-            }
-            elseif (preg_match($commonRegex, ($address->email ?? ''), $matches)) {
-              [$match, $action, $_, $job, $queue, $hash] = $matches;
-              break;
-            }
-            elseif (preg_match($subscrRegex, ($address->email ?? ''), $matches)) {
-              [$match, $action, $_, $job] = $matches;
+              [, $action, $job, $queue, $hash] = $matches;
               break;
             }
           }
 
           // CRM-5471: if $matches is empty, it still might be a soft bounce sent
           // to another address, so scan the body for ‘Return-Path: …bounce-pattern…’
-          if (!$matches and preg_match($rpRegex, ($mail->generateBody() ?? ''), $matches)) {
-            [$match, $action, $job, $queue, $hash] = $matches;
+          if (!$matches && preg_match($rpRegex, ($mail->generateBody() ?? ''), $matches)) {
+            [, $action, $job, $queue, $hash] = $matches;
           }
 
           // if $matches is still empty, look for the X-CiviMail-Bounce header
           // CRM-9855
-          if (!$matches and preg_match($rpXheaderRegex, ($mail->generateBody() ?? ''), $matches)) {
-            [$match, $action, $job, $queue, $hash] = $matches;
+          if (!$matches && preg_match($rpXheaderRegex, ($mail->generateBody() ?? ''), $matches)) {
+            [, $action, $job, $queue, $hash] = $matches;
           }
           // With Mandrilla, the X-CiviMail-Bounce header is produced by generateBody
           // is base64 encoded
@@ -176,7 +162,7 @@ class CRM_Utils_Mail_EmailProcessor {
                 $p_file = $v_part->__get('fileName');
                 $c_file = file_get_contents($p_file);
                 if (preg_match($rpXheaderRegex, ($c_file ?? ''), $matches)) {
-                  [$match, $action, $job, $queue, $hash] = $matches;
+                  [, $action, $job, $queue, $hash] = $matches;
                 }
               }
             }
@@ -184,7 +170,7 @@ class CRM_Utils_Mail_EmailProcessor {
 
           // if all else fails, check Delivered-To for possible pattern
           if (!$matches and preg_match($regex, ($mail->getHeader('Delivered-To') ?? ''), $matches)) {
-            [$match, $action, $job, $queue, $hash] = $matches;
+            [, $action, $job, $queue, $hash] = $matches;
           }
         }
 
@@ -233,13 +219,11 @@ class CRM_Utils_Mail_EmailProcessor {
         $replyTo = $mail->getHeader('Reply-To') ? $mail->getHeader('Reply-To') : ($mail->from ? $mail->from->email : "");
 
         // handle the action by passing it to the proper API call
-        // FIXME: leave only one-letter cases when dropping legacy support
         if (!empty($action)) {
           $result = NULL;
 
           switch ($action) {
             case 'b':
-            case 'bounce':
               $text = '';
               if ($mail->body instanceof ezcMailText) {
                 $text = $mail->body->text;
@@ -253,18 +237,18 @@ class CRM_Utils_Mail_EmailProcessor {
 
               if (
                 empty($text) &&
-                $mail->subject == "Delivery Status Notification (Failure)"
+                $mail->subject === 'Delivery Status Notification (Failure)'
               ) {
                 // Exchange error - CRM-9361
                 foreach ($mail->body->getParts() as $part) {
                   if ($part instanceof ezcMailDeliveryStatus) {
                     foreach ($part->recipients as $rec) {
-                      if ($rec["Status"] == "5.1.1") {
-                        if (isset($rec["Description"])) {
-                          $text = $rec["Description"];
+                      if ($rec['Status'] === '5.1.1') {
+                        if (isset($rec['Description'])) {
+                          $text = $rec['Description'];
                         }
                         else {
-                          $text = $rec["Status"] . " Delivery to the following recipients failed";
+                          $text = $rec['Status'] . ' Delivery to the following recipients failed';
                         }
                         break;
                       }
@@ -302,7 +286,6 @@ class CRM_Utils_Mail_EmailProcessor {
               break;
 
             case 'c':
-            case 'confirm':
               // CRM-7921
               $params = [
                 'contact_id' => $job,
@@ -314,7 +297,6 @@ class CRM_Utils_Mail_EmailProcessor {
               break;
 
             case 'o':
-            case 'optOut':
               $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
@@ -325,7 +307,6 @@ class CRM_Utils_Mail_EmailProcessor {
               break;
 
             case 'r':
-            case 'reply':
               // instead of text and HTML parts (4th and 6th params) send the whole email as the last param
               $params = [
                 'job_id' => $job,
@@ -341,8 +322,6 @@ class CRM_Utils_Mail_EmailProcessor {
               break;
 
             case 'e':
-            case 're':
-            case 'resubscribe':
               $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
@@ -353,7 +332,6 @@ class CRM_Utils_Mail_EmailProcessor {
               break;
 
             case 's':
-            case 'subscribe':
               $params = [
                 'email' => $mail->from->email,
                 'group_id' => $job,
@@ -363,7 +341,6 @@ class CRM_Utils_Mail_EmailProcessor {
               break;
 
             case 'u':
-            case 'unsubscribe':
               $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
