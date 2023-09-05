@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Api4\Address;
+use Civi\Api4\Event;
 use Civi\Api4\LineItem;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Participant;
@@ -715,19 +716,23 @@ London,',
    * @throws \CRM_Core_Exception
    */
   public function testTransferParticipantRegistration(): void {
-    //Register a contact to a sample event.
-    $this->createEventOrder();
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => 'id']);
-    //Check line item count of the contribution id before transfer.
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
-    $this->assertCount(2, $lineItems);
-    $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $contribution['id'], 'participant_id', 'contribution_id');
-    /** @var CRM_Event_Form_SelfSvcTransfer $form */
-    $form = $this->getFormObject('CRM_Event_Form_SelfSvcTransfer');
-    $toContactId = $this->individualCreate();
     $mut = new CiviMailUtils($this);
     $this->swapMessageTemplateForInput('event_online_receipt', '{domain.name} {contact.first_name}');
-    $form->transferParticipantRegistration($toContactId, $participantId);
+
+    $this->createEventOrder();
+    Event::update()->addWhere('id', '=', $this->getEventID())->setValues([
+      'start_date' => 'next week',
+      'allow_selfcancelxfer' => TRUE,
+    ])->execute();
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => 'id']);
+    $toContactID = $this->individualCreate([], 'to');
+    $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $contribution['id'], 'participant_id', 'contribution_id');
+    $this->getTestForm('CRM_Event_Form_SelfSvcTransfer', [
+      'contact_id' => $toContactID,
+    ], [
+      'pid' => $participantId,
+      'is_backoffice' => 1,
+    ])->processForm();
     $mut->checkAllMailLog(['Default Domain Name Anthony']);
     $mut->clearMessages();
     $this->revertTemplateToReservedTemplate();
@@ -737,11 +742,11 @@ London,',
       'return' => ['transferred_to_contact_id'],
       'id' => $participantId,
     ]);
-    $this->assertEquals($participant['transferred_to_contact_id'], $toContactId);
+    $this->assertEquals($participant['transferred_to_contact_id'], $toContactID);
 
     //Assert $toContactId has a new registration.
     $toParticipant = $this->callAPISuccess('Participant', 'getsingle', [
-      'contact_id' => $toContactId,
+      'contact_id' => $toContactID,
     ]);
     $this->assertEquals($toParticipant['participant_registered_by_id'], $participantId);
 

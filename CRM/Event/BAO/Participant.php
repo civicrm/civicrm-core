@@ -1858,7 +1858,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
         return $details;
       }
       // Verify participant status is one that can be self-cancelled
-      if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist'])) {
+      if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist', 'Pending from incomplete transaction'])) {
         $details['eligible'] = FALSE;
         $details['ineligible_message'] = ts('You cannot transfer or cancel your registration for %1 as you are not currently registered for this event.', [1 => $eventTitle]);
         return $details;
