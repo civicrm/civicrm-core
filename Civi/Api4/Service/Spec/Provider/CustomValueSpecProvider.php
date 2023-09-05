@@ -31,8 +31,10 @@ class CustomValueSpecProvider extends \Civi\Core\Service\AutoService implements 
     $idField->setType('Field');
     $idField->setInputType('Number');
     $idField->setColumnName('id');
+    $idField->setNullable('false');
     $idField->setTitle(ts('Custom Value ID'));
     $idField->setReadonly(TRUE);
+    $idField->setNullable(FALSE);
     $spec->addFieldSpec($idField);
 
     $entityField = new FieldSpec('entity_id', $spec->getEntity(), 'Integer');
@@ -43,6 +45,7 @@ class CustomValueSpecProvider extends \Civi\Core\Service\AutoService implements 
     $entityField->setRequired($action === 'create');
     $entityField->setFkEntity('Contact');
     $entityField->setReadonly(TRUE);
+    $entityField->setNullable(FALSE);
     $entityField->setInputType('EntityRef');
     $spec->addFieldSpec($entityField);
   }

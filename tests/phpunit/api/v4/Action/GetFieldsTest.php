@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\ACLEntityRole;
 use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Campaign;
@@ -68,6 +69,13 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     // Check suffixes
     $this->assertEquals(['name', 'label', 'icon'], $fields['contact_type']['suffixes']);
     $this->assertEquals(['name', 'label', 'icon'], $fields['contact_sub_type']['suffixes']);
+
+    // Check `required` and `nullable`
+    $this->assertFalse($fields['is_deleted']['required']);
+    $this->assertFalse($fields['is_deleted']['nullable']);
+    $this->assertFalse($fields['id']['nullable']);
+    $this->assertFalse($fields['id']['required']);
+    $this->assertNull($fields['id']['default_value']);
   }
 
   public function testComponentFields(): void {
@@ -95,6 +103,15 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->indexBy('name');
 
     $this->assertEquals('Email', $createFields['email']['input_type']);
+    $this->assertIsInt($createFields['location_type_id']['default_value']);
+
+    // Check `required` and `nullable`
+    $this->assertFalse($createFields['is_primary']['required']);
+    $this->assertFalse($createFields['is_primary']['nullable']);
+    $this->assertFalse($createFields['is_primary']['default_value']);
+    $this->assertFalse($createFields['id']['required']);
+    $this->assertFalse($createFields['id']['nullable']);
+    $this->assertNull($createFields['id']['default_value']);
   }
 
   public function testInternalPropsAreHidden(): void {
@@ -131,12 +148,32 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->indexBy('name');
 
     $this->assertFalse($actFields['id']['required']);
+    $this->assertFalse($actFields['id']['nullable']);
     $this->assertTrue($actFields['activity_type_id']['required']);
     $this->assertFalse($actFields['activity_type_id']['nullable']);
+    $this->assertNull($actFields['activity_type_id']['default_value']);
+    $this->assertFalse($actFields['is_deleted']['required']);
+    $this->assertFalse($actFields['is_deleted']['nullable']);
+    $this->assertFalse($actFields['is_deleted']['default_value']);
     $this->assertFalse($actFields['subject']['required']);
     $this->assertTrue($actFields['subject']['nullable']);
     $this->assertFalse($actFields['subject']['deprecated']);
     $this->assertTrue($actFields['phone_id']['deprecated']);
+
+    $getFields = Activity::getFields(FALSE)
+      ->setAction('get')
+      ->execute()->indexBy('name');
+
+    $this->assertFalse($getFields['is_deleted']['required']);
+    $this->assertFalse($getFields['is_deleted']['nullable']);
+    $this->assertFalse($getFields['is_deleted']['default_value']);
+
+    $aclFields = ACLEntityRole::getFields(FALSE)
+      ->setAction('create')
+      ->execute()->indexBy('name');
+    $this->assertTrue($aclFields['is_active']['default_value']);
+    $this->assertFalse($aclFields['is_active']['nullable']);
+    $this->assertFalse($aclFields['is_active']['required']);
   }
 
   public function testGetSuffixes(): void {

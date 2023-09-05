@@ -91,9 +91,6 @@ class SpecGatherer extends AutoService {
     $DAOFields = $this->getDAOFields($entity);
 
     foreach ($DAOFields as $DAOField) {
-      if ($DAOField['name'] == 'id' && $action == 'create') {
-        $DAOField['required'] = FALSE;
-      }
       if (array_key_exists('contactType', $DAOField) && $spec->getValue('contact_type') && $DAOField['contactType'] != $spec->getValue('contact_type')) {
         continue;
       }
