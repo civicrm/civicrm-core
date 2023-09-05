@@ -158,8 +158,7 @@ class CRM_Utils_Mail_EmailProcessor {
           }
         }
 
-        // preseve backward compatibility
-        if ($usedfor == 0 || $is_create_activities) {
+        if ($is_create_activities) {
           // Mail account may have 'Skip emails which do not have a Case ID
           // or Case hash' option, if its enabled and email is not related
           // to cases - then we need to put email to ignored folder.
