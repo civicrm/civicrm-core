@@ -20,6 +20,12 @@
  * This class generates form components for processing Entity.
  */
 class CRM_Core_Form_RecurringEntity {
+
+  private static $preDeleteFunction = [
+    'Event' => 'CRM_Event_Form_ManageEvent_Repeat::checkRegistrationForEvents',
+    'Activity' => NULL,
+  ];
+
   /**
    *  Current entity id
    * @var int
@@ -317,6 +323,7 @@ class CRM_Core_Form_RecurringEntity {
    *
    * @param array $params
    * @param string $type
+   *   Redundant - always the same as `$params['entity_table']`
    * @param array $linkedEntities
    *
    * @throws \CRM_Core_Exception
@@ -393,59 +400,22 @@ class CRM_Core_Form_RecurringEntity {
           }
         }
 
-        // FIXME: This is the worst way possible to convert a table name to an api entity name
-        $apiEntityType = explode("_", $type);
-        if (!empty($apiEntityType[1])) {
-          $apiType = $apiEntityType[1];
-        }
-        //Delete relations if any from recurring entity tables before inserting new relations for this entity id
+        // Delete relations if any from recurring entity tables before inserting new relations for this entity id
         if ($params['entity_id']) {
-          //If entity has any pre delete function, consider that first
-          if (!empty(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func']) &&
-            !empty(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'])
-          ) {
-            // FIXME: This calls `CRM_Event_Form_ManageEvent_Repeat::checkRegistrationForEvents`
-            // which then sets the static variable `CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted`
-            // which is then accessed below and used to delete events with no registrations.
-            // I can't think of a worse way to pass a variable back from a function.
-            call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], [$params['entity_id']]);
+          $entityType = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($type);
+          // Use pre-delete function for events to exclude those with registered participants
+          if (!empty(self::$preDeleteFunction[$entityType])) {
+            $itemsToDelete = call_user_func_array(self::$preDeleteFunction[$entityType], [$params['entity_id']]);
           }
-          //Ready to execute delete on entities if it has delete function set
-          if (!empty(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func']) &&
-            !empty(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'])
-          ) {
-            //Check if pre delete function has some ids to be deleted
-            if (!empty(CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted)) {
-              foreach (CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted as $eid) {
-                $result = civicrm_api3(
-                  ucfirst(strtolower($apiType)),
-                  CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'],
-                  [
-                    'sequential' => 1,
-                    'id' => $eid,
-                  ]
-                );
-                if ($result['error']) {
-                  CRM_Core_Error::statusBounce(ts('Error creating recurring list'));
-                }
-              }
-            }
-            else {
-              $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['entity_id'], $params['entity_table'], FALSE);
-              foreach ($getRelatedEntities as $key => $value) {
-                $result = civicrm_api3(
-                  ucfirst(strtolower($apiType)),
-                  CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func'],
-                  [
-                    'sequential' => 1,
-                    'id' => $value['id'],
-                  ]
-                );
-                if ($result['error']) {
-                  CRM_Core_Error::statusBounce(ts('Error creating recurring list'));
-                }
-              }
-            }
+          else {
+            $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($params['entity_id'], $params['entity_table'], FALSE);
+            $itemsToDelete = array_column($getRelatedEntities, 'id');
+          }
+          if ($itemsToDelete) {
+            civicrm_api4($entityType, 'delete', [
+              'checkPermissions' => FALSE,
+              'where' => [['id', 'IN', $itemsToDelete]],
+            ]);
           }
 
           // find all entities from the recurring set. At this point we 'll get entities which were not deleted
