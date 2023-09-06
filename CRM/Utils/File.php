@@ -394,7 +394,10 @@ class CRM_Utils_File {
   }
 
   /**
-   * Remove the 32 bit md5 we add to the fileName also remove the unknown tag if we added it.
+   * Remove 32 bit md5 hash prepended to the file suffix.
+   *
+   * Note: if the filename was munged with an `.unknown` suffix, this removes
+   * the md5 but doesn't undo the munging or remove the `.unknown` suffix.
    *
    * @param $name
    *
