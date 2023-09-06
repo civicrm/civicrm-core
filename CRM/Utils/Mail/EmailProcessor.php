@@ -84,21 +84,6 @@ class CRM_Utils_Mail_EmailProcessor {
       $createContact = !($dao->is_contact_creation_disabled_if_no_match ?? FALSE);
     }
 
-    $config = CRM_Core_Config::singleton();
-    $verpSeparator = preg_quote($config->verpSeparator ?? '');
-    $twoDigitStringMin = $verpSeparator . '(\d+)' . $verpSeparator . '(\d+)';
-    $twoDigitString = $twoDigitStringMin . $verpSeparator;
-
-    // a common-for-all-actions regex to handle CiviCRM 2.2 address patterns
-    $regex = '/^' . preg_quote($dao->localpart ?? '') . '(b|c|e|o|r|u)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain ?? '') . '$/';
-
-    // a tighter regex for finding bounce info in soft bounces’ mail bodies
-    $rpRegex = '/Return-Path:\s*' . preg_quote($dao->localpart ?? '') . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain ?? '') . '/';
-
-    // a regex for finding bound info X-Header
-    $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart ?? '') . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain ?? '') . '/i';
-    // CiviMail in regex and Civimail in header !!!
-
     // retrieve the emails
     try {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
@@ -113,51 +98,11 @@ class CRM_Utils_Mail_EmailProcessor {
     // process fifty at a time, CRM-4002
     while ($mails = $store->fetchNext(MAIL_BATCH_SIZE)) {
       foreach ($mails as $key => $mail) {
-
-        // for every addressee: match address elements if it's to CiviMail
-        $matches = [];
-        $action = NULL;
-
-        if ($usedfor == 1) {
-          foreach ($mail->to as $address) {
-            if (preg_match($regex, ($address->email ?? ''), $matches)) {
-              [, $action, $job, $queue, $hash] = $matches;
-              break;
-            }
-          }
-
-          // CRM-5471: if $matches is empty, it still might be a soft bounce sent
-          // to another address, so scan the body for ‘Return-Path: …bounce-pattern…’
-          if (!$matches && preg_match($rpRegex, ($mail->generateBody() ?? ''), $matches)) {
-            [, $action, $job, $queue, $hash] = $matches;
-          }
-
-          // if $matches is still empty, look for the X-CiviMail-Bounce header
-          // CRM-9855
-          if (!$matches && preg_match($rpXheaderRegex, ($mail->generateBody() ?? ''), $matches)) {
-            [, $action, $job, $queue, $hash] = $matches;
-          }
-          // With Mandrilla, the X-CiviMail-Bounce header is produced by generateBody
-          // is base64 encoded
-          // Check all parts
-          if (!$matches) {
-            $all_parts = $mail->fetchParts();
-            foreach ($all_parts as $k_part => $v_part) {
-              if ($v_part instanceof ezcMailFile) {
-                $p_file = $v_part->__get('fileName');
-                $c_file = file_get_contents($p_file);
-                if (preg_match($rpXheaderRegex, ($c_file ?? ''), $matches)) {
-                  [, $action, $job, $queue, $hash] = $matches;
-                }
-              }
-            }
-          }
-
-          // if all else fails, check Delivered-To for possible pattern
-          if (!$matches and preg_match($regex, ($mail->getHeader('Delivered-To') ?? ''), $matches)) {
-            [, $action, $job, $queue, $hash] = $matches;
-          }
-        }
+        $incomingMail = new CRM_Utils_Mail_IncomingMail($mail, (string) $dao->domain, (string) $dao->localpart);
+        $action = $incomingMail->getAction();
+        $job = $incomingMail->getJobID();
+        $queue = $incomingMail->getQueueID();
+        $hash = $incomingMail->getHash();
 
         // preseve backward compatibility
         if ($usedfor == 0 || $is_create_activities) {
@@ -187,7 +132,7 @@ class CRM_Utils_Mail_EmailProcessor {
         }
 
         // if $matches is empty, this email is not CiviMail-bound
-        if (!$matches) {
+        if (!$incomingMail->isVerp() && empty($matches)) {
           $store->markIgnored($key);
           continue;
         }
