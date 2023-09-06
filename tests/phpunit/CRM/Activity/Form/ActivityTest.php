@@ -99,7 +99,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
     // Create the repeating activity's schedule.
     $actionScheduleParams = [
-      'title' => 'RepeatingActSchedule',
+      'name' => 'repeat_civicrm_activity_' . $repeatingActivityBao->id,
       'used_for' => 'civicrm_activity',
       'entity_value' => $repeatingActivityBao->id,
       'start_action_date' => $repeatingActivityBao->activity_date_time,
