@@ -262,17 +262,30 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    if (empty($this->_contactID) && !empty($this->_id) && $this->entity) {
-      $this->_contactID = civicrm_api3($this->entity, 'getvalue', ['id' => $this->_id, 'return' => 'contact_id']);
-    }
-    $this->assign('contactID', $this->_contactID);
-    CRM_Core_Resources::singleton()->addVars('coreForm', ['contact_id' => (int) $this->_contactID]);
+    $this->assignContactID();
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $this->_mode = empty($this->_mode) ? CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this) : $this->_mode;
     $this->assign('isBackOffice', $this->isBackOffice);
     $this->assignContactEmailDetails();
     $this->assignPaymentRelatedVariables();
+  }
+
+  /**
+   * Get the contact ID in use.
+   *
+   * Ideally override this as appropriate to the form.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocSignatureIsNotCompleteInspection
+   */
+  public function getContactID():?int {
+    if ($this->_contactID === NULL) {
+      $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+      if (empty($this->_contactID) && !empty($this->_id) && $this->entity) {
+        $this->_contactID = civicrm_api3($this->entity, 'getvalue', ['id' => $this->_id, 'return' => 'contact_id']);
+      }
+    }
+    return $this->_contactID ? (int) $this->_contactID : NULL;
   }
 
   /**
@@ -544,7 +557,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       $fields["email-{$this->_bltID}"] = 1;
     }
 
-    list($hasBillingField, $addressParams) = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
+    [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
     $fields = $this->formatParamsForPaymentProcessor($fields);
 
     if ($hasBillingField) {
@@ -659,13 +672,19 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   }
 
   protected function assignContactEmailDetails() {
-    if ($this->_contactID) {
-      list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-      if (empty($this->userDisplayName)) {
-        $this->userDisplayName = civicrm_api3('contact', 'getvalue', ['id' => $this->_contactID, 'return' => 'display_name']);
+    if ($this->getContactID()) {
+      [$displayName, $this->userEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->getContactID());
+      if (!$displayName) {
+        $displayName = civicrm_api3('contact', 'getvalue', ['id' => $this->getContactID(), 'return' => 'display_name']);
       }
-      $this->assign('displayName', $this->userDisplayName);
+      $this->assign('displayName', $displayName);
     }
+  }
+
+  protected function assignContactID(): void {
+    $this->assign('contactID', $this->getContactID());
+    CRM_Core_Resources::singleton()
+      ->addVars('coreForm', ['contact_id' => (int) $this->getContactID()]);
   }
 
 }

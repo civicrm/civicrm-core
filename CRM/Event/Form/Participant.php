@@ -16,10 +16,14 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\API\EntityLookupTrait;
+
 /**
  * Back office participant form.
  */
 class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment {
+
+  use EntityLookupTrait;
 
   /**
    * Participant ID - use getParticipantID.
@@ -285,13 +289,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $this->assign('feeBlockPaid', FALSE);
 
     // @todo eliminate this duplication.
-    $this->_contactId = $this->_contactID;
+    $this->_contactId = $this->getContactID();
     $this->_eID = CRM_Utils_Request::retrieve('eid', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $this->_context);
 
-    if ($this->_contactID) {
-      $this->setPageTitle(ts('Event Registration for %1', [1 => $this->userDisplayName]));
+    if ($this->getContactID()) {
+      $this->setPageTitle(ts('Event Registration for %1', [1 => $this->getContactValue('display_name')]));
     }
     else {
       $this->setPageTitle(ts('Event Registration'));
@@ -567,6 +571,25 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->assign('event_is_test', CRM_Utils_Array::value('event_is_test', $defaults[$this->_id]));
     return $defaults[$this->_id];
+  }
+
+  /**
+   * Get a value for the contact being acted on in the form.
+   *
+   * This can be called from any point in the form flow and if
+   * the contact can not yet be determined it will return NULL.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getContactValue($fieldName) {
+    if ($this->isDefined('Contact')) {
+      return $this->lookup('Contact', $fieldName);
+    }
+    if ($this->getContactID()) {
+      $this->define('Contact', 'Contact', ['id' => $this->getContactID()]);
+      return $this->lookup('Contact', $fieldName);
+    }
+    return NULL;
   }
 
   /**
@@ -961,7 +984,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $userName = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
 
     if ($this->_contactId) {
-      [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
+      [, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
     }
 
     //modify params according to parameter used in create
@@ -1381,9 +1404,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected function getStatusMsg(array $params, int $numberSent, int $numberNotSent, string $updateStatusMsg): string {
     $statusMsg = '';
     if (($this->_action & CRM_Core_Action::UPDATE)) {
-      $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contributorDisplayName]);
+      $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->getContactValue('display_name')]);
       if (!empty($params['send_receipt']) && $numberSent) {
-        $statusMsg .= ' ' . ts('A confirmation email has been sent to %1', [1 => $this->_contributorEmail]);
+        $statusMsg .= ' ' . ts('A confirmation email has been sent to %1', [1 => $this->getContactValue('email_primary.email')]);
       }
 
       if ($updateStatusMsg) {
@@ -1391,9 +1414,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
-      $statusMsg = ts('Event registration for %1 has been added.', [1 => $this->_contributorDisplayName]);
+      $statusMsg = ts('Event registration for %1 has been added.', [1 => $this->getContactValue('display_name')]);
       if (!empty($params['send_receipt']) && $numberSent) {
-        $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', [1 => $this->_contributorEmail]);
+        $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', [1 => $this->getContactValue('email_primary.email')]);
       }
     }
     return $statusMsg;
@@ -1515,7 +1538,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         // don't show transaction id in batch update mode
         $path = CRM_Utils_System::currentPath();
         $form->assign('showTransactionId', FALSE);
-        if ($path != 'civicrm/contact/search/basic') {
+        if ($path !== 'civicrm/contact/search/basic') {
           $form->add('text', 'trxn_id', ts('Transaction ID'));
           $form->addRule('trxn_id', ts('Transaction ID already exists in Database.'),
             'objectExists', ['CRM_Contribute_DAO_Contribution', $form->_eventId, 'trxn_id']
@@ -1554,9 +1577,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $form->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
     // Retrieve the name and email of the contact - form will be the TO for receipt email ( only if context is not standalone)
-    if ($form->_context != 'standalone') {
-      if ($form->_contactId) {
-        [$form->_contributorDisplayName, $form->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($form->_contactId);
+    if ($form->_context !== 'standalone') {
+      if ($form->getContactID()) {
+        [, $form->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($form->_contactId);
         $form->assign('email', $form->_contributorEmail);
       }
       else {
@@ -1792,7 +1815,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $contribParams['is_test'] = 0;
-    if ($form->_action & CRM_Core_Action::PREVIEW || ($params['mode'] ?? NULL) == 'test') {
+    if ($form->_action & CRM_Core_Action::PREVIEW || ($params['mode'] ?? NULL) === 'test') {
       $contribParams['is_test'] = 1;
     }
 
@@ -1941,7 +1964,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function getParticipantValue($fieldName) {
     if (!$this->participantRecord) {
-      $this->participantRecord = civicrm_api3('Participant', 'getsingle', ['id' => $this->_id]);
+      $this->participantRecord = civicrm_api3('Participant', 'getsingle', ['id' => $this->getParticipantID()]);
     }
     return $this->participantRecord[$fieldName] ?? $this->participantRecord['participant_' . $fieldName];
   }
@@ -2172,7 +2195,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
     foreach ($this->_contactIds as $num => $contactID) {
       // Retrieve the name and email of the contact - this will be the TO for receipt email
-      [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
+      [, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
 
       $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
       $waitingStatus = $waitStatus[$params['status_id']] ?? NULL;
@@ -2247,7 +2270,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       // and the do-not-email option is not checked for that contact
       if ($this->_contributorEmail and !$this->_toDoNotEmail) {
         $sendTemplateParams['from'] = $params['from_email_address'];
-        $sendTemplateParams['toName'] = $this->_contributorDisplayName;
+        $sendTemplateParams['toName'] = $this->getContactValue('display_name');
         $sendTemplateParams['toEmail'] = $this->_contributorEmail;
         $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;
         $sendTemplateParams['bcc'] = $this->_fromEmails['bcc'] ?? NULL;
@@ -2351,6 +2374,30 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    */
   protected function isOverloadFeesMode(): bool {
     return (bool) ($_GET['eventId'] ?? NULL);
+  }
+
+  /**
+   * Get the contact ID in use.
+   *
+   * Ideally override this as appropriate to the form.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocSignatureIsNotCompleteInspection
+   */
+  public function getContactID():?int {
+    if ($this->_contactID === NULL) {
+      if ($this->getSubmittedValue('contact_id')) {
+        $contactID = $this->getSubmittedValue('contact_id');
+      }
+      else {
+        $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+      }
+      if (!$contactID && $this->getParticipantID()) {
+        $contactID = $this->getParticipantValue('contact_id');
+      }
+      $this->_contactID = $contactID ? (int) $contactID : NULL;
+    }
+    return $this->_contactID;
   }
 
 }
