@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\MailSettings;
+
 /**
  * Class CRM_Utils_Mail_EmailProcessorTest
  * @group headless
@@ -27,19 +29,17 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     parent::setUp();
     CRM_Utils_File::cleanDir(__DIR__ . '/data/mail');
     mkdir(__DIR__ . '/data/mail');
-    $this->callAPISuccess('MailSettings', 'get', [
-      'api.MailSettings.create' => [
-        'name' => 'local',
-        'protocol' => 'Localdir',
-        'source' => __DIR__ . '/data/mail',
-        'domain' => 'example.com',
-        'is_active' => 1,
-        'activity_type_id' => 'Inbound Email',
-        'activity_source' => 'from',
-        'activity_targets' => 'to,cc,bcc',
-        'activity_assignees' => 'from',
-      ],
-    ]);
+    MailSettings::update(FALSE)->setValues([
+      'name' => 'local',
+      'protocol:name' => 'Localdir',
+      'source' => __DIR__ . '/data/mail',
+      'domain' => 'example.com',
+      'is_active' => 1,
+      'activity_type_id' => 'Inbound Email',
+      'activity_source' => 'from',
+      'activity_targets' => 'to,cc,bcc',
+      'activity_assignees' => 'from',
+    ])->addWhere('is_default', '=', TRUE)->execute();
   }
 
   /**
@@ -113,9 +113,12 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_sample_message.eml';
 
     copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_bounces', []);
+    $this->callAPISuccess('job', 'fetch_bounces', ['is_create_activities' => TRUE]);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
+    $activity = $this->callAPISuccessGetSingle('Activity', ['return' => ['target_contact_id', 'source_contact_id']]);
+    $this->assertEquals('Default Organization', $activity['source_contact_name']);
+    $this->assertEquals([$this->contactID], $activity['target_contact_id']);
   }
 
   /**

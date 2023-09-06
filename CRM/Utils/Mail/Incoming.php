@@ -296,12 +296,6 @@ class CRM_Utils_Mail_Incoming {
    */
   public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE, $emailFields = ['from', 'to', 'cc', 'bcc']) {
 
-    $config = CRM_Core_Config::singleton();
-
-    // get ready for collecting data about this email
-    // and put it in a standardized format
-    $params = ['is_error' => 0];
-
     // Sometimes $mail->from is unset because ezcMail didn't handle format
     // of From header. CRM-19215.
     if (!isset($mail->from)) {
@@ -320,40 +314,15 @@ class CRM_Utils_Mail_Incoming {
       }
       self::parseAddresses($value, $field, $params, $mail, $createContact);
     }
-
-    // define other parameters
-    $params['subject'] = $mail->subject;
-    $params['date'] = date("YmdHi00",
-      strtotime($mail->getHeader("Date"))
-    );
-    $attachments = [];
-    $params['body'] = self::formatMailPart($mail->body, $attachments);
-
-    // format and move attachments to the civicrm area
-    if (!empty($attachments)) {
-      $date = date('YmdHis');
-      $config = CRM_Core_Config::singleton();
-      for ($i = 0; $i < count($attachments); $i++) {
-        $attachNum = $i + 1;
-        $fileName = basename($attachments[$i]['fullName']);
-        $newName = CRM_Utils_File::makeFileName($fileName);
-        $location = $config->uploadDir . $newName;
-
-        // move file to the civicrm upload directory
-        rename($attachments[$i]['fullName'], $location);
-
-        $mimeType = "{$attachments[$i]['contentType']}/{$attachments[$i]['mimeType']}";
-
-        $params["attachFile_$attachNum"] = [
-          'uri' => $fileName,
-          'type' => $mimeType,
-          'upload_date' => $date,
-          'location' => $location,
-        ];
+    $contactIDs = [];
+    foreach ($params as $field => $value) {
+      if (is_array($value)) {
+        foreach ($value as $email) {
+          $contactIDs[$field][] = $email['id'];
+        }
       }
     }
-
-    return $params;
+    return $contactIDs;
   }
 
   /**

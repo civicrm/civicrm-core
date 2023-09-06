@@ -16,6 +16,11 @@
  */
 
 // we should consider moving this to the settings table
+use Civi\Api4\Contact;
+use Civi\Api4\Email;
+use Civi\Api4\Mailing;
+use Civi\Api4\MailingJob;
+
 define('MAIL_BATCH_SIZE', 50);
 
 /**
@@ -75,29 +80,11 @@ class CRM_Utils_Mail_EmailProcessor {
    * @throws CRM_Core_Exception
    */
   private static function _process($dao, bool $is_create_activities) {
-    // 0 = activities; 1 = bounce;
-    $usedfor = $dao->is_default;
-    if ($usedfor == 0) {
       // create an array of all of to, from, cc, bcc that are in use for this Mail Account, so we don't create contacts for emails we aren't adding to the activity
-      $emailFields = array_filter(array_unique(array_merge(explode(",", $dao->activity_targets), explode(",", $dao->activity_assignees), explode(",", $dao->activity_source))));
-      $createContact = !($dao->is_contact_creation_disabled_if_no_match ?? FALSE);
-    }
-
-    $config = CRM_Core_Config::singleton();
-    $verpSeparator = preg_quote($config->verpSeparator ?? '');
-    $twoDigitStringMin = $verpSeparator . '(\d+)' . $verpSeparator . '(\d+)';
-    $twoDigitString = $twoDigitStringMin . $verpSeparator;
-
-    // a common-for-all-actions regex to handle CiviCRM 2.2 address patterns
-    $regex = '/^' . preg_quote($dao->localpart ?? '') . '(b|c|e|o|r|u)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain ?? '') . '$/';
-
-    // a tighter regex for finding bounce info in soft bounces’ mail bodies
-    $rpRegex = '/Return-Path:\s*' . preg_quote($dao->localpart ?? '') . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain ?? '') . '/';
-
-    // a regex for finding bound info X-Header
-    $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart ?? '') . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain ?? '') . '/i';
-    // CiviMail in regex and Civimail in header !!!
-
+    $emailFields = array_filter(array_unique(array_merge(explode(',', $dao->activity_targets), explode(',', $dao->activity_assignees), explode(',', $dao->activity_source))));
+    $createContact = !($dao->is_contact_creation_disabled_if_no_match ?? FALSE);
+    $targetEmailFields = array_filter(explode(',', $dao->activity_targets));
+    $assigneeEmailFields = array_filter(explode(',', $dao->activity_assignees));
     // retrieve the emails
     try {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
@@ -108,55 +95,19 @@ class CRM_Utils_Mail_EmailProcessor {
       $message .= '<pre>' . $e->getMessage() . '</pre><p>';
       throw new CRM_Core_Exception($message);
     }
+    $permittedNumberOfAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
 
     // process fifty at a time, CRM-4002
     while ($mails = $store->fetchNext(MAIL_BATCH_SIZE)) {
       foreach ($mails as $key => $mail) {
+        $incomingMail = new CRM_Utils_Mail_IncomingMail($mail, (string) $dao->domain, (string) $dao->localpart);
 
         // for every addressee: match address elements if it's to CiviMail
-        $matches = [];
-        $action = NULL;
-
-        if ($usedfor == 1) {
-          foreach ($mail->to as $address) {
-            if (preg_match($regex, ($address->email ?? ''), $matches)) {
-              [, $action, $job, $queue, $hash] = $matches;
-              break;
-            }
-          }
-
-          // CRM-5471: if $matches is empty, it still might be a soft bounce sent
-          // to another address, so scan the body for ‘Return-Path: …bounce-pattern…’
-          if (!$matches && preg_match($rpRegex, ($mail->generateBody() ?? ''), $matches)) {
-            [, $action, $job, $queue, $hash] = $matches;
-          }
-
-          // if $matches is still empty, look for the X-CiviMail-Bounce header
-          // CRM-9855
-          if (!$matches && preg_match($rpXheaderRegex, ($mail->generateBody() ?? ''), $matches)) {
-            [, $action, $job, $queue, $hash] = $matches;
-          }
-          // With Mandrilla, the X-CiviMail-Bounce header is produced by generateBody
-          // is base64 encoded
-          // Check all parts
-          if (!$matches) {
-            $all_parts = $mail->fetchParts();
-            foreach ($all_parts as $k_part => $v_part) {
-              if ($v_part instanceof ezcMailFile) {
-                $p_file = $v_part->__get('fileName');
-                $c_file = file_get_contents($p_file);
-                if (preg_match($rpXheaderRegex, ($c_file ?? ''), $matches)) {
-                  [, $action, $job, $queue, $hash] = $matches;
-                }
-              }
-            }
-          }
-
-          // if all else fails, check Delivered-To for possible pattern
-          if (!$matches and preg_match($regex, ($mail->getHeader('Delivered-To') ?? ''), $matches)) {
-            [, $action, $job, $queue, $hash] = $matches;
-          }
-        }
+        $matches = $incomingMail->isVerp();
+        $action = $incomingMail->getVerpAction();
+        $queue = $incomingMail->getQueueID();
+        $job = $incomingMail->getJobID();
+        $hash = $incomingMail->getHash();
 
         if ($is_create_activities) {
           // Mail account may have 'Skip emails which do not have a Case ID
@@ -170,25 +121,72 @@ class CRM_Utils_Mail_EmailProcessor {
 
           // if its the activities that needs to be processed ..
           try {
-            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE, $emailFields);
+            $params = [];
+            if (!$incomingMail->isVerp()) {
+              $mailingParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE, $emailFields);
+              $params['target_contact_id'] = [];
+              $params['assignee_contact_id'] = [];
+              foreach ($targetEmailFields as $targetKey) {
+                $params['target_contact_id'] += $mailingParams[$targetKey] ?? [];
+              }
+              foreach ($assigneeEmailFields as $assigneeKey) {
+                $params['assignee_contact_id'] += $mailingParams[$assigneeKey];
+              }
+              $params['source_contact_id'] = $mailingParams[$dao->activity_source][0];
+            }
+            else {
+              $params['target_contact_id'] = (int) $incomingMail->lookup('Queue', 'contact_id');
+              $fromEmail = $incomingMail->lookup('Mailing', 'from_email');
+              $replyToEmail = $incomingMail->lookup('Mailing', 'replyto_email');
+              $emails = Email::get(FALSE)
+                ->addWhere('email', 'IN', array_filter([
+                  $fromEmail,
+                  $replyToEmail
+                ]))
+                ->addSelect('is_primary', 'email', 'contact_id')
+                ->addOrderBy('is_primary', 'DESC')
+                ->execute()
+                ->indexBy('email');
+              $params['source_contact_id'] = $emails[$replyToEmail] ?? ($emails[$fromEmail] ?? $incomingMail->lookup('Mailing', 'created_id'));
+              if (empty($params['source_contact_id'])) {
+                $params['source_contact_id'] = Contact::create(FALSE)
+                  // Organization? Individual? No right answers here - hopefully this is
+                  // not hit as mostly the fall-back in civicrm_mailing.created_id.
+                  ->setValues([
+                    'contact_type' => 'Organization',
+                    'organization_name' => $incomingMail->lookup('Mailing', 'from_name'),
+                    'email_primary.email' => $replyToEmail ?: $fromEmail,
+                  ])->execute()->first()['id'];
+              }
+            }
+            $params['subject'] = $incomingMail->getEmailSubject();
+            $params['activity_date_time'] = $incomingMail->getDate();
+            $params['details'] = $incomingMail->getBody();
+            $params['activity_type_id'] = (int) $dao->activity_type_id ?: 'Inbound Email';
+            $params['campaign_id'] = $dao->campaign_id;
+            $params['status_id'] = $dao->activity_status;
+            $params['activity_type_id'] = (int) $dao->activity_type_id;
+            // Do not add attachments for bounce as the later effort to load the attachments will fail
+            // at $text = $mail->generateBody(); because it has already moved the files.
+            if ($incomingMail->getVerpAction() !== 'bounce') {
+              foreach ($incomingMail->getAttachments() as $attachmentNumber => $attachment) {
+                if ($permittedNumberOfAttachments < $attachmentNumber) {
+                  break;
+                }
+                $params["attachFile_$attachmentNumber"] = $attachment;
+              }
+            }
+            $result = civicrm_api3('activity', 'create', $params);
           }
           catch (Exception $e) {
-            echo $e->getMessage();
+            echo "Failed Processing: {$mail->subject}. Reason: " . $e->getMessage() ."\n";
             $store->markIgnored($key);
             continue;
           }
-          $params = self::deprecated_activity_buildmailparams($mailParams, $dao);
-          $result = civicrm_api('activity', 'create', $params);
 
-          if ($result['is_error']) {
-            $matches = FALSE;
-            echo "Failed Processing: {$mail->subject}. Reason: {$result['error_message']}\n";
-          }
-          else {
-            $matches = TRUE;
-            CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
-            echo "Processed as Activity: {$mail->subject}\n";
-          }
+          $matches = TRUE;
+          CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
+          echo "Processed as Activity: {$mail->subject}\n";
         }
 
         // if $matches is empty, this email is not CiviMail-bound
@@ -202,11 +200,11 @@ class CRM_Utils_Mail_EmailProcessor {
         $replyTo = $mail->getHeader('Reply-To') ? $mail->getHeader('Reply-To') : ($mail->from ? $mail->from->email : "");
 
         // handle the action by passing it to the proper API call
-        if (!empty($action)) {
+        if ($incomingMail->isVerp()) {
           $result = NULL;
 
-          switch ($action) {
-            case 'b':
+          switch ($incomingMail->getVerpAction()) {
+            case 'bounce':
               $text = '';
               if ($mail->body instanceof ezcMailText) {
                 $text = $mail->body->text;
@@ -253,7 +251,7 @@ class CRM_Utils_Mail_EmailProcessor {
               $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
-                'hash' => $hash,
+                'hash' => $incomingMail->getHash(),
                 'body' => $text,
                 'version' => 3,
                 // Setting is_transactional means it will rollback if
@@ -268,33 +266,33 @@ class CRM_Utils_Mail_EmailProcessor {
               $result = civicrm_api('Mailing', 'event_bounce', $params);
               break;
 
-            case 'c':
+            case 'confirm':
               // CRM-7921
               $params = [
                 'contact_id' => $job,
                 'subscribe_id' => $queue,
-                'hash' => $hash,
+                'hash' => $incomingMail->getHash(),
                 'version' => 3,
               ];
               $result = civicrm_api('Mailing', 'event_confirm', $params);
               break;
 
-            case 'o':
+            case 'opt_out':
               $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
-                'hash' => $hash,
+                'hash' => $incomingMail->getHash(),
                 'version' => 3,
               ];
               $result = civicrm_api('MailingGroup', 'event_domain_unsubscribe', $params);
               break;
 
-            case 'r':
+            case 'reply':
               // instead of text and HTML parts (4th and 6th params) send the whole email as the last param
               $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
-                'hash' => $hash,
+                'hash' => $incomingMail->getHash(),
                 'bodyTxt' => NULL,
                 'replyTo' => $replyTo,
                 'bodyHTML' => NULL,
@@ -304,17 +302,17 @@ class CRM_Utils_Mail_EmailProcessor {
               $result = civicrm_api('Mailing', 'event_reply', $params);
               break;
 
-            case 'e':
+            case 'resubscribe':
               $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
-                'hash' => $hash,
+                'hash' => $incomingMail->getHash(),
                 'version' => 3,
               ];
               $result = civicrm_api('MailingGroup', 'event_resubscribe', $params);
               break;
 
-            case 's':
+            case 'subscribe':
               $params = [
                 'email' => $mail->from->email,
                 'group_id' => $job,
@@ -323,7 +321,7 @@ class CRM_Utils_Mail_EmailProcessor {
               $result = civicrm_api('MailingGroup', 'event_subscribe', $params);
               break;
 
-            case 'u':
+            case 'unsubscribe':
               $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
@@ -335,7 +333,7 @@ class CRM_Utils_Mail_EmailProcessor {
           }
 
           if ($result['is_error']) {
-            echo "Failed Processing: {$mail->subject}, Action: $action, Job ID: $job, Queue ID: $queue, Hash: $hash. Reason: {$result['error_message']}\n";
+            echo "Failed Processing: {$mail->subject}, Action: $action, Job ID: $job, Queue ID: ' . $, Hash: $hash. Reason: {$result['error_message']}\n";
           }
           else {
             CRM_Utils_Hook::emailProcessor('mailing', $params, $mail, $result, $action);
@@ -450,56 +448,6 @@ class CRM_Utils_Mail_EmailProcessor {
       }
     }
     return $text;
-  }
-
-  /**
-   * @param array $result
-   * @param CRM_Core_DAO_MailSettings $dao
-   *
-   * @return array
-   *   <type> $params
-   */
-  protected static function deprecated_activity_buildmailparams($result, $dao) {
-    $params = [];
-    $params['version'] = 3;
-
-    // if we don't cast to int (the dao gives a string), then the Inbound Email Activity 1.0 extension won't work, will be fixed in next version to use a non-strict comparison
-    $params['activity_type_id'] = (int) $dao->activity_type_id;
-    $params['campaign_id'] = $dao->campaign_id;
-    $params['status_id'] = $dao->activity_status;
-    $params['source_contact_id'] = $result[$dao->activity_source][0]['id'];
-
-    $activityContacts = ['target_contact_id' => 'activity_targets', 'assignee_contact_id' => 'activity_assignees'];
-    foreach ($activityContacts as $activityContact => $daoName) {
-      $params[$activityContact] = [];
-      $keys = array_filter(explode(",", $dao->$daoName));
-      foreach ($keys as $key) {
-        if (is_array($result[$key])) {
-          foreach ($result[$key] as $key => $keyValue) {
-            if (!empty($keyValue['id'])) {
-              $params[$activityContact][] = $keyValue['id'];
-            }
-          }
-        }
-      }
-    }
-
-    $params['subject'] = $result['subject'];
-    $params['activity_date_time'] = $result['date'];
-    $params['details'] = $result['body'];
-
-    $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
-    for ($i = 1; $i <= $numAttachments; $i++) {
-      if (isset($result["attachFile_$i"])) {
-        $params["attachFile_$i"] = $result["attachFile_$i"];
-      }
-      else {
-        // No point looping 100 times if there's only one attachment
-        break;
-      }
-    }
-
-    return $params;
   }
 
 }
