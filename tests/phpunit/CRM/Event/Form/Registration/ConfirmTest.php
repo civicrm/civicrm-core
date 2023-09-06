@@ -10,6 +10,7 @@ use Civi\Test\FormTrait;
  */
 class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
 
+  use CRMTraits_Event_ScenarioTrait;
   use CRMTraits_Financial_PriceSetTrait;
   use CRMTraits_Profile_ProfileTrait;
   use FormTrait;
@@ -293,35 +294,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   public function testTaxMultipleParticipant(): void {
     $this->swapMessageTemplateForTestTemplate('event_online_receipt', 'text');
     $this->createLoggedInUser();
-    $this->eventCreatePaid();
-    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'));
-    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
-      'first_name' => 'Participant1',
-      'last_name' => 'LastName',
-      'email-Primary' => 'participant1@example.com',
-      'additional_participants' => 2,
-      'payment_processor_id' => 0,
-      'priceSetId' => $this->getPriceSetID('PaidEvent'),
-      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-      'defaultRole' => 1,
-      'participant_role_id' => '1',
-      'button' => '_qf_Register_upload',
-    ], ['id' => $this->getEventID()])
-      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
-        'first_name' => 'Participant2',
-        'last_name' => 'LastName',
-        'email-Primary' => 'participant2@example.com',
-        'priceSetId' => $this->getPriceSetID('PaidEvent'),
-        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-      ])->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
-        'first_name' => 'Participant3',
-        'last_name' => 'LastName',
-        'email-Primary' => 'participant3@example.com',
-        'priceSetId' => $this->getPriceSetID('PaidEvent'),
-        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-      ])
-      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
-      ->processForm();
+    $this->createScenarioMultipleParticipantPendingWithTax();
 
     $participants = $this->callAPISuccess('Participant', 'get', [])['values'];
     $this->assertCount(3, $participants);
