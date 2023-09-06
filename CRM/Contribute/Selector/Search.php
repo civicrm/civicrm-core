@@ -413,9 +413,10 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           'url' => 'civicrm/contact/view/contribution',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%&mode=live',
           'title' => ts('Pay with Credit Card'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ];
       }
-      elseif (($row['contribution_status_name'] ?? NULL) == 'Pending') {
+      elseif (($row['contribution_status_name'] ?? NULL) === 'Pending') {
         $row['contribution_status'] .= ' (' . ts('Incomplete Transaction') . ')';
       }
 
@@ -433,7 +434,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
 
       if (in_array($row['contribution_status_name'], ['Partially paid', 'Pending refund']) || $isPayLater) {
         $buttonName = ts('Record Payment');
-        if ($row['contribution_status_name'] == 'Pending refund') {
+        if ($row['contribution_status_name'] === 'Pending refund') {
           $buttonName = ts('Record Refund');
         }
         elseif (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
@@ -442,6 +443,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             'url' => 'civicrm/payment/add',
             'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution&mode=live',
             'title' => ts('Submit Credit Card payment'),
+            'weight' => 30,
           ];
         }
         $links[CRM_Core_Action::ADD] = [
@@ -449,6 +451,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           'url' => 'civicrm/payment',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
           'title' => $buttonName,
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ];
       }
       $links = $links + CRM_Contribute_Task::getContextualLinks($row);

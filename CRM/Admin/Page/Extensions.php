@@ -66,6 +66,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=add&id=%%id%%&key=%%key%%',
           'title' => ts('Install'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
@@ -73,24 +74,28 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
           'qs' => 'action=enable&id=%%id%%&key=%%key%%',
           'ref' => 'enable-action',
           'title' => ts('Enable'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=disable&id=%%id%%&key=%%key%%',
           'title' => ts('Disable'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Uninstall'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=delete&id=%%id%%&key=%%key%%',
           'title' => ts('Uninstall Extension'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Download'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=update&id=%%id%%&key=%%key%%',
           'title' => ts('Download Extension'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
       ];
     }
