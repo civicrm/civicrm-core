@@ -74,35 +74,33 @@
 
   {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $priceSetID and $lineItem ) }
     <div class="crm-group amount_display-group">
-      {if !$useForMember}
-        <div class="header-dark">
-          {if !$membershipBlock AND $amount OR ( $priceSetID and $lineItem )}{ts}Contribution Information{/ts}{else}{ts}Membership Fee{/ts}{/if}
-        </div>
-      {/if}
+      <div class="header-dark">
+        {if !$membershipBlock AND $amount OR ( $priceSetID and $lineItem )}{ts}Contribution Information{/ts}{else}{ts}Membership Fee{/ts}{/if}
+      </div>
+
       <div class="display-block">
-        {if !$useForMember}
-          {if $lineItem and $priceSetID}
-            {if !$amount}{assign var="amount" value=0}{/if}
-            {assign var="totalAmount" value=$amount}
-            {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
-          {elseif $membership_amount}
-            {$membership_name} {ts}Membership{/ts}: <strong>{$membership_amount|crmMoney}</strong><br />
-            {if $amount}
-              {if !$is_separate_payment}
-                {ts}Contribution Amount{/ts}: <strong>{$amount|crmMoney}</strong><br />
-              {else}
-                {ts}Additional Contribution{/ts}: <strong>{$amount|crmMoney}</strong><br />
-              {/if}
+        {if $lineItem and $priceSetID}
+          {if !$amount}{assign var="amount" value=0}{/if}
+          {assign var="totalAmount" value=$amount}
+          {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+        {elseif $membership_amount}
+          {$membership_name} {ts}Membership{/ts}: <strong>{$membership_amount|crmMoney}</strong><br />
+          {if $amount}
+            {if !$is_separate_payment}
+              {ts}Contribution Amount{/ts}: <strong>{$amount|crmMoney}</strong><br />
+            {else}
+              {ts}Additional Contribution{/ts}: <strong>{$amount|crmMoney}</strong><br />
             {/if}
-            <strong> -------------------------------------------</strong><br />
-            {ts}Total{/ts}: <strong>{$amount+$membership_amount|crmMoney}</strong><br />
-          {else}
-            {if $totalTaxAmount}
-              {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
-            {/if}
-            {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if}: <strong>{$amount|crmMoney:$currency}{if $amount_level } &ndash; {$amount_level}{/if}</strong>
           {/if}
+          <strong> -------------------------------------------</strong><br />
+          {ts}Total{/ts}: <strong>{$amount+$membership_amount|crmMoney}</strong><br />
+        {else}
+          {if $totalTaxAmount}
+            {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
+          {/if}
+          {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if}: <strong>{$amount|crmMoney:$currency}{if $amount_level } &ndash; {$amount_level}{/if}</strong>
         {/if}
+
         {if $receive_date}
           {ts}Date{/ts}: <strong>{$receive_date|crmDate}</strong><br />
         {/if}
