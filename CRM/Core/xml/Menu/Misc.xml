@@ -136,6 +136,7 @@
     <path>civicrm/asset/builder</path>
     <page_callback>\Civi\Core\AssetBuilder::pageRun</page_callback>
     <access_arguments>*always allow*</access_arguments>
+    <is_public>1</is_public>
   </item>
   <item>
      <path>civicrm/contribute/ajax/tableview</path>
