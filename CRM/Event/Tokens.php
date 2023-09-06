@@ -234,7 +234,12 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
             $tokens[$fieldName]['text/html'] = CRM_Core_BAO_CustomField::displayValue($value, $fieldSpec['custom_field_id']);
           }
           else {
-            $tokens[$fieldName]['text/html'] = $event[$fieldName];
+            if ($this->isHTMLTextField($fieldName)) {
+              $tokens[$fieldName]['text/html'] = $event[$fieldName];
+            }
+            else {
+              $tokens[$fieldName]['text/plain'] = $event[$fieldName];
+            }
           }
         }
       }
