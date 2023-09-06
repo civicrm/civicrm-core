@@ -34,7 +34,7 @@
 
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
-{if {event.pay_later_receipt|boolean}}{event.pay_later_receipt|boolean}{/if}
+{if {event.pay_later_receipt|boolean}}{event.pay_later_receipt}{/if}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {/if}
