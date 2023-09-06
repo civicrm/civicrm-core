@@ -296,12 +296,6 @@ class CRM_Utils_Mail_Incoming {
    */
   public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE, $emailFields = ['from', 'to', 'cc', 'bcc']) {
 
-    $config = CRM_Core_Config::singleton();
-
-    // get ready for collecting data about this email
-    // and put it in a standardized format
-    $params = ['is_error' => 0];
-
     // Sometimes $mail->from is unset because ezcMail didn't handle format
     // of From header. CRM-19215.
     if (!isset($mail->from)) {

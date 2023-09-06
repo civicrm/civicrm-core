@@ -188,24 +188,17 @@ class CRM_Utils_Mail_EmailProcessor {
           // if its the activities that needs to be processed ..
           try {
             $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE, $emailFields);
+            $params = self::deprecated_activity_buildmailparams($mailParams, $dao);
+            $result = civicrm_api3('Activity', 'create', $params);
           }
           catch (Exception $e) {
-            echo $e->getMessage();
+            echo "Failed Processing: {$mail->subject}. Reason: " . $e->getMessage() . "\n";
             $store->markIgnored($key);
             continue;
           }
-          $params = self::deprecated_activity_buildmailparams($mailParams, $dao);
-          $result = civicrm_api('activity', 'create', $params);
-
-          if ($result['is_error']) {
-            $matches = FALSE;
-            echo "Failed Processing: {$mail->subject}. Reason: {$result['error_message']}\n";
-          }
-          else {
-            $matches = TRUE;
-            CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
-            echo "Processed as Activity: {$mail->subject}\n";
-          }
+          $matches = TRUE;
+          CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
+          echo "Processed as Activity: {$mail->subject}\n";
         }
 
         // if $matches is empty, this email is not CiviMail-bound
@@ -478,7 +471,6 @@ class CRM_Utils_Mail_EmailProcessor {
    */
   protected static function deprecated_activity_buildmailparams($result, $dao) {
     $params = [];
-    $params['version'] = 3;
 
     // if we don't cast to int (the dao gives a string), then the Inbound Email Activity 1.0 extension won't work, will be fixed in next version to use a non-strict comparison
     $params['activity_type_id'] = (int) $dao->activity_type_id;
