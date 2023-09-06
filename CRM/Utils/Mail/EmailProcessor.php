@@ -118,7 +118,44 @@ class CRM_Utils_Mail_EmailProcessor {
           // if its the activities that needs to be processed ..
           try {
             $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE, $emailFields);
-            $params = self::deprecated_activity_buildmailparams($mailParams, $dao);
+            $params = [];
+
+            // if we don't cast to int (the dao gives a string), then the Inbound Email Activity 1.0 extension won't work, will be fixed in next version to use a non-strict comparison
+            $params['activity_type_id'] = (int) $dao->activity_type_id;
+            $params['campaign_id'] = $dao->campaign_id;
+            $params['status_id'] = $dao->activity_status;
+            $params['source_contact_id'] = $mailParams[$dao->activity_source][0]['id'];
+
+            $activityContacts = ['target_contact_id' => 'activity_targets', 'assignee_contact_id' => 'activity_assignees'];
+            foreach ($activityContacts as $activityContact => $daoName) {
+              $params[$activityContact] = [];
+              $keys = array_filter(explode(",", $dao->$daoName));
+              foreach ($keys as $key) {
+                if (is_array($mailParams[$key])) {
+                  foreach ($mailParams[$key] as $key => $keyValue) {
+                    if (!empty($keyValue['id'])) {
+                      $params[$activityContact][] = $keyValue['id'];
+                    }
+                  }
+                }
+              }
+            }
+
+            $params['subject'] = $mailParams['subject'];
+            $params['activity_date_time'] = $mailParams['date'];
+            $params['details'] = $mailParams['body'];
+
+            $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
+            for ($i = 1; $i <= $numAttachments; $i++) {
+              if (isset($mailParams["attachFile_$i"])) {
+                $params["attachFile_$i"] = $mailParams["attachFile_$i"];
+              }
+              else {
+                // No point looping 100 times if there's only one attachment
+                break;
+              }
+            }
+
             $result = civicrm_api3('Activity', 'create', $params);
           }
           catch (Exception $e) {
@@ -390,55 +427,6 @@ class CRM_Utils_Mail_EmailProcessor {
       }
     }
     return $text;
-  }
-
-  /**
-   * @param array $result
-   * @param CRM_Core_DAO_MailSettings $dao
-   *
-   * @return array
-   *   <type> $params
-   */
-  protected static function deprecated_activity_buildmailparams($result, $dao) {
-    $params = [];
-
-    // if we don't cast to int (the dao gives a string), then the Inbound Email Activity 1.0 extension won't work, will be fixed in next version to use a non-strict comparison
-    $params['activity_type_id'] = (int) $dao->activity_type_id;
-    $params['campaign_id'] = $dao->campaign_id;
-    $params['status_id'] = $dao->activity_status;
-    $params['source_contact_id'] = $result[$dao->activity_source][0]['id'];
-
-    $activityContacts = ['target_contact_id' => 'activity_targets', 'assignee_contact_id' => 'activity_assignees'];
-    foreach ($activityContacts as $activityContact => $daoName) {
-      $params[$activityContact] = [];
-      $keys = array_filter(explode(",", $dao->$daoName));
-      foreach ($keys as $key) {
-        if (is_array($result[$key])) {
-          foreach ($result[$key] as $key => $keyValue) {
-            if (!empty($keyValue['id'])) {
-              $params[$activityContact][] = $keyValue['id'];
-            }
-          }
-        }
-      }
-    }
-
-    $params['subject'] = $result['subject'];
-    $params['activity_date_time'] = $result['date'];
-    $params['details'] = $result['body'];
-
-    $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
-    for ($i = 1; $i <= $numAttachments; $i++) {
-      if (isset($result["attachFile_$i"])) {
-        $params["attachFile_$i"] = $result["attachFile_$i"];
-      }
-      else {
-        // No point looping 100 times if there's only one attachment
-        break;
-      }
-    }
-
-    return $params;
   }
 
 }
