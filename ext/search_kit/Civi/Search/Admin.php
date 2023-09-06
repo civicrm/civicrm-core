@@ -170,22 +170,7 @@ class Admin {
           }
           $entity['fields'][] = $field;
         }
-        $defaultColumns = CoreUtil::getSearchFields($entity['name']);
-        // Add grouping fields like "event_type_id" + status_id + description if available
-        $grouping = (array) (CoreUtil::getCustomGroupExtends($entity['name'])['grouping'] ?? ['financial_type_id']);
-        foreach ($grouping as $fieldName) {
-          if (!empty($getFields[$fieldName]['options'])) {
-            $defaultColumns[] = "$fieldName:label";
-          }
-        }
-        $statusField = $getFields['status_id'] ?? $getFields[strtolower($entity['name']) . '_status_id'] ?? NULL;
-        if (!empty($statusField['options'])) {
-          $defaultColumns[] = $statusField['name'] . ':label';
-        }
-        if (isset($getFields['description'])) {
-          $defaultColumns[] = 'description';
-        }
-        $entity['default_columns'] = array_values(array_unique($defaultColumns));
+        $entity['default_columns'] = self::getDefaultColumns($entity, $getFields);
         $params = $entity['get'][0];
         // Entity must support at least these params or it is too weird for search kit
         if (!array_diff(['select', 'where', 'orderBy', 'limit', 'offset'], array_keys($params))) {
@@ -196,6 +181,44 @@ class Admin {
       }
     }
     return $schema;
+  }
+
+  /**
+   * Build default columns - these are used when creating a new search with this entity
+   *
+   * @param array $entity
+   * @param iterable $getFields
+   * @return array
+   */
+  private static function getDefaultColumns(array $entity, iterable $getFields): array {
+    // Start with id & label
+    $defaultColumns = array_merge(
+      $entity['primary_key'],
+      $entity['search_fields'] ?? []
+    );
+    $possibleColumns = [];
+    // Include grouping fields like "event_type_id"
+    foreach ((array) (CoreUtil::getCustomGroupExtends($entity['name'])['grouping'] ?? []) as $column) {
+      $possibleColumns[$column] = "$column:label";
+    }
+    // Other possible relevant columns... now we're just guessing
+    $possibleColumns['financial_type_id'] = 'financial_type_id:label';
+    $possibleColumns['description'] = 'description';
+    // E.g. "activity_status_id"
+    $possibleColumns[strtolower($entity['name']) . 'status_id'] = strtolower($entity['name']) . 'status_id:label';
+    $possibleColumns['start_date'] = 'start_date';
+    $possibleColumns['end_date'] = 'end_date';
+    $possibleColumns['is_active'] = 'is_active';
+    foreach ($possibleColumns as $fieldName => $columnName) {
+      if (
+        (str_contains($columnName, ':') && !empty($getFields[$fieldName]['options'])) ||
+        (!str_contains($columnName, ':') && !empty($getFields[$fieldName]))
+      ) {
+        $defaultColumns[] = $columnName;
+      }
+    }
+    // `array_unique` messes with the index so reset it with `array_values` so it cleanly encodes to a json array
+    return array_values(array_unique($defaultColumns));
   }
 
   /**
