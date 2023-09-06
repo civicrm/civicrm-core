@@ -349,6 +349,7 @@ class CRM_Core_Form_RecurringEntity {
           CRM_Core_BAO_ActionSchedule::deleteRecord($params);
           unset($params['id']);
         }
+        $dbParams['name'] = 'repeat_' . $params['used_for'] . '_' . $params['entity_id'];
         $actionScheduleObj = CRM_Core_BAO_ActionSchedule::writeRecord($dbParams);
 
         //exclude dates
@@ -392,7 +393,7 @@ class CRM_Core_Form_RecurringEntity {
           }
         }
 
-        //Set type for API
+        // FIXME: This is the worst way possible to convert a table name to an api entity name
         $apiEntityType = explode("_", $type);
         if (!empty($apiEntityType[1])) {
           $apiType = $apiEntityType[1];
@@ -403,10 +404,11 @@ class CRM_Core_Form_RecurringEntity {
           if (!empty(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func']) &&
             !empty(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'])
           ) {
-            $preDeleteResult = call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], [$params['entity_id']]);
-            if (!empty($preDeleteResult)) {
-              call_user_func([CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'], $preDeleteResult]);
-            }
+            // FIXME: This calls `CRM_Event_Form_ManageEvent_Repeat::checkRegistrationForEvents`
+            // which then sets the static variable `CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted`
+            // which is then accessed below and used to delete events with no registrations.
+            // I can't think of a worse way to pass a variable back from a function.
+            call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], [$params['entity_id']]);
           }
           //Ready to execute delete on entities if it has delete function set
           if (!empty(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func']) &&
