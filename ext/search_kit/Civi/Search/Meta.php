@@ -29,8 +29,11 @@ class Meta {
    * @return array
    */
   public static function getCalcFields($apiEntity, $apiParams): array {
-    $calcFields = [];
     $api = \Civi\API\Request::create($apiEntity, 'get', $apiParams);
+    if (!is_a($api, '\Civi\Api4\Generic\DAOGetAction')) {
+      return [];
+    }
+    $calcFields = [];
     $selectQuery = new \Civi\Api4\Query\Api4SelectQuery($api);
     $joinMap = $joinCount = [];
     foreach ($apiParams['join'] ?? [] as $join) {
