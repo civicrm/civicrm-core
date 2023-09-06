@@ -152,6 +152,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function isHTMLTextField(string $fieldName): bool {
+    $metadata = $this->getMetadataForField($fieldName);
     return ($this->getMetadataForField($fieldName)['input_type'] ?? NULL) === 'RichTextEditor';
   }
 

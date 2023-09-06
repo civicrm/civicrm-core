@@ -580,7 +580,7 @@
     <comment>The receipt sent to the user instead of the normal receipt text</comment>
     <add>2.0</add>
     <html>
-      <type>Text</type>
+      <type>RichTextEditor</type>
     </html>
   </field>
   <field>
