@@ -713,7 +713,7 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "RichTextEditor",
           ],
           'pay_later_receipt' => [
-            'type' => "Text",
+            'type' => "RichTextEditor",
           ],
           'initial_amount_label' => [
             'type' => "Text",
