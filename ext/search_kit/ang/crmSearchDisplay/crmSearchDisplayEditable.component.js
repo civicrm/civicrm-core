@@ -11,7 +11,7 @@
       cancel: '&'
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayEditable.html',
-    controller: function($scope, $element, crmApi4) {
+    controller: function($scope, $element, crmApi4, crmStatus) {
       var ctrl = this,
         initialValue,
         col;
@@ -53,7 +53,7 @@
         const value = formatDataType(ctrl.value);
         if (value !== initialValue) {
           col.edit.record[col.edit.value_key] = value;
-          CRM.status({}, crmApi4(col.edit.entity, col.edit.action, {values: col.edit.record}));
+          crmStatus({}, crmApi4(col.edit.entity, col.edit.action, {values: col.edit.record}));
           ctrl.row.data[col.edit.value_path] = value;
           col.val = formatDisplayValue(value);
         }
