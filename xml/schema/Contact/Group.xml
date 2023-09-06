@@ -178,7 +178,7 @@
   </index>
   <field>
     <name>cache_fill_took</name>
-    <type>decimal</type>
+    <type>float</type>
     <title>Seconds taken by last cache fill</title>
     <comment>Seconds taken to fill smart group cache</comment>
     <required>false</required>

@@ -167,12 +167,15 @@ AND (
    */
   protected static function updateCacheTime($groupID, $processed, ?float $startTime = NULL) {
     // only update cache entry if we had any values
-    $took = $now = 'null';
+    $now = 'null';
+    $setCacheFillTook = '';
     if ($processed) {
       // also update the group with cache date information
       $now = date('YmdHis');
       if ($startTime) {
+        // If we can calculate how long this took, we update the cache_fill_took column.
         $took = microtime(TRUE) - $startTime;
+        $setCacheFillTook = ", cache_fill_took = $took";
         $maxTime = CRM_Utils_Constant::value('CIVICRM_SLOW_SMART_GROUP_SECONDS');
         if ($maxTime && $took > $maxTime) {
           Civi::log()->warning(
@@ -187,8 +190,7 @@ AND (
     $groupIDs = implode(',', $groupID);
     $sql = "
 UPDATE civicrm_group
-SET    cache_date = $now,
-       cache_fill_took = $took
+SET    cache_date = $now$setCacheFillTook
 WHERE  id IN ( $groupIDs )
 ";
     CRM_Core_DAO::executeQuery($sql);
