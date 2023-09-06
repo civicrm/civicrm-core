@@ -9,6 +9,21 @@ class OAuthSessionToken extends Generic\AbstractEntity {
 
   const ENTITY = 'OAuthSessionToken';
 
+  public static function create($checkPermissions = TRUE): Generic\BasicCreateAction {
+    $action = new Generic\BasicCreateAction(
+      self::ENTITY,
+      __FUNCTION__,
+      function ($item, $createAction) {
+        $session = \CRM_Core_Session::singleton();
+        $all = $session->get('OAuthSessionTokens') ?? [];
+        $all[] = &$item;
+        $item['cardinal'] = array_key_last($all);
+        $session->set('OAuthSessionTokens', $all);
+        return $item;
+      });
+    return $action->setCheckPermissions($checkPermissions);
+  }
+
   public static function deleteAll($checkPermissions = TRUE): AbstractAction {
     return (new class(self::ENTITY, __FUNCTION__) extends AbstractAction {
 
@@ -32,21 +47,6 @@ class OAuthSessionToken extends Generic\AbstractEntity {
     return $action->setCheckPermissions($checkPermissions);
   }
 
-  public static function create($checkPermissions = TRUE): Generic\BasicCreateAction {
-    $action = new Generic\BasicCreateAction(
-      self::ENTITY,
-      __FUNCTION__,
-      function ($item, $createAction) {
-        $session = \CRM_Core_Session::singleton();
-        $all = $session->get('OAuthSessionTokens') ?? [];
-        $all[] = &$item;
-        $item['cardinal'] = array_key_last($all);
-        $session->set('OAuthSessionTokens', $all);
-        return $item;
-      });
-    return $action->setCheckPermissions($checkPermissions);
-  }
-
   /**
    * @param bool $checkPermissions
    * @return Generic\BasicGetFieldsAction
@@ -58,6 +58,7 @@ class OAuthSessionToken extends Generic\AbstractEntity {
           'name' => 'client_id',
           'required' => TRUE,
         ],
+        ['name' => 'cardinal'],
         ['name' => 'grant_type'],
         ['name' => 'tag'],
         ['name' => 'scopes'],
@@ -65,10 +66,10 @@ class OAuthSessionToken extends Generic\AbstractEntity {
         ['name' => 'access_token'],
         ['name' => 'refresh_token'],
         ['name' => 'expires'],
-        ['name' => 'raw'],
         ['name' => 'storage'],
         ['name' => 'resource_owner_name'],
         ['name' => 'resource_owner'],
+        ['name' => 'raw'],
       ];
     });
     return $action->setCheckPermissions($checkPermissions);
@@ -82,6 +83,10 @@ class OAuthSessionToken extends Generic\AbstractEntity {
       "meta" => ["access CiviCRM"],
       "default" => ["administer CiviCRM data"],
     ];
+  }
+
+  protected static function getEntityTitle($plural = FALSE) {
+    return $plural ? ts('OAuth Session Tokens') : ts('OAuth Session Token');
   }
 
 }
