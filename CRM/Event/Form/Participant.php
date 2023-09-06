@@ -1350,7 +1350,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     if (!empty($params['send_receipt'])) {
-      $result = $this->sendReceipts($params, $contributionParams['total_amount'], $customFields, $participants, $lineItem[0], $additionalParticipantDetails);
+      $result = $this->sendReceipts($params, $contributionParams['total_amount'], $customFields, $participants, $lineItem[0] ?? [], $additionalParticipantDetails);
     }
 
     // set the participant id if it is not set
