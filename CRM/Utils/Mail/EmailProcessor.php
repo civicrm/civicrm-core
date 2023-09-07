@@ -118,8 +118,45 @@ class CRM_Utils_Mail_EmailProcessor {
           // if its the activities that needs to be processed ..
           try {
             $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE, $emailFields);
-            $params = self::deprecated_activity_buildmailparams($mailParams, $dao);
-            $result = civicrm_api3('Activity', 'create', $params);
+            $activityParams = [
+              'activity_type_id' => (int) $dao->activity_type_id,
+              'campaign_id' => $dao->campaign_id ? (int) $dao->campaign_id : NULL,
+              'status_id' => $dao->activity_status,
+            ];
+
+            $activityParams['source_contact_id'] = $mailParams[$dao->activity_source][0]['id'];
+
+            $activityContacts = ['target_contact_id' => 'activity_targets', 'assignee_contact_id' => 'activity_assignees'];
+            foreach ($activityContacts as $activityContact => $daoName) {
+              $activityParams[$activityContact] = [];
+              $activityKeys = array_filter(explode(",", $dao->$daoName));
+              foreach ($activityKeys as $activityKey) {
+                if (is_array($mailParams[$activityKey])) {
+                  foreach ($mailParams[$activityKey] as $keyValue) {
+                    if (!empty($keyValue['id'])) {
+                      $activityParams[$activityContact][] = $keyValue['id'];
+                    }
+                  }
+                }
+              }
+            }
+
+            $activityParams['subject'] = $mailParams['subject'];
+            $activityParams['activity_date_time'] = $mailParams['date'];
+            $activityParams['details'] = $mailParams['body'];
+
+            $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
+            for ($i = 1; $i <= $numAttachments; $i++) {
+              if (isset($mailParams["attachFile_$i"])) {
+                $activityParams["attachFile_$i"] = $mailParams["attachFile_$i"];
+              }
+              else {
+                // No point looping 100 times if there's only one attachment
+                break;
+              }
+            }
+
+            $result = civicrm_api3('Activity', 'create', $activityParams);
           }
           catch (Exception $e) {
             echo "Failed Processing: {$mail->subject}. Reason: " . $e->getMessage() . "\n";
@@ -127,7 +164,7 @@ class CRM_Utils_Mail_EmailProcessor {
             continue;
           }
           $matches = TRUE;
-          CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
+          CRM_Utils_Hook::emailProcessor('activity', $activityParams, $mail, $result);
           echo "Processed as Activity: {$mail->subject}\n";
         }
 
@@ -190,7 +227,7 @@ class CRM_Utils_Mail_EmailProcessor {
                 }
               }
 
-              $params = [
+              $activityParams = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
@@ -205,33 +242,33 @@ class CRM_Utils_Mail_EmailProcessor {
                 // a quick hack.
                 'is_transactional' => 1,
               ];
-              $result = civicrm_api('Mailing', 'event_bounce', $params);
+              $result = civicrm_api('Mailing', 'event_bounce', $activityParams);
               break;
 
             case 'c':
               // CRM-7921
-              $params = [
+              $activityParams = [
                 'contact_id' => $job,
                 'subscribe_id' => $queue,
                 'hash' => $hash,
                 'version' => 3,
               ];
-              $result = civicrm_api('Mailing', 'event_confirm', $params);
+              $result = civicrm_api('Mailing', 'event_confirm', $activityParams);
               break;
 
             case 'o':
-              $params = [
+              $activityParams = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
                 'version' => 3,
               ];
-              $result = civicrm_api('MailingGroup', 'event_domain_unsubscribe', $params);
+              $result = civicrm_api('MailingGroup', 'event_domain_unsubscribe', $activityParams);
               break;
 
             case 'r':
               // instead of text and HTML parts (4th and 6th params) send the whole email as the last param
-              $params = [
+              $activityParams = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
@@ -241,36 +278,36 @@ class CRM_Utils_Mail_EmailProcessor {
                 'fullEmail' => $mail->generate(),
                 'version' => 3,
               ];
-              $result = civicrm_api('Mailing', 'event_reply', $params);
+              $result = civicrm_api('Mailing', 'event_reply', $activityParams);
               break;
 
             case 'e':
-              $params = [
+              $activityParams = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
                 'version' => 3,
               ];
-              $result = civicrm_api('MailingGroup', 'event_resubscribe', $params);
+              $result = civicrm_api('MailingGroup', 'event_resubscribe', $activityParams);
               break;
 
             case 's':
-              $params = [
+              $activityParams = [
                 'email' => $mail->from->email,
                 'group_id' => $job,
                 'version' => 3,
               ];
-              $result = civicrm_api('MailingGroup', 'event_subscribe', $params);
+              $result = civicrm_api('MailingGroup', 'event_subscribe', $activityParams);
               break;
 
             case 'u':
-              $params = [
+              $activityParams = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
                 'version' => 3,
               ];
-              $result = civicrm_api('MailingGroup', 'event_unsubscribe', $params);
+              $result = civicrm_api('MailingGroup', 'event_unsubscribe', $activityParams);
               break;
           }
 
@@ -278,7 +315,7 @@ class CRM_Utils_Mail_EmailProcessor {
             echo "Failed Processing: {$mail->subject}, Action: $action, Job ID: $job, Queue ID: $queue, Hash: $hash. Reason: {$result['error_message']}\n";
           }
           else {
-            CRM_Utils_Hook::emailProcessor('mailing', $params, $mail, $result, $action);
+            CRM_Utils_Hook::emailProcessor('mailing', $activityParams, $mail, $result, $action);
           }
         }
 
@@ -390,55 +427,6 @@ class CRM_Utils_Mail_EmailProcessor {
       }
     }
     return $text;
-  }
-
-  /**
-   * @param array $result
-   * @param CRM_Core_DAO_MailSettings $dao
-   *
-   * @return array
-   *   <type> $params
-   */
-  protected static function deprecated_activity_buildmailparams($result, $dao) {
-    $params = [];
-
-    // if we don't cast to int (the dao gives a string), then the Inbound Email Activity 1.0 extension won't work, will be fixed in next version to use a non-strict comparison
-    $params['activity_type_id'] = (int) $dao->activity_type_id;
-    $params['campaign_id'] = $dao->campaign_id;
-    $params['status_id'] = $dao->activity_status;
-    $params['source_contact_id'] = $result[$dao->activity_source][0]['id'];
-
-    $activityContacts = ['target_contact_id' => 'activity_targets', 'assignee_contact_id' => 'activity_assignees'];
-    foreach ($activityContacts as $activityContact => $daoName) {
-      $params[$activityContact] = [];
-      $keys = array_filter(explode(",", $dao->$daoName));
-      foreach ($keys as $key) {
-        if (is_array($result[$key])) {
-          foreach ($result[$key] as $key => $keyValue) {
-            if (!empty($keyValue['id'])) {
-              $params[$activityContact][] = $keyValue['id'];
-            }
-          }
-        }
-      }
-    }
-
-    $params['subject'] = $result['subject'];
-    $params['activity_date_time'] = $result['date'];
-    $params['details'] = $result['body'];
-
-    $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
-    for ($i = 1; $i <= $numAttachments; $i++) {
-      if (isset($result["attachFile_$i"])) {
-        $params["attachFile_$i"] = $result["attachFile_$i"];
-      }
-      else {
-        // No point looping 100 times if there's only one attachment
-        break;
-      }
-    }
-
-    return $params;
   }
 
 }
