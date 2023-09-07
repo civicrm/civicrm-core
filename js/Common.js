@@ -544,8 +544,8 @@ if (!CRM.vars) CRM.vars = {};
     }
     var markup = '<div class="crm-entityref-links crm-entityref-links-static">';
     _.each(staticItems, function(link) {
-      markup += ' <a class="crm-hover-button" href="#' + link.id + '">' +
-        '<i class="crm-i ' + link.icon + '" aria-hidden="true"></i> ' +
+      markup += ' <a class="crm-hover-button" href="#' + _.escape(link.id) + '">' +
+        '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
@@ -604,7 +604,7 @@ if (!CRM.vars) CRM.vars = {};
           }
         },
         formatInputTooShort: function() {
-          var txt = $.fn.select2.defaults.formatInputTooShort.call(this);
+          var txt = _.escape($.fn.select2.defaults.formatInputTooShort.call(this));
           txt += getStaticOptionMarkup(staticItems);
           return txt;
         }
@@ -745,12 +745,12 @@ if (!CRM.vars) CRM.vars = {};
       }
       else {
         selectParams.formatInputTooShort = function() {
-          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
+          var txt = _.escape($el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this));
           txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
         selectParams.formatNoMatches = function() {
-          var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
+          var txt = _.escape($el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches);
           txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
@@ -844,14 +844,14 @@ if (!CRM.vars) CRM.vars = {};
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
-      markup += '<div class="crm-select2-image"><img src="' + row.image + '"/></div>';
+      markup += '<div class="crm-select2-image"><img src="' + _.escape(row.image) + '"/></div>';
     }
     else if (row.icon_class) {
-      markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
+      markup += '<div class="crm-select2-icon"><div class="crm-icon ' + _.escape(row.icon_class) + '-icon"></div></div>';
     }
-    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' +
-      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
-      (row.icon ? '<i class="crm-i ' + row.icon + '" aria-hidden="true"></i> ' : '') +
+    markup += '<div><div class="crm-select2-row-label ' + _.escape(row.label_class || '') + '">' +
+      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + _.escape(row.color) + '"></span> ' : '') +
+      (row.icon ? '<i class="crm-i ' + _.escape(row.icon) + '" aria-hidden="true"></i> ' : '') +
       _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '')) +
       '</div>' +
       '<div class="crm-select2-row-description">';
@@ -863,7 +863,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   function formatEntityRefSelection(row) {
-    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
+    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + _.escape(row.color) + '"></span> ' : '') +
       _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
   }
 
@@ -893,8 +893,8 @@ if (!CRM.vars) CRM.vars = {};
       }
     }
     _.each(createLinks, function(link) {
-      markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
-        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
+      markup += ' <a class="crm-add-entity crm-hover-button" href="' + _.escape(link.url) + '">' +
+        '<i class="crm-i ' + _.escape(link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';

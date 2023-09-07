@@ -235,7 +235,7 @@
         "url": "https://github.com/civicrm/jqueryui/archive/1.13.2-civicrm.zip"
       },
       "jquery-validation": {
-        "url": "https://github.com/jquery-validation/jquery-validation/archive/1.19.3.zip",
+        "url": "https://github.com/jquery-validation/jquery-validation/archive/1.19.5.zip",
         "ignore": [".*", "node_modules", "bower_components", "test", "demo", "lib"]
       },
       "json-formatter": {

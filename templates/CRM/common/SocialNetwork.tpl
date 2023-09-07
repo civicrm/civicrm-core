@@ -13,7 +13,7 @@
     <h2>{ts}Help spread the word{/ts}</h2>
     <p>
     {if $title}
-      {ts 1=$pageURL 2=$title}Please help us and let your friends, colleagues and followers know about: <strong><a
+      {ts 1=$pageURL 2=$title|smarty:nodefaults|purify}Please help us and let your friends, colleagues and followers know about: <strong><a
           href="%1">%2</a></strong>{/ts}
     {else}
       {ts}Please help us and let your friends, colleagues and followers know about our page{/ts}.
