@@ -104,7 +104,7 @@
         {if $receive_date}
           {ts}Date{/ts}: <strong>{$receive_date|crmDate}</strong><br />
         {/if}
-        {if $contributeMode ne 'notify' and $is_monetary and ! $is_pay_later and $trxn_id}
+        {if $trxn_id}
           {ts}Transaction #{/ts}: {$trxn_id}<br />
         {/if}
         {if $membership_trx_id}
