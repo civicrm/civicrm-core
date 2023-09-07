@@ -96,6 +96,13 @@ class CRM_Utils_Mail_IncomingMail {
   }
 
   /**
+   * @return ezcMailAddress
+   */
+  public function getFrom(): ezcMailAddress {
+    return $this->mail->from;
+  }
+
+  /**
    * @return string
    */
   public function getSubject(): string {
@@ -126,6 +133,13 @@ class CRM_Utils_Mail_IncomingMail {
    * @throws \CRM_Core_Exception
    */
   public function __construct(ezcMail $mail, string $emailDomain, string $emailLocalPart) {
+    // Sometimes $mail->from is unset because ezcMail didn't handle format
+    // of From header. CRM-19215 (https://issues.civicrm.org/jira/browse/CRM-19215).
+    if (!isset($mail->from)) {
+      if (preg_match('/^([^ ]*)( (.*))?$/', $mail->getHeader('from'), $matches)) {
+        $mail->from = new ezcMailAddress($matches[1], trim($matches[2]));
+      }
+    }
     $this->mail = $mail;
     $this->body = CRM_Utils_Mail_Incoming::formatMailPart($mail->body, $this->attachments);
 

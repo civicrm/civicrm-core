@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\ActivityContact;
+
 /**
  * Class CRM_Utils_Mail_EmailProcessorInboundTest
  * @group headless
@@ -152,12 +154,28 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
    * Test messed up from.
    *
    * This ensures fix for https://issues.civicrm.org/jira/browse/CRM-19215.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBadFrom() :void {
     $email = file_get_contents(__DIR__ . '/data/inbound/test_broken_from.eml');
+    $badEmails = [
+      'foo@example.com' => 'foo@example.com (foo)',
+      "KO'Bananas@benders.com" => "KO'Bananas@benders.com",
+    ];
+    foreach ($badEmails as $index => $badEmail) {
+      $file = fopen(__DIR__ . '/data/mail/test_broken_from.eml' . $index, 'wb');
+      fwrite($file, str_replace('bad-email-placeholder', $badEmail, $email));
+      fclose($file);
+    }
 
-    copy(__DIR__ . '/data/inbound/test_broken_from.eml', __DIR__ . '/data/mail/test_broken_from.eml');
     $this->callAPISuccess('Job', 'fetch_activities', []);
+    $activities = ActivityContact::get()
+      ->addSelect('contact_id.email_primary.email', 'activity_id.activity_type_id:name', 'activity_id.subject')
+      ->addWhere('contact_id.email_primary.email', 'IN', array_keys($badEmails))
+      ->addWhere('record_type_id:name', '=', 'Activity Source')
+      ->execute();
+    $this->assertCount(2, $activities);
   }
 
   /**
