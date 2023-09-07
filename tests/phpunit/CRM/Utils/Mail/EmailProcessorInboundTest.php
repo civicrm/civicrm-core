@@ -149,6 +149,18 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test messed up from.
+   *
+   * This ensures fix for https://issues.civicrm.org/jira/browse/CRM-19215.
+   */
+  public function testBadFrom() :void {
+    $email = file_get_contents(__DIR__ . '/data/inbound/test_broken_from.eml');
+
+    copy(__DIR__ . '/data/inbound/test_broken_from.eml', __DIR__ . '/data/mail/test_broken_from.eml');
+    $this->callAPISuccess('Job', 'fetch_activities', []);
+  }
+
+  /**
    * test hook_civicrm_emailProcessor
    */
   public function testHookEmailProcessor(): void {
@@ -189,7 +201,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
    * as a fallback if it doesn't match an individual first.
    */
   public function hookImplForEmailProcessorContact($email, $contactID, &$result) {
-    list($mailName, $mailDomain) = CRM_Utils_System::explode('@', $email, 2);
+    [$mailName, $mailDomain] = CRM_Utils_System::explode('@', $email, 2);
     if (empty($mailDomain)) {
       return;
     }
