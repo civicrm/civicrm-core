@@ -43,6 +43,20 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Participant', ['id' => $form->getParticipantID()]);
   }
 
+  public function testSubmitDualRole(): void {
+    $email = $this->getForm([], [
+      'status_id' => 1,
+      'register_date' => date('Ymd'),
+      'send_receipt' => 1,
+      'from_email_address' => 'admin@email.com',
+      'role_id' => [
+        CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Volunteer'),
+        CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Speaker'),
+      ],
+    ])->postProcess()->getFirstMailBody();
+    $this->assertStringContainsString('Volunteer, Speaker', $email);
+  }
+
   /**
    * Test financial items pending transaction is later altered.
    *

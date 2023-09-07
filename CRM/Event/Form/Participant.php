@@ -151,7 +151,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @var string
    */
-  public $_mode = NULL;
+  public $_mode;
 
   /**
    * Event ID preselect.
