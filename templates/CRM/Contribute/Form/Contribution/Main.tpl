@@ -94,7 +94,7 @@
       {/if}
     {else}
       <div id="priceset-div">
-        {include file="CRM/Price/Form/PriceSet.tpl" extends="Contribution"}
+        {include file="CRM/Price/Form/PriceSet.tpl" extends="Contribution" hideTotal=$quickConfig}
       </div>
     {/if}
 
