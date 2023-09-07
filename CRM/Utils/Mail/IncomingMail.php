@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\API\EntityLookupTrait;
+use Civi\Api4\MailingJob;
+
 /**
  * Incoming mail class.
  *
@@ -18,6 +21,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Mail_IncomingMail {
+
+  use EntityLookupTrait;
 
   /**
    * @var \ezcMail
@@ -43,6 +48,27 @@ class CRM_Utils_Mail_IncomingMail {
    * @var string
    */
   private $hash;
+
+  /**
+   * @var string|null
+   */
+  private $body;
+
+  /**
+   * @return string|null
+   */
+  public function getBody(): ?string {
+    return $this->body;
+  }
+
+  /**
+   * @return array
+   */
+  public function getAttachments(): array {
+    return $this->attachments;
+  }
+
+  private $attachments = [];
 
   public function getAction() : ?string {
     return $this->action;
@@ -70,6 +96,17 @@ class CRM_Utils_Mail_IncomingMail {
   }
 
   /**
+   * @return string
+   */
+  public function getSubject(): string {
+    return (string) $this->mail->subject;
+  }
+
+  public function getDate(): string {
+    return date('YmdHis', strtotime($this->mail->getHeader('Date')));
+  }
+
+  /**
    * Is this a verp email.
    *
    * If the regex didn't find a match then no.
@@ -90,6 +127,7 @@ class CRM_Utils_Mail_IncomingMail {
    */
   public function __construct(ezcMail $mail, string $emailDomain, string $emailLocalPart) {
     $this->mail = $mail;
+    $this->body = CRM_Utils_Mail_Incoming::formatMailPart($mail->body, $this->attachments);
 
     $verpSeparator = preg_quote(\Civi::settings()->get('verpSeparator') ?: '');
     $emailDomain = preg_quote($emailDomain);
@@ -145,6 +183,26 @@ class CRM_Utils_Mail_IncomingMail {
     if (!$matches && preg_match($regex, ($mail->getHeader('Delivered-To') ?? ''), $matches)) {
       [, $this->action, $this->jobID, $this->queueID, $this->hash] = $matches;
     }
+    if ($this->isVerp()) {
+      $queue = CRM_Mailing_Event_BAO_MailingEventQueue::verify($this->getJobID(), $this->getQueueID(), $this->getHash());
+      if (!$queue) {
+        throw new CRM_Core_Exception('Contact could not be found from civimail response');
+      }
+      $this->define('Queue', 'Queue', [
+        'id' => $queue->id,
+        'hash' => $queue->hash,
+        'contact_id' => $queue->contact_id,
+        'job_id' => $queue->contact_id,
+      ]);
+      $this->define('Mailing', 'Mailing', [
+        'id' => MailingJob::get(FALSE)
+          ->addWhere('id', '=', $this->getJobID())
+          ->addSelect('mailing_id')
+          ->execute()
+          ->first()['mailing_id'],
+      ]);
+    }
+
   }
 
 }

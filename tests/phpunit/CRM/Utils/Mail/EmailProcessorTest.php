@@ -113,9 +113,10 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_sample_message.eml';
 
     copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_bounces', []);
+    $this->callAPISuccess('job', 'fetch_bounces', ['is_create_activities' => TRUE]);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
+    $this->callAPISuccessGetSingle('Activity', ['source_contact_id' => $this->contactID, 'activity_type_id' => 'Inbound Email']);
   }
 
   /**
