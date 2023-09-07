@@ -14,10 +14,13 @@
   </urls>
   <releaseDate>2020-01-09</releaseDate>
   <version>5.67.alpha1</version>
-  <develStage>beta</develStage>
   <compatibility>
     <ver>5.67</ver>
   </compatibility>
+  <develStage>stable</develStage>
+  <tags>
+    <tag>mgmt:required</tag>
+  </tags>
   <comments>The Form Core extension is required to use any dynamic form. To administer and edit forms, also install the FormBuilder extension.</comments>
   <civix>
     <namespace>CRM/Afform</namespace>
