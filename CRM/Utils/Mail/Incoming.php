@@ -306,12 +306,10 @@ class CRM_Utils_Mail_Incoming {
       }
       $params[$field] = [];
       foreach ($value as $address) {
-        $subParam = [];
         // CRM-9484
         if ($address->email) {
-          self::parseAddress($address, $subParam, $mail, $createContact);
+          $params[$field][] = self::parseAddress($address, $createContact);
         }
-        $params[$field][] = $subParam;
       }
     }
     $attachments = [];
@@ -346,19 +344,14 @@ class CRM_Utils_Mail_Incoming {
 
   /**
    * @param ezcMailAddress $address
-   * @param $subParam
-   * @param $mail
    * @param $createContact
    */
-  private static function parseAddress($address, &$subParam, &$mail, $createContact = TRUE) {
-    $subParam['email'] = $address->email;
-    $subParam['name'] = $address->name;
-
-    $contactID = self::getContactID($subParam['email'],
-      $subParam['name'],
+  private static function parseAddress($address, $createContact = TRUE) {
+    $contactID = self::getContactID($address->email,
+      $address->name,
       $createContact
     );
-    $subParam['id'] = $contactID ?: NULL;
+    return $contactID ?: NULL;
   }
 
   /**

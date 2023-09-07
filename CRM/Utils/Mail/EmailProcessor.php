@@ -125,30 +125,18 @@ class CRM_Utils_Mail_EmailProcessor {
               'subject' => $incomingMail->getSubject(),
               'date' => $incomingMail->getDate(),
             ];
-            $activityParams['source_contact_id'] = $mailParams[$dao->activity_source][0]['id'];
+            $activityParams['source_contact_id'] = $mailParams[$dao->activity_source][0];
 
-            $activityContacts = ['target_contact_id' => 'activity_targets', 'assignee_contact_id' => 'activity_assignees'];
             $activityParams['target_contact_id'] = [];
-
-            $targetKeys = array_filter(explode(',', $dao->activity_targets));
-            foreach ($targetKeys as $activityKey) {
-              if (is_array($mailParams[$activityKey])) {
-                foreach ($mailParams[$activityKey] as $keyValue) {
-                  if (!empty($keyValue['id'])) {
-                    $activityParams['target_contact_id'][] = $keyValue['id'];
-                  }
-                }
+            foreach (array_filter(explode(',', $dao->activity_targets)) as $addressField) {
+              foreach ((array) ($mailParams[$addressField] ?? []) as $contactID) {
+                $activityParams['target_contact_id'][] = $contactID;
               }
             }
             $activityParams['assignee_contact_id'] = [];
-            $assigneeKeys = array_filter(explode(',', $dao->activity_assignees));
-            foreach ($assigneeKeys as $activityKey) {
-              if (is_array($mailParams[$activityKey])) {
-                foreach ($mailParams[$activityKey] as $keyValue) {
-                  if (!empty($keyValue['id'])) {
-                    $activityParams['assignee_contact_id'][] = $keyValue['id'];
-                  }
-                }
+            foreach (array_filter(explode(',', $dao->activity_assignees)) as $addressField) {
+              foreach ((array) ($mailParams[$addressField] ?? []) as $contactID) {
+                $activityParams['assignee_contact_id'][] = $contactID;
               }
             }
             $activityParams['details'] = $mailParams['body'];
