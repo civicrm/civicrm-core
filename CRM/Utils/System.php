@@ -472,7 +472,7 @@ class CRM_Utils_System {
   public static function setTitle($title, $pageTitle = NULL) {
     self::$title = $title;
     $config = CRM_Core_Config::singleton();
-    return $config->userSystem->setTitle($title, $pageTitle);
+    return $config->userSystem->setTitle(CRM_Utils_String::purifyHtml($title), CRM_Utils_String::purifyHtml($pageTitle));
   }
 
   /**

@@ -31,7 +31,7 @@
                           {if $keys == 'Title'}
                               <tr>
                                         <th>{$keys}</th>
-                                        <th colspan="3">{$values}</th>
+                                        <th colspan="3">{$values|smarty:nodefaults|purify}</th>
                                     </tr>
                                 {else}
                                     <tr class="{cycle values="odd-row,even-row"} crm-report crm-report_event_summary" id="crm-report_{$eventID}_summary_{$keys}">
