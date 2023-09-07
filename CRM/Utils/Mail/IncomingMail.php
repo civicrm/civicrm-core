@@ -70,6 +70,24 @@ class CRM_Utils_Mail_IncomingMail {
   }
 
   /**
+   * @return ezcMailAddress
+   */
+  public function getFrom(): ezcMailAddress {
+    return $this->mail->from;
+  }
+
+  /**
+   * @return string
+   */
+  public function getSubject(): string {
+    return (string) $this->mail->subject;
+  }
+
+  public function getDate(): string {
+    return date('YmdHis', strtotime($this->mail->getHeader('Date')));
+  }
+
+  /**
    * Is this a verp email.
    *
    * If the regex didn't find a match then no.
@@ -89,6 +107,13 @@ class CRM_Utils_Mail_IncomingMail {
    * @throws \CRM_Core_Exception
    */
   public function __construct(ezcMail $mail, string $emailDomain, string $emailLocalPart) {
+    // Sometimes $mail->from is unset because ezcMail didn't handle format
+    // of From header. CRM-19215 (https://issues.civicrm.org/jira/browse/CRM-19215).
+    if (!isset($mail->from)) {
+      if (preg_match('/^([^ ]*)( (.*))?$/', $mail->getHeader('from'), $matches)) {
+        $mail->from = new ezcMailAddress($matches[1], trim($matches[2]));
+      }
+    }
     $this->mail = $mail;
 
     $verpSeparator = preg_quote(\Civi::settings()->get('verpSeparator') ?: '');

@@ -117,13 +117,14 @@ class CRM_Utils_Mail_EmailProcessor {
 
           // if its the activities that needs to be processed ..
           try {
-            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE, $emailFields);
+            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, [$incomingMail->getFrom()], $emailFields);
             $activityParams = [
               'activity_type_id' => (int) $dao->activity_type_id,
               'campaign_id' => $dao->campaign_id ? (int) $dao->campaign_id : NULL,
               'status_id' => $dao->activity_status,
+              'subject' => $incomingMail->getSubject(),
+              'date' => $incomingMail->getDate(),
             ];
-
             $activityParams['source_contact_id'] = $mailParams[$dao->activity_source][0]['id'];
 
             $activityContacts = ['target_contact_id' => 'activity_targets', 'assignee_contact_id' => 'activity_assignees'];
@@ -141,8 +142,6 @@ class CRM_Utils_Mail_EmailProcessor {
               }
             }
 
-            $activityParams['subject'] = $mailParams['subject'];
-            $activityParams['activity_date_time'] = $mailParams['date'];
             $activityParams['details'] = $mailParams['body'];
 
             $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
