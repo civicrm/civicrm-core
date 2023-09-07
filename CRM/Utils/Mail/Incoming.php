@@ -304,6 +304,7 @@ class CRM_Utils_Mail_Incoming {
       }
     }
 
+    $params = [];
     foreach ($emailFields as $field) {
       // to, bcc, cc are arrays of objects, but from is an object, so make it an array of one object so we can handle it the same
       if ($field === 'from') {
@@ -312,7 +313,12 @@ class CRM_Utils_Mail_Incoming {
       else {
         $value = $mail->$field;
       }
-      self::parseAddresses($value, $field, $params, $mail, $createContact);
+      $params[$field] = [];
+      foreach ($value as $address) {
+        $subParam = [];
+        self::parseAddress($address, $subParam, $mail, $createContact);
+        $params[$field][] = $subParam;
+      }
     }
     // format and move attachments to the civicrm area
     if (!empty($attachments)) {
@@ -362,22 +368,6 @@ class CRM_Utils_Mail_Incoming {
       $mail
     );
     $subParam['id'] = $contactID ?: NULL;
-  }
-
-  /**
-   * @param ezcMailAddress[] $addresses
-   * @param $token
-   * @param array $params
-   * @param $mail
-   * @param $createContact
-   */
-  private static function parseAddresses(&$addresses, $token, &$params, &$mail, $createContact = TRUE) {
-    $params[$token] = [];
-    foreach ($addresses as $address) {
-      $subParam = [];
-      self::parseAddress($address, $subParam, $mail, $createContact);
-      $params[$token][] = $subParam;
-    }
   }
 
   /**
