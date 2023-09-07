@@ -352,8 +352,9 @@ class Api4SelectQuery extends Api4Query {
    * @param bool $strict
    *   In strict mode, this will throw an exception if the field doesn't exist
    *
-   * @return array|null
+   * @return array|bool|null
    * @throws \CRM_Core_Exception
+   * @throws UnauthorizedException
    */
   public function getField($expr, $strict = FALSE) {
     // If the expression contains a pseudoconstant filter like activity_type_id:label,
@@ -378,6 +379,11 @@ class Api4SelectQuery extends Api4Query {
       $this->apiFieldSpec[$expr] = $field;
     }
     return $field;
+  }
+
+  public function getFieldSibling(array $field, string $siblingFieldName) {
+    $prefix = ($field['explicit_join'] ? $field['explicit_join'] . '.' : '') . ($field['implicit_join'] ? $field['implicit_join'] . '.' : '');
+    return $this->getField($prefix . $siblingFieldName);
   }
 
   /**
