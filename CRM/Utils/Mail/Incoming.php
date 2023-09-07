@@ -290,25 +290,17 @@ class CRM_Utils_Mail_Incoming {
    * @param $attachments
    * @param bool $createContact
    * @param array $emailFields
-   *   Which fields to process and create contacts for of from, to, cc, bcc
+   *   Which fields to process and create contacts for - subset of [from, to, cc, bcc],
+   * @param array $from
    *
    * @return array
    */
-  public static function parseMailingObject(&$mail, $attachments, $createContact = TRUE, $emailFields = ['from', 'to', 'cc', 'bcc']) {
-
-    // Sometimes $mail->from is unset because ezcMail didn't handle format
-    // of From header. CRM-19215.
-    if (!isset($mail->from)) {
-      if (preg_match('/^([^ ]*)( (.*))?$/', $mail->getHeader('from'), $matches)) {
-        $mail->from = new ezcMailAddress($matches[1], trim($matches[2]));
-      }
-    }
-
+  public static function parseMailingObject(&$mail, $attachments, $createContact, $emailFields, $from) {
     $params = [];
     foreach ($emailFields as $field) {
       // to, bcc, cc are arrays of objects, but from is an object, so make it an array of one object so we can handle it the same
       if ($field === 'from') {
-        $value = [$mail->$field];
+        $value = $from;
       }
       else {
         $value = $mail->$field;

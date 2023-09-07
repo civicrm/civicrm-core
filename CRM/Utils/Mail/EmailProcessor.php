@@ -118,7 +118,7 @@ class CRM_Utils_Mail_EmailProcessor {
 
           // if its the activities that needs to be processed ..
           try {
-            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $incomingMail->getAttachments(), $createContact, $emailFields);
+            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $incomingMail->getAttachments(), $createContact, $emailFields, [$incomingMail->getFrom()]);
             $activityParams = [
               'activity_type_id' => (int) $dao->activity_type_id,
               'campaign_id' => $dao->campaign_id ? (int) $dao->campaign_id : NULL,
@@ -150,7 +150,6 @@ class CRM_Utils_Mail_EmailProcessor {
                 }
               }
             }
-
             $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
             for ($i = 1; $i <= $numAttachments; $i++) {
               if (isset($mailParams["attachFile_$i"])) {

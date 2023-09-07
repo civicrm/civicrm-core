@@ -8,8 +8,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-From: foo@example.com (foo)
+From: bad-email-placeholder
 To: jjj@myorg.org
-Subject: This is for hooks
+Subject: Subject
 
 Sample body for hook test.
