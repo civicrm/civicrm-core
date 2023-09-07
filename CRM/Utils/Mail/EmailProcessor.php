@@ -128,20 +128,29 @@ class CRM_Utils_Mail_EmailProcessor {
             $activityParams['source_contact_id'] = $mailParams[$dao->activity_source][0]['id'];
 
             $activityContacts = ['target_contact_id' => 'activity_targets', 'assignee_contact_id' => 'activity_assignees'];
-            foreach ($activityContacts as $activityContact => $daoName) {
-              $activityParams[$activityContact] = [];
-              $activityKeys = array_filter(explode(",", $dao->$daoName));
-              foreach ($activityKeys as $activityKey) {
-                if (is_array($mailParams[$activityKey])) {
-                  foreach ($mailParams[$activityKey] as $keyValue) {
-                    if (!empty($keyValue['id'])) {
-                      $activityParams[$activityContact][] = $keyValue['id'];
-                    }
+            $activityParams['target_contact_id'] = [];
+
+            $targetKeys = array_filter(explode(',', $dao->activity_targets));
+            foreach ($targetKeys as $activityKey) {
+              if (is_array($mailParams[$activityKey])) {
+                foreach ($mailParams[$activityKey] as $keyValue) {
+                  if (!empty($keyValue['id'])) {
+                    $activityParams['target_contact_id'][] = $keyValue['id'];
                   }
                 }
               }
             }
-
+            $activityParams['assignee_contact_id'] = [];
+            $assigneeKeys = array_filter(explode(',', $dao->activity_assignees));
+            foreach ($assigneeKeys as $activityKey) {
+              if (is_array($mailParams[$activityKey])) {
+                foreach ($mailParams[$activityKey] as $keyValue) {
+                  if (!empty($keyValue['id'])) {
+                    $activityParams['assignee_contact_id'][] = $keyValue['id'];
+                  }
+                }
+              }
+            }
             $activityParams['details'] = $mailParams['body'];
 
             $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
