@@ -209,8 +209,10 @@ class CRM_Core_PseudoConstant {
     }
 
     // Core field: load schema
-    $dao = new $daoName();
-    $fieldSpec = $dao->getFieldSpec($fieldName);
+    if (class_exists($daoName)) {
+      $dao = new $daoName();
+      $fieldSpec = $dao->getFieldSpec($fieldName);
+    }
 
     // Return false if field doesn't exist.
     if (empty($fieldSpec)) {
