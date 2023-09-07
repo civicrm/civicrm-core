@@ -367,8 +367,7 @@ class CRM_Utils_Mail_Incoming {
 
     $contactID = self::getContactID($subParam['email'],
       $subParam['name'],
-      $createContact,
-      $mail
+      $createContact
     );
     $subParam['id'] = $contactID ?: NULL;
   }
@@ -397,11 +396,12 @@ class CRM_Utils_Mail_Incoming {
    * @param string $email
    * @param string $name
    * @param bool $create
-   * @param string $mail
+   *
+   * @internal core use only (only use outside this class is in core unit tests).
    *
    * @return int|null
    */
-  public static function getContactID($email, $name, $create, &$mail) {
+  public static function getContactID($email, $name, $create) {
     $dao = CRM_Contact_BAO_Contact::matchContactOnEmail($email, 'Individual');
 
     $contactID = NULL;

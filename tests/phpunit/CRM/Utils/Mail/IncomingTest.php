@@ -46,7 +46,7 @@ class CRM_Utils_Mail_IncomingTest extends CiviUnitTestCase {
   public function testEmailUseExistentIndividualContact(): void {
     $expectedContactId = $this->individualCreate(['email' => $this->email]);
 
-    $receivedContactId = CRM_Utils_Mail_Incoming::getContactID($this->email, $this->name, TRUE, $mail);
+    $receivedContactId = CRM_Utils_Mail_Incoming::getContactID($this->email, $this->name, TRUE);
 
     $this->assertEquals($expectedContactId, $receivedContactId);
   }
@@ -58,7 +58,7 @@ class CRM_Utils_Mail_IncomingTest extends CiviUnitTestCase {
     $contact = CRM_Contact_BAO_Contact::matchContactOnEmail($this->email, 'Individual');
     $this->assertNull($contact);
 
-    CRM_Utils_Mail_Incoming::getContactID($this->email, $this->name, TRUE, $mail);
+    CRM_Utils_Mail_Incoming::getContactID($this->email, $this->name, TRUE);
 
     $contact = CRM_Contact_BAO_Contact::matchContactOnEmail($this->email, 'Individual');
     $this->assertNotNull($contact);
@@ -70,7 +70,7 @@ class CRM_Utils_Mail_IncomingTest extends CiviUnitTestCase {
   public function testEmailUseExistentOrganizationContact(): void {
     $expectedContactId = $this->organizationCreate(['email' => $this->email]);
 
-    $receivedContactId = CRM_Utils_Mail_Incoming::getContactID($this->email, $this->name, TRUE, $mail);
+    $receivedContactId = CRM_Utils_Mail_Incoming::getContactID($this->email, $this->name, TRUE);
 
     $this->assertEquals($expectedContactId, $receivedContactId);
   }
@@ -82,7 +82,7 @@ class CRM_Utils_Mail_IncomingTest extends CiviUnitTestCase {
     $individualContactId = $this->individualCreate(['email' => $this->email]);
     $this->organizationCreate(['email' => $this->email]);
 
-    $receivedContactId = CRM_Utils_Mail_Incoming::getContactID($this->email, $this->name, TRUE, $mail);
+    $receivedContactId = CRM_Utils_Mail_Incoming::getContactID($this->email, $this->name, TRUE);
 
     $this->assertEquals($individualContactId, $receivedContactId);
   }
