@@ -287,14 +287,14 @@ class CRM_Utils_Mail_Incoming {
 
   /**
    * @param $mail
-   * @param $createContact
-   * @param $requireContact
+   * @param $attachments
+   * @param bool $createContact
    * @param array $emailFields
    *   Which fields to process and create contacts for of from, to, cc, bcc
    *
    * @return array
    */
-  public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE, $emailFields = ['from', 'to', 'cc', 'bcc']) {
+  public static function parseMailingObject(&$mail, $attachments, $createContact = TRUE, $emailFields = ['from', 'to', 'cc', 'bcc']) {
 
     // Sometimes $mail->from is unset because ezcMail didn't handle format
     // of From header. CRM-19215.
@@ -314,15 +314,6 @@ class CRM_Utils_Mail_Incoming {
       }
       self::parseAddresses($value, $field, $params, $mail, $createContact);
     }
-
-    // define other parameters
-    $params['subject'] = $mail->subject;
-    $params['date'] = date("YmdHi00",
-      strtotime($mail->getHeader("Date"))
-    );
-    $attachments = [];
-    $params['body'] = self::formatMailPart($mail->body, $attachments);
-
     // format and move attachments to the civicrm area
     if (!empty($attachments)) {
       $date = date('YmdHis');
