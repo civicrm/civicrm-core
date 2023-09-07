@@ -148,7 +148,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $eventID = $this->getFieldValue($row, 'id');
+    $eventID = (int) $this->getFieldValue($row, 'id');
     if (array_key_exists($field, $this->getEventTokenValues($eventID))) {
       foreach ($this->getEventTokenValues($eventID)[$field] as $format => $value) {
         $row->format($format)->tokens($entity, $field, $value ?? '');
