@@ -990,8 +990,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     //modify params according to parameter used in create
     //participant method (addParticipant)
     $this->_params['participant_status_id'] = $params['status_id'];
-    $this->_params['participant_role_id'] = is_array($params['role_id']) ? $params['role_id'] : explode(',', $params['role_id']);
-    $roleIdWithSeparator = implode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_params['participant_role_id']);
+    $this->_params['participant_role_id'] = $this->getSubmittedValue('role_id');
     $this->assign('participant_status_id', $params['status_id']);
 
     $now = date('YmdHis');
@@ -1046,32 +1045,30 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $this->_contactId, NULL, NULL, $ctype);
     }
 
-    if (!empty($this->_params['participant_role_id'])) {
-      $customFieldsRole = [];
-      foreach ($this->_params['participant_role_id'] as $roleKey) {
-        $customFieldsRole = CRM_Utils_Array::crmArrayMerge(CRM_Core_BAO_CustomField::getFields('Participant',
-          FALSE, FALSE, $roleKey, $this->_roleCustomDataTypeID), $customFieldsRole);
-      }
-      $customFieldsEvent = CRM_Core_BAO_CustomField::getFields('Participant',
-        FALSE,
-        FALSE,
-        CRM_Utils_Array::value('event_id', $params),
-        $this->_eventNameCustomDataTypeID
-      );
-      $customFieldsEventType = CRM_Core_BAO_CustomField::getFields('Participant',
-        FALSE,
-        FALSE,
-        $this->_eventTypeId,
-        $this->_eventTypeCustomDataTypeID
-      );
-      $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsRole,
-        CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, NULL, TRUE)
-      );
-      $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEvent, $customFields);
-      $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEventType, $customFields);
-
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, $this->getDefaultEntity());
+    $customFieldsRole = [];
+    foreach ($this->getSubmittedValue('role_id') as $roleKey) {
+      $customFieldsRole = CRM_Utils_Array::crmArrayMerge(CRM_Core_BAO_CustomField::getFields('Participant',
+        FALSE, FALSE, $roleKey, $this->_roleCustomDataTypeID), $customFieldsRole);
     }
+    $customFieldsEvent = CRM_Core_BAO_CustomField::getFields('Participant',
+      FALSE,
+      FALSE,
+      CRM_Utils_Array::value('event_id', $params),
+      $this->_eventNameCustomDataTypeID
+    );
+    $customFieldsEventType = CRM_Core_BAO_CustomField::getFields('Participant',
+      FALSE,
+      FALSE,
+      $this->_eventTypeId,
+      $this->_eventTypeCustomDataTypeID
+    );
+    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsRole,
+      CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, NULL, TRUE)
+    );
+    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEvent, $customFields);
+    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEventType, $customFields);
+
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, $this->getDefaultEntity());
 
     //do cleanup line  items if participant edit the Event Fee.
     if (($this->_lineItem || !isset($params['proceSetId'])) && !$this->_paymentId && $this->_id) {
