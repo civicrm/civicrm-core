@@ -69,7 +69,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFour extends CRM_Upgrade_Incremental_
       $dsn = DB::parseDSN($dsn);
       $table = '`' . $dsn['database'] . '`.`log_civicrm_uf_group`';
       CRM_Core_DAO::executeQuery("ALTER TABLE $table CHANGE `post_URL` `post_url` varchar(255) DEFAULT NULL COMMENT 'Redirect to URL on submit.',
-CHANGE `cancel_URL` `cancel_url` varchar(255) DEFAULT NULL COMMENT 'Redirect to URL when Cancel button clicked.'");
+CHANGE `cancel_URL` `cancel_url` varchar(255) DEFAULT NULL COMMENT 'Redirect to URL when Cancel button clicked.'", [], TRUE, NULL, FALSE, FALSE);
     }
     return TRUE;
   }
