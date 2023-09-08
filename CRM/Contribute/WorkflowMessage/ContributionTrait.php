@@ -31,6 +31,18 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   public $isShowTax;
 
   /**
+   * Is it a good idea to show the line item subtotal.
+   *
+   * This would be true if at least one line has a quantity > 1.
+   * Otherwise it is very repetitive.
+   *
+   * @var bool
+   *
+   * @scope tplParams
+   */
+  public $isShowLineSubtotal;
+
+  /**
    * Line items associated with the contribution.
    *
    * @var array
@@ -109,6 +121,25 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
       return FALSE;
     }
     return !$this->order->getPriceSetMetadata()['is_quick_config'];
+    return $this->isShowLineItems;
+  }
+
+  /**
+   * Is it a good idea to show the line item subtotal.
+   *
+   * This would be true if at least one line has a quantity > 1.
+   * Otherwise it is very repetitive.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function getIsShowLineSubtotal(): bool {
+    foreach ($this->getLineItems() as $lineItem) {
+      if ((int) $lineItem['qty'] > 1) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**

@@ -163,124 +163,80 @@
 
 
      {if {event.is_monetary|boolean}}
-
       <tr>
        <th {$headerStyle}>
-        {event.fee_label}
+         {event.fee_label}
        </th>
       </tr>
 
-      {if !empty($lineItem)}
-       {foreach from=$lineItem item=value key=priceset}
-        {if $value neq 'skip'}
-          {if $lineItem|@count GT 1} {* Header for multi participant registration cases. *}
-           <tr>
-            <td colspan="2" {$labelStyle}>
-             {ts 1=$priceset+1}Participant %1{/ts}
-            </td>
-           </tr>
-          {/if}
-
+       {if $isShowLineItems}
          <tr>
-          <td colspan="2" {$valueStyle}>
-           <table>
-            <tr>
-             <th>{ts}Item{/ts}</th>
-             <th>{ts}Qty{/ts}</th>
-             <th>{ts}Each{/ts}</th>
-             {if !empty($dataArray)}
-              <th>{ts}SubTotal{/ts}</th>
-              <th>{ts}Tax Rate{/ts}</th>
-              <th>{ts}Tax Amount{/ts}</th>
-             {/if}
-             <th>{ts}Total{/ts}</th>
-       {if !empty($pricesetFieldsCount) }<th>{ts}Total Participants{/ts}</th>{/if}
-            </tr>
-            {foreach from=$value item=line}
-             <tr>
-              <td>
-        {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}
-              </td>
-              <td>
-               {$line.qty}
-              </td>
-              <td>
-               {$line.unit_price|crmMoney}
-              </td>
-              {if !empty($dataArray)}
-               <td>
-                {$line.unit_price*$line.qty|crmMoney}
-               </td>
-               {if $line.tax_rate || $line.tax_amount != ""}
-                <td>
-                 {$line.tax_rate|string_format:"%.2f"}%
-                </td>
-                <td>
-                 {$line.tax_amount|crmMoney}
-                </td>
-               {else}
-                <td></td>
-                <td></td>
-               {/if}
-              {/if}
-              <td>
-               {$line.line_total+$line.tax_amount|crmMoney}
-              </td>
-        {if  !empty($pricesetFieldsCount) }
-        <td>
-    {$line.participant_count}
-              </td>
-        {/if}
-             </tr>
-            {/foreach}
-           </table>
-          </td>
+           <td colspan="2" {$valueStyle}>
+             <table>
+               <tr>
+                 <th>{ts}Item{/ts}</th>
+                 <th>{ts}Qty{/ts}</th>
+                 <th>{ts}Each{/ts}</th>
+                 {if $isShowTax && {contribution.tax_amount|boolean}}
+                   {if $isShowLineSubtotal}<th>{ts}SubTotal{/ts}</th>{/if}
+                   <th>{ts}Tax Rate{/ts}</th>
+                   <th>{ts}Tax Amount{/ts}</th>
+                 {/if}
+                 <th>{ts}Total{/ts}</th>
+                 {if $isShowParticipantCount}
+                   <th>{ts}Total Participants{/ts}</th>
+                 {/if}
+               </tr>
+                 {foreach from=$participants key=index item=participant}
+                   {* Display if it is the current participant or this is the primary participant *}
+                   {if $isPrimary || {participant.id} === $participant.id}
+                     {foreach from=$participant.line_items item=line}
+                       <tr>
+                         <td>{$line.title}</td>
+                         <td>{$line.qty}</td>
+                         <td>{$line.unit_price|crmMoney:$currency}</td>
+                         {if $isShowTax && {contribution.tax_amount|boolean}}
+                           {if $isShowLineSubtotal}<td>{$line.line_total|crmMoney:$currency}</td>{/if}
+                           <td>{$line.tax_rate|string_format:"%.2f"}%</td>
+                           <td>{$line.tax_amount|crmMoney:$currency}</td>
+                         {/if}
+                         <td>{$line.line_total+$line.tax_amount|crmMoney}</td>
+                         {if $isShowParticipantCount}
+                           <td>{$line.participant_count}</td>
+                         {/if}
+                       </tr>
+                     {/foreach}
+                   {/if}
+                 {/foreach}
+             </table>
+           </td>
          </tr>
-        {/if}
-       {/foreach}
-       {if !empty($dataArray)}
-        {if $totalAmount and $totalTaxAmount}
-        <tr>
-         <td {$labelStyle}>
-          {ts}Amount Before Tax:{/ts}
-         </td>
-         <td {$valueStyle}>
-          {$totalAmount-$totalTaxAmount|crmMoney}
-         </td>
-        </tr>
-        {/if}
-        {foreach from=$dataArray item=value key=priceset}
-          <tr>
-           {if $priceset || $priceset == 0}
-            <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
-            <td>&nbsp;{$value|crmMoney:$currency}</td>
-           {/if}
-          </tr>
-        {/foreach}
        {/if}
-      {/if}
-
-      {if !empty($amount) && !$lineItem}
-       {foreach from=$amount item=amnt key=level}
-        <tr>
-         <td colspan="2" {$valueStyle}>
-          {$amnt.amount|crmMoney} {$amnt.label}
-         </td>
-        </tr>
+       {foreach from=$participants key=index item=participant}
+         {if !$isPrimary && {participant.id} === $participant.id}
+           {* Use the participant specific tax rate breakdown *}
+           {assign var=taxRateBreakdown value=$participant.tax_rate_breakdown}
+         {/if}
        {/foreach}
-      {/if}
+       {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
+         <tr>
+           <td {$labelStyle}>{if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else}{$taxTerm} {$taxDetail.percentage}%{/if}</td>
+           <td {$valueStyle}>{$taxDetail.amount|crmMoney:'{contribution.currency}'}</td>
+         </tr>
+       {/foreach}
+
       {if {contribution.tax_amount|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}Total Tax Amount{/ts}
         </td>
         <td {$valueStyle}>
-          {contribution.tax_amount}
+            {if $isPrimary}{contribution.tax_amount}{else}{$participantDetail.totals.tax_amount|crmMoney}{/if}
         </td>
        </tr>
       {/if}
       {if {event.is_monetary|boolean}}
-       {if {contribution.balance_amount|boolean}}
+      {if $isPrimary && {contribution.balance_amount|boolean}}
          <tr>
            <td {$labelStyle}>{ts}Total Paid{/ts}</td>
            <td {$valueStyle}>
@@ -295,33 +251,11 @@
          <tr>
            <td {$labelStyle}>{ts}Total Amount{/ts}</td>
            <td {$valueStyle}>
-             {contribution.total_amount} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+             {if $isPrimary}{contribution.total_amount}{else}{$participantDetail.totals.total_amount_inclusive|crmMoney:$currency}{/if} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
            </td>
          </tr>
        {/if}
-       {if !empty($pricesetFieldsCount) }
-     <tr>
-       <td {$labelStyle}>
-   {ts}Total Participants{/ts}</td>
-       <td {$valueStyle}>
-   {assign var="count" value= 0}
-         {foreach from=$lineItem item=pcount}
-         {assign var="lineItemCount" value=0}
-         {if $pcount neq 'skip'}
-           {foreach from=$pcount item=p_count}
-           {assign var="lineItemCount" value=$lineItemCount+$p_count.participant_count}
-           {/foreach}
-           {if $lineItemCount < 1 }
-           assign var="lineItemCount" value=1}
-           {/if}
-           {assign var="count" value=$count+$lineItemCount}
-         {/if}
-         {/foreach}
-   {$count}
-       </td>
-     </tr>
-     {/if}
-       {if $is_pay_later}
+         {if $is_pay_later}
         <tr>
          <td colspan="2" {$labelStyle}>
           {$pay_later_receipt}
@@ -340,57 +274,57 @@
         </tr>
        {/if}
 
-       {if !empty($receive_date)}
+       {if {contribution.receive_date|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Transaction Date{/ts}
          </td>
          <td {$valueStyle}>
-          {$receive_date|crmDate}
+           {contribution.receive_date}
          </td>
         </tr>
        {/if}
 
-       {if !empty($financialTypeName)}
+       {if {contribution.financial_type_id|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Financial Type{/ts}
          </td>
          <td {$valueStyle}>
-          {$financialTypeName}
+           {contribution.financial_type_id:label}
          </td>
         </tr>
        {/if}
 
-       {if !empty($trxn_id)}
+       {if {contribution.trxn_id|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Transaction #{/ts}
          </td>
          <td {$valueStyle}>
-          {$trxn_id}
+           {contribution.trxn_id}
          </td>
         </tr>
        {/if}
 
-       {if !empty($paidBy)}
+       {if {contribution.payment_instrument_id|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Paid By{/ts}
          </td>
          <td {$valueStyle}>
-         {$paidBy}
+           {contribution.payment_instrument_id:label}
          </td>
         </tr>
        {/if}
 
-       {if !empty($checkNumber)}
+       {if {contribution.check_number|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Check Number{/ts}
          </td>
          <td {$valueStyle}>
-          {$checkNumber}
+           {contribution.check_number}
          </td>
         </tr>
        {/if}

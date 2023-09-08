@@ -38,6 +38,19 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
   public $isPrimary;
 
   /**
+   * Should a participant count column be shown.
+   *
+   * This would be true if there is a line item on the receipt
+   * with more than one participant in it. Otherwise it's confusing to
+   * show.
+   *
+   * @var bool
+   *
+   * @scope tplParams as isShowParticipantCount
+   */
+  public $isShowParticipantCount;
+
+  /**
    * @var int
    *
    * @scope tokenContext as eventId, tplParams as eventID
@@ -48,7 +61,9 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * Line items indexed by the participant.
    *
    * The format is otherwise the same as lineItems which is also available on the
-   * template. The by-participant re-keying permits only including the current
+   * template. It also includes totals.
+   *
+   * The by-participant re-keying permits only including the current
    * participant for non-primary participants and
    * creating a by-participant table for the primary participant.
    *
@@ -57,6 +72,17 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * @scope tplParams as participants
    */
   public $participants;
+
+  /**
+   * Line items indexed by the participant.
+   *
+   * The format includes the line items and totals that are determined per participant.
+   *
+   * @var array
+   *
+   * @scope tplParams as participantDetail
+   */
+  public $participantDetail;
 
   /**
    * Details of the participant contacts.
@@ -141,7 +167,26 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
   }
 
   /**
-   * Set contribution object.
+   * It is a good idea to show the participant count column.
+   *
+   * This would be true if there is a line item on the receipt
+   * with more than one participant in it. Otherwise it's confusing to
+   * show.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function getIsShowParticipantCount(): bool {
+    foreach ($this->getLineItems() as $lineItem) {
+      if ((int) $lineItem['participant_count'] > 1) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Set participant object.
    *
    * @param array $participant
    *
@@ -171,6 +216,19 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
         ->addSelect('registered_by_id')->execute()->first();
     }
     return $this->participant;
+  }
+
+  /**
+   * Get the details for the recipient participant.
+   *
+   * The details include line items and tax break down & hence differ from the
+   * `participant` property which is a simple api entitiy.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getParticipantDetail(): array {
+    return $this->getParticipants()[$this->getParticipantID()];
   }
 
   /**
