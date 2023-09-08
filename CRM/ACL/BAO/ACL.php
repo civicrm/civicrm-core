@@ -233,7 +233,7 @@ SELECT count( a.id )
       $aclKeys = implode(',', $aclKeys);
       $orderBy = 'a.object_id';
       if (array_key_exists('priority', CRM_ACL_BAO_ACL::getSupportedFields())) {
-        $orderBy .= ',a.priority';
+        $orderBy = 'a.priority,a.object_id';
       }
       $query = "
 SELECT   a.operation, a.object_id,a.deny
@@ -456,7 +456,7 @@ ORDER BY {$orderBy}
     $aclKeys = implode(',', $aclKeys);
     $orderBy = 'a.object_id';
     if (array_key_exists('priority', CRM_ACL_BAO_ACL::getSupportedFields())) {
-      $orderBy .= ',a.priority';
+      $orderBy = 'a.priority,a.object_id';
     }
     $query = "
 SELECT   a.operation,a.object_id,a.deny
@@ -493,7 +493,6 @@ ORDER BY {$orderBy}
             $ids = array_diff($ids, array_keys($allGroups));
           }
         }
-        break;
       }
     }
     return $ids;
