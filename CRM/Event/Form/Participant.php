@@ -1364,7 +1364,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     if (!empty($params['send_receipt'])) {
-      $result = $this->sendReceipts($params, $contributionParams['total_amount'], $customFields, $participants, $lineItem[0] ?? [], $additionalParticipantDetails);
+      $result = $this->sendReceipts($params, $customFields, $participants, $lineItem[0] ?? [], $additionalParticipantDetails ?? []);
     }
 
     // set the participant id if it is not set
@@ -2129,7 +2129,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
   /**
    * @param $params
-   * @param $total_amount
    * @param array $customFields
    * @param array $participants
    * @param $lineItem
@@ -2138,7 +2137,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function sendReceipts($params, $total_amount, array $customFields, array $participants, $lineItem, $additionalParticipantDetails): array {
+  protected function sendReceipts($params, array $customFields, array $participants, $lineItem, $additionalParticipantDetails): array {
     $sent = [];
     $notSent = [];
     $this->assign('module', 'Event Registration');
@@ -2159,10 +2158,9 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
           );
         }
       }
-
-      $this->assign('totalAmount', $params['total_amount'] ?? $total_amount);
-      $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
     }
+
+    $this->assign('checkNumber', $params['check_number'] ?? NULL);
     if ($this->_mode) {
       $this->assignBillingName($params);
       $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
@@ -2210,6 +2208,16 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $participants[$num]->id, 'contribution_id', 'participant_id'
       );
+      $totalAmount = 0;
+      if ($contributionID) {
+        // @todo - this should be temporary - we are looking to remove this variable from the template
+        // in favour of the {contribution.total_amount} token.
+        // In case this needs back-porting I have kept it as simple as possible.
+        $totalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
+          $contributionID, 'id', 'total_amount'
+        );
+      }
+      $this->assign('totalAmount', $params['total_amount'] ?? $totalAmount);
       $this->_id = $participants[$num]->id;
 
       if ($this->_isPaidEvent) {

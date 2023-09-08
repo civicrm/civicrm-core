@@ -44,6 +44,23 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test an unpaid event, test role displays in receipt
+   */
+  public function testSubmitUnPaidEvent(): void {
+    $this->getForm(['is_monetary' => FALSE], [
+      'status_id' => 1,
+      'send_receipt' => 1,
+      'from_email_address' => 'admin@example.com',
+      'register_date' => date('Y-m-d H:i:s'),
+      'role_id' => [
+        CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Volunteer'),
+        CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Speaker'),
+      ],
+    ])->postProcess();
+    $this->callAPISuccessGetCount('Participant', [], 1);
+  }
+
+  /**
    * Test financial items pending transaction is later altered.
    *
    * @throws \Exception
