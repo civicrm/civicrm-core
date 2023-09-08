@@ -22,10 +22,18 @@ UPDATE civicrm_contribution_page SET `name` = `id`;
 {if $multilingual}
   {foreach from=$locales item=locale}
     UPDATE `civicrm_contribution_page`
+    SET `title_{$locale}` = ''
+    WHERE `title_{$locale}` IS NULL;
+
+    UPDATE `civicrm_contribution_page`
     SET `frontend_title_{$locale}` = `title_{$locale}`
     WHERE `frontend_title_{$locale}` IS NULL OR `frontend_title_{$locale}` = '';
   {/foreach}
 {else}
+  UPDATE `civicrm_contribution_page`
+  SET `title` = ''
+  WHERE `title` IS NULL;
+
   UPDATE `civicrm_contribution_page`
   SET `frontend_title` = `title`
   WHERE `frontend_title` IS NULL OR `frontend_title` = '';
