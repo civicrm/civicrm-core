@@ -207,6 +207,68 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * This callback is used to enable one or more extensions which have no install or upgrade code,
+   * and whose autoloaders are needed right away.
+   *
+   * It was written to facilitate migrating core code into extensions.
+   * Moving a class into an extension means it is no longer loaded by the core autoloader.
+   * Upgrade code that relies on it could crash if classes disappear during the upgrade,
+   * so this function sets the extension status to enabled and installs its autoloader;
+   * both of which are important depending on the upgrade interface:
+   * - The web UI does each step as a separate ajax request, so inserting/enabling the extension in the db
+   * ensures it is loaded on subsequent requests.
+   * - The CLI upgrader does everything in a single request so its autoloader should be installed right away.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string|array $keys
+   * @return bool
+   * @throws CRM_Extension_Exception
+   * @throws DBQueryException
+   */
+  public static function enableSimpleExtension(CRM_Queue_TaskContext $ctx, $keys): bool {
+    $keys = (array) $keys;
+    $select = CRM_Utils_SQL_Select::from('civicrm_extension')
+      ->select(['full_name, is_active'])
+      ->where('full_name IN (@keys)', ['@keys' => $keys])
+      ->toSQL();
+    $all = CRM_Core_DAO::executeQuery($select, [], TRUE, NULL, FALSE, FALSE)
+      ->fetchMap('full_name', 'is_active');
+    $toEnable = array_filter($all, function($isActive) {
+      return !$isActive;
+    });
+    $system = CRM_Extension_System::singleton();
+    $toInsert = [];
+    foreach ($keys as $key) {
+      if (empty($all[$key])) {
+        $info = $system->getMapper()->keyToInfo($key);
+        $path = $system->getMapper()->keyToPath($key);
+        $system->getClassLoader()->installExtension($info, $path);
+      }
+      if (!isset($all[$key])) {
+        $toInsert[] = [
+          'full_name' => $info->key,
+          'type' => $info->type,
+          'name' => $info->name,
+          'label' => $info->label,
+          'file' => $info->file,
+          'is_active' => 1,
+        ];
+      }
+    }
+    if ($toEnable) {
+      $updateSql = 'UPDATE civicrm_extension SET is_active = 1 WHERE full_name IN ("' . implode('", "', array_keys($toEnable)) . '")';
+      CRM_Core_DAO::executeQuery($updateSql, [], TRUE, NULL, FALSE, FALSE);
+    }
+    if ($toInsert) {
+      $insertSql = CRM_Utils_SQL_Insert::into('civicrm_extension')
+        ->rows($toInsert)
+        ->toSQL();
+      CRM_Core_DAO::executeQuery($insertSql, [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
+  /**
    * @param \CRM_Queue_TaskContext $ctx
    * @param string[] $keys
    *   List of extensions to enable.
