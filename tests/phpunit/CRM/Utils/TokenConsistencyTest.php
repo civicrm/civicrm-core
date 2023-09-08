@@ -681,6 +681,7 @@ event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL
 event.pay_later_receipt :Please transfer funds to our bank account.
 event.custom_1 :my field
 event.confirm_email_text :
+event.fee_label :Event fees
 ';
   }
 
@@ -980,6 +981,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{event.pay_later_receipt}' => 'Pay Later Receipt Text',
       '{event.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
       '{event.confirm_email_text}' => 'Confirmation Email Text',
+      '{event.fee_label}' => 'Fee Label',
     ];
   }
 
