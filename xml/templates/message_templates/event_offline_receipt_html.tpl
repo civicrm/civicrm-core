@@ -166,7 +166,7 @@
 
       <tr>
        <th {$headerStyle}>
-        {if !empty($event.fee_label)}{$event.fee_label}{/if}
+        {event.fee_label}
        </th>
       </tr>
 

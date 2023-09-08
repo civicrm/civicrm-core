@@ -100,7 +100,7 @@ You were registered by: {$payer.name}
 
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
-{if !empty ($event.fee_label)}{$event.fee_label}{/if}
+{event.fee_label}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {if !empty($lineItem)}{foreach from=$lineItem item=value key=priceset}

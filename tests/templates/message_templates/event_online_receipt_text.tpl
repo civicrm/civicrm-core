@@ -38,9 +38,7 @@ event.event_end_date:::{event.end_date|crmDate:"%Y%m%d"}
 {if isset($event.is_monetary)}
 event.is_monetary:::{$event.is_monetary}
 {/if}
-{if !empty($event.fee_label)}
-event.fee_label:::{$event.fee_label}
-{/if}
+event.fee_label:::{event.fee_label}
 {if !empty($conference_sessions)}
 conference_sessions:::{$conference_sessions}
 {/if}
