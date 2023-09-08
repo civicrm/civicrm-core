@@ -1576,6 +1576,12 @@ class CRM_Core_Permission {
       'gettree' => ['access CiviCRM'],
     ];
 
+    $permissions['location_type'] = [
+      'get' => ['access CiviCRM'],
+      'update' => ['administer CiviCRM data'],
+      'delete' => ['administer CiviCRM data'],
+    ];
+
     $permissions['message_template'] = [
       'get' => ['access CiviCRM'],
       'create' => [['edit message templates', 'edit user-driven message templates', 'edit system workflow message templates']],

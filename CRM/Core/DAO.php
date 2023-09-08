@@ -3123,7 +3123,10 @@ SELECT contact_id
     foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
       $clauses[$field] = NULL;
       if ($vals) {
-        $clauses[$field] = "(`$tableAlias`.`$field` IS NULL OR (`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals) . '))';
+        $clauses[$field] = "(`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals) . ')';
+        if (empty(static::getSupportedFields()[$field]['required'])) {
+          $clauses[$field] = "(`$tableAlias`.`$field` IS NULL OR {$clauses[$field]})";
+        }
       }
     }
     return $clauses;

@@ -495,24 +495,34 @@ class Api4SelectQuery extends Api4Query {
     // with a padded empty stack to bypass its deduping.
     $stack = [NULL, NULL];
     // See if the ON clause already contains an FK reference to joinEntity
-    $explicitFK = array_filter($joinTree, function($clause) use ($alias, $joinEntityFields) {
+    $explicitFK = array_filter($joinTree, function($clause) use ($alias, $joinEntityFields, &$stack) {
       [$sideA, $op, $sideB] = array_pad((array) $clause, 3, NULL);
       if ($op !== '=' || !$sideB) {
         return FALSE;
       }
-      foreach ([$sideA, $sideB] as $expr) {
-        // Check for explicit link to FK entity
-        if ($expr === "$alias.id" || !empty($joinEntityFields[str_replace("$alias.", '', $expr)]['fk_entity'])) {
-          return TRUE;
+      foreach ([2 => $sideA, 0 => $sideB] as $otherSide => $expr) {
+        if (!str_starts_with($expr, "$alias.")) {
+          continue;
         }
-        // Check for dynamic FK
-        if ($expr === "$alias.entity_id") {
+        $joinField = str_replace("$alias.", '', $expr);
+        // Check for explicit link to FK entity (include entity_id for dynamic FKs)
+        // FIXME: This is just guessing. We ought to check the schema for all unique fields and foreign keys.
+        if (
+          // Unique field - might be a link FROM the other entity
+          in_array($joinField, ['id', 'name'], TRUE) ||
+          // FK field - might be a link TO the other entity
+          $joinField === 'entity_id' || !empty($joinEntityFields[$joinField]['fk_entity'])) {
+          // If the join links to a field on the main entity, ACL clauses can be deduped
+          if (preg_match('/^[_a-z0-9]+$/i', $clause[$otherSide])) {
+            $stack = [$clause[$otherSide]];
+          }
           return TRUE;
         }
       }
       return FALSE;
     });
     // If we're not explicitly referencing the ID (or some other FK field) of the joinEntity, search for a default
+    // FIXME: This guesswork ought to emit a deprecation notice. SearchKit doesn't use it.
     if (!$explicitFK) {
       foreach ($this->apiFieldSpec as $name => $field) {
         if (!is_array($field) || $field['type'] !== 'Field') {
