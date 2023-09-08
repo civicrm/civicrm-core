@@ -200,6 +200,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
           'is_monetary:label',
           'event_type_id:name',
           'pay_later_text',
+          'pay_later_receipt',
           'fee_label',
           'custom.*',
         ], $this->getExposedFields()))
@@ -264,6 +265,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       'is_public',
       'confirm_email_text',
       'is_monetary',
+      'fee_label',
     ];
   }
 
