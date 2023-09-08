@@ -1425,18 +1425,48 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called soon after the CRM_Core_Config object has ben initialized.
    * You can use this hook to modify the config object and hence behavior of CiviCRM dynamically.
    *
-   * @param CRM_Core_Config|array $config
+   * In *typical* page-loads, this hook fires one time. However, the hook may fire multiple times if...
+   *
+   * - the process is executing test-suites, or
+   * - the process involves some special configuration-changes, or
+   * - the process begins with the "extern" bootstrap process (aka `loadBootStrap()`)
+   *       N.B. For "extern", CiviCRM initially boots without having access to the UF APIs.
+   *       When the UF eventually boots, it may re-fire the event (for the benefit UF add-ons).
+   *
+   * The possibility of multiple invocations means that most consumers should be guarded.
+   * When registering resources, consult the `$flags`.
+   *
+   *   function hook_civicrm_config($config, $flags = NULL) {
+   *     if ($flags['...']) {
+   *       Civi::dispatcher()->addListener(...);
+   *       CRM_Core_Smarty::singleton()->addTemplateDir(...);
+   *     }
+   *   }
+   *
+   * @param CRM_Core_Config $config
    *   The config object
+   * @param array|NULL $flags
+   *   Mix of flags:
+   *     - civicrm: TRUE if this invocation is intended for CiviCRM extensions
+   *     - uf: TRUE if this invocation is intended for UF modules (Drupal/Joomla/etc)
+   *     - instances: The number of distinct copies of `CRM_Core_Config` which have been initialized.
+   *
+   *   The value of `$flags` is NULL when executing on an older CiviCRM environments (<=5.65).
    *
    * @return mixed
    */
-  public static function config(&$config) {
+  public static function config(&$config, ?array $flags = NULL) {
+    static $count = 0;
+    if (!empty($flags['civicrm'])) {
+      $count++;
+    }
+    $defaultFlags = ['civicrm' => FALSE, 'uf' => FALSE, 'instances' => $count];
+    $flags = array_merge($defaultFlags, $flags);
     $null = NULL;
-    return self::singleton()->invoke(['config'], $config,
-      $null, $null, $null, $null, $null,
+    return self::singleton()->invoke(['config', 'flags'], $config,
+      $flags, $null, $null, $null, $null,
       'civicrm_config'
     );
   }

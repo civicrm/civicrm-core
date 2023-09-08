@@ -286,7 +286,7 @@ class TokenRow {
                 $htmlTokens[$entity][$field] = \CRM_Utils_String::purifyHTML($value);
               }
               else {
-                $htmlTokens[$entity][$field] = is_object($value) ? $value : nl2br(htmlentities($value, ENT_QUOTES));
+                $htmlTokens[$entity][$field] = is_object($value) ? $value : rtrim(nl2br(htmlentities($value, ENT_QUOTES)), "\r\n");
               }
             }
           }

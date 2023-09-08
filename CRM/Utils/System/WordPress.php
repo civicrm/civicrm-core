@@ -679,6 +679,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * @internal
+   * @return bool
+   */
+  public function isLoaded(): bool {
+    return function_exists('__');
+  }
+
+  /**
    * Tries to bootstrap WordPress.
    *
    * @param array $params

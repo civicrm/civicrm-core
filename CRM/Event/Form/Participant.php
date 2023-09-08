@@ -830,8 +830,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (empty($values['payment_instrument_id'])) {
         $errorMsg['payment_instrument_id'] = ts('Payment Method is a required field.');
       }
-      if (!empty($values['priceSetId'])) {
-        CRM_Price_BAO_PriceField::priceSetValidation($values['priceSetId'], $values, $errorMsg);
+      if ($self->getPriceSetID()) {
+        CRM_Price_BAO_PriceField::priceSetValidation($self->getPriceSetID(), $values, $errorMsg);
       }
     }
 
@@ -842,9 +842,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       ) ||
       ($self->_id && !$self->_paymentId && isset($self->_values['line_items']) && is_array($self->_values['line_items']))
     ) {
-      $priceSetId = $values['priceSetId'] ?? NULL;
-      if ($priceSetId) {
-        CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $values, $errorMsg, TRUE);
+      // @todo - this seems unreachable.
+      if ($self->getPriceSetID()) {
+        CRM_Price_BAO_PriceField::priceSetValidation($self->getPriceSetID(), $values, $errorMsg, TRUE);
       }
     }
     // For single additions - show validation error if the contact has already been registered

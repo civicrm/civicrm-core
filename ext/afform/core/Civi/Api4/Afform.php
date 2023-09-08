@@ -21,6 +21,7 @@ use CRM_Afform_ExtensionUtil as E;
  * @labelField title
  * @iconField type:icon
  * @searchable none
+ * @since 5.31
  * @package Civi\Api4
  */
 class Afform extends Generic\AbstractEntity {

@@ -513,7 +513,7 @@ AND    u.status = 1
     // all the modules that are listening on it, does not apply
     // to J! and WP as yet
     // CRM-8655
-    CRM_Utils_Hook::config($config);
+    CRM_Utils_Hook::config($config, ['uf' => TRUE]);
 
     if (!$loadUser) {
       return TRUE;
@@ -556,6 +556,7 @@ AND    u.status = 1
     $config->cleanURL = (int) variable_get('clean_url', '0');
 
     // CRM-8655: Drupal wasn't available during bootstrap, so hook_civicrm_config never executes
+    // FIXME: This call looks redundant with the earlier call in the same function. Consider removing it.
     CRM_Utils_Hook::config($config);
 
     return FALSE;
