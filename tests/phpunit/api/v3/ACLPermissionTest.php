@@ -1456,6 +1456,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->assertCount(2, $contacts);
     $this->assertEquals($contact2, $contacts[0]['id']);
     $this->assertEquals($contact3, $contacts[1]['id']);
+    $groups = CRM_ACL_API::group(CRM_ACL_API::EDIT);
+    $this->assertFalse(in_array($excludeGroup, $groups));
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
   }
 
   /**
