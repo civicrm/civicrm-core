@@ -1697,6 +1697,48 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('$250.00', $result[3]['columns'][0]['val']);
   }
 
+  public function testContributionTotalCountWithTestAndTemplateContributions():void {
+    // Add a source here for the where below, as if we use id, we get the test and template contributions
+    $contributions = $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['is_test' => TRUE, 'source' => 'TestTemplate'],
+        ['is_template' => TRUE, 'source' => 'TestTemplate'],
+        ['source' => 'TestTemplate'],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id'],
+          'where' => [['source', '=', 'TestTemplate']],
+        ],
+      ],
+      'display' => [
+        'settings' => [
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'tally' => [
+                'fn' => 'COUNT',
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $return = civicrm_api4('SearchDisplay', 'run', $params);
+    $params['return'] = 'tally';
+    $total = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals($return->rowCount, $total[0]['id']);
+  }
+
   public function testSelectEquations() {
     $activities = $this->saveTestRecords('Activity', [
       'records' => [

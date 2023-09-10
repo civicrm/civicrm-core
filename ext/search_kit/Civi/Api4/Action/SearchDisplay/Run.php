@@ -63,6 +63,7 @@ class Run extends AbstractRunAction {
       case 'tally':
         unset($apiParams['orderBy'], $apiParams['limit']);
         $api = Request::create($entityName, 'get', $apiParams);
+        $api->setDefaultWhereClause();
         $query = new Api4SelectQuery($api);
         $query->forceSelectId = FALSE;
         $sql = $query->getSql();

@@ -292,12 +292,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   public function testTaxMultipleParticipant(): void {
     $this->swapMessageTemplateForTestTemplate('event_online_receipt', 'text');
-
-    $mut = new CiviMailUtils($this);
     $this->createLoggedInUser();
     $this->eventCreatePaid();
     $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'));
-    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
       'first_name' => 'Participant1',
       'last_name' => 'LastName',
       'email-Primary' => 'participant1@example.com',
@@ -336,23 +334,23 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertContains(' (multiple participants)', $contribution['amount_level']);
     $this->assertEquals(90, $contribution['tax_amount'], 'Invalid Tax amount.');
     $this->assertEquals(990, $contribution['total_amount'], 'Invalid Tax amount.');
-    $mailSent = $mut->getAllMessages();
+    $mailSent = $form->getMail();
     $this->assertCount(3, $mailSent, 'Three mails should have been sent to the 3 participants.');
-    $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[0]);
-    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[1]);
-
+    $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[0]['body']);
+    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[1]['body']);
+    $mut = new CiviMailUtils($this);
     $this->validateAllContributions();
     $this->validateAllPayments();
     $this->callAPISuccess('Payment', 'create', ['total_amount' => 990, 'payment_type_id' => 'Cash', 'contribution_id' => $contribution['id']]);
     $mailSent = $mut->getAllMessages();
-    $this->assertCount(6, $mailSent);
+    $this->assertCount(3, $mailSent);
 
-    $this->assertStringContainsString('participant_status:::Registered', $mailSent[3]);
-    $this->assertStringContainsString('Dear Participant2', $mailSent[3]);
+    $this->assertStringContainsString('participant_status:::Registered', $mailSent[0]);
+    $this->assertStringContainsString('Dear Participant2', $mailSent[0]);
 
-    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[3]);
-    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 2), $mailSent[4]);
-    $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[5]);
+    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[0]);
+    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 2), $mailSent[1]);
+    $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[2]);
   }
 
   /**
