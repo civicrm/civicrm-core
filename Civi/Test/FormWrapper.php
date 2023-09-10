@@ -36,9 +36,31 @@ class FormWrapper {
 
   private $mail;
 
+  /**
+   * @return null|array
+   */
+  public function getMail(): ?array {
+    return $this->mail;
+  }
+
+  /**
+   * @return array
+   */
+  public function getFirstMail(): array {
+    return $this->mail ? (array) reset($this->mail) : [];
+  }
+
+  public function getFirstMailBody() : string {
+    return $this->getFirstMail()['body'] ?? '';
+  }
+
   private $redirects;
 
+  private $mailSpoolID;
+
   private $validation;
+
+  private $originalMailSetting;
 
   public const CONSTRUCTED = 0;
   public const PREPROCESSED = 1;
@@ -79,12 +101,7 @@ class FormWrapper {
       $this->validation = $this->form->validate();
     }
     if ($state > self::VALIDATED) {
-      $this->form->postProcess();
-      foreach ($this->subsequentForms as $form) {
-        $form->preProcess();
-        $form->buildForm();
-        $form->postProcess();
-      }
+      $this->postProcess();
     }
     return $this;
   }
@@ -138,7 +155,14 @@ class FormWrapper {
    * @return $this
    */
   public function postProcess(): self {
+    $this->startTrackingMail();
     $this->form->postProcess();
+    foreach ($this->subsequentForms as $form) {
+      $form->preProcess();
+      $form->buildForm();
+      $form->postProcess();
+    }
+    $this->stopTrackingMail();
     return $this;
   }
 
@@ -287,6 +311,32 @@ class FormWrapper {
     if (isset($formValues['_qf_button_name'])) {
       $_SESSION['_' . $this->form->controller->_name . '_container']['_qf_button_name'] = $this->formValues['_qf_button_name'];
     }
+  }
+
+  /**
+   * Start tracking any emails sent by this form.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  private function startTrackingMail(): void {
+    $this->originalMailSetting = \Civi::settings()->get('mailing_backend');
+    \Civi::settings()
+      ->set('mailing_backend', array_merge((array) $this->originalMailSetting, ['outBound_option' => \CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB]));
+    $this->mailSpoolID = (int) \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_spool');
+  }
+
+  /**
+   * Store any mails sent & revert to pre-test behaviour.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  private function stopTrackingMail(): void {
+    $dao = \CRM_Core_DAO::executeQuery('SELECT headers, body FROM civicrm_mailing_spool WHERE id > ' . $this->mailSpoolID . ' ORDER BY id');
+    \CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_spool WHERE id > ' . $this->mailSpoolID);
+    while ($dao->fetch()) {
+      $this->mail[] = ['headers' => $dao->headers, 'body' => $dao->body];
+    }
+    \Civi::settings()->set('mailing_backend', $this->originalMailSetting);
   }
 
 }
