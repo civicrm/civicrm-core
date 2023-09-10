@@ -1259,6 +1259,7 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['files_by_entity'] = $permissions['file'];
+    $permissions['entity_file'] = $permissions['file'];
 
     // Group permissions
     $permissions['group'] = [

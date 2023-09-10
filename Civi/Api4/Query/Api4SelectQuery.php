@@ -493,9 +493,9 @@ class Api4SelectQuery extends Api4Query {
     // getAclClause() expects a stack of 1-to-1 join fields to help it dedupe, but this is more flexible,
     // so unless this is a direct 1-to-1 join with the main entity, we'll just hack it
     // with a padded empty stack to bypass its deduping.
-    $stack = [NULL, NULL];
+    $aclStack = [NULL, NULL];
     // See if the ON clause already contains an FK reference to joinEntity
-    $explicitFK = array_filter($joinTree, function($clause) use ($alias, $joinEntityFields, &$stack) {
+    $explicitFK = array_filter($joinTree, function($clause) use ($alias, $joinEntityFields, &$aclStack) {
       [$sideA, $op, $sideB] = array_pad((array) $clause, 3, NULL);
       if ($op !== '=' || !$sideB) {
         return FALSE;
@@ -514,7 +514,7 @@ class Api4SelectQuery extends Api4Query {
           $joinField === 'entity_id' || !empty($joinEntityFields[$joinField]['fk_entity'])) {
           // If the join links to a field on the main entity, ACL clauses can be deduped
           if (preg_match('/^[_a-z0-9]+$/i', $clause[$otherSide])) {
-            $stack = [$clause[$otherSide]];
+            $aclStack = [$clause[$otherSide]];
           }
           return TRUE;
         }
@@ -533,17 +533,17 @@ class Api4SelectQuery extends Api4Query {
         }
         elseif (strpos($name, "$alias.") === 0 && substr_count($name, '.') === 1 && $field['fk_entity'] === $this->getEntity()) {
           $conditions[] = $this->treeWalkClauses([$name, '=', 'id'], 'ON');
-          $stack = ['id'];
+          $aclStack = ['id'];
         }
       }
       // Hmm, if we came up with > 1 condition, then it's ambiguous how it should be joined so we won't return anything but the generic ACLs
       if (count($conditions) > 1) {
-        $stack = [NULL, NULL];
+        $aclStack = [NULL, NULL];
         $conditions = [];
       }
     }
     $baoName = CoreUtil::getBAOFromApiName($joinEntity);
-    $acls = array_values($this->getAclClause($alias, $baoName, $stack));
+    $acls = array_values($this->getAclClause($alias, $baoName, $aclStack));
     return array_merge($acls, $conditions);
   }
 
@@ -568,11 +568,14 @@ class Api4SelectQuery extends Api4Query {
 
     $this->registerBridgeJoinFields($bridgeEntity, $joinRef, $baseRef, $alias, $bridgeAlias);
 
+    // Used to dedupe acl clauses
+    $aclStack = [NULL, NULL];
+
     $linkConditions = $this->getBridgeLinkConditions($bridgeAlias, $alias, $joinTable, $joinRef);
 
-    $bridgeConditions = $this->getBridgeJoinConditions($joinTree, $baseRef, $alias, $bridgeAlias, $bridgeEntity);
+    $bridgeConditions = $this->getBridgeJoinConditions($joinTree, $baseRef, $alias, $bridgeAlias, $bridgeEntity, $aclStack);
 
-    $acls = array_values($this->getAclClause($alias, CoreUtil::getBAOFromApiName($joinEntity), [NULL, NULL]));
+    $acls = array_values($this->getAclClause($alias, CoreUtil::getBAOFromApiName($joinEntity), $aclStack));
 
     $outerConditions = [];
     foreach (array_filter($joinTree) as $clause) {
@@ -676,13 +679,14 @@ class Api4SelectQuery extends Api4Query {
    * @param string $alias
    * @param string $bridgeAlias
    * @param string $bridgeEntity
+   * @param array $aclStack
    * @return string[]
    * @throws \CRM_Core_Exception
    */
-  private function getBridgeJoinConditions(array &$joinTree, $baseRef, string $alias, string $bridgeAlias, string $bridgeEntity): array {
+  private function getBridgeJoinConditions(array &$joinTree, $baseRef, string $alias, string $bridgeAlias, string $bridgeEntity, array &$aclStack): array {
     $bridgeConditions = [];
     // Find explicit bridge join conditions and move them out of the joinTree
-    $joinTree = array_filter($joinTree, function ($clause) use ($baseRef, $alias, $bridgeAlias, &$bridgeConditions) {
+    $joinTree = array_filter($joinTree, function ($clause) use ($baseRef, $alias, $bridgeAlias, &$bridgeConditions, &$aclStack) {
       [$sideA, $op, $sideB] = array_pad((array) $clause, 3, NULL);
       // Skip AND/OR/NOT branches
       if (!$sideB) {
@@ -692,6 +696,7 @@ class Api4SelectQuery extends Api4Query {
       if ($op === '=' && $sideB && ($sideA === "$alias.{$baseRef->getReferenceKey()}" || $sideB === "$alias.{$baseRef->getReferenceKey()}")) {
         $expr = $sideA === "$alias.{$baseRef->getReferenceKey()}" ? $sideB : $sideA;
         $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = " . $this->getExpression($expr)->render($this);
+        $aclStack = [$expr];
         return FALSE;
       }
       // Explicit link with dynamic "entity_table" column
@@ -708,6 +713,7 @@ class Api4SelectQuery extends Api4Query {
         throw new \CRM_Core_Exception("Unable to join $bridgeEntity to " . $this->getEntity());
       }
       $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = a.`{$baseRef->getTargetKey()}`";
+      $aclStack = [$baseRef->getTargetKey()];
       if ($baseRef->getTypeColumn()) {
         $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getTypeColumn()}` = '" . $this->getFrom() . "'";
       }

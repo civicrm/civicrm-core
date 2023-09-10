@@ -835,6 +835,24 @@ HEREDOC;
   }
 
   /**
+   * @inheritDoc
+   */
+  public function addSelectWhereClause() {
+    // We always return an array with these keys, even if they are empty,
+    // because this tells the query builder that we have considered these fields for acls
+    $clauses = [
+      'id' => [],
+    ];
+    // File ACLs are driven by the EntityFile table
+    $entityFileClause = CRM_Core_DAO_EntityFile::getDynamicFkAclClauses();
+    if ($entityFileClause) {
+      $clauses['id'] = 'IN (SELECT file_id FROM `civicrm_entity_file` WHERE (' . implode(') OR (', $entityFileClause) . '))';
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
+  /**
    * FIXME: Incomplete pseudoconstant for EntityFile.entity_table
    *
    * The `EntityFile` table serves 2 purposes:
