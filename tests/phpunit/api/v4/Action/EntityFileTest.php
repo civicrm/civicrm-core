@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\Activity;
 use Civi\Api4\EntityFile;
 use Civi\Api4\File;
 use Civi\Api4\Note;
@@ -96,6 +97,35 @@ class EntityFileTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertEquals('file_for_' . $note[3] . '.txt', $allowedNotes[$note[3]]['file.file_name']);
     $this->assertStringContainsString("id=$file[2]&eid=$note[2]&fcs=", $allowedNotes[$note[2]]['file.url']);
     $this->assertStringContainsString("id=$file[3]&eid=$note[3]&fcs=", $allowedNotes[$note[3]]['file.url']);
+  }
+
+  public function testGetAggregateFileFields() {
+    $activity = $this->createTestRecord('Activity');
+
+    foreach (['text/plain' => 'txt', 'image/png' => 'png', 'image/jpg' => 'jpg'] as $mimeType => $ext) {
+      // FIXME: Use api4 when available
+      civicrm_api3('Attachment', 'create', [
+        'entity_table' => 'civicrm_activity',
+        'entity_id' => $activity['id'],
+        'name' => 'test_file.' . $ext,
+        'mime_type' => $mimeType,
+        'content' => 'hello',
+      ])['id'];
+    }
+
+    $get = Activity::get(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addJoin('File AS file', 'LEFT', 'EntityFile', ['file.entity_id', '=', 'id'], ['file.entity_table', '=', '"civicrm_activity"'])
+      ->addGroupBy('id')
+      ->addSelect('GROUP_CONCAT(UNIQUE file.file_name) AS aggregate_file_name')
+      ->addSelect('GROUP_CONCAT(UNIQUE file.url) AS aggregate_url')
+      ->addSelect('GROUP_CONCAT(UNIQUE file.icon) AS aggregate_icon')
+      ->execute()->single();
+
+    $this->assertCount(3, $get['aggregate_url']);
+    $this->assertCount(3, $get['aggregate_icon']);
+    $this->assertEquals(['test_file.txt', 'test_file.png', 'test_file.jpg'], $get['aggregate_file_name']);
+    $this->assertEquals(['fa-file-text-o', 'fa-file-image-o', 'fa-file-image-o'], $get['aggregate_icon']);
   }
 
 }
