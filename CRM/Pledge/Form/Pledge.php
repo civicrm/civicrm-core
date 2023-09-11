@@ -90,7 +90,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $params = ['id' => $this->_id];
       CRM_Pledge_BAO_Pledge::getValues($params, $this->_values);
 
-      $this->_isPending = (CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($this->_id, CRM_Utils_Array::value('status_id', $this->_values))) ? FALSE : TRUE;
+      $this->_isPending = !CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($this->_id, CRM_Utils_Array::value('status_id', $this->_values));
     }
 
     // get the pledge frequency units.
@@ -100,6 +100,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   /**
    * Set default values for the form.
    * The default values are retrieved from the database.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues(): array {
     $defaults = $this->_values;
@@ -189,13 +191,12 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     $contactField = $this->addEntityRef('contact_id', ts('Pledge by'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
-    if ($this->_context !== 'standalone') {
+    if ($this->getContext() !== 'standalone') {
       $contactField->freeze();
     }
 
     $showAdditionalInfo = FALSE;
-    $this->_formType = $_GET['formType'] ?? NULL;
-
+    $formType = CRM_Utils_Request::retrieveValue('form_type', 'String');
     $defaults = [];
 
     $paneNames = [
@@ -209,7 +210,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         'id' => $type,
       ];
       // see if we need to include this paneName in the current form
-      if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
+      if ($formType == $type || !empty($_POST["hidden_{$type}"]) ||
         !empty($defaults["hidden_{$type}"])
       ) {
         $showAdditionalInfo = TRUE;
@@ -222,8 +223,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->assign('allPanes', $allPanes);
     $this->assign('showAdditionalInfo', $showAdditionalInfo);
 
-    $this->assign('formType', $this->_formType);
-    if ($this->_formType) {
+    $this->assign('formType', $formType);
+    if ($formType) {
       return;
     }
 

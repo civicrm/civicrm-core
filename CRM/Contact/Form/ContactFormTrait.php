@@ -28,10 +28,7 @@ trait CRM_Contact_Form_ContactFormTrait {
     }
     $id = $this->getContactID();
     if ($id) {
-      // GetContactID may or may not have defined this.
-      if (!$this->isDefined('Contact')) {
-        $this->define('Contact', 'Contact', ['id' => $id]);
-      }
+      $this->define('Contact', 'Contact', ['id' => $id]);
       return $this->lookup('Contact', $fieldName);
     }
     return NULL;
@@ -49,9 +46,6 @@ trait CRM_Contact_Form_ContactFormTrait {
    */
   public function getContactID(): ?int {
     $id = (int) CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    if ($id) {
-      $this->define('Contact', 'Contact', ['id' => $id]);
-    }
     return $id ?: NULL;
   }
 
