@@ -21,6 +21,8 @@ use Civi\Api4\PledgePayment;
  * This class generates form components for processing a pledge
  */
 class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
+  use CRM_Contact_Form_ContactFormTrait;
+
   public $_action;
 
   /**
@@ -77,11 +79,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->assign('context', $this->_context);
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
-    }
-
-    $displayName = $this->userEmail = NULL;
-    if ($this->_contactID) {
-      [$displayName, $this->userEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
     }
 
     $this->setPageTitle(ts('Pledge'));
@@ -169,10 +166,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $defaultPledgeStatus
     ));
 
-    if (isset($this->userEmail)) {
-      $this->assign('email', $this->userEmail);
-    }
-
+    $this->assign('email', $this->getContactValue('email_primary.email'));
     // custom data set defaults
     $defaults += CRM_Custom_Form_CustomData::setDefaultValues($this);
 
@@ -538,7 +532,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       // send Acknowledgment mail.
       CRM_Pledge_BAO_Pledge::sendAcknowledgment($this, $params);
 
-      $statusMsg .= ' ' . ts('An acknowledgment email has been sent to %1.<br />', [1 => $this->userEmail]);
+      $statusMsg .= ' ' . ts('An acknowledgment email has been sent to %1.<br />', [1 => $this->getContactValue('email_primary.email')]);
       // get the first valid payment id.
       $nextPaymentID = PledgePayment::get()
         ->addWhere('pledge_id', '=', $pledgeID)

@@ -24,6 +24,7 @@ use Civi\API\EntityLookupTrait;
 class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment {
 
   use EntityLookupTrait;
+  use CRM_Contact_Form_ContactFormTrait;
 
   /**
    * Participant ID - use getParticipantID.
@@ -571,25 +572,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->assign('event_is_test', CRM_Utils_Array::value('event_is_test', $defaults[$this->_id]));
     return $defaults[$this->_id];
-  }
-
-  /**
-   * Get a value for the contact being acted on in the form.
-   *
-   * This can be called from any point in the form flow and if
-   * the contact can not yet be determined it will return NULL.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function getContactValue($fieldName) {
-    if ($this->isDefined('Contact')) {
-      return $this->lookup('Contact', $fieldName);
-    }
-    if ($this->getContactID()) {
-      $this->define('Contact', 'Contact', ['id' => $this->getContactID()]);
-      return $this->lookup('Contact', $fieldName);
-    }
-    return NULL;
   }
 
   /**
