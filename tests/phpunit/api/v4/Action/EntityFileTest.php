@@ -22,7 +22,6 @@ namespace api\v4\Action;
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\EntityFile;
-use Civi\Api4\File;
 use Civi\Api4\Note;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
@@ -75,14 +74,15 @@ class EntityFileTest extends Api4TestBase implements TransactionalInterface, Hoo
     // Results should have been filtered by allowed contacts
     $this->assertCount(2, $allowedEntityFiles);
 
-    $allowedFiles = File::get()
-      ->addWhere('id', 'IN', $file)
-      ->setDebug(TRUE)
-      ->execute();
-    // ACL clause should have been inserted
-    $this->assertStringContainsString('civicrm_acl_contact_cache', $allowedFiles->debug['sql'][0]);
-    // Results should have been filtered by allowed contacts
-    $this->assertCount(2, $allowedFiles);
+    // Disabling - see comment in CRM_Core_BAO_File::addSelectWhereClause()
+    //  $allowedFiles = File::get()
+    //    ->addWhere('id', 'IN', $file)
+    //    ->setDebug(TRUE)
+    //    ->execute();
+    //  // ACL clause should have been inserted
+    //  $this->assertStringContainsString('civicrm_acl_contact_cache', $allowedFiles->debug['sql'][0]);
+    //  // Results should have been filtered by allowed contacts
+    //  $this->assertCount(2, $allowedFiles);
 
     $allowedNotes = Note::get()
       ->addJoin('File AS file', 'LEFT', 'EntityFile', ['file.entity_id', '=', 'id'], ['file.entity_table', '=', '"civicrm_note"'])

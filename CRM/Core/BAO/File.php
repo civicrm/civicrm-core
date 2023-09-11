@@ -838,8 +838,11 @@ HEREDOC;
    * @inheritDoc
    */
   public function addSelectWhereClause() {
-    // We always return an array with these keys, even if they are empty,
-    // because this tells the query builder that we have considered these fields for acls
+    // TODO: This seemded like a good idea... piggybacking off the ACL clause of EntityFile
+    // however that's too restrictive because entityFile ACLs are limited to just attachments,
+    // so this would prevent access to other file fields (e.g. custom fields)
+    // Disabling this function for now by calling the parent instead.
+    return parent::addSelectWhereClause();
     $clauses = [
       'id' => [],
     ];
