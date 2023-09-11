@@ -87,10 +87,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->_values = [];
     // current pledge id
     if ($this->_id) {
-      // get the contribution id
-      $this->_contributionID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
-        $this->_id, 'contribution_id', 'pledge_id'
-      );
       $params = ['id' => $this->_id];
       CRM_Pledge_BAO_Pledge::getValues($params, $this->_values);
 
