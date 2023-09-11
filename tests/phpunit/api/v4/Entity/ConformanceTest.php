@@ -355,7 +355,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    * @param string $entity
    */
   protected function checkGetAllowed($entityClass, $id, $entity) {
-    $this->setCheckAccessGrants(["{$entity}::get" => TRUE]);
+    $this->setCheckAccessGrants(["{$entity}::get" => FALSE]);
     $getResult = $entityClass::get()
       ->addWhere('id', '=', $id)
       ->execute();
