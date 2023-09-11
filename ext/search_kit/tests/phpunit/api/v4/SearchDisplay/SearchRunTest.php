@@ -1232,9 +1232,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     // Icon based on activity type
-    $this->assertEquals([['class' => 'fa-slideshare', 'side' => 'left']], $result[0]['columns'][0]['icons']);
+    $this->assertEquals(['left' => ['fa-slideshare']], $result[0]['columns'][0]['icons']);
     // Activity type icon + conditional icon based on status
-    $this->assertEquals([['class' => 'fa-star', 'side' => 'right'], ['class' => 'fa-phone', 'side' => 'left']], $result[1]['columns'][0]['icons']);
+    $this->assertEquals(['right' => ['fa-star'], 'left' => ['fa-phone']], $result[1]['columns'][0]['icons']);
   }
 
   /**
@@ -1845,11 +1845,11 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     // Contacts will be returned in order by sort_name
     $this->assertEquals('Both', $result[0]['columns'][0]['val']);
-    $this->assertEquals('fa-star', $result[0]['columns'][0]['icons'][0]['class']);
+    $this->assertEquals('fa-star', $result[0]['columns'][0]['icons']['left'][0]);
     $this->assertEquals('No icon', $result[1]['columns'][0]['val']);
-    $this->assertEquals('fa-user', $result[1]['columns'][0]['icons'][0]['class']);
+    $this->assertEquals('fa-user', $result[1]['columns'][0]['icons']['left'][0]);
     $this->assertEquals('Starry', $result[2]['columns'][0]['val']);
-    $this->assertEquals('fa-star', $result[2]['columns'][0]['icons'][0]['class']);
+    $this->assertEquals('fa-star', $result[2]['columns'][0]['icons']['left'][0]);
   }
 
   public function testKeyIsReturned(): void {
@@ -1893,6 +1893,125 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
     $this->assertEquals($id, $result[0]['key']);
+  }
+
+  public function testRunWithEntityFile(): void {
+    $cid = $this->createTestRecord('Contact')['id'];
+    $notes = $this->saveTestRecords('Note', [
+      'records' => 2,
+      'defaults' => ['entity_table' => 'civicrm_contact', 'entity_id' => $cid],
+    ])->column('id');
+
+    foreach (['text/plain' => 'txt', 'image/png' => 'png', 'image/foo' => 'foo'] as $mimeType => $ext) {
+      // FIXME: Use api4 when available
+      civicrm_api3('Attachment', 'create', [
+        'entity_table' => 'civicrm_note',
+        'entity_id' => $notes[0],
+        'name' => 'test_file.' . $ext,
+        'mime_type' => $mimeType,
+        'content' => 'hello',
+      ])['id'];
+    }
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'debug' => TRUE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Note',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'subject',
+            'note',
+            'note_date',
+            'modified_date',
+            'contact_id.sort_name',
+            'GROUP_CONCAT(UNIQUE Note_EntityFile_File_01.file_name) AS GROUP_CONCAT_Note_EntityFile_File_01_file_name',
+            'GROUP_CONCAT(UNIQUE Note_EntityFile_File_01.url) AS GROUP_CONCAT_Note_EntityFile_File_01_url',
+            'GROUP_CONCAT(UNIQUE Note_EntityFile_File_01.icon) AS GROUP_CONCAT_Note_EntityFile_File_01_icon',
+          ],
+          'where' => [
+            ['entity_id', 'IN', [$cid]],
+            ['entity_table:name', '=', 'Contact'],
+          ],
+          'groupBy' => [
+            'id',
+          ],
+          'join' => [
+            [
+              'File AS Note_EntityFile_File_01',
+              'LEFT',
+              'EntityFile',
+              [
+                'id',
+                '=',
+                'Note_EntityFile_File_01.entity_id',
+              ],
+              [
+                'Note_EntityFile_File_01.entity_table',
+                '=',
+                "'civicrm_note'",
+              ],
+            ],
+          ],
+          'having' => [],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'limit' => 20,
+          'pager' => TRUE,
+          'actions' => TRUE,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'dataType' => 'Integer',
+              'label' => 'ID',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'GROUP_CONCAT_Note_EntityFile_File_01_file_name',
+              'dataType' => 'String',
+              'label' => ts('Attachments'),
+              'sortable' => TRUE,
+              'link' => [
+                'path' => '[GROUP_CONCAT_Note_EntityFile_File_01_url]',
+                'entity' => '',
+                'action' => '',
+                'join' => '',
+                'target' => '',
+              ],
+              'icons' => [
+                [
+                  'field' => 'Note_EntityFile_File_01.icon',
+                  'side' => 'left',
+                ],
+                [
+                  'icon' => 'fa-search',
+                  'side' => 'right',
+                  'if' => ['Note_EntityFile_File_01.is_image'],
+                ],
+              ],
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+    $this->assertEquals(['fa-file-text-o', 'fa-file-image-o', 'fa-file-image-o'], $result[0]['columns'][1]['icons']['left']);
+    $this->assertEquals([NULL, 'fa-search', NULL], $result[0]['columns'][1]['icons']['right']);
   }
 
   /**
