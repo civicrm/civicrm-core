@@ -82,11 +82,9 @@ class CRM_Custom_Form_CustomData {
     &$form, $extendsEntityColumn = NULL, $subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
   ) {
-    if ($type) {
-      $form->_type = $type;
-    }
-    else {
-      $form->_type = CRM_Utils_Request::retrieve('type', 'String', $form);
+    if (!$type) {
+      CRM_Core_Error::deprecatedWarning('type should be passed in');
+      $type = CRM_Utils_Request::retrieve('type', 'String', $form);
     }
 
     if (!isset($subType)) {
@@ -150,7 +148,7 @@ class CRM_Custom_Form_CustomData {
       $singleRecord = 'new';
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
       NULL,
       $form->_entityId,
       $gid,
