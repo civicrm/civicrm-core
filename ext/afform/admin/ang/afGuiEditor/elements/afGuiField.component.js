@@ -276,6 +276,7 @@
         val = '' + val;
         if (defaultValueShouldBeArray()) {
           if (!_.isArray(getSet('afform_default'))) {
+            ctrl.node.defn = ctrl.node.defn || {};
             ctrl.node.defn.afform_default = [];
           }
           if (_.includes(ctrl.node.defn.afform_default, val)) {
