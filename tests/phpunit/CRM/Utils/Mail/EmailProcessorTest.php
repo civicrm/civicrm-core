@@ -89,9 +89,11 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_invalid_character.eml';
 
     copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_bounces', []);
+    $this->callAPISuccess('job', 'fetch_bounces', ['is_create_activities' => TRUE]);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
+    $activity = $this->callAPISuccessGetSingle('Activity', ['activity_type_id' => 'Bounce']);
+    $this->assertEquals('Bounce type not identified, email will not be put on hold', $activity['details']);
   }
 
   /**
