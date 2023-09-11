@@ -135,6 +135,10 @@
       buildPaymentBlock(0);
     });
 
+    if ($('#payment_instrument_id').val()) {
+      buildPaymentBlock(0);
+    }
+
     $('#billing-payment-block').on('crmLoad', function() {
       $('.crm-submit-buttons input').prop('disabled', false);
     })
