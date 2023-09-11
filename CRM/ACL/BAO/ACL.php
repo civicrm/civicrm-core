@@ -252,7 +252,10 @@ SELECT count( a.id )
           }
         }
       }
-      if (!empty($excludeIds) && !$allInclude) {
+      if ($allInclude) {
+        $clauses[] = 1;
+      }
+      elseif (!empty($excludeIds) && !$allInclude) {
         $ids = array_diff($ids, $excludeIds);
       }
       elseif (!empty($excludeIds) && $allInclude) {
