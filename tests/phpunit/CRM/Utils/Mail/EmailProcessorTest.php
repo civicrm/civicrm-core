@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\OptionValue;
+
 /**
  * Class CRM_Utils_Mail_EmailProcessorTest
  * @group headless
@@ -40,6 +42,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
         'activity_assignees' => 'from',
       ],
     ]);
+    $this->createTestEntity('OptionValue', ['option_group_id:name' => 'activity_type', 'name' => 'Bounce', 'label' => "Bounce"]);
   }
 
   /**
@@ -48,6 +51,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   public function tearDown(): void {
     CRM_Utils_File::cleanDir(__DIR__ . '/data/mail');
     parent::tearDown();
+    OptionValue::delete(FALSE)->addWhere('name', '=', 'Bounce')->execute();
     $this->quickCleanup([
       'civicrm_group',
       'civicrm_group_contact',
@@ -116,7 +120,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->callAPISuccess('job', 'fetch_bounces', ['is_create_activities' => TRUE]);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
-    $this->callAPISuccessGetSingle('Activity', ['source_contact_id' => $this->contactID, 'activity_type_id' => 'Inbound Email']);
+    $this->callAPISuccessGetSingle('Activity', ['source_contact_id' => $this->contactID, 'activity_type_id' => 'Bounce']);
   }
 
   /**

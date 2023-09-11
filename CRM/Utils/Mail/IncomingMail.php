@@ -125,6 +125,17 @@ class CRM_Utils_Mail_IncomingMail {
   }
 
   /**
+   * Is this a bounce email.
+   *
+   * At the moment we are only able to detect verp bounces but maybe in the future...
+   *
+   * @return bool
+   */
+  public function isBounce() : bool {
+    return $this->getAction() === 'b';
+  }
+
+  /**
    * @param \ezcMail $mail
    * @param string $emailDomain
    * @param string $emailLocalPart

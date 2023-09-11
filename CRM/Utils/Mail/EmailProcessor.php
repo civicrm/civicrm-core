@@ -16,6 +16,8 @@
  */
 
 // we should consider moving this to the settings table
+use Civi\Api4\Activity;
+
 define('MAIL_BATCH_SIZE', 50);
 
 /**
@@ -84,6 +86,16 @@ class CRM_Utils_Mail_EmailProcessor {
     // create an array of all of to, from, cc, bcc that are in use for this Mail Account, so we don't create contacts for emails we aren't adding to the activity.
     $emailFields = array_merge($targetFields, $assigneeFields, $sourceFields);
     $createContact = !($dao->is_contact_creation_disabled_if_no_match);
+    $bounceActivityTypeID = $activityTypeID = (int) $dao->activity_type_id;
+    $activityTypes = Activity::getFields(TRUE)
+      ->setLoadOptions(['id', 'name'])
+      ->addWhere('name', '=', 'activity_type_id')
+      ->execute()->first()['options'];
+    foreach ($activityTypes as $activityType) {
+      if ($activityType['name'] === 'Bounce') {
+        $bounceActivityTypeID = (int) $activityType['id'];
+      }
+    }
 
     // retrieve the emails
     try {
@@ -118,9 +130,12 @@ class CRM_Utils_Mail_EmailProcessor {
 
           // if its the activities that needs to be processed ..
           try {
+            if ($incomingMail->isBounce()) {
+              $activityTypeID = $bounceActivityTypeID;
+            }
             $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $incomingMail->getAttachments(), $createContact, $emailFields, [$incomingMail->getFrom()]);
             $activityParams = [
-              'activity_type_id' => (int) $dao->activity_type_id,
+              'activity_type_id' => $activityTypeID,
               'campaign_id' => $dao->campaign_id ? (int) $dao->campaign_id : NULL,
               'status_id' => $dao->activity_status,
               'subject' => $incomingMail->getSubject(),
