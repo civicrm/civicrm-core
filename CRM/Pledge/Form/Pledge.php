@@ -63,20 +63,19 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function preProcess(): void {
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->_contactID = $this->getContactID();
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 'add'
     );
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
-
+    $this->setContext();
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviPledge', $this->_action)) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     $this->assign('action', $this->_action);
-    $this->assign('context', $this->_context);
+    $this->assign('context', $this->getContext());
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -563,7 +562,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     CRM_Core_Session::setStatus($statusMsg, ts('Payment Due'), 'info');
 
     $buttonName = $this->controller->getButtonName();
-    if ($this->_context === 'standalone') {
+    if ($this->getContext() === 'standalone') {
       if ($buttonName === $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/pledge/add',
           'reset=1&action=add&context=standalone'
