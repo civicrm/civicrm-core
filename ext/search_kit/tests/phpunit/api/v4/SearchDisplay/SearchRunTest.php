@@ -1998,6 +1998,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
                   'if' => ['Note_EntityFile_File_01.is_image'],
                 ],
               ],
+              'cssRules' => [
+                ['crm-image-popup', 'Note_EntityFile_File_01.is_image', '=', TRUE],
+              ],
             ],
           ],
           'sort' => [
@@ -2012,6 +2015,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(2, $result);
     $this->assertEquals(['fa-file-text-o', 'fa-file-image-o', 'fa-file-image-o'], $result[0]['columns'][1]['icons']['left']);
     $this->assertEquals([NULL, 'fa-search', NULL], $result[0]['columns'][1]['icons']['right']);
+    $this->assertEquals(['', 'crm-image-popup', ''], array_column($result[0]['columns'][1]['links'], 'style'));
+    $this->assertEquals(['test_file.txt', 'test_file.png', 'test_file_foo.unknown'], array_column($result[0]['columns'][1]['links'], 'text'));
   }
 
   /**

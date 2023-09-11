@@ -278,7 +278,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (isset($column['title']) && strlen($column['title'])) {
       $out['title'] = $this->replaceTokens($column['title'], $data, 'view');
     }
-    $cssClass = $this->getCssStyles($column['cssRules'] ?? [], $data);
+    $cssClass = [];
+    // Style rules get applied to entire column if not a link
+    if (empty($column['link']) && !empty($column['cssRules'])) {
+      $cssClass = $this->getCssStyles($column['cssRules'], $data);
+    }
     if (!empty($column['alignment'])) {
       $cssClass[] = $column['alignment'];
     }
@@ -316,15 +320,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param array[] $styleRules
    * @param array $data
+   * @param int $index
    * @return array
    */
-  protected function getCssStyles(array $styleRules, array $data) {
+  protected function getCssStyles(array $styleRules, array $data, int $index = NULL) {
     $classes = [];
     foreach ($styleRules as $clause) {
       $cssClass = $clause[0] ?? '';
       if ($cssClass) {
         $condition = $this->getRuleCondition(array_slice($clause, 1));
-        if (is_null($condition[0]) || (self::filterCompare($data, $condition))) {
+        if (is_null($condition[0]) || (self::filterCompare($data, $condition, $index))) {
           $classes[] = $cssClass;
         }
       }
@@ -467,6 +472,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     foreach ((array) $value as $index => $val) {
       $link = $this->formatLink($column['link'], $data, $val, $index);
       if ($link) {
+        // Style rules get appled to each link
+        if (!empty($column['cssRules'])) {
+          $link += ['style' => ''];
+          $css = $this->getCssStyles($column['cssRules'], $data, $index);
+          $link['style'] = trim($link['style'] . ' ' . implode(' ', $css));
+        }
         $links[] = $link;
       }
     }
