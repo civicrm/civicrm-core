@@ -16,7 +16,8 @@ use Civi\API\Event\RequestTrait;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
- * Determine if the a user has access to a given record.
+ * Determine if the a user has WRITE access to a given record.
+ * This event does not impact READ access for `get` actions.
  *
  * Event name: 'civi.api4.authorizeRecord'
  */
