@@ -287,42 +287,31 @@ class CRM_Utils_Mail_Incoming {
 
   /**
    * @param $mail
-   * @param $createContact
-   * @param $requireContact
+   * @param $attachments
+   * @param bool $createContact
    * @param array $emailFields
-   *   Which fields to process and create contacts for of from, to, cc, bcc
+   *   Which fields to process and create contacts for - subset of [from, to, cc, bcc],
+   * @param array $from
    *
    * @return array
    */
-  public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE, $emailFields = ['from', 'to', 'cc', 'bcc']) {
-
-    // Sometimes $mail->from is unset because ezcMail didn't handle format
-    // of From header. CRM-19215.
-    if (!isset($mail->from)) {
-      if (preg_match('/^([^ ]*)( (.*))?$/', $mail->getHeader('from'), $matches)) {
-        $mail->from = new ezcMailAddress($matches[1], trim($matches[2]));
-      }
-    }
-
+  public static function parseMailingObject(&$mail, $attachments, $createContact, $emailFields, $from) {
+    $params = [];
     foreach ($emailFields as $field) {
       // to, bcc, cc are arrays of objects, but from is an object, so make it an array of one object so we can handle it the same
       if ($field === 'from') {
-        $value = [$mail->$field];
+        $value = $from;
       }
       else {
         $value = $mail->$field;
       }
-      self::parseAddresses($value, $field, $params, $mail, $createContact);
+      $params[$field] = [];
+      foreach ($value as $address) {
+        $subParam = [];
+        self::parseAddress($address, $subParam, $mail, $createContact);
+        $params[$field][] = $subParam;
+      }
     }
-
-    // define other parameters
-    $params['subject'] = $mail->subject;
-    $params['date'] = date("YmdHi00",
-      strtotime($mail->getHeader("Date"))
-    );
-    $attachments = [];
-    $params['body'] = self::formatMailPart($mail->body, $attachments);
-
     // format and move attachments to the civicrm area
     if (!empty($attachments)) {
       $date = date('YmdHis');
@@ -370,22 +359,6 @@ class CRM_Utils_Mail_Incoming {
       $createContact
     );
     $subParam['id'] = $contactID ?: NULL;
-  }
-
-  /**
-   * @param ezcMailAddress[] $addresses
-   * @param $token
-   * @param array $params
-   * @param $mail
-   * @param $createContact
-   */
-  private static function parseAddresses(&$addresses, $token, &$params, &$mail, $createContact = TRUE) {
-    $params[$token] = [];
-    foreach ($addresses as $address) {
-      $subParam = [];
-      self::parseAddress($address, $subParam, $mail, $createContact);
-      $params[$token][] = $subParam;
-    }
   }
 
   /**
