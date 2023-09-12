@@ -37,10 +37,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO
       'name' => 'CKEditor4',
     ],
     [
-      'full_name' => 'legacycustomsearches',
-      'name' => 'Custom search framework',
-    ],
-    [
       'full_name' => 'org.civicrm.flexmailer',
       'name' => 'FlexMailer',
       'file' => 'flexmailer',
