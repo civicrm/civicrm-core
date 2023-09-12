@@ -21,6 +21,7 @@ namespace api\v4\Entity;
 
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
+use Civi\Api4\Contribution;
 use Civi\Api4\Email;
 use Civi\Api4\OptionValue;
 use api\v4\Api4TestBase;
@@ -182,6 +183,34 @@ class ContactJoinTest extends Api4TestBase {
     $this->assertEquals('99999', $get['phone_primary.phone']);
     $this->assertEquals('99999', $get['phone_billing.phone']);
     $this->assertEquals($get['phone_primary.id'], $get['phone_billing.id']);
+  }
+
+  public function testJoinToEmailId(): void {
+    $contact = $this->createTestRecord('Contact', [
+      'email_primary.email' => 'a@test.com',
+      'email_billing.email' => 'b@test.com',
+    ]);
+    $emails = Email::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->addOrderBy('is_primary', 'DESC')
+      ->execute()->column('id');
+    $contribution = $this->createTestRecord('Contribution', [
+      'contact_id' => $contact['id'],
+    ]);
+
+    $result = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->addSelect('contact_id.email_primary')
+      ->execute()->single();
+    $this->assertEquals($emails[0], $result['contact_id.email_primary']);
+
+    $result = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->addSelect('contact_id.email_primary.email')
+      ->addSelect('contact_id.email_billing')
+      ->execute()->single();
+    $this->assertEquals('a@test.com', $result['contact_id.email_primary.email']);
+    $this->assertEquals($emails[1], $result['contact_id.email_billing']);
   }
 
 }
