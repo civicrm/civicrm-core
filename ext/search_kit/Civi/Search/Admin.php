@@ -13,7 +13,6 @@ namespace Civi\Search;
 
 use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
 use Civi\Api4\Entity;
-use Civi\Api4\Extension;
 use Civi\Api4\Query\SqlEquation;
 use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\SearchDisplay;
@@ -35,8 +34,6 @@ class Admin {
    */
   public static function getAdminSettings():array {
     $schema = self::getSchema();
-    $extensions = Extension::get(FALSE)->addWhere('status', '=', 'installed')
-      ->execute()->indexBy('key')->column('label');
     $data = [
       'schema' => self::addImplicitFKFields($schema),
       'joins' => self::getJoins($schema),
@@ -48,7 +45,7 @@ class Admin {
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
       'defaultPagerSize' => (int) \Civi::settings()->get('default_pager_size'),
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
-      'modules' => $extensions,
+      'modules' => \CRM_Core_BAO_Managed::getBaseModules(),
       'defaultContactType' => \CRM_Contact_BAO_ContactType::basicTypeInfo()['Individual']['name'] ?? NULL,
       'defaultDistanceUnit' => \CRM_Utils_Address::getDefaultDistanceUnit(),
       'jobFrequency' => \Civi\Api4\Job::getFields()

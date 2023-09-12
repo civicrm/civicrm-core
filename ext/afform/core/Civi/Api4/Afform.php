@@ -306,7 +306,7 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'String',
           'description' => 'Name of extension which provides this form',
           'readonly' => TRUE,
-          'pseudoconstant' => ['callback' => ['CRM_Core_PseudoConstant', 'getExtensions']],
+          'pseudoconstant' => ['callback' => ['CRM_Core_BAO_Managed', 'getBaseModules']],
         ];
         $fields[] = [
           'name' => 'search_displays',

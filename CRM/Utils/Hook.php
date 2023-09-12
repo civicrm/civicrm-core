@@ -771,7 +771,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    *   the return value is ignored
    */
-  public static function managed(&$entities, ?array $modules = NULL) {
+  public static function managed(array &$entities, ?array $modules = NULL) {
     $null = NULL;
     self::singleton()->invoke(['entities', 'modules'], $entities, $modules,
       $null, $null, $null, $null,
