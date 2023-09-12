@@ -278,8 +278,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
                 ],
                 [
                   'entity' => 'Contribution',
+                  'title' => 'Delete',
                   'action' => 'delete',
-                  'icon' => 'fa-pencil',
+                  'icon' => 'fa-trash',
                   'target' => 'crm-popup',
                 ],
               ],
@@ -297,12 +298,16 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // 1st link is to a quickform-based search task (CRM_Contribute_Task::PDF_RECEIPT)
     $this->assertArrayNotHasKey('task', $result[0]['columns'][1]['links'][0]);
     $this->assertStringContainsString('id=' . $contributions[0]['id'] . '&qfKey=', $result[0]['columns'][1]['links'][0]['url']);
+    $this->assertEquals('fa-external-link', $result[0]['columns'][1]['links'][0]['icon']);
     // 2nd link is to the native SK bulk-update task
     $this->assertArrayNotHasKey('url', $result[0]['columns'][1]['links'][1]);
     $this->assertEquals('update', $result[0]['columns'][1]['links'][1]['task']);
+    $this->assertEquals('fa-pencil', $result[0]['columns'][1]['links'][1]['icon']);
     // 3rd link is a popup link to the delete contribution quickform
     $this->assertStringContainsString('action=delete&id=' . $contributions[0]['id'], $result[0]['columns'][1]['links'][2]['url']);
     $this->assertEquals('crm-popup', $result[0]['columns'][1]['links'][2]['target']);
+    $this->assertEquals('fa-trash', $result[0]['columns'][1]['links'][2]['icon']);
+    $this->assertEquals('Delete', $result[0]['columns'][1]['links'][2]['title']);
   }
 
   public function testRelationshipCacheLinks():void {
@@ -345,6 +350,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
                   'icon' => 'fa-external-link',
                 ],
                 [
+                  'title' => '0',
                   'entity' => 'Relationship',
                   'task' => 'delete',
                   'icon' => 'fa-trash',
@@ -377,11 +383,15 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // 2nd link is to the native SK bulk-delete task
     $this->assertArrayNotHasKey('url', $result[0]['columns'][1]['links'][1]);
     $this->assertEquals('delete', $result[0]['columns'][1]['links'][1]['task']);
+    $this->assertEquals('fa-trash', $result[0]['columns'][1]['links'][1]['icon']);
+    // Ensure "empty" titles are still returned
+    $this->assertEquals('0', $result[0]['columns'][1]['links'][1]['title']);
     // 3rd link is the disable task for active relationships or the enable task for inactive ones
     $this->assertEquals('disable', $result[0]['columns'][1]['links'][2]['task']);
     $this->assertEquals('disable', $result[1]['columns'][1]['links'][2]['task']);
     $this->assertEquals('enable', $result[2]['columns'][1]['links'][2]['task']);
     $this->assertEquals('enable', $result[3]['columns'][1]['links'][2]['task']);
+    $this->assertStringContainsString('Enable', $result[3]['columns'][1]['links'][2]['title']);
   }
 
   /**
