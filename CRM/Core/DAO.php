@@ -3097,7 +3097,8 @@ SELECT contact_id
     $relatedClauses = [];
     $relatedEntities = static::buildOptions('entity_table', 'get');
     foreach ((array) $relatedEntities as $table => $ent) {
-      if (!empty($ent)) {
+      // Prevent recursion
+      if (!empty($ent) && $table !== static::getTableName()) {
         $ent = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
         $subquery = CRM_Utils_SQL::mergeSubquery($ent);
         if ($subquery) {

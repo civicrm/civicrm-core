@@ -32,6 +32,17 @@ class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental
     $this->addTask('Make EntityFile.entity_table required', 'alterColumn', 'civicrm_entity_file', 'entity_table', "varchar(64) NOT NULL COMMENT 'physical tablename for entity being joined to file, e.g. civicrm_contact'");
     $this->addExtensionTask('Enable Authx extension', ['authx'], 1101);
     $this->addExtensionTask('Enable Afform extension', ['org.civicrm.afform'], 1102);
+    $this->addTask('Add "civicrm_note" to "note_used_for" option group', 'addNoteNote');
+  }
+
+  public static function addNoteNote(CRM_Queue_TaskContext $ctx): bool {
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'note_used_for',
+      'label' => ts('Notes'),
+      'name' => 'Note',
+      'value' => 'civicrm_note',
+    ]);
+    return TRUE;
   }
 
 }
