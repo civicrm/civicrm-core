@@ -31,16 +31,10 @@ class CRM_Core_Payment_ProcessorForm {
    * @throws Exception
    */
   public static function preProcess(&$form, $type = NULL, $mode = NULL) {
+    $type = $type ?: CRM_Utils_Request::retrieve('type', 'String', $form);
     if ($type) {
-      $form->_type = $type;
-    }
-    else {
-      $form->_type = CRM_Utils_Request::retrieve('type', 'String', $form);
-    }
-
-    if ($form->_type) {
       // @todo not sure when this would be true. Never passed in.
-      $form->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($form->_type, $form->_mode);
+      $form->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($type, $form->_mode);
     }
 
     if (empty($form->_paymentProcessor)) {
