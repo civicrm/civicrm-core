@@ -353,6 +353,10 @@ body.af-gui-dragging {
   width: 45px;
 }
 
+#afGuiEditor #afGuiEditor-palette input[type=number] {
+  width: 6em;
+}
+
 #afGuiEditor .af-gui-layout-icon {
   width: 12px;
   height: 11px;
