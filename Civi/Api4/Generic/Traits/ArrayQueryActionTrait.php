@@ -107,16 +107,18 @@ trait ArrayQueryActionTrait {
   /**
    * @param array $row
    * @param array $condition
+   * @param int $index
    * @return bool
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public static function filterCompare($row, $condition) {
-    if (!is_array($condition)) {
-      throw new NotImplementedException('Unexpected where syntax; expecting array.');
-    }
+  public static function filterCompare(array $row, array $condition, int $index = NULL): bool {
     $value = $row[$condition[0]] ?? NULL;
     $operator = $condition[1];
     $expected = $condition[2] ?? NULL;
+    // Comparison for aggregated values
+    if (isset($index) && is_array($value) && $operator !== 'IN' && $operator !== 'NOT IN') {
+      $value = $value[$index] ?? NULL;
+    }
     switch ($operator) {
       case '=':
       case '!=':
@@ -180,7 +182,7 @@ trait ArrayQueryActionTrait {
         }
         elseif (is_string($value) || is_numeric($value)) {
           // Lowercase check if string contains string
-          return (strpos(strtolower((string) $value), strtolower((string) $expected)) !== FALSE) == ($operator == 'CONTAINS');
+          return (str_contains(strtolower((string) $value), strtolower((string) $expected))) == ($operator == 'CONTAINS');
         }
         return ($value == $expected) == ($operator == 'CONTAINS');
 

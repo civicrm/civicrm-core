@@ -1259,6 +1259,7 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['files_by_entity'] = $permissions['file'];
+    $permissions['entity_file'] = $permissions['file'];
 
     // Group permissions
     $permissions['group'] = [
@@ -1574,6 +1575,12 @@ class CRM_Core_Permission {
 
     $permissions['custom_value'] = [
       'gettree' => ['access CiviCRM'],
+    ];
+
+    $permissions['location_type'] = [
+      'get' => ['access CiviCRM'],
+      'update' => ['administer CiviCRM data'],
+      'delete' => ['administer CiviCRM data'],
     ];
 
     $permissions['message_template'] = [

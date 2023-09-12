@@ -3083,20 +3083,7 @@ SELECT contact_id
       }
       // Clause for an entity_table/entity_id combo
       if ($field['name'] === 'entity_id' && isset($fields['entity_table'])) {
-        $relatedClauses = [];
-        $relatedEntities = $this->buildOptions('entity_table', 'get');
-        foreach ((array) $relatedEntities as $table => $ent) {
-          if (!empty($ent)) {
-            $ent = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
-            $subquery = CRM_Utils_SQL::mergeSubquery($ent);
-            if ($subquery) {
-              $relatedClauses[] = "(entity_table = '$table' AND entity_id " . implode(' AND entity_id ', $subquery) . ")";
-            }
-            else {
-              $relatedClauses[] = "(entity_table = '$table')";
-            }
-          }
-        }
+        $relatedClauses = self::getDynamicFkAclClauses();
         if ($relatedClauses) {
           $clauses['id'] = 'IN (SELECT id FROM `' . $this->tableName() . '` WHERE (' . implode(') OR (', $relatedClauses) . '))';
         }
@@ -3104,6 +3091,24 @@ SELECT contact_id
     }
     CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
+  }
+
+  protected static function getDynamicFkAclClauses(): array {
+    $relatedClauses = [];
+    $relatedEntities = static::buildOptions('entity_table', 'get');
+    foreach ((array) $relatedEntities as $table => $ent) {
+      if (!empty($ent)) {
+        $ent = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
+        $subquery = CRM_Utils_SQL::mergeSubquery($ent);
+        if ($subquery) {
+          $relatedClauses[] = "(entity_table = '$table' AND entity_id " . implode(' AND entity_id ', $subquery) . ")";
+        }
+        else {
+          $relatedClauses[] = "(entity_table = '$table')";
+        }
+      }
+    }
+    return $relatedClauses;
   }
 
   /**
@@ -3123,7 +3128,10 @@ SELECT contact_id
     foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
       $clauses[$field] = NULL;
       if ($vals) {
-        $clauses[$field] = "(`$tableAlias`.`$field` IS NULL OR (`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals) . '))';
+        $clauses[$field] = "(`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals) . ')';
+        if (empty(static::getSupportedFields()[$field]['required'])) {
+          $clauses[$field] = "(`$tableAlias`.`$field` IS NULL OR {$clauses[$field]})";
+        }
       }
     }
     return $clauses;

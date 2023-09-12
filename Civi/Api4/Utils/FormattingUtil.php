@@ -237,17 +237,17 @@ class FormattingUtil {
         continue;
       }
       $fieldExpr = SqlExpression::convert($selectAliases[$key] ?? $key);
-      $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields() ?? '');
+      $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
       $baseName = $fieldName ? \CRM_Utils_Array::first(explode(':', $fieldName)) : NULL;
       $field = $fields[$fieldName] ?? $fields[$baseName] ?? NULL;
       $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
-      // Allow Sql Functions to do alter the value and/or $dataType
+      // Allow Sql Functions to alter the value and/or $dataType
       if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {
         $fieldExpr->formatOutputValue($dataType, $result, $key);
         $value = $result[$key];
       }
       if (!empty($field['output_formatters'])) {
-        self::applyFormatters($result, $fieldName, $field, $value);
+        self::applyFormatters($result, $fieldExpr, $field, $value);
         $dataType = NULL;
       }
       // Evaluate pseudoconstant suffixes
@@ -345,15 +345,34 @@ class FormattingUtil {
    * Apply a field's output_formatters callback functions
    *
    * @param array $result
-   * @param string $fieldPath
-   * @param array $field
+   * @param \Civi\Api4\Query\SqlExpression $fieldExpr
+   * @param array $fieldDefn
    * @param mixed $value
    */
-  private static function applyFormatters(array $result, string $fieldPath, array $field, &$value) {
-    $row = self::filterByPath($result, $fieldPath, $field['name']);
+  private static function applyFormatters(array $result, SqlExpression $fieldExpr, array $fieldDefn, &$value): void {
+    $fieldPath = \CRM_Utils_Array::first($fieldExpr->getFields());
+    $row = self::filterByPath($result, $fieldPath, $fieldDefn['name']);
 
-    foreach ($field['output_formatters'] as $formatter) {
-      $formatter($value, $row, $field);
+    // For aggregated array data, apply the formatter to each item
+    if (is_array($value) && $fieldExpr->getType() === 'SqlFunction' && $fieldExpr::getCategory() === 'aggregate') {
+      foreach ($value as $index => &$val) {
+        $subRow = $row;
+        foreach ($row as $rowKey => $rowValue) {
+          if (is_array($rowValue) && array_key_exists($index, $rowValue)) {
+            $subRow[$rowKey] = $rowValue[$index];
+          }
+        }
+        self::applyFormatter($fieldDefn, $subRow, $val);
+      }
+    }
+    else {
+      self::applyFormatter($fieldDefn, $row, $value);
+    }
+  }
+
+  private static function applyFormatter(array $fieldDefn, array $row, &$value): void {
+    foreach ($fieldDefn['output_formatters'] as $formatter) {
+      $formatter($value, $row, $fieldDefn);
     }
   }
 

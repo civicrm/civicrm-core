@@ -11,12 +11,13 @@
 namespace Civi\Api4;
 
 /**
- * File entity.
+ * EntityFile Bridge.
  *
- * @searchable secondary
- * @since 5.41
+ * @searchable bridge
+ * @since 5.67
  * @package Civi\Api4
  */
-class File extends Generic\DAOEntity {
+class EntityFile extends Generic\DAOEntity {
+  use Generic\Traits\EntityBridge;
 
 }

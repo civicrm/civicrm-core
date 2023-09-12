@@ -108,10 +108,11 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
     if ($this->args[0]['prefix'] === ['UNIQUE']) {
       $this->args[0]['prefix'] = [];
       $expr = $this->args[0]['expr'][0];
+      [$fieldPath] = explode(':', $expr->getFields()[0]);
       $field = $query->getField($expr->getFields()[0]);
       if ($field) {
         $idField = CoreUtil::getIdFieldName($field['entity']);
-        $idFieldKey = substr($expr->getFields()[0], 0, 0 - strlen($field['name'])) . $idField;
+        $idFieldKey = substr($fieldPath, 0, 0 - strlen($field['name'])) . $idField;
         // Keep the ordering consistent
         if (empty($this->args[1]['prefix'])) {
           $this->args[1] = [

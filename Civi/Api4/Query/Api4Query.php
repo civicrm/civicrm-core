@@ -147,6 +147,7 @@ abstract class Api4Query {
     }
     $this->apiFieldSpec[$path] = $field + [
       'name' => $path,
+      'path' => $path,
       'type' => 'Extra',
       'entity' => NULL,
       'implicit_join' => NULL,

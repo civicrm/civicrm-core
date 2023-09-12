@@ -21,6 +21,11 @@
 class CRM_Utils_File {
 
   /**
+   * Used to remove md5 hash that was injected into uploaded file names.
+   */
+  const HASH_REMOVAL_PATTERN = '/_[a-f0-9]{32}\./';
+
+  /**
    * Given a file name, determine if the file contents make it an ascii file
    *
    * @param string $name
@@ -394,7 +399,10 @@ class CRM_Utils_File {
   }
 
   /**
-   * Remove the 32 bit md5 we add to the fileName also remove the unknown tag if we added it.
+   * Remove 32 bit md5 hash prepended to the file suffix.
+   *
+   * Note: if the filename was munged with an `.unknown` suffix, this removes
+   * the md5 but doesn't undo the munging or remove the `.unknown` suffix.
    *
    * @param $name
    *
@@ -402,7 +410,7 @@ class CRM_Utils_File {
    */
   public static function cleanFileName($name) {
     // replace the last 33 character before the '.' with null
-    $name = preg_replace('/(_[\w]{32})\./', '.', $name);
+    $name = preg_replace(self::HASH_REMOVAL_PATTERN, '.', $name);
     return $name;
   }
 

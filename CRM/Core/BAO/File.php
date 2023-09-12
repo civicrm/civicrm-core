@@ -834,4 +834,48 @@ HEREDOC;
     return FALSE;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function addSelectWhereClause() {
+    // TODO: This seemded like a good idea... piggybacking off the ACL clause of EntityFile
+    // however that's too restrictive because entityFile ACLs are limited to just attachments,
+    // so this would prevent access to other file fields (e.g. custom fields)
+    // Disabling this function for now by calling the parent instead.
+    return parent::addSelectWhereClause();
+    $clauses = [
+      'id' => [],
+    ];
+    // File ACLs are driven by the EntityFile table
+    $entityFileClause = CRM_Core_DAO_EntityFile::getDynamicFkAclClauses();
+    if ($entityFileClause) {
+      $clauses['id'] = 'IN (SELECT file_id FROM `civicrm_entity_file` WHERE (' . implode(') OR (', $entityFileClause) . '))';
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
+  /**
+   * FIXME: Incomplete pseudoconstant for EntityFile.entity_table
+   *
+   * The `EntityFile` table serves 2 purposes:
+   * 1. As a many-to-many bridge table for entities that support multiple attachments
+   * 2. As a redundant copy of the value of custom fields of type File
+   *
+   * The 2nd use isn't really a bridge entity, and doesn't even make much sense
+   * (what purpose does it serve other than as a dummy value to use in file download links).
+   * Including the 2nd in this function would blow up the possible values for `entity_table`
+   * and make ACL clauses quite slow. So until someone comes up with a better idea,
+   * this only returns values relevant to the 1st.
+   *
+   * @return array
+   */
+  public static function getEntityTables(): array {
+    return [
+      'civicrm_activity' => ts('Activity'),
+      'civicrm_case' => ts('Case'),
+      'civicrm_note' => ts('Note'),
+    ];
+  }
+
 }

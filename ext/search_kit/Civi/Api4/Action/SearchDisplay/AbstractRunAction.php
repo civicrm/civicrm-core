@@ -213,7 +213,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array{val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
    */
   private function formatColumn($column, $data) {
-    $column += ['rewrite' => NULL, 'label' => NULL];
+    $column += ['rewrite' => NULL, 'label' => NULL, 'key' => ''];
     $out = [];
     switch ($column['type']) {
       case 'field':
@@ -278,7 +278,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (isset($column['title']) && strlen($column['title'])) {
       $out['title'] = $this->replaceTokens($column['title'], $data, 'view');
     }
-    $cssClass = $this->getCssStyles($column['cssRules'] ?? [], $data);
+    $cssClass = [];
+    // Style rules get applied to entire column if not a link
+    if (empty($column['link']) && !empty($column['cssRules'])) {
+      $cssClass = $this->getCssStyles($column['cssRules'], $data);
+    }
     if (!empty($column['alignment'])) {
       $cssClass[] = $column['alignment'];
     }
@@ -286,7 +290,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $out['cssClass'] = implode(' ', $cssClass);
     }
     if (!empty($column['icons'])) {
-      $out['icons'] = $this->getColumnIcons($column['icons'], $data);
+      $out['icons'] = $this->getColumnIcons($column, $data, $out);
     }
     return $out;
   }
@@ -316,15 +320,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param array[] $styleRules
    * @param array $data
+   * @param int $index
    * @return array
    */
-  protected function getCssStyles(array $styleRules, array $data) {
+  protected function getCssStyles(array $styleRules, array $data, int $index = NULL) {
     $classes = [];
     foreach ($styleRules as $clause) {
       $cssClass = $clause[0] ?? '';
       if ($cssClass) {
         $condition = $this->getRuleCondition(array_slice($clause, 1));
-        if (is_null($condition[0]) || (self::filterCompare($data, $condition))) {
+        if (is_null($condition[0]) || (self::filterCompare($data, $condition, $index))) {
           $classes[] = $cssClass;
         }
       }
@@ -339,44 +344,79 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * If more than one per side is given, latter icons are treated as fallbacks
    * and only shown if prior ones are missing.
    *
-   * @param array{icon: string, field: string, if: array, side: string}[] $icons
+   * @param array $column
    * @param array $data
+   * @param array $out
    * @return array
    */
-  protected function getColumnIcons(array $icons, array $data) {
+  protected function getColumnIcons(array $column, array $data, array $out): array {
+    // Column is either outputting an array of links, or a plain value
+    // Links are always an array. Value could be, if field is multivalued or aggregated.
+    $value = $out['links'] ?? $out['val'] ?? NULL;
+    // Get 0-indexed keys of the values (pad so we have at least one)
+    $keys = array_pad(array_keys(array_values((array) $value)), 1, 0);
     $result = [];
-    // Reverse order so latter icons become fallbacks and earlier ones take priority
-    foreach (array_reverse($icons) as $icon) {
-      $iconClass = $icon['icon'] ?? NULL;
-      if (!$iconClass && !empty($icon['field']) && !empty($data[$icon['field']])) {
-        // Icon field may be multivalued e.g. contact_sub_type
-        $iconClass = \CRM_Utils_Array::first(array_filter((array) $data[$icon['field']]));
+    foreach (['left', 'right'] as $side) {
+      foreach ($keys as $index) {
+        $result[$side][$index] = $this->getColumnIcon($column['icons'], $side, $index, $data, is_array($value));
       }
-      if ($iconClass) {
-        $condition = $this->getRuleCondition($icon['if'] ?? []);
-        if (!is_null($condition[0]) && !(self::filterCompare($data, $condition))) {
-          continue;
-        }
-        $side = $icon['side'] ?? 'left';
-        $result[$side] = ['class' => $iconClass, 'side' => $side];
+      // Drop if empty
+      if (!array_filter($result[$side])) {
+        unset($result[$side]);
       }
     }
-    return array_values($result);
+    return $result;
+  }
+
+  private function getColumnIcon(array $icons, string $side, int $index, array $data, bool $isMulti): ?string {
+    // Latter icons are fallbacks, earlier ones take priority
+    foreach ($icons as $icon) {
+      $iconClass = NULL;
+      $icon += ['side' => 'left', 'icon' => NULL];
+      if ($icon['side'] !== $side) {
+        continue;
+      }
+      $iconField = !empty($icon['field']) ? $this->renameIfAggregate($icon['field']) : NULL;
+      if (!empty($iconField) && !empty($data[$iconField])) {
+        // Icon field may be multivalued e.g. contact_sub_type, or it may be aggregated
+        // If both base field and icon field are multivalued, use corresponding index
+        if ($isMulti && is_array($data[$iconField])) {
+          $iconClass = $data[$iconField][$index] ?? NULL;
+        }
+        // Otherwise get a single value
+        else {
+          $iconClass = \CRM_Utils_Array::first(array_filter((array) $data[$iconField]));
+        }
+      }
+      $iconClass = $iconClass ?? $icon['icon'];
+      if ($iconClass && !empty($icon['if'])) {
+        $condition = $this->getRuleCondition($icon['if'], $isMulti);
+        if (!is_null($condition[0]) && !(self::filterCompare($data, $condition, $isMulti ? $index : NULL))) {
+          continue;
+        }
+      }
+      if ($iconClass) {
+        return $iconClass;
+      }
+    }
+    return NULL;
   }
 
   /**
    * Returns the condition of a cssRules
    *
    * @param array $clause
+   * @param bool $isMulti
    * @return array
    */
-  protected function getRuleCondition($clause) {
+  protected function getRuleCondition($clause, bool $isMulti = FALSE): array {
     $fieldKey = $clause[0] ?? NULL;
-    // For fields used in group by, add aggregation and change operator to CONTAINS
-    // NOTE: This doesn't support any other operators for aggregated fields.
+    // For fields used in group by, add aggregation and change comparison operator to CONTAINS
     if ($fieldKey && $this->canAggregate($fieldKey)) {
-      $clause[1] = 'CONTAINS';
-      $fieldKey = 'GROUP_CONCAT_' . str_replace(['.', ':'], '_', $clause[0]);
+      if (!$isMulti && !empty($clause[1]) && !in_array($clause[1], ['IS EMPTY', 'IS NOT EMPTY'], TRUE)) {
+        $clause[1] = 'CONTAINS';
+      }
+      $fieldKey = $this->renameIfAggregate($fieldKey);
     }
     return [$fieldKey, $clause[1] ?? 'IS NOT EMPTY', $clause[2] ?? NULL];
   }
@@ -393,7 +433,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $fieldKey = $clause[1] ?? NULL;
       if ($fieldKey) {
         // For fields used in group by, add aggregation
-        $select[] = $this->canAggregate($fieldKey) ? "GROUP_CONCAT($fieldKey) AS GROUP_CONCAT_" . str_replace(['.', ':'], '_', $fieldKey) : $fieldKey;
+        $select[] = $this->renameIfAggregate($fieldKey, TRUE);
       }
     }
     return $select;
@@ -409,12 +449,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $select = [];
     foreach ($icons as $icon) {
       if (!empty($icon['field'])) {
-        $select[] = $icon['field'];
+        $select[] = $this->renameIfAggregate($icon['field'], TRUE);
       }
       $fieldKey = $icon['if'][0] ?? NULL;
       if ($fieldKey) {
         // For fields used in group by, add aggregation
-        $select[] = $this->canAggregate($fieldKey) ? "GROUP_CONCAT($fieldKey) AS GROUP_CONCAT_" . str_replace(['.', ':'], '_', $fieldKey) : $fieldKey;
+        $select[] = $this->renameIfAggregate($fieldKey, TRUE);
       }
     }
     return $select;
@@ -432,6 +472,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     foreach ((array) $value as $index => $val) {
       $link = $this->formatLink($column['link'], $data, $val, $index);
       if ($link) {
+        // Style rules get appled to each link
+        if (!empty($column['cssRules'])) {
+          $link += ['style' => ''];
+          $css = $this->getCssStyles($column['cssRules'], $data, $index);
+          $link['style'] = trim($link['style'] . ' ' . implode(' ', $css));
+        }
         $links[] = $link;
       }
     }
@@ -462,7 +508,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   private function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
-    $link = $this->getLinkInfo($link, $data, $index);
+    $link = $this->getLinkInfo($link);
     if (!$this->checkLinkAccess($link, $data, $index)) {
       return NULL;
     }
@@ -471,10 +517,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $path = $this->replaceTokens($link['path'], $data, 'url', $index);
     if ($path) {
       $link['url'] = $this->getUrl($path);
-      $keys = ['url', 'text', 'title', 'target', 'style', 'icon'];
+      $keys = ['url', 'text', 'title', 'target', 'style'];
     }
     else {
-      $keys = ['task', 'text', 'title', 'style', 'icon'];
+      $keys = ['task', 'text', 'title', 'style'];
     }
     $link = array_intersect_key($link, array_flip($keys));
     return array_filter($link);
@@ -591,8 +637,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * @param array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, icon: string, title: string, text: string} $link
-   * @return array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, icon: string, title: string, text: string, prefix: string}
+   * @param array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, title: string, text: string} $link
+   * @return array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, title: string, text: string, prefix: string}
    */
   private function getLinkInfo(array $link): array {
     $link += [
@@ -1255,7 +1301,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!$this->getSelectExpression($expr)) {
       // Tokens for aggregated columns start with 'GROUP_CONCAT_'
       if (strpos($expr, 'GROUP_CONCAT_') === 0) {
-        $expr = 'GROUP_CONCAT(' . $this->getJoinFromAlias(explode('_', $expr, 3)[2]) . ') AS ' . $expr;
+        $expr = 'GROUP_CONCAT(UNIQUE ' . $this->getJoinFromAlias(explode('_', $expr, 3)[2]) . ') AS ' . $expr;
       }
       $this->_apiParams['select'][] = $expr;
       // Force-reset cache so it gets rebuilt with the new select param

@@ -30,6 +30,7 @@
         _.each(ctrl.onInitialize, function(callback) {
           callback.call(ctrl, $scope, $element);
         });
+        this.isArray = angular.isArray;
 
         // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 300ms
         this.getResultsPronto = _.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});

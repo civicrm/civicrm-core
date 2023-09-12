@@ -234,6 +234,17 @@ trait SavedSearchInspectorTrait {
     return !in_array($idField, $apiParams['groupBy']);
   }
 
+  private function renameIfAggregate(string $fieldPath, bool $asSelect = FALSE): string {
+    $renamed = $fieldPath;
+    if ($this->canAggregate($fieldPath)) {
+      $renamed = 'GROUP_CONCAT_' . str_replace(['.', ':'], '_', $fieldPath);
+      if ($asSelect) {
+        $renamed = "GROUP_CONCAT(UNIQUE $fieldPath) AS $renamed";
+      }
+    }
+    return $renamed;
+  }
+
   /**
    * @param string|array $fieldName
    *   If multiple field names are given they will be combined in an OR clause
