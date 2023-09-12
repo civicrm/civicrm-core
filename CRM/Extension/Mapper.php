@@ -489,7 +489,7 @@ class CRM_Extension_Mapper {
     $dao->type = 'module';
     $dao->find();
     while ($dao->fetch()) {
-      $result[] = new CRM_Core_Module($dao->full_name, $dao->is_active);
+      $result[] = new CRM_Core_Module($dao->full_name, $dao->is_active, $dao->label);
     }
     return $result;
   }
