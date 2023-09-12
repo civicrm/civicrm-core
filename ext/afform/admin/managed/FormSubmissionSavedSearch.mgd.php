@@ -105,6 +105,18 @@ return [
               'size' => 'btn-xs',
               'links' => [
                 [
+                  'entity' => 'AfformSubmission',
+                  'action' => 'view',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-external-link',
+                  'text' => E::ts('View'),
+                  'style' => 'default',
+                  'path' => '',
+                  'task' => '',
+                  'condition' => [],
+                ],
+                [
                   'path' => '',
                   'icon' => 'fa-check-square-o',
                   'text' => E::ts('Process'),
