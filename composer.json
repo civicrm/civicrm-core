@@ -68,7 +68,7 @@
     "tecnickcom/tcpdf" : "6.4.*",
     "totten/ca-config": "~22.11",
     "zetacomponents/base": "1.9.*",
-    "zetacomponents/mail": "~1.9.5",
+    "zetacomponents/mail": "~1.9.4",
     "marcj/topsort": "~1.1",
     "phpoffice/phpword": "^0.18.0",
     "pear/validate_finance_creditcard": "0.7.0",

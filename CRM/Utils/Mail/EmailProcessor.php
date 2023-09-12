@@ -16,6 +16,8 @@
  */
 
 // we should consider moving this to the settings table
+use Civi\Api4\Activity;
+
 define('MAIL_BATCH_SIZE', 50);
 
 /**
@@ -77,11 +79,29 @@ class CRM_Utils_Mail_EmailProcessor {
    */
   private static function _process($civiMail, $dao, $is_create_activities) {
     // 0 = activities; 1 = bounce;
-    $usedfor = $dao->is_default;
-    if ($usedfor == 0) {
-      // create an array of all of to, from, cc, bcc that are in use for this Mail Account, so we don't create contacts for emails we aren't adding to the activity
-      $emailFields = array_filter(array_unique(array_merge(explode(",", $dao->activity_targets), explode(",", $dao->activity_assignees), explode(",", $dao->activity_source))));
-      $createContact = !($dao->is_contact_creation_disabled_if_no_match ?? FALSE);
+    $isBounceProcessing = $dao->is_default;
+    $targetFields = array_filter(explode(',', $dao->activity_targets));
+    $assigneeFields = array_filter(explode(",", $dao->activity_assignees));
+    $sourceFields = array_filter(explode(",", $dao->activity_source));
+    // create an array of all of to, from, cc, bcc that are in use for this Mail Account, so we don't create contacts for emails we aren't adding to the activity.
+    $emailFields = array_merge($targetFields, $assigneeFields, $sourceFields);
+    $createContact = !($dao->is_contact_creation_disabled_if_no_match);
+    $bounceActivityTypeID = $activityTypeID = (int) $dao->activity_type_id;
+    $activityTypes = Activity::getFields(TRUE)
+      ->setLoadOptions(['id', 'name'])
+      ->addWhere('name', '=', 'activity_type_id')
+      ->execute()->first()['options'];
+    foreach ($activityTypes as $activityType) {
+      if ($activityType['name'] === 'Bounce') {
+        $bounceActivityTypeID = (int) $activityType['id'];
+      }
+    }
+    $bounceTypes = [];
+    if ($isBounceProcessing) {
+      $result = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_mailing_bounce_type');
+      while ($result->fetch()) {
+        $bounceTypes[$result->id] = ['id' => $result->id, 'name' => $result->name, 'description' => $result->description, 'hold_threshold' => $result->hold_threshold];
+      }
     }
 
     // retrieve the emails
@@ -104,8 +124,8 @@ class CRM_Utils_Mail_EmailProcessor {
         $queue = $incomingMail->getQueueID();
         $hash = $incomingMail->getHash();
 
-        // preseve backward compatibility
-        if ($usedfor == 0 || $is_create_activities) {
+        // preserve backward compatibility
+        if (!$isBounceProcessing || $is_create_activities) {
           // Mail account may have 'Skip emails which do not have a Case ID
           // or Case hash' option, if its enabled and email is not related
           // to cases - then we need to put email to ignored folder.
@@ -115,36 +135,56 @@ class CRM_Utils_Mail_EmailProcessor {
             continue;
           }
 
+          $bounceString = '';
           // if its the activities that needs to be processed ..
           try {
-            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE, $emailFields);
+            if ($incomingMail->isBounce()) {
+              $activityTypeID = $bounceActivityTypeID;
+              $bounce = CRM_Mailing_BAO_BouncePattern::match($incomingMail->getBody());
+              if (!empty($bounce['bounce_type_id'])) {
+                $bounceType = $bounceTypes[$bounce['bounce_type_id']];
+                $bounceString = ts('Bounce type: %1. %2', [1 => $bounceType['name'], 2 => $bounceType['description']])
+                  . '<br>'
+                  . ts('Email will be put on hold after %1 of this type of bounce', [1 => $bounceType['hold_threshold']])
+                  . "\n";
+              }
+              else {
+                $bounceString = ts('Bounce type not identified, email will not be put on hold')
+                . "\n";
+              }
+            }
+            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $incomingMail->getAttachments(), $createContact, $emailFields, [$incomingMail->getFrom()]);
             $activityParams = [
-              'activity_type_id' => (int) $dao->activity_type_id,
+              'activity_type_id' => $activityTypeID,
               'campaign_id' => $dao->campaign_id ? (int) $dao->campaign_id : NULL,
               'status_id' => $dao->activity_status,
+              'subject' => $incomingMail->getSubject(),
+              'activity_date_time' => $incomingMail->getDate(),
+              'details' => $incomingMail->getBody(),
             ];
+            if ($incomingMail->isVerp()) {
+              $activityParams['source_contact_id'] = $incomingMail->lookup('Queue', 'contact_id');
+            }
+            else {
+              $activityParams['source_contact_id'] = $mailParams[$dao->activity_source][0]['id'];
 
-            $activityParams['source_contact_id'] = $mailParams[$dao->activity_source][0]['id'];
-
-            $activityContacts = ['target_contact_id' => 'activity_targets', 'assignee_contact_id' => 'activity_assignees'];
-            foreach ($activityContacts as $activityContact => $daoName) {
-              $activityParams[$activityContact] = [];
-              $activityKeys = array_filter(explode(",", $dao->$daoName));
-              foreach ($activityKeys as $activityKey) {
-                if (is_array($mailParams[$activityKey])) {
-                  foreach ($mailParams[$activityKey] as $keyValue) {
-                    if (!empty($keyValue['id'])) {
-                      $activityParams[$activityContact][] = $keyValue['id'];
+              $activityContacts = [
+                'target_contact_id' => $targetFields,
+                'assignee_contact_id' => $assigneeFields,
+              ];
+              foreach ($activityContacts as $activityContact => $activityKeys) {
+                $activityParams[$activityContact] = [];
+                foreach ($activityKeys as $activityKey) {
+                  if (is_array($mailParams[$activityKey])) {
+                    foreach ($mailParams[$activityKey] as $keyValue) {
+                      if (!empty($keyValue['id'])) {
+                        $activityParams[$activityContact][] = $keyValue['id'];
+                      }
                     }
                   }
                 }
               }
             }
-
-            $activityParams['subject'] = $mailParams['subject'];
-            $activityParams['activity_date_time'] = $mailParams['date'];
-            $activityParams['details'] = $mailParams['body'];
-
             $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
             for ($i = 1; $i <= $numAttachments; $i++) {
               if (isset($mailParams["attachFile_$i"])) {
@@ -157,18 +197,28 @@ class CRM_Utils_Mail_EmailProcessor {
             }
 
             $result = civicrm_api3('Activity', 'create', $activityParams);
+            $matches = TRUE;
+            CRM_Utils_Hook::emailProcessor('activity', $activityParams, $mail, $result);
+            echo "Processed as Activity: {$mail->subject}\n";
           }
           catch (Exception $e) {
-            echo "Failed Processing: {$mail->subject}. Reason: " . $e->getMessage() . "\n";
-            $store->markIgnored($key);
-            continue;
+            // Try again with just the bounceString as the details.
+            // This allows us to still process even if we hit https://lab.civicrm.org/dev/mail/issues/36
+            // as tested in testBounceProcessingInvalidCharacter.
+            $activityParams['details'] = trim($bounceString);
+            try {
+              civicrm_api3('Activity', 'create', $activityParams);
+              $matches = TRUE;
+            }
+            catch (CRM_Core_Exception $e) {
+              echo "Failed Processing: {$mail->subject}. Reason: " . $e->getMessage() . "\n";
+              $store->markIgnored($key);
+              continue;
+            }
           }
-          $matches = TRUE;
-          CRM_Utils_Hook::emailProcessor('activity', $activityParams, $mail, $result);
-          echo "Processed as Activity: {$mail->subject}\n";
         }
 
-        // if $matches is empty, this email is not CiviMail-bound
+        // This is an awkward exit when processing is done. It probably needs revisiting
         if (!$incomingMail->isVerp() && empty($matches)) {
           $store->markIgnored($key);
           continue;
@@ -184,54 +234,13 @@ class CRM_Utils_Mail_EmailProcessor {
 
           switch ($action) {
             case 'b':
-              $text = '';
-              if ($mail->body instanceof ezcMailText) {
-                $text = $mail->body->text;
-              }
-              elseif ($mail->body instanceof ezcMailMultipart) {
-                $text = self::getTextFromMultipart($mail->body);
-              }
-              elseif ($mail->body instanceof ezcMailFile) {
-                $text = file_get_contents($mail->body->__get('fileName'));
-              }
-
-              if (
-                empty($text) &&
-                $mail->subject === 'Delivery Status Notification (Failure)'
-              ) {
-                // Exchange error - CRM-9361
-                foreach ($mail->body->getParts() as $part) {
-                  if ($part instanceof ezcMailDeliveryStatus) {
-                    foreach ($part->recipients as $rec) {
-                      if ($rec['Status'] === '5.1.1') {
-                        if (isset($rec['Description'])) {
-                          $text = $rec['Description'];
-                        }
-                        else {
-                          $text = $rec['Status'] . ' Delivery to the following recipients failed';
-                        }
-                        break;
-                      }
-                    }
-                  }
-                }
-              }
-
-              if (empty($text)) {
-                // If bounce processing fails, just take the raw body. Cf. CRM-11046
-                $text = $mail->generateBody();
-
-                // if text is still empty, lets fudge a blank text so the api call below will succeed
-                if (empty($text)) {
-                  $text = ts('We could not extract the mail body from this bounce message.');
-                }
-              }
+              $text = $incomingMail->getBody();
 
               $activityParams = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
-                'body' => $text,
+                'body' => $text ?: ts('We could not extract the mail body from this bounce message.'),
                 'version' => 3,
                 // Setting is_transactional means it will rollback if
                 // it crashes part way through creating the bounce.
