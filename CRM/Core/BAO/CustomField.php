@@ -2045,6 +2045,7 @@ WHERE  id IN ( %1, %2 )
 
     $sql = "INSERT INTO {$newGroup->table_name} (entity_id, `{$field->column_name}`)
             SELECT entity_id, `{$field->column_name}` FROM {$oldGroup->table_name}
+            WHERE `{$field->column_name}` IS NOT NULL
             ON DUPLICATE KEY UPDATE `{$field->column_name}` = {$oldGroup->table_name}.`{$field->column_name}`
             ";
     CRM_Core_DAO::executeQuery($sql);
