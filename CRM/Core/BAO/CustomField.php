@@ -2043,6 +2043,9 @@ WHERE  id IN ( %1, %2 )
     $add->custom_group_id = $newGroup->id;
     self::createField($add, 'add');
 
+    // IS NOT NULL needed here to prevent NULL values from being inserted when a field is moving from one entity type to another.
+    // It will pass _moveFieldValidate if all values are NULL,
+    // but will break things to try to insert NULL values for entity ids that make no sense for the new entity type.
     $sql = "INSERT INTO {$newGroup->table_name} (entity_id, `{$field->column_name}`)
             SELECT entity_id, `{$field->column_name}` FROM {$oldGroup->table_name}
             WHERE `{$field->column_name}` IS NOT NULL
