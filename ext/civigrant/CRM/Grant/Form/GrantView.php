@@ -69,21 +69,21 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
     }
 
     // add Grant to Recent Items
-    $url = CRM_Utils_System::url('civicrm/contact/view/grant',
-      "action=view&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
+    $url = CRM_Utils_System::url('civicrm/grant/add',
+      "action=view&reset=1&id={$values['id']}&cid={$values['contact_id']}"
     );
 
     $title = CRM_Contact_BAO_Contact::displayName($values['contact_id']) . ' - ' . ts('Grant') . ': ' . CRM_Utils_Money::format($values['amount_total']) . ' (' . $grantType[$values['grant_type_id']] . ')';
 
     $recentOther = [];
     if (CRM_Core_Permission::check('edit grants')) {
-      $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/grant',
-        "action=update&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
+      $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/grant/add',
+        "action=update&reset=1&id={$values['id']}&cid={$values['contact_id']}"
       );
     }
     if (CRM_Core_Permission::check('delete in CiviGrant')) {
-      $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/grant',
-        "action=delete&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
+      $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/grant/add',
+        "action=delete&reset=1&id={$values['id']}&cid={$values['contact_id']}"
       );
     }
     CRM_Utils_Recent::add($title,

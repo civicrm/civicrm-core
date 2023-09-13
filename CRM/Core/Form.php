@@ -1607,7 +1607,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       return 'delete';
     }
     // If you get this exception try adding more cases above.
-    throw new Exception("Cannot determine api action for " . get_class($this) . '.' . 'CRM_Core_Action "' . CRM_Core_Action::description($action) . '" not recognized.');
+    throw new CRM_Core_Exception("Cannot determine api action for " . get_class($this) . '.' . 'CRM_Core_Action "' . CRM_Core_Action::description($action) . '" not recognized.');
   }
 
   /**
@@ -1615,7 +1615,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws Exception
    */
   public function getDefaultEntity() {
-    throw new Exception("Cannot determine default entity. " . get_class($this) . " should implement getDefaultEntity().");
+    throw new CRM_Core_Exception("Cannot determine default entity. " . get_class($this) . " should implement getDefaultEntity().");
   }
 
   /**
@@ -1625,7 +1625,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws Exception
    */
   public function getDefaultContext() {
-    throw new Exception("Cannot determine default context. " . get_class($this) . " should implement getDefaultContext().");
+    throw new CRM_Core_Exception("Cannot determine default context. " . get_class($this) . " should implement getDefaultContext().");
   }
 
   /**
@@ -2643,9 +2643,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Sets page title based on entity and action.
-   * @param string $entityLabel
+   * @param string|null $entityLabel
+   * @throws CRM_Core_Exception
    */
-  public function setPageTitle($entityLabel) {
+  public function setPageTitle(?string $entityLabel = NULL): void {
+    if (!isset($entityLabel)) {
+      $entityLabel = \Civi\Api4\Utils\CoreUtil::getInfoItem($this->getDefaultEntity(), 'title');
+    }
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
         $this->setTitle(ts('New %1', [1 => $entityLabel]));
