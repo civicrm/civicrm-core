@@ -1016,7 +1016,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             "GROUP_CONCAT(DISTINCT subject) AS GROUP_CONCAT_subject",
           ],
           'groupBy' => ['activity_type_id'],
-          'orderBy' => ['activity_type_id:label'],
           'where' => [],
         ],
       ],
