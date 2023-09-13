@@ -160,7 +160,7 @@ class CRM_Utils_Mail_EmailProcessor {
               'status_id' => $dao->activity_status,
               'subject' => $incomingMail->getSubject(),
               'activity_date_time' => $incomingMail->getDate(),
-              'details' => $incomingMail->getBody(),
+              'details' => $bounceString . $incomingMail->getBody(),
             ];
             if ($incomingMail->isVerp()) {
               $activityParams['source_contact_id'] = $incomingMail->lookup('Queue', 'contact_id');
