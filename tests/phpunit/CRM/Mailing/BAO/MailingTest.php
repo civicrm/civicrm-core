@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Mailing;
+use Civi\Api4\MailingJob;
+
 /**
  * Class CRM_Mailing_BAO_MailingTest
  */
@@ -68,9 +71,20 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that the non-crud actions do not occur when creating a mailing using apiv4.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testApiV4DoesNotSchedule(): void {
+    Mailing::create(FALSE)->setValues(['name' => 'bob', 'scheduled_date' => 'tomorrow'])->execute();
+    $jobs = MailingJob::get(FALSE)->execute();
+    $this->assertEquals(0, $jobs->rowCount);
+  }
+
+  /**
    * Test to ensure that using ACL permitted contacts are correctly fetched for bulk mailing
    */
-  public function testgetRecipientsUsingACL(): void {
+  public function testGetRecipientsUsingACL(): void {
     $this->prepareForACLs();
     $this->createLoggedInUser();
     // create hook to build ACL where clause which choses $this->allowedContactId as the only contact to be considered as mail recipient

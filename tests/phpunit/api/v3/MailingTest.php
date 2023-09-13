@@ -79,13 +79,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_mailing_create.
-   *
-   * @dataProvider versionThreeAndFour
-   *
-   * @param int $version
    */
-  public function testMailerCreateSuccess(int $version): void {
-    $this->_apiversion = $version;
+  public function testMailerCreateSuccess(): void {
     $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
     $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign']);
     $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
@@ -109,13 +104,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   /**
    * Create a completed mailing (e.g when importing from a provider).
-   *
-   * @dataProvider versionThreeAndFour
-   *
-   * @param int $version
    */
-  public function testMailerCreateCompleted(int $version): void {
-    $this->_apiversion = $version;
+  public function testMailerCreateCompleted(): void {
     $this->_params['body_html'] = 'I am completed so it does not matter if there is an opt out link since I have already been sent by another system';
     $this->_params['is_completed'] = 1;
     $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now']);
