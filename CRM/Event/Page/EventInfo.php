@@ -52,11 +52,6 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     // Sometimes we want to suppress the Event Full msg
     $noFullMsg = CRM_Utils_Request::retrieve('noFullMsg', 'String', $this, FALSE, 'false');
 
-    // set breadcrumb to append to 2nd layer pages
-    $breadCrumbPath = CRM_Utils_System::url('civicrm/event/info',
-      "id={$this->_id}&reset=1"
-    );
-
     //retrieve event information
     $params = ['id' => $this->_id];
     $values = ['event' => NULL];
