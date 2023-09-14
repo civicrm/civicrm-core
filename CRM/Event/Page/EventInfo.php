@@ -30,12 +30,10 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
    * @return void
    */
   public function run() {
-    //get the event id.
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $config = CRM_Core_Config::singleton();
     // ensure that the user has permission to see this page
     if (!CRM_Core_Permission::event(CRM_Core_Permission::VIEW,
-      $this->_id, 'view event info'
+      $this->getEventID(), 'view event info'
     )
     ) {
       CRM_Utils_System::setUFMessage(ts('You do not have permission to view this event'));
@@ -332,10 +330,27 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
   }
 
   /**
+   * Get the selected Event ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int|null
+   */
+  public function getEventID(): int {
+    if (!isset($this->_id)) {
+      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      $this->_id = $id;
+    }
+    return (int) $this->_id;
+  }
+
+  /**
    * @return string
    */
   public function getTemplateFileName() {
-    if ($this->_id) {
+    if ($this->getEventID()) {
       $templateFile = "CRM/Event/Page/{$this->_id}/EventInfo.tpl";
       $template = CRM_Core_Page::getTemplate();
 
