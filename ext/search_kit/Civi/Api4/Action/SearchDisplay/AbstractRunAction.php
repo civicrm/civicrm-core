@@ -507,7 +507,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     return $out;
   }
 
-  private function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
+  protected function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
     $link = $this->getLinkInfo($link);
     if (!$this->checkLinkAccess($link, $data, $index)) {
       return NULL;
@@ -517,7 +517,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $path = $this->replaceTokens($link['path'], $data, 'url', $index);
     if ($path) {
       $link['url'] = $this->getUrl($path);
-      $keys = ['url', 'text', 'title', 'target', 'icon', 'style'];
+      $keys = ['url', 'text', 'title', 'target', 'icon', 'style', 'autoOpen'];
     }
     else {
       $keys = ['task', 'text', 'title', 'icon', 'style'];

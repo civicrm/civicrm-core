@@ -80,16 +80,16 @@ class FormattingUtil {
    * This is used by read AND write actions (Get, Create, Update, Replace)
    *
    * @param $value
-   * @param string|null $fieldName
+   * @param string|null $fieldPath
    * @param array $fieldSpec
    * @param array $params
    * @param string|null $operator (only for 'get' actions)
    * @param null $index (for recursive loops)
    * @throws \CRM_Core_Exception
    */
-  public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, array $params = [], &$operator = NULL, $index = NULL) {
+  public static function formatInputValue(&$value, ?string $fieldPath, array $fieldSpec, array $params = [], &$operator = NULL, $index = NULL) {
     // Evaluate pseudoconstant suffix
-    $suffix = str_replace(':', '', strstr(($fieldName ?? ''), ':'));
+    $suffix = str_replace(':', '', strstr(($fieldPath ?? ''), ':'));
     $fk = $fieldSpec['name'] == 'id' ? $fieldSpec['entity'] : $fieldSpec['fk_entity'] ?? NULL;
 
     // Handle special 'current_domain' option. See SpecFormatter::getOptions
@@ -113,14 +113,14 @@ class FormattingUtil {
 
     // Convert option list suffix to value
     if ($suffix) {
-      $options = self::getPseudoconstantList($fieldSpec, $fieldName, $params, $operator ? 'get' : 'create');
+      $options = self::getPseudoconstantList($fieldSpec, $fieldPath, $params, $operator ? 'get' : 'create');
       $value = self::replacePseudoconstant($options, $value, TRUE);
       return;
     }
     elseif (is_array($value)) {
       $i = 0;
       foreach ($value as &$val) {
-        self::formatInputValue($val, $fieldName, $fieldSpec, $params, $operator, $i++);
+        self::formatInputValue($val, $fieldPath, $fieldSpec, $params, $operator, $i++);
       }
       return;
     }
@@ -144,7 +144,7 @@ class FormattingUtil {
     }
 
     $hic = \CRM_Utils_API_HTMLInputCoder::singleton();
-    if (is_string($value) && $fieldName && !$hic->isSkippedField($fieldSpec['name'])) {
+    if (is_string($value) && $fieldPath && !$hic->isSkippedField($fieldSpec['name'])) {
       $value = $hic->encodeValue($value);
     }
   }

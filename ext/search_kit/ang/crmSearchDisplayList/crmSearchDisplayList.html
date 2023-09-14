@@ -3,7 +3,7 @@
   <div class="form-inline">
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
     <span ng-if="$ctrl.settings.headerCount" ng-include="'~/crmSearchDisplay/ResultCount.html'"></span>
-    <div class="btn-group pull-right" ng-include="'~/crmSearchDisplay/AddButton.html'" ng-if="$ctrl.settings.addButton.path"></div>
+    <div class="btn-group pull-right" ng-include="'~/crmSearchDisplay/toolbar.html'" ng-if="$ctrl.toolbar"></div>
   </div>
   <ol ng-if=":: $ctrl.settings.style === 'ol'" ng-include="'~/crmSearchDisplayList/crmSearchDisplayList' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'" ng-style="{'list-style': $ctrl.settings.symbol}"></ol>
   <ul ng-if=":: $ctrl.settings.style !== 'ol'" ng-include="'~/crmSearchDisplayList/crmSearchDisplayList' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'" ng-style="{'list-style': $ctrl.settings.symbol}"></ul>

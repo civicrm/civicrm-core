@@ -1904,6 +1904,80 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($id, $result[0]['key']);
   }
 
+  public function testRunWithToolbar(): void {
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'contact_type'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'toolbar' => [
+            [
+              'entity' => 'Contact',
+              'action' => 'add',
+              'text' => 'Add Contact',
+              'target' => 'crm-popup',
+              'icon' => 'fa-plus',
+              'style' => 'primary',
+            ],
+          ],
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
+          ],
+          'sort' => [],
+        ],
+      ],
+      'filters' => ['contact_type' => 'Individual'],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result->toolbar);
+    $button = $result->toolbar[0];
+    $this->assertEquals('crm-popup', $button['target']);
+    $this->assertEquals('fa-plus', $button['icon']);
+    $this->assertEquals('primary', $button['style']);
+    $this->assertEquals('Add Contact', $button['text']);
+    $this->assertStringContainsString('=Individual', $button['url']);
+
+    // Try with pseudoconstant (for proper test the label needs to be different from the name)
+    ContactType::update(FALSE)
+      ->addValue('label', 'Disorganization')
+      ->addWhere('name', '=', 'Organization')
+      ->execute();
+    $params['filters'] = ['contact_type:label' => 'Disorganization'];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $button = $result->toolbar[0];
+    $this->assertStringContainsString('=Organization', $button['url']);
+
+    // Test legacy 'addButton' setting
+    $params['display']['settings']['toolbar'] = NULL;
+    $params['display']['settings']['addButton'] = [
+      'path' => 'civicrm/test/url?test=[contact_type]',
+      'text' => 'Test',
+      'icon' => 'fa-old',
+      'autoOpen' => TRUE,
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result->toolbar);
+    $button = $result->toolbar[0];
+    $this->assertStringContainsString('test=Organization', $button['url']);
+    $this->assertTrue($button['autoOpen']);
+  }
+
   public function testRunWithEntityFile(): void {
     $cid = $this->createTestRecord('Contact')['id'];
     $notes = $this->saveTestRecords('Note', [

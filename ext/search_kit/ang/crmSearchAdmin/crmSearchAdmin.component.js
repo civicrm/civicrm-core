@@ -665,7 +665,7 @@
 
     // Build a list of all possible links to main entity & join entities
     // @return {Array}
-    this.buildLinks = function() {
+    this.buildLinks = function(isRow) {
       function addTitle(link, entityName) {
         link.text = link.text.replace('%1', entityName);
       }
@@ -712,7 +712,8 @@
           }
         }
       });
-      return links;
+      // Filter links according to usage - add & browse only make sense outside of a row
+      return _.filter(links, (link) => ['add', 'browse'].includes(link.action) !== isRow);
     };
 
     function loadAfforms() {

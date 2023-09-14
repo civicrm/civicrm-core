@@ -248,7 +248,10 @@
 
       this.getLinks = function(columnKey) {
         if (!ctrl.links) {
-          ctrl.links = {'*': ctrl.crmSearchAdmin.buildLinks(), '0': []};
+          ctrl.links = {
+            '*': ctrl.crmSearchAdmin.buildLinks(true),
+            '0': []
+          };
           ctrl.links[''] = _.filter(ctrl.links['*'], {join: ''});
           searchMeta.getSearchTasks(ctrl.savedSearch.api_entity).then(function(tasks) {
             _.each(tasks, function (task) {
@@ -287,25 +290,6 @@
         searchMeta.pickIcon().then(function(icon) {
           model[key] = icon;
         });
-      };
-
-      this.toggleAddButton = function() {
-        if (ctrl.display.settings.addButton && ctrl.display.settings.addButton.path) {
-          delete ctrl.display.settings.addButton;
-        } else {
-          var entity = searchMeta.getBaseEntity();
-          ctrl.display.settings.addButton = {
-            path: entity.addPath || 'civicrm/',
-            text: ts('Add %1', {1: entity.title}),
-            icon: 'fa-plus'
-          };
-        }
-      };
-
-      this.onChangeAddButtonPath = function() {
-        if (!ctrl.display.settings.addButton.path) {
-          delete ctrl.display.settings.addButton;
-        }
       };
 
       // Helper function to sort active from hidden columns and initialize each column with defaults
