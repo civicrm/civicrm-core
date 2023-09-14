@@ -111,7 +111,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             $adminFieldVisible = TRUE;
           }
 
-          foreach ($priceSetFields as $fid => $fieldValues) {
+          foreach ($priceSetFields as $fieldValues) {
             if (!is_array($fieldValues['options']) ||
               empty($fieldValues['options']) ||
               (($fieldValues['visibility_id'] ?? NULL) != array_search('public', $visibility) && $adminFieldVisible == FALSE)
@@ -121,6 +121,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
             if (count($fieldValues['options']) > 1) {
               $values['feeBlock']['value'][$fieldCnt] = '';
+              $values['feeBlock']['tax_amount'][$fieldCnt] = '';
               $values['feeBlock']['label'][$fieldCnt] = $fieldValues['label'];
               $values['feeBlock']['lClass'][$fieldCnt] = 'price_set_option_group-label';
               $values['feeBlock']['isDisplayAmount'][$fieldCnt] = $fieldValues['is_display_amounts'] ?? NULL;
@@ -325,9 +326,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     CRM_Utils_System::setTitle($values['event']['title']);
 
     $this->assign('event', $values['event']);
-    if (isset($values['feeBlock'])) {
-      $this->assign('feeBlock', $values['feeBlock']);
-    }
+    $this->assign('feeBlock', $values['feeBlock'] ?? NULL);
     $this->assign('location', $values['location']);
 
     if (CRM_Core_Permission::check(['access CiviEvent', 'edit all events'])) {
