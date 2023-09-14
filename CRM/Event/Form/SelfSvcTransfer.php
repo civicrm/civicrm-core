@@ -16,6 +16,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\API\EntityLookupTrait;
 use Civi\Api4\Participant;
 
 /**
@@ -23,6 +24,8 @@ use Civi\Api4\Participant;
  *
  */
 class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
+  use EntityLookupTrait;
+
   /**
    * from participant id
    *
@@ -30,13 +33,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    *
    */
   protected $_from_participant_id;
-  /**
-   * from contact id
-   *
-   * @var string
-   *
-   */
-  protected $_from_contact_id;
+
   /**
    * last name of the participant to transfer to
    *
@@ -127,7 +124,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->set('values', $this->_part_values);
     $this->_event_id = $this->_part_values['event_id'];
     $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}");
-    $this->_from_contact_id = $this->_part_values['participant_contact_id'];
+    $this->define('Contact', 'ContactFrom', ['id' => (int) $this->_part_values['participant_contact_id']]);
     if (!$this->getAuthenticatedCheckSumContactID() && !CRM_Core_Permission::check('edit all events')) {
       CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to transfer/cancel this participant.'), $url);
     }
@@ -135,10 +132,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     if ($this->_from_participant_id) {
       $this->assign('participantId', $this->_from_participant_id);
     }
-
-    [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_from_contact_id);
-    $this->_contact_name = $displayName;
-    $this->_contact_email = $email;
 
     $details = CRM_Event_BAO_Participant::participantDetails($this->_from_participant_id);
     $selfServiceDetails = CRM_Event_BAO_Participant::getSelfServiceEligibility($this->_from_participant_id, $url, $this->isBackoffice);
@@ -153,6 +146,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * Build form for input of transferree email, name
    *
    * return @void
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
     // use entityRef select field for contact when this form is used by staff/admin user
@@ -161,7 +156,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     // for front-end user show and use the basic three fields used to create a contact
     else {
-      $this->add('text', 'email', ts('To Email'), $this->_contact_email, TRUE);
+      $this->add('text', 'email', ts('To Email'), $this->lookup('ContactFrom', 'email_primary.email'), TRUE);
       $this->add('text', 'last_name', ts('To Last Name'), $this->_to_contact_last_name, TRUE);
       $this->add('text', 'first_name', ts('To First Name'), $this->_to_contact_first_name, TRUE);
     }
@@ -181,7 +176,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    *
    * return @array _defaults
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $this->_defaults = [];
     return $this->_defaults;
   }
@@ -198,7 +193,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     else {
       //check that either an email or firstname+lastname is included in the form(CRM-9587)
-      $to_contact_id = self::checkProfileComplete($fields, $errors, $self);
+      $to_contact_id = self::checkProfileComplete($fields, $errors);
     }
     //To check if the user is already registered for the event(CRM-2426)
     if (!empty($to_contact_id)) {
@@ -211,9 +206,12 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   /**
    * Check whether profile (name, email) is complete
    *
-   * return $contact_id
+   * @params array $fields
+   * @params array $errors
+   *
+   * return int $contact_id
    */
-  public static function checkProfileComplete($fields, &$errors, $self) {
+  public static function checkProfileComplete($fields, &$errors): ?int {
     $email = '';
     foreach ($fields as $fieldname => $fieldvalue) {
       if (strpos($fieldname, 'email') === 0 && $fieldvalue) {
@@ -224,8 +222,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       $message = ts('Mandatory fields (first name and last name, OR email address) are missing from this form.');
       $errors['_qf_default'] = $message;
     }
-    $contact = CRM_Contact_BAO_Contact::matchContactOnEmail($email, "");
-    $contact_id = empty($contact->contact_id) ? NULL : $contact->contact_id;
+    $contact = CRM_Contact_BAO_Contact::matchContactOnEmail($email, '');
+    $contact_id = empty($contact->contact_id) ? NULL : (int) $contact->contact_id;
     if (!CRM_Utils_Rule::email($fields['email'])) {
       $errors['email'] = ts('Enter valid email address.');
     }
@@ -247,8 +245,16 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * Check contact details
    *
    * return @void
+   *
+   * @param array $fields
+   * @param self $self
+   * @param int $contact_id
+   * @param array $errors
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function checkRegistration($fields, $self, $contact_id, &$errors) {
+  public static function checkRegistration($fields, $self, $contact_id, &$errors): void {
     // verify whether this contact already registered for this event
     $participant = Participant::get(FALSE)
       ->addSelect('contact_id.display_name')
@@ -272,8 +278,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  public function postProcess() {
-    //For transfer, process form to allow selection of transferree
+  public function postProcess(): void {
+    //For transfer, process form to allow selection of transferred.
     $params = $this->controller->exportValues($this->_name);
     if (!empty($params['contact_id'])) {
       $contact_id = $params['contact_id'];
@@ -389,6 +395,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * Send confirmation of cancellation to source participant
    *
    * return @ void
+   *
+   * @throws \CRM_Core_Exception
    */
   public function sendCancellation() {
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
@@ -423,8 +431,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       NULL,
       'Transferred'
     );
-    $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contact_name]);
-    $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', [1 => $this->_contact_email]);
+    $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->lookup('ContactFrom', 'display_name')]);
+    $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', [1 => $this->lookup('ContactFrom', 'email_primary.email')]);
     CRM_Core_Session::setStatus($statusMsg, ts('Thanks'), 'success');
   }
 
@@ -436,7 +444,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  public function transferParticipantRegistration(int $toContactID, $fromParticipantID) {
+  public function transferParticipantRegistration(int $toContactID, $fromParticipantID): void {
     $toParticipantValues = Participant::get(FALSE)
       ->addWhere('id', '=', $fromParticipantID)
       ->execute()
