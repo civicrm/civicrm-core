@@ -447,7 +447,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    *   Could be an error object
    *
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   public function &add(
     $type, $name, $label = '',
@@ -465,17 +466,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     // Fudge some extra types that quickform doesn't support
     $inputType = $type;
-    if ($type == 'wysiwyg' || in_array($type, self::$html5Types)) {
+    if ($type === 'wysiwyg' || in_array($type, self::$html5Types)) {
       $attributes = ($attributes ?: []) + ['class' => ''];
       $attributes['class'] = ltrim($attributes['class'] . " crm-form-$type");
-      if ($type == 'wysiwyg' && isset($attributes['preset'])) {
+      if ($type === 'wysiwyg' && isset($attributes['preset'])) {
         $attributes['data-preset'] = $attributes['preset'];
         unset($attributes['preset']);
       }
-      $type = $type == 'wysiwyg' ? 'textarea' : 'text';
+      $type = $type === 'wysiwyg' ? 'textarea' : 'text';
     }
     // Like select but accepts rich array data (with nesting, colors, icons, etc) as option list.
-    if ($inputType == 'select2') {
+    if ($inputType === 'select2') {
       $type = 'text';
       $options = [];
       foreach ($attributes as $option) {
@@ -485,7 +486,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $options[] = $option;
       }
       $attributes = ($extra ?: []) + ['class' => ''];
-      $attributes['class'] = ltrim($attributes['class'] . " crm-select2 crm-form-select2");
+      $attributes['class'] = ltrim($attributes['class'] . ' crm-select2 crm-form-select2');
       $attributes['data-select-params'] = json_encode(['data' => $options, 'multiple' => !empty($attributes['multiple'])]);
       unset($attributes['multiple']);
       $extra = NULL;
@@ -515,7 +516,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       if (!empty($attributes['aria-label']) || $label) {
         $attributes['aria-label'] = $attributes['aria-label'] ?? $label;
       }
-      $type = "text";
+      $type = 'text';
     }
     if ($type === 'select' && is_array($extra)) {
       // Normalize this property
@@ -557,12 +558,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
     }
 
-    if ($inputType == 'color') {
+    if ($inputType === 'color') {
       $this->addRule($name, ts('%1 must contain a color value e.g. #ffffff.', [1 => $label]), 'regex', '/#[0-9a-fA-F]{6}/');
     }
 
     if ($required) {
-      if ($type == 'file') {
+      if ($type === 'file') {
         $error = $this->addRule($name, ts('%1 is a required field.', [1 => $label]), 'uploadedfile');
       }
       else {
