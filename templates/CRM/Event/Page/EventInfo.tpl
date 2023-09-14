@@ -158,7 +158,7 @@
                     <div class="crm-eventinfo-contact-phone">
                       {* @todo This should use "{ts 1=$phone.phone_type_display 2=$phone}%1: %2{/ts}" because some language have nbsp before column *}
                       {if $phone.phone_type_id}{$phone.phone_type_display}:{else}{ts}Phone:{/ts}{/if}
-                      <span class="tel">{$phone.phone}{if $phone.phone_ext}&nbsp;{ts}ext.{/ts}&nbsp;{$phone.phone_ext}{/if}</span>
+                      <span class="tel">{$phone.phone}{if array_key_exists('phone_ext', $phone)}&nbsp;{ts}ext.{/ts}&nbsp;{$phone.phone_ext}{/if}</span>
                     </div>
                   {/if}
               {/foreach}
