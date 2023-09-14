@@ -273,10 +273,15 @@ return [
             'table',
             'table-striped',
           ],
-          'addButton' => [
-            'path' => 'civicrm/group/add?reset=1',
-            'text' => E::ts('Add Group'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'Group',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Group'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

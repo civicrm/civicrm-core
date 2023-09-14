@@ -262,10 +262,15 @@ return [
               'label' => '',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/uf/group/add?action=add&reset=1',
-            'text' => E::ts('Add Profile'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'UFGroup',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Profile'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

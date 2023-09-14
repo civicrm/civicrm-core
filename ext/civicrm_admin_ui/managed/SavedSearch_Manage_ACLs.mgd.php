@@ -180,10 +180,15 @@ return [
             'table-striped',
             'crm-sticky-header',
           ],
-          'addButton' => [
-            'path' => 'civicrm/acl/edit?reset=1&action=add',
-            'text' => E::ts('Add ACL'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'ACL',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add ACL'),
+              'icon' => 'fa-plus',
+            ],
           ],
         ],
         'acl_bypass' => FALSE,

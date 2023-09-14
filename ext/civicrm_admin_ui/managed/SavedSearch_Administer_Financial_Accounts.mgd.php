@@ -188,10 +188,15 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/financial/financialAccount/edit?action=add&reset=1',
-            'text' => E::ts('Add Financial Account'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'FinancialAccount',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Financial Account'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

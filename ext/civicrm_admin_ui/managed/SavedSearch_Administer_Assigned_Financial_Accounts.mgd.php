@@ -164,10 +164,15 @@ return [
               FALSE,
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/financial/financialType/accounts?action=add&reset=1&aid=[entity_id]',
-            'text' => E::ts('Add Assigned Account'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'EntityFinancialAccount',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Assigned Account'),
+              'icon' => 'fa-plus',
+            ],
           ],
         ],
         'acl_bypass' => FALSE,

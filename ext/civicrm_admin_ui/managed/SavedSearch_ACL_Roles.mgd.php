@@ -178,10 +178,15 @@ return [
               FALSE,
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/acl/entityrole/edit?reset=1&action=add',
-            'text' => E::ts('Add ACL Role Assignment'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'ACLEntityRole',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add ACL Role Assignment'),
+              'icon' => 'fa-plus',
+            ],
           ],
         ],
         'acl_bypass' => FALSE,
