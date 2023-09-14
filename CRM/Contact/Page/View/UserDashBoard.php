@@ -19,7 +19,7 @@
  * This class is used to build User Dashboard
  */
 class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
-  public $_contactId = NULL;
+  public $_contactId;
 
   /**
    * Always show public groups.
@@ -34,7 +34,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    *
    * @var array
    */
-  public static $_links = NULL;
+  public static $_links;
 
   /**
    * @throws Exception
@@ -149,7 +149,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
         'sectionTitle' => ts('Personal Campaign Pages'),
         'weight' => 40,
       ];
-      list($pcpBlock, $pcpInfo) = CRM_PCP_BAO_PCP::getPcpDashboardInfo($this->_contactId);
+      [$pcpBlock, $pcpInfo] = CRM_PCP_BAO_PCP::getPcpDashboardInfo((int) $this->_contactId);
       $this->assign('pcpBlock', $pcpBlock);
       $this->assign('pcpInfo', $pcpInfo);
     }

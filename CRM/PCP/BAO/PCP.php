@@ -73,12 +73,13 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
   /**
    * Return PCP  Block info for dashboard.
    *
-   * @param int $contactId
+   * @param int $contactID
    *
    * @return array
    *   array of Pcp if found
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function getPcpDashboardInfo($contactId) {
+  public static function getPcpDashboardInfo(int $contactID): array {
     $query = '
 SELECT pcp.*, block.is_tellfriend_enabled,
 COALESCE(cp.end_date, event.end_date) as end_date
@@ -90,16 +91,15 @@ WHERE pcp.is_active = 1
   AND pcp.contact_id = %1
 ORDER BY page_type, page_id';
 
-    $params = [1 => [$contactId, 'Integer']];
-    $pcpInfoDao = CRM_Core_DAO::executeQuery($query, $params);
+    $pcpInfoDao = CRM_Core_DAO::executeQuery($query, [1 => [$contactID, 'Integer']]);
 
     $approved = CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCP', 'status_id', 'Approved');
     $contactPCPPages = [];
     $pcpInfo = [];
-
+    $links = [];
     while ($pcpInfoDao->fetch()) {
       $links = self::pcpLinks($pcpInfoDao->id);
-      $hide = $mask = array_sum(array_keys($links['all']));
+      $hide = array_sum(array_keys($links['all']));
       $mask = $hide;
       if ($links) {
         $replace = [
@@ -180,8 +180,8 @@ ORDER BY target_entity_type, target_entity_id
           'pageComponent' => $pcpBlockDao->target_entity_type,
         ];
       }
-      $pcpLink = $links['add'];
-      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace, ts('more'),
+      $pcpLink = $links['add'] ?? NULL;
+      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace ?? [], ts('more'),
         FALSE, 'pcp.dashboard.other', "{$pcpBlockDao->target_entity_type}_PCP", $pcpBlockDao->target_entity_id);
       $pageTitle = self::getPcpTitle($pcpBlockDao->target_entity_type, (int) $pcpBlockDao->target_entity_id);
       if ($pageTitle) {
@@ -666,7 +666,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     ];
 
     //get the default domain email address.
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
       $fixUrl = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'reset=1');
@@ -678,10 +678,10 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     // get recipient (supporter) name and email
     $params = ['id' => $pcpId];
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
-    list($name, $address) = CRM_Contact_BAO_Contact_Location::getEmailDetails($pcpInfo['contact_id']);
+    [$name, $address] = CRM_Contact_BAO_Contact_Location::getEmailDetails($pcpInfo['contact_id']);
 
     // get pcp block info
-    list($blockId, $eid) = self::getPcpBlockEntityId($pcpId, $component);
+    [$blockId, $eid] = self::getPcpBlockEntityId($pcpId, $component);
     $params = ['id' => $blockId];
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $pcpBlockInfo);
 
@@ -712,7 +712,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
 
     $tplName = $isInitial ? 'pcp_supporter_notify' : 'pcp_status_change';
 
-    list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+    [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'groupName' => 'msg_tpl_workflow_contribution',
         'workflow' => $tplName,
