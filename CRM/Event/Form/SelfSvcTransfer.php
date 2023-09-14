@@ -119,7 +119,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    */
   public function preProcess(): void {
     $this->_from_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
-    $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
     $this->isBackoffice = (CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, FALSE, 'REQUEST') && CRM_Core_Permission::check('edit event participants')) ?? FALSE;
     $params = ['id' => $this->_from_participant_id];
     $participant = $values = [];
@@ -129,8 +128,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_event_id = $this->_part_values['event_id'];
     $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}");
     $this->_from_contact_id = $this->_part_values['participant_contact_id'];
-    $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_from_contact_id, $this->_userChecksum);
-    if (!$validUser && !CRM_Core_Permission::check('edit all events')) {
+    if (!$this->getAuthenticatedCheckSumContactID() && !CRM_Core_Permission::check('edit all events')) {
       CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to transfer/cancel this participant.'), $url);
     }
     $this->assign('action', $this->_action);
@@ -218,12 +216,12 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   public static function checkProfileComplete($fields, &$errors, $self) {
     $email = '';
     foreach ($fields as $fieldname => $fieldvalue) {
-      if (substr($fieldname, 0, 5) == 'email' && $fieldvalue) {
+      if (strpos($fieldname, 'email') === 0 && $fieldvalue) {
         $email = $fieldvalue;
       }
     }
     if (empty($email) && (empty($fields['first_name']) || empty($fields['last_name']))) {
-      $message = ts("Mandatory fields (first name and last name, OR email address) are missing from this form.");
+      $message = ts('Mandatory fields (first name and last name, OR email address) are missing from this form.');
       $errors['_qf_default'] = $message;
     }
     $contact = CRM_Contact_BAO_Contact::matchContactOnEmail($email, "");
