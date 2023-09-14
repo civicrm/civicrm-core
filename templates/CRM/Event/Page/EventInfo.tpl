@@ -211,7 +211,7 @@
   {/if}
 
 
-    {include file="CRM/Custom/Page/CustomDataView.tpl"}
+    {include file="CRM/Custom/Page/CustomDataView.tpl" groupId = false}
 
     <div class="crm-actionlinks-bottom">
       {crmRegion name="event-page-eventinfo-actionlinks-bottom"}
