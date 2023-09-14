@@ -129,9 +129,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to transfer/cancel this participant.'), $url);
     }
     $this->assign('action', $this->_action);
-    if ($this->_from_participant_id) {
-      $this->assign('participantId', $this->_from_participant_id);
-    }
+    $this->assign('participantId', $this->_from_participant_id);
 
     $details = CRM_Event_BAO_Participant::participantDetails($this->_from_participant_id);
     $selfServiceDetails = CRM_Event_BAO_Participant::getSelfServiceEligibility($this->_from_participant_id, $url, $this->isBackoffice);
