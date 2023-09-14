@@ -16,5 +16,6 @@ if (!defined('CIVI_SETUP')) {
     $e->getModel()->extensions[] = 'org.civicrm.search_kit';
     $e->getModel()->extensions[] = 'org.civicrm.afform';
     $e->getModel()->extensions[] = 'authx';
+    $e->getModel()->extensions[] = 'civicrm_admin_ui';
 
   });
