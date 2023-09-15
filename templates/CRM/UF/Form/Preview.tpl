@@ -24,7 +24,7 @@
         {if $help_pre && $action neq 4}<div class="messages help">{$help_pre}</div>{/if}
         {assign var=zeroField value="Initial Non Existent Fieldset"}
         {assign var=fieldset  value=$zeroField}
-        {include file="CRM/UF/Form/Fields.tpl"}
+        {include file="CRM/UF/Form/Fields.tpl" prefix=false mode=false hideFieldset=false}
         {if $field.groupHelpPost}
           <div class="messages help">{$field.groupHelpPost}</div>
         {/if}

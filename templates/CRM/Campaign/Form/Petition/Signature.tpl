@@ -42,11 +42,11 @@
     {/if}
   {else}
     <div class="crm-section crm-petition-contact-profile">
-      {include file="CRM/UF/Form/Block.tpl" fields=$petitionContactProfile hideFieldset=true}
+      {include file="CRM/UF/Form/Block.tpl" fields=$petitionContactProfile hideFieldset=true prefix=false}
     </div>
 
     <div class="crm-section crm-petition-activity-profile">
-      {include file="CRM/UF/Form/Block.tpl" fields=$petitionActivityProfile hideFieldset=true}
+      {include file="CRM/UF/Form/Block.tpl" fields=$petitionActivityProfile hideFieldset=true prefix=false}
     </div>
 
     <div class="crm-submit-buttons">

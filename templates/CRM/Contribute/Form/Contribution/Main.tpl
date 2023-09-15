@@ -214,7 +214,7 @@
       {/if}
 
       <div class="crm-public-form-item crm-group custom_pre_profile-group">
-        {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+        {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false}
       </div>
 
       {if array_key_exists('pcp_display_in_roll', $form)}
@@ -283,7 +283,7 @@
     {include file="CRM/Core/BillingBlockWrapper.tpl"}
 
     <div class="crm-public-form-item crm-group custom_post_profile-group">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false}
     </div>
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">
