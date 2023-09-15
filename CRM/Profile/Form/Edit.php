@@ -54,6 +54,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
     $this->assign('context', $this->_context);
 
     if ($this->_blockNo) {
+      CRM_Core_Error::deprecatedWarning('code believed to be unreachable');
       $this->assign('blockNo', $this->_blockNo);
       $this->assign('prefix', $this->_prefix);
     }
