@@ -1995,7 +1995,7 @@ ORDER BY civicrm_email.is_primary DESC";
     else {
       CRM_Utils_Hook::post('create', 'Profile', $contactID, $params);
     }
-    return $contactID;
+    return (int) $contactID;
   }
 
   /**
