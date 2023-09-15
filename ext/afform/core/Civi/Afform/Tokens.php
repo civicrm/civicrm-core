@@ -64,6 +64,8 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     foreach ($tokenForms as $tokenName => $afform) {
       $e->tokens['afform']["afform.{$tokenName}Url"] = E::ts('%1 (URL)', [1 => $afform['title'] ?? $afform['name']]);
       $e->tokens['afform']["afform.{$tokenName}Link"] = E::ts('%1 (Full Hyperlink)', [1 => $afform['title'] ?? $afform['name']]);
+      $e->tokens['afform']["afform.{$tokenName}ValidateSubmissionUrl"] = E::ts('%1 Validate Submission URL)', [1 => $afform['title'] ?? $afform['name']]);
+      $e->tokens['afform']["afform.{$tokenName}ValidateSubmissionLink"] = E::ts('%1 Validate Submission (Full Hyperlink)', [1 => $afform['title'] ?? $afform['name']]);
     }
   }
 

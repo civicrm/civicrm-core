@@ -73,6 +73,8 @@ class Submit extends AbstractProcessor {
 
     // let's not save the data in other CiviCRM table if manual verification is needed.
     if (!empty($this->_afform['manual_processing']) && empty($this->args['sid'])) {
+      // check for verification email
+      $this->processVerficationEmail($submission['id']);
       return [];
     }
 
@@ -467,6 +469,72 @@ class Submit extends AbstractProcessor {
       'scope' => 'afformPostSubmit',
       'civiAfformSubmission' => ['name' => $this->name, 'data' => $this->_entityIds],
     ]);
+  }
+
+  /**
+   * Function to send the verification email if configured
+   *
+   * @param int $submissionId
+   *
+   * @return void
+   */
+  private function processVerficationEmail(int $submissionId):void {
+    // check if email verification configured and message template is set
+    if (empty($this->_afform['allow_verification_by_email']) || empty($this->_afform['email_confirmation_template_id'])) {
+      return;
+    }
+
+    $emailValue = '';
+    $submittedValues = $this->getValues();
+    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
+      foreach ($submittedValues[$entityName] ?? [] as $values) {
+        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
+        foreach ($values['joins'] as $joinEntity => &$joinValues) {
+          if ($joinEntity === 'Email') {
+            foreach ($joinValues as $fld => $val) {
+              if (!empty($val['email'])) {
+                $emailValue = $val['email'];
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // processing sending of email only if email field exists in the form
+    if (!empty($emailValue)) {
+      $this->sendEmail($emailValue, $submissionId);
+    }
+  }
+
+  /**
+   * Function to send email
+   *
+   * @param string $emailAddress
+   * @param int $submissionId
+   *
+   * @return void
+   */
+  private function sendEmail(string $emailAddress, int $submissionId) {
+    // get domain email address
+    [$domainEmailName, $domainEmailAddress] = \CRM_Core_BAO_Domain::getNameAndEmail();
+
+    $tokenContext = [
+      'validateAfformSubmission' => [
+        'submissionId' => $submissionId,
+      ],
+    ];
+
+    // send email
+    $emailParams = [
+      'id' => $this->_afform['email_confirmation_template_id'],
+      'from' => "$domainEmailName <" . $domainEmailAddress . ">",
+      'toEmail' => $emailAddress,
+      'tokenContext' => $tokenContext,
+    ];
+
+    civicrm_api3('MessageTemplate', 'send', $emailParams);
   }
 
 }
