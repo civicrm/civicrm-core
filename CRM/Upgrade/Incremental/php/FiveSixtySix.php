@@ -51,6 +51,39 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
   }
 
   /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_66_beta1($rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
+      // Note these are localizable so need the last param
+      $this->addTask('civicrm_location_type.display_name default', 'alterColumn', 'civicrm_location_type', 'display_name', "varchar(64) NOT NULL DEFAULT '' COMMENT 'Location Type Display Name.'", TRUE);
+      $this->addTask('civicrm_survey.title default', 'alterColumn', 'civicrm_survey', 'title', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Title of the Survey.'", TRUE);
+      $this->addTask('civicrm_case_type.title default', 'alterColumn', 'civicrm_case_type', 'title', "varchar(64) NOT NULL DEFAULT '' COMMENT 'Natural language name for Case Type'", TRUE);
+      $this->addTask('civicrm_custom_group.title default', 'alterColumn', 'civicrm_custom_group', 'title', "varchar(64) NOT NULL DEFAULT '' COMMENT 'Friendly Name.'", TRUE);
+      $this->addTask('civicrm_custom_field.label default', 'alterColumn', 'civicrm_custom_field', 'label', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Text for form field label (also friendly name for administering this custom property).'", TRUE);
+      $this->addTask('civicrm_option_value.label default', 'alterColumn', 'civicrm_option_value', 'label', "varchar(512) NOT NULL DEFAULT '' COMMENT 'Option string as displayed to users - e.g. the label in an HTML OPTION tag.'", TRUE);
+      $this->addTask('civicrm_group.title default', 'alterColumn', 'civicrm_group', 'title', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Name of Group.'", TRUE);
+      $this->addTask('civicrm_group.frontend_title default', 'alterColumn', 'civicrm_group', 'frontend_title', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Alternative public title for this Group.'", TRUE);
+      $this->addTask('civicrm_contribution_page.title default', 'alterColumn', 'civicrm_contribution_page', 'title', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Contribution Page title. For top of page display'", TRUE);
+      $this->addTask('civicrm_contribution_page.frontend_title default', 'alterColumn', 'civicrm_contribution_page', 'frontend_title', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Contribution Page Public title'", TRUE);
+      $this->addTask('civicrm_product.name default', 'alterColumn', 'civicrm_product', 'name', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Required product/premium name'", TRUE);
+      $this->addTask('civicrm_payment_processor.title default', 'alterColumn', 'civicrm_payment_processor', 'title', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Name of processor when shown to CiviCRM administrators.'", TRUE);
+      $this->addTask('civicrm_payment_processor.frontend_title default', 'alterColumn', 'civicrm_payment_processor', 'frontend_title', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Name of processor when shown to users making a payment.'", TRUE);
+      $this->addTask('civicrm_membership_type.name default', 'alterColumn', 'civicrm_membership_type', 'name', "varchar(128) NOT NULL DEFAULT '' COMMENT 'Name of Membership Type'", TRUE);
+      $this->addTask('civicrm_price_set.title default', 'alterColumn', 'civicrm_price_set', 'title', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Displayed title for the Price Set.'", TRUE);
+      $this->addTask('civicrm_uf_group.title default', 'alterColumn', 'civicrm_uf_group', 'title', "varchar(64) NOT NULL DEFAULT '' COMMENT 'Form title.'", TRUE);
+      $this->addTask('civicrm_uf_field.label default', 'alterColumn', 'civicrm_uf_field', 'label', "varchar(255) NOT NULL DEFAULT '' COMMENT 'To save label for fields.'", TRUE);
+      $this->addTask('civicrm_price_field.label default', 'alterColumn', 'civicrm_price_field', 'label', "varchar(255) NOT NULL DEFAULT '' COMMENT 'Text for form field label (also friendly name for administering this field).'", TRUE);
+      // END localizable field updates
+    }
+  }
+
+  /**
    * Add fields to civicrm_mail_settings to allow more flexibility for email to activity
    *
    * @param \CRM_Queue_TaskContext $ctx
