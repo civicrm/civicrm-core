@@ -308,11 +308,17 @@ class CRM_Utils_Mail_Incoming {
       $params[$field] = [];
       foreach ($value as $address) {
         $subParam = [];
+        // @todo - stop creating a complex array here - $params[$field][] is
+        // an array with name, email & id. The calling function only wants the
+        // id & does quite a bit of work to extract it....
         self::parseAddress($address, $subParam, $mail, $createContact);
         $params[$field][] = $subParam;
       }
     }
-    // format and move attachments to the civicrm area
+    // @todo mode this code to be a `getAttachments` function on the IncomingMail class
+    // which would get attachments & move the files to the civicrm area.
+    // The formatting to api array should go back to the calling function on
+    // EmailProcessor.
     if (!empty($attachments)) {
       $date = date('YmdHis');
       $config = CRM_Core_Config::singleton();
