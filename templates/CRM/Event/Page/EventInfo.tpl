@@ -211,7 +211,7 @@
   {/if}
 
 
-    {include file="CRM/Custom/Page/CustomDataView.tpl"}
+    {include file="CRM/Custom/Page/CustomDataView.tpl" groupId = false}
 
     <div class="crm-actionlinks-bottom">
       {crmRegion name="event-page-eventinfo-actionlinks-bottom"}
@@ -230,7 +230,7 @@
 
     {if $event.is_share }
         {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&amp;reset=1" a=1 fe=1 h=1}{/capture}
-        {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl}
+        {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl emailMode=true}
     {/if}
     </div>
 </div>
