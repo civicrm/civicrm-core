@@ -24,7 +24,15 @@ use Civi\Test\EventTestTrait;
  * between accepting parameters & winding up with crazy complex functions.
  */
 trait CRMTraits_Event_ScenarioTrait {
+
   use EventTestTrait;
+
+  /**
+   * Mail sent during form submission.
+   *
+   * @var array
+   */
+  protected $sentMail = [];
 
   /**
    * Create a participant registration with 2 registered_by participants.
@@ -37,7 +45,7 @@ trait CRMTraits_Event_ScenarioTrait {
   protected function createScenarioMultipleParticipantPendingWithTax(): void {
     $this->eventCreatePaid();
     $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'));
-    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
       'first_name' => 'Participant1',
       'last_name' => 'LastName',
       'email-Primary' => 'participant1@example.com',
@@ -54,17 +62,18 @@ trait CRMTraits_Event_ScenarioTrait {
         'last_name' => 'LastName',
         'email-Primary' => 'participant2@example.com',
         'priceSetId' => $this->getPriceSetID('PaidEvent'),
-        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
+        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student'],
       ])
       ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
         'first_name' => 'Participant3',
         'last_name' => 'LastName',
         'email-Primary' => 'participant3@example.com',
         'priceSetId' => $this->getPriceSetID('PaidEvent'),
-        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
+        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student_plus'],
       ])
       ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
       ->processForm();
+    $this->sentMail = $form->getMail();
     $participants = Participant::get(FALSE)
       ->addWhere('event_id', '=', $this->getEventID('PaidEvent'))
       ->addOrderBy('registered_by_id')

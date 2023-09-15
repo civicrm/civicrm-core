@@ -305,9 +305,9 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ]
     );
     $this->assertContains(' (multiple participants)', $contribution['amount_level']);
-    $this->assertEquals(90, $contribution['tax_amount'], 'Invalid Tax amount.');
-    $this->assertEquals(990, $contribution['total_amount'], 'Invalid Tax amount.');
-    $mailSent = $form->getMail();
+    $this->assertEquals(60, $contribution['tax_amount'], 'Invalid Tax amount.');
+    $this->assertEquals(660, $contribution['total_amount'], 'Invalid Tax amount.');
+    $mailSent = $this->sentMail;
     $this->assertCount(3, $mailSent, 'Three mails should have been sent to the 3 participants.');
     $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[0]['body']);
     $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[1]['body']);
@@ -324,6 +324,33 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[0]);
     $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 2), $mailSent[1]);
     $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[2]);
+  }
+
+  /**
+   * Test stock template for multiple participant.
+   *
+   * The goal is to ensure no leakage.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailMultipleParticipant(): void {
+    $this->createScenarioMultipleParticipantPendingWithTax();
+    $mailSent = $this->sentMail;
+    $amountsPaid = [300, 100, 200];
+    // The first participant, as the primary participant, (only) will have the full total in the email
+    $this->assertStringContainsString('$600', $mailSent[0]['body']);
+    $this->assertStringNotContainsString(600, $mailSent[1]['body']);
+    $this->assertStringNotContainsString(600, $mailSent[2]['body']);
+
+    // The $100 paid by the second participant will be in the emails to the primary but and second participant
+    $this->assertStringContainsString('$100', $mailSent[0]['body']);
+    $this->assertStringContainsString('$100', $mailSent[1]['body']);
+    $this->assertStringNotContainsString('$100', $mailSent[2]['body']);
+
+    // The $200 paid by the second participant will be in the emails to the primary but and third participant
+    $this->assertStringContainsString('$200', $mailSent[0]['body']);
+    $this->assertStringNotContainsString('$200', $mailSent[1]['body']);
+    $this->assertStringContainsString('$200', $mailSent[2]['body']);
   }
 
   /**

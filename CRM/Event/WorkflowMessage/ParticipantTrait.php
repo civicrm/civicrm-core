@@ -59,6 +59,17 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
   public $participants;
 
   /**
+   * The current participant (if there are multiple this is the one being emailed).
+   *
+   * This uses the same format as the participants array.
+   *
+   * @var array
+   *
+   * @scope tplParams as participant
+   */
+  public $currentParticipant;
+
+  /**
    * Details of the participant contacts.
    *
    * This would normally be loaded but exists to allow the example to set them.
@@ -171,6 +182,22 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
         ->addSelect('registered_by_id')->execute()->first();
     }
     return $this->participant;
+  }
+
+  /**
+   * Get the line items and tax information indexed by participant.
+   *
+   * We will likely add profile data to this too. This is so we can iterate through
+   * participants as the primary participant needs to show them all (and the others
+   * need to be able to filter).
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getCurrentParticipant(): array {
+    // @todo - it is only because of some messed up tests which use
+    // the legacy testSubmit function we have ?? []
+    return $this->getParticipants()[$this->participantID] ?? [];
   }
 
   /**
