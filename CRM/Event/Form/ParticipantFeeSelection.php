@@ -171,7 +171,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     //retrieve custom information
     $this->_values = [];
 
-    CRM_Event_Form_Registration::initEventFee($this, $event['id'], $this->_action !== CRM_Core_Action::UPDATE, $this->getPriceSetID());
+    CRM_Event_Form_Registration::initEventFee($this, $this->_action !== CRM_Core_Action::UPDATE, $this->getPriceSetID());
     CRM_Event_Form_Registration_Register::buildAmount($this, TRUE, NULL, $this->getPriceSetID());
 
     if (!CRM_Utils_System::isNull($this->_values['line_items'] ?? NULL)) {

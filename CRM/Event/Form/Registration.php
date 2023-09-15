@@ -300,7 +300,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       $priceSetID = $this->getPriceSetID();
       if ($priceSetID) {
-        self::initEventFee($this, $this->_eventId, TRUE, $priceSetID);
+        self::initEventFee($this, TRUE, $priceSetID);
         $this->assign('quickConfig', $this->isQuickConfig());
       }
 
@@ -571,15 +571,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Initiate event fee.
    *
    * @param \CRM_Event_Form_Participant|\CRM_Event_Form_Registration|\CRM_Event_Form_ParticipantFeeSelection|\CRM_Event_Form_Task_Register $form
-   * @param int $eventID
    * @param bool $doNotIncludeExpiredFields
    *   See CRM-16456.
    * @param int|null $priceSetId
    *   ID of the price set in use.
    *
-   * @throws \CRM_Core_Exception
+   * @internal function has had several recent signature changes & is expected to be eventually removed.
    */
-  public static function initEventFee(&$form, $eventID, $doNotIncludeExpiredFields, $priceSetId): void {
+  public static function initEventFee($form, $doNotIncludeExpiredFields, $priceSetId): void {
     if (!$priceSetId) {
       CRM_Core_Error::deprecatedWarning('this should not be reachable');
       return;
