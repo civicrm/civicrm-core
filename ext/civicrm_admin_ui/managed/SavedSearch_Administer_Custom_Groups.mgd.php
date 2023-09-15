@@ -216,11 +216,16 @@ return [
             ],
           ],
           'placeholder' => 5,
-          'addButton' => [
-            'path' => 'civicrm/admin/custom/group/edit?reset=1',
-            'text' => E::ts('Add Set of Custom Fields'),
-            'icon' => 'fa-plus',
-            'autoOpen' => TRUE,
+          'toolbar' => [
+            [
+              'entity' => 'CustomGroup',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Set of Custom Fields'),
+              'icon' => 'fa-plus',
+              'autoOpen' => TRUE,
+            ],
           ],
         ],
         'acl_bypass' => FALSE,

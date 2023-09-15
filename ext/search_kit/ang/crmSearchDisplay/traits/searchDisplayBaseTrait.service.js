@@ -126,16 +126,6 @@
         };
       },
 
-      // Get path for the addButton
-      getButtonUrl: function() {
-        var path = this.settings.addButton.path,
-          filters = this.getFilters();
-        _.each(filters, function(value, key) {
-          path = path.replace('[' + key + ']', value);
-        });
-        return CRM.url(path);
-      },
-
       onClickSearchButton: function() {
         this.rowCount = null;
         this.page = 1;
@@ -173,14 +163,20 @@
                 ctrl.rowCount = result.count;
               });
             }
-            // If there are no results on initial load, open the "addNew" link if configured as "autoOpen"
-            if (!ctrl.results.length && requestId === 1 && ctrl.settings.addButton && ctrl.settings.addButton.autoOpen) {
-              CRM.loadForm(ctrl.getButtonUrl())
-                .on('crmFormSuccess', function() {
-                  ctrl.rowCount = null;
-                  ctrl.getResultsPronto();
-                });
-            }
+          }
+          // Process toolbar
+          if (apiResults.run.toolbar) {
+            ctrl.toolbar = apiResults.run.toolbar;
+            // If there are no results on initial load, open an "autoOpen" toolbar link
+            ctrl.toolbar.forEach((link) => {
+              if (link.autoOpen && requestId === 1 && !ctrl.results.length) {
+                CRM.loadForm(link.url)
+                  .on('crmFormSuccess', () => {
+                    ctrl.rowCount = null;
+                    ctrl.getResultsPronto();
+                  });
+              }
+            });
           }
           _.each(ctrl.onPostRun, function(callback) {
             callback.call(ctrl, apiResults, 'success', editedRow);

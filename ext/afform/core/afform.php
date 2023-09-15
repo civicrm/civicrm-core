@@ -173,7 +173,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   }
   $contactTypes = array_merge((array) ($context['contact_type'] ?? []), $context['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get(FALSE)
-    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
+    ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type', 'summary_weight')
     ->addWhere('contact_summary', '=', 'tab')
     ->addOrderBy('title')
     ->execute();
@@ -186,7 +186,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
       $tabs[] = [
         'id' => $tabId,
         'title' => $afform['title'],
-        'weight' => $weight++,
+        'weight' => $afform['summary_weight'] ?? $weight++,
         'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
         'is_active' => TRUE,
         'contact_type' => _afform_get_contact_types($summaryContactType) ?: NULL,
@@ -214,6 +214,7 @@ function afform_civicrm_pageRun(&$page) {
   $afforms = Civi\Api4\Afform::get(FALSE)
     ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
     ->addWhere('contact_summary', '=', 'block')
+    ->addOrderBy('summary_weight')
     ->addOrderBy('title')
     ->execute();
   $cid = $page->get('cid');

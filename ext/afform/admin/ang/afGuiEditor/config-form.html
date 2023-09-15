@@ -103,8 +103,10 @@
         </select>
       </div>
       <div class="form-inline" ng-if="editor.afform.contact_summary">
-        <label>{{:: ts('For') }}</label>
-        <input class="form-control" crm-autocomplete="'ContactType'" ng-model="editor.afform.summary_contact_type" auto-open="true" multi="true" crm-autocomplete-params="{key: 'name'}" placeholder="{{:: ts('Any contact type') }}">
+        <label for="afform_summary_weight">{{:: ts('Position') }}</label>
+        <input class="form-control" type="number" id="afform_summary_weight" ng-model="editor.afform.summary_weight" placeholder="{{:: ts('Auto') }}">
+        <label for="afform_summary_contact_type">{{:: ts('For') }}</label>
+        <input class="form-control" crm-autocomplete="'ContactType'" id="afform_summary_contact_type" ng-model="editor.afform.summary_contact_type" auto-open="true" multi="true" crm-autocomplete-params="{key: 'name'}" placeholder="{{:: ts('Any contact type') }}">
       </div>
       <p class="help-block" ng-show="editor.afform.contact_summary">
         {{:: ts('Placement can be configured using the Contact Layout Editor.') }}

@@ -8,6 +8,11 @@
   <comment>Map between an entity and a financial account, where there is a specific relationship between the financial account and the entity, e.g. Income Account for or AR Account for</comment>
   <log>true</log>
   <component>CiviContribute</component>
+  <paths>
+    <add>civicrm/admin/financial/financialType/accounts?action=add&amp;reset=1&amp;aid=[entity_id]</add>
+    <update>civicrm/admin/financial/financialType/accounts?action=update&amp;id=[id]&amp;aid=[entity_id]&amp;reset=1</update>
+    <delete>civicrm/admin/financial/financialType/accounts?action=delete&amp;id=[id]&amp;aid=[entity_id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Entity Financial Account ID</title>

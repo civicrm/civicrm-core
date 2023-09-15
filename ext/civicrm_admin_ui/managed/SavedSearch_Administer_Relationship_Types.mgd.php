@@ -163,10 +163,15 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/reltype/edit?action=add&reset=1',
-            'text' => E::ts('Add Relationship Type'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'RelationshipType',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Relationship Type'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

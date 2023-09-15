@@ -507,7 +507,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     return $out;
   }
 
-  private function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
+  protected function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
     $link = $this->getLinkInfo($link);
     if (!$this->checkLinkAccess($link, $data, $index)) {
       return NULL;
@@ -517,13 +517,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $path = $this->replaceTokens($link['path'], $data, 'url', $index);
     if ($path) {
       $link['url'] = $this->getUrl($path);
-      $keys = ['url', 'text', 'title', 'target', 'style'];
+      $keys = ['url', 'text', 'title', 'target', 'icon', 'style', 'autoOpen'];
     }
     else {
-      $keys = ['task', 'text', 'title', 'style'];
+      $keys = ['task', 'text', 'title', 'icon', 'style'];
     }
     $link = array_intersect_key($link, array_flip($keys));
-    return array_filter($link);
+    return array_filter($link, function($value) {
+      // "0" is a valid title
+      return $value || (is_string($value) && strlen($value));
+    });
   }
 
   /**
@@ -688,7 +691,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           }
         }
         elseif (!empty($task['apiBatch']) || !empty($task['uiDialog'])) {
-          $link['title'] = $link['title'] ?: $task['title'];
+          if (!strlen($link['title'])) {
+            $link['title'] = $task['title'];
+          }
           // Fill in the api action if known, for the sake of $this->checkLinkAccess
           $link['action'] = $task['apiBatch']['action'] ?? NULL;
         }

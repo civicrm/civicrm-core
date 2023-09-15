@@ -5,6 +5,7 @@ namespace Civi\Api4\Action\SearchDisplay;
 use Civi\API\Request;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Utils\FormattingUtil;
 
 /**
  * Load the results for rendering a SearchDisplay.
@@ -119,10 +120,50 @@ class Run extends AbstractRunAction {
         $result->setCountMatched($apiResult->countFetched());
         $apiResult = array_slice((array) $apiResult, 0, $apiParams['limit'] - 1);
       }
+      if ($pagerMode === 'page') {
+        $result->toolbar = $this->formatToolbar();
+      }
       $result->exchangeArray($this->formatResult($apiResult));
       $result->labels = $this->filterLabels;
     }
+  }
 
+  private function formatToolbar(): array {
+    $toolbar = $data = [];
+    $settings = $this->display['settings'];
+    // If no toolbar, early return
+    if (empty($settings['toolbar']) && empty($settings['addButton']['path'])) {
+      return [];
+    }
+    // There is no row data, but some values can be inferred from query filters
+    // First pass: gather raw data from the where clause
+    foreach ($this->_apiParams['where'] as $clause) {
+      if ($clause[1] === '=' || $clause[1] === 'IN') {
+        $data[$clause[0]] = $clause[2];
+      }
+    }
+    // Second pass: format values (because data from first pass could be useful to FormattingUtil)
+    foreach ($this->_apiParams['where'] as $clause) {
+      if ($clause[1] === '=' || $clause[1] === 'IN') {
+        [$fieldPath] = explode(':', $clause[0]);
+        $fieldSpec = $this->getField($fieldPath);
+        $data[$fieldPath] = $clause[2];
+        if ($fieldSpec) {
+          FormattingUtil::formatInputValue($data[$fieldPath], $clause[0], $fieldSpec, $data, $clause[1]);
+        }
+      }
+    }
+    // Support legacy 'addButton' setting
+    if (empty($settings['toolbar']) && !empty($settings['addButton']['path'])) {
+      $settings['toolbar'][] = $settings['addButton'] + ['style' => 'primary', 'target' => 'crm-popup'];
+    }
+    foreach ($settings['toolbar'] ?? [] as $button) {
+      $button = $this->formatLink($button, $data);
+      if ($button) {
+        $toolbar[] = $button;
+      }
+    }
+    return $toolbar;
   }
 
 }

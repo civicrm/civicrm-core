@@ -212,10 +212,15 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/paymentProcessor/edit?action=add&reset=1',
-            'text' => E::ts('Add Payment Processor'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'PaymentProcessor',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Payment Processor'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

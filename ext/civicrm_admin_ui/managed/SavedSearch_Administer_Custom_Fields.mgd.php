@@ -215,11 +215,16 @@ return [
               FALSE,
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/custom/group/field/add?reset=1&action=add&gid=[custom_group_id]',
-            'text' => E::ts('Add Custom Field'),
-            'icon' => 'fa-plus',
-            'autoOpen' => TRUE,
+          'toolbar' => [
+            [
+              'entity' => 'CustomField',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Custom Field'),
+              'icon' => 'fa-plus',
+              'autoOpen' => TRUE,
+            ],
           ],
           'placeholder' => 5,
         ],

@@ -196,6 +196,11 @@ class Afform extends Generic\AbstractEntity {
           'options' => \CRM_Contact_BAO_ContactType::contactTypePairs(),
         ],
         [
+          'name' => 'summary_weight',
+          'title' => E::ts('Order'),
+          'data_type' => 'Integer',
+        ],
+        [
           'name' => 'icon',
           'title' => E::ts('Icon'),
           'description' => 'Icon shown in the contact summary tab',

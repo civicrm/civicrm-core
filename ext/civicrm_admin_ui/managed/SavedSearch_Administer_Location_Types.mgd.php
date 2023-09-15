@@ -172,10 +172,15 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/locationType/edit?action=add&reset=1',
-            'text' => E::ts('Add Location Type'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'LocationType',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Location Type'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

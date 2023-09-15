@@ -146,9 +146,10 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
    */
   public function getLinksMenu() {
     $menu = [];
+    $discard = array_flip(['add', 'browse']);
     $mainEntity = $this->savedSearch['api_entity'] ?? NULL;
     if ($mainEntity && !$this->canAggregate(CoreUtil::getIdFieldName($mainEntity))) {
-      foreach (Display::getEntityLinks($mainEntity, TRUE) as $link) {
+      foreach (array_diff_key(Display::getEntityLinks($mainEntity, TRUE), $discard) as $link) {
         $link['join'] = NULL;
         $menu[] = $link;
       }
@@ -158,7 +159,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       if (!$this->canAggregate($join['alias'] . '.' . CoreUtil::getIdFieldName($join['entity']))) {
         foreach (array_filter(array_intersect_key($join, $keys)) as $joinEntity) {
           $joinLabel = $this->getJoinLabel($join['alias']);
-          foreach (Display::getEntityLinks($joinEntity, $joinLabel) as $link) {
+          foreach (array_diff_key(Display::getEntityLinks($joinEntity, $joinLabel), $discard) as $link) {
             $link['join'] = $join['alias'];
             $menu[] = $link;
           }

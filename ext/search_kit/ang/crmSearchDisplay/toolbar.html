@@ -1,0 +1,4 @@
+<a ng-repeat="link in $ctrl.toolbar" ng-href="{{:: link.url }}" class="btn btn-{{:: link.style }}" target="{{:: link.target }}">
+  <i ng-if="link.icon" class="crm-i {{:: link.icon }}"></i>
+  {{:: link.text }}
+</a>

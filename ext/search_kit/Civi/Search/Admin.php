@@ -150,7 +150,7 @@ class Admin {
           $getFields = civicrm_api4($entity['name'], 'getFields', [
             'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
             'where' => [['deprecated', '=', FALSE], ['name', 'NOT IN', ['api_key', 'hash']]],
-            'orderBy' => ['label'],
+            'orderBy' => ['label' => 'ASC'],
           ])->indexBy('name');
         }
         catch (\CRM_Core_Exception $e) {
@@ -334,21 +334,29 @@ class Admin {
 
             // For dynamic references getTargetEntities will return multiple targets; for normal joins this loop will only run once
             foreach ($reference->getTargetEntities() as $targetTable => $targetEntityName) {
-              if (!isset($allowedEntities[$targetEntityName]) || $targetEntityName === $entity['name']) {
+              if (
+                !isset($allowedEntities[$targetEntityName]) ||
+                // What to do with self-references? They're weird but sometimes useful.
+                // For now, only allowing it for dynamic columns since they're explicitly declared
+                // (e.g. a Note can be a comment on a Note), and only the 1-n join since n-1 can be done with implicit joins.
+                ($targetEntityName === $entity['name'] && !$dynamicCol)
+              ) {
                 continue;
               }
               $targetEntity = $allowedEntities[$targetEntityName];
-              // Add the straight 1-1 join
-              $alias = $entity['name'] . '_' . $targetEntityName . '_' . $keyField['name'];
-              $joins[$entity['name']][] = [
-                'label' => $entity['title'] . ' ' . ($dynamicCol ? $targetEntity['title'] : $keyField['label']),
-                'description' => '',
-                'entity' => $targetEntityName,
-                'conditions' => self::getJoinConditions($keyField['name'], $alias . '.' . $reference->getTargetKey(), $targetTable, $dynamicCol),
-                'defaults' => self::getJoinDefaults($alias, $targetEntity),
-                'alias' => $alias,
-                'multi' => FALSE,
-              ];
+              // Add the straight 1-1 join (but only if it's not a reference to itself, see above)
+              if ($targetEntityName !== $entity['name']) {
+                $alias = $entity['name'] . '_' . $targetEntityName . '_' . $keyField['name'];
+                $joins[$entity['name']][] = [
+                  'label' => $entity['title'] . ' ' . ($dynamicCol ? $targetEntity['title'] : $keyField['label']),
+                  'description' => '',
+                  'entity' => $targetEntityName,
+                  'conditions' => self::getJoinConditions($keyField['name'], $alias . '.' . $reference->getTargetKey(), $targetTable, $dynamicCol),
+                  'defaults' => self::getJoinDefaults($alias, $targetEntity),
+                  'alias' => $alias,
+                  'multi' => FALSE,
+                ];
+              }
               // Flip the conditions & add the reverse (1-n) join
               $alias = $targetEntityName . '_' . $entity['name'] . '_' . $keyField['name'];
               $joins[$targetEntityName][] = [

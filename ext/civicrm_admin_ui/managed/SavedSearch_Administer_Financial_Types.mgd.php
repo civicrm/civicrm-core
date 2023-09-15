@@ -194,10 +194,15 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/financial/financialType/edit?reset=1&action=add',
-            'text' => E::ts('Add Financial Type'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'FinancialType',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Financial Type'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

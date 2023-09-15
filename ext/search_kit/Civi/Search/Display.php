@@ -69,7 +69,10 @@ class Display {
     }
     // If addLabel is false the placeholder needs to be passed through to javascript
     $label = $addLabel ?: '%1';
-    unset($paths['add'], $paths['browse']);
+    $styles = [
+      'delete' => 'danger',
+      'add' => 'primary',
+    ];
     foreach (array_keys($paths) as $actionName) {
       $actionKey = \CRM_Core_Action::mapItem($actionName);
       $link = [
@@ -78,7 +81,7 @@ class Display {
         'text' => \CRM_Core_Action::getTitle($actionKey, $label),
         'icon' => \CRM_Core_Action::getIcon($actionKey),
         'weight' => \CRM_Core_Action::getWeight($actionKey),
-        'style' => $actionName === 'delete' ? 'danger' : 'default',
+        'style' => $styles[$actionName] ?? 'default',
         'target' => 'crm-popup',
       ];
       // Contacts and cases are too cumbersome to view in a popup
@@ -87,7 +90,11 @@ class Display {
       }
       $links[$actionName] = $link;
     }
+    // Sort by weight, then discard it
     uasort($links, ['CRM_Utils_Sort', 'cmpFunc']);
+    foreach ($links as $index => $link) {
+      unset($links[$index]['weight']);
+    }
     return $links;
   }
 
