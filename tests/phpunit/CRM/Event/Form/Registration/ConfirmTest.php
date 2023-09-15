@@ -10,6 +10,7 @@ use Civi\Test\FormTrait;
  */
 class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
 
+  use CRMTraits_Event_ScenarioTrait;
   use CRMTraits_Financial_PriceSetTrait;
   use CRMTraits_Profile_ProfileTrait;
   use FormTrait;
@@ -293,35 +294,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   public function testTaxMultipleParticipant(): void {
     $this->swapMessageTemplateForTestTemplate('event_online_receipt', 'text');
     $this->createLoggedInUser();
-    $this->eventCreatePaid();
-    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'));
-    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
-      'first_name' => 'Participant1',
-      'last_name' => 'LastName',
-      'email-Primary' => 'participant1@example.com',
-      'additional_participants' => 2,
-      'payment_processor_id' => 0,
-      'priceSetId' => $this->getPriceSetID('PaidEvent'),
-      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-      'defaultRole' => 1,
-      'participant_role_id' => '1',
-      'button' => '_qf_Register_upload',
-    ], ['id' => $this->getEventID()])
-      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
-        'first_name' => 'Participant2',
-        'last_name' => 'LastName',
-        'email-Primary' => 'participant2@example.com',
-        'priceSetId' => $this->getPriceSetID('PaidEvent'),
-        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-      ])->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
-        'first_name' => 'Participant3',
-        'last_name' => 'LastName',
-        'email-Primary' => 'participant3@example.com',
-        'priceSetId' => $this->getPriceSetID('PaidEvent'),
-        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-      ])
-      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
-      ->processForm();
+    $this->createScenarioMultipleParticipantPendingWithTax();
 
     $participants = $this->callAPISuccess('Participant', 'get', [])['values'];
     $this->assertCount(3, $participants);
@@ -332,9 +305,9 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ]
     );
     $this->assertContains(' (multiple participants)', $contribution['amount_level']);
-    $this->assertEquals(90, $contribution['tax_amount'], 'Invalid Tax amount.');
-    $this->assertEquals(990, $contribution['total_amount'], 'Invalid Tax amount.');
-    $mailSent = $form->getMail();
+    $this->assertEquals(60, $contribution['tax_amount'], 'Invalid Tax amount.');
+    $this->assertEquals(660, $contribution['total_amount'], 'Invalid Tax amount.');
+    $mailSent = $this->sentMail;
     $this->assertCount(3, $mailSent, 'Three mails should have been sent to the 3 participants.');
     $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[0]['body']);
     $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[1]['body']);
@@ -351,6 +324,33 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[0]);
     $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 2), $mailSent[1]);
     $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[2]);
+  }
+
+  /**
+   * Test stock template for multiple participant.
+   *
+   * The goal is to ensure no leakage.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailMultipleParticipant(): void {
+    $this->createScenarioMultipleParticipantPendingWithTax();
+    $mailSent = $this->sentMail;
+    $amountsPaid = [300, 100, 200];
+    // The first participant, as the primary participant, (only) will have the full total in the email
+    $this->assertStringContainsString('$600', $mailSent[0]['body']);
+    $this->assertStringNotContainsString(600, $mailSent[1]['body']);
+    $this->assertStringNotContainsString(600, $mailSent[2]['body']);
+
+    // The $100 paid by the second participant will be in the emails to the primary but and second participant
+    $this->assertStringContainsString('$100', $mailSent[0]['body']);
+    $this->assertStringContainsString('$100', $mailSent[1]['body']);
+    $this->assertStringNotContainsString('$100', $mailSent[2]['body']);
+
+    // The $200 paid by the second participant will be in the emails to the primary but and third participant
+    $this->assertStringContainsString('$200', $mailSent[0]['body']);
+    $this->assertStringNotContainsString('$200', $mailSent[1]['body']);
+    $this->assertStringContainsString('$200', $mailSent[2]['body']);
   }
 
   /**
