@@ -22,7 +22,7 @@
       {/if}
     {/if}
 
-    {if $mode ne 8 && $action ne 1028 && $action ne 4 && !$hideFieldset}
+    {if $mode ne 8 && $action ne 4 && !$hideFieldset}
       <fieldset class="crm-profile crm-profile-id-{$field.group_id} crm-profile-name-{$field.groupName}"><legend>{$field.groupDisplayTitle}</legend>
     {/if}
 
@@ -31,18 +31,18 @@
     {/if}
     {assign var=fieldset  value=`$field.groupTitle`}
     {assign var=groupHelpPost  value=`$field.groupHelpPost`}
-    {if $field.groupHelpPre && $action neq 4 && $action neq 1028}
+    {if $field.groupHelpPre && $action neq 4}
       <div class="messages help">{$field.groupHelpPre}</div>
     {/if}
   {/if}
 
   {if $field.field_type eq "Formatting"}
-    {if $action neq 4 && $action neq 1028}
+    {if $action neq 4}
       {$field.help_pre}
     {/if}
   {elseif $profileFieldName}
-    {* Show explanatory text for field if not in 'view' or 'preview' modes *}
-    {if $field.help_pre && $action neq 4 && $action neq 1028}
+    {* Show explanatory text for field if not in 'view' mode *}
+    {if $field.help_pre && $action neq 4}
       <div class="crm-section helprow-{$profileFieldName}-section helprow-pre" id="helprow-{$rowIdentifier}">
         <div class="content description">{$field.help_pre}</div>
       </div>
@@ -141,8 +141,8 @@
         <div class="clear"></div>
       </div>
     {/if}
-    {* Show explanatory text for field if not in 'view' or 'preview' modes *}
-    {if $field.help_post && $action neq 4 && $action neq 1028}
+    {* Show explanatory text for field if not in 'view' mode *}
+    {if $field.help_post && $action neq 4}
       <div class="crm-section helprow-{$profileFieldName}-section helprow-post" id="helprow-{$rowIdentifier}">
         <div class="content description">{$field.help_post}</div>
       </div>

@@ -15,7 +15,7 @@
     {assign var=fieldset  value=$zeroField}
     {include file="CRM/UF/Form/Fields.tpl"}
 
-    {if $field.groupHelpPost && $action neq 4  && $action neq 1028}
+    {if $field.groupHelpPost && $action neq 4}
       <div class="messages help">{$field.groupHelpPost}</div>
     {/if}
 
@@ -25,7 +25,7 @@
       </div>
     {/if}
 
-    {if $mode ne 8 && $action neq 1028 && !$hideFieldset}
+    {if $mode ne 8 && !$hideFieldset}
     </fieldset>
     {/if}
 

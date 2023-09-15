@@ -36,9 +36,7 @@
 {* CRM-15804 - CiviEvent Date Picker broken in modal dialog *}
 {assign var='displayDate' value=$elementId|cat:"_display"|cat:"_$string"|uniqid}
 
-{if $action neq 1028}
-    <input type="text" name="{$displayDate}" id="{$displayDate}" class="dateplugin" autocomplete="off"/>
-{/if}
+<input type="text" name="{$displayDate}" id="{$displayDate}" class="dateplugin" autocomplete="off"/>
 
 {if $batchUpdate AND $timeElement AND $tElement}
     &nbsp;&nbsp;{$form.field.$elementIndex.$tElement.label}&nbsp;&nbsp;{$form.field.$elementIndex.$tElement.html|crmAddClass:six}
@@ -49,9 +47,8 @@
     {$form.$timeElement.html|crmAddClass:six}
 {/if}
 
-{if $action neq 1028}
-    <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
-{/if}
+
+ <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
 
 <script type="text/javascript">
     {literal}
