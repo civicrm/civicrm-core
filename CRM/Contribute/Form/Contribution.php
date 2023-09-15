@@ -17,6 +17,8 @@ use Civi\Payment\Exception\PaymentProcessorException;
  * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditPayment {
+  use CRM_Contact_Form_ContactFormTrait;
+
   /**
    * The id of the contribution that we are processing.
    *
@@ -146,11 +148,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @var array
    */
   public $_paymentFields = [];
-  /**
-   * Logged in user's email.
-   * @var string
-   */
-  public $userEmail;
 
   /**
    * Price set ID.
@@ -164,13 +161,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @var array
    */
   public $_priceSet;
-
-  /**
-   * User display name
-   *
-   * @var string
-   */
-  public $userDisplayName;
 
   /**
    * Status message to be shown to the user.
@@ -504,7 +494,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    $this->assign('email', $this->userEmail);
     $this->assign('is_pay_later', !empty($defaults['is_pay_later']));
 
     $this->assign('contribution_status_id', CRM_Utils_Array::value('contribution_status_id', $defaults));
@@ -704,8 +693,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Contribution');
     $this->assign('customDataSubType', $this->getFinancialTypeID());
-    $this->assign('entityID', $this->_id);
-
+    $this->assign('entityID', $this->getContributionID());
+    $this->assign('email', $this->getContactValue('email_primary.email'));
     $contactField = $this->addEntityRef('contact_id', ts('Contributor'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
     if ($this->_context !== 'standalone') {
       $contactField->freeze();
@@ -1128,7 +1117,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $now = date('YmdHis');
 
-    $this->_contributorEmail = $this->userEmail;
+    $this->_contributorEmail = $this->getContactValue('email_primary.email');
     $this->_contributorContactID = $contactID;
     $this->processBillingAddress();
     if (!empty($params['source'])) {
@@ -1178,7 +1167,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $paymentParams['contributionPageID'] = NULL;
 
     if (!empty($this->_params['is_email_receipt'])) {
-      $paymentParams['email'] = $this->userEmail;
+      $paymentParams['email'] = $this->getContactValue('email_primary.email');
       $paymentParams['is_email_receipt'] = 1;
     }
     else {
@@ -2045,7 +2034,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public function setUserContext(): void {
     $session = CRM_Core_Session::singleton();
     $buttonName = $this->controller->getButtonName();
-    if ($this->_context == 'standalone') {
+    if ($this->_context === 'standalone') {
       if ($buttonName == $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/contribute/add',
           'reset=1&action=add&context=standalone'
@@ -2206,6 +2195,24 @@ WHERE  contribution_id = {$id}
       $this->_premiumID = $dao->id;
       $this->_productDAO = $dao;
     }
+  }
+
+  /**
+   * Get the contact ID in use.
+   *
+   * Ideally override this as appropriate to the form.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocSignatureIsNotCompleteInspection
+   */
+  public function getContactID(): ?int {
+    if ($this->_contactID === NULL) {
+      $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+      if (empty($this->_contactID) && !empty($this->_id) && $this->entity) {
+        $this->_contactID = civicrm_api3($this->entity, 'getvalue', ['id' => $this->_id, 'return' => 'contact_id']);
+      }
+    }
+    return $this->_contactID ? (int) $this->_contactID : NULL;
   }
 
 }

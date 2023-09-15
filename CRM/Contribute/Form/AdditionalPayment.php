@@ -369,9 +369,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     // we need to retrieve email address
     if ($this->_context === 'standalone' && !empty($this->_params['is_email_receipt'])) {
-      list($displayName,
-        $this->userEmail
-        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
+      [$displayName] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
       $this->assign('displayName', $displayName);
     }
 
