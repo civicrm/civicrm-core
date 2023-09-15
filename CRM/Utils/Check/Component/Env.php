@@ -603,9 +603,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $enabled = array_keys(array_filter($stauses, function($status) {
       return $status === CRM_Extension_Manager::STATUS_INSTALLED;
     }));
-    $requiredExtensions = $mapper->getKeysByTag('mgmt:required');
+    // Extensions belonging to enabled components are required
+    $enabledComponents = array_map(['CRM_Utils_String', 'convertStringToSnakeCase'], Civi::settings()->get('enable_components'));
+    // And extensions tagged `mgmg:required` must be enabled
+    $requiredExtensions = array_merge($enabledComponents, $mapper->getKeysByTag('mgmt:required'));
     sort($keys);
-    $updates = $errors = $okextensions = [];
+    $updates = $errors = $okextensions = $missingRequired = [];
 
     $extPrettyLabel = function($key) use ($mapper) {
       // We definitely know a $key, but we may not have a $label.
@@ -637,13 +640,13 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           break;
 
         case CRM_Extension_Manager::STATUS_INSTALLED:
-          $missingRequirements = array_diff($row['requires'], $enabled);
-          if (!empty($row['requires']) && $missingRequirements) {
+          $missingDependencies = array_diff($row['requires'], $enabled);
+          if (!empty($row['requires']) && $missingDependencies) {
             $errors[] = ts('%1 has a missing dependency on %2', [
               1 => $extPrettyLabel($key),
-              2 => implode(', ', array_map($extPrettyLabel, $missingRequirements)),
+              2 => implode(', ', array_map($extPrettyLabel, $missingDependencies)),
               'plural' => '%1 has missing dependencies: %2',
-              'count' => count($missingRequirements),
+              'count' => count($missingDependencies),
             ]);
           }
           elseif (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
@@ -664,22 +667,26 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
         default:
           if (in_array($key, $requiredExtensions, TRUE)) {
-            $requiredMessage = new CRM_Utils_Check_Message(
-              __FUNCTION__ . 'Required:' . $key,
-              ts('The extension %1 is required and must be enabled.', [1 => $row['label']]),
-              ts('Required Extension'),
-              \Psr\Log\LogLevel::ERROR,
-              'fa-exclamation-triangle'
-            );
-            $requiredMessage->addAction(
-              ts('Enable %1', [1 => $row['label']]),
-              '',
-              'api3',
-              ['Extension', 'install', ['key' => $key]]
-            );
-            $messages[] = $requiredMessage;
+            $missingRequired[$key] = $row['label'];
           }
       }
+    }
+
+    if ($missingRequired) {
+      $requiredMessage = new CRM_Utils_Check_Message(
+        __FUNCTION__ . 'Required:' . implode(',', array_keys($missingRequired)),
+        ts('The extension %1 is required and must be enabled.', [1 => implode(', ', $missingRequired)]),
+        ts('Required Extension'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-exclamation-triangle'
+      );
+      $requiredMessage->addAction(
+        ts('Enable %1', [1 => implode(', ', $missingRequired)]),
+        '',
+        'api3',
+        ['Extension', 'install', ['keys' => array_keys($missingRequired)]]
+      );
+      $messages[] = $requiredMessage;
     }
 
     if (!$okextensions && !$updates && !$errors) {
