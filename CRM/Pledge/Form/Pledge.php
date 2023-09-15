@@ -21,6 +21,8 @@ use Civi\Api4\PledgePayment;
  * This class generates form components for processing a pledge
  */
 class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
+  use CRM_Contact_Form_ContactFormTrait;
+
   public $_action;
 
   /**
@@ -61,27 +63,21 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function preProcess(): void {
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->_contactID = $this->getContactID();
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 'add'
     );
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
-
+    $this->setContext();
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviPledge', $this->_action)) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     $this->assign('action', $this->_action);
-    $this->assign('context', $this->_context);
+    $this->assign('context', $this->getContext());
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
-    }
-
-    $displayName = $this->userEmail = NULL;
-    if ($this->_contactID) {
-      [$displayName, $this->userEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
     }
 
     $this->setPageTitle(ts('Pledge'));
@@ -91,25 +87,21 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->_values = [];
     // current pledge id
     if ($this->_id) {
-      // get the contribution id
-      $this->_contributionID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
-        $this->_id, 'contribution_id', 'pledge_id'
-      );
       $params = ['id' => $this->_id];
       CRM_Pledge_BAO_Pledge::getValues($params, $this->_values);
 
-      $this->_isPending = (CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($this->_id, CRM_Utils_Array::value('status_id', $this->_values))) ? FALSE : TRUE;
+      $this->_isPending = !CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($this->_id, CRM_Utils_Array::value('status_id', $this->_values));
     }
 
     // get the pledge frequency units.
     $this->_freqUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
-
-    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
   }
 
   /**
    * Set default values for the form.
    * The default values are retrieved from the database.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues(): array {
     $defaults = $this->_values;
@@ -169,10 +161,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $defaultPledgeStatus
     ));
 
-    if (isset($this->userEmail)) {
-      $this->assign('email', $this->userEmail);
-    }
-
+    $this->assign('email', $this->getContactValue('email_primary.email'));
     // custom data set defaults
     $defaults += CRM_Custom_Form_CustomData::setDefaultValues($this);
 
@@ -202,13 +191,12 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     $contactField = $this->addEntityRef('contact_id', ts('Pledge by'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
-    if ($this->_context !== 'standalone') {
+    if ($this->getContext() !== 'standalone') {
       $contactField->freeze();
     }
 
     $showAdditionalInfo = FALSE;
-    $this->_formType = $_GET['formType'] ?? NULL;
-
+    $formType = CRM_Utils_Request::retrieveValue('form_type', 'String');
     $defaults = [];
 
     $paneNames = [
@@ -222,7 +210,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         'id' => $type,
       ];
       // see if we need to include this paneName in the current form
-      if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
+      if ($formType == $type || !empty($_POST["hidden_{$type}"]) ||
         !empty($defaults["hidden_{$type}"])
       ) {
         $showAdditionalInfo = TRUE;
@@ -235,8 +223,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->assign('allPanes', $allPanes);
     $this->assign('showAdditionalInfo', $showAdditionalInfo);
 
-    $this->assign('formType', $this->_formType);
-    if ($this->_formType) {
+    $this->assign('formType', $formType);
+    if ($formType) {
       return;
     }
 
@@ -319,8 +307,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->addElement('checkbox', 'is_acknowledge', ts('Send Acknowledgment?'), NULL,
         ['onclick' => "showHideByValue( 'is_acknowledge', '', 'acknowledgeDate', 'table-row', 'radio', true); showHideByValue( 'is_acknowledge', '', 'fromEmail', 'table-row', 'radio', false );"]
       );
-
-      $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails, FALSE, ['class' => 'crm-select2 huge']);
+      $this->add('select', 'from_email_address', ts('Receipt From'), CRM_Core_BAO_Email::getFromEmail(), FALSE, ['class' => 'crm-select2 huge']);
     }
 
     $this->add('datepicker', 'acknowledge_date', ts('Acknowledgment Date'), [], FALSE, ['time' => FALSE]);
@@ -538,7 +525,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       // send Acknowledgment mail.
       CRM_Pledge_BAO_Pledge::sendAcknowledgment($this, $params);
 
-      $statusMsg .= ' ' . ts('An acknowledgment email has been sent to %1.<br />', [1 => $this->userEmail]);
+      $statusMsg .= ' ' . ts('An acknowledgment email has been sent to %1.<br />', [1 => $this->getContactValue('email_primary.email')]);
       // get the first valid payment id.
       $nextPaymentID = PledgePayment::get()
         ->addWhere('pledge_id', '=', $pledgeID)
@@ -569,7 +556,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     CRM_Core_Session::setStatus($statusMsg, ts('Payment Due'), 'info');
 
     $buttonName = $this->controller->getButtonName();
-    if ($this->_context === 'standalone') {
+    if ($this->getContext() === 'standalone') {
       if ($buttonName === $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/pledge/add',
           'reset=1&action=add&context=standalone'
