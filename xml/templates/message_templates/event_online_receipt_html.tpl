@@ -66,28 +66,6 @@
           </td>
         </tr>
 
-        {if $conference_sessions}
-          <tr>
-            <td colspan="2" {$labelStyle}>
-              {ts}Your schedule:{/ts}
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2" {$valueStyle}>
-              {assign var='group_by_day' value='NA'}
-              {foreach from=$conference_sessions item=session}
-                {if $session.start_date|crmDate:"%Y/%m/%d" != $group_by_day|crmDate:"%Y/%m/%d"}
-                  {assign var='group_by_day' value=$session.start_date}
-                  <em>{$group_by_day|crmDate:"%m/%d/%Y"}</em><br/>
-                {/if}
-                {$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}
-                <br/>
-                {if $session.location}&nbsp;&nbsp;&nbsp;&nbsp;{$session.location}<br/>{/if}
-              {/foreach}
-            </td>
-          </tr>
-        {/if}
-
         {if !empty($event.participant_role) and $event.participant_role neq 'Attendee' and !empty($defaultRole)}
           <tr>
             <td {$labelStyle}>

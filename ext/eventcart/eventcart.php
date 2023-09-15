@@ -33,6 +33,19 @@ function eventcart_civicrm_install() {
 }
 
 /**
+ * Add the conference session variable to the template.
+ *
+ * @param array $params
+ * @param string $template
+ */
+function eventcart_civicrm_alterMailParams(&$params, $template) {
+  $workflow = $params['workflow'] ?? '';
+  if (($workflow === 'event_online_receipt' || $workflow === 'participant_confirm') && !empty($params['tokenContact']['participant']['id'])) {
+    $params['tplParams']['conference_sessions'] = CRM_Event_Cart_BAO_Conference::get_participant_sessions($params['tokenContact']['participant']['id']);
+  }
+}
+
+/**
  * Implements hook_civicrm_enable().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
