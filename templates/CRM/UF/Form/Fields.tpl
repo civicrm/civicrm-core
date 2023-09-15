@@ -47,7 +47,7 @@
         <div class="content description">{$field.help_pre}</div>
       </div>
     {/if}
-    {if $field.options_per_line != 0}
+    {if array_key_exists('options_per_line', $field) && $field.options_per_line != 0}
       <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}">
         <div class="label option-label">{$formElement.label}</div>
         <div class="content 3">
@@ -91,7 +91,7 @@
             {include file="CRM/Profile/Form/GreetingType.tpl"}
           {elseif ($profileFieldName eq 'group' && $form.group) || ($profileFieldName eq 'tag' && $form.tag)}
             {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$profileFieldName title=null context="profile"}
-          {elseif $field.is_datetime_field && $action & 4}
+          {elseif array_key_exists('is_datetime_field', $field) && $field.is_datetime_field && $action & 4}
             <span class="crm-frozen-field">
               {$formElement.value|crmDate:$field.smarty_view_format}
               <input type="hidden"
