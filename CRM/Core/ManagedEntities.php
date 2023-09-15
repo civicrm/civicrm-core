@@ -43,14 +43,15 @@ class CRM_Core_ManagedEntities {
 
   /**
    * Perform an asynchronous reconciliation when the transaction ends.
+   * @param array|null $modules
    */
-  public static function scheduleReconciliation() {
+  public static function scheduleReconciliation(array $modules = NULL) {
     CRM_Core_Transaction::addCallback(
       CRM_Core_Transaction::PHASE_POST_COMMIT,
-      function () {
-        CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+      function ($modules) {
+        CRM_Core_ManagedEntities::singleton(TRUE)->reconcile($modules);
       },
-      [],
+      [$modules],
       'ManagedEntities::reconcile'
     );
   }
