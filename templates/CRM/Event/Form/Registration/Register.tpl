@@ -73,7 +73,7 @@
 
     <div class="crm-public-form-item crm-section custom_pre-section">
       {* Display "Top of page" profile immediately after the introductory text *}
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false}
     </div>
 
     {if $priceSet}
@@ -135,7 +135,7 @@
     {/if}
 
     <div class="crm-public-form-item crm-section custom_post-section">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false}
     </div>
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">

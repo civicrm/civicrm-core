@@ -15,7 +15,7 @@
   {if $field.groupTitle != $fieldset}
     {if $fieldset != $zeroField}
       {if $groupHelpPost && $action neq 4}
-        <div class="messages help">{$groupHelpPost}</div>
+        <div class="messages help">{$groupHelpPost|smarty:nodefaults|purify}</div>
       {/if}
       {if $mode ne 8}
         </fieldset>
@@ -32,7 +32,7 @@
     {assign var=fieldset  value=`$field.groupTitle`}
     {assign var=groupHelpPost  value=`$field.groupHelpPost`}
     {if $field.groupHelpPre && $action neq 4}
-      <div class="messages help">{$field.groupHelpPre}</div>
+      <div class="messages help">{$field.groupHelpPre|smarty:nodefaults|purify}</div>
     {/if}
   {/if}
 

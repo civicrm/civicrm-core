@@ -22,7 +22,7 @@
 {/if}
 
 <div class="crm-public-form-item crm-section custom_pre-section">
-  {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
+  {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre prefix=false}
 </div>
 
 {if $priceSet && $allowGroupOnWaitlist}
@@ -49,7 +49,7 @@
 {/if}
 
 <div class="crm-public-form-item crm-section custom_post-section">
-  {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
+  {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost prefix=false}
 </div>
 
 <div id="crm-submit-buttons" class="crm-submit-buttons">

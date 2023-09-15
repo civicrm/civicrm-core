@@ -220,7 +220,7 @@
 
   {if $customPre}
     <fieldset class="label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false}
     </fieldset>
   {/if}
 
@@ -304,7 +304,7 @@
 
   {if $customPost}
     <fieldset class="label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false}
     </fieldset>
   {/if}
 
