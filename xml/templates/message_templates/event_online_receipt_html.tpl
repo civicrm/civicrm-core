@@ -189,12 +189,12 @@
       </tr>
 
       {if $isShowLineItems}
-        {foreach from=$participants key=index item=participant}
-          {if $isPrimary || {participant.id} === $participant.id}
+        {foreach from=$participants key=index item=currentParticipant}
+          {if $isPrimary || {participant.id} === $currentParticipant.id}
           {if $isPrimary && $lineItems|@count GT 1} {* Header for multi participant registration cases. *}
             <tr>
               <td colspan="2" {$labelStyle}>
-                {ts 1=$participant.index}Participant %1{/ts} {$participant.contact.display_name}
+                {ts 1=$currentParticipant.index}Participant %1{/ts} {$currentParticipant.contact.display_name}
               </td>
             </tr>
           {/if}
@@ -213,7 +213,7 @@
                     <th>{ts}Total{/ts}</th>
                       {if !empty($pricesetFieldsCount)}<th>{ts}Total Participants{/ts}</th>{/if}
                   </tr>
-                  {foreach from=$participant.line_items item=line}
+                  {foreach from=$currentParticipant.line_items item=line}
                     <tr>
                       <td {$tdfirstStyle}>{$line.title}</td>
                       <td {$tdStyle} align="middle">{$line.qty}</td>
@@ -234,9 +234,9 @@
                   {if $isShowTax}
                     <tr {$participantTotal}>
                       <td colspan=3>{ts}Participant Total{/ts}</td>
-                      <td colspan=2>{$participant.totals.total_amount_exclusive|crmMoney}</td>
-                      <td colspan=1>{$participant.totals.tax_amount|crmMoney}</td>
-                      <td colspan=2>{$participant.totals.total_amount_inclusive|crmMoney}</td>
+                      <td colspan=2>{$currentParticipant.totals.total_amount_exclusive|crmMoney}</td>
+                      <td colspan=1>{$currentParticipant.totals.tax_amount|crmMoney}</td>
+                      <td colspan=2>{$currentParticipant.totals.total_amount_inclusive|crmMoney}</td>
                     </tr>
                   {/if}
                 </table>
