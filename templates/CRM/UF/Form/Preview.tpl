@@ -25,9 +25,6 @@
         {assign var=zeroField value="Initial Non Existent Fieldset"}
         {assign var=fieldset  value=$zeroField}
         {include file="CRM/UF/Form/Fields.tpl"}
-        {if $addCAPTCHA }
-          {include file='CRM/common/ReCAPTCHA.tpl'}
-        {/if}
         {if $field.groupHelpPost}
           <div class="messages help">{$field.groupHelpPost}</div>
         {/if}
