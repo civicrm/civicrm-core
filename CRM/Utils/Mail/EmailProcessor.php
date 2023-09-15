@@ -172,6 +172,9 @@ class CRM_Utils_Mail_EmailProcessor {
                 'target_contact_id' => $targetFields,
                 'assignee_contact_id' => $assigneeFields,
               ];
+              // @todo - if the function that gets/ creates emails were more sane it would return
+              // an array of ids rather than a mutli-value array from which the id can be
+              // extracted...
               foreach ($activityContacts as $activityContact => $activityKeys) {
                 $activityParams[$activityContact] = [];
                 foreach ($activityKeys as $activityKey) {
@@ -185,6 +188,9 @@ class CRM_Utils_Mail_EmailProcessor {
                 }
               }
             }
+            // @todo the IncomingMail class should have `getAttachments` - retrieving from
+            // the email & moving to the file system should be separate to formatting
+            // array for api
             $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
             for ($i = 1; $i <= $numAttachments; $i++) {
               if (isset($mailParams["attachFile_$i"])) {
