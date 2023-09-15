@@ -19,6 +19,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   protected $optionGroup;
 
+  protected $customFieldID;
+
   /**
    * @throws \CRM_Core_Exception
    */
@@ -88,8 +90,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function testCreateCustomValue(): void {
     $this->_populateOptionAndCustomGroup();
-    $this->_customField = $this->customFieldCreate(['custom_group_id' => $this->ids['string']['custom_group_id']]);
-    $this->_customFieldID = $this->_customField['id'];
+    $customField = $this->customFieldCreate(['custom_group_id' => $this->ids['string']['custom_group_id']]);
+    $this->customFieldID = $customField['id'];
 
     $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'id');
     $dataToHtmlTypes = CRM_Custom_Form_Field::$_dataToHTML;
@@ -209,7 +211,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $params = [
       'entity_id' => $contactId,
       'custom_' . $customId => $selectedValue,
-      "custom_{$this->_customFieldID}" => "Test String Value for {$this->_customFieldID}",
+      "custom_{$this->customFieldID}" => "Test String Value for {$this->customFieldID}",
     ];
     $this->callAPISuccess('CustomValue', 'create', $params);
 
@@ -218,8 +220,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       ['return' => "custom_{$customId}"],
       ['return' => ["custom_{$customId}"]],
       ["return.custom_{$customId}" => 1],
-      ['return' => ["custom_{$customId}", "custom_{$this->_customFieldID}"]],
-      ["return.custom_{$customId}" => 1, "return.custom_{$this->_customFieldID}" => 1],
+      ['return' => ["custom_{$customId}", "custom_{$this->customFieldID}"]],
+      ["return.custom_{$customId}" => 1, "return.custom_{$this->customFieldID}" => 1],
     ];
     foreach ($returnValues as $key => $val) {
       $params = array_merge($val, [
@@ -237,7 +239,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
         $this->assertEquals($selectedValue, $customValue['values'][$customId]['latest']);
       }
       if ($key > 2) {
-        $this->assertEquals("Test String Value for {$this->_customFieldID}", $customValue['values'][$this->_customFieldID]['latest']);
+        $this->assertEquals("Test String Value for {$this->customFieldID}", $customValue['values'][$this->customFieldID]['latest']);
       }
     }
 
