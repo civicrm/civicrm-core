@@ -130,7 +130,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $params = [];
     // rfp == redirect from paypal
     // @fixme rfp is probably not required - the getPreApprovalDetails should deal with any payment-processor specific 'stuff'
-    $rfp = CRM_Utils_Request::retrieve('rfp', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET');
+    $rfp = CRM_Utils_Request::retrieve('rfp', 'Boolean', NULL, FALSE, NULL, 'GET');
 
     //we lost rfp in case of additional participant. So set it explicitly.
     if ($rfp || ($this->_params[0]['additional_participants'] ?? FALSE)) {
@@ -168,7 +168,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if (!in_array($name, $skipFields)) {
           $params[$name] = $value;
         }
-        if (substr($name, 0, 6) == 'price_') {
+        if (str_starts_with($name, 'price_')) {
           $params[$name] = $this->_params[0][$name];
         }
       }
@@ -207,7 +207,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       $taxAmount = 0;
       foreach ($this->_params as $k => $v) {
-        if ($v == 'skip') {
+        if ($v === 'skip') {
           continue;
         }
         $individualTaxAmount = 0;
@@ -233,7 +233,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           else {
             //use an email if we have one
             foreach ($v as $v_key => $v_val) {
-              if (substr($v_key, 0, 6) == 'email-') {
+              if (str_starts_with($v_key, 'email-')) {
                 $append = $v[$v_key];
               }
             }
@@ -329,7 +329,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     foreach ($fields as $name => $dontCare) {
       if (isset($this->_params[0][$name])) {
         $defaults[$name] = $this->_params[0][$name];
-        if (substr($name, 0, 7) == 'custom_') {
+        if (str_starts_with($name, 'custom_')) {
           $timeField = "{$name}_time";
           if (isset($this->_params[0][$timeField])) {
             $defaults[$timeField] = $this->_params[0][$timeField];
@@ -459,7 +459,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     //build the $participantCount array.
     //maintain record for all participants.
     foreach ($params as $participantNum => $record) {
-      if ($record == 'skip') {
+      if ($record === 'skip') {
         unset($params[$participantNum]);
         $participantCount[$participantNum] = 'skip';
       }
