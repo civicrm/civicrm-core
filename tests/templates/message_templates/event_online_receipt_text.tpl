@@ -4,38 +4,38 @@ contactID:::{$contactID}
 {if !empty($event.confirm_email_text)}
 event.confirm_email_text:::{$event.confirm_email_text}
 {/if}
-{if isset($isOnWaitlist)}
+{if !empty($isOnWaitlist)}
 isOnWaitlist:::{$isOnWaitlist}
 {/if}
-{if isset($isRequireApproval)}
+{if !empty($isRequireApproval)}
 isRequireApproval:::{$isRequireApproval}
 {/if}
 participant_status:::{$participant_status}
-{if isset($pricesetFieldsCount)}
+{if !empty($pricesetFieldsCount)}
 pricesetFieldsCount:::{$pricesetFieldsCount}
 {/if}
 {if !empty($isPrimary)}
 isPrimary:::{$isPrimary}
 {/if}
-{if isset($conference_sessions)}
+{if !empty($conference_sessions)}
 conference_sessions:::{$conference_sessions}
 {/if}
-{if isset($is_pay_later)}
+{if !empty($is_pay_later)}
 is_pay_later:::{$is_pay_later}
 {/if}
-{if isset($isAmountzero)}
+{if !empty($isAmountzero)}
 isAmountzero:::{$isAmountzero}
 {/if}
-{if isset($isAdditionalParticipant)}
+{if !empty($isAdditionalParticipant)}
 isAdditionalParticipant:::{$isAdditionalParticipant}
 {/if}
-{if isset($pay_later_receipt)}
+{if !empty($pay_later_receipt)}
 pay_later_receipt:::{$pay_later_receipt}
 {/if}
 event.event_title:::{$event.event_title}
 event.event_start_date:::{$event.event_start_date|crmDate:"%A"}
 event.event_end_date:::{event.end_date|crmDate:"%Y%m%d"}
-{if isset($event.is_monetary)}
+{if !empty($event.is_monetary)}
 event.is_monetary:::{$event.is_monetary}
 {/if}
 event.fee_label:::{event.fee_label}
