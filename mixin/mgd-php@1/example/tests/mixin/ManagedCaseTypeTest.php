@@ -24,10 +24,6 @@ class ManagedCaseTypeTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals(TRUE, $items[0]['is_active']);
     $this->assertEquals(1, count($items));
 
-    // This is normally handled by `CRM_Case_BAO_CaseType` calling `CRM_Core_ManagedEntities::scheduleReconciliation`
-    // But due to timing issues with the E2E tests the scheduled reconciliation hasn't happened yet.
-    \Civi\Api4\Managed::reconcile(FALSE)->addModule('civicrm')->execute();
-
     $actTypes = $cv->api4('OptionValue', 'get', [
       'where' => [['option_group_id:name', '=', 'activity_type'], ['name', '=', 'Nibble']],
     ]);
@@ -47,12 +43,6 @@ class ManagedCaseTypeTest extends \PHPUnit\Framework\Assert {
   public function testUninstalled($cv): void {
     $items = $cv->api4('CaseType', 'get', ['where' => [['name', '=', 'BunnyDance']]]);
     $this->assertEquals(0, count($items));
-
-    // This is normally handled by `CRM_Case_BAO_CaseType` calling `CRM_Core_ManagedEntities::scheduleReconciliation`
-    // But static caching seems to interfere.
-    \Civi\Api4\Managed::reconcile(FALSE)->execute();
-    \CRM_Core_PseudoConstant::flush();
-    \Civi\Api4\Managed::reconcile(FALSE)->addModule('civicrm')->execute();
 
     $actTypes = $cv->api4('OptionValue', 'get', [
       'where' => [['option_group_id:name', '=', 'activity_type'], ['name', '=', 'Nibble']],
