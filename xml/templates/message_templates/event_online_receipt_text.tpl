@@ -80,12 +80,12 @@
 {if {event.loc_block_id.phone_id.phone|boolean}}
   {if {event.loc_block_id.phone_id.phone_type_id|boolean}}{event.loc_block_id.phone_id.phone_type_id:label}{else}{ts}Phone{/ts}{/if} {event.loc_block_id.phone_id.phone} {if {event.loc_block_id.phone_id.phone_ext|boolean}} {ts}ext.{/ts} {event.loc_block_id.phone_id.phone_ext}{/if}
 {/if}
-{foreach from=$location.email item=eventEmail}
-{if $eventEmail.email}
-
-{ts}Email{/ts}: {$eventEmail.email}{/if}{/foreach}
+{if {event.loc_block_id.email_id.email|boolean}}
+{ts}Email {/ts}{event.loc_block_id.email_id.email}
 {/if}
-
+{if {event.loc_block_id.email_2_id.email|boolean}}
+{ts}Email {/ts}{event.loc_block_id.email_2_id.email}{/if}
+{/if}
 {if {event.is_public|boolean}}
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
 {ts}Download iCalendar entry for this event.{/ts} {$icalFeed}
