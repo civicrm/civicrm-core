@@ -136,13 +136,13 @@
      {if {event.is_public|boolean}}
       <tr>
        <td colspan="2" {$valueStyle}>
-        {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+        {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
         <a href="{$icalFeed}">{ts}Download iCalendar entry for this event.{/ts}</a>
        </td>
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
-        {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+        {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
          <a href="{$gCalendar}">{ts}Add event to Google Calendar{/ts}</a>
        </td>
       </tr>
