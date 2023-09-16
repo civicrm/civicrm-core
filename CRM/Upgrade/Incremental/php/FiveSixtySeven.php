@@ -33,6 +33,9 @@ class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental
     $this->addExtensionTask('Enable Authx extension', ['authx'], 1101);
     $this->addExtensionTask('Enable Afform extension', ['org.civicrm.afform'], 1102);
     $this->addTask('Add "civicrm_note" to "note_used_for" option group', 'addNoteNote');
+    $this->addTask('Add cache_fill_took column to Group table', 'addColumn', 'civicrm_group', 'cache_fill_took',
+      'DOUBLE DEFAULT NULL COMMENT "Seconds taken to fill smart group cache, not always related to cache_date"',
+      FALSE);
   }
 
   public static function addNoteNote(CRM_Queue_TaskContext $ctx): bool {
