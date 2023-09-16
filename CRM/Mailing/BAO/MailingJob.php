@@ -283,25 +283,21 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
   /**
    * before we run jobs, we need to split the jobs
+   *
    * @param int $offset
    * @param string|null $mode
    *   Either 'sms' or null
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function runJobs_pre($offset = 200, $mode = NULL) {
-    $job = new CRM_Mailing_BAO_MailingJob();
-
-    $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
-    $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
-
+  public static function runJobs_pre(int $offset = 200, $mode = NULL): void {
     $currentTime = date('YmdHis');
-    $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL('m');
-
     $workflowClause = CRM_Mailing_BAO_MailingJob::workflowClause();
 
     $domainID = CRM_Core_Config::domainID();
 
     $modeClause = 'AND m.sms_provider_id IS NULL';
-    if ($mode == 'sms') {
+    if ($mode === 'sms') {
       $modeClause = 'AND m.sms_provider_id IS NOT NULL';
     }
 
@@ -309,8 +305,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     // when the mailing is submitted or scheduled.
     $query = "
     SELECT   j.*
-      FROM   $jobTable     j,
-         $mailingTable m
+      FROM civicrm_mailing_job j,
+         civicrm_mailing m
      WHERE   m.id = j.mailing_id AND m.domain_id = {$domainID}
                  $workflowClause
                  $modeClause
@@ -323,7 +319,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     ORDER BY j.scheduled_date,
          j.start_date";
 
-    $job->query($query);
+    $job = CRM_Core_DAO::executeQuery($query);
 
     // For each of the "Parent Jobs" we find, we split them into
     // X Number of child jobs
@@ -344,14 +340,14 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         'id',
         TRUE
       );
-      if ($job->status != 'Scheduled') {
+      if ($job->status !== 'Scheduled') {
         $lock->release();
         continue;
       }
 
       $transaction = new CRM_Core_Transaction();
 
-      $job->split_job((int) $offset, (int) $job->id, (int) $job->mailing_id, $job->scheduled_date);
+      self::split_job((int) $offset, (int) $job->id, (int) $job->mailing_id, $job->scheduled_date);
 
       // Update the status of the parent job
       self::create(['id' => $job->id, 'start_date' => date('YmdHis'), 'status' => 'Running']);

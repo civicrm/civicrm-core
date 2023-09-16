@@ -2752,7 +2752,7 @@ WHERE  civicrm_mailing_job.id = %1
     }
 
     // Split up the parent jobs into multiple child jobs
-    $mailerJobSize = Civi::settings()->get('mailerJobSize');
+    $mailerJobSize = (int) Civi::settings()->get('mailerJobSize');
     CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs(NULL, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs_post($mode);
