@@ -749,6 +749,44 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Ensure that *some* CiviCRM components (component-extensions) are enabled.
+   *
+   * It is believed that some sites lost their list of active-components due to a flawed
+   * upgrade-step circa 5.62/5.63. The upgrade-step has been fixed (civicrm-core#27075),
+   * but some sites may still have bad configurations.
+   *
+   * This problem should generally be obvious after running web-based upgrader, but it's not obvious
+   * in scripted+CLI upgrades.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function checkComponents(): array {
+    $messages = [];
+
+    $setting = Civi::settings()->get('enable_components');
+    $exts = \Civi\Api4\Extension::get(FALSE)
+      ->addWhere('key', 'LIKE', 'civi_%')
+      ->addWhere('status', '=', 'installed')
+      ->execute()
+      ->indexBy('key')->column('status');
+    if (empty($setting) || empty($exts)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('None of the CiviCRM components are enabled. This is theoretically legal, but it is most likely a misconfiguration.<br/> Please inspect and re-save the <a %1>component settings</a>.', [
+          1 => sprintf('target="_blank" href="%s"', Civi::url('backend://civicrm/admin/setting/component?reset=1', 'ah')),
+        ]),
+        ts('Missing Components'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+
+    return $messages;
+  }
+
+  /**
    * @return CRM_Utils_Check_Message[]
    */
   public function checkScheduledJobLogErrors() {
