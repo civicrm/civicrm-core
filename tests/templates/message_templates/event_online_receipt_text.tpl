@@ -43,10 +43,10 @@ event.fee_label:::{event.fee_label}
 {if !empty($isShowLocation)}
 isShowLocation:::{$isShowLocation}
 location.address.1.display:::{$location.address.1.display}
-location.phone.1.phone:::{$location.phone.1.phone}
-location.phone.1.phone_type_display:::{$location.phone.1.phone_type_display}
-location.phone.1.phone_ext:::{$location.phone.1.phone_ext}
-location.email.1.email:::{$location.email.1.email}
+location.phone.1.phone:::{event.loc_block_id.phone_id.phone}
+location.phone.1.phone_type_display:::{event.loc_block_id.phone_id.phone_type_id:label}
+location.phone.1.phone_ext:::{event.loc_block_id.phone_id.phone_ext}
+location.email.1.email:::{event.loc_block_id.email_id.email}
 {/if}
 {if {event.is_public|boolean}}
 event.is_public:::{$event.is_public}
