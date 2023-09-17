@@ -12,7 +12,7 @@
   <table class="form-layout-compressed">
     <tr class="crm-contribution-form-block-product_name">
       <td class="label">{$form.product_name.label}</td>
-      <td class="html-adjust">{$form.product_name.html}</td>
+      <td class="html-adjust">{$form.product_name.html|smarty:nodefaults}</td>
     </tr>
   </table>
 
