@@ -29,12 +29,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @var int
    */
-  public $_premiumID = NULL;
+  public $_premiumID;
 
   /**
    * @var CRM_Contribute_DAO_ContributionProduct
    */
-  public $_productDAO = NULL;
+  public $_productDAO;
 
   /**
    * The id of the note.
@@ -229,7 +229,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
+  public function preProcess(): void {
     // Check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
@@ -488,7 +488,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // For Premium section.
     if ($this->_premiumID) {
       $this->assign('showOption', FALSE);
-      $options = $this->_options[$this->_productDAO->product_id] ?? "";
+      $options = $this->_options[$this->_productDAO->product_id] ?? '';
       if (!$options) {
         $this->assign('showOption', TRUE);
       }
@@ -832,7 +832,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $element = $this->add('select', 'price_set_id', ts('Choose price set'),
           ['' => ts('Choose price set')] + $priceSets,
           NULL,
-          ['onchange' => "buildAmount( this.value, " . json_encode($financialTypeIds) . ");", 'class' => 'crm-select2']
+          ['onchange' => 'buildAmount( this.value, ' . json_encode($financialTypeIds) . ');', 'class' => 'crm-select2']
         );
         if ($this->_online && !($this->_action & CRM_Core_Action::UPDATE)) {
           $element->freeze();
@@ -878,7 +878,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $js = NULL;
     if (!$this->_mode) {
-      $js = ['onclick' => "return verify( );"];
+      $js = ['onclick' => 'return verify( );'];
     }
 
     $mailingInfo = Civi::settings()->get('mailing_backend');
@@ -1099,7 +1099,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @throws \CRM_Core_Exception
    */
   protected function processCreditCard($submittedValues, $lineItem, $contactID) {
-    $isTest = ($this->_mode == 'test') ? 1 : 0;
+    $isTest = ($this->_mode === 'test') ? 1 : 0;
     // CRM-12680 set $_lineItem if its not set
     // @todo - I don't believe this would ever BE set. I can't find anywhere in the code.
     // It would be better to pass line item out to functions than $this->_lineItem as
@@ -1263,7 +1263,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
             $contribution->contribution_status_id = 1;
           }
           catch (CRM_Core_Exception $e) {
-            if ($e->getErrorCode() != 'contribution_completed') {
+            if ($e->getErrorCode() !== 'contribution_completed') {
               \Civi::log()->error('CRM_Contribute_Form_Contribution::processCreditCard CRM_Core_Exception: ' . $e->getMessage());
               throw new CRM_Core_Exception('Failed to update contribution in database');
             }
@@ -1609,10 +1609,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if ($this->_id) {
       if ($this->_compId) {
-        if ($this->_context == 'participant') {
+        if ($this->_context === 'participant') {
           $pId = $this->_compId;
         }
-        elseif ($this->_context == 'membership') {
+        elseif ($this->_context === 'membership') {
           $isRelatedId = TRUE;
         }
         else {
@@ -1682,7 +1682,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $lineItems[$itemId]['tax_rate'] = $financialItemsId[$submittedValues['financial_type_id']];
         }
         else {
-          $lineItems[$itemId]['tax_rate'] = $lineItems[$itemId]['tax_amount'] = "";
+          $lineItems[$itemId]['tax_rate'] = $lineItems[$itemId]['tax_amount'] = '';
           $submittedValues['tax_amount'] = 0;
         }
         if ($lineItems[$itemId]['tax_rate']) {
@@ -1791,7 +1791,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       if (!empty($formValues['is_email_receipt'])) {
-        $params['receipt_date'] = date("Y-m-d");
+        $params['receipt_date'] = date('Y-m-d');
       }
 
       if (CRM_Contribute_BAO_Contribution::isContributionStatusNegative($params['contribution_status_id'])
@@ -1920,7 +1920,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @param int $action
    * @param array $lineItem
    */
-  protected function invoicingPostProcessHook($submittedValues, $action, $lineItem) {
+  protected function invoicingPostProcessHook($submittedValues, $action, $lineItem): void {
     if (!Civi::settings()->get('invoicing')) {
       return;
     }
@@ -1942,12 +1942,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($action & CRM_Core_Action::UPDATE) {
-      if (isset($submittedValues['tax_amount'])) {
-        $totalTaxAmount = $submittedValues['tax_amount'];
-      }
-      else {
-        $totalTaxAmount = $this->_values['tax_amount'];
-      }
+      $totalTaxAmount = $submittedValues['tax_amount'] ?? $this->_values['tax_amount'];
       $this->assign('totalTaxAmount', $totalTaxAmount);
       $this->assign('dataArray', $taxRate);
     }
@@ -2062,7 +2057,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         ));
       }
     }
-    elseif ($this->_context == 'contribution' && $this->_mode && $buttonName == $this->getButtonName('upload', 'new')) {
+    elseif ($this->_context === 'contribution' && $this->_mode && $buttonName == $this->getButtonName('upload', 'new')) {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/contribution',
         "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}&mode={$this->_mode}"
       ));
