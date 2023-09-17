@@ -213,17 +213,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $_component;
 
   /**
-   * Array of fields to display on billingBlock.tpl - this is not fully implemented but basically intent is the panes/fieldsets on this page should
-   * be all in this array in order like
-   *  'credit_card' => array('credit_card_number' ...
-   *  'billing_details' => array('first_name' ...
-   *
-   * such that both the fields and the order can be more easily altered by payment processors & other extensions
-   * @var array
-   */
-  public $billingFieldSets = [];
-
-  /**
    * Monetary fields that may be submitted.
    *
    * These should get a standardised format in the beginPostProcess function.

@@ -39,7 +39,6 @@ class CRM_Core_Payment_Form {
    *   ID of the payment processor.
    */
   public static function setPaymentFieldsByProcessor(&$form, $processor, $billing_profile_id = NULL, $isBackOffice = FALSE, $paymentInstrumentID = NULL) {
-    $form->billingFieldSets = [];
     // Load the pay-later processor
     // @todo load this right up where the other processors are loaded initially.
     if (empty($processor)) {
@@ -55,12 +54,10 @@ class CRM_Core_Payment_Form {
     $form->assign('paymentTypeName', $paymentTypeName);
     $form->assign('paymentTypeLabel', self::getPaymentLabel($processor['object']));
     $form->assign('isBackOffice', $isBackOffice);
-    $form->_paymentFields = $form->billingFieldSets[$paymentTypeName]['fields'] = self::getPaymentFieldMetadata($processor);
+    $form->_paymentFields = self::getPaymentFieldMetadata($processor);
     $form->_paymentFields = array_merge($form->_paymentFields, self::getBillingAddressMetadata($processor, $form->_bltID));
     $form->assign('paymentFields', self::getPaymentFields($processor));
     self::setBillingAddressFields($form, $processor);
-    // @todo - this may be obsolete - although potentially it could be used to re-order things in the form.
-    $form->billingFieldSets['billing_name_address-group']['fields'] = [];
   }
 
   /**
