@@ -528,13 +528,13 @@ class Submit extends AbstractProcessor {
 
     // send email
     $emailParams = [
-      'id' => $this->_afform['email_confirmation_template_id'],
+      'messageTemplateID' => $this->_afform['email_confirmation_template_id'],
       'from' => "$domainEmailName <" . $domainEmailAddress . ">",
       'toEmail' => $emailAddress,
       'tokenContext' => $tokenContext,
     ];
 
-    civicrm_api3('MessageTemplate', 'send', $emailParams);
+    \CRM_Core_BAO_MessageTemplate::sendTemplate($emailParams);
   }
 
 }
