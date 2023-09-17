@@ -23,24 +23,6 @@ Click this link to go to a web page where you can confirm your registration onli
 ===========================================================
 {$event.event_title}
 {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
-{if $conference_sessions}
-
-
-{ts}Your schedule:{/ts}
-{assign var='group_by_day' value='NA'}
-{foreach from=$conference_sessions item=session}
-{if $session.start_date|crmDate:"%Y/%m/%d" != $group_by_day|crmDate:"%Y/%m/%d"}
-{assign var='group_by_day' value=$session.start_date}
-
-{$group_by_day|crmDate:"%m/%d/%Y"}
-
-
-{/if}
-{$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}
-{if $session.location}    {$session.location}{/if}
-{/foreach}
-{/if}
-
 
 {ts}Participant Role{/ts}: {$participant.role}
 

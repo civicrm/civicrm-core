@@ -17,9 +17,6 @@ pricesetFieldsCount:::{$pricesetFieldsCount}
 {if !empty($isPrimary)}
 isPrimary:::{$isPrimary}
 {/if}
-{if !empty($conference_sessions)}
-conference_sessions:::{$conference_sessions}
-{/if}
 {if !empty($is_pay_later)}
 is_pay_later:::{$is_pay_later}
 {/if}
@@ -39,9 +36,6 @@ event.event_end_date:::{event.end_date|crmDate:"%Y%m%d"}
 event.is_monetary:::{$event.is_monetary}
 {/if}
 event.fee_label:::{event.fee_label}
-{if !empty($conference_sessions)}
-conference_sessions:::{$conference_sessions}
-{/if}
 {if !empty($event.participant_role)}
   event.participant_role::{$event.participant_role}
   defaultRole:::{$defaultRole}
