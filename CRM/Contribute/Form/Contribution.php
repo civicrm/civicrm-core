@@ -56,6 +56,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * The id of the pledge payment that we are processing.
    *
    * @var int
+   * @internal Only retrieve using $this->getPledgePaymentID().
    */
   public $_ppID;
 
@@ -233,9 +234,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->_priceSetId = $_GET['priceSetId'] ?? NULL;
     $this->set('priceSetId', $this->_priceSetId);
     $this->assign('priceSetId', $this->_priceSetId);
-
-    // Get the pledge payment id
-    $this->_ppID = CRM_Utils_Request::retrieve('ppid', 'Positive', $this);
+    $this->assign('taxTerm', Civi::settings()->get('tax_term'));
+    $this->assign('ppID', $this->getPledgePaymentID());
 
     $this->assign('action', $this->_action);
 
@@ -342,7 +342,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $ids = [];
       $pledgeParams = ['id' => $this->_pledgeID];
       CRM_Pledge_BAO_Pledge::getValues($pledgeParams, $this->_pledgeValues, $ids);
-      $this->assign('ppID', $this->_ppID);
     }
     else {
       // Not making a pledge payment, so if adding a new contribution we should check if pledge payment(s) are due for this contact so we can alert the user. CRM-5206
@@ -1940,7 +1939,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
         $this->assign('getTaxDetails', $getTaxDetails);
         $this->assign('dataArray', $taxRate);
-        $this->assign('taxTerm', Civi::settings()->get('tax_term'));
       }
       else {
         $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
@@ -2213,6 +2211,15 @@ WHERE  contribution_id = {$id}
       }
     }
     return $this->_contactID ? (int) $this->_contactID : NULL;
+  }
+
+  /**
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getPledgePaymentID(): ?int {
+    $this->_ppID = CRM_Utils_Request::retrieve('ppid', 'Positive', $this) ?: FALSE;
+    return $this->_ppID ? (int) $this->_ppID : NULL;
   }
 
 }
