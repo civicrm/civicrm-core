@@ -806,13 +806,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   public function addSelectWhereClause() {
     $clauses = [];
     $permittedActivityTypeIDs = self::getPermittedActivityTypes();
-    $allActivityTypes = self::buildOptions('activity_type_id');
+    $allActivityTypes = self::buildOptions('activity_type_id', 'validate');
     if (empty($permittedActivityTypeIDs)) {
       // This just prevents a mysql fail if they have no access - should be extremely edge case.
       $permittedActivityTypeIDs = [0];
     }
-    if (array_keys($allActivityTypes) !== array_keys($permittedActivityTypeIDs)) {
-      $clauses['activity_type_id'] = ('IN (' . implode(', ', $permittedActivityTypeIDs) . ')');
+    if (array_diff_key($allActivityTypes, $permittedActivityTypeIDs)) {
+      $clauses['activity_type_id'] = ['IN (' . implode(', ', $permittedActivityTypeIDs) . ')'];
     }
 
     $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
