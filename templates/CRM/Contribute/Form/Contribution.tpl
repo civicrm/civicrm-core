@@ -591,10 +591,10 @@
         var freezeFinancialType = '{/literal}{$freezeFinancialType}{literal}';
         if (!freezeFinancialType) {
           var financialType = $('#financial_type_id').val();
-          var taxRates = '{/literal}{$taxRates}{literal}';
+          var taxRates = '{/literal}{$taxRates|smarty:nodefaults}{literal}';
           var taxTerm = '{/literal}{$taxTerm}{literal}';
           taxRates = JSON.parse(taxRates);
-          var currencies = '{/literal}{$currencies}{literal}';
+          var currencies = '{/literal}{$currencies|smarty:nodefaults}{literal}';
           currencies = JSON.parse(currencies);
           var currencySelect = $('#currency').val();
           var currencySymbol = currencies[currencySelect];
