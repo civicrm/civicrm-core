@@ -618,7 +618,7 @@ AND    domain_id    = %4
   /**
    * @inheritDoc
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(): array {
     // Prevent default behavior of joining ACLs onto the contact_id field.
     $clauses = [];
     CRM_Utils_Hook::selectWhereClause($this, $clauses);

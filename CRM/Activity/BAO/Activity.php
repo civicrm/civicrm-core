@@ -803,7 +803,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   /**
    * @inheritDoc
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(): array {
     $clauses = [];
     $permittedActivityTypeIDs = self::getPermittedActivityTypes();
     $allActivityTypes = self::buildOptions('activity_type_id', 'validate');

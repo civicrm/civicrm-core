@@ -312,7 +312,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * @inheritDoc
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(): array {
     $clauses = [];
     if (!CRM_Core_Permission::check([['edit all contacts', 'view all contacts']])) {
       $allowedGroups = CRM_Core_Permission::group(NULL, FALSE);

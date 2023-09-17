@@ -99,7 +99,7 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
   /**
    * @inheritDoc
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(): array {
     $clauses = [];
     $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
 

@@ -3068,7 +3068,7 @@ SELECT contact_id
    *
    * @return array
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(): array {
     $clauses = [];
     $fields = $this->fields();
     // Notes should check permissions on the entity_id field, not the contact_id field
