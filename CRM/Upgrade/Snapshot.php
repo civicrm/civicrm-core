@@ -47,7 +47,7 @@ class CRM_Upgrade_Snapshot {
       static::$activationIssues = [];
 
       $version = CRM_Utils_SQL::getDatabaseVersion();
-      if (stripos($version, 'mariadb') !== FALSE) {
+      if ((stripos($version, 'mariadb') !== FALSE) && version_compare($version, '10.6.0', '>=')) {
         // MariaDB briefly (10.6.0-10.6.5) flirted with the idea of phasing-out `COMPRESSED`. By default, snapshots won't work on those versions.
         // https://mariadb.com/kb/en/innodb-compressed-row-format/#read-only
         $roCompressed = CRM_Core_DAO::singleValueQuery('SELECT @@innodb_read_only_compressed');
