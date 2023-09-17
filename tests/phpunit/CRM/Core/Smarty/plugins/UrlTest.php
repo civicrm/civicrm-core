@@ -86,7 +86,7 @@ class CRM_Core_Smarty_plugins_UrlTest extends CiviUnitTestCase {
   public function testUrl($expected, $input) {
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:' . $input);
-    $this->assertRegExp($expected, $actual, "Process input=[$input]");
+    $this->assertMatchesRegularExpression($expected, $actual, "Process input=[$input]");
   }
 
 }
