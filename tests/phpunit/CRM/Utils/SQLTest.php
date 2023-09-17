@@ -37,6 +37,21 @@ class CRM_Utils_SQLTest extends CiviUnitTestCase {
     }
   }
 
+  public function testPrefixFieldNames(): void {
+    $exampleFieldNames = ['one', 'two', 'three'];
+    $tableAlias = 'foo';
+    $clause = [
+      '{one} = 1',
+      ['{two} = {three}', '`{threee}` IN ({one}, "{twothree}")'],
+    ];
+    $expected = [
+      '`foo`.`one` = 1',
+      ['`foo`.`two` = `foo`.`three`', '`{threee}` IN (`foo`.`one`, "{twothree}")'],
+    ];
+    CRM_Utils_SQL::prefixFieldNames($clause, $exampleFieldNames, $tableAlias);
+    $this->assertEquals($expected, $clause);
+  }
+
   /**
    * Test isSSLDSN
    * @dataProvider dsnProvider

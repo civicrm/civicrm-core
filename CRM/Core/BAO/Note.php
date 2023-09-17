@@ -526,4 +526,14 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
     }
   }
 
+  public function addSelectWhereClause(): array {
+    $clauses = [];
+    $relatedClauses = self::getDynamicFkAclClauses('entity_table', 'entity_id');
+    if ($relatedClauses) {
+      // Nested array will be joined with OR
+      $clauses['entity_table'] = [$relatedClauses];
+    }
+    return $clauses;
+  }
+
 }

@@ -93,19 +93,19 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
     case 'MembershipType':
     case 'ContributionRecur':
     case 'Contribution':
-      $clauses['financial_type_id'] = _financialacls_civicrm_get_type_clause();
+      $clauses['financial_type_id'][] = _financialacls_civicrm_get_type_clause();
       break;
 
     case 'Membership':
-      $clauses['membership_type_id'] = _financialacls_civicrm_get_membership_type_clause();
+      $clauses['membership_type_id'][] = _financialacls_civicrm_get_membership_type_clause();
       break;
 
     case 'FinancialType':
-      $clauses['id'] = _financialacls_civicrm_get_type_clause();
+      $clauses['id'][] = _financialacls_civicrm_get_type_clause();
       break;
 
     case 'FinancialAccount':
-      $clauses['id'] = _financialacls_civicrm_get_accounts_clause();
+      $clauses['id'][] = _financialacls_civicrm_get_accounts_clause();
       break;
 
   }

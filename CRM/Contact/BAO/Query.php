@@ -5082,7 +5082,9 @@ civicrm_relationship.start_date > {$today}
         $clauses = $subclauses = [];
         foreach ($bao->addSelectWhereClause() as $field => $vals) {
           if ($vals && $field !== 'id') {
-            $clauses[] = $bao->tableName() . ".$field " . $vals;
+            foreach ($vals as $val) {
+              $clauses[] = $bao->tableName() . ".$field " . $val;
+            }
           }
           elseif ($vals) {
             $subclauses[] = "$field " . implode(" AND $field ", (array) $vals);
