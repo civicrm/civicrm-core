@@ -501,7 +501,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $params['is_pay_later'] = 0;
     }
     if ($trxnDetails == NULL) {
-      $params['trxn_id'] = $trxn_prefix . strftime("%Y%m%d%H%M%S");
+      $params['trxn_id'] = $trxn_prefix . date('YmdHMS');
       $params['trxn_date'] = $params['now'];
     }
 
