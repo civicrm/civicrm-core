@@ -188,8 +188,13 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
-   * Add a task to activate an extension. This task will run post-upgrade (after all
-   * changes to core DB are settled).
+   * Add a task to activate an extension. It will use the full, normal installation process
+   * (invoking `hook_install`, `hook_enable`, and so on). To ensure that the installation process
+   * can rely on regular core services and APIs, it will run after the core-upgrade-steps.
+   *
+   * This is more suited to green-field extensions (which started life as an extension).
+   * If you have a brown-field extension which doesn't have install-logic (i.e. it arises from
+   * rearranging pre-existing core-core functionality), then consider `addSimpleExtensionTask()`.
    *
    * @param string $title
    * @param string[] $keys
@@ -204,6 +209,24 @@ class CRM_Upgrade_Incremental_Base {
       new CRM_Queue_Task([static::CLASS, 'enableExtension'], [$keys], $title),
       ['weight' => $weight]
     );
+  }
+
+  /**
+   * Add a task to activate an extension. It will use a simple (low-tech) installation process
+   * (skipping events like `hook_install`; instead, it merely updates `civicrm_extension` and
+   * `CRM_Extension_ClassLoader`). The extension should not now (or in the future) use
+   * `hook_install`. Simple installations can run at any point during the upgrade process.
+   *
+   * This is more suited to brown-field extensions (which arise from rearranging pre-existing
+   * core-core functionality). If you have a green-field extension (which has always been an
+   * extension), then consider `addExtensionTask()` instead.
+   *
+   * @param string $title
+   * @param string|string[] $keys
+   *   List of extensions to enable.
+   */
+  protected function addSimpleExtensionTask(string $title, $keys): void {
+    $this->addTask($title, 'enableSimpleExtension', $keys);
   }
 
   /**
