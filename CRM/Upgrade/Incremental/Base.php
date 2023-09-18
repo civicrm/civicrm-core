@@ -250,36 +250,35 @@ class CRM_Upgrade_Incremental_Base {
    */
   public static function enableSimpleExtension(CRM_Queue_TaskContext $ctx, $keys): bool {
     $keys = (array) $keys;
-    $select = CRM_Utils_SQL_Select::from('civicrm_extension')
-      ->select(['full_name, is_active'])
-      ->where('full_name IN (@keys)', ['@keys' => $keys])
-      ->toSQL();
-    $all = CRM_Core_DAO::executeQuery($select, [], TRUE, NULL, FALSE, FALSE)
-      ->fetchMap('full_name', 'is_active');
-    $toEnable = array_filter($all, function($isActive) {
-      return !$isActive;
-    });
+
+    // Find out current situation
     $system = CRM_Extension_System::singleton();
+    $statuses = CRM_Utils_SQL_Select::from('civicrm_extension')
+      ->select(['full_name, is_active'])
+      ->execute(NULL, FALSE)
+      ->fetchAll();
+    $byStatus = CRM_Utils_Array::index(['is_active', 'full_name'], $statuses);
+    $disabled = array_intersect($keys, array_keys($byStatus[0] ?? []));
+    $uninstalled = array_diff($keys, array_keys($byStatus[0] ?? []), array_keys($byStatus[1] ?? []));
+
+    // Make a plan
+    $toUpdate = $disabled;
     $toInsert = [];
-    foreach ($keys as $key) {
-      if (empty($all[$key])) {
-        $info = $system->getMapper()->keyToInfo($key);
-        $path = $system->getMapper()->keyToPath($key);
-        $system->getClassLoader()->installExtension($info, $path);
-      }
-      if (!isset($all[$key])) {
-        $toInsert[] = [
-          'full_name' => $info->key,
-          'type' => $info->type,
-          'name' => $info->name,
-          'label' => $info->label,
-          'file' => $info->file,
-          'is_active' => 1,
-        ];
-      }
+    foreach ($uninstalled as $key) {
+      $info = $system->getMapper()->keyToInfo($key);
+      $toInsert[] = [
+        'full_name' => $info->key,
+        'type' => $info->type,
+        'name' => $info->name,
+        'label' => $info->label,
+        'file' => $info->file,
+        'is_active' => 1,
+      ];
     }
-    if ($toEnable) {
-      $updateSql = 'UPDATE civicrm_extension SET is_active = 1 WHERE full_name IN ("' . implode('", "', array_keys($toEnable)) . '")';
+
+    // Execute the plan
+    if ($toUpdate) {
+      $updateSql = 'UPDATE civicrm_extension SET is_active = 1 WHERE full_name IN ("' . implode('", "', array_keys($toUpdate)) . '")';
       CRM_Core_DAO::executeQuery($updateSql, [], TRUE, NULL, FALSE, FALSE);
     }
     if ($toInsert) {
@@ -287,6 +286,11 @@ class CRM_Upgrade_Incremental_Base {
         ->rows($toInsert)
         ->toSQL();
       CRM_Core_DAO::executeQuery($insertSql, [], TRUE, NULL, FALSE, FALSE);
+    }
+    foreach (array_merge($disabled, $uninstalled) as $key) {
+      $info = $system->getMapper()->keyToInfo($key);
+      $path = $system->getMapper()->keyToPath($key);
+      $system->getClassLoader()->installExtension($info, dirname($path));
     }
     return TRUE;
   }
