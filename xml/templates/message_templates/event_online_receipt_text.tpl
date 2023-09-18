@@ -147,8 +147,13 @@ You were registered by: {$payer.name}
 {/if}
 {/if}
 
-{if !empty($amounts) && empty($lineItem)}
-{foreach from=$amounts item=amnt key=level}{$amnt.amount|crmMoney:$currency} {$amnt.label}
+{if !$isShowLineItems}
+{foreach from=$participants key=index item=currentParticipant}
+{if $isPrimary || {participant.id} === $currentParticipant.id}
+{foreach from=$currentParticipant.line_items key=index item=currentLineItem}
+{$currentLineItem.label} {if $isPrimary} - {$currentParticipant.contact.display_name}{/if} - {$currentLineItem.line_total|crmMoney:$currency}
+{/foreach}
+{/if}
 {/foreach}
 {/if}
 
