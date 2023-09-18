@@ -96,7 +96,7 @@
 {if !empty($payer.name)}
 You were registered by: {$payer.name}
 {/if}
-{if !empty($event.is_monetary) and empty($isRequireApproval)} {* This section for Paid events only.*}
+{if {event.is_monetary|boolean} and empty($isRequireApproval)} {* This section for Paid events only.*}
 
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 

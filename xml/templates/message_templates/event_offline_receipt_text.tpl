@@ -84,7 +84,7 @@
 
 {$email}
 {/if}
-{if !empty($event.is_monetary)} {* This section for Paid events only.*}
+{if {event.is_monetary|boolean}} {* This section for Paid events only.*}
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 

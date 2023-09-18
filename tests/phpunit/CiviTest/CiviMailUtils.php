@@ -124,9 +124,10 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    * @param string $type
    *   'raw'|'ezc'.
    *
-   * @throws CRM_Core_Exception
-   *
    * @return array(ezcMail)|array(string)
+   *
+   * @noinspection PhpMissingReturnTypeInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
   public function getAllMessages($type = 'raw') {
     $msgs = [];

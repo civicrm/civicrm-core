@@ -25,15 +25,22 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * Initial test of submit function.
    */
   public function testSubmit(): void {
-    $mut = new CiviMailUtils($this, TRUE);
     $this->submitPaidEvent();
-
-    $mut->checkMailLog([
+    $this->assertSentMailHasStrings([
       'Dear Kim,  Thank you for your registration.  This is a confirmation that your registration has been received and your status has been updated to Registered.',
       'Friday September 16th, 2022 12:00 PM-Saturday September 17th, 2022 12:00 PM',
+      'Add event to Google Calendar',
     ]);
-    $mut->stop();
-    $mut->clearMessages();
+  }
+
+  public function assertSentMailHasStrings(array $strings): void {
+    foreach ($strings as $string) {
+      $this->assertSentMailHasString($string);
+    }
+  }
+
+  public function assertSentMailHasString(string $string): void {
+    $this->assertStringContainsString($string, $this->sentMail[0]);
   }
 
   /**
@@ -645,6 +652,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @param array $submitValues
    */
   protected function submitPaidEvent(array $submitValues = []): void {
+    $mailUtil = new CiviMailUtils($this, TRUE);
     $this->dummyProcessorCreate();
     $event = $this->eventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE, 'start_date' => '2022-09-16 12:00', 'end_date' => '2022-09-17 12:00']);
     $this->submitForm($event['id'], array_merge([
@@ -669,6 +677,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'billing_state_province-5' => 'AP',
       'billing_country-5' => 'US',
     ], $submitValues));
+    $this->sentMail = $mailUtil->getAllMessages();
   }
 
   public function testRegistrationWithoutCiviContributeEnabled(): void {
