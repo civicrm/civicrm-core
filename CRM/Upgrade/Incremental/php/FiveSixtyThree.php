@@ -43,7 +43,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyThree extends CRM_Upgrade_Incremental
 
     $enabledComponents = Civi::settings()->get('enable_components');
     $extensions = array_map(['CRM_Utils_String', 'convertStringToSnakeCase'], $enabledComponents);
-    $this->addExtensionTask('Enable component extensions', $extensions);
+    $this->addSimpleExtensionTask(sprintf('Enable component-extensions (%s)', implode(', ', $extensions)), $extensions);
 
     $this->addTask('Make ContributionPage.name required', 'alterColumn', 'civicrm_contribution_page', 'name', "varchar(255) NOT NULL COMMENT 'Unique name for identifying contribution page'");
     $this->addTask('Make ContributionPage.title required', 'alterColumn', 'civicrm_contribution_page', 'title', "varchar(255) NOT NULL COMMENT 'Contribution Page title. For top of page display'", TRUE);
