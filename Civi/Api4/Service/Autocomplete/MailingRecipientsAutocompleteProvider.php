@@ -70,6 +70,7 @@ class MailingRecipientsAutocompleteProvider extends AutoService implements Event
             ],
             'join' => [],
             'where' => [
+              ['is_active', '=', TRUE],
               ['group_type:name', 'CONTAINS', 'Mailing List'],
               ['OR', [['saved_search_id.expires_date', 'IS NULL'], ['saved_search_id.expires_date', '>', 'NOW()', TRUE]]],
               ['OR', [['is_hidden', '=', FALSE], [($mode === 'include' ? 'mailing_group.id' : '(NULL)'), 'IS NOT NULL']]],
