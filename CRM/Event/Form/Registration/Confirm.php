@@ -570,17 +570,22 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $value['email'] = CRM_Utils_Array::valueByRegexKey('/^email-/', $value);
           }
 
-          // If registering from waitlist participant_id is set but contact_id is not.
-          // We need a contact ID to process the payment so set the "primary" contact ID.
-          if (empty($value['contact_id'])) {
-            $value['contact_id'] = $contactID;
-          }
-
           if (is_object($payment)) {
             // Not quite sure why we don't just user $value since it contains the data
             // from result
             // @todo ditch $result & retest.
-            list($result, $value) = $this->processPayment($payment, $value);
+            // If registering from waitlist participant_id is set but contact_id is not.
+            // We need a contact ID to process the payment so set the "primary" contact ID.
+            $value['contactID'] = empty($value['contact_id']) ? (int) $contactID : (int) $value['contact_id'];
+            // contactID is the correct parameter to pass to the processor.
+            // However, we still pass contact_id as the same value as was previously being assigned,
+            // in case some processors are expecting that.
+            // (especially since this was recently not passing the correct value).
+            // https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/create/#getpaymentformfields
+            if (empty($value['contact_id'])) {
+              $value['contact_id'] = $value['contactID'];
+            }
+            [$result, $value] = $this->processPayment($payment, $value);
           }
           else {
             throw new CRM_Core_Exception($paymentObjError);
@@ -1289,6 +1294,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @param $params
    */
   public static function testSubmit($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the Civi\Test\FormTrait');
     $form = new CRM_Event_Form_Registration_Confirm();
     // This way the mocked up controller ignores the session stuff.
     $_SERVER['REQUEST_METHOD'] = 'GET';

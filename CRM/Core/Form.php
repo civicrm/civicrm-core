@@ -988,16 +988,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return array $params
    */
-  protected function prepareParamsForPaymentProcessor($params) {
+  protected function prepareParamsForPaymentProcessor(array $params): array {
     // also add location name to the array
-    $params["address_name-{$this->_bltID}"] = ($params['billing_first_name'] ?? '') . ' ' . ($params['billing_middle_name'] ?? '') . ' ' . ($params['billing_last_name'] ?? '');
-    $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
+    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
+    $params['address_name-' . $billingLocationID] = ($params['billing_first_name'] ?? '') . ' ' . ($params['billing_middle_name'] ?? '') . ' ' . ($params['billing_last_name'] ?? '');
+    $params['address_name-' . $billingLocationID] = trim($params['address_name-' . $billingLocationID]);
     // Add additional parameters that the payment processors are used to receiving.
-    if (!empty($params["billing_state_province_id-{$this->_bltID}"])) {
-      $params['state_province'] = $params["state_province-{$this->_bltID}"] = $params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($params["billing_state_province_id-{$this->_bltID}"]);
+    if (!empty($params["billing_state_province_id-$billingLocationID"])) {
+      $params['state_province'] = $params["state_province-$billingLocationID"] = $params["billing_state_province-$billingLocationID"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($params["billing_state_province_id-$billingLocationID"]);
     }
-    if (!empty($params["billing_country_id-{$this->_bltID}"])) {
-      $params['country'] = $params["country-{$this->_bltID}"] = $params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($params["billing_country_id-{$this->_bltID}"]);
+    if (!empty($params["billing_country_id-$billingLocationID"])) {
+      $params['country'] = $params["country-$billingLocationID"] = $params["billing_country-$billingLocationID"] = CRM_Core_PseudoConstant::countryIsoCode($params["billing_country_id-$billingLocationID"]);
     }
 
     [$hasAddressField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($params, $this->_bltID);
@@ -1014,12 +1015,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
 
-    // For legacy reasons we set these creditcard expiry fields if present
+    // For legacy reasons we set these credit card expiry fields if present
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
 
     // Assign IP address parameter
     $params['ip_address'] = CRM_Utils_System::ipAddress();
-
+    // Ensure our contracted fields are set.
+    // See https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/create/#getpaymentformfields
+    if (empty($params['currency'])) {
+      // Ideally never null but the tests have to catch up.
+      $params['currency'] = $params['currencyID'] ?? NULL;
+    }
+    if (empty($params['contactID'])) {
+      // Ideally never null but the tests have to catch up.
+      $params['contactID'] = $params['contact_id'] ?? NULL;
+    }
     return $params;
   }
 
