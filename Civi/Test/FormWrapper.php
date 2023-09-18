@@ -107,6 +107,7 @@ class FormWrapper {
    * @return \Civi\Test\FormWrapper
    */
   public function processForm(int $state = self::SUBMITTED): self {
+    \CRM_Core_Smarty::singleton()->pushScope([]);
     if ($state > self::CONSTRUCTED) {
       $this->form->preProcess();
     }
@@ -119,7 +120,8 @@ class FormWrapper {
     if ($state > self::VALIDATED) {
       $this->postProcess();
     }
-    $this->templateVariables = $this->form->get_template_vars();
+    $this->templateVariables = \CRM_Core_Smarty::singleton()->get_template_vars();
+    \CRM_Core_Smarty::singleton()->popScope([]);
     return $this;
   }
 
@@ -161,7 +163,7 @@ class FormWrapper {
    */
   public function __call(string $name, array $arguments) {
     if (!empty(ReflectionUtils::getCodeDocs((new \ReflectionMethod($this->form, $name)), 'Method')['api'])) {
-      return call_user_func([$this->form, $name], $arguments);
+      return call_user_func_array([$this->form, $name], $arguments);
     }
     throw new \CRM_Core_Exception($name . ' method not supported for external use');
   }
@@ -375,6 +377,18 @@ class FormWrapper {
       return $value;
     }
     throw new \CRM_Core_Exception('Deprecation should have been triggered');
+  }
+
+  /**
+   * @param string $name
+   * @param mixed $value
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function checkTemplateVariable(string $name, $value): void {
+    if ($this->templateVariables[$name] !== $value) {
+      throw new \CRM_Core_Exception("Template variable $name not set to " . print_r($value, TRUE) . ' actual value: ' . print_r($this->templateVariables[$name], TRUE));
+    }
   }
 
 }

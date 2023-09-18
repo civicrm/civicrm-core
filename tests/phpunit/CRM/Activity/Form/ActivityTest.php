@@ -1,5 +1,8 @@
 <?php
 
+use Civi\Api4\OptionValue;
+use Civi\Test\FormTrait;
+use Civi\Test\FormWrapper;
 use Civi\Test\Invasive;
 
 /**
@@ -7,6 +10,8 @@ use Civi\Test\Invasive;
  * @group headless
  */
 class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
+
+  use FormTrait;
 
   protected $assignee1;
   protected $assignee2;
@@ -16,17 +21,25 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
   public function setUp():void {
     parent::setUp();
     $this->assignee1 = $this->individualCreate([
-      'first_name' => 'testassignee1',
-      'last_name' => 'testassignee1',
-      'email' => 'testassignee1@gmail.com',
+      'first_name' => 'test_assignee1',
+      'last_name' => 'test_assignee1',
+      'email' => 'test_assignee1@gmail.com',
     ]);
     $this->assignee2 = $this->individualCreate([
-      'first_name' => 'testassignee2',
-      'last_name' => 'testassignee2',
+      'first_name' => 'test_assignee2',
+      'last_name' => 'test_assignee2',
       'email' => 'testassignee2@gmail.com',
     ]);
     $this->target = $this->individualCreate();
     $this->source = $this->individualCreate();
+  }
+
+  public function tearDown(): void {
+    if (!empty($this->ids['OptionValue'])) {
+      OptionValue::delete(FALSE)->addWhere('id', 'IN', $this->ids['OptionValue'])->execute();
+      unset($this->ids['OptionValue']);
+    }
+    parent::tearDown();
   }
 
   public function testActivityCreate(): void {
@@ -240,34 +253,27 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * This is a bit messed up having a variable called name that means label but we don't want to fix it because it's a form member variable _activityTypeName that might be used in form hooks, so just make sure it doesn't flip between name and label. dev/core#1116
+   * Test that the correct variables are assigned for the activity type.
+   *
+   * Sadly for historial reasons this means 'activityTypeName' is actually the label.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testActivityTypeNameIsReallyLabel(): void {
-    $form = new CRM_Activity_Form_Activity();
-
-    // the actual value is irrelevant we just need something for the tested function to act on
-    $form->_currentlyViewedContactId = $this->source;
-
     // Let's make a new activity type that has a different name from its label just to be sure.
-    $actParams = [
-      'option_group_id' => 'activity_type',
+    $this->createTestEntity('OptionValue', [
+      'option_group_id:name' => 'activity_type',
       'name' => 'wp1234',
       'label' => 'Water Plants',
       'is_active' => 1,
+      'value' => 800,
       'is_default' => 0,
-    ];
-    $result = $this->callAPISuccess('option_value', 'create', $actParams);
+    ]);
 
-    $form->_activityTypeId = $result['values'][$result['id']]['value'];
-    $this->assertNotEmpty($form->_activityTypeId);
-
-    // Do the thing we want to test
-    $form->assignActivityType();
-
-    $this->assertEquals('Water Plants', $form->_activityTypeName);
-
-    // cleanup
-    $this->callAPISuccess('option_value', 'delete', ['id' => $result['id']]);
+    $form = $this->getTestForm('CRM_Activity_Form_Activity', [], ['atype' => 800, 'cid' => $this->source, 'action' => 'add']);
+    $form->processForm(FormWrapper::BUILT);
+    $form->checkTemplateVariable('activityTypeName', 'Water Plants');
+    $form->checkTemplateVariable('activityTypeNameAndLabel', ['machineName' => 'wp1234', 'displayLabel' => 'Water Plants', 'id' => 800]);
   }
 
   /**

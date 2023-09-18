@@ -357,7 +357,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $client_id_2 = $this->individualCreate([], 1);
     $caseObj_2 = $this->createCase($client_id_2, $loggedInUser);
     $case_id_2 = $caseObj_2->id;
-
+    $_REQUEST['action'] = 'add';
     $form = $this->getFormObject('CRM_Case_Form_Activity', [
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Link Cases'),
       'link_to_case_id' => $case_id_2,
