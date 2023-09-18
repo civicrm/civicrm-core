@@ -529,7 +529,7 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
     }
   }
 
-  public function addSelectWhereClause(string $entityName = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     $relatedClauses = self::getDynamicFkAclClauses('entity_table', 'entity_id', $conditions['entity_table'] ?? NULL);
     if ($relatedClauses) {
@@ -546,7 +546,7 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
         ],
       ];
     }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 

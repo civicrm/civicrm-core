@@ -617,13 +617,14 @@ AND    domain_id    = %4
 
   /**
    * @param string|null $entityName
+   * @param int|null $userId
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     // Prevent default behavior of joining ACLs onto the contact_id field.
     $clauses = [];
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 

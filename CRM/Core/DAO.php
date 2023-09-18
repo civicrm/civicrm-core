@@ -3076,13 +3076,17 @@ SELECT contact_id
    *   Name of the entity being queried (for normal BAO files implementing this method, this variable is redundant
    *   as there is a 1-1 relationship between most entities and most BAOs. However the variable is passed in to support
    *   dynamic entities such as ECK).
+   * @param int|null $userId
+   *   Contact id of the current user.
+   *   This param is more aspirational than functional for now. Someday the API may support checking permissions
+   *   for contacts other than the current user, but at present this is always NULL which defaults to the current user.
    * @param array $conditions
    *   Contains field/value pairs gleaned from the WHERE clause or ON clause
    *   (depending on how the entity was added to the query).
    *   Can be used for optimization/deduping of clauses.
    * @return array
    */
-  public function addSelectWhereClause(string $entityName = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     $fields = $this::getSupportedFields();
     foreach ($fields as $fieldName => $field) {
@@ -3153,8 +3157,12 @@ SELECT contact_id
    *
    * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
    *
-   * @param string $tableAlias
-   * @param string $entityName
+   * DO NOT OVERRIDE THIS FUNCTION
+   *
+   * @TODO: ADD `final` keyword to function signature
+   *
+   * @param string|null $tableAlias
+   * @param string|null $entityName
    * @param array $conditions
    *   Values from WHERE or ON clause
    * @return array
@@ -3165,7 +3173,7 @@ SELECT contact_id
     $entityName = $entityName ?? CRM_Core_DAO_AllCoreTables::getBriefName($bao::class);
     $finalClauses = [];
     $fields = static::getSupportedFields();
-    $selectWhereClauses = $bao->addSelectWhereClause($entityName, $conditions);
+    $selectWhereClauses = $bao->addSelectWhereClause($entityName, NULL, $conditions);
     foreach ($selectWhereClauses as $fieldName => $fieldClauses) {
       $finalClauses[$fieldName] = NULL;
       if ($fieldClauses) {

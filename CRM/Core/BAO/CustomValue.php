@@ -213,10 +213,11 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   /**
    * ACL clause for an APIv4 custom pseudo-entity (aka multi-record custom group extending Contact).
    * @param string|null $entityName
+   * @param int|null $userId
    * @param array $conditions
    * @return array
    */
-  public function addSelectWhereClause(string $entityName = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     // To-date, custom-value-based entities are only supported for contacts.
     // If this changes, $entityName variable contains the name of this custom group,
     // and could be used to lookup the type of entity this custom group joins to.

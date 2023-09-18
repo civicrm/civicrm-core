@@ -802,10 +802,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
   /**
    * @param string|null $entityName
+   * @param int|null $userId
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     $permittedActivityTypeIDs = self::getPermittedActivityTypes();
     if (!empty($conditions['activity_type_id'])) {
@@ -827,7 +828,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $contactClause = implode(' AND contact_id ', $contactClause);
       $clauses['id'][] = "IN (SELECT activity_id FROM civicrm_activity_contact WHERE contact_id $contactClause)";
     }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 

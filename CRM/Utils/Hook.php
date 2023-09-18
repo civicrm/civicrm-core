@@ -627,13 +627,18 @@ abstract class CRM_Utils_Hook {
   /**
    * @param string|CRM_Core_DAO $entity
    * @param array $clauses
-   * @return mixed
+   * @param int|null $userId
+   *   User contact id. NULL == current user.
+   * @param array $conditions
+   *   Values from WHERE or ON clause
    */
-  public static function selectWhereClause($entity, &$clauses) {
+  public static function selectWhereClause($entity, array &$clauses, int $userId = NULL, array $conditions = []): void {
     $entityName = is_object($entity) ? CRM_Core_DAO_AllCoreTables::getBriefName($entity::class) : $entity;
     $null = NULL;
-    return self::singleton()->invoke(['entity', 'clauses'], $entityName, $clauses,
-      $null, $null, $null, $null,
+    $userId = $userId ?? (int) CRM_Core_Session::getLoggedInContactID();
+    self::singleton()->invoke(['entity', 'clauses', 'userId', 'conditions'],
+      $entityName, $clauses, $userId, $conditions,
+      $null, $null,
       'civicrm_selectWhereClause'
     );
   }
