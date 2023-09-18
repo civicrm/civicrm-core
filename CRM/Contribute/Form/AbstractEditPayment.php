@@ -137,6 +137,18 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_honorID = NULL;
 
   /**
+   * Array of payment related fields to potentially display on this form (generally credit card or debit card fields).
+   *
+   * Note that this is not accessed in core except in a function that could use
+   * a local variable but both IATS & TSys access it.
+   *
+   * This is rendered via billingBlock.tpl.
+   *
+   * @var array
+   */
+  public $_paymentFields = [];
+
+  /**
    * The contribution values if an existing contribution
    * @var array
    */
