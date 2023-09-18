@@ -835,14 +835,16 @@ HEREDOC;
   }
 
   /**
+   * @param string|null $entityName
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(): array {
+  public function addSelectWhereClause(string $entityName = NULL, array $conditions = []): array {
     // TODO: This seemded like a good idea... piggybacking off the ACL clause of EntityFile
     // however that's too restrictive because entityFile ACLs are limited to just attachments,
     // so this would prevent access to other file fields (e.g. custom fields)
     // Disabling this function for now by calling the parent instead.
-    return parent::addSelectWhereClause();
+    return parent::addSelectWhereClause($entityName, $conditions);
     $clauses = [
       'id' => [],
     ];

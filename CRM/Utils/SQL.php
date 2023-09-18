@@ -52,16 +52,16 @@ class CRM_Utils_SQL {
   /**
    * Helper function for adding the permissioned subquery from one entity onto another
    *
-   * @param string $entity
+   * @param string $entityName
    * @param string $joinColumn
    * @return array
    */
-  public static function mergeSubquery($entity, $joinColumn = 'id') {
-    $baoName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getFullName($entity));
+  public static function mergeSubquery($entityName, $joinColumn = 'id') {
+    $baoName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getFullName($entityName));
     $bao = new $baoName();
     $fields = $bao::getSupportedFields();
     $mergeClauses = $subClauses = [];
-    foreach ((array) $bao->addSelectWhereClause() as $fieldName => $fieldClauses) {
+    foreach ((array) $bao->addSelectWhereClause($entityName) as $fieldName => $fieldClauses) {
       if ($fieldClauses) {
         foreach ((array) $fieldClauses as $fieldClause) {
           $formattedClause = CRM_Utils_SQL::prefixFieldNames($fieldClause, array_keys($fields), $bao->tableName());

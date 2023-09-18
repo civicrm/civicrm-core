@@ -630,7 +630,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function selectWhereClause($entity, &$clauses) {
-    $entityName = is_object($entity) ? _civicrm_api_get_entity_name_from_dao($entity) : $entity;
+    $entityName = is_object($entity) ? CRM_Core_DAO_AllCoreTables::getBriefName($entity::class) : $entity;
     $null = NULL;
     return self::singleton()->invoke(['entity', 'clauses'], $entityName, $clauses,
       $null, $null, $null, $null,

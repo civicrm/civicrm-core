@@ -801,17 +801,24 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
+   * @param string|null $entityName
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(): array {
+  public function addSelectWhereClause(string $entityName = NULL, array $conditions = []): array {
     $clauses = [];
     $permittedActivityTypeIDs = self::getPermittedActivityTypes();
-    $allActivityTypes = self::buildOptions('activity_type_id', 'validate');
+    if (!empty($conditions['activity_type_id'])) {
+      $allActivityTypes = (array) $conditions['activity_type_id'];
+    }
+    else {
+      $allActivityTypes = self::buildOptions('activity_type_id', 'validate');
+    }
     if (empty($permittedActivityTypeIDs)) {
       // This just prevents a mysql fail if they have no access - should be extremely edge case.
       $permittedActivityTypeIDs = [0];
     }
-    if (array_diff_key($allActivityTypes, $permittedActivityTypeIDs)) {
+    if (array_diff($allActivityTypes, $permittedActivityTypeIDs)) {
       $clauses['activity_type_id'] = ['IN (' . implode(', ', $permittedActivityTypeIDs) . ')'];
     }
 

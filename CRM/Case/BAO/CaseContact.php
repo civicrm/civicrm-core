@@ -71,9 +71,11 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact implements \Civi
   }
 
   /**
+   * @param string|null $entityName
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(): array {
+  public function addSelectWhereClause(string $entityName = NULL, array $conditions = []): array {
     return [
       // Reuse case acls
       'case_id' => CRM_Utils_SQL::mergeSubquery('Case'),

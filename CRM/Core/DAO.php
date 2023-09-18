@@ -3070,11 +3070,19 @@ SELECT contact_id
    * ```
    *
    * Note that all array keys must be actual field names in this entity. Use subqueries to filter on other tables e.g. custom values.
-   * The query strings MAY reference other fields in this entity; but they must be enclosed in {curly_braces}.
+   * The query strings MAY reference other fields in this entity; they must be enclosed in {curly_braces}.
    *
+   * @param string|null $entityName
+   *   Name of the entity being queried (for normal BAO files implementing this method, this variable is redundant
+   *   as there is a 1-1 relationship between most entities and most BAOs. However the variable is passed in to support
+   *   dynamic entities such as ECK).
+   * @param array $conditions
+   *   Contains field/value pairs gleaned from the WHERE clause or ON clause
+   *   (depending on how the entity was added to the query).
+   *   Can be used for optimization/deduping of clauses.
    * @return array
    */
-  public function addSelectWhereClause(): array {
+  public function addSelectWhereClause(string $entityName = NULL, array $conditions = []): array {
     $clauses = [];
     $fields = $this::getSupportedFields();
     foreach ($fields as $fieldName => $field) {
@@ -3087,21 +3095,44 @@ SELECT contact_id
       }
       // Clause for an entity_table/entity_id combo
       if ($fieldName === 'entity_id' && isset($fields['entity_table'])) {
-        $relatedClauses = self::getDynamicFkAclClauses('entity_table', 'entity_id');
+        $relatedClauses = self::getDynamicFkAclClauses('entity_table', 'entity_id', $conditions['entity_table'] ?? NULL);
         if ($relatedClauses) {
           // Nested array will be joined with OR
           $clauses['entity_table'] = [$relatedClauses];
         }
       }
     }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($entityName ?? $this, $clauses);
     return $clauses;
   }
 
-  protected static function getDynamicFkAclClauses($entityTableField, $entityIdField): array {
+  /**
+   * Get an array of ACL clauses for a dynamic FK (entity_id/entity_table combo)
+   *
+   * @param string $entityTableField
+   * @param string $entityIdField
+   * @param mixed|NULL $entityTableValues
+   * @return array
+   */
+  protected static function getDynamicFkAclClauses(string $entityTableField, string $entityIdField, $entityTableValues = NULL): array {
+    // If entity_table is specified in the WHERE clause, use that instead of the entity_table pseudoconstant
+    if ($entityTableValues && is_string($entityTableValues) || is_array($entityTableValues)) {
+      // Ideally we would validate table names against the entity_table pseudoconstant,
+      // but some entities have missing/incomplete metadata and it's better to generate an ACL
+      // clause for what we have than no ACL clause at all, so validate against all known tables.
+      $allTableNames = CRM_Core_DAO_AllCoreTables::tables();
+      $relatedEntities = array_intersect_key(array_flip((array) $entityTableValues), $allTableNames);
+    }
+    // No valid entity_table in WHERE clause so build an ACL case for every possible entity type
+    if (empty($relatedEntities)) {
+      $relatedEntities = static::buildOptions($entityTableField, 'get');
+    }
+    // Hmm, this entity is missing entity_table pseudoconstant. We really should fix that.
+    if (!$relatedEntities) {
+      return [];
+    }
     $relatedClauses = [];
-    $relatedEntities = static::buildOptions($entityTableField, 'get');
-    foreach ((array) $relatedEntities as $table => $ent) {
+    foreach ($relatedEntities as $table => $ent) {
       // Ensure $ent is the machine name of the entity not a translated title
       $ent = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
       // Prevent infinite recursion
@@ -3109,7 +3140,8 @@ SELECT contact_id
       if ($subquery) {
         $relatedClauses[] = "= '$table' AND {{$entityIdField}} " . implode(" AND {{$entityIdField}} ", $subquery);
       }
-      else {
+      // If it's the only value with no conditions, don't need to add it
+      elseif (!$entityTableValues || count($relatedEntities) > 1) {
         $relatedClauses[] = "= '$table'";
       }
     }
@@ -3122,16 +3154,19 @@ SELECT contact_id
    * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
    *
    * @param string $tableAlias
+   * @param string $entityName
+   * @param array $conditions
+   *   Values from WHERE or ON clause
    * @return array
    */
-  public static function getSelectWhereClause($tableAlias = NULL) {
+  public static function getSelectWhereClause($tableAlias = NULL, $entityName = NULL, $conditions = []) {
     $bao = new static();
-    if ($tableAlias === NULL) {
-      $tableAlias = $bao->tableName();
-    }
+    $tableAlias = $tableAlias ?? $bao->tableName();
+    $entityName = $entityName ?? CRM_Core_DAO_AllCoreTables::getBriefName($bao::class);
     $finalClauses = [];
     $fields = static::getSupportedFields();
-    foreach ((array) $bao->addSelectWhereClause() as $fieldName => $fieldClauses) {
+    $selectWhereClauses = $bao->addSelectWhereClause($entityName, $conditions);
+    foreach ($selectWhereClauses as $fieldName => $fieldClauses) {
       $finalClauses[$fieldName] = NULL;
       if ($fieldClauses) {
         if (!is_array($fieldClauses)) {

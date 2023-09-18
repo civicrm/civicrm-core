@@ -156,9 +156,11 @@ class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCach
   }
 
   /**
+   * @param string|null $entityName
+   * @param array $conditions
    * @return array
    */
-  public function addSelectWhereClause(): array {
+  public function addSelectWhereClause(string $entityName = NULL, array $conditions = []): array {
     // Permission for this entity depends on access to the two related contacts.
     $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
     $clauses = [
