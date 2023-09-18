@@ -793,7 +793,7 @@ WHERE  id = %1";
    * @return void
    * @throws \CRM_Core_Exception
    */
-  public static function buildPriceSet(&$form, $component = NULL, $validFieldsOnly = TRUE) {
+  public static function buildPriceSet(&$form, $component = 'contribution', $validFieldsOnly = TRUE) {
     $priceSetId = $form->get('priceSetId');
     if (!$priceSetId) {
       return;
@@ -838,9 +838,9 @@ WHERE  id = %1";
     }
 
     // Call the buildAmount hook.
-    CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
+    CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
 
-    self::addPriceFieldsToForm($form, $feeBlock, $validFieldsOnly, $className, $validPriceFieldIds);
+    self::addPriceFieldsToForm($form, $component, $feeBlock, $validFieldsOnly, $className, $validPriceFieldIds);
   }
 
   /**
@@ -1617,12 +1617,13 @@ WHERE     ct.id = cp.financial_type_id AND
    * Add the relevant price fields to the form.
    *
    * @param \CRM_Core_Form $form
+   * @param string $component
    * @param array $feeBlock
    * @param bool $validFieldsOnly
    * @param string $className
    * @param array $validPriceFieldIds
    */
-  protected static function addPriceFieldsToForm(CRM_Core_Form $form, $feeBlock, bool $validFieldsOnly, string $className, array $validPriceFieldIds) {
+  protected static function addPriceFieldsToForm(CRM_Core_Form $form, string $component, $feeBlock, bool $validFieldsOnly, string $className, array $validPriceFieldIds) {
     $hideAdminValues = !CRM_Core_Permission::check('edit contributions');
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
     $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
@@ -1633,14 +1634,14 @@ WHERE     ct.id = cp.financial_type_id AND
         !$validFieldsOnly
       ) {
         $options = $field['options'] ?? NULL;
-        if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
+        if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component == 'membership') {
           $contactId = $form->getVar('_membershipContactID');
           if ($contactId && $options) {
             $checklifetime = $checklifetime ?: self::checkCurrentMembership($options, $contactId);
           }
         }
 
-        $formClasses = ['CRM_Contribute_Form_Contribution', 'CRM_Member_Form_Membership'];
+        $formClasses = ['CRM_Contribute_Form_Contribution', 'CRM_Member_Form_Membership', 'CRM_Member_Form_MembershipRenewal'];
 
         if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
           continue;
@@ -1688,6 +1689,43 @@ WHERE     ct.id = cp.financial_type_id AND
       ];
     }
     return $result;
+  }
+
+  /**
+   * Get priceset ID of selected entity ID
+   *
+   * @param int $entityID
+   * @param string $entityTable
+   *
+   * @return int Price set ID
+   */
+  public static function getPriceSetFromEntityID($entityID, $entityTable = 'civicrm_contribution') {
+    $sql = "SELECT ps.id
+      FROM civicrm_price_set ps
+       INNER JOIN civicrm_price_field pf ON ps.id = pf.price_set_id
+       INNER JOIN civicrm_line_item li ON pf.id = li.price_field_id
+      WHERE li.entity_table = %1 AND li.entity_id = %2
+    ";
+    return CRM_Core_DAO::singleValueQuery($sql, array(
+      1 => array($entityTable, 'String'),
+      2 => array($entityID, 'Int'),
+    ));
+  }
+
+  /**
+   * Set default price field value on basis of entity ID and entity
+   *
+   * @param array $defaults
+   * @param int $entityID
+   * @param string $entity
+   *
+   */
+  public static function setPriceSetDefaultsToLastUsedValues(&$defaults, $entityID, $entity = 'contribution') {
+    $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entity);
+    foreach ($lineItems as $lineItem) {
+      $priceFieldName = "price_" . $lineItem['price_field_id'];
+      self::setDefaultPriceSetField($priceFieldName, $lineItem['price_field_value_id'], $lineItem['html_type'], $defaults);
+    }
   }
 
 }

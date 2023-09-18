@@ -628,7 +628,7 @@
 
       cj( "#total_amount" ).val('').attr("readonly", true);
 
-      var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetId=' + priceSetId;
+      var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetOnly=1&priceSetId=' + priceSetId;
 
       var response = cj.ajax({
         url: dataUrl,
