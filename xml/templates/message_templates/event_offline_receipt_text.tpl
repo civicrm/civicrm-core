@@ -134,8 +134,13 @@
 {/if}
 {/if}
 
-{if !empty($amount) && !$lineItem}
-{foreach from=$amount item=amnt key=level}{$amnt.amount|crmMoney} {$amnt.label}
+{if !$isShowLineItems}
+{foreach from=$participants key=index item=currentParticipant}
+{if $isPrimary || {participant.id} === $currentParticipant.id}
+{foreach from=$currentParticipant.line_items key=index item=currentLineItem}
+{$currentLineItem.label} {if $isPrimary} - {$currentParticipant.contact.display_name}{/if} - {$currentLineItem.line_total|crmMoney:$currency}
+{/foreach}
+{/if}
 {/foreach}
 {/if}
 

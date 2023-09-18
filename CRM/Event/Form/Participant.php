@@ -2237,6 +2237,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         ];
         //as we are using same template for online & offline registration.
         //So we have to build amount as array.
+        // @todo not used in core from 5.67 - remove
         $eventAmount = array_merge($eventAmount, $additionalParticipantDetails);
         $this->assign('amount', $eventAmount);
       }
