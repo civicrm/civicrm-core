@@ -409,11 +409,27 @@ abstract class CRM_Utils_Hook {
    * @param string $op
    *   The type of operation being performed.
    * @param string $objectName
-   *   The name of the object.
+   *   The name of the object. This is generally a CamelCase entity (eg `Contact` or `Activity`).
+   *   Historical exceptions: 'CRM_Core_BAO_LocationType'
    * @param int $objectId
    *   The unique identifier for the object.
    * @param array $links
    *   (optional) the links array (introduced in v3.2).
+   *   Each of the links may have properties:
+   *   - 'name' (string): the link text
+   *   - 'url' (string): the link URL base path (like civicrm/contact/view, and fillable from $values)
+   *   - 'qs' (string|array): the link URL query parameters to be used by sprintf() with $values (like reset=1&cid=%%id%% when $values['id'] is the contact ID)
+   *   - 'title' (string) (optional): the text that appears when hovering over the link
+   *   - 'extra' (optional): additional attributes for the <a> tag (fillable from $values)
+   *   - 'bit' (optional): a binary number that will be filtered by $mask (sending nothing as $links['bit'] means the link will always display)
+   *   - 'ref' (optional, recommended): a CSS class to apply to the <a> tag.
+   *   - 'class' (string): Optional list of CSS classes
+   *   - 'weight' (int): Weight is used to order the links. If not set 0 will be used but e-notices could occur. This was introduced in CiviCRM 5.63 so it will not have any impact on earlier versions of CiviCRM.
+   *   - 'accessKey' (string) (optional): HTML access key. Single letter or empty string.
+   *   - 'icon' (string) (optional): FontAwesome class name
+   *
+   *   Depending on the specific screen, some fields (e.g. `icon`) may be ignored.
+   *   If you have any idea of a clearer rule, then please update the docs.
    * @param int|null $mask
    *   (optional) the bitmask to show/hide links.
    * @param array $values
