@@ -673,7 +673,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   protected function assignContactEmailDetails() {
     if ($this->getContactID()) {
-      [$displayName, $this->userEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->getContactID());
+      [$displayName] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->getContactID());
       if (!$displayName) {
         $displayName = civicrm_api3('contact', 'getvalue', ['id' => $this->getContactID(), 'return' => 'display_name']);
       }
