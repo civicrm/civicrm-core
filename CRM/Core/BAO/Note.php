@@ -50,7 +50,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
    *
    * @return bool
    *   TRUE if the note should be hidden, otherwise FALSE
-   *
+   * @deprecated in favor of selectWhereClause
    */
   public static function getNotePrivacyHidden($note) {
     if (CRM_Core_Permission::check('view all notes')) {
@@ -60,6 +60,9 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
     $noteValues = [];
     if (is_object($note) && get_class($note) === 'CRM_Core_DAO_Note') {
       CRM_Core_DAO::storeValues($note, $noteValues);
+    }
+    elseif (is_array($note)) {
+      $noteValues = $note;
     }
     else {
       $noteDAO = new CRM_Core_DAO_Note();
@@ -533,6 +536,17 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
       // Nested array will be joined with OR
       $clauses['entity_table'] = [$relatedClauses];
     }
+    // Enforce note privacy setting
+    if (!CRM_Core_Permission::check('view all notes')) {
+      $clauses['privacy'] = [
+        [
+          '= 0',
+          // OR
+          '= 1 AND {contact_id} = ' . (int) CRM_Core_Session::getLoggedInContactID(),
+        ],
+      ];
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
   }
 

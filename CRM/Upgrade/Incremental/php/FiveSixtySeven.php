@@ -21,6 +21,23 @@
  */
 class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    parent::setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
+    if ($rev === '5.67.alpha1') {
+      $customPrivacy = CRM_Core_DAO::executeQuery('
+        SELECT value, label
+        FROM civicrm_option_value
+        WHERE is_active = 1 AND value NOT IN ("0", "1")
+          AND option_group_id = (SELECT id FROM civicrm_option_group WHERE name = "note_privacy")')
+        ->fetchMap('value', 'label');
+      if ($customPrivacy) {
+        $preUpgradeMessage .= '<p>'
+          . ts('This site has custom note privacy options (%1) which may not work correctly after the upgrade, due to the deprecation of hook_civicrm_notePrivacy. If you are using this hook, see <a %2>developer documentation on updating your code</a>.', [1 => '"' . implode('", "', $customPrivacy) . '"', 2 => 'href="https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_notePrivacy/" target="_blank"']) .
+          '</p>';
+      }
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *

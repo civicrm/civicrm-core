@@ -1548,19 +1548,19 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook provides a way to override the default privacy behavior for notes.
-   *
+   * Deprecated: use hook_civicrm_selectWhereClause instead.
+   * @deprecated
    * @param array &$noteValues
-   *   Associative array of values for this note
-   *
-   * @return mixed
    */
   public static function notePrivacy(&$noteValues) {
     $null = NULL;
-    return self::singleton()->invoke(['noteValues'], $noteValues,
+    self::singleton()->invoke(['noteValues'], $noteValues,
       $null, $null, $null, $null, $null,
       'civicrm_notePrivacy'
     );
+    if (isset($noteValues['notePrivacy_hidden'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('hook_civicrm_selectWhereClause', 'hook_civicrm_notePrivacy');
+    }
   }
 
   /**
