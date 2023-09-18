@@ -21,7 +21,7 @@
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
-{elseif $is_pay_later}
+{elseif $isPrimary && {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
@@ -167,8 +167,7 @@
 {ts}Total Participants{/ts}: {$count}
 {/if}
 
-{if $is_pay_later}
-
+{if $isPrimary && {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 
 {$pay_later_receipt}
@@ -179,8 +178,8 @@
 {if {participant.register_date|boolean}}
 {ts}Registration Date{/ts}: {participant.register_date}
 {/if}
-{if $receive_date}
-{ts}Transaction Date{/ts}: {$receive_date|crmDate}
+{if {contribution.receive_date|boolean}}
+{ts}Transaction Date{/ts}: {contribution.receive_date}
 {/if}
 {if !empty($financialTypeName)}
 {ts}Financial Type{/ts}: {$financialTypeName}
