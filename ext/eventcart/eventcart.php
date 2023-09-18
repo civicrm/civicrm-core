@@ -1,9 +1,7 @@
 <?php
 
 require_once 'eventcart.civix.php';
-// phpcs:disable
-use CRM_Eventcart_ExtensionUtil as E;
-// phpcs:enable
+use CRM_Event_Cart_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
@@ -63,4 +61,19 @@ function eventcart_civicrm_enable() {
  */
 function eventcart_civicrm_entityTypes(&$entityTypes) {
   _eventcart_civix_civicrm_entityTypes($entityTypes);
+}
+
+function eventcart_civicrm_tabset($name, &$tabs) {
+  if ($name === 'civicrm/event/manage' && Civi::settings()->get('enable_cart')) {
+    $tabs['conference'] = [
+      'title' => E::ts('Conference Slots'),
+      'link' => NULL,
+      'valid' => TRUE,
+      'active' => TRUE,
+      'current' => FALSE,
+      'class' => 'ajaxForm',
+      'url' => 'civicrm/event/manage/conference',
+      'field' => 'slot_label_id',
+    ];
+  }
 }
