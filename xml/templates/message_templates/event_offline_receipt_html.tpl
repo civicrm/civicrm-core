@@ -35,7 +35,7 @@
     {elseif !empty($isRequireApproval)}
       <p>{ts}Your registration has been submitted.{/ts}</p>
       <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
-    {elseif $is_pay_later}
+    {elseif $isPrimary && {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
@@ -151,7 +151,7 @@
       </tr>
      {/if}
 
-     {if $email}
+     {if {contact.email_primary.email|boolean}}
       <tr>
        <th {$headerStyle}>
         {ts}Registered Email{/ts}
@@ -159,7 +159,7 @@
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
-        {$email}
+         {contact.email_primary.email}
        </td>
       </tr>
      {/if}
@@ -309,13 +309,13 @@
             </tr>
           {/if}
 
-          {if $register_date}
+          {if {participant.register_date|boolean}}
             <tr>
               <td {$labelStyle}>
                   {ts}Registration Date{/ts}
               </td>
               <td {$valueStyle}>
-                  {$register_date|crmDate}
+                {participant.register_date}
               </td>
             </tr>
           {/if}

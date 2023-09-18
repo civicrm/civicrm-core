@@ -46,7 +46,7 @@
             {if $isPrimary}
               <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
             {/if}
-        {elseif !empty($is_pay_later) && empty($isAmountzero) && empty($isAdditionalParticipant)}
+        {elseif $isPrimary && {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
           <p>{if {event.pay_later_receipt|boolean}}{event.pay_later_receipt}{/if}</p>
         {/if}
     </td>

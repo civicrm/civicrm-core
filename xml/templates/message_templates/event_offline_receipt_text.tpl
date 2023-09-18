@@ -172,7 +172,7 @@
 {ts}Total Participants{/ts}: {$count}
 {/if}
 
-{if $is_pay_later}
+{elseif $isPrimary && {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
 
 ==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
 

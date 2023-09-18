@@ -30,7 +30,7 @@
 {/if}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
-{elseif !empty($is_pay_later) && empty($isAmountzero) && empty($isAdditionalParticipant)}
+{elseif $isPrimary && {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
 
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
