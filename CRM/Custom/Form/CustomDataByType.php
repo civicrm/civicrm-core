@@ -29,7 +29,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
   /**
    * @var array
    */
-  private $groupTree;
+  protected $groupTree;
 
   /**
    * @var array
