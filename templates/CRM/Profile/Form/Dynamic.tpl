@@ -192,6 +192,7 @@
     {/if}
 
     {if ($action eq 1 and $mode eq 4 ) or ($action eq 2) or ($action eq 8192)}
+      {assign var=floatStyle value=''}
       {if $action eq 2 and $multiRecordFieldListing}
         <div class="crm-multi-record-custom-field-listing">
           {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl" showListing=true}

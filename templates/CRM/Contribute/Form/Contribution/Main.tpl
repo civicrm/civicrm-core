@@ -208,13 +208,13 @@
           {/if}
           {/crmRegion}
           <div id="honorType" class="honoree-name-email-section">
-            {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
+            {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor' hideFieldset=false}
           </div>
         </fieldset>
       {/if}
 
       <div class="crm-public-form-item crm-group custom_pre_profile-group">
-        {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false}
+        {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false hideFieldset=false}
       </div>
 
       {if array_key_exists('pcp_display_in_roll', $form)}
@@ -283,7 +283,7 @@
     {include file="CRM/Core/BillingBlockWrapper.tpl"}
 
     <div class="crm-public-form-item crm-group custom_post_profile-group">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
     </div>
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">

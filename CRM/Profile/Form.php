@@ -795,6 +795,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     $this->assign('id', $this->_id);
     $this->assign('mode', $this->_mode);
+    $this->assign('isHideFieldSet', ($this->_mode === self::MODE_CREATE || $this->_mode === self::MODE_EDIT));
     $this->assign('action', $this->_action);
     $this->assign('fields', $this->_fields);
     $this->assign('fieldset', (isset($this->_fieldset)) ? $this->_fieldset : "");

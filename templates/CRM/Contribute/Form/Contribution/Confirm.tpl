@@ -153,7 +153,7 @@
 
   {if $onbehalfProfile && $onbehalfProfile|@count}
     <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
+      {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf' hideFieldset=false}
     </div>
   {/if}
 
@@ -165,7 +165,7 @@
       <div class="display-block">
         <div class="label-left crm-section honoree_profile-section">
           <strong>{$honorName}</strong><br/>
-          {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
+          {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor' hideFieldset=false}
         </div>
       </div>
     </div>
@@ -173,7 +173,7 @@
 
   {if $customPre}
     <fieldset class="label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false hideFieldset=false}
     </fieldset>
   {/if}
 
@@ -272,7 +272,7 @@
 
   {if $customPost}
     <fieldset class="label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
     </fieldset>
   {/if}
 
