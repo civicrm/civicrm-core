@@ -157,6 +157,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
           'qs' => "reset=1&cid=%%id%%{$extraParams}{$searchContext}",
           'class' => 'no-popup',
           'title' => ts('View Contact Details'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
@@ -164,6 +165,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
           'qs' => 'reset=1&action=update&cid=%%id%%',
           'class' => 'no-popup',
           'title' => ts('Edit Contact Details'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
       ];
 
