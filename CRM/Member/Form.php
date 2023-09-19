@@ -427,6 +427,21 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
+   * Get the membership ID.
+   *
+   * For new memberships this may initially be NULL.
+   *
+   * @return int
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getMembershipID(): ?int {
+    return $this->_id;
+  }
+
+  /**
    * Set variables in a way that can be accessed from different places.
    *
    * This is part of refactoring for unit testability on the submit function.
