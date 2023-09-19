@@ -249,7 +249,7 @@ class CRM_Core_Invoke {
         CRM_Utils_System::setTitle($item['title']);
       }
 
-      if (isset($item['breadcrumb']) && empty($item['is_public'])) {
+      if (!CRM_Core_Config::isUpgradeMode() && isset($item['breadcrumb']) && empty($item['is_public'])) {
         CRM_Utils_System::appendBreadCrumb($item['breadcrumb']);
       }
 
