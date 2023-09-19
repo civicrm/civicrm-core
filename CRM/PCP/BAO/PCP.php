@@ -344,7 +344,11 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
         ],
       ];
 
+      // pcp.user.actions emits a malformed set of $links. But it is locked-in via unit-test, so we'll grandfather
+      // the bad one and fire new variants that are well-formed.
       CRM_Utils_Hook::links('pcp.user.actions', 'Pcp', $pcpId, self::$_pcpLinks);
+      CRM_Utils_Hook::links('pcp.user.actions.add', 'Pcp', $pcpId, self::$_pcpLinks['add']);
+      CRM_Utils_Hook::links('pcp.user.actions.all', 'Pcp', $pcpId, self::$_pcpLinks['all']);
     }
     return self::$_pcpLinks;
   }
