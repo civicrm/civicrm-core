@@ -1117,9 +1117,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $now = date('YmdHis');
 
-    $this->_contributorEmail = $this->getContactValue('email_primary.email');
-    $this->_contributorContactID = $contactID;
-    $this->processBillingAddress();
+    $this->processBillingAddress($contactID, (string) $this->getContactValue('email_primary.email'));
     if (!empty($params['source'])) {
       unset($params['source']);
     }

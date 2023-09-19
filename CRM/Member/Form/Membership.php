@@ -933,7 +933,7 @@ DESC limit 1");
 
     $params = $softParams = [];
 
-    $this->processBillingAddress();
+    $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
     $formValues = $this->_params;
     $formValues = $this->setPriceSetParameters($formValues);
 

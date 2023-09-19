@@ -314,8 +314,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   public function submit($submittedValues) {
     $this->_params = $submittedValues;
     $this->beginPostProcess();
+    // _contributorContactID may no longer need to be set - setting it here
+    // was for use in processBillingAddress
     $this->_contributorContactID = $this->_contactID;
-    $this->processBillingAddress();
+    $this->processBillingAddress($this->_contactID, (string) $this->_contributorEmail);
     $participantId = NULL;
     if ($this->_component === 'event') {
       $participantId = $this->_id;
