@@ -13,6 +13,7 @@ return new class() extends EventCheck implements HookInterface {
    */
   protected $grandfatheredObjectNames = [
     'CRM_Core_BAO_LocationType',
+    'CRM_Core_BAO_MessageTemplate',
   ];
 
   /**
@@ -27,6 +28,7 @@ return new class() extends EventCheck implements HookInterface {
     'job.manage.action::Job',
     'membershipType.manage.action::MembershipType',
     'messageTemplate.manage.action::MessageTemplate',
+    'basic.CRM_Core_BAO_MessageTemplate.page::CRM_Core_BAO_MessageTemplate',
   ];
 
   /**

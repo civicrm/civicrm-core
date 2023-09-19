@@ -410,7 +410,7 @@ abstract class CRM_Utils_Hook {
    *   The type of operation being performed.
    * @param string $objectName
    *   The name of the object. This is generally a CamelCase entity (eg `Contact` or `Activity`).
-   *   Historical exceptions: 'CRM_Core_BAO_LocationType'
+   *   Historical exceptions: 'CRM_Core_BAO_LocationType', 'CRM_Core_BAO_MessageTemplate'
    * @param int $objectId
    *   The unique identifier for the object.
    * @param array $links
