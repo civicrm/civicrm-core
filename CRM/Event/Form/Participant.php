@@ -1026,30 +1026,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $this->_contactId, NULL, NULL, $ctype);
     }
-
-    $customFieldsRole = [];
-    foreach ($this->getSubmittedValue('role_id') as $roleKey) {
-      $customFieldsRole = CRM_Utils_Array::crmArrayMerge(CRM_Core_BAO_CustomField::getFields('Participant',
-        FALSE, FALSE, $roleKey, $this->_roleCustomDataTypeID), $customFieldsRole);
-    }
-    $customFieldsEvent = CRM_Core_BAO_CustomField::getFields('Participant',
-      FALSE,
-      FALSE,
-      CRM_Utils_Array::value('event_id', $params),
-      $this->_eventNameCustomDataTypeID
-    );
-    $customFieldsEventType = CRM_Core_BAO_CustomField::getFields('Participant',
-      FALSE,
-      FALSE,
-      $this->_eventTypeId,
-      $this->_eventTypeCustomDataTypeID
-    );
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsRole,
-      CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, NULL, TRUE)
-    );
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEvent, $customFields);
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEventType, $customFields);
-
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, $this->getDefaultEntity());
 
     //do cleanup line  items if participant edit the Event Fee.
@@ -1343,7 +1319,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     if (!empty($params['send_receipt'])) {
-      $result = $this->sendReceipts($params, $customFields, $participants, $lineItem[0] ?? [], $additionalParticipantDetails ?? []);
+      $result = $this->sendReceipts($params, $participants, $lineItem[0] ?? [], $additionalParticipantDetails ?? []);
     }
 
     // set the participant id if it is not set
@@ -2108,7 +2084,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
   /**
    * @param $params
-   * @param array $customFields
    * @param array $participants
    * @param $lineItem
    * @param $additionalParticipantDetails
@@ -2116,7 +2091,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function sendReceipts($params, array $customFields, array $participants, $lineItem, $additionalParticipantDetails): array {
+  protected function sendReceipts($params, array $participants, $lineItem, $additionalParticipantDetails): array {
     $sent = [];
     $notSent = [];
     $this->assign('module', 'Event Registration');
@@ -2159,6 +2134,28 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
     $customGroup = [];
     //format submitted data
+    $customFieldsRole = [];
+    foreach ($this->getSubmittedValue('role_id') as $roleKey) {
+      $customFieldsRole = CRM_Utils_Array::crmArrayMerge(CRM_Core_BAO_CustomField::getFields('Participant',
+        FALSE, FALSE, $roleKey, $this->_roleCustomDataTypeID), $customFieldsRole);
+    }
+    $customFieldsEvent = CRM_Core_BAO_CustomField::getFields('Participant',
+      FALSE,
+      FALSE,
+      $this->getEventID(),
+      $this->_eventNameCustomDataTypeID
+    );
+    $customFieldsEventType = CRM_Core_BAO_CustomField::getFields('Participant',
+      FALSE,
+      FALSE,
+      $this->_eventTypeId,
+      $this->_eventTypeCustomDataTypeID
+    );
+    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsRole,
+      CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, NULL, TRUE)
+    );
+    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEvent, $customFields);
+    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEventType, $customFields);
     foreach ($params['custom'] as $fieldID => $values) {
       foreach ($values as $fieldValue) {
         $isPublic = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $fieldValue['custom_group_id'], 'is_public');
