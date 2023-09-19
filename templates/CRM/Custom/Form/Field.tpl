@@ -33,7 +33,7 @@
       <td class="label">{$form.serialize.label}</td>
       <td class="html-adjust">{$form.serialize.html}</td>
     </tr>
-    {if !empty($form.in_selector)}
+    {if array_key_exists('in_selector', $form)}
       <tr class='crm-custom-field-form-block-in_selector'>
         <td class='label'>{$form.in_selector.label}</td>
         <td class='html-adjust'>{$form.in_selector.html} {help id="id-in_selector"}</td>
