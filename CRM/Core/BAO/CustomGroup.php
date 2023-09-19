@@ -837,6 +837,7 @@ ORDER BY civicrm_custom_group.weight,
               'qs' => 'reset=1&id=%%id%%&eid=%%eid%%&fid=%%fid%%&action=delete&fcs=%%fcs%%',
               'extra' => 'onclick = "if (confirm( \'' . $deleteExtra
               . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
+              'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
             ],
           ];
           $customValue['deleteURL'] = CRM_Core_Action::formLink($deleteURL,
