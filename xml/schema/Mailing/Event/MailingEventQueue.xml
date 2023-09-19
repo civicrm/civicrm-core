@@ -27,7 +27,7 @@
   <field>
     <name>job_id</name>
     <type>int unsigned</type>
-    <required>true</required>
+    <required>false</required>
     <title>Job ID</title>
     <comment>Mailing Job</comment>
     <html>
@@ -38,8 +38,37 @@
     <name>job_id</name>
     <table>civicrm_mailing_job</table>
     <key>id</key>
-    <onDelete>CASCADE</onDelete>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
+  <field>
+    <name>mailing_id</name>
+    <type>int unsigned</type>
+    <required>false</required>
+    <title>Mailing ID</title>
+    <comment>Related mailing. Used for reporting on mailing success, if present.</comment>
+    <html>
+      <label>Mailing</label>
+    </html>
+    <add>5.67</add>
+  </field>
+  <foreignKey>
+    <name>mailing_id</name>
+    <table>civicrm_mailing</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>is_test</name>
+    <title>Test</title>
+    <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <readonly>true</readonly>
+    <add>5.67</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
   <field>
     <name>email_id</name>
     <type>int unsigned</type>
