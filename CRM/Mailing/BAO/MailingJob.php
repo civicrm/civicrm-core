@@ -443,22 +443,22 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         }
 
         $params[] = [
-          $this->id,
-          $recipients->email_id,
-          $recipients->contact_id,
-          $recipients->phone_id,
+          'job_id' => $this->id,
+          'email_id' => $recipients->email_id,
+          'contact_id' => $recipients->contact_id,
+          'phone_id' => $recipients->phone_id,
         ];
         $count++;
         // dev/core#1768 Mail sync interval is now configurable.
         if ($count % $mail_sync_interval == 0) {
-          CRM_Mailing_Event_BAO_MailingEventQueue::bulkCreate($params, $now);
+          CRM_Mailing_Event_BAO_MailingEventQueue::bulkCreate($params);
           $count = 0;
           $params = [];
         }
       }
 
       if (!empty($params)) {
-        CRM_Mailing_Event_BAO_MailingEventQueue::bulkCreate($params, $now);
+        CRM_Mailing_Event_BAO_MailingEventQueue::bulkCreate($params);
       }
     }
   }
