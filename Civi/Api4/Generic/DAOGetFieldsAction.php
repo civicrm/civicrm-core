@@ -123,6 +123,11 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
   public function fields() {
     $fields = parent::fields();
     $fields[] = [
+      'name' => 'dfk_entities',
+      'description' => 'List of possible entity types this field could be referencing.',
+      'data_type' => 'Array',
+    ];
+    $fields[] = [
       'name' => 'help_pre',
       'data_type' => 'String',
     ];

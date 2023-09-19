@@ -47,7 +47,7 @@ class SpecGatherer extends AutoService {
     $specification = new RequestSpec($entity, $action, $values);
 
     // Real entities
-    if (strpos($entity, 'Custom_') !== 0) {
+    if (!str_starts_with($entity, 'Custom_')) {
       $this->addDAOFields($entity, $action, $specification, $values);
       if ($includeCustom) {
         $this->addCustomFields($entity, $specification, $checkPermissions);
@@ -77,18 +77,18 @@ class SpecGatherer extends AutoService {
   /**
    * @param \Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface $provider
    */
-  public function addSpecProvider(SpecProviderInterface $provider) {
+  public function addSpecProvider(SpecProviderInterface $provider): void {
     $this->specProviders[] = $provider;
   }
 
   /**
-   * @param string $entity
+   * @param string $entityName
    * @param string $action
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    * @param array $values
    */
-  private function addDAOFields($entity, $action, RequestSpec $spec, array $values) {
-    $DAOFields = $this->getDAOFields($entity);
+  private function addDAOFields(string $entityName, string $action, RequestSpec $spec, array $values) {
+    $DAOFields = $this->getDAOFields($entityName);
 
     foreach ($DAOFields as $DAOField) {
       if (array_key_exists('contactType', $DAOField) && $spec->getValue('contact_type') && $DAOField['contactType'] != $spec->getValue('contact_type')) {
@@ -100,32 +100,36 @@ class SpecGatherer extends AutoService {
       if ($DAOField['name'] == 'is_active' && empty($DAOField['default'])) {
         $DAOField['default'] = '1';
       }
-      $this->setDynamicFk($DAOField, $entity, $values);
-      $field = SpecFormatter::arrayToField($DAOField, $entity);
+      $this->setDynamicFk($DAOField, $values);
+      $field = SpecFormatter::arrayToField($DAOField, $entityName);
       $spec->addFieldSpec($field);
     }
   }
 
   /**
-   * Cleverly enables getFields to report dynamic FKs if a value is supplied for the entity type.
+   * Adds metadata about dynamic foreign key fields.
    *
-   * E.g. many tables have a DFK with a pair of `entity_table` and `entity_id` columns.
-   * If you supply a value for `entity_table`, then getFields will output the correct `fk_entity` for the `entity_id` field.
+   * E.g. some tables have a DFK with a pair of columns named `entity_table` and `entity_id`.
+   * This will gather the list of 'dfk_entities' to add as metadata to the e.g. `entity_id` column.
+   *
+   * Additionally, if $values contains a value for e.g. `entity_table`,
+   * then getFields will also output the corresponding `fk_entity` for the `entity_id` field.
    *
    * @param array $DAOField
-   * @param string $entityName
    * @param array $values
    */
-  private function setDynamicFk(array &$DAOField, string $entityName, array $values): void {
-    if (empty($field['FKClassName']) && $values) {
-      $bao = CoreUtil::getBAOFromApiName($entityName);
-      // Check all dynamic FKs for entity for a match with this field and a supplied value
-      foreach ($bao::getReferenceColumns() ?? [] as $reference) {
-        if ($reference instanceof \CRM_Core_Reference_Dynamic
-          && $reference->getReferenceKey() === $DAOField['name']
-          && array_key_exists($reference->getTypeColumn(), $values)
-        ) {
-          $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($values[$reference->getTypeColumn()]);
+  private function setDynamicFk(array &$DAOField, array $values): void {
+    if (empty($DAOField['FKClassName']) && !empty($DAOField['bao']) && $DAOField['type'] == \CRM_Utils_Type::T_INT) {
+      // Check if this field is a key for a dynamic FK
+      foreach ($DAOField['bao']::getReferenceColumns() ?? [] as $reference) {
+        if ($reference instanceof \CRM_Core_Reference_Dynamic && $reference->getReferenceKey() === $DAOField['name']) {
+          $entityTableColumn = $reference->getTypeColumn();
+          $DAOField['DFKEntities'] = $reference->getTargetEntities();
+          $DAOField['html']['controlField'] = $entityTableColumn;
+          // If we have a value for entity_table then this field can pretend to be a single FK too.
+          if (array_key_exists($entityTableColumn, $values)) {
+            $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($values[$entityTableColumn]);
+          }
           break;
         }
       }
