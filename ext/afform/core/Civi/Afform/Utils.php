@@ -75,6 +75,8 @@ class Utils {
       'NOT LIKE' => E::ts('Not Like'),
       'REGEXP' => E::ts('Matches Pattern'),
       'NOT REGEXP' => E::ts("Doesn't Match Pattern"),
+      'REGEXP BINARY' => E::ts('Matches Pattern (case-sensitive)'),
+      'NOT REGEXP BINARY' => E::ts("Doesn't Match Pattern (case-sensitive)"),
     ];
   }
 

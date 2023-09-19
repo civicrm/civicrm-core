@@ -166,8 +166,12 @@ trait ArrayQueryActionTrait {
 
       case 'REGEXP':
       case 'NOT REGEXP':
-        $pattern = '/' . str_replace('/', '\\/', $expected) . '/';
-        return !preg_match($pattern, $value) == ($operator != 'REGEXP');
+      case 'REGEXP BINARY':
+      case 'NOT REGEXP BINARY':
+        // Perform case-sensitive matching for BINARY operator, otherwise insensitive
+        $i = str_ends_with($operator, 'BINARY') ? '' : 'i';
+        $pattern = '/' . str_replace('/', '\\/', $expected) . "/$i";
+        return !preg_match($pattern, $value) == str_starts_with($operator, 'NOT');
 
       case 'IN':
         return in_array($value, $expected);

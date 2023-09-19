@@ -150,6 +150,8 @@ class CoreUtil {
     $operators[] = 'IS NOT EMPTY';
     $operators[] = 'REGEXP';
     $operators[] = 'NOT REGEXP';
+    $operators[] = 'REGEXP BINARY';
+    $operators[] = 'NOT REGEXP BINARY';
     return $operators;
   }
 
