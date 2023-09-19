@@ -852,6 +852,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
             'job_id' => $testParams['job_id'],
             'email_id' => $dao->email_id,
             'contact_id' => $groupContact,
+            'is_test' => TRUE,
           ];
           CRM_Mailing_Event_BAO_MailingEventQueue::create($params);
         }

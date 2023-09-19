@@ -307,14 +307,14 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     // Construct a bulk insert statement.
     $values = [];
     foreach ($params as $queueItem) {
-      $values[] = "({$queueItem['job_id']}, {$queueItem['email_id']}, {$queueItem['contact_id']}, {$queueItem['phone_id']}, '"
+      $values[] = "({$queueItem['job_id']}, {$queueItem['email_id']}, {$queueItem['contact_id']}, {$queueItem['phone_id']}, {$queueItem['mailing_id']}, {$queueItem['is_test']}'"
        . self::hash($queueItem) . "')";
     }
 
     while (!empty($values)) {
       $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
       $str = implode(',', $input);
-      $sql = "INSERT INTO civicrm_mailing_event_queue ( job_id, email_id, contact_id, phone_id, hash ) VALUES $str;";
+      $sql = "INSERT INTO civicrm_mailing_event_queue ( job_id, email_id, contact_id, phone_id, hash, mailing_id, is_test) VALUES $str;";
       CRM_Core_DAO::executeQuery($sql);
     }
   }

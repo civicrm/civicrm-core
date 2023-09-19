@@ -76,9 +76,10 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     if (!empty($testParams)) {
       $query = "
       SELECT *
-        FROM $jobTable
+        FROM civicrm_mailing_job
        WHERE id = {$testParams['job_id']}";
       $job->query($query);
+      $testParams['mailing_id'] = $job->mailing_id;
     }
     else {
       $currentTime = date('YmdHis');
@@ -423,7 +424,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       // FIXME: this is not very smart, we should move this to one DB call
       // INSERT INTO ... SELECT FROM ..
       // the thing we need to figure out is how to generate the hash automatically
-      $now = time();
+      // voice from 2023 says No idea what the above was about but we could surely
+      // generate 'something random' in mysql since the hash is just a one way 'secret'
+      // string.
       $params = [];
       $count = 0;
       // dev/core#1768 Get the mail sync interval.
@@ -447,6 +450,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           'email_id' => $recipients->email_id,
           'contact_id' => $recipients->contact_id,
           'phone_id' => $recipients->phone_id,
+          'mailing_id' => $this->mailing_id,
+          'is_test' => (int) $this->is_test,
         ];
         $count++;
         // dev/core#1768 Mail sync interval is now configurable.
