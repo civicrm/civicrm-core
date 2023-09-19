@@ -33,7 +33,7 @@ class CRM_Utils_Mail_Logger {
   public static function filter($mailer, &$recipients, &$headers, &$body) {
     if (defined('CIVICRM_MAIL_LOG')) {
       static::log($recipients, $headers, $body);
-      if (!defined('CIVICRM_MAIL_LOG_AND_SEND') && !defined('CIVICRM_MAIL_LOG_AND SEND')) {
+      if (!defined('CIVICRM_MAIL_LOG_AND_SEND')) {
         return TRUE;
       }
     }
