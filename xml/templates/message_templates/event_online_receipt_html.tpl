@@ -157,7 +157,7 @@
           </tr>
         {/if}
 
-        {if $event.is_share}
+        {if {event.is_share|boolean}}
           <tr>
             <td colspan="2" {$valueStyle}>
               {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id={event.id}&reset=1" a=true fe=1 h=1}{/capture}
