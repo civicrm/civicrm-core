@@ -42,6 +42,11 @@ trait DataTypeSpecTrait {
   public $fkEntity;
 
   /**
+   * @var string
+   */
+  public $dfkEntities;
+
+  /**
    * Aliases for the valid data types
    *
    * @var array
@@ -94,6 +99,23 @@ trait DataTypeSpecTrait {
   public function setFkEntity($fkEntity) {
     $this->fkEntity = $fkEntity;
 
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getDfkEntities() {
+    return $this->dfkEntities;
+  }
+
+  /**
+   * @param string $dfkEntities
+   *
+   * @return $this
+   */
+  public function setDfkEntities($dfkEntities) {
+    $this->dfkEntities = $dfkEntities;
     return $this;
   }
 

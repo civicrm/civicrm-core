@@ -133,7 +133,7 @@ trait Api4TestTrait {
         !isset($values[$fieldName]) &&
         ($field['required'] || AbstractAction::evaluateCondition($field['required_if'], $values + $extraValues))
       ) {
-        $extraValues[$fieldName] = $this->getRequiredValue($field);
+        $extraValues[$fieldName] = $this->getRequiredValue($field, $requiredFields);
       }
     }
 
@@ -233,21 +233,18 @@ trait Api4TestTrait {
     if (!empty($field['fk_entity'])) {
       return $this->getFkID($field['fk_entity']);
     }
+    if (!empty($field['dfk_entities'])) {
+      return $this->getFkID($field['dfk_entities'][0]);
+    }
     if (isset($field['default_value'])) {
       return $field['default_value'];
     }
-    if ($field['name'] === 'contact_id') {
+    if ($field['name'] === 'contact_id' || $field['name'] === 'entity_id') {
+      // Obviously an FK field, but if we get here it's missing FK metadata :(
+      // FIXME: This is what we SHOULD do here...
+      // throw new \CRM_Core_Exception($field['name'] . ' should have foreign key information defined.');
+      // ... instead this is how it was done, so we're stuck with it until FK metadata for every field gets fixed
       return $this->getFkID('Contact');
-    }
-    if ($field['name'] === 'entity_id') {
-      // What could possibly go wrong with this?
-      switch ($field['table_name'] ?? NULL) {
-        case 'civicrm_financial_item':
-          return $this->getFkID(FinancialItemCreationSpecProvider::DEFAULT_ENTITY);
-
-        default:
-          return $this->getFkID('Contact');
-      }
     }
     // If there are no options but the field is supposed to have them, we may need to
     // create a new option

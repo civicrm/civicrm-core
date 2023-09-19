@@ -204,16 +204,21 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $tagFields = EntityTag::getFields(FALSE)
       ->execute()->indexBy('name');
     $this->assertEmpty($tagFields['entity_id']['fk_entity']);
+    $this->assertContains('Activity', $tagFields['entity_id']['dfk_entities']);
+    $this->assertEquals('entity_table', $tagFields['entity_id']['input_attrs']['control_field']);
 
     $tagFields = EntityTag::getFields(FALSE)
       ->addValue('entity_table', 'civicrm_activity')
       ->execute()->indexBy('name');
+    // fk_entity should be specific to specified entity_table, but dfk_entities should still contain all values
     $this->assertEquals('Activity', $tagFields['entity_id']['fk_entity']);
+    $this->assertContains('Contact', $tagFields['entity_id']['dfk_entities']);
 
     $tagFields = EntityTag::getFields(FALSE)
       ->addValue('entity_table:name', 'Contact')
       ->execute()->indexBy('name');
     $this->assertEquals('Contact', $tagFields['entity_id']['fk_entity']);
+    $this->assertContains('SavedSearch', $tagFields['entity_id']['dfk_entities']);
   }
 
   public function testFiltersAreReturned(): void {
