@@ -30,7 +30,8 @@
 {/if}
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
-{elseif !empty($is_pay_later) && empty($isAmountzero) && empty($isAdditionalParticipant)}
+{elseif $isPrimary && {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
+
 
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
@@ -47,7 +48,7 @@
 ==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {event.title}
-{event.start_date|crmDate:"%A"} {event.start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate:"%A"} {$event.event_end_date|crmDate}{/if}{/if}
+{event.start_date|crmDate:"%A"} {event.start_date|crmDate}{if {event.end_date|boolean}}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate:"%A"} {$event.event_end_date|crmDate}{/if}{/if}
 
 {if !empty($event.participant_role) and $event.participant_role neq 'Attendee' and !empty($defaultRole)}
 {ts}Participant Role{/ts}: {$event.participant_role}
@@ -160,11 +161,11 @@ You were registered by: {$payer.name}
 {ts}Total Participants{/ts}: {$count}
 {/if}
 
-{if $register_date}
-{ts}Registration Date{/ts}: {$register_date|crmDate}
+{if {participant.register_date|boolean}}
+{ts}Registration Date{/ts}: {participant.register_date}
 {/if}
-{if !empty($receive_date)}
-{ts}Transaction Date{/ts}: {$receive_date|crmDate}
+{if {contribution.receive_date|boolean}}
+{ts}Transaction Date{/ts}: {contribution.receive_date}
 {/if}
 {if !empty($financialTypeName)}
 {ts}Financial Type{/ts}: {$financialTypeName}
