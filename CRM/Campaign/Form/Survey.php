@@ -168,15 +168,13 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   /**
    * @return string
    */
-  public function getTemplateFileName() {
-    if ($this->controller->getPrint() || $this->getVar('_surveyId') <= 0) {
+  public function getTemplateFileName(): string {
+    if ($this->_surveyId <= 0 || $this->controller->getPrint()) {
       return parent::getTemplateFileName();
     }
-    else {
-      // hack lets suppress the form rendering for now
-      self::$_template->assign('isForm', FALSE);
-      return 'CRM/Campaign/Form/Survey/Tab.tpl';
-    }
+    // hack lets suppress the form rendering for now
+    self::$_template->assign('isForm', FALSE);
+    return 'CRM/Campaign/Form/Survey/Tab.tpl';
   }
 
 }
