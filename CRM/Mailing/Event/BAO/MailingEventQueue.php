@@ -36,19 +36,21 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
   }
 
   /**
-   * Create a security hash from the job, email and contact ids.
+   * Create a unique hash from the email and contact ids.
+   *
+   * This hash is saved to the civicrm_mailing_event_queue table as the field
+   * hash. It just needs to be a unique value of some sort that, along with the
+   * queue_id can be used to very that the hash came from our database & hence is
+   * part of a reply address we generated.
    *
    * @param array $params
    *
    * @return string
    *   The hash
    */
-  public static function hash($params) {
-    $jobId = $params['job_id'];
-    $emailId = CRM_Utils_Array::value('email_id', $params, '');
-    $contactId = $params['contact_id'];
-
-    return substr(sha1("{$jobId}:{$emailId}:{$contactId}:" . time()),
+  public static function hash(array $params): string {
+    $emailID = $params['email_id'] ?? '';
+    return substr(md5("{$emailID}:{$params['contact_id']}:" . time() . CIVICRM_SITE_KEY),
       0, 16
     );
   }
@@ -56,7 +58,7 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
   /**
    * Verify that a queue event exists with the specified id/job id/hash.
    *
-   * @param int $job_id
+   * @param int|null $job_id
    *   The job ID of the event to find.
    * @param int $queue_id
    *   The Queue Event ID to find.
@@ -66,12 +68,11 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
    * @return object|null
    *   The queue event if verified, or null
    */
-  public static function &verify($job_id, $queue_id, $hash) {
+  public static function verify($job_id, $queue_id, $hash) {
     $success = NULL;
     $q = new CRM_Mailing_Event_BAO_MailingEventQueue();
-    if (!empty($job_id) && !empty($queue_id) && !empty($hash)) {
+    if (!empty($queue_id) && !empty($hash)) {
       $q->id = $queue_id;
-      $q->job_id = $job_id;
       $q->hash = $hash;
       if ($q->find(TRUE)) {
         $success = $q;
@@ -283,20 +284,31 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
   }
 
   /**
+   * Create EventQueue records with direct sql.
+   *
+   * Note this supports an non associative array but a keyed array is preferred.
+   *
    * @param array $params
-   * @param null $now
+   *   -job_id
+   *   -contact_id
+   *   -email_id
+   *   -phone_id
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function bulkCreate($params, $now = NULL) {
-    if (!$now) {
-      $now = time();
+  public static function bulkCreate(array $params): void {
+    $mapping = ['job_id', 'email_id', 'contact_id', 'phone_id'];
+    foreach ($mapping as $index => $saneKeyName) {
+      if (isset($params[$index])) {
+        $params[$saneKeyName] = $params[$index];
+        unset($params[$index]);
+      }
     }
-
-    // construct a bulk insert statement
+    // Construct a bulk insert statement.
     $values = [];
-    foreach ($params as $param) {
-      $values[] = "( {$param[0]}, {$param[1]}, {$param[2]}, {$param[3]}, '" . substr(sha1("{$param[0]}:{$param[1]}:{$param[2]}:{$param[3]}:{$now}"),
-          0, 16
-        ) . "' )";
+    foreach ($params as $queueItem) {
+      $values[] = "({$queueItem['job_id']}, {$queueItem['email_id']}, {$queueItem['contact_id']}, {$queueItem['phone_id']}, '"
+       . self::hash($queueItem) . "')";
     }
 
     while (!empty($values)) {
