@@ -4,7 +4,6 @@ namespace Civi\Test;
 
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
-use Civi\Api4\Service\Spec\Provider\FinancialItemCreationSpecProvider;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -227,6 +226,19 @@ trait Api4TestTrait {
    * @throws \CRM_Core_Exception
    */
   private function getRequiredValue(array $field) {
+    // Hack that shouldn't exist except that these entities were added with bad fk metadata
+    // and existing tests at the time didn't catch it.
+    // TODO: Fix these entities and delete this list
+    // NOT TODO: Add to this list!
+    $fixmeDfkMissing = [
+      'EntityBatch' => 'Contact',
+      'FinancialTrxn' => 'Contact',
+      'Log' => 'Contact',
+      'Managed' => 'Contact',
+      'PCPBlock' => 'Contact',
+      'PriceSetEntity' => 'Contact',
+      'RecentItem' => 'Contact',
+    ];
     if (!empty($field['options'])) {
       return key($field['options']);
     }
@@ -239,12 +251,12 @@ trait Api4TestTrait {
     if (isset($field['default_value'])) {
       return $field['default_value'];
     }
+    // Obviously an FK field, but if we get here it's missing FK metadata :(
     if ($field['name'] === 'contact_id' || $field['name'] === 'entity_id') {
-      // Obviously an FK field, but if we get here it's missing FK metadata :(
-      // FIXME: This is what we SHOULD do here...
-      // throw new \CRM_Core_Exception($field['name'] . ' should have foreign key information defined.');
-      // ... instead this is how it was done, so we're stuck with it until FK metadata for every field gets fixed
-      return $this->getFkID('Contact');
+      if (isset($fixmeDfkMissing[$field['entity']])) {
+        return $this->getFkID($fixmeDfkMissing[$field['entity']]);
+      }
+      throw new \CRM_Core_Exception($field['name'] . ' should have foreign key information defined.');
     }
     // If there are no options but the field is supposed to have them, we may need to
     // create a new option

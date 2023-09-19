@@ -278,8 +278,8 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
    */
   public static function entityTables(): array {
     return [
-      'civicrm_financial_type' => ts('Financial Type'),
       'civicrm_option_value' => ts('Payment Instrument'),
+      'civicrm_financial_type' => ts('Financial Type'),
       'civicrm_payment_processor' => ts('Payment Processor'),
     ];
   }
