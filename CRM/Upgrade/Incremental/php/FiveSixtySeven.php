@@ -36,6 +36,53 @@ class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental
     $this->addTask('Add cache_fill_took column to Group table', 'addColumn', 'civicrm_group', 'cache_fill_took',
       'DOUBLE DEFAULT NULL COMMENT "Seconds taken to fill smart group cache, not always related to cache_date"',
       FALSE);
+    $this->addTask('Update civicrm_mailing_event_queue to permit deleting records from civicrm_mailing_job', 'updateMailingEventQueueTable', 'updateMailingEventQueueTable');
+  }
+
+  /**
+   * We want to add 2 columns & fix one index. This function allows us to
+   * do it in less sql statements (given they might be slow).
+   */
+  public static function updateMailingEventQueueTable(CRM_Queue_TaskContext $ctx): bool {
+    $sql = ["MODIFY job_id int unsigned null comment 'Mailing Job'"];
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_mailing_event_queue', 'mailing_id')) {
+      $sql[] = "ADD COLUMN mailing_id int(10) unsigned DEFAULT NULL COMMENT 'Related mailing. Used for reporting on mailing success, if present.'";
+      $sql[] = 'ADD CONSTRAINT FOREIGN KEY (`mailing_id`) REFERENCES `civicrm_mailing` (`id`) ON DELETE SET NULL';
+    }
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_mailing_event_queue', 'is_test')) {
+      $sql[] = 'ADD COLUMN is_test tinyint(4) NOT NULL DEFAULT 0';
+    }
+    if (CRM_Core_BAO_SchemaHandler::checkFKExists('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_job_id')) {
+      $sql[] = 'DROP FOREIGN KEY FK_civicrm_mailing_event_queue_job_id';
+    }
+    if (empty($sql)) {
+      // If someone pre-upgraded to better manage a potentially slow query.
+      return TRUE;
+    }
+    try {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_mailing_event_queue ' . implode(', ', $sql), [], FALSE, FALSE, FALSE, FALSE);
+      CRM_Core_DAO::executeQuery('
+      ALTER TABLE `civicrm_mailing_event_queue`
+      ADD CONSTRAINT `FK_civicrm_mailing_event_queue_job_id`
+      FOREIGN KEY (`job_id`)
+      REFERENCES `civicrm_mailing_job`(`id`) ON DELETE SET NULL
+    ', [], FALSE, FALSE, FALSE, FALSE);
+    }
+    catch (\Civi\Core\Exception\DBQueryException $e) {
+      throw new CRM_Core_Exception(
+        'db error message' . $e->getDBErrorMessage()
+        . 'message ' . $e->getMessage()
+        . "\n"
+        . 'sql ' . $e->getSQL()
+        . "\n"
+        . 'user info ' . $e->getUserInfo()
+        . "\n"
+        . 'debug info ' . $e->getCause()
+        . "\n"
+        . 'debug info ' . $e->getDebugInfo()
+        . "\n");
+    }
+    return TRUE;
   }
 
   public static function addNoteNote(CRM_Queue_TaskContext $ctx): bool {
