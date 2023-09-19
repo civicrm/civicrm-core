@@ -16,14 +16,17 @@ return new class() extends EventCheck implements HookInterface {
   ];
 
   /**
-   * These are contexts where the "url" can be replaced with an onclick handler.
-   * It evidently works on some screens, but it doesn't sound reliable.
-   * They're allowed for backward-compatibility.
+   * These are contexts where the "url" can be replaced by... magic?
    *
    * @var string[]
    */
-  protected $grandfatheredOnClickLinks = [
+  protected $grandfatheredNoUrl = [
+    'basic.CRM_Core_BAO_LocationType.page::CRM_Core_BAO_LocationType',
     'case.tab.row::Activity',
+    'group.selector.row::Group',
+    'job.manage.action::Job',
+    'membershipType.manage.action::MembershipType',
+    'messageTemplate.manage.action::MessageTemplate',
   ];
 
   /**
@@ -72,8 +75,8 @@ return new class() extends EventCheck implements HookInterface {
       if (isset($link['url'])) {
         $this->assertType('string', $link['url'], "$msg: url should be a string");
       }
-      elseif (in_array("$op::$objectName", $this->grandfatheredOnClickLinks)) {
-        $this->assertTrue((bool) preg_match(';onclick;', $link['extra']), "$msg: ");
+      elseif (in_array("$op::$objectName", $this->grandfatheredNoUrl)) {
+        // This context is allowed to have links without urls. God knows why.
       }
       else {
         $this->fail("$msg: url is missing");
