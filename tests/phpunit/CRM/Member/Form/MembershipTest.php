@@ -536,6 +536,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form->buildForm();
     $form->postProcess();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $this->assertEquals($form->getMembershipID(), $membership['id']);
     $membershipEndYear = date('Y') + 1;
     if (date('m-d') === '12-31') {
       // If you join on Dec 31, then the first term would end right away, so

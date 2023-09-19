@@ -1822,10 +1822,10 @@ DESC limit 1");
   /**
    * Get the created or edited membership ID.
    *
-   * @return false|mixed
+   * @return int|null
    */
-  protected function getMembershipID() {
-    return reset($this->_membershipIDs);
+  public function getMembershipID(): ?int {
+    return $this->_membershipIDs[0] ?? NULL;
   }
 
   /**
@@ -1848,7 +1848,7 @@ DESC limit 1");
    */
   protected function setMembership(array $membership): void {
     if (!in_array($membership['id'], $this->_membershipIDs, TRUE)) {
-      $this->_membershipIDs[] = $membership['id'];
+      $this->_membershipIDs[] = (int) $membership['id'];
     }
     $this->membership = $membership;
   }
@@ -1894,7 +1894,7 @@ DESC limit 1");
     $ids = [];
     foreach ($contribution['values'][$contribution['id']]['line_item'] as $line) {
       if ($line['entity_table'] ?? '' === 'civicrm_membership') {
-        $ids[] = $line['entity_id'];
+        $ids[] = (int) $line['entity_id'];
       }
     }
     $this->setMembershipIDs($ids);

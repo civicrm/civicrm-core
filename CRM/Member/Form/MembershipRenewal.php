@@ -490,9 +490,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
       CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
     );
-    $this->_membershipId = $this->_id;
     $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->_params,
-      $this->_id,
+      $this->getMembershipID(),
       'Membership'
     );
     if (empty($this->_params['financial_type_id'])) {
@@ -580,7 +579,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
 
     $membershipParams = [
-      'id' => $this->_membershipId,
+      'id' => $this->getMembershipID(),
       'membership_type_id' => $this->_params['membership_type_id'][1],
       'modified_id' => $this->_contactID,
       'custom' => $customFieldsFormatted,
@@ -660,7 +659,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $customFields["custom_{$k}"] = $field;
       }
     }
-    $members = [['member_id', '=', $this->_membershipId, 0, 0]];
+    $members = [['member_id', '=', $this->getMembershipID(), 0, 0]];
     // check whether its a test drive
     if ($this->_mode === 'test') {
       $members[] = ['member_test', '=', 1, 0, 0];
@@ -705,7 +704,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'receiptText' => $this->getSubmittedValue('receipt_text'),
           'contactID' => $this->_receiptContactId,
           'contributionID' => $this->getContributionID(),
-          'membershipID' => $this->_membershipId,
+          'membershipID' => $this->getMembershipID(),
         ],
       ]
     );
