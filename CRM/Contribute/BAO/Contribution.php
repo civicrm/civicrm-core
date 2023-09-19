@@ -1029,6 +1029,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
             'class' => 'medium-popup',
             'qs' => "reset=1&id=%%id%%&contribution_id=%%contribution_id%%",
             'title' => ts('Edit Payment'),
+            'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
           ],
         ];
         $paymentEditLink = CRM_Core_Action::formLink(
@@ -4291,6 +4292,7 @@ LIMIT 1;";
         'is_refund' => 0,
       ],
       'extra' => '',
+      'weight' => 0,
     ];
 
     if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
@@ -4308,6 +4310,7 @@ LIMIT 1;";
           'mode' => 'live',
         ],
         'extra' => '',
+        'weight' => 0,
       ];
     }
     if ($contributionStatus !== 'Pending') {
@@ -4324,6 +4327,7 @@ LIMIT 1;";
           'is_refund' => 1,
         ],
         'extra' => '',
+        'weight' => 0,
       ];
     }
 
