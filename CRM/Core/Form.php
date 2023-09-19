@@ -2046,6 +2046,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * @param string $name
    *
+   * @deprecated - use of this function assumes that an otherwise unavailable
+   * variable can be used form outside the class in question. However, the very
+   * fact it is otherwise unavailable means there is no contract that it will
+   * not be changed or become unused. This function is OK for temporary usage but
+   * should be accompanied with an effort to establish a more correct method
+   * or property tested hook / api interface if this is being done from outside of
+   * core.
+   *
    * @return mixed
    */
   public function getVar($name) {
@@ -2055,6 +2063,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * @param string $name
    * @param mixed $value
+   *
+   * @deprecated - use of this function assumes that an otherwise unavailable
+   * variable can be used form outside the class in question. However, the very
+   * fact it is otherwise unavailable means there is no contract that it will
+   * not be changed or become unused. This function is OK for temporary usage but
+   * should be accompanied with an effort to establish a more correct method
+   * or property tested hook / api interface if this is being done from outside of
+   * core.
    */
   public function setVar($name, $value) {
     $this->$name = $value;
