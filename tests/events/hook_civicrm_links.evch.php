@@ -6,6 +6,38 @@ use Civi\Test\HookInterface;
 return new class() extends EventCheck implements HookInterface {
 
   /**
+   * These are $objectNames that deviate from the normal "CamelCase" convention.
+   * They're allowed for backward-compatibility.
+   *
+   * @var string[]
+   */
+  protected $grandfatheredObjectNames = [
+    'CRM_Core_BAO_LocationType',
+  ];
+
+  /**
+   * These are contexts where the "url" can be replaced with an onclick handler.
+   * It evidently works on some screens, but it doesn't sound reliable.
+   * They're allowed for backward-compatibility.
+   *
+   * @var string[]
+   */
+  protected $grandfatheredOnClickLinks = [
+    'case.tab.row::Activity',
+  ];
+
+  /**
+   * These variants have majorly deviant data in $links.
+   * They are protected by pre-existing unit-tests.
+   * They're allowed for backward-compatibility.
+   *
+   * @var string[]
+   */
+  protected $grandfatheredInvalidLinks = [
+    'pcp.user.actions::Pcp',
+  ];
+
+  /**
    * Ensure that the hook data is always well-formed.
    *
    * @see \CRM_Utils_Hook::links()
@@ -14,21 +46,8 @@ return new class() extends EventCheck implements HookInterface {
     // fprintf(STDERR, "CHECK hook_civicrm_links($op)\n");
     $msg = sprintf('Non-conforming hook_civicrm_links(%s, %s)', json_encode($op), json_encode($objectName));
 
-    // These are $objectNames that deviate from the normal "CamelCase" convention.
-    $grandfatheredObjectNames = [
-      'CRM_Core_BAO_LocationType',
-    ];
-    // These are contexts where the "url" can be replaced with an onclick handler. It evidentally works on some screens, but it doesn't sound reliable.
-    $grandfatheredOnClickLinks = [
-      'case.tab.row::Activity',
-    ];
-    // These variants have majorly deviant data in $links. But they are protected by pre-existing unit-tests.
-    $grandfatheredInvalidLinks = [
-      'pcp.user.actions::Pcp',
-    ];
-
     $this->assertTrue((bool) preg_match(';^\w+(\.\w+)+$;', $op), "$msg: Operation ($op) should be dotted expression");
-    $this->assertTrue((bool) preg_match(';^[A-Z][a-zA-Z0-9]+$;', $objectName) || in_array($objectName, $grandfatheredObjectNames),
+    $this->assertTrue((bool) preg_match(';^[A-Z][a-zA-Z0-9]+$;', $objectName) || in_array($objectName, $this->grandfatheredObjectNames),
       "$msg: Object name ($objectName) should be a CamelCase name or a grandfathered name");
 
     // $this->assertType('integer|null', $objectId, "$msg: Object ID ($objectId) should be int|null");
@@ -39,7 +58,7 @@ return new class() extends EventCheck implements HookInterface {
     $this->assertType('integer|null', $mask, "$msg: Mask ($mask) should be int}null");
     $this->assertType('array', $values, "$msg: Values should be an array");
 
-    if (in_array("$op::$objectName", $grandfatheredInvalidLinks)) {
+    if (in_array("$op::$objectName", $this->grandfatheredInvalidLinks)) {
       return;
     }
     foreach ($links as $link) {
@@ -53,7 +72,7 @@ return new class() extends EventCheck implements HookInterface {
       if (isset($link['url'])) {
         $this->assertType('string', $link['url'], "$msg: url should be a string");
       }
-      elseif (in_array("$op::$objectName", $grandfatheredOnClickLinks)) {
+      elseif (in_array("$op::$objectName", $this->grandfatheredOnClickLinks)) {
         $this->assertTrue((bool) preg_match(';onclick;', $link['extra']), "$msg: ");
       }
       else {
