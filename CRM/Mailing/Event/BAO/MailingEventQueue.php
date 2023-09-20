@@ -36,21 +36,24 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
   }
 
   /**
-   * Create a security hash from the job, email and contact ids.
+   * Create a unique-ish string to stare in the hash table.
    *
-   * @param array $params
+   * This is included in verp emails such that bounces go to a unique
+   * address (e.g. b.123456.456ABC456ABC.my-email-address@example.com). In this case
+   * b is the action (bounce), 123456 is the queue_id and the last part is the
+   * random string from this function. Note that the local part of the email
+   * can have a max of 64 characters
+   *
+   * https://issues.civicrm.org/jira/browse/CRM-2574
+   *
+   * The hash combined with the queue id provides a fairly unguessable combo for the emails
+   * (enough that a sysadmin should notice if someone tried to brute force it!)
    *
    * @return string
    *   The hash
    */
-  public static function hash($params) {
-    $jobId = $params['job_id'];
-    $emailId = CRM_Utils_Array::value('email_id', $params, '');
-    $contactId = $params['contact_id'];
-
-    return substr(sha1("{$jobId}:{$emailId}:{$contactId}:" . time()),
-      0, 16
-    );
+  public static function hash() {
+    return base64_encode(random_bytes(16));
   }
 
   /**
