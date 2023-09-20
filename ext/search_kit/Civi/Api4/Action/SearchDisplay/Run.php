@@ -158,6 +158,9 @@ class Run extends AbstractRunAction {
       $settings['toolbar'][] = $settings['addButton'] + ['style' => 'primary', 'target' => 'crm-popup'];
     }
     foreach ($settings['toolbar'] ?? [] as $button) {
+      if (!$this->checkLinkCondition($button, $data)) {
+        continue;
+      }
       $button = $this->formatLink($button, $data);
       if ($button) {
         $toolbar[] = $button;

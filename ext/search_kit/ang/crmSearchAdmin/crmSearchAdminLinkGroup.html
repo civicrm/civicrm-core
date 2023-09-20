@@ -39,7 +39,7 @@
         <input ng-model="item.condition[0]" crm-ui-select="{placeholder: item.action ? ts('Allowed') : ts('Always'), data: $ctrl.fields}" ng-change="$ctrl.onChangeCondition(item)">
         <div class="form-group" ng-if="item.condition[0] === 'check user permission'">
           <select class="form-control api4-operator" ng-model="item.condition[1]" ng-options="o.key as o.value for o in $ctrl.permissionOperators"></select>
-          <input class="form-control" crm-ui-select="{data: $ctrl.permissions}" ng-model="item.condition[2]">
+          <input class="form-control" crm-ui-select="{data: $ctrl.permissions, multiple: true}" ng-model="item.condition[2]" ng-list>
         </div>
         <crm-search-condition class="form-group"
           ng-if="item.condition[0] && item.condition[0] !== 'check user permission'"
