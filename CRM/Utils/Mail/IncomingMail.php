@@ -209,7 +209,7 @@ class CRM_Utils_Mail_IncomingMail {
       [, $this->action, $this->jobID, $this->queueID, $this->hash] = $matches;
     }
     if ($this->isVerp()) {
-      $queue = CRM_Mailing_Event_BAO_MailingEventQueue::verify($this->getJobID(), $this->getQueueID(), $this->getHash());
+      $queue = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $this->getQueueID(), $this->getHash());
       if (!$queue) {
         throw new CRM_Core_Exception('Contact could not be found from civimail response');
       }

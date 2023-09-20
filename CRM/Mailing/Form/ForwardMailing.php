@@ -27,7 +27,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
       $this, NULL
     );
 
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
 
     if ($q == NULL) {
 
