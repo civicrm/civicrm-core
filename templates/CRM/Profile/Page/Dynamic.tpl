@@ -9,7 +9,7 @@
 *}
 {if ! empty( $row )}
 {* wrap in crm-container div so crm styles are used *}
-    {if $overlayProfile }
+    {if $overlayProfile}
         {include file="CRM/Profile/Page/Overlay.tpl"}
     {else}
         <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">

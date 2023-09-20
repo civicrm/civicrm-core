@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this div is being used to apply special css *}
-    {if !$section }
+    {if !$section}
     <div class="crm-block crm-form-block crm-report-field-form-block">
         {include file="CRM/Report/Form/Fields.tpl"}
     </div>
@@ -16,7 +16,7 @@
 
 <div class="crm-block crm-content-block crm-report-form-block">
 {include file="CRM/Report/Form/Actions.tpl"}
-{if !$section }
+{if !$section}
 {include file="CRM/Report/Form/Statistics.tpl" top=true bottom=false}
 {/if}
     {if $rows}
@@ -178,7 +178,7 @@
             </table>
         {/if}
 
-        {if !$section }
+        {if !$section}
             {*Statistics at the bottom of the page*}
             {include file="CRM/Report/Form/Statistics.tpl" top=false bottom=true}
         {/if}

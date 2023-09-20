@@ -20,7 +20,7 @@
 {ts}Thanks for your recurring contribution sign-up.{/ts}
 
 
-{ts 1=$recur_frequency_interval 2=$recur_frequency_unit 3=$recur_installments}This recurring contribution will be automatically processed every %1 %2(s){/ts}{if $recur_installments } {ts 1=$recur_installments} for a total of %1 installment(s){/ts}{/if}.
+{ts 1=$recur_frequency_interval 2=$recur_frequency_unit 3=$recur_installments}This recurring contribution will be automatically processed every %1 %2(s){/ts}{if $recur_installments} {ts 1=$recur_installments} for a total of %1 installment(s){/ts}{/if}.
 
 {ts}Start Date{/ts}:  {$recur_start_date|crmDate}
 

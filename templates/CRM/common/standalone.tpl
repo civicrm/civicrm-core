@@ -17,8 +17,8 @@
   {/crmRegion}
 
 {* @todo This is probably not required? *}
-{if isset($buildNavigation) and !$urlIsPublic }
-    {include file="CRM/common/Navigation.tpl" }
+{if isset($buildNavigation) and !$urlIsPublic}
+    {include file="CRM/common/Navigation.tpl"}
 {/if}
 
   <title>{$docTitle}</title>

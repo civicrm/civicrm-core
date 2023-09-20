@@ -4,38 +4,38 @@
 {/if}
 
 {if !empty($isOnWaitlist)}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {ts}You have been added to the WAIT LIST for this event.{/ts}
 
 {ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {elseif !empty($isRequireApproval)}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {ts}Your registration has been submitted.{/ts}
 
 {ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {elseif $isPrimary && {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {$pay_later_receipt}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {/if}
 
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {ts}Event Information and Location{/ts}
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {event.title}
 {event.start_date|crmDate}{if {event.end_date|boolean}}-{if '{event.end_date|crmDate:"%Y%m%d"}' === '{event.start_date|crmDate:"%Y%m%d"}'}{event.end_date|crmDate:"Time"}{else}{event.end_date}{/if}{/if}
@@ -76,20 +76,20 @@
 
 {if !empty($email)}
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {ts}Registered Email{/ts}
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {$email}
 {/if}
 {if {event.is_monetary|boolean}} {* This section for Paid events only.*}
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {event.fee_label}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {if !empty($lineItem)}{foreach from=$lineItem item=value key=priceset}
 
@@ -99,7 +99,7 @@
 {ts 1=$priceset+1}Participant %1{/ts}
 {/if}
 {/if}
----------------------------------------------------------{if !empty($pricesetFieldsCount) }--------------------{/if}
+---------------------------------------------------------{if !empty($pricesetFieldsCount)}--------------------{/if}
 
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_qty}{ts}Qty{/ts}{/capture}
@@ -110,12 +110,12 @@
 {capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
 {/if}
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
-{capture assign=ts_participant_total}{if !empty($pricesetFieldsCount) }{ts}Total Participants{/ts}{/if}{/capture}
+{capture assign=ts_participant_total}{if !empty($pricesetFieldsCount)}{ts}Total Participants{/ts}{/if}{/capture}
 {$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if !empty($dataArray)} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"} {if !empty($ts_participant_total)}{$ts_participant_total|string_format:"%10s"}{/if}
-----------------------------------------------------------{if !empty($pricesetFieldsCount) }--------------------{/if}
+----------------------------------------------------------{if !empty($pricesetFieldsCount)}--------------------{/if}
 
 {foreach from=$value item=line}
-{if !empty($pricesetFieldsCount) }{capture assign=ts_participant_count}{$line.participant_count}{/capture}{/if}
+{if !empty($pricesetFieldsCount)}{capture assign=ts_participant_count}{$line.participant_count}{/capture}{/if}
 {capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney|string_format:"%10s"} {if !empty($dataArray)} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}  {/if}  {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {if !empty($ts_participant_count)}{$ts_participant_count|string_format:"%10s"}{/if}
 {/foreach}
 {/if}
@@ -149,7 +149,7 @@
 {else}{ts}Total Amount{/ts}: {contribution.total_amount}  {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
 {/if}
 
-{if !empty($pricesetFieldsCount) }
+{if !empty($pricesetFieldsCount)}
       {assign var="count" value= 0}
       {foreach from=$lineItem item=pcount}
       {assign var="lineItemCount" value=0}
@@ -157,7 +157,7 @@
         {foreach from=$pcount item=p_count}
         {assign var="lineItemCount" value=$lineItemCount+$p_count.participant_count}
         {/foreach}
-        {if $lineItemCount < 1 }
+        {if $lineItemCount < 1}
         {assign var="lineItemCount" value=1}
         {/if}
       {assign var="count" value=$count+$lineItemCount}
@@ -168,10 +168,10 @@
 {/if}
 
 {if $isPrimary && {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {$pay_later_receipt}
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {/if}
 
@@ -195,11 +195,11 @@
 {/if}
 {if !empty($billingName)}
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {ts}Billing Name and Address{/ts}
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {$billingName}
 {$address}
@@ -209,7 +209,7 @@
 ===========================================================
 {ts}Credit Card Information{/ts}
 
-==========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+==========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {$credit_card_type}
 {$credit_card_number}
@@ -220,10 +220,10 @@
 
 {if !empty($customGroup)}
 {foreach from=$customGroup item=value key=customName}
-=========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+=========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {$customName}
-=========================================================={if !empty($pricesetFieldsCount) }===================={/if}
+=========================================================={if !empty($pricesetFieldsCount)}===================={/if}
 
 {foreach from=$value item=v key=n}
 {$n}: {$v}

@@ -35,7 +35,7 @@
   </script>
   {/literal}
 {else}
-  {if $membershipMode == 'test' }
+  {if $membershipMode == 'test'}
     {assign var=registerMode value="TEST"}
     {elseif $membershipMode == 'live'}
     {assign var=registerMode value="LIVE"}
@@ -442,7 +442,7 @@
     }
     {/literal}{/if}
 
-    {if $context eq 'standalone' and $isEmailEnabledForSite }
+    {if $context eq 'standalone' and $isEmailEnabledForSite}
     {literal}
     CRM.$(function($) {
       var $form = $("form.{/literal}{$form.formClass}{literal}");

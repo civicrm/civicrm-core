@@ -72,10 +72,10 @@
 
   {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl"}
 
-  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $priceSetID and $lineItem ) }
+  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ($priceSetID and $lineItem)}
     <div class="crm-group amount_display-group">
       <div class="header-dark">
-        {if !$membershipBlock AND $amount OR ( $priceSetID and $lineItem )}{ts}Contribution Information{/ts}{else}{ts}Membership Fee{/ts}{/if}
+        {if !$membershipBlock AND $amount OR ($priceSetID and $lineItem)}{ts}Contribution Information{/ts}{else}{ts}Membership Fee{/ts}{/if}
       </div>
 
       <div class="display-block">
@@ -98,7 +98,7 @@
           {if $totalTaxAmount}
             {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
           {/if}
-          {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if}: <strong>{$amount|crmMoney:$currency}{if $amount_level } &ndash; {$amount_level}{/if}</strong>
+          {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if}: <strong>{$amount|crmMoney:$currency}{if $amount_level} &ndash; {$amount_level}{/if}</strong>
         {/if}
 
         {if $receive_date}

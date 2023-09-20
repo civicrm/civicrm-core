@@ -35,7 +35,7 @@
 </table>
 </div>
 
-{/if }
+{/if}
 
 
 {* print survey response set option value and label *}

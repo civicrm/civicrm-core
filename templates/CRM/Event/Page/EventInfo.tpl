@@ -9,7 +9,7 @@
 *}
 {* this template is used for displaying event information *}
 
-{if $registerClosed }
+{if $registerClosed}
 <div class="spacer"></div>
 <div class="messages status no-popup">
   <i class="crm-i fa-info-circle" aria-hidden="true"></i>
@@ -133,9 +133,9 @@
             </div>
         {/if}
 
-      {if ( $event.is_map && $config->mapProvider &&
-          ( is_numeric($location.address.1.geo_code_1)  ||
-          ( $location.address.1.city AND $location.address.1.state_province ) ) ) }
+      {if ($event.is_map && $config->mapProvider &&
+          (is_numeric($location.address.1.geo_code_1) ||
+          ($location.address.1.city AND $location.address.1.state_province)))}
           <div class="crm-section event_map-section">
               <div class="content">
                     {assign var=showDirectly value="1"}
@@ -222,13 +222,13 @@
         {/if}
       {/crmRegion}
     </div>
-    {if $event.is_public }
+    {if $event.is_public}
         <div class="action-link section iCal_links-section">
           {include file="CRM/Event/Page/iCalLinks.tpl"}
         </div>
     {/if}
 
-    {if $event.is_share }
+    {if $event.is_share}
         {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&amp;reset=1" a=1 fe=1 h=1}{/capture}
         {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl emailMode=true}
     {/if}

@@ -12,7 +12,7 @@
 </div>
 {if $membershipBlock AND $is_quick_config}
     <div class="header-dark">
-      {if $renewal_mode }
+      {if $renewal_mode}
         {if $membershipBlock.renewal_title}
           {$membershipBlock.renewal_title}
         {else}

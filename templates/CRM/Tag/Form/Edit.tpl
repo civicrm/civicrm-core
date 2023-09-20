@@ -9,7 +9,7 @@
 *}
 {* this template is used for adding/editing a tag (admin)  *}
 <div class="crm-block crm-form-block crm-tag-form-block">
-  {if $action eq 1 or $action eq 2 }
+  {if $action eq 1 or $action eq 2}
     <table class="form-layout-compressed">
        <tr class="crm-tag-form-block-label">
           <td class="label">{$form.name.label}</td>

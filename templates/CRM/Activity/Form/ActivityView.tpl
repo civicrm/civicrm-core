@@ -41,7 +41,7 @@
   {/if}
 
         <tr>
-            <td class="label">{ts}Date and Time{/ts}</td><td class="view-value">{$values.activity_date_time|crmDate }</td>
+            <td class="label">{ts}Date and Time{/ts}</td><td class="view-value">{$values.activity_date_time|crmDate}</td>
         </tr>
         {if (array_key_exists('mailingId', $values) && $values.mailingId)}
             <tr>

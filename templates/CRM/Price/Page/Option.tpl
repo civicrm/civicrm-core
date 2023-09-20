@@ -72,7 +72,7 @@
               <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
               <td class="nowrap crm-price-option-order">{$row.weight|smarty:nodefaults}</td>
               {if $getTaxDetails}
-                <td>{if $row.tax_rate != '' }
+                <td>{if $row.tax_rate != ''}
                       {$taxTerm} ({$row.tax_rate}%)
                     {/if}
                 </td>

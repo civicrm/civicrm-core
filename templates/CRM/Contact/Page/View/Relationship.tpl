@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Relationship tab within View Contact - browse, and view relationships for a contact *}
-{if $action eq 4 } {* action = view *}
+{if $action eq 4} {* action = view *}
   {include file="CRM/Contact/Page/View/ViewRelationship.tpl"}
 {elseif $action neq 16} {* add, update *}
   {include file="CRM/Contact/Form/Relationship.tpl"}

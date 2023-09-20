@@ -50,7 +50,7 @@
 {else}
   {if $showForm eq false}
     <div class="messages status no-popup">
-      {if $products ne null }
+      {if $products ne null}
         {icon icon="fa-info-circle"}{/icon}
         {capture assign=crmURL}{crmURL p='civicrm/admin/contribute/addProductToPage' q="reset=1&action=update&id=$id"}{/capture}
         {ts 1=$crmURL}There are no premiums offered on this contribution page yet. You can <a href='%1'>add one</a>.{/ts}

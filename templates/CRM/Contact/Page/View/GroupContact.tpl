@@ -22,7 +22,7 @@
     {include file="CRM/Contact/Form/GroupContact.tpl"}
   {/if}
 
-  {if $groupIn }
+  {if $groupIn}
     <div class="ht-one"></div>
     <h3>{ts}Regular Groups{/ts}</h3>
     <div class="description">{ts 1=$displayName}%1 has joined or been added to these group(s).{/ts}</div>

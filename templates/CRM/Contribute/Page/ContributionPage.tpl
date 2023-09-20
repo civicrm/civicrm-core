@@ -13,7 +13,7 @@
     </div>
 
     {include file="CRM/Contribute/Form/SearchContribution.tpl"}
-    {if NOT ($action eq 1 or $action eq 2) }
+    {if NOT ($action eq 1 or $action eq 2)}
       <table class="form-layout-compressed">
       <tr>
       <td><a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Contribution Page{/ts}</span></a></td>

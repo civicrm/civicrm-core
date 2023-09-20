@@ -120,7 +120,7 @@
     }
 
     function showComments (response) {
-        var urlTemplate = '{/literal}{crmURL p='civicrm/contact/view' q="reset=1&cid=" h=0 }{literal}'
+        var urlTemplate = '{/literal}{crmURL p='civicrm/contact/view' q="reset=1&cid=" h=0}{literal}'
         if (response['values'][0] && response['values'][0].entity_id) {
             var noteId = response['values'][0].entity_id
             var row = cj('tr#Note-'+ noteId);

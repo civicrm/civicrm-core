@@ -143,7 +143,7 @@
           <tr class="crm-contribution-form-block-contribution_status_id">
             <td class="label">{$form.contribution_status_id.label}</td>
             <td>{$form.contribution_status_id.html}
-              {if $contribution_status_id eq 2}{if $is_pay_later }: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
+              {if $contribution_status_id eq 2}{if $is_pay_later}: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
             </td>
             <td>
               {if !$isUsePaymentBlock && $contactId && $contribution_status_id eq 2 && $contribID && $contributionMode EQ null}
@@ -205,7 +205,7 @@
               <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
             </td>
           </tr>
-        {elseif empty($is_template) and $context eq 'standalone' and $outBound_option != 2 }
+        {elseif empty($is_template) and $context eq 'standalone' and $outBound_option != 2}
           <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
             <td class="label">{$form.is_email_receipt.label}</td>
             <td>{$form.is_email_receipt.html}

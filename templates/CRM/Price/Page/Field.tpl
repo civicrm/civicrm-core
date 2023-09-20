@@ -11,7 +11,7 @@
   {include file="CRM/Price/Form/Field.tpl"}
 {elseif $action eq 8 and !$usedBy and !$isReserved}
   {include file="CRM/Price/Form/DeleteField.tpl"}
-{elseif $action eq 1024 }
+{elseif $action eq 1024}
   {include file="CRM/Price/Form/Preview.tpl"}
 {elseif $usedBy}
   <div id="price_set_used_by" class="messages status no-popup">
@@ -64,7 +64,7 @@
                     {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
                 {/if}
       </td>
-            <td>{if $row.html_type eq "Text / Numeric Quantity" }{$row.tax_amount|crmMoney}{/if}</td>
+            <td>{if $row.html_type eq "Text / Numeric Quantity"}{$row.tax_amount|crmMoney}{/if}</td>
         {/if}
         <td class="field-action">{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
       </tr>

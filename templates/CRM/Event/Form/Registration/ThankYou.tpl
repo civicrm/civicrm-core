@@ -196,7 +196,7 @@
         <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
     </div>
 
-    {if $event.is_public }
+    {if $event.is_public}
       <div class="action-link section iCal_links-section">
         {include file="CRM/Event/Page/iCalLinks.tpl"}
       </div>

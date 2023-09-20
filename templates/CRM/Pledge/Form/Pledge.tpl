@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting pledge *}
-{if $showAdditionalInfo and $formType }
+{if $showAdditionalInfo and $formType}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 {if !$email and $action neq 8 and $context neq 'standalone'}
@@ -85,7 +85,7 @@
             </td>
           </tr>
             {/if}
-        {elseif $context eq 'standalone' and $outBound_option != 2 }
+        {elseif $context eq 'standalone' and $outBound_option != 2}
           <tr id="acknowledgment-receipt" style="display:none;">
             <td class="label">{$form.is_acknowledge.label}</td>
             <td>
@@ -233,7 +233,7 @@
      };
 
     {/literal}
-    {if $context eq 'standalone' and $outBound_option != 2 }
+    {if $context eq 'standalone' and $outBound_option != 2}
     {literal}
     CRM.$(function($) {
       var $form = $("form.{/literal}{$form.formClass}{literal}");

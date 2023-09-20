@@ -70,7 +70,7 @@
       <td class="label">{$form.max_participants.label} {help id="id-max_participants" waitlist=$waitlist}</td>
       <td>
         {$form.max_participants.html|crmAddClass:four}
-        {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+        {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
           <a class="crm-popup crm-hover-button" target="_blank" title="{ts}Edit Participant Status Options{/ts}" href="{crmURL p='civicrm/admin/participant_status' q='reset=1'}"><i class="crm-i fa-wrench" aria-hidden="true"></i></a>
         {/if}
       </td>

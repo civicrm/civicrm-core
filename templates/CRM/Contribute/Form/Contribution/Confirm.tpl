@@ -26,10 +26,10 @@
 
   {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl"}
 
-  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $isDisplayLineItems and $lineItem ) }
+  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ($isDisplayLineItems and $lineItem)}
     <div class="crm-group amount_display-group">
       <div class="header-dark">
-        {if !$membershipBlock AND $amount OR ( $isDisplayLineItems and $lineItem ) }{ts}Contribution Amount{/ts}{else}{ts}Membership Fee{/ts} {/if}
+        {if !$membershipBlock AND $amount OR ($isDisplayLineItems and $lineItem)}{ts}Contribution Amount{/ts}{else}{ts}Membership Fee{/ts} {/if}
       </div>
 
       <div class="display-block">
@@ -37,7 +37,7 @@
           {if !$amount}{assign var="amount" value=0}{/if}
           {assign var="totalAmount" value=$amount}
           {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
-        {elseif $is_separate_payment }
+        {elseif $is_separate_payment}
           {if $amount AND $minimum_fee}
             {$membership_name} {ts}Membership{/ts}:
             <strong>{$minimum_fee|crmMoney}</strong>
@@ -50,23 +50,23 @@
             {ts}Total{/ts}:
             <strong>{$amount+$minimum_fee|crmMoney}</strong>
             <br/>
-          {elseif $amount }
+          {elseif $amount}
             {ts}Amount{/ts}:
-            <strong>{$amount|crmMoney} {if $amount_level }<span class='crm-price-amount-label'>
+            <strong>{$amount|crmMoney} {if $amount_level}<span class='crm-price-amount-label'>
                 &ndash; {$amount_level}</span>{/if}</strong>
           {else}
             {$membership_name} {ts}Membership{/ts}:
             <strong>{$minimum_fee|crmMoney}</strong>
           {/if}
         {else}
-          {if $totalTaxAmount }
+          {if $totalTaxAmount}
             {ts 1=$taxTerm}Total %1 Amount{/ts}:
             <strong>{$totalTaxAmount|crmMoney} </strong>
             <br/>
           {/if}
           {if $amount}
             {if $installments}{ts}Installment Amount{/ts}{else}{ts}Total Amount{/ts}{/if}:
-            <strong>{$amount|crmMoney:$currency}{if $amount_level }<span class='crm-price-amount-label'>
+            <strong>{$amount|crmMoney:$currency}{if $amount_level}<span class='crm-price-amount-label'>
                 &ndash; {$amount_level}</span>{/if}</strong>
           {else}
             {$membership_name} {ts}Membership{/ts}:
@@ -131,7 +131,7 @@
           {/if}
         {/if}
 
-        {if $is_pledge }
+        {if $is_pledge}
           {if $pledge_frequency_interval GT 1}
             <p>
               <strong>{ts 1=$pledge_frequency_interval 2=$pledge_frequency_unit 3=$pledge_installments}I pledge to contribute this amount every %1 %2s for %3 installments.{/ts}</strong>
@@ -276,7 +276,7 @@
     </fieldset>
   {/if}
 
-  {if $contributeMode NEQ 'notify' and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) } {* In 'notify mode, contributor is taken to processor payment forms next *}
+  {if $contributeMode NEQ 'notify' and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 )} {* In 'notify mode, contributor is taken to processor payment forms next *}
     <div class="messages status continue_instructions-section">
       <p>
         {if $is_pay_later OR $amount LE 0.0}

@@ -7,8 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if ! empty( $fields )}
-  {if $groupId }
+{if ! empty($fields)}
+  {if $groupId}
   <div class="crm-accordion-wrapper crm-group-{$groupId}-accordion {if $rows}collapsed{/if}">
     <div class="crm-accordion-header crm-master-accordion-header">
       {ts}Edit Search Criteria{/ts}

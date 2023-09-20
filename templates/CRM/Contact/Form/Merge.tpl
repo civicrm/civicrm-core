@@ -142,12 +142,12 @@
 
             <td>
               {* Display location for fields with locations *}
-              {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im' }
+              {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im'}
                 {$form.location_blocks.$blockName.$blockId.locTypeId.html}&nbsp;
               {/if}
 
               {* Display other_type_id for websites, ims and phones *}
-              {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
+              {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone'}
                 {$form.location_blocks.$blockName.$blockId.typeTypeId.html}&nbsp;
               {/if}
 

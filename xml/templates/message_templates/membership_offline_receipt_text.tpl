@@ -70,7 +70,7 @@
 {/if}
 {/if}
 
-{if !empty($isPrimary) }
+{if !empty($isPrimary)}
 {if !empty($billingName)}
 
 ===========================================================
