@@ -259,8 +259,11 @@ SELECT count( a.id )
         $ids = [];
         $clauses[] = self::getGroupClause($excludeIds, 'NOT IN');
       }
-      if (!empty($ids)) {
+      if (!empty($ids) && !$allInclude) {
         $clauses[] = self::getGroupClause($ids, 'IN');
+      }
+      elseif ($allInclude && empty($excludeIds)) {
+        $clauses[] = ' ( 1 ) ';
       }
     }
 
