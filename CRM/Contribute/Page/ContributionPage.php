@@ -112,7 +112,8 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString . 'settings',
           'qs' => $urlParams,
           'uniqueName' => 'settings',
-          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
+          // This needs to be lower than Membership Settings since otherwise the order doesn't make sense.
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Contribution Amounts'),
@@ -129,7 +130,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'qs' => $urlParams,
           'uniqueName' => 'membership',
           // This should come after Title
-          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
+          'weight' => 0,
         ],
         CRM_Core_Action::EXPORT => [
           'name' => ts('Thank-you and Receipting'),
