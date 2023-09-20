@@ -41,7 +41,7 @@
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 <div id="editMessageDetails" class="section">
-  {if call_user_func(array('CRM_Core_Permission','check'), 'edit message templates') }
+  {if call_user_func(array('CRM_Core_Permission','check'), 'edit message templates')}
       <div id="updateDetails" class="section" >
     {$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}
       </div>

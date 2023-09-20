@@ -44,7 +44,7 @@
       <td class="html-adjust">{$form.text_length.html}</td>
     </tr>
 
-    <tr id='showoption' {if $action eq 1 or $action eq 2 }class="hiddenElement"{/if}>
+    <tr id='showoption' {if $action eq 1 or $action eq 2}class="hiddenElement"{/if}>
       <td colspan="2">
         <table class="form-layout-compressed">
           {* Conditionally show table for setting up selection options - for field types = radio, checkbox or select *}
@@ -354,7 +354,7 @@
 </script>
 {/literal}
 {* Give link to view/edit option group *}
-{if $action eq 2 && !empty($hasOptionGroup) }
+{if $action eq 2 && !empty($hasOptionGroup)}
   <div class="action-link">
     {crmButton p="civicrm/admin/custom/group/field/option" q="reset=1&action=browse&fid=`$id`&gid=`$gid`" icon="pencil"}{ts}View / Edit Multiple Choice Options{/ts}{/crmButton}
   </div>

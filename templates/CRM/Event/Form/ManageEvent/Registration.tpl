@@ -9,7 +9,7 @@
 *}
 {if $addProfileBottomAdd OR $addProfileBottom}
   <td scope="row" class="label" width="20%">
-    {if $addProfileBottomAdd }{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].label}
+    {if $addProfileBottomAdd}{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].label}
     {else}{$form.custom_post_id_multiple[$profileBottomNum].label}{/if}</td>
   <td>
     {if $addProfileBottomAdd}{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].html}

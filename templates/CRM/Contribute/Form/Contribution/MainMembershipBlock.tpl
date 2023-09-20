@@ -78,7 +78,7 @@
       <table id="membership-listings">
           {foreach from=$membershipTypes item=row}
             <tr class="odd-row" valign="top">
-                {if $showRadio }
+                {if $showRadio}
                     {* unreachable - show radio is never true *}
                     {assign var="pid" value=$row.id}
                   <td style="width: 1em;">{$form.selectMembership.$pid.html}</td>
@@ -87,7 +87,7 @@
                 {/if}
               <td style="width: auto;">
                 <span class="bold">{$row.name} &nbsp;
-                {if ($membershipBlock.display_min_fee) AND $row.minimum_fee GT 0 }
+                {if ($membershipBlock.display_min_fee) AND $row.minimum_fee GT 0}
                     {if $is_separate_payment OR ! $form.amount.label}
                       &ndash; {$row.minimum_fee|crmMoney}
                     {else}
@@ -126,7 +126,7 @@
             </tr>
           {/if}
           {if $showRadio}{* unreachable *}
-              {if $showRadioNoThanks } {* Provide no-thanks option when Membership signup is not required - per membership block configuration. *}
+              {if $showRadioNoThanks} {* Provide no-thanks option when Membership signup is not required - per membership block configuration. *}
                 <tr class="odd-row">
                   <td>{$form.selectMembership.no_thanks.html}</td>
                   <td colspan="2"><strong>{ts}No thank you{/ts}</strong></td>

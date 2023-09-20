@@ -22,7 +22,7 @@
         </tr>
     {/if}
 
-    {if $contributionSummary }
+    {if $contributionSummary}
       <tr>
           {if $contributionSummary.total.amount}
             <th class="contriTotalLeft right">{ts}Total{/ts} &ndash; {$contributionSummary.total.amount|smarty:nodefaults}</th>

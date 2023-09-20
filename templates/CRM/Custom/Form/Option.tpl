@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block {if $action eq 4}crm-content-block {else}crm-form-block {/if}crm-custom_option-form-block">
-<h3>{if $action eq 4 }{ts}View Option{/ts}{elseif $action eq 2}{ts}Edit Option{/ts}{elseif $action eq 8}{ts 1=$label}Delete Option "%1"{/ts}{else}{ts}Add Option{/ts}{/if}</h3>
+<h3>{if $action eq 4}{ts}View Option{/ts}{elseif $action eq 2}{ts}Edit Option{/ts}{elseif $action eq 8}{ts 1=$label}Delete Option "%1"{/ts}{else}{ts}Add Option{/ts}{/if}</h3>
     {if $action eq 8}
       <div class="messages status no-popup">
           {icon icon="fa-info-circle"}{/icon}

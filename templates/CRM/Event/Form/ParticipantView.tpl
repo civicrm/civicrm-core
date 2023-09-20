@@ -115,7 +115,7 @@
         </tr>
     {/if}
     {foreach from=$note item="rec"}
-      {if $rec }
+      {if $rec}
             <tr><td class="label">{ts}Note{/ts}</td><td>{$rec|nl2br}</td></tr>
       {/if}
     {/foreach}

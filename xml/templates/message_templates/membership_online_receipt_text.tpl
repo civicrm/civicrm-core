@@ -28,7 +28,7 @@
 ===========================================================
 {if !$useForMember && isset($membership_amount) && !empty($is_quick_config)}
 {ts 1=$membership_name}%1 Membership{/ts}: {$membership_amount|crmMoney}
-{if $amount && !$is_separate_payment }
+{if $amount && !$is_separate_payment}
 {ts}Contribution Amount{/ts}: {$amount|crmMoney}
 -------------------------------------------
 {ts}Total{/ts}: {$amount+$membership_amount|crmMoney}
@@ -87,7 +87,7 @@
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
 
-{ts}Amount{/ts}: {$amount|crmMoney} {if isset($amount_level) } - {$amount_level} {/if}
+{ts}Amount{/ts}: {$amount|crmMoney} {if isset($amount_level)} - {$amount_level} {/if}
 {/if}
 {elseif isset($membership_amount)}
 ===========================================================
@@ -123,7 +123,7 @@
 {/if}
 {/if}
 
-{if $honor_block_is_active }
+{if $honor_block_is_active}
 ===========================================================
 {$soft_credit_type}
 ===========================================================

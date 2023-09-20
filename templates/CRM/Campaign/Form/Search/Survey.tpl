@@ -144,7 +144,7 @@ function searchSurveys( qfKey )
 
 function loadSurveyList( )
 {
-     var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=surveyList' }"{literal};
+     var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=surveyList'}"{literal};
 
      //build the search qill.
      //get the search criteria.
@@ -254,7 +254,7 @@ function displayResultSet( surveyId, surveyTitle, OptionGroupId ) {
   data['option_group_id'] = OptionGroupId;
   data['survey_id']       = surveyId;
 
-  var dataUrl  = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Campaign_Page_AJAX&fnName=loadOptionGroupDetails' }"{literal};
+  var dataUrl  = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Campaign_Page_AJAX&fnName=loadOptionGroupDetails'}"{literal};
   var content  = '<tr><th>{/literal}{ts escape='js'}Label{/ts}{literal}</th><th>{/literal}{ts escape='js'}Value{/ts}{literal}</th><th>{/literal}{ts escape='js'}Recontact Interval{/ts}{literal}</th><th>{/literal}{ts escape='js'}Order{/ts}{literal}</th></tr>';
   var setTitle = '{/literal}{ts escape='js'}Result Set for{/ts} {literal}' + surveyTitle;
 

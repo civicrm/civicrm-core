@@ -38,7 +38,7 @@
           <td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
         </tr>
 
-        {if $action neq 2 }
+        {if $action neq 2}
           <tr class="crm-{$formClass}-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
             <td>{$form.trxn_id.html}</td>

@@ -21,7 +21,7 @@
   </tr>
   {counter start=0 skip=1 print=false}
   {foreach from=$pledge_rows item=row}
-  <tr id='rowid{$row.pledge_id}' class="{cycle values="odd-row,even-row"} {if $row.pledge_status_name eq 'Overdue' } disabled{/if} crm-pledge crm-pledge_{$row.pledge_id} ">
+  <tr id='rowid{$row.pledge_id}' class="{cycle values="odd-row,even-row"} {if $row.pledge_status_name eq 'Overdue'} disabled{/if} crm-pledge crm-pledge_{$row.pledge_id} ">
     <td class="crm-pledge-pledge_amount">{$row.pledge_amount|crmMoney:$row.pledge_currency}</td>
     <td class="crm-pledge-pledge_total_paid">{$row.pledge_total_paid|crmMoney:$row.pledge_currency}</td>
     <td class="crm-pledge-pledge_amount">{$row.pledge_amount-$row.pledge_total_paid|crmMoney:$row.pledge_currency}</td>
@@ -32,7 +32,7 @@
     <td class="crm-pledge-pledge_status crm-pledge-pledge_status_{$row.pledge_status}">{$row.pledge_status}</td>
     {if empty($userChecksum)}
       <td>
-        {if $row.pledge_contribution_page_id and ($row.pledge_status_name neq 'Completed') and ( $row.contact_id eq $loggedUserID ) }
+        {if $row.pledge_contribution_page_id and ($row.pledge_status_name neq 'Completed') and ($row.contact_id eq $loggedUserID)}
           <a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$row.pledge_contribution_page_id`&pledgeId=`$row.pledge_id`"}">{ts}Make Payment{/ts}</a><br/>
         {/if}
         <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}">{ts}Payments{/ts}</a>

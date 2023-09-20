@@ -44,7 +44,7 @@
       {if $location.lat}
     var point  = new google.maps.LatLng({$location.lat},{$location.lng});
     var image  = null;
-    {if $location.image && ( $location.marker_class neq 'Event' ) }
+    {if $location.image && ( $location.marker_class neq 'Event' )}
        image = '{$location.image}';
     {else}
                  {if $location.marker_class eq 'Individual'}
@@ -67,7 +67,7 @@
         {if count($locations) gt 1}
             map.fitBounds(bounds);
             map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
-        {elseif $location.marker_class eq 'Event' || $location.marker_class eq 'Individual'|| $location.marker_class eq 'Household' || $location.marker_class eq 'Organization' }
+        {elseif $location.marker_class eq 'Event' || $location.marker_class eq 'Individual'|| $location.marker_class eq 'Household' || $location.marker_class eq 'Organization'}
             map.setZoom({$defaultZoom});
         {else}
             map.setZoom({$defaultZoom});

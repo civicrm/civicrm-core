@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $overlayProfile }
+{if $overlayProfile}
 <table class="crm-table-group-summary">
   <tr>
     <td colspan="2">{$displayName}</td>

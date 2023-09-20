@@ -7,8 +7,8 @@
 <body>
 
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
-{capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
-{capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
+{capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 {capture assign=tdfirstStyle}style="width: 180px; padding-bottom: 15px;"{/capture}
 {capture assign=tdStyle}style="width: 100px;"{/capture}
 {capture assign=participantTotalStyle}style="margin: 0.5em 0 0.5em;padding: 0.5em;background-color: #999999;font-weight: bold;color: #FAFAFA;border-radius: 2px;"{/capture}
@@ -294,7 +294,7 @@
                   {contribution.total_amount} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
                 </td>
               </tr>
-              {if !empty($pricesetFieldsCount) }
+              {if !empty($pricesetFieldsCount)}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Total Participants{/ts}</td>
@@ -306,7 +306,7 @@
                         {foreach from=$pcount item=p_count}
                           {assign var="lineItemCount" value=$lineItemCount+$p_count.participant_count}
                         {/foreach}
-                        {if $lineItemCount < 1 }
+                        {if $lineItemCount < 1}
                           {assign var="lineItemCount" value=1}
                         {/if}
                         {assign var="count" value=$count+$lineItemCount}
@@ -465,7 +465,7 @@
         {/if}
 
       </table>
-      {if !empty($event.allow_selfcancelxfer) }
+      {if !empty($event.allow_selfcancelxfer)}
         <tr>
           <td colspan="2" {$valueStyle}>
             {ts 1=$selfcancelxfer_time 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts} {if !empty($totalAmount)}{ts}Cancellations are not refundable.{/ts}{/if}<br/>

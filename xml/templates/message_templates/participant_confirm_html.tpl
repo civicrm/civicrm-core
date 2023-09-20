@@ -7,8 +7,8 @@
 <body>
 
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
-{capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
-{capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
+{capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
   <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
   <!-- BEGIN HEADER -->
@@ -36,7 +36,7 @@
     </td>
    </tr>
   {/if}
-  {if $event.allow_selfcancelxfer }
+  {if $event.allow_selfcancelxfer}
   {ts}This event allows for{/ts}
   {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}" h=0 a=1 fe=1}{/capture}
        <a href="{$selfService}"> {ts}self service cancel or transfer{/ts}</a>
@@ -147,7 +147,7 @@
     </table>
    </td>
   </tr>
-  {if $event.allow_selfcancelxfer }
+  {if $event.allow_selfcancelxfer}
    <tr>
      <td colspan="2" {$valueStyle}>
        {ts 1=$selfcancelxfer_time 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts} {if $totalAmount}{ts}Cancellations are not refundable.{/ts}{/if}<br />

@@ -19,7 +19,7 @@
    <tr class="crm-contact-type-form-block-label">
       <td class="label">{$form.label.label}
       {if $action eq 2}
-        {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contact_type' field='label' id= $cid }
+        {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contact_type' field='label' id= $cid}
       {/if}
       </td>
       <td>{$form.label.html}</td>

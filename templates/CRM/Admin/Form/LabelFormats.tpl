@@ -120,7 +120,7 @@
     selectPaper(document.getElementById('paper_size').value);
 
     function selectPaper(val) {
-      dataUrl = {/literal}"{crmURL p='civicrm/ajax/paperSize' h=0 }"{literal};
+      dataUrl = {/literal}"{crmURL p='civicrm/ajax/paperSize' h=0}"{literal};
       cj.post(dataUrl, {paperSizeName: val}, function (data) {
         cj("#paper_size").val(data.name);
         metric = document.getElementById('metric').value;

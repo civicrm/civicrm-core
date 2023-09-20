@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Enduser Tell-a-Friend form. *}
-{if $status eq 'thankyou' } {* Form has been submitted. *}
+{if $status eq 'thankyou'} {* Form has been submitted. *}
     <div class="crm-section tell_friend_thankyou-section">
         {$thankYouText}
     </div>

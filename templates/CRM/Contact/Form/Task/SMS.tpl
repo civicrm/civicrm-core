@@ -77,7 +77,7 @@
 
 {literal}
 CRM.$(function($){
-  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkphone' h=0 }{literal}";
+  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkphone' h=0}{literal}";
   function phoneSelect(el){
     $(el).data('api-entity', 'contact').crmSelect2({
       minimumInputLength: 1,

@@ -144,7 +144,7 @@ function showLabel( ) {
   // Code to set Profile Field help, from custom data field help
   if (fieldId.substring(0, 7) == 'custom_') {
     fieldId = fieldId.substring( fieldId.length, 7);
-    var dataUrl = {/literal}"{crmURL p='civicrm/ajax/custom' h=0 }"{literal};
+    var dataUrl = {/literal}"{crmURL p='civicrm/ajax/custom' h=0}"{literal};
     cj.post( dataUrl, { id: fieldId }, function(data) {
       cj('#help_post').val(data.help_post);
       cj('#help_pre').val(data.help_pre);
@@ -203,7 +203,7 @@ CRM.$(function($) {
 function multiSummaryToggle(customId) {
   if (customId && customId.match(/custom_[\d]/)) {
 
-    var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' q='className=CRM_UF_Page_AJAX&fnName=checkIsMultiRecord&json=1' h=0 }"{literal};
+    var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' q='className=CRM_UF_Page_AJAX&fnName=checkIsMultiRecord&json=1' h=0}"{literal};
     dataUrl = dataUrl + '&customId=' + customId;
     cj.ajax({  url: dataUrl,
       async: false,

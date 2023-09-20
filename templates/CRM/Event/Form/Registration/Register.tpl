@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
   {capture assign="buttonTitle"}{ts}Configure Event{/ts}{/capture}
   {crmButton target="_blank" p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$event.id`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
   <div class='clear'></div>
@@ -83,7 +83,7 @@
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
       {if ! $quickConfig}</fieldset>{/if}
     {/if}
-    {if $pcp && $is_honor_roll }
+    {if $pcp && $is_honor_roll}
       <fieldset class="crm-public-form-item crm-group pcp-group">
         <div class="crm-public-form-item crm-section pcp-section">
           <div class="crm-public-form-item crm-section display_in_roll-section">
@@ -162,7 +162,7 @@
     });
 
   {/literal}
-  {if $pcp && $is_honor_roll }
+  {if $pcp && $is_honor_roll}
     pcpAnonymous();
   {/if}
   {literal}
@@ -260,7 +260,7 @@
   }
 
   {/literal}
-  {if $pcp && $is_honor_roll }{literal}
+  {if $pcp && $is_honor_roll}{literal}
   function pcpAnonymous() {
     // clear nickname field if anonymous is true
     if (document.getElementsByName("pcp_is_anonymous")[1].checked) {

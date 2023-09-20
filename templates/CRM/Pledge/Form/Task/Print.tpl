@@ -9,7 +9,7 @@
 *}
 <p>
 
-{if $rows }
+{if $rows}
 <div class="form-item">
      <span class="element-right">{$form.buttons.html}</span>
 </div>

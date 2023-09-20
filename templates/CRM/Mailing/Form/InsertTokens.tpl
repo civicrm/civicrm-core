@@ -141,7 +141,7 @@ function selectValue( val, prefix) {
     return;
   }
 
-  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/template' h=0 }"{literal};
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/template' h=0}"{literal};
 
   cj.post( dataUrl, {tid: val}, function( data ) {
     var hide = (data.document_body && isPDF) ? false : true;
@@ -310,7 +310,7 @@ CRM.$(function($) {
   function setSignature() {
     var emailID = $("#fromEmailAddress").val( );
     if ( !isNaN( emailID ) ) {
-      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/signature' h=0 }"{literal};
+      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/signature' h=0}"{literal};
       $.post( dataUrl, {emailID: emailID}, function( data ) {
 
         if (data.signature_text) {

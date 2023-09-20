@@ -309,7 +309,7 @@
      </p>
    {/foreach}
 
-   {if !$tags && !$tagSetTags }
+   {if !$tags && !$tagSetTags}
      <div class="status">
        {ts}There are no tags currently assigned to this case.{/ts}
      </div>
