@@ -1906,7 +1906,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
   public function testRunWithToolbar(): void {
     $params = [
-      'checkPermissions' => FALSE,
       'return' => 'page:1',
       'savedSearch' => [
         'api_entity' => 'Contact',
@@ -1944,6 +1943,15 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'filters' => ['contact_type' => 'Individual'],
     ];
+    // No 'add contacts' permission == no "Add contacts" button
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'administer search_kit',
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(0, $result->toolbar);
+    // With 'add contacts' permission the button will be shown
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'add contacts';
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result->toolbar);
     $button = $result->toolbar[0];
@@ -1976,6 +1984,80 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $button = $result->toolbar[0];
     $this->assertStringContainsString('test=Organization', $button['url']);
     $this->assertTrue($button['autoOpen']);
+  }
+
+  public static function toolbarLinkPermissions(): array {
+    $sets = [];
+    $sets[] = [
+      'CONTAINS',
+      ['access CiviCRM', 'administer CiviCRM'],
+      ['access CiviCRM'],
+      TRUE,
+    ];
+    $sets[] = [
+      '=',
+      ['access CiviCRM', 'administer CiviCRM'],
+      ['access CiviCRM'],
+      FALSE,
+    ];
+    $sets[] = [
+      '!=',
+      ['access CiviCRM', 'administer CiviCRM'],
+      ['access CiviCRM'],
+      TRUE,
+    ];
+    $sets[] = [
+      'CONTAINS',
+      ['access CiviCRM', 'administer CiviCRM'],
+      [],
+      FALSE,
+    ];
+    $sets[] = [
+      '=',
+      [],
+      [],
+      TRUE,
+    ];
+    return $sets;
+  }
+
+  /**
+   * @dataProvider toolbarLinkPermissions
+   */
+  public function testToolbarLinksPermissionOperators($linkOperator, $linkPerms, $userPerms, $shouldBeVisible): void {
+    $params = [
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'contact_type'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'toolbar' => [
+            [
+              'path' => 'civicrm/test',
+              'text' => 'Test',
+              'condition' => [
+                'check user permission',
+                $linkOperator,
+                $linkPerms,
+              ],
+            ],
+          ],
+          'columns' => [],
+        ],
+      ],
+    ];
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge(['administer search_kit'], $userPerms);
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount((int) $shouldBeVisible, $result->toolbar);
   }
 
   public function testRunWithEntityFile(): void {

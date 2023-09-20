@@ -18,8 +18,9 @@
         linkProps = ['path', 'task', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'condition'];
 
       ctrl.permissionOperators = [
-        {key: '=', value: ts('Has')},
-        {key: '!=', value: ts('Lacks')}
+        {key: 'CONTAINS', value: ts('Includes')},
+        {key: '=', value: ts('Has All')},
+        {key: '!=', value: ts('Lacks All')}
       ];
 
       this.styles = CRM.crmSearchAdmin.styles;

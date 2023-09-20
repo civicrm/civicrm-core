@@ -551,6 +551,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if (!$actionName) {
         return FALSE;
       }
+      if ($actionName === 'create') {
+        // No record to check for this action and getPermittedLinkAction says it's allowed; we're good.
+        return TRUE;
+      }
       $idField = CoreUtil::getIdFieldName($link['entity']);
       $idKey = $this->getIdKeyName($link['entity']);
       $id = $data[$link['prefix'] . $idKey] ?? NULL;
@@ -566,6 +570,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $apiRequest = Request::create($link['entity'], $actionName, ['version' => 4]);
         return CoreUtil::checkAccessRecord($apiRequest, $values);
       }
+      // No id so cannot possibly update or delete record
+      return FALSE;
     }
     return TRUE;
   }
@@ -589,6 +595,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'allowed' => civicrm_api4($entityName, 'getActions', ['checkPermissions' => TRUE])->column('name'),
       ];
     }
+    // Map CRM_Core_Action names to API action names :/
+    $map = [
+      'add' => 'create',
+    ];
+    $actionName = $map[$actionName] ?? $actionName;
     // Action exists and is permitted
     if (in_array($actionName, $this->entityActions[$entityName]['allowed'], TRUE)) {
       return $actionName;
@@ -616,16 +627,22 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $data
    * @return bool
    */
-  private function checkLinkCondition(array $item, array $data): bool {
+  protected function checkLinkCondition(array $item, array $data): bool {
     if (empty($item['condition'][0]) || empty($item['condition'][1])) {
       return TRUE;
     }
     $op = $item['condition'][1];
     if ($item['condition'][0] === 'check user permission') {
-      if (!empty($item['condition'][2]) && !\CRM_Core_Permission::check($item['condition'][2])) {
-        return $op !== '=';
+      // No permission == open access
+      if (empty($item['condition'][2])) {
+        return TRUE;
       }
-      return TRUE;
+      $permissions = (array) $item['condition'][2];
+      if ($op === 'CONTAINS') {
+        // Place conditions in OR array for CONTAINS operator
+        $permissions = [$permissions];
+      }
+      return \CRM_Core_Permission::check($permissions) == ($op !== '!=');
     }
     // Convert the conditional value of 'current_domain' into an actual value that filterCompare can work with
     if ($item['condition'][2] === 'current_domain') {
