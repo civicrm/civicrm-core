@@ -28,7 +28,7 @@ use Civi\Api4\Utils\ReflectionUtils;
  *  - Require a value for the param if you add the "@required" annotation.
  *
  * @method bool getCheckPermissions()
- * @method $this setDebug(bool $value) Enable/disable debug output
+ * @method $this setDebug(bool $debug) Enable/disable debug output
  * @method bool getDebug()
  * @method $this setChain(array $chain)
  * @method array getChain()

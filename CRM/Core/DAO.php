@@ -3059,54 +3059,94 @@ SELECT contact_id
    *
    * Return format is in the form of fieldname => clauses starting with an operator. e.g.:
    * ```
-   *   array(
-   *     'location_type_id' => array('IS NOT NULL', 'IN (1,2,3)')
-   *   )
+   *   [
+   *     // Each string in the array will get joined with AND
+   *     'location_type_id' => ['IS NOT NULL', 'IN (1,2,3)'],
+   *     // Each sub-array in the array will get joined with OR, field names must be enclosed in curly braces
+   *     'privacy' => [
+   *                    ['= 0', '= 1 AND {contact_id} = 456'],
+   *                  ],
+   *   ]
    * ```
    *
    * Note that all array keys must be actual field names in this entity. Use subqueries to filter on other tables e.g. custom values.
+   * The query strings MAY reference other fields in this entity; they must be enclosed in {curly_braces}.
    *
+   * @param string|null $entityName
+   *   Name of the entity being queried (for normal BAO files implementing this method, this variable is redundant
+   *   as there is a 1-1 relationship between most entities and most BAOs. However the variable is passed in to support
+   *   dynamic entities such as ECK).
+   * @param int|null $userId
+   *   Contact id of the current user.
+   *   This param is more aspirational than functional for now. Someday the API may support checking permissions
+   *   for contacts other than the current user, but at present this is always NULL which defaults to the current user.
+   * @param array $conditions
+   *   Contains field/value pairs gleaned from the WHERE clause or ON clause
+   *   (depending on how the entity was added to the query).
+   *   Can be used for optimization/deduping of clauses.
    * @return array
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
-    $fields = $this->fields();
-    // Notes should check permissions on the entity_id field, not the contact_id field
-    $skipContactCheckFor = ['Note'];
+    $fields = $this::getSupportedFields();
     foreach ($fields as $fieldName => $field) {
       // Clause for contact-related entities like Email, Relationship, etc.
-      if (strpos($field['name'], 'contact_id') === 0 && !in_array($field['entity'], $skipContactCheckFor) && ($field['FKClassName'] ?? NULL) == 'CRM_Contact_DAO_Contact') {
+      if (str_starts_with($fieldName, 'contact_id') && ($field['FKClassName'] ?? NULL) === 'CRM_Contact_DAO_Contact') {
         $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
         if (!empty($contactClause)) {
-          $clauses[$field['name']] = $contactClause;
+          $clauses[$fieldName] = $contactClause;
         }
       }
       // Clause for an entity_table/entity_id combo
-      if ($field['name'] === 'entity_id' && isset($fields['entity_table'])) {
-        $relatedClauses = self::getDynamicFkAclClauses();
+      if ($fieldName === 'entity_id' && isset($fields['entity_table'])) {
+        $relatedClauses = self::getDynamicFkAclClauses('entity_table', 'entity_id', $conditions['entity_table'] ?? NULL);
         if ($relatedClauses) {
-          $clauses['id'] = 'IN (SELECT id FROM `' . $this->tableName() . '` WHERE (' . implode(') OR (', $relatedClauses) . '))';
+          // Nested array will be joined with OR
+          $clauses['entity_table'] = [$relatedClauses];
         }
       }
     }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($entityName ?? $this, $clauses);
     return $clauses;
   }
 
-  protected static function getDynamicFkAclClauses(): array {
+  /**
+   * Get an array of ACL clauses for a dynamic FK (entity_id/entity_table combo)
+   *
+   * @param string $entityTableField
+   * @param string $entityIdField
+   * @param mixed|NULL $entityTableValues
+   * @return array
+   */
+  protected static function getDynamicFkAclClauses(string $entityTableField, string $entityIdField, $entityTableValues = NULL): array {
+    // If entity_table is specified in the WHERE clause, use that instead of the entity_table pseudoconstant
+    if ($entityTableValues && is_string($entityTableValues) || is_array($entityTableValues)) {
+      // Ideally we would validate table names against the entity_table pseudoconstant,
+      // but some entities have missing/incomplete metadata and it's better to generate an ACL
+      // clause for what we have than no ACL clause at all, so validate against all known tables.
+      $allTableNames = CRM_Core_DAO_AllCoreTables::tables();
+      $relatedEntities = array_intersect_key(array_flip((array) $entityTableValues), $allTableNames);
+    }
+    // No valid entity_table in WHERE clause so build an ACL case for every possible entity type
+    if (empty($relatedEntities)) {
+      $relatedEntities = static::buildOptions($entityTableField, 'get');
+    }
+    // Hmm, this entity is missing entity_table pseudoconstant. We really should fix that.
+    if (!$relatedEntities) {
+      return [];
+    }
     $relatedClauses = [];
-    $relatedEntities = static::buildOptions('entity_table', 'get');
-    foreach ((array) $relatedEntities as $table => $ent) {
-      // Prevent recursion
-      if (!empty($ent) && $table !== static::getTableName()) {
-        $ent = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
-        $subquery = CRM_Utils_SQL::mergeSubquery($ent);
-        if ($subquery) {
-          $relatedClauses[] = "(entity_table = '$table' AND entity_id " . implode(' AND entity_id ', $subquery) . ")";
-        }
-        else {
-          $relatedClauses[] = "(entity_table = '$table')";
-        }
+    foreach ($relatedEntities as $table => $ent) {
+      // Ensure $ent is the machine name of the entity not a translated title
+      $ent = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
+      // Prevent infinite recursion
+      $subquery = $table === static::getTableName() ? NULL : CRM_Utils_SQL::mergeSubquery($ent);
+      if ($subquery) {
+        $relatedClauses[] = "= '$table' AND {{$entityIdField}} " . implode(" AND {{$entityIdField}} ", $subquery);
+      }
+      // If it's the only value with no conditions, don't need to add it
+      elseif (!$entityTableValues || count($relatedEntities) > 1) {
+        $relatedClauses[] = "= '$table'";
       }
     }
     return $relatedClauses;
@@ -3117,25 +3157,47 @@ SELECT contact_id
    *
    * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
    *
-   * @param string $tableAlias
+   * DO NOT OVERRIDE THIS FUNCTION
+   *
+   * @TODO: ADD `final` keyword to function signature
+   *
+   * @param string|null $tableAlias
+   * @param string|null $entityName
+   * @param array $conditions
+   *   Values from WHERE or ON clause
    * @return array
    */
-  public static function getSelectWhereClause($tableAlias = NULL) {
+  public static function getSelectWhereClause($tableAlias = NULL, $entityName = NULL, $conditions = []) {
     $bao = new static();
-    if ($tableAlias === NULL) {
-      $tableAlias = $bao->tableName();
-    }
-    $clauses = [];
-    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
-      $clauses[$field] = NULL;
-      if ($vals) {
-        $clauses[$field] = "(`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals) . ')';
-        if (empty(static::getSupportedFields()[$field]['required'])) {
-          $clauses[$field] = "(`$tableAlias`.`$field` IS NULL OR {$clauses[$field]})";
+    $tableAlias = $tableAlias ?? $bao->tableName();
+    $entityName = $entityName ?? CRM_Core_DAO_AllCoreTables::getBriefName($bao::class);
+    $finalClauses = [];
+    $fields = static::getSupportedFields();
+    $selectWhereClauses = $bao->addSelectWhereClause($entityName, NULL, $conditions);
+    foreach ($selectWhereClauses as $fieldName => $fieldClauses) {
+      $finalClauses[$fieldName] = NULL;
+      if ($fieldClauses) {
+        if (!is_array($fieldClauses)) {
+          CRM_Core_Error::deprecatedWarning('Expected array of selectWhereClauses for ' . $bao->tableName() . '.' . $fieldName . ', instead got ' . json_encode($fieldClauses));
+          $fieldClauses = (array) $fieldClauses;
+        }
+        $formattedClauses = [];
+        foreach (CRM_Utils_SQL::prefixFieldNames($fieldClauses, array_keys($fields), $tableAlias) as $subClause) {
+          // Arrays of arrays get joined with OR (similar to CRM_Core_Permission::check)
+          if (is_array($subClause)) {
+            $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . implode(" OR `$tableAlias`.`$fieldName` ", $subClause) . ')';
+          }
+          else {
+            $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . $subClause . ')';
+          }
+        }
+        $finalClauses[$fieldName] = '(' . implode(' AND ', $formattedClauses) . ')';
+        if (empty($fields[$fieldName]['required'])) {
+          $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
         }
       }
     }
-    return $clauses;
+    return $finalClauses;
   }
 
   /**

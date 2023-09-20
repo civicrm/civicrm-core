@@ -153,6 +153,8 @@
     <length>255</length>
     <comment>Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)</comment>
     <add>3.3</add>
+    <required>true</required>
+    <default>0</default>
     <html>
       <type>Select</type>
     </html>

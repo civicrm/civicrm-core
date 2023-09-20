@@ -627,13 +627,18 @@ abstract class CRM_Utils_Hook {
   /**
    * @param string|CRM_Core_DAO $entity
    * @param array $clauses
-   * @return mixed
+   * @param int|null $userId
+   *   User contact id. NULL == current user.
+   * @param array $conditions
+   *   Values from WHERE or ON clause
    */
-  public static function selectWhereClause($entity, &$clauses) {
-    $entityName = is_object($entity) ? _civicrm_api_get_entity_name_from_dao($entity) : $entity;
+  public static function selectWhereClause($entity, array &$clauses, int $userId = NULL, array $conditions = []): void {
+    $entityName = is_object($entity) ? CRM_Core_DAO_AllCoreTables::getBriefName($entity::class) : $entity;
     $null = NULL;
-    return self::singleton()->invoke(['entity', 'clauses'], $entityName, $clauses,
-      $null, $null, $null, $null,
+    $userId = $userId ?? (int) CRM_Core_Session::getLoggedInContactID();
+    self::singleton()->invoke(['entity', 'clauses', 'userId', 'conditions'],
+      $entityName, $clauses, $userId, $conditions,
+      $null, $null,
       'civicrm_selectWhereClause'
     );
   }
@@ -1548,19 +1553,19 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook provides a way to override the default privacy behavior for notes.
-   *
+   * Deprecated: use hook_civicrm_selectWhereClause instead.
+   * @deprecated
    * @param array &$noteValues
-   *   Associative array of values for this note
-   *
-   * @return mixed
    */
   public static function notePrivacy(&$noteValues) {
     $null = NULL;
-    return self::singleton()->invoke(['noteValues'], $noteValues,
+    self::singleton()->invoke(['noteValues'], $noteValues,
       $null, $null, $null, $null, $null,
       'civicrm_notePrivacy'
     );
+    if (isset($noteValues['notePrivacy_hidden'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('hook_civicrm_selectWhereClause', 'hook_civicrm_notePrivacy');
+    }
   }
 
   /**

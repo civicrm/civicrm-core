@@ -835,24 +835,27 @@ HEREDOC;
   }
 
   /**
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     // TODO: This seemded like a good idea... piggybacking off the ACL clause of EntityFile
     // however that's too restrictive because entityFile ACLs are limited to just attachments,
     // so this would prevent access to other file fields (e.g. custom fields)
     // Disabling this function for now by calling the parent instead.
-    return parent::addSelectWhereClause();
-    $clauses = [
-      'id' => [],
-    ];
-    // File ACLs are driven by the EntityFile table
-    $entityFileClause = CRM_Core_DAO_EntityFile::getDynamicFkAclClauses();
-    if ($entityFileClause) {
-      $clauses['id'] = 'IN (SELECT file_id FROM `civicrm_entity_file` WHERE (' . implode(') OR (', $entityFileClause) . '))';
-    }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
-    return $clauses;
+    return parent::addSelectWhereClause('File', $userId, $conditions);
+    //  $clauses = [
+    //    'id' => [],
+    //  ];
+    //  // File ACLs are driven by the EntityFile table
+    //  $entityFileClause = CRM_Core_DAO_EntityFile::getDynamicFkAclClauses();
+    //  if ($entityFileClause) {
+    //    $clauses['id'] = 'IN (SELECT file_id FROM `civicrm_entity_file` WHERE (' . implode(') OR (', $entityFileClause) . '))';
+    //  }
+    //  CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
+    //  return $clauses;
   }
 
   /**

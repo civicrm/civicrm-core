@@ -455,8 +455,8 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
             0 => 'SELECT contact_a.id as contact_id, source_contact.id as source_contact_id',
-            2 => 'WHERE ( source_contact.id IS NOT NULL ) AND ( 1 ) AND (contact_a.is_deleted = 0)',
           ],
+          'where_contains' => 'WHERE ( source_contact.id IS NOT NULL ) AND ( 1 ) AND (contact_a.is_deleted = 0)',
         ],
       ],
       'Test display relationships' => [

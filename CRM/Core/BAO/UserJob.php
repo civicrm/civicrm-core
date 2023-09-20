@@ -147,16 +147,19 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
    * use an existing permission? a new permission ? do they require
    * 'view all contacts' etc.
    *
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(): array {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     if (!\CRM_Core_Permission::check('administer queues')) {
       // @todo - the is_template should really be prefixed. We need to add support
       // for that in the compiler & then this would be `{table}.is_template`
       $clauses['created_id'] = '= ' . (int) CRM_Core_Session::getLoggedInContactID() . ' OR is_template = 1';
     }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 

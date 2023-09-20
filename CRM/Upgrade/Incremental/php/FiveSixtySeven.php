@@ -21,6 +21,23 @@
  */
 class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    parent::setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
+    if ($rev === '5.67.alpha1') {
+      $customPrivacy = CRM_Core_DAO::executeQuery('
+        SELECT value, label
+        FROM civicrm_option_value
+        WHERE is_active = 1 AND value NOT IN ("0", "1")
+          AND option_group_id = (SELECT id FROM civicrm_option_group WHERE name = "note_privacy")')
+        ->fetchMap('value', 'label');
+      if ($customPrivacy) {
+        $preUpgradeMessage .= '<p>'
+          . ts('This site has custom note privacy options (%1) which may not work correctly after the upgrade, due to the deprecation of hook_civicrm_notePrivacy. If you are using this hook, see <a %2>developer documentation on updating your code</a>.', [1 => '"' . implode('", "', $customPrivacy) . '"', 2 => 'href="https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_notePrivacy/" target="_blank"']) .
+          '</p>';
+      }
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
@@ -29,6 +46,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_67_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Make Note.privacy required', 'alterColumn', 'civicrm_note', 'privacy', "varchar(255) NOT NULL DEFAULT 0 COMMENT 'Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)'");
     $this->addTask('Make EntityFile.entity_table required', 'alterColumn', 'civicrm_entity_file', 'entity_table', "varchar(64) NOT NULL COMMENT 'physical tablename for entity being joined to file, e.g. civicrm_contact'");
     $this->addExtensionTask('Enable Authx extension', ['authx'], 1101);
     $this->addExtensionTask('Enable Afform extension', ['org.civicrm.afform'], 1102);

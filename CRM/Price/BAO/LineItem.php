@@ -1279,11 +1279,14 @@ WHERE li.contribution_id = %1";
    * clauses being added. Additional filters joining on the participant
    * and membership tables just seem too non-performant.
    *
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(): array {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses['contribution_id'] = CRM_Utils_SQL::mergeSubquery('Contribution');
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 

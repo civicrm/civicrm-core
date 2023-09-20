@@ -3409,16 +3409,19 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   }
 
   /**
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     // We always return an array with these keys, even if they are empty,
     // because this tells the query builder that we have considered these fields for acls
     $clauses = [
       'id' => (array) CRM_Contact_BAO_Contact_Permission::cacheSubquery(),
       'is_deleted' => CRM_Core_Permission::check('access deleted contacts') ? [] : ['!= 1'],
     ];
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 

@@ -5080,9 +5080,11 @@ civicrm_relationship.start_date > {$today}
       if (isset($this->_tables['civicrm_activity'])) {
         $bao = new CRM_Activity_BAO_Activity();
         $clauses = $subclauses = [];
-        foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
+        foreach ($bao->addSelectWhereClause() as $field => $vals) {
           if ($vals && $field !== 'id') {
-            $clauses[] = $bao->tableName() . ".$field " . $vals;
+            foreach ($vals as $val) {
+              $clauses[] = $bao->tableName() . ".$field " . $val;
+            }
           }
           elseif ($vals) {
             $subclauses[] = "$field " . implode(" AND $field ", (array) $vals);

@@ -85,8 +85,7 @@ class Api4SelectQuery extends Api4Query {
     $this->entityAccess[$this->getEntity()] = TRUE;
 
     // Add ACLs first to avoid redundant subclauses
-    $baoName = CoreUtil::getBAOFromApiName($this->getEntity());
-    $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
+    $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $this->getEntity(), [], $this->getWhere()));
 
     // Add explicit joins. Other joins implied by dot notation may be added later
     $this->addExplicitJoins();
@@ -323,11 +322,12 @@ class Api4SelectQuery extends Api4Query {
    * Get acl clause for an entity
    *
    * @param string $tableAlias
-   * @param \CRM_Core_DAO|string $baoName
+   * @param string $entityName
    * @param array $stack
+   * @param array[] $conditions
    * @return array
    */
-  public function getAclClause($tableAlias, $baoName, $stack = []) {
+  public function getAclClause($tableAlias, $entityName, $stack = [], $conditions = []) {
     if (!$this->getCheckPermissions()) {
       return [];
     }
@@ -337,7 +337,28 @@ class Api4SelectQuery extends Api4Query {
     if (count($stack) === 1 && in_array(reset($stack), $this->aclFields, TRUE)) {
       return [];
     }
-    $clauses = $baoName::getSelectWhereClause($tableAlias);
+    // Glean entity values from the WHERE or ON clause conditions
+    $entityValues = [];
+    foreach ($conditions as $condition) {
+      [$fieldExpr, $operator, $valueExpr, $isExpr] = array_pad((array) $condition, 4, NULL);
+      if (in_array($operator, ['=', 'IN'], TRUE)) {
+        // If flag is set then value must be parsed as an expression
+        if ($isExpr) {
+          $expr = SqlExpression::convert($valueExpr);
+          $valueExpr = in_array($expr->getType(), ['SqlString', 'SqlNumber'], TRUE) ? $expr->getExpr() : NULL;
+        }
+        if (isset($valueExpr)) {
+          [$fieldPath] = explode(':', $fieldExpr);
+          $fieldSpec = $this->getField($fieldPath);
+          $entityValues[$fieldPath] = $valueExpr;
+          if ($fieldSpec) {
+            FormattingUtil::formatInputValue($entityValues[$fieldPath], $fieldExpr, $fieldSpec, $entityValues, $operator);
+          }
+        }
+      }
+    }
+    $baoName = CoreUtil::getBAOFromApiName($entityName);
+    $clauses = $baoName::getSelectWhereClause($tableAlias, $entityName, $entityValues);
     if (!$stack) {
       // Track field clauses added to the main entity
       $this->aclFields = array_keys($clauses);
@@ -542,8 +563,15 @@ class Api4SelectQuery extends Api4Query {
         $conditions = [];
       }
     }
-    $baoName = CoreUtil::getBAOFromApiName($joinEntity);
-    $acls = array_values($this->getAclClause($alias, $baoName, $aclStack));
+    // Gather join conditions to help optimize aclClause
+    $joinOn = [];
+    foreach ($joinTree as $clause) {
+      if (is_array($clause) && isset($clause[2])) {
+        // Set 4th param ($isExpr) default to TRUE because this is an ON clause
+        $joinOn[] = array_pad($clause, 4, TRUE);
+      }
+    }
+    $acls = array_values($this->getAclClause($alias, $joinEntity, $aclStack, $joinOn));
     return array_merge($acls, $conditions);
   }
 
@@ -575,7 +603,7 @@ class Api4SelectQuery extends Api4Query {
 
     $bridgeConditions = $this->getBridgeJoinConditions($joinTree, $baseRef, $alias, $bridgeAlias, $bridgeEntity, $aclStack);
 
-    $acls = array_values($this->getAclClause($alias, CoreUtil::getBAOFromApiName($joinEntity), $aclStack));
+    $acls = array_values($this->getAclClause($alias, $joinEntity, $aclStack));
 
     $outerConditions = [];
     foreach (array_filter($joinTree) as $clause) {
@@ -825,10 +853,9 @@ class Api4SelectQuery extends Api4Query {
 
         // Serialized joins are rendered by this::renderSerializedJoin. Don't add their tables.
         if (!$virtualField) {
-          $bao = $joinEntity ? CoreUtil::getBAOFromApiName($joinEntity) : NULL;
           $conditions = $link->getConditionsForJoin($baseTableAlias, $tableAlias);
-          if ($bao) {
-            $conditions = array_merge($conditions, $this->getAclClause($tableAlias, $bao, $joinPath));
+          if ($joinEntity) {
+            $conditions = array_merge($conditions, $this->getAclClause($tableAlias, $joinEntity, $joinPath));
           }
           $this->addJoin('LEFT', $target, $tableAlias, $baseTableAlias, $conditions);
         }
