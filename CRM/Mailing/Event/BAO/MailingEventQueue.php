@@ -291,23 +291,28 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
    * @param null $now
    */
   public static function bulkCreate($params, $now = NULL) {
-    if (!$now) {
-      $now = time();
-    }
+    $cleanNull = function ($value) {
+      return $value === 'null' ? NULL : $value;
+    };
 
-    // construct a bulk insert statement
-    $values = [];
+    // Perform batch-inserts, with batch-sizes limited by BULK_INSERT_COUNT.
+    $rows = [];
     foreach ($params as $param) {
-      $hash = static::hash();
-      $values[] = "( {$param[0]}, {$param[1]}, {$param[2]}, {$param[3]}, '" . $hash . "' )";
-      // FIXME: This (non)escaping is valid as currently used but is not robust to change. This should use CRM_Utils_SQL_Insert...
+      $rows[] = [
+        'job_id' => $cleanNull($param[0]),
+        'email_id' => $cleanNull($param[1]),
+        'contact_id' => $cleanNull($param[2]),
+        'phone_id' => $cleanNull($param[3]),
+        'hash' => static::hash(),
+      ];
+      if (count($rows) >= CRM_Core_DAO::BULK_INSERT_COUNT) {
+        CRM_Utils_SQL_Insert::into('civicrm_mailing_event_queue')->rows($rows)->execute();
+        $rows = [];
+      }
     }
 
-    while (!empty($values)) {
-      $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-      $str = implode(',', $input);
-      $sql = "INSERT INTO civicrm_mailing_event_queue ( job_id, email_id, contact_id, phone_id, hash ) VALUES $str;";
-      CRM_Core_DAO::executeQuery($sql);
+    if (count($rows) >= 0) {
+      CRM_Utils_SQL_Insert::into('civicrm_mailing_event_queue')->rows($rows)->execute();
     }
   }
 
