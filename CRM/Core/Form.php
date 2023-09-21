@@ -2614,7 +2614,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * and a dozen other small ones to be refactored into a shared parent with the reduction of much code duplication
    */
   public function addCIDZeroOptions() {
-    $this->assign('nocid', TRUE);
     $profiles = [];
     if ($this->_values['custom_pre_id']) {
       $profiles[] = $this->_values['custom_pre_id'];

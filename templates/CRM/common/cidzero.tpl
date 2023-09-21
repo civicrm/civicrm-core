@@ -1,4 +1,4 @@
-{if !empty($nocid)}
+{if $nocid}
   <div class="crm-other-contact-row messages status">
     <span>{ts}You are completing this form on behalf of someone else. Please enter their details.</span>{/ts}
   {if !empty($selectable)}
