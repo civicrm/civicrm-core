@@ -40,8 +40,8 @@
 {event.title}
 {event.start_date|crmDate}{if {event.end_date|boolean}}-{if '{event.end_date|crmDate:"%Y%m%d"}' === '{event.start_date|crmDate:"%Y%m%d"}'}{event.end_date|crmDate:"Time"}{else}{event.end_date}{/if}{/if}
 
-{if !empty($event.participant_role) and $event.participant_role neq 'Attendee' and empty($defaultRole)}
-{ts}Participant Role{/ts}: {$event.participant_role}
+{if "{participant.role_id:label}" neq 'Attendee'}
+{ts}Participant Role{/ts}: {participant.role_id:label}
 {/if}
 
 {if !empty($isShowLocation)}

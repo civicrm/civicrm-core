@@ -53,13 +53,13 @@
       </td>
      </tr>
 
-     {if !empty($event.participant_role) and $event.participant_role neq 'Attendee' and !empty($defaultRole)}
+     {if "{participant.role_id:label}" neq 'Attendee'}
       <tr>
        <td {$labelStyle}>
         {ts}Participant Role{/ts}
        </td>
        <td {$valueStyle}>
-        {$event.participant_role}
+         {participant.role_id:label}
        </td>
       </tr>
      {/if}
