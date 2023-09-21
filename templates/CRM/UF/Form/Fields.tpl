@@ -12,30 +12,6 @@
     {assign var="rowIdentifier" value=$field.name}
   {/if}
 
-  {if $field.groupTitle != $fieldset}
-    {if $fieldset != $zeroField}
-      {if $groupHelpPost && $action neq 4}
-        <div class="messages help">{$groupHelpPost|smarty:nodefaults|purify}</div>
-      {/if}
-      {if $mode ne 8}
-        </fieldset>
-      {/if}
-    {/if}
-
-    {if $mode ne 8 && $action ne 4 && !$hideFieldset}
-      <fieldset class="crm-profile crm-profile-id-{$field.group_id} crm-profile-name-{$field.groupName}"><legend>{$field.groupDisplayTitle}</legend>
-    {/if}
-
-    {if ($form.formName eq 'Confirm' OR $form.formName eq 'ThankYou') AND $prefix neq 'honor'}
-      <div class="header-dark">{$field.groupDisplayTitle} </div>
-    {/if}
-    {assign var=fieldset  value=`$field.groupTitle`}
-    {assign var=groupHelpPost  value=`$field.groupHelpPost`}
-    {if $field.groupHelpPre && $action neq 4}
-      <div class="messages help">{$field.groupHelpPre|smarty:nodefaults|purify}</div>
-    {/if}
-  {/if}
-
   {if $field.field_type eq "Formatting"}
     {if $action neq 4}
       {$field.help_pre}
