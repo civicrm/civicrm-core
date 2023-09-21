@@ -175,8 +175,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $locations = CRM_Event_BAO_Event::getMapInfo($this->_id);
     $this->assign('locations', $locations);
     if (!empty($locations) && !empty($values['event']['is_map'])) {
-      $this->assign('mapProvider', $config->mapProvider);
-      $this->assign('mapKey', $config->mapAPIKey);
+      $this->assign('mapProvider', \Civi::settings()->get('mapProvider'));
+      $this->assign('mapKey', \Civi::settings()->get('mapAPIKey'));
       $sumLat = $sumLng = 0;
       $maxLat = $maxLng = -400;
       $minLat = $minLng = 400;
