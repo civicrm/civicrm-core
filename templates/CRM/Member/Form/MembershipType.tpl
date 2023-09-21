@@ -105,7 +105,7 @@
       </div>
     </fieldset>
 
-    {include file="CRM/common/customDataBlock.tpl"}
+    {include file="CRM/common/customDataBlock.tpl" customDataType='MembershipType' customDataSubType=false cid=false groupID=false}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {/if}
     <div class="spacer"></div>
