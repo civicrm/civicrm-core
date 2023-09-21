@@ -192,7 +192,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
 
     $customGroupFields = CustomGroup::getFields(FALSE)
       ->execute()->indexBy('name');
-    $this->assertEquals(['name', 'label', 'grouping'], $customGroupFields['extends']['suffixes']);
+    $this->assertEquals(['name', 'label', 'grouping', 'icon'], $customGroupFields['extends']['suffixes']);
     $this->assertEquals(['name', 'label', 'grouping'], $customGroupFields['extends_entity_column_id']['suffixes']);
 
     $userJobFields = UserJob::getFields(FALSE)

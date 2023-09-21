@@ -13,7 +13,6 @@
 namespace Civi\Api4\Generic\Traits;
 
 use Civi\Api4\CustomField;
-use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
@@ -311,7 +310,7 @@ trait DAOActionTrait {
         $field['table_name'] = $field['custom_group_id.table_name'];
         unset($field['custom_group_id.table_name']);
         $field['name'] = $groupName . '.' . $name;
-        $field['entity'] = CustomGroupJoinable::getEntityFromExtends($field['custom_group_id.extends']);
+        $field['entity'] = \CRM_Core_BAO_CustomGroup::getEntityFromExtends($field['custom_group_id.extends']);
         $info[$name] = $field;
       }
       \Civi::cache('metadata')->set($cacheKey, $info);

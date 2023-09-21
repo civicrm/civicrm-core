@@ -89,25 +89,4 @@ class CustomGroupJoinable extends Joinable {
     return $this->columns[$fieldName];
   }
 
-  /**
-   * Translate custom_group.extends to entity name.
-   *
-   * Custom_group.extends pretty much maps 1-1 with entity names, except for a couple oddballs.
-   * @see \CRM_Core_SelectValues::customGroupExtends
-   *
-   * @param $extends
-   * @return string
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  public static function getEntityFromExtends($extends) {
-    if (strpos($extends, 'Participant') === 0) {
-      return 'Participant';
-    }
-    if ($extends === 'Contact' || in_array($extends, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
-      return 'Contact';
-    }
-    return $extends;
-  }
-
 }
