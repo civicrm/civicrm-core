@@ -97,9 +97,6 @@ class SpecGatherer extends AutoService {
       if (!empty($DAOField['component']) && !\CRM_Core_Component::isEnabled($DAOField['component'])) {
         continue;
       }
-      if ($DAOField['name'] == 'is_active' && empty($DAOField['default'])) {
-        $DAOField['default'] = '1';
-      }
       $this->setDynamicFk($DAOField, $values);
       $field = SpecFormatter::arrayToField($DAOField, $entityName);
       $spec->addFieldSpec($field);
