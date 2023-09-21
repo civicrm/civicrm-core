@@ -66,6 +66,8 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
   /**
    * Generate a fully-formatted mailing with standard email headers.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBasicHeaders(): void {
     $allMessages = $this->runMailingSuccess([
@@ -77,15 +79,15 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $offset = $k + 1;
 
-      $this->assertEquals("FIXME", $message->from->name);
-      $this->assertEquals("info@EXAMPLE.ORG", $message->from->email);
+      $this->assertEquals('FIXME', $message->from->name);
+      $this->assertEquals('info@EXAMPLE.ORG', $message->from->email);
       $this->assertEquals("Mr. Foo{$offset} Anderson II", $message->to[0]->name);
       $this->assertEquals("mail{$offset}@nul.example.com", $message->to[0]->email);
 
       $this->assertMatchesRegularExpression('#^text/plain; charset=utf-8#', $message->headers['Content-Type']);
-      $this->assertMatchesRegularExpression(';^b\.[\d\.a-f]+@chaos.org$;', $message->headers['Return-Path']);
-      $this->assertMatchesRegularExpression(';^b\.[\d\.a-f]+@chaos.org$;', $message->headers['X-CiviMail-Bounce'][0]);
-      $this->assertMatchesRegularExpression(';^\<mailto:u\.[\d\.a-f]+@chaos.org\>$;', $message->headers['List-Unsubscribe'][0]);
+      $this->assertMatchesRegularExpression(';^b\.[\d\.a-z]+@chaos.org$;', $message->headers['Return-Path']);
+      $this->assertMatchesRegularExpression(';^b\.[\d\.a-z]+@chaos.org$;', $message->headers['X-CiviMail-Bounce'][0]);
+      $this->assertMatchesRegularExpression(';^\<mailto:u\.[\d\.a-z]+@chaos.org\>$;', $message->headers['List-Unsubscribe'][0]);
       $this->assertEquals('bulk', $message->headers['Precedence'][0]);
     }
   }
