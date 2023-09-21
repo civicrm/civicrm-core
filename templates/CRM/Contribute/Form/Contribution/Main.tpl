@@ -208,7 +208,7 @@
           {/if}
           {/crmRegion}
           <div id="honorType" class="honoree-name-email-section">
-            {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor' hideFieldset=false}
+            {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor' hideFieldset=true}
           </div>
         </fieldset>
       {/if}
