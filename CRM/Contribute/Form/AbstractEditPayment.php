@@ -551,12 +551,18 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * Note that this function works based on the presence or otherwise of billing fields & can be called regardless of
    * whether they are 'expected' (due to assumptions about the payment processor type or the setting to collect billing
    * for pay later.
+   *
+   * @param int $contactID
+   * @param string $email
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function processBillingAddress() {
+  protected function processBillingAddress(int $contactID, string $email): void {
     $fields = [];
 
     $fields['email-Primary'] = 1;
-    $this->_params['email-5'] = $this->_params['email-Primary'] = $this->_contributorEmail;
+    $this->_params['email-5'] = $this->_params['email-Primary'] = $email;
     // now set the values for the billing location.
     foreach (array_keys($this->_fields) as $name) {
       $fields[$name] = 1;
@@ -565,7 +571,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     $fields["address_name-{$this->_bltID}"] = 1;
 
     //ensure we don't over-write the payer's email with the member's email
-    if ($this->_contributorContactID == $this->_contactID) {
+    if ($contactID == $this->_contactID) {
       $fields["email-{$this->_bltID}"] = 1;
     }
 
@@ -582,10 +588,10 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       }
       //here we are setting up the billing contact - if different from the member they are already created
       // but they will get billing details assigned
-      $addressParams['contact_id'] = $this->_contributorContactID;
+      $addressParams['contact_id'] = $contactID;
       CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,
-        $this->_contributorContactID, NULL, NULL,
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contributorContactID, 'contact_type')
+        $contactID, NULL, NULL,
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'contact_type')
       );
     }
 
