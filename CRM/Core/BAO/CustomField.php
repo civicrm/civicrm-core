@@ -286,45 +286,23 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * @param string $context
+   * @param string|null $context
    * @return array|bool
    */
-  public function getOptions($context = NULL) {
-    CRM_Core_DAO::buildOptionsContext($context);
+  public function getOptions(?string $context = NULL) {
 
     if (!$this->id) {
       return FALSE;
     }
-    $cacheKey = "CRM_Core_BAO_CustomField_getOptions_{$this->id}_$context";
-    $cache = CRM_Utils_Cache::singleton();
-    $options = $cache->get($cacheKey);
-    if (!isset($options)) {
-      if (!$this->data_type || !$this->custom_group_id) {
-        $this->find(TRUE);
-      }
-
-      // This will hold the list of options in format key => label
-      $options = [];
-
-      if (!empty($this->option_group_id)) {
-        $options = CRM_Core_OptionGroup::valuesByID(
-        $this->option_group_id, FALSE, FALSE, FALSE, $context == 'validate' ? 'name' : 'label', !($context == 'validate' || $context == 'get')
-        );
-      }
-      elseif ($this->data_type === 'StateProvince') {
-        $options = CRM_Core_PseudoConstant::stateProvince();
-      }
-      elseif ($this->data_type === 'Country') {
-        $options = $context == 'validate' ? CRM_Core_PseudoConstant::countryIsoCode() : CRM_Core_PseudoConstant::country();
-      }
-      elseif ($this->data_type === 'Boolean') {
-        $options = $context == 'validate' ? [0, 1] : CRM_Core_SelectValues::boolean();
-      }
-      CRM_Utils_Hook::customFieldOptions($this->id, $options, FALSE);
-      CRM_Utils_Hook::fieldOptions($this->getEntity(), "custom_{$this->id}", $options, ['context' => $context]);
-      $cache->set($cacheKey, $options);
+    if (!$this->data_type || !$this->custom_group_id) {
+      $this->find(TRUE);
     }
-    return $options;
+    $id = (int) $this->id;
+    $dataType = $this->data_type;
+    $optionGroupID = $this->option_group_id ? (int) $this->option_group_id : NULL;
+    $entity = $this->getEntity();
+
+    return self::getFieldOptions($id, $optionGroupID, $dataType, $entity, $context);
   }
 
   /**
@@ -811,6 +789,26 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
+   * Use the cache to get all values of a specific custom field.
+   *
+   * @param int $id
+   *   The custom field ID.
+   * @param int|false $permissionType
+   *
+   * @return array
+   *   The field object.
+   * @throws CRM_Core_Exception
+   */
+  public static function getField(int $id, $permissionType = FALSE): array {
+    $field = self::getAllCustomFields($permissionType)[$id];
+    // @todo - on the fence about caching these in the cache for all custom fields. The down side is the
+    // cache array could get really big & serializing & un-serializing big arrays is expensive.
+    $entity = in_array($field['custom_group_id.extends'], CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE) ? 'Contact' : $field['custom_group_id.extends'];
+    $field['options'] = self::getFieldOptions($field['id'], $field['option_group_id'], $field['data_type'], $entity);
+    return $field;
+  }
+
+  /**
    * Add a custom field to an existing form.
    *
    * @param CRM_Core_Form $qf
@@ -1166,31 +1164,24 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
   /**
    * @param string|int|array|null $value
-   * @param CRM_Core_BAO_CustomField|int|array|string $field
-   * @param int $entityId
+   * @param int $fieldID
+   * @param ?int $entityID
+   *   Entity ID is used a a proxy for context
+   *   - In the context of displaying a profile, show file/image
+   *   - In other contexts show a paperclip icon.
    *
    * @return string
-   *
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\Brick\Money\Exception\UnknownCurrencyException
    */
-  public static function displayValue($value, $field, $entityId = NULL) {
-    $field = is_array($field) ? $field['id'] : $field;
-    $fieldId = is_object($field) ? $field->id : (int) str_replace('custom_', '', $field);
-
-    if (!$fieldId) {
-      throw new CRM_Core_Exception('CRM_Core_BAO_CustomField::displayValue requires a field id');
+  public static function displayValue($value, $fieldID, $entityID = NULL) {
+    if (!is_numeric($fieldID)) {
+      // Deprecated support for a non-id value.
+      $fieldID = is_object($fieldID) ? $fieldID->id : (int) str_replace('custom_', '', $fieldID);
     }
-
-    if (!is_a($field, 'CRM_Core_BAO_CustomField')) {
-      $field = self::getFieldObject($fieldId);
-    }
-
-    $fieldInfo = ['options' => $field->getOptions()] + (array) $field;
-
-    $displayValue = self::formatDisplayValue($value, $fieldInfo, $entityId);
-
+    $fieldInfo = self::getField($fieldID);
+    $displayValue = self::formatDisplayValue($value, $fieldInfo, $entityID);
     // Call hook to alter display value.
-    CRM_Utils_Hook::alterCustomFieldDisplayValue($displayValue, $value, $entityId, $fieldInfo);
+    CRM_Utils_Hook::alterCustomFieldDisplayValue($displayValue, $value, $entityID, $fieldInfo);
 
     return $displayValue;
   }
@@ -2913,6 +2904,46 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
       $params['default'] = "'{$field->default_value}'";
     }
     return $params;
+  }
+
+  /**
+   * @param int $id
+   * @param int|null $optionGroupID
+   * @param string $dataType
+   * @param string $entity
+   * @param string|null $context
+   *
+   * @return array|int[]|mixed|null
+   * @throws \CRM_Core_Exception
+   */
+  private static function getFieldOptions(int $id, ?int $optionGroupID, string $dataType, string $entity, ?string $context = NULL): array {
+    CRM_Core_DAO::buildOptionsContext($context);
+    $cacheKey = "CRM_Core_BAO_CustomField_getOptions_{$id}_$context";
+    $cache = CRM_Utils_Cache::singleton();
+    $options = $cache->get($cacheKey);
+    if (!isset($options)) {
+      // This will hold the list of options in format key => label
+      $options = [];
+
+      if ($optionGroupID) {
+        $options = CRM_Core_OptionGroup::valuesByID(
+          $optionGroupID, FALSE, FALSE, FALSE, $context === 'validate' ? 'name' : 'label', !($context === 'validate' || $context === 'get')
+        );
+      }
+      elseif ($dataType === 'StateProvince') {
+        $options = CRM_Core_PseudoConstant::stateProvince();
+      }
+      elseif ($dataType === 'Country') {
+        $options = $context === 'validate' ? CRM_Core_PseudoConstant::countryIsoCode() : CRM_Core_PseudoConstant::country();
+      }
+      elseif ($dataType === 'Boolean') {
+        $options = $context === 'validate' ? [0, 1] : CRM_Core_SelectValues::boolean();
+      }
+      CRM_Utils_Hook::customFieldOptions($id, $options);
+      CRM_Utils_Hook::fieldOptions($entity, "custom_{$id}", $options, ['context' => $context]);
+      $cache->set($cacheKey, $options);
+    }
+    return $options;
   }
 
 }
