@@ -102,6 +102,12 @@
      <weight>25</weight>
   </item>
   <item>
+     <path>civicrm/admin/uf/group/copy</path>
+     <title>Profile Copy</title>
+     <page_callback>CRM_UF_Page_Group</page_callback>
+     <weight>26</weight>
+  </item>
+  <item>
      <path>civicrm/admin/uf/group/setting</path>
      <title>AdditionalInfo Form</title>
      <page_callback>CRM_UF_Form_AdvanceSetting</page_callback>
