@@ -61,7 +61,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     // or invoice ID as an existing recurring contribution
     $duplicates = [];
     if (self::checkDuplicate($params, $duplicates)) {
-      throw new CRM_Core_Exception("Found matching recurring contribution(s): implode(', ', $duplicates)");
+      throw new CRM_Core_Exception('Found matching recurring contribution(s): ' . implode(', ', $duplicates));
     }
 
     $recurring = new CRM_Contribute_BAO_ContributionRecur();
