@@ -10,11 +10,13 @@
  */
 class CRM_Afform_AfformScanner {
 
-  const METADATA_FILE = 'aff.json';
+  const METADATA_JSON = 'aff.json';
+
+  const METADATA_PHP = 'aff.php';
 
   const LAYOUT_FILE = 'aff.html';
 
-  const FILE_REGEXP = '/\.aff\.(json|html)$/';
+  const FILE_REGEXP = '/\.aff\.(json|html|php)$/';
 
   const DEFAULT_REQUIRES = 'afCore';
 
@@ -138,11 +140,10 @@ class CRM_Afform_AfformScanner {
    *     'requires' => ['afform'],
    *   ]
    */
-  public function getMeta($name) {
+  public function getMeta(string $name): ?array {
     // FIXME error checking
 
     $defaults = [
-      'name' => $name,
       'requires' => [],
       'title' => '',
       'description' => '',
@@ -152,22 +153,30 @@ class CRM_Afform_AfformScanner {
       'permission' => ['access CiviCRM'],
       'type' => 'system',
     ];
+    $defn = [];
 
-    $metaFile = $this->findFilePath($name, self::METADATA_FILE);
-    if ($metaFile !== NULL) {
-      $r = array_merge($defaults, json_decode(file_get_contents($metaFile), 1));
-      // Previous revisions of GUI allowed permission==''. array_merge() doesn't catch all forms of missing-ness.
-      if (empty($r['permission'])) {
-        $r['permission'] = $defaults['permission'];
-      }
-      return $r;
+    // If there is a local file it will be json - read from that first
+    $jsonFile = $this->findFilePath($name, self::METADATA_JSON);
+    if ($jsonFile !== NULL) {
+      $defn = json_decode(file_get_contents($jsonFile), 1);
     }
-    elseif ($this->findFilePath($name, self::LAYOUT_FILE)) {
-      return $defaults;
-    }
+    // Extensions may provide afform definitions in php files
     else {
+      $phpFile = $this->findFilePath($name, self::METADATA_PHP);
+      if ($phpFile !== NULL) {
+        $defn = include $phpFile;
+      }
+    }
+    // A form must have at least a layout file (if no metadata file, just use defaults)
+    if (!$defn && !$this->findFilePath($name, self::LAYOUT_FILE)) {
       return NULL;
     }
+    $defn = array_merge($defaults, $defn, ['name' => $name]);
+    // Previous revisions of GUI allowed permission==''. array_merge() doesn't catch all forms of missing-ness.
+    if (empty($defn['permission'])) {
+      $defn['permission'] = $defaults['permission'];
+    }
+    return $defn;
   }
 
   /**
@@ -246,17 +255,6 @@ class CRM_Afform_AfformScanner {
     // TODO Allow a setting override.
     // return Civi::paths()->getPath(Civi::settings()->get('afformPath'));
     return Civi::paths()->getPath('[civicrm.files]/ang');
-  }
-
-  /**
-   * @return string
-   */
-  private function getMarkerRegexp() {
-    static $v;
-    if ($v === NULL) {
-      $v = '/\.(' . preg_quote(self::LAYOUT_FILE, '/') . '|' . preg_quote(self::METADATA_FILE, '/') . ')$/';
-    }
-    return $v;
   }
 
 }
