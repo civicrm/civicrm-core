@@ -3170,7 +3170,7 @@ SELECT contact_id
   public static function getSelectWhereClause($tableAlias = NULL, $entityName = NULL, $conditions = []) {
     $bao = new static();
     $tableAlias = $tableAlias ?? $bao->tableName();
-    $entityName = $entityName ?? CRM_Core_DAO_AllCoreTables::getBriefName($bao::class);
+    $entityName = $entityName ?? CRM_Core_DAO_AllCoreTables::getBriefName(get_class($bao));
     $finalClauses = [];
     $fields = static::getSupportedFields();
     $selectWhereClauses = $bao->addSelectWhereClause($entityName, NULL, $conditions);
