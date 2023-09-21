@@ -279,14 +279,12 @@
                   <td {$valueStyle}>{$taxDetail.amount|crmMoney:'{contribution.currency}'}</td>
                 </tr>
               {/foreach}
-            {/if}
-            {if $isShowTax && {contribution.tax_amount|boolean}}
               <tr>
                 <td {$labelStyle}>
-                  {ts}Total Tax Amount{/ts}
+                    {ts}Total Tax Amount{/ts}
                 </td>
                 <td {$valueStyle}>
-                  {if $isPrimary}{contribution.tax_amount}{else}{$participant.totals.tax_amount|crmMoney}{/if}
+                    {if $isPrimary}{contribution.tax_amount}{else}{$participant.totals.tax_amount|crmMoney}{/if}
                 </td>
               </tr>
             {/if}
