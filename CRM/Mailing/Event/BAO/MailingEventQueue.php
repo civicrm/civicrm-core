@@ -29,7 +29,7 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
     $eq = new CRM_Mailing_Event_BAO_MailingEventQueue();
     $eq->copyValues($params);
     if (empty($params['id']) && empty($params['hash'])) {
-      $eq->hash = self::hash($params);
+      $eq->hash = self::hash();
     }
     $eq->save();
     return $eq;
@@ -53,7 +53,9 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
    *   The hash
    */
   public static function hash() {
-    return base64_encode(random_bytes(16));
+    // Case-insensitive. Some b64 chars are awkward in VERP+URL contexts. Over-generate (24 bytes) and then cut-back (16 alphanums).
+    $random = random_bytes(24);
+    return strtolower(substr(str_replace(['+', '/', '='], ['', '', ''], base64_encode($random)), 0, 16));
   }
 
   /**
@@ -296,9 +298,9 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     // construct a bulk insert statement
     $values = [];
     foreach ($params as $param) {
-      $values[] = "( {$param[0]}, {$param[1]}, {$param[2]}, {$param[3]}, '" . substr(sha1("{$param[0]}:{$param[1]}:{$param[2]}:{$param[3]}:{$now}"),
-          0, 16
-        ) . "' )";
+      $hash = static::hash();
+      $values[] = "( {$param[0]}, {$param[1]}, {$param[2]}, {$param[3]}, '" . $hash . "' )";
+      // FIXME: This (non)escaping is valid as currently used but is not robust to change. This should use CRM_Utils_SQL_Insert...
     }
 
     while (!empty($values)) {
