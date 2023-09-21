@@ -50,7 +50,7 @@
         }
 {/literal}
        var index = 1;
-       {foreach from= $mincontribution item=amt key=id}
+       {foreach from=$mincontribution item=amt key=id}
          {literal}amount[index]{/literal} = "{$amt}"
          {literal}index = index + 1{/literal}
        {/foreach}

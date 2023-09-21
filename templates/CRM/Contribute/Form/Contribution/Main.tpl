@@ -169,7 +169,7 @@
         </div>
       {/if}
       {if $showMainEmail}
-        {assign var=n value=email-$bltID}
+        {assign var=n value="email-`$bltID`"}
         <div class="crm-public-form-item crm-section {$form.$n.name}-section">
           <div class="label">{$form.$n.label}</div>
           <div class="content">

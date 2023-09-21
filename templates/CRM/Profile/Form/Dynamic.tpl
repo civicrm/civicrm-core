@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-profile-name-{$ufGroupName}">
-{crmRegion name=profile-form-`$ufGroupName`}
+{crmRegion name="profile-form-`$ufGroupName`"}
 
 {* Profile forms when embedded in CMS account create (mode=1) or
     cms account edit (mode=8) or civicrm/profile (mode=4) pages *}
