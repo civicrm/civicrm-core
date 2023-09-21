@@ -21,6 +21,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   use FormTrait;
   use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_PriceSetTrait;
+  use CRMTraits_Custom_CustomDataTrait;
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -55,6 +56,19 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ],
     ])->postProcess()->getFirstMailBody();
     $this->assertStringContainsString('Volunteer, Speaker', $email);
+  }
+
+  public function testSubmitWithCustomData(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant', 'extends_entity_column_id' => 1, 'extends_entity_column_value' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Volunteer')]);
+    $email = $this->getForm([], [
+      'status_id' => 1,
+      'register_date' => date('Ymd'),
+      'send_receipt' => 1,
+      'from_email_address' => 'admin@email.com',
+      'role_id' => [CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Volunteer')],
+      $this->getCustomFieldName() => 'Random thing',
+    ])->postProcess()->getFirstMailBody();
+    $this->assertStringContainsStrings($email, ['Enter text here', 'Random thing', 'Group with field text']);
   }
 
   /**
