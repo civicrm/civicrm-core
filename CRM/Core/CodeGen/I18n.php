@@ -38,6 +38,11 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
       foreach ($table['fields'] as $field) {
         if ($field['localizable']) {
           $required = $field['required'] ? ' NOT NULL' : '';
+          // The setting of default `''` for required fields is a workaround
+          // that makes it work similar to turning off STRICT_TRANS_TABLES, but
+          // means that the database cannot enforce required fields since this
+          // definition is not the same as "required". Ideally, required fields
+          // would be included in every INSERT statement.
           $default = $field['default'] ? ' DEFAULT ' . $field['default'] : ($field['required'] ? " DEFAULT '' " : '');
           $comment = $field['comment'] ? " COMMENT '" . $field['comment'] . "'" : '';
           $columns[$table['name']][$field['name']] = $field['sqlType'] . $required . $default . $comment;
