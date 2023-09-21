@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -49,21 +51,13 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('text', 'description', ts('Description'),
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
 
-    // get the tokens - at the point of rendering the token processor is used so
-    // the only reason for this cut-down set of tokens is UI on this
-    // screen and / or historical.
-    $contactTokens = CRM_Core_SelectValues::contactTokens();
-    $eventTokens = [
-      '{event.event_id}' => ts('Event ID'),
-      '{event.title}' => ts('Event Title'),
-      // This layout selection is day + month eg October 27th
-      // obviously someone felt year was not logical for dates.
-      '{event.start_date|crmDate:"%B %E%f"}' => ts('Event Start Date'),
-      '{event.end_date|crmDate:"%B %E%f"}' => ts('Event End Date'),
-    ];
-    $participantTokens = CRM_Core_SelectValues::participantTokens();
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['participantId', 'contactId', 'eventId']]);
+    $tokens = $tokenProcessor->listTokens();
+    // This layout selection is day + month eg October 27th
+    // obviously someone felt year was not logical for dates.
+    $tokens['{event.start_date|crmDate:"%B %E%f"}'] = ts('Event Start Date - Day & Month');
+    $tokens[] = ts('Event End Date - Day & Month');
 
-    $tokens = array_merge($contactTokens, $eventTokens, $participantTokens);
     asort($tokens);
 
     $tokens = array_merge(['spacer' => ts('- spacer -')] + $tokens);
