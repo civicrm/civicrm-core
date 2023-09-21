@@ -247,6 +247,16 @@ return [
                   'condition' => ['is_active', '=', TRUE],
                 ],
                 [
+                  'icon' => 'fa-copy',
+                  'text' => E::ts('Copy'),
+                  'style' => 'default',
+                  'condition' => [],
+                  'entity' => 'UFGroup',
+                  'action' => 'copy',
+                  'join' => '',
+                  'target' => '',
+                ],
+                [
                   'icon' => 'fa-trash',
                   'text' => E::ts('Delete'),
                   'style' => 'danger',

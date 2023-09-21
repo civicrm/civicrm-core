@@ -14,6 +14,7 @@
     <update>civicrm/admin/uf/group/update?action=update&amp;reset=1&amp;id=[id]</update>
     <delete>civicrm/admin/uf/group/update?action=delete&amp;reset=1&amp;id=[id]</delete>
     <browse>civicrm/admin/uf/group</browse>
+    <copy>civicrm/admin/uf/group/copy?action=copy&amp;reset=1&amp;gid=[id]</copy>
   </paths>
   <field>
     <name>id</name>
