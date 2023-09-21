@@ -66,13 +66,13 @@
           </td>
         </tr>
 
-        {if !empty($event.participant_role) and $event.participant_role neq 'Attendee' and !empty($defaultRole)}
+        {if "{participant.role_id:label}" neq 'Attendee'}
           <tr>
             <td {$labelStyle}>
               {ts}Participant Role{/ts}
             </td>
             <td {$valueStyle}>
-              {$event.participant_role}
+              {participant.role_id:label}
             </td>
           </tr>
         {/if}
@@ -317,13 +317,13 @@
                 </tr>
               {/if}
 
-              {if $register_date}
+              {if {participant.register_date|boolean}}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Registration Date{/ts}
                   </td>
                   <td {$valueStyle}>
-                    {$register_date|crmDate}
+                    {participant.register_date}
                   </td>
                 </tr>
               {/if}
