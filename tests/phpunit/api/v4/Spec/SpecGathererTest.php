@@ -65,4 +65,11 @@ class SpecGathererTest extends Api4TestBase {
     $this->assertContains('foo', $fieldNames);
   }
 
+  public function testIsActiveFieldCanDefaultToFalse(): void {
+    $gatherer = new SpecGatherer();
+    // Use Dashboard as it has is_active field and that defaults to 0 (according to schema)
+    $specs = $gatherer->getSpec('Dashboard', 'create', FALSE);
+    self::assertFalse($specs->getFieldByName('is_active')->getDefaultValue(), 'Default value for "is_active" field is not false');
+  }
+
 }
