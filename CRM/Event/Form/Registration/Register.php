@@ -430,8 +430,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $this->addPaymentProcessorFieldsToForm();
       }
     }
-
-    if ($contactID === 0 && !$this->_values['event']['is_multiple_registrations']) {
+    $isSelectContactID = ($contactID === 0 && !$this->_values['event']['is_multiple_registrations']);
+    $this->assign('nocid', $isSelectContactID);
+    if ($isSelectContactID) {
       //@todo we are blocking for multiple registrations because we haven't tested
       $this->addCIDZeroOptions();
     }

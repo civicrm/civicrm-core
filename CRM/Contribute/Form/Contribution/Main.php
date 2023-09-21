@@ -321,10 +321,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->addPaymentProcessorFieldsToForm();
     $this->assign('is_pay_later', $this->getCurrentPaymentProcessor() === 0 && $this->_values['is_pay_later']);
     $this->assign('pay_later_text', $this->getCurrentPaymentProcessor() === 0 ? $this->getPayLaterLabel() : NULL);
-
+    $this->assign('nocid', $contactID === 0);
     if ($contactID === 0) {
       $this->addCidZeroOptions();
-
     }
 
     //build pledge block.

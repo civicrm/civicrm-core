@@ -106,7 +106,6 @@
     </fieldset>
 
     {include file="CRM/common/customDataBlock.tpl"}
-
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {/if}
     <div class="spacer"></div>
