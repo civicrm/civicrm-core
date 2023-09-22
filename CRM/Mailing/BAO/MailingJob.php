@@ -407,23 +407,17 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * @param array $testParams
+   * @param ?array $testParams
    */
-  public function queue($testParams = NULL) {
-    $mailing = new CRM_Mailing_BAO_Mailing();
-    $mailing->id = $this->mailing_id;
+  public function queue(?array $testParams = NULL) {
     if (!empty($testParams)) {
-      $mailing->getTestRecipients($testParams);
+      CRM_Mailing_BAO_Mailing::getTestRecipients($testParams, (int) $this->mailing_id);
     }
     else {
       // We are still getting all the recipients from the parent job
       // so we don't mess with the include/exclude logic.
       $recipients = CRM_Mailing_BAO_MailingRecipients::mailingQuery($this->mailing_id, $this->job_offset, $this->job_limit);
 
-      // FIXME: this is not very smart, we should move this to one DB call
-      // INSERT INTO ... SELECT FROM ..
-      // the thing we need to figure out is how to generate the hash automatically
-      $now = time();
       $params = [];
       $count = 0;
       // dev/core#1768 Get the mail sync interval.
@@ -434,31 +428,40 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         if (empty($recipients->email_id) && empty($recipients->phone_id)) {
           continue;
         }
-
-        if ($recipients->phone_id) {
-          $recipients->email_id = "null";
-        }
-        else {
-          $recipients->phone_id = "null";
-        }
-
         $params[] = [
-          $this->id,
-          $recipients->email_id,
-          $recipients->contact_id,
-          $recipients->phone_id,
+          'job_id' => $this->id,
+          'email_id' => $recipients->email_id ? (int) $recipients->email_id : NULL,
+          'phone_id' => $recipients->phone_id ? (int) $recipients->phone_id : NULL,
+          'contact_id' => $recipients->contact_id ? (int) $recipients->contact_id : NULL,
+          'mailing_id' => (int) $this->mailing_id,
+          'is_test' => !empty($testParams),
         ];
         $count++;
-        // dev/core#1768 Mail sync interval is now configurable.
-        if ($count % $mail_sync_interval == 0) {
-          CRM_Mailing_Event_BAO_MailingEventQueue::bulkCreate($params, $now);
+        /*
+        The mail sync interval is used here to determine how
+        many rows to insert in each insert statement.
+        The discussion & name of the setting implies that the intent of the
+        setting is the frequency with which the mailing tables are updated
+        with information about actions taken on the mailings (ie if you send
+        an email & quickly update the delivered table that impacts information
+        availability.
+
+        However, here it is used to manage the size of each individual
+        insert statement. It is unclear why as the trade offs are out of sync
+        ie. you want you insert statements here to be 'big, but not so big they
+        stall out' but in the delivery context it's a trade off between
+        information availability & performance.
+        https://github.com/civicrm/civicrm-core/pull/17367 */
+
+        if ($count % $mail_sync_interval === 0) {
+          CRM_Mailing_Event_BAO_MailingEventQueue::writeRecords($params);
           $count = 0;
           $params = [];
         }
       }
 
       if (!empty($params)) {
-        CRM_Mailing_Event_BAO_MailingEventQueue::bulkCreate($params, $now);
+        CRM_Mailing_Event_BAO_MailingEventQueue::writeRecords($params);
       }
     }
   }

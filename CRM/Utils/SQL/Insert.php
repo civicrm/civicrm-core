@@ -145,7 +145,12 @@ class CRM_Utils_SQL_Insert {
 
     $escapedRow = [];
     foreach ($this->columns as $column) {
-      $escapedRow[$column] = $this->escapeString($row[$column]);
+      if (is_bool($row[$column])) {
+        $escapedRow[$column] = (int) $row[$column];
+      }
+      else {
+        $escapedRow[$column] = $this->escapeString($row[$column]);
+      }
     }
     $this->rows[] = $escapedRow;
 
@@ -184,6 +189,21 @@ class CRM_Utils_SQL_Insert {
     $sql .= "\n";
 
     return $sql;
+  }
+
+  /**
+   * Execute the query.
+   *
+   * @param bool $i18nRewrite
+   *   If the system has multilingual features, should the field/table
+   *   names be rewritten?
+   * @return CRM_Core_DAO
+   * @see CRM_Core_DAO::executeQuery
+   * @see CRM_Core_I18n_Schema::rewriteQuery
+   */
+  public function execute($i18nRewrite = TRUE) {
+    return CRM_Core_DAO::executeQuery($this->toSQL(), [], TRUE, NULL,
+      FALSE, $i18nRewrite);
   }
 
 }

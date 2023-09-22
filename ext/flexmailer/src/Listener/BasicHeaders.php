@@ -39,7 +39,7 @@ class BasicHeaders extends BaseListener {
 
       $mailParams = array();
       $mailParams['List-Unsubscribe'] = "<mailto:{$verp['unsubscribe']}>";
-      \CRM_Mailing_BAO_Mailing::addMessageIdHeader($mailParams, 'm', $e->getJob()->id, $task->getEventQueueId(), $task->getHash());
+      \CRM_Mailing_BAO_Mailing::addMessageIdHeader($mailParams, 'm', NULL, $task->getEventQueueId(), $task->getHash());
       $mailParams['Precedence'] = 'bulk';
       $mailParams['job_id'] = $e->getJob()->id;
 

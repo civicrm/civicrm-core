@@ -100,8 +100,6 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
 
   /**
    * Test that a contact deleted after the mailing is queued is not emailed.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testDeletedRecipient(): void {
     $this->createContactsInGroup(2, $this->_groupID);
@@ -260,7 +258,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
   }
 
-  public function concurrencyExamples() {
+  public function concurrencyExamples(): array {
     $es = [];
 
     // Launch 3 workers, but mailerJobsMax limits us to 1 worker.
@@ -489,7 +487,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testBatchActivityTargets($isBulk) {
+  public function testBatchActivityTargets($isBulk): void {
     $loggedInUserId = $this->createLoggedInUser();
 
     \Civi::settings()->set('mailerBatchLimit', 2);
