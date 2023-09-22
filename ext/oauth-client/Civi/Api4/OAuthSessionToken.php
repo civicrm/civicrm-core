@@ -25,12 +25,14 @@ class OAuthSessionToken extends Generic\AbstractEntity {
     $action = new Generic\BasicCreateAction(
       static::getEntityName(),
       __FUNCTION__,
-      function ($item, $createAction) {
+      function ($item) {
         $session = \CRM_Core_Session::singleton();
-        $all = $session->get('OAuthSessionTokens') ?? [];
-        $all[] = &$item;
-        $item['cardinal'] = array_key_last($all);
-        $session->set('OAuthSessionTokens', $all);
+        $allTokens = $session->get('OAuthSessionTokens') ?? [];
+        $cardinal = ($session->get('OAuthSessionTokenCount') ?? 0) + 1;
+        $item['cardinal'] = $cardinal;
+        $allTokens[$cardinal] = $item;
+        $session->set('OAuthSessionTokens', $allTokens);
+        $session->set('OAuthSessionTokenCount', $cardinal);
         return $item;
       });
     return $action->setCheckPermissions($checkPermissions);
@@ -69,8 +71,15 @@ class OAuthSessionToken extends Generic\AbstractEntity {
         [
           'name' => 'client_id',
           'required' => TRUE,
+          'data_type' => 'Integer',
+          'fk_entity' => 'OAuthClient',
         ],
-        ['name' => 'cardinal'],
+        [
+          'name' => 'cardinal',
+          'readonly' => TRUE,
+          'data_type' => 'Integer',
+          'description' => 'Order in which the token was created within the current session. Unique within the session.',
+        ],
         ['name' => 'grant_type'],
         ['name' => 'tag'],
         ['name' => 'scopes'],
