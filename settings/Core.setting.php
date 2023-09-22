@@ -1201,8 +1201,8 @@ return [
     'description' => ts('How long should HTTP requests through Guzzle application run for in seconds'),
     'help_text' => ts('Set the number of seconds http requests should run for before terminating'),
   ],
-  'queue_suspended' => [
-    'name' => 'queue_suspended',
+  'queue_paused' => [
+    'name' => 'queue_paused',
     'type' => 'Boolean',
     'default' => FALSE,
     'html_type' => 'yesno',

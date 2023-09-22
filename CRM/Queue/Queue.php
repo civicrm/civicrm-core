@@ -64,11 +64,11 @@ abstract class CRM_Queue_Queue {
     // Queues work with concurrent processes. We want to make sure status info is up-to-date (never cached).
     $status = CRM_Core_DAO::getFieldValue('CRM_Queue_DAO_Queue', $this->_name, 'status', 'name', TRUE);
     if ($status === 'active') {
-      $suspend = CRM_Core_DAO::singleValueQuery('SELECT value FROM civicrm_setting WHERE name = "queue_suspended" AND domain_id = %1', [
+      $suspend = CRM_Core_DAO::singleValueQuery('SELECT value FROM civicrm_setting WHERE name = "queue_paused" AND domain_id = %1', [
         1 => [CRM_Core_BAO_Domain::getDomain()->id, 'Positive'],
       ]);
       if (!empty(CRM_Utils_String::unserialize($suspend))) {
-        $status = 'deferred';
+        $status = 'paused';
       }
     }
     $event = GenericHookEvent::create([
