@@ -62,7 +62,7 @@ abstract class CRM_Queue_Queue {
    */
   public function isActive(): bool {
     $status = CRM_Core_DAO::getFieldValue('CRM_Queue_DAO_Queue', $this->_name, 'status', 'name', TRUE);
-    if ($status === 'active' && \Civi::settings()->get('is_queue_processing_disabled')) {
+    if ($status === 'active' && \Civi::settings()->get('queue_suspended')) {
       $status = 'deferred';
     }
     $event = GenericHookEvent::create([

@@ -1201,13 +1201,13 @@ return [
     'description' => ts('How long should HTTP requests through Guzzle application run for in seconds'),
     'help_text' => ts('Set the number of seconds http requests should run for before terminating'),
   ],
-  'is_queue_processing_disabled' => [
-    'name' => 'is_queue_processing_disabled',
+  'queue_suspended' => [
+    'name' => 'queue_suspended',
     'type' => 'Boolean',
     'default' => FALSE,
     'html_type' => 'yesno',
     'add' => '5.67',
-    'title' => ts('Is background queue processing disabled?'),
+    'title' => ts('Is background queue temporarily disabled?'),
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('If enabled, CiviCRM will not process background queues.'),
