@@ -179,25 +179,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_online;
 
   /**
-   * Store id of role custom data type ( option value )
-   *
-   * @var int
-   */
-  protected $_roleCustomDataTypeID;
-
-  /**
-   * Store id of event Name custom data type ( option value)
-   *
-   * @var int
-   */
-  protected $_eventNameCustomDataTypeID;
-
-  /**
    * Selected discount id.
    *
    * @var int
    */
-  public $_originalDiscountId = NULL;
+  public $_originalDiscountId;
 
   /**
    * Event id.
@@ -219,7 +205,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @var null
    * @todo add explanatory note about this
    */
-  public $_onlinePendingContributionId = NULL;
+  public $_onlinePendingContributionId;
 
   /**
    * Stored participant record.
@@ -380,14 +366,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       //       not sure if that ever really happens
       if (!empty($_POST['role_id'])) {
         foreach ($_POST['role_id'] as $roleID) {
-          CRM_Custom_Form_CustomData::preProcess($this, $this->_roleCustomDataTypeID, $roleID, 1, 'Participant', $this->_id);
+          CRM_Custom_Form_CustomData::preProcess($this, $this->getExtendsEntityColumnID('ParticipantRole'), $roleID, 1, 'Participant', $this->_id);
           CRM_Custom_Form_CustomData::buildQuickForm($this);
           CRM_Custom_Form_CustomData::setDefaultValues($this);
         }
       }
 
       //custom data of type participant event
-      CRM_Custom_Form_CustomData::preProcess($this, $this->_eventNameCustomDataTypeID, $eventId, 1, 'Participant', $this->_id);
+      CRM_Custom_Form_CustomData::preProcess($this, $this->getExtendsEntityColumnID('ParticipantEventType'), $eventId, 1, 'Participant', $this->_id);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
 
@@ -396,7 +382,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if ($eventId) {
         $eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'event_type_id', 'id');
       }
-      CRM_Custom_Form_CustomData::preProcess($this, $this->_eventTypeCustomDataTypeID, $eventTypeId,
+      CRM_Custom_Form_CustomData::preProcess($this, $this->getExtendsEntityColumnID('ParticipantEventType'), $eventTypeId,
         1, 'Participant', $this->_id
       );
       CRM_Custom_Form_CustomData::buildQuickForm($this);
@@ -1337,13 +1323,26 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * no longer call it.
    */
   public function setCustomDataTypes(): void {
-    $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
-    $this->_roleCustomDataTypeID = array_search('ParticipantRole', $customDataType);
-    $this->_eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
-    $this->_eventTypeCustomDataTypeID = array_search('ParticipantEventType', $customDataType);
-    $this->assign('roleCustomDataTypeID', $this->_roleCustomDataTypeID);
-    $this->assign('eventNameCustomDataTypeID', $this->_eventNameCustomDataTypeID);
-    $this->assign('eventTypeCustomDataTypeID', $this->_eventTypeCustomDataTypeID);
+    $this->assign('roleCustomDataTypeID', $this->getExtendsEntityColumnID('ParticipantRole'));
+    $this->assign('eventNameCustomDataTypeID', $this->getExtendsEntityColumnID('ParticipantEventName'));
+    $this->assign('eventTypeCustomDataTypeID', $this->getExtendsEntityColumnID('ParticipantEventType'));
+  }
+
+  /**
+   * Get the relevant mapping for civicrm_custom_group.extends_entity_column_value.
+   *
+   * @param string $type
+   *
+   * @return int|null
+   */
+  private function getExtendsEntityColumnID(string $type): ?int {
+    foreach (CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions() as $item) {
+      if ($item['name'] === $type) {
+        return (int) $item['id'];
+      }
+    }
+    // Should not be reachable but maybe people disable them?
+    return NULL;
   }
 
   /**
@@ -1661,9 +1660,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param $participantRoles
    * @param $receiptText
    *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
-  protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText) {
+  protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText): void {
     //use of the message template below requires variables in different format
     $events = [];
     $returnProperties = ['event_type_id', 'fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
@@ -1994,6 +1993,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *   Do fetch from line items.
    *
    * @return array
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function getFeeDetails($participantIds, $hasLineItems = FALSE) {
     $feeDetails = [];
